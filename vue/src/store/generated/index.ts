@@ -20,6 +20,10 @@ import CosmosIbcGoIbcCoreChannelV1 from './cosmos/ibc-go/ibc.core.channel.v1'
 import CosmosIbcGoIbcCoreClientV1 from './cosmos/ibc-go/ibc.core.client.v1'
 import CosmosIbcGoIbcCoreConnectionV1 from './cosmos/ibc-go/ibc.core.connection.v1'
 import CosmosIbcGoIbcCorePortV1 from './cosmos/ibc-go/ibc.core.port.v1'
+import TrevormilBitbadgeschainTrevormilBitbadgeschainBadges from './trevormil/bitbadgeschain/trevormil.bitbadgeschain.badges'
+import TrevormilBitbadgeschainTrevormilBitbadgeschainCollections from './trevormil/bitbadgeschain/trevormil.bitbadgeschain.collections'
+import TrevormilBitbadgeschainTrevormilBitbadgeschainEducation from './trevormil/bitbadgeschain/trevormil.bitbadgeschain.education'
+import TrevormilBitbadgeschainTrevormilBitbadgeschainSocial from './trevormil/bitbadgeschain/trevormil.bitbadgeschain.social'
 
 
 export default { 
@@ -43,6 +47,10 @@ export default {
   CosmosIbcGoIbcCoreClientV1: load(CosmosIbcGoIbcCoreClientV1, 'ibc.core.client.v1'),
   CosmosIbcGoIbcCoreConnectionV1: load(CosmosIbcGoIbcCoreConnectionV1, 'ibc.core.connection.v1'),
   CosmosIbcGoIbcCorePortV1: load(CosmosIbcGoIbcCorePortV1, 'ibc.core.port.v1'),
+  TrevormilBitbadgeschainTrevormilBitbadgeschainBadges: load(TrevormilBitbadgeschainTrevormilBitbadgeschainBadges, 'trevormil.bitbadgeschain.badges'),
+  TrevormilBitbadgeschainTrevormilBitbadgeschainCollections: load(TrevormilBitbadgeschainTrevormilBitbadgeschainCollections, 'trevormil.bitbadgeschain.collections'),
+  TrevormilBitbadgeschainTrevormilBitbadgeschainEducation: load(TrevormilBitbadgeschainTrevormilBitbadgeschainEducation, 'trevormil.bitbadgeschain.education'),
+  TrevormilBitbadgeschainTrevormilBitbadgeschainSocial: load(TrevormilBitbadgeschainTrevormilBitbadgeschainSocial, 'trevormil.bitbadgeschain.social'),
   
 }
 

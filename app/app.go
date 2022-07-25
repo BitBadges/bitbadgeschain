@@ -99,6 +99,18 @@ import (
 	monitoringptypes "github.com/tendermint/spn/x/monitoringp/types"
 
 	"github.com/trevormil/bitbadgeschain/docs"
+	badgesmodule "github.com/trevormil/bitbadgeschain/x/badges"
+	badgesmodulekeeper "github.com/trevormil/bitbadgeschain/x/badges/keeper"
+	badgesmoduletypes "github.com/trevormil/bitbadgeschain/x/badges/types"
+	collectionsmodule "github.com/trevormil/bitbadgeschain/x/collections"
+	collectionsmodulekeeper "github.com/trevormil/bitbadgeschain/x/collections/keeper"
+	collectionsmoduletypes "github.com/trevormil/bitbadgeschain/x/collections/types"
+	educationmodule "github.com/trevormil/bitbadgeschain/x/education"
+	educationmodulekeeper "github.com/trevormil/bitbadgeschain/x/education/keeper"
+	educationmoduletypes "github.com/trevormil/bitbadgeschain/x/education/types"
+	socialmodule "github.com/trevormil/bitbadgeschain/x/social"
+	socialmodulekeeper "github.com/trevormil/bitbadgeschain/x/social/keeper"
+	socialmoduletypes "github.com/trevormil/bitbadgeschain/x/social/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -153,6 +165,10 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		monitoringp.AppModuleBasic{},
+		badgesmodule.AppModuleBasic{},
+		collectionsmodule.AppModuleBasic{},
+		socialmodule.AppModuleBasic{},
+		educationmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -225,6 +241,14 @@ type App struct {
 	ScopedTransferKeeper   capabilitykeeper.ScopedKeeper
 	ScopedMonitoringKeeper capabilitykeeper.ScopedKeeper
 
+	ScopedBadgesKeeper      capabilitykeeper.ScopedKeeper
+	BadgesKeeper            badgesmodulekeeper.Keeper
+	ScopedCollectionsKeeper capabilitykeeper.ScopedKeeper
+	CollectionsKeeper       collectionsmodulekeeper.Keeper
+	ScopedSocialKeeper      capabilitykeeper.ScopedKeeper
+	SocialKeeper            socialmodulekeeper.Keeper
+	ScopedEducationKeeper   capabilitykeeper.ScopedKeeper
+	EducationKeeper         educationmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -261,6 +285,10 @@ func New(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey, monitoringptypes.StoreKey,
+		badgesmoduletypes.StoreKey,
+		collectionsmoduletypes.StoreKey,
+		socialmoduletypes.StoreKey,
+		educationmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -382,12 +410,72 @@ func New(
 	)
 	monitoringModule := monitoringp.NewAppModule(appCodec, app.MonitoringKeeper)
 
+	scopedBadgesKeeper := app.CapabilityKeeper.ScopeToModule(badgesmoduletypes.ModuleName)
+	app.ScopedBadgesKeeper = scopedBadgesKeeper
+	app.BadgesKeeper = *badgesmodulekeeper.NewKeeper(
+		appCodec,
+		keys[badgesmoduletypes.StoreKey],
+		keys[badgesmoduletypes.MemStoreKey],
+		app.GetSubspace(badgesmoduletypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedBadgesKeeper,
+		app.AccountKeeper,
+	)
+	badgesModule := badgesmodule.NewAppModule(appCodec, app.BadgesKeeper, app.AccountKeeper, app.BankKeeper)
+
+	scopedCollectionsKeeper := app.CapabilityKeeper.ScopeToModule(collectionsmoduletypes.ModuleName)
+	app.ScopedCollectionsKeeper = scopedCollectionsKeeper
+	app.CollectionsKeeper = *collectionsmodulekeeper.NewKeeper(
+		appCodec,
+		keys[collectionsmoduletypes.StoreKey],
+		keys[collectionsmoduletypes.MemStoreKey],
+		app.GetSubspace(collectionsmoduletypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedCollectionsKeeper,
+		app.AccountKeeper,
+	)
+	collectionsModule := collectionsmodule.NewAppModule(appCodec, app.CollectionsKeeper, app.AccountKeeper, app.BankKeeper)
+
+	scopedSocialKeeper := app.CapabilityKeeper.ScopeToModule(socialmoduletypes.ModuleName)
+	app.ScopedSocialKeeper = scopedSocialKeeper
+	app.SocialKeeper = *socialmodulekeeper.NewKeeper(
+		appCodec,
+		keys[socialmoduletypes.StoreKey],
+		keys[socialmoduletypes.MemStoreKey],
+		app.GetSubspace(socialmoduletypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedSocialKeeper,
+		app.AccountKeeper,
+	)
+	socialModule := socialmodule.NewAppModule(appCodec, app.SocialKeeper, app.AccountKeeper, app.BankKeeper)
+
+	scopedEducationKeeper := app.CapabilityKeeper.ScopeToModule(educationmoduletypes.ModuleName)
+	app.ScopedEducationKeeper = scopedEducationKeeper
+	app.EducationKeeper = *educationmodulekeeper.NewKeeper(
+		appCodec,
+		keys[educationmoduletypes.StoreKey],
+		keys[educationmoduletypes.MemStoreKey],
+		app.GetSubspace(educationmoduletypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedEducationKeeper,
+		app.AccountKeeper,
+	)
+	educationModule := educationmodule.NewAppModule(appCodec, app.EducationKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
 	ibcRouter.AddRoute(monitoringptypes.ModuleName, monitoringModule)
+	ibcRouter.AddRoute(badgesmoduletypes.ModuleName, badgesModule)
+	ibcRouter.AddRoute(collectionsmoduletypes.ModuleName, collectionsModule)
+	ibcRouter.AddRoute(socialmoduletypes.ModuleName, socialModule)
+	ibcRouter.AddRoute(educationmoduletypes.ModuleName, educationModule)
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -423,6 +511,10 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		monitoringModule,
+		badgesModule,
+		collectionsModule,
+		socialModule,
+		educationModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -450,6 +542,10 @@ func New(
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		monitoringptypes.ModuleName,
+		badgesmoduletypes.ModuleName,
+		collectionsmoduletypes.ModuleName,
+		socialmoduletypes.ModuleName,
+		educationmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -473,6 +569,10 @@ func New(
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
 		monitoringptypes.ModuleName,
+		badgesmoduletypes.ModuleName,
+		collectionsmoduletypes.ModuleName,
+		socialmoduletypes.ModuleName,
+		educationmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -501,6 +601,10 @@ func New(
 		ibctransfertypes.ModuleName,
 		feegrant.ModuleName,
 		monitoringptypes.ModuleName,
+		badgesmoduletypes.ModuleName,
+		collectionsmoduletypes.ModuleName,
+		socialmoduletypes.ModuleName,
+		educationmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -525,6 +629,10 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		monitoringModule,
+		badgesModule,
+		collectionsModule,
+		socialModule,
+		educationModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()
@@ -714,6 +822,10 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(monitoringptypes.ModuleName)
+	paramsKeeper.Subspace(badgesmoduletypes.ModuleName)
+	paramsKeeper.Subspace(collectionsmoduletypes.ModuleName)
+	paramsKeeper.Subspace(socialmoduletypes.ModuleName)
+	paramsKeeper.Subspace(educationmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
