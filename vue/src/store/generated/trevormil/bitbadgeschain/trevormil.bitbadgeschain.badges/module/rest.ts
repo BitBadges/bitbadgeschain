@@ -225,7 +225,7 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title badges/genesis.proto
+ * @title badges/class.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
