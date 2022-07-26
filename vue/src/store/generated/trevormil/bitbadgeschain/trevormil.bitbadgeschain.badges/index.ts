@@ -1,12 +1,15 @@
 import { txClient, queryClient, MissingWalletError , registry} from './module'
 
-import { Class } from "./module/types/badges/class"
+import { BitBadge } from "./module/types/badges/badges"
+import { AddressOwnershipInfo } from "./module/types/badges/genesis"
+import { BadgeOwnershipInfo } from "./module/types/badges/genesis"
+import { PendingTransfers } from "./module/types/badges/genesis"
 import { BadgesPacketData } from "./module/types/badges/packet"
 import { NoData } from "./module/types/badges/packet"
 import { Params } from "./module/types/badges/params"
 
 
-export { Class, BadgesPacketData, NoData, Params };
+export { BitBadge, AddressOwnershipInfo, BadgeOwnershipInfo, PendingTransfers, BadgesPacketData, NoData, Params };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -47,7 +50,10 @@ const getDefaultState = () => {
 				Params: {},
 				
 				_Structure: {
-						Class: getStructure(Class.fromPartial({})),
+						BitBadge: getStructure(BitBadge.fromPartial({})),
+						AddressOwnershipInfo: getStructure(AddressOwnershipInfo.fromPartial({})),
+						BadgeOwnershipInfo: getStructure(BadgeOwnershipInfo.fromPartial({})),
+						PendingTransfers: getStructure(PendingTransfers.fromPartial({})),
 						BadgesPacketData: getStructure(BadgesPacketData.fromPartial({})),
 						NoData: getStructure(NoData.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),

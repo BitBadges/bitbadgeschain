@@ -5,44 +5,49 @@ import "google/protobuf/any.proto";
 
 option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
-// Class defines the class of the nft type.
-message Class {
-    // id defines the unique identifier of the NFT classification, similar to the contract address of ERC721
+// BitBadge defines a badge type. Think of this like the smart contract definition
+message BitBadge {
+    // id defines the unique identifier of the Badge classification, similar to the contract address of ERC721
+    //TODO: set max length
     string id = 1;
   
-    // name defines the human-readable name of the NFT classification. Optional
-    string name = 2;
-  
-    // symbol is an abbreviated name for nft classification. Optional
-    string symbol = 3;
-  
-    // description is a brief description of nft classification. Optional
-    string description = 4;
-  
-    // uri for the class metadata stored off chain. It can define schema for Class and NFT `Data` attributes. Optional
-    string uri = 5;
-  
-    // uri_hash is a hash of the document pointed by uri. Optional
-    string uri_hash = 6;
-  
-    // data is the app specific metadata of the NFT class. Optional
-    google.protobuf.Any data = 7;
-}
+    // uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc)
+    //TODO: set max length
+    string uri = 2;
 
-// NFT defines the NFT.
-message NFT {
-    // class_id associated with the NFT, similar to the contract address of ERC721
-    string class_id = 1;
-  
-    // id is a unique identifier of the NFT
-    string id = 2;
-  
-    // uri for the NFT metadata stored off chain
-    string uri = 3;
-  
-    // uri_hash is a hash of the document pointed by uri
-    string uri_hash = 4;
-  
-    // data is an app specific data of the NFT. Optional
-    google.protobuf.Any data = 10;
-  }
+    // inital creator address of the class
+    string creator = 3;
+    
+    // manager addressof the class; defaults to creator if not specified; can have special permissions; is used as the reserve address
+    string manager = 4;
+    
+    /*
+        Flag bits are in the following order from left to right; leading zeroes are applied and any future additions will be appended to the right
+
+        can_update_uris: can the manager update the uris of the class and subassets; if false, locked forever
+        forceful_transfers: if true, one can send a badge to an account without pending approval; these badges should not by default be displayed on public profiles (can also use collections)
+        can_create: when true, manager can create more subassets of the class; once set to false, it is locked
+        can_revoke: when true, manager can revoke subassets of the class (including null address); once set to false, it is locked
+        can_freeze: when true, manager can freeze addresseses from transferring; once set to false, it is locked
+        frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
+    */
+    uint32 permission_flags = 5;
+    
+
+    // if frozen_by_default is true, this is a list of unfrozen addresses; and vice versa for false
+    //TODO: make this a fixed length set efficient accumulator (no need to store a list of all addresses; just lookup membership)
+    string frozen_or_unfrozen_addresses_digest = 10;
+
+    // uri for the subassets metadata stored off chain; include {id} in the string, it will be replaced with the subasset id
+    // if not specified, uses a default Class (ID # 1) like metadata
+    //TODO: set max length
+    string subasset_uri_format = 11;
+
+    // starts at 0; each subasset created will incrementally have an increasing ID #
+    uint32 next_subasset_id = 12;
+
+    //subasset id => total supply map; only store if not 1 (default)
+    map<uint64, uint64> subassets_total_supply = 13;
+    
+    //TODO: maybe do something to more efficiently query owners of a badge?
+}

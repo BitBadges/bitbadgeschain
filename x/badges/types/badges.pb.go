@@ -5,7 +5,7 @@ package types
 
 import (
 	fmt "fmt"
-	types "github.com/cosmos/cosmos-sdk/codec/types"
+	_ "github.com/cosmos/cosmos-sdk/codec/types"
 	proto "github.com/gogo/protobuf/proto"
 	io "io"
 	math "math"
@@ -23,36 +23,52 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// Class defines the class of the nft type.
-type Class struct {
-	// id defines the unique identifier of the NFT classification, similar to the contract address of ERC721
+// BitBadge defines a badge type. Think of this like the smart contract definition
+type BitBadge struct {
+	// id defines the unique identifier of the Badge classification, similar to the contract address of ERC721
+	//TODO: set max length
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// name defines the human-readable name of the NFT classification. Optional
-	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// symbol is an abbreviated name for nft classification. Optional
-	Symbol string `protobuf:"bytes,3,opt,name=symbol,proto3" json:"symbol,omitempty"`
-	// description is a brief description of nft classification. Optional
-	Description string `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	// uri for the class metadata stored off chain. It can define schema for Class and NFT `Data` attributes. Optional
-	Uri string `protobuf:"bytes,5,opt,name=uri,proto3" json:"uri,omitempty"`
-	// uri_hash is a hash of the document pointed by uri. Optional
-	UriHash string `protobuf:"bytes,6,opt,name=uri_hash,json=uriHash,proto3" json:"uri_hash,omitempty"`
-	// data is the app specific metadata of the NFT class. Optional
-	Data *types.Any `protobuf:"bytes,7,opt,name=data,proto3" json:"data,omitempty"`
+	// uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc)
+	//TODO: set max length
+	Uri string `protobuf:"bytes,2,opt,name=uri,proto3" json:"uri,omitempty"`
+	// inital creator address of the class
+	Creator string `protobuf:"bytes,3,opt,name=creator,proto3" json:"creator,omitempty"`
+	// manager addressof the class; defaults to creator if not specified; can have special permissions; is used as the reserve address
+	Manager string `protobuf:"bytes,4,opt,name=manager,proto3" json:"manager,omitempty"`
+	//
+	//Flag bits are in the following order from left to right; leading zeroes are applied and any future additions will be appended to the right
+	//
+	//forceful_transfers: if true, one can send a badge to an account without pending approval; these badges should not by default be displayed on public profiles (can also use collections)
+	//can_create: when true, manager can create more subassets of the class; once set to false, it is locked
+	//can_revoke: when true, manager can revoke subassets of the class (including null address); once set to false, it is locked
+	//can_freeze: when true, manager can freeze addresseses from transferring; once set to false, it is locked
+	//frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
+	PermissionFlags uint32 `protobuf:"varint,5,opt,name=permission_flags,json=permissionFlags,proto3" json:"permission_flags,omitempty"`
+	// if frozen_by_default is true, this is a list of unfrozen addresses; and vice versa for false
+	//TODO: make this a fixed length set efficient accumulator (no need to store a list of all addresses; just lookup membership)
+	FrozenOrUnfrozenAddressesDigest string `protobuf:"bytes,10,opt,name=frozen_or_unfrozen_addresses_digest,json=frozenOrUnfrozenAddressesDigest,proto3" json:"frozen_or_unfrozen_addresses_digest,omitempty"`
+	// uri for the subassets metadata stored off chain; include {id} in the string, it will be replaced with the subasset id
+	// if not specified, uses a default Class (ID # 1) like metadata
+	//TODO: set max length
+	SubassetUriFormat string `protobuf:"bytes,11,opt,name=subasset_uri_format,json=subassetUriFormat,proto3" json:"subasset_uri_format,omitempty"`
+	// starts at 0; each subasset created will incrementally have an increasing ID #
+	NextSubassetId uint32 `protobuf:"varint,12,opt,name=next_subasset_id,json=nextSubassetId,proto3" json:"next_subasset_id,omitempty"`
+	//subasset id => total supply map; only store if not 1 (default)
+	SubassetsTotalSupply map[uint64]uint64 `protobuf:"bytes,13,rep,name=subassets_total_supply,json=subassetsTotalSupply,proto3" json:"subassets_total_supply,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
 }
 
-func (m *Class) Reset()         { *m = Class{} }
-func (m *Class) String() string { return proto.CompactTextString(m) }
-func (*Class) ProtoMessage()    {}
-func (*Class) Descriptor() ([]byte, []int) {
+func (m *BitBadge) Reset()         { *m = BitBadge{} }
+func (m *BitBadge) String() string { return proto.CompactTextString(m) }
+func (*BitBadge) ProtoMessage()    {}
+func (*BitBadge) Descriptor() ([]byte, []int) {
 	return fileDescriptor_71eab594b779f631, []int{0}
 }
-func (m *Class) XXX_Unmarshal(b []byte) error {
+func (m *BitBadge) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *Class) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *BitBadge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_Class.Marshal(b, m, deterministic)
+		return xxx_messageInfo_BitBadge.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -62,182 +78,120 @@ func (m *Class) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *Class) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Class.Merge(m, src)
+func (m *BitBadge) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BitBadge.Merge(m, src)
 }
-func (m *Class) XXX_Size() int {
+func (m *BitBadge) XXX_Size() int {
 	return m.Size()
 }
-func (m *Class) XXX_DiscardUnknown() {
-	xxx_messageInfo_Class.DiscardUnknown(m)
+func (m *BitBadge) XXX_DiscardUnknown() {
+	xxx_messageInfo_BitBadge.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Class proto.InternalMessageInfo
+var xxx_messageInfo_BitBadge proto.InternalMessageInfo
 
-func (m *Class) GetId() string {
+func (m *BitBadge) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *Class) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *Class) GetSymbol() string {
-	if m != nil {
-		return m.Symbol
-	}
-	return ""
-}
-
-func (m *Class) GetDescription() string {
-	if m != nil {
-		return m.Description
-	}
-	return ""
-}
-
-func (m *Class) GetUri() string {
+func (m *BitBadge) GetUri() string {
 	if m != nil {
 		return m.Uri
 	}
 	return ""
 }
 
-func (m *Class) GetUriHash() string {
+func (m *BitBadge) GetCreator() string {
 	if m != nil {
-		return m.UriHash
+		return m.Creator
 	}
 	return ""
 }
 
-func (m *Class) GetData() *types.Any {
+func (m *BitBadge) GetManager() string {
 	if m != nil {
-		return m.Data
-	}
-	return nil
-}
-
-// NFT defines the NFT.
-type NFT struct {
-	// class_id associated with the NFT, similar to the contract address of ERC721
-	ClassId string `protobuf:"bytes,1,opt,name=class_id,json=classId,proto3" json:"class_id,omitempty"`
-	// id is a unique identifier of the NFT
-	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	// uri for the NFT metadata stored off chain
-	Uri string `protobuf:"bytes,3,opt,name=uri,proto3" json:"uri,omitempty"`
-	// uri_hash is a hash of the document pointed by uri
-	UriHash string `protobuf:"bytes,4,opt,name=uri_hash,json=uriHash,proto3" json:"uri_hash,omitempty"`
-	// data is an app specific data of the NFT. Optional
-	Data *types.Any `protobuf:"bytes,10,opt,name=data,proto3" json:"data,omitempty"`
-}
-
-func (m *NFT) Reset()         { *m = NFT{} }
-func (m *NFT) String() string { return proto.CompactTextString(m) }
-func (*NFT) ProtoMessage()    {}
-func (*NFT) Descriptor() ([]byte, []int) {
-	return fileDescriptor_71eab594b779f631, []int{1}
-}
-func (m *NFT) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *NFT) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_NFT.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *NFT) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_NFT.Merge(m, src)
-}
-func (m *NFT) XXX_Size() int {
-	return m.Size()
-}
-func (m *NFT) XXX_DiscardUnknown() {
-	xxx_messageInfo_NFT.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_NFT proto.InternalMessageInfo
-
-func (m *NFT) GetClassId() string {
-	if m != nil {
-		return m.ClassId
+		return m.Manager
 	}
 	return ""
 }
 
-func (m *NFT) GetId() string {
+func (m *BitBadge) GetPermissionFlags() uint32 {
 	if m != nil {
-		return m.Id
+		return m.PermissionFlags
+	}
+	return 0
+}
+
+func (m *BitBadge) GetFrozenOrUnfrozenAddressesDigest() string {
+	if m != nil {
+		return m.FrozenOrUnfrozenAddressesDigest
 	}
 	return ""
 }
 
-func (m *NFT) GetUri() string {
+func (m *BitBadge) GetSubassetUriFormat() string {
 	if m != nil {
-		return m.Uri
+		return m.SubassetUriFormat
 	}
 	return ""
 }
 
-func (m *NFT) GetUriHash() string {
+func (m *BitBadge) GetNextSubassetId() uint32 {
 	if m != nil {
-		return m.UriHash
+		return m.NextSubassetId
 	}
-	return ""
+	return 0
 }
 
-func (m *NFT) GetData() *types.Any {
+func (m *BitBadge) GetSubassetsTotalSupply() map[uint64]uint64 {
 	if m != nil {
-		return m.Data
+		return m.SubassetsTotalSupply
 	}
 	return nil
 }
 
 func init() {
-	proto.RegisterType((*Class)(nil), "trevormil.bitbadgeschain.badges.Class")
-	proto.RegisterType((*NFT)(nil), "trevormil.bitbadgeschain.badges.NFT")
+	proto.RegisterType((*BitBadge)(nil), "trevormil.bitbadgeschain.badges.BitBadge")
+	proto.RegisterMapType((map[uint64]uint64)(nil), "trevormil.bitbadgeschain.badges.BitBadge.SubassetsTotalSupplyEntry")
 }
 
 func init() { proto.RegisterFile("badges/badges.proto", fileDescriptor_71eab594b779f631) }
 
 var fileDescriptor_71eab594b779f631 = []byte{
-	// 323 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x91, 0xc1, 0x4a, 0xc3, 0x30,
-	0x18, 0xc7, 0x97, 0xb6, 0xdb, 0x34, 0x03, 0x91, 0x28, 0x92, 0x79, 0xa8, 0x63, 0xa7, 0x9d, 0x12,
-	0x98, 0x4f, 0xa0, 0x82, 0x28, 0x88, 0x87, 0xe1, 0xc9, 0xcb, 0x48, 0x9a, 0xd8, 0x06, 0xda, 0x66,
-	0x24, 0xa9, 0xd8, 0x27, 0xf0, 0xea, 0x03, 0xf9, 0x00, 0x1e, 0x77, 0xf4, 0x28, 0xdb, 0x8b, 0xc8,
-	0xd2, 0x3a, 0x14, 0x06, 0x9e, 0xf2, 0x7d, 0xff, 0xef, 0x4b, 0xf2, 0xfb, 0xf3, 0x87, 0x47, 0x9c,
-	0x89, 0x54, 0x5a, 0xda, 0x1c, 0x64, 0x61, 0xb4, 0xd3, 0xe8, 0xcc, 0x19, 0xf9, 0xac, 0x4d, 0xa1,
-	0x72, 0xc2, 0x95, 0x6b, 0x46, 0x49, 0xc6, 0x54, 0x49, 0x9a, 0xfa, 0x74, 0x98, 0x6a, 0x9d, 0xe6,
-	0x92, 0xfa, 0x75, 0x5e, 0x3d, 0x51, 0x56, 0xd6, 0xcd, 0xdd, 0xf1, 0x3b, 0x80, 0xdd, 0xab, 0x9c,
-	0x59, 0x8b, 0x0e, 0x60, 0xa0, 0x04, 0x06, 0x23, 0x30, 0xd9, 0x9f, 0x05, 0x4a, 0x20, 0x04, 0xa3,
-	0x92, 0x15, 0x12, 0x07, 0x5e, 0xf1, 0x35, 0x3a, 0x81, 0x3d, 0x5b, 0x17, 0x5c, 0xe7, 0x38, 0xf4,
-	0x6a, 0xdb, 0xa1, 0x11, 0x1c, 0x08, 0x69, 0x13, 0xa3, 0x16, 0x4e, 0xe9, 0x12, 0x47, 0x7e, 0xf8,
-	0x5b, 0x42, 0x87, 0x30, 0xac, 0x8c, 0xc2, 0x5d, 0x3f, 0xd9, 0x94, 0x68, 0x08, 0xf7, 0x2a, 0xa3,
-	0xe6, 0x19, 0xb3, 0x19, 0xee, 0x79, 0xb9, 0x5f, 0x19, 0x75, 0xc3, 0x6c, 0x86, 0x26, 0x30, 0x12,
-	0xcc, 0x31, 0xdc, 0x1f, 0x81, 0xc9, 0x60, 0x7a, 0x4c, 0x1a, 0x7c, 0xf2, 0x83, 0x4f, 0x2e, 0xca,
-	0x7a, 0xe6, 0x37, 0xc6, 0xaf, 0x00, 0x86, 0xf7, 0xd7, 0x0f, 0x9b, 0xc7, 0x92, 0x8d, 0x8b, 0xf9,
-	0xd6, 0x42, 0xdf, 0xf7, 0xb7, 0xa2, 0xf5, 0x15, 0x6c, 0x7d, 0xb5, 0x24, 0xe1, 0x6e, 0x92, 0x68,
-	0x37, 0x09, 0xfc, 0x8f, 0xe4, 0xf2, 0xee, 0x63, 0x15, 0x83, 0xe5, 0x2a, 0x06, 0x5f, 0xab, 0x18,
-	0xbc, 0xad, 0xe3, 0xce, 0x72, 0x1d, 0x77, 0x3e, 0xd7, 0x71, 0xe7, 0x71, 0x9a, 0x2a, 0x97, 0x55,
-	0x9c, 0x24, 0xba, 0xa0, 0xdb, 0xa4, 0xe8, 0xdf, 0xa4, 0xe8, 0x4b, 0x1b, 0x29, 0x75, 0xf5, 0x42,
-	0x5a, 0xde, 0xf3, 0x3f, 0x9c, 0x7f, 0x07, 0x00, 0x00, 0xff, 0xff, 0x9e, 0x2d, 0x85, 0x10, 0xf0,
-	0x01, 0x00, 0x00,
+	// 429 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x52, 0x3d, 0x6f, 0xd4, 0x30,
+	0x18, 0xbe, 0xdc, 0x5d, 0xf9, 0x70, 0x69, 0x39, 0xdc, 0x0a, 0xb9, 0x1d, 0xd2, 0x13, 0x2c, 0xc7,
+	0x92, 0x48, 0x65, 0x41, 0x6c, 0x1c, 0x50, 0x84, 0x54, 0x09, 0x29, 0xa5, 0x0b, 0x8b, 0xe5, 0x5c,
+	0x9c, 0xd4, 0x22, 0x89, 0xa3, 0xf7, 0xb5, 0xab, 0x86, 0x5f, 0xc1, 0xcf, 0x62, 0xec, 0xc8, 0x88,
+	0xee, 0x7e, 0x04, 0x2b, 0xb2, 0x93, 0x1c, 0x42, 0x02, 0x31, 0xe5, 0x79, 0x9f, 0x8f, 0x37, 0x71,
+	0x1e, 0x93, 0x83, 0x54, 0x64, 0x85, 0xc4, 0xb8, 0x7b, 0x44, 0x0d, 0x68, 0xa3, 0xe9, 0x89, 0x01,
+	0x79, 0xad, 0xa1, 0x52, 0x65, 0x94, 0x2a, 0xd3, 0x49, 0xab, 0x2b, 0xa1, 0xea, 0xa8, 0xc3, 0xc7,
+	0x47, 0x85, 0xd6, 0x45, 0x29, 0x63, 0x6f, 0x4f, 0x6d, 0x1e, 0x8b, 0xba, 0xed, 0xb2, 0x4f, 0x7e,
+	0x4e, 0xc8, 0xbd, 0xa5, 0x32, 0x4b, 0x67, 0xa4, 0xfb, 0x64, 0xac, 0x32, 0x16, 0xcc, 0x83, 0xc5,
+	0xfd, 0x64, 0xac, 0x32, 0x3a, 0x23, 0x13, 0x0b, 0x8a, 0x8d, 0x3d, 0xe1, 0x20, 0x65, 0xe4, 0xee,
+	0x0a, 0xa4, 0x30, 0x1a, 0xd8, 0xc4, 0xb3, 0xc3, 0xe8, 0x94, 0x4a, 0xd4, 0xa2, 0x90, 0xc0, 0xa6,
+	0x9d, 0xd2, 0x8f, 0xf4, 0x19, 0x99, 0x35, 0x12, 0x2a, 0x85, 0xa8, 0x74, 0xcd, 0xf3, 0x52, 0x14,
+	0xc8, 0x76, 0xe6, 0xc1, 0x62, 0x2f, 0x79, 0xf8, 0x9b, 0x3f, 0x73, 0x34, 0x3d, 0x27, 0x4f, 0x73,
+	0xd0, 0x5f, 0x64, 0xcd, 0x35, 0x70, 0x5b, 0xf7, 0x58, 0x64, 0x19, 0x48, 0x44, 0x89, 0x3c, 0x53,
+	0x85, 0x44, 0xc3, 0x88, 0x7f, 0xc1, 0x49, 0x27, 0x7f, 0x80, 0xcb, 0xde, 0xf8, 0x6a, 0xf0, 0xbd,
+	0xf1, 0x36, 0x1a, 0x91, 0x03, 0xb4, 0xa9, 0x40, 0x94, 0x86, 0x5b, 0x50, 0x3c, 0xd7, 0x50, 0x09,
+	0xc3, 0x76, 0x7d, 0xfa, 0xd1, 0x20, 0x5d, 0x82, 0x3a, 0xf3, 0x02, 0x5d, 0x90, 0x59, 0x2d, 0x6f,
+	0x0c, 0xdf, 0x86, 0x54, 0xc6, 0x1e, 0xf8, 0x0f, 0xdd, 0x77, 0xfc, 0x45, 0x4f, 0xbf, 0xcf, 0x68,
+	0x4b, 0x1e, 0x0f, 0x26, 0xe4, 0x46, 0x1b, 0x51, 0x72, 0xb4, 0x4d, 0x53, 0xb6, 0x6c, 0x6f, 0x3e,
+	0x59, 0xec, 0x9e, 0xbe, 0x8e, 0xfe, 0x53, 0x49, 0x34, 0xfc, 0xf3, 0x68, 0xd8, 0x8a, 0x1f, 0xdd,
+	0x9a, 0x0b, 0xbf, 0xe5, 0x6d, 0x6d, 0xa0, 0x4d, 0x0e, 0xf1, 0x2f, 0xd2, 0xf1, 0x3b, 0x72, 0xf4,
+	0xcf, 0x88, 0x2b, 0xec, 0xb3, 0x6c, 0x7d, 0x83, 0xd3, 0xc4, 0x41, 0x7a, 0x48, 0x76, 0xae, 0x45,
+	0x69, 0xa5, 0x2f, 0x71, 0x9a, 0x74, 0xc3, 0xcb, 0xf1, 0x8b, 0x60, 0x79, 0xfe, 0x6d, 0x1d, 0x06,
+	0xb7, 0xeb, 0x30, 0xf8, 0xb1, 0x0e, 0x83, 0xaf, 0x9b, 0x70, 0x74, 0xbb, 0x09, 0x47, 0xdf, 0x37,
+	0xe1, 0xe8, 0xd3, 0x69, 0xa1, 0xcc, 0x95, 0x4d, 0xa3, 0x95, 0xae, 0xe2, 0xed, 0x39, 0xe2, 0x3f,
+	0xcf, 0x11, 0xdf, 0xf4, 0x77, 0x30, 0x36, 0x6d, 0x23, 0x31, 0xbd, 0xe3, 0xaf, 0xd3, 0xf3, 0x5f,
+	0x01, 0x00, 0x00, 0xff, 0xff, 0xda, 0xb5, 0x68, 0xf6, 0xa1, 0x02, 0x00, 0x00,
 }
 
-func (m *Class) Marshal() (dAtA []byte, err error) {
+func (m *BitBadge) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -247,130 +201,80 @@ func (m *Class) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Class) MarshalTo(dAtA []byte) (int, error) {
+func (m *BitBadge) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *Class) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *BitBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Data != nil {
-		{
-			size, err := m.Data.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintBadges(dAtA, i, uint64(size))
+	if len(m.SubassetsTotalSupply) > 0 {
+		for k := range m.SubassetsTotalSupply {
+			v := m.SubassetsTotalSupply[k]
+			baseI := i
+			i = encodeVarintBadges(dAtA, i, uint64(v))
+			i--
+			dAtA[i] = 0x10
+			i = encodeVarintBadges(dAtA, i, uint64(k))
+			i--
+			dAtA[i] = 0x8
+			i = encodeVarintBadges(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x6a
 		}
+	}
+	if m.NextSubassetId != 0 {
+		i = encodeVarintBadges(dAtA, i, uint64(m.NextSubassetId))
 		i--
-		dAtA[i] = 0x3a
+		dAtA[i] = 0x60
 	}
-	if len(m.UriHash) > 0 {
-		i -= len(m.UriHash)
-		copy(dAtA[i:], m.UriHash)
-		i = encodeVarintBadges(dAtA, i, uint64(len(m.UriHash)))
+	if len(m.SubassetUriFormat) > 0 {
+		i -= len(m.SubassetUriFormat)
+		copy(dAtA[i:], m.SubassetUriFormat)
+		i = encodeVarintBadges(dAtA, i, uint64(len(m.SubassetUriFormat)))
 		i--
-		dAtA[i] = 0x32
+		dAtA[i] = 0x5a
 	}
-	if len(m.Uri) > 0 {
-		i -= len(m.Uri)
-		copy(dAtA[i:], m.Uri)
-		i = encodeVarintBadges(dAtA, i, uint64(len(m.Uri)))
-		i--
-		dAtA[i] = 0x2a
-	}
-	if len(m.Description) > 0 {
-		i -= len(m.Description)
-		copy(dAtA[i:], m.Description)
-		i = encodeVarintBadges(dAtA, i, uint64(len(m.Description)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.Symbol) > 0 {
-		i -= len(m.Symbol)
-		copy(dAtA[i:], m.Symbol)
-		i = encodeVarintBadges(dAtA, i, uint64(len(m.Symbol)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Name) > 0 {
-		i -= len(m.Name)
-		copy(dAtA[i:], m.Name)
-		i = encodeVarintBadges(dAtA, i, uint64(len(m.Name)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Id) > 0 {
-		i -= len(m.Id)
-		copy(dAtA[i:], m.Id)
-		i = encodeVarintBadges(dAtA, i, uint64(len(m.Id)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *NFT) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *NFT) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *NFT) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Data != nil {
-		{
-			size, err := m.Data.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintBadges(dAtA, i, uint64(size))
-		}
+	if len(m.FrozenOrUnfrozenAddressesDigest) > 0 {
+		i -= len(m.FrozenOrUnfrozenAddressesDigest)
+		copy(dAtA[i:], m.FrozenOrUnfrozenAddressesDigest)
+		i = encodeVarintBadges(dAtA, i, uint64(len(m.FrozenOrUnfrozenAddressesDigest)))
 		i--
 		dAtA[i] = 0x52
 	}
-	if len(m.UriHash) > 0 {
-		i -= len(m.UriHash)
-		copy(dAtA[i:], m.UriHash)
-		i = encodeVarintBadges(dAtA, i, uint64(len(m.UriHash)))
+	if m.PermissionFlags != 0 {
+		i = encodeVarintBadges(dAtA, i, uint64(m.PermissionFlags))
+		i--
+		dAtA[i] = 0x28
+	}
+	if len(m.Manager) > 0 {
+		i -= len(m.Manager)
+		copy(dAtA[i:], m.Manager)
+		i = encodeVarintBadges(dAtA, i, uint64(len(m.Manager)))
 		i--
 		dAtA[i] = 0x22
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintBadges(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if len(m.Uri) > 0 {
 		i -= len(m.Uri)
 		copy(dAtA[i:], m.Uri)
 		i = encodeVarintBadges(dAtA, i, uint64(len(m.Uri)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x12
 	}
 	if len(m.Id) > 0 {
 		i -= len(m.Id)
 		copy(dAtA[i:], m.Id)
 		i = encodeVarintBadges(dAtA, i, uint64(len(m.Id)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.ClassId) > 0 {
-		i -= len(m.ClassId)
-		copy(dAtA[i:], m.ClassId)
-		i = encodeVarintBadges(dAtA, i, uint64(len(m.ClassId)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -388,7 +292,7 @@ func encodeVarintBadges(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *Class) Size() (n int) {
+func (m *BitBadge) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -398,58 +302,39 @@ func (m *Class) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovBadges(uint64(l))
 	}
-	l = len(m.Name)
-	if l > 0 {
-		n += 1 + l + sovBadges(uint64(l))
-	}
-	l = len(m.Symbol)
-	if l > 0 {
-		n += 1 + l + sovBadges(uint64(l))
-	}
-	l = len(m.Description)
-	if l > 0 {
-		n += 1 + l + sovBadges(uint64(l))
-	}
 	l = len(m.Uri)
 	if l > 0 {
 		n += 1 + l + sovBadges(uint64(l))
 	}
-	l = len(m.UriHash)
+	l = len(m.Creator)
 	if l > 0 {
 		n += 1 + l + sovBadges(uint64(l))
 	}
-	if m.Data != nil {
-		l = m.Data.Size()
-		n += 1 + l + sovBadges(uint64(l))
-	}
-	return n
-}
-
-func (m *NFT) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.ClassId)
+	l = len(m.Manager)
 	if l > 0 {
 		n += 1 + l + sovBadges(uint64(l))
 	}
-	l = len(m.Id)
+	if m.PermissionFlags != 0 {
+		n += 1 + sovBadges(uint64(m.PermissionFlags))
+	}
+	l = len(m.FrozenOrUnfrozenAddressesDigest)
 	if l > 0 {
 		n += 1 + l + sovBadges(uint64(l))
 	}
-	l = len(m.Uri)
+	l = len(m.SubassetUriFormat)
 	if l > 0 {
 		n += 1 + l + sovBadges(uint64(l))
 	}
-	l = len(m.UriHash)
-	if l > 0 {
-		n += 1 + l + sovBadges(uint64(l))
+	if m.NextSubassetId != 0 {
+		n += 1 + sovBadges(uint64(m.NextSubassetId))
 	}
-	if m.Data != nil {
-		l = m.Data.Size()
-		n += 1 + l + sovBadges(uint64(l))
+	if len(m.SubassetsTotalSupply) > 0 {
+		for k, v := range m.SubassetsTotalSupply {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + sovBadges(uint64(k)) + 1 + sovBadges(uint64(v))
+			n += mapEntrySize + 1 + sovBadges(uint64(mapEntrySize))
+		}
 	}
 	return n
 }
@@ -460,7 +345,7 @@ func sovBadges(x uint64) (n int) {
 func sozBadges(x uint64) (n int) {
 	return sovBadges(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *Class) Unmarshal(dAtA []byte) error {
+func (m *BitBadge) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -483,10 +368,10 @@ func (m *Class) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Class: wiretype end group for non-group")
+			return fmt.Errorf("proto: BitBadge: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Class: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: BitBadge: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -523,7 +408,7 @@ func (m *Class) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -551,11 +436,11 @@ func (m *Class) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Name = string(dAtA[iNdEx:postIndex])
+			m.Uri = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Symbol", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -583,11 +468,11 @@ func (m *Class) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Symbol = string(dAtA[iNdEx:postIndex])
+			m.Creator = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Manager", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -615,13 +500,13 @@ func (m *Class) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Description = string(dAtA[iNdEx:postIndex])
+			m.Manager = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PermissionFlags", wireType)
 			}
-			var stringLen uint64
+			m.PermissionFlags = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowBadges
@@ -631,273 +516,97 @@ func (m *Class) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				m.PermissionFlags |= uint32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthBadges
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthBadges
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Uri = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UriHash", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowBadges
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthBadges
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthBadges
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.UriHash = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowBadges
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthBadges
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthBadges
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Data == nil {
-				m.Data = &types.Any{}
-			}
-			if err := m.Data.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipBadges(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthBadges
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *NFT) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowBadges
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: NFT: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: NFT: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClassId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowBadges
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthBadges
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthBadges
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ClassId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowBadges
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthBadges
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthBadges
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Id = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowBadges
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthBadges
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthBadges
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Uri = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UriHash", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowBadges
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthBadges
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthBadges
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.UriHash = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 10:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field FrozenOrUnfrozenAddressesDigest", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBadges
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthBadges
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthBadges
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FrozenOrUnfrozenAddressesDigest = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SubassetUriFormat", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBadges
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthBadges
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthBadges
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.SubassetUriFormat = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 12:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NextSubassetId", wireType)
+			}
+			m.NextSubassetId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBadges
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NextSubassetId |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 13:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SubassetsTotalSupply", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -924,12 +633,75 @@ func (m *NFT) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Data == nil {
-				m.Data = &types.Any{}
+			if m.SubassetsTotalSupply == nil {
+				m.SubassetsTotalSupply = make(map[uint64]uint64)
 			}
-			if err := m.Data.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			var mapkey uint64
+			var mapvalue uint64
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowBadges
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowBadges
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+				} else if fieldNum == 2 {
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowBadges
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapvalue |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipBadges(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if (skippy < 0) || (iNdEx+skippy) < 0 {
+						return ErrInvalidLengthBadges
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
 			}
+			m.SubassetsTotalSupply[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

@@ -3,6 +3,7 @@ package trevormil.bitbadgeschain.badges;
 
 import "gogoproto/gogo.proto";
 import "badges/params.proto";
+import "badges/badges.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
@@ -11,5 +12,29 @@ option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
   string port_id = 2;
+  map<string,BitBadge> badges = 3; //badge id => BitBadge object
+  map<string, AddressOwnershipInfo> addresses = 4; //address => AddressOwnershipInfo object
   // this line is used by starport scaffolding # genesis/proto/state
+}
+  
+// AddressOwnershipInfo stores all badge data relating to a specific address
+message AddressOwnershipInfo {
+    // badges is a map of badges owned by the owner: indexed by (badge id + subasset_id)
+    map<string, BadgeOwnershipInfo> badges_owned = 1; //(badge id + subasset_id) => BadgeOwnershipInfo
+}
+
+message BadgeOwnershipInfo {
+    uint64 balance = 1;
+    uint64 pending_nonce = 2;
+    map<string, PendingTransfers> pending = 3; //indexed by (from's pending_nonce - to's pending_nonce)
+    map<string, uint64> approvals = 4; //address => amount
+}
+
+//Pending transfers will not be saved after accept / reject
+message PendingTransfers {
+    uint64 amount = 1;
+    bool send_request = 2; //vs. receive request
+    string to = 3;
+    string from = 4;
+    string memo = 5;
 }
