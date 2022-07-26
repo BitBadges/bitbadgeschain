@@ -52087,6 +52087,13 @@ definitions:
     title: >-
       SignatureCounts contains information about signature reporting for a
       number of blocks
+  trevormil.bitbadgeschain.badges.MsgNewBadgeResponse:
+    type: object
+    properties:
+      id:
+        type: string
+      message:
+        type: string
   trevormil.bitbadgeschain.badges.Params:
     type: object
     description: Params defines the parameters for the module.

@@ -23,6 +23,7 @@ export interface BitBadge {
   /**
    * Flag bits are in the following order from left to right; leading zeroes are applied and any future additions will be appended to the right
    *
+   * can_update_uris: can the manager update the uris of the class and subassets; if false, locked forever
    * forceful_transfers: if true, one can send a badge to an account without pending approval; these badges should not by default be displayed on public profiles (can also use collections)
    * can_create: when true, manager can create more subassets of the class; once set to false, it is locked
    * can_revoke: when true, manager can revoke subassets of the class (including null address); once set to false, it is locked
@@ -33,6 +34,7 @@ export interface BitBadge {
   /**
    * if frozen_by_default is true, this is a list of unfrozen addresses; and vice versa for false
    * TODO: make this a fixed length set efficient accumulator (no need to store a list of all addresses; just lookup membership)
+   * TODO: set max length
    */
   frozen_or_unfrozen_addresses_digest: string;
   /**
@@ -78,7 +80,7 @@ export const BitBadge = {
       writer.uint32(34).string(message.manager);
     }
     if (message.permission_flags !== 0) {
-      writer.uint32(40).uint32(message.permission_flags);
+      writer.uint32(40).uint64(message.permission_flags);
     }
     if (message.frozen_or_unfrozen_addresses_digest !== "") {
       writer.uint32(82).string(message.frozen_or_unfrozen_addresses_digest);
@@ -119,7 +121,7 @@ export const BitBadge = {
           message.manager = reader.string();
           break;
         case 5:
-          message.permission_flags = reader.uint32();
+          message.permission_flags = longToNumber(reader.uint64() as Long);
           break;
         case 10:
           message.frozen_or_unfrozen_addresses_digest = reader.string();

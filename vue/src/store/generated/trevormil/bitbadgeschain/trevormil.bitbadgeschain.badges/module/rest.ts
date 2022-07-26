@@ -9,6 +9,11 @@
  * ---------------------------------------------------------------
  */
 
+export interface BadgesMsgNewBadgeResponse {
+  id?: string;
+  message?: string;
+}
+
 /**
  * Params defines the parameters for the module.
  */

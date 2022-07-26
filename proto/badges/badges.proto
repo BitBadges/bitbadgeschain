@@ -31,11 +31,12 @@ message BitBadge {
         can_freeze: when true, manager can freeze addresseses from transferring; once set to false, it is locked
         frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
     */
-    uint32 permission_flags = 5;
+    uint64 permission_flags = 5;
     
 
     // if frozen_by_default is true, this is a list of unfrozen addresses; and vice versa for false
     //TODO: make this a fixed length set efficient accumulator (no need to store a list of all addresses; just lookup membership)
+    //TODO: set max length
     string frozen_or_unfrozen_addresses_digest = 10;
 
     // uri for the subassets metadata stored off chain; include {id} in the string, it will be replaced with the subasset id
