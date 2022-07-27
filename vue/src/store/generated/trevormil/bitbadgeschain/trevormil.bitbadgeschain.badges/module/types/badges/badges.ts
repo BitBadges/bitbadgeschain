@@ -6,23 +6,28 @@ export const protobufPackage = "trevormil.bitbadgeschain.badges";
 
 /** BitBadge defines a badge type. Think of this like the smart contract definition */
 export interface BitBadge {
-  /** id defines the unique identifier of the Badge classification, similar to the contract address of ERC721 */
-  id: string;
+  /**
+   * id defines the unique identifier of the Badge classification, similar to the contract address of ERC721
+   * starts at 0 and increments by 1 each badge
+   */
+  id: number;
   /** uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc) */
   uri: string;
-  /** inital creator address of the class */
-  creator: string;
   /** manager addressof the class; can have special permissions; is used as the reserve address for the assets */
   manager: string;
   /**
    * Flag bits are in the following order from left to right; leading zeroes are applied and any future additions will be appended to the right
    *
+   * can_manager_transfer: can the manager transfer managerial privileges to another address
    * can_update_uris: can the manager update the uris of the class and subassets; if false, locked forever
    * forceful_transfers: if true, one can send a badge to an account without pending approval; these badges should not by default be displayed on public profiles (can also use collections)
    * can_create: when true, manager can create more subassets of the class; once set to false, it is locked
    * can_revoke: when true, manager can revoke subassets of the class (including null address); once set to false, it is locked
    * can_freeze: when true, manager can freeze addresseses from transferring; once set to false, it is locked
    * frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
+   * manager is not frozen by default
+   *
+   * More permissions to be added
    */
   permission_flags: number;
   /**
@@ -38,19 +43,19 @@ export interface BitBadge {
   subasset_uri_format: string;
   /** starts at 0; each subasset created will incrementally have an increasing ID # */
   next_subasset_id: number;
-  /** subasset id => total supply map; only store if not 1 (default) */
-  subassets_total_supply: { [key: number]: number };
+  /** only store if not 1 (default); will be sorted in order of subsasset ids; (maybe add defaut option in future) */
+  subassets_total_supply: Subasset[];
 }
 
-export interface BitBadge_SubassetsTotalSupplyEntry {
-  key: number;
-  value: number;
+/** Only will be created if supply >= 0 */
+export interface Subasset {
+  id: number;
+  supply: number;
 }
 
 const baseBitBadge: object = {
-  id: "",
+  id: 0,
   uri: "",
-  creator: "",
   manager: "",
   permission_flags: 0,
   frozen_or_unfrozen_addresses_digest: "",
@@ -60,14 +65,11 @@ const baseBitBadge: object = {
 
 export const BitBadge = {
   encode(message: BitBadge, writer: Writer = Writer.create()): Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
+    if (message.id !== 0) {
+      writer.uint32(8).uint64(message.id);
     }
     if (message.uri !== "") {
       writer.uint32(18).string(message.uri);
-    }
-    if (message.creator !== "") {
-      writer.uint32(26).string(message.creator);
     }
     if (message.manager !== "") {
       writer.uint32(34).string(message.manager);
@@ -84,12 +86,9 @@ export const BitBadge = {
     if (message.next_subasset_id !== 0) {
       writer.uint32(96).uint64(message.next_subasset_id);
     }
-    Object.entries(message.subassets_total_supply).forEach(([key, value]) => {
-      BitBadge_SubassetsTotalSupplyEntry.encode(
-        { key: key as any, value },
-        writer.uint32(106).fork()
-      ).ldelim();
-    });
+    for (const v of message.subassets_total_supply) {
+      Subasset.encode(v!, writer.uint32(106).fork()).ldelim();
+    }
     return writer;
   },
 
@@ -97,18 +96,15 @@ export const BitBadge = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseBitBadge } as BitBadge;
-    message.subassets_total_supply = {};
+    message.subassets_total_supply = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = reader.string();
+          message.id = longToNumber(reader.uint64() as Long);
           break;
         case 2:
           message.uri = reader.string();
-          break;
-        case 3:
-          message.creator = reader.string();
           break;
         case 4:
           message.manager = reader.string();
@@ -126,13 +122,9 @@ export const BitBadge = {
           message.next_subasset_id = longToNumber(reader.uint64() as Long);
           break;
         case 13:
-          const entry13 = BitBadge_SubassetsTotalSupplyEntry.decode(
-            reader,
-            reader.uint32()
+          message.subassets_total_supply.push(
+            Subasset.decode(reader, reader.uint32())
           );
-          if (entry13.value !== undefined) {
-            message.subassets_total_supply[entry13.key] = entry13.value;
-          }
           break;
         default:
           reader.skipType(tag & 7);
@@ -144,21 +136,16 @@ export const BitBadge = {
 
   fromJSON(object: any): BitBadge {
     const message = { ...baseBitBadge } as BitBadge;
-    message.subassets_total_supply = {};
+    message.subassets_total_supply = [];
     if (object.id !== undefined && object.id !== null) {
-      message.id = String(object.id);
+      message.id = Number(object.id);
     } else {
-      message.id = "";
+      message.id = 0;
     }
     if (object.uri !== undefined && object.uri !== null) {
       message.uri = String(object.uri);
     } else {
       message.uri = "";
-    }
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = String(object.creator);
-    } else {
-      message.creator = "";
     }
     if (object.manager !== undefined && object.manager !== null) {
       message.manager = String(object.manager);
@@ -203,9 +190,9 @@ export const BitBadge = {
       object.subassets_total_supply !== undefined &&
       object.subassets_total_supply !== null
     ) {
-      Object.entries(object.subassets_total_supply).forEach(([key, value]) => {
-        message.subassets_total_supply[Number(key)] = Number(value);
-      });
+      for (const e of object.subassets_total_supply) {
+        message.subassets_total_supply.push(Subasset.fromJSON(e));
+      }
     }
     return message;
   },
@@ -214,7 +201,6 @@ export const BitBadge = {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
     message.uri !== undefined && (obj.uri = message.uri);
-    message.creator !== undefined && (obj.creator = message.creator);
     message.manager !== undefined && (obj.manager = message.manager);
     message.permission_flags !== undefined &&
       (obj.permission_flags = message.permission_flags);
@@ -225,32 +211,28 @@ export const BitBadge = {
       (obj.subasset_uri_format = message.subasset_uri_format);
     message.next_subasset_id !== undefined &&
       (obj.next_subasset_id = message.next_subasset_id);
-    obj.subassets_total_supply = {};
     if (message.subassets_total_supply) {
-      Object.entries(message.subassets_total_supply).forEach(([k, v]) => {
-        obj.subassets_total_supply[k] = v;
-      });
+      obj.subassets_total_supply = message.subassets_total_supply.map((e) =>
+        e ? Subasset.toJSON(e) : undefined
+      );
+    } else {
+      obj.subassets_total_supply = [];
     }
     return obj;
   },
 
   fromPartial(object: DeepPartial<BitBadge>): BitBadge {
     const message = { ...baseBitBadge } as BitBadge;
-    message.subassets_total_supply = {};
+    message.subassets_total_supply = [];
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
     } else {
-      message.id = "";
+      message.id = 0;
     }
     if (object.uri !== undefined && object.uri !== null) {
       message.uri = object.uri;
     } else {
       message.uri = "";
-    }
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = object.creator;
-    } else {
-      message.creator = "";
     }
     if (object.manager !== undefined && object.manager !== null) {
       message.manager = object.manager;
@@ -294,49 +276,39 @@ export const BitBadge = {
       object.subassets_total_supply !== undefined &&
       object.subassets_total_supply !== null
     ) {
-      Object.entries(object.subassets_total_supply).forEach(([key, value]) => {
-        if (value !== undefined) {
-          message.subassets_total_supply[Number(key)] = Number(value);
-        }
-      });
+      for (const e of object.subassets_total_supply) {
+        message.subassets_total_supply.push(Subasset.fromPartial(e));
+      }
     }
     return message;
   },
 };
 
-const baseBitBadge_SubassetsTotalSupplyEntry: object = { key: 0, value: 0 };
+const baseSubasset: object = { id: 0, supply: 0 };
 
-export const BitBadge_SubassetsTotalSupplyEntry = {
-  encode(
-    message: BitBadge_SubassetsTotalSupplyEntry,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.key !== 0) {
-      writer.uint32(8).uint64(message.key);
+export const Subasset = {
+  encode(message: Subasset, writer: Writer = Writer.create()): Writer {
+    if (message.id !== 0) {
+      writer.uint32(8).uint64(message.id);
     }
-    if (message.value !== 0) {
-      writer.uint32(16).uint64(message.value);
+    if (message.supply !== 0) {
+      writer.uint32(16).uint64(message.supply);
     }
     return writer;
   },
 
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): BitBadge_SubassetsTotalSupplyEntry {
+  decode(input: Reader | Uint8Array, length?: number): Subasset {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseBitBadge_SubassetsTotalSupplyEntry,
-    } as BitBadge_SubassetsTotalSupplyEntry;
+    const message = { ...baseSubasset } as Subasset;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.key = longToNumber(reader.uint64() as Long);
+          message.id = longToNumber(reader.uint64() as Long);
           break;
         case 2:
-          message.value = longToNumber(reader.uint64() as Long);
+          message.supply = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -346,45 +318,39 @@ export const BitBadge_SubassetsTotalSupplyEntry = {
     return message;
   },
 
-  fromJSON(object: any): BitBadge_SubassetsTotalSupplyEntry {
-    const message = {
-      ...baseBitBadge_SubassetsTotalSupplyEntry,
-    } as BitBadge_SubassetsTotalSupplyEntry;
-    if (object.key !== undefined && object.key !== null) {
-      message.key = Number(object.key);
+  fromJSON(object: any): Subasset {
+    const message = { ...baseSubasset } as Subasset;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = Number(object.id);
     } else {
-      message.key = 0;
+      message.id = 0;
     }
-    if (object.value !== undefined && object.value !== null) {
-      message.value = Number(object.value);
+    if (object.supply !== undefined && object.supply !== null) {
+      message.supply = Number(object.supply);
     } else {
-      message.value = 0;
+      message.supply = 0;
     }
     return message;
   },
 
-  toJSON(message: BitBadge_SubassetsTotalSupplyEntry): unknown {
+  toJSON(message: Subasset): unknown {
     const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined && (obj.value = message.value);
+    message.id !== undefined && (obj.id = message.id);
+    message.supply !== undefined && (obj.supply = message.supply);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<BitBadge_SubassetsTotalSupplyEntry>
-  ): BitBadge_SubassetsTotalSupplyEntry {
-    const message = {
-      ...baseBitBadge_SubassetsTotalSupplyEntry,
-    } as BitBadge_SubassetsTotalSupplyEntry;
-    if (object.key !== undefined && object.key !== null) {
-      message.key = object.key;
+  fromPartial(object: DeepPartial<Subasset>): Subasset {
+    const message = { ...baseSubasset } as Subasset;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
     } else {
-      message.key = 0;
+      message.id = 0;
     }
-    if (object.value !== undefined && object.value !== null) {
-      message.value = object.value;
+    if (object.supply !== undefined && object.supply !== null) {
+      message.supply = object.supply;
     } else {
-      message.value = 0;
+      message.supply = 0;
     }
     return message;
   },

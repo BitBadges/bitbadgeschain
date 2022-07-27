@@ -1,15 +1,16 @@
 import { txClient, queryClient, MissingWalletError , registry} from './module'
 
 import { BitBadge } from "./module/types/badges/badges"
-import { AddressOwnershipInfo } from "./module/types/badges/genesis"
-import { BadgeOwnershipInfo } from "./module/types/badges/genesis"
-import { PendingTransfers } from "./module/types/badges/genesis"
+import { Subasset } from "./module/types/badges/badges"
+import { BadgeBalanceInfo } from "./module/types/badges/balances"
+import { Approval } from "./module/types/badges/balances"
+import { PendingTransfer } from "./module/types/badges/balances"
 import { BadgesPacketData } from "./module/types/badges/packet"
 import { NoData } from "./module/types/badges/packet"
 import { Params } from "./module/types/badges/params"
 
 
-export { BitBadge, AddressOwnershipInfo, BadgeOwnershipInfo, PendingTransfers, BadgesPacketData, NoData, Params };
+export { BitBadge, Subasset, BadgeBalanceInfo, Approval, PendingTransfer, BadgesPacketData, NoData, Params };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -52,9 +53,10 @@ const getDefaultState = () => {
 				
 				_Structure: {
 						BitBadge: getStructure(BitBadge.fromPartial({})),
-						AddressOwnershipInfo: getStructure(AddressOwnershipInfo.fromPartial({})),
-						BadgeOwnershipInfo: getStructure(BadgeOwnershipInfo.fromPartial({})),
-						PendingTransfers: getStructure(PendingTransfers.fromPartial({})),
+						Subasset: getStructure(Subasset.fromPartial({})),
+						BadgeBalanceInfo: getStructure(BadgeBalanceInfo.fromPartial({})),
+						Approval: getStructure(Approval.fromPartial({})),
+						PendingTransfer: getStructure(PendingTransfer.fromPartial({})),
 						BadgesPacketData: getStructure(BadgesPacketData.fromPartial({})),
 						NoData: getStructure(NoData.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
@@ -191,6 +193,21 @@ export default {
 				}
 			}
 		},
+		async sendMsgNewSubBadge({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgNewSubBadge(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgNewSubBadge:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgNewSubBadge:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
 		
 		async MsgNewBadge({ rootGetters }, { value }) {
 			try {
@@ -202,6 +219,19 @@ export default {
 					throw new Error('TxClient:MsgNewBadge:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgNewBadge:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgNewSubBadge({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgNewSubBadge(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgNewSubBadge:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgNewSubBadge:Create Could not create message: ' + e.message)
 				}
 			}
 		},

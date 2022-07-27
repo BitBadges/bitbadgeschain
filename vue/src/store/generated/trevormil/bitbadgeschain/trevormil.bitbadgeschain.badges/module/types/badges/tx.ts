@@ -6,7 +6,6 @@ export const protobufPackage = "trevormil.bitbadgeschain.badges";
 
 export interface MsgNewBadge {
   creator: string;
-  id: string;
   uri: string;
   manager: string;
   permissions: number;
@@ -15,13 +14,23 @@ export interface MsgNewBadge {
 }
 
 export interface MsgNewBadgeResponse {
-  id: string;
+  id: number;
+  message: string;
+}
+
+export interface MsgNewSubBadge {
+  creator: string;
+  id: number;
+  supply: number;
+}
+
+export interface MsgNewSubBadgeResponse {
+  subassetId: number;
   message: string;
 }
 
 const baseMsgNewBadge: object = {
   creator: "",
-  id: "",
   uri: "",
   manager: "",
   permissions: 0,
@@ -33,9 +42,6 @@ export const MsgNewBadge = {
   encode(message: MsgNewBadge, writer: Writer = Writer.create()): Writer {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
-    }
-    if (message.id !== "") {
-      writer.uint32(18).string(message.id);
     }
     if (message.uri !== "") {
       writer.uint32(26).string(message.uri);
@@ -64,9 +70,6 @@ export const MsgNewBadge = {
       switch (tag >>> 3) {
         case 1:
           message.creator = reader.string();
-          break;
-        case 2:
-          message.id = reader.string();
           break;
         case 3:
           message.uri = reader.string();
@@ -97,11 +100,6 @@ export const MsgNewBadge = {
       message.creator = String(object.creator);
     } else {
       message.creator = "";
-    }
-    if (object.id !== undefined && object.id !== null) {
-      message.id = String(object.id);
-    } else {
-      message.id = "";
     }
     if (object.uri !== undefined && object.uri !== null) {
       message.uri = String(object.uri);
@@ -137,7 +135,6 @@ export const MsgNewBadge = {
   toJSON(message: MsgNewBadge): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
-    message.id !== undefined && (obj.id = message.id);
     message.uri !== undefined && (obj.uri = message.uri);
     message.manager !== undefined && (obj.manager = message.manager);
     message.permissions !== undefined &&
@@ -155,11 +152,6 @@ export const MsgNewBadge = {
       message.creator = object.creator;
     } else {
       message.creator = "";
-    }
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
-    } else {
-      message.id = "";
     }
     if (object.uri !== undefined && object.uri !== null) {
       message.uri = object.uri;
@@ -193,15 +185,15 @@ export const MsgNewBadge = {
   },
 };
 
-const baseMsgNewBadgeResponse: object = { id: "", message: "" };
+const baseMsgNewBadgeResponse: object = { id: 0, message: "" };
 
 export const MsgNewBadgeResponse = {
   encode(
     message: MsgNewBadgeResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
+    if (message.id !== 0) {
+      writer.uint32(8).uint64(message.id);
     }
     if (message.message !== "") {
       writer.uint32(18).string(message.message);
@@ -217,7 +209,7 @@ export const MsgNewBadgeResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = reader.string();
+          message.id = longToNumber(reader.uint64() as Long);
           break;
         case 2:
           message.message = reader.string();
@@ -233,9 +225,9 @@ export const MsgNewBadgeResponse = {
   fromJSON(object: any): MsgNewBadgeResponse {
     const message = { ...baseMsgNewBadgeResponse } as MsgNewBadgeResponse;
     if (object.id !== undefined && object.id !== null) {
-      message.id = String(object.id);
+      message.id = Number(object.id);
     } else {
-      message.id = "";
+      message.id = 0;
     }
     if (object.message !== undefined && object.message !== null) {
       message.message = String(object.message);
@@ -257,7 +249,173 @@ export const MsgNewBadgeResponse = {
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
     } else {
-      message.id = "";
+      message.id = 0;
+    }
+    if (object.message !== undefined && object.message !== null) {
+      message.message = object.message;
+    } else {
+      message.message = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgNewSubBadge: object = { creator: "", id: 0, supply: 0 };
+
+export const MsgNewSubBadge = {
+  encode(message: MsgNewSubBadge, writer: Writer = Writer.create()): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.id !== 0) {
+      writer.uint32(16).uint64(message.id);
+    }
+    if (message.supply !== 0) {
+      writer.uint32(24).uint64(message.supply);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgNewSubBadge {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgNewSubBadge } as MsgNewSubBadge;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.id = longToNumber(reader.uint64() as Long);
+          break;
+        case 3:
+          message.supply = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgNewSubBadge {
+    const message = { ...baseMsgNewSubBadge } as MsgNewSubBadge;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = Number(object.id);
+    } else {
+      message.id = 0;
+    }
+    if (object.supply !== undefined && object.supply !== null) {
+      message.supply = Number(object.supply);
+    } else {
+      message.supply = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgNewSubBadge): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.id !== undefined && (obj.id = message.id);
+    message.supply !== undefined && (obj.supply = message.supply);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgNewSubBadge>): MsgNewSubBadge {
+    const message = { ...baseMsgNewSubBadge } as MsgNewSubBadge;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = 0;
+    }
+    if (object.supply !== undefined && object.supply !== null) {
+      message.supply = object.supply;
+    } else {
+      message.supply = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgNewSubBadgeResponse: object = { subassetId: 0, message: "" };
+
+export const MsgNewSubBadgeResponse = {
+  encode(
+    message: MsgNewSubBadgeResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.subassetId !== 0) {
+      writer.uint32(8).uint64(message.subassetId);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgNewSubBadgeResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgNewSubBadgeResponse } as MsgNewSubBadgeResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.subassetId = longToNumber(reader.uint64() as Long);
+          break;
+        case 2:
+          message.message = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgNewSubBadgeResponse {
+    const message = { ...baseMsgNewSubBadgeResponse } as MsgNewSubBadgeResponse;
+    if (object.subassetId !== undefined && object.subassetId !== null) {
+      message.subassetId = Number(object.subassetId);
+    } else {
+      message.subassetId = 0;
+    }
+    if (object.message !== undefined && object.message !== null) {
+      message.message = String(object.message);
+    } else {
+      message.message = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgNewSubBadgeResponse): unknown {
+    const obj: any = {};
+    message.subassetId !== undefined && (obj.subassetId = message.subassetId);
+    message.message !== undefined && (obj.message = message.message);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<MsgNewSubBadgeResponse>
+  ): MsgNewSubBadgeResponse {
+    const message = { ...baseMsgNewSubBadgeResponse } as MsgNewSubBadgeResponse;
+    if (object.subassetId !== undefined && object.subassetId !== null) {
+      message.subassetId = object.subassetId;
+    } else {
+      message.subassetId = 0;
     }
     if (object.message !== undefined && object.message !== null) {
       message.message = object.message;
@@ -270,8 +428,9 @@ export const MsgNewBadgeResponse = {
 
 /** Msg defines the Msg service. */
 export interface Msg {
-  /** this line is used by starport scaffolding # proto/tx/rpc */
   NewBadge(request: MsgNewBadge): Promise<MsgNewBadgeResponse>;
+  /** this line is used by starport scaffolding # proto/tx/rpc */
+  NewSubBadge(request: MsgNewSubBadge): Promise<MsgNewSubBadgeResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -287,6 +446,18 @@ export class MsgClientImpl implements Msg {
       data
     );
     return promise.then((data) => MsgNewBadgeResponse.decode(new Reader(data)));
+  }
+
+  NewSubBadge(request: MsgNewSubBadge): Promise<MsgNewSubBadgeResponse> {
+    const data = MsgNewSubBadge.encode(request).finish();
+    const promise = this.rpc.request(
+      "trevormil.bitbadgeschain.badges.Msg",
+      "NewSubBadge",
+      data
+    );
+    return promise.then((data) =>
+      MsgNewSubBadgeResponse.decode(new Reader(data))
+    );
   }
 }
 

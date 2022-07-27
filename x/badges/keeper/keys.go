@@ -1,30 +1,44 @@
 package keeper
 
 import (
+	"strconv"
+
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 var (
-	BadgeKey             = []byte{0x01}
-	// NFTKey               = []byte{0x02}
-	// NFTOfClassByOwnerKey = []byte{0x03}
+	BadgeKey = []byte{0x01}
+	BadgeBalanceKey = []byte{0x02}
+	NextAssetIDKey = []byte{0x03}
 	// OwnerKey             = []byte{0x04}
 	// ClassTotalSupply     = []byte{0x05}
 
+
+
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}
+
+	IDLength = 8
 )
 
 // StoreKey is the store key string for nft
 const StoreKey = types.ModuleName
 
 // badgeStoreKey returns the byte representation of the nft class key
-func badgeStoreKey(badgeID string) []byte {
-	key := make([]byte, len(BadgeKey)+len(badgeID))
+func badgeStoreKey(badgeID uint64) []byte {
+	key := make([]byte, len(BadgeKey)+IDLength)
 	copy(key, BadgeKey)
-	copy(key[len(BadgeKey):], badgeID)
+	copy(key[len(BadgeKey):], []byte(strconv.FormatUint(badgeID, 10)))
 	return key
 }
+
+func badgeBalanceStoreKey(balance_id string) []byte {
+	key := make([]byte, len(BadgeBalanceKey)+len(balance_id))
+	copy(key, BadgeBalanceKey)
+	copy(key[len(BadgeBalanceKey):], []byte(balance_id))
+	return key
+}
+
 
 // // nftStoreKey returns the byte representation of the nft
 // func nftStoreKey(classID string) []byte {

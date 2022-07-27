@@ -15,8 +15,8 @@ var (
 	reBadgeID       = regexp.MustCompile(fmt.Sprintf(`^%s$`, reBadgeIDString))
 
 	// URI must be a valid URI. Method <= 35 characters long. Path <= 1000 characters long.
-	reUriString 	= `\w{0,35}:(\/?\/?)[^\s]{0,1000}`
-	reUri       	= regexp.MustCompile(fmt.Sprintf(`^%s$`, reUriString))
+	reUriString = `\w{0,35}:(\/?\/?)[^\s]{0,1000}`
+	reUri       = regexp.MustCompile(fmt.Sprintf(`^%s$`, reUriString))
 )
 
 // ValidateBadgeID returns whether the Badge id is valid

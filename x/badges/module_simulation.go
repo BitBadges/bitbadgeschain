@@ -28,6 +28,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgNewBadge int = 100
 
+	opWeightMsgNewSubBadge = "op_weight_msg_new_sub_badge"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgNewSubBadge int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -72,6 +76,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgNewBadge,
 		badgessimulation.SimulateMsgNewBadge(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgNewSubBadge int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgNewSubBadge, &weightMsgNewSubBadge, nil,
+		func(_ *rand.Rand) {
+			weightMsgNewSubBadge = defaultWeightMsgNewSubBadge
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgNewSubBadge,
+		badgessimulation.SimulateMsgNewSubBadge(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

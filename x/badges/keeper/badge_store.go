@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"strconv"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
@@ -9,8 +11,9 @@ import (
 // SaveBadge defines a method for creating a new badge class
 func (k Keeper) SetBadgeInStore(ctx sdk.Context, badge types.BitBadge) error {
 	if k.StoreHasBadgeID(ctx, badge.Id) {
-		return sdkerrors.Wrap(ErrBadgeExists, badge.Id)
+		return sdkerrors.Wrap(ErrBadgeExists, strconv.FormatUint(badge.Id, 10))
 	}
+
 	marshaled_badge, err := k.cdc.Marshal(&badge)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.BitBadge failed")
@@ -23,7 +26,7 @@ func (k Keeper) SetBadgeInStore(ctx sdk.Context, badge types.BitBadge) error {
 // UpdateBadge defines a method for updating an existing badge
 func (k Keeper) UpdateBadgeInStore(ctx sdk.Context, badge types.BitBadge) error {
 	if !k.StoreHasBadgeID(ctx, badge.Id) {
-		return sdkerrors.Wrap(ErrBadgeNotExists, badge.Id)
+		return sdkerrors.Wrap(ErrBadgeNotExists, strconv.FormatUint(badge.Id, 10))
 	}
 	marshaled_badge, err := k.cdc.Marshal(&badge)
 	if err != nil {
@@ -35,7 +38,7 @@ func (k Keeper) UpdateBadgeInStore(ctx sdk.Context, badge types.BitBadge) error 
 }
 
 // GetBadge defines a method for returning the badge information of the specified id
-func (k Keeper) GetBadgeFromStore(ctx sdk.Context, badgeID string) (types.BitBadge, bool) {
+func (k Keeper) GetBadgeFromStore(ctx sdk.Context, badgeID uint64) (types.BitBadge, bool) {
 	store := ctx.KVStore(k.storeKey)
 	marshaled_badge := store.Get(badgeStoreKey(badgeID))
 
@@ -61,7 +64,7 @@ func (k Keeper) GetBadgesFromStore(ctx sdk.Context) (badges []*types.BitBadge) {
 }
 
 // HasBadge determines whether the specified badgeID exists
-func (k Keeper) StoreHasBadgeID(ctx sdk.Context, badgeID string) bool {
+func (k Keeper) StoreHasBadgeID(ctx sdk.Context, badgeID uint64) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(badgeStoreKey(badgeID))
 }

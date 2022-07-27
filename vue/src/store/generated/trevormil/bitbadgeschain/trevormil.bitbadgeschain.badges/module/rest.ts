@@ -10,18 +10,22 @@
  */
 
 export interface BadgesBitBadge {
+  /** @format uint64 */
   id?: string;
   uri?: string;
-  creator?: string;
   manager?: string;
 
   /**
+   * can_manager_transfer: can the manager transfer managerial privileges to another address
    * can_update_uris: can the manager update the uris of the class and subassets; if false, locked forever
    * forceful_transfers: if true, one can send a badge to an account without pending approval; these badges should not by default be displayed on public profiles (can also use collections)
    * can_create: when true, manager can create more subassets of the class; once set to false, it is locked
    * can_revoke: when true, manager can revoke subassets of the class (including null address); once set to false, it is locked
    * can_freeze: when true, manager can freeze addresseses from transferring; once set to false, it is locked
    * frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
+   * manager is not frozen by default
+   *
+   * More permissions to be added
    * @format uint64
    */
   permission_flags?: string;
@@ -30,11 +34,18 @@ export interface BadgesBitBadge {
 
   /** @format uint64 */
   next_subasset_id?: string;
-  subassets_total_supply?: Record<string, string>;
+  subassets_total_supply?: BadgesSubasset[];
 }
 
 export interface BadgesMsgNewBadgeResponse {
+  /** @format uint64 */
   id?: string;
+  message?: string;
+}
+
+export interface BadgesMsgNewSubBadgeResponse {
+  /** @format uint64 */
+  subassetId?: string;
   message?: string;
 }
 
@@ -53,6 +64,14 @@ export interface BadgesQueryGetBadgeResponse {
 export interface BadgesQueryParamsResponse {
   /** params holds all the parameters of this module. */
   params?: BadgesParams;
+}
+
+export interface BadgesSubasset {
+  /** @format uint64 */
+  id?: string;
+
+  /** @format uint64 */
+  supply?: string;
 }
 
 /**

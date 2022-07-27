@@ -9,19 +9,19 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) GetBadge(goCtx context.Context,  req *types.QueryGetBadgeRequest) (*types.QueryGetBadgeResponse, error) {
+func (k Keeper) GetBadge(goCtx context.Context, req *types.QueryGetBadgeRequest) (*types.QueryGetBadgeResponse, error) {
 	if req == nil {
-        return nil, status.Error(codes.InvalidArgument, "invalid request")
-    }
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-    badge, found := k.GetBadgeFromStore(ctx, req.Id)
+	badge, found := k.GetBadgeFromStore(ctx, req.Id)
 
 	if !found {
 		return nil, status.Error(codes.NotFound, "badge not found")
 	}
-    _ = ctx
+	_ = ctx
 
 	return &types.QueryGetBadgeResponse{
 		Badge: &badge,

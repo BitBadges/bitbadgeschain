@@ -8,12 +8,12 @@ option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 // Msg defines the Msg service.
 service Msg {
       rpc NewBadge(MsgNewBadge) returns (MsgNewBadgeResponse);
+  rpc NewSubBadge(MsgNewSubBadge) returns (MsgNewSubBadgeResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
 message MsgNewBadge {
   string creator = 1;
-  string id = 2;
   string uri = 3;
   string manager = 4;
   uint64 permissions = 5;
@@ -22,7 +22,18 @@ message MsgNewBadge {
 }
 
 message MsgNewBadgeResponse {
-  string id = 1;
+  uint64 id = 1;
+  string message = 2;
+}
+
+message MsgNewSubBadge {
+  string creator = 1;
+  uint64 id = 2;
+  uint64 supply = 3;
+}
+
+message MsgNewSubBadgeResponse {
+  uint64 subassetId = 1;
   string message = 2;
 }
 

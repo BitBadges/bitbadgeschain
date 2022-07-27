@@ -1,8 +1,9 @@
 package keeper
 
 const (
-	NumPermissions = 6
+	NumPermissions = 7
 )
+
 /*
 	Flag bits are in the following order from left to right; leading zeroes are applied and any future additions will be appended to the right
 
@@ -13,13 +14,14 @@ const (
 	can_freeze: when true, manager can freeze addresseses from transferring; once set to false, it is locked
 	frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
 */
-type PermissionFlags struct{
-	can_update_uris bool
+type PermissionFlags struct {
+	can_manager_transfer    bool
+	can_update_uris    bool
 	forceful_transfers bool
-	can_create bool
-	can_revoke bool
-	can_freeze bool
-	frozen_by_default bool
+	can_create         bool
+	can_revoke         bool
+	can_freeze         bool
+	frozen_by_default  bool
 }
 
 //Check leading zeroes
@@ -36,11 +38,11 @@ func ValidatePermissions(permissions uint64) error {
 
 func ValidatePermissionsUpdate(oldPermissions uint64, newPermissions uint64) error {
 	if err := ValidatePermissions(newPermissions); err != nil {
-		return err;
+		return err
 	}
 
 	if err := ValidatePermissions(oldPermissions); err != nil {
-		return err;
+		return err
 	}
 
 	oldFlags := GetPermissions(oldPermissions)
@@ -62,6 +64,10 @@ func ValidatePermissionsUpdate(oldPermissions uint64, newPermissions uint64) err
 		return ErrInvalidPermissionsUpdateLocked
 	}
 
+	if !oldFlags.can_manager_transfer && newFlags.can_manager_transfer {
+		return ErrInvalidPermissionsUpdateLocked
+	}
+
 	if oldFlags.forceful_transfers != newFlags.forceful_transfers {
 		return ErrInvalidPermissionsUpdatePermanent
 	}
@@ -72,32 +78,34 @@ func ValidatePermissionsUpdate(oldPermissions uint64, newPermissions uint64) err
 	return nil
 }
 
-func GetPermissions(permissions uint64) (PermissionFlags) {
+func GetPermissions(permissions uint64) PermissionFlags {
 	var flags PermissionFlags
 	for i := 1; i <= NumPermissions; i++ {
-		mask :=  uint64(1) << i
+		mask := uint64(1) << i
 		masked_n := permissions & mask
 		bit := masked_n >> i
 		bit_as_bool := bit == 1
 
-		SetPermissionsFlags(bit_as_bool, i, &flags);
+		SetPermissionsFlags(bit_as_bool, i, &flags)
 	}
 
 	return flags
 }
 
 func SetPermissionsFlags(permission bool, digit_index int, flags *PermissionFlags) {
-	if (digit_index == 6) {
+	if digit_index == 7 {
+		flags.can_manager_transfer = permission
+	} else if digit_index == 6 {
 		flags.can_update_uris = permission
-	} else if (digit_index == 5) {
+	} else if digit_index == 5 {
 		flags.forceful_transfers = permission
-	} else if (digit_index == 4) {
+	} else if digit_index == 4 {
 		flags.can_create = permission
-	} else if (digit_index == 3) {
+	} else if digit_index == 3 {
 		flags.can_revoke = permission
-	} else if (digit_index == 2) {
+	} else if digit_index == 2 {
 		flags.can_freeze = permission
-	} else if (digit_index == 1) {
+	} else if digit_index == 1 {
 		flags.frozen_by_default = permission
 	}
 }

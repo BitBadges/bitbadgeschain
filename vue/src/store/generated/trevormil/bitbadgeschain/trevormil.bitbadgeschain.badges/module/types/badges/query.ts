@@ -1,5 +1,6 @@
 /* eslint-disable */
-import { Reader, Writer } from "protobufjs/minimal";
+import { Reader, util, configure, Writer } from "protobufjs/minimal";
+import * as Long from "long";
 import { Params } from "../badges/params";
 import { BitBadge } from "../badges/badges";
 
@@ -15,7 +16,7 @@ export interface QueryParamsResponse {
 }
 
 export interface QueryGetBadgeRequest {
-  id: string;
+  id: number;
 }
 
 export interface QueryGetBadgeResponse {
@@ -119,15 +120,15 @@ export const QueryParamsResponse = {
   },
 };
 
-const baseQueryGetBadgeRequest: object = { id: "" };
+const baseQueryGetBadgeRequest: object = { id: 0 };
 
 export const QueryGetBadgeRequest = {
   encode(
     message: QueryGetBadgeRequest,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
+    if (message.id !== 0) {
+      writer.uint32(8).uint64(message.id);
     }
     return writer;
   },
@@ -140,7 +141,7 @@ export const QueryGetBadgeRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = reader.string();
+          message.id = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -153,9 +154,9 @@ export const QueryGetBadgeRequest = {
   fromJSON(object: any): QueryGetBadgeRequest {
     const message = { ...baseQueryGetBadgeRequest } as QueryGetBadgeRequest;
     if (object.id !== undefined && object.id !== null) {
-      message.id = String(object.id);
+      message.id = Number(object.id);
     } else {
-      message.id = "";
+      message.id = 0;
     }
     return message;
   },
@@ -171,7 +172,7 @@ export const QueryGetBadgeRequest = {
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
     } else {
-      message.id = "";
+      message.id = 0;
     }
     return message;
   },
@@ -282,6 +283,16 @@ interface Rpc {
   ): Promise<Uint8Array>;
 }
 
+declare var self: any | undefined;
+declare var window: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") return globalThis;
+  if (typeof self !== "undefined") return self;
+  if (typeof window !== "undefined") return window;
+  if (typeof global !== "undefined") return global;
+  throw "Unable to locate global object";
+})();
+
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin
   ? T
@@ -292,3 +303,15 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  return long.toNumber();
+}
+
+if (util.Long !== Long) {
+  util.Long = Long as any;
+  configure();
+}

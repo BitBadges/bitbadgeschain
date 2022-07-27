@@ -30387,17 +30387,17 @@ paths:
                 properties:
                   id:
                     type: string
+                    format: uint64
                     title: >-
                       id defines the unique identifier of the Badge
                       classification, similar to the contract address of ERC721
+
+                      starts at 0 and increments by 1 each badge
                   uri:
                     type: string
                     title: >-
                       uri for the class metadata stored off chain. must match a
                       valid metadata standard (bitbadge, collection, etc)
-                  creator:
-                    type: string
-                    title: inital creator address of the class
                   manager:
                     type: string
                     title: >-
@@ -30407,6 +30407,9 @@ paths:
                     type: string
                     format: uint64
                     description: >-
+                      can_manager_transfer: can the manager transfer managerial
+                      privileges to another address
+
                       can_update_uris: can the manager update the uris of the
                       class and subassets; if false, locked forever
 
@@ -30429,6 +30432,11 @@ paths:
                       frozen and must be unfrozen to transfer; when false, all
                       addresses are considered unfrozen and must be frozen to
                       freeze
+
+                      manager is not frozen by default
+
+
+                      More permissions to be added
                     title: >-
                       Flag bits are in the following order from left to right;
                       leading zeroes are applied and any future additions will
@@ -30460,13 +30468,20 @@ paths:
                       starts at 0; each subasset created will incrementally have
                       an increasing ID #
                   subassets_total_supply:
-                    type: object
-                    additionalProperties:
-                      type: string
-                      format: uint64
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uint64
+                        supply:
+                          type: string
+                          format: uint64
+                      title: Only will be created if supply >= 0
                     title: >-
-                      subasset id => total supply map; only store if not 1
-                      (default)
+                      only store if not 1 (default); will be sorted in order of
+                      subsasset ids; (maybe add defaut option in future)
                 title: >-
                   BitBadge defines a badge type. Think of this like the smart
                   contract definition
@@ -30660,6 +30675,7 @@ paths:
           in: path
           required: true
           type: string
+          format: uint64
       tags:
         - Query
   /trevormil/bitbadgeschain/badges/params:
@@ -52382,17 +52398,17 @@ definitions:
     properties:
       id:
         type: string
+        format: uint64
         title: >-
           id defines the unique identifier of the Badge classification, similar
           to the contract address of ERC721
+
+          starts at 0 and increments by 1 each badge
       uri:
         type: string
         title: >-
           uri for the class metadata stored off chain. must match a valid
           metadata standard (bitbadge, collection, etc)
-      creator:
-        type: string
-        title: inital creator address of the class
       manager:
         type: string
         title: >-
@@ -52402,6 +52418,9 @@ definitions:
         type: string
         format: uint64
         description: >-
+          can_manager_transfer: can the manager transfer managerial privileges
+          to another address
+
           can_update_uris: can the manager update the uris of the class and
           subassets; if false, locked forever
 
@@ -52421,6 +52440,11 @@ definitions:
           frozen_by_default: when true, all addresses are considered frozen and
           must be unfrozen to transfer; when false, all addresses are considered
           unfrozen and must be frozen to freeze
+
+          manager is not frozen by default
+
+
+          More permissions to be added
         title: >-
           Flag bits are in the following order from left to right; leading
           zeroes are applied and any future additions will be appended to the
@@ -52449,11 +52473,20 @@ definitions:
           starts at 0; each subasset created will incrementally have an
           increasing ID #
       subassets_total_supply:
-        type: object
-        additionalProperties:
-          type: string
-          format: uint64
-        title: subasset id => total supply map; only store if not 1 (default)
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uint64
+            supply:
+              type: string
+              format: uint64
+          title: Only will be created if supply >= 0
+        title: >-
+          only store if not 1 (default); will be sorted in order of subsasset
+          ids; (maybe add defaut option in future)
     title: >-
       BitBadge defines a badge type. Think of this like the smart contract
       definition
@@ -52462,6 +52495,15 @@ definitions:
     properties:
       id:
         type: string
+        format: uint64
+      message:
+        type: string
+  trevormil.bitbadgeschain.badges.MsgNewSubBadgeResponse:
+    type: object
+    properties:
+      subassetId:
+        type: string
+        format: uint64
       message:
         type: string
   trevormil.bitbadgeschain.badges.Params:
@@ -52475,17 +52517,17 @@ definitions:
         properties:
           id:
             type: string
+            format: uint64
             title: >-
               id defines the unique identifier of the Badge classification,
               similar to the contract address of ERC721
+
+              starts at 0 and increments by 1 each badge
           uri:
             type: string
             title: >-
               uri for the class metadata stored off chain. must match a valid
               metadata standard (bitbadge, collection, etc)
-          creator:
-            type: string
-            title: inital creator address of the class
           manager:
             type: string
             title: >-
@@ -52495,6 +52537,9 @@ definitions:
             type: string
             format: uint64
             description: >-
+              can_manager_transfer: can the manager transfer managerial
+              privileges to another address
+
               can_update_uris: can the manager update the uris of the class and
               subassets; if false, locked forever
 
@@ -52514,6 +52559,11 @@ definitions:
               frozen_by_default: when true, all addresses are considered frozen
               and must be unfrozen to transfer; when false, all addresses are
               considered unfrozen and must be frozen to freeze
+
+              manager is not frozen by default
+
+
+              More permissions to be added
             title: >-
               Flag bits are in the following order from left to right; leading
               zeroes are applied and any future additions will be appended to
@@ -52542,11 +52592,20 @@ definitions:
               starts at 0; each subasset created will incrementally have an
               increasing ID #
           subassets_total_supply:
-            type: object
-            additionalProperties:
-              type: string
-              format: uint64
-            title: subasset id => total supply map; only store if not 1 (default)
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uint64
+                supply:
+                  type: string
+                  format: uint64
+              title: Only will be created if supply >= 0
+            title: >-
+              only store if not 1 (default); will be sorted in order of
+              subsasset ids; (maybe add defaut option in future)
         title: >-
           BitBadge defines a badge type. Think of this like the smart contract
           definition
@@ -52557,6 +52616,16 @@ definitions:
         description: params holds all the parameters of this module.
         type: object
     description: QueryParamsResponse is response type for the Query/Params RPC method.
+  trevormil.bitbadgeschain.badges.Subasset:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+      supply:
+        type: string
+        format: uint64
+    title: Only will be created if supply >= 0
   trevormil.bitbadgeschain.collections.Params:
     type: object
     description: Params defines the parameters for the module.

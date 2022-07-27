@@ -8,13 +8,11 @@ option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 // BitBadge defines a badge type. Think of this like the smart contract definition
 message BitBadge {
     // id defines the unique identifier of the Badge classification, similar to the contract address of ERC721
-    string id = 1;
+    // starts at 0 and increments by 1 each badge
+    uint64 id = 1;
   
     // uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc)
     string uri = 2;
-
-    // inital creator address of the class
-    string creator = 3;
     
     // manager addressof the class; can have special permissions; is used as the reserve address for the assets
     string manager = 4;
@@ -22,12 +20,16 @@ message BitBadge {
     /*
         Flag bits are in the following order from left to right; leading zeroes are applied and any future additions will be appended to the right
 
+        can_manager_transfer: can the manager transfer managerial privileges to another address
         can_update_uris: can the manager update the uris of the class and subassets; if false, locked forever
         forceful_transfers: if true, one can send a badge to an account without pending approval; these badges should not by default be displayed on public profiles (can also use collections)
         can_create: when true, manager can create more subassets of the class; once set to false, it is locked
         can_revoke: when true, manager can revoke subassets of the class (including null address); once set to false, it is locked
         can_freeze: when true, manager can freeze addresseses from transferring; once set to false, it is locked
         frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
+            manager is not frozen by default
+
+        More permissions to be added
     */
     uint64 permission_flags = 5;
     
@@ -44,8 +46,14 @@ message BitBadge {
     // starts at 0; each subasset created will incrementally have an increasing ID #
     uint64 next_subasset_id = 12;
 
-    //subasset id => total supply map; only store if not 1 (default)
-    map<uint64, uint64> subassets_total_supply = 13;
+    //only store if not 1 (default); will be sorted in order of subsasset ids; (maybe add defaut option in future)
+    repeated Subasset subassets_total_supply = 13;
     
     //TODO: maybe do something to more efficiently query owners of a badge?
+}
+
+//Only will be created if supply >= 0
+message Subasset {
+    uint64 id = 1;
+    uint64 supply = 2;
 }

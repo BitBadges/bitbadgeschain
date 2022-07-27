@@ -9,12 +9,16 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgNewBadge{}, "badges/NewBadge", nil)
+	cdc.RegisterConcrete(&MsgNewSubBadge{}, "badges/NewSubBadge", nil)
 	// this line is used by starport scaffolding # 2
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgNewBadge{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgNewSubBadge{},
 	)
 	// this line is used by starport scaffolding # 3
 

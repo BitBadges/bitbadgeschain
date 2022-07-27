@@ -20,7 +20,6 @@ service Query {
 	rpc GetBadge(QueryGetBadgeRequest) returns (QueryGetBadgeResponse) {
 		option (google.api.http).get = "/trevormil/bitbadgeschain/badges/get_badge/{id}";
 	}
-
 // this line is used by starport scaffolding # 2
 }
 
@@ -34,11 +33,10 @@ message QueryParamsResponse {
 }
 
 message QueryGetBadgeRequest {
-  string id = 1;
+  uint64 id = 1;
 }
 
 message QueryGetBadgeResponse {
   BitBadge badge = 1;
 }
-
 // this line is used by starport scaffolding # 3
