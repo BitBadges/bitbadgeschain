@@ -9,6 +9,30 @@
  * ---------------------------------------------------------------
  */
 
+export interface BadgesBitBadge {
+  id?: string;
+  uri?: string;
+  creator?: string;
+  manager?: string;
+
+  /**
+   * can_update_uris: can the manager update the uris of the class and subassets; if false, locked forever
+   * forceful_transfers: if true, one can send a badge to an account without pending approval; these badges should not by default be displayed on public profiles (can also use collections)
+   * can_create: when true, manager can create more subassets of the class; once set to false, it is locked
+   * can_revoke: when true, manager can revoke subassets of the class (including null address); once set to false, it is locked
+   * can_freeze: when true, manager can freeze addresseses from transferring; once set to false, it is locked
+   * frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
+   * @format uint64
+   */
+  permission_flags?: string;
+  frozen_or_unfrozen_addresses_digest?: string;
+  subasset_uri_format?: string;
+
+  /** @format uint64 */
+  next_subasset_id?: string;
+  subassets_total_supply?: Record<string, string>;
+}
+
 export interface BadgesMsgNewBadgeResponse {
   id?: string;
   message?: string;
@@ -18,6 +42,10 @@ export interface BadgesMsgNewBadgeResponse {
  * Params defines the parameters for the module.
  */
 export type BadgesParams = object;
+
+export interface BadgesQueryGetBadgeResponse {
+  badge?: BadgesBitBadge;
+}
 
 /**
  * QueryParamsResponse is response type for the Query/Params RPC method.
@@ -347,6 +375,22 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryGetBadge
+   * @summary Queries a list of GetBadge items.
+   * @request GET:/trevormil/bitbadgeschain/badges/get_badge/{id}
+   */
+  queryGetBadge = (id: string, params: RequestParams = {}) =>
+    this.request<BadgesQueryGetBadgeResponse, RpcStatus>({
+      path: `/trevormil/bitbadgeschain/badges/get_badge/${id}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
   /**
    * No description
    *

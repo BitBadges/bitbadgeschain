@@ -14,11 +14,28 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 		return nil, err
 	}
 
-	if k.HasBadge(ctx, msg.Id) {
+	if err := ValidateURI(msg.Uri); err != nil {
+		return nil, err
+	}
+
+	if err := ValidateURI(msg.SubassetUris); err != nil {
+		return nil, err
+	}
+
+	if err := ValidateAddress(msg.Manager); err != nil {
+		return nil, err
+	}
+
+	if err := ValidatePermissions(msg.Permissions); err != nil {
+		return nil, err
+	}
+
+	//TODO: Validate freeze digest string
+
+	if k.StoreHasBadgeID(ctx, msg.Id) {
 		return nil, ErrBadgeExists
 	}
 
-	
 	m := make(map[uint64]uint64)
 
 	badge := types.BitBadge{
@@ -33,9 +50,8 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 		FrozenOrUnfrozenAddressesDigest:	msg.FreezeAddressesDigest,
 	}
 
-	k.SetBadge(ctx, badge);
+	k.SetBadgeInStore(ctx, badge);
 	
-	// TODO: Handling the message
 	_ = ctx
 
 	return &types.MsgNewBadgeResponse{}, nil

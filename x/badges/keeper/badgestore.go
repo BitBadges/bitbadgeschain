@@ -7,8 +7,8 @@ import (
 )
 
 // SaveBadge defines a method for creating a new badge class
-func (k Keeper) SetBadge(ctx sdk.Context, badge types.BitBadge) error {
-	if k.HasBadge(ctx, badge.Id) {
+func (k Keeper) SetBadgeInStore(ctx sdk.Context, badge types.BitBadge) error {
+	if k.StoreHasBadgeID(ctx, badge.Id) {
 		return sdkerrors.Wrap(ErrBadgeExists, badge.Id)
 	}
 	marshaled_badge, err := k.cdc.Marshal(&badge)
@@ -21,8 +21,8 @@ func (k Keeper) SetBadge(ctx sdk.Context, badge types.BitBadge) error {
 }
 
 // UpdateBadge defines a method for updating an existing badge
-func (k Keeper) UpdateBadge(ctx sdk.Context, badge types.BitBadge) error {
-	if !k.HasBadge(ctx, badge.Id) {
+func (k Keeper) UpdateBadgeInStore(ctx sdk.Context, badge types.BitBadge) error {
+	if !k.StoreHasBadgeID(ctx, badge.Id) {
 		return sdkerrors.Wrap(ErrBadgeNotExists, badge.Id)
 	}
 	marshaled_badge, err := k.cdc.Marshal(&badge)
@@ -35,7 +35,7 @@ func (k Keeper) UpdateBadge(ctx sdk.Context, badge types.BitBadge) error {
 }
 
 // GetBadge defines a method for returning the badge information of the specified id
-func (k Keeper) GetBadge(ctx sdk.Context, badgeID string) (types.BitBadge, bool) {
+func (k Keeper) GetBadgeFromStore(ctx sdk.Context, badgeID string) (types.BitBadge, bool) {
 	store := ctx.KVStore(k.storeKey)
 	marshaled_badge := store.Get(badgeStoreKey(badgeID))
 
@@ -48,7 +48,7 @@ func (k Keeper) GetBadge(ctx sdk.Context, badgeID string) (types.BitBadge, bool)
 }
 
 // GetBadges defines a method for returning all badges information
-func (k Keeper) GetBadges(ctx sdk.Context) (badges []*types.BitBadge) {
+func (k Keeper) GetBadgesFromStore(ctx sdk.Context) (badges []*types.BitBadge) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, BadgeKey)
 	defer iterator.Close()
@@ -61,7 +61,7 @@ func (k Keeper) GetBadges(ctx sdk.Context) (badges []*types.BitBadge) {
 }
 
 // HasBadge determines whether the specified badgeID exists
-func (k Keeper) HasBadge(ctx sdk.Context, badgeID string) bool {
+func (k Keeper) StoreHasBadgeID(ctx sdk.Context, badgeID string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(badgeStoreKey(badgeID))
 }

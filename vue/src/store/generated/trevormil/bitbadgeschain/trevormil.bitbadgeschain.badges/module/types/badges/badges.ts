@@ -6,19 +6,13 @@ export const protobufPackage = "trevormil.bitbadgeschain.badges";
 
 /** BitBadge defines a badge type. Think of this like the smart contract definition */
 export interface BitBadge {
-  /**
-   * id defines the unique identifier of the Badge classification, similar to the contract address of ERC721
-   * TODO: set max length
-   */
+  /** id defines the unique identifier of the Badge classification, similar to the contract address of ERC721 */
   id: string;
-  /**
-   * uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc)
-   * TODO: set max length
-   */
+  /** uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc) */
   uri: string;
   /** inital creator address of the class */
   creator: string;
-  /** manager addressof the class; defaults to creator if not specified; can have special permissions; is used as the reserve address */
+  /** manager addressof the class; can have special permissions; is used as the reserve address for the assets */
   manager: string;
   /**
    * Flag bits are in the following order from left to right; leading zeroes are applied and any future additions will be appended to the right
@@ -40,7 +34,6 @@ export interface BitBadge {
   /**
    * uri for the subassets metadata stored off chain; include {id} in the string, it will be replaced with the subasset id
    * if not specified, uses a default Class (ID # 1) like metadata
-   * TODO: set max length
    */
   subasset_uri_format: string;
   /** starts at 0; each subasset created will incrementally have an increasing ID # */
@@ -89,7 +82,7 @@ export const BitBadge = {
       writer.uint32(90).string(message.subasset_uri_format);
     }
     if (message.next_subasset_id !== 0) {
-      writer.uint32(96).uint32(message.next_subasset_id);
+      writer.uint32(96).uint64(message.next_subasset_id);
     }
     Object.entries(message.subassets_total_supply).forEach(([key, value]) => {
       BitBadge_SubassetsTotalSupplyEntry.encode(
@@ -130,7 +123,7 @@ export const BitBadge = {
           message.subasset_uri_format = reader.string();
           break;
         case 12:
-          message.next_subasset_id = reader.uint32();
+          message.next_subasset_id = longToNumber(reader.uint64() as Long);
           break;
         case 13:
           const entry13 = BitBadge_SubassetsTotalSupplyEntry.decode(

@@ -48,6 +48,7 @@ function getStructure(template) {
 const getDefaultState = () => {
 	return {
 				Params: {},
+				GetBadge: {},
 				
 				_Structure: {
 						BitBadge: getStructure(BitBadge.fromPartial({})),
@@ -90,6 +91,12 @@ export default {
 						(<any> params).query=null
 					}
 			return state.Params[JSON.stringify(params)] ?? {}
+		},
+				getGetBadge: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.GetBadge[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -142,6 +149,28 @@ export default {
 				return getters['getParams']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryParams API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryGetBadge({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryGetBadge( key.id)).data
+				
+					
+				commit('QUERY', { query: 'GetBadge', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryGetBadge', payload: { options: { all }, params: {...key},query }})
+				return getters['getGetBadge']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryGetBadge API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
