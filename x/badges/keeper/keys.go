@@ -7,13 +7,11 @@ import (
 )
 
 var (
-	BadgeKey = []byte{0x01}
+	BadgeKey        = []byte{0x01}
 	BadgeBalanceKey = []byte{0x02}
-	NextAssetIDKey = []byte{0x03}
+	NextAssetIDKey  = []byte{0x03}
 	// OwnerKey             = []byte{0x04}
 	// ClassTotalSupply     = []byte{0x05}
-
-
 
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}
@@ -38,7 +36,6 @@ func badgeBalanceStoreKey(balance_id string) []byte {
 	copy(key[len(BadgeBalanceKey):], []byte(balance_id))
 	return key
 }
-
 
 // // nftStoreKey returns the byte representation of the nft
 // func nftStoreKey(classID string) []byte {

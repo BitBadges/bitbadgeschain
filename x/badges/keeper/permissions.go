@@ -15,13 +15,13 @@ const (
 	frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
 */
 type PermissionFlags struct {
-	can_manager_transfer    bool
-	can_update_uris    bool
-	forceful_transfers bool
-	can_create         bool
-	can_revoke         bool
-	can_freeze         bool
-	frozen_by_default  bool
+	can_manager_transfer bool
+	can_update_uris      bool
+	forceful_transfers   bool
+	can_create           bool
+	can_revoke           bool
+	can_freeze           bool
+	frozen_by_default    bool
 }
 
 //Check leading zeroes

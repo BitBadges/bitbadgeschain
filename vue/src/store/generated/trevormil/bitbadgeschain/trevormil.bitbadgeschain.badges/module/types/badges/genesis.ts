@@ -2,6 +2,8 @@
 import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
 import { Params } from "../badges/params";
+import { BitBadge } from "../badges/badges";
+import { BadgeBalanceInfo } from "../badges/balances";
 
 export const protobufPackage = "trevormil.bitbadgeschain.badges";
 
@@ -9,14 +11,18 @@ export const protobufPackage = "trevormil.bitbadgeschain.badges";
 export interface GenesisState {
   params: Params | undefined;
   port_id: string;
-  /**
-   * map<string,BitBadge> badges = 3; //badge id => BitBadge object
-   *   map<string, AddressOwnershipInfo> addresses = 4; //address => AddressOwnershipInfo object
-   */
+  badges: BitBadge[];
+  balances: BadgeBalanceInfo[];
+  balance_ids: string[];
+  /** this line is used by starport scaffolding # genesis/proto/state */
   nextAssetId: number;
 }
 
-const baseGenesisState: object = { port_id: "", nextAssetId: 0 };
+const baseGenesisState: object = {
+  port_id: "",
+  balance_ids: "",
+  nextAssetId: 0,
+};
 
 export const GenesisState = {
   encode(message: GenesisState, writer: Writer = Writer.create()): Writer {
@@ -26,8 +32,17 @@ export const GenesisState = {
     if (message.port_id !== "") {
       writer.uint32(18).string(message.port_id);
     }
+    for (const v of message.badges) {
+      BitBadge.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    for (const v of message.balances) {
+      BadgeBalanceInfo.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    for (const v of message.balance_ids) {
+      writer.uint32(42).string(v!);
+    }
     if (message.nextAssetId !== 0) {
-      writer.uint32(24).uint64(message.nextAssetId);
+      writer.uint32(48).uint64(message.nextAssetId);
     }
     return writer;
   },
@@ -36,6 +51,9 @@ export const GenesisState = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseGenesisState } as GenesisState;
+    message.badges = [];
+    message.balances = [];
+    message.balance_ids = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -46,6 +64,17 @@ export const GenesisState = {
           message.port_id = reader.string();
           break;
         case 3:
+          message.badges.push(BitBadge.decode(reader, reader.uint32()));
+          break;
+        case 4:
+          message.balances.push(
+            BadgeBalanceInfo.decode(reader, reader.uint32())
+          );
+          break;
+        case 5:
+          message.balance_ids.push(reader.string());
+          break;
+        case 6:
           message.nextAssetId = longToNumber(reader.uint64() as Long);
           break;
         default:
@@ -58,6 +87,9 @@ export const GenesisState = {
 
   fromJSON(object: any): GenesisState {
     const message = { ...baseGenesisState } as GenesisState;
+    message.badges = [];
+    message.balances = [];
+    message.balance_ids = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -67,6 +99,21 @@ export const GenesisState = {
       message.port_id = String(object.port_id);
     } else {
       message.port_id = "";
+    }
+    if (object.badges !== undefined && object.badges !== null) {
+      for (const e of object.badges) {
+        message.badges.push(BitBadge.fromJSON(e));
+      }
+    }
+    if (object.balances !== undefined && object.balances !== null) {
+      for (const e of object.balances) {
+        message.balances.push(BadgeBalanceInfo.fromJSON(e));
+      }
+    }
+    if (object.balance_ids !== undefined && object.balance_ids !== null) {
+      for (const e of object.balance_ids) {
+        message.balance_ids.push(String(e));
+      }
     }
     if (object.nextAssetId !== undefined && object.nextAssetId !== null) {
       message.nextAssetId = Number(object.nextAssetId);
@@ -81,6 +128,25 @@ export const GenesisState = {
     message.params !== undefined &&
       (obj.params = message.params ? Params.toJSON(message.params) : undefined);
     message.port_id !== undefined && (obj.port_id = message.port_id);
+    if (message.badges) {
+      obj.badges = message.badges.map((e) =>
+        e ? BitBadge.toJSON(e) : undefined
+      );
+    } else {
+      obj.badges = [];
+    }
+    if (message.balances) {
+      obj.balances = message.balances.map((e) =>
+        e ? BadgeBalanceInfo.toJSON(e) : undefined
+      );
+    } else {
+      obj.balances = [];
+    }
+    if (message.balance_ids) {
+      obj.balance_ids = message.balance_ids.map((e) => e);
+    } else {
+      obj.balance_ids = [];
+    }
     message.nextAssetId !== undefined &&
       (obj.nextAssetId = message.nextAssetId);
     return obj;
@@ -88,6 +154,9 @@ export const GenesisState = {
 
   fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = { ...baseGenesisState } as GenesisState;
+    message.badges = [];
+    message.balances = [];
+    message.balance_ids = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -97,6 +166,21 @@ export const GenesisState = {
       message.port_id = object.port_id;
     } else {
       message.port_id = "";
+    }
+    if (object.badges !== undefined && object.badges !== null) {
+      for (const e of object.badges) {
+        message.badges.push(BitBadge.fromPartial(e));
+      }
+    }
+    if (object.balances !== undefined && object.balances !== null) {
+      for (const e of object.balances) {
+        message.balances.push(BadgeBalanceInfo.fromPartial(e));
+      }
+    }
+    if (object.balance_ids !== undefined && object.balance_ids !== null) {
+      for (const e of object.balance_ids) {
+        message.balance_ids.push(e);
+      }
     }
     if (object.nextAssetId !== undefined && object.nextAssetId !== null) {
       message.nextAssetId = object.nextAssetId;

@@ -9,6 +9,23 @@
  * ---------------------------------------------------------------
  */
 
+export interface BadgesApproval {
+  address?: string;
+
+  /** @format uint64 */
+  amount?: string;
+}
+
+export interface BadgesBadgeBalanceInfo {
+  /** @format uint64 */
+  balance?: string;
+
+  /** @format uint64 */
+  pending_nonce?: string;
+  pending?: BadgesPendingTransfer[];
+  approvals?: BadgesApproval[];
+}
+
 export interface BadgesBitBadge {
   /** @format uint64 */
   id?: string;
@@ -54,8 +71,24 @@ export interface BadgesMsgNewSubBadgeResponse {
  */
 export type BadgesParams = object;
 
+export interface BadgesPendingTransfer {
+  id?: string;
+
+  /** @format uint64 */
+  amount?: string;
+  send_request?: boolean;
+  to?: string;
+  from?: string;
+  memo?: string;
+}
+
 export interface BadgesQueryGetBadgeResponse {
   badge?: BadgesBitBadge;
+}
+
+export interface BadgesQueryGetBalanceResponse {
+  balanceInfo?: BadgesBadgeBalanceInfo;
+  message?: string;
 }
 
 /**
@@ -405,6 +438,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   queryGetBadge = (id: string, params: RequestParams = {}) =>
     this.request<BadgesQueryGetBadgeResponse, RpcStatus>({
       path: `/trevormil/bitbadgeschain/badges/get_badge/${id}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryGetBalance
+   * @summary Queries a list of GetBalance items.
+   * @request GET:/trevormil/bitbadgeschain/badges/get_balance/{badgeId}/{subbadgeId}/{address}
+   */
+  queryGetBalance = (badgeId: string, subbadgeId: string, address: string, params: RequestParams = {}) =>
+    this.request<BadgesQueryGetBalanceResponse, RpcStatus>({
+      path: `/trevormil/bitbadgeschain/badges/get_balance/${badgeId}/${subbadgeId}/${address}`,
       method: "GET",
       format: "json",
       ...params,

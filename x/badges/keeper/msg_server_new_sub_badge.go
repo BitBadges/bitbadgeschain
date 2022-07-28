@@ -38,7 +38,7 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	subasset_id := badge.NextSubassetId
 	if msg.Supply != 1 {
 		badge.SubassetsTotalSupply = append(badge.SubassetsTotalSupply, &types.Subasset{
-			Id: subasset_id,
+			Id:     subasset_id,
 			Supply: msg.Supply,
 		})
 	}
@@ -54,13 +54,12 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "manager account %s does not exist", msg.Creator)
 	}
 
-
 	manager_balance_id := GetFullSubassetID(
-		manager_account.GetAccountNumber(), 
-		msg.Id, 
+		manager_account.GetAccountNumber(),
+		msg.Id,
 		subasset_id,
 	)
-		
+
 	if err := k.AddToBadgeBalance(ctx, manager_balance_id, msg.Supply); err != nil {
 		return nil, err
 	}
@@ -73,6 +72,6 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 
 	return &types.MsgNewSubBadgeResponse{
 		SubassetId: subasset_id,
-		Message: "Subbadge created successfully",
+		Message:    "Subbadge created successfully",
 	}, nil
 }

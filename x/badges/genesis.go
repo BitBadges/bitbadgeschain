@@ -9,7 +9,8 @@ import (
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 
-//TODO: add stores to balances and badges here
+//We assume that all badges are validly formed here
+//TODO: make this more robust with well formedness checks
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// Set if defined
 	k.SetNextAssetId(ctx, genState.NextAssetId)
@@ -25,6 +26,19 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 			panic("could not claim port capability: " + err.Error())
 		}
 	}
+
+	for _, badge := range genState.Badges {
+		if err := k.SetBadgeInStore(ctx, *badge); err != nil {
+			panic(err)
+		}
+	}
+
+	for idx, balance := range genState.Balances {
+		if err := k.CreateBadgeBalanceInStore(ctx, genState.BalanceIds[idx], *balance); err != nil {
+			panic(err)
+		}
+	}
+
 	k.SetParams(ctx, genState.Params)
 }
 
@@ -35,7 +49,11 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	genesis.PortId = k.GetPort(ctx)
 	genesis.NextAssetId = k.GetNextAssetId(ctx)
-// this line is used by starport scaffolding # genesis/module/export
+
+	genesis.Badges = k.GetBadgesFromStore(ctx)
+	genesis.Balances = k.GetBadgeBalanceesFromStore(ctx)
+	genesis.BalanceIds = k.GetBadgeBalanceIdsFromStore(ctx)
+	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis
 }

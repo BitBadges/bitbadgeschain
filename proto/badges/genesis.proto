@@ -4,6 +4,7 @@ package trevormil.bitbadgeschain.badges;
 import "gogoproto/gogo.proto";
 import "badges/params.proto";
 import "badges/badges.proto";
+import "badges/balances.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
@@ -12,9 +13,10 @@ option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
   string port_id = 2;
-//   map<string,BitBadge> badges = 3; //badge id => BitBadge object
-//   map<string, AddressOwnershipInfo> addresses = 4; //address => AddressOwnershipInfo object
-  uint64 nextAssetId = 3;
+  repeated BitBadge badges = 3;
+  repeated BadgeBalanceInfo balances = 4;
+  repeated string balance_ids = 5;
+  uint64 nextAssetId = 6;
   // this line is used by starport scaffolding # genesis/proto/state
 }
   

@@ -10,8 +10,6 @@ import (
 func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*types.MsgNewBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	
-
 	if err := ValidateURI(msg.Uri); err != nil {
 		return nil, err
 	}
@@ -29,8 +27,8 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 	}
 
 	//TODO: Validate freeze digest string
-	
-	badge_id := k.GetNextAssetId(ctx);
+
+	badge_id := k.GetNextAssetId(ctx)
 
 	//probably redundant
 	// if err := ValidateBadgeID(badge_id); err != nil {
@@ -42,24 +40,24 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 	}
 
 	badge := types.BitBadge{
-		Id:        							badge_id,
-		Uri:	   							msg.Uri,
-		Manager:   							msg.Manager,
-		PermissionFlags: 					msg.Permissions,
-		SubassetUriFormat: 					msg.SubassetUris,
-		SubassetsTotalSupply: 				[]*types.Subasset{},
-		NextSubassetId: 					0,
-		FrozenOrUnfrozenAddressesDigest:	msg.FreezeAddressesDigest,
+		Id:                              badge_id,
+		Uri:                             msg.Uri,
+		Manager:                         msg.Manager,
+		PermissionFlags:                 msg.Permissions,
+		SubassetUriFormat:               msg.SubassetUris,
+		SubassetsTotalSupply:            []*types.Subasset{},
+		NextSubassetId:                  0,
+		FrozenOrUnfrozenAddressesDigest: msg.FreezeAddressesDigest,
 	}
 
-	k.SetBadgeInStore(ctx, badge);
-	
+	k.SetBadgeInStore(ctx, badge)
+
 	_ = ctx
 
-	k.SetNextAssetId(ctx, badge_id + 1);
+	k.SetNextAssetId(ctx, badge_id+1)
 
 	return &types.MsgNewBadgeResponse{
-		Id: badge_id,
+		Id:      badge_id,
 		Message: "Badge created successfully",
 	}, nil
 }

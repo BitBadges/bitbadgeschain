@@ -7,6 +7,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "badges/params.proto";
 // this line is used by starport scaffolding # 1
 import "badges/badges.proto";
+import "badges/balances.proto";
 
 option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
@@ -20,6 +21,11 @@ service Query {
 	rpc GetBadge(QueryGetBadgeRequest) returns (QueryGetBadgeResponse) {
 		option (google.api.http).get = "/trevormil/bitbadgeschain/badges/get_badge/{id}";
 	}
+// Queries a list of GetBalance items.
+	rpc GetBalance(QueryGetBalanceRequest) returns (QueryGetBalanceResponse) {
+		option (google.api.http).get = "/trevormil/bitbadgeschain/badges/get_balance/{badgeId}/{subbadgeId}/{address}";
+	}
+
 // this line is used by starport scaffolding # 2
 }
 
@@ -39,4 +45,15 @@ message QueryGetBadgeRequest {
 message QueryGetBadgeResponse {
   BitBadge badge = 1;
 }
+message QueryGetBalanceRequest {
+  uint64 badgeId = 1;
+  uint64 subbadgeId = 2;
+  string address = 3;
+}
+
+message QueryGetBalanceResponse {
+    BadgeBalanceInfo balanceInfo = 1;
+    string message = 2;
+}
+
 // this line is used by starport scaffolding # 3

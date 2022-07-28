@@ -201,43 +201,166 @@ func (m *QueryGetBadgeResponse) GetBadge() *BitBadge {
 	return nil
 }
 
+type QueryGetBalanceRequest struct {
+	BadgeId    uint64 `protobuf:"varint,1,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
+	SubbadgeId uint64 `protobuf:"varint,2,opt,name=subbadgeId,proto3" json:"subbadgeId,omitempty"`
+	Address    string `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
+}
+
+func (m *QueryGetBalanceRequest) Reset()         { *m = QueryGetBalanceRequest{} }
+func (m *QueryGetBalanceRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryGetBalanceRequest) ProtoMessage()    {}
+func (*QueryGetBalanceRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_938ed0d19dbc00d5, []int{4}
+}
+func (m *QueryGetBalanceRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryGetBalanceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryGetBalanceRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryGetBalanceRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetBalanceRequest.Merge(m, src)
+}
+func (m *QueryGetBalanceRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryGetBalanceRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetBalanceRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryGetBalanceRequest proto.InternalMessageInfo
+
+func (m *QueryGetBalanceRequest) GetBadgeId() uint64 {
+	if m != nil {
+		return m.BadgeId
+	}
+	return 0
+}
+
+func (m *QueryGetBalanceRequest) GetSubbadgeId() uint64 {
+	if m != nil {
+		return m.SubbadgeId
+	}
+	return 0
+}
+
+func (m *QueryGetBalanceRequest) GetAddress() string {
+	if m != nil {
+		return m.Address
+	}
+	return ""
+}
+
+type QueryGetBalanceResponse struct {
+	BalanceInfo *BadgeBalanceInfo `protobuf:"bytes,1,opt,name=balanceInfo,proto3" json:"balanceInfo,omitempty"`
+	Message     string            `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+}
+
+func (m *QueryGetBalanceResponse) Reset()         { *m = QueryGetBalanceResponse{} }
+func (m *QueryGetBalanceResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryGetBalanceResponse) ProtoMessage()    {}
+func (*QueryGetBalanceResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_938ed0d19dbc00d5, []int{5}
+}
+func (m *QueryGetBalanceResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryGetBalanceResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryGetBalanceResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryGetBalanceResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetBalanceResponse.Merge(m, src)
+}
+func (m *QueryGetBalanceResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryGetBalanceResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetBalanceResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryGetBalanceResponse proto.InternalMessageInfo
+
+func (m *QueryGetBalanceResponse) GetBalanceInfo() *BadgeBalanceInfo {
+	if m != nil {
+		return m.BalanceInfo
+	}
+	return nil
+}
+
+func (m *QueryGetBalanceResponse) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*QueryParamsRequest)(nil), "trevormil.bitbadgeschain.badges.QueryParamsRequest")
 	proto.RegisterType((*QueryParamsResponse)(nil), "trevormil.bitbadgeschain.badges.QueryParamsResponse")
 	proto.RegisterType((*QueryGetBadgeRequest)(nil), "trevormil.bitbadgeschain.badges.QueryGetBadgeRequest")
 	proto.RegisterType((*QueryGetBadgeResponse)(nil), "trevormil.bitbadgeschain.badges.QueryGetBadgeResponse")
+	proto.RegisterType((*QueryGetBalanceRequest)(nil), "trevormil.bitbadgeschain.badges.QueryGetBalanceRequest")
+	proto.RegisterType((*QueryGetBalanceResponse)(nil), "trevormil.bitbadgeschain.badges.QueryGetBalanceResponse")
 }
 
 func init() { proto.RegisterFile("badges/query.proto", fileDescriptor_938ed0d19dbc00d5) }
 
 var fileDescriptor_938ed0d19dbc00d5 = []byte{
-	// 406 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x92, 0x4f, 0x6a, 0xdb, 0x40,
-	0x14, 0xc6, 0x25, 0x61, 0x9b, 0x32, 0x85, 0x2e, 0xc6, 0x2e, 0x14, 0x51, 0xe4, 0xa2, 0x45, 0x5d,
-	0x77, 0xa1, 0xc1, 0x76, 0xff, 0x2c, 0x0b, 0x82, 0x92, 0x4d, 0x16, 0x89, 0x57, 0x21, 0x04, 0xc2,
-	0xc8, 0x1a, 0xc6, 0x03, 0x96, 0x46, 0xd6, 0x8c, 0x4d, 0x4c, 0xc8, 0x26, 0x27, 0x08, 0xe4, 0x0a,
-	0x39, 0x41, 0x4e, 0xe1, 0xa5, 0x21, 0x9b, 0xac, 0x42, 0xb0, 0x72, 0x90, 0xe0, 0x99, 0x71, 0xc0,
-	0x0e, 0x41, 0xf1, 0x4a, 0x8f, 0xa7, 0xef, 0xfb, 0xbd, 0xef, 0x3d, 0x09, 0xc0, 0x08, 0xc7, 0x94,
-	0x08, 0x34, 0x9e, 0x90, 0x7c, 0x16, 0x64, 0x39, 0x97, 0x1c, 0x36, 0x65, 0x4e, 0xa6, 0x3c, 0x4f,
-	0xd8, 0x28, 0x88, 0x98, 0xd4, 0x82, 0xc1, 0x10, 0xb3, 0x34, 0xd0, 0xb5, 0xdb, 0xa0, 0x9c, 0x72,
-	0xa5, 0x45, 0xab, 0x4a, 0xdb, 0xdc, 0xaf, 0x94, 0x73, 0x3a, 0x22, 0x08, 0x67, 0x0c, 0xe1, 0x34,
-	0xe5, 0x12, 0x4b, 0xc6, 0x53, 0x61, 0xde, 0xfe, 0x1c, 0x70, 0x91, 0x70, 0x81, 0x22, 0x2c, 0x88,
-	0x9e, 0x86, 0xa6, 0x9d, 0x88, 0x48, 0xdc, 0x41, 0x19, 0xa6, 0x2c, 0x55, 0x62, 0xa3, 0xad, 0x9b,
-	0x50, 0x19, 0xce, 0x71, 0x22, 0xb6, 0x9a, 0xfa, 0xa1, 0x9b, 0x7e, 0x03, 0xc0, 0xc3, 0x15, 0xeb,
-	0x40, 0x29, 0xfb, 0x64, 0x3c, 0x21, 0x42, 0xfa, 0x27, 0xa0, 0xbe, 0xd1, 0x15, 0x19, 0x4f, 0x05,
-	0x81, 0xff, 0x41, 0x4d, 0x13, 0xbf, 0xd8, 0xdf, 0xec, 0x1f, 0x1f, 0xbb, 0xad, 0xa0, 0x64, 0xd1,
-	0x40, 0x03, 0xc2, 0xca, 0xfc, 0xa1, 0x69, 0xf5, 0x8d, 0xd9, 0xff, 0x0e, 0x1a, 0x8a, 0xbe, 0x47,
-	0x64, 0xb8, 0x92, 0x99, 0xa9, 0xf0, 0x13, 0x70, 0x58, 0xac, 0xd0, 0x95, 0xbe, 0xc3, 0x62, 0xff,
-	0x08, 0x7c, 0xde, 0xd2, 0x99, 0x1c, 0xff, 0x40, 0x55, 0xf1, 0x4d, 0x8c, 0x76, 0x69, 0x8c, 0x90,
-	0x19, 0x82, 0xf6, 0x75, 0x0b, 0x07, 0x54, 0x15, 0x1a, 0xde, 0xd8, 0xa0, 0xa6, 0x43, 0xc2, 0x5e,
-	0x29, 0xe6, 0xf5, 0xa5, 0xdc, 0x5f, 0xbb, 0x99, 0xf4, 0x02, 0x3e, 0xba, 0xbc, 0x7b, 0xba, 0x76,
-	0xda, 0xb0, 0x85, 0x5e, 0xdc, 0x68, 0xd3, 0x8d, 0x36, 0xbe, 0x20, 0xbc, 0xb5, 0xc1, 0x87, 0xf5,
-	0x19, 0xe0, 0xef, 0xf7, 0xcd, 0xdc, 0x3a, 0xaf, 0xfb, 0x67, 0x57, 0x9b, 0x09, 0xfb, 0x57, 0x85,
-	0xed, 0x40, 0x54, 0x1a, 0x96, 0x12, 0x79, 0xaa, 0x4a, 0x74, 0xce, 0xe2, 0x8b, 0x70, 0x7f, 0xbe,
-	0xf4, 0xec, 0xc5, 0xd2, 0xb3, 0x1f, 0x97, 0x9e, 0x7d, 0x55, 0x78, 0xd6, 0xa2, 0xf0, 0xac, 0xfb,
-	0xc2, 0xb3, 0x8e, 0xbb, 0x94, 0xc9, 0xe1, 0x24, 0x0a, 0x06, 0x3c, 0x79, 0x1b, 0x7a, 0xb6, 0xc6,
-	0xca, 0x59, 0x46, 0x44, 0x54, 0x53, 0x3f, 0x6c, 0xef, 0x39, 0x00, 0x00, 0xff, 0xff, 0x28, 0xd0,
-	0xf0, 0x8b, 0x71, 0x03, 0x00, 0x00,
+	// 549 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x94, 0xcf, 0x6b, 0x13, 0x41,
+	0x14, 0xc7, 0x33, 0x31, 0x8d, 0xf6, 0x15, 0x3c, 0x4c, 0x53, 0x0d, 0x41, 0xb6, 0x65, 0x0f, 0xb6,
+	0xf5, 0xb0, 0x43, 0x52, 0xb5, 0xde, 0x84, 0x80, 0x48, 0x41, 0x51, 0x57, 0x04, 0x11, 0x41, 0x66,
+	0xb3, 0xe3, 0x76, 0x20, 0xbb, 0xb3, 0xdd, 0x99, 0x14, 0x4b, 0xc8, 0xc5, 0x93, 0x47, 0xc1, 0x7f,
+	0xc1, 0xbf, 0xc0, 0xb3, 0x7f, 0x40, 0x8f, 0x05, 0x41, 0x3c, 0x89, 0x24, 0xfe, 0x21, 0xb2, 0x33,
+	0xb3, 0xcd, 0x8f, 0x22, 0xdb, 0x9c, 0x76, 0xe6, 0xcd, 0xfb, 0xbe, 0xef, 0xe7, 0xe5, 0x3d, 0x02,
+	0x38, 0xa0, 0x61, 0xc4, 0x24, 0x39, 0x1a, 0xb0, 0xec, 0xc4, 0x4b, 0x33, 0xa1, 0x04, 0xde, 0x54,
+	0x19, 0x3b, 0x16, 0x59, 0xcc, 0xfb, 0x5e, 0xc0, 0x95, 0x49, 0xe8, 0x1d, 0x52, 0x9e, 0x78, 0xe6,
+	0xdc, 0x6a, 0x44, 0x22, 0x12, 0x3a, 0x97, 0xe4, 0x27, 0x23, 0x6b, 0xdd, 0x8a, 0x84, 0x88, 0xfa,
+	0x8c, 0xd0, 0x94, 0x13, 0x9a, 0x24, 0x42, 0x51, 0xc5, 0x45, 0x22, 0xed, 0xeb, 0x9d, 0x9e, 0x90,
+	0xb1, 0x90, 0x24, 0xa0, 0x92, 0x19, 0x37, 0x72, 0xdc, 0x0e, 0x98, 0xa2, 0x6d, 0x92, 0xd2, 0x88,
+	0x27, 0x3a, 0xd9, 0xe6, 0xae, 0x5b, 0xa8, 0x94, 0x66, 0x34, 0x96, 0x0b, 0x41, 0xf3, 0xb1, 0xc1,
+	0x8d, 0xf3, 0x60, 0x9f, 0x26, 0xbd, 0x22, 0xec, 0x36, 0x00, 0xbf, 0xc8, 0x2d, 0x9e, 0xeb, 0x02,
+	0x3e, 0x3b, 0x1a, 0x30, 0xa9, 0xdc, 0xb7, 0xb0, 0x3e, 0x17, 0x95, 0xa9, 0x48, 0x24, 0xc3, 0x8f,
+	0xa0, 0x6e, 0x8c, 0x9a, 0x68, 0x0b, 0xed, 0xac, 0x75, 0xb6, 0xbd, 0x92, 0xfe, 0x3d, 0x53, 0xa0,
+	0x5b, 0x3b, 0xfd, 0xbd, 0x59, 0xf1, 0xad, 0xd8, 0xbd, 0x0d, 0x0d, 0x5d, 0xfd, 0x31, 0x53, 0xdd,
+	0x3c, 0xcd, 0xba, 0xe2, 0xeb, 0x50, 0xe5, 0xa1, 0x2e, 0x5d, 0xf3, 0xab, 0x3c, 0x74, 0x5f, 0xc3,
+	0xc6, 0x42, 0x9e, 0xe5, 0x78, 0x08, 0x2b, 0xba, 0xbe, 0xc5, 0xd8, 0x2d, 0xc5, 0xe8, 0x72, 0x5b,
+	0xc1, 0xe8, 0xdc, 0x3e, 0xdc, 0x98, 0x56, 0xd6, 0xbf, 0x47, 0xc1, 0xd0, 0x84, 0xab, 0x3a, 0xe5,
+	0xa0, 0x00, 0x29, 0xae, 0xd8, 0x01, 0x90, 0x83, 0xa0, 0x78, 0xac, 0xea, 0xc7, 0x99, 0x48, 0xae,
+	0xa4, 0x61, 0x98, 0x31, 0x29, 0x9b, 0x57, 0xb6, 0xd0, 0xce, 0xaa, 0x5f, 0x5c, 0xdd, 0x4f, 0x08,
+	0x6e, 0x5e, 0xb0, 0xb3, 0xad, 0xbc, 0x84, 0x35, 0x3b, 0x91, 0x83, 0xe4, 0xbd, 0xb0, 0x0d, 0xb5,
+	0xcb, 0x1b, 0xca, 0x3f, 0xdd, 0xa9, 0xd0, 0x9f, 0xad, 0x92, 0xa3, 0xc4, 0x4c, 0x4a, 0x1a, 0x31,
+	0xcd, 0xb9, 0xea, 0x17, 0xd7, 0xce, 0xf7, 0x1a, 0xac, 0x68, 0x14, 0xfc, 0x15, 0x41, 0xdd, 0x4c,
+	0x07, 0xef, 0x95, 0xda, 0x5d, 0x5c, 0x91, 0xd6, 0xdd, 0xe5, 0x44, 0xa6, 0x5d, 0x97, 0x7c, 0xfc,
+	0xf1, 0xf7, 0x4b, 0x75, 0x17, 0x6f, 0x93, 0x73, 0x35, 0x99, 0x57, 0x93, 0xb9, 0x8d, 0xc6, 0xdf,
+	0x10, 0x5c, 0x2b, 0xe6, 0x8f, 0xef, 0x5d, 0xce, 0x73, 0x61, 0xaf, 0x5a, 0xf7, 0x97, 0x95, 0x59,
+	0xd8, 0x7d, 0x0d, 0xdb, 0xc6, 0xa4, 0x14, 0x36, 0x62, 0xea, 0x9d, 0x3e, 0x92, 0x21, 0x0f, 0x47,
+	0xf8, 0x27, 0x02, 0x98, 0xce, 0x1a, 0xef, 0x2f, 0xe1, 0x3f, 0xbb, 0x8c, 0xad, 0x07, 0xcb, 0x0b,
+	0x2d, 0xfa, 0x2b, 0x8d, 0xfe, 0x0c, 0x3f, 0xbd, 0x24, 0xba, 0x56, 0x93, 0xa1, 0xdd, 0xe5, 0x11,
+	0x19, 0x4e, 0x17, 0x7b, 0x44, 0x86, 0x76, 0x91, 0x47, 0xdd, 0x27, 0xa7, 0x63, 0x07, 0x9d, 0x8d,
+	0x1d, 0xf4, 0x67, 0xec, 0xa0, 0xcf, 0x13, 0xa7, 0x72, 0x36, 0x71, 0x2a, 0xbf, 0x26, 0x4e, 0xe5,
+	0x4d, 0x27, 0xe2, 0xea, 0x70, 0x10, 0x78, 0x3d, 0x11, 0xff, 0xdf, 0xf2, 0x43, 0x61, 0xaa, 0x4e,
+	0x52, 0x26, 0x83, 0xba, 0xfe, 0x0b, 0xda, 0xfb, 0x17, 0x00, 0x00, 0xff, 0xff, 0x77, 0xa7, 0x53,
+	0x57, 0x5a, 0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -256,6 +379,8 @@ type QueryClient interface {
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 	// Queries a list of GetBadge items.
 	GetBadge(ctx context.Context, in *QueryGetBadgeRequest, opts ...grpc.CallOption) (*QueryGetBadgeResponse, error)
+	// Queries a list of GetBalance items.
+	GetBalance(ctx context.Context, in *QueryGetBalanceRequest, opts ...grpc.CallOption) (*QueryGetBalanceResponse, error)
 }
 
 type queryClient struct {
@@ -284,12 +409,23 @@ func (c *queryClient) GetBadge(ctx context.Context, in *QueryGetBadgeRequest, op
 	return out, nil
 }
 
+func (c *queryClient) GetBalance(ctx context.Context, in *QueryGetBalanceRequest, opts ...grpc.CallOption) (*QueryGetBalanceResponse, error) {
+	out := new(QueryGetBalanceResponse)
+	err := c.cc.Invoke(ctx, "/trevormil.bitbadgeschain.badges.Query/GetBalance", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 	// Queries a list of GetBadge items.
 	GetBadge(context.Context, *QueryGetBadgeRequest) (*QueryGetBadgeResponse, error)
+	// Queries a list of GetBalance items.
+	GetBalance(context.Context, *QueryGetBalanceRequest) (*QueryGetBalanceResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -301,6 +437,9 @@ func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsReq
 }
 func (*UnimplementedQueryServer) GetBadge(ctx context.Context, req *QueryGetBadgeRequest) (*QueryGetBadgeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBadge not implemented")
+}
+func (*UnimplementedQueryServer) GetBalance(ctx context.Context, req *QueryGetBalanceRequest) (*QueryGetBalanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBalance not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -343,6 +482,24 @@ func _Query_GetBadge_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_GetBalance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetBalanceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).GetBalance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/trevormil.bitbadgeschain.badges.Query/GetBalance",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).GetBalance(ctx, req.(*QueryGetBalanceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "trevormil.bitbadgeschain.badges.Query",
 	HandlerType: (*QueryServer)(nil),
@@ -354,6 +511,10 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBadge",
 			Handler:    _Query_GetBadge_Handler,
+		},
+		{
+			MethodName: "GetBalance",
+			Handler:    _Query_GetBalance_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -479,6 +640,88 @@ func (m *QueryGetBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *QueryGetBalanceRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryGetBalanceRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryGetBalanceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Address) > 0 {
+		i -= len(m.Address)
+		copy(dAtA[i:], m.Address)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Address)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.SubbadgeId != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.SubbadgeId))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.BadgeId != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.BadgeId))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryGetBalanceResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryGetBalanceResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryGetBalanceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Message) > 0 {
+		i -= len(m.Message)
+		copy(dAtA[i:], m.Message)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Message)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.BalanceInfo != nil {
+		{
+			size, err := m.BalanceInfo.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -530,6 +773,42 @@ func (m *QueryGetBadgeResponse) Size() (n int) {
 	_ = l
 	if m.Badge != nil {
 		l = m.Badge.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryGetBalanceRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.BadgeId != 0 {
+		n += 1 + sovQuery(uint64(m.BadgeId))
+	}
+	if m.SubbadgeId != 0 {
+		n += 1 + sovQuery(uint64(m.SubbadgeId))
+	}
+	l = len(m.Address)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryGetBalanceResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.BalanceInfo != nil {
+		l = m.BalanceInfo.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	l = len(m.Message)
+	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
@@ -807,6 +1086,244 @@ func (m *QueryGetBadgeResponse) Unmarshal(dAtA []byte) error {
 			if err := m.Badge.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryGetBalanceRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryGetBalanceRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryGetBalanceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
+			}
+			m.BadgeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.BadgeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeId", wireType)
+			}
+			m.SubbadgeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.SubbadgeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Address = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryGetBalanceResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryGetBalanceResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryGetBalanceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BalanceInfo", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.BalanceInfo == nil {
+				m.BalanceInfo = &BadgeBalanceInfo{}
+			}
+			if err := m.BalanceInfo.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

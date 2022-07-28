@@ -3,6 +3,7 @@ import { Reader, util, configure, Writer } from "protobufjs/minimal";
 import * as Long from "long";
 import { Params } from "../badges/params";
 import { BitBadge } from "../badges/badges";
+import { BadgeBalanceInfo } from "../badges/balances";
 
 export const protobufPackage = "trevormil.bitbadgeschain.badges";
 
@@ -21,6 +22,17 @@ export interface QueryGetBadgeRequest {
 
 export interface QueryGetBadgeResponse {
   badge: BitBadge | undefined;
+}
+
+export interface QueryGetBalanceRequest {
+  badgeId: number;
+  subbadgeId: number;
+  address: string;
+}
+
+export interface QueryGetBalanceResponse {
+  balanceInfo: BadgeBalanceInfo | undefined;
+  message: string;
 }
 
 const baseQueryParamsRequest: object = {};
@@ -239,12 +251,204 @@ export const QueryGetBadgeResponse = {
   },
 };
 
+const baseQueryGetBalanceRequest: object = {
+  badgeId: 0,
+  subbadgeId: 0,
+  address: "",
+};
+
+export const QueryGetBalanceRequest = {
+  encode(
+    message: QueryGetBalanceRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.badgeId !== 0) {
+      writer.uint32(8).uint64(message.badgeId);
+    }
+    if (message.subbadgeId !== 0) {
+      writer.uint32(16).uint64(message.subbadgeId);
+    }
+    if (message.address !== "") {
+      writer.uint32(26).string(message.address);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryGetBalanceRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetBalanceRequest } as QueryGetBalanceRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.badgeId = longToNumber(reader.uint64() as Long);
+          break;
+        case 2:
+          message.subbadgeId = longToNumber(reader.uint64() as Long);
+          break;
+        case 3:
+          message.address = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetBalanceRequest {
+    const message = { ...baseQueryGetBalanceRequest } as QueryGetBalanceRequest;
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = Number(object.badgeId);
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
+      message.subbadgeId = Number(object.subbadgeId);
+    } else {
+      message.subbadgeId = 0;
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = String(object.address);
+    } else {
+      message.address = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetBalanceRequest): unknown {
+    const obj: any = {};
+    message.badgeId !== undefined && (obj.badgeId = message.badgeId);
+    message.subbadgeId !== undefined && (obj.subbadgeId = message.subbadgeId);
+    message.address !== undefined && (obj.address = message.address);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetBalanceRequest>
+  ): QueryGetBalanceRequest {
+    const message = { ...baseQueryGetBalanceRequest } as QueryGetBalanceRequest;
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = object.badgeId;
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
+      message.subbadgeId = object.subbadgeId;
+    } else {
+      message.subbadgeId = 0;
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    } else {
+      message.address = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryGetBalanceResponse: object = { message: "" };
+
+export const QueryGetBalanceResponse = {
+  encode(
+    message: QueryGetBalanceResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.balanceInfo !== undefined) {
+      BadgeBalanceInfo.encode(
+        message.balanceInfo,
+        writer.uint32(10).fork()
+      ).ldelim();
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryGetBalanceResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryGetBalanceResponse,
+    } as QueryGetBalanceResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.balanceInfo = BadgeBalanceInfo.decode(
+            reader,
+            reader.uint32()
+          );
+          break;
+        case 2:
+          message.message = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetBalanceResponse {
+    const message = {
+      ...baseQueryGetBalanceResponse,
+    } as QueryGetBalanceResponse;
+    if (object.balanceInfo !== undefined && object.balanceInfo !== null) {
+      message.balanceInfo = BadgeBalanceInfo.fromJSON(object.balanceInfo);
+    } else {
+      message.balanceInfo = undefined;
+    }
+    if (object.message !== undefined && object.message !== null) {
+      message.message = String(object.message);
+    } else {
+      message.message = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetBalanceResponse): unknown {
+    const obj: any = {};
+    message.balanceInfo !== undefined &&
+      (obj.balanceInfo = message.balanceInfo
+        ? BadgeBalanceInfo.toJSON(message.balanceInfo)
+        : undefined);
+    message.message !== undefined && (obj.message = message.message);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetBalanceResponse>
+  ): QueryGetBalanceResponse {
+    const message = {
+      ...baseQueryGetBalanceResponse,
+    } as QueryGetBalanceResponse;
+    if (object.balanceInfo !== undefined && object.balanceInfo !== null) {
+      message.balanceInfo = BadgeBalanceInfo.fromPartial(object.balanceInfo);
+    } else {
+      message.balanceInfo = undefined;
+    }
+    if (object.message !== undefined && object.message !== null) {
+      message.message = object.message;
+    } else {
+      message.message = "";
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
   /** Queries a list of GetBadge items. */
   GetBadge(request: QueryGetBadgeRequest): Promise<QueryGetBadgeResponse>;
+  /** Queries a list of GetBalance items. */
+  GetBalance(request: QueryGetBalanceRequest): Promise<QueryGetBalanceResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -271,6 +475,20 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryGetBadgeResponse.decode(new Reader(data))
+    );
+  }
+
+  GetBalance(
+    request: QueryGetBalanceRequest
+  ): Promise<QueryGetBalanceResponse> {
+    const data = QueryGetBalanceRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "trevormil.bitbadgeschain.badges.Query",
+      "GetBalance",
+      data
+    );
+    return promise.then((data) =>
+      QueryGetBalanceResponse.decode(new Reader(data))
     );
   }
 }

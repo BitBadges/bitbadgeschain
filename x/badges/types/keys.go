@@ -24,10 +24,8 @@ const (
 )
 
 const (
-	NextAssetIdKey= "NextAssetId-value-"
+	NextAssetIdKey = "NextAssetId-value-"
 )
-
-
 
 var (
 	// PortKey defines the key to store the port ID in store
@@ -37,4 +35,3 @@ var (
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
-
