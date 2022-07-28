@@ -14,7 +14,7 @@ export interface BadgeBalanceInfo {
 }
 
 export interface Approval {
-  address: string;
+  address_num: number;
   amount: number;
 }
 
@@ -28,6 +28,7 @@ export interface PendingTransfer {
   to: number;
   from: number;
   memo: string;
+  approved_by: number;
 }
 
 const baseBadgeBalanceInfo: object = { balance: 0, pending_nonce: 0 };
@@ -155,12 +156,12 @@ export const BadgeBalanceInfo = {
   },
 };
 
-const baseApproval: object = { address: "", amount: 0 };
+const baseApproval: object = { address_num: 0, amount: 0 };
 
 export const Approval = {
   encode(message: Approval, writer: Writer = Writer.create()): Writer {
-    if (message.address !== "") {
-      writer.uint32(10).string(message.address);
+    if (message.address_num !== 0) {
+      writer.uint32(8).uint64(message.address_num);
     }
     if (message.amount !== 0) {
       writer.uint32(16).uint64(message.amount);
@@ -176,7 +177,7 @@ export const Approval = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.address = reader.string();
+          message.address_num = longToNumber(reader.uint64() as Long);
           break;
         case 2:
           message.amount = longToNumber(reader.uint64() as Long);
@@ -191,10 +192,10 @@ export const Approval = {
 
   fromJSON(object: any): Approval {
     const message = { ...baseApproval } as Approval;
-    if (object.address !== undefined && object.address !== null) {
-      message.address = String(object.address);
+    if (object.address_num !== undefined && object.address_num !== null) {
+      message.address_num = Number(object.address_num);
     } else {
-      message.address = "";
+      message.address_num = 0;
     }
     if (object.amount !== undefined && object.amount !== null) {
       message.amount = Number(object.amount);
@@ -206,17 +207,18 @@ export const Approval = {
 
   toJSON(message: Approval): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
+    message.address_num !== undefined &&
+      (obj.address_num = message.address_num);
     message.amount !== undefined && (obj.amount = message.amount);
     return obj;
   },
 
   fromPartial(object: DeepPartial<Approval>): Approval {
     const message = { ...baseApproval } as Approval;
-    if (object.address !== undefined && object.address !== null) {
-      message.address = object.address;
+    if (object.address_num !== undefined && object.address_num !== null) {
+      message.address_num = object.address_num;
     } else {
-      message.address = "";
+      message.address_num = 0;
     }
     if (object.amount !== undefined && object.amount !== null) {
       message.amount = object.amount;
@@ -234,6 +236,7 @@ const basePendingTransfer: object = {
   to: 0,
   from: 0,
   memo: "",
+  approved_by: 0,
 };
 
 export const PendingTransfer = {
@@ -255,6 +258,9 @@ export const PendingTransfer = {
     }
     if (message.memo !== "") {
       writer.uint32(50).string(message.memo);
+    }
+    if (message.approved_by !== 0) {
+      writer.uint32(56).uint64(message.approved_by);
     }
     return writer;
   },
@@ -283,6 +289,9 @@ export const PendingTransfer = {
           break;
         case 6:
           message.memo = reader.string();
+          break;
+        case 7:
+          message.approved_by = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -324,6 +333,11 @@ export const PendingTransfer = {
     } else {
       message.memo = "";
     }
+    if (object.approved_by !== undefined && object.approved_by !== null) {
+      message.approved_by = Number(object.approved_by);
+    } else {
+      message.approved_by = 0;
+    }
     return message;
   },
 
@@ -336,6 +350,8 @@ export const PendingTransfer = {
     message.to !== undefined && (obj.to = message.to);
     message.from !== undefined && (obj.from = message.from);
     message.memo !== undefined && (obj.memo = message.memo);
+    message.approved_by !== undefined &&
+      (obj.approved_by = message.approved_by);
     return obj;
   },
 
@@ -370,6 +386,11 @@ export const PendingTransfer = {
       message.memo = object.memo;
     } else {
       message.memo = "";
+    }
+    if (object.approved_by !== undefined && object.approved_by !== null) {
+      message.approved_by = object.approved_by;
+    } else {
+      message.approved_by = 0;
     }
     return message;
   },

@@ -20,6 +20,7 @@ func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgReq
 		return nil, err
 	}
 
+	//TODO: add msg.Creator === from here?
 	err = k.Keeper.RequestTransferBadge(ctx, from, to, msg.Amount, msg.BadgeId, msg.SubbadgeId)
 	if err != nil {
 		return nil, err

@@ -193,19 +193,28 @@ func (k Keeper) TransferBadge(ctx sdk.Context, tx_signer sdk.AccAddress, from sd
 	from_account_num := from_account.GetAccountNumber()
 	from_balance_id := GetFullSubassetID(from_account_num, badge_id, subasset_id)
 
-	//TODO: check approvals
-	if !tx_signer.Equals(from) {
-		//throw if not approved
-	}
-
 	//TODO: check if the account is frozen
-
+	permissions := GetPermissions(badge.PermissionFlags)
 	manager_address, err := sdk.AccAddressFromBech32(badge.Manager)
 	if err != nil {
 		return err
 	}
 
-	permissions := GetPermissions(badge.PermissionFlags)
+	//TODO: check approvals
+	approved_by_num := from_account_num
+	if !tx_signer.Equals(from) {
+		tx_signer := k.accountKeeper.GetAccount(ctx, tx_signer)
+		if tx_signer == nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "account %s does not exist", tx_signer)
+		}
+		tx_signer_num := tx_signer.GetAccountNumber()
+
+		err := k.RemoveBalanceFromApproval(ctx, from_balance_id, amount, tx_signer_num)
+		if err != nil {
+			return err
+		}
+		approved_by_num = tx_signer_num
+	}
 
 	//Forceful transfers only when permitted to or "burning" (aka sending back to manager)
 	if permissions.forceful_transfers || manager_address.Equals(to) {
@@ -234,6 +243,7 @@ func (k Keeper) TransferBadge(ctx sdk.Context, tx_signer sdk.AccAddress, from sd
 			To:          to_account_num,
 			From:        from_account_num,
 			Memo:        "",
+			ApprovedBy:  approved_by_num,
 		}
 
 		from_transfer := types.PendingTransfer{
@@ -243,6 +253,7 @@ func (k Keeper) TransferBadge(ctx sdk.Context, tx_signer sdk.AccAddress, from sd
 			To:          to_account_num,
 			From:        from_account_num,
 			Memo:        "",
+			ApprovedBy:  approved_by_num,
 		}
 
 		if to_account_num == from_account_num {
@@ -307,6 +318,7 @@ func (k Keeper) RequestTransferBadge(ctx sdk.Context, from sdk.AccAddress, to sd
 		To:          to_account_num,
 		From:        from_account_num,
 		Memo:        "",
+		ApprovedBy:  to_account_num,
 	}
 
 	from_transfer := types.PendingTransfer{
@@ -316,6 +328,7 @@ func (k Keeper) RequestTransferBadge(ctx sdk.Context, from sdk.AccAddress, to sd
 		To:          to_account_num,
 		From:        from_account_num,
 		Memo:        "",
+		ApprovedBy:  to_account_num,
 	}
 
 	//Remove from from's balance
@@ -358,7 +371,7 @@ func (k Keeper) HandlePendingTransfer(ctx sdk.Context, accept bool, balance_id s
 				} else {
 					return ErrInvalidPermissions
 				}
-				
+
 				other_balance_id := GetFullSubassetID(other_account_num, balance_id_details.badge_id, balance_id_details.subasset_id)
 				other_pending_id := GetPendingID(pending_id_details.SecondNonce, pending_id_details.FirstNonce)
 
@@ -374,6 +387,9 @@ func (k Keeper) HandlePendingTransfer(ctx sdk.Context, accept bool, balance_id s
 					} else if balance_id_details.account_num == target_pending.From {
 						// Cancel an outgoing transfer
 						k.AddToBadgeBalance(ctx, balance_id, target_pending.Amount) //Add back funds to this account
+						if target_pending.ApprovedBy != target_pending.From {
+							k.AddBalanceToApproval(ctx, balance_id, target_pending.Amount, target_pending.ApprovedBy)
+						}
 					}
 				} else if !target_pending.SendRequest {
 					to_balance_id := ""
@@ -395,6 +411,10 @@ func (k Keeper) HandlePendingTransfer(ctx sdk.Context, accept bool, balance_id s
 					} else {
 						if balance_id_details.account_num == target_pending.To {
 							k.AddToBadgeBalance(ctx, from_balance_id, target_pending.Amount) //Add back funds to from account
+							//Refund the approval aamount if rejected
+							if target_pending.ApprovedBy != target_pending.From {
+								k.AddBalanceToApproval(ctx, from_balance_id, target_pending.Amount, target_pending.ApprovedBy)
+							}
 						} else if balance_id_details.account_num == target_pending.From {
 							// Do nothing; ignore request for transfer
 						}
@@ -407,4 +427,104 @@ func (k Keeper) HandlePendingTransfer(ctx sdk.Context, accept bool, balance_id s
 	}
 }
 
-//Approve / Update Approval
+//We don't do any math here, always just set the approval to whatever amount is inputted
+func (k Keeper) SetApproval(ctx sdk.Context, balance_id string, amount uint64, address_num uint64) error {
+	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, balance_id)
+	if !found {
+		return ErrBadgeBalanceNotExists
+	} else {
+		new_approvals := []*types.Approval{}
+		//check for approval with same address / amount
+		for _, approval := range badgeBalanceInfo.Approvals {
+			if approval.AddressNum != address_num {
+				new_approvals = append(new_approvals, approval)
+			}
+		}
+
+		new_approvals = append(new_approvals, &types.Approval{
+			Amount:     amount,
+			AddressNum: address_num,
+		})
+
+		badgeBalanceInfo.Approvals = new_approvals
+		k.UpdateBadgeBalanceInStore(ctx, balance_id, badgeBalanceInfo)
+		return nil
+	}
+}
+
+//Will return an error if isn't approved for amounts
+func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, balance_id string, amount_to_remove uint64, address_num uint64) error {
+	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, balance_id)
+	if !found {
+		return ErrBadgeBalanceNotExists
+	} else {
+		new_approvals := []*types.Approval{}
+		//check for approval with same address / amount
+		for _, approval := range badgeBalanceInfo.Approvals {
+			if approval.AddressNum == address_num {
+				if approval.Amount < amount_to_remove {
+					return ErrInsufficientApproval
+				}
+
+				if approval.Amount-amount_to_remove > 0 {
+					new_approvals = append(new_approvals, &types.Approval{
+						Amount:     approval.Amount - amount_to_remove,
+						AddressNum: address_num,
+					})
+				}
+			} else {
+				new_approvals = append(new_approvals, approval)
+			}
+		}
+
+		badgeBalanceInfo.Approvals = new_approvals
+		k.UpdateBadgeBalanceInStore(ctx, balance_id, badgeBalanceInfo)
+		return nil
+	}
+}
+
+func (k Keeper) AddBalanceToApproval(ctx sdk.Context, balance_id string, amount_to_add uint64, address_num uint64) error {
+	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, balance_id)
+	if !found {
+		return ErrBadgeBalanceNotExists
+	} else {
+		new_approvals := []*types.Approval{}
+		found := false
+		//check for approval with same address / amount
+		for _, approval := range badgeBalanceInfo.Approvals {
+			if approval.AddressNum == address_num {
+				new_approvals = append(new_approvals, &types.Approval{
+					Amount:     approval.Amount + amount_to_add,
+					AddressNum: address_num,
+				})
+			} else {
+				new_approvals = append(new_approvals, approval)
+			}
+		}
+		if !found {
+			new_approvals = append(new_approvals, &types.Approval{
+				Amount:     amount_to_add,
+				AddressNum: address_num,
+			})
+		}
+
+		badgeBalanceInfo.Approvals = new_approvals
+		k.UpdateBadgeBalanceInStore(ctx, balance_id, badgeBalanceInfo)
+		return nil
+	}
+}
+
+//Precondition: manager must be calling this
+func (k Keeper) RevokeBadge(ctx sdk.Context, balance_id string, manager_balance_id string, amount uint64) error {
+	err := k.RemoveFromBadgeBalance(ctx, balance_id, amount)
+	if err != nil {
+		return err
+	}
+
+	err = k.AddToBadgeBalance(ctx, manager_balance_id, amount)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

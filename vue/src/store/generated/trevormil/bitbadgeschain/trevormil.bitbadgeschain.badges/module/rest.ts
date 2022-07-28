@@ -10,7 +10,8 @@
  */
 
 export interface BadgesApproval {
-  address?: string;
+  /** @format uint64 */
+  address_num?: string;
 
   /** @format uint64 */
   amount?: string;
@@ -74,6 +75,14 @@ export interface BadgesMsgRequestTransferBadgeResponse {
   message?: string;
 }
 
+export interface BadgesMsgRevokeBadgeResponse {
+  message?: string;
+}
+
+export interface BadgesMsgSetApprovalResponse {
+  message?: string;
+}
+
 export interface BadgesMsgTransferBadgeResponse {
   message?: string;
 }
@@ -96,6 +105,9 @@ export interface BadgesPendingTransfer {
   /** @format uint64 */
   from?: string;
   memo?: string;
+
+  /** @format uint64 */
+  approved_by?: string;
 }
 
 export interface BadgesQueryGetBadgeResponse {

@@ -17,7 +17,7 @@ message BadgeBalanceInfo {
 }
 
 message Approval {
-    string address = 1;
+    uint64 address_num = 1;
     uint64 amount = 2;
 }
 
@@ -29,4 +29,5 @@ message PendingTransfer {
     uint64 to = 4;
     uint64 from = 5;
     string memo = 6;
+    uint64 approved_by = 7;
 }

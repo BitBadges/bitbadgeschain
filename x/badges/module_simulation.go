@@ -44,6 +44,14 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgHandlePendingTransfer int = 100
 
+	opWeightMsgSetApproval = "op_weight_msg_set_approval"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgSetApproval int = 100
+
+	opWeightMsgRevokeBadge = "op_weight_msg_revoke_badge"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgRevokeBadge int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -132,6 +140,28 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgHandlePendingTransfer,
 		badgessimulation.SimulateMsgHandlePendingTransfer(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgSetApproval int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgSetApproval, &weightMsgSetApproval, nil,
+		func(_ *rand.Rand) {
+			weightMsgSetApproval = defaultWeightMsgSetApproval
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgSetApproval,
+		badgessimulation.SimulateMsgSetApproval(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgRevokeBadge int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgRevokeBadge, &weightMsgRevokeBadge, nil,
+		func(_ *rand.Rand) {
+			weightMsgRevokeBadge = defaultWeightMsgRevokeBadge
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgRevokeBadge,
+		badgessimulation.SimulateMsgRevokeBadge(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

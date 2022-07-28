@@ -30717,6 +30717,9 @@ paths:
                           format: uint64
                         memo:
                           type: string
+                        approved_by:
+                          type: string
+                          format: uint64
                       title: >-
                         Pending transfers will not be saved after accept /
                         reject
@@ -30725,8 +30728,9 @@ paths:
                     items:
                       type: object
                       properties:
-                        address:
+                        address_num:
                           type: string
+                          format: uint64
                         amount:
                           type: string
                           format: uint64
@@ -52653,8 +52657,9 @@ definitions:
   trevormil.bitbadgeschain.badges.Approval:
     type: object
     properties:
-      address:
+      address_num:
         type: string
+        format: uint64
       amount:
         type: string
         format: uint64
@@ -52687,14 +52692,18 @@ definitions:
               format: uint64
             memo:
               type: string
+            approved_by:
+              type: string
+              format: uint64
           title: Pending transfers will not be saved after accept / reject
       approvals:
         type: array
         items:
           type: object
           properties:
-            address:
+            address_num:
               type: string
+              format: uint64
             amount:
               type: string
               format: uint64
@@ -52822,6 +52831,16 @@ definitions:
     properties:
       message:
         type: string
+  trevormil.bitbadgeschain.badges.MsgRevokeBadgeResponse:
+    type: object
+    properties:
+      message:
+        type: string
+  trevormil.bitbadgeschain.badges.MsgSetApprovalResponse:
+    type: object
+    properties:
+      message:
+        type: string
   trevormil.bitbadgeschain.badges.MsgTransferBadgeResponse:
     type: object
     properties:
@@ -52848,6 +52867,9 @@ definitions:
         format: uint64
       memo:
         type: string
+      approved_by:
+        type: string
+        format: uint64
     title: Pending transfers will not be saved after accept / reject
   trevormil.bitbadgeschain.badges.QueryGetBadgeResponse:
     type: object
@@ -52981,14 +53003,18 @@ definitions:
                   format: uint64
                 memo:
                   type: string
+                approved_by:
+                  type: string
+                  format: uint64
               title: Pending transfers will not be saved after accept / reject
           approvals:
             type: array
             items:
               type: object
               properties:
-                address:
+                address_num:
                   type: string
+                  format: uint64
                 amount:
                   type: string
                   format: uint64

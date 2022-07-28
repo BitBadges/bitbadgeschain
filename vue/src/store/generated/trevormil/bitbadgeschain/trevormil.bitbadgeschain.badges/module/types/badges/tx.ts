@@ -67,6 +67,30 @@ export interface MsgHandlePendingTransferResponse {
   message: string;
 }
 
+export interface MsgSetApproval {
+  creator: string;
+  amount: number;
+  address: string;
+  badgeId: number;
+  subbadgeId: number;
+}
+
+export interface MsgSetApprovalResponse {
+  message: string;
+}
+
+export interface MsgRevokeBadge {
+  creator: string;
+  address: string;
+  amount: number;
+  badgeId: number;
+  subbadgeId: number;
+}
+
+export interface MsgRevokeBadgeResponse {
+  message: string;
+}
+
 const baseMsgNewBadge: object = {
   creator: "",
   uri: "",
@@ -1119,6 +1143,384 @@ export const MsgHandlePendingTransferResponse = {
   },
 };
 
+const baseMsgSetApproval: object = {
+  creator: "",
+  amount: 0,
+  address: "",
+  badgeId: 0,
+  subbadgeId: 0,
+};
+
+export const MsgSetApproval = {
+  encode(message: MsgSetApproval, writer: Writer = Writer.create()): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.amount !== 0) {
+      writer.uint32(16).uint64(message.amount);
+    }
+    if (message.address !== "") {
+      writer.uint32(26).string(message.address);
+    }
+    if (message.badgeId !== 0) {
+      writer.uint32(32).uint64(message.badgeId);
+    }
+    if (message.subbadgeId !== 0) {
+      writer.uint32(40).uint64(message.subbadgeId);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgSetApproval {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgSetApproval } as MsgSetApproval;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.amount = longToNumber(reader.uint64() as Long);
+          break;
+        case 3:
+          message.address = reader.string();
+          break;
+        case 4:
+          message.badgeId = longToNumber(reader.uint64() as Long);
+          break;
+        case 5:
+          message.subbadgeId = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgSetApproval {
+    const message = { ...baseMsgSetApproval } as MsgSetApproval;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = Number(object.amount);
+    } else {
+      message.amount = 0;
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = String(object.address);
+    } else {
+      message.address = "";
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = Number(object.badgeId);
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
+      message.subbadgeId = Number(object.subbadgeId);
+    } else {
+      message.subbadgeId = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgSetApproval): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.amount !== undefined && (obj.amount = message.amount);
+    message.address !== undefined && (obj.address = message.address);
+    message.badgeId !== undefined && (obj.badgeId = message.badgeId);
+    message.subbadgeId !== undefined && (obj.subbadgeId = message.subbadgeId);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgSetApproval>): MsgSetApproval {
+    const message = { ...baseMsgSetApproval } as MsgSetApproval;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    } else {
+      message.amount = 0;
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    } else {
+      message.address = "";
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = object.badgeId;
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
+      message.subbadgeId = object.subbadgeId;
+    } else {
+      message.subbadgeId = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgSetApprovalResponse: object = { message: "" };
+
+export const MsgSetApprovalResponse = {
+  encode(
+    message: MsgSetApprovalResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgSetApprovalResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgSetApprovalResponse } as MsgSetApprovalResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.message = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgSetApprovalResponse {
+    const message = { ...baseMsgSetApprovalResponse } as MsgSetApprovalResponse;
+    if (object.message !== undefined && object.message !== null) {
+      message.message = String(object.message);
+    } else {
+      message.message = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgSetApprovalResponse): unknown {
+    const obj: any = {};
+    message.message !== undefined && (obj.message = message.message);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<MsgSetApprovalResponse>
+  ): MsgSetApprovalResponse {
+    const message = { ...baseMsgSetApprovalResponse } as MsgSetApprovalResponse;
+    if (object.message !== undefined && object.message !== null) {
+      message.message = object.message;
+    } else {
+      message.message = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgRevokeBadge: object = {
+  creator: "",
+  address: "",
+  amount: 0,
+  badgeId: 0,
+  subbadgeId: 0,
+};
+
+export const MsgRevokeBadge = {
+  encode(message: MsgRevokeBadge, writer: Writer = Writer.create()): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.address !== "") {
+      writer.uint32(18).string(message.address);
+    }
+    if (message.amount !== 0) {
+      writer.uint32(24).uint64(message.amount);
+    }
+    if (message.badgeId !== 0) {
+      writer.uint32(32).uint64(message.badgeId);
+    }
+    if (message.subbadgeId !== 0) {
+      writer.uint32(40).uint64(message.subbadgeId);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgRevokeBadge {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgRevokeBadge } as MsgRevokeBadge;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.address = reader.string();
+          break;
+        case 3:
+          message.amount = longToNumber(reader.uint64() as Long);
+          break;
+        case 4:
+          message.badgeId = longToNumber(reader.uint64() as Long);
+          break;
+        case 5:
+          message.subbadgeId = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRevokeBadge {
+    const message = { ...baseMsgRevokeBadge } as MsgRevokeBadge;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = String(object.address);
+    } else {
+      message.address = "";
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = Number(object.amount);
+    } else {
+      message.amount = 0;
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = Number(object.badgeId);
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
+      message.subbadgeId = Number(object.subbadgeId);
+    } else {
+      message.subbadgeId = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgRevokeBadge): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.address !== undefined && (obj.address = message.address);
+    message.amount !== undefined && (obj.amount = message.amount);
+    message.badgeId !== undefined && (obj.badgeId = message.badgeId);
+    message.subbadgeId !== undefined && (obj.subbadgeId = message.subbadgeId);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgRevokeBadge>): MsgRevokeBadge {
+    const message = { ...baseMsgRevokeBadge } as MsgRevokeBadge;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    } else {
+      message.address = "";
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    } else {
+      message.amount = 0;
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = object.badgeId;
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
+      message.subbadgeId = object.subbadgeId;
+    } else {
+      message.subbadgeId = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgRevokeBadgeResponse: object = { message: "" };
+
+export const MsgRevokeBadgeResponse = {
+  encode(
+    message: MsgRevokeBadgeResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgRevokeBadgeResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgRevokeBadgeResponse } as MsgRevokeBadgeResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.message = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRevokeBadgeResponse {
+    const message = { ...baseMsgRevokeBadgeResponse } as MsgRevokeBadgeResponse;
+    if (object.message !== undefined && object.message !== null) {
+      message.message = String(object.message);
+    } else {
+      message.message = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgRevokeBadgeResponse): unknown {
+    const obj: any = {};
+    message.message !== undefined && (obj.message = message.message);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<MsgRevokeBadgeResponse>
+  ): MsgRevokeBadgeResponse {
+    const message = { ...baseMsgRevokeBadgeResponse } as MsgRevokeBadgeResponse;
+    if (object.message !== undefined && object.message !== null) {
+      message.message = object.message;
+    } else {
+      message.message = "";
+    }
+    return message;
+  },
+};
+
 /** Msg defines the Msg service. */
 export interface Msg {
   NewBadge(request: MsgNewBadge): Promise<MsgNewBadgeResponse>;
@@ -1127,10 +1529,12 @@ export interface Msg {
   RequestTransferBadge(
     request: MsgRequestTransferBadge
   ): Promise<MsgRequestTransferBadgeResponse>;
-  /** this line is used by starport scaffolding # proto/tx/rpc */
   HandlePendingTransfer(
     request: MsgHandlePendingTransfer
   ): Promise<MsgHandlePendingTransferResponse>;
+  SetApproval(request: MsgSetApproval): Promise<MsgSetApprovalResponse>;
+  /** this line is used by starport scaffolding # proto/tx/rpc */
+  RevokeBadge(request: MsgRevokeBadge): Promise<MsgRevokeBadgeResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -1197,6 +1601,30 @@ export class MsgClientImpl implements Msg {
     );
     return promise.then((data) =>
       MsgHandlePendingTransferResponse.decode(new Reader(data))
+    );
+  }
+
+  SetApproval(request: MsgSetApproval): Promise<MsgSetApprovalResponse> {
+    const data = MsgSetApproval.encode(request).finish();
+    const promise = this.rpc.request(
+      "trevormil.bitbadgeschain.badges.Msg",
+      "SetApproval",
+      data
+    );
+    return promise.then((data) =>
+      MsgSetApprovalResponse.decode(new Reader(data))
+    );
+  }
+
+  RevokeBadge(request: MsgRevokeBadge): Promise<MsgRevokeBadgeResponse> {
+    const data = MsgRevokeBadge.encode(request).finish();
+    const promise = this.rpc.request(
+      "trevormil.bitbadgeschain.badges.Msg",
+      "RevokeBadge",
+      data
+    );
+    return promise.then((data) =>
+      MsgRevokeBadgeResponse.decode(new Reader(data))
     );
   }
 }
