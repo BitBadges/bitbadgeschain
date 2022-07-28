@@ -6,11 +6,17 @@ import { Registry, OfflineSigner, EncodeObject, DirectSecp256k1HdWallet } from "
 import { Api } from "./rest";
 import { MsgNewBadge } from "./types/badges/tx";
 import { MsgNewSubBadge } from "./types/badges/tx";
+import { MsgRequestTransferBadge } from "./types/badges/tx";
+import { MsgHandlePendingTransfer } from "./types/badges/tx";
+import { MsgTransferBadge } from "./types/badges/tx";
 
 
 const types = [
   ["/trevormil.bitbadgeschain.badges.MsgNewBadge", MsgNewBadge],
   ["/trevormil.bitbadgeschain.badges.MsgNewSubBadge", MsgNewSubBadge],
+  ["/trevormil.bitbadgeschain.badges.MsgRequestTransferBadge", MsgRequestTransferBadge],
+  ["/trevormil.bitbadgeschain.badges.MsgHandlePendingTransfer", MsgHandlePendingTransfer],
+  ["/trevormil.bitbadgeschain.badges.MsgTransferBadge", MsgTransferBadge],
   
 ];
 export const MissingWalletError = new Error("wallet is required");
@@ -45,6 +51,9 @@ const txClient = async (wallet: OfflineSigner, { addr: addr }: TxClientOptions =
     signAndBroadcast: (msgs: EncodeObject[], { fee, memo }: SignAndBroadcastOptions = {fee: defaultFee, memo: ""}) => client.signAndBroadcast(address, msgs, fee,memo),
     msgNewBadge: (data: MsgNewBadge): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgNewBadge", value: MsgNewBadge.fromPartial( data ) }),
     msgNewSubBadge: (data: MsgNewSubBadge): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgNewSubBadge", value: MsgNewSubBadge.fromPartial( data ) }),
+    msgRequestTransferBadge: (data: MsgRequestTransferBadge): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgRequestTransferBadge", value: MsgRequestTransferBadge.fromPartial( data ) }),
+    msgHandlePendingTransfer: (data: MsgHandlePendingTransfer): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgHandlePendingTransfer", value: MsgHandlePendingTransfer.fromPartial( data ) }),
+    msgTransferBadge: (data: MsgTransferBadge): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgTransferBadge", value: MsgTransferBadge.fromPartial( data ) }),
     
   };
 };

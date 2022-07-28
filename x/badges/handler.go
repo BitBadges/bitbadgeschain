@@ -23,6 +23,15 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgNewSubBadge:
 			res, err := msgServer.NewSubBadge(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgTransferBadge:
+			res, err := msgServer.TransferBadge(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgRequestTransferBadge:
+			res, err := msgServer.RequestTransferBadge(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgHandlePendingTransfer:
+			res, err := msgServer.HandlePendingTransfer(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 			// this line is used by starport scaffolding # 1
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)

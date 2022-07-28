@@ -9,6 +9,9 @@ option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 service Msg {
       rpc NewBadge(MsgNewBadge) returns (MsgNewBadgeResponse);
   rpc NewSubBadge(MsgNewSubBadge) returns (MsgNewSubBadgeResponse);
+  rpc TransferBadge(MsgTransferBadge) returns (MsgTransferBadgeResponse);
+  rpc RequestTransferBadge(MsgRequestTransferBadge) returns (MsgRequestTransferBadgeResponse);
+  rpc HandlePendingTransfer(MsgHandlePendingTransfer) returns (MsgHandlePendingTransferResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -35,6 +38,44 @@ message MsgNewSubBadge {
 message MsgNewSubBadgeResponse {
   uint64 subassetId = 1;
   string message = 2;
+}
+
+message MsgTransferBadge {
+  string creator = 1;
+  string from = 2;
+  string to = 3;
+  uint64 amount = 4;
+  uint64 badgeId = 5;
+  uint64 subbadgeId = 6;
+}
+
+message MsgTransferBadgeResponse {
+    string message = 1;
+}
+
+message MsgRequestTransferBadge {
+  string creator = 1;
+  string from = 2;
+  string to = 3;
+  uint64 amount = 4;
+  uint64 badgeId = 5;
+  uint64 subbadgeId = 6;
+}
+
+message MsgRequestTransferBadgeResponse {
+    string message = 1;
+}
+
+message MsgHandlePendingTransfer {
+  string creator = 1;
+  bool accept = 2;
+  uint64 badgeId = 3;
+  uint64 subbadgeId = 4;
+  string pendingId = 5;
+}
+
+message MsgHandlePendingTransferResponse {
+  string message = 1;
 }
 
 // this line is used by starport scaffolding # proto/tx/message

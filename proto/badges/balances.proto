@@ -26,7 +26,7 @@ message PendingTransfer {
     string id = 1; //indexed by (this account's pending_nonce - other account's pending_nonce)
     uint64 amount = 2;
     bool send_request = 3; //vs. receive request
-    string to = 4;
-    string from = 5;
+    uint64 to = 4;
+    uint64 from = 5;
     string memo = 6;
 }

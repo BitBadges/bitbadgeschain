@@ -80,13 +80,13 @@ func ValidatePermissionsUpdate(oldPermissions uint64, newPermissions uint64) err
 
 func GetPermissions(permissions uint64) PermissionFlags {
 	var flags PermissionFlags
-	for i := 1; i <= NumPermissions; i++ {
+	for i := 0; i <= NumPermissions; i++ {
 		mask := uint64(1) << i
 		masked_n := permissions & mask
 		bit := masked_n >> i
 		bit_as_bool := bit == 1
 
-		SetPermissionsFlags(bit_as_bool, i, &flags)
+		SetPermissionsFlags(bit_as_bool, i+1, &flags)
 	}
 
 	return flags

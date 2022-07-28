@@ -29,6 +29,44 @@ export interface MsgNewSubBadgeResponse {
   message: string;
 }
 
+export interface MsgTransferBadge {
+  creator: string;
+  from: string;
+  to: string;
+  amount: number;
+  badgeId: number;
+  subbadgeId: number;
+}
+
+export interface MsgTransferBadgeResponse {
+  message: string;
+}
+
+export interface MsgRequestTransferBadge {
+  creator: string;
+  from: string;
+  to: string;
+  amount: number;
+  badgeId: number;
+  subbadgeId: number;
+}
+
+export interface MsgRequestTransferBadgeResponse {
+  message: string;
+}
+
+export interface MsgHandlePendingTransfer {
+  creator: string;
+  accept: boolean;
+  badgeId: number;
+  subbadgeId: number;
+  pendingId: string;
+}
+
+export interface MsgHandlePendingTransferResponse {
+  message: string;
+}
+
 const baseMsgNewBadge: object = {
   creator: "",
   uri: "",
@@ -426,11 +464,673 @@ export const MsgNewSubBadgeResponse = {
   },
 };
 
+const baseMsgTransferBadge: object = {
+  creator: "",
+  from: "",
+  to: "",
+  amount: 0,
+  badgeId: 0,
+  subbadgeId: 0,
+};
+
+export const MsgTransferBadge = {
+  encode(message: MsgTransferBadge, writer: Writer = Writer.create()): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.from !== "") {
+      writer.uint32(18).string(message.from);
+    }
+    if (message.to !== "") {
+      writer.uint32(26).string(message.to);
+    }
+    if (message.amount !== 0) {
+      writer.uint32(32).uint64(message.amount);
+    }
+    if (message.badgeId !== 0) {
+      writer.uint32(40).uint64(message.badgeId);
+    }
+    if (message.subbadgeId !== 0) {
+      writer.uint32(48).uint64(message.subbadgeId);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgTransferBadge {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgTransferBadge } as MsgTransferBadge;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.from = reader.string();
+          break;
+        case 3:
+          message.to = reader.string();
+          break;
+        case 4:
+          message.amount = longToNumber(reader.uint64() as Long);
+          break;
+        case 5:
+          message.badgeId = longToNumber(reader.uint64() as Long);
+          break;
+        case 6:
+          message.subbadgeId = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgTransferBadge {
+    const message = { ...baseMsgTransferBadge } as MsgTransferBadge;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.from !== undefined && object.from !== null) {
+      message.from = String(object.from);
+    } else {
+      message.from = "";
+    }
+    if (object.to !== undefined && object.to !== null) {
+      message.to = String(object.to);
+    } else {
+      message.to = "";
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = Number(object.amount);
+    } else {
+      message.amount = 0;
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = Number(object.badgeId);
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
+      message.subbadgeId = Number(object.subbadgeId);
+    } else {
+      message.subbadgeId = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgTransferBadge): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.from !== undefined && (obj.from = message.from);
+    message.to !== undefined && (obj.to = message.to);
+    message.amount !== undefined && (obj.amount = message.amount);
+    message.badgeId !== undefined && (obj.badgeId = message.badgeId);
+    message.subbadgeId !== undefined && (obj.subbadgeId = message.subbadgeId);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgTransferBadge>): MsgTransferBadge {
+    const message = { ...baseMsgTransferBadge } as MsgTransferBadge;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.from !== undefined && object.from !== null) {
+      message.from = object.from;
+    } else {
+      message.from = "";
+    }
+    if (object.to !== undefined && object.to !== null) {
+      message.to = object.to;
+    } else {
+      message.to = "";
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    } else {
+      message.amount = 0;
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = object.badgeId;
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
+      message.subbadgeId = object.subbadgeId;
+    } else {
+      message.subbadgeId = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgTransferBadgeResponse: object = { message: "" };
+
+export const MsgTransferBadgeResponse = {
+  encode(
+    message: MsgTransferBadgeResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgTransferBadgeResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgTransferBadgeResponse,
+    } as MsgTransferBadgeResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.message = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgTransferBadgeResponse {
+    const message = {
+      ...baseMsgTransferBadgeResponse,
+    } as MsgTransferBadgeResponse;
+    if (object.message !== undefined && object.message !== null) {
+      message.message = String(object.message);
+    } else {
+      message.message = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgTransferBadgeResponse): unknown {
+    const obj: any = {};
+    message.message !== undefined && (obj.message = message.message);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<MsgTransferBadgeResponse>
+  ): MsgTransferBadgeResponse {
+    const message = {
+      ...baseMsgTransferBadgeResponse,
+    } as MsgTransferBadgeResponse;
+    if (object.message !== undefined && object.message !== null) {
+      message.message = object.message;
+    } else {
+      message.message = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgRequestTransferBadge: object = {
+  creator: "",
+  from: "",
+  to: "",
+  amount: 0,
+  badgeId: 0,
+  subbadgeId: 0,
+};
+
+export const MsgRequestTransferBadge = {
+  encode(
+    message: MsgRequestTransferBadge,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.from !== "") {
+      writer.uint32(18).string(message.from);
+    }
+    if (message.to !== "") {
+      writer.uint32(26).string(message.to);
+    }
+    if (message.amount !== 0) {
+      writer.uint32(32).uint64(message.amount);
+    }
+    if (message.badgeId !== 0) {
+      writer.uint32(40).uint64(message.badgeId);
+    }
+    if (message.subbadgeId !== 0) {
+      writer.uint32(48).uint64(message.subbadgeId);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgRequestTransferBadge {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgRequestTransferBadge,
+    } as MsgRequestTransferBadge;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.from = reader.string();
+          break;
+        case 3:
+          message.to = reader.string();
+          break;
+        case 4:
+          message.amount = longToNumber(reader.uint64() as Long);
+          break;
+        case 5:
+          message.badgeId = longToNumber(reader.uint64() as Long);
+          break;
+        case 6:
+          message.subbadgeId = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRequestTransferBadge {
+    const message = {
+      ...baseMsgRequestTransferBadge,
+    } as MsgRequestTransferBadge;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.from !== undefined && object.from !== null) {
+      message.from = String(object.from);
+    } else {
+      message.from = "";
+    }
+    if (object.to !== undefined && object.to !== null) {
+      message.to = String(object.to);
+    } else {
+      message.to = "";
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = Number(object.amount);
+    } else {
+      message.amount = 0;
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = Number(object.badgeId);
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
+      message.subbadgeId = Number(object.subbadgeId);
+    } else {
+      message.subbadgeId = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgRequestTransferBadge): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.from !== undefined && (obj.from = message.from);
+    message.to !== undefined && (obj.to = message.to);
+    message.amount !== undefined && (obj.amount = message.amount);
+    message.badgeId !== undefined && (obj.badgeId = message.badgeId);
+    message.subbadgeId !== undefined && (obj.subbadgeId = message.subbadgeId);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<MsgRequestTransferBadge>
+  ): MsgRequestTransferBadge {
+    const message = {
+      ...baseMsgRequestTransferBadge,
+    } as MsgRequestTransferBadge;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.from !== undefined && object.from !== null) {
+      message.from = object.from;
+    } else {
+      message.from = "";
+    }
+    if (object.to !== undefined && object.to !== null) {
+      message.to = object.to;
+    } else {
+      message.to = "";
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    } else {
+      message.amount = 0;
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = object.badgeId;
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
+      message.subbadgeId = object.subbadgeId;
+    } else {
+      message.subbadgeId = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgRequestTransferBadgeResponse: object = { message: "" };
+
+export const MsgRequestTransferBadgeResponse = {
+  encode(
+    message: MsgRequestTransferBadgeResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgRequestTransferBadgeResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgRequestTransferBadgeResponse,
+    } as MsgRequestTransferBadgeResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.message = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRequestTransferBadgeResponse {
+    const message = {
+      ...baseMsgRequestTransferBadgeResponse,
+    } as MsgRequestTransferBadgeResponse;
+    if (object.message !== undefined && object.message !== null) {
+      message.message = String(object.message);
+    } else {
+      message.message = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgRequestTransferBadgeResponse): unknown {
+    const obj: any = {};
+    message.message !== undefined && (obj.message = message.message);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<MsgRequestTransferBadgeResponse>
+  ): MsgRequestTransferBadgeResponse {
+    const message = {
+      ...baseMsgRequestTransferBadgeResponse,
+    } as MsgRequestTransferBadgeResponse;
+    if (object.message !== undefined && object.message !== null) {
+      message.message = object.message;
+    } else {
+      message.message = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgHandlePendingTransfer: object = {
+  creator: "",
+  accept: false,
+  badgeId: 0,
+  subbadgeId: 0,
+  pendingId: "",
+};
+
+export const MsgHandlePendingTransfer = {
+  encode(
+    message: MsgHandlePendingTransfer,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.accept === true) {
+      writer.uint32(16).bool(message.accept);
+    }
+    if (message.badgeId !== 0) {
+      writer.uint32(24).uint64(message.badgeId);
+    }
+    if (message.subbadgeId !== 0) {
+      writer.uint32(32).uint64(message.subbadgeId);
+    }
+    if (message.pendingId !== "") {
+      writer.uint32(42).string(message.pendingId);
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgHandlePendingTransfer {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgHandlePendingTransfer,
+    } as MsgHandlePendingTransfer;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.accept = reader.bool();
+          break;
+        case 3:
+          message.badgeId = longToNumber(reader.uint64() as Long);
+          break;
+        case 4:
+          message.subbadgeId = longToNumber(reader.uint64() as Long);
+          break;
+        case 5:
+          message.pendingId = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgHandlePendingTransfer {
+    const message = {
+      ...baseMsgHandlePendingTransfer,
+    } as MsgHandlePendingTransfer;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.accept !== undefined && object.accept !== null) {
+      message.accept = Boolean(object.accept);
+    } else {
+      message.accept = false;
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = Number(object.badgeId);
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
+      message.subbadgeId = Number(object.subbadgeId);
+    } else {
+      message.subbadgeId = 0;
+    }
+    if (object.pendingId !== undefined && object.pendingId !== null) {
+      message.pendingId = String(object.pendingId);
+    } else {
+      message.pendingId = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgHandlePendingTransfer): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.accept !== undefined && (obj.accept = message.accept);
+    message.badgeId !== undefined && (obj.badgeId = message.badgeId);
+    message.subbadgeId !== undefined && (obj.subbadgeId = message.subbadgeId);
+    message.pendingId !== undefined && (obj.pendingId = message.pendingId);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<MsgHandlePendingTransfer>
+  ): MsgHandlePendingTransfer {
+    const message = {
+      ...baseMsgHandlePendingTransfer,
+    } as MsgHandlePendingTransfer;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.accept !== undefined && object.accept !== null) {
+      message.accept = object.accept;
+    } else {
+      message.accept = false;
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = object.badgeId;
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
+      message.subbadgeId = object.subbadgeId;
+    } else {
+      message.subbadgeId = 0;
+    }
+    if (object.pendingId !== undefined && object.pendingId !== null) {
+      message.pendingId = object.pendingId;
+    } else {
+      message.pendingId = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgHandlePendingTransferResponse: object = { message: "" };
+
+export const MsgHandlePendingTransferResponse = {
+  encode(
+    message: MsgHandlePendingTransferResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgHandlePendingTransferResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgHandlePendingTransferResponse,
+    } as MsgHandlePendingTransferResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.message = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgHandlePendingTransferResponse {
+    const message = {
+      ...baseMsgHandlePendingTransferResponse,
+    } as MsgHandlePendingTransferResponse;
+    if (object.message !== undefined && object.message !== null) {
+      message.message = String(object.message);
+    } else {
+      message.message = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgHandlePendingTransferResponse): unknown {
+    const obj: any = {};
+    message.message !== undefined && (obj.message = message.message);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<MsgHandlePendingTransferResponse>
+  ): MsgHandlePendingTransferResponse {
+    const message = {
+      ...baseMsgHandlePendingTransferResponse,
+    } as MsgHandlePendingTransferResponse;
+    if (object.message !== undefined && object.message !== null) {
+      message.message = object.message;
+    } else {
+      message.message = "";
+    }
+    return message;
+  },
+};
+
 /** Msg defines the Msg service. */
 export interface Msg {
   NewBadge(request: MsgNewBadge): Promise<MsgNewBadgeResponse>;
-  /** this line is used by starport scaffolding # proto/tx/rpc */
   NewSubBadge(request: MsgNewSubBadge): Promise<MsgNewSubBadgeResponse>;
+  TransferBadge(request: MsgTransferBadge): Promise<MsgTransferBadgeResponse>;
+  RequestTransferBadge(
+    request: MsgRequestTransferBadge
+  ): Promise<MsgRequestTransferBadgeResponse>;
+  /** this line is used by starport scaffolding # proto/tx/rpc */
+  HandlePendingTransfer(
+    request: MsgHandlePendingTransfer
+  ): Promise<MsgHandlePendingTransferResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -457,6 +1157,46 @@ export class MsgClientImpl implements Msg {
     );
     return promise.then((data) =>
       MsgNewSubBadgeResponse.decode(new Reader(data))
+    );
+  }
+
+  TransferBadge(request: MsgTransferBadge): Promise<MsgTransferBadgeResponse> {
+    const data = MsgTransferBadge.encode(request).finish();
+    const promise = this.rpc.request(
+      "trevormil.bitbadgeschain.badges.Msg",
+      "TransferBadge",
+      data
+    );
+    return promise.then((data) =>
+      MsgTransferBadgeResponse.decode(new Reader(data))
+    );
+  }
+
+  RequestTransferBadge(
+    request: MsgRequestTransferBadge
+  ): Promise<MsgRequestTransferBadgeResponse> {
+    const data = MsgRequestTransferBadge.encode(request).finish();
+    const promise = this.rpc.request(
+      "trevormil.bitbadgeschain.badges.Msg",
+      "RequestTransferBadge",
+      data
+    );
+    return promise.then((data) =>
+      MsgRequestTransferBadgeResponse.decode(new Reader(data))
+    );
+  }
+
+  HandlePendingTransfer(
+    request: MsgHandlePendingTransfer
+  ): Promise<MsgHandlePendingTransferResponse> {
+    const data = MsgHandlePendingTransfer.encode(request).finish();
+    const promise = this.rpc.request(
+      "trevormil.bitbadgeschain.badges.Msg",
+      "HandlePendingTransfer",
+      data
+    );
+    return promise.then((data) =>
+      MsgHandlePendingTransferResponse.decode(new Reader(data))
     );
   }
 }

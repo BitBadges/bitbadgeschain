@@ -25,8 +25,8 @@ export interface PendingTransfer {
   amount: number;
   /** vs. receive request */
   send_request: boolean;
-  to: string;
-  from: string;
+  to: number;
+  from: number;
   memo: string;
 }
 
@@ -231,8 +231,8 @@ const basePendingTransfer: object = {
   id: "",
   amount: 0,
   send_request: false,
-  to: "",
-  from: "",
+  to: 0,
+  from: 0,
   memo: "",
 };
 
@@ -247,11 +247,11 @@ export const PendingTransfer = {
     if (message.send_request === true) {
       writer.uint32(24).bool(message.send_request);
     }
-    if (message.to !== "") {
-      writer.uint32(34).string(message.to);
+    if (message.to !== 0) {
+      writer.uint32(32).uint64(message.to);
     }
-    if (message.from !== "") {
-      writer.uint32(42).string(message.from);
+    if (message.from !== 0) {
+      writer.uint32(40).uint64(message.from);
     }
     if (message.memo !== "") {
       writer.uint32(50).string(message.memo);
@@ -276,10 +276,10 @@ export const PendingTransfer = {
           message.send_request = reader.bool();
           break;
         case 4:
-          message.to = reader.string();
+          message.to = longToNumber(reader.uint64() as Long);
           break;
         case 5:
-          message.from = reader.string();
+          message.from = longToNumber(reader.uint64() as Long);
           break;
         case 6:
           message.memo = reader.string();
@@ -310,14 +310,14 @@ export const PendingTransfer = {
       message.send_request = false;
     }
     if (object.to !== undefined && object.to !== null) {
-      message.to = String(object.to);
+      message.to = Number(object.to);
     } else {
-      message.to = "";
+      message.to = 0;
     }
     if (object.from !== undefined && object.from !== null) {
-      message.from = String(object.from);
+      message.from = Number(object.from);
     } else {
-      message.from = "";
+      message.from = 0;
     }
     if (object.memo !== undefined && object.memo !== null) {
       message.memo = String(object.memo);
@@ -359,12 +359,12 @@ export const PendingTransfer = {
     if (object.to !== undefined && object.to !== null) {
       message.to = object.to;
     } else {
-      message.to = "";
+      message.to = 0;
     }
     if (object.from !== undefined && object.from !== null) {
       message.from = object.from;
     } else {
-      message.from = "";
+      message.from = 0;
     }
     if (object.memo !== undefined && object.memo !== null) {
       message.memo = object.memo;

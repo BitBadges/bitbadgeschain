@@ -31,7 +31,7 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	permission_flags := GetPermissions(badge.PermissionFlags)
 
 	if !permission_flags.can_create {
-		return nil, ErrInvalidPermissions
+		return nil, sdkerrors.Wrapf(ErrInvalidPermissions, "%s", permission_flags)
 	}
 
 	//By default, we assume non fungible (i.e. supply == 1) so we don't store if supply == 1

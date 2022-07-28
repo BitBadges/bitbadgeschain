@@ -10,6 +10,9 @@ import (
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgNewBadge{}, "badges/NewBadge", nil)
 	cdc.RegisterConcrete(&MsgNewSubBadge{}, "badges/NewSubBadge", nil)
+	cdc.RegisterConcrete(&MsgTransferBadge{}, "badges/TransferBadge", nil)
+	cdc.RegisterConcrete(&MsgRequestTransferBadge{}, "badges/RequestTransferBadge", nil)
+	cdc.RegisterConcrete(&MsgHandlePendingTransfer{}, "badges/HandlePendingTransfer", nil)
 	// this line is used by starport scaffolding # 2
 }
 
@@ -19,6 +22,15 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgNewSubBadge{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgTransferBadge{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgRequestTransferBadge{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgHandlePendingTransfer{},
 	)
 	// this line is used by starport scaffolding # 3
 

@@ -54,6 +54,10 @@ export interface BadgesBitBadge {
   subassets_total_supply?: BadgesSubasset[];
 }
 
+export interface BadgesMsgHandlePendingTransferResponse {
+  message?: string;
+}
+
 export interface BadgesMsgNewBadgeResponse {
   /** @format uint64 */
   id?: string;
@@ -63,6 +67,14 @@ export interface BadgesMsgNewBadgeResponse {
 export interface BadgesMsgNewSubBadgeResponse {
   /** @format uint64 */
   subassetId?: string;
+  message?: string;
+}
+
+export interface BadgesMsgRequestTransferBadgeResponse {
+  message?: string;
+}
+
+export interface BadgesMsgTransferBadgeResponse {
   message?: string;
 }
 
@@ -77,7 +89,11 @@ export interface BadgesPendingTransfer {
   /** @format uint64 */
   amount?: string;
   send_request?: boolean;
+
+  /** @format uint64 */
   to?: string;
+
+  /** @format uint64 */
   from?: string;
   memo?: string;
 }

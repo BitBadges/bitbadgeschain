@@ -32,6 +32,18 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgNewSubBadge int = 100
 
+	opWeightMsgTransferBadge = "op_weight_msg_transfer_badge"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgTransferBadge int = 100
+
+	opWeightMsgRequestTransferBadge = "op_weight_msg_request_transfer_badge"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgRequestTransferBadge int = 100
+
+	opWeightMsgHandlePendingTransfer = "op_weight_msg_handle_pending_transfer"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgHandlePendingTransfer int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -87,6 +99,39 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgNewSubBadge,
 		badgessimulation.SimulateMsgNewSubBadge(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgTransferBadge int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgTransferBadge, &weightMsgTransferBadge, nil,
+		func(_ *rand.Rand) {
+			weightMsgTransferBadge = defaultWeightMsgTransferBadge
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgTransferBadge,
+		badgessimulation.SimulateMsgTransferBadge(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgRequestTransferBadge int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgRequestTransferBadge, &weightMsgRequestTransferBadge, nil,
+		func(_ *rand.Rand) {
+			weightMsgRequestTransferBadge = defaultWeightMsgRequestTransferBadge
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgRequestTransferBadge,
+		badgessimulation.SimulateMsgRequestTransferBadge(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgHandlePendingTransfer int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgHandlePendingTransfer, &weightMsgHandlePendingTransfer, nil,
+		func(_ *rand.Rand) {
+			weightMsgHandlePendingTransfer = defaultWeightMsgHandlePendingTransfer
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgHandlePendingTransfer,
+		badgessimulation.SimulateMsgHandlePendingTransfer(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

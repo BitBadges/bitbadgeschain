@@ -30711,8 +30711,10 @@ paths:
                           type: boolean
                         to:
                           type: string
+                          format: uint64
                         from:
                           type: string
+                          format: uint64
                         memo:
                           type: string
                       title: >-
@@ -52679,8 +52681,10 @@ definitions:
               type: boolean
             to:
               type: string
+              format: uint64
             from:
               type: string
+              format: uint64
             memo:
               type: string
           title: Pending transfers will not be saved after accept / reject
@@ -52792,6 +52796,11 @@ definitions:
     title: >-
       BitBadge defines a badge type. Think of this like the smart contract
       definition
+  trevormil.bitbadgeschain.badges.MsgHandlePendingTransferResponse:
+    type: object
+    properties:
+      message:
+        type: string
   trevormil.bitbadgeschain.badges.MsgNewBadgeResponse:
     type: object
     properties:
@@ -52806,6 +52815,16 @@ definitions:
       subassetId:
         type: string
         format: uint64
+      message:
+        type: string
+  trevormil.bitbadgeschain.badges.MsgRequestTransferBadgeResponse:
+    type: object
+    properties:
+      message:
+        type: string
+  trevormil.bitbadgeschain.badges.MsgTransferBadgeResponse:
+    type: object
+    properties:
       message:
         type: string
   trevormil.bitbadgeschain.badges.Params:
@@ -52823,8 +52842,10 @@ definitions:
         type: boolean
       to:
         type: string
+        format: uint64
       from:
         type: string
+        format: uint64
       memo:
         type: string
     title: Pending transfers will not be saved after accept / reject
@@ -52954,8 +52975,10 @@ definitions:
                   type: boolean
                 to:
                   type: string
+                  format: uint64
                 from:
                   type: string
+                  format: uint64
                 memo:
                   type: string
               title: Pending transfers will not be saved after accept / reject

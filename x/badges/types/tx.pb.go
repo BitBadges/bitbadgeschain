@@ -275,42 +275,437 @@ func (m *MsgNewSubBadgeResponse) GetMessage() string {
 	return ""
 }
 
+type MsgTransferBadge struct {
+	Creator    string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	From       string `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`
+	To         string `protobuf:"bytes,3,opt,name=to,proto3" json:"to,omitempty"`
+	Amount     uint64 `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
+	BadgeId    uint64 `protobuf:"varint,5,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
+	SubbadgeId uint64 `protobuf:"varint,6,opt,name=subbadgeId,proto3" json:"subbadgeId,omitempty"`
+}
+
+func (m *MsgTransferBadge) Reset()         { *m = MsgTransferBadge{} }
+func (m *MsgTransferBadge) String() string { return proto.CompactTextString(m) }
+func (*MsgTransferBadge) ProtoMessage()    {}
+func (*MsgTransferBadge) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{4}
+}
+func (m *MsgTransferBadge) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgTransferBadge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgTransferBadge.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgTransferBadge) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgTransferBadge.Merge(m, src)
+}
+func (m *MsgTransferBadge) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgTransferBadge) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgTransferBadge.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgTransferBadge proto.InternalMessageInfo
+
+func (m *MsgTransferBadge) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgTransferBadge) GetFrom() string {
+	if m != nil {
+		return m.From
+	}
+	return ""
+}
+
+func (m *MsgTransferBadge) GetTo() string {
+	if m != nil {
+		return m.To
+	}
+	return ""
+}
+
+func (m *MsgTransferBadge) GetAmount() uint64 {
+	if m != nil {
+		return m.Amount
+	}
+	return 0
+}
+
+func (m *MsgTransferBadge) GetBadgeId() uint64 {
+	if m != nil {
+		return m.BadgeId
+	}
+	return 0
+}
+
+func (m *MsgTransferBadge) GetSubbadgeId() uint64 {
+	if m != nil {
+		return m.SubbadgeId
+	}
+	return 0
+}
+
+type MsgTransferBadgeResponse struct {
+	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+}
+
+func (m *MsgTransferBadgeResponse) Reset()         { *m = MsgTransferBadgeResponse{} }
+func (m *MsgTransferBadgeResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgTransferBadgeResponse) ProtoMessage()    {}
+func (*MsgTransferBadgeResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{5}
+}
+func (m *MsgTransferBadgeResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgTransferBadgeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgTransferBadgeResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgTransferBadgeResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgTransferBadgeResponse.Merge(m, src)
+}
+func (m *MsgTransferBadgeResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgTransferBadgeResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgTransferBadgeResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgTransferBadgeResponse proto.InternalMessageInfo
+
+func (m *MsgTransferBadgeResponse) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
+type MsgRequestTransferBadge struct {
+	Creator    string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	From       string `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`
+	To         string `protobuf:"bytes,3,opt,name=to,proto3" json:"to,omitempty"`
+	Amount     uint64 `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
+	BadgeId    uint64 `protobuf:"varint,5,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
+	SubbadgeId uint64 `protobuf:"varint,6,opt,name=subbadgeId,proto3" json:"subbadgeId,omitempty"`
+}
+
+func (m *MsgRequestTransferBadge) Reset()         { *m = MsgRequestTransferBadge{} }
+func (m *MsgRequestTransferBadge) String() string { return proto.CompactTextString(m) }
+func (*MsgRequestTransferBadge) ProtoMessage()    {}
+func (*MsgRequestTransferBadge) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{6}
+}
+func (m *MsgRequestTransferBadge) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRequestTransferBadge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRequestTransferBadge.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRequestTransferBadge) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRequestTransferBadge.Merge(m, src)
+}
+func (m *MsgRequestTransferBadge) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRequestTransferBadge) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRequestTransferBadge.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRequestTransferBadge proto.InternalMessageInfo
+
+func (m *MsgRequestTransferBadge) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgRequestTransferBadge) GetFrom() string {
+	if m != nil {
+		return m.From
+	}
+	return ""
+}
+
+func (m *MsgRequestTransferBadge) GetTo() string {
+	if m != nil {
+		return m.To
+	}
+	return ""
+}
+
+func (m *MsgRequestTransferBadge) GetAmount() uint64 {
+	if m != nil {
+		return m.Amount
+	}
+	return 0
+}
+
+func (m *MsgRequestTransferBadge) GetBadgeId() uint64 {
+	if m != nil {
+		return m.BadgeId
+	}
+	return 0
+}
+
+func (m *MsgRequestTransferBadge) GetSubbadgeId() uint64 {
+	if m != nil {
+		return m.SubbadgeId
+	}
+	return 0
+}
+
+type MsgRequestTransferBadgeResponse struct {
+	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+}
+
+func (m *MsgRequestTransferBadgeResponse) Reset()         { *m = MsgRequestTransferBadgeResponse{} }
+func (m *MsgRequestTransferBadgeResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgRequestTransferBadgeResponse) ProtoMessage()    {}
+func (*MsgRequestTransferBadgeResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{7}
+}
+func (m *MsgRequestTransferBadgeResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRequestTransferBadgeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRequestTransferBadgeResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRequestTransferBadgeResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRequestTransferBadgeResponse.Merge(m, src)
+}
+func (m *MsgRequestTransferBadgeResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRequestTransferBadgeResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRequestTransferBadgeResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRequestTransferBadgeResponse proto.InternalMessageInfo
+
+func (m *MsgRequestTransferBadgeResponse) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
+type MsgHandlePendingTransfer struct {
+	Creator    string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Accept     bool   `protobuf:"varint,2,opt,name=accept,proto3" json:"accept,omitempty"`
+	BadgeId    uint64 `protobuf:"varint,3,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
+	SubbadgeId uint64 `protobuf:"varint,4,opt,name=subbadgeId,proto3" json:"subbadgeId,omitempty"`
+	PendingId  string `protobuf:"bytes,5,opt,name=pendingId,proto3" json:"pendingId,omitempty"`
+}
+
+func (m *MsgHandlePendingTransfer) Reset()         { *m = MsgHandlePendingTransfer{} }
+func (m *MsgHandlePendingTransfer) String() string { return proto.CompactTextString(m) }
+func (*MsgHandlePendingTransfer) ProtoMessage()    {}
+func (*MsgHandlePendingTransfer) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{8}
+}
+func (m *MsgHandlePendingTransfer) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgHandlePendingTransfer) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgHandlePendingTransfer.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgHandlePendingTransfer) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgHandlePendingTransfer.Merge(m, src)
+}
+func (m *MsgHandlePendingTransfer) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgHandlePendingTransfer) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgHandlePendingTransfer.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgHandlePendingTransfer proto.InternalMessageInfo
+
+func (m *MsgHandlePendingTransfer) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgHandlePendingTransfer) GetAccept() bool {
+	if m != nil {
+		return m.Accept
+	}
+	return false
+}
+
+func (m *MsgHandlePendingTransfer) GetBadgeId() uint64 {
+	if m != nil {
+		return m.BadgeId
+	}
+	return 0
+}
+
+func (m *MsgHandlePendingTransfer) GetSubbadgeId() uint64 {
+	if m != nil {
+		return m.SubbadgeId
+	}
+	return 0
+}
+
+func (m *MsgHandlePendingTransfer) GetPendingId() string {
+	if m != nil {
+		return m.PendingId
+	}
+	return ""
+}
+
+type MsgHandlePendingTransferResponse struct {
+	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+}
+
+func (m *MsgHandlePendingTransferResponse) Reset()         { *m = MsgHandlePendingTransferResponse{} }
+func (m *MsgHandlePendingTransferResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgHandlePendingTransferResponse) ProtoMessage()    {}
+func (*MsgHandlePendingTransferResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{9}
+}
+func (m *MsgHandlePendingTransferResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgHandlePendingTransferResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgHandlePendingTransferResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgHandlePendingTransferResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgHandlePendingTransferResponse.Merge(m, src)
+}
+func (m *MsgHandlePendingTransferResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgHandlePendingTransferResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgHandlePendingTransferResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgHandlePendingTransferResponse proto.InternalMessageInfo
+
+func (m *MsgHandlePendingTransferResponse) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*MsgNewBadge)(nil), "trevormil.bitbadgeschain.badges.MsgNewBadge")
 	proto.RegisterType((*MsgNewBadgeResponse)(nil), "trevormil.bitbadgeschain.badges.MsgNewBadgeResponse")
 	proto.RegisterType((*MsgNewSubBadge)(nil), "trevormil.bitbadgeschain.badges.MsgNewSubBadge")
 	proto.RegisterType((*MsgNewSubBadgeResponse)(nil), "trevormil.bitbadgeschain.badges.MsgNewSubBadgeResponse")
+	proto.RegisterType((*MsgTransferBadge)(nil), "trevormil.bitbadgeschain.badges.MsgTransferBadge")
+	proto.RegisterType((*MsgTransferBadgeResponse)(nil), "trevormil.bitbadgeschain.badges.MsgTransferBadgeResponse")
+	proto.RegisterType((*MsgRequestTransferBadge)(nil), "trevormil.bitbadgeschain.badges.MsgRequestTransferBadge")
+	proto.RegisterType((*MsgRequestTransferBadgeResponse)(nil), "trevormil.bitbadgeschain.badges.MsgRequestTransferBadgeResponse")
+	proto.RegisterType((*MsgHandlePendingTransfer)(nil), "trevormil.bitbadgeschain.badges.MsgHandlePendingTransfer")
+	proto.RegisterType((*MsgHandlePendingTransferResponse)(nil), "trevormil.bitbadgeschain.badges.MsgHandlePendingTransferResponse")
 }
 
 func init() { proto.RegisterFile("badges/tx.proto", fileDescriptor_bc897b33479788c9) }
 
 var fileDescriptor_bc897b33479788c9 = []byte{
-	// 392 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0xcf, 0xae, 0xd2, 0x40,
-	0x14, 0xc6, 0x99, 0x52, 0x41, 0x0f, 0x06, 0xcd, 0x18, 0xc9, 0x84, 0x45, 0x25, 0x5d, 0xb1, 0x30,
-	0x6d, 0x82, 0x24, 0x2e, 0x8d, 0xc4, 0x8d, 0x89, 0xb8, 0xa8, 0x71, 0xe3, 0xae, 0xa5, 0xc7, 0x32,
-	0x09, 0xfd, 0x93, 0x39, 0x53, 0x01, 0x9f, 0xc2, 0xc7, 0x72, 0x27, 0x4b, 0x97, 0x37, 0xb0, 0xbf,
-	0xcf, 0x70, 0x43, 0x4b, 0x9b, 0x92, 0xdc, 0x1b, 0x2e, 0xbb, 0x39, 0xdf, 0x9c, 0xf9, 0xcd, 0x37,
-	0xdf, 0xe4, 0xc0, 0x8b, 0xc0, 0x0f, 0x23, 0x24, 0x57, 0x6f, 0x9c, 0x4c, 0xa5, 0x3a, 0xe5, 0x6f,
-	0xb4, 0xc2, 0x5f, 0xa9, 0x8a, 0xe5, 0xca, 0x09, 0xa4, 0x2e, 0x77, 0x17, 0x4b, 0x5f, 0x26, 0x4e,
-	0xb9, 0xb6, 0xff, 0x31, 0xe8, 0xcd, 0x29, 0xfa, 0x8a, 0xeb, 0xd9, 0x51, 0xe0, 0x02, 0xba, 0x0b,
-	0x85, 0xbe, 0x4e, 0x95, 0x60, 0x23, 0x36, 0x7e, 0xe6, 0x55, 0x25, 0x7f, 0x09, 0xed, 0x5c, 0x49,
-	0xd1, 0x2e, 0xd4, 0xe3, 0xf2, 0xd8, 0x1b, 0xfb, 0x89, 0x1f, 0xa1, 0x12, 0x66, 0xd9, 0x7b, 0x2a,
-	0xf9, 0x08, 0x7a, 0x19, 0xaa, 0x58, 0x12, 0xc9, 0x34, 0x21, 0xf1, 0x64, 0xc4, 0xc6, 0xa6, 0xd7,
-	0x94, 0xf8, 0x14, 0x5e, 0xff, 0x54, 0x88, 0xbf, 0xf1, 0x63, 0x18, 0x2a, 0x24, 0x42, 0xfa, 0x24,
-	0x23, 0x24, 0x2d, 0x3a, 0x05, 0xe9, 0xfe, 0x4d, 0x6e, 0xc3, 0x73, 0xca, 0x03, 0x9f, 0x08, 0xf5,
-	0x77, 0x25, 0x49, 0x74, 0x8b, 0xe6, 0x33, 0xcd, 0xfe, 0x00, 0xaf, 0x1a, 0x0f, 0xf2, 0x90, 0xb2,
-	0x34, 0x21, 0xe4, 0x7d, 0x30, 0x64, 0x58, 0xbc, 0xc9, 0xf4, 0x0c, 0x19, 0x16, 0xe6, 0x91, 0xc8,
-	0x8f, 0x50, 0x18, 0x27, 0xf3, 0x65, 0x69, 0x7b, 0xd0, 0x2f, 0x01, 0xdf, 0xf2, 0xe0, 0x52, 0x28,
-	0x25, 0xd5, 0xa8, 0xa9, 0x03, 0xe8, 0x50, 0x9e, 0x65, 0xab, 0x6d, 0x91, 0x93, 0xe9, 0x9d, 0x2a,
-	0xdb, 0x83, 0xc1, 0x39, 0xb3, 0xf6, 0x65, 0x01, 0x54, 0xf6, 0x3f, 0x57, 0xfe, 0x1a, 0xca, 0xc3,
-	0x3e, 0x27, 0xb7, 0x0c, 0xda, 0x73, 0x8a, 0x78, 0x02, 0x4f, 0xeb, 0xef, 0x7b, 0xeb, 0x5c, 0xf8,
-	0x70, 0xa7, 0x91, 0xcd, 0x70, 0x7a, 0x4d, 0x77, 0xed, 0x78, 0x0d, 0xbd, 0x66, 0x38, 0xee, 0x23,
-	0x21, 0xd5, 0x81, 0xe1, 0xfb, 0x2b, 0x0f, 0x54, 0x17, 0xcf, 0xbe, 0xfc, 0xdd, 0x5b, 0x6c, 0xb7,
-	0xb7, 0xd8, 0xcd, 0xde, 0x62, 0x7f, 0x0e, 0x56, 0x6b, 0x77, 0xb0, 0x5a, 0xff, 0x0f, 0x56, 0xeb,
-	0xc7, 0x24, 0x92, 0x7a, 0x99, 0x07, 0xce, 0x22, 0x8d, 0xdd, 0x1a, 0xee, 0x9e, 0xc3, 0xdd, 0x8d,
-	0x5b, 0x4d, 0xc7, 0x36, 0x43, 0x0a, 0x3a, 0xc5, 0x84, 0xbc, 0xbb, 0x0b, 0x00, 0x00, 0xff, 0xff,
-	0x41, 0x6e, 0xae, 0x79, 0x34, 0x03, 0x00, 0x00,
+	// 608 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x95, 0xcf, 0x4f, 0xd4, 0x40,
+	0x14, 0xc7, 0x99, 0xdd, 0xb2, 0xc0, 0x43, 0x91, 0x54, 0xc1, 0x66, 0x63, 0xca, 0xa6, 0x27, 0x0e,
+	0x66, 0x1b, 0x91, 0x44, 0x8d, 0x26, 0x0a, 0xf1, 0x20, 0x89, 0x6b, 0x4c, 0xd5, 0x8b, 0xb7, 0x76,
+	0xfb, 0x28, 0x93, 0xd0, 0x1f, 0xce, 0x9b, 0x0a, 0x98, 0xf8, 0x3f, 0x18, 0x13, 0x2f, 0x1e, 0x8d,
+	0x17, 0xff, 0x13, 0x6f, 0x72, 0xf4, 0x68, 0xe0, 0x1f, 0x31, 0x9d, 0xfe, 0xb0, 0x25, 0x0b, 0xbb,
+	0xcb, 0xc9, 0xdb, 0xbc, 0x37, 0xf3, 0xbe, 0xf3, 0xf9, 0xbe, 0x99, 0x69, 0xe1, 0x9a, 0xe7, 0xfa,
+	0x01, 0x92, 0x2d, 0x0f, 0xfb, 0x89, 0x88, 0x65, 0xac, 0xaf, 0x49, 0x81, 0xef, 0x63, 0x11, 0xf2,
+	0xfd, 0xbe, 0xc7, 0x65, 0x3e, 0x3b, 0xdc, 0x73, 0x79, 0xd4, 0xcf, 0xc7, 0xd6, 0x2f, 0x06, 0x8b,
+	0x03, 0x0a, 0x5e, 0xe0, 0xc1, 0x76, 0x96, 0xd0, 0x0d, 0x98, 0x1b, 0x0a, 0x74, 0x65, 0x2c, 0x0c,
+	0xd6, 0x63, 0xeb, 0x0b, 0x4e, 0x19, 0xea, 0xcb, 0xd0, 0x4e, 0x05, 0x37, 0xda, 0x2a, 0x9b, 0x0d,
+	0xb3, 0xb5, 0xa1, 0x1b, 0xb9, 0x01, 0x0a, 0x43, 0xcb, 0xd7, 0x16, 0xa1, 0xde, 0x83, 0xc5, 0x04,
+	0x45, 0xc8, 0x89, 0x78, 0x1c, 0x91, 0x31, 0xdb, 0x63, 0xeb, 0x9a, 0x53, 0x4f, 0xe9, 0x9b, 0xb0,
+	0xb2, 0x2b, 0x10, 0x3f, 0xe0, 0x96, 0xef, 0x0b, 0x24, 0x42, 0x7a, 0xca, 0x03, 0x24, 0x69, 0x74,
+	0x94, 0xd2, 0xe8, 0x49, 0xdd, 0x82, 0x2b, 0x94, 0x7a, 0x2e, 0x11, 0xca, 0x37, 0x82, 0x93, 0x31,
+	0xa7, 0x16, 0x37, 0x72, 0xd6, 0x63, 0xb8, 0x5e, 0x33, 0xe4, 0x20, 0x25, 0x71, 0x44, 0xa8, 0x2f,
+	0x41, 0x8b, 0xfb, 0xca, 0x93, 0xe6, 0xb4, 0xb8, 0xaf, 0xe0, 0x91, 0xc8, 0x0d, 0xd0, 0x68, 0x15,
+	0xf0, 0x79, 0x68, 0x39, 0xb0, 0x94, 0x0b, 0xbc, 0x4a, 0xbd, 0x71, 0x4d, 0xc9, 0x55, 0x5b, 0x95,
+	0xea, 0x2a, 0x74, 0x28, 0x4d, 0x92, 0xfd, 0x23, 0xd5, 0x27, 0xcd, 0x29, 0x22, 0xcb, 0x81, 0xd5,
+	0xa6, 0x66, 0xc5, 0x65, 0x02, 0x94, 0xf8, 0x3b, 0x25, 0x5f, 0x2d, 0x73, 0x01, 0xe7, 0x37, 0x06,
+	0xcb, 0x03, 0x0a, 0x5e, 0x0b, 0x37, 0xa2, 0x5d, 0x14, 0xe3, 0x50, 0x75, 0xd0, 0x76, 0x45, 0x1c,
+	0x16, 0x2a, 0x6a, 0x9c, 0xe1, 0xcb, 0xb8, 0x38, 0xd2, 0x96, 0x8c, 0x33, 0x7c, 0x37, 0x8c, 0xd3,
+	0x48, 0xaa, 0x03, 0xd5, 0x9c, 0x22, 0xca, 0x54, 0xd5, 0x7d, 0xd9, 0xf1, 0x8b, 0xb3, 0x2c, 0xc3,
+	0x02, 0xbf, 0x9c, 0xec, 0x54, 0xf8, 0x45, 0xc6, 0xda, 0x04, 0xe3, 0x2c, 0x63, 0x65, 0xbd, 0x66,
+	0x8d, 0x35, 0xad, 0xfd, 0x60, 0x70, 0x73, 0x40, 0x81, 0x83, 0xef, 0x52, 0x24, 0xf9, 0x7f, 0x3b,
+	0x7c, 0x08, 0x6b, 0xe7, 0xa0, 0x4e, 0x60, 0xf4, 0x3b, 0x53, 0xfd, 0x79, 0xe6, 0x46, 0xfe, 0x3e,
+	0xbe, 0xc4, 0xc8, 0xe7, 0x51, 0xd5, 0xac, 0x0b, 0x9c, 0x66, 0x2e, 0x86, 0x43, 0x4c, 0xa4, 0xf2,
+	0x3a, 0xef, 0x14, 0x51, 0xdd, 0x45, 0xfb, 0x22, 0x17, 0xda, 0x59, 0x17, 0xfa, 0x2d, 0x58, 0x48,
+	0xf2, 0xed, 0x8b, 0x0e, 0x2c, 0x38, 0xff, 0x12, 0xd6, 0x23, 0xe8, 0x9d, 0x47, 0x39, 0xde, 0xe4,
+	0xc6, 0xd7, 0x59, 0x68, 0x0f, 0x28, 0xd0, 0x23, 0x98, 0xaf, 0xbe, 0x33, 0xb7, 0xfb, 0x63, 0xbe,
+	0x4c, 0xfd, 0xda, 0x23, 0xee, 0x6e, 0x4e, 0xb3, 0xba, 0x22, 0x3a, 0x80, 0xc5, 0xfa, 0x2b, 0xb6,
+	0x27, 0x14, 0x29, 0x0b, 0xba, 0xf7, 0xa6, 0x2c, 0xa8, 0x36, 0xfe, 0x08, 0x57, 0x9b, 0x77, 0xf6,
+	0xce, 0x24, 0x4a, 0x8d, 0x92, 0xee, 0x83, 0xa9, 0x4b, 0xaa, 0xed, 0x3f, 0x33, 0xb8, 0x31, 0xf2,
+	0xe9, 0xdc, 0x9f, 0x44, 0x73, 0x54, 0x65, 0xf7, 0xc9, 0x65, 0x2b, 0x2b, 0xa8, 0x2f, 0x0c, 0x56,
+	0x46, 0x5f, 0xf3, 0x89, 0x9c, 0x8e, 0x2c, 0xed, 0x6e, 0x5d, 0xba, 0xb4, 0xe4, 0xda, 0x7e, 0xfe,
+	0xf3, 0xc4, 0x64, 0xc7, 0x27, 0x26, 0xfb, 0x73, 0x62, 0xb2, 0x4f, 0xa7, 0xe6, 0xcc, 0xf1, 0xa9,
+	0x39, 0xf3, 0xfb, 0xd4, 0x9c, 0x79, 0xbb, 0x11, 0x70, 0xb9, 0x97, 0x7a, 0xfd, 0x61, 0x1c, 0xda,
+	0xd5, 0x36, 0x76, 0x73, 0x1b, 0xfb, 0xd0, 0x2e, 0x7f, 0xb9, 0x47, 0x09, 0x92, 0xd7, 0x51, 0xbf,
+	0xdd, 0xbb, 0x7f, 0x03, 0x00, 0x00, 0xff, 0xff, 0xa9, 0x78, 0xb5, 0xaa, 0x89, 0x07, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -327,6 +722,9 @@ const _ = grpc.SupportPackageIsVersion4
 type MsgClient interface {
 	NewBadge(ctx context.Context, in *MsgNewBadge, opts ...grpc.CallOption) (*MsgNewBadgeResponse, error)
 	NewSubBadge(ctx context.Context, in *MsgNewSubBadge, opts ...grpc.CallOption) (*MsgNewSubBadgeResponse, error)
+	TransferBadge(ctx context.Context, in *MsgTransferBadge, opts ...grpc.CallOption) (*MsgTransferBadgeResponse, error)
+	RequestTransferBadge(ctx context.Context, in *MsgRequestTransferBadge, opts ...grpc.CallOption) (*MsgRequestTransferBadgeResponse, error)
+	HandlePendingTransfer(ctx context.Context, in *MsgHandlePendingTransfer, opts ...grpc.CallOption) (*MsgHandlePendingTransferResponse, error)
 }
 
 type msgClient struct {
@@ -355,10 +753,40 @@ func (c *msgClient) NewSubBadge(ctx context.Context, in *MsgNewSubBadge, opts ..
 	return out, nil
 }
 
+func (c *msgClient) TransferBadge(ctx context.Context, in *MsgTransferBadge, opts ...grpc.CallOption) (*MsgTransferBadgeResponse, error) {
+	out := new(MsgTransferBadgeResponse)
+	err := c.cc.Invoke(ctx, "/trevormil.bitbadgeschain.badges.Msg/TransferBadge", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) RequestTransferBadge(ctx context.Context, in *MsgRequestTransferBadge, opts ...grpc.CallOption) (*MsgRequestTransferBadgeResponse, error) {
+	out := new(MsgRequestTransferBadgeResponse)
+	err := c.cc.Invoke(ctx, "/trevormil.bitbadgeschain.badges.Msg/RequestTransferBadge", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) HandlePendingTransfer(ctx context.Context, in *MsgHandlePendingTransfer, opts ...grpc.CallOption) (*MsgHandlePendingTransferResponse, error) {
+	out := new(MsgHandlePendingTransferResponse)
+	err := c.cc.Invoke(ctx, "/trevormil.bitbadgeschain.badges.Msg/HandlePendingTransfer", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	NewBadge(context.Context, *MsgNewBadge) (*MsgNewBadgeResponse, error)
 	NewSubBadge(context.Context, *MsgNewSubBadge) (*MsgNewSubBadgeResponse, error)
+	TransferBadge(context.Context, *MsgTransferBadge) (*MsgTransferBadgeResponse, error)
+	RequestTransferBadge(context.Context, *MsgRequestTransferBadge) (*MsgRequestTransferBadgeResponse, error)
+	HandlePendingTransfer(context.Context, *MsgHandlePendingTransfer) (*MsgHandlePendingTransferResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -370,6 +798,15 @@ func (*UnimplementedMsgServer) NewBadge(ctx context.Context, req *MsgNewBadge) (
 }
 func (*UnimplementedMsgServer) NewSubBadge(ctx context.Context, req *MsgNewSubBadge) (*MsgNewSubBadgeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewSubBadge not implemented")
+}
+func (*UnimplementedMsgServer) TransferBadge(ctx context.Context, req *MsgTransferBadge) (*MsgTransferBadgeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TransferBadge not implemented")
+}
+func (*UnimplementedMsgServer) RequestTransferBadge(ctx context.Context, req *MsgRequestTransferBadge) (*MsgRequestTransferBadgeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RequestTransferBadge not implemented")
+}
+func (*UnimplementedMsgServer) HandlePendingTransfer(ctx context.Context, req *MsgHandlePendingTransfer) (*MsgHandlePendingTransferResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HandlePendingTransfer not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -412,6 +849,60 @@ func _Msg_NewSubBadge_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_TransferBadge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgTransferBadge)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).TransferBadge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/trevormil.bitbadgeschain.badges.Msg/TransferBadge",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).TransferBadge(ctx, req.(*MsgTransferBadge))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_RequestTransferBadge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRequestTransferBadge)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RequestTransferBadge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/trevormil.bitbadgeschain.badges.Msg/RequestTransferBadge",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RequestTransferBadge(ctx, req.(*MsgRequestTransferBadge))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_HandlePendingTransfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgHandlePendingTransfer)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).HandlePendingTransfer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/trevormil.bitbadgeschain.badges.Msg/HandlePendingTransfer",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).HandlePendingTransfer(ctx, req.(*MsgHandlePendingTransfer))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "trevormil.bitbadgeschain.badges.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -423,6 +914,18 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NewSubBadge",
 			Handler:    _Msg_NewSubBadge_Handler,
+		},
+		{
+			MethodName: "TransferBadge",
+			Handler:    _Msg_TransferBadge_Handler,
+		},
+		{
+			MethodName: "RequestTransferBadge",
+			Handler:    _Msg_RequestTransferBadge_Handler,
+		},
+		{
+			MethodName: "HandlePendingTransfer",
+			Handler:    _Msg_HandlePendingTransfer_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -602,6 +1105,271 @@ func (m *MsgNewSubBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgTransferBadge) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgTransferBadge) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgTransferBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.SubbadgeId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.SubbadgeId))
+		i--
+		dAtA[i] = 0x30
+	}
+	if m.BadgeId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.Amount != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Amount))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.To) > 0 {
+		i -= len(m.To)
+		copy(dAtA[i:], m.To)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.To)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.From) > 0 {
+		i -= len(m.From)
+		copy(dAtA[i:], m.From)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.From)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgTransferBadgeResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgTransferBadgeResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgTransferBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Message) > 0 {
+		i -= len(m.Message)
+		copy(dAtA[i:], m.Message)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Message)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRequestTransferBadge) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRequestTransferBadge) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRequestTransferBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.SubbadgeId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.SubbadgeId))
+		i--
+		dAtA[i] = 0x30
+	}
+	if m.BadgeId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.Amount != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Amount))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.To) > 0 {
+		i -= len(m.To)
+		copy(dAtA[i:], m.To)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.To)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.From) > 0 {
+		i -= len(m.From)
+		copy(dAtA[i:], m.From)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.From)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRequestTransferBadgeResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRequestTransferBadgeResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRequestTransferBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Message) > 0 {
+		i -= len(m.Message)
+		copy(dAtA[i:], m.Message)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Message)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgHandlePendingTransfer) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgHandlePendingTransfer) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgHandlePendingTransfer) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.PendingId) > 0 {
+		i -= len(m.PendingId)
+		copy(dAtA[i:], m.PendingId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.PendingId)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.SubbadgeId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.SubbadgeId))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.BadgeId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.Accept {
+		i--
+		if m.Accept {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgHandlePendingTransferResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgHandlePendingTransferResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgHandlePendingTransferResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Message) > 0 {
+		i -= len(m.Message)
+		copy(dAtA[i:], m.Message)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Message)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -689,6 +1457,131 @@ func (m *MsgNewSubBadgeResponse) Size() (n int) {
 	if m.SubassetId != 0 {
 		n += 1 + sovTx(uint64(m.SubassetId))
 	}
+	l = len(m.Message)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgTransferBadge) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.From)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.To)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Amount != 0 {
+		n += 1 + sovTx(uint64(m.Amount))
+	}
+	if m.BadgeId != 0 {
+		n += 1 + sovTx(uint64(m.BadgeId))
+	}
+	if m.SubbadgeId != 0 {
+		n += 1 + sovTx(uint64(m.SubbadgeId))
+	}
+	return n
+}
+
+func (m *MsgTransferBadgeResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Message)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgRequestTransferBadge) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.From)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.To)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Amount != 0 {
+		n += 1 + sovTx(uint64(m.Amount))
+	}
+	if m.BadgeId != 0 {
+		n += 1 + sovTx(uint64(m.BadgeId))
+	}
+	if m.SubbadgeId != 0 {
+		n += 1 + sovTx(uint64(m.SubbadgeId))
+	}
+	return n
+}
+
+func (m *MsgRequestTransferBadgeResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Message)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgHandlePendingTransfer) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Accept {
+		n += 2
+	}
+	if m.BadgeId != 0 {
+		n += 1 + sovTx(uint64(m.BadgeId))
+	}
+	if m.SubbadgeId != 0 {
+		n += 1 + sovTx(uint64(m.SubbadgeId))
+	}
+	l = len(m.PendingId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgHandlePendingTransferResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
 	l = len(m.Message)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
@@ -1201,6 +2094,830 @@ func (m *MsgNewSubBadgeResponse) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgTransferBadge) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgTransferBadge: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgTransferBadge: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.From = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field To", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.To = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			m.Amount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Amount |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
+			}
+			m.BadgeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.BadgeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeId", wireType)
+			}
+			m.SubbadgeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.SubbadgeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgTransferBadgeResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgTransferBadgeResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgTransferBadgeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRequestTransferBadge) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRequestTransferBadge: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRequestTransferBadge: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.From = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field To", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.To = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			m.Amount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Amount |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
+			}
+			m.BadgeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.BadgeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeId", wireType)
+			}
+			m.SubbadgeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.SubbadgeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRequestTransferBadgeResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRequestTransferBadgeResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRequestTransferBadgeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgHandlePendingTransfer) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgHandlePendingTransfer: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgHandlePendingTransfer: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Accept", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Accept = bool(v != 0)
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
+			}
+			m.BadgeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.BadgeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeId", wireType)
+			}
+			m.SubbadgeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.SubbadgeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PendingId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PendingId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgHandlePendingTransferResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgHandlePendingTransferResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgHandlePendingTransferResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
 			}

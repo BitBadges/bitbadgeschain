@@ -39,7 +39,7 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 		if found {
 			return &types.QueryGetBalanceResponse{
 				BalanceInfo: &badgeBalanceInfo,
-				Message: 	"Successfully queried badge balance info.",
+				Message:     "Successfully queried badge balance info.",
 			}, nil
 		}
 	}
@@ -53,6 +53,6 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 			Pending:      []*types.PendingTransfer{},
 			Approvals:    []*types.Approval{},
 		},
-		Message: 	"Badge balance was not found so returning default balance == 0.",
+		Message: "Badge balance was not found so returning default balance == 0.",
 	}, nil
 }
