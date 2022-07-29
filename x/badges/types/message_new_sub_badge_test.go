@@ -18,13 +18,22 @@ func TestMsgNewSubBadge_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: MsgNewSubBadge{
 				Creator: "invalid_address",
+				Supply: 10,
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
-			name: "valid address",
+			name: "valid state",
 			msg: MsgNewSubBadge{
 				Creator: sample.AccAddress(),
+				Supply: 10,
 			},
+		}, {
+			name: "invalid supply",
+			msg: MsgNewSubBadge{
+				Creator: sample.AccAddress(),
+				Supply: 0,
+			},
+			err: ErrSupplyEqualsZero,
 		},
 	}
 	for _, tt := range tests {

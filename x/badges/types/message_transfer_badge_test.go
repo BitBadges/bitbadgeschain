@@ -18,13 +18,25 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: MsgTransferBadge{
 				Creator: "invalid_address",
+				To: 0,
+				From: 1,
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
-			name: "valid address",
+			name: "valid state",
 			msg: MsgTransferBadge{
 				Creator: sample.AccAddress(),
+				To: 0,
+				From: 1,
 			},
+		}, {
+			name: "invalid addresses",
+			msg: MsgTransferBadge{
+				Creator: sample.AccAddress(),
+				To: 0,
+				From: 0,
+			},
+			err: ErrSenderAndReceiverSame,
 		},
 	}
 	for _, tt := range tests {
