@@ -17,8 +17,6 @@ service Msg {
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
-//TODO: Make these as space efficient as possible
-
 message MsgNewBadge {
     string creator = 1;
     string uri = 2;
