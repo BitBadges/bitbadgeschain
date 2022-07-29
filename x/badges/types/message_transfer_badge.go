@@ -46,5 +46,10 @@ func (msg *MsgTransferBadge) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	//Can't send to same address
+	if msg.To == msg.From {
+		return ErrSenderAndReceiverSame
+	}
 	return nil
 }

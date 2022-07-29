@@ -4,23 +4,23 @@ import { StdFee } from "@cosmjs/launchpad";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry, OfflineSigner, EncodeObject, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
-import { MsgTransferBadge } from "./types/badges/tx";
-import { MsgRequestTransferBadge } from "./types/badges/tx";
-import { MsgSetApproval } from "./types/badges/tx";
-import { MsgNewSubBadge } from "./types/badges/tx";
-import { MsgRevokeBadge } from "./types/badges/tx";
-import { MsgNewBadge } from "./types/badges/tx";
 import { MsgHandlePendingTransfer } from "./types/badges/tx";
+import { MsgNewBadge } from "./types/badges/tx";
+import { MsgRevokeBadge } from "./types/badges/tx";
+import { MsgTransferBadge } from "./types/badges/tx";
+import { MsgSetApproval } from "./types/badges/tx";
+import { MsgRequestTransferBadge } from "./types/badges/tx";
+import { MsgNewSubBadge } from "./types/badges/tx";
 
 
 const types = [
-  ["/trevormil.bitbadgeschain.badges.MsgTransferBadge", MsgTransferBadge],
-  ["/trevormil.bitbadgeschain.badges.MsgRequestTransferBadge", MsgRequestTransferBadge],
-  ["/trevormil.bitbadgeschain.badges.MsgSetApproval", MsgSetApproval],
-  ["/trevormil.bitbadgeschain.badges.MsgNewSubBadge", MsgNewSubBadge],
-  ["/trevormil.bitbadgeschain.badges.MsgRevokeBadge", MsgRevokeBadge],
-  ["/trevormil.bitbadgeschain.badges.MsgNewBadge", MsgNewBadge],
   ["/trevormil.bitbadgeschain.badges.MsgHandlePendingTransfer", MsgHandlePendingTransfer],
+  ["/trevormil.bitbadgeschain.badges.MsgNewBadge", MsgNewBadge],
+  ["/trevormil.bitbadgeschain.badges.MsgRevokeBadge", MsgRevokeBadge],
+  ["/trevormil.bitbadgeschain.badges.MsgTransferBadge", MsgTransferBadge],
+  ["/trevormil.bitbadgeschain.badges.MsgSetApproval", MsgSetApproval],
+  ["/trevormil.bitbadgeschain.badges.MsgRequestTransferBadge", MsgRequestTransferBadge],
+  ["/trevormil.bitbadgeschain.badges.MsgNewSubBadge", MsgNewSubBadge],
   
 ];
 export const MissingWalletError = new Error("wallet is required");
@@ -53,13 +53,13 @@ const txClient = async (wallet: OfflineSigner, { addr: addr }: TxClientOptions =
 
   return {
     signAndBroadcast: (msgs: EncodeObject[], { fee, memo }: SignAndBroadcastOptions = {fee: defaultFee, memo: ""}) => client.signAndBroadcast(address, msgs, fee,memo),
-    msgTransferBadge: (data: MsgTransferBadge): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgTransferBadge", value: MsgTransferBadge.fromPartial( data ) }),
-    msgRequestTransferBadge: (data: MsgRequestTransferBadge): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgRequestTransferBadge", value: MsgRequestTransferBadge.fromPartial( data ) }),
-    msgSetApproval: (data: MsgSetApproval): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgSetApproval", value: MsgSetApproval.fromPartial( data ) }),
-    msgNewSubBadge: (data: MsgNewSubBadge): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgNewSubBadge", value: MsgNewSubBadge.fromPartial( data ) }),
-    msgRevokeBadge: (data: MsgRevokeBadge): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgRevokeBadge", value: MsgRevokeBadge.fromPartial( data ) }),
-    msgNewBadge: (data: MsgNewBadge): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgNewBadge", value: MsgNewBadge.fromPartial( data ) }),
     msgHandlePendingTransfer: (data: MsgHandlePendingTransfer): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgHandlePendingTransfer", value: MsgHandlePendingTransfer.fromPartial( data ) }),
+    msgNewBadge: (data: MsgNewBadge): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgNewBadge", value: MsgNewBadge.fromPartial( data ) }),
+    msgRevokeBadge: (data: MsgRevokeBadge): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgRevokeBadge", value: MsgRevokeBadge.fromPartial( data ) }),
+    msgTransferBadge: (data: MsgTransferBadge): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgTransferBadge", value: MsgTransferBadge.fromPartial( data ) }),
+    msgSetApproval: (data: MsgSetApproval): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgSetApproval", value: MsgSetApproval.fromPartial( data ) }),
+    msgRequestTransferBadge: (data: MsgRequestTransferBadge): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgRequestTransferBadge", value: MsgRequestTransferBadge.fromPartial( data ) }),
+    msgNewSubBadge: (data: MsgNewSubBadge): EncodeObject => ({ typeUrl: "/trevormil.bitbadgeschain.badges.MsgNewSubBadge", value: MsgNewSubBadge.fromPartial( data ) }),
     
   };
 };

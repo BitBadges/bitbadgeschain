@@ -1,4 +1,4 @@
-package keeper
+package types
 
 import (
 	"fmt"
@@ -30,7 +30,7 @@ func ValidateBadgeID(id string) error {
 // ValidateURI returns whether the uri is valid
 func ValidateURI(uri string) error {
 	if !reUri.MatchString(uri) {
-		return sdkerrors.Wrapf(ErrInvalidUri, "invalid uri: %s", uri)
+		return sdkerrors.Wrapf(ErrInvalidBadgeURI, "invalid uri: %s", uri)
 	}
 	return nil
 }

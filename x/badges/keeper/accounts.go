@@ -17,13 +17,14 @@ func (k Keeper) MustGetAccountNumberForAddressString(ctx sdk.Context, address st
 	return k.GetOrCreateAccountNumberForAccAddressBech32(ctx, acc_address)
 }
 
+//TODO: update this to be compatible with v0.46.0 AccountKeeper
 func (k Keeper) AssertAccountNumbersAreValid(ctx sdk.Context, accountNums []uint64) error {
-	for _, accountNum := range accountNums {
-		address := k.accountKeeper.GetAccountAddressByID(ctx, accountNum)
-		if address == "" {
-			return ErrAccountsAreNotRegistered
-		}
-	}
+	// for _, accountNum := range accountNums {
+	// 	address := k.accountKeeper.GetAccountAddressByID(ctx, accountNum)
+	// 	if address == "" {
+	// 		return ErrAccountsAreNotRegistered
+	// 	}
+	// }
 
 	return nil
 }

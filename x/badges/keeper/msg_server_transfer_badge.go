@@ -11,11 +11,6 @@ import (
 func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBadge) (*types.MsgTransferBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	//Can't send to same address
-	if msg.To == msg.From {
-		return nil, ErrSenderAndReceiverSame
-	}
-
 	// Creator will already be registered, so we can do this and panic if it fails
 	creator_account_num := k.Keeper.MustGetAccountNumberForAddressString(ctx, msg.Creator)
 
@@ -40,7 +35,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 
 	// Verify that the permissions are valid
 	badge, _ := k.GetBadgeFromStore(ctx, msg.BadgeId) //currently ignore error because above we assert that it exists
-	permissions := GetPermissions(badge.PermissionFlags)
+	permissions := types.GetPermissions(badge.PermissionFlags)
 	from_balance_key := GetBalanceKey(msg.From, msg.BadgeId, msg.SubbadgeId)
 	to_balance_key := GetBalanceKey(msg.To, msg.BadgeId, msg.SubbadgeId)
 
@@ -58,7 +53,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 
 	// Handle the transfer forcefully (no pending) if forceful transfers is set or "burning" (sending to manager address)
 	// Else, handle it by adding a pending transfer
-	if permissions.forceful_transfers || badge.Manager == msg.To {
+	if permissions.ForcefulTransfers() || badge.Manager == msg.To {
 		err := k.AddToBadgeBalance(ctx, to_balance_key, msg.Amount)
 		if err != nil {
 			return nil, err

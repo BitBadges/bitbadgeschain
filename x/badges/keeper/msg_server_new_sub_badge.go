@@ -14,10 +14,6 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	// Creator will already be registered, so we can do this and panic if it fails
 	creator_account_num := k.Keeper.MustGetAccountNumberForAddressString(ctx, msg.Creator)
 
-	if msg.Supply == 0 {
-		return nil, ErrSupplyEqualsZero
-	}
-
 	badge, found := k.GetBadgeFromStore(ctx, msg.Id)
 	if !found {
 		return nil, ErrBadgeNotExists
@@ -28,8 +24,8 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	}
 
 	//Check permissions (can_create)
-	permission_flags := GetPermissions(badge.PermissionFlags)
-	if !permission_flags.can_create {
+	permission_flags := types.GetPermissions(badge.PermissionFlags)
+	if !permission_flags.CanCreateSubbadges() {
 		return nil, sdkerrors.Wrapf(ErrInvalidPermissions, "%s", "Manager can't create more subbadges")
 	}
 

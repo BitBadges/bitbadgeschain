@@ -13,22 +13,6 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 	// Creator will already be registered, so we can do this and panic if it fails
 	creator_account_num := k.Keeper.MustGetAccountNumberForAddressString(ctx, msg.Creator)
 
-	//Validate well-formedness of the message entries
-	if err := ValidateURI(msg.Uri); err != nil {
-		return nil, err
-	}
-
-	if err := ValidateURI(msg.SubassetUris); err != nil {
-		return nil, err
-	}
-
-	if err := ValidatePermissions(msg.Permissions); err != nil {
-		return nil, err
-	}
-
-	//TODO: Validate freeze digest string
-
-
 	//Get next badge ID and increment
 	next_badge_id := k.GetNextAssetId(ctx)
 	k.SetNextAssetId(ctx, next_badge_id + 1)

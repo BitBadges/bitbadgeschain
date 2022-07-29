@@ -26,7 +26,10 @@ func CmdGetBalance() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			reqAddress := args[2]
+			reqAddress, err := cast.ToUint64E(args[2])
+			if err != nil {
+				return err
+			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {

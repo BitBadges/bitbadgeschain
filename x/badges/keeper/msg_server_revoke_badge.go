@@ -35,8 +35,8 @@ func (k msgServer) RevokeBadge(goCtx context.Context,  msg *types.MsgRevokeBadge
 
 	// Verify that the permissions are valid
 	badge, _ := k.GetBadgeFromStore(ctx, msg.BadgeId) //currently ignore error because above we assert that it exists
-	permissions := GetPermissions(badge.PermissionFlags)
-	if !permissions.can_revoke {
+	permissions := types.GetPermissions(badge.PermissionFlags)
+	if !permissions.CanRevoke() {
 		return nil, ErrInvalidPermissions
 	}
 

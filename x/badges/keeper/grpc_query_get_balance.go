@@ -16,7 +16,10 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	address, err := sdk.AccAddressFromBech32(req.Address)
+	// Verify that the from and to addresses are registered; 
+	account_nums := []uint64{}
+	account_nums = append(account_nums, req.Address)
+	err := k.AssertAccountNumbersAreValid(ctx, account_nums)
 	if err != nil {
 		return nil, err
 	}
@@ -26,23 +29,19 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 		return nil, err
 	}
 
-	account := k.accountKeeper.GetAccount(ctx, address)
+	full_id := GetBalanceKey(
+		req.Address,
+		req.BadgeId,
+		req.SubbadgeId,
+	)
 
-	if account != nil {
-		full_id := GetBalanceKey(
-			account.GetAccountNumber(),
-			req.BadgeId,
-			req.SubbadgeId,
-		)
-
-		badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, full_id)
-		if found {
-			return &types.QueryGetBalanceResponse{
-				BalanceInfo: &badgeBalanceInfo,
-				Message:     "Successfully queried badge balance info.",
-			}, nil
-		}
+	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, full_id)
+	if found {
+		return &types.QueryGetBalanceResponse{
+			BalanceInfo: &badgeBalanceInfo,
+		}, nil
 	}
+	
 
 	_ = ctx
 
@@ -53,6 +52,5 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 			Pending:      []*types.PendingTransfer{},
 			Approvals:    []*types.Approval{},
 		},
-		Message: "Badge balance was not found so returning default balance == 0.",
 	}, nil
 }

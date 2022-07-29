@@ -1,4 +1,4 @@
-package keeper
+package types
 
 const (
 	NumPermissions = 7
@@ -79,7 +79,7 @@ func ValidatePermissionsUpdate(oldPermissions uint64, newPermissions uint64) err
 }
 
 func GetPermissions(permissions uint64) PermissionFlags {
-	var flags PermissionFlags
+	var flags PermissionFlags = PermissionFlags{}
 	for i := 0; i <= NumPermissions; i++ {
 		mask := uint64(1) << i
 		masked_n := permissions & mask
@@ -91,6 +91,34 @@ func GetPermissions(permissions uint64) PermissionFlags {
 
 	return flags
 }
+
+func (p *PermissionFlags) CanManagerTransfer() bool {
+	return p.can_manager_transfer
+}
+
+func (p *PermissionFlags) CanUpdateUris() bool {
+	return p.can_update_uris
+}
+
+func (p *PermissionFlags) ForcefulTransfers() bool {
+	return p.forceful_transfers
+}
+
+func (p *PermissionFlags) CanCreateSubbadges() bool {
+	return p.can_create
+}
+
+func (p *PermissionFlags) CanRevoke() bool {
+	return p.can_revoke
+}
+
+func (p *PermissionFlags) CanFreeze() bool {
+	return p.can_freeze
+}
+func (p *PermissionFlags) FrozenByDefault() bool {
+	return p.frozen_by_default
+}
+
 
 func SetPermissionsFlags(permission bool, digit_index int, flags *PermissionFlags) {
 	if digit_index == 7 {

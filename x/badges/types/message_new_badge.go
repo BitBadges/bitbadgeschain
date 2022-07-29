@@ -45,5 +45,21 @@ func (msg *MsgNewBadge) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	//Validate well-formedness of the message entries
+	if err := ValidateURI(msg.Uri); err != nil {
+		return err
+	}
+
+	if err := ValidateURI(msg.SubassetUris); err != nil {
+		return err
+	}
+
+	if err := ValidatePermissions(msg.Permissions); err != nil {
+		return err
+	}
+
+	//TODO: Validate freeze digest string
+
 	return nil
 }
