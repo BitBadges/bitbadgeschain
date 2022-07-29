@@ -7,103 +7,89 @@ option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
 // Msg defines the Msg service.
 service Msg {
-      rpc NewBadge(MsgNewBadge) returns (MsgNewBadgeResponse);
-  rpc NewSubBadge(MsgNewSubBadge) returns (MsgNewSubBadgeResponse);
-  rpc TransferBadge(MsgTransferBadge) returns (MsgTransferBadgeResponse);
-  rpc RequestTransferBadge(MsgRequestTransferBadge) returns (MsgRequestTransferBadgeResponse);
-  rpc HandlePendingTransfer(MsgHandlePendingTransfer) returns (MsgHandlePendingTransferResponse);
-  rpc SetApproval(MsgSetApproval) returns (MsgSetApprovalResponse);
-  rpc RevokeBadge(MsgRevokeBadge) returns (MsgRevokeBadgeResponse);
+    rpc NewBadge(MsgNewBadge) returns (MsgNewBadgeResponse);
+    rpc NewSubBadge(MsgNewSubBadge) returns (MsgNewSubBadgeResponse);
+    rpc TransferBadge(MsgTransferBadge) returns (MsgTransferBadgeResponse);
+    rpc RequestTransferBadge(MsgRequestTransferBadge) returns (MsgRequestTransferBadgeResponse);
+    rpc HandlePendingTransfer(MsgHandlePendingTransfer) returns (MsgHandlePendingTransferResponse);
+    rpc SetApproval(MsgSetApproval) returns (MsgSetApprovalResponse);
+    rpc RevokeBadge(MsgRevokeBadge) returns (MsgRevokeBadgeResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
 //TODO: Make these as space efficient as possible
 
 message MsgNewBadge {
-  string creator = 1;
-  string uri = 3;
-  string manager = 4;
-  uint64 permissions = 5;
-  string freezeAddressesDigest = 6;
-  string subassetUris = 7;
+    string creator = 1;
+    string uri = 2;
+    string subassetUris = 3;
+    uint64 permissions = 4;
+    string freezeAddressesDigest = 5;
 }
 
 message MsgNewBadgeResponse {
-  uint64 id = 1;
-  string message = 2;
+    uint64 id = 1;
 }
 
 message MsgNewSubBadge {
-  string creator = 1;
-  uint64 id = 2;
-  uint64 supply = 3;
+    string creator = 1;
+    uint64 id = 2;
+    uint64 supply = 3;
 }
 
 message MsgNewSubBadgeResponse {
-  uint64 subassetId = 1;
-  string message = 2;
+    uint64 subassetId = 1;
 }
 
 message MsgTransferBadge {
-  string creator = 1;
-  string from = 2;
-  string to = 3;
-  uint64 amount = 4;
-  uint64 badgeId = 5;
-  uint64 subbadgeId = 6;
+    string creator = 1;
+    uint64 from = 2;
+    uint64 to = 3;
+    uint64 amount = 4;
+    uint64 badgeId = 5;
+    uint64 subbadgeId = 6;
 }
 
-message MsgTransferBadgeResponse {
-    string message = 1;
-}
+message MsgTransferBadgeResponse {}
 
 message MsgRequestTransferBadge {
-  string creator = 1;
-  string from = 2;
-  string to = 3;
-  uint64 amount = 4;
-  uint64 badgeId = 5;
-  uint64 subbadgeId = 6;
+    string creator = 1;
+    uint64 from = 2;
+    uint64 amount = 4;
+    uint64 badgeId = 5;
+    uint64 subbadgeId = 6;
 }
 
-message MsgRequestTransferBadgeResponse {
-    string message = 1;
-}
+message MsgRequestTransferBadgeResponse {}
 
 message MsgHandlePendingTransfer {
-  string creator = 1;
-  bool accept = 2;
-  uint64 badgeId = 3;
-  uint64 subbadgeId = 4;
-  string pendingId = 5;
+    string creator = 1;
+    bool accept = 2;
+    uint64 badgeId = 3;
+    uint64 subbadgeId = 4;
+    uint64 this_nonce = 5;
 }
 
-message MsgHandlePendingTransferResponse {
-  string message = 1;
-}
+message MsgHandlePendingTransferResponse {}
 
 message MsgSetApproval {
-  string creator = 1;
-  uint64 amount = 2;
-  string address = 3;
-  uint64 badgeId = 4;
-  uint64 subbadgeId = 5;
+    string creator = 1;
+    uint64 amount = 2;
+    uint64 address = 3;
+    uint64 badgeId = 4;
+    uint64 subbadgeId = 5;
 }
 
-message MsgSetApprovalResponse {
-  string message = 1;
-}
+message MsgSetApprovalResponse {}
 
 message MsgRevokeBadge {
-  string creator = 1;
-  string address = 2;
-  uint64 amount = 3;
-  uint64 badgeId = 4;
-  uint64 subbadgeId = 5;
+    string creator = 1;
+    uint64 address = 2;
+    uint64 amount = 3;
+    uint64 badgeId = 4;
+    uint64 subbadgeId = 5;
 }
 
-message MsgRevokeBadgeResponse {
-  string message = 1;
-}
+message MsgRevokeBadgeResponse {}
 
 // this line is used by starport scaffolding # proto/tx/message

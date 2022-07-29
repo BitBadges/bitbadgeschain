@@ -20,14 +20,14 @@ export interface Approval {
 
 /** Pending transfers will not be saved after accept / reject */
 export interface PendingTransfer {
-  /** indexed by (this account's pending_nonce - other account's pending_nonce) */
-  id: string;
+  this_pending_nonce: number;
+  other_pending_nonce: number;
+  address_num: number;
   amount: number;
   /** vs. receive request */
   send_request: boolean;
   to: number;
   from: number;
-  memo: string;
   approved_by: number;
 }
 
@@ -230,37 +230,41 @@ export const Approval = {
 };
 
 const basePendingTransfer: object = {
-  id: "",
+  this_pending_nonce: 0,
+  other_pending_nonce: 0,
+  address_num: 0,
   amount: 0,
   send_request: false,
   to: 0,
   from: 0,
-  memo: "",
   approved_by: 0,
 };
 
 export const PendingTransfer = {
   encode(message: PendingTransfer, writer: Writer = Writer.create()): Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
+    if (message.this_pending_nonce !== 0) {
+      writer.uint32(8).uint64(message.this_pending_nonce);
+    }
+    if (message.other_pending_nonce !== 0) {
+      writer.uint32(16).uint64(message.other_pending_nonce);
+    }
+    if (message.address_num !== 0) {
+      writer.uint32(24).uint64(message.address_num);
     }
     if (message.amount !== 0) {
-      writer.uint32(16).uint64(message.amount);
+      writer.uint32(32).uint64(message.amount);
     }
     if (message.send_request === true) {
-      writer.uint32(24).bool(message.send_request);
+      writer.uint32(40).bool(message.send_request);
     }
     if (message.to !== 0) {
-      writer.uint32(32).uint64(message.to);
+      writer.uint32(48).uint64(message.to);
     }
     if (message.from !== 0) {
-      writer.uint32(40).uint64(message.from);
-    }
-    if (message.memo !== "") {
-      writer.uint32(50).string(message.memo);
+      writer.uint32(56).uint64(message.from);
     }
     if (message.approved_by !== 0) {
-      writer.uint32(56).uint64(message.approved_by);
+      writer.uint32(72).uint64(message.approved_by);
     }
     return writer;
   },
@@ -273,24 +277,27 @@ export const PendingTransfer = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = reader.string();
+          message.this_pending_nonce = longToNumber(reader.uint64() as Long);
           break;
         case 2:
-          message.amount = longToNumber(reader.uint64() as Long);
+          message.other_pending_nonce = longToNumber(reader.uint64() as Long);
           break;
         case 3:
-          message.send_request = reader.bool();
+          message.address_num = longToNumber(reader.uint64() as Long);
           break;
         case 4:
-          message.to = longToNumber(reader.uint64() as Long);
+          message.amount = longToNumber(reader.uint64() as Long);
           break;
         case 5:
-          message.from = longToNumber(reader.uint64() as Long);
+          message.send_request = reader.bool();
           break;
         case 6:
-          message.memo = reader.string();
+          message.to = longToNumber(reader.uint64() as Long);
           break;
         case 7:
+          message.from = longToNumber(reader.uint64() as Long);
+          break;
+        case 9:
           message.approved_by = longToNumber(reader.uint64() as Long);
           break;
         default:
@@ -303,10 +310,26 @@ export const PendingTransfer = {
 
   fromJSON(object: any): PendingTransfer {
     const message = { ...basePendingTransfer } as PendingTransfer;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = String(object.id);
+    if (
+      object.this_pending_nonce !== undefined &&
+      object.this_pending_nonce !== null
+    ) {
+      message.this_pending_nonce = Number(object.this_pending_nonce);
     } else {
-      message.id = "";
+      message.this_pending_nonce = 0;
+    }
+    if (
+      object.other_pending_nonce !== undefined &&
+      object.other_pending_nonce !== null
+    ) {
+      message.other_pending_nonce = Number(object.other_pending_nonce);
+    } else {
+      message.other_pending_nonce = 0;
+    }
+    if (object.address_num !== undefined && object.address_num !== null) {
+      message.address_num = Number(object.address_num);
+    } else {
+      message.address_num = 0;
     }
     if (object.amount !== undefined && object.amount !== null) {
       message.amount = Number(object.amount);
@@ -328,11 +351,6 @@ export const PendingTransfer = {
     } else {
       message.from = 0;
     }
-    if (object.memo !== undefined && object.memo !== null) {
-      message.memo = String(object.memo);
-    } else {
-      message.memo = "";
-    }
     if (object.approved_by !== undefined && object.approved_by !== null) {
       message.approved_by = Number(object.approved_by);
     } else {
@@ -343,13 +361,17 @@ export const PendingTransfer = {
 
   toJSON(message: PendingTransfer): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
+    message.this_pending_nonce !== undefined &&
+      (obj.this_pending_nonce = message.this_pending_nonce);
+    message.other_pending_nonce !== undefined &&
+      (obj.other_pending_nonce = message.other_pending_nonce);
+    message.address_num !== undefined &&
+      (obj.address_num = message.address_num);
     message.amount !== undefined && (obj.amount = message.amount);
     message.send_request !== undefined &&
       (obj.send_request = message.send_request);
     message.to !== undefined && (obj.to = message.to);
     message.from !== undefined && (obj.from = message.from);
-    message.memo !== undefined && (obj.memo = message.memo);
     message.approved_by !== undefined &&
       (obj.approved_by = message.approved_by);
     return obj;
@@ -357,10 +379,26 @@ export const PendingTransfer = {
 
   fromPartial(object: DeepPartial<PendingTransfer>): PendingTransfer {
     const message = { ...basePendingTransfer } as PendingTransfer;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
+    if (
+      object.this_pending_nonce !== undefined &&
+      object.this_pending_nonce !== null
+    ) {
+      message.this_pending_nonce = object.this_pending_nonce;
     } else {
-      message.id = "";
+      message.this_pending_nonce = 0;
+    }
+    if (
+      object.other_pending_nonce !== undefined &&
+      object.other_pending_nonce !== null
+    ) {
+      message.other_pending_nonce = object.other_pending_nonce;
+    } else {
+      message.other_pending_nonce = 0;
+    }
+    if (object.address_num !== undefined && object.address_num !== null) {
+      message.address_num = object.address_num;
+    } else {
+      message.address_num = 0;
     }
     if (object.amount !== undefined && object.amount !== null) {
       message.amount = object.amount;
@@ -381,11 +419,6 @@ export const PendingTransfer = {
       message.from = object.from;
     } else {
       message.from = 0;
-    }
-    if (object.memo !== undefined && object.memo !== null) {
-      message.memo = object.memo;
-    } else {
-      message.memo = "";
     }
     if (object.approved_by !== undefined && object.approved_by !== null) {
       message.approved_by = object.approved_by;

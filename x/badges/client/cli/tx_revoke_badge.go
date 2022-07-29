@@ -19,7 +19,10 @@ func CmdRevokeBadge() *cobra.Command {
 		Short: "Broadcast message revoke-badge",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argAddress := args[0]
+			argAddress, err := cast.ToUint64E(args[0])
+			if err != nil {
+				return err
+			}
 			argAmount, err := cast.ToUint64E(args[1])
 			if err != nil {
 				return err

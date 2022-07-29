@@ -23,11 +23,12 @@ message Approval {
 
 //Pending transfers will not be saved after accept / reject
 message PendingTransfer {
-    string id = 1; //indexed by (this account's pending_nonce - other account's pending_nonce)
-    uint64 amount = 2;
-    bool send_request = 3; //vs. receive request
-    uint64 to = 4;
-    uint64 from = 5;
-    string memo = 6;
-    uint64 approved_by = 7;
+    uint64 this_pending_nonce = 1;
+    uint64 other_pending_nonce = 2;
+    uint64 address_num = 3;
+    uint64 amount = 4;
+    bool send_request = 5; //vs. receive request
+    uint64 to = 6;
+    uint64 from = 7;
+    uint64 approved_by = 9;
 }

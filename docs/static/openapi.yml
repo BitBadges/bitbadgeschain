@@ -30400,9 +30400,10 @@ paths:
                       valid metadata standard (bitbadge, collection, etc)
                   manager:
                     type: string
+                    format: uint64
                     title: >-
-                      manager addressof the class; can have special permissions;
-                      is used as the reserve address for the assets
+                      manager address of the class; can have special
+                      permissions; is used as the reserve address for the assets
                   permission_flags:
                     type: string
                     format: uint64
@@ -30702,8 +30703,15 @@ paths:
                     items:
                       type: object
                       properties:
-                        id:
+                        this_pending_nonce:
                           type: string
+                          format: uint64
+                        other_pending_nonce:
+                          type: string
+                          format: uint64
+                        address_num:
+                          type: string
+                          format: uint64
                         amount:
                           type: string
                           format: uint64
@@ -30715,8 +30723,6 @@ paths:
                         from:
                           type: string
                           format: uint64
-                        memo:
-                          type: string
                         approved_by:
                           type: string
                           format: uint64
@@ -52677,8 +52683,15 @@ definitions:
         items:
           type: object
           properties:
-            id:
+            this_pending_nonce:
               type: string
+              format: uint64
+            other_pending_nonce:
+              type: string
+              format: uint64
+            address_num:
+              type: string
+              format: uint64
             amount:
               type: string
               format: uint64
@@ -52690,8 +52703,6 @@ definitions:
             from:
               type: string
               format: uint64
-            memo:
-              type: string
             approved_by:
               type: string
               format: uint64
@@ -52726,8 +52737,9 @@ definitions:
           metadata standard (bitbadge, collection, etc)
       manager:
         type: string
+        format: uint64
         title: >-
-          manager addressof the class; can have special permissions; is used as
+          manager address of the class; can have special permissions; is used as
           the reserve address for the assets
       permission_flags:
         type: string
@@ -52807,53 +52819,41 @@ definitions:
       definition
   trevormil.bitbadgeschain.badges.MsgHandlePendingTransferResponse:
     type: object
-    properties:
-      message:
-        type: string
   trevormil.bitbadgeschain.badges.MsgNewBadgeResponse:
     type: object
     properties:
       id:
         type: string
         format: uint64
-      message:
-        type: string
   trevormil.bitbadgeschain.badges.MsgNewSubBadgeResponse:
     type: object
     properties:
       subassetId:
         type: string
         format: uint64
-      message:
-        type: string
   trevormil.bitbadgeschain.badges.MsgRequestTransferBadgeResponse:
     type: object
-    properties:
-      message:
-        type: string
   trevormil.bitbadgeschain.badges.MsgRevokeBadgeResponse:
     type: object
-    properties:
-      message:
-        type: string
   trevormil.bitbadgeschain.badges.MsgSetApprovalResponse:
     type: object
-    properties:
-      message:
-        type: string
   trevormil.bitbadgeschain.badges.MsgTransferBadgeResponse:
     type: object
-    properties:
-      message:
-        type: string
   trevormil.bitbadgeschain.badges.Params:
     type: object
     description: Params defines the parameters for the module.
   trevormil.bitbadgeschain.badges.PendingTransfer:
     type: object
     properties:
-      id:
+      this_pending_nonce:
         type: string
+        format: uint64
+      other_pending_nonce:
+        type: string
+        format: uint64
+      address_num:
+        type: string
+        format: uint64
       amount:
         type: string
         format: uint64
@@ -52865,8 +52865,6 @@ definitions:
       from:
         type: string
         format: uint64
-      memo:
-        type: string
       approved_by:
         type: string
         format: uint64
@@ -52892,9 +52890,10 @@ definitions:
               metadata standard (bitbadge, collection, etc)
           manager:
             type: string
+            format: uint64
             title: >-
-              manager addressof the class; can have special permissions; is used
-              as the reserve address for the assets
+              manager address of the class; can have special permissions; is
+              used as the reserve address for the assets
           permission_flags:
             type: string
             format: uint64
@@ -52988,8 +52987,15 @@ definitions:
             items:
               type: object
               properties:
-                id:
+                this_pending_nonce:
                   type: string
+                  format: uint64
+                other_pending_nonce:
+                  type: string
+                  format: uint64
+                address_num:
+                  type: string
+                  format: uint64
                 amount:
                   type: string
                   format: uint64
@@ -53001,8 +53007,6 @@ definitions:
                 from:
                   type: string
                   format: uint64
-                memo:
-                  type: string
                 approved_by:
                   type: string
                   format: uint64

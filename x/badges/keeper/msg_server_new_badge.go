@@ -10,15 +10,15 @@ import (
 func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*types.MsgNewBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// Creator will already be registered, so we can do this and panic if it fails
+	creator_account_num := k.Keeper.MustGetAccountNumberForAddressString(ctx, msg.Creator)
+
+	//Validate well-formedness of the message entries
 	if err := ValidateURI(msg.Uri); err != nil {
 		return nil, err
 	}
 
 	if err := ValidateURI(msg.SubassetUris); err != nil {
-		return nil, err
-	}
-
-	if err := ValidateAddress(msg.Manager); err != nil {
 		return nil, err
 	}
 
@@ -28,36 +28,27 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 
 	//TODO: Validate freeze digest string
 
-	badge_id := k.GetNextAssetId(ctx)
 
-	//probably redundant
-	// if err := ValidateBadgeID(badge_id); err != nil {
-	// 	return nil, err
-	// }
+	//Get next badge ID and increment
+	next_badge_id := k.GetNextAssetId(ctx)
+	k.SetNextAssetId(ctx, next_badge_id + 1)
 
-	if k.StoreHasBadgeID(ctx, badge_id) {
-		return nil, ErrBadgeExists
-	}
-
+	//Create and store the badge
 	badge := types.BitBadge{
-		Id:                              badge_id,
+		Id:                              next_badge_id,
 		Uri:                             msg.Uri,
-		Manager:                         msg.Manager,
+		Manager:                         creator_account_num,
 		PermissionFlags:                 msg.Permissions,
 		SubassetUriFormat:               msg.SubassetUris,
 		SubassetsTotalSupply:            []*types.Subasset{},
 		NextSubassetId:                  0,
 		FrozenOrUnfrozenAddressesDigest: msg.FreezeAddressesDigest,
 	}
-
-	k.SetBadgeInStore(ctx, badge)
-
-	_ = ctx
-
-	k.SetNextAssetId(ctx, badge_id+1)
-
+	if err := k.SetBadgeInStore(ctx, badge); err != nil {
+		return nil, err
+	}
+	
 	return &types.MsgNewBadgeResponse{
-		Id:      badge_id,
-		Message: "Badge created successfully",
+		Id:      next_badge_id,
 	}, nil
 }

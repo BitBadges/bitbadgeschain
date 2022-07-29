@@ -11,12 +11,11 @@ option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
 // GenesisState defines the badges module's genesis state.
 message GenesisState {
-  Params params = 1 [(gogoproto.nullable) = false];
-  string port_id = 2;
-  repeated BitBadge badges = 3;
-  repeated BadgeBalanceInfo balances = 4;
-  repeated string balance_ids = 5;
-  uint64 nextAssetId = 6;
-  // this line is used by starport scaffolding # genesis/proto/state
+    Params params = 1 [(gogoproto.nullable) = false];
+    string port_id = 2;
+    repeated BitBadge badges = 3;
+    repeated BadgeBalanceInfo balances = 4;
+    repeated string balance_ids = 5;
+    uint64 nextAssetId = 6;
+    // this line is used by starport scaffolding # genesis/proto/state
 }
-  

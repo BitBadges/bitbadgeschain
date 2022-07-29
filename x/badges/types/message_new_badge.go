@@ -12,7 +12,6 @@ var _ sdk.Msg = &MsgNewBadge{}
 func NewMsgNewBadge(creator string, uri string, permissions uint64, freezeAddressesDigest string, subassetUris string) *MsgNewBadge {
 	return &MsgNewBadge{
 		Creator:               creator,
-		Manager:               creator,
 		Uri:                   uri,
 		Permissions:           permissions,
 		FreezeAddressesDigest: freezeAddressesDigest,

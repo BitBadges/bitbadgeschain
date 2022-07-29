@@ -29,7 +29,7 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 	account := k.accountKeeper.GetAccount(ctx, address)
 
 	if account != nil {
-		full_id := GetFullSubassetID(
+		full_id := GetBalanceKey(
 			account.GetAccountNumber(),
 			req.BadgeId,
 			req.SubbadgeId,

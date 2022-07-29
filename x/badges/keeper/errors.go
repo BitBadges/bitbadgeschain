@@ -30,4 +30,7 @@ var (
 	ErrSenderAndReceiverSame             = sdkerrors.Register(types.ModuleName, 19, "sender and receiver cannot be the same")
 	ErrCantAcceptOwnTransferRequest      = sdkerrors.Register(types.ModuleName, 20, "cannot accept own transfer request")
 	ErrInsufficientApproval              = sdkerrors.Register(types.ModuleName, 21, "insufficient approval")
+	ErrAccountsAreNotRegistered		  	= sdkerrors.Register(types.ModuleName, 22, "accounts are not registered")
+	ErrNoPendingTransferFound			  	= sdkerrors.Register(types.ModuleName, 23, "no pending transfer found")
+	ErrPendingNotFound					  	= sdkerrors.Register(types.ModuleName, 24, "pending transfer not found")
 )

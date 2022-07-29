@@ -4,37 +4,113 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHandlePendingTransfer) (*types.MsgHandlePendingTransferResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	// Creator will already be registered, so we can do this and panic if it fails
+	creator_account_num := k.Keeper.MustGetAccountNumberForAddressString(ctx, msg.Creator)
+
+	// Verify that the badge and subbadge exist and are valid
+	err := k.AssertBadgeAndSubBadgeExists(ctx, msg.BadgeId, msg.SubbadgeId)
 	if err != nil {
 		return nil, err
 	}
 
-	creator_account := k.accountKeeper.GetAccount(ctx, creator)
-	if creator_account == nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "account %s does not exist", creator)
-	}
-	creator_account_num := creator_account.GetAccountNumber()
+	// Handle the transfers
+	balance_key := GetBalanceKey(creator_account_num, msg.BadgeId, msg.SubbadgeId)
+	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, balance_key)
+	if !found {
+		return nil, ErrBadgeBalanceNotExists
+	} else {
+		//In the future, we can make this a binary search since this is all sorted
+		for _, pending_transfer := range badgeBalanceInfo.Pending {
+			if pending_transfer.ThisPendingNonce == msg.ThisNonce {
+				//We have four scenarios
+				if pending_transfer.SendRequest && msg.Accept {
+					return nil, ErrCantAcceptOwnTransferRequest
+				}
+				sentAndWantToCancel := pending_transfer.SendRequest && !msg.Accept
+				receivedAndWantToAccept := !pending_transfer.SendRequest && msg.Accept
+				received := !pending_transfer.SendRequest
 
-	balance_id := GetFullSubassetID(
-		creator_account_num,
-		msg.BadgeId,
-		msg.SubbadgeId,
-	)
+				//Get the other party's account number, nonce, and information
+				other_account_num := uint64(0)
+				outgoing := false
+				if pending_transfer.From == creator_account_num {
+					outgoing = true
+					other_account_num = pending_transfer.To
+				} else if pending_transfer.To == creator_account_num {
+					outgoing = false
+					other_account_num = pending_transfer.From
+				} else {
+					panic("This pending transfer should always have the creator address as 'To' or 'From'")
+				}
+				other_balance_key := GetBalanceKey(other_account_num, msg.BadgeId, msg.SubbadgeId)
+				other_nonce := pending_transfer.OtherPendingNonce
 
-	err = k.Keeper.HandlePendingTransfer(ctx, msg.Accept, balance_id, msg.PendingId)
-	if err != nil {
-		return nil, err
-	}
+				//Remove from both parties' pending because it will always be removed (whether accepted or not)
+				if err := k.RemovePending(ctx, balance_key, msg.ThisNonce, other_nonce); err != nil {
+					return nil, err
+				}
 
-	_ = ctx
-	return &types.MsgHandlePendingTransferResponse{
-		Message: "Success!",
-	}, nil
+				if err = k.RemovePending(ctx, other_balance_key, other_nonce, msg.ThisNonce); err != nil {
+					return nil, err
+				}
+
+
+				if sentAndWantToCancel {
+					// If an outgoing transfer, we need to revert the balance and approval back to what it was
+					if creator_account_num == pending_transfer.From {
+						if err := k.AddToBadgeBalance(ctx, balance_key, pending_transfer.Amount); err != nil {
+							return nil, err
+						}
+
+						
+						//If it was sent via an approval, we need to add the approval back
+						if pending_transfer.ApprovedBy != pending_transfer.From {
+							if err = k.AddBalanceToApproval(ctx, balance_key, pending_transfer.Amount, pending_transfer.ApprovedBy); err != nil {
+								return nil, err
+							}
+						}
+					}
+				} else if received {
+					to_balance_key := other_balance_key
+					from_balance_key := balance_key
+					if outgoing {
+						to_balance_key = balance_key
+						from_balance_key = other_balance_key
+					}
+
+					if receivedAndWantToAccept {
+						if err := k.AddToBadgeBalance(ctx, to_balance_key, pending_transfer.Amount); err != nil {
+							return nil, err
+						}
+
+						if err := k.RemoveFromBadgeBalance(ctx, from_balance_key, pending_transfer.Amount); err != nil {
+							return nil, err
+						}
+					} else {
+						//If an incoming transfer and you want to reject it, we need to revert the balances and approvals back to what it was
+						if !outgoing {
+							if err := k.AddToBadgeBalance(ctx, from_balance_key, pending_transfer.Amount); err != nil {
+								return nil, err
+							}
+
+							//If it was sent via an approval, we need to add the approval back
+							if pending_transfer.ApprovedBy != pending_transfer.From {
+								if err = k.AddBalanceToApproval(ctx, from_balance_key, pending_transfer.Amount, pending_transfer.ApprovedBy); err != nil {
+									return nil, err
+								}
+							}
+						}
+					}
+				}
+				return &types.MsgHandlePendingTransferResponse{}, nil
+			}
+		}
+		return nil, ErrNoPendingTransferFound
+	}	
 }

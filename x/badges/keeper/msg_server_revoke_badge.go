@@ -4,7 +4,6 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
@@ -12,57 +11,55 @@ import (
 func (k msgServer) RevokeBadge(goCtx context.Context,  msg *types.MsgRevokeBadge) (*types.MsgRevokeBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	badge, found := k.GetBadgeFromStore(ctx, msg.BadgeId)
-	if !found {
-		return nil, ErrBadgeNotExists
+	// Creator will already be registered, so we can do this and panic if it fails
+	creator_account_num := k.Keeper.MustGetAccountNumberForAddressString(ctx, msg.Creator)
+
+	//Can't revoke from same address
+	if creator_account_num == msg.Address {
+		return nil, ErrSenderAndReceiverSame
 	}
 
+	// Verify that the from and to addresses are registered; 
+	account_nums := []uint64{}
+	account_nums = append(account_nums, msg.Address)
+	err := k.AssertAccountNumbersAreValid(ctx, account_nums)
+	if err != nil {
+		return nil, err
+	}
+
+	// Verify that the badge and subbadge exist and are valid
+	err = k.AssertBadgeAndSubBadgeExists(ctx, msg.BadgeId, msg.SubbadgeId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Verify that the permissions are valid
+	badge, _ := k.GetBadgeFromStore(ctx, msg.BadgeId) //currently ignore error because above we assert that it exists
 	permissions := GetPermissions(badge.PermissionFlags)
-
-	if badge.Manager != msg.Creator {
-		return nil, ErrSenderIsNotManager
-	}
-
 	if !permissions.can_revoke {
 		return nil, ErrInvalidPermissions
 	}
 
-	manager, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		return nil, err
+	if badge.Manager != creator_account_num {
+		return nil, ErrSenderIsNotManager
 	}
-	
-	manager_account := k.accountKeeper.GetAccount(ctx, manager)
-	if manager_account == nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "account %s does not exist", manager)
-	}
-	manager_account_num := manager_account.GetAccountNumber()
 
-	address, err := sdk.AccAddressFromBech32(msg.Address)
-	if err != nil {
-		return nil, err
-	}
-	
+	address_balance_key := GetBalanceKey(msg.Address, msg.BadgeId, msg.SubbadgeId)
+	manager_balance_key := GetBalanceKey(creator_account_num, msg.BadgeId, msg.SubbadgeId)
 
-	address_account := k.accountKeeper.GetAccount(ctx, address)
-	if address_account == nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "account %s does not exist", address)
-	}
-	address_account_num := address_account.GetAccountNumber()
 
-	balance_id := GetFullSubassetID(address_account_num, msg.BadgeId, msg.SubbadgeId)
-	manager_balance_id := GetFullSubassetID(manager_account_num, msg.BadgeId, msg.SubbadgeId)
-
-	err = k.Keeper.RevokeBadge(ctx, balance_id, manager_balance_id, msg.Amount)
+	err = k.RemoveFromBadgeBalance(ctx, address_balance_key, msg.Amount)
 	if err != nil {
 		return nil, err
 	}
 
+	err = k.AddToBadgeBalance(ctx, manager_balance_key, msg.Amount)
+	if err != nil {
+		return nil, err
+	}
 
     // TODO: Handling the message
     _ = ctx
 
-	return &types.MsgRevokeBadgeResponse{
-		Message: "Success!",
-	}, nil
+	return &types.MsgRevokeBadgeResponse{}, nil
 }

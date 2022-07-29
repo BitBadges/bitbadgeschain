@@ -13,8 +13,8 @@ export interface BitBadge {
   id: number;
   /** uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc) */
   uri: string;
-  /** manager addressof the class; can have special permissions; is used as the reserve address for the assets */
-  manager: string;
+  /** manager address of the class; can have special permissions; is used as the reserve address for the assets */
+  manager: number;
   /**
    * Flag bits are in the following order from left to right; leading zeroes are applied and any future additions will be appended to the right
    *
@@ -56,7 +56,7 @@ export interface Subasset {
 const baseBitBadge: object = {
   id: 0,
   uri: "",
-  manager: "",
+  manager: 0,
   permission_flags: 0,
   frozen_or_unfrozen_addresses_digest: "",
   subasset_uri_format: "",
@@ -71,8 +71,8 @@ export const BitBadge = {
     if (message.uri !== "") {
       writer.uint32(18).string(message.uri);
     }
-    if (message.manager !== "") {
-      writer.uint32(34).string(message.manager);
+    if (message.manager !== 0) {
+      writer.uint32(32).uint64(message.manager);
     }
     if (message.permission_flags !== 0) {
       writer.uint32(40).uint64(message.permission_flags);
@@ -107,7 +107,7 @@ export const BitBadge = {
           message.uri = reader.string();
           break;
         case 4:
-          message.manager = reader.string();
+          message.manager = longToNumber(reader.uint64() as Long);
           break;
         case 5:
           message.permission_flags = longToNumber(reader.uint64() as Long);
@@ -148,9 +148,9 @@ export const BitBadge = {
       message.uri = "";
     }
     if (object.manager !== undefined && object.manager !== null) {
-      message.manager = String(object.manager);
+      message.manager = Number(object.manager);
     } else {
-      message.manager = "";
+      message.manager = 0;
     }
     if (
       object.permission_flags !== undefined &&
@@ -237,7 +237,7 @@ export const BitBadge = {
     if (object.manager !== undefined && object.manager !== null) {
       message.manager = object.manager;
     } else {
-      message.manager = "";
+      message.manager = 0;
     }
     if (
       object.permission_flags !== undefined &&

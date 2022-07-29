@@ -31,7 +31,11 @@ func CmdHandlePendingTransfer() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			argPendingId := args[3]
+
+			argPendingId, err := cast.ToUint64E(args[3])
+			if err != nil {
+				return err
+			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {

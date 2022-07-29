@@ -23,7 +23,10 @@ func CmdSetApproval() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			argAddress := args[1]
+			argAddress, err := cast.ToUint64E(args[1])
+			if err != nil {
+				return err
+			}
 			argBadgeId, err := cast.ToUint64E(args[2])
 			if err != nil {
 				return err

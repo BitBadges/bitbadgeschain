@@ -31,6 +31,8 @@ export interface BadgesBitBadge {
   /** @format uint64 */
   id?: string;
   uri?: string;
+
+  /** @format uint64 */
   manager?: string;
 
   /**
@@ -55,37 +57,25 @@ export interface BadgesBitBadge {
   subassets_total_supply?: BadgesSubasset[];
 }
 
-export interface BadgesMsgHandlePendingTransferResponse {
-  message?: string;
-}
+export type BadgesMsgHandlePendingTransferResponse = object;
 
 export interface BadgesMsgNewBadgeResponse {
   /** @format uint64 */
   id?: string;
-  message?: string;
 }
 
 export interface BadgesMsgNewSubBadgeResponse {
   /** @format uint64 */
   subassetId?: string;
-  message?: string;
 }
 
-export interface BadgesMsgRequestTransferBadgeResponse {
-  message?: string;
-}
+export type BadgesMsgRequestTransferBadgeResponse = object;
 
-export interface BadgesMsgRevokeBadgeResponse {
-  message?: string;
-}
+export type BadgesMsgRevokeBadgeResponse = object;
 
-export interface BadgesMsgSetApprovalResponse {
-  message?: string;
-}
+export type BadgesMsgSetApprovalResponse = object;
 
-export interface BadgesMsgTransferBadgeResponse {
-  message?: string;
-}
+export type BadgesMsgTransferBadgeResponse = object;
 
 /**
  * Params defines the parameters for the module.
@@ -93,7 +83,14 @@ export interface BadgesMsgTransferBadgeResponse {
 export type BadgesParams = object;
 
 export interface BadgesPendingTransfer {
-  id?: string;
+  /** @format uint64 */
+  this_pending_nonce?: string;
+
+  /** @format uint64 */
+  other_pending_nonce?: string;
+
+  /** @format uint64 */
+  address_num?: string;
 
   /** @format uint64 */
   amount?: string;
@@ -104,7 +101,6 @@ export interface BadgesPendingTransfer {
 
   /** @format uint64 */
   from?: string;
-  memo?: string;
 
   /** @format uint64 */
   approved_by?: string;

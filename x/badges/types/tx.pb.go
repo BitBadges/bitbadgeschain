@@ -29,11 +29,10 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type MsgNewBadge struct {
 	Creator               string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Uri                   string `protobuf:"bytes,3,opt,name=uri,proto3" json:"uri,omitempty"`
-	Manager               string `protobuf:"bytes,4,opt,name=manager,proto3" json:"manager,omitempty"`
-	Permissions           uint64 `protobuf:"varint,5,opt,name=permissions,proto3" json:"permissions,omitempty"`
-	FreezeAddressesDigest string `protobuf:"bytes,6,opt,name=freezeAddressesDigest,proto3" json:"freezeAddressesDigest,omitempty"`
-	SubassetUris          string `protobuf:"bytes,7,opt,name=subassetUris,proto3" json:"subassetUris,omitempty"`
+	Uri                   string `protobuf:"bytes,2,opt,name=uri,proto3" json:"uri,omitempty"`
+	SubassetUris          string `protobuf:"bytes,3,opt,name=subassetUris,proto3" json:"subassetUris,omitempty"`
+	Permissions           uint64 `protobuf:"varint,4,opt,name=permissions,proto3" json:"permissions,omitempty"`
+	FreezeAddressesDigest string `protobuf:"bytes,5,opt,name=freezeAddressesDigest,proto3" json:"freezeAddressesDigest,omitempty"`
 }
 
 func (m *MsgNewBadge) Reset()         { *m = MsgNewBadge{} }
@@ -83,9 +82,9 @@ func (m *MsgNewBadge) GetUri() string {
 	return ""
 }
 
-func (m *MsgNewBadge) GetManager() string {
+func (m *MsgNewBadge) GetSubassetUris() string {
 	if m != nil {
-		return m.Manager
+		return m.SubassetUris
 	}
 	return ""
 }
@@ -104,16 +103,8 @@ func (m *MsgNewBadge) GetFreezeAddressesDigest() string {
 	return ""
 }
 
-func (m *MsgNewBadge) GetSubassetUris() string {
-	if m != nil {
-		return m.SubassetUris
-	}
-	return ""
-}
-
 type MsgNewBadgeResponse struct {
-	Id      uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
 func (m *MsgNewBadgeResponse) Reset()         { *m = MsgNewBadgeResponse{} }
@@ -154,13 +145,6 @@ func (m *MsgNewBadgeResponse) GetId() uint64 {
 		return m.Id
 	}
 	return 0
-}
-
-func (m *MsgNewBadgeResponse) GetMessage() string {
-	if m != nil {
-		return m.Message
-	}
-	return ""
 }
 
 type MsgNewSubBadge struct {
@@ -225,7 +209,6 @@ func (m *MsgNewSubBadge) GetSupply() uint64 {
 
 type MsgNewSubBadgeResponse struct {
 	SubassetId uint64 `protobuf:"varint,1,opt,name=subassetId,proto3" json:"subassetId,omitempty"`
-	Message    string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 }
 
 func (m *MsgNewSubBadgeResponse) Reset()         { *m = MsgNewSubBadgeResponse{} }
@@ -268,17 +251,10 @@ func (m *MsgNewSubBadgeResponse) GetSubassetId() uint64 {
 	return 0
 }
 
-func (m *MsgNewSubBadgeResponse) GetMessage() string {
-	if m != nil {
-		return m.Message
-	}
-	return ""
-}
-
 type MsgTransferBadge struct {
 	Creator    string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	From       string `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`
-	To         string `protobuf:"bytes,3,opt,name=to,proto3" json:"to,omitempty"`
+	From       uint64 `protobuf:"varint,2,opt,name=from,proto3" json:"from,omitempty"`
+	To         uint64 `protobuf:"varint,3,opt,name=to,proto3" json:"to,omitempty"`
 	Amount     uint64 `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
 	BadgeId    uint64 `protobuf:"varint,5,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
 	SubbadgeId uint64 `protobuf:"varint,6,opt,name=subbadgeId,proto3" json:"subbadgeId,omitempty"`
@@ -324,18 +300,18 @@ func (m *MsgTransferBadge) GetCreator() string {
 	return ""
 }
 
-func (m *MsgTransferBadge) GetFrom() string {
+func (m *MsgTransferBadge) GetFrom() uint64 {
 	if m != nil {
 		return m.From
 	}
-	return ""
+	return 0
 }
 
-func (m *MsgTransferBadge) GetTo() string {
+func (m *MsgTransferBadge) GetTo() uint64 {
 	if m != nil {
 		return m.To
 	}
-	return ""
+	return 0
 }
 
 func (m *MsgTransferBadge) GetAmount() uint64 {
@@ -360,7 +336,6 @@ func (m *MsgTransferBadge) GetSubbadgeId() uint64 {
 }
 
 type MsgTransferBadgeResponse struct {
-	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 }
 
 func (m *MsgTransferBadgeResponse) Reset()         { *m = MsgTransferBadgeResponse{} }
@@ -396,17 +371,9 @@ func (m *MsgTransferBadgeResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgTransferBadgeResponse proto.InternalMessageInfo
 
-func (m *MsgTransferBadgeResponse) GetMessage() string {
-	if m != nil {
-		return m.Message
-	}
-	return ""
-}
-
 type MsgRequestTransferBadge struct {
 	Creator    string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	From       string `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`
-	To         string `protobuf:"bytes,3,opt,name=to,proto3" json:"to,omitempty"`
+	From       uint64 `protobuf:"varint,2,opt,name=from,proto3" json:"from,omitempty"`
 	Amount     uint64 `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
 	BadgeId    uint64 `protobuf:"varint,5,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
 	SubbadgeId uint64 `protobuf:"varint,6,opt,name=subbadgeId,proto3" json:"subbadgeId,omitempty"`
@@ -452,18 +419,11 @@ func (m *MsgRequestTransferBadge) GetCreator() string {
 	return ""
 }
 
-func (m *MsgRequestTransferBadge) GetFrom() string {
+func (m *MsgRequestTransferBadge) GetFrom() uint64 {
 	if m != nil {
 		return m.From
 	}
-	return ""
-}
-
-func (m *MsgRequestTransferBadge) GetTo() string {
-	if m != nil {
-		return m.To
-	}
-	return ""
+	return 0
 }
 
 func (m *MsgRequestTransferBadge) GetAmount() uint64 {
@@ -488,7 +448,6 @@ func (m *MsgRequestTransferBadge) GetSubbadgeId() uint64 {
 }
 
 type MsgRequestTransferBadgeResponse struct {
-	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 }
 
 func (m *MsgRequestTransferBadgeResponse) Reset()         { *m = MsgRequestTransferBadgeResponse{} }
@@ -524,19 +483,12 @@ func (m *MsgRequestTransferBadgeResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRequestTransferBadgeResponse proto.InternalMessageInfo
 
-func (m *MsgRequestTransferBadgeResponse) GetMessage() string {
-	if m != nil {
-		return m.Message
-	}
-	return ""
-}
-
 type MsgHandlePendingTransfer struct {
 	Creator    string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	Accept     bool   `protobuf:"varint,2,opt,name=accept,proto3" json:"accept,omitempty"`
 	BadgeId    uint64 `protobuf:"varint,3,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
 	SubbadgeId uint64 `protobuf:"varint,4,opt,name=subbadgeId,proto3" json:"subbadgeId,omitempty"`
-	PendingId  string `protobuf:"bytes,5,opt,name=pendingId,proto3" json:"pendingId,omitempty"`
+	ThisNonce  uint64 `protobuf:"varint,5,opt,name=this_nonce,json=thisNonce,proto3" json:"this_nonce,omitempty"`
 }
 
 func (m *MsgHandlePendingTransfer) Reset()         { *m = MsgHandlePendingTransfer{} }
@@ -600,15 +552,14 @@ func (m *MsgHandlePendingTransfer) GetSubbadgeId() uint64 {
 	return 0
 }
 
-func (m *MsgHandlePendingTransfer) GetPendingId() string {
+func (m *MsgHandlePendingTransfer) GetThisNonce() uint64 {
 	if m != nil {
-		return m.PendingId
+		return m.ThisNonce
 	}
-	return ""
+	return 0
 }
 
 type MsgHandlePendingTransferResponse struct {
-	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 }
 
 func (m *MsgHandlePendingTransferResponse) Reset()         { *m = MsgHandlePendingTransferResponse{} }
@@ -644,17 +595,10 @@ func (m *MsgHandlePendingTransferResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgHandlePendingTransferResponse proto.InternalMessageInfo
 
-func (m *MsgHandlePendingTransferResponse) GetMessage() string {
-	if m != nil {
-		return m.Message
-	}
-	return ""
-}
-
 type MsgSetApproval struct {
 	Creator    string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	Amount     uint64 `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	Address    string `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
+	Address    uint64 `protobuf:"varint,3,opt,name=address,proto3" json:"address,omitempty"`
 	BadgeId    uint64 `protobuf:"varint,4,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
 	SubbadgeId uint64 `protobuf:"varint,5,opt,name=subbadgeId,proto3" json:"subbadgeId,omitempty"`
 }
@@ -706,11 +650,11 @@ func (m *MsgSetApproval) GetAmount() uint64 {
 	return 0
 }
 
-func (m *MsgSetApproval) GetAddress() string {
+func (m *MsgSetApproval) GetAddress() uint64 {
 	if m != nil {
 		return m.Address
 	}
-	return ""
+	return 0
 }
 
 func (m *MsgSetApproval) GetBadgeId() uint64 {
@@ -728,7 +672,6 @@ func (m *MsgSetApproval) GetSubbadgeId() uint64 {
 }
 
 type MsgSetApprovalResponse struct {
-	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 }
 
 func (m *MsgSetApprovalResponse) Reset()         { *m = MsgSetApprovalResponse{} }
@@ -764,16 +707,9 @@ func (m *MsgSetApprovalResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetApprovalResponse proto.InternalMessageInfo
 
-func (m *MsgSetApprovalResponse) GetMessage() string {
-	if m != nil {
-		return m.Message
-	}
-	return ""
-}
-
 type MsgRevokeBadge struct {
 	Creator    string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Address    string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
+	Address    uint64 `protobuf:"varint,2,opt,name=address,proto3" json:"address,omitempty"`
 	Amount     uint64 `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
 	BadgeId    uint64 `protobuf:"varint,4,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
 	SubbadgeId uint64 `protobuf:"varint,5,opt,name=subbadgeId,proto3" json:"subbadgeId,omitempty"`
@@ -819,11 +755,11 @@ func (m *MsgRevokeBadge) GetCreator() string {
 	return ""
 }
 
-func (m *MsgRevokeBadge) GetAddress() string {
+func (m *MsgRevokeBadge) GetAddress() uint64 {
 	if m != nil {
 		return m.Address
 	}
-	return ""
+	return 0
 }
 
 func (m *MsgRevokeBadge) GetAmount() uint64 {
@@ -848,7 +784,6 @@ func (m *MsgRevokeBadge) GetSubbadgeId() uint64 {
 }
 
 type MsgRevokeBadgeResponse struct {
-	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 }
 
 func (m *MsgRevokeBadgeResponse) Reset()         { *m = MsgRevokeBadgeResponse{} }
@@ -884,13 +819,6 @@ func (m *MsgRevokeBadgeResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRevokeBadgeResponse proto.InternalMessageInfo
 
-func (m *MsgRevokeBadgeResponse) GetMessage() string {
-	if m != nil {
-		return m.Message
-	}
-	return ""
-}
-
 func init() {
 	proto.RegisterType((*MsgNewBadge)(nil), "trevormil.bitbadgeschain.badges.MsgNewBadge")
 	proto.RegisterType((*MsgNewBadgeResponse)(nil), "trevormil.bitbadgeschain.badges.MsgNewBadgeResponse")
@@ -911,52 +839,50 @@ func init() {
 func init() { proto.RegisterFile("badges/tx.proto", fileDescriptor_bc897b33479788c9) }
 
 var fileDescriptor_bc897b33479788c9 = []byte{
-	// 706 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0xcd, 0x6e, 0xd3, 0x40,
-	0x10, 0xee, 0x3a, 0x6e, 0xda, 0x4e, 0xa0, 0x54, 0x86, 0x16, 0x2b, 0x42, 0x6e, 0xe4, 0x53, 0x0f,
-	0x28, 0x16, 0xa5, 0x12, 0x20, 0x90, 0xa0, 0x15, 0x07, 0x2a, 0x11, 0x84, 0x5c, 0xb8, 0x70, 0x73,
-	0xe2, 0xa9, 0x6b, 0x91, 0xd8, 0x66, 0x77, 0xdd, 0x1f, 0x24, 0xde, 0x80, 0x03, 0x42, 0x82, 0x07,
-	0x40, 0x5c, 0x78, 0x13, 0x6e, 0xf4, 0xc8, 0x11, 0xb5, 0x2f, 0x82, 0xbc, 0xfe, 0xe9, 0xba, 0xb8,
-	0x89, 0x9b, 0x13, 0xb7, 0x9d, 0xd9, 0x9d, 0x6f, 0xbf, 0x6f, 0x66, 0x76, 0x6c, 0xb8, 0xd6, 0x77,
-	0x5c, 0x0f, 0x99, 0xc5, 0x0f, 0xbb, 0x11, 0x0d, 0x79, 0xa8, 0xad, 0x72, 0x8a, 0xfb, 0x21, 0x1d,
-	0xf9, 0xc3, 0x6e, 0xdf, 0xe7, 0xe9, 0xee, 0x60, 0xcf, 0xf1, 0x83, 0x6e, 0xba, 0x36, 0x7f, 0x11,
-	0x68, 0xf5, 0x98, 0xf7, 0x02, 0x0f, 0xb6, 0x12, 0x87, 0xa6, 0xc3, 0xdc, 0x80, 0xa2, 0xc3, 0x43,
-	0xaa, 0x93, 0x0e, 0x59, 0x5b, 0xb0, 0x73, 0x53, 0x5b, 0x82, 0x46, 0x4c, 0x7d, 0xbd, 0x21, 0xbc,
-	0xc9, 0x32, 0x39, 0x3b, 0x72, 0x02, 0xc7, 0x43, 0xaa, 0xab, 0xe9, 0xd9, 0xcc, 0xd4, 0x3a, 0xd0,
-	0x8a, 0x90, 0x8e, 0x7c, 0xc6, 0xfc, 0x30, 0x60, 0xfa, 0x6c, 0x87, 0xac, 0xa9, 0xb6, 0xec, 0xd2,
-	0x36, 0x60, 0x79, 0x97, 0x22, 0xbe, 0xc7, 0x4d, 0xd7, 0xa5, 0xc8, 0x18, 0xb2, 0xa7, 0xbe, 0x87,
-	0x8c, 0xeb, 0x4d, 0x81, 0x54, 0xbd, 0xa9, 0x99, 0x70, 0x85, 0xc5, 0x7d, 0x87, 0x31, 0xe4, 0xaf,
-	0xa9, 0xcf, 0xf4, 0x39, 0x71, 0xb8, 0xe4, 0x33, 0x1f, 0xc3, 0x75, 0x49, 0x90, 0x8d, 0x2c, 0x0a,
-	0x03, 0x86, 0xda, 0x22, 0x28, 0xbe, 0x2b, 0x34, 0xa9, 0xb6, 0xe2, 0xbb, 0x82, 0x3c, 0x32, 0xe6,
-	0x78, 0xa8, 0x2b, 0x19, 0xf9, 0xd4, 0x34, 0x6d, 0x58, 0x4c, 0x01, 0x76, 0xe2, 0xfe, 0xa4, 0xa4,
-	0xa4, 0xa8, 0x4a, 0x81, 0xba, 0x02, 0x4d, 0x16, 0x47, 0xd1, 0xf0, 0x48, 0xe4, 0x49, 0xb5, 0x33,
-	0xcb, 0xb4, 0x61, 0xa5, 0x8c, 0x59, 0xf0, 0x32, 0x00, 0x72, 0xfa, 0xdb, 0x39, 0x3f, 0xc9, 0x33,
-	0x86, 0xe7, 0x37, 0x02, 0x4b, 0x3d, 0xe6, 0xbd, 0xa2, 0x4e, 0xc0, 0x76, 0x91, 0x4e, 0xa2, 0xaa,
-	0x81, 0xba, 0x4b, 0xc3, 0x51, 0x86, 0x22, 0xd6, 0x09, 0x7d, 0x1e, 0x66, 0x25, 0x55, 0x78, 0x98,
-	0xd0, 0x77, 0x46, 0x61, 0x1c, 0x70, 0x51, 0x50, 0xd5, 0xce, 0xac, 0x04, 0x55, 0xf4, 0xcb, 0xb6,
-	0x9b, 0xd5, 0x32, 0x37, 0x33, 0xfa, 0xf9, 0x66, 0xb3, 0xa0, 0x9f, 0x79, 0xcc, 0x0d, 0xd0, 0xcf,
-	0x73, 0x2c, 0xa4, 0x4b, 0xd2, 0x48, 0x59, 0xda, 0x0f, 0x02, 0x37, 0x7b, 0xcc, 0xb3, 0xf1, 0x5d,
-	0x8c, 0x8c, 0xff, 0xdf, 0x0a, 0x1f, 0xc2, 0xea, 0x05, 0x54, 0x6b, 0x08, 0xfd, 0x4e, 0x44, 0x7e,
-	0x9e, 0x39, 0x81, 0x3b, 0xc4, 0x97, 0x18, 0xb8, 0x7e, 0x50, 0x24, 0x6b, 0x8c, 0xd2, 0x44, 0xc5,
-	0x60, 0x80, 0x11, 0x17, 0x5a, 0xe7, 0xed, 0xcc, 0x92, 0x55, 0x34, 0xc6, 0xa9, 0x50, 0xcf, 0xab,
-	0xd0, 0x6e, 0xc1, 0x42, 0x94, 0x5e, 0x9f, 0x65, 0x60, 0xc1, 0x3e, 0x73, 0x98, 0x8f, 0xa0, 0x73,
-	0x11, 0xcb, 0x1a, 0x22, 0xbf, 0x12, 0xf1, 0xa2, 0x76, 0x90, 0x6f, 0x46, 0x11, 0x0d, 0xf7, 0x9d,
-	0xe1, 0x04, 0x69, 0x69, 0x81, 0x94, 0xf3, 0x05, 0x72, 0xd2, 0x69, 0x90, 0x55, 0x33, 0x37, 0x65,
-	0xd1, 0xea, 0x38, 0xd1, 0xb3, 0xff, 0x94, 0x6e, 0x5d, 0xbc, 0x4a, 0x89, 0x57, 0x7d, 0x31, 0x36,
-	0xee, 0x87, 0x6f, 0x71, 0x52, 0x47, 0x4a, 0xa4, 0x95, 0x32, 0xe9, 0x33, 0x99, 0x8d, 0x8b, 0xfa,
-	0x70, 0x2a, 0x31, 0x12, 0xaf, 0xc9, 0x62, 0xd6, 0x3f, 0xce, 0x41, 0xa3, 0xc7, 0x3c, 0x2d, 0x80,
-	0xf9, 0xe2, 0x0b, 0x70, 0xbb, 0x3b, 0xe1, 0x9b, 0xd1, 0x95, 0xc6, 0x6b, 0x7b, 0xe3, 0x32, 0xa7,
-	0x0b, 0x46, 0x07, 0xd0, 0x92, 0xe7, 0xab, 0x55, 0x13, 0x24, 0x0f, 0x68, 0xdf, 0xbb, 0x64, 0x40,
-	0x71, 0xf1, 0x07, 0xb8, 0x5a, 0x9e, 0x26, 0x77, 0xea, 0x20, 0x95, 0x42, 0xda, 0x0f, 0x2e, 0x1d,
-	0x52, 0x5c, 0xff, 0x99, 0xc0, 0x8d, 0xca, 0xa1, 0x76, 0xbf, 0x0e, 0x66, 0x55, 0x64, 0xfb, 0xc9,
-	0xb4, 0x91, 0x05, 0xa9, 0x2f, 0x04, 0x96, 0xab, 0x07, 0x50, 0x2d, 0xa5, 0x95, 0xa1, 0xed, 0xcd,
-	0xa9, 0x43, 0xe5, 0x26, 0x91, 0x47, 0x46, 0xad, 0x26, 0x91, 0x02, 0xea, 0x35, 0x49, 0xd5, 0xe3,
-	0x3f, 0x80, 0x96, 0xfc, 0xbc, 0xad, 0x7a, 0x19, 0x2e, 0x02, 0xea, 0x5d, 0x5c, 0xf1, 0x50, 0xb7,
-	0x9e, 0xff, 0x3c, 0x31, 0xc8, 0xf1, 0x89, 0x41, 0xfe, 0x9c, 0x18, 0xe4, 0xd3, 0xa9, 0x31, 0x73,
-	0x7c, 0x6a, 0xcc, 0xfc, 0x3e, 0x35, 0x66, 0xde, 0xac, 0x7b, 0x3e, 0xdf, 0x8b, 0xfb, 0xdd, 0x41,
-	0x38, 0xb2, 0x0a, 0x70, 0xab, 0x0c, 0x6e, 0x1d, 0x5a, 0xf9, 0xef, 0xdf, 0x51, 0x84, 0xac, 0xdf,
-	0x14, 0xbf, 0x80, 0x77, 0xff, 0x06, 0x00, 0x00, 0xff, 0xff, 0x16, 0x91, 0xdb, 0x1d, 0x15, 0x0a,
-	0x00, 0x00,
+	// 683 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x96, 0xcf, 0x6b, 0xd4, 0x40,
+	0x14, 0xc7, 0x3b, 0xbb, 0xe9, 0xaf, 0x57, 0xad, 0x25, 0xda, 0x1a, 0x16, 0x4c, 0xd7, 0x80, 0xd0,
+	0x83, 0x6c, 0xb0, 0x16, 0xac, 0x37, 0x5b, 0x3c, 0x58, 0x70, 0x8b, 0xa4, 0x7a, 0xf1, 0x22, 0xd9,
+	0xcd, 0x6b, 0x3a, 0xb8, 0x9b, 0x89, 0x33, 0x93, 0xfe, 0x10, 0xfc, 0x0f, 0x3c, 0x88, 0xa0, 0xe0,
+	0x55, 0xf0, 0x4f, 0xf0, 0x7f, 0xf0, 0xd8, 0xa3, 0x47, 0x69, 0xff, 0x11, 0xc9, 0x6c, 0x12, 0x67,
+	0xd7, 0xb4, 0x9b, 0x56, 0x6f, 0x99, 0x37, 0xf9, 0xbe, 0xf9, 0x7c, 0x27, 0xef, 0x3d, 0x02, 0xd7,
+	0x3a, 0x7e, 0x10, 0xa2, 0x70, 0xe5, 0x61, 0x2b, 0xe6, 0x4c, 0x32, 0x73, 0x59, 0x72, 0xdc, 0x67,
+	0xbc, 0x4f, 0x7b, 0xad, 0x0e, 0x95, 0x83, 0xdd, 0xee, 0x9e, 0x4f, 0xa3, 0xd6, 0xe0, 0xd9, 0xf9,
+	0x4e, 0x60, 0xae, 0x2d, 0xc2, 0x6d, 0x3c, 0xd8, 0x4c, 0x03, 0xa6, 0x05, 0xd3, 0x5d, 0x8e, 0xbe,
+	0x64, 0xdc, 0x22, 0x4d, 0xb2, 0x32, 0xeb, 0xe5, 0x4b, 0x73, 0x01, 0xea, 0x09, 0xa7, 0x56, 0x4d,
+	0x45, 0xd3, 0x47, 0xd3, 0x81, 0x2b, 0x22, 0xe9, 0xf8, 0x42, 0xa0, 0x7c, 0xc1, 0xa9, 0xb0, 0xea,
+	0x6a, 0x6b, 0x28, 0x66, 0x36, 0x61, 0x2e, 0x46, 0xde, 0xa7, 0x42, 0x50, 0x16, 0x09, 0xcb, 0x68,
+	0x92, 0x15, 0xc3, 0xd3, 0x43, 0xe6, 0x1a, 0x2c, 0xee, 0x72, 0xc4, 0xb7, 0xb8, 0x11, 0x04, 0x1c,
+	0x85, 0x40, 0xf1, 0x98, 0x86, 0x28, 0xa4, 0x35, 0xa9, 0xd2, 0x95, 0x6f, 0x3a, 0x77, 0xe0, 0xba,
+	0x86, 0xed, 0xa1, 0x88, 0x59, 0x24, 0xd0, 0x9c, 0x87, 0x1a, 0x0d, 0x14, 0xb9, 0xe1, 0xd5, 0x68,
+	0xe0, 0x78, 0x30, 0x3f, 0x78, 0x6d, 0x27, 0xe9, 0x8c, 0x33, 0x38, 0xd0, 0xd6, 0x72, 0xad, 0xb9,
+	0x04, 0x53, 0x22, 0x89, 0xe3, 0xde, 0x91, 0x32, 0x66, 0x78, 0xd9, 0xca, 0x59, 0x87, 0xa5, 0xe1,
+	0x9c, 0xc5, 0xe9, 0x36, 0x40, 0x6e, 0x7e, 0x2b, 0xa7, 0xd0, 0x22, 0xce, 0x57, 0x02, 0x0b, 0x6d,
+	0x11, 0x3e, 0xe7, 0x7e, 0x24, 0x76, 0x91, 0x8f, 0x03, 0x32, 0xc1, 0xd8, 0xe5, 0xac, 0x9f, 0x21,
+	0xa9, 0xe7, 0x14, 0x52, 0xb2, 0x0c, 0xa8, 0x26, 0x59, 0x0a, 0xe9, 0xf7, 0x59, 0x12, 0xc9, 0xec,
+	0x6a, 0xb3, 0x55, 0x9a, 0x55, 0x7d, 0xe1, 0xad, 0x40, 0xdd, 0xa3, 0xe1, 0xe5, 0xcb, 0x0c, 0x32,
+	0xdf, 0x9c, 0x2a, 0x20, 0xb3, 0x88, 0xd3, 0x00, 0x6b, 0x94, 0x31, 0x37, 0xe8, 0x7c, 0x21, 0x70,
+	0xb3, 0x2d, 0x42, 0x0f, 0xdf, 0x24, 0x28, 0xe4, 0xbf, 0xf8, 0xf8, 0xff, 0xdc, 0xb7, 0x61, 0xf9,
+	0x0c, 0xb4, 0x02, 0xff, 0x1b, 0x51, 0xde, 0x9e, 0xf8, 0x51, 0xd0, 0xc3, 0x67, 0x18, 0x05, 0x34,
+	0x2a, 0x8c, 0x9e, 0xc3, 0x9f, 0xb2, 0x76, 0xbb, 0x18, 0x4b, 0xe5, 0x60, 0xc6, 0xcb, 0x56, 0x3a,
+	0x6b, 0xfd, 0x3c, 0x56, 0x63, 0x94, 0xd5, 0xbc, 0x05, 0x20, 0xf7, 0xa8, 0x78, 0x15, 0xb1, 0xa8,
+	0x8b, 0x99, 0xd1, 0xd9, 0x34, 0xb2, 0x9d, 0x06, 0x1c, 0x07, 0x9a, 0x67, 0x61, 0x16, 0x5e, 0x3e,
+	0x13, 0x55, 0xda, 0x3b, 0x28, 0x37, 0xe2, 0x98, 0xb3, 0x7d, 0xbf, 0x37, 0xc6, 0xc1, 0xe0, 0xb6,
+	0x6b, 0xa3, 0xb7, 0xed, 0x0f, 0x1a, 0x2b, 0x77, 0x90, 0x2d, 0x75, 0x6f, 0xc6, 0x79, 0xde, 0x26,
+	0xff, 0xfa, 0x0e, 0x96, 0x6a, 0x0f, 0x8d, 0x6b, 0x14, 0xd9, 0xc3, 0x7d, 0xf6, 0x1a, 0xc7, 0x15,
+	0x8d, 0x86, 0x56, 0x1b, 0x46, 0xfb, 0x63, 0xa6, 0x7e, 0x56, 0xe9, 0x5c, 0x0a, 0x59, 0xe3, 0xca,
+	0x91, 0x57, 0xdf, 0x4f, 0x43, 0xbd, 0x2d, 0x42, 0x33, 0x82, 0x99, 0x62, 0x44, 0xde, 0x6d, 0x8d,
+	0x19, 0xaa, 0x2d, 0x6d, 0x32, 0x35, 0xd6, 0x2e, 0xf2, 0x76, 0x31, 0x49, 0x0e, 0x60, 0x4e, 0x1f,
+	0x5a, 0x6e, 0xc5, 0x24, 0xb9, 0xa0, 0xf1, 0xe0, 0x82, 0x82, 0xe2, 0xe0, 0x77, 0x70, 0x75, 0xb8,
+	0xad, 0xef, 0x55, 0xc9, 0x34, 0x24, 0x69, 0x3c, 0xbc, 0xb0, 0xa4, 0x38, 0xfe, 0x23, 0x81, 0x1b,
+	0xa5, 0xd3, 0x65, 0xbd, 0x4a, 0xce, 0x32, 0x65, 0xe3, 0xd1, 0x65, 0x95, 0x05, 0xd4, 0x27, 0x02,
+	0x8b, 0xe5, 0x33, 0xa3, 0x92, 0xd3, 0x52, 0x69, 0x63, 0xe3, 0xd2, 0x52, 0xbd, 0x48, 0xf4, 0xf6,
+	0xaf, 0x54, 0x24, 0x9a, 0xa0, 0x5a, 0x91, 0x94, 0x34, 0x72, 0x7a, 0xb0, 0xde, 0xc4, 0x6e, 0xb5,
+	0x1b, 0x2e, 0x04, 0xd5, 0x0e, 0x2e, 0x69, 0xc7, 0xcd, 0xa7, 0x3f, 0x4e, 0x6c, 0x72, 0x7c, 0x62,
+	0x93, 0x5f, 0x27, 0x36, 0xf9, 0x70, 0x6a, 0x4f, 0x1c, 0x9f, 0xda, 0x13, 0x3f, 0x4f, 0xed, 0x89,
+	0x97, 0xab, 0x21, 0x95, 0x7b, 0x49, 0xa7, 0xd5, 0x65, 0x7d, 0xb7, 0x48, 0xee, 0x0e, 0x27, 0x77,
+	0x0f, 0xdd, 0xfc, 0xff, 0xe8, 0x28, 0x46, 0xd1, 0x99, 0x52, 0xff, 0x48, 0xf7, 0x7f, 0x07, 0x00,
+	0x00, 0xff, 0xff, 0x97, 0xe0, 0x07, 0xd6, 0x36, 0x09, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1275,38 +1201,31 @@ func (m *MsgNewBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.SubassetUris) > 0 {
-		i -= len(m.SubassetUris)
-		copy(dAtA[i:], m.SubassetUris)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.SubassetUris)))
-		i--
-		dAtA[i] = 0x3a
-	}
 	if len(m.FreezeAddressesDigest) > 0 {
 		i -= len(m.FreezeAddressesDigest)
 		copy(dAtA[i:], m.FreezeAddressesDigest)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.FreezeAddressesDigest)))
 		i--
-		dAtA[i] = 0x32
+		dAtA[i] = 0x2a
 	}
 	if m.Permissions != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.Permissions))
 		i--
-		dAtA[i] = 0x28
+		dAtA[i] = 0x20
 	}
-	if len(m.Manager) > 0 {
-		i -= len(m.Manager)
-		copy(dAtA[i:], m.Manager)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Manager)))
+	if len(m.SubassetUris) > 0 {
+		i -= len(m.SubassetUris)
+		copy(dAtA[i:], m.SubassetUris)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.SubassetUris)))
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x1a
 	}
 	if len(m.Uri) > 0 {
 		i -= len(m.Uri)
 		copy(dAtA[i:], m.Uri)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Uri)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x12
 	}
 	if len(m.Creator) > 0 {
 		i -= len(m.Creator)
@@ -1338,13 +1257,6 @@ func (m *MsgNewBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Message) > 0 {
-		i -= len(m.Message)
-		copy(dAtA[i:], m.Message)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Message)))
-		i--
-		dAtA[i] = 0x12
-	}
 	if m.Id != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.Id))
 		i--
@@ -1413,13 +1325,6 @@ func (m *MsgNewSubBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	_ = i
 	var l int
 	_ = l
-	if len(m.Message) > 0 {
-		i -= len(m.Message)
-		copy(dAtA[i:], m.Message)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Message)))
-		i--
-		dAtA[i] = 0x12
-	}
 	if m.SubassetId != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.SubassetId))
 		i--
@@ -1463,19 +1368,15 @@ func (m *MsgTransferBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x20
 	}
-	if len(m.To) > 0 {
-		i -= len(m.To)
-		copy(dAtA[i:], m.To)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.To)))
+	if m.To != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.To))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x18
 	}
-	if len(m.From) > 0 {
-		i -= len(m.From)
-		copy(dAtA[i:], m.From)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.From)))
+	if m.From != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.From))
 		i--
-		dAtA[i] = 0x12
+		dAtA[i] = 0x10
 	}
 	if len(m.Creator) > 0 {
 		i -= len(m.Creator)
@@ -1507,13 +1408,6 @@ func (m *MsgTransferBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error
 	_ = i
 	var l int
 	_ = l
-	if len(m.Message) > 0 {
-		i -= len(m.Message)
-		copy(dAtA[i:], m.Message)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Message)))
-		i--
-		dAtA[i] = 0xa
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -1552,19 +1446,10 @@ func (m *MsgRequestTransferBadge) MarshalToSizedBuffer(dAtA []byte) (int, error)
 		i--
 		dAtA[i] = 0x20
 	}
-	if len(m.To) > 0 {
-		i -= len(m.To)
-		copy(dAtA[i:], m.To)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.To)))
+	if m.From != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.From))
 		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.From) > 0 {
-		i -= len(m.From)
-		copy(dAtA[i:], m.From)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.From)))
-		i--
-		dAtA[i] = 0x12
+		dAtA[i] = 0x10
 	}
 	if len(m.Creator) > 0 {
 		i -= len(m.Creator)
@@ -1596,13 +1481,6 @@ func (m *MsgRequestTransferBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Message) > 0 {
-		i -= len(m.Message)
-		copy(dAtA[i:], m.Message)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Message)))
-		i--
-		dAtA[i] = 0xa
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -1626,12 +1504,10 @@ func (m *MsgHandlePendingTransfer) MarshalToSizedBuffer(dAtA []byte) (int, error
 	_ = i
 	var l int
 	_ = l
-	if len(m.PendingId) > 0 {
-		i -= len(m.PendingId)
-		copy(dAtA[i:], m.PendingId)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.PendingId)))
+	if m.ThisNonce != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.ThisNonce))
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x28
 	}
 	if m.SubbadgeId != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.SubbadgeId))
@@ -1683,13 +1559,6 @@ func (m *MsgHandlePendingTransferResponse) MarshalToSizedBuffer(dAtA []byte) (in
 	_ = i
 	var l int
 	_ = l
-	if len(m.Message) > 0 {
-		i -= len(m.Message)
-		copy(dAtA[i:], m.Message)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Message)))
-		i--
-		dAtA[i] = 0xa
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -1723,12 +1592,10 @@ func (m *MsgSetApproval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x20
 	}
-	if len(m.Address) > 0 {
-		i -= len(m.Address)
-		copy(dAtA[i:], m.Address)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Address)))
+	if m.Address != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Address))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x18
 	}
 	if m.Amount != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.Amount))
@@ -1765,13 +1632,6 @@ func (m *MsgSetApprovalResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	_ = i
 	var l int
 	_ = l
-	if len(m.Message) > 0 {
-		i -= len(m.Message)
-		copy(dAtA[i:], m.Message)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Message)))
-		i--
-		dAtA[i] = 0xa
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -1810,12 +1670,10 @@ func (m *MsgRevokeBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x18
 	}
-	if len(m.Address) > 0 {
-		i -= len(m.Address)
-		copy(dAtA[i:], m.Address)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Address)))
+	if m.Address != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Address))
 		i--
-		dAtA[i] = 0x12
+		dAtA[i] = 0x10
 	}
 	if len(m.Creator) > 0 {
 		i -= len(m.Creator)
@@ -1847,13 +1705,6 @@ func (m *MsgRevokeBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	_ = i
 	var l int
 	_ = l
-	if len(m.Message) > 0 {
-		i -= len(m.Message)
-		copy(dAtA[i:], m.Message)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Message)))
-		i--
-		dAtA[i] = 0xa
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -1882,7 +1733,7 @@ func (m *MsgNewBadge) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.Manager)
+	l = len(m.SubassetUris)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -1890,10 +1741,6 @@ func (m *MsgNewBadge) Size() (n int) {
 		n += 1 + sovTx(uint64(m.Permissions))
 	}
 	l = len(m.FreezeAddressesDigest)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.SubassetUris)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -1908,10 +1755,6 @@ func (m *MsgNewBadgeResponse) Size() (n int) {
 	_ = l
 	if m.Id != 0 {
 		n += 1 + sovTx(uint64(m.Id))
-	}
-	l = len(m.Message)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
 }
@@ -1944,10 +1787,6 @@ func (m *MsgNewSubBadgeResponse) Size() (n int) {
 	if m.SubassetId != 0 {
 		n += 1 + sovTx(uint64(m.SubassetId))
 	}
-	l = len(m.Message)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
 	return n
 }
 
@@ -1961,13 +1800,11 @@ func (m *MsgTransferBadge) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.From)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if m.From != 0 {
+		n += 1 + sovTx(uint64(m.From))
 	}
-	l = len(m.To)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if m.To != 0 {
+		n += 1 + sovTx(uint64(m.To))
 	}
 	if m.Amount != 0 {
 		n += 1 + sovTx(uint64(m.Amount))
@@ -1987,10 +1824,6 @@ func (m *MsgTransferBadgeResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Message)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
 	return n
 }
 
@@ -2004,13 +1837,8 @@ func (m *MsgRequestTransferBadge) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.From)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.To)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if m.From != 0 {
+		n += 1 + sovTx(uint64(m.From))
 	}
 	if m.Amount != 0 {
 		n += 1 + sovTx(uint64(m.Amount))
@@ -2030,10 +1858,6 @@ func (m *MsgRequestTransferBadgeResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Message)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
 	return n
 }
 
@@ -2056,9 +1880,8 @@ func (m *MsgHandlePendingTransfer) Size() (n int) {
 	if m.SubbadgeId != 0 {
 		n += 1 + sovTx(uint64(m.SubbadgeId))
 	}
-	l = len(m.PendingId)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if m.ThisNonce != 0 {
+		n += 1 + sovTx(uint64(m.ThisNonce))
 	}
 	return n
 }
@@ -2069,10 +1892,6 @@ func (m *MsgHandlePendingTransferResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Message)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
 	return n
 }
 
@@ -2089,9 +1908,8 @@ func (m *MsgSetApproval) Size() (n int) {
 	if m.Amount != 0 {
 		n += 1 + sovTx(uint64(m.Amount))
 	}
-	l = len(m.Address)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if m.Address != 0 {
+		n += 1 + sovTx(uint64(m.Address))
 	}
 	if m.BadgeId != 0 {
 		n += 1 + sovTx(uint64(m.BadgeId))
@@ -2108,10 +1926,6 @@ func (m *MsgSetApprovalResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Message)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
 	return n
 }
 
@@ -2125,9 +1939,8 @@ func (m *MsgRevokeBadge) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.Address)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if m.Address != 0 {
+		n += 1 + sovTx(uint64(m.Address))
 	}
 	if m.Amount != 0 {
 		n += 1 + sovTx(uint64(m.Amount))
@@ -2147,10 +1960,6 @@ func (m *MsgRevokeBadgeResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Message)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
 	return n
 }
 
@@ -2221,7 +2030,7 @@ func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 			}
 			m.Creator = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
 			}
@@ -2253,90 +2062,7 @@ func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 			}
 			m.Uri = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Manager", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Manager = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Permissions", wireType)
-			}
-			m.Permissions = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Permissions |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FreezeAddressesDigest", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.FreezeAddressesDigest = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 7:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SubassetUris", wireType)
 			}
@@ -2367,6 +2093,57 @@ func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.SubassetUris = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Permissions", wireType)
+			}
+			m.Permissions = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Permissions |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FreezeAddressesDigest", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FreezeAddressesDigest = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2437,38 +2214,6 @@ func (m *MsgNewBadgeResponse) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Message = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -2658,38 +2403,6 @@ func (m *MsgNewSubBadgeResponse) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Message = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -2773,10 +2486,10 @@ func (m *MsgTransferBadge) Unmarshal(dAtA []byte) error {
 			m.Creator = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 {
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
 			}
-			var stringLen uint64
+			m.From = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -2786,29 +2499,16 @@ func (m *MsgTransferBadge) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				m.From |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.From = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 3:
-			if wireType != 2 {
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field To", wireType)
 			}
-			var stringLen uint64
+			m.To = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -2818,24 +2518,11 @@ func (m *MsgTransferBadge) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				m.To |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.To = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 4:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
@@ -2943,38 +2630,6 @@ func (m *MsgTransferBadgeResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgTransferBadgeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Message = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -3058,10 +2713,10 @@ func (m *MsgRequestTransferBadge) Unmarshal(dAtA []byte) error {
 			m.Creator = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 {
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
 			}
-			var stringLen uint64
+			m.From = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -3071,56 +2726,11 @@ func (m *MsgRequestTransferBadge) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				m.From |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.From = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field To", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.To = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 4:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
@@ -3228,38 +2838,6 @@ func (m *MsgRequestTransferBadgeResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgRequestTransferBadgeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Message = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -3401,10 +2979,10 @@ func (m *MsgHandlePendingTransfer) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PendingId", wireType)
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ThisNonce", wireType)
 			}
-			var stringLen uint64
+			m.ThisNonce = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -3414,24 +2992,11 @@ func (m *MsgHandlePendingTransfer) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				m.ThisNonce |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.PendingId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -3482,38 +3047,6 @@ func (m *MsgHandlePendingTransferResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgHandlePendingTransferResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Message = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -3616,10 +3149,10 @@ func (m *MsgSetApproval) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 3:
-			if wireType != 2 {
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
 			}
-			var stringLen uint64
+			m.Address = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -3629,24 +3162,11 @@ func (m *MsgSetApproval) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				m.Address |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Address = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 4:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
@@ -3735,38 +3255,6 @@ func (m *MsgSetApprovalResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgSetApprovalResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Message = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -3850,10 +3338,10 @@ func (m *MsgRevokeBadge) Unmarshal(dAtA []byte) error {
 			m.Creator = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 {
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
 			}
-			var stringLen uint64
+			m.Address = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -3863,24 +3351,11 @@ func (m *MsgRevokeBadge) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				m.Address |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Address = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
@@ -3988,38 +3463,6 @@ func (m *MsgRevokeBadgeResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgRevokeBadgeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Message = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
