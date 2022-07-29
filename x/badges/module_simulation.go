@@ -64,6 +64,10 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	badgesGenesis := types.GenesisState{
 		Params: types.DefaultParams(),
 		PortId: types.PortID,
+		NextAssetId: 0,
+		Badges: []*types.BitBadge{},
+		Balances: []*types.BadgeBalanceInfo{},
+		BalanceIds: []string{},
 		// this line is used by starport scaffolding # simapp/module/genesisState
 	}
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&badgesGenesis)
