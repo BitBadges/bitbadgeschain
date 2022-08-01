@@ -20,3 +20,8 @@ func (k Keeper) SetNextAssetId(ctx sdk.Context, next_id uint64) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set(NextAssetIDKey, []byte(strconv.FormatInt(int64(next_id), 10)))
 }
+
+func (k Keeper) IncrementNextAssetId(ctx sdk.Context) {
+	next_id := k.GetNextAssetId(ctx)
+	k.SetNextAssetId(ctx, next_id + 1)
+}

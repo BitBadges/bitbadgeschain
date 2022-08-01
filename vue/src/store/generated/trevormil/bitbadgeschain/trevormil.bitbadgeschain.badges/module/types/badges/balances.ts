@@ -22,7 +22,6 @@ export interface Approval {
 export interface PendingTransfer {
   this_pending_nonce: number;
   other_pending_nonce: number;
-  address_num: number;
   amount: number;
   /** vs. receive request */
   send_request: boolean;
@@ -232,7 +231,6 @@ export const Approval = {
 const basePendingTransfer: object = {
   this_pending_nonce: 0,
   other_pending_nonce: 0,
-  address_num: 0,
   amount: 0,
   send_request: false,
   to: 0,
@@ -247,9 +245,6 @@ export const PendingTransfer = {
     }
     if (message.other_pending_nonce !== 0) {
       writer.uint32(16).uint64(message.other_pending_nonce);
-    }
-    if (message.address_num !== 0) {
-      writer.uint32(24).uint64(message.address_num);
     }
     if (message.amount !== 0) {
       writer.uint32(32).uint64(message.amount);
@@ -281,9 +276,6 @@ export const PendingTransfer = {
           break;
         case 2:
           message.other_pending_nonce = longToNumber(reader.uint64() as Long);
-          break;
-        case 3:
-          message.address_num = longToNumber(reader.uint64() as Long);
           break;
         case 4:
           message.amount = longToNumber(reader.uint64() as Long);
@@ -326,11 +318,6 @@ export const PendingTransfer = {
     } else {
       message.other_pending_nonce = 0;
     }
-    if (object.address_num !== undefined && object.address_num !== null) {
-      message.address_num = Number(object.address_num);
-    } else {
-      message.address_num = 0;
-    }
     if (object.amount !== undefined && object.amount !== null) {
       message.amount = Number(object.amount);
     } else {
@@ -365,8 +352,6 @@ export const PendingTransfer = {
       (obj.this_pending_nonce = message.this_pending_nonce);
     message.other_pending_nonce !== undefined &&
       (obj.other_pending_nonce = message.other_pending_nonce);
-    message.address_num !== undefined &&
-      (obj.address_num = message.address_num);
     message.amount !== undefined && (obj.amount = message.amount);
     message.send_request !== undefined &&
       (obj.send_request = message.send_request);
@@ -394,11 +379,6 @@ export const PendingTransfer = {
       message.other_pending_nonce = object.other_pending_nonce;
     } else {
       message.other_pending_nonce = 0;
-    }
-    if (object.address_num !== undefined && object.address_num !== null) {
-      message.address_num = object.address_num;
-    } else {
-      message.address_num = 0;
     }
     if (object.amount !== undefined && object.amount !== null) {
       message.amount = object.amount;

@@ -15,5 +15,3 @@ func (k Keeper) AssertBadgeAndSubBadgeExists(ctx sdk.Context, badge_id uint64, s
 	}
 	return nil
 }
-
-

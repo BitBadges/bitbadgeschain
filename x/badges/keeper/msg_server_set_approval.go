@@ -19,7 +19,7 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 		return nil, ErrSenderAndReceiverSame
 	}
 
-	// Verify that the from and to addresses are registered; 
+	// Verify that the from and to addresses are registered
 	account_nums := []uint64{}
 	account_nums = append(account_nums, msg.Address)
 	err := k.AssertAccountNumbersAreValid(ctx, account_nums)

@@ -47,8 +47,6 @@ type BitBadge struct {
 	//More permissions to be added
 	PermissionFlags uint64 `protobuf:"varint,5,opt,name=permission_flags,json=permissionFlags,proto3" json:"permission_flags,omitempty"`
 	// if frozen_by_default is true, this is a list of unfrozen addresses; and vice versa for false
-	//TODO: make this a fixed length set efficient accumulator (no need to store a list of all addresses; just lookup membership)
-	//TODO: set max length
 	FrozenOrUnfrozenAddressesDigest string `protobuf:"bytes,10,opt,name=frozen_or_unfrozen_addresses_digest,json=frozenOrUnfrozenAddressesDigest,proto3" json:"frozen_or_unfrozen_addresses_digest,omitempty"`
 	// uri for the subassets metadata stored off chain; include {id} in the string, it will be replaced with the subasset id
 	// if not specified, uses a default Class (ID # 1) like metadata

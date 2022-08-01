@@ -8,6 +8,7 @@ func (k Keeper) GetOrCreateAccountNumberForAccAddressBech32(ctx sdk.Context, add
  	account := k.accountKeeper.GetAccount(ctx, address)
 	if account == nil {
 		account = k.accountKeeper.NewAccountWithAddress(ctx, address)
+		k.accountKeeper.SetAccount(ctx, account)
 	}
 	return account.GetAccountNumber()
 }
@@ -17,7 +18,7 @@ func (k Keeper) MustGetAccountNumberForAddressString(ctx sdk.Context, address st
 	return k.GetOrCreateAccountNumberForAccAddressBech32(ctx, acc_address)
 }
 
-//TODO: update this to be compatible with v0.46.0 AccountKeeper
+//TODO: update this to be compatible with v0.46.0 AccountKeeper and test it
 func (k Keeper) AssertAccountNumbersAreValid(ctx sdk.Context, accountNums []uint64) error {
 	// for _, accountNum := range accountNums {
 	// 	address := k.accountKeeper.GetAccountAddressByID(ctx, accountNum)

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
@@ -26,7 +25,7 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	//Check permissions (can_create)
 	permission_flags := types.GetPermissions(badge.PermissionFlags)
 	if !permission_flags.CanCreateSubbadges() {
-		return nil, sdkerrors.Wrapf(ErrInvalidPermissions, "%s", "Manager can't create more subbadges")
+		return nil, ErrInvalidPermissions
 	}
 
 	//Once here, we are safe to mint
@@ -40,7 +39,7 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	}
 	badge.NextSubassetId += 1
 
-	//Mint the total supplt of subbadge to the manager
+	//Mint the total supply of subbadge to the manager
 	manager_balance_id := GetBalanceKey(creator_account_num, msg.Id, subasset_id)
 	if err := k.AddToBadgeBalance(ctx, manager_balance_id, msg.Supply); err != nil {
 		return nil, err

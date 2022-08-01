@@ -27,12 +27,11 @@ export interface QueryGetBadgeResponse {
 export interface QueryGetBalanceRequest {
   badgeId: number;
   subbadgeId: number;
-  address: string;
+  address: number;
 }
 
 export interface QueryGetBalanceResponse {
   balanceInfo: BadgeBalanceInfo | undefined;
-  message: string;
 }
 
 const baseQueryParamsRequest: object = {};
@@ -254,7 +253,7 @@ export const QueryGetBadgeResponse = {
 const baseQueryGetBalanceRequest: object = {
   badgeId: 0,
   subbadgeId: 0,
-  address: "",
+  address: 0,
 };
 
 export const QueryGetBalanceRequest = {
@@ -268,8 +267,8 @@ export const QueryGetBalanceRequest = {
     if (message.subbadgeId !== 0) {
       writer.uint32(16).uint64(message.subbadgeId);
     }
-    if (message.address !== "") {
-      writer.uint32(26).string(message.address);
+    if (message.address !== 0) {
+      writer.uint32(24).uint64(message.address);
     }
     return writer;
   },
@@ -288,7 +287,7 @@ export const QueryGetBalanceRequest = {
           message.subbadgeId = longToNumber(reader.uint64() as Long);
           break;
         case 3:
-          message.address = reader.string();
+          message.address = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -311,9 +310,9 @@ export const QueryGetBalanceRequest = {
       message.subbadgeId = 0;
     }
     if (object.address !== undefined && object.address !== null) {
-      message.address = String(object.address);
+      message.address = Number(object.address);
     } else {
-      message.address = "";
+      message.address = 0;
     }
     return message;
   },
@@ -343,13 +342,13 @@ export const QueryGetBalanceRequest = {
     if (object.address !== undefined && object.address !== null) {
       message.address = object.address;
     } else {
-      message.address = "";
+      message.address = 0;
     }
     return message;
   },
 };
 
-const baseQueryGetBalanceResponse: object = { message: "" };
+const baseQueryGetBalanceResponse: object = {};
 
 export const QueryGetBalanceResponse = {
   encode(
@@ -361,9 +360,6 @@ export const QueryGetBalanceResponse = {
         message.balanceInfo,
         writer.uint32(10).fork()
       ).ldelim();
-    }
-    if (message.message !== "") {
-      writer.uint32(18).string(message.message);
     }
     return writer;
   },
@@ -383,9 +379,6 @@ export const QueryGetBalanceResponse = {
             reader.uint32()
           );
           break;
-        case 2:
-          message.message = reader.string();
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -403,11 +396,6 @@ export const QueryGetBalanceResponse = {
     } else {
       message.balanceInfo = undefined;
     }
-    if (object.message !== undefined && object.message !== null) {
-      message.message = String(object.message);
-    } else {
-      message.message = "";
-    }
     return message;
   },
 
@@ -417,7 +405,6 @@ export const QueryGetBalanceResponse = {
       (obj.balanceInfo = message.balanceInfo
         ? BadgeBalanceInfo.toJSON(message.balanceInfo)
         : undefined);
-    message.message !== undefined && (obj.message = message.message);
     return obj;
   },
 
@@ -431,11 +418,6 @@ export const QueryGetBalanceResponse = {
       message.balanceInfo = BadgeBalanceInfo.fromPartial(object.balanceInfo);
     } else {
       message.balanceInfo = undefined;
-    }
-    if (object.message !== undefined && object.message !== null) {
-      message.message = object.message;
-    } else {
-      message.message = "";
     }
     return message;
   },

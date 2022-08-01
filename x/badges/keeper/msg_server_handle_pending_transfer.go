@@ -77,19 +77,16 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 						}
 					}
 				} else if received {
-					to_balance_key := other_balance_key
-					from_balance_key := balance_key
+					to_balance_key := balance_key
+					from_balance_key := other_balance_key
 					if outgoing {
-						to_balance_key = balance_key
-						from_balance_key = other_balance_key
+						to_balance_key =  other_balance_key
+						from_balance_key =  balance_key
 					}
 
 					if receivedAndWantToAccept {
+						// We alteady removed from "From" balance so all we have to do now is add to "To" balance
 						if err := k.AddToBadgeBalance(ctx, to_balance_key, pending_transfer.Amount); err != nil {
-							return nil, err
-						}
-
-						if err := k.RemoveFromBadgeBalance(ctx, from_balance_key, pending_transfer.Amount); err != nil {
 							return nil, err
 						}
 					} else {

@@ -30,11 +30,7 @@ export interface BitBadge {
    * More permissions to be added
    */
   permission_flags: number;
-  /**
-   * if frozen_by_default is true, this is a list of unfrozen addresses; and vice versa for false
-   * TODO: make this a fixed length set efficient accumulator (no need to store a list of all addresses; just lookup membership)
-   * TODO: set max length
-   */
+  /** if frozen_by_default is true, this is a list of unfrozen addresses; and vice versa for false */
   frozen_or_unfrozen_addresses_digest: string;
   /**
    * uri for the subassets metadata stored off chain; include {id} in the string, it will be replaced with the subasset id

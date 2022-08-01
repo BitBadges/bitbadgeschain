@@ -30447,12 +30447,6 @@ paths:
                     title: >-
                       if frozen_by_default is true, this is a list of unfrozen
                       addresses; and vice versa for false
-
-                      TODO: make this a fixed length set efficient accumulator
-                      (no need to store a list of all addresses; just lookup
-                      membership)
-
-                      TODO: set max length
                   subasset_uri_format:
                     type: string
                     title: >-
@@ -30709,9 +30703,6 @@ paths:
                         other_pending_nonce:
                           type: string
                           format: uint64
-                        address_num:
-                          type: string
-                          format: uint64
                         amount:
                           type: string
                           format: uint64
@@ -30741,8 +30732,6 @@ paths:
                           type: string
                           format: uint64
                 title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
-              message:
-                type: string
         default:
           description: An unexpected error response.
           schema:
@@ -30943,6 +30932,7 @@ paths:
           in: path
           required: true
           type: string
+          format: uint64
       tags:
         - Query
   /trevormil/bitbadgeschain/badges/params:
@@ -52689,9 +52679,6 @@ definitions:
             other_pending_nonce:
               type: string
               format: uint64
-            address_num:
-              type: string
-              format: uint64
             amount:
               type: string
               format: uint64
@@ -52781,11 +52768,6 @@ definitions:
         title: >-
           if frozen_by_default is true, this is a list of unfrozen addresses;
           and vice versa for false
-
-          TODO: make this a fixed length set efficient accumulator (no need to
-          store a list of all addresses; just lookup membership)
-
-          TODO: set max length
       subasset_uri_format:
         type: string
         title: >-
@@ -52849,9 +52831,6 @@ definitions:
         type: string
         format: uint64
       other_pending_nonce:
-        type: string
-        format: uint64
-      address_num:
         type: string
         format: uint64
       amount:
@@ -52934,11 +52913,6 @@ definitions:
             title: >-
               if frozen_by_default is true, this is a list of unfrozen
               addresses; and vice versa for false
-
-              TODO: make this a fixed length set efficient accumulator (no need
-              to store a list of all addresses; just lookup membership)
-
-              TODO: set max length
           subasset_uri_format:
             type: string
             title: >-
@@ -52993,9 +52967,6 @@ definitions:
                 other_pending_nonce:
                   type: string
                   format: uint64
-                address_num:
-                  type: string
-                  format: uint64
                 amount:
                   type: string
                   format: uint64
@@ -53023,8 +52994,6 @@ definitions:
                   type: string
                   format: uint64
         title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
-      message:
-        type: string
   trevormil.bitbadgeschain.badges.QueryParamsResponse:
     type: object
     properties:

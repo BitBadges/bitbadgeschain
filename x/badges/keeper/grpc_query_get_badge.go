@@ -21,7 +21,6 @@ func (k Keeper) GetBadge(goCtx context.Context, req *types.QueryGetBadgeRequest)
 	if !found {
 		return nil, status.Error(codes.NotFound, "badge not found")
 	}
-	_ = ctx
 
 	return &types.QueryGetBadgeResponse{
 		Badge: &badge,

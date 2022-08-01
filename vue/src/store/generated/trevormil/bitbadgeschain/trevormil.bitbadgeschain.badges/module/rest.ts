@@ -90,9 +90,6 @@ export interface BadgesPendingTransfer {
   other_pending_nonce?: string;
 
   /** @format uint64 */
-  address_num?: string;
-
-  /** @format uint64 */
   amount?: string;
   send_request?: boolean;
 
@@ -112,7 +109,6 @@ export interface BadgesQueryGetBadgeResponse {
 
 export interface BadgesQueryGetBalanceResponse {
   balanceInfo?: BadgesBadgeBalanceInfo;
-  message?: string;
 }
 
 /**

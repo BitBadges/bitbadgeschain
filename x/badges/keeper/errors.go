@@ -29,4 +29,5 @@ var (
 	ErrAccountsAreNotRegistered		  	 	= sdkerrors.Register(types.ModuleName, 22, "accounts are not registered")
 	ErrNoPendingTransferFound			  	= sdkerrors.Register(types.ModuleName, 23, "no pending transfer found")
 	ErrPendingNotFound					  	= sdkerrors.Register(types.ModuleName, 24, "pending transfer not found")
+	ErrOverflow						  		= sdkerrors.Register(types.ModuleName, 25, "overflow")
 )

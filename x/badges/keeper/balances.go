@@ -1,11 +1,11 @@
 package keeper
 
 import (
+	"math"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
-
-//TODO: overflow / underflow handlers
 
 func GetEmptyBadgeBalanceTemplate() types.BadgeBalanceInfo {
 	badgeBalanceInfo := types.BadgeBalanceInfo{
@@ -17,6 +17,22 @@ func GetEmptyBadgeBalanceTemplate() types.BadgeBalanceInfo {
 	return badgeBalanceInfo
 }
 
+//Don't think it'll ever reach an overflow but this is here just in case
+func SafeAdd(left uint64, right uint64) (uint64, error) {
+	if left > math.MaxUint64 - right {
+		return 0, ErrOverflow
+	}
+    return left + right, nil
+}
+
+func SafeSubtract(left uint64, right uint64) (uint64, error) {
+    if right > left {
+        return 0, ErrOverflow
+    }
+    return left - right, nil
+}
+
+
 func (k Keeper) AddToBadgeBalance(ctx sdk.Context, balance_key string, balance_to_add uint64) error {
 	if balance_to_add == 0 {
 		return ErrBalanceIsZero
@@ -25,14 +41,24 @@ func (k Keeper) AddToBadgeBalance(ctx sdk.Context, balance_key string, balance_t
 	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, balance_key)
 	if !found {
 		badgeBalanceInfo = GetEmptyBadgeBalanceTemplate()
-		badgeBalanceInfo.Balance += balance_to_add
-		err := k.CreateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		newBalance, err := SafeAdd(badgeBalanceInfo.Balance, balance_to_add)
+		badgeBalanceInfo.Balance = newBalance
+		if err != nil {
+			return err
+		}
+
+		err = k.CreateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
 		if err != nil {
 			return err
 		}
 	} else {
-		badgeBalanceInfo.Balance += balance_to_add
-		err := k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		newBalance, err := SafeAdd(badgeBalanceInfo.Balance, balance_to_add)
+		badgeBalanceInfo.Balance = newBalance
+		if err != nil {
+			return err
+		}
+
+		err = k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
 		if err != nil {
 			return err
 		}
@@ -54,8 +80,13 @@ func (k Keeper) RemoveFromBadgeBalance(ctx sdk.Context, balance_key string, bala
 			return ErrBadgeBalanceTooLow
 		}
 
-		badgeBalanceInfo.Balance -= balance_to_remove
-		err := k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		newBalance, err := SafeSubtract(badgeBalanceInfo.Balance, balance_to_remove)
+		badgeBalanceInfo.Balance = newBalance
+		if err != nil {
+			return err
+		}
+
+		err = k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
 		if err != nil {
 			return err
 		}
@@ -145,6 +176,7 @@ func (k Keeper) RemovePending(ctx sdk.Context, balance_key string, this_nonce ui
 	} else {
 		new_pending := []*types.PendingTransfer{}
 		found := false
+		// Can make this a binary search in the future as its sorted by nonces
 		for _, pending_info := range badgeBalanceInfo.Pending {
 			if pending_info.ThisPendingNonce != this_nonce || pending_info.OtherPendingNonce != other_nonce {
 				new_pending = append(new_pending, pending_info)
@@ -186,7 +218,10 @@ func (k Keeper) SetApproval(ctx sdk.Context, balance_key string, amount uint64, 
 		})
 
 		badgeBalanceInfo.Approvals = new_approvals
-		k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		err := k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		if err != nil {
+			return err
+		}
 		return nil
 	}
 }
@@ -198,6 +233,8 @@ func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, balance_key string, a
 		return ErrBadgeBalanceNotExists
 	} else {
 		new_approvals := []*types.Approval{}
+		removed := false
+
 		//check for approval with same address / amount
 		for _, approval := range badgeBalanceInfo.Approvals {
 			if approval.AddressNum == address_num {
@@ -205,19 +242,33 @@ func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, balance_key string, a
 					return ErrInsufficientApproval
 				}
 
+				newAmount, err := SafeSubtract(approval.Amount, amount_to_remove)
+				if err != nil {
+					return err
+				}
+
 				if approval.Amount-amount_to_remove > 0 {
 					new_approvals = append(new_approvals, &types.Approval{
-						Amount:     approval.Amount - amount_to_remove,
+						Amount:     newAmount,
 						AddressNum: address_num,
 					})
 				}
+				removed = true
 			} else {
 				new_approvals = append(new_approvals, approval)
 			}
 		}
 
+		if !removed {
+			return ErrInsufficientApproval
+		}
+
 		badgeBalanceInfo.Approvals = new_approvals
-		k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		err := k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		if err != nil {
+			return err
+		}
+
 		return nil
 	}
 }
@@ -232,8 +283,12 @@ func (k Keeper) AddBalanceToApproval(ctx sdk.Context, balance_key string, amount
 		//check for approval with same address / amount
 		for _, approval := range badgeBalanceInfo.Approvals {
 			if approval.AddressNum == address_num {
+				newAmount, err := SafeAdd(approval.Amount, amount_to_add)
+				if err != nil {
+					return err
+				}
 				new_approvals = append(new_approvals, &types.Approval{
-					Amount:     approval.Amount + amount_to_add,
+					Amount:     newAmount,
 					AddressNum: address_num,
 				})
 			} else {
@@ -248,7 +303,11 @@ func (k Keeper) AddBalanceToApproval(ctx sdk.Context, balance_key string, amount
 		}
 
 		badgeBalanceInfo.Approvals = new_approvals
-		k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		err := k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		if err != nil {
+			return err
+		}
+
 		return nil
 	}
 }

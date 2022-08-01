@@ -6,7 +6,6 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-// balance_id is addressnumber-badgeid-subassetid
 func (k Keeper) CreateBadgeBalanceInStore(ctx sdk.Context, balance_id string, badgeBalanceInfo types.BadgeBalanceInfo) error {
 	if k.StoreHasBadgeBalance(ctx, balance_id) {
 		return sdkerrors.Wrap(ErrBadgeBalanceExists, balance_id)
@@ -21,7 +20,6 @@ func (k Keeper) CreateBadgeBalanceInStore(ctx sdk.Context, balance_id string, ba
 	return nil
 }
 
-//Will create an empty one if not found
 func (k Keeper) UpdateBadgeBalanceInStore(ctx sdk.Context, balance_id string, badgeBalanceInfo types.BadgeBalanceInfo) error {
 	if !k.StoreHasBadgeBalance(ctx, balance_id) {
 		return sdkerrors.Wrap(ErrBadgeBalanceNotExists, balance_id)

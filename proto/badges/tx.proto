@@ -14,7 +14,7 @@ service Msg {
     rpc HandlePendingTransfer(MsgHandlePendingTransfer) returns (MsgHandlePendingTransferResponse);
     rpc SetApproval(MsgSetApproval) returns (MsgSetApprovalResponse);
     rpc RevokeBadge(MsgRevokeBadge) returns (MsgRevokeBadgeResponse);
-// this line is used by starport scaffolding # proto/tx/rpc
+    // this line is used by starport scaffolding # proto/tx/rpc
 }
 
 message MsgNewBadge {

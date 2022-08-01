@@ -9,10 +9,9 @@ import (
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 
-//We assume that all badges are validly formed here
-//TODO: make this more robust with well formedness checks
+//NOTE: We assume that all badges are validly formed here
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-	// Set if defined
+	// Set if defined; default 0
 	k.SetNextAssetId(ctx, genState.NextAssetId)
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetPort(ctx, genState.PortId)

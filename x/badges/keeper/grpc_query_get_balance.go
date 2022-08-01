@@ -41,9 +41,6 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 			BalanceInfo: &badgeBalanceInfo,
 		}, nil
 	}
-	
-
-	_ = ctx
 
 	return &types.QueryGetBalanceResponse{
 		BalanceInfo: &types.BadgeBalanceInfo{

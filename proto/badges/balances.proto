@@ -25,7 +25,6 @@ message Approval {
 message PendingTransfer {
     uint64 this_pending_nonce = 1;
     uint64 other_pending_nonce = 2;
-    uint64 address_num = 3;
     uint64 amount = 4;
     bool send_request = 5; //vs. receive request
     uint64 to = 6;

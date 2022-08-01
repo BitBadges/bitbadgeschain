@@ -14,6 +14,7 @@ const (
 	can_freeze: when true, manager can freeze addresseses from transferring; once set to false, it is locked
 	frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
 */
+//TODO: Add test cases for these permissions
 type PermissionFlags struct {
 	can_manager_transfer bool
 	can_update_uris      bool

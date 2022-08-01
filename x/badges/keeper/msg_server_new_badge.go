@@ -15,7 +15,7 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 
 	//Get next badge ID and increment
 	next_badge_id := k.GetNextAssetId(ctx)
-	k.SetNextAssetId(ctx, next_badge_id + 1)
+	k.IncrementNextAssetId(ctx)
 
 	//Create and store the badge
 	badge := types.BitBadge{
@@ -28,6 +28,7 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 		NextSubassetId:                  0,
 		FrozenOrUnfrozenAddressesDigest: msg.FreezeAddressesDigest,
 	}
+
 	if err := k.SetBadgeInStore(ctx, badge); err != nil {
 		return nil, err
 	}
