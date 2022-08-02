@@ -15,12 +15,11 @@ func (suite *TestSuite) TestNewBadges() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri: validUri,
-				Permissions: 62,
-				FreezeAddressesDigest: "",
+				Uri:          validUri,
+				Permissions:  62,
 				SubassetUris: validUri,
 			},
-			Amount: 1,
+			Amount:  1,
 			Creator: bob,
 		},
 	}
@@ -40,7 +39,7 @@ func (suite *TestSuite) TestNewBadges() {
 	suite.Require().Equal([]*types.Subasset(nil), badge.SubassetsTotalSupply)
 	suite.Require().Equal(firstAccountNumCreated, badge.Manager) //7 is the first ID it creates
 	suite.Require().Equal(perms, badge.PermissionFlags)
-	suite.Require().Equal(validFreezeDigest, badge.FrozenOrUnfrozenAddressesDigest)
+	suite.Require().Equal([]uint64(nil), badge.FreezeAddresses)
 	suite.Require().Equal(uint64(0), badge.Id)
 
 	err = CreateBadges(suite, wctx, badgesToCreate)

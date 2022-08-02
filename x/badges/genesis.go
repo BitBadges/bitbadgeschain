@@ -50,7 +50,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.NextAssetId = k.GetNextAssetId(ctx)
 
 	genesis.Badges = k.GetBadgesFromStore(ctx)
-	genesis.Balances = k.GetBadgeBalanceesFromStore(ctx)
+	genesis.Balances = k.GetBadgeBalancesFromStore(ctx)
 	genesis.BalanceIds = k.GetBadgeBalanceIdsFromStore(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 

@@ -49,13 +49,15 @@ export interface BadgesBitBadge {
    * @format uint64
    */
   permission_flags?: string;
-  frozen_or_unfrozen_addresses_digest?: string;
+  freeze_addresses?: string[];
   subasset_uri_format?: string;
 
   /** @format uint64 */
   next_subasset_id?: string;
   subassets_total_supply?: BadgesSubasset[];
 }
+
+export type BadgesMsgFreezeAddressResponse = object;
 
 export type BadgesMsgHandlePendingTransferResponse = object;
 

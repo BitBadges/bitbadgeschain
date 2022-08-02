@@ -10,25 +10,24 @@ import (
 func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge) (*types.MsgNewSubBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Creator will already be registered, so we can do this and panic if it fails
-	creator_account_num := k.Keeper.MustGetAccountNumberForAddressString(ctx, msg.Creator)
-
+	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
+	
 	badge, found := k.GetBadgeFromStore(ctx, msg.Id)
+	
 	if !found {
 		return nil, ErrBadgeNotExists
 	}
 
-	if badge.Manager != creator_account_num {
+	if badge.Manager != CreatorAccountNum {
 		return nil, ErrSenderIsNotManager
 	}
 
-	//Check permissions (can_create)
-	permission_flags := types.GetPermissions(badge.PermissionFlags)
-	if !permission_flags.CanCreateSubbadges() {
+	permissions := types.GetPermissions(badge.PermissionFlags)
+	if !permissions.CanCreateSubbadges() {
 		return nil, ErrInvalidPermissions
 	}
 
-	//Once here, we are safe to mint
+	//Once here, we should be safe to mint
 	//By default, we assume non fungible subbadge (i.e. supply == 1) so we don't store if supply == 1
 	subasset_id := badge.NextSubassetId
 	if msg.Supply != 1 {
@@ -40,11 +39,11 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	badge.NextSubassetId += 1
 
 	//Mint the total supply of subbadge to the manager
-	manager_balance_id := GetBalanceKey(creator_account_num, msg.Id, subasset_id)
-	if err := k.AddToBadgeBalance(ctx, manager_balance_id, msg.Supply); err != nil {
+	ManagerBalanceKey := GetBalanceKey(CreatorAccountNum, msg.Id, subasset_id)
+	if err := k.AddToBadgeBalance(ctx, ManagerBalanceKey, msg.Supply); err != nil {
 		return nil, err
 	}
-	
+
 	if err := k.UpdateBadgeInStore(ctx, badge); err != nil {
 		return nil, err
 	}

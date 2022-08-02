@@ -34,8 +34,9 @@ message BitBadge {
     uint64 permission_flags = 5;
     
 
-    // if frozen_by_default is true, this is a list of unfrozen addresses; and vice versa for false
-    string frozen_or_unfrozen_addresses_digest = 10;
+    // if frozen_by_default is true, this is an accumulator of unfrozen addresses; and vice versa for false
+    //big.Int will always only be 32 uint64s long
+    repeated uint64 freeze_addresses = 10;
 
     // uri for the subassets metadata stored off chain; include {id} in the string, it will be replaced with the subasset id
     // if not specified, uses a default Class (ID # 1) like metadata

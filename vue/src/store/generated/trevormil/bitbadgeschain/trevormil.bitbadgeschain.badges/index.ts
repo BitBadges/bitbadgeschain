@@ -207,18 +207,18 @@ export default {
 		},
 		
 		
-		async sendMsgTransferBadge({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgRequestTransferBadge({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgTransferBadge(value)
+				const msg = await txClient.msgRequestTransferBadge(value)
 				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
 	gas: "200000" }, memo})
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgTransferBadge:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgRequestTransferBadge:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgTransferBadge:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgRequestTransferBadge:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -237,63 +237,18 @@ export default {
 				}
 			}
 		},
-		async sendMsgSetApproval({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgTransferBadge({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSetApproval(value)
+				const msg = await txClient.msgTransferBadge(value)
 				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
 	gas: "200000" }, memo})
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSetApproval:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgTransferBadge:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSetApproval:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgRequestTransferBadge({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgRequestTransferBadge(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgRequestTransferBadge:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgRequestTransferBadge:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgHandlePendingTransfer({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgHandlePendingTransfer(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgHandlePendingTransfer:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgHandlePendingTransfer:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgNewBadge({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgNewBadge(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgNewBadge:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgNewBadge:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgTransferBadge:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -312,17 +267,77 @@ export default {
 				}
 			}
 		},
-		
-		async MsgTransferBadge({ rootGetters }, { value }) {
+		async sendMsgNewBadge({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgTransferBadge(value)
+				const msg = await txClient.msgNewBadge(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgNewBadge:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgNewBadge:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgFreezeAddress({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgFreezeAddress(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgFreezeAddress:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgFreezeAddress:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgSetApproval({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgSetApproval(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSetApproval:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgSetApproval:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgHandlePendingTransfer({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgHandlePendingTransfer(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgHandlePendingTransfer:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgHandlePendingTransfer:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		
+		async MsgRequestTransferBadge({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgRequestTransferBadge(value)
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgTransferBadge:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgRequestTransferBadge:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgTransferBadge:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgRequestTransferBadge:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -339,42 +354,29 @@ export default {
 				}
 			}
 		},
-		async MsgSetApproval({ rootGetters }, { value }) {
+		async MsgTransferBadge({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSetApproval(value)
+				const msg = await txClient.msgTransferBadge(value)
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSetApproval:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgTransferBadge:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgSetApproval:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgTransferBadge:Create Could not create message: ' + e.message)
 				}
 			}
 		},
-		async MsgRequestTransferBadge({ rootGetters }, { value }) {
+		async MsgNewSubBadge({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgRequestTransferBadge(value)
+				const msg = await txClient.msgNewSubBadge(value)
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgRequestTransferBadge:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgNewSubBadge:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgRequestTransferBadge:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgHandlePendingTransfer({ rootGetters }, { value }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgHandlePendingTransfer(value)
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgHandlePendingTransfer:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgHandlePendingTransfer:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgNewSubBadge:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -391,16 +393,42 @@ export default {
 				}
 			}
 		},
-		async MsgNewSubBadge({ rootGetters }, { value }) {
+		async MsgFreezeAddress({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgNewSubBadge(value)
+				const msg = await txClient.msgFreezeAddress(value)
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgNewSubBadge:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgFreezeAddress:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgNewSubBadge:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgFreezeAddress:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgSetApproval({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgSetApproval(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSetApproval:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgSetApproval:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgHandlePendingTransfer({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgHandlePendingTransfer(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgHandlePendingTransfer:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgHandlePendingTransfer:Create Could not create message: ' + e.message)
 				}
 			}
 		},

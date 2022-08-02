@@ -8,35 +8,23 @@ import (
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
 )
 
-func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
+func TestMsgFreezeAddress_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgTransferBadge
+		msg  MsgFreezeAddress
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgTransferBadge{
+			msg: MsgFreezeAddress{
 				Creator: "invalid_address",
-				To:      0,
-				From:    1,
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
-			name: "valid state",
-			msg: MsgTransferBadge{
+			name: "valid address",
+			msg: MsgFreezeAddress{
 				Creator: sample.AccAddress(),
-				To:      0,
-				From:    1,
 			},
-		}, {
-			name: "invalid addresses",
-			msg: MsgTransferBadge{
-				Creator: sample.AccAddress(),
-				To:      0,
-				From:    0,
-			},
-			err: ErrSenderAndReceiverSame,
 		},
 	}
 	for _, tt := range tests {

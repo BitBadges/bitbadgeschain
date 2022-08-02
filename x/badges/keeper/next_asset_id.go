@@ -23,5 +23,5 @@ func (k Keeper) SetNextAssetId(ctx sdk.Context, next_id uint64) {
 
 func (k Keeper) IncrementNextAssetId(ctx sdk.Context) {
 	next_id := k.GetNextAssetId(ctx)
-	k.SetNextAssetId(ctx, next_id + 1)
+	k.SetNextAssetId(ctx, next_id+1)
 }

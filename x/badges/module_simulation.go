@@ -52,6 +52,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgRevokeBadge int = 100
 
+	opWeightMsgFreezeAddress = "op_weight_msg_freeze_address"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgFreezeAddress int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -62,12 +66,12 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 		accs[i] = acc.Address.String()
 	}
 	badgesGenesis := types.GenesisState{
-		Params: types.DefaultParams(),
-		PortId: types.PortID,
+		Params:      types.DefaultParams(),
+		PortId:      types.PortID,
 		NextAssetId: 0,
-		Badges: []*types.BitBadge{},
-		Balances: []*types.BadgeBalanceInfo{},
-		BalanceIds: []string{},
+		Badges:      []*types.BitBadge{},
+		Balances:    []*types.BadgeBalanceInfo{},
+		BalanceIds:  []string{},
 		// this line is used by starport scaffolding # simapp/module/genesisState
 	}
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&badgesGenesis)
@@ -166,6 +170,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgRevokeBadge,
 		badgessimulation.SimulateMsgRevokeBadge(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgFreezeAddress int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgFreezeAddress, &weightMsgFreezeAddress, nil,
+		func(_ *rand.Rand) {
+			weightMsgFreezeAddress = defaultWeightMsgFreezeAddress
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgFreezeAddress,
+		badgessimulation.SimulateMsgFreezeAddress(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

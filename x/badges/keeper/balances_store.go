@@ -45,7 +45,7 @@ func (k Keeper) GetBadgeBalanceFromStore(ctx sdk.Context, balance_id string) (ty
 	return badgeBalanceInfo, true
 }
 
-func (k Keeper) GetBadgeBalanceesFromStore(ctx sdk.Context) (addresses []*types.BadgeBalanceInfo) {
+func (k Keeper) GetBadgeBalancesFromStore(ctx sdk.Context) (addresses []*types.BadgeBalanceInfo) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, BadgeBalanceKey)
 	defer iterator.Close()

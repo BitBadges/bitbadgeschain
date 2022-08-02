@@ -30,8 +30,11 @@ export interface BitBadge {
    * More permissions to be added
    */
   permission_flags: number;
-  /** if frozen_by_default is true, this is a list of unfrozen addresses; and vice versa for false */
-  frozen_or_unfrozen_addresses_digest: string;
+  /**
+   * if frozen_by_default is true, this is an accumulator of unfrozen addresses; and vice versa for false
+   * big.Int will always only be 32 uint64s long
+   */
+  freeze_addresses: number[];
   /**
    * uri for the subassets metadata stored off chain; include {id} in the string, it will be replaced with the subasset id
    * if not specified, uses a default Class (ID # 1) like metadata
@@ -54,7 +57,7 @@ const baseBitBadge: object = {
   uri: "",
   manager: 0,
   permission_flags: 0,
-  frozen_or_unfrozen_addresses_digest: "",
+  freeze_addresses: 0,
   subasset_uri_format: "",
   next_subasset_id: 0,
 };
@@ -73,9 +76,11 @@ export const BitBadge = {
     if (message.permission_flags !== 0) {
       writer.uint32(40).uint64(message.permission_flags);
     }
-    if (message.frozen_or_unfrozen_addresses_digest !== "") {
-      writer.uint32(82).string(message.frozen_or_unfrozen_addresses_digest);
+    writer.uint32(82).fork();
+    for (const v of message.freeze_addresses) {
+      writer.uint64(v);
     }
+    writer.ldelim();
     if (message.subasset_uri_format !== "") {
       writer.uint32(90).string(message.subasset_uri_format);
     }
@@ -92,6 +97,7 @@ export const BitBadge = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseBitBadge } as BitBadge;
+    message.freeze_addresses = [];
     message.subassets_total_supply = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
@@ -109,7 +115,18 @@ export const BitBadge = {
           message.permission_flags = longToNumber(reader.uint64() as Long);
           break;
         case 10:
-          message.frozen_or_unfrozen_addresses_digest = reader.string();
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.freeze_addresses.push(
+                longToNumber(reader.uint64() as Long)
+              );
+            }
+          } else {
+            message.freeze_addresses.push(
+              longToNumber(reader.uint64() as Long)
+            );
+          }
           break;
         case 11:
           message.subasset_uri_format = reader.string();
@@ -132,6 +149,7 @@ export const BitBadge = {
 
   fromJSON(object: any): BitBadge {
     const message = { ...baseBitBadge } as BitBadge;
+    message.freeze_addresses = [];
     message.subassets_total_supply = [];
     if (object.id !== undefined && object.id !== null) {
       message.id = Number(object.id);
@@ -157,14 +175,12 @@ export const BitBadge = {
       message.permission_flags = 0;
     }
     if (
-      object.frozen_or_unfrozen_addresses_digest !== undefined &&
-      object.frozen_or_unfrozen_addresses_digest !== null
+      object.freeze_addresses !== undefined &&
+      object.freeze_addresses !== null
     ) {
-      message.frozen_or_unfrozen_addresses_digest = String(
-        object.frozen_or_unfrozen_addresses_digest
-      );
-    } else {
-      message.frozen_or_unfrozen_addresses_digest = "";
+      for (const e of object.freeze_addresses) {
+        message.freeze_addresses.push(Number(e));
+      }
     }
     if (
       object.subasset_uri_format !== undefined &&
@@ -200,9 +216,11 @@ export const BitBadge = {
     message.manager !== undefined && (obj.manager = message.manager);
     message.permission_flags !== undefined &&
       (obj.permission_flags = message.permission_flags);
-    message.frozen_or_unfrozen_addresses_digest !== undefined &&
-      (obj.frozen_or_unfrozen_addresses_digest =
-        message.frozen_or_unfrozen_addresses_digest);
+    if (message.freeze_addresses) {
+      obj.freeze_addresses = message.freeze_addresses.map((e) => e);
+    } else {
+      obj.freeze_addresses = [];
+    }
     message.subasset_uri_format !== undefined &&
       (obj.subasset_uri_format = message.subasset_uri_format);
     message.next_subasset_id !== undefined &&
@@ -219,6 +237,7 @@ export const BitBadge = {
 
   fromPartial(object: DeepPartial<BitBadge>): BitBadge {
     const message = { ...baseBitBadge } as BitBadge;
+    message.freeze_addresses = [];
     message.subassets_total_supply = [];
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
@@ -244,13 +263,12 @@ export const BitBadge = {
       message.permission_flags = 0;
     }
     if (
-      object.frozen_or_unfrozen_addresses_digest !== undefined &&
-      object.frozen_or_unfrozen_addresses_digest !== null
+      object.freeze_addresses !== undefined &&
+      object.freeze_addresses !== null
     ) {
-      message.frozen_or_unfrozen_addresses_digest =
-        object.frozen_or_unfrozen_addresses_digest;
-    } else {
-      message.frozen_or_unfrozen_addresses_digest = "";
+      for (const e of object.freeze_addresses) {
+        message.freeze_addresses.push(e);
+      }
     }
     if (
       object.subasset_uri_format !== undefined &&

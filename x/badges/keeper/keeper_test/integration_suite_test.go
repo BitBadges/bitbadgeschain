@@ -25,16 +25,13 @@ import (
 )
 
 const (
-	alice                         = "cosmos1jmjfq0tplp9tmx4v9uemw72y4d2wa5nr3xn9d3"
-	bob                           = "cosmos1xyxs3skf3f4jfqeuv89yyaqvjc6lffavxqhc8g"
-	charlie                       = "cosmos1e0w5t53nrq7p66fye6c8p0ynyhf6y24l4yuxd7"
-	validUri					  = "https://example.com/badge.json"
-	invalidUri					  = "invaliduri"
-	validFreezeDigest			  = ""	
-	// TODO: invalidFreezeDigest  = ""
-	firstAccountNumCreated 	  	  = uint64(7) //Just how it is. I believe the first 6 are validator node accounts
+	alice                  = "cosmos1jmjfq0tplp9tmx4v9uemw72y4d2wa5nr3xn9d3"
+	bob                    = "cosmos1xyxs3skf3f4jfqeuv89yyaqvjc6lffavxqhc8g"
+	charlie                = "cosmos1e0w5t53nrq7p66fye6c8p0ynyhf6y24l4yuxd7"
+	validUri               = "https://example.com/badge.json"
+	invalidUri             = "invaliduri"
+	firstAccountNumCreated = uint64(7) //Just how it is. I believe the first 6 are validator node accounts
 )
-
 
 var DefaultConsensusParams = &abci.ConsensusParams{
 	Block: &abci.BlockParams{
@@ -52,7 +49,6 @@ var DefaultConsensusParams = &abci.ConsensusParams{
 		},
 	},
 }
-
 
 type TestSuite struct {
 	suite.Suite
@@ -99,8 +95,6 @@ func (suite *TestSuite) SetupTest() {
 		ConsensusParams: DefaultConsensusParams,
 	})
 
-	
-
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
@@ -119,23 +113,23 @@ func TestBadgesKeeperTestSuite(t *testing.T) {
 }
 
 type BadgesToCreate struct {
-	Badge types.MsgNewBadge
-	Amount uint64
+	Badge   types.MsgNewBadge
+	Amount  uint64
 	Creator string
 }
 
 func CreateBadges(suite *TestSuite, ctx context.Context, badges []BadgesToCreate) error {
 	for _, badge := range badges {
 		for i := 0; i < int(badge.Amount); i++ {
-			msg := types.NewMsgNewBadge(badge.Creator, badge.Badge.Uri, badge.Badge.Permissions, badge.Badge.FreezeAddressesDigest, badge.Badge.SubassetUris)
+			msg := types.NewMsgNewBadge(badge.Creator, badge.Badge.Uri, badge.Badge.Permissions, badge.Badge.SubassetUris)
 			_, err := suite.msgServer.NewBadge(ctx, msg)
 			if err != nil {
 				return err
 			}
-			
+
 		}
 	}
-	return nil;
+	return nil
 }
 
 func CreateSubBadge(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, supply uint64) error {
@@ -174,9 +168,15 @@ func HandlePendingTransfer(suite *TestSuite, ctx context.Context, creator string
 	return err
 }
 
+func FreezeAddress(suite *TestSuite, ctx context.Context, creator string, address uint64, badgeId uint64, subbadgeId uint64, add bool) error {
+	msg := types.NewMsgFreezeAddress(creator, address, badgeId, subbadgeId, add)
+	_, err := suite.msgServer.FreezeAddress(ctx, msg)
+	return err
+}
+
 /* Below, we should define all query handlers and use them within the other integration tests. */
 
-func GetBadge(suite *TestSuite, ctx context.Context, id uint64) (types.BitBadge) {
+func GetBadge(suite *TestSuite, ctx context.Context, id uint64) types.BitBadge {
 	res, err := suite.app.BadgesKeeper.GetBadge(ctx, &types.QueryGetBadgeRequest{Id: uint64(id)})
 	if err != nil {
 		suite.Fail(err.Error())
@@ -185,11 +185,11 @@ func GetBadge(suite *TestSuite, ctx context.Context, id uint64) (types.BitBadge)
 	return *res.Badge
 }
 
-func GetBadgeBalance(suite *TestSuite, ctx context.Context, badgeId uint64, subbadgeId uint64, address uint64) (types.BadgeBalanceInfo) {
+func GetBadgeBalance(suite *TestSuite, ctx context.Context, badgeId uint64, subbadgeId uint64, address uint64) types.BadgeBalanceInfo {
 	res, err := suite.app.BadgesKeeper.GetBalance(ctx, &types.QueryGetBalanceRequest{
-		BadgeId: uint64(badgeId),
+		BadgeId:    uint64(badgeId),
 		SubbadgeId: uint64(subbadgeId),
-		Address: uint64(address),
+		Address:    uint64(address),
 	})
 
 	if err != nil {
@@ -198,4 +198,3 @@ func GetBadgeBalance(suite *TestSuite, ctx context.Context, badgeId uint64, subb
 
 	return *res.BalanceInfo
 }
-

@@ -14,7 +14,8 @@ service Msg {
     rpc HandlePendingTransfer(MsgHandlePendingTransfer) returns (MsgHandlePendingTransferResponse);
     rpc SetApproval(MsgSetApproval) returns (MsgSetApprovalResponse);
     rpc RevokeBadge(MsgRevokeBadge) returns (MsgRevokeBadgeResponse);
-    // this line is used by starport scaffolding # proto/tx/rpc
+      rpc FreezeAddress(MsgFreezeAddress) returns (MsgFreezeAddressResponse);
+// this line is used by starport scaffolding # proto/tx/rpc
 }
 
 message MsgNewBadge {
@@ -22,7 +23,6 @@ message MsgNewBadge {
     string uri = 2;
     string subassetUris = 3;
     uint64 permissions = 4;
-    string freezeAddressesDigest = 5;
 }
 
 message MsgNewBadgeResponse {
@@ -89,5 +89,16 @@ message MsgRevokeBadge {
 }
 
 message MsgRevokeBadgeResponse {}
+
+message MsgFreezeAddress {
+  string creator = 1;
+  uint64 address = 2;
+  uint64 badgeId = 3;
+  uint64 subbadgeId = 4;
+  bool  add = 5;
+}
+
+message MsgFreezeAddressResponse {
+}
 
 // this line is used by starport scaffolding # proto/tx/message

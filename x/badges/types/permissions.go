@@ -120,7 +120,6 @@ func (p *PermissionFlags) FrozenByDefault() bool {
 	return p.frozen_by_default
 }
 
-
 func SetPermissionsFlags(permission bool, digit_index int, flags *PermissionFlags) {
 	if digit_index == 7 {
 		flags.can_manager_transfer = permission

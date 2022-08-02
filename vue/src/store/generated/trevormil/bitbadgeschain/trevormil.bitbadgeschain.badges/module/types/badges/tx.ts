@@ -9,7 +9,6 @@ export interface MsgNewBadge {
   uri: string;
   subassetUris: string;
   permissions: number;
-  freezeAddressesDigest: string;
 }
 
 export interface MsgNewBadgeResponse {
@@ -77,12 +76,20 @@ export interface MsgRevokeBadge {
 
 export interface MsgRevokeBadgeResponse {}
 
+export interface MsgFreezeAddress {
+  creator: string;
+  address: string;
+  badgeId: string;
+  subbadgeId: string;
+}
+
+export interface MsgFreezeAddressResponse {}
+
 const baseMsgNewBadge: object = {
   creator: "",
   uri: "",
   subassetUris: "",
   permissions: 0,
-  freezeAddressesDigest: "",
 };
 
 export const MsgNewBadge = {
@@ -98,9 +105,6 @@ export const MsgNewBadge = {
     }
     if (message.permissions !== 0) {
       writer.uint32(32).uint64(message.permissions);
-    }
-    if (message.freezeAddressesDigest !== "") {
-      writer.uint32(42).string(message.freezeAddressesDigest);
     }
     return writer;
   },
@@ -123,9 +127,6 @@ export const MsgNewBadge = {
           break;
         case 4:
           message.permissions = longToNumber(reader.uint64() as Long);
-          break;
-        case 5:
-          message.freezeAddressesDigest = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -157,14 +158,6 @@ export const MsgNewBadge = {
     } else {
       message.permissions = 0;
     }
-    if (
-      object.freezeAddressesDigest !== undefined &&
-      object.freezeAddressesDigest !== null
-    ) {
-      message.freezeAddressesDigest = String(object.freezeAddressesDigest);
-    } else {
-      message.freezeAddressesDigest = "";
-    }
     return message;
   },
 
@@ -176,8 +169,6 @@ export const MsgNewBadge = {
       (obj.subassetUris = message.subassetUris);
     message.permissions !== undefined &&
       (obj.permissions = message.permissions);
-    message.freezeAddressesDigest !== undefined &&
-      (obj.freezeAddressesDigest = message.freezeAddressesDigest);
     return obj;
   },
 
@@ -202,14 +193,6 @@ export const MsgNewBadge = {
       message.permissions = object.permissions;
     } else {
       message.permissions = 0;
-    }
-    if (
-      object.freezeAddressesDigest !== undefined &&
-      object.freezeAddressesDigest !== null
-    ) {
-      message.freezeAddressesDigest = object.freezeAddressesDigest;
-    } else {
-      message.freezeAddressesDigest = "";
     }
     return message;
   },
@@ -1342,6 +1325,169 @@ export const MsgRevokeBadgeResponse = {
   },
 };
 
+const baseMsgFreezeAddress: object = {
+  creator: "",
+  address: "",
+  badgeId: "",
+  subbadgeId: "",
+};
+
+export const MsgFreezeAddress = {
+  encode(message: MsgFreezeAddress, writer: Writer = Writer.create()): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.address !== "") {
+      writer.uint32(18).string(message.address);
+    }
+    if (message.badgeId !== "") {
+      writer.uint32(26).string(message.badgeId);
+    }
+    if (message.subbadgeId !== "") {
+      writer.uint32(34).string(message.subbadgeId);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgFreezeAddress {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgFreezeAddress } as MsgFreezeAddress;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.address = reader.string();
+          break;
+        case 3:
+          message.badgeId = reader.string();
+          break;
+        case 4:
+          message.subbadgeId = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgFreezeAddress {
+    const message = { ...baseMsgFreezeAddress } as MsgFreezeAddress;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = String(object.address);
+    } else {
+      message.address = "";
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = String(object.badgeId);
+    } else {
+      message.badgeId = "";
+    }
+    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
+      message.subbadgeId = String(object.subbadgeId);
+    } else {
+      message.subbadgeId = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgFreezeAddress): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.address !== undefined && (obj.address = message.address);
+    message.badgeId !== undefined && (obj.badgeId = message.badgeId);
+    message.subbadgeId !== undefined && (obj.subbadgeId = message.subbadgeId);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgFreezeAddress>): MsgFreezeAddress {
+    const message = { ...baseMsgFreezeAddress } as MsgFreezeAddress;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    } else {
+      message.address = "";
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = object.badgeId;
+    } else {
+      message.badgeId = "";
+    }
+    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
+      message.subbadgeId = object.subbadgeId;
+    } else {
+      message.subbadgeId = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgFreezeAddressResponse: object = {};
+
+export const MsgFreezeAddressResponse = {
+  encode(
+    _: MsgFreezeAddressResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgFreezeAddressResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgFreezeAddressResponse,
+    } as MsgFreezeAddressResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgFreezeAddressResponse {
+    const message = {
+      ...baseMsgFreezeAddressResponse,
+    } as MsgFreezeAddressResponse;
+    return message;
+  },
+
+  toJSON(_: MsgFreezeAddressResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<MsgFreezeAddressResponse>
+  ): MsgFreezeAddressResponse {
+    const message = {
+      ...baseMsgFreezeAddressResponse,
+    } as MsgFreezeAddressResponse;
+    return message;
+  },
+};
+
 /** Msg defines the Msg service. */
 export interface Msg {
   NewBadge(request: MsgNewBadge): Promise<MsgNewBadgeResponse>;
@@ -1354,8 +1500,9 @@ export interface Msg {
     request: MsgHandlePendingTransfer
   ): Promise<MsgHandlePendingTransferResponse>;
   SetApproval(request: MsgSetApproval): Promise<MsgSetApprovalResponse>;
-  /** this line is used by starport scaffolding # proto/tx/rpc */
   RevokeBadge(request: MsgRevokeBadge): Promise<MsgRevokeBadgeResponse>;
+  /** this line is used by starport scaffolding # proto/tx/rpc */
+  FreezeAddress(request: MsgFreezeAddress): Promise<MsgFreezeAddressResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -1446,6 +1593,18 @@ export class MsgClientImpl implements Msg {
     );
     return promise.then((data) =>
       MsgRevokeBadgeResponse.decode(new Reader(data))
+    );
+  }
+
+  FreezeAddress(request: MsgFreezeAddress): Promise<MsgFreezeAddressResponse> {
+    const data = MsgFreezeAddress.encode(request).finish();
+    const promise = this.rpc.request(
+      "trevormil.bitbadgeschain.badges.Msg",
+      "FreezeAddress",
+      data
+    );
+    return promise.then((data) =>
+      MsgFreezeAddressResponse.decode(new Reader(data))
     );
   }
 }

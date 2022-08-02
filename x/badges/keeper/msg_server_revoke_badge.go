@@ -7,53 +7,33 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-
-func (k msgServer) RevokeBadge(goCtx context.Context,  msg *types.MsgRevokeBadge) (*types.MsgRevokeBadgeResponse, error) {
+func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge) (*types.MsgRevokeBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Creator will already be registered, so we can do this and panic if it fails
-	creator_account_num := k.Keeper.MustGetAccountNumberForAddressString(ctx, msg.Creator)
+	CreatorAccountNum, _, permissions, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
+		ctx, msg.Creator, []uint64{ msg.Address }, msg.BadgeId, msg.SubbadgeId, true,
+	)
+	if err != nil {
+		return nil, err
+	}
 
-	//Can't revoke from same address
-	if creator_account_num == msg.Address {
+	if CreatorAccountNum == msg.Address {
 		return nil, ErrSenderAndReceiverSame
 	}
 
-	// Verify that the from and to addresses are registered; 
-	account_nums := []uint64{}
-	account_nums = append(account_nums, msg.Address)
-	err := k.AssertAccountNumbersAreValid(ctx, account_nums)
-	if err != nil {
-		return nil, err
-	}
-
-	// Verify that the badge and subbadge exist and are valid
-	err = k.AssertBadgeAndSubBadgeExists(ctx, msg.BadgeId, msg.SubbadgeId)
-	if err != nil {
-		return nil, err
-	}
-
-	// Verify that the permissions are valid
-	badge, _ := k.GetBadgeFromStore(ctx, msg.BadgeId) //currently ignore error because above we assert that it exists
-	permissions := types.GetPermissions(badge.PermissionFlags)
 	if !permissions.CanRevoke() {
 		return nil, ErrInvalidPermissions
 	}
 
-	if badge.Manager != creator_account_num {
-		return nil, ErrSenderIsNotManager
-	}
+	AddressBalanceKey := GetBalanceKey(msg.Address, msg.BadgeId, msg.SubbadgeId)
+	ManagerBalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId, msg.SubbadgeId)
 
-	address_balance_key := GetBalanceKey(msg.Address, msg.BadgeId, msg.SubbadgeId)
-	manager_balance_key := GetBalanceKey(creator_account_num, msg.BadgeId, msg.SubbadgeId)
-
-
-	err = k.RemoveFromBadgeBalance(ctx, address_balance_key, msg.Amount)
+	err = k.RemoveFromBadgeBalance(ctx, AddressBalanceKey, msg.Amount)
 	if err != nil {
 		return nil, err
 	}
 
-	err = k.AddToBadgeBalance(ctx, manager_balance_key, msg.Amount)
+	err = k.AddToBadgeBalance(ctx, ManagerBalanceKey, msg.Amount)
 	if err != nil {
 		return nil, err
 	}

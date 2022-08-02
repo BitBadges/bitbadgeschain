@@ -1,18 +1,20 @@
 // Copyright 2017 David Lazar. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-package keeper
+package accumulator_test
 
 import (
 	"crypto/rand"
 	"math/big"
 	"testing"
+
+	"github.com/trevormil/bitbadgeschain/accumulator"
 )
 
 func TestAccumulator(t *testing.T) {
-	publicKey := UniversalPublicKey
-	privateKey := UniversalPrivateKey
-	
+	publicKey := accumulator.UniversalPublicKey
+	privateKey := accumulator.UniversalPrivateKey
+
 	items := makeItems(100)
 	acc, witnesses := publicKey.Accumulate(items...)
 	accPriv, witnessesPriv := privateKey.Accumulate(items...)
@@ -33,9 +35,11 @@ func TestAccumulator(t *testing.T) {
 		if !publicKey.Verify(acc, w, items[i]) {
 			t.Fatal("item not found")
 		}
+
 		if publicKey.Verify(acc, w, badItem) {
 			t.Fatal("bad item was verified")
 		}
+
 		if publicKey.Verify(acc, w, items[(i+1)%len(items)]) {
 			t.Fatal("bad item was verified")
 		}
@@ -52,7 +56,7 @@ func makeItems(count int) [][]byte {
 }
 
 func benchAccumulate(b *testing.B, count int) {
-	privateKey := UniversalPrivateKey
+	privateKey := accumulator.UniversalPrivateKey
 	items := makeItems(count)
 	b.ResetTimer()
 	b.SetBytes(int64(count) * 32)
@@ -66,7 +70,7 @@ func benchAccumulate(b *testing.B, count int) {
 }
 
 func benchAccumulatePublic(b *testing.B, count int) {
-	publicKey := UniversalPublicKey
+	publicKey := accumulator.UniversalPublicKey
 	items := makeItems(count)
 	b.ResetTimer()
 	b.SetBytes(int64(count) * 32)
@@ -76,6 +80,23 @@ func benchAccumulatePublic(b *testing.B, count int) {
 	}
 
 	_ = acc
+}
+
+var verify_items = makeItems(1)
+
+func benchVerify(b *testing.B, count int) {
+	for i := 0; i < count; i++ {
+		accumulator.UniversalPublicKey.Verify(accumulator.PrivateKeyPBigInt, accumulator.PrivateKeyPBigInt, verify_items[0])
+	}
+	//1000 4.432 s
+	//1 0.017 s
+	//100
+	//10000 17.082 s
+	// _ = acc
+}
+
+func BenchmarkVerify(b *testing.B) {
+	benchVerify(b, 1000)
 }
 
 func BenchmarkAccumulate100(b *testing.B) {
@@ -90,7 +111,7 @@ func BenchmarkAccumulate10000(b *testing.B) {
 	benchAccumulate(b, 10000)
 }
 
-
+//Public Key is pretty slow comparitively
 func BenchmarkAccumulate100Public(b *testing.B) {
 	benchAccumulatePublic(b, 100)
 }

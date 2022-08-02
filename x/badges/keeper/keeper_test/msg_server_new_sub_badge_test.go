@@ -12,12 +12,11 @@ func (suite *TestSuite) TestNewSubBadges() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri: validUri,
-				Permissions: 62,
-				FreezeAddressesDigest: "",
+				Uri:          validUri,
+				Permissions:  62,
 				SubassetUris: validUri,
 			},
-			Amount: 1,
+			Amount:  1,
 			Creator: bob,
 		},
 	}
@@ -34,7 +33,7 @@ func (suite *TestSuite) TestNewSubBadges() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id: 0,
+			Id:     0,
 			Supply: 10,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -43,14 +42,14 @@ func (suite *TestSuite) TestNewSubBadges() {
 	//Create subbadge 2 with supply == 1
 	err = CreateSubBadge(suite, wctx, bob, 0, 1)
 	suite.Require().Nil(err, "Error creating subbadge")
-	
+
 	badge = GetBadge(suite, wctx, 0)
 	bobBalanceInfo = GetBadgeBalance(suite, wctx, 0, 1, firstAccountNumCreated)
 
 	suite.Require().Equal(uint64(2), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id: 0,
+			Id:     0,
 			Supply: 10,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -65,17 +64,16 @@ func (suite *TestSuite) TestNewSubBadges() {
 	suite.Require().Equal(uint64(3), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id: 0,
+			Id:     0,
 			Supply: 10,
 		},
 		{
-			Id: 2,
+			Id:     2,
 			Supply: 10,
 		},
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10), bobBalanceInfo.Balance)
 }
-
 
 func (suite *TestSuite) TestNewSubBadgesNotManager() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -83,12 +81,11 @@ func (suite *TestSuite) TestNewSubBadgesNotManager() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri: validUri,
-				Permissions: 62,
-				FreezeAddressesDigest: "",
+				Uri:          validUri,
+				Permissions:  62,
 				SubassetUris: validUri,
 			},
-			Amount: 1,
+			Amount:  1,
 			Creator: bob,
 		},
 	}
@@ -111,12 +108,11 @@ func (suite *TestSuite) TestNewSubBadgeCreateIsLocked() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri: validUri,
-				Permissions: 0,
-				FreezeAddressesDigest: "",
+				Uri:          validUri,
+				Permissions:  0,
 				SubassetUris: validUri,
 			},
-			Amount: 1,
+			Amount:  1,
 			Creator: bob,
 		},
 	}

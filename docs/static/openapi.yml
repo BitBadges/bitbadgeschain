@@ -30442,11 +30442,16 @@ paths:
                       Flag bits are in the following order from left to right;
                       leading zeroes are applied and any future additions will
                       be appended to the right
-                  frozen_or_unfrozen_addresses_digest:
-                    type: string
+                  freeze_addresses:
+                    type: array
+                    items:
+                      type: string
+                      format: uint64
                     title: >-
-                      if frozen_by_default is true, this is a list of unfrozen
-                      addresses; and vice versa for false
+                      if frozen_by_default is true, this is an accumulator of
+                      unfrozen addresses; and vice versa for false
+
+                      big.Int will always only be 32 uint64s long
                   subasset_uri_format:
                     type: string
                     title: >-
@@ -52763,11 +52768,16 @@ definitions:
           Flag bits are in the following order from left to right; leading
           zeroes are applied and any future additions will be appended to the
           right
-      frozen_or_unfrozen_addresses_digest:
-        type: string
+      freeze_addresses:
+        type: array
+        items:
+          type: string
+          format: uint64
         title: >-
-          if frozen_by_default is true, this is a list of unfrozen addresses;
-          and vice versa for false
+          if frozen_by_default is true, this is an accumulator of unfrozen
+          addresses; and vice versa for false
+
+          big.Int will always only be 32 uint64s long
       subasset_uri_format:
         type: string
         title: >-
@@ -52799,6 +52809,8 @@ definitions:
     title: >-
       BitBadge defines a badge type. Think of this like the smart contract
       definition
+  trevormil.bitbadgeschain.badges.MsgFreezeAddressResponse:
+    type: object
   trevormil.bitbadgeschain.badges.MsgHandlePendingTransferResponse:
     type: object
   trevormil.bitbadgeschain.badges.MsgNewBadgeResponse:
@@ -52908,11 +52920,16 @@ definitions:
               Flag bits are in the following order from left to right; leading
               zeroes are applied and any future additions will be appended to
               the right
-          frozen_or_unfrozen_addresses_digest:
-            type: string
+          freeze_addresses:
+            type: array
+            items:
+              type: string
+              format: uint64
             title: >-
-              if frozen_by_default is true, this is a list of unfrozen
+              if frozen_by_default is true, this is an accumulator of unfrozen
               addresses; and vice versa for false
+
+              big.Int will always only be 32 uint64s long
           subasset_uri_format:
             type: string
             title: >-

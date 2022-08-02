@@ -19,19 +19,18 @@ func GetEmptyBadgeBalanceTemplate() types.BadgeBalanceInfo {
 
 //Don't think it'll ever reach an overflow but this is here just in case
 func SafeAdd(left uint64, right uint64) (uint64, error) {
-	if left > math.MaxUint64 - right {
+	if left > math.MaxUint64-right {
 		return 0, ErrOverflow
 	}
-    return left + right, nil
+	return left + right, nil
 }
 
 func SafeSubtract(left uint64, right uint64) (uint64, error) {
-    if right > left {
-        return 0, ErrOverflow
-    }
-    return left - right, nil
+	if right > left {
+		return 0, ErrOverflow
+	}
+	return left - right, nil
 }
-
 
 func (k Keeper) AddToBadgeBalance(ctx sdk.Context, balance_key string, balance_to_add uint64) error {
 	if balance_to_add == 0 {
@@ -116,23 +115,23 @@ func (k Keeper) AddToBothPendingBadgeBalances(ctx sdk.Context, badgeId uint64, s
 
 	//Append pending transfers and update nonces
 	fromBadgeBalanceInfo.Pending = append(fromBadgeBalanceInfo.Pending, &types.PendingTransfer{
-		Amount:           	amount,
-		ApprovedBy:       	approvedBy,
-		SendRequest: 	  	sentByFrom,
-		To: 		 	  	to,
-		From: 		  	  	from,
-		ThisPendingNonce: 	fromBadgeBalanceInfo.PendingNonce,
-		OtherPendingNonce:  toBadgeBalanceInfo.PendingNonce,
+		Amount:            amount,
+		ApprovedBy:        approvedBy,
+		SendRequest:       sentByFrom,
+		To:                to,
+		From:              from,
+		ThisPendingNonce:  fromBadgeBalanceInfo.PendingNonce,
+		OtherPendingNonce: toBadgeBalanceInfo.PendingNonce,
 	})
 
 	toBadgeBalanceInfo.Pending = append(toBadgeBalanceInfo.Pending, &types.PendingTransfer{
-		Amount:           	amount,
-		ApprovedBy:       	approvedBy,
-		SendRequest: 	  	!sentByFrom,
-		To: 		 	  	to,
-		From: 		  	  	from,
-		ThisPendingNonce: 	toBadgeBalanceInfo.PendingNonce,
-		OtherPendingNonce:  fromBadgeBalanceInfo.PendingNonce,
+		Amount:            amount,
+		ApprovedBy:        approvedBy,
+		SendRequest:       !sentByFrom,
+		To:                to,
+		From:              from,
+		ThisPendingNonce:  toBadgeBalanceInfo.PendingNonce,
+		OtherPendingNonce: fromBadgeBalanceInfo.PendingNonce,
 	})
 
 	fromBadgeBalanceInfo.PendingNonce += 1
@@ -165,9 +164,6 @@ func (k Keeper) AddToBothPendingBadgeBalances(ctx sdk.Context, badgeId uint64, s
 
 	return nil
 }
-
-
-
 
 func (k Keeper) RemovePending(ctx sdk.Context, balance_key string, this_nonce uint64, other_nonce uint64) error {
 	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, balance_key)

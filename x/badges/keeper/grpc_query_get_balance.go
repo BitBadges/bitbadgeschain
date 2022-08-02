@@ -16,15 +16,15 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Verify that the from and to addresses are registered; 
+	// Verify that the from and to addresses are registered;
 	account_nums := []uint64{}
 	account_nums = append(account_nums, req.Address)
-	err := k.AssertAccountNumbersAreValid(ctx, account_nums)
+	err := k.AssertAccountNumbersAreRegistered(ctx, account_nums)
 	if err != nil {
 		return nil, err
 	}
 
-	err = k.AssertBadgeAndSubBadgeExists(ctx, req.BadgeId, req.SubbadgeId)
+	_, err = k.AssertBadgeAndSubBadgeExistsAndReturnBadge(ctx, req.BadgeId, req.SubbadgeId)
 	if err != nil {
 		return nil, err
 	}
