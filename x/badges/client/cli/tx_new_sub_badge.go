@@ -38,6 +38,7 @@ func CmdNewSubBadge() *cobra.Command {
 				argId,
 				argSupply,
 			)
+			
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

@@ -25,7 +25,7 @@ func (suite *TestSuite) TestNewSubBadges() {
 	badge := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadge(suite, wctx, bob, 0, 10)
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10 }, []uint64 { 1 })
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge = GetBadge(suite, wctx, 0)
 	bobBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -40,7 +40,7 @@ func (suite *TestSuite) TestNewSubBadges() {
 	suite.Require().Equal(uint64(10), bobBalanceInfo.Balance)
 
 	//Create subbadge 2 with supply == 1
-	err = CreateSubBadge(suite, wctx, bob, 0, 1)
+	err = CreateSubBadges(suite, wctx, bob, 0, []uint64 { 1 }, []uint64 { 1 })
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	badge = GetBadge(suite, wctx, 0)
@@ -56,7 +56,7 @@ func (suite *TestSuite) TestNewSubBadges() {
 	suite.Require().Equal(uint64(1), bobBalanceInfo.Balance)
 
 	//Create subbadge 2 with supply == 10
-	err = CreateSubBadge(suite, wctx, bob, 0, 10)
+	err = CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10 }, []uint64 { 2 })
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge = GetBadge(suite, wctx, 0)
 	bobBalanceInfo = GetBadgeBalance(suite, wctx, 0, 2, firstAccountNumCreated)
@@ -69,6 +69,10 @@ func (suite *TestSuite) TestNewSubBadges() {
 		},
 		{
 			Id:     2,
+			Supply: 10,
+		},
+		{
+			Id:     3,
 			Supply: 10,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -91,14 +95,14 @@ func (suite *TestSuite) TestNewSubBadgesNotManager() {
 	}
 
 	CreateBadges(suite, wctx, badgesToCreate)
-	err := CreateSubBadge(suite, wctx, alice, 0, 10)
+	err := CreateSubBadges(suite, wctx, alice, 0, []uint64 { 10 }, []uint64 { 1 })
 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
 }
 
 func (suite *TestSuite) TestNewSubBadgeBadgeNotExists() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	err := CreateSubBadge(suite, wctx, alice, 0, 10)
+	err := CreateSubBadges(suite, wctx, alice, 0, []uint64 { 10 }, []uint64 { 1 })
 	suite.Require().EqualError(err, keeper.ErrBadgeNotExists.Error())
 }
 
@@ -118,6 +122,6 @@ func (suite *TestSuite) TestNewSubBadgeCreateIsLocked() {
 	}
 
 	CreateBadges(suite, wctx, badgesToCreate)
-	err := CreateSubBadge(suite, wctx, bob, 0, 10)
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10 }, []uint64 { 1 })
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }

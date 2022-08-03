@@ -132,8 +132,8 @@ func CreateBadges(suite *TestSuite, ctx context.Context, badges []BadgesToCreate
 	return nil
 }
 
-func CreateSubBadge(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, supply uint64) error {
-	msg := types.NewMsgNewSubBadge(creator, badgeId, supply)
+func CreateSubBadges(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, supplys []uint64, amounts []uint64) error {
+	msg := types.NewMsgNewSubBadge(creator, badgeId, supplys, amounts)
 	_, err := suite.msgServer.NewSubBadge(ctx, msg)
 	return err
 }

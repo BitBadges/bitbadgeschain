@@ -25,7 +25,7 @@ func (suite *TestSuite) TestSetApproval() {
 	badge := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadge(suite, wctx, bob, 0, 10000)
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge = GetBadge(suite, wctx, 0)
 	bobBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -80,7 +80,7 @@ func (suite *TestSuite) TestApproveSelf() {
 	badge := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadge(suite, wctx, bob, 0, 10000)
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge = GetBadge(suite, wctx, 0)
 	bobBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)

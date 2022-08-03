@@ -19,4 +19,6 @@ var (
 	ErrInvalidPermissionsUpdatePermanent = sdkerrors.Register(ModuleName, 1507, "invalid permissions update permanent")
 	ErrSupplyEqualsZero                  = sdkerrors.Register(ModuleName, 1508, "supply equals zero")
 	ErrSenderAndReceiverSame             = sdkerrors.Register(ModuleName, 1509, "sender and receiver same")
+	ErrInvalidSupplyAndAmounts		 	 = sdkerrors.Register(ModuleName, 1510, "invalid supply and amounts")
+	ErrAmountEqualsZero 				 = sdkerrors.Register(ModuleName, 1511, "amount to create equals zero")
 )

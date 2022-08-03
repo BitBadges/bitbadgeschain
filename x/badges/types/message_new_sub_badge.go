@@ -9,11 +9,12 @@ const TypeMsgNewSubBadge = "new_sub_badge"
 
 var _ sdk.Msg = &MsgNewSubBadge{}
 
-func NewMsgNewSubBadge(creator string, id uint64, supply uint64) *MsgNewSubBadge {
+func NewMsgNewSubBadge(creator string, id uint64, supplys []uint64, amountsToCreate []uint64) *MsgNewSubBadge {
 	return &MsgNewSubBadge{
 		Creator: creator,
 		Id:      id,
-		Supply:  supply,
+		Supplys:  supplys,
+		AmountsToCreate: amountsToCreate,
 	}
 }
 
@@ -44,8 +45,18 @@ func (msg *MsgNewSubBadge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.Supply == 0 {
-		return ErrSupplyEqualsZero
+	if len(msg.Supplys) != len(msg.AmountsToCreate) {
+		return ErrInvalidSupplyAndAmounts
+	}
+	
+	for i, supply := range msg.Supplys {
+		if supply == 0 {
+			return ErrSupplyEqualsZero
+		}
+
+		if msg.AmountsToCreate[i] == 0 {
+			return ErrAmountEqualsZero
+		}
 	}
 	return nil
 }

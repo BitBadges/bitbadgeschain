@@ -36,7 +36,8 @@ message MsgNewBadgeResponse {
 message MsgNewSubBadge {
     string creator = 1;
     uint64 id = 2;
-    uint64 supply = 3;
+    repeated uint64 supplys = 3;
+    repeated uint64 amountsToCreate = 4;
 }
 
 message MsgNewSubBadgeResponse {

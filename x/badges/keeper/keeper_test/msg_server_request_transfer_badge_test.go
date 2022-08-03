@@ -33,7 +33,7 @@ func (suite *TestSuite) TestRequestTransfer() {
 	CreateBadges(suite, wctx, badgesToCreate)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadge(suite, wctx, bob, 0, 10000)
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	bobBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -103,7 +103,7 @@ func (suite *TestSuite) TestRequestTransferFrozen() {
 	CreateBadges(suite, wctx, badgesToCreate)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadge(suite, wctx, bob, 0, 10000)
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	bobBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -170,7 +170,7 @@ func (suite *TestSuite) TestRequestTransferFrozenThenUnrozen() {
 	CreateBadges(suite, wctx, badgesToCreate)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadge(suite, wctx, bob, 0, 10000)
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	bobBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -245,7 +245,7 @@ func (suite *TestSuite) TestRequestTransferToSelf() {
 	CreateBadges(suite, wctx, badgesToCreate)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadge(suite, wctx, bob, 0, 10000)
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	bobBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
