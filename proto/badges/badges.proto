@@ -55,6 +55,7 @@ message BitBadge {
 
 //Only will be created if supply >= 0
 message Subasset {
-    uint64 id = 1;
-    uint64 supply = 2;
+    uint64 startId = 1;
+    uint64 endId = 2;
+    uint64 supply = 3;
 }

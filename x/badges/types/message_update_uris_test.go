@@ -18,12 +18,16 @@ func TestMsgUpdateUris_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: MsgUpdateUris{
 				Creator: "invalid_address",
+				Uri:    "https://example.com",
+				SubassetUri: "https://example.com",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: MsgUpdateUris{
 				Creator: sample.AccAddress(),
+				Uri:    "https://example.com",
+				SubassetUri: "https://example.com",
 			},
 		},
 	}

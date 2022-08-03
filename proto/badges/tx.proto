@@ -14,11 +14,11 @@ service Msg {
     rpc HandlePendingTransfer(MsgHandlePendingTransfer) returns (MsgHandlePendingTransferResponse);
     rpc SetApproval(MsgSetApproval) returns (MsgSetApprovalResponse);
     rpc RevokeBadge(MsgRevokeBadge) returns (MsgRevokeBadgeResponse);
-      rpc FreezeAddress(MsgFreezeAddress) returns (MsgFreezeAddressResponse);
-  rpc UpdateUris(MsgUpdateUris) returns (MsgUpdateUrisResponse);
-  rpc UpdatePermissions(MsgUpdatePermissions) returns (MsgUpdatePermissionsResponse);
-  rpc TransferManager(MsgTransferManager) returns (MsgTransferManagerResponse);
-  rpc RequestTransferManager(MsgRequestTransferManager) returns (MsgRequestTransferManagerResponse);
+    rpc FreezeAddress(MsgFreezeAddress) returns (MsgFreezeAddressResponse);
+    rpc UpdateUris(MsgUpdateUris) returns (MsgUpdateUrisResponse);
+    rpc UpdatePermissions(MsgUpdatePermissions) returns (MsgUpdatePermissionsResponse);
+    rpc TransferManager(MsgTransferManager) returns (MsgTransferManagerResponse);
+    rpc RequestTransferManager(MsgRequestTransferManager) returns (MsgRequestTransferManagerResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -43,6 +43,9 @@ message MsgNewSubBadge {
 message MsgNewSubBadgeResponse {
     uint64 subassetId = 1;
 }
+
+//TODO: Add support for batch transfers, pending transfers, and requests
+// Need to take time to think of best way to implement it (best way may be to have multiple Msgs)
 
 message MsgTransferBadge {
     string creator = 1;
@@ -70,7 +73,8 @@ message MsgHandlePendingTransfer {
     bool accept = 2;
     uint64 badgeId = 3;
     uint64 subbadgeId = 4;
-    uint64 this_nonce = 5;
+    uint64 startingNonce = 5;
+    uint64 endingNonce = 6;
 }
 
 message MsgHandlePendingTransferResponse {}
@@ -87,8 +91,8 @@ message MsgSetApprovalResponse {}
 
 message MsgRevokeBadge {
     string creator = 1;
-    uint64 address = 2;
-    uint64 amount = 3;
+    repeated uint64 addresses = 2;
+    repeated uint64 amounts = 3;
     uint64 badgeId = 4;
     uint64 subbadgeId = 5;
 }
@@ -97,7 +101,7 @@ message MsgRevokeBadgeResponse {}
 
 message MsgFreezeAddress {
   string creator = 1;
-  uint64 address = 2;
+  repeated uint64 addresses = 2;
   uint64 badgeId = 3;
   uint64 subbadgeId = 4;
   bool  add = 5;

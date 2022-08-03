@@ -2,6 +2,7 @@ package cli
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -15,17 +16,33 @@ var _ = strconv.Itoa(0)
 
 func CmdRevokeBadge() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "revoke-badge [address] [amount] [badge-id] [subbadge-id]",
+		Use:   "revoke-badge [addresses] [amounts] [badge-id] [subbadge-id]",
 		Short: "Broadcast message revoke-badge",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argAddress, err := cast.ToUint64E(args[0])
-			if err != nil {
-				return err
+
+			argAddressesStringArr := strings.Split(args[0], ",")
+
+			argAddressesUInt64 := []uint64{}
+			for _, address := range argAddressesStringArr {
+				addressAsUint64, err := cast.ToUint64E(address)
+				if err != nil {
+					return err
+				}
+
+				argAddressesUInt64 = append(argAddressesUInt64, addressAsUint64)
 			}
-			argAmount, err := cast.ToUint64E(args[1])
-			if err != nil {
-				return err
+
+			argAmountsStringArr := strings.Split(args[1], ",")
+
+			argAmountsUInt64 := []uint64{}
+			for _, amount := range argAmountsStringArr {
+				amountAsUint64, err := cast.ToUint64E(amount)
+				if err != nil {
+					return err
+				}
+
+				argAmountsUInt64 = append(argAmountsUInt64, amountAsUint64)
 			}
 			argBadgeId, err := cast.ToUint64E(args[2])
 			if err != nil {
@@ -43,8 +60,8 @@ func CmdRevokeBadge() *cobra.Command {
 
 			msg := types.NewMsgRevokeBadge(
 				clientCtx.GetFromAddress().String(),
-				argAddress,
-				argAmount,
+				argAddressesUInt64,
+				argAmountsUInt64,
 				argBadgeId,
 				argSubbadgeId,
 			)

@@ -144,8 +144,8 @@ func RequestTransferBadge(suite *TestSuite, ctx context.Context, creator string,
 	return err
 }
 
-func RevokeBadge(suite *TestSuite, ctx context.Context, creator string, address uint64, amount uint64, badgeId uint64, subbadgeId uint64) error {
-	msg := types.NewMsgRevokeBadge(creator, address, amount, badgeId, subbadgeId)
+func RevokeBadges(suite *TestSuite, ctx context.Context, creator string, addresses []uint64, amounts []uint64, badgeId uint64, subbadgeId uint64) error {
+	msg := types.NewMsgRevokeBadge(creator, addresses, amounts, badgeId, subbadgeId)
 	_, err := suite.msgServer.RevokeBadge(ctx, msg)
 	return err
 }
@@ -162,14 +162,14 @@ func SetApproval(suite *TestSuite, ctx context.Context, creator string, amount u
 	return err
 }
 
-func HandlePendingTransfer(suite *TestSuite, ctx context.Context, creator string, accept bool, badgeId uint64, subbadgeId uint64, thisNonce uint64) error {
-	msg := types.NewMsgHandlePendingTransfer(creator, accept, badgeId, subbadgeId, thisNonce)
+func HandlePendingTransfers(suite *TestSuite, ctx context.Context, creator string, accept bool, badgeId uint64, subbadgeId uint64, startingNonce uint64, endingNonce uint64) error {
+	msg := types.NewMsgHandlePendingTransfer(creator, accept, badgeId, subbadgeId, startingNonce, endingNonce)
 	_, err := suite.msgServer.HandlePendingTransfer(ctx, msg)
 	return err
 }
 
-func FreezeAddress(suite *TestSuite, ctx context.Context, creator string, address uint64, badgeId uint64, subbadgeId uint64, add bool) error {
-	msg := types.NewMsgFreezeAddress(creator, address, badgeId, subbadgeId, add)
+func FreezeAddresses(suite *TestSuite, ctx context.Context, creator string, addresses []uint64, badgeId uint64, subbadgeId uint64, add bool) error {
+	msg := types.NewMsgFreezeAddress(creator, addresses, badgeId, subbadgeId, add)
 	_, err := suite.msgServer.FreezeAddress(ctx, msg)
 	return err
 }

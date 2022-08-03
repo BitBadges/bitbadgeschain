@@ -2,6 +2,7 @@ package cli
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -15,17 +16,39 @@ var _ = strconv.Itoa(0)
 
 func CmdNewSubBadge() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "new-sub-badge [id] [supply]",
-		Short: "Creates a subasset of the badge ID. Must be executed by the manager",
-		Args:  cobra.ExactArgs(2),
+		Use:   "new-sub-badge [id] [supplys] [amounts]",
+		Short: "Creates a subasset of the badge ID. Must be executed by the manager. CLI args delimited by commas.",
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argId, err := cast.ToUint64E(args[0])
 			if err != nil {
 				return err
 			}
-			argSupply, err := cast.ToUint64E(args[1])
-			if err != nil {
-				return err
+
+			argSupplysStringArr := strings.Split(args[1], ",")
+
+
+			argSupplysUInt64 := []uint64{}
+			for _, supply := range argSupplysStringArr {
+				println(supply)
+				supplyAsUint64, err := cast.ToUint64E(supply)
+				if err != nil {
+					return err
+				}
+
+				argSupplysUInt64 = append(argSupplysUInt64, supplyAsUint64)
+			}
+
+			argAmountsStringArr := strings.Split(args[2], ",")
+
+			argAmountsUInt64 := []uint64{}
+			for _, amount := range argAmountsStringArr {
+				amountAsUint64, err := cast.ToUint64E(amount)
+				if err != nil {
+					return err
+				}
+
+				argAmountsUInt64 = append(argAmountsUInt64, amountAsUint64)
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -36,9 +59,10 @@ func CmdNewSubBadge() *cobra.Command {
 			msg := types.NewMsgNewSubBadge(
 				clientCtx.GetFromAddress().String(),
 				argId,
-				argSupply,
+				argSupplysUInt64,
+				argAmountsUInt64,
 			)
-			
+
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

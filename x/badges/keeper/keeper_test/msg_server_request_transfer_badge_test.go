@@ -67,7 +67,7 @@ func (suite *TestSuite) TestRequestTransfer() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(true, aliceBalanceInfo.Pending[0].SendRequest)
 
-	err = HandlePendingTransfer(suite, wctx, bob, true, 0, 0, 0)
+	err = HandlePendingTransfers(suite, wctx, bob, true, 0, 0, 0, 0)
 	suite.Require().Nil(err, "Error accepting transfer")
 	bobBalanceInfo = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	suite.Require().Equal(uint64(5000), bobBalanceInfo.Balance)
@@ -137,10 +137,10 @@ func (suite *TestSuite) TestRequestTransferFrozen() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(true, aliceBalanceInfo.Pending[0].SendRequest)
 
-	err = FreezeAddress(suite, wctx, bob, firstAccountNumCreated, 0, 0, true)
+	err = FreezeAddresses(suite, wctx, bob, []uint64{firstAccountNumCreated}, 0, 0, true)
 	suite.Require().Nil(err, "Error freezing address")
 
-	err = HandlePendingTransfer(suite, wctx, bob, true, 0, 0, 0)
+	err = HandlePendingTransfers(suite, wctx, bob, true, 0, 0, 0, 0)
 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 }
 func (suite *TestSuite) TestRequestTransferFrozenThenUnrozen() {
@@ -204,13 +204,13 @@ func (suite *TestSuite) TestRequestTransferFrozenThenUnrozen() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(true, aliceBalanceInfo.Pending[0].SendRequest)
 
-	err = FreezeAddress(suite, wctx, bob, firstAccountNumCreated, 0, 0, true)
+	err = FreezeAddresses(suite, wctx, bob, []uint64{firstAccountNumCreated}, 0, 0, true)
 	suite.Require().Nil(err, "Error freezing address")
 
-	err = FreezeAddress(suite, wctx, bob, firstAccountNumCreated, 0, 0, false)
+	err = FreezeAddresses(suite, wctx, bob, []uint64{firstAccountNumCreated}, 0, 0, false)
 	suite.Require().Nil(err, "Error unfreezing address")
 
-	err = HandlePendingTransfer(suite, wctx, bob, true, 0, 0, 0)
+	err = HandlePendingTransfers(suite, wctx, bob, true, 0, 0, 0, 0)
 	suite.Require().Nil(err, "Error accepting transfer")
 	bobBalanceInfo = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	suite.Require().Equal(uint64(5000), bobBalanceInfo.Balance)

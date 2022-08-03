@@ -30472,7 +30472,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        id:
+                        startId:
+                          type: string
+                          format: uint64
+                        endId:
                           type: string
                           format: uint64
                         supply:
@@ -52796,7 +52799,10 @@ definitions:
         items:
           type: object
           properties:
-            id:
+            startId:
+              type: string
+              format: uint64
+            endId:
               type: string
               format: uint64
             supply:
@@ -52956,7 +52962,10 @@ definitions:
             items:
               type: object
               properties:
-                id:
+                startId:
+                  type: string
+                  format: uint64
+                endId:
                   type: string
                   format: uint64
                 supply:
@@ -53029,7 +53038,10 @@ definitions:
   trevormil.bitbadgeschain.badges.Subasset:
     type: object
     properties:
-      id:
+      startId:
+        type: string
+        format: uint64
+      endId:
         type: string
         format: uint64
       supply:

@@ -11,32 +11,39 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum, _, permissions, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, []uint64{msg.Address}, msg.BadgeId, msg.SubbadgeId, true,
+		ctx, msg.Creator, msg.Addresses, msg.BadgeId, msg.SubbadgeId, true,
 	)
 	if err != nil {
 		return nil, err
-	}
-
-	if CreatorAccountNum == msg.Address {
-		return nil, ErrSenderAndReceiverSame
 	}
 
 	if !permissions.CanRevoke() {
 		return nil, ErrInvalidPermissions
 	}
 
-	AddressBalanceKey := GetBalanceKey(msg.Address, msg.BadgeId, msg.SubbadgeId)
-	ManagerBalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId, msg.SubbadgeId)
+	for i, revokeAddress := range msg.Addresses {
+		if revokeAddress == CreatorAccountNum {
+			return nil, ErrSenderAndReceiverSame
+		}
 
-	err = k.RemoveFromBadgeBalance(ctx, AddressBalanceKey, msg.Amount)
-	if err != nil {
-		return nil, err
+		AddressBalanceKey := GetBalanceKey(revokeAddress, msg.BadgeId, msg.SubbadgeId)
+		ManagerBalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId, msg.SubbadgeId)
+
+		revokeAmount := msg.Amounts[i]
+		err = k.RemoveFromBadgeBalance(ctx, AddressBalanceKey, revokeAmount)
+		if err != nil {
+			return nil, err
+		}
+
+		err = k.AddToBadgeBalance(ctx, ManagerBalanceKey, revokeAmount)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	err = k.AddToBadgeBalance(ctx, ManagerBalanceKey, msg.Amount)
-	if err != nil {
-		return nil, err
-	}
+	
+
+	
 
 	return &types.MsgRevokeBadgeResponse{}, nil
 }

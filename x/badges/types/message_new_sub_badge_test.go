@@ -52,7 +52,7 @@ func TestMsgNewSubBadge_ValidateBasic(t *testing.T) {
 				Supplys:  []uint64{ 10, 2 },
 				AmountsToCreate: []uint64{ 0 },
 			},
-			err: ErrAmountEqualsZero,
+			err: ErrInvalidSupplyAndAmounts,
 		},
 	}
 	for _, tt := range tests {

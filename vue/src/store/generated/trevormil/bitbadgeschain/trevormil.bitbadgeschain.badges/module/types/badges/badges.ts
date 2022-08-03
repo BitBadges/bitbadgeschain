@@ -48,7 +48,8 @@ export interface BitBadge {
 
 /** Only will be created if supply >= 0 */
 export interface Subasset {
-  id: number;
+  startId: number;
+  endId: number;
   supply: number;
 }
 
@@ -298,15 +299,18 @@ export const BitBadge = {
   },
 };
 
-const baseSubasset: object = { id: 0, supply: 0 };
+const baseSubasset: object = { startId: 0, endId: 0, supply: 0 };
 
 export const Subasset = {
   encode(message: Subasset, writer: Writer = Writer.create()): Writer {
-    if (message.id !== 0) {
-      writer.uint32(8).uint64(message.id);
+    if (message.startId !== 0) {
+      writer.uint32(8).uint64(message.startId);
+    }
+    if (message.endId !== 0) {
+      writer.uint32(16).uint64(message.endId);
     }
     if (message.supply !== 0) {
-      writer.uint32(16).uint64(message.supply);
+      writer.uint32(24).uint64(message.supply);
     }
     return writer;
   },
@@ -319,9 +323,12 @@ export const Subasset = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = longToNumber(reader.uint64() as Long);
+          message.startId = longToNumber(reader.uint64() as Long);
           break;
         case 2:
+          message.endId = longToNumber(reader.uint64() as Long);
+          break;
+        case 3:
           message.supply = longToNumber(reader.uint64() as Long);
           break;
         default:
@@ -334,10 +341,15 @@ export const Subasset = {
 
   fromJSON(object: any): Subasset {
     const message = { ...baseSubasset } as Subasset;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id);
+    if (object.startId !== undefined && object.startId !== null) {
+      message.startId = Number(object.startId);
     } else {
-      message.id = 0;
+      message.startId = 0;
+    }
+    if (object.endId !== undefined && object.endId !== null) {
+      message.endId = Number(object.endId);
+    } else {
+      message.endId = 0;
     }
     if (object.supply !== undefined && object.supply !== null) {
       message.supply = Number(object.supply);
@@ -349,17 +361,23 @@ export const Subasset = {
 
   toJSON(message: Subasset): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
+    message.startId !== undefined && (obj.startId = message.startId);
+    message.endId !== undefined && (obj.endId = message.endId);
     message.supply !== undefined && (obj.supply = message.supply);
     return obj;
   },
 
   fromPartial(object: DeepPartial<Subasset>): Subasset {
     const message = { ...baseSubasset } as Subasset;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
+    if (object.startId !== undefined && object.startId !== null) {
+      message.startId = object.startId;
     } else {
-      message.id = 0;
+      message.startId = 0;
+    }
+    if (object.endId !== undefined && object.endId !== null) {
+      message.endId = object.endId;
+    } else {
+      message.endId = 0;
     }
     if (object.supply !== undefined && object.supply !== null) {
       message.supply = object.supply;

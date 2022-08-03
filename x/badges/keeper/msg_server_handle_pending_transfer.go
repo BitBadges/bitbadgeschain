@@ -52,9 +52,11 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 		return nil, ErrBadgeBalanceNotExists
 	}
 
+	updated := false
 	//In the future, we can make this a binary search since this is all sorted by the nonces (append-only)
 	for _, CurrPendingTransfer := range BadgeBalanceInfo.Pending {
-		if CurrPendingTransfer.ThisPendingNonce == msg.ThisNonce {
+		if CurrPendingTransfer.ThisPendingNonce <= msg.EndingNonce && CurrPendingTransfer.ThisPendingNonce >= msg.StartingNonce {
+			updated = true
 			if CurrPendingTransfer.SendRequest && msg.Accept {
 				return nil, ErrCantAcceptOwnTransferRequest //Handle cases 2, 4
 			}
@@ -83,10 +85,10 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 			OtherPartyNonce := CurrPendingTransfer.OtherPendingNonce
 
 			//We already handled cases 2, 4, where we try and accept own request so all will end up with removing from both parties' pending requests whether accepting or rejecting
-			if err := k.RemovePending(ctx, CreatorBalanceKey, msg.ThisNonce, OtherPartyNonce); err != nil {
+			if err := k.RemovePending(ctx, CreatorBalanceKey, CurrPendingTransfer.ThisPendingNonce, OtherPartyNonce); err != nil {
 				return nil, err
 			}
-			if err = k.RemovePending(ctx, OtherPartyBalanceKey, OtherPartyNonce, msg.ThisNonce); err != nil {
+			if err = k.RemovePending(ctx, OtherPartyBalanceKey, OtherPartyNonce, CurrPendingTransfer.ThisPendingNonce); err != nil {
 				return nil, err
 			}
 
@@ -125,10 +127,11 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 					return nil, err
 				}
 			}
-
-			return &types.MsgHandlePendingTransferResponse{}, nil
 		}
 	}
-	return nil, ErrNoPendingTransferFound
-
+	if updated {
+		return &types.MsgHandlePendingTransferResponse{}, nil
+	} else {
+		return nil, ErrNoPendingTransferFound
+	}
 }

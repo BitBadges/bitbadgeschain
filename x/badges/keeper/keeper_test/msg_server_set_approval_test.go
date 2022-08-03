@@ -33,7 +33,8 @@ func (suite *TestSuite) TestSetApproval() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:   0,
 			Supply: 10000,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -88,7 +89,8 @@ func (suite *TestSuite) TestApproveSelf() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:   0,
 			Supply: 10000,
 		},
 	}, badge.SubassetsTotalSupply)

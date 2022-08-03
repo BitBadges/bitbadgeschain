@@ -33,7 +33,8 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:   0,
 			Supply: 10000,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -76,7 +77,8 @@ func (suite *TestSuite) TestTransferBadgePending() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:   0,
 			Supply: 10000,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -133,7 +135,8 @@ func (suite *TestSuite) TestTransferBadgeForceBurn() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:   0,
 			Supply: 10000,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -162,7 +165,7 @@ func (suite *TestSuite) TestTransferBadgeForceBurn() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(false, aliceBalanceInfo.Pending[0].SendRequest)
 
-	err = HandlePendingTransfer(suite, wctx, alice, true, 0, 0, 0)
+	err = HandlePendingTransfers(suite, wctx, alice, true, 0, 0, 0, 0)
 	suite.Require().Nil(err, "Error accepting badge")
 
 	bobBalanceInfo = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -208,7 +211,8 @@ func (suite *TestSuite) TestApprovalsApproved() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:   0,
 			Supply: 10000,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -251,7 +255,8 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:   0,
 			Supply: 10000,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -291,7 +296,8 @@ func (suite *TestSuite) TestApprovalsNotApproved() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:   0,
 			Supply: 10000,
 		},
 	}, badge.SubassetsTotalSupply)

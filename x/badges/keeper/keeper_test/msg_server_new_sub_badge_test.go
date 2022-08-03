@@ -33,7 +33,8 @@ func (suite *TestSuite) TestNewSubBadges() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:     0,
 			Supply: 10,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -49,7 +50,8 @@ func (suite *TestSuite) TestNewSubBadges() {
 	suite.Require().Equal(uint64(2), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:     0,
 			Supply: 10,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -61,18 +63,16 @@ func (suite *TestSuite) TestNewSubBadges() {
 	badge = GetBadge(suite, wctx, 0)
 	bobBalanceInfo = GetBadgeBalance(suite, wctx, 0, 2, firstAccountNumCreated)
 
-	suite.Require().Equal(uint64(3), badge.NextSubassetId)
+	suite.Require().Equal(uint64(4), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:   0,
 			Supply: 10,
 		},
 		{
-			Id:     2,
-			Supply: 10,
-		},
-		{
-			Id:     3,
+			StartId: 2,
+			EndId:   3,
 			Supply: 10,
 		},
 	}, badge.SubassetsTotalSupply)

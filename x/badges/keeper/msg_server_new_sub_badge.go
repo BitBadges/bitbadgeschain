@@ -33,10 +33,29 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 			//By default, we assume non fungible subbadge (i.e. supply == 1) so we don't store if supply == 1
 			subasset_id := badge.NextSubassetId
 			if supply != 1 {
-				badge.SubassetsTotalSupply = append(badge.SubassetsTotalSupply, &types.Subasset{
-					Id:     subasset_id,
-					Supply: supply,
-				})
+				hasLastEntry := false
+				if len(badge.SubassetsTotalSupply) > 0 {
+					hasLastEntry = true
+				}
+				
+				lastEntry := &types.Subasset{}
+				if hasLastEntry {
+					lastEntry = badge.SubassetsTotalSupply[len(badge.SubassetsTotalSupply)-1]
+				}
+
+				if hasLastEntry && lastEntry.Supply == supply && lastEntry.EndId == subasset_id - 1 {
+					badge.SubassetsTotalSupply[len(badge.SubassetsTotalSupply)-1] = &types.Subasset{
+						Supply: lastEntry.Supply,
+						StartId: lastEntry.StartId,
+						EndId: subasset_id,
+					}
+				} else {
+					badge.SubassetsTotalSupply = append(badge.SubassetsTotalSupply, &types.Subasset{
+						Supply: supply,
+						StartId: subasset_id,
+						EndId: subasset_id,
+					})
+				}
 			}
 			badge.NextSubassetId += 1
 
@@ -47,6 +66,7 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 			}
 		}
 	}
+
 	
 
 	if err := k.UpdateBadgeInStore(ctx, badge); err != nil {

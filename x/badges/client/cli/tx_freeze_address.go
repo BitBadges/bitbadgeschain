@@ -2,6 +2,7 @@ package cli
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -15,14 +16,22 @@ var _ = strconv.Itoa(0)
 
 func CmdFreezeAddress() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "freeze-address [address] [badge-id] [subbadge-id] [add]",
+		Use:   "freeze-address [addresses] [badge-id] [subbadge-id] [add]",
 		Short: "Broadcast message freezeAddress",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argAddress, err := cast.ToUint64E(args[0])
-			if err != nil {
-				return err
+			argAddresses := strings.Split(args[0], ",")
+
+			argAddressesUint64 := []uint64{}
+			for _, address := range argAddresses {
+				addressAsUint64, err := cast.ToUint64E(address)
+				if err != nil {
+					return err
+				}
+
+				argAddressesUint64 = append(argAddressesUint64, addressAsUint64)
 			}
+
 			argBadgeId, err := cast.ToUint64E(args[1])
 			if err != nil {
 				return err
@@ -43,7 +52,7 @@ func CmdFreezeAddress() *cobra.Command {
 
 			msg := types.NewMsgFreezeAddress(
 				clientCtx.GetFromAddress().String(),
-				argAddress,
+				argAddressesUint64,
 				argBadgeId,
 				argSubbadgeId,
 				argAdd,

@@ -18,7 +18,8 @@ export interface MsgNewBadgeResponse {
 export interface MsgNewSubBadge {
   creator: string;
   id: number;
-  supply: number;
+  supplys: number[];
+  amountsToCreate: number[];
 }
 
 export interface MsgNewSubBadgeResponse {
@@ -289,7 +290,12 @@ export const MsgNewBadgeResponse = {
   },
 };
 
-const baseMsgNewSubBadge: object = { creator: "", id: 0, supply: 0 };
+const baseMsgNewSubBadge: object = {
+  creator: "",
+  id: 0,
+  supplys: 0,
+  amountsToCreate: 0,
+};
 
 export const MsgNewSubBadge = {
   encode(message: MsgNewSubBadge, writer: Writer = Writer.create()): Writer {
@@ -299,9 +305,16 @@ export const MsgNewSubBadge = {
     if (message.id !== 0) {
       writer.uint32(16).uint64(message.id);
     }
-    if (message.supply !== 0) {
-      writer.uint32(24).uint64(message.supply);
+    writer.uint32(26).fork();
+    for (const v of message.supplys) {
+      writer.uint64(v);
     }
+    writer.ldelim();
+    writer.uint32(34).fork();
+    for (const v of message.amountsToCreate) {
+      writer.uint64(v);
+    }
+    writer.ldelim();
     return writer;
   },
 
@@ -309,6 +322,8 @@ export const MsgNewSubBadge = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseMsgNewSubBadge } as MsgNewSubBadge;
+    message.supplys = [];
+    message.amountsToCreate = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -319,7 +334,26 @@ export const MsgNewSubBadge = {
           message.id = longToNumber(reader.uint64() as Long);
           break;
         case 3:
-          message.supply = longToNumber(reader.uint64() as Long);
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.supplys.push(longToNumber(reader.uint64() as Long));
+            }
+          } else {
+            message.supplys.push(longToNumber(reader.uint64() as Long));
+          }
+          break;
+        case 4:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.amountsToCreate.push(
+                longToNumber(reader.uint64() as Long)
+              );
+            }
+          } else {
+            message.amountsToCreate.push(longToNumber(reader.uint64() as Long));
+          }
           break;
         default:
           reader.skipType(tag & 7);
@@ -331,6 +365,8 @@ export const MsgNewSubBadge = {
 
   fromJSON(object: any): MsgNewSubBadge {
     const message = { ...baseMsgNewSubBadge } as MsgNewSubBadge;
+    message.supplys = [];
+    message.amountsToCreate = [];
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = String(object.creator);
     } else {
@@ -341,10 +377,18 @@ export const MsgNewSubBadge = {
     } else {
       message.id = 0;
     }
-    if (object.supply !== undefined && object.supply !== null) {
-      message.supply = Number(object.supply);
-    } else {
-      message.supply = 0;
+    if (object.supplys !== undefined && object.supplys !== null) {
+      for (const e of object.supplys) {
+        message.supplys.push(Number(e));
+      }
+    }
+    if (
+      object.amountsToCreate !== undefined &&
+      object.amountsToCreate !== null
+    ) {
+      for (const e of object.amountsToCreate) {
+        message.amountsToCreate.push(Number(e));
+      }
     }
     return message;
   },
@@ -353,12 +397,23 @@ export const MsgNewSubBadge = {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.id !== undefined && (obj.id = message.id);
-    message.supply !== undefined && (obj.supply = message.supply);
+    if (message.supplys) {
+      obj.supplys = message.supplys.map((e) => e);
+    } else {
+      obj.supplys = [];
+    }
+    if (message.amountsToCreate) {
+      obj.amountsToCreate = message.amountsToCreate.map((e) => e);
+    } else {
+      obj.amountsToCreate = [];
+    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<MsgNewSubBadge>): MsgNewSubBadge {
     const message = { ...baseMsgNewSubBadge } as MsgNewSubBadge;
+    message.supplys = [];
+    message.amountsToCreate = [];
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
     } else {
@@ -369,10 +424,18 @@ export const MsgNewSubBadge = {
     } else {
       message.id = 0;
     }
-    if (object.supply !== undefined && object.supply !== null) {
-      message.supply = object.supply;
-    } else {
-      message.supply = 0;
+    if (object.supplys !== undefined && object.supplys !== null) {
+      for (const e of object.supplys) {
+        message.supplys.push(e);
+      }
+    }
+    if (
+      object.amountsToCreate !== undefined &&
+      object.amountsToCreate !== null
+    ) {
+      for (const e of object.amountsToCreate) {
+        message.amountsToCreate.push(e);
+      }
     }
     return message;
   },

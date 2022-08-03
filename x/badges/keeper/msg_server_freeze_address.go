@@ -11,7 +11,7 @@ import (
 func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddress) (*types.MsgFreezeAddressResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	_, badge, permissions, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, []uint64{msg.Address}, msg.BadgeId, msg.SubbadgeId, true,
+		ctx, msg.Creator, msg.Addresses, msg.BadgeId, msg.SubbadgeId, true,
 	)
 	if err != nil {
 		return nil, err
@@ -23,23 +23,26 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 
 	found := false
 	new_addresses := []uint64{}
-	//TODO: binary search (they are sorted)
-	for _, address := range badge.FreezeAddresses {
-		if address == msg.Address {
-			found = true
-		} else {
-			new_addresses = append(new_addresses, address)
-		}
-	}
 
-	if found && msg.Add {
-		return nil, ErrAddressAlreadyFrozen
-	} else if !found && msg.Add {
-		badge.FreezeAddresses = append(badge.FreezeAddresses, msg.Address)
-	} else if found && !msg.Add {
-		badge.FreezeAddresses = new_addresses
-	} else {
-		return nil, ErrAddressNotFrozen
+	//TODO: binary search (they are sorted)
+	for _, targetAddress := range msg.Addresses {
+		for _, address := range badge.FreezeAddresses {
+			if address == targetAddress {
+				found = true
+			} else {
+				new_addresses = append(new_addresses, address)
+			}
+		}
+
+		if found && msg.Add {
+			return nil, ErrAddressAlreadyFrozen
+		} else if !found && msg.Add {
+			badge.FreezeAddresses = append(badge.FreezeAddresses, targetAddress)
+		} else if found && !msg.Add {
+			badge.FreezeAddresses = new_addresses
+		} else {
+			return nil, ErrAddressNotFrozen
+		}
 	}
 
 	//sort the addresses in order

@@ -33,7 +33,8 @@ func (suite *TestSuite) TestRevokeBadge() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:   0,
 			Supply: 10000,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -48,7 +49,7 @@ func (suite *TestSuite) TestRevokeBadge() {
 	aliceBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 	suite.Require().Equal(uint64(5000), aliceBalanceInfo.Balance)
 
-	err = RevokeBadge(suite, wctx, bob, firstAccountNumCreated+1, 5000, 0, 0)
+	err = RevokeBadges(suite, wctx, bob, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, 0)
 	suite.Require().Nil(err, "Error revoking badge")
 
 	bobBalanceInfo = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -85,7 +86,8 @@ func (suite *TestSuite) TestRevokeBadgeTooMuch() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:   0,
 			Supply: 10000,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -100,7 +102,7 @@ func (suite *TestSuite) TestRevokeBadgeTooMuch() {
 	aliceBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 	suite.Require().Equal(uint64(5000), aliceBalanceInfo.Balance)
 
-	err = RevokeBadge(suite, wctx, bob, firstAccountNumCreated+1, 7000, 0, 0)
+	err = RevokeBadges(suite, wctx, bob, []uint64{firstAccountNumCreated+1}, []uint64{7000}, 0, 0)
 	suite.Require().EqualError(err, keeper.ErrBadgeBalanceTooLow.Error())
 }
 
@@ -131,7 +133,8 @@ func (suite *TestSuite) TestRevokeBadgeFromSelf() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:   0,
 			Supply: 10000,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -149,7 +152,7 @@ func (suite *TestSuite) TestRevokeBadgeFromSelf() {
 	accs := suite.app.AccountKeeper.GetAllAccounts(suite.ctx)
 	_ = accs
 
-	err = RevokeBadge(suite, wctx, bob, firstAccountNumCreated, 5000, 0, 0)
+	err = RevokeBadges(suite, wctx, bob, []uint64{firstAccountNumCreated}, []uint64{5000}, 0, 0)
 	suite.Require().EqualError(err, keeper.ErrSenderAndReceiverSame.Error())
 }
 
@@ -180,7 +183,8 @@ func (suite *TestSuite) TestNewSubBadgeRevokeIsLocked() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:   0,
 			Supply: 10000,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -198,7 +202,7 @@ func (suite *TestSuite) TestNewSubBadgeRevokeIsLocked() {
 	accs := suite.app.AccountKeeper.GetAllAccounts(suite.ctx)
 	_ = accs
 
-	err = RevokeBadge(suite, wctx, bob, firstAccountNumCreated+1, 5000, 0, 0)
+	err = RevokeBadges(suite, wctx, bob, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, 0)
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }
 
@@ -229,7 +233,8 @@ func (suite *TestSuite) TestNewSubBadgeNotManager() {
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
-			Id:     0,
+			StartId: 0,
+			EndId:   0,
 			Supply: 10000,
 		},
 	}, badge.SubassetsTotalSupply)
@@ -247,6 +252,6 @@ func (suite *TestSuite) TestNewSubBadgeNotManager() {
 	accs := suite.app.AccountKeeper.GetAllAccounts(suite.ctx)
 	_ = accs
 
-	err = RevokeBadge(suite, wctx, alice, firstAccountNumCreated, 5000, 0, 0)
+	err = RevokeBadges(suite, wctx, alice, []uint64{firstAccountNumCreated}, []uint64{5000}, 0, 0)
 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
 }

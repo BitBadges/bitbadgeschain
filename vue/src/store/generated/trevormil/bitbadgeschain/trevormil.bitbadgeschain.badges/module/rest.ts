@@ -131,7 +131,10 @@ export interface BadgesQueryParamsResponse {
 
 export interface BadgesSubasset {
   /** @format uint64 */
-  id?: string;
+  startId?: string;
+
+  /** @format uint64 */
+  endId?: string;
 
   /** @format uint64 */
   supply?: string;

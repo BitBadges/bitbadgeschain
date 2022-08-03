@@ -21,4 +21,5 @@ var (
 	ErrSenderAndReceiverSame             = sdkerrors.Register(ModuleName, 1509, "sender and receiver same")
 	ErrInvalidSupplyAndAmounts		 	 = sdkerrors.Register(ModuleName, 1510, "invalid supply and amounts")
 	ErrAmountEqualsZero 				 = sdkerrors.Register(ModuleName, 1511, "amount to create equals zero")
+	ErrInvalidAmountsAndAddressesLength  = sdkerrors.Register(ModuleName, 1512, "invalid amounts and addresses length")
 )
