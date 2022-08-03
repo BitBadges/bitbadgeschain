@@ -13,7 +13,7 @@ func NewMsgRequestTransferManager(creator string, badgeId uint64, add bool) *Msg
 	return &MsgRequestTransferManager{
 		Creator: creator,
 		BadgeId: badgeId,
-		Add: 	 add,
+		Add:     add,
 	}
 }
 

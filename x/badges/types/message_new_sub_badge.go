@@ -11,9 +11,9 @@ var _ sdk.Msg = &MsgNewSubBadge{}
 
 func NewMsgNewSubBadge(creator string, id uint64, supplys []uint64, amountsToCreate []uint64) *MsgNewSubBadge {
 	return &MsgNewSubBadge{
-		Creator: creator,
-		Id:      id,
-		Supplys:  supplys,
+		Creator:         creator,
+		Id:              id,
+		Supplys:         supplys,
 		AmountsToCreate: amountsToCreate,
 	}
 }
@@ -48,7 +48,7 @@ func (msg *MsgNewSubBadge) ValidateBasic() error {
 	if len(msg.Supplys) != len(msg.AmountsToCreate) {
 		return ErrInvalidSupplyAndAmounts
 	}
-	
+
 	for i, supply := range msg.Supplys {
 		if supply == 0 {
 			return ErrSupplyEqualsZero

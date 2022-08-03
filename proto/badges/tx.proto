@@ -19,6 +19,7 @@ service Msg {
     rpc UpdatePermissions(MsgUpdatePermissions) returns (MsgUpdatePermissionsResponse);
     rpc TransferManager(MsgTransferManager) returns (MsgTransferManagerResponse);
     rpc RequestTransferManager(MsgRequestTransferManager) returns (MsgRequestTransferManagerResponse);
+  rpc SelfDestructBadge(MsgSelfDestructBadge) returns (MsgSelfDestructBadgeResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -145,6 +146,14 @@ message MsgRequestTransferManager {
 }
 
 message MsgRequestTransferManagerResponse {
+}
+
+message MsgSelfDestructBadge {
+  string creator = 1;
+  uint64 badgeId = 2;
+}
+
+message MsgSelfDestructBadgeResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

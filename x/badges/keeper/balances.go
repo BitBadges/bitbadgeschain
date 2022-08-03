@@ -215,7 +215,6 @@ func (k Keeper) SetApproval(ctx sdk.Context, balance_key string, amount uint64, 
 				AddressNum: address_num,
 			})
 		}
-		
 
 		badgeBalanceInfo.Approvals = new_approvals
 		err := k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
@@ -269,7 +268,7 @@ func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, balance_key string, a
 		} else {
 			badgeBalanceInfo.Approvals = new_approvals
 		}
-		
+
 		err := k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
 		if err != nil {
 			return err

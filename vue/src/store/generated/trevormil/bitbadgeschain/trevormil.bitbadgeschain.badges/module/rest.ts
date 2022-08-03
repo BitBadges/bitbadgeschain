@@ -77,6 +77,8 @@ export type BadgesMsgRequestTransferManagerResponse = object;
 
 export type BadgesMsgRevokeBadgeResponse = object;
 
+export type BadgesMsgSelfDestructBadgeResponse = object;
+
 export type BadgesMsgSetApprovalResponse = object;
 
 export type BadgesMsgTransferBadgeResponse = object;

@@ -8,26 +8,22 @@ import (
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
 )
 
-func TestMsgUpdateUris_ValidateBasic(t *testing.T) {
+func TestMsgSelfDestructBadge_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgUpdateUris
+		msg  MsgSelfDestructBadge
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgUpdateUris{
-				Creator:     "invalid_address",
-				Uri:         "https://example.com",
-				SubassetUri: "https://example.com",
+			msg: MsgSelfDestructBadge{
+				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgUpdateUris{
-				Creator:     sample.AccAddress(),
-				Uri:         "https://example.com",
-				SubassetUri: "https://example.com",
+			msg: MsgSelfDestructBadge{
+				Creator: sample.AccAddress(),
 			},
 		},
 	}

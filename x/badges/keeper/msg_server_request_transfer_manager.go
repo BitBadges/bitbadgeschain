@@ -23,7 +23,7 @@ func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgR
 		if !permissions.CanManagerTransfer() {
 			return nil, ErrInvalidPermissions
 		}
-	
+
 		if err := k.CreateTransferManagerRequest(ctx, msg.BadgeId, CreatorAccountNum); err != nil {
 			return nil, err
 		}
@@ -32,7 +32,6 @@ func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgR
 			return nil, err
 		}
 	}
-	
 
 	return &types.MsgRequestTransferManagerResponse{}, nil
 }

@@ -52837,6 +52837,8 @@ definitions:
     type: object
   trevormil.bitbadgeschain.badges.MsgRevokeBadgeResponse:
     type: object
+  trevormil.bitbadgeschain.badges.MsgSelfDestructBadgeResponse:
+    type: object
   trevormil.bitbadgeschain.badges.MsgSetApprovalResponse:
     type: object
   trevormil.bitbadgeschain.badges.MsgTransferBadgeResponse:

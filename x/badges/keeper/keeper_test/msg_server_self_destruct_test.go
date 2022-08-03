@@ -6,7 +6,7 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func (suite *TestSuite) TestSetApproval() {
+func (suite *TestSuite) TestSelfDestruct() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	badgesToCreate := []BadgesToCreate{
@@ -23,12 +23,17 @@ func (suite *TestSuite) TestSetApproval() {
 
 	CreateBadges(suite, wctx, badgesToCreate)
 	badge, _ := GetBadge(suite, wctx, 0)
-
+	
+	
 	//Create subbadge 1 with supply > 1
 	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
+	
+	
 	bobBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	
+	
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
@@ -40,29 +45,27 @@ func (suite *TestSuite) TestSetApproval() {
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
 
-	err = SetApproval(suite, wctx, bob, 1000, firstAccountNumCreated+1, 0, 0)
-	suite.Require().Nil(err, "Error setting approval")
+	err = SelfDestructBadge(suite, wctx, bob, 0)
+	suite.Require().Nil(err, "Error self destructing badge")
 
-	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(firstAccountNumCreated+1), bobBalanceInfo.Approvals[0].AddressNum)
-	suite.Require().Equal(uint64(1000), bobBalanceInfo.Approvals[0].Amount)
+	badge, err = GetBadge(suite, wctx, 0)
+	suite.Require().NotNil(err, "We should get a not exists error here now")
 
-	err = SetApproval(suite, wctx, bob, 500, firstAccountNumCreated+2, 0, 0)
-	suite.Require().Nil(err, "Error setting approval")
+	CreateBadges(suite, wctx, badgesToCreate)
+	badge, _ = GetBadge(suite, wctx, 0)
 
-	err = SetApproval(suite, wctx, bob, 500, firstAccountNumCreated+1, 0, 0)
-	suite.Require().Nil(err, "Error setting approval")
+	//Create subbadge 1 with supply > 1
+	err = CreateSubBadges(suite, wctx, bob, 1, []uint64{10000}, []uint64{1})
+	suite.Require().Nil(err, "Error creating subbadge")
+	
+	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, firstAccountNumCreated + 1, 500, 1, 0)
+	suite.Require().Nil(err, "Error transferring subbadge")
 
-	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-
-	suite.Require().Equal(uint64(firstAccountNumCreated+2), bobBalanceInfo.Approvals[0].AddressNum)
-	suite.Require().Equal(uint64(500), bobBalanceInfo.Approvals[0].Amount)
-
-	suite.Require().Equal(uint64(firstAccountNumCreated+1), bobBalanceInfo.Approvals[1].AddressNum)
-	suite.Require().Equal(uint64(500), bobBalanceInfo.Approvals[1].Amount)
+	err = SelfDestructBadge(suite, wctx, bob, 1)
+	suite.Require().EqualError(err, keeper.ErrMustOwnTotalSupplyToSelfDestruct.Error())
 }
 
-func (suite *TestSuite) TestApproveSelf() {
+func (suite *TestSuite) TestSelfDestructNotManager() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	badgesToCreate := []BadgesToCreate{
@@ -79,12 +82,18 @@ func (suite *TestSuite) TestApproveSelf() {
 
 	CreateBadges(suite, wctx, badgesToCreate)
 	badge, _ := GetBadge(suite, wctx, 0)
+	
+	
 
 	//Create subbadge 1 with supply > 1
 	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
+	
+	
 	bobBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	
+	
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
@@ -96,6 +105,7 @@ func (suite *TestSuite) TestApproveSelf() {
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
 
-	err = SetApproval(suite, wctx, bob, 1000, firstAccountNumCreated, 0, 0)
-	suite.Require().EqualError(err, keeper.ErrSenderAndReceiverSame.Error())
+	err = SelfDestructBadge(suite, wctx, alice, 0)
+	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
+
 }

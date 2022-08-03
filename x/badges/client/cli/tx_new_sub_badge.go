@@ -27,7 +27,6 @@ func CmdNewSubBadge() *cobra.Command {
 
 			argSupplysStringArr := strings.Split(args[1], ",")
 
-
 			argSupplysUInt64 := []uint64{}
 			for _, supply := range argSupplysStringArr {
 				println(supply)

@@ -22,20 +22,20 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 	}
 
 	CreateBadges(suite, wctx, badgesToCreate)
-	badge := GetBadge(suite, wctx, 0)
+	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
-	badge = GetBadge(suite, wctx, 0)
-	bobBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	badge, _ = GetBadge(suite, wctx, 0)
+	bobBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
 			StartId: 0,
 			EndId:   0,
-			Supply: 10000,
+			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
@@ -43,10 +43,10 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, firstAccountNumCreated+1, 5000, 0, 0)
 	suite.Require().Nil(err, "Error transferring badge")
 
-	bobBalanceInfo = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	suite.Require().Equal(uint64(5000), bobBalanceInfo.Balance)
 
-	aliceBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
+	aliceBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 	suite.Require().Equal(uint64(5000), aliceBalanceInfo.Balance)
 }
 
@@ -66,20 +66,20 @@ func (suite *TestSuite) TestTransferBadgePending() {
 	}
 
 	CreateBadges(suite, wctx, badgesToCreate)
-	badge := GetBadge(suite, wctx, 0)
+	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
-	badge = GetBadge(suite, wctx, 0)
-	bobBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	badge, _ = GetBadge(suite, wctx, 0)
+	bobBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
 			StartId: 0,
 			EndId:   0,
-			Supply: 10000,
+			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
@@ -87,7 +87,7 @@ func (suite *TestSuite) TestTransferBadgePending() {
 	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, firstAccountNumCreated+1, 5000, 0, 0)
 	suite.Require().Nil(err, "Error transferring badge")
 
-	bobBalanceInfo = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	suite.Require().Equal(uint64(5000), bobBalanceInfo.Pending[0].Amount)
 	suite.Require().Equal(uint64(1), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(firstAccountNumCreated, bobBalanceInfo.Pending[0].ApprovedBy)
@@ -97,7 +97,7 @@ func (suite *TestSuite) TestTransferBadgePending() {
 	suite.Require().Equal(uint64(0), bobBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(true, bobBalanceInfo.Pending[0].SendRequest)
 
-	aliceBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
+	aliceBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 	suite.Require().Equal(uint64(5000), aliceBalanceInfo.Pending[0].Amount)
 	suite.Require().Equal(uint64(1), aliceBalanceInfo.PendingNonce)
 	suite.Require().Equal(firstAccountNumCreated, aliceBalanceInfo.Pending[0].ApprovedBy)
@@ -124,20 +124,20 @@ func (suite *TestSuite) TestTransferBadgeForceBurn() {
 	}
 
 	CreateBadges(suite, wctx, badgesToCreate)
-	badge := GetBadge(suite, wctx, 0)
+	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
-	badge = GetBadge(suite, wctx, 0)
-	bobBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	badge, _ = GetBadge(suite, wctx, 0)
+	bobBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
 			StartId: 0,
 			EndId:   0,
-			Supply: 10000,
+			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
@@ -145,7 +145,7 @@ func (suite *TestSuite) TestTransferBadgeForceBurn() {
 	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, firstAccountNumCreated+1, 5000, 0, 0)
 	suite.Require().Nil(err, "Error transferring badge")
 
-	bobBalanceInfo = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	suite.Require().Equal(uint64(5000), bobBalanceInfo.Pending[0].Amount)
 	suite.Require().Equal(uint64(1), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(firstAccountNumCreated, bobBalanceInfo.Pending[0].ApprovedBy)
@@ -155,7 +155,7 @@ func (suite *TestSuite) TestTransferBadgeForceBurn() {
 	suite.Require().Equal(uint64(0), bobBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(true, bobBalanceInfo.Pending[0].SendRequest)
 
-	aliceBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
+	aliceBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 	suite.Require().Equal(uint64(5000), aliceBalanceInfo.Pending[0].Amount)
 	suite.Require().Equal(uint64(1), aliceBalanceInfo.PendingNonce)
 	suite.Require().Equal(firstAccountNumCreated, aliceBalanceInfo.Pending[0].ApprovedBy)
@@ -168,19 +168,19 @@ func (suite *TestSuite) TestTransferBadgeForceBurn() {
 	err = HandlePendingTransfers(suite, wctx, alice, true, 0, 0, 0, 0)
 	suite.Require().Nil(err, "Error accepting badge")
 
-	bobBalanceInfo = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	suite.Require().Equal(uint64(5000), bobBalanceInfo.Balance)
 
-	aliceBalanceInfo = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
+	aliceBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 	suite.Require().Equal(uint64(5000), aliceBalanceInfo.Balance)
 
 	err = TransferBadge(suite, wctx, alice, firstAccountNumCreated+1, firstAccountNumCreated, 5000, 0, 0)
 	suite.Require().Nil(err, "Error transferring badge")
 
-	bobBalanceInfo = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
 
-	aliceBalanceInfo = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
+	aliceBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Balance)
 }
 
@@ -200,20 +200,20 @@ func (suite *TestSuite) TestApprovalsApproved() {
 	}
 
 	CreateBadges(suite, wctx, badgesToCreate)
-	badge := GetBadge(suite, wctx, 0)
+	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
-	badge = GetBadge(suite, wctx, 0)
-	bobBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	badge, _ = GetBadge(suite, wctx, 0)
+	bobBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
 			StartId: 0,
 			EndId:   0,
-			Supply: 10000,
+			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
@@ -224,7 +224,7 @@ func (suite *TestSuite) TestApprovalsApproved() {
 	err = TransferBadge(suite, wctx, charlie, firstAccountNumCreated, firstAccountNumCreated+1, 5000, 0, 0)
 	suite.Require().Nil(err, "Error transferring badge")
 
-	bobBalanceInfo = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	suite.Require().Equal(uint64(1000000-5000), bobBalanceInfo.Approvals[0].Amount)
 }
 
@@ -244,20 +244,20 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 	}
 
 	CreateBadges(suite, wctx, badgesToCreate)
-	badge := GetBadge(suite, wctx, 0)
+	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
-	badge = GetBadge(suite, wctx, 0)
-	bobBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	badge, _ = GetBadge(suite, wctx, 0)
+	bobBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
 			StartId: 0,
 			EndId:   0,
-			Supply: 10000,
+			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
@@ -285,20 +285,20 @@ func (suite *TestSuite) TestApprovalsNotApproved() {
 	}
 
 	CreateBadges(suite, wctx, badgesToCreate)
-	badge := GetBadge(suite, wctx, 0)
+	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
-	badge = GetBadge(suite, wctx, 0)
-	bobBalanceInfo := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	badge, _ = GetBadge(suite, wctx, 0)
+	bobBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.Subasset{
 		{
 			StartId: 0,
 			EndId:   0,
-			Supply: 10000,
+			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)

@@ -37,23 +37,23 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 				if len(badge.SubassetsTotalSupply) > 0 {
 					hasLastEntry = true
 				}
-				
+
 				lastEntry := &types.Subasset{}
 				if hasLastEntry {
 					lastEntry = badge.SubassetsTotalSupply[len(badge.SubassetsTotalSupply)-1]
 				}
 
-				if hasLastEntry && lastEntry.Supply == supply && lastEntry.EndId == subasset_id - 1 {
+				if hasLastEntry && lastEntry.Supply == supply && lastEntry.EndId == subasset_id-1 {
 					badge.SubassetsTotalSupply[len(badge.SubassetsTotalSupply)-1] = &types.Subasset{
-						Supply: lastEntry.Supply,
+						Supply:  lastEntry.Supply,
 						StartId: lastEntry.StartId,
-						EndId: subasset_id,
+						EndId:   subasset_id,
 					}
 				} else {
 					badge.SubassetsTotalSupply = append(badge.SubassetsTotalSupply, &types.Subasset{
-						Supply: supply,
+						Supply:  supply,
 						StartId: subasset_id,
-						EndId: subasset_id,
+						EndId:   subasset_id,
 					})
 				}
 			}
@@ -66,8 +66,6 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 			}
 		}
 	}
-
-	
 
 	if err := k.UpdateBadgeInStore(ctx, badge); err != nil {
 		return nil, err

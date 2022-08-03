@@ -41,9 +41,5 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 		}
 	}
 
-	
-
-	
-
 	return &types.MsgRevokeBadgeResponse{}, nil
 }

@@ -25,16 +25,16 @@ func (suite *TestSuite) TestTransferManager() {
 	suite.Require().Nil(err, "Error creating badge")
 
 	//Create subbadge 1 with supply > 1
-	err = CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
+	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 0, firstAccountNumCreated + 1)
+	err = TransferManager(suite, wctx, bob, 0, firstAccountNumCreated+1)
 	suite.Require().Nil(err, "Error transferring manager")
 
-	badge := GetBadge(suite, wctx, 0)
+	badge, _ := GetBadge(suite, wctx, 0)
 	suite.Require().Equal(firstAccountNumCreated+1, badge.Manager)
 }
 
@@ -57,7 +57,7 @@ func (suite *TestSuite) TestRequestTransferManager() {
 	suite.Require().Nil(err, "Error creating badge")
 
 	//Create subbadge 1 with supply > 1
-	err = CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
+	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
@@ -69,10 +69,10 @@ func (suite *TestSuite) TestRequestTransferManager() {
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 0, firstAccountNumCreated + 1)
+	err = TransferManager(suite, wctx, bob, 0, firstAccountNumCreated+1)
 	suite.Require().Nil(err, "Error transferring manager")
 
-	badge := GetBadge(suite, wctx, 0)
+	badge, _ := GetBadge(suite, wctx, 0)
 	suite.Require().Equal(firstAccountNumCreated+1, badge.Manager)
 }
 
@@ -95,7 +95,7 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 	suite.Require().Nil(err, "Error creating badge")
 
 	//Create subbadge 1 with supply > 1
-	err = CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
+	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
@@ -104,7 +104,7 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 	err = RequestTransferManager(suite, wctx, alice, 0, false)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 0, firstAccountNumCreated + 1)
+	err = TransferManager(suite, wctx, bob, 0, firstAccountNumCreated+1)
 	suite.Require().EqualError(err, keeper.ErrAddressNeedsToOptInAndRequestManagerTransfer.Error())
 }
 
@@ -127,7 +127,7 @@ func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 	suite.Require().Nil(err, "Error creating badge")
 
 	//Create subbadge 1 with supply > 1
-	err = CreateSubBadges(suite, wctx, bob, 0, []uint64 { 10000 }, []uint64 { 1 })
+	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	err = RequestTransferManager(suite, wctx, alice, 0, true)

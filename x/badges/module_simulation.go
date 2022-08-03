@@ -72,6 +72,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgRequestTransferManager int = 100
 
+	opWeightMsgSelfDestructBadge = "op_weight_msg_self_destruct_badge"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgSelfDestructBadge int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -241,6 +245,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgRequestTransferManager,
 		badgessimulation.SimulateMsgRequestTransferManager(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgSelfDestructBadge int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgSelfDestructBadge, &weightMsgSelfDestructBadge, nil,
+		func(_ *rand.Rand) {
+			weightMsgSelfDestructBadge = defaultWeightMsgSelfDestructBadge
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgSelfDestructBadge,
+		badgessimulation.SimulateMsgSelfDestructBadge(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

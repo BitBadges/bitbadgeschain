@@ -12,8 +12,8 @@ var _ sdk.Msg = &MsgRevokeBadge{}
 func NewMsgRevokeBadge(creator string, addresses []uint64, amounts []uint64, badgeId uint64, subbadgeId uint64) *MsgRevokeBadge {
 	return &MsgRevokeBadge{
 		Creator:    creator,
-		Addresses:    addresses,
-		Amounts:     amounts,
+		Addresses:  addresses,
+		Amounts:    amounts,
 		BadgeId:    badgeId,
 		SubbadgeId: subbadgeId,
 	}
@@ -49,7 +49,7 @@ func (msg *MsgRevokeBadge) ValidateBasic() error {
 	if len(msg.Amounts) != len(msg.Addresses) {
 		return ErrInvalidAmountsAndAddressesLength
 	}
-	
+
 	for _, amount := range msg.Amounts {
 		if amount == 0 {
 			return ErrAmountEqualsZero

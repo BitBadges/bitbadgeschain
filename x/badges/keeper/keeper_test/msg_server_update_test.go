@@ -29,7 +29,7 @@ func (suite *TestSuite) TestUpdateURIs() {
 
 	err = UpdateURIs(suite, wctx, bob, 0, "http://google.com", "http://google.com")
 	suite.Require().Nil(err, "Error updating uris")
-	badge := GetBadge(suite, wctx, 0)
+	badge, _ := GetBadge(suite, wctx, 0)
 	suite.Require().Equal("http://google.com", badge.Uri)
 	suite.Require().Equal("http://google.com", badge.SubassetUriFormat)
 
@@ -92,4 +92,3 @@ func (suite *TestSuite) TestCantUpdateNotManager() {
 	err = UpdatePermissions(suite, wctx, alice, 0, 77)
 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
 }
-

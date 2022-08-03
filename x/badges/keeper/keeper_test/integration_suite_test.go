@@ -197,18 +197,25 @@ func UpdatePermissions(suite *TestSuite, ctx context.Context, creator string, ba
 	_, err := suite.msgServer.UpdatePermissions(ctx, msg)
 	return err
 }
-/* Below, we should define all query handlers and use them within the other integration tests. */
 
-func GetBadge(suite *TestSuite, ctx context.Context, id uint64) types.BitBadge {
-	res, err := suite.app.BadgesKeeper.GetBadge(ctx, &types.QueryGetBadgeRequest{Id: uint64(id)})
-	if err != nil {
-		suite.Fail(err.Error())
-	}
-
-	return *res.Badge
+func SelfDestructBadge(suite *TestSuite, ctx context.Context, creator string, badgeId uint64) error {
+	msg := types.NewMsgSelfDestructBadge(creator, badgeId)
+	_, err := suite.msgServer.SelfDestructBadge(ctx, msg)
+	return err
 }
 
-func GetBadgeBalance(suite *TestSuite, ctx context.Context, badgeId uint64, subbadgeId uint64, address uint64) types.BadgeBalanceInfo {
+
+/* Below, we should define all query handlers and use them within the other integration tests. */
+func GetBadge(suite *TestSuite, ctx context.Context, id uint64) (types.BitBadge, error) {
+	res, err := suite.app.BadgesKeeper.GetBadge(ctx, &types.QueryGetBadgeRequest{Id: uint64(id)})
+	if err != nil {
+		return types.BitBadge{}, err
+	}
+
+	return *res.Badge, nil
+}
+
+func GetBadgeBalance(suite *TestSuite, ctx context.Context, badgeId uint64, subbadgeId uint64, address uint64) (types.BadgeBalanceInfo, error) {
 	res, err := suite.app.BadgesKeeper.GetBalance(ctx, &types.QueryGetBalanceRequest{
 		BadgeId:    uint64(badgeId),
 		SubbadgeId: uint64(subbadgeId),
@@ -216,8 +223,8 @@ func GetBadgeBalance(suite *TestSuite, ctx context.Context, badgeId uint64, subb
 	})
 
 	if err != nil {
-		suite.Fail(err.Error())
+		return types.BadgeBalanceInfo{}, err
 	}
 
-	return *res.BalanceInfo
+	return *res.BalanceInfo, nil
 }

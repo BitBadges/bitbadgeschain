@@ -15,11 +15,11 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 	k.IncrementNextAssetId(ctx)
 
 	badge := types.BitBadge{
-		Id:                   NextBadgeId,
-		Uri:                  msg.Uri,
-		Manager:              CreatorAccountNum,
-		PermissionFlags:      msg.Permissions,
-		SubassetUriFormat:    msg.SubassetUris,
+		Id:                NextBadgeId,
+		Uri:               msg.Uri,
+		Manager:           CreatorAccountNum,
+		PermissionFlags:   msg.Permissions,
+		SubassetUriFormat: msg.SubassetUris,
 		// SubassetsTotalSupply: []*types.Subasset{},
 		// NextSubassetId:       0,
 		// FreezeAddresses:      []uint64{},

@@ -69,6 +69,12 @@ func (k Keeper) StoreHasBadgeID(ctx sdk.Context, badgeID uint64) bool {
 	return store.Has(badgeStoreKey(badgeID))
 }
 
+// HasBadge determines whether the specified badgeID exists
+func (k Keeper) DeleteBadgeFromStore(ctx sdk.Context, badgeID uint64) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(badgeStoreKey(badgeID))
+}
+
 func (k Keeper) HasAddressRequestedManagerTransfer(ctx sdk.Context, badgeId uint64, address uint64) bool {
 	store := ctx.KVStore(k.storeKey)
 	key := GetManagerRequestKey(badgeId, address)

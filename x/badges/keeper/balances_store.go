@@ -23,9 +23,9 @@ func (k Keeper) CreateBadgeBalanceInStore(ctx sdk.Context, balance_id string, ba
 
 func (k Keeper) UpdateBadgeBalanceInStore(ctx sdk.Context, balance_id string, badgeBalanceInfo types.BadgeBalanceInfo) error {
 	if !k.StoreHasBadgeBalance(ctx, balance_id) {
-		k.CreateBadgeBalanceInStore(ctx, balance_id, badgeBalanceInfo);
+		k.CreateBadgeBalanceInStore(ctx, balance_id, badgeBalanceInfo)
 	}
-	
+
 	marshaled_badge_balance_info, err := k.cdc.Marshal(&badgeBalanceInfo)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.BadgeBalanceInfo failed")
@@ -37,7 +37,7 @@ func (k Keeper) UpdateBadgeBalanceInStore(ctx sdk.Context, balance_id string, ba
 	} else {
 		store.Set(badgeBalanceStoreKey(balance_id), marshaled_badge_balance_info)
 	}
-	
+
 	return nil
 }
 
