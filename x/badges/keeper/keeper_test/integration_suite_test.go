@@ -174,6 +174,29 @@ func FreezeAddresses(suite *TestSuite, ctx context.Context, creator string, addr
 	return err
 }
 
+func RequestTransferManager(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, add bool) error {
+	msg := types.NewMsgRequestTransferManager(creator, badgeId, add)
+	_, err := suite.msgServer.RequestTransferManager(ctx, msg)
+	return err
+}
+
+func TransferManager(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, address uint64) error {
+	msg := types.NewMsgTransferManager(creator, badgeId, address)
+	_, err := suite.msgServer.TransferManager(ctx, msg)
+	return err
+}
+
+func UpdateURIs(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, uri string, subassetUri string) error {
+	msg := types.NewMsgUpdateUris(creator, badgeId, uri, subassetUri)
+	_, err := suite.msgServer.UpdateUris(ctx, msg)
+	return err
+}
+
+func UpdatePermissions(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, permissions uint64) error {
+	msg := types.NewMsgUpdatePermissions(creator, badgeId, permissions)
+	_, err := suite.msgServer.UpdatePermissions(ctx, msg)
+	return err
+}
 /* Below, we should define all query handlers and use them within the other integration tests. */
 
 func GetBadge(suite *TestSuite, ctx context.Context, id uint64) types.BitBadge {

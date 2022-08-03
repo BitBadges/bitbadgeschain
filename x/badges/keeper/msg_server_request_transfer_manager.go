@@ -18,14 +18,21 @@ func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgR
 	}
 
 	//Redundant because this is locked so we shouldn't store anything
-	permissions := types.GetPermissions(badge.PermissionFlags)
-	if !permissions.CanManagerTransfer() {
-		return nil, ErrInvalidPermissions
+	if msg.Add {
+		permissions := types.GetPermissions(badge.PermissionFlags)
+		if !permissions.CanManagerTransfer() {
+			return nil, ErrInvalidPermissions
+		}
+	
+		if err := k.CreateTransferManagerRequest(ctx, msg.BadgeId, CreatorAccountNum); err != nil {
+			return nil, err
+		}
+	} else {
+		if err := k.RemoveTransferManagerRequest(ctx, msg.BadgeId, CreatorAccountNum); err != nil {
+			return nil, err
+		}
 	}
-
-	if err := k.CreateTransferManagerRequest(ctx, msg.BadgeId, CreatorAccountNum); err != nil {
-		return nil, err
-	}
+	
 
 	return &types.MsgRequestTransferManagerResponse{}, nil
 }

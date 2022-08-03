@@ -141,6 +141,7 @@ message MsgTransferManagerResponse {
 message MsgRequestTransferManager {
   string creator = 1;
   uint64 badgeId = 2;
+  bool add = 3;
 }
 
 message MsgRequestTransferManagerResponse {

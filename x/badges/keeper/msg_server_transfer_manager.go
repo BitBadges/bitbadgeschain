@@ -40,6 +40,10 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 
 	badge.Manager = msg.Address
 
+	if err := k.RemoveTransferManagerRequest(ctx, msg.BadgeId, msg.Address); err != nil {
+		return nil, err
+	}
+
 	if err := k.UpdateBadgeInStore(ctx, badge); err != nil {
 		return nil, err
 	}

@@ -20,9 +20,9 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 		Manager:              CreatorAccountNum,
 		PermissionFlags:      msg.Permissions,
 		SubassetUriFormat:    msg.SubassetUris,
-		SubassetsTotalSupply: []*types.Subasset{},
-		NextSubassetId:       0,
-		FreezeAddresses:      []uint64{},
+		// SubassetsTotalSupply: []*types.Subasset{},
+		// NextSubassetId:       0,
+		// FreezeAddresses:      []uint64{},
 	}
 
 	if err := k.SetBadgeInStore(ctx, badge); err != nil {

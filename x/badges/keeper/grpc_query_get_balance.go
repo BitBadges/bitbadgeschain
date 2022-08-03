@@ -43,11 +43,6 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 	}
 
 	return &types.QueryGetBalanceResponse{
-		BalanceInfo: &types.BadgeBalanceInfo{
-			Balance:      0,
-			PendingNonce: 0,
-			Pending:      []*types.PendingTransfer{},
-			Approvals:    []*types.Approval{},
-		},
+		BalanceInfo: &types.BadgeBalanceInfo{},
 	}, nil
 }

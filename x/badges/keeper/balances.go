@@ -8,13 +8,7 @@ import (
 )
 
 func GetEmptyBadgeBalanceTemplate() types.BadgeBalanceInfo {
-	badgeBalanceInfo := types.BadgeBalanceInfo{
-		Balance:      0,
-		PendingNonce: 0,
-		Pending:      []*types.PendingTransfer{},
-		Approvals:    []*types.Approval{},
-	}
-	return badgeBalanceInfo
+	return types.BadgeBalanceInfo{}
 }
 
 //Don't think it'll ever reach an overflow but this is here just in case
@@ -185,7 +179,13 @@ func (k Keeper) RemovePending(ctx sdk.Context, balance_key string, this_nonce ui
 			return ErrPendingNotFound
 		}
 
-		badgeBalanceInfo.Pending = new_pending
+		if len(new_pending) == 0 {
+			badgeBalanceInfo.Pending = nil
+			badgeBalanceInfo.PendingNonce = 0
+		} else {
+			badgeBalanceInfo.Pending = new_pending
+		}
+
 		err := k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
 		if err != nil {
 			return err
@@ -208,10 +208,14 @@ func (k Keeper) SetApproval(ctx sdk.Context, balance_key string, amount uint64, 
 			}
 		}
 
-		new_approvals = append(new_approvals, &types.Approval{
-			Amount:     amount,
-			AddressNum: address_num,
-		})
+		//Remove completely if setting to zero
+		if amount != 0 {
+			new_approvals = append(new_approvals, &types.Approval{
+				Amount:     amount,
+				AddressNum: address_num,
+			})
+		}
+		
 
 		badgeBalanceInfo.Approvals = new_approvals
 		err := k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
@@ -249,6 +253,7 @@ func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, balance_key string, a
 						AddressNum: address_num,
 					})
 				}
+
 				removed = true
 			} else {
 				new_approvals = append(new_approvals, approval)
@@ -259,7 +264,12 @@ func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, balance_key string, a
 			return ErrInsufficientApproval
 		}
 
-		badgeBalanceInfo.Approvals = new_approvals
+		if len(new_approvals) == 0 {
+			badgeBalanceInfo.Approvals = nil
+		} else {
+			badgeBalanceInfo.Approvals = new_approvals
+		}
+		
 		err := k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
 		if err != nil {
 			return err
