@@ -7,6 +7,7 @@ const (
 /*
 	Flag bits are in the following order from left to right; leading zeroes are applied and any future additions will be appended to the right
 
+	can_manager_transfer: can the manager transfer the managerial ownership of the badge to another account
 	can_update_uris: can the manager update the uris of the class and subassets; if false, locked forever
 	forceful_transfers: if true, one can send a badge to an account without pending approval; these badges should not by default be displayed on public profiles (can also use collections)
 	can_create: when true, manager can create more subassets of the class; once set to false, it is locked

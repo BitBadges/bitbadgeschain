@@ -14,7 +14,8 @@ message BitBadge {
     // uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc)
     string uri = 2;
 
-    //TODO: add back metadata hash
+    // this is permanent and never changable; use this for asserting the permanence of the metadata
+    string metadata_hash = 3;
     
     // manager address of the class; can have special permissions; is used as the reserve address for the assets
     uint64 manager = 4;
@@ -49,8 +50,6 @@ message BitBadge {
 
     //only store if not 1 (default); will be sorted in order of subsasset ids; (maybe add defaut option in future)
     repeated Subasset subassets_total_supply = 13;
-    
-    //TODO: maybe do something to more efficiently query owners of a badge?
 }
 
 //Only will be created if supply >= 0

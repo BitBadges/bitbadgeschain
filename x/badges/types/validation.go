@@ -17,6 +17,10 @@ var (
 	// URI must be a valid URI. Method <= 35 characters long. Path <= 1000 characters long.
 	reUriString = `\w{0,35}:(\/?\/?)[^\s]{0,1000}`
 	reUri       = regexp.MustCompile(fmt.Sprintf(`^%s$`, reUriString))
+	
+	// Metadata hash must be <= 32 characters long.
+	reMetadataString = `(\/?\/?)[^\s]{0,32}`
+	reMetadata       = regexp.MustCompile(fmt.Sprintf(`^%s$`, reMetadataString))
 )
 
 // ValidateURI returns whether the uri is valid
@@ -31,6 +35,13 @@ func ValidateAddress(address string) error {
 	_, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s)", err)
+	}
+	return nil
+}
+
+func ValidateMetadata(hash string) error {
+	if !reMetadata.MatchString(hash) {
+		return sdkerrors.Wrapf(ErrInvalidBadgeHash, "invalid metadata hash: %s", hash)
 	}
 	return nil
 }

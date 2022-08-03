@@ -22,4 +22,5 @@ var (
 	ErrInvalidSupplyAndAmounts           = sdkerrors.Register(ModuleName, 1510, "invalid supply and amounts")
 	ErrAmountEqualsZero                  = sdkerrors.Register(ModuleName, 1511, "amount to create equals zero")
 	ErrInvalidAmountsAndAddressesLength  = sdkerrors.Register(ModuleName, 1512, "invalid amounts and addresses length")
+	ErrInvalidBadgeHash				  	 = sdkerrors.Register(ModuleName, 1513, "invalid badge hash")
 )

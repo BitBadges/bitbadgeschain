@@ -9,12 +9,13 @@ const TypeMsgNewBadge = "new_badge"
 
 var _ sdk.Msg = &MsgNewBadge{}
 
-func NewMsgNewBadge(creator string, uri string, permissions uint64, subassetUris string) *MsgNewBadge {
+func NewMsgNewBadge(creator string, uri string, permissions uint64, subassetUris string, metadataHash string) *MsgNewBadge {
 	return &MsgNewBadge{
 		Creator:      creator,
 		Uri:          uri,
 		Permissions:  permissions,
 		SubassetUris: subassetUris,
+		MetadataHash: metadataHash,
 	}
 }
 
@@ -55,6 +56,10 @@ func (msg *MsgNewBadge) ValidateBasic() error {
 	}
 
 	if err := ValidatePermissions(msg.Permissions); err != nil {
+		return err
+	}
+
+	if err := ValidateMetadata(msg.MetadataHash); err != nil {
 		return err
 	}
 

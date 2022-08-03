@@ -14,12 +14,13 @@ var _ = strconv.Itoa(0)
 
 func CmdNewBadge() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "new-badge [uri] [permissions] [subasset-uris]",
+		Use:   "new-badge [uri] [permissions] [subasset-uris] [metadata-hash]",
 		Short: "Broadcast message newBadge",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argUri := args[0]
 			argSubassetUris := args[2]
+			argMetadataHash := args[3]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -36,6 +37,7 @@ func CmdNewBadge() *cobra.Command {
 				argUri,
 				permissions,
 				argSubassetUris,
+				argMetadataHash,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

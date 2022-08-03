@@ -22,10 +22,10 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 	}
 
 	found := false
-	new_addresses := []uint64{}
+	
 
-	//TODO: binary search (they are sorted)
 	for _, targetAddress := range msg.Addresses {
+		new_addresses := []uint64{}
 		for _, address := range badge.FreezeAddresses {
 			if address == targetAddress {
 				found = true

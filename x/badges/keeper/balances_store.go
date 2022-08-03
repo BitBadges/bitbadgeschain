@@ -32,7 +32,7 @@ func (k Keeper) UpdateBadgeBalanceInStore(ctx sdk.Context, balance_id string, ba
 	}
 	store := ctx.KVStore(k.storeKey)
 
-	if badgeBalanceInfo.Balance == 0 && len(badgeBalanceInfo.Pending) == 0 && len(badgeBalanceInfo.Approvals) == 0 {
+	if badgeBalanceInfo.UserFlags == 0 && badgeBalanceInfo.Balance == 0 && len(badgeBalanceInfo.Pending) == 0 && len(badgeBalanceInfo.Approvals) == 0 {
 		store.Delete(badgeBalanceStoreKey(balance_id))
 	} else {
 		store.Set(badgeBalanceStoreKey(balance_id), marshaled_badge_balance_info)

@@ -36,8 +36,18 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 	// Handle the transfer forcefully (no pending) if forceful transfers is set or "burning" (sending to manager address)
 	// Else, handle it by adding a pending transfer
 
-	// TODO: Think about adding forceful transfers when sending to reserved addresses such as NULL address
-	if Permissions.ForcefulTransfers() || Badge.Manager == msg.To {
+	// TODO: support forceful transfers when sending to reserved address numbers such as ETH NULL address
+	var reservedAddress = []uint64{ }
+	sendingToReservedAddress := false
+	for _, address := range reservedAddress {
+		if address == msg.To {
+			sendingToReservedAddress = true
+			break
+		}
+	}
+
+	
+	if sendingToReservedAddress || Permissions.ForcefulTransfers() || Badge.Manager == msg.To {
 		err := k.AddToBadgeBalance(ctx, ToBalanceKey, msg.Amount)
 		if err != nil {
 			return nil, err
