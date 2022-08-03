@@ -18,22 +18,32 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 	}
 
 	/* 
-		These are the cases we have to handle:
-		1. Creator wants to cancel an outgoing transfer they sent where they are the ApprovedBy 
-		2. Creator wants to cancel an outgoing transfer they sent where they are not the ApprovedBy
-		3. Creator wants to accept an outgoing transfer they sent where they are the ApprovedBy (can't accept own transfer)
-		4. Creator wants to accept an outgoing transfer they sent where they are not the Approved By (can't accept own transfer)
-		
-		5. Creator wants to cancel an incoming transfer (transfer request) they sent 
-		6. Creator wants to accept an incoming transfer (transfer request) they sent (can't accept own transfer)
+		Outgoing : Creator -> OtherParty
+		Incoming : OtherParty -> CreatorAccountNum
 
-		7. Creator wants to reject an outgoing transfer (transfer request) they received
-		8. Creator wants to accept an outgoing transfer (transfer request) they received
+		Sent vs Received: Who originally sent the pending transfer
+		ApprovedBy: Who approved the sending of pending transfer
+
+		"Requests for transfer" (5-8) currently always sent by that address (i.e. no ApprovedBy).
+
+		Outcomes (all successful outcomes result in both pending transfers being removed from balanceInfo.Pending):
+		Revert - Revert the balance and approval to the original values
+		Accept Forcefully - Transfer the badge forcefully if permissions allow (i.e. no pending or else we will have an infinite loop of pending transfers)
+		Simple Accept - Balance and approval already in escrow. Just need to simply add the new balance to the recipient.
+		Nothing Additional - Besides removing from pending, nothing additional happens.
+
+		These are the cases we have to handle:
+		1. Creator wants to cancel an outgoing transfer they sent -> Revert
+		2. Creator wants to accept an outgoing transfer they sent -> Error (can't accept a transfer you sent)
+		
+		3. Creator wants to cancel a request for transfer they sent -> Nothing Additional
+		4. Creator wants to accept a request for transfer they sent -> Error (can't accept own request)
+
+		5. Creator wants to reject a request for transfer they received -> Nothing Additional
+		6. Creator wants to accept a request for transfer they received -> Accept Forcefully
         
-		9. Creator wants to reject an incoming transfer they received where From == ApprovedBy
-		10. Creator wants to reject an incoming transfer they received where From != ApprovedBy
-		11. Creator wants to accept an incoming transfer they received where From == ApprovedBy
-		12. Creator wants to accept an incoming transfer they received where From != ApprovedBy
+		7. Creator wants to reject an incoming transfer they received -> Revert
+		8. Creator wants to accept an incoming transfer they received -> Simple Accept
 	*/
 
 	CreatorBalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId, msg.SubbadgeId)
@@ -46,13 +56,24 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 	for _, CurrPendingTransfer := range BadgeBalanceInfo.Pending {
 		if CurrPendingTransfer.ThisPendingNonce == msg.ThisNonce {
 			if CurrPendingTransfer.SendRequest && msg.Accept {
-				return nil, ErrCantAcceptOwnTransferRequest //Handle cases 3, 4, 6
+				return nil, ErrCantAcceptOwnTransferRequest //Handle cases 2, 4
 			}
-			sentAndWantToCancel := CurrPendingTransfer.SendRequest && !msg.Accept //Cases 1, 2, 5
-			receivedAndWantToAccept := !CurrPendingTransfer.SendRequest && msg.Accept // Cases 8, 11, 12
-			receivedAndWantToReject := !CurrPendingTransfer.SendRequest && !msg.Accept //Cases 7, 9, 10
+
+			sentAndWantToCancel := CurrPendingTransfer.SendRequest && !msg.Accept //Cases 1, 3
+			receivedAndWantToAccept := !CurrPendingTransfer.SendRequest && msg.Accept // Cases 6, 8
+			receivedAndWantToReject := !CurrPendingTransfer.SendRequest && !msg.Accept //Cases 5, 7
 			outgoingTransfer := CurrPendingTransfer.From == CreatorAccountNum
-			
+			balancesAreInEscrow := CurrPendingTransfer.SendRequest == outgoingTransfer
+
+			// Cases 1, 7: Existing transfer was sent, is pending, but needs to be reversed
+			needToRevertBalances := balancesAreInEscrow && ((sentAndWantToCancel && outgoingTransfer) || (receivedAndWantToReject && !outgoingTransfer))
+			// Case 6: Accept a transfer / mint request from another party. Must go through all pre transfer checks. Forceful transfer (no pending)
+			fullForcefulTransfer := receivedAndWantToAccept && outgoingTransfer
+			// Case 8: Accepting an incoming transfer. Balances and approvals already in escrow.
+			simpleAddToRecipientBalance := receivedAndWantToAccept && !outgoingTransfer
+			// Cases 3 and 5: All we need to do is remove pending requests
+			// Cases 2 and 4 already handled
+
 			//Get basic info
 			OtherPartyAccountNum := CurrPendingTransfer.From
 			if outgoingTransfer {
@@ -61,7 +82,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 			OtherPartyBalanceKey := GetBalanceKey(OtherPartyAccountNum, msg.BadgeId, msg.SubbadgeId)
 			OtherPartyNonce := CurrPendingTransfer.OtherPendingNonce
 
-			//We already handled cases 3, 4, 6, so all will end up with removing from both parties' pending requests whether accepting or rejecting
+			//We already handled cases 2, 4, where we try and accept own request so all will end up with removing from both parties' pending requests whether accepting or rejecting
 			if err := k.RemovePending(ctx, CreatorBalanceKey, msg.ThisNonce, OtherPartyNonce); err != nil {
 				return nil, err
 			}
@@ -69,64 +90,42 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 				return nil, err
 			}
 
-			if sentAndWantToCancel {
-				if outgoingTransfer {
-					// Cases 1, 2: We need to revert balances since they are in escrow
-					if err := k.AddToBadgeBalance(ctx, CreatorBalanceKey, CurrPendingTransfer.Amount); err != nil {
+			if needToRevertBalances {
+				// Depending on if it is outgoing or not determines which party's balances to revert and add approvals back to
+				FromKey := CreatorBalanceKey
+				if !outgoingTransfer {
+					FromKey = OtherPartyBalanceKey
+				}
+
+				if err := k.AddToBadgeBalance(ctx, FromKey, CurrPendingTransfer.Amount); err != nil {
+					return nil, err
+				}
+
+				//If it was sent via an approval, we need to add the approval back
+				if CurrPendingTransfer.ApprovedBy != CurrPendingTransfer.From {
+					if err = k.AddBalanceToApproval(ctx, FromKey, CurrPendingTransfer.Amount, CurrPendingTransfer.ApprovedBy); err != nil {
 						return nil, err
 					}
-
-					//If it was sent via an approval, we need to add the approval back
-					if CurrPendingTransfer.ApprovedBy != CurrPendingTransfer.From {
-						if err = k.AddBalanceToApproval(ctx, CreatorBalanceKey, CurrPendingTransfer.Amount, CurrPendingTransfer.ApprovedBy); err != nil {
-							return nil, err
-						}
-					}
-				} else {
-					// Case 5: Everything is already handled. We just remove from pending
 				}
-			} else {
-				if receivedAndWantToAccept {
-					if outgoingTransfer {
-						//Case 8: Accepting a transfer request we received. Forcefully send the funds to the other party
-						err = k.HandlePreTransfer(ctx, badge, msg.BadgeId, msg.SubbadgeId, CurrPendingTransfer.From, CurrPendingTransfer.To, CreatorAccountNum, CurrPendingTransfer.Amount)
-						if err != nil {
-							return nil, err
-						}
+			} else if fullForcefulTransfer {
+				err = k.HandlePreTransfer(ctx, badge, msg.BadgeId, msg.SubbadgeId, CurrPendingTransfer.From, CurrPendingTransfer.To, CreatorAccountNum, CurrPendingTransfer.Amount)
+				if err != nil {
+					return nil, err
+				}
 
-						if err := k.RemoveFromBadgeBalance(ctx, CreatorBalanceKey, CurrPendingTransfer.Amount); err != nil {
-							return nil, err
-						}
+				if err := k.RemoveFromBadgeBalance(ctx, CreatorBalanceKey, CurrPendingTransfer.Amount); err != nil {
+					return nil, err
+				}
 
-						// We already removed from "From" balance so all we have to do now is add to "To" balance
-						if err := k.AddToBadgeBalance(ctx, OtherPartyBalanceKey, CurrPendingTransfer.Amount); err != nil {
-							return nil, err
-						}
-					} else {
-						// Case 11, 12: Accepting an incoming transfer; Balances and approvals already taken care of 
-						// We already removed from "From" balance so all we have to do now is add to "To" balance
-						if err := k.AddToBadgeBalance(ctx, CreatorBalanceKey, CurrPendingTransfer.Amount); err != nil {
-							return nil, err
-						}
-					}
-				} else if receivedAndWantToReject {
-					if outgoingTransfer {
-						// Case 7: Reject a transfer request we received. Nothing needs to be done besides remove from pending which we already did
-					} else {
-						// Case 9, 10: Reject an incoming transfer we received. We need to revert balances since they are in escrow
-						if err := k.AddToBadgeBalance(ctx, OtherPartyBalanceKey, CurrPendingTransfer.Amount); err != nil {
-							return nil, err
-						}
-
-						//If it was sent via an approval, we need to add the approval back
-						if CurrPendingTransfer.ApprovedBy != CurrPendingTransfer.From {
-							if err = k.AddBalanceToApproval(ctx, OtherPartyBalanceKey, CurrPendingTransfer.Amount, CurrPendingTransfer.ApprovedBy); err != nil {
-								return nil, err
-							}
-						}
-					}
+				if err := k.AddToBadgeBalance(ctx, OtherPartyBalanceKey, CurrPendingTransfer.Amount); err != nil {
+					return nil, err
+				}
+			} else if simpleAddToRecipientBalance {
+				if err := k.AddToBadgeBalance(ctx, CreatorBalanceKey, CurrPendingTransfer.Amount); err != nil {
+					return nil, err
 				}
 			}
+
 			return &types.MsgHandlePendingTransferResponse{}, nil
 		}
 	}
