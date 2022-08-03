@@ -30398,6 +30398,11 @@ paths:
                     title: >-
                       uri for the class metadata stored off chain. must match a
                       valid metadata standard (bitbadge, collection, etc)
+                  metadata_hash:
+                    type: string
+                    title: >-
+                      this is permanent and never changable; use this for
+                      asserting the permanence of the metadata
                   manager:
                     type: string
                     format: uint64
@@ -30739,6 +30744,9 @@ paths:
                         amount:
                           type: string
                           format: uint64
+                  user_flags:
+                    type: string
+                    format: uint64
                 title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
         default:
           description: An unexpected error response.
@@ -52713,6 +52721,9 @@ definitions:
             amount:
               type: string
               format: uint64
+      user_flags:
+        type: string
+        format: uint64
     title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
   trevormil.bitbadgeschain.badges.BitBadge:
     type: object
@@ -52730,6 +52741,11 @@ definitions:
         title: >-
           uri for the class metadata stored off chain. must match a valid
           metadata standard (bitbadge, collection, etc)
+      metadata_hash:
+        type: string
+        title: >-
+          this is permanent and never changable; use this for asserting the
+          permanence of the metadata
       manager:
         type: string
         format: uint64
@@ -52895,6 +52911,11 @@ definitions:
             title: >-
               uri for the class metadata stored off chain. must match a valid
               metadata standard (bitbadge, collection, etc)
+          metadata_hash:
+            type: string
+            title: >-
+              this is permanent and never changable; use this for asserting the
+              permanence of the metadata
           manager:
             type: string
             format: uint64
@@ -53029,6 +53050,9 @@ definitions:
                 amount:
                   type: string
                   format: uint64
+          user_flags:
+            type: string
+            format: uint64
         title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
   trevormil.bitbadgeschain.badges.QueryParamsResponse:
     type: object

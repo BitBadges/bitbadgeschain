@@ -6,24 +6,30 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
+
+	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgSetApproval_ValidateBasic(t *testing.T) {
+func TestMsgUpdateUris_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgSetApproval
+		msg  types.MsgUpdateUris
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgSetApproval{
-				Creator: "invalid_address",
+			msg: types.MsgUpdateUris{
+				Creator:     "invalid_address",
+				Uri:         "https://example.com",
+				SubassetUri: "https://example.com",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgSetApproval{
-				Creator: sample.AccAddress(),
+			msg: types.MsgUpdateUris{
+				Creator:     sample.AccAddress(),
+				Uri:         "https://example.com",
+				SubassetUri: "https://example.com",
 			},
 		},
 	}

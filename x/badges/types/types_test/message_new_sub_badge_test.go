@@ -6,17 +6,19 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
+
+	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 func TestMsgNewSubBadge_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgNewSubBadge
+		msg  types.MsgNewSubBadge
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgNewSubBadge{
+			msg: types.MsgNewSubBadge{
 				Creator:         "invalid_address",
 				Supplys:         []uint64{10},
 				AmountsToCreate: []uint64{1},
@@ -24,35 +26,35 @@ func TestMsgNewSubBadge_ValidateBasic(t *testing.T) {
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid state",
-			msg: MsgNewSubBadge{
+			msg: types.MsgNewSubBadge{
 				Creator:         sample.AccAddress(),
 				Supplys:         []uint64{10},
 				AmountsToCreate: []uint64{1},
 			},
 		}, {
 			name: "invalid supply",
-			msg: MsgNewSubBadge{
+			msg: types.MsgNewSubBadge{
 				Creator:         sample.AccAddress(),
 				Supplys:         []uint64{0},
 				AmountsToCreate: []uint64{1},
 			},
-			err: ErrSupplyEqualsZero,
+			err: types.ErrSupplyEqualsZero,
 		}, {
 			name: "invalid amount",
-			msg: MsgNewSubBadge{
+			msg: types.MsgNewSubBadge{
 				Creator:         sample.AccAddress(),
 				Supplys:         []uint64{10},
 				AmountsToCreate: []uint64{0},
 			},
-			err: ErrAmountEqualsZero,
+			err: types.ErrAmountEqualsZero,
 		}, {
 			name: "mismatching lengths",
-			msg: MsgNewSubBadge{
+			msg: types.MsgNewSubBadge{
 				Creator:         sample.AccAddress(),
 				Supplys:         []uint64{10, 2},
 				AmountsToCreate: []uint64{0},
 			},
-			err: ErrInvalidSupplyAndAmounts,
+			err: types.ErrInvalidSupplyAndAmounts,
 		},
 	}
 	for _, tt := range tests {

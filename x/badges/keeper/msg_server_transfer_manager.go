@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
@@ -11,6 +12,7 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
+	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 
 	if err := k.AssertAccountNumbersAreRegistered(ctx, []uint64{msg.Address}); err != nil {
 		return nil, ErrAccountsAreNotRegistered
@@ -31,6 +33,7 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 		return nil, ErrInvalidPermissions
 	}
 
+	ctx.GasMeter().ConsumeGas(TransferManagerCost, "transfer manager cost")
 	requested := k.HasAddressRequestedManagerTransfer(ctx, msg.BadgeId, msg.Address)
 	if !requested {
 		return nil, ErrAddressNeedsToOptInAndRequestManagerTransfer
@@ -47,6 +50,16 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 	if err := k.UpdateBadgeInStore(ctx, badge); err != nil {
 		return nil, err
 	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeyAction, "TransferManager"),
+			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
+			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
+			sdk.NewAttribute("NewManager", fmt.Sprint(msg.Address)),
+		),
+	)
 
 	return &types.MsgTransferManagerResponse{}, nil
 }

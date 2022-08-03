@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
@@ -13,6 +14,7 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
 
 	badge, found := k.GetBadgeFromStore(ctx, msg.Id)
+	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 
 	if !found {
 		return nil, ErrBadgeNotExists
@@ -26,13 +28,14 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	if !permissions.CanCreateSubbadges() {
 		return nil, ErrInvalidPermissions
 	}
-
+	originalSubassetId := badge.NextSubassetId
 	for i, supply := range msg.Supplys {
 		for j := uint64(0); j < msg.AmountsToCreate[i]; j++ {
 			//Once here, we should be safe to mint
 			//By default, we assume non fungible subbadge (i.e. supply == 1) so we don't store if supply == 1
 			subasset_id := badge.NextSubassetId
 			if supply != 1 {
+				ctx.GasMeter().ConsumeGas(SubbadgeWithSupplyNotEqualToOne, "create new subbadge cost")
 				hasLastEntry := false
 				if len(badge.SubassetsTotalSupply) > 0 {
 					hasLastEntry = true
@@ -70,6 +73,16 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	if err := k.UpdateBadgeInStore(ctx, badge); err != nil {
 		return nil, err
 	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeyAction, "CreatedSubBadges"),
+			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
+			sdk.NewAttribute("FirstCreatedID", fmt.Sprint(originalSubassetId)),
+			sdk.NewAttribute("LastCreatedID", fmt.Sprint(badge.NextSubassetId - 1)),
+		),
+	)
 
 	return &types.MsgNewSubBadgeResponse{
 		SubassetId: badge.NextSubassetId,

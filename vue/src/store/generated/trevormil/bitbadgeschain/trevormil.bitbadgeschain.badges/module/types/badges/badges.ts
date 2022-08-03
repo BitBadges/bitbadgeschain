@@ -13,6 +13,8 @@ export interface BitBadge {
   id: number;
   /** uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc) */
   uri: string;
+  /** this is permanent and never changable; use this for asserting the permanence of the metadata */
+  metadata_hash: string;
   /** manager address of the class; can have special permissions; is used as the reserve address for the assets */
   manager: number;
   /**
@@ -56,6 +58,7 @@ export interface Subasset {
 const baseBitBadge: object = {
   id: 0,
   uri: "",
+  metadata_hash: "",
   manager: 0,
   permission_flags: 0,
   freeze_addresses: 0,
@@ -70,6 +73,9 @@ export const BitBadge = {
     }
     if (message.uri !== "") {
       writer.uint32(18).string(message.uri);
+    }
+    if (message.metadata_hash !== "") {
+      writer.uint32(26).string(message.metadata_hash);
     }
     if (message.manager !== 0) {
       writer.uint32(32).uint64(message.manager);
@@ -108,6 +114,9 @@ export const BitBadge = {
           break;
         case 2:
           message.uri = reader.string();
+          break;
+        case 3:
+          message.metadata_hash = reader.string();
           break;
         case 4:
           message.manager = longToNumber(reader.uint64() as Long);
@@ -162,6 +171,11 @@ export const BitBadge = {
     } else {
       message.uri = "";
     }
+    if (object.metadata_hash !== undefined && object.metadata_hash !== null) {
+      message.metadata_hash = String(object.metadata_hash);
+    } else {
+      message.metadata_hash = "";
+    }
     if (object.manager !== undefined && object.manager !== null) {
       message.manager = Number(object.manager);
     } else {
@@ -214,6 +228,8 @@ export const BitBadge = {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
     message.uri !== undefined && (obj.uri = message.uri);
+    message.metadata_hash !== undefined &&
+      (obj.metadata_hash = message.metadata_hash);
     message.manager !== undefined && (obj.manager = message.manager);
     message.permission_flags !== undefined &&
       (obj.permission_flags = message.permission_flags);
@@ -249,6 +265,11 @@ export const BitBadge = {
       message.uri = object.uri;
     } else {
       message.uri = "";
+    }
+    if (object.metadata_hash !== undefined && object.metadata_hash !== null) {
+      message.metadata_hash = object.metadata_hash;
+    } else {
+      message.metadata_hash = "";
     }
     if (object.manager !== undefined && object.manager !== null) {
       message.manager = object.manager;

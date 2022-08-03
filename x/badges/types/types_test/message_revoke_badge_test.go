@@ -6,23 +6,25 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
+
+	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 func TestMsgRevokeBadge_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgRevokeBadge
+		msg  types.MsgRevokeBadge
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgRevokeBadge{
+			msg: types.MsgRevokeBadge{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgRevokeBadge{
+			msg: types.MsgRevokeBadge{
 				Creator: sample.AccAddress(),
 			},
 		},

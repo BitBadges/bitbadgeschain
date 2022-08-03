@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
@@ -14,6 +15,8 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 	CreatorAccountNum, Badge, Permissions, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
 		ctx, msg.Creator, []uint64{msg.To, msg.From}, msg.BadgeId, msg.SubbadgeId, false,
 	)
+	
+	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 	if err != nil {
 		return nil, err
 	}
@@ -46,18 +49,34 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 		}
 	}
 
-	
+	forceful := false
 	if sendingToReservedAddress || Permissions.ForcefulTransfers() || Badge.Manager == msg.To {
 		err := k.AddToBadgeBalance(ctx, ToBalanceKey, msg.Amount)
 		if err != nil {
 			return nil, err
 		}
+
+		forceful = true
 	} else {
 		err = k.AddToBothPendingBadgeBalances(ctx, msg.BadgeId, msg.SubbadgeId, msg.To, msg.From, msg.Amount, CreatorAccountNum, true)
 		if err != nil {
 			return nil, err
 		}
 	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeyAction, "TransferBadge"),
+			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
+			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
+			sdk.NewAttribute("SubbadgeId", fmt.Sprint(msg.SubbadgeId)),
+			sdk.NewAttribute("Amount", fmt.Sprint(msg.Amount)),
+			sdk.NewAttribute("From", fmt.Sprint(msg.From)),
+			sdk.NewAttribute("To", fmt.Sprint(msg.To)),
+			sdk.NewAttribute("Forceful", fmt.Sprint(forceful)),
+		),
+	)
 
 	return &types.MsgTransferBadgeResponse{}, nil
 }

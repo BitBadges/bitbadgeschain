@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
@@ -13,6 +14,8 @@ func (k msgServer) SelfDestructBadge(goCtx context.Context, msg *types.MsgSelfDe
 	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
 
 	badge, found := k.GetBadgeFromStore(ctx, msg.BadgeId)
+	
+	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 	if !found {
 		return nil, ErrBadgeNotExists
 	}
@@ -22,7 +25,7 @@ func (k msgServer) SelfDestructBadge(goCtx context.Context, msg *types.MsgSelfDe
 	}
 
 	nextSubassetId := badge.NextSubassetId
-
+	
 	for i := uint64(0); i < nextSubassetId; i++ {
 		ManagerBalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId, i)
 		SubassetSupply := uint64(1) //Default if not found
@@ -40,6 +43,15 @@ func (k msgServer) SelfDestructBadge(goCtx context.Context, msg *types.MsgSelfDe
 	}
 
 	k.DeleteBadgeFromStore(ctx, msg.BadgeId)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeyAction, "SelfDestructBadge"),
+			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
+			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
+		),
+	)
 
 	return &types.MsgSelfDestructBadgeResponse{}, nil
 }

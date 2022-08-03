@@ -25,12 +25,16 @@ export interface BadgesBadgeBalanceInfo {
   pending_nonce?: string;
   pending?: BadgesPendingTransfer[];
   approvals?: BadgesApproval[];
+
+  /** @format uint64 */
+  user_flags?: string;
 }
 
 export interface BadgesBitBadge {
   /** @format uint64 */
   id?: string;
   uri?: string;
+  metadata_hash?: string;
 
   /** @format uint64 */
   manager?: string;

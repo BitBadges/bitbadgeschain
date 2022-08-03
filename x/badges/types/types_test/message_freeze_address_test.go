@@ -1,4 +1,4 @@
-package types
+package types_test
 
 import (
 	"testing"
@@ -6,23 +6,24 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
+	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgRequestTransferBadge_ValidateBasic(t *testing.T) {
+func TestMsgFreezeAddress_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgRequestTransferBadge
+		msg  types.MsgFreezeAddress
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgRequestTransferBadge{
+			msg: types.MsgFreezeAddress{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgRequestTransferBadge{
+			msg: types.MsgFreezeAddress{
 				Creator: sample.AccAddress(),
 			},
 		},

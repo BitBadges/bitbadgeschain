@@ -10,8 +10,9 @@ export interface BadgeBalanceInfo {
   pending_nonce: number;
   /** IDs will be sorted in order of pending_nonce */
   pending: PendingTransfer[];
-  /** TODO: add an approve all number in there */
   approvals: Approval[];
+  /** TODO: for (hidden on profile, pinned, etc) */
+  user_flags: number;
 }
 
 export interface Approval {
@@ -31,7 +32,11 @@ export interface PendingTransfer {
   approved_by: number;
 }
 
-const baseBadgeBalanceInfo: object = { balance: 0, pending_nonce: 0 };
+const baseBadgeBalanceInfo: object = {
+  balance: 0,
+  pending_nonce: 0,
+  user_flags: 0,
+};
 
 export const BadgeBalanceInfo = {
   encode(message: BadgeBalanceInfo, writer: Writer = Writer.create()): Writer {
@@ -46,6 +51,9 @@ export const BadgeBalanceInfo = {
     }
     for (const v of message.approvals) {
       Approval.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.user_flags !== 0) {
+      writer.uint32(40).uint64(message.user_flags);
     }
     return writer;
   },
@@ -70,6 +78,9 @@ export const BadgeBalanceInfo = {
           break;
         case 4:
           message.approvals.push(Approval.decode(reader, reader.uint32()));
+          break;
+        case 5:
+          message.user_flags = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -103,6 +114,11 @@ export const BadgeBalanceInfo = {
         message.approvals.push(Approval.fromJSON(e));
       }
     }
+    if (object.user_flags !== undefined && object.user_flags !== null) {
+      message.user_flags = Number(object.user_flags);
+    } else {
+      message.user_flags = 0;
+    }
     return message;
   },
 
@@ -125,6 +141,7 @@ export const BadgeBalanceInfo = {
     } else {
       obj.approvals = [];
     }
+    message.user_flags !== undefined && (obj.user_flags = message.user_flags);
     return obj;
   },
 
@@ -151,6 +168,11 @@ export const BadgeBalanceInfo = {
       for (const e of object.approvals) {
         message.approvals.push(Approval.fromPartial(e));
       }
+    }
+    if (object.user_flags !== undefined && object.user_flags !== null) {
+      message.user_flags = object.user_flags;
+    } else {
+      message.user_flags = 0;
     }
     return message;
   },

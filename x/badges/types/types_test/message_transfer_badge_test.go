@@ -6,29 +6,39 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
+	
+	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgUpdateUris_ValidateBasic(t *testing.T) {
+func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgUpdateUris
+		msg  types.MsgTransferBadge
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgUpdateUris{
-				Creator:     "invalid_address",
-				Uri:         "https://example.com",
-				SubassetUri: "https://example.com",
+			msg: types.MsgTransferBadge{
+				Creator: "invalid_address",
+				To:      0,
+				From:    1,
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
-			name: "valid address",
-			msg: MsgUpdateUris{
-				Creator:     sample.AccAddress(),
-				Uri:         "https://example.com",
-				SubassetUri: "https://example.com",
+			name: "valid state",
+			msg: types.MsgTransferBadge{
+				Creator: sample.AccAddress(),
+				To:      0,
+				From:    1,
 			},
+		}, {
+			name: "invalid addresses",
+			msg: types.MsgTransferBadge{
+				Creator: sample.AccAddress(),
+				To:      0,
+				From:    0,
+			},
+			err: types.ErrSenderAndReceiverSame,
 		},
 	}
 	for _, tt := range tests {

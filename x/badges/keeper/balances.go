@@ -27,6 +27,7 @@ func SafeSubtract(left uint64, right uint64) (uint64, error) {
 }
 
 func (k Keeper) AddToBadgeBalance(ctx sdk.Context, balance_key string, balance_to_add uint64) error {
+	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "simple add balance")
 	if balance_to_add == 0 {
 		return ErrBalanceIsZero
 	}
@@ -61,6 +62,7 @@ func (k Keeper) AddToBadgeBalance(ctx sdk.Context, balance_key string, balance_t
 }
 
 func (k Keeper) RemoveFromBadgeBalance(ctx sdk.Context, balance_key string, balance_to_remove uint64) error {
+	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "simple remove balance")
 	if balance_to_remove == 0 {
 		return ErrBalanceIsZero
 	}
@@ -89,6 +91,7 @@ func (k Keeper) RemoveFromBadgeBalance(ctx sdk.Context, balance_key string, bala
 }
 
 func (k Keeper) AddToBothPendingBadgeBalances(ctx sdk.Context, badgeId uint64, subbadgeId uint64, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool) error {
+	ctx.GasMeter().ConsumeGas(AddOrRemovePending * 2, "add to both pending balances")
 	if amount == 0 {
 		return ErrBalanceIsZero
 	}
@@ -160,6 +163,7 @@ func (k Keeper) AddToBothPendingBadgeBalances(ctx sdk.Context, badgeId uint64, s
 }
 
 func (k Keeper) RemovePending(ctx sdk.Context, balance_key string, this_nonce uint64, other_nonce uint64) error {
+	ctx.GasMeter().ConsumeGas(AddOrRemovePending, "remove from pending")
 	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, balance_key)
 	if !found {
 		return ErrBadgeBalanceNotExists
@@ -195,6 +199,7 @@ func (k Keeper) RemovePending(ctx sdk.Context, balance_key string, this_nonce ui
 }
 
 func (k Keeper) SetApproval(ctx sdk.Context, balance_key string, amount uint64, address_num uint64) error {
+	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "adjust approval")
 	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, balance_key)
 	if !found {
 		return ErrBadgeBalanceNotExists
@@ -226,6 +231,7 @@ func (k Keeper) SetApproval(ctx sdk.Context, balance_key string, amount uint64, 
 
 //Will return an error if isn't approved for amounts
 func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, balance_key string, amount_to_remove uint64, address_num uint64) error {
+	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "adjust approval")
 	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, balance_key)
 	if !found {
 		return ErrBadgeBalanceNotExists
@@ -278,6 +284,7 @@ func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, balance_key string, a
 }
 
 func (k Keeper) AddBalanceToApproval(ctx sdk.Context, balance_key string, amount_to_add uint64, address_num uint64) error {
+	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "adjust approval")
 	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, balance_key)
 	if !found {
 		return ErrBadgeBalanceNotExists

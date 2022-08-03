@@ -6,23 +6,25 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
+
+	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 func TestMsgHandlePendingTransfer_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgHandlePendingTransfer
+		msg  types.MsgHandlePendingTransfer
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgHandlePendingTransfer{
+			msg: types.MsgHandlePendingTransfer{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgHandlePendingTransfer{
+			msg: types.MsgHandlePendingTransfer{
 				Creator: sample.AccAddress(),
 			},
 		},

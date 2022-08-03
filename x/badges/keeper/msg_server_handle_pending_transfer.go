@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
@@ -13,6 +14,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 	CreatorAccountNum, badge, _, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
 		ctx, msg.Creator, []uint64{}, msg.BadgeId, msg.SubbadgeId, false,
 	)
+	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 	if err != nil {
 		return nil, err
 	}
@@ -84,13 +86,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 			OtherPartyBalanceKey := GetBalanceKey(OtherPartyAccountNum, msg.BadgeId, msg.SubbadgeId)
 			OtherPartyNonce := CurrPendingTransfer.OtherPendingNonce
 
-			//We already handled cases 2, 4, where we try and accept own request so all will end up with removing from both parties' pending requests whether accepting or rejecting
-			if err := k.RemovePending(ctx, CreatorBalanceKey, CurrPendingTransfer.ThisPendingNonce, OtherPartyNonce); err != nil {
-				return nil, err
-			}
-			if err = k.RemovePending(ctx, OtherPartyBalanceKey, OtherPartyNonce, CurrPendingTransfer.ThisPendingNonce); err != nil {
-				return nil, err
-			}
+			
 
 			if needToRevertBalances {
 				// Depending on if it is outgoing or not determines which party's balances to revert and add approvals back to
@@ -127,9 +123,30 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 					return nil, err
 				}
 			}
+
+			//We already handled cases 2, 4, where we try and accept own request so all will end up with removing from both parties' pending requests whether accepting or rejecting
+			if err := k.RemovePending(ctx, CreatorBalanceKey, CurrPendingTransfer.ThisPendingNonce, OtherPartyNonce); err != nil {
+				return nil, err
+			}
+			if err = k.RemovePending(ctx, OtherPartyBalanceKey, OtherPartyNonce, CurrPendingTransfer.ThisPendingNonce); err != nil {
+				return nil, err
+			}
 		}
 	}
 	if updated {
+		ctx.EventManager().EmitEvent(
+			sdk.NewEvent(sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+				sdk.NewAttribute(sdk.AttributeKeyAction, "HandledPendingTransfers"),
+				sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
+				sdk.NewAttribute("Accepted", fmt.Sprint(msg.Accept)),
+				sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
+				sdk.NewAttribute("SubbadgeId", fmt.Sprint(msg.SubbadgeId)),
+				sdk.NewAttribute("StartingNonce", fmt.Sprint(msg.StartingNonce)),
+				sdk.NewAttribute("EndingNonce", fmt.Sprint(msg.EndingNonce)),
+			),
+		)
+		
 		return &types.MsgHandlePendingTransferResponse{}, nil
 	} else {
 		return nil, ErrNoPendingTransferFound

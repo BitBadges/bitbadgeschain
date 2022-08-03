@@ -9,6 +9,7 @@ export interface MsgNewBadge {
   uri: string;
   subassetUris: string;
   permissions: number;
+  metadataHash: string;
 }
 
 export interface MsgNewBadgeResponse {
@@ -133,6 +134,7 @@ const baseMsgNewBadge: object = {
   uri: "",
   subassetUris: "",
   permissions: 0,
+  metadataHash: "",
 };
 
 export const MsgNewBadge = {
@@ -148,6 +150,9 @@ export const MsgNewBadge = {
     }
     if (message.permissions !== 0) {
       writer.uint32(32).uint64(message.permissions);
+    }
+    if (message.metadataHash !== "") {
+      writer.uint32(42).string(message.metadataHash);
     }
     return writer;
   },
@@ -170,6 +175,9 @@ export const MsgNewBadge = {
           break;
         case 4:
           message.permissions = longToNumber(reader.uint64() as Long);
+          break;
+        case 5:
+          message.metadataHash = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -201,6 +209,11 @@ export const MsgNewBadge = {
     } else {
       message.permissions = 0;
     }
+    if (object.metadataHash !== undefined && object.metadataHash !== null) {
+      message.metadataHash = String(object.metadataHash);
+    } else {
+      message.metadataHash = "";
+    }
     return message;
   },
 
@@ -212,6 +225,8 @@ export const MsgNewBadge = {
       (obj.subassetUris = message.subassetUris);
     message.permissions !== undefined &&
       (obj.permissions = message.permissions);
+    message.metadataHash !== undefined &&
+      (obj.metadataHash = message.metadataHash);
     return obj;
   },
 
@@ -236,6 +251,11 @@ export const MsgNewBadge = {
       message.permissions = object.permissions;
     } else {
       message.permissions = 0;
+    }
+    if (object.metadataHash !== undefined && object.metadataHash !== null) {
+      message.metadataHash = object.metadataHash;
+    } else {
+      message.metadataHash = "";
     }
     return message;
   },
