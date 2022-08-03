@@ -34,3 +34,9 @@ func GetDetailsFromBalanceKey(id string) BalanceKeyDetails {
 		subasset_id: subasset_id,
 	}
 }
+
+func GetManagerRequestKey(badgeId uint64, accountNumber uint64) string {
+	badge_id_str := strconv.FormatUint(badgeId, 10)
+	account_num_str := strconv.FormatUint(accountNumber, 10)
+	return badge_id_str + BalanceKeyDelimiter + account_num_str + BalanceKeyDelimiter
+}

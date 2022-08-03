@@ -52827,11 +52827,19 @@ definitions:
         format: uint64
   trevormil.bitbadgeschain.badges.MsgRequestTransferBadgeResponse:
     type: object
+  trevormil.bitbadgeschain.badges.MsgRequestTransferManagerResponse:
+    type: object
   trevormil.bitbadgeschain.badges.MsgRevokeBadgeResponse:
     type: object
   trevormil.bitbadgeschain.badges.MsgSetApprovalResponse:
     type: object
   trevormil.bitbadgeschain.badges.MsgTransferBadgeResponse:
+    type: object
+  trevormil.bitbadgeschain.badges.MsgTransferManagerResponse:
+    type: object
+  trevormil.bitbadgeschain.badges.MsgUpdatePermissionsResponse:
+    type: object
+  trevormil.bitbadgeschain.badges.MsgUpdateUrisResponse:
     type: object
   trevormil.bitbadgeschain.badges.Params:
     type: object

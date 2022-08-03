@@ -172,7 +172,7 @@ func (k Keeper) RemovePending(ctx sdk.Context, balance_key string, this_nonce ui
 	} else {
 		new_pending := []*types.PendingTransfer{}
 		found := false
-		// Can make this a binary search in the future as its sorted by nonces
+		// TODO: can make this a binary search in the future as its sorted by nonces
 		for _, pending_info := range badgeBalanceInfo.Pending {
 			if pending_info.ThisPendingNonce != this_nonce || pending_info.OtherPendingNonce != other_nonce {
 				new_pending = append(new_pending, pending_info)

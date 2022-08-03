@@ -12,7 +12,7 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum, _, _, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, []uint64{ msg.Address }, msg.BadgeId,	msg.SubbadgeId, false,
+		ctx, msg.Creator, []uint64{msg.Address}, msg.BadgeId, msg.SubbadgeId, false,
 	)
 	if err != nil {
 		return nil, err
@@ -22,7 +22,7 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 		return nil, ErrSenderAndReceiverSame // Can't approve yourself
 	}
 
-	BalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId, msg.SubbadgeId)	
+	BalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId, msg.SubbadgeId)
 
 	if err := k.Keeper.SetApproval(ctx, BalanceKey, msg.Amount, msg.Address); err != nil {
 		return nil, err

@@ -7,10 +7,10 @@ import (
 )
 
 var (
-	BadgeKey        = []byte{0x01}
-	BadgeBalanceKey = []byte{0x02}
-	NextAssetIDKey  = []byte{0x03}
-	// OwnerKey             = []byte{0x04}
+	BadgeKey           = []byte{0x01}
+	BadgeBalanceKey    = []byte{0x02}
+	NextAssetIDKey     = []byte{0x03}
+	TransferManagerKey = []byte{0x04}
 	// ClassTotalSupply     = []byte{0x05}
 
 	Delimiter   = []byte{0xDD}
@@ -34,6 +34,13 @@ func badgeBalanceStoreKey(balance_id string) []byte {
 	key := make([]byte, len(BadgeBalanceKey)+len(balance_id))
 	copy(key, BadgeBalanceKey)
 	copy(key[len(BadgeBalanceKey):], []byte(balance_id))
+	return key
+}
+
+func managerTransferRequestKey(id string) []byte {
+	key := make([]byte, len(TransferManagerKey)+len(id))
+	copy(key, TransferManagerKey)
+	copy(key[len(TransferManagerKey):], []byte(id))
 	return key
 }
 

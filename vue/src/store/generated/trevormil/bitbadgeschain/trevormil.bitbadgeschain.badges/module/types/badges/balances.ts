@@ -10,6 +10,7 @@ export interface BadgeBalanceInfo {
   pending_nonce: number;
   /** IDs will be sorted in order of pending_nonce */
   pending: PendingTransfer[];
+  /** TODO: add an approve all number in there */
   approvals: Approval[];
 }
 

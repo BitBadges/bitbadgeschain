@@ -11,7 +11,7 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum, _, permissions, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, []uint64{ msg.Address }, msg.BadgeId, msg.SubbadgeId, true,
+		ctx, msg.Creator, []uint64{msg.Address}, msg.BadgeId, msg.SubbadgeId, true,
 	)
 	if err != nil {
 		return nil, err

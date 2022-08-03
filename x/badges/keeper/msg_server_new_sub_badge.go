@@ -11,9 +11,9 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
-	
+
 	badge, found := k.GetBadgeFromStore(ctx, msg.Id)
-	
+
 	if !found {
 		return nil, ErrBadgeNotExists
 	}

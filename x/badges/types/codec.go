@@ -16,6 +16,10 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSetApproval{}, "badges/SetApproval", nil)
 	cdc.RegisterConcrete(&MsgRevokeBadge{}, "badges/RevokeBadge", nil)
 	cdc.RegisterConcrete(&MsgFreezeAddress{}, "badges/FreezeAddress", nil)
+	cdc.RegisterConcrete(&MsgUpdateUris{}, "badges/UpdateUris", nil)
+	cdc.RegisterConcrete(&MsgUpdatePermissions{}, "badges/UpdatePermissions", nil)
+	cdc.RegisterConcrete(&MsgTransferManager{}, "badges/TransferManager", nil)
+	cdc.RegisterConcrete(&MsgRequestTransferManager{}, "badges/RequestTransferManager", nil)
 	// this line is used by starport scaffolding # 2
 }
 
@@ -43,6 +47,18 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgFreezeAddress{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgUpdateUris{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgUpdatePermissions{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgTransferManager{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgRequestTransferManager{},
 	)
 	// this line is used by starport scaffolding # 3
 

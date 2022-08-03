@@ -13,6 +13,8 @@ message BitBadge {
   
     // uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc)
     string uri = 2;
+
+    //TODO: add back metadata hash
     
     // manager address of the class; can have special permissions; is used as the reserve address for the assets
     uint64 manager = 4;

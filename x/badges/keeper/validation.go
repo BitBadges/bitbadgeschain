@@ -5,7 +5,7 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func (k Keeper) UniversalValidateMsgAndReturnMsgInfo(ctx sdk.Context, MsgCreator string , AddressesToValidate []uint64, BadgeId uint64, SubbadgeId uint64, MustBeManager bool) (uint64, types.BitBadge, types.PermissionFlags, error) {
+func (k Keeper) UniversalValidateMsgAndReturnMsgInfo(ctx sdk.Context, MsgCreator string, AddressesToValidate []uint64, BadgeId uint64, SubbadgeId uint64, MustBeManager bool) (uint64, types.BitBadge, types.PermissionFlags, error) {
 	CreatorAccountNum := k.MustGetAccountNumberForBech32AddressString(ctx, MsgCreator)
 
 	if err := k.AssertAccountNumbersAreRegistered(ctx, AddressesToValidate); err != nil {
@@ -26,8 +26,7 @@ func (k Keeper) UniversalValidateMsgAndReturnMsgInfo(ctx sdk.Context, MsgCreator
 	return CreatorAccountNum, badge, permissions, nil
 }
 
-
-func (k Keeper) HandlePreTransfer(ctx sdk.Context, badge types.BitBadge, badgeId uint64, subbadgeId uint64, from uint64, to uint64, requester uint64, amount uint64) (error) {
+func (k Keeper) HandlePreTransfer(ctx sdk.Context, badge types.BitBadge, badgeId uint64, subbadgeId uint64, from uint64, to uint64, requester uint64, amount uint64) error {
 	permissions := types.GetPermissions(badge.PermissionFlags)
 	FromBalanceKey := GetBalanceKey(from, badgeId, subbadgeId)
 
@@ -70,4 +69,3 @@ func AccountNotFrozen(badge types.BitBadge, permissions types.PermissionFlags, a
 
 	return can_transfer
 }
-

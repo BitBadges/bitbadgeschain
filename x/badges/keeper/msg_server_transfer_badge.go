@@ -12,7 +12,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum, Badge, Permissions, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, []uint64{ msg.To, msg.From }, msg.BadgeId, msg.SubbadgeId, false,
+		ctx, msg.Creator, []uint64{msg.To, msg.From}, msg.BadgeId, msg.SubbadgeId, false,
 	)
 	if err != nil {
 		return nil, err
@@ -20,7 +20,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 
 	FromBalanceKey := GetBalanceKey(msg.From, msg.BadgeId, msg.SubbadgeId)
 	ToBalanceKey := GetBalanceKey(msg.To, msg.BadgeId, msg.SubbadgeId)
-	
+
 	// Checks and handles if this account can transfer or is approved to transfer
 	err = k.HandlePreTransfer(ctx, Badge, msg.BadgeId, msg.SubbadgeId, msg.From, msg.To, CreatorAccountNum, msg.Amount)
 	if err != nil {
@@ -36,7 +36,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 	// Handle the transfer forcefully (no pending) if forceful transfers is set or "burning" (sending to manager address)
 	// Else, handle it by adding a pending transfer
 
-	// TODO: Forceful transfers to reserved addresses, but manager may be able to restore them
+	// TODO: Think about adding forceful transfers when sending to reserved addresses such as NULL address
 	if Permissions.ForcefulTransfers() || Badge.Manager == msg.To {
 		err := k.AddToBadgeBalance(ctx, ToBalanceKey, msg.Amount)
 		if err != nil {

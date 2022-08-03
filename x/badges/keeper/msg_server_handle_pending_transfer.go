@@ -11,13 +11,13 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum, badge, _, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, []uint64{ }, msg.BadgeId, msg.SubbadgeId, false,
+		ctx, msg.Creator, []uint64{}, msg.BadgeId, msg.SubbadgeId, false,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	/* 
+	/*
 		Outgoing : Creator -> OtherParty
 		Incoming : OtherParty -> CreatorAccountNum
 
@@ -35,13 +35,13 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 		These are the cases we have to handle:
 		1. Creator wants to cancel an outgoing transfer they sent -> Revert
 		2. Creator wants to accept an outgoing transfer they sent -> Error (can't accept a transfer you sent)
-		
+
 		3. Creator wants to cancel a request for transfer they sent -> Nothing Additional
 		4. Creator wants to accept a request for transfer they sent -> Error (can't accept own request)
 
 		5. Creator wants to reject a request for transfer they received -> Nothing Additional
 		6. Creator wants to accept a request for transfer they received -> Accept Forcefully
-        
+
 		7. Creator wants to reject an incoming transfer they received -> Revert
 		8. Creator wants to accept an incoming transfer they received -> Simple Accept
 	*/
@@ -50,7 +50,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 	BadgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, CreatorBalanceKey)
 	if !found {
 		return nil, ErrBadgeBalanceNotExists
-	} 
+	}
 
 	//In the future, we can make this a binary search since this is all sorted by the nonces (append-only)
 	for _, CurrPendingTransfer := range BadgeBalanceInfo.Pending {
@@ -59,8 +59,8 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 				return nil, ErrCantAcceptOwnTransferRequest //Handle cases 2, 4
 			}
 
-			sentAndWantToCancel := CurrPendingTransfer.SendRequest && !msg.Accept //Cases 1, 3
-			receivedAndWantToAccept := !CurrPendingTransfer.SendRequest && msg.Accept // Cases 6, 8
+			sentAndWantToCancel := CurrPendingTransfer.SendRequest && !msg.Accept      //Cases 1, 3
+			receivedAndWantToAccept := !CurrPendingTransfer.SendRequest && msg.Accept  // Cases 6, 8
 			receivedAndWantToReject := !CurrPendingTransfer.SendRequest && !msg.Accept //Cases 5, 7
 			outgoingTransfer := CurrPendingTransfer.From == CreatorAccountNum
 			balancesAreInEscrow := CurrPendingTransfer.SendRequest == outgoingTransfer

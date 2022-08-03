@@ -11,18 +11,19 @@ import (
 func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddress) (*types.MsgFreezeAddressResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	_, badge, permissions, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, []uint64{ msg.Address }, msg.BadgeId,	msg.SubbadgeId, true,
+		ctx, msg.Creator, []uint64{msg.Address}, msg.BadgeId, msg.SubbadgeId, true,
 	)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	if !permissions.CanFreeze() {
 		return nil, ErrInvalidPermissions
 	}
 
 	found := false
 	new_addresses := []uint64{}
+	//TODO: binary search (they are sorted)
 	for _, address := range badge.FreezeAddresses {
 		if address == msg.Address {
 			found = true
@@ -40,7 +41,7 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 	} else {
 		return nil, ErrAddressNotFrozen
 	}
-	
+
 	//sort the addresses in order
 	sort.Slice(badge.FreezeAddresses, func(i, j int) bool { return badge.FreezeAddresses[i] < badge.FreezeAddresses[j] })
 

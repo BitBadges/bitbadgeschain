@@ -73,11 +73,19 @@ export interface BadgesMsgNewSubBadgeResponse {
 
 export type BadgesMsgRequestTransferBadgeResponse = object;
 
+export type BadgesMsgRequestTransferManagerResponse = object;
+
 export type BadgesMsgRevokeBadgeResponse = object;
 
 export type BadgesMsgSetApprovalResponse = object;
 
 export type BadgesMsgTransferBadgeResponse = object;
+
+export type BadgesMsgTransferManagerResponse = object;
+
+export type BadgesMsgUpdatePermissionsResponse = object;
+
+export type BadgesMsgUpdateUrisResponse = object;
 
 /**
  * Params defines the parameters for the module.

@@ -15,7 +15,7 @@ func NewMsgFreezeAddress(creator string, address uint64, badgeId uint64, subbadg
 		Address:    address,
 		BadgeId:    badgeId,
 		SubbadgeId: subbadgeId,
-		Add: 		add,
+		Add:        add,
 	}
 }
 

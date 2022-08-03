@@ -68,3 +68,28 @@ func (k Keeper) StoreHasBadgeID(ctx sdk.Context, badgeID uint64) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(badgeStoreKey(badgeID))
 }
+
+func (k Keeper) HasAddressRequestedManagerTransfer(ctx sdk.Context, badgeId uint64, address uint64) bool {
+	store := ctx.KVStore(k.storeKey)
+	key := GetManagerRequestKey(badgeId, address)
+	return store.Has(badgeBalanceStoreKey(key))
+}
+
+func (k Keeper) CreateTransferManagerRequest(ctx sdk.Context, badgeId uint64, address uint64) error {
+	request := []byte{1}
+	store := ctx.KVStore(k.storeKey)
+	key := GetManagerRequestKey(badgeId, address)
+	store.Set(badgeBalanceStoreKey(key), request)
+	return nil
+}
+
+func (k Keeper) RemoveTransferManagerRequest(ctx sdk.Context, badgeId uint64, address uint64) error {
+	key := GetManagerRequestKey(badgeId, address)
+	store := ctx.KVStore(k.storeKey)
+	// store.Set(badgeBalanceStoreKey(key), request)
+
+	if store.Has(badgeBalanceStoreKey(key)) {
+		store.Delete(badgeBalanceStoreKey(key))
+	}
+	return nil
+}

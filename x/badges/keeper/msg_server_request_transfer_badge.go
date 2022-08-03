@@ -10,7 +10,7 @@ import (
 func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgRequestTransferBadge) (*types.MsgRequestTransferBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	CreatorAccountNum, _, _, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, []uint64{ msg.From }, msg.BadgeId, msg.SubbadgeId, false,
+		ctx, msg.Creator, []uint64{msg.From}, msg.BadgeId, msg.SubbadgeId, false,
 	)
 	if err != nil {
 		return nil, err

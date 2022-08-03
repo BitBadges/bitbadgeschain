@@ -78,12 +78,45 @@ export interface MsgRevokeBadgeResponse {}
 
 export interface MsgFreezeAddress {
   creator: string;
-  address: string;
-  badgeId: string;
-  subbadgeId: string;
+  address: number;
+  badgeId: number;
+  subbadgeId: number;
+  add: boolean;
 }
 
 export interface MsgFreezeAddressResponse {}
+
+export interface MsgUpdateUris {
+  creator: string;
+  badgeId: number;
+  uri: string;
+  subassetUri: string;
+}
+
+export interface MsgUpdateUrisResponse {}
+
+export interface MsgUpdatePermissions {
+  creator: string;
+  badgeId: number;
+  permissions: number;
+}
+
+export interface MsgUpdatePermissionsResponse {}
+
+export interface MsgTransferManager {
+  creator: string;
+  badgeId: number;
+  address: number;
+}
+
+export interface MsgTransferManagerResponse {}
+
+export interface MsgRequestTransferManager {
+  creator: string;
+  badgeId: number;
+}
+
+export interface MsgRequestTransferManagerResponse {}
 
 const baseMsgNewBadge: object = {
   creator: "",
@@ -1327,9 +1360,10 @@ export const MsgRevokeBadgeResponse = {
 
 const baseMsgFreezeAddress: object = {
   creator: "",
-  address: "",
-  badgeId: "",
-  subbadgeId: "",
+  address: 0,
+  badgeId: 0,
+  subbadgeId: 0,
+  add: false,
 };
 
 export const MsgFreezeAddress = {
@@ -1337,14 +1371,17 @@ export const MsgFreezeAddress = {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
-    if (message.address !== "") {
-      writer.uint32(18).string(message.address);
+    if (message.address !== 0) {
+      writer.uint32(16).uint64(message.address);
     }
-    if (message.badgeId !== "") {
-      writer.uint32(26).string(message.badgeId);
+    if (message.badgeId !== 0) {
+      writer.uint32(24).uint64(message.badgeId);
     }
-    if (message.subbadgeId !== "") {
-      writer.uint32(34).string(message.subbadgeId);
+    if (message.subbadgeId !== 0) {
+      writer.uint32(32).uint64(message.subbadgeId);
+    }
+    if (message.add === true) {
+      writer.uint32(40).bool(message.add);
     }
     return writer;
   },
@@ -1360,13 +1397,16 @@ export const MsgFreezeAddress = {
           message.creator = reader.string();
           break;
         case 2:
-          message.address = reader.string();
+          message.address = longToNumber(reader.uint64() as Long);
           break;
         case 3:
-          message.badgeId = reader.string();
+          message.badgeId = longToNumber(reader.uint64() as Long);
           break;
         case 4:
-          message.subbadgeId = reader.string();
+          message.subbadgeId = longToNumber(reader.uint64() as Long);
+          break;
+        case 5:
+          message.add = reader.bool();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1384,19 +1424,24 @@ export const MsgFreezeAddress = {
       message.creator = "";
     }
     if (object.address !== undefined && object.address !== null) {
-      message.address = String(object.address);
+      message.address = Number(object.address);
     } else {
-      message.address = "";
+      message.address = 0;
     }
     if (object.badgeId !== undefined && object.badgeId !== null) {
-      message.badgeId = String(object.badgeId);
+      message.badgeId = Number(object.badgeId);
     } else {
-      message.badgeId = "";
+      message.badgeId = 0;
     }
     if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
-      message.subbadgeId = String(object.subbadgeId);
+      message.subbadgeId = Number(object.subbadgeId);
     } else {
-      message.subbadgeId = "";
+      message.subbadgeId = 0;
+    }
+    if (object.add !== undefined && object.add !== null) {
+      message.add = Boolean(object.add);
+    } else {
+      message.add = false;
     }
     return message;
   },
@@ -1407,6 +1452,7 @@ export const MsgFreezeAddress = {
     message.address !== undefined && (obj.address = message.address);
     message.badgeId !== undefined && (obj.badgeId = message.badgeId);
     message.subbadgeId !== undefined && (obj.subbadgeId = message.subbadgeId);
+    message.add !== undefined && (obj.add = message.add);
     return obj;
   },
 
@@ -1420,17 +1466,22 @@ export const MsgFreezeAddress = {
     if (object.address !== undefined && object.address !== null) {
       message.address = object.address;
     } else {
-      message.address = "";
+      message.address = 0;
     }
     if (object.badgeId !== undefined && object.badgeId !== null) {
       message.badgeId = object.badgeId;
     } else {
-      message.badgeId = "";
+      message.badgeId = 0;
     }
     if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
       message.subbadgeId = object.subbadgeId;
     } else {
-      message.subbadgeId = "";
+      message.subbadgeId = 0;
+    }
+    if (object.add !== undefined && object.add !== null) {
+      message.add = object.add;
+    } else {
+      message.add = false;
     }
     return message;
   },
@@ -1488,6 +1539,587 @@ export const MsgFreezeAddressResponse = {
   },
 };
 
+const baseMsgUpdateUris: object = {
+  creator: "",
+  badgeId: 0,
+  uri: "",
+  subassetUri: "",
+};
+
+export const MsgUpdateUris = {
+  encode(message: MsgUpdateUris, writer: Writer = Writer.create()): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.badgeId !== 0) {
+      writer.uint32(16).uint64(message.badgeId);
+    }
+    if (message.uri !== "") {
+      writer.uint32(26).string(message.uri);
+    }
+    if (message.subassetUri !== "") {
+      writer.uint32(34).string(message.subassetUri);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgUpdateUris {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgUpdateUris } as MsgUpdateUris;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.badgeId = longToNumber(reader.uint64() as Long);
+          break;
+        case 3:
+          message.uri = reader.string();
+          break;
+        case 4:
+          message.subassetUri = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgUpdateUris {
+    const message = { ...baseMsgUpdateUris } as MsgUpdateUris;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = Number(object.badgeId);
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.uri !== undefined && object.uri !== null) {
+      message.uri = String(object.uri);
+    } else {
+      message.uri = "";
+    }
+    if (object.subassetUri !== undefined && object.subassetUri !== null) {
+      message.subassetUri = String(object.subassetUri);
+    } else {
+      message.subassetUri = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgUpdateUris): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.badgeId !== undefined && (obj.badgeId = message.badgeId);
+    message.uri !== undefined && (obj.uri = message.uri);
+    message.subassetUri !== undefined &&
+      (obj.subassetUri = message.subassetUri);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgUpdateUris>): MsgUpdateUris {
+    const message = { ...baseMsgUpdateUris } as MsgUpdateUris;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = object.badgeId;
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.uri !== undefined && object.uri !== null) {
+      message.uri = object.uri;
+    } else {
+      message.uri = "";
+    }
+    if (object.subassetUri !== undefined && object.subassetUri !== null) {
+      message.subassetUri = object.subassetUri;
+    } else {
+      message.subassetUri = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgUpdateUrisResponse: object = {};
+
+export const MsgUpdateUrisResponse = {
+  encode(_: MsgUpdateUrisResponse, writer: Writer = Writer.create()): Writer {
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgUpdateUrisResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgUpdateUrisResponse } as MsgUpdateUrisResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgUpdateUrisResponse {
+    const message = { ...baseMsgUpdateUrisResponse } as MsgUpdateUrisResponse;
+    return message;
+  },
+
+  toJSON(_: MsgUpdateUrisResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(_: DeepPartial<MsgUpdateUrisResponse>): MsgUpdateUrisResponse {
+    const message = { ...baseMsgUpdateUrisResponse } as MsgUpdateUrisResponse;
+    return message;
+  },
+};
+
+const baseMsgUpdatePermissions: object = {
+  creator: "",
+  badgeId: 0,
+  permissions: 0,
+};
+
+export const MsgUpdatePermissions = {
+  encode(
+    message: MsgUpdatePermissions,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.badgeId !== 0) {
+      writer.uint32(16).uint64(message.badgeId);
+    }
+    if (message.permissions !== 0) {
+      writer.uint32(24).uint64(message.permissions);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgUpdatePermissions {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgUpdatePermissions } as MsgUpdatePermissions;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.badgeId = longToNumber(reader.uint64() as Long);
+          break;
+        case 3:
+          message.permissions = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgUpdatePermissions {
+    const message = { ...baseMsgUpdatePermissions } as MsgUpdatePermissions;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = Number(object.badgeId);
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.permissions !== undefined && object.permissions !== null) {
+      message.permissions = Number(object.permissions);
+    } else {
+      message.permissions = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgUpdatePermissions): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.badgeId !== undefined && (obj.badgeId = message.badgeId);
+    message.permissions !== undefined &&
+      (obj.permissions = message.permissions);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgUpdatePermissions>): MsgUpdatePermissions {
+    const message = { ...baseMsgUpdatePermissions } as MsgUpdatePermissions;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = object.badgeId;
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.permissions !== undefined && object.permissions !== null) {
+      message.permissions = object.permissions;
+    } else {
+      message.permissions = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgUpdatePermissionsResponse: object = {};
+
+export const MsgUpdatePermissionsResponse = {
+  encode(
+    _: MsgUpdatePermissionsResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgUpdatePermissionsResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgUpdatePermissionsResponse,
+    } as MsgUpdatePermissionsResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgUpdatePermissionsResponse {
+    const message = {
+      ...baseMsgUpdatePermissionsResponse,
+    } as MsgUpdatePermissionsResponse;
+    return message;
+  },
+
+  toJSON(_: MsgUpdatePermissionsResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<MsgUpdatePermissionsResponse>
+  ): MsgUpdatePermissionsResponse {
+    const message = {
+      ...baseMsgUpdatePermissionsResponse,
+    } as MsgUpdatePermissionsResponse;
+    return message;
+  },
+};
+
+const baseMsgTransferManager: object = { creator: "", badgeId: 0, address: 0 };
+
+export const MsgTransferManager = {
+  encode(
+    message: MsgTransferManager,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.badgeId !== 0) {
+      writer.uint32(16).uint64(message.badgeId);
+    }
+    if (message.address !== 0) {
+      writer.uint32(24).uint64(message.address);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgTransferManager {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgTransferManager } as MsgTransferManager;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.badgeId = longToNumber(reader.uint64() as Long);
+          break;
+        case 3:
+          message.address = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgTransferManager {
+    const message = { ...baseMsgTransferManager } as MsgTransferManager;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = Number(object.badgeId);
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = Number(object.address);
+    } else {
+      message.address = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgTransferManager): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.badgeId !== undefined && (obj.badgeId = message.badgeId);
+    message.address !== undefined && (obj.address = message.address);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgTransferManager>): MsgTransferManager {
+    const message = { ...baseMsgTransferManager } as MsgTransferManager;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = object.badgeId;
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    } else {
+      message.address = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgTransferManagerResponse: object = {};
+
+export const MsgTransferManagerResponse = {
+  encode(
+    _: MsgTransferManagerResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgTransferManagerResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgTransferManagerResponse,
+    } as MsgTransferManagerResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgTransferManagerResponse {
+    const message = {
+      ...baseMsgTransferManagerResponse,
+    } as MsgTransferManagerResponse;
+    return message;
+  },
+
+  toJSON(_: MsgTransferManagerResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<MsgTransferManagerResponse>
+  ): MsgTransferManagerResponse {
+    const message = {
+      ...baseMsgTransferManagerResponse,
+    } as MsgTransferManagerResponse;
+    return message;
+  },
+};
+
+const baseMsgRequestTransferManager: object = { creator: "", badgeId: 0 };
+
+export const MsgRequestTransferManager = {
+  encode(
+    message: MsgRequestTransferManager,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.badgeId !== 0) {
+      writer.uint32(16).uint64(message.badgeId);
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgRequestTransferManager {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgRequestTransferManager,
+    } as MsgRequestTransferManager;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.badgeId = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRequestTransferManager {
+    const message = {
+      ...baseMsgRequestTransferManager,
+    } as MsgRequestTransferManager;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = Number(object.badgeId);
+    } else {
+      message.badgeId = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgRequestTransferManager): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.badgeId !== undefined && (obj.badgeId = message.badgeId);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<MsgRequestTransferManager>
+  ): MsgRequestTransferManager {
+    const message = {
+      ...baseMsgRequestTransferManager,
+    } as MsgRequestTransferManager;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = object.badgeId;
+    } else {
+      message.badgeId = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgRequestTransferManagerResponse: object = {};
+
+export const MsgRequestTransferManagerResponse = {
+  encode(
+    _: MsgRequestTransferManagerResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgRequestTransferManagerResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgRequestTransferManagerResponse,
+    } as MsgRequestTransferManagerResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgRequestTransferManagerResponse {
+    const message = {
+      ...baseMsgRequestTransferManagerResponse,
+    } as MsgRequestTransferManagerResponse;
+    return message;
+  },
+
+  toJSON(_: MsgRequestTransferManagerResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<MsgRequestTransferManagerResponse>
+  ): MsgRequestTransferManagerResponse {
+    const message = {
+      ...baseMsgRequestTransferManagerResponse,
+    } as MsgRequestTransferManagerResponse;
+    return message;
+  },
+};
+
 /** Msg defines the Msg service. */
 export interface Msg {
   NewBadge(request: MsgNewBadge): Promise<MsgNewBadgeResponse>;
@@ -1501,8 +2133,18 @@ export interface Msg {
   ): Promise<MsgHandlePendingTransferResponse>;
   SetApproval(request: MsgSetApproval): Promise<MsgSetApprovalResponse>;
   RevokeBadge(request: MsgRevokeBadge): Promise<MsgRevokeBadgeResponse>;
-  /** this line is used by starport scaffolding # proto/tx/rpc */
   FreezeAddress(request: MsgFreezeAddress): Promise<MsgFreezeAddressResponse>;
+  UpdateUris(request: MsgUpdateUris): Promise<MsgUpdateUrisResponse>;
+  UpdatePermissions(
+    request: MsgUpdatePermissions
+  ): Promise<MsgUpdatePermissionsResponse>;
+  TransferManager(
+    request: MsgTransferManager
+  ): Promise<MsgTransferManagerResponse>;
+  /** this line is used by starport scaffolding # proto/tx/rpc */
+  RequestTransferManager(
+    request: MsgRequestTransferManager
+  ): Promise<MsgRequestTransferManagerResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -1605,6 +2247,60 @@ export class MsgClientImpl implements Msg {
     );
     return promise.then((data) =>
       MsgFreezeAddressResponse.decode(new Reader(data))
+    );
+  }
+
+  UpdateUris(request: MsgUpdateUris): Promise<MsgUpdateUrisResponse> {
+    const data = MsgUpdateUris.encode(request).finish();
+    const promise = this.rpc.request(
+      "trevormil.bitbadgeschain.badges.Msg",
+      "UpdateUris",
+      data
+    );
+    return promise.then((data) =>
+      MsgUpdateUrisResponse.decode(new Reader(data))
+    );
+  }
+
+  UpdatePermissions(
+    request: MsgUpdatePermissions
+  ): Promise<MsgUpdatePermissionsResponse> {
+    const data = MsgUpdatePermissions.encode(request).finish();
+    const promise = this.rpc.request(
+      "trevormil.bitbadgeschain.badges.Msg",
+      "UpdatePermissions",
+      data
+    );
+    return promise.then((data) =>
+      MsgUpdatePermissionsResponse.decode(new Reader(data))
+    );
+  }
+
+  TransferManager(
+    request: MsgTransferManager
+  ): Promise<MsgTransferManagerResponse> {
+    const data = MsgTransferManager.encode(request).finish();
+    const promise = this.rpc.request(
+      "trevormil.bitbadgeschain.badges.Msg",
+      "TransferManager",
+      data
+    );
+    return promise.then((data) =>
+      MsgTransferManagerResponse.decode(new Reader(data))
+    );
+  }
+
+  RequestTransferManager(
+    request: MsgRequestTransferManager
+  ): Promise<MsgRequestTransferManagerResponse> {
+    const data = MsgRequestTransferManager.encode(request).finish();
+    const promise = this.rpc.request(
+      "trevormil.bitbadgeschain.badges.Msg",
+      "RequestTransferManager",
+      data
+    );
+    return promise.then((data) =>
+      MsgRequestTransferManagerResponse.decode(new Reader(data))
     );
   }
 }
