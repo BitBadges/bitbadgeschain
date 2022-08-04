@@ -29,6 +29,7 @@ message MsgNewBadge {
     string subassetUris = 3;
     uint64 permissions = 4;
     string metadataHash = 5;
+    uint64 defaultSubassetSupply = 6;
 }
 
 message MsgNewBadgeResponse {

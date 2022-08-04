@@ -24,6 +24,7 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 		Manager:           CreatorAccountNum,
 		PermissionFlags:   msg.Permissions,
 		SubassetUriFormat: msg.SubassetUris,
+		DefaultSubassetSupply: msg.DefaultSubassetSupply,
 		// SubassetsTotalSupply: []*types.Subasset{},
 		// NextSubassetId:       0,
 		// FreezeAddresses:      []uint64{},

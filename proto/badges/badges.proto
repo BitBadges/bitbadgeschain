@@ -48,8 +48,11 @@ message BitBadge {
     // starts at 0; each subasset created will incrementally have an increasing ID #
     uint64 next_subasset_id = 12;
 
-    //only store if not 1 (default); will be sorted in order of subsasset ids; (maybe add defaut option in future)
+    //only store if not == default; will be sorted in order of subsasset ids; (maybe add defaut option in future)
     repeated Subasset subassets_total_supply = 13;
+
+    
+    uint64 default_subasset_supply = 14;
 }
 
 //Only will be created if supply >= 0

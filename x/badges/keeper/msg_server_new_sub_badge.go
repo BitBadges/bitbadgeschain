@@ -41,7 +41,12 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 			//Once here, we should be safe to mint
 			//By default, we assume non fungible subbadge (i.e. supply == 1) so we don't store if supply == 1
 			subasset_id := badge.NextSubassetId
-			if supply != 1 {
+			defaultSupply := badge.DefaultSubassetSupply
+			if badge.DefaultSubassetSupply == 0 {
+				defaultSupply = 1
+			}
+
+			if supply != defaultSupply {
 				ctx.GasMeter().ConsumeGas(SubbadgeWithSupplyNotEqualToOne, "create new subbadge cost")
 				hasLastEntry := false
 				if len(badge.SubassetsTotalSupply) > 0 {
