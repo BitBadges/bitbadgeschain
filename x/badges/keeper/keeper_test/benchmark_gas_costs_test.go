@@ -423,6 +423,18 @@ func (suite *TestSuite) TestGasCosts() {
 		tbl.AddRow("GetBadgeBalance", endGas - startGas)
 
 
+		err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, addresses, []uint64{1}, 1, types.SubbadgeRange{Start: 0, End: 999})
+		suite.Require().Nil(err, "Error transferring badge")
+		suite.Require().Nil(err, "Error transferring badge")
+		endGas = suite.ctx.GasMeter().GasConsumed();
+		tbl.AddRow("TransferBadge - Forceful 1000 (Different Addresses, Diff SubbadgeId)", endGas - startGas)
+
+		startGas = suite.ctx.GasMeter().GasConsumed();
+		_, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated + 1)
+		endGas = suite.ctx.GasMeter().GasConsumed();
+		tbl.AddRow("GetBadgeBalance", endGas - startGas)
+
+
 		firstColumnFormatter := func(format string, vals ...interface{}) string {
 			return ""
 		}
