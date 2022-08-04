@@ -41,7 +41,7 @@ func (k Keeper) AddToBadgeBalance(ctx sdk.Context, balance_key string, balance_t
 			return err
 		}
 
-		err = k.CreateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		err = k.SetBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
 		if err != nil {
 			return err
 		}
@@ -52,7 +52,7 @@ func (k Keeper) AddToBadgeBalance(ctx sdk.Context, balance_key string, balance_t
 			return err
 		}
 
-		err = k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		err = k.SetBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
 		if err != nil {
 			return err
 		}
@@ -81,7 +81,7 @@ func (k Keeper) RemoveFromBadgeBalance(ctx sdk.Context, balance_key string, bala
 			return err
 		}
 
-		err = k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		err = k.SetBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
 		if err != nil {
 			return err
 		}
@@ -134,29 +134,15 @@ func (k Keeper) AddToBothPendingBadgeBalances(ctx sdk.Context, badgeId uint64, s
 	fromBadgeBalanceInfo.PendingNonce += 1
 	toBadgeBalanceInfo.PendingNonce += 1
 
-	//Finally, update the stores
-	if !fromFound {
-		err := k.CreateBadgeBalanceInStore(ctx, from_balance_key, fromBadgeBalanceInfo)
-		if err != nil {
-			return err
-		}
-	} else {
-		err := k.UpdateBadgeBalanceInStore(ctx, from_balance_key, fromBadgeBalanceInfo)
-		if err != nil {
-			return err
-		}
+	
+	err := k.SetBadgeBalanceInStore(ctx, from_balance_key, fromBadgeBalanceInfo)
+	if err != nil {
+		return err
 	}
 
-	if !toFound {
-		err := k.CreateBadgeBalanceInStore(ctx, to_balance_key, toBadgeBalanceInfo)
-		if err != nil {
-			return err
-		}
-	} else {
-		err := k.UpdateBadgeBalanceInStore(ctx, to_balance_key, toBadgeBalanceInfo)
-		if err != nil {
-			return err
-		}
+	err = k.SetBadgeBalanceInStore(ctx, to_balance_key, toBadgeBalanceInfo)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -189,7 +175,7 @@ func (k Keeper) RemovePending(ctx sdk.Context, balance_key string, this_nonce ui
 			badgeBalanceInfo.Pending = new_pending
 		}
 
-		err := k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		err := k.SetBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
 		if err != nil {
 			return err
 		}
@@ -221,7 +207,7 @@ func (k Keeper) SetApproval(ctx sdk.Context, balance_key string, amount uint64, 
 		}
 
 		badgeBalanceInfo.Approvals = new_approvals
-		err := k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		err := k.SetBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
 		if err != nil {
 			return err
 		}
@@ -274,7 +260,7 @@ func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, balance_key string, a
 			badgeBalanceInfo.Approvals = new_approvals
 		}
 
-		err := k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		err := k.SetBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
 		if err != nil {
 			return err
 		}
@@ -314,7 +300,7 @@ func (k Keeper) AddBalanceToApproval(ctx sdk.Context, balance_key string, amount
 		}
 
 		badgeBalanceInfo.Approvals = new_approvals
-		err := k.UpdateBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
+		err := k.SetBadgeBalanceInStore(ctx, balance_key, badgeBalanceInfo)
 		if err != nil {
 			return err
 		}

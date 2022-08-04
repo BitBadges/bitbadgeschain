@@ -47,7 +47,7 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 		return nil, err
 	}
 
-	if err := k.UpdateBadgeInStore(ctx, badge); err != nil {
+	if err := k.SetBadgeInStore(ctx, badge); err != nil {
 		return nil, err
 	}
 

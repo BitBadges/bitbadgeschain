@@ -6,11 +6,7 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func (k Keeper) CreateBadgeBalanceInStore(ctx sdk.Context, balance_id string, badgeBalanceInfo types.BadgeBalanceInfo) error {
-	if k.StoreHasBadgeBalance(ctx, balance_id) {
-		return sdkerrors.Wrap(ErrBadgeBalanceExists, balance_id)
-	}
-
+func (k Keeper) SetBadgeBalanceInStore(ctx sdk.Context, balance_id string, badgeBalanceInfo types.BadgeBalanceInfo) error {
 	marshaled_badge_balance_info, err := k.cdc.Marshal(&badgeBalanceInfo)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.BadgeBalanceInfo failed")
@@ -18,26 +14,6 @@ func (k Keeper) CreateBadgeBalanceInStore(ctx sdk.Context, balance_id string, ba
 
 	store := ctx.KVStore(k.storeKey)
 	store.Set(badgeBalanceStoreKey(balance_id), marshaled_badge_balance_info)
-	return nil
-}
-
-func (k Keeper) UpdateBadgeBalanceInStore(ctx sdk.Context, balance_id string, badgeBalanceInfo types.BadgeBalanceInfo) error {
-	if !k.StoreHasBadgeBalance(ctx, balance_id) {
-		k.CreateBadgeBalanceInStore(ctx, balance_id, badgeBalanceInfo)
-	}
-
-	marshaled_badge_balance_info, err := k.cdc.Marshal(&badgeBalanceInfo)
-	if err != nil {
-		return sdkerrors.Wrap(err, "Marshal types.BadgeBalanceInfo failed")
-	}
-	store := ctx.KVStore(k.storeKey)
-
-	if badgeBalanceInfo.UserFlags == 0 && badgeBalanceInfo.Balance == 0 && len(badgeBalanceInfo.Pending) == 0 && len(badgeBalanceInfo.Approvals) == 0 {
-		store.Delete(badgeBalanceStoreKey(balance_id))
-	} else {
-		store.Set(badgeBalanceStoreKey(balance_id), marshaled_badge_balance_info)
-	}
-
 	return nil
 }
 
@@ -75,7 +51,7 @@ func (k Keeper) GetBadgeBalanceIdsFromStore(ctx sdk.Context) (ids []string) {
 	return
 }
 
-func (k Keeper) StoreHasBadgeBalance(ctx sdk.Context, balance_id string) bool {
-	store := ctx.KVStore(k.storeKey)
-	return store.Has(badgeBalanceStoreKey(balance_id))
-}
+// func (k Keeper) StoreHasBadgeBalance(ctx sdk.Context, balance_id string) bool {
+// 	store := ctx.KVStore(k.storeKey)
+// 	return store.Has(badgeBalanceStoreKey(balance_id))
+// }

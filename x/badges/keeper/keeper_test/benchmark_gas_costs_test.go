@@ -96,7 +96,7 @@ func (suite *TestSuite) TestGasCosts() {
 		err = FreezeAddresses(suite, wctx, bob, addressesThroughTenThousand, 0, 0, false)
 		suite.Require().Nil(err, "Error creating subbadge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
-		tbl.AddRow("Unfreeze 1 Address", endGas - startGas)
+		tbl.AddRow("Unfreeze 10000 Address", endGas - startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
 		_, _ = GetBadge(suite, wctx, 0)
@@ -363,6 +363,10 @@ func (suite *TestSuite) TestGasCosts() {
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("GetBadgeBalance", endGas - startGas)		
 
-		tbl.Print()
+		firstColumnFormatter := func(format string, vals ...interface{}) string {
+			return ""
+		}
+		
+		tbl.WithFirstColumnFormatter(firstColumnFormatter).Print()
 	}
 }

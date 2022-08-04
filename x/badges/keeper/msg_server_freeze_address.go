@@ -49,7 +49,7 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 	//sort the addresses in order
 	sort.Slice(badge.FreezeAddresses, func(i, j int) bool { return badge.FreezeAddresses[i] < badge.FreezeAddresses[j] })
 
-	err = k.UpdateBadgeInStore(ctx, badge)
+	err = k.SetBadgeInStore(ctx, badge)
 	if err != nil {
 		return nil, err
 	}

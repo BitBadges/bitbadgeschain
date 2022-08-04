@@ -33,7 +33,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	}
 
 	for idx, balance := range genState.Balances {
-		if err := k.CreateBadgeBalanceInStore(ctx, genState.BalanceIds[idx], *balance); err != nil {
+		if err := k.SetBadgeBalanceInStore(ctx, genState.BalanceIds[idx], *balance); err != nil {
 			panic(err)
 		}
 	}

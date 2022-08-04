@@ -32,7 +32,7 @@ func (k msgServer) UpdatePermissions(goCtx context.Context, msg *types.MsgUpdate
 
 	badge.PermissionFlags = msg.Permissions
 
-	if err := k.UpdateBadgeInStore(ctx, badge); err != nil {
+	if err := k.SetBadgeInStore(ctx, badge); err != nil {
 		return nil, err
 	}
 	

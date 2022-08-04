@@ -33,7 +33,7 @@ func (k msgServer) UpdateUris(goCtx context.Context, msg *types.MsgUpdateUris) (
 	badge.Uri = msg.Uri
 	badge.SubassetUriFormat = msg.SubassetUri
 
-	if err := k.UpdateBadgeInStore(ctx, badge); err != nil {
+	if err := k.SetBadgeInStore(ctx, badge); err != nil {
 		return nil, err
 	}
 
