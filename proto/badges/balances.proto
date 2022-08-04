@@ -10,22 +10,30 @@ option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
 //indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
 message BadgeBalanceInfo {
-    uint64 balance = 1;
-    uint64 pending_nonce = 2;
-    repeated PendingTransfer pending = 3; //IDs will be sorted in order of pending_nonce
-    repeated Approval approvals = 4;
-    uint64 user_flags= 5; //TODO: for (hidden on profile, pinned, etc)
+    repeated BalanceIDs idsForBalances = 1;
+    repeated uint64 balances = 2;
+    uint64 pending_nonce = 3;
+    repeated PendingTransfer pending = 4; //IDs will be sorted in order of pending_nonce
+    repeated Approval approvals = 5;
+    uint64 user_flags= 6; //TODO: for (hidden on profile, pinned, etc)
+}
+
+message BalanceIDs {
+    uint64 startId = 1;
+    uint64 endId = 2;
 }
 
 message Approval {
-    uint64 address_num = 1;
+    uint64 addressNum = 1;
     uint64 amount = 2;
+    uint64 subbadgeId = 3;
 }
 
 //Pending transfers will not be saved after accept / reject
 message PendingTransfer {
-    uint64 this_pending_nonce = 1;
-    uint64 other_pending_nonce = 2;
+    uint64 subbadgeId = 1;
+    uint64 this_pending_nonce = 2;
+    uint64 other_pending_nonce = 3;
     uint64 amount = 4;
     bool send_request = 5; //vs. receive request
     uint64 to = 6;

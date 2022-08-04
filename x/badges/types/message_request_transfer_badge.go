@@ -9,13 +9,13 @@ const TypeMsgRequestTransferBadge = "request_transfer_badge"
 
 var _ sdk.Msg = &MsgRequestTransferBadge{}
 
-func NewMsgRequestTransferBadge(creator string, from uint64, amount uint64, badgeId uint64, subbadgeId uint64) *MsgRequestTransferBadge {
+func NewMsgRequestTransferBadge(creator string, from uint64, amount uint64, badgeId uint64, subbadgeRange SubbadgeRange) *MsgRequestTransferBadge {
 	return &MsgRequestTransferBadge{
 		Creator:    creator,
 		From:       from,
 		Amount:     amount,
 		BadgeId:    badgeId,
-		SubbadgeId: subbadgeId,
+		SubbadgeRange: &subbadgeRange,
 	}
 }
 
@@ -42,6 +42,16 @@ func (msg *MsgRequestTransferBadge) GetSignBytes() []byte {
 
 func (msg *MsgRequestTransferBadge) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
+
+
+	if msg.SubbadgeRange == nil || msg.SubbadgeRange.Start > msg.SubbadgeRange.End {
+		return ErrStartGreaterThanEnd
+	}
+
+	if msg.Amount == 0 {
+		return ErrAmountEqualsZero
+	}
+
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}

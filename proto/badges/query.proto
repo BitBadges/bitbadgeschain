@@ -23,7 +23,7 @@ service Query {
 	}
 // Queries a list of GetBalance items.
 	rpc GetBalance(QueryGetBalanceRequest) returns (QueryGetBalanceResponse) {
-		option (google.api.http).get = "/trevormil/bitbadgeschain/badges/get_balance/{badgeId}/{subbadgeId}/{address}";
+		option (google.api.http).get = "/trevormil/bitbadgeschain/badges/get_balance/{badgeId}/{address}";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -48,8 +48,7 @@ message QueryGetBadgeResponse {
 
 message QueryGetBalanceRequest {
   uint64 badgeId = 1;
-  uint64 subbadgeId = 2;
-  uint64 address = 3;
+  uint64 address = 2;
 }
 
 message QueryGetBalanceResponse {

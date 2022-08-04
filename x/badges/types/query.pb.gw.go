@@ -127,17 +127,6 @@ func request_Query_GetBalance_0(ctx context.Context, marshaler runtime.Marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "badgeId", err)
 	}
 
-	val, ok = pathParams["subbadgeId"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "subbadgeId")
-	}
-
-	protoReq.SubbadgeId, err = runtime.Uint64(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "subbadgeId", err)
-	}
-
 	val, ok = pathParams["address"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
@@ -174,17 +163,6 @@ func local_request_Query_GetBalance_0(ctx context.Context, marshaler runtime.Mar
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "badgeId", err)
-	}
-
-	val, ok = pathParams["subbadgeId"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "subbadgeId")
-	}
-
-	protoReq.SubbadgeId, err = runtime.Uint64(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "subbadgeId", err)
 	}
 
 	val, ok = pathParams["address"]
@@ -387,7 +365,7 @@ var (
 
 	pattern_Query_GetBadge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"trevormil", "bitbadgeschain", "badges", "get_badge", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetBalance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"trevormil", "bitbadgeschain", "badges", "get_balance", "badgeId", "subbadgeId", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetBalance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"trevormil", "bitbadgeschain", "badges", "get_balance", "badgeId", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

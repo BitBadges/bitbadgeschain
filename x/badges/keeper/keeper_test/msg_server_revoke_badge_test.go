@@ -38,25 +38,25 @@ func (suite *TestSuite) TestRevokeBadge() {
 			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, firstAccountNumCreated+1, 5000, 0, 0)
+	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.SubbadgeRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error transferring badge")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(5000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(5000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
 	aliceBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(5000), aliceBalanceInfo.Balance)
+	suite.Require().Equal(uint64(5000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, aliceBalanceInfo.IdsForBalances, aliceBalanceInfo.Balances))
 
 	err = RevokeBadges(suite, wctx, bob, []uint64{firstAccountNumCreated + 1}, []uint64{5000}, 0, 0)
 	suite.Require().Nil(err, "Error revoking badge")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
 	aliceBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(0), aliceBalanceInfo.Balance)
+	suite.Require().Equal(uint64(0), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, aliceBalanceInfo.IdsForBalances, aliceBalanceInfo.Balances))
 }
 
 func (suite *TestSuite) TestRevokeBadgeTooMuch() {
@@ -91,16 +91,16 @@ func (suite *TestSuite) TestRevokeBadgeTooMuch() {
 			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, firstAccountNumCreated+1, 5000, 0, 0)
+	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.SubbadgeRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error transferring badge")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(5000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(5000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
 	aliceBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(5000), aliceBalanceInfo.Balance)
+	suite.Require().Equal(uint64(5000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, aliceBalanceInfo.IdsForBalances, aliceBalanceInfo.Balances))
 
 	err = RevokeBadges(suite, wctx, bob, []uint64{firstAccountNumCreated + 1}, []uint64{7000}, 0, 0)
 	suite.Require().EqualError(err, keeper.ErrBadgeBalanceTooLow.Error())
@@ -138,16 +138,16 @@ func (suite *TestSuite) TestRevokeBadgeFromSelf() {
 			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, firstAccountNumCreated+1, 5000, 0, 0)
+	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.SubbadgeRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error transferring badge")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(5000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(5000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
 	aliceBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(5000), aliceBalanceInfo.Balance)
+	suite.Require().Equal(uint64(5000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, aliceBalanceInfo.IdsForBalances, aliceBalanceInfo.Balances))
 
 	accs := suite.app.AccountKeeper.GetAllAccounts(suite.ctx)
 	_ = accs
@@ -188,16 +188,16 @@ func (suite *TestSuite) TestNewSubBadgeRevokeIsLocked() {
 			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, firstAccountNumCreated+1, 5000, 0, 0)
+	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.SubbadgeRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error transferring badge")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(5000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(5000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
 	aliceBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(5000), aliceBalanceInfo.Balance)
+	suite.Require().Equal(uint64(5000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, aliceBalanceInfo.IdsForBalances, aliceBalanceInfo.Balances))
 
 	accs := suite.app.AccountKeeper.GetAllAccounts(suite.ctx)
 	_ = accs
@@ -238,16 +238,16 @@ func (suite *TestSuite) TestNewSubBadgeNotManager() {
 			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, firstAccountNumCreated+1, 5000, 0, 0)
+	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.SubbadgeRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error transferring badge")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(5000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(5000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
 	aliceBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(5000), aliceBalanceInfo.Balance)
+	suite.Require().Equal(uint64(5000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, aliceBalanceInfo.IdsForBalances, aliceBalanceInfo.Balances))
 
 	accs := suite.app.AccountKeeper.GetAllAccounts(suite.ctx)
 	_ = accs

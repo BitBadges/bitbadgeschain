@@ -138,8 +138,8 @@ func CreateSubBadges(suite *TestSuite, ctx context.Context, creator string, badg
 	return err
 }
 
-func RequestTransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, amount uint64, badgeId uint64, subbadgeId uint64) error {
-	msg := types.NewMsgRequestTransferBadge(creator, from, amount, badgeId, subbadgeId)
+func RequestTransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, amount uint64, badgeId uint64, subbadgeRange types.SubbadgeRange) error {
+	msg := types.NewMsgRequestTransferBadge(creator, from, amount, badgeId, subbadgeRange)
 	_, err := suite.msgServer.RequestTransferBadge(ctx, msg)
 	return err
 }
@@ -150,8 +150,8 @@ func RevokeBadges(suite *TestSuite, ctx context.Context, creator string, address
 	return err
 }
 
-func TransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, to uint64, amount uint64, badgeId uint64, subbadgeId uint64) error {
-	msg := types.NewMsgTransferBadge(creator, from, to, amount, badgeId, subbadgeId)
+func TransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, to []uint64, amounts []uint64, badgeId uint64, subbadgeRange types.SubbadgeRange) error {
+	msg := types.NewMsgTransferBadge(creator, from, to, amounts, badgeId, subbadgeRange)
 	_, err := suite.msgServer.TransferBadge(ctx, msg)
 	return err
 }
@@ -218,7 +218,6 @@ func GetBadge(suite *TestSuite, ctx context.Context, id uint64) (types.BitBadge,
 func GetBadgeBalance(suite *TestSuite, ctx context.Context, badgeId uint64, subbadgeId uint64, address uint64) (types.BadgeBalanceInfo, error) {
 	res, err := suite.app.BadgesKeeper.GetBalance(ctx, &types.QueryGetBalanceRequest{
 		BadgeId:    uint64(badgeId),
-		SubbadgeId: uint64(subbadgeId),
 		Address:    uint64(address),
 	})
 

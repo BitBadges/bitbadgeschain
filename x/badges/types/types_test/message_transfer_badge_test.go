@@ -6,7 +6,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
-	
+
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
@@ -20,25 +20,67 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgTransferBadge{
 				Creator: "invalid_address",
-				To:      0,
+				ToAddresses:      []uint64{ 0 },
+				Amounts:      []uint64{ 10 },
 				From:    1,
+				SubbadgeRange: &types.SubbadgeRange{
+					Start: 0,
+					End: 0,
+				},
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid state",
 			msg: types.MsgTransferBadge{
 				Creator: sample.AccAddress(),
-				To:      0,
+				ToAddresses:      []uint64{ 0 },
+				Amounts:      []uint64{ 10 },
 				From:    1,
+				SubbadgeRange: &types.SubbadgeRange{
+					Start: 0,
+					End: 0,
+				},
 			},
 		}, {
 			name: "invalid addresses",
 			msg: types.MsgTransferBadge{
 				Creator: sample.AccAddress(),
-				To:      0,
+				ToAddresses:      []uint64{ 0 },
+				Amounts:      []uint64{ 10 },
 				From:    0,
+				SubbadgeRange: &types.SubbadgeRange{
+					Start: 0,
+					End: 0,
+				},
 			},
 			err: types.ErrSenderAndReceiverSame,
+		},  {
+			name: "invalid amounts",
+			msg: types.MsgTransferBadge{
+				Creator: sample.AccAddress(),
+				ToAddresses:      []uint64{ 0 },
+				Amounts:      []uint64{ 0 },
+				From:    7,
+				SubbadgeRange: &types.SubbadgeRange{
+					Start: 0,
+					End: 0,
+				},
+			},
+			err: types.ErrAmountEqualsZero,
+		},
+		{
+			name: "invalid subbadge range",
+			msg: types.MsgTransferBadge{
+				Creator: sample.AccAddress(),
+				ToAddresses:      []uint64{ 0 },
+				Amounts:      []uint64{ 0 },
+				From:    7,
+				SubbadgeRange: &types.SubbadgeRange{
+					Start: 10,
+					End: 0,
+				},
+			},
+			err: types.ErrStartGreaterThanEnd,
 		},
 	}
 	for _, tt := range tests {

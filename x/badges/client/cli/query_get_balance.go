@@ -14,19 +14,15 @@ var _ = strconv.Itoa(0)
 
 func CmdGetBalance() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-balance [badge-id] [subbadge-id] [address]",
+		Use:   "get-balance [badge-id] [address]",
 		Short: "Query getBalance",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqBadgeId, err := cast.ToUint64E(args[0])
 			if err != nil {
 				return err
 			}
-			reqSubbadgeId, err := cast.ToUint64E(args[1])
-			if err != nil {
-				return err
-			}
-			reqAddress, err := cast.ToUint64E(args[2])
+			reqAddress, err := cast.ToUint64E(args[1])
 			if err != nil {
 				return err
 			}
@@ -41,7 +37,6 @@ func CmdGetBalance() *cobra.Command {
 			params := &types.QueryGetBalanceRequest{
 
 				BadgeId:    reqBadgeId,
-				SubbadgeId: reqSubbadgeId,
 				Address:    reqAddress,
 			}
 

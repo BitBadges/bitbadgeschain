@@ -40,6 +40,19 @@ func (msg *MsgRevokeBadge) GetSignBytes() []byte {
 	return sdk.MustSortJSON(bz)
 }
 
+func duplicateInArray(arr []uint64) bool {
+	visited := make(map[uint64]bool, 0)
+	for i:=0; i<len(arr); i++{
+	   if visited[arr[i]] == true {
+		  return true
+	   } else {
+		  visited[arr[i]] = true
+	   }
+	}
+	return false
+}
+ 
+
 func (msg *MsgRevokeBadge) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
@@ -55,5 +68,10 @@ func (msg *MsgRevokeBadge) ValidateBasic() error {
 			return ErrAmountEqualsZero
 		}
 	}
+
+	if duplicateInArray(msg.Addresses) {
+		return ErrDuplicateAddresses
+	}
+
 	return nil
 }

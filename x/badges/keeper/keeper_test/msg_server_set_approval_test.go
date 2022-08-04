@@ -38,7 +38,7 @@ func (suite *TestSuite) TestSetApproval() {
 			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
 	err = SetApproval(suite, wctx, bob, 1000, firstAccountNumCreated+1, 0, 0)
 	suite.Require().Nil(err, "Error setting approval")
@@ -94,7 +94,7 @@ func (suite *TestSuite) TestApproveSelf() {
 			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
 	err = SetApproval(suite, wctx, bob, 1000, firstAccountNumCreated, 0, 0)
 	suite.Require().EqualError(err, keeper.ErrSenderAndReceiverSame.Error())

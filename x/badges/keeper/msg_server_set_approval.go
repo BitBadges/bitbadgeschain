@@ -25,9 +25,19 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 		return nil, ErrSenderAndReceiverSame // Can't approve yourself
 	}
 
-	BalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId, msg.SubbadgeId)
+	BalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId)
+	badgeBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, BalanceKey)
+	if !found {
+		badgeBalanceInfo = GetEmptyBadgeBalanceTemplate()
+	}
 
-	if err := k.Keeper.SetApproval(ctx, BalanceKey, msg.Amount, msg.Address); err != nil {
+
+	badgeBalanceInfo, err = k.Keeper.SetApproval(ctx, badgeBalanceInfo, msg.Amount, msg.Address, msg.SubbadgeId)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := k.SetBadgeBalanceInStore(ctx, BalanceKey, badgeBalanceInfo); err != nil {
 		return nil, err
 	}
 

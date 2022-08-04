@@ -25,11 +25,12 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 //indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
 type BadgeBalanceInfo struct {
-	Balance      uint64             `protobuf:"varint,1,opt,name=balance,proto3" json:"balance,omitempty"`
-	PendingNonce uint64             `protobuf:"varint,2,opt,name=pending_nonce,json=pendingNonce,proto3" json:"pending_nonce,omitempty"`
-	Pending      []*PendingTransfer `protobuf:"bytes,3,rep,name=pending,proto3" json:"pending,omitempty"`
-	Approvals    []*Approval        `protobuf:"bytes,4,rep,name=approvals,proto3" json:"approvals,omitempty"`
-	UserFlags    uint64             `protobuf:"varint,5,opt,name=user_flags,json=userFlags,proto3" json:"user_flags,omitempty"`
+	IdsForBalances []*BalanceIDs      `protobuf:"bytes,1,rep,name=idsForBalances,proto3" json:"idsForBalances,omitempty"`
+	Balances       []uint64           `protobuf:"varint,2,rep,packed,name=balances,proto3" json:"balances,omitempty"`
+	PendingNonce   uint64             `protobuf:"varint,3,opt,name=pending_nonce,json=pendingNonce,proto3" json:"pending_nonce,omitempty"`
+	Pending        []*PendingTransfer `protobuf:"bytes,4,rep,name=pending,proto3" json:"pending,omitempty"`
+	Approvals      []*Approval        `protobuf:"bytes,5,rep,name=approvals,proto3" json:"approvals,omitempty"`
+	UserFlags      uint64             `protobuf:"varint,6,opt,name=user_flags,json=userFlags,proto3" json:"user_flags,omitempty"`
 }
 
 func (m *BadgeBalanceInfo) Reset()         { *m = BadgeBalanceInfo{} }
@@ -65,11 +66,18 @@ func (m *BadgeBalanceInfo) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_BadgeBalanceInfo proto.InternalMessageInfo
 
-func (m *BadgeBalanceInfo) GetBalance() uint64 {
+func (m *BadgeBalanceInfo) GetIdsForBalances() []*BalanceIDs {
 	if m != nil {
-		return m.Balance
+		return m.IdsForBalances
 	}
-	return 0
+	return nil
+}
+
+func (m *BadgeBalanceInfo) GetBalances() []uint64 {
+	if m != nil {
+		return m.Balances
+	}
+	return nil
 }
 
 func (m *BadgeBalanceInfo) GetPendingNonce() uint64 {
@@ -100,16 +108,69 @@ func (m *BadgeBalanceInfo) GetUserFlags() uint64 {
 	return 0
 }
 
+type BalanceIDs struct {
+	StartId uint64 `protobuf:"varint,1,opt,name=startId,proto3" json:"startId,omitempty"`
+	EndId   uint64 `protobuf:"varint,2,opt,name=endId,proto3" json:"endId,omitempty"`
+}
+
+func (m *BalanceIDs) Reset()         { *m = BalanceIDs{} }
+func (m *BalanceIDs) String() string { return proto.CompactTextString(m) }
+func (*BalanceIDs) ProtoMessage()    {}
+func (*BalanceIDs) Descriptor() ([]byte, []int) {
+	return fileDescriptor_233d29a167e739f0, []int{1}
+}
+func (m *BalanceIDs) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *BalanceIDs) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_BalanceIDs.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *BalanceIDs) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BalanceIDs.Merge(m, src)
+}
+func (m *BalanceIDs) XXX_Size() int {
+	return m.Size()
+}
+func (m *BalanceIDs) XXX_DiscardUnknown() {
+	xxx_messageInfo_BalanceIDs.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BalanceIDs proto.InternalMessageInfo
+
+func (m *BalanceIDs) GetStartId() uint64 {
+	if m != nil {
+		return m.StartId
+	}
+	return 0
+}
+
+func (m *BalanceIDs) GetEndId() uint64 {
+	if m != nil {
+		return m.EndId
+	}
+	return 0
+}
+
 type Approval struct {
-	AddressNum uint64 `protobuf:"varint,1,opt,name=address_num,json=addressNum,proto3" json:"address_num,omitempty"`
+	AddressNum uint64 `protobuf:"varint,1,opt,name=addressNum,proto3" json:"addressNum,omitempty"`
 	Amount     uint64 `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
+	SubbadgeId uint64 `protobuf:"varint,3,opt,name=subbadgeId,proto3" json:"subbadgeId,omitempty"`
 }
 
 func (m *Approval) Reset()         { *m = Approval{} }
 func (m *Approval) String() string { return proto.CompactTextString(m) }
 func (*Approval) ProtoMessage()    {}
 func (*Approval) Descriptor() ([]byte, []int) {
-	return fileDescriptor_233d29a167e739f0, []int{1}
+	return fileDescriptor_233d29a167e739f0, []int{2}
 }
 func (m *Approval) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -152,10 +213,18 @@ func (m *Approval) GetAmount() uint64 {
 	return 0
 }
 
+func (m *Approval) GetSubbadgeId() uint64 {
+	if m != nil {
+		return m.SubbadgeId
+	}
+	return 0
+}
+
 //Pending transfers will not be saved after accept / reject
 type PendingTransfer struct {
-	ThisPendingNonce  uint64 `protobuf:"varint,1,opt,name=this_pending_nonce,json=thisPendingNonce,proto3" json:"this_pending_nonce,omitempty"`
-	OtherPendingNonce uint64 `protobuf:"varint,2,opt,name=other_pending_nonce,json=otherPendingNonce,proto3" json:"other_pending_nonce,omitempty"`
+	SubbadgeId        uint64 `protobuf:"varint,1,opt,name=subbadgeId,proto3" json:"subbadgeId,omitempty"`
+	ThisPendingNonce  uint64 `protobuf:"varint,2,opt,name=this_pending_nonce,json=thisPendingNonce,proto3" json:"this_pending_nonce,omitempty"`
+	OtherPendingNonce uint64 `protobuf:"varint,3,opt,name=other_pending_nonce,json=otherPendingNonce,proto3" json:"other_pending_nonce,omitempty"`
 	Amount            uint64 `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
 	SendRequest       bool   `protobuf:"varint,5,opt,name=send_request,json=sendRequest,proto3" json:"send_request,omitempty"`
 	To                uint64 `protobuf:"varint,6,opt,name=to,proto3" json:"to,omitempty"`
@@ -167,7 +236,7 @@ func (m *PendingTransfer) Reset()         { *m = PendingTransfer{} }
 func (m *PendingTransfer) String() string { return proto.CompactTextString(m) }
 func (*PendingTransfer) ProtoMessage()    {}
 func (*PendingTransfer) Descriptor() ([]byte, []int) {
-	return fileDescriptor_233d29a167e739f0, []int{2}
+	return fileDescriptor_233d29a167e739f0, []int{3}
 }
 func (m *PendingTransfer) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -195,6 +264,13 @@ func (m *PendingTransfer) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_PendingTransfer proto.InternalMessageInfo
+
+func (m *PendingTransfer) GetSubbadgeId() uint64 {
+	if m != nil {
+		return m.SubbadgeId
+	}
+	return 0
+}
 
 func (m *PendingTransfer) GetThisPendingNonce() uint64 {
 	if m != nil {
@@ -247,6 +323,7 @@ func (m *PendingTransfer) GetApprovedBy() uint64 {
 
 func init() {
 	proto.RegisterType((*BadgeBalanceInfo)(nil), "trevormil.bitbadgeschain.badges.BadgeBalanceInfo")
+	proto.RegisterType((*BalanceIDs)(nil), "trevormil.bitbadgeschain.badges.BalanceIDs")
 	proto.RegisterType((*Approval)(nil), "trevormil.bitbadgeschain.badges.Approval")
 	proto.RegisterType((*PendingTransfer)(nil), "trevormil.bitbadgeschain.badges.PendingTransfer")
 }
@@ -254,35 +331,39 @@ func init() {
 func init() { proto.RegisterFile("badges/balances.proto", fileDescriptor_233d29a167e739f0) }
 
 var fileDescriptor_233d29a167e739f0 = []byte{
-	// 441 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x92, 0xcd, 0x6e, 0xd4, 0x30,
-	0x10, 0xc7, 0x37, 0x69, 0xd8, 0xed, 0xce, 0x16, 0x28, 0x2e, 0x20, 0xab, 0x12, 0x69, 0x59, 0x2e,
-	0x45, 0x42, 0x09, 0x2a, 0x4f, 0x40, 0x90, 0x40, 0x20, 0x54, 0x55, 0x11, 0x27, 0x2e, 0x91, 0xb3,
-	0x71, 0x3e, 0xa4, 0xc4, 0x0e, 0xb6, 0x53, 0xb1, 0x0f, 0xc0, 0x9d, 0xc7, 0xe2, 0xd8, 0x23, 0x47,
-	0xb4, 0xfb, 0x00, 0xbc, 0x02, 0xf2, 0xc7, 0xd2, 0x6e, 0x55, 0xa9, 0xa7, 0x78, 0x7e, 0x33, 0xf3,
-	0xcf, 0xcc, 0xdf, 0x86, 0x27, 0x39, 0x29, 0x2a, 0x2a, 0xe3, 0x9c, 0xb4, 0x84, 0x2d, 0xa8, 0x8c,
-	0x7a, 0xc1, 0x15, 0x47, 0x47, 0x4a, 0xd0, 0x0b, 0x2e, 0xba, 0xa6, 0x8d, 0xf2, 0x46, 0xd9, 0x9a,
-	0x45, 0x4d, 0x1a, 0x16, 0xd9, 0xf3, 0xe1, 0xe3, 0x8a, 0x57, 0xdc, 0xd4, 0xc6, 0xfa, 0x64, 0xdb,
-	0x0e, 0x0f, 0x9c, 0x5a, 0x4f, 0x04, 0xe9, 0xe4, 0x0d, 0x68, 0x3f, 0x16, 0xce, 0x7f, 0xf8, 0xb0,
-	0x9f, 0x68, 0x90, 0xd8, 0x1f, 0x7f, 0x64, 0x25, 0x47, 0x18, 0x26, 0x6e, 0x0e, 0xec, 0x1d, 0x7b,
-	0x27, 0x41, 0xba, 0x09, 0xd1, 0x0b, 0xb8, 0xdf, 0x53, 0x56, 0x34, 0xac, 0xca, 0x18, 0xd7, 0x79,
-	0xdf, 0xe4, 0xf7, 0x1c, 0x3c, 0xd3, 0x0c, 0x7d, 0x82, 0x89, 0x8b, 0xf1, 0xce, 0xf1, 0xce, 0xc9,
-	0xec, 0xf4, 0x75, 0x74, 0xc7, 0x1a, 0xd1, 0xb9, 0xad, 0xff, 0x22, 0x08, 0x93, 0x25, 0x15, 0xe9,
-	0x46, 0x00, 0x7d, 0x80, 0x29, 0xe9, 0x7b, 0xc1, 0x2f, 0x48, 0x2b, 0x71, 0x60, 0xd4, 0x5e, 0xde,
-	0xa9, 0xf6, 0xd6, 0x75, 0xa4, 0x57, 0xbd, 0xe8, 0x19, 0xc0, 0x20, 0xa9, 0xc8, 0xca, 0x96, 0x54,
-	0x12, 0xdf, 0x33, 0x63, 0x4f, 0x35, 0x79, 0xaf, 0xc1, 0xfc, 0x1d, 0xec, 0x6e, 0xba, 0xd0, 0x11,
-	0xcc, 0x48, 0x51, 0x08, 0x2a, 0x65, 0xc6, 0x86, 0xce, 0x59, 0x00, 0x0e, 0x9d, 0x0d, 0x1d, 0x7a,
-	0x0a, 0x63, 0xd2, 0xf1, 0x81, 0x29, 0xb7, 0xbe, 0x8b, 0xe6, 0x7f, 0x3d, 0x78, 0x78, 0x63, 0x13,
-	0xf4, 0x0a, 0x90, 0xaa, 0x1b, 0x99, 0x6d, 0xdb, 0x66, 0x35, 0xf7, 0x75, 0xe6, 0xfc, 0xba, 0x75,
-	0x11, 0x1c, 0x70, 0x55, 0x53, 0x91, 0xdd, 0xe6, 0xf2, 0x23, 0x93, 0xda, 0xaa, 0xbf, 0x9a, 0x24,
-	0xb8, 0x3e, 0x09, 0x7a, 0x0e, 0x7b, 0x92, 0xb2, 0x22, 0x13, 0xf4, 0xdb, 0x40, 0xa5, 0x32, 0xfb,
-	0xee, 0xa6, 0x33, 0xcd, 0x52, 0x8b, 0xd0, 0x03, 0xf0, 0x15, 0xc7, 0x63, 0xd3, 0xe6, 0x2b, 0x8e,
-	0x10, 0x04, 0xa5, 0xe0, 0x1d, 0x9e, 0x18, 0x62, 0xce, 0xc6, 0x09, 0xe3, 0x0a, 0x2d, 0xb2, 0x7c,
-	0x89, 0xa7, 0xce, 0x09, 0x87, 0x92, 0x65, 0xf2, 0xf9, 0xd7, 0x2a, 0xf4, 0x2e, 0x57, 0xa1, 0xf7,
-	0x67, 0x15, 0x7a, 0x3f, 0xd7, 0xe1, 0xe8, 0x72, 0x1d, 0x8e, 0x7e, 0xaf, 0xc3, 0xd1, 0xd7, 0xd3,
-	0xaa, 0x51, 0xf5, 0x90, 0x47, 0x0b, 0xde, 0xc5, 0xff, 0xef, 0x2b, 0xde, 0xbe, 0xaf, 0xf8, 0xbb,
-	0x7b, 0x8c, 0xb1, 0x5a, 0xf6, 0x54, 0xe6, 0x63, 0xf3, 0x26, 0xdf, 0xfc, 0x0b, 0x00, 0x00, 0xff,
-	0xff, 0x40, 0xbb, 0xde, 0x7b, 0x0d, 0x03, 0x00, 0x00,
+	// 509 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x93, 0x4d, 0x6f, 0xd3, 0x30,
+	0x18, 0xc7, 0x97, 0xf4, 0xfd, 0xe9, 0x18, 0xc3, 0x1b, 0xc8, 0xaa, 0x44, 0x56, 0xca, 0xa5, 0x08,
+	0x94, 0xa0, 0x71, 0xe5, 0x42, 0x85, 0x86, 0x8a, 0xd0, 0x34, 0x05, 0x4e, 0x5c, 0x22, 0xa7, 0x71,
+	0xd3, 0x48, 0x8d, 0x1d, 0x6c, 0x67, 0xa2, 0x9f, 0x02, 0x3e, 0x16, 0xc7, 0x1d, 0x39, 0x70, 0x40,
+	0xed, 0x17, 0x41, 0xb1, 0xdd, 0xf5, 0x45, 0x48, 0x3d, 0xc5, 0xcf, 0x2f, 0xcf, 0xff, 0xef, 0xe7,
+	0x25, 0x81, 0xc7, 0x31, 0x49, 0x52, 0x2a, 0x83, 0x98, 0xcc, 0x09, 0x9b, 0x50, 0xe9, 0x17, 0x82,
+	0x2b, 0x8e, 0x2e, 0x94, 0xa0, 0xb7, 0x5c, 0xe4, 0xd9, 0xdc, 0x8f, 0x33, 0x65, 0x72, 0x26, 0x33,
+	0x92, 0x31, 0xdf, 0x9c, 0x7b, 0xe7, 0x29, 0x4f, 0xb9, 0xce, 0x0d, 0xaa, 0x93, 0x91, 0xf5, 0xce,
+	0xac, 0x5b, 0x41, 0x04, 0xc9, 0xe5, 0x1e, 0x34, 0x0f, 0x03, 0x07, 0x7f, 0x5c, 0x38, 0x1d, 0x55,
+	0x60, 0x64, 0x2e, 0x1e, 0xb3, 0x29, 0x47, 0x9f, 0xe1, 0x24, 0x4b, 0xe4, 0x15, 0x17, 0x16, 0x4a,
+	0xec, 0xf4, 0x6b, 0xc3, 0xee, 0xe5, 0x4b, 0xff, 0x40, 0x39, 0xfe, 0xda, 0xe5, 0xbd, 0x0c, 0xf7,
+	0x2c, 0x50, 0x0f, 0xda, 0xeb, 0xe6, 0xb0, 0xdb, 0xaf, 0x0d, 0xeb, 0xe1, 0x7d, 0x8c, 0x9e, 0xc3,
+	0x83, 0x82, 0xb2, 0x24, 0x63, 0x69, 0xc4, 0x38, 0x9b, 0x50, 0x5c, 0xeb, 0x3b, 0xc3, 0x7a, 0x78,
+	0x6c, 0xe1, 0x75, 0xc5, 0xd0, 0x47, 0x68, 0xd9, 0x18, 0xd7, 0x75, 0x39, 0xaf, 0x0f, 0x96, 0x73,
+	0x63, 0xf2, 0xbf, 0x08, 0xc2, 0xe4, 0x94, 0x8a, 0x70, 0x6d, 0x80, 0x3e, 0x40, 0x87, 0x14, 0x85,
+	0xe0, 0xb7, 0x64, 0x2e, 0x71, 0x43, 0xbb, 0xbd, 0x38, 0xe8, 0xf6, 0xce, 0x2a, 0xc2, 0x8d, 0x16,
+	0x3d, 0x05, 0x28, 0x25, 0x15, 0xd1, 0x74, 0x4e, 0x52, 0x89, 0x9b, 0xba, 0xec, 0x4e, 0x45, 0xae,
+	0x2a, 0x30, 0x78, 0x0b, 0xb0, 0x19, 0x09, 0xc2, 0xd0, 0x92, 0x8a, 0x08, 0x35, 0x4e, 0xb0, 0xa3,
+	0x33, 0xd7, 0x21, 0x3a, 0x87, 0x06, 0x65, 0xc9, 0x38, 0xc1, 0xae, 0xe6, 0x26, 0x18, 0xc4, 0xd0,
+	0x5e, 0xdf, 0x89, 0x3c, 0x00, 0x92, 0x24, 0x82, 0x4a, 0x79, 0x5d, 0xe6, 0x56, 0xbe, 0x45, 0xd0,
+	0x13, 0x68, 0x92, 0x9c, 0x97, 0x4c, 0x59, 0x0b, 0x1b, 0x55, 0x3a, 0x59, 0xc6, 0xba, 0x83, 0x71,
+	0x62, 0xe7, 0xba, 0x45, 0x06, 0x3f, 0x5c, 0x78, 0xb8, 0x37, 0xa6, 0x3d, 0x8d, 0xb3, 0xaf, 0x41,
+	0xaf, 0x00, 0xa9, 0x59, 0x26, 0xa3, 0xdd, 0x9d, 0x99, 0x7b, 0x4f, 0xab, 0x37, 0x37, 0xdb, 0x7b,
+	0xf3, 0xe1, 0x8c, 0xab, 0x19, 0x15, 0xd1, 0xff, 0x56, 0xfc, 0x48, 0xbf, 0xda, 0xc9, 0xdf, 0x74,
+	0x52, 0xdf, 0xe9, 0xe4, 0x19, 0x1c, 0x4b, 0xca, 0x92, 0x48, 0xd0, 0x6f, 0x25, 0x95, 0x0a, 0x37,
+	0xfa, 0xce, 0xb0, 0x1d, 0x76, 0x2b, 0x16, 0x1a, 0x84, 0x4e, 0xc0, 0x55, 0xdc, 0x6e, 0xc1, 0x55,
+	0x1c, 0x21, 0xa8, 0x4f, 0x05, 0xcf, 0x71, 0x4b, 0x13, 0x7d, 0x46, 0x17, 0xd0, 0x35, 0xeb, 0xa3,
+	0x49, 0x14, 0x2f, 0x70, 0xc7, 0x4e, 0xd2, 0xa2, 0xd1, 0x62, 0xf4, 0xe9, 0xd7, 0xd2, 0x73, 0xee,
+	0x96, 0x9e, 0xf3, 0x77, 0xe9, 0x39, 0x3f, 0x57, 0xde, 0xd1, 0xdd, 0xca, 0x3b, 0xfa, 0xbd, 0xf2,
+	0x8e, 0xbe, 0x5e, 0xa6, 0x99, 0x9a, 0x95, 0xb1, 0x3f, 0xe1, 0x79, 0x70, 0xff, 0xb1, 0x04, 0xbb,
+	0x1f, 0x4b, 0xf0, 0xdd, 0xfe, 0x60, 0x81, 0x5a, 0x14, 0x54, 0xc6, 0x4d, 0xfd, 0x9f, 0xbd, 0xf9,
+	0x17, 0x00, 0x00, 0xff, 0xff, 0xf3, 0xa2, 0x6f, 0x02, 0xe1, 0x03, 0x00, 0x00,
 }
 
 func (m *BadgeBalanceInfo) Marshal() (dAtA []byte, err error) {
@@ -308,7 +389,7 @@ func (m *BadgeBalanceInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if m.UserFlags != 0 {
 		i = encodeVarintBalances(dAtA, i, uint64(m.UserFlags))
 		i--
-		dAtA[i] = 0x28
+		dAtA[i] = 0x30
 	}
 	if len(m.Approvals) > 0 {
 		for iNdEx := len(m.Approvals) - 1; iNdEx >= 0; iNdEx-- {
@@ -321,7 +402,7 @@ func (m *BadgeBalanceInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintBalances(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x22
+			dAtA[i] = 0x2a
 		}
 	}
 	if len(m.Pending) > 0 {
@@ -335,16 +416,76 @@ func (m *BadgeBalanceInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintBalances(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x1a
+			dAtA[i] = 0x22
 		}
 	}
 	if m.PendingNonce != 0 {
 		i = encodeVarintBalances(dAtA, i, uint64(m.PendingNonce))
 		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.Balances) > 0 {
+		dAtA2 := make([]byte, len(m.Balances)*10)
+		var j1 int
+		for _, num := range m.Balances {
+			for num >= 1<<7 {
+				dAtA2[j1] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j1++
+			}
+			dAtA2[j1] = uint8(num)
+			j1++
+		}
+		i -= j1
+		copy(dAtA[i:], dAtA2[:j1])
+		i = encodeVarintBalances(dAtA, i, uint64(j1))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.IdsForBalances) > 0 {
+		for iNdEx := len(m.IdsForBalances) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.IdsForBalances[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintBalances(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *BalanceIDs) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *BalanceIDs) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *BalanceIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.EndId != 0 {
+		i = encodeVarintBalances(dAtA, i, uint64(m.EndId))
+		i--
 		dAtA[i] = 0x10
 	}
-	if m.Balance != 0 {
-		i = encodeVarintBalances(dAtA, i, uint64(m.Balance))
+	if m.StartId != 0 {
+		i = encodeVarintBalances(dAtA, i, uint64(m.StartId))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -371,6 +512,11 @@ func (m *Approval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.SubbadgeId != 0 {
+		i = encodeVarintBalances(dAtA, i, uint64(m.SubbadgeId))
+		i--
+		dAtA[i] = 0x18
+	}
 	if m.Amount != 0 {
 		i = encodeVarintBalances(dAtA, i, uint64(m.Amount))
 		i--
@@ -437,10 +583,15 @@ func (m *PendingTransfer) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if m.OtherPendingNonce != 0 {
 		i = encodeVarintBalances(dAtA, i, uint64(m.OtherPendingNonce))
 		i--
-		dAtA[i] = 0x10
+		dAtA[i] = 0x18
 	}
 	if m.ThisPendingNonce != 0 {
 		i = encodeVarintBalances(dAtA, i, uint64(m.ThisPendingNonce))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.SubbadgeId != 0 {
+		i = encodeVarintBalances(dAtA, i, uint64(m.SubbadgeId))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -464,8 +615,18 @@ func (m *BadgeBalanceInfo) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Balance != 0 {
-		n += 1 + sovBalances(uint64(m.Balance))
+	if len(m.IdsForBalances) > 0 {
+		for _, e := range m.IdsForBalances {
+			l = e.Size()
+			n += 1 + l + sovBalances(uint64(l))
+		}
+	}
+	if len(m.Balances) > 0 {
+		l = 0
+		for _, e := range m.Balances {
+			l += sovBalances(uint64(e))
+		}
+		n += 1 + sovBalances(uint64(l)) + l
 	}
 	if m.PendingNonce != 0 {
 		n += 1 + sovBalances(uint64(m.PendingNonce))
@@ -488,6 +649,21 @@ func (m *BadgeBalanceInfo) Size() (n int) {
 	return n
 }
 
+func (m *BalanceIDs) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.StartId != 0 {
+		n += 1 + sovBalances(uint64(m.StartId))
+	}
+	if m.EndId != 0 {
+		n += 1 + sovBalances(uint64(m.EndId))
+	}
+	return n
+}
+
 func (m *Approval) Size() (n int) {
 	if m == nil {
 		return 0
@@ -500,6 +676,9 @@ func (m *Approval) Size() (n int) {
 	if m.Amount != 0 {
 		n += 1 + sovBalances(uint64(m.Amount))
 	}
+	if m.SubbadgeId != 0 {
+		n += 1 + sovBalances(uint64(m.SubbadgeId))
+	}
 	return n
 }
 
@@ -509,6 +688,9 @@ func (m *PendingTransfer) Size() (n int) {
 	}
 	var l int
 	_ = l
+	if m.SubbadgeId != 0 {
+		n += 1 + sovBalances(uint64(m.SubbadgeId))
+	}
 	if m.ThisPendingNonce != 0 {
 		n += 1 + sovBalances(uint64(m.ThisPendingNonce))
 	}
@@ -569,10 +751,10 @@ func (m *BadgeBalanceInfo) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Balance", wireType)
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IdsForBalances", wireType)
 			}
-			m.Balance = 0
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowBalances
@@ -582,12 +764,103 @@ func (m *BadgeBalanceInfo) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Balance |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			if msglen < 0 {
+				return ErrInvalidLengthBalances
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthBalances
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.IdsForBalances = append(m.IdsForBalances, &BalanceIDs{})
+			if err := m.IdsForBalances[len(m.IdsForBalances)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 2:
+			if wireType == 0 {
+				var v uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowBalances
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.Balances = append(m.Balances, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowBalances
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthBalances
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthBalances
+				}
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				var count int
+				for _, integer := range dAtA[iNdEx:postIndex] {
+					if integer < 128 {
+						count++
+					}
+				}
+				elementCount = count
+				if elementCount != 0 && len(m.Balances) == 0 {
+					m.Balances = make([]uint64, 0, elementCount)
+				}
+				for iNdEx < postIndex {
+					var v uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowBalances
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Balances = append(m.Balances, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Balances", wireType)
+			}
+		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PendingNonce", wireType)
 			}
@@ -606,7 +879,7 @@ func (m *BadgeBalanceInfo) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 3:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Pending", wireType)
 			}
@@ -640,7 +913,7 @@ func (m *BadgeBalanceInfo) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 4:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Approvals", wireType)
 			}
@@ -674,7 +947,7 @@ func (m *BadgeBalanceInfo) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
+		case 6:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UserFlags", wireType)
 			}
@@ -689,6 +962,94 @@ func (m *BadgeBalanceInfo) Unmarshal(dAtA []byte) error {
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.UserFlags |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipBalances(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthBalances
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *BalanceIDs) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowBalances
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: BalanceIDs: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: BalanceIDs: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StartId", wireType)
+			}
+			m.StartId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBalances
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.StartId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndId", wireType)
+			}
+			m.EndId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBalances
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.EndId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -781,6 +1142,25 @@ func (m *Approval) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeId", wireType)
+			}
+			m.SubbadgeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBalances
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.SubbadgeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipBalances(dAtA[iNdEx:])
@@ -833,6 +1213,25 @@ func (m *PendingTransfer) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeId", wireType)
+			}
+			m.SubbadgeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBalances
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.SubbadgeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ThisPendingNonce", wireType)
 			}
 			m.ThisPendingNonce = 0
@@ -850,7 +1249,7 @@ func (m *PendingTransfer) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 2:
+		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field OtherPendingNonce", wireType)
 			}

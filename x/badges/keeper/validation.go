@@ -26,24 +26,25 @@ func (k Keeper) UniversalValidateMsgAndReturnMsgInfo(ctx sdk.Context, MsgCreator
 	return CreatorAccountNum, badge, permissions, nil
 }
 
-func (k Keeper) HandlePreTransfer(ctx sdk.Context, badge types.BitBadge, badgeId uint64, subbadgeId uint64, from uint64, to uint64, requester uint64, amount uint64) error {
+func (k Keeper) HandlePreTransfer(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, badge types.BitBadge, badgeId uint64, subbadgeId uint64, from uint64, to uint64, requester uint64, amount uint64) (types.BadgeBalanceInfo, error) {
+	newBadgeBalanceInfo := badgeBalanceInfo
 	permissions := types.GetPermissions(badge.PermissionFlags)
-	FromBalanceKey := GetBalanceKey(from, badgeId, subbadgeId)
 
 	can_transfer := AccountNotFrozen(badge, permissions, from)
 	if !can_transfer {
-		return ErrAddressFrozen
+		return badgeBalanceInfo, ErrAddressFrozen
 	}
 
 	// Check and handle approvals if requester != from
 	if from != requester {
-		err := k.RemoveBalanceFromApproval(ctx, FromBalanceKey, amount, requester) //if pending and cancelled, this approval will be added back
+		postApprovalBadgeBalanceInfo, err := k.RemoveBalanceFromApproval(ctx, newBadgeBalanceInfo, amount, requester, subbadgeId) //if pending and cancelled, this approval will be added back
+		newBadgeBalanceInfo = postApprovalBadgeBalanceInfo
 		if err != nil {
-			return err
+			return badgeBalanceInfo, err
 		}
 	}
 
-	return nil
+	return newBadgeBalanceInfo, nil
 }
 
 func AccountNotFrozen(badge types.BitBadge, permissions types.PermissionFlags, address uint64) bool {

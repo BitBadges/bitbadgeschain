@@ -24,17 +24,15 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 		return nil, err
 	}
 
-	_, err = k.AssertBadgeAndSubBadgeExistsAndReturnBadge(ctx, req.BadgeId, req.SubbadgeId)
-	if err != nil {
-		return nil, err
+	_, found := k.GetBadgeFromStore(ctx, req.BadgeId)
+	if !found {
+		return nil, ErrBadgeNotExists
 	}
 
 	full_id := GetBalanceKey(
 		req.Address,
 		req.BadgeId,
-		req.SubbadgeId,
 	)
-
 	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, full_id)
 	if found {
 		return &types.QueryGetBalanceResponse{

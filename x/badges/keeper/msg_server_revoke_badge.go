@@ -23,25 +23,48 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 		return nil, ErrInvalidPermissions
 	}
 
+	ManagerBalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId)
+	managerBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, ManagerBalanceKey)
+	if !found {
+		return nil, ErrBadgeBalanceNotExists
+	}
+
 	for i, revokeAddress := range msg.Addresses {
 		if revokeAddress == CreatorAccountNum {
 			return nil, ErrSenderAndReceiverSame
 		}
 
-		AddressBalanceKey := GetBalanceKey(revokeAddress, msg.BadgeId, msg.SubbadgeId)
-		ManagerBalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId, msg.SubbadgeId)
+		// Note that we check for duplicates in ValidateBasic, so these addresses will be unique every time
+		AddressBalanceKey := GetBalanceKey(revokeAddress, msg.BadgeId)
+		addressBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, AddressBalanceKey)
+		if !found {
+			return nil, ErrBadgeBalanceNotExists
+		}
+		
 
 		revokeAmount := msg.Amounts[i]
-		err = k.RemoveFromBadgeBalance(ctx, AddressBalanceKey, revokeAmount)
+		addressBalanceInfo, err = k.RemoveFromBadgeBalance(ctx, addressBalanceInfo, msg.SubbadgeId, revokeAmount)
 		if err != nil {
 			return nil, err
 		}
 
-		err = k.AddToBadgeBalance(ctx, ManagerBalanceKey, revokeAmount)
+		managerBalanceInfo, err = k.AddToBadgeBalance(ctx, managerBalanceInfo, msg.SubbadgeId, revokeAmount)
+		if err != nil {
+			return nil, err
+		}
+
+		err = k.SetBadgeBalanceInStore(ctx, AddressBalanceKey, addressBalanceInfo)
 		if err != nil {
 			return nil, err
 		}
 	}
+
+	err = k.SetBadgeBalanceInStore(ctx, ManagerBalanceKey, managerBalanceInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,

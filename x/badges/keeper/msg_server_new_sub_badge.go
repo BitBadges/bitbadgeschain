@@ -28,6 +28,13 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	if !permissions.CanCreateSubbadges() {
 		return nil, ErrInvalidPermissions
 	}
+
+	ManagerBalanceKey := GetBalanceKey(CreatorAccountNum, msg.Id)
+	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, ManagerBalanceKey)
+	if !found {
+		badgeBalanceInfo = GetEmptyBadgeBalanceTemplate()
+	}
+
 	originalSubassetId := badge.NextSubassetId
 	for i, supply := range msg.Supplys {
 		for j := uint64(0); j < msg.AmountsToCreate[i]; j++ {
@@ -63,14 +70,19 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 			badge.NextSubassetId += 1
 
 			//Mint the total supply of subbadge to the manager
-			ManagerBalanceKey := GetBalanceKey(CreatorAccountNum, msg.Id, subasset_id)
-			if err := k.AddToBadgeBalance(ctx, ManagerBalanceKey, supply); err != nil {
+			newBadgeBalanceInfo, err := k.AddToBadgeBalance(ctx, badgeBalanceInfo, subasset_id, supply); 
+			if err != nil {
 				return nil, err
 			}
+			badgeBalanceInfo = newBadgeBalanceInfo
 		}
 	}
 
 	if err := k.SetBadgeInStore(ctx, badge); err != nil {
+		return nil, err
+	}
+
+	if err := k.SetBadgeBalanceInStore(ctx, ManagerBalanceKey, badgeBalanceInfo); err != nil {
 		return nil, err
 	}
 

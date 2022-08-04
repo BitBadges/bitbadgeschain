@@ -2,6 +2,7 @@ package cli
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -15,30 +16,53 @@ var _ = strconv.Itoa(0)
 
 func CmdTransferBadge() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "transfer-badge [from] [to] [amount] [badge-id] [subbadge-id]",
+		Use:   "transfer-badge [from] [to] [amount] [badge-id] [subbadge-id-start] [subbadge-id-end]",
 		Short: "Broadcast message transferBadge",
-		Args:  cobra.ExactArgs(5),
+		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argFrom, err := cast.ToUint64E(args[0])
 			if err != nil {
 				return err
 			}
-			argTo, err := cast.ToUint64E(args[1])
-			if err != nil {
-				return err
+
+			argToAddresses := strings.Split(args[1], ",")
+
+			argToAddressesUint64 := []uint64{}
+			for _, toAddress := range argToAddresses {
+				addressAsUint64, err := cast.ToUint64E(toAddress)
+				if err != nil {
+					return err
+				}
+
+				argToAddressesUint64 = append(argToAddressesUint64, addressAsUint64)
 			}
-			argAmount, err := cast.ToUint64E(args[2])
-			if err != nil {
-				return err
+
+			argAmounts := strings.Split(args[2], ",")
+
+			argAmountsUint64 := []uint64{}
+			for _, amount := range argAmounts {
+				amountAsUint64, err := cast.ToUint64E(amount)
+				if err != nil {
+					return err
+				}
+
+				argAmountsUint64 = append(argAmountsUint64, amountAsUint64)
 			}
+
 			argBadgeId, err := cast.ToUint64E(args[3])
 			if err != nil {
 				return err
 			}
-			argSubbadgeId, err := cast.ToUint64E(args[4])
+			argSubbadgeIdStart, err := cast.ToUint64E(args[4])
 			if err != nil {
 				return err
 			}
+
+			argSubbadgeIdEnd, err := cast.ToUint64E(args[5])
+			if err != nil {
+				return err
+			}
+
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -48,10 +72,13 @@ func CmdTransferBadge() *cobra.Command {
 			msg := types.NewMsgTransferBadge(
 				clientCtx.GetFromAddress().String(),
 				argFrom,
-				argTo,
-				argAmount,
+				argToAddressesUint64,
+				argAmountsUint64,
 				argBadgeId,
-				argSubbadgeId,
+				types.SubbadgeRange{
+					Start: argSubbadgeIdStart,
+					End:   argSubbadgeIdEnd,
+				},
 			)
 
 			if err := msg.ValidateBasic(); err != nil {

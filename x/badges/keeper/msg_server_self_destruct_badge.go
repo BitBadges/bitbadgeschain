@@ -27,7 +27,7 @@ func (k msgServer) SelfDestructBadge(goCtx context.Context, msg *types.MsgSelfDe
 	nextSubassetId := badge.NextSubassetId
 	
 	for i := uint64(0); i < nextSubassetId; i++ {
-		ManagerBalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId, i)
+		ManagerBalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId,)
 		SubassetSupply := uint64(1) //Default if not found
 		for _, subasset := range badge.SubassetsTotalSupply {
 			if subasset.StartId <= i && subasset.EndId >= i {
@@ -37,7 +37,8 @@ func (k msgServer) SelfDestructBadge(goCtx context.Context, msg *types.MsgSelfDe
 		}
 
 		balanceInfo, found := k.GetBadgeBalanceFromStore(ctx, ManagerBalanceKey)
-		if !found || balanceInfo.Balance < SubassetSupply {
+		balance := GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(i, balanceInfo.IdsForBalances, balanceInfo.Balances)
+		if !found || balance < SubassetSupply {
 			return nil, ErrMustOwnTotalSupplyToSelfDestruct
 		}
 	}

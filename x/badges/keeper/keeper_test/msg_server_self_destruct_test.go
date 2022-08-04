@@ -43,7 +43,7 @@ func (suite *TestSuite) TestSelfDestruct() {
 			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
 	err = SelfDestructBadge(suite, wctx, bob, 0)
 	suite.Require().Nil(err, "Error self destructing badge")
@@ -58,7 +58,7 @@ func (suite *TestSuite) TestSelfDestruct() {
 	err = CreateSubBadges(suite, wctx, bob, 1, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 	
-	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, firstAccountNumCreated + 1, 500, 1, 0)
+	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{500}, 1, types.SubbadgeRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error transferring subbadge")
 
 	err = SelfDestructBadge(suite, wctx, bob, 1)
@@ -103,7 +103,7 @@ func (suite *TestSuite) TestSelfDestructNotManager() {
 			Supply:  10000,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10000), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
 	err = SelfDestructBadge(suite, wctx, alice, 0)
 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())

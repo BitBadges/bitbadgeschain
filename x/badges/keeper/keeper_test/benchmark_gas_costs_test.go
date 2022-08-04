@@ -37,7 +37,7 @@ func (suite *TestSuite) TestGasCosts() {
 		
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+		err := CreateSubBadges(suite, wctx, bob, 0, []uint64{1000000}, []uint64{1})
 		suite.Require().Nil(err, "Error creating subbadge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("CreateSubBadge 1 (Supply 10000)", endGas - startGas)
@@ -105,7 +105,7 @@ func (suite *TestSuite) TestGasCosts() {
 
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, firstAccountNumCreated+1, 1, 0, 0)
+		err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{1}, 0, types.SubbadgeRange{Start: 0, End: 0})
 		suite.Require().Nil(err, "Error transferring badge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("TransferBadge - Pending 1", endGas - startGas)
@@ -127,12 +127,10 @@ func (suite *TestSuite) TestGasCosts() {
 		tbl.AddRow("GetBadgeBalance", endGas - startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		for i := 0; i < 1000; i++ {
-			err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, firstAccountNumCreated+1, 1, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}
+		err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{1}, 0, types.SubbadgeRange{Start: 0, End: 999})
+		suite.Require().Nil(err, "Error transferring badge")	
 		endGas = suite.ctx.GasMeter().GasConsumed();
-		tbl.AddRow("TransferBadge - Pending 1000", endGas - startGas)
+		tbl.AddRow("TransferBadge - Pending 1000 Diff IDs", endGas - startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
 		_, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated + 1)
@@ -152,7 +150,7 @@ func (suite *TestSuite) TestGasCosts() {
 
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, firstAccountNumCreated+1, 1, 0, 0)
+		err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{1}, 0, types.SubbadgeRange{Start: 0, End: 0})
 		suite.Require().Nil(err, "Error transferring badge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("TransferBadge - Pending 1", endGas - startGas)
@@ -174,10 +172,8 @@ func (suite *TestSuite) TestGasCosts() {
 		tbl.AddRow("GetBadgeBalance", endGas - startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		for i := 0; i < 1000; i++ {
-			err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, firstAccountNumCreated+1, 1, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}
+		err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{1}, 0, types.SubbadgeRange{Start: 1000, End: 1999})
+		suite.Require().Nil(err, "Error transferring badge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("TransferBadge - Pending 1000", endGas - startGas)
 
@@ -200,7 +196,7 @@ func (suite *TestSuite) TestGasCosts() {
 		
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, 0)
+		err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, types.SubbadgeRange{Start: 0, End: 0})
 		suite.Require().Nil(err, "Error transferring badge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("RequestTransferBadge - 1", endGas - startGas)
@@ -222,10 +218,8 @@ func (suite *TestSuite) TestGasCosts() {
 		tbl.AddRow("GetBadgeBalance", endGas - startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		for i := 0; i < 1000; i++ {
-			err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}
+		err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, types.SubbadgeRange{Start: 0, End: 999})
+		suite.Require().Nil(err, "Error transferring badge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("Request Transfer- 1000", endGas - startGas)
 
@@ -247,7 +241,7 @@ func (suite *TestSuite) TestGasCosts() {
 
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, 0)
+		err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, types.SubbadgeRange{Start: 0, End: 0})
 		suite.Require().Nil(err, "Error transferring badge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("RequestTransferBadge - 1", endGas - startGas)
@@ -269,10 +263,8 @@ func (suite *TestSuite) TestGasCosts() {
 		tbl.AddRow("GetBadgeBalance", endGas - startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		for i := 0; i < 1000; i++ {
-			err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}
+		err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, types.SubbadgeRange{Start: 0, End: 999})
+		suite.Require().Nil(err, "Error transferring badge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("Request Transfer- 1000", endGas - startGas)
 
@@ -339,7 +331,7 @@ func (suite *TestSuite) TestGasCosts() {
 		tbl.AddRow("GetBadgeBalance", endGas - startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		err = SetApproval(suite, wctx, bob, 0, firstAccountNumCreated + 1, 0, 0)
+		err = SetApproval(suite, wctx, bob, 10, firstAccountNumCreated + 1, 0, 0)
 		suite.Require().Nil(err, "Error transferring badge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("Remove Approval 1", endGas - startGas)
@@ -351,22 +343,91 @@ func (suite *TestSuite) TestGasCosts() {
 
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		for j := 0; j < 1000; j++ {
-			err = SetApproval(suite, wctx, bob, 0, firstAccountNumCreated + 1 + uint64(j), 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}
+		// for j := 0; j < 1000; j++ {
+		// 	err = SetApproval(suite, wctx, bob, 10, firstAccountNumCreated + 1 + uint64(j), 0, 0)
+		// 	suite.Require().Nil(err, "Error transferring badge")
+		// }
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("Set Approval 1000", endGas - startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
 		_, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 		endGas = suite.ctx.GasMeter().GasConsumed();
-		tbl.AddRow("GetBadgeBalance", endGas - startGas)		
+		tbl.AddRow("GetBadgeBalance", endGas - startGas)	
+		
+		badgesToCreate = []BadgesToCreate{
+			{
+				Badge: types.MsgNewBadge{
+					Uri:          validUri,
+					Permissions:  62,
+					SubassetUris: validUri,
+				},
+				Amount:  1,
+				Creator: bob,
+			},
+		}
+
+		startGas = suite.ctx.GasMeter().GasConsumed();
+		CreateBadges(suite, wctx, badgesToCreate)
+		endGas = suite.ctx.GasMeter().GasConsumed();
+		tbl.AddRow("CreateBadge", endGas - startGas)
+
+		startGas = suite.ctx.GasMeter().GasConsumed();
+		_, _ = GetBadge(suite, wctx, 1)
+		endGas = suite.ctx.GasMeter().GasConsumed();
+		tbl.AddRow("GetBadge", endGas - startGas)
+		
+
+		startGas = suite.ctx.GasMeter().GasConsumed();
+		err = CreateSubBadges(suite, wctx, bob, 1, []uint64{10000}, []uint64{10000})
+		suite.Require().Nil(err, "Error creating subbadge")
+		endGas = suite.ctx.GasMeter().GasConsumed();
+		tbl.AddRow("CreateSubBadge 10000 (Supply 10000)", endGas - startGas)
+
+		startGas = suite.ctx.GasMeter().GasConsumed();
+		err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{1}, 1, types.SubbadgeRange{Start: 0, End: 0})
+		suite.Require().Nil(err, "Error transferring badge")
+		endGas = suite.ctx.GasMeter().GasConsumed();
+		tbl.AddRow("TransferBadge - Forceful 1", endGas - startGas)
+
+		startGas = suite.ctx.GasMeter().GasConsumed();
+		_, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated + 1)
+		endGas = suite.ctx.GasMeter().GasConsumed();
+		tbl.AddRow("GetBadgeBalance", endGas - startGas)
+
+		startGas = suite.ctx.GasMeter().GasConsumed();
+		err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{1}, 1, types.SubbadgeRange{Start: 0, End: 999})
+		suite.Require().Nil(err, "Error transferring badge")
+		endGas = suite.ctx.GasMeter().GasConsumed();
+		tbl.AddRow("TransferBadge - Forceful 1000 (Same Address, Diff Subbadge ID)", endGas - startGas)
+
+		startGas = suite.ctx.GasMeter().GasConsumed();
+		_, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated + 1)
+		endGas = suite.ctx.GasMeter().GasConsumed();
+		tbl.AddRow("GetBadgeBalance", endGas - startGas)
+
+		startGas = suite.ctx.GasMeter().GasConsumed();
+		addresses := []uint64{}
+		for i := 0; i < 1000; i++ {
+			addresses = append(addresses, firstAccountNumCreated + 1 + uint64(i))
+		}
+		err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, addresses, []uint64{1}, 1, types.SubbadgeRange{Start: 0, End: 0})
+		suite.Require().Nil(err, "Error transferring badge")
+		suite.Require().Nil(err, "Error transferring badge")
+		endGas = suite.ctx.GasMeter().GasConsumed();
+		tbl.AddRow("TransferBadge - Forceful 1000 (Different Addresses, Same SubbadgeId)", endGas - startGas)
+
+		startGas = suite.ctx.GasMeter().GasConsumed();
+		_, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated + 1)
+		endGas = suite.ctx.GasMeter().GasConsumed();
+		tbl.AddRow("GetBadgeBalance", endGas - startGas)
+
 
 		firstColumnFormatter := func(format string, vals ...interface{}) string {
 			return ""
 		}
 		
 		tbl.WithFirstColumnFormatter(firstColumnFormatter).Print()
+
 	}
 }

@@ -23,4 +23,6 @@ var (
 	ErrAmountEqualsZero                  = sdkerrors.Register(ModuleName, 1511, "amount to create equals zero")
 	ErrInvalidAmountsAndAddressesLength  = sdkerrors.Register(ModuleName, 1512, "invalid amounts and addresses length")
 	ErrInvalidBadgeHash				  	 = sdkerrors.Register(ModuleName, 1513, "invalid badge hash")
+	ErrDuplicateAddresses				 = sdkerrors.Register(ModuleName, 1514, "duplicate addresses")
+	ErrStartGreaterThanEnd				 = sdkerrors.Register(ModuleName, 1515, "start greater than end")
 )

@@ -9,14 +9,14 @@ const TypeMsgTransferBadge = "transfer_badge"
 
 var _ sdk.Msg = &MsgTransferBadge{}
 
-func NewMsgTransferBadge(creator string, from uint64, to uint64, amount uint64, badgeId uint64, subbadgeId uint64) *MsgTransferBadge {
+func NewMsgTransferBadge(creator string, from uint64, toAddresses []uint64, amounts []uint64, badgeId uint64, subbadgeRange SubbadgeRange) *MsgTransferBadge {
 	return &MsgTransferBadge{
 		Creator:    creator,
 		From:       from,
-		To:         to,
-		Amount:     amount,
+		ToAddresses:toAddresses,
+		Amounts:    amounts,
 		BadgeId:    badgeId,
-		SubbadgeId: subbadgeId,
+		SubbadgeRange: &subbadgeRange,
 	}
 }
 
@@ -47,9 +47,25 @@ func (msg *MsgTransferBadge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	//Can't send to same address
-	if msg.To == msg.From {
-		return ErrSenderAndReceiverSame
+	if msg.SubbadgeRange == nil || msg.SubbadgeRange.Start > msg.SubbadgeRange.End {
+		return ErrStartGreaterThanEnd
+	}
+
+	if duplicateInArray(msg.ToAddresses) {
+		return ErrDuplicateAddresses
+	}
+
+	for _, toAddress := range msg.ToAddresses {
+		//Can't send to same address
+		if toAddress == msg.From {
+			return ErrSenderAndReceiverSame
+		}
+	}
+
+	for _, amount := range msg.Amounts {
+		if amount == uint64(0) {
+			return ErrAmountEqualsZero
+		}
 	}
 	return nil
 }

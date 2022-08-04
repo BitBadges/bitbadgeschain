@@ -52,10 +52,15 @@ message MsgNewSubBadgeResponse {
 message MsgTransferBadge {
     string creator = 1;
     uint64 from = 2;
-    uint64 to = 3;
-    uint64 amount = 4;
+    repeated uint64 toAddresses = 3;
+    repeated uint64 amounts = 4;
     uint64 badgeId = 5;
-    uint64 subbadgeId = 6;
+    SubbadgeRange subbadgeRange = 6;
+}
+
+message SubbadgeRange {
+    uint64 start = 1;
+    uint64 end = 2;
 }
 
 message MsgTransferBadgeResponse {}
@@ -65,7 +70,7 @@ message MsgRequestTransferBadge {
     uint64 from = 2;
     uint64 amount = 4;
     uint64 badgeId = 5;
-    uint64 subbadgeId = 6;
+    SubbadgeRange subbadgeRange = 6;
 }
 
 message MsgRequestTransferBadgeResponse {}

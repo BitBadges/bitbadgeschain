@@ -38,7 +38,7 @@ func (suite *TestSuite) TestNewSubBadges() {
 			Supply:  10,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(10), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
 	//Create subbadge 2 with supply == 1
 	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{1}, []uint64{1})
@@ -55,7 +55,7 @@ func (suite *TestSuite) TestNewSubBadges() {
 			Supply:  10,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(1), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(1), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(1, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
 	//Create subbadge 2 with supply == 10
 	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{10}, []uint64{2})
@@ -76,7 +76,7 @@ func (suite *TestSuite) TestNewSubBadges() {
 			Supply:  10,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10), bobBalanceInfo.Balance)
+	suite.Require().Equal(uint64(10), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(2, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 }
 
 func (suite *TestSuite) TestNewSubBadgesNotManager() {
