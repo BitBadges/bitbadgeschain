@@ -39,11 +39,16 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	for i, supply := range msg.Supplys {
 		for j := uint64(0); j < msg.AmountsToCreate[i]; j++ {
 			//Once here, we should be safe to mint
-			//By default, we assume non fungible subbadge (i.e. supply == 1) so we don't store if supply == 1
+			//We don't need to store if subbadge supply == default
 			subasset_id := badge.NextSubassetId
 			defaultSupply := badge.DefaultSubassetSupply
 			if badge.DefaultSubassetSupply == 0 {
 				defaultSupply = 1
+			}
+
+			//default to supply = default when supply is 0
+			if supply == 0 {
+				supply = defaultSupply
 			}
 
 			if supply != defaultSupply {

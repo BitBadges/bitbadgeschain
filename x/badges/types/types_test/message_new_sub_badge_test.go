@@ -31,15 +31,7 @@ func TestMsgNewSubBadge_ValidateBasic(t *testing.T) {
 				Supplys:         []uint64{10},
 				AmountsToCreate: []uint64{1},
 			},
-		}, {
-			name: "invalid supply",
-			msg: types.MsgNewSubBadge{
-				Creator:         sample.AccAddress(),
-				Supplys:         []uint64{0},
-				AmountsToCreate: []uint64{1},
-			},
-			err: types.ErrSupplyEqualsZero,
-		}, {
+		},  {
 			name: "invalid amount",
 			msg: types.MsgNewSubBadge{
 				Creator:         sample.AccAddress(),

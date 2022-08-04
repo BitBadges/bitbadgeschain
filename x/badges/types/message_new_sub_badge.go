@@ -49,10 +49,7 @@ func (msg *MsgNewSubBadge) ValidateBasic() error {
 		return ErrInvalidSupplyAndAmounts
 	}
 
-	for i, supply := range msg.Supplys {
-		if supply == 0 {
-			return ErrSupplyEqualsZero
-		}
+	for i, _ := range msg.Supplys {
 
 		if msg.AmountsToCreate[i] == 0 {
 			return ErrAmountEqualsZero
