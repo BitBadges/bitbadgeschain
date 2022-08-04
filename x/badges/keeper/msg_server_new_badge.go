@@ -15,8 +15,8 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 	NextBadgeId := k.GetNextAssetId(ctx)
 	k.IncrementNextAssetId(ctx)
 	
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
-	ctx.GasMeter().ConsumeGas(BadgeCost, "create new badge cost")
+	// ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
+	// ctx.GasMeter().ConsumeGas(BadgeCost, "create new badge cost")
 
 	badge := types.BitBadge{
 		Id:                NextBadgeId,
