@@ -135,7 +135,9 @@ func SetBadgeBalanceBySubbadgeId(subbadgeId uint64, amount uint64, ids []*types.
 
 func UpdateBadgeBalanceBySubbadgeId(subbadgeId uint64, newAmount uint64, ids []*types.SubbadgeRange, balances []uint64) ([]*types.SubbadgeRange, []uint64) {
 	ids, balances = RemoveBadgeBalanceBySubbadgeId(subbadgeId, ids, balances)
-	ids, balances = SetBadgeBalanceBySubbadgeId(subbadgeId, newAmount, ids, balances)
+	if newAmount != 0 {
+		ids, balances = SetBadgeBalanceBySubbadgeId(subbadgeId, newAmount, ids, balances)
+	}
 	return ids, balances
 }
 
@@ -183,7 +185,7 @@ func (k Keeper) RemoveFromBadgeBalance(ctx sdk.Context, badgeBalanceInfo types.B
 	return badgeBalanceInfo, nil
 }
 
-func (k Keeper) AddToBothPendingBadgeBalances(ctx sdk.Context, fromBadgeBalanceInfo types.BadgeBalanceInfo, toBadgeBalanceInfo types.BadgeBalanceInfo, subbadgeId uint64, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool) (types.BadgeBalanceInfo, types.BadgeBalanceInfo, error) {
+func (k Keeper) AddToBothPendingBadgeBalances(ctx sdk.Context, fromBadgeBalanceInfo types.BadgeBalanceInfo, toBadgeBalanceInfo types.BadgeBalanceInfo, subbadgeRange types.SubbadgeRange, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool) (types.BadgeBalanceInfo, types.BadgeBalanceInfo, error) {
 	ctx.GasMeter().ConsumeGas(AddOrRemovePending * 2, "add to both pending balances")
 	if amount == 0 {
 		return fromBadgeBalanceInfo, toBadgeBalanceInfo, ErrBalanceIsZero
@@ -191,7 +193,7 @@ func (k Keeper) AddToBothPendingBadgeBalances(ctx sdk.Context, fromBadgeBalanceI
 
 	//Append pending transfers and update nonces
 	fromBadgeBalanceInfo.Pending = append(fromBadgeBalanceInfo.Pending, &types.PendingTransfer{
-		SubbadgeId: 	   subbadgeId,
+		SubbadgeRange: &subbadgeRange,
 		Amount:            amount,
 		ApprovedBy:        approvedBy,
 		SendRequest:       sentByFrom,
@@ -202,7 +204,7 @@ func (k Keeper) AddToBothPendingBadgeBalances(ctx sdk.Context, fromBadgeBalanceI
 	})
 
 	toBadgeBalanceInfo.Pending = append(toBadgeBalanceInfo.Pending, &types.PendingTransfer{
-		SubbadgeId: 	  	subbadgeId,
+		SubbadgeRange: &subbadgeRange,
 		Amount:            amount,
 		ApprovedBy:        approvedBy,
 		SendRequest:       !sentByFrom,

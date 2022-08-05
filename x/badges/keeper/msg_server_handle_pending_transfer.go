@@ -11,14 +11,14 @@ import (
 func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHandlePendingTransfer) (*types.MsgHandlePendingTransferResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	CreatorAccountNum, badge, _, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, []uint64{}, msg.BadgeId, msg.SubbadgeId, false,
-	)
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
-	if err != nil {
-		return nil, err
+	CreatorAccountNum := k.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
+	badge, found := k.GetBadgeFromStore(ctx, msg.BadgeId)
+	if !found {
+		return nil, ErrBadgeNotExists
 	}
-
+	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
+	
+	err :=  *new(error)
 	/*
 		Outgoing : Creator -> OtherParty
 		Incoming : OtherParty -> CreatorAccountNum
@@ -59,107 +59,110 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 	balanceInfoCache := make(map[uint64]types.BadgeBalanceInfo, 0)
 
 	updated := false
-	//In the future, we can make this a binary search since this is all sorted by the nonces (append-only)
-	for _, CurrPendingTransfer := range creatorBadgeBalanceInfo.Pending {
-		if CurrPendingTransfer.ThisPendingNonce <= msg.EndingNonce && CurrPendingTransfer.ThisPendingNonce >= msg.StartingNonce {
-			updated = true
-			if CurrPendingTransfer.SendRequest && msg.Accept {
-				return nil, ErrCantAcceptOwnTransferRequest //Handle cases 2, 4
-			}
-			
-
-			sentAndWantToCancel := CurrPendingTransfer.SendRequest && !msg.Accept      //Cases 1, 3
-			receivedAndWantToAccept := !CurrPendingTransfer.SendRequest && msg.Accept  // Cases 6, 8
-			receivedAndWantToReject := !CurrPendingTransfer.SendRequest && !msg.Accept //Cases 5, 7
-			outgoingTransfer := CurrPendingTransfer.From == CreatorAccountNum
-			balancesAreInEscrow := CurrPendingTransfer.SendRequest == outgoingTransfer
-
-			// Cases 1, 7: Existing transfer was sent, is pending, but needs to be reversed
-			needToRevertBalances := balancesAreInEscrow && ((sentAndWantToCancel && outgoingTransfer) || (receivedAndWantToReject && !outgoingTransfer))
-			// Case 6: Accept a transfer / mint request from another party. Must go through all pre transfer checks. Forceful transfer (no pending)
-			fullForcefulTransfer := receivedAndWantToAccept && outgoingTransfer
-			// Case 8: Accepting an incoming transfer. Balances and approvals already in escrow.
-			simpleAddToRecipientBalance := receivedAndWantToAccept && !outgoingTransfer
-			// Cases 3 and 5: All we need to do is remove pending requests
-			// Cases 2 and 4 already handled
-
-			//Get basic info
-			OtherPartyAccountNum := CurrPendingTransfer.From
-			if outgoingTransfer {
-				OtherPartyAccountNum = CurrPendingTransfer.To
-			}
-			OtherPartyBalanceKey := GetBalanceKey(OtherPartyAccountNum, msg.BadgeId)
-			OtherPartyNonce := CurrPendingTransfer.OtherPendingNonce
-			otherPartyBalanceInfo, ok := balanceInfoCache[OtherPartyAccountNum]
-			if !ok {
-				otherPartyBalanceInfo, found = k.GetBadgeBalanceFromStore(ctx, OtherPartyBalanceKey)
-				balanceInfoCache[OtherPartyAccountNum] = otherPartyBalanceInfo
-				if !found {
-					return nil, ErrBadgeBalanceNotExists
-				}
-			}
-			
-
-			if needToRevertBalances {
-				// Depending on if it is outgoing or not determines which party's balances to revert and add approvals back to
-				FromInfo := newCreatorBadgeBalanceInfo
-				if !outgoingTransfer {
-					FromInfo = otherPartyBalanceInfo
+	
+		//In the future, we can make this a binary search since this is all sorted by the nonces (append-only)
+		for _, CurrPendingTransfer := range creatorBadgeBalanceInfo.Pending {
+			if CurrPendingTransfer.ThisPendingNonce <= msg.NonceRanges.End && CurrPendingTransfer.ThisPendingNonce >= msg.NonceRanges.Start {
+				updated = true
+				if CurrPendingTransfer.SendRequest && msg.Accept {
+					return nil, ErrCantAcceptOwnTransferRequest //Handle cases 2, 4
 				}
 
-				FromInfo, err := k.AddToBadgeBalance(ctx, FromInfo, msg.SubbadgeId, CurrPendingTransfer.Amount); 
-				if err != nil {
-					return nil, err
-				}
+				sentAndWantToCancel := CurrPendingTransfer.SendRequest && !msg.Accept      //Cases 1, 3
+				receivedAndWantToAccept := !CurrPendingTransfer.SendRequest && msg.Accept  // Cases 6, 8
+				receivedAndWantToReject := !CurrPendingTransfer.SendRequest && !msg.Accept //Cases 5, 7
+				outgoingTransfer := CurrPendingTransfer.From == CreatorAccountNum
+				balancesAreInEscrow := CurrPendingTransfer.SendRequest == outgoingTransfer
 
-				//If it was sent via an approval, we need to add the approval back
-				if CurrPendingTransfer.ApprovedBy != CurrPendingTransfer.From {
-					FromInfo, err = k.AddBalanceToApproval(ctx, FromInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.ApprovedBy, msg.SubbadgeId) 
-					if err != nil {
-						return nil, err
+				// Cases 1, 7: Existing transfer was sent, is pending, but needs to be reversed
+				needToRevertBalances := balancesAreInEscrow && ((sentAndWantToCancel && outgoingTransfer) || (receivedAndWantToReject && !outgoingTransfer))
+				// Case 6: Accept a transfer / mint request from another party. Must go through all pre transfer checks. Forceful transfer (no pending)
+				fullForcefulTransfer := receivedAndWantToAccept && outgoingTransfer
+				// Case 8: Accepting an incoming transfer. Balances and approvals already in escrow.
+				simpleAddToRecipientBalance := receivedAndWantToAccept && !outgoingTransfer
+				// Cases 3 and 5: All we need to do is remove pending requests
+				// Cases 2 and 4 already handled
+
+				//Get basic info
+				OtherPartyAccountNum := CurrPendingTransfer.From
+				if outgoingTransfer {
+					OtherPartyAccountNum = CurrPendingTransfer.To
+				}
+				OtherPartyBalanceKey := GetBalanceKey(OtherPartyAccountNum, msg.BadgeId)
+				OtherPartyNonce := CurrPendingTransfer.OtherPendingNonce
+				otherPartyBalanceInfo, ok := balanceInfoCache[OtherPartyAccountNum]
+				if !ok {
+					otherPartyBalanceInfo, found = k.GetBadgeBalanceFromStore(ctx, OtherPartyBalanceKey)
+					balanceInfoCache[OtherPartyAccountNum] = otherPartyBalanceInfo
+					if !found {
+						return nil, ErrBadgeBalanceNotExists
+					}
+				}
+				
+				for i := CurrPendingTransfer.SubbadgeRange.Start; i <= CurrPendingTransfer.SubbadgeRange.End; i++ {
+					if needToRevertBalances {
+						// Depending on if it is outgoing or not determines which party's balances to revert and add approvals back to
+						FromInfo := newCreatorBadgeBalanceInfo
+						if !outgoingTransfer {
+							FromInfo = otherPartyBalanceInfo
+						}
+
+						FromInfo, err := k.AddToBadgeBalance(ctx, FromInfo, i, CurrPendingTransfer.Amount); 
+						if err != nil {
+							return nil, err
+						}
+
+						//If it was sent via an approval, we need to add the approval back
+						if CurrPendingTransfer.ApprovedBy != CurrPendingTransfer.From {
+							FromInfo, err = k.AddBalanceToApproval(ctx, FromInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.ApprovedBy, i) 
+							if err != nil {
+								return nil, err
+							}
+						}
+
+						if outgoingTransfer {
+							newCreatorBadgeBalanceInfo = FromInfo
+						} else {
+							otherPartyBalanceInfo = FromInfo
+						}
+					} else if fullForcefulTransfer {
+						
+						newCreatorBadgeBalanceInfo, err = k.HandlePreTransfer(ctx, newCreatorBadgeBalanceInfo, badge, msg.BadgeId, i, CurrPendingTransfer.From, CurrPendingTransfer.To, CreatorAccountNum, CurrPendingTransfer.Amount)
+						if err != nil {
+							return nil, err
+						}
+
+						newCreatorBadgeBalanceInfo, err = k.RemoveFromBadgeBalance(ctx, newCreatorBadgeBalanceInfo, i, CurrPendingTransfer.Amount)
+						if err != nil {
+							return nil, err
+						}
+
+						otherPartyBalanceInfo, err = k.AddToBadgeBalance(ctx, otherPartyBalanceInfo, i, CurrPendingTransfer.Amount)
+						if err != nil {
+							return nil, err
+						}
+					} else if simpleAddToRecipientBalance {
+						newCreatorBadgeBalanceInfo, err = k.AddToBadgeBalance(ctx, newCreatorBadgeBalanceInfo, i, CurrPendingTransfer.Amount)
+						if err != nil {
+							return nil, err
+						}
 					}
 				}
 
-				if outgoingTransfer {
-					newCreatorBadgeBalanceInfo = FromInfo
-				} else {
-					otherPartyBalanceInfo = FromInfo
+				//We already handled cases 2, 4, where we try and accept own request so all will end up with removing from both parties' pending requests whether accepting or rejecting
+				newCreatorBadgeBalanceInfo, err = k.RemovePending(ctx, newCreatorBadgeBalanceInfo, CurrPendingTransfer.ThisPendingNonce, OtherPartyNonce)
+				if err != nil {
+					return nil, err
 				}
-			} else if fullForcefulTransfer {
-				newCreatorBadgeBalanceInfo, err = k.HandlePreTransfer(ctx, newCreatorBadgeBalanceInfo, badge, msg.BadgeId, msg.SubbadgeId, CurrPendingTransfer.From, CurrPendingTransfer.To, CreatorAccountNum, CurrPendingTransfer.Amount)
+				otherPartyBalanceInfo, err = k.RemovePending(ctx, otherPartyBalanceInfo, OtherPartyNonce, CurrPendingTransfer.ThisPendingNonce)
 				if err != nil {
 					return nil, err
 				}
 
-				newCreatorBadgeBalanceInfo, err = k.RemoveFromBadgeBalance(ctx, newCreatorBadgeBalanceInfo, msg.SubbadgeId, CurrPendingTransfer.Amount)
-				if err != nil {
-					return nil, err
-				}
-
-				otherPartyBalanceInfo, err = k.AddToBadgeBalance(ctx, otherPartyBalanceInfo, msg.SubbadgeId, CurrPendingTransfer.Amount)
-				if err != nil {
-					return nil, err
-				}
-			} else if simpleAddToRecipientBalance {
-				newCreatorBadgeBalanceInfo, err = k.AddToBadgeBalance(ctx, newCreatorBadgeBalanceInfo, msg.SubbadgeId, CurrPendingTransfer.Amount)
-				if err != nil {
-					return nil, err
-				}
+				balanceInfoCache[OtherPartyAccountNum] = otherPartyBalanceInfo
 			}
-
-			//We already handled cases 2, 4, where we try and accept own request so all will end up with removing from both parties' pending requests whether accepting or rejecting
-			newCreatorBadgeBalanceInfo, err = k.RemovePending(ctx, newCreatorBadgeBalanceInfo, CurrPendingTransfer.ThisPendingNonce, OtherPartyNonce)
-			if err != nil {
-				return nil, err
-			}
-			otherPartyBalanceInfo, err = k.RemovePending(ctx, otherPartyBalanceInfo, OtherPartyNonce, CurrPendingTransfer.ThisPendingNonce)
-			if err != nil {
-				return nil, err
-			}
-
-			balanceInfoCache[OtherPartyAccountNum] = otherPartyBalanceInfo
 		}
-	}
+	
 
 	
 
@@ -183,10 +186,8 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 				sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
 				sdk.NewAttribute("Accepted", fmt.Sprint(msg.Accept)),
 				sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
-				sdk.NewAttribute("SubbadgeId", fmt.Sprint(msg.SubbadgeId)),
-				sdk.NewAttribute("StartingNonce", fmt.Sprint(msg.StartingNonce)),
-				sdk.NewAttribute("EndingNonce", fmt.Sprint(msg.EndingNonce)),
-			),
+				sdk.NewAttribute("NonceRanges", fmt.Sprint(msg.NonceRanges)),
+						),
 		)
 		
 		return &types.MsgHandlePendingTransferResponse{}, nil

@@ -26,4 +26,5 @@ var (
 	ErrDuplicateAddresses				 = sdkerrors.Register(ModuleName, 1514, "duplicate addresses")
 	ErrStartGreaterThanEnd				 = sdkerrors.Register(ModuleName, 1515, "start greater than end")
 	ErrDefaultSupplyEqualsZero			 = sdkerrors.Register(ModuleName, 1516, "default supply equals zero")
+	ErrInvalidArgumentLengths		 = sdkerrors.Register(ModuleName, 1517, "invalid argument lengths")
 )

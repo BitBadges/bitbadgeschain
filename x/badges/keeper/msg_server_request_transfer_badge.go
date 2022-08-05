@@ -35,12 +35,9 @@ func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgReq
 		toBadgeBalanceInfo = GetEmptyBadgeBalanceTemplate()
 	}
 
-	for i := msg.SubbadgeRange.Start; i <= msg.SubbadgeRange.End; i++ {
-		// Add to both account's pending transfers (we handle permissions when acecepting / rejecting the transfer)
-		fromBadgeBalanceInfo, toBadgeBalanceInfo, err = k.AddToBothPendingBadgeBalances(ctx, fromBadgeBalanceInfo, toBadgeBalanceInfo, i, CreatorAccountNum, msg.From, msg.Amount, CreatorAccountNum, false)
-		if err != nil {
-			return nil, err
-		}
+	fromBadgeBalanceInfo, toBadgeBalanceInfo, err = k.AddToBothPendingBadgeBalances(ctx, fromBadgeBalanceInfo, toBadgeBalanceInfo, *msg.SubbadgeRange, CreatorAccountNum, msg.From, msg.Amount, CreatorAccountNum, false)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := k.SetBadgeBalanceInStore(ctx, FromBalanceKey, fromBadgeBalanceInfo); err != nil {

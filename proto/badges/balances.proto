@@ -27,7 +27,7 @@ message Approval {
 
 //Pending transfers will not be saved after accept / reject
 message PendingTransfer {
-    uint64 subbadgeId = 1;
+    SubbadgeRange subbadgeRange = 1;
     uint64 this_pending_nonce = 2;
     uint64 other_pending_nonce = 3;
     uint64 amount = 4;

@@ -16,7 +16,7 @@ var _ = strconv.Itoa(0)
 
 func CmdRevokeBadge() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "revoke-badge [addresses] [amounts] [badge-id] [subbadge-id]",
+		Use:   "revoke-badge [addresses] [amounts] [badge-id] [subbadge-start-id] [subbadge-end-id]",
 		Short: "Broadcast message revoke-badge",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -48,7 +48,11 @@ func CmdRevokeBadge() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			argSubbadgeId, err := cast.ToUint64E(args[3])
+			argSubbadgeStartId, err := cast.ToUint64E(args[3])
+			if err != nil {
+				return err
+			}
+			argSubbadgeEndId, err := cast.ToUint64E(args[4])
 			if err != nil {
 				return err
 			}
@@ -63,7 +67,10 @@ func CmdRevokeBadge() *cobra.Command {
 				argAddressesUInt64,
 				argAmountsUInt64,
 				argBadgeId,
-				argSubbadgeId,
+				types.SubbadgeRange{
+					Start: argSubbadgeStartId,
+					End:   argSubbadgeEndId,
+				},
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

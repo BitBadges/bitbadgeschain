@@ -15,7 +15,7 @@ var _ = strconv.Itoa(0)
 
 func CmdHandlePendingTransfer() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "handle-pending-transfer [accept] [badge-id] [subbadge-id] [starting-pending-id] [ending-pending-id]",
+		Use:   "handle-pending-transfer [accept] [badge-id] [starting-pending-id] [ending-pending-id]",
 		Short: "Broadcast message handlePendingTransfer",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -27,20 +27,52 @@ func CmdHandlePendingTransfer() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			argSubbadgeId, err := cast.ToUint64E(args[2])
+
+			argStartingNonce, err := cast.ToUint64E(args[2])
 			if err != nil {
 				return err
 			}
 
-			argStartingPendingId, err := cast.ToUint64E(args[3])
+			argEndingNonce, err := cast.ToUint64E(args[3])
 			if err != nil {
 				return err
 			}
+			// argStartingNonces := strings.Split(args[2], ",")
 
-			argEndingPendingId, err := cast.ToUint64E(args[4])
-			if err != nil {
-				return err
-			}
+			// argStartingNoncesUint64 := []uint64{}
+			// for _, nonce := range argStartingNonces {
+			// 	nonceAsUint64, err := cast.ToUint64E(nonce)
+			// 	if err != nil {
+			// 		return err
+			// 	}
+
+			// 	argStartingNoncesUint64 = append(argStartingNoncesUint64, nonceAsUint64)
+			// }
+
+			// argEndingNonces := strings.Split(args[3], ",")
+
+			// argEndingNoncesUint64 := []uint64{}
+			// for _, nonce := range argEndingNonces {
+			// 	nonceAsUint64, err := cast.ToUint64E(nonce)
+			// 	if err != nil {
+			// 		return err
+			// 	}
+
+			// 	argEndingNoncesUint64 = append(argEndingNoncesUint64, nonceAsUint64)
+			// }
+
+			// if len(argStartingNoncesUint64) != len(argEndingNoncesUint64) {
+			// 	return types.ErrInvalidArgumentLengths
+			// }
+
+			// nonceRanges := []*types.SubbadgeRange{}
+			// for i := 0; i < len(argStartingNoncesUint64); i++ {
+			// 	nonceRanges = append(nonceRanges, &types.SubbadgeRange{
+			// 		Start: argStartingNoncesUint64[i],
+			// 		End:   argEndingNoncesUint64[i],
+			// 	})
+			// }
+
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -51,9 +83,10 @@ func CmdHandlePendingTransfer() *cobra.Command {
 				clientCtx.GetFromAddress().String(),
 				argAccept,
 				argBadgeId,
-				argSubbadgeId,
-				argStartingPendingId,
-				argEndingPendingId,
+				types.SubbadgeRange{
+					Start: argStartingNonce,
+					End:   argEndingNonce,
+				},
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

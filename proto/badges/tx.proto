@@ -80,9 +80,7 @@ message MsgHandlePendingTransfer {
     string creator = 1;
     bool accept = 2;
     uint64 badgeId = 3;
-    uint64 subbadgeId = 4;
-    uint64 startingNonce = 5;
-    uint64 endingNonce = 6;
+    SubbadgeRange nonceRanges = 4;
 }
 
 message MsgHandlePendingTransferResponse {}
@@ -102,7 +100,7 @@ message MsgRevokeBadge {
     repeated uint64 addresses = 2;
     repeated uint64 amounts = 3;
     uint64 badgeId = 4;
-    uint64 subbadgeId = 5;
+    SubbadgeRange subbadgeRange = 5;
 }
 
 message MsgRevokeBadgeResponse {}

@@ -12,7 +12,7 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum, _, permissions, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, msg.Addresses, msg.BadgeId, msg.SubbadgeId, true,
+		ctx, msg.Creator, msg.Addresses, msg.BadgeId, msg.SubbadgeRange.End, true,
 	)
 	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 	if err != nil {
@@ -43,16 +43,19 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 		
 
 		revokeAmount := msg.Amounts[i]
-		addressBalanceInfo, err = k.RemoveFromBadgeBalance(ctx, addressBalanceInfo, msg.SubbadgeId, revokeAmount)
-		if err != nil {
-			return nil, err
-		}
 
-		managerBalanceInfo, err = k.AddToBadgeBalance(ctx, managerBalanceInfo, msg.SubbadgeId, revokeAmount)
-		if err != nil {
-			return nil, err
-		}
+		for i := msg.SubbadgeRange.Start; i <= msg.SubbadgeRange.End; i++ {
+			addressBalanceInfo, err = k.RemoveFromBadgeBalance(ctx, addressBalanceInfo, i, revokeAmount)
+			if err != nil {
+				return nil, err
+			}
 
+			managerBalanceInfo, err = k.AddToBadgeBalance(ctx, managerBalanceInfo, i, revokeAmount)
+			if err != nil {
+				return nil, err
+			}
+
+		}
 		err = k.SetBadgeBalanceInStore(ctx, AddressBalanceKey, addressBalanceInfo)
 		if err != nil {
 			return nil, err
@@ -72,7 +75,7 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 			sdk.NewAttribute(sdk.AttributeKeyAction, "RevokeBadge"),
 			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
 			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
-			sdk.NewAttribute("SubbadgeId", fmt.Sprint(msg.SubbadgeId)),
+			sdk.NewAttribute("Subbadge Range", fmt.Sprint(msg.SubbadgeRange)),
 			sdk.NewAttribute("Addresses", fmt.Sprint(msg.Addresses)),
 			sdk.NewAttribute("Amounts", fmt.Sprint(msg.Amounts)),
 		),

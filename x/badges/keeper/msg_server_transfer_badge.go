@@ -25,7 +25,6 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 	}
 
 
-
 	FromBalanceKey := GetBalanceKey(msg.From, msg.BadgeId)
 	fromBadgeBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, FromBalanceKey)
 	if !found {
@@ -40,6 +39,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 		}
 		
 		for _, amount := range msg.Amounts {
+			handledForcefulTransfer := false
 			for currSubbadgeId := msg.SubbadgeRange.Start; currSubbadgeId <= msg.SubbadgeRange.End; currSubbadgeId++ {
 				// Checks and handles if this account can transfer or is approved to transfer
 				fromBadgeBalanceInfo, err = k.HandlePreTransfer(ctx, fromBadgeBalanceInfo, Badge, msg.BadgeId, currSubbadgeId, msg.From, to, CreatorAccountNum, amount)
@@ -67,15 +67,18 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 				}
 
 				if sendingToReservedAddress || Permissions.ForcefulTransfers() || Badge.Manager == to {
+					handledForcefulTransfer = true
 					toBadgeBalanceInfo, err = k.AddToBadgeBalance(ctx, toBadgeBalanceInfo, currSubbadgeId, amount)
 					if err != nil {
 						return nil, err
 					}
-				} else {
-					fromBadgeBalanceInfo, toBadgeBalanceInfo, err = k.AddToBothPendingBadgeBalances(ctx, fromBadgeBalanceInfo, toBadgeBalanceInfo, currSubbadgeId, to, msg.From, amount, CreatorAccountNum, true)
-					if err != nil {
-						return nil, err
-					}
+				}
+			}
+			
+			if !handledForcefulTransfer {
+				fromBadgeBalanceInfo, toBadgeBalanceInfo, err = k.AddToBothPendingBadgeBalances(ctx, fromBadgeBalanceInfo, toBadgeBalanceInfo, *msg.SubbadgeRange, to, msg.From, amount, CreatorAccountNum, true)
+				if err != nil {
+					return nil, err
 				}
 			}
 		}
