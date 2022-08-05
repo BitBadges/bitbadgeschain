@@ -4,23 +4,19 @@ package trevormil.bitbadgeschain.badges;
 import "gogoproto/gogo.proto";
 import "badges/params.proto";
 import "badges/badges.proto";
+import "badges/tx.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
 //indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
 message BadgeBalanceInfo {
-    repeated BalanceIDs idsForBalances = 1;
+    repeated SubbadgeRange idsForBalances = 1;
     repeated uint64 balances = 2;
     uint64 pending_nonce = 3;
     repeated PendingTransfer pending = 4; //IDs will be sorted in order of pending_nonce
     repeated Approval approvals = 5;
     uint64 user_flags= 6; //TODO: for (hidden on profile, pinned, etc)
-}
-
-message BalanceIDs {
-    uint64 startId = 1;
-    uint64 endId = 2;
 }
 
 message Approval {

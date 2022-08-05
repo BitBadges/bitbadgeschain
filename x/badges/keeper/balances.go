@@ -26,37 +26,37 @@ func SafeSubtract(left uint64, right uint64) (uint64, error) {
 	return left - right, nil
 }
 
-func GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(subbadgeId uint64, ids []*types.BalanceIDs, balances []uint64) uint64 {
+func GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(subbadgeId uint64, ids []*types.SubbadgeRange, balances []uint64) uint64 {
 	//TODO: binary search
 	for i, idObject := range ids {
-		if idObject.EndId >= subbadgeId && idObject.StartId <= subbadgeId {
+		if idObject.End >= subbadgeId && idObject.Start <= subbadgeId {
 			return balances[i]
 		}
 	}
 	return 0
 }
 
-func RemoveBadgeBalanceBySubbadgeId(subbadgeId uint64, ids []*types.BalanceIDs, balances []uint64) ([]*types.BalanceIDs, []uint64) {
-	newIds := []*types.BalanceIDs{}
+func RemoveBadgeBalanceBySubbadgeId(subbadgeId uint64, ids []*types.SubbadgeRange, balances []uint64) ([]*types.SubbadgeRange, []uint64) {
+	newIds := []*types.SubbadgeRange{}
 	newBalances := []uint64{}
 	for i, idObject := range ids {
-		if idObject.EndId >= subbadgeId && idObject.StartId <= subbadgeId {
+		if idObject.End >= subbadgeId && idObject.Start <= subbadgeId {
 			//Found current subbadge
 
 			//If we still have an existing before range, keep that up until subbadge - 1
-			if subbadgeId >= 1 && subbadgeId - 1 >= idObject.StartId {
-				newIds = append(newIds, &types.BalanceIDs{
-					StartId: idObject.StartId,
-					EndId:   subbadgeId - 1,
+			if subbadgeId >= 1 && subbadgeId - 1 >= idObject.Start {
+				newIds = append(newIds, &types.SubbadgeRange{
+					Start: idObject.Start,
+					End:   subbadgeId - 1,
 				})
 				newBalances = append(newBalances, balances[i])
 			}
 
 			//If we still have an existing after range, start that at subbadge + 1
-			if subbadgeId + 1 <= idObject.EndId {
-				newIds = append(newIds, &types.BalanceIDs{
-					StartId: subbadgeId + 1,
-					EndId:   idObject.EndId,
+			if subbadgeId + 1 <= idObject.End {
+				newIds = append(newIds, &types.SubbadgeRange{
+					Start: subbadgeId + 1,
+					End:   idObject.End,
 				})
 				newBalances = append(newBalances, balances[i])
 			}
@@ -69,60 +69,60 @@ func RemoveBadgeBalanceBySubbadgeId(subbadgeId uint64, ids []*types.BalanceIDs, 
 }
 
 //Precondition: Must be removed already (balance == 0)
-func SetBadgeBalanceBySubbadgeId(subbadgeId uint64, amount uint64, ids []*types.BalanceIDs, balances []uint64) ([]*types.BalanceIDs, []uint64) {
-	newIds := []*types.BalanceIDs{}
+func SetBadgeBalanceBySubbadgeId(subbadgeId uint64, amount uint64, ids []*types.SubbadgeRange, balances []uint64) ([]*types.SubbadgeRange, []uint64) {
+	newIds := []*types.SubbadgeRange{}
 	newBalances := []uint64{}
 
 	if len(ids) == 0 {
-		newIds = append(newIds, &types.BalanceIDs{
-			StartId: subbadgeId,
-			EndId:   subbadgeId,
+		newIds = append(newIds, &types.SubbadgeRange{
+			Start: subbadgeId,
+			End:   subbadgeId,
 		})
 		newBalances = append(newBalances, amount)
 		return newIds, newBalances
 	}
 	
-	if len(ids) > 0 && ids[0].StartId > subbadgeId {
-		newIds = append(newIds, &types.BalanceIDs{
-			StartId: subbadgeId,
-			EndId:   subbadgeId,
+	if len(ids) > 0 && ids[0].Start > subbadgeId {
+		newIds = append(newIds, &types.SubbadgeRange{
+			Start: subbadgeId,
+			End:   subbadgeId,
 		})
 		newBalances = append(newBalances, amount)
 	}
 
 	for i := 0; i < len(ids); i++ {
-		if i >= 1 && subbadgeId > ids[i - 1].EndId && subbadgeId < ids[i].StartId {
-			newIds = append(newIds, &types.BalanceIDs{
-				StartId: subbadgeId,
-				EndId:   subbadgeId,
+		if i >= 1 && subbadgeId > ids[i - 1].End && subbadgeId < ids[i].Start {
+			newIds = append(newIds, &types.SubbadgeRange{
+				Start: subbadgeId,
+				End:   subbadgeId,
 			})
 			newBalances = append(newBalances, amount)
 		}
 
-		newIds = append(newIds, &types.BalanceIDs{
-			StartId: ids[i].StartId,
-			EndId:   ids[i].EndId,
+		newIds = append(newIds, &types.SubbadgeRange{
+			Start: ids[i].Start,
+			End:   ids[i].End,
 		})
 		newBalances = append(newBalances, balances[i])
 	}
 
-	if len(ids) > 0 && ids[len(ids)-1].EndId < subbadgeId {
-		newIds = append(newIds, &types.BalanceIDs{
-			StartId: subbadgeId,
-			EndId:   subbadgeId,
+	if len(ids) > 0 && ids[len(ids)-1].End < subbadgeId {
+		newIds = append(newIds, &types.SubbadgeRange{
+			Start: subbadgeId,
+			End:   subbadgeId,
 		})
 		newBalances = append(newBalances, amount)
 	}
 
-	mergedIds := []*types.BalanceIDs{
+	mergedIds := []*types.SubbadgeRange{
 		newIds[0],
 	}
 	mergedBalances := []uint64{
 		newBalances[0],
 	}
 	for idx := 1; idx < len(newIds); idx++ {
-		if newIds[idx].StartId == mergedIds[len(mergedIds)-1].EndId + 1 && newBalances[idx] == mergedBalances[len(mergedBalances)-1] {
-			mergedIds[len(mergedIds)-1].EndId = newIds[idx].EndId
+		if newIds[idx].Start == mergedIds[len(mergedIds)-1].End + 1 && newBalances[idx] == mergedBalances[len(mergedBalances)-1] {
+			mergedIds[len(mergedIds)-1].End = newIds[idx].End
 		} else {
 			mergedIds = append(mergedIds, newIds[idx])
 			mergedBalances = append(mergedBalances, newBalances[idx])
@@ -133,7 +133,7 @@ func SetBadgeBalanceBySubbadgeId(subbadgeId uint64, amount uint64, ids []*types.
 }
 
 
-func UpdateBadgeBalanceBySubbadgeId(subbadgeId uint64, newAmount uint64, ids []*types.BalanceIDs, balances []uint64) ([]*types.BalanceIDs, []uint64) {
+func UpdateBadgeBalanceBySubbadgeId(subbadgeId uint64, newAmount uint64, ids []*types.SubbadgeRange, balances []uint64) ([]*types.SubbadgeRange, []uint64) {
 	ids, balances = RemoveBadgeBalanceBySubbadgeId(subbadgeId, ids, balances)
 	ids, balances = SetBadgeBalanceBySubbadgeId(subbadgeId, newAmount, ids, balances)
 	return ids, balances
