@@ -63,7 +63,13 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 					lastEntry = badge.SubassetsTotalSupply[len(badge.SubassetsTotalSupply)-1]
 				}
 
-				if hasLastEntry && lastEntry.Supply == supply && lastEntry.EndId == subasset_id-1 {
+				if hasLastEntry && lastEntry.Supply == supply && lastEntry.EndId == subasset_id - 1 {
+					badge.SubassetsTotalSupply[len(badge.SubassetsTotalSupply)-1] = &types.Subasset{
+						Supply:  lastEntry.Supply,
+						StartId: lastEntry.StartId,
+						EndId:   subasset_id,
+					}
+				} else if hasLastEntry && lastEntry.Supply == supply && lastEntry.EndId == 0 && lastEntry.StartId == subasset_id-1 {
 					badge.SubassetsTotalSupply[len(badge.SubassetsTotalSupply)-1] = &types.Subasset{
 						Supply:  lastEntry.Supply,
 						StartId: lastEntry.StartId,
@@ -73,7 +79,7 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 					badge.SubassetsTotalSupply = append(badge.SubassetsTotalSupply, &types.Subasset{
 						Supply:  supply,
 						StartId: subasset_id,
-						EndId:   subasset_id,
+						EndId:   0,
 					})
 				}
 			}

@@ -58,6 +58,8 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 	err = FreezeAddresses(suite, wctx, bob, types.NumberRange{ Start: firstAccountNumCreated + 1, End: firstAccountNumCreated + 1}, 0, 0, true)
 	suite.Require().Nil(err, "Error freezing address")
 
+	badge, _ = GetBadge(suite, wctx, 0)
+	
 	err = TransferBadge(suite, wctx, alice, firstAccountNumCreated+1, []uint64{firstAccountNumCreated}, []uint64{5000}, 0, types.NumberRange{Start: 0, End: 0})
 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 }
