@@ -114,7 +114,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 
 						//If it was sent via an approval, we need to add the approval back
 						if CurrPendingTransfer.ApprovedBy != CurrPendingTransfer.From {
-							FromInfo, err = k.AddBalanceToApproval(ctx, FromInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.ApprovedBy, i) 
+							FromInfo, err = k.AddBalanceToApproval(ctx, FromInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.ApprovedBy, types.SubbadgeRange{Start: i, End: i}) 
 							if err != nil {
 								return nil, err
 							}

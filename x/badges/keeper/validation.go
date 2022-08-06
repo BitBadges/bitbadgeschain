@@ -37,7 +37,7 @@ func (k Keeper) HandlePreTransfer(ctx sdk.Context, badgeBalanceInfo types.BadgeB
 
 	// Check and handle approvals if requester != from
 	if from != requester {
-		postApprovalBadgeBalanceInfo, err := k.RemoveBalanceFromApproval(ctx, newBadgeBalanceInfo, amount, requester, subbadgeId) //if pending and cancelled, this approval will be added back
+		postApprovalBadgeBalanceInfo, err := k.RemoveBalanceFromApproval(ctx, newBadgeBalanceInfo, amount, requester, types.SubbadgeRange{Start: subbadgeId, End: subbadgeId}) //if pending and cancelled, this approval will be added back
 		newBadgeBalanceInfo = postApprovalBadgeBalanceInfo
 		if err != nil {
 			return badgeBalanceInfo, err

@@ -40,26 +40,26 @@ func (suite *TestSuite) TestSetApproval() {
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = SetApproval(suite, wctx, bob, 1000, firstAccountNumCreated+1, 0, 0)
+	err = SetApproval(suite, wctx, bob, 1000, firstAccountNumCreated+1, 0, types.SubbadgeRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error setting approval")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(firstAccountNumCreated+1), bobBalanceInfo.Approvals[0].AddressNum)
-	suite.Require().Equal(uint64(1000), bobBalanceInfo.Approvals[0].Amount)
+	suite.Require().Equal(uint64(firstAccountNumCreated+1), bobBalanceInfo.Approvals[0].Address)
+	suite.Require().Equal(uint64(1000), bobBalanceInfo.Approvals[0].Amounts[0])
 
-	err = SetApproval(suite, wctx, bob, 500, firstAccountNumCreated+2, 0, 0)
+	err = SetApproval(suite, wctx, bob, 500, firstAccountNumCreated+2, 0, types.SubbadgeRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error setting approval")
 
-	err = SetApproval(suite, wctx, bob, 500, firstAccountNumCreated+1, 0, 0)
+	err = SetApproval(suite, wctx, bob, 500, firstAccountNumCreated+1, 0, types.SubbadgeRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error setting approval")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 
-	suite.Require().Equal(uint64(firstAccountNumCreated+2), bobBalanceInfo.Approvals[0].AddressNum)
-	suite.Require().Equal(uint64(500), bobBalanceInfo.Approvals[0].Amount)
+	suite.Require().Equal(uint64(firstAccountNumCreated+2), bobBalanceInfo.Approvals[1].Address)
+	suite.Require().Equal(uint64(500), bobBalanceInfo.Approvals[1].Amounts[0])
 
-	suite.Require().Equal(uint64(firstAccountNumCreated+1), bobBalanceInfo.Approvals[1].AddressNum)
-	suite.Require().Equal(uint64(500), bobBalanceInfo.Approvals[1].Amount)
+	suite.Require().Equal(uint64(firstAccountNumCreated+1), bobBalanceInfo.Approvals[0].Address)
+	suite.Require().Equal(uint64(500), bobBalanceInfo.Approvals[0].Amounts[0])
 }
 
 func (suite *TestSuite) TestApproveSelf() {
@@ -96,6 +96,6 @@ func (suite *TestSuite) TestApproveSelf() {
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = SetApproval(suite, wctx, bob, 1000, firstAccountNumCreated, 0, 0)
+	err = SetApproval(suite, wctx, bob, 1000, firstAccountNumCreated, 0, types.SubbadgeRange{Start: 0, End: 0})
 	suite.Require().EqualError(err, keeper.ErrSenderAndReceiverSame.Error())
 }

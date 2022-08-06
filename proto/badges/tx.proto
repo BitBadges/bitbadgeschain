@@ -90,7 +90,7 @@ message MsgSetApproval {
     uint64 amount = 2;
     uint64 address = 3;
     uint64 badgeId = 4;
-    uint64 subbadgeId = 5;
+    SubbadgeRange subbadgeRange = 5;
 }
 
 message MsgSetApprovalResponse {}

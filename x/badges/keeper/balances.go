@@ -248,25 +248,44 @@ func (k Keeper) RemovePending(ctx sdk.Context, badgeBalanceInfo types.BadgeBalan
 	return badgeBalanceInfo, nil
 }
 
-func (k Keeper) SetApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount uint64, address_num uint64, subbadgeId uint64) (types.BadgeBalanceInfo, error) {
+func (k Keeper) SetApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount uint64, address_num uint64, subbadgeRange types.SubbadgeRange) (types.BadgeBalanceInfo, error) {
 	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "adjust approval")
 	
+
 	new_approvals := []*types.Approval{}
+	found := false
 	//check for approval with same address / amount
 	for _, approval := range badgeBalanceInfo.Approvals {
-		if approval.AddressNum != address_num || approval.SubbadgeId != subbadgeId {
+		if approval.Address != address_num {
 			new_approvals = append(new_approvals, approval)
+		} else {
+			found = true
+			//Remove completely if setting to zero
+			if amount != 0 {
+				newSubbadgeRanges := approval.SubbadgeRanges
+				newAmounts := approval.Amounts
+				for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
+					newSubbadgeRanges, newAmounts = UpdateBadgeBalanceBySubbadgeId(i, amount, newSubbadgeRanges, newAmounts)
+				}
+
+				approval.Amounts = newAmounts;
+				approval.SubbadgeRanges = newSubbadgeRanges;
+
+				new_approvals = append(new_approvals, approval)
+			}
+
 		}
 	}
 
-	//Remove completely if setting to zero
-	if amount != 0 {
+	if !found {
+		//Add new approval
 		new_approvals = append(new_approvals, &types.Approval{
-			Amount:     amount,
-			AddressNum: address_num,
-			SubbadgeId: subbadgeId,
+			Address: address_num,
+			Amounts: []uint64{amount},
+			SubbadgeRanges: []*types.SubbadgeRange{&subbadgeRange},
 		})
 	}
+
 
 	badgeBalanceInfo.Approvals = new_approvals
 	
@@ -274,7 +293,7 @@ func (k Keeper) SetApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalance
 }
 
 //Will return an error if isn't approved for amounts
-func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount_to_remove uint64, address_num uint64, subbadgeId uint64) (types.BadgeBalanceInfo, error) {
+func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount_to_remove uint64, address_num uint64, subbadgeRange types.SubbadgeRange) (types.BadgeBalanceInfo, error) {
 	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "adjust approval")
 	
 	new_approvals := []*types.Approval{}
@@ -282,22 +301,28 @@ func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, badgeBalanceInfo type
 
 	//check for approval with same address / amount
 	for _, approval := range badgeBalanceInfo.Approvals {
-		if approval.AddressNum == address_num && approval.SubbadgeId == subbadgeId {
-			if approval.Amount < amount_to_remove {
-				return badgeBalanceInfo, ErrInsufficientApproval
+		if approval.Address == address_num {
+			newSubbadgeRanges := approval.SubbadgeRanges
+			newAmounts := approval.Amounts
+			for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
+				currAmount := GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(i, approval.SubbadgeRanges, approval.Amounts)
+				if currAmount < amount_to_remove {
+					return badgeBalanceInfo, ErrInsufficientApproval
+				}
+				
+				
+				newAmount, err := SafeSubtract(currAmount, amount_to_remove)
+				if err != nil {
+					return badgeBalanceInfo, err
+				}
+
+				newSubbadgeRanges, newAmounts  = UpdateBadgeBalanceBySubbadgeId(i, newAmount, approval.SubbadgeRanges, approval.Amounts)
 			}
 
-			newAmount, err := SafeSubtract(approval.Amount, amount_to_remove)
-			if err != nil {
-				return badgeBalanceInfo, err
-			}
+			approval.Amounts = newAmounts;
+			approval.SubbadgeRanges = newSubbadgeRanges;
 
-			if approval.Amount-amount_to_remove > 0 {
-				new_approvals = append(new_approvals, &types.Approval{
-					Amount:     newAmount,
-					AddressNum: address_num,
-				})
-			}
+			new_approvals = append(new_approvals, approval)
 
 			removed = true
 		} else {
@@ -318,31 +343,33 @@ func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, badgeBalanceInfo type
 	return badgeBalanceInfo, nil
 }
 
-func (k Keeper) AddBalanceToApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount_to_add uint64, address_num uint64, subbadgeId uint64) (types.BadgeBalanceInfo, error) {
+func (k Keeper) AddBalanceToApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount_to_add uint64, address_num uint64, subbadgeRange types.SubbadgeRange) (types.BadgeBalanceInfo, error) {
 	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "adjust approval")
 
+
 	new_approvals := []*types.Approval{}
-	found := false
 	//check for approval with same address / amount
 	for _, approval := range badgeBalanceInfo.Approvals {
-		if approval.AddressNum == address_num && approval.SubbadgeId == subbadgeId {
-			newAmount, err := SafeAdd(approval.Amount, amount_to_add)
-			if err != nil {
-				return badgeBalanceInfo, err
+		if approval.Address == address_num {
+			newSubbadgeRanges := approval.SubbadgeRanges
+			newAmounts := approval.Amounts
+			for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
+				currAmount := GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(i, approval.SubbadgeRanges, approval.Amounts)				
+				newAmount, err := SafeAdd(currAmount, amount_to_add)
+				if err != nil {
+					return badgeBalanceInfo, err
+				}
+
+				newSubbadgeRanges, newAmounts  = UpdateBadgeBalanceBySubbadgeId(i, newAmount, approval.SubbadgeRanges, approval.Amounts)
 			}
-			new_approvals = append(new_approvals, &types.Approval{
-				Amount:     newAmount,
-				AddressNum: address_num,
-			})
+
+			approval.Amounts = newAmounts;
+			approval.SubbadgeRanges = newSubbadgeRanges;
+
+			new_approvals = append(new_approvals, approval)
 		} else {
 			new_approvals = append(new_approvals, approval)
 		}
-	}
-	if !found {
-		new_approvals = append(new_approvals, &types.Approval{
-			Amount:     amount_to_add,
-			AddressNum: address_num,
-		})
 	}
 
 	badgeBalanceInfo.Approvals = new_approvals

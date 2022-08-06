@@ -156,8 +156,8 @@ func TransferBadge(suite *TestSuite, ctx context.Context, creator string, from u
 	return err
 }
 
-func SetApproval(suite *TestSuite, ctx context.Context, creator string, amount uint64, address uint64, badgeId uint64, subbadgeId uint64) error {
-	msg := types.NewMsgSetApproval(creator, amount, address, badgeId, subbadgeId)
+func SetApproval(suite *TestSuite, ctx context.Context, creator string, amount uint64, address uint64, badgeId uint64, subbadgeRange types.SubbadgeRange) error {
+	msg := types.NewMsgSetApproval(creator, amount, address, badgeId, subbadgeRange)
 	_, err := suite.msgServer.SetApproval(ctx, msg)
 	return err
 }

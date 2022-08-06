@@ -218,7 +218,7 @@ func (suite *TestSuite) TestApprovalsApproved() {
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = SetApproval(suite, wctx, bob, 1000000, firstAccountNumCreated+1, 0, 0)
+	err = SetApproval(suite, wctx, bob, 1000000, firstAccountNumCreated+1, 0, types.SubbadgeRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error setting approval")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -228,7 +228,7 @@ func (suite *TestSuite) TestApprovalsApproved() {
 	suite.Require().Nil(err, "Error transferring badge")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(1000000-5000), bobBalanceInfo.Approvals[0].Amount)
+	suite.Require().Equal(uint64(1000000-5000), bobBalanceInfo.Approvals[0].Amounts[0])
 }
 
 func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
@@ -265,7 +265,7 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = SetApproval(suite, wctx, bob, 10, firstAccountNumCreated+1, 0, 0)
+	err = SetApproval(suite, wctx, bob, 10, firstAccountNumCreated+1, 0, types.SubbadgeRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error setting approval")
 
 	err = TransferBadge(suite, wctx, charlie, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.SubbadgeRange{Start: 0, End: 0})

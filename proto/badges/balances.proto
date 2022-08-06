@@ -20,9 +20,9 @@ message BadgeBalanceInfo {
 }
 
 message Approval {
-    uint64 addressNum = 1;
-    uint64 amount = 2;
-    uint64 subbadgeId = 3;
+    uint64 address = 1;
+    repeated uint64 amounts = 2;
+    repeated SubbadgeRange subbadgeRanges = 3;
 }
 
 //Pending transfers will not be saved after accept / reject
