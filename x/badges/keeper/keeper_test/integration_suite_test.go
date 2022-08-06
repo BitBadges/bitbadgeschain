@@ -106,6 +106,15 @@ func (suite *TestSuite) SetupTest() {
 	suite.ctx = ctx
 	suite.msgServer = keeper.NewMsgServerImpl(app.BadgesKeeper)
 	suite.queryClient = queryClient
+
+	
+	bob_acc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.MustAccAddressFromBech32(bob))
+	alice_acc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.MustAccAddressFromBech32(alice))
+	charlie_acc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.MustAccAddressFromBech32(charlie))
+	
+	suite.app.AccountKeeper.SetAccount(suite.ctx, bob_acc)
+	suite.app.AccountKeeper.SetAccount(suite.ctx, alice_acc)
+	suite.app.AccountKeeper.SetAccount(suite.ctx, charlie_acc)
 }
 
 func TestBadgesKeeperTestSuite(t *testing.T) {
