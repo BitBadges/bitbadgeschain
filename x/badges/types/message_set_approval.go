@@ -15,7 +15,7 @@ func NewMsgSetApproval(creator string, amount uint64, address uint64, badgeId ui
 		Amount:     amount,
 		Address:    address,
 		BadgeId:    badgeId,
-		NumberRange: &subbadgeRange,
+		SubbadgeRange: &subbadgeRange,
 	}
 }
 

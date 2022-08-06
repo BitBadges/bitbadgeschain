@@ -273,7 +273,7 @@ type MsgTransferBadge struct {
 	ToAddresses   []uint64     `protobuf:"varint,3,rep,packed,name=toAddresses,proto3" json:"toAddresses,omitempty"`
 	Amounts       []uint64     `protobuf:"varint,4,rep,packed,name=amounts,proto3" json:"amounts,omitempty"`
 	BadgeId       uint64       `protobuf:"varint,5,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	NumberRange *NumberRange `protobuf:"bytes,6,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
+	SubbadgeRange *NumberRange `protobuf:"bytes,6,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
 }
 
 func (m *MsgTransferBadge) Reset()         { *m = MsgTransferBadge{} }
@@ -346,7 +346,7 @@ func (m *MsgTransferBadge) GetBadgeId() uint64 {
 
 func (m *MsgTransferBadge) GetSubbadgeRange() *NumberRange {
 	if m != nil {
-		return m.NumberRange
+		return m.SubbadgeRange
 	}
 	return nil
 }
@@ -392,7 +392,7 @@ type MsgRequestTransferBadge struct {
 	From          uint64       `protobuf:"varint,2,opt,name=from,proto3" json:"from,omitempty"`
 	Amount        uint64       `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
 	BadgeId       uint64       `protobuf:"varint,5,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	NumberRange *NumberRange `protobuf:"bytes,6,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
+	SubbadgeRange *NumberRange `protobuf:"bytes,6,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
 }
 
 func (m *MsgRequestTransferBadge) Reset()         { *m = MsgRequestTransferBadge{} }
@@ -458,7 +458,7 @@ func (m *MsgRequestTransferBadge) GetBadgeId() uint64 {
 
 func (m *MsgRequestTransferBadge) GetSubbadgeRange() *NumberRange {
 	if m != nil {
-		return m.NumberRange
+		return m.SubbadgeRange
 	}
 	return nil
 }
@@ -608,7 +608,7 @@ type MsgSetApproval struct {
 	Amount        uint64       `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
 	Address       uint64       `protobuf:"varint,3,opt,name=address,proto3" json:"address,omitempty"`
 	BadgeId       uint64       `protobuf:"varint,4,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	NumberRange *NumberRange `protobuf:"bytes,5,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
+	SubbadgeRange *NumberRange `protobuf:"bytes,5,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
 }
 
 func (m *MsgSetApproval) Reset()         { *m = MsgSetApproval{} }
@@ -674,7 +674,7 @@ func (m *MsgSetApproval) GetBadgeId() uint64 {
 
 func (m *MsgSetApproval) GetSubbadgeRange() *NumberRange {
 	if m != nil {
-		return m.NumberRange
+		return m.SubbadgeRange
 	}
 	return nil
 }
@@ -720,7 +720,7 @@ type MsgRevokeBadge struct {
 	Addresses     []uint64     `protobuf:"varint,2,rep,packed,name=addresses,proto3" json:"addresses,omitempty"`
 	Amounts       []uint64     `protobuf:"varint,3,rep,packed,name=amounts,proto3" json:"amounts,omitempty"`
 	BadgeId       uint64       `protobuf:"varint,4,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	NumberRange *NumberRange `protobuf:"bytes,5,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
+	SubbadgeRange *NumberRange `protobuf:"bytes,5,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
 }
 
 func (m *MsgRevokeBadge) Reset()         { *m = MsgRevokeBadge{} }
@@ -786,7 +786,7 @@ func (m *MsgRevokeBadge) GetBadgeId() uint64 {
 
 func (m *MsgRevokeBadge) GetSubbadgeRange() *NumberRange {
 	if m != nil {
-		return m.NumberRange
+		return m.SubbadgeRange
 	}
 	return nil
 }
@@ -2232,9 +2232,9 @@ func (m *MsgTransferBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.NumberRange != nil {
+	if m.SubbadgeRange != nil {
 		{
-			size, err := m.NumberRange.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.SubbadgeRange.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -2343,9 +2343,9 @@ func (m *MsgRequestTransferBadge) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	_ = i
 	var l int
 	_ = l
-	if m.NumberRange != nil {
+	if m.SubbadgeRange != nil {
 		{
-			size, err := m.NumberRange.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.SubbadgeRange.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -2503,9 +2503,9 @@ func (m *MsgSetApproval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.NumberRange != nil {
+	if m.SubbadgeRange != nil {
 		{
-			size, err := m.NumberRange.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.SubbadgeRange.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -2583,9 +2583,9 @@ func (m *MsgRevokeBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.NumberRange != nil {
+	if m.SubbadgeRange != nil {
 		{
-			size, err := m.NumberRange.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.SubbadgeRange.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -3199,8 +3199,8 @@ func (m *MsgTransferBadge) Size() (n int) {
 	if m.BadgeId != 0 {
 		n += 1 + sovTx(uint64(m.BadgeId))
 	}
-	if m.NumberRange != nil {
-		l = m.NumberRange.Size()
+	if m.SubbadgeRange != nil {
+		l = m.SubbadgeRange.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
@@ -3234,8 +3234,8 @@ func (m *MsgRequestTransferBadge) Size() (n int) {
 	if m.BadgeId != 0 {
 		n += 1 + sovTx(uint64(m.BadgeId))
 	}
-	if m.NumberRange != nil {
-		l = m.NumberRange.Size()
+	if m.SubbadgeRange != nil {
+		l = m.SubbadgeRange.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
@@ -3301,8 +3301,8 @@ func (m *MsgSetApproval) Size() (n int) {
 	if m.BadgeId != 0 {
 		n += 1 + sovTx(uint64(m.BadgeId))
 	}
-	if m.NumberRange != nil {
-		l = m.NumberRange.Size()
+	if m.SubbadgeRange != nil {
+		l = m.SubbadgeRange.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
@@ -3344,8 +3344,8 @@ func (m *MsgRevokeBadge) Size() (n int) {
 	if m.BadgeId != 0 {
 		n += 1 + sovTx(uint64(m.BadgeId))
 	}
-	if m.NumberRange != nil {
-		l = m.NumberRange.Size()
+	if m.SubbadgeRange != nil {
+		l = m.SubbadgeRange.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
@@ -4400,7 +4400,7 @@ func (m *MsgTransferBadge) Unmarshal(dAtA []byte) error {
 			}
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NumberRange", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeRange", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4427,10 +4427,10 @@ func (m *MsgTransferBadge) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.NumberRange == nil {
-				m.NumberRange = &NumberRange{}
+			if m.SubbadgeRange == nil {
+				m.SubbadgeRange = &NumberRange{}
 			}
-			if err := m.NumberRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.SubbadgeRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4625,7 +4625,7 @@ func (m *MsgRequestTransferBadge) Unmarshal(dAtA []byte) error {
 			}
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NumberRange", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeRange", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4652,10 +4652,10 @@ func (m *MsgRequestTransferBadge) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.NumberRange == nil {
-				m.NumberRange = &NumberRange{}
+			if m.SubbadgeRange == nil {
+				m.SubbadgeRange = &NumberRange{}
 			}
-			if err := m.NumberRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.SubbadgeRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5057,7 +5057,7 @@ func (m *MsgSetApproval) Unmarshal(dAtA []byte) error {
 			}
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NumberRange", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeRange", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5084,10 +5084,10 @@ func (m *MsgSetApproval) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.NumberRange == nil {
-				m.NumberRange = &NumberRange{}
+			if m.SubbadgeRange == nil {
+				m.SubbadgeRange = &NumberRange{}
 			}
-			if err := m.NumberRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.SubbadgeRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5396,7 +5396,7 @@ func (m *MsgRevokeBadge) Unmarshal(dAtA []byte) error {
 			}
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NumberRange", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeRange", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5423,10 +5423,10 @@ func (m *MsgRevokeBadge) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.NumberRange == nil {
-				m.NumberRange = &NumberRange{}
+			if m.SubbadgeRange == nil {
+				m.SubbadgeRange = &NumberRange{}
 			}
-			if err := m.NumberRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.SubbadgeRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

@@ -31,14 +31,13 @@ func (suite *TestSuite) TestNewSubBadges() {
 	bobBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
-	suite.Require().Equal([]*types.Subasset{
+	suite.Require().Equal([]*types.RangesToAmounts{
 		{
-			StartId: 0,
-			EndId:   0,
-			Supply:  10,
+			Ranges: []*types.NumberRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+			Amount: 10,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
+	suite.Require().Equal(uint64(10), keeper.GetBadgeBalanceFromBalanceAmountsForSubbadgeId(0, bobBalanceInfo.BalanceAmounts))
 
 	//Create subbadge 2 with supply == 1
 	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{1}, []uint64{1})
@@ -48,14 +47,13 @@ func (suite *TestSuite) TestNewSubBadges() {
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 1, firstAccountNumCreated)
 
 	suite.Require().Equal(uint64(2), badge.NextSubassetId)
-	suite.Require().Equal([]*types.Subasset{
+	suite.Require().Equal([]*types.RangesToAmounts{
 		{
-			StartId: 0,
-			EndId:   0,
-			Supply:  10,
+			Ranges: []*types.NumberRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+			Amount: 10,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(1), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(1, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
+	suite.Require().Equal(uint64(1), keeper.GetBadgeBalanceFromBalanceAmountsForSubbadgeId(1, bobBalanceInfo.BalanceAmounts))
 
 	//Create subbadge 2 with supply == 10
 	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{10}, []uint64{2})
@@ -64,19 +62,14 @@ func (suite *TestSuite) TestNewSubBadges() {
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 2, firstAccountNumCreated)
 
 	suite.Require().Equal(uint64(4), badge.NextSubassetId)
-	suite.Require().Equal([]*types.Subasset{
+	suite.Require().Equal([]*types.RangesToAmounts{
 		{
-			StartId: 0,
-			EndId:   0,
-			Supply:  10,
+			Ranges: []*types.NumberRange{{Start: 0, End: 0}, {Start: 2, End: 3}}, //0 to 0 range so it will be nil
+			Amount: 10,
 		},
-		{
-			StartId: 2,
-			EndId:   3,
-			Supply:  10,
-		},
-	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(2, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
+	},
+	badge.SubassetsTotalSupply)
+	suite.Require().Equal(uint64(10), keeper.GetBadgeBalanceFromBalanceAmountsForSubbadgeId(2, bobBalanceInfo.BalanceAmounts))
 }
 
 func (suite *TestSuite) TestNewSubBadgesNotManager() {

@@ -19,7 +19,7 @@ func TestMsgRequestTransferBadge_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgRequestTransferBadge{
 				Creator: "invalid_address",
-				NumberRange: &types.NumberRange{
+				SubbadgeRange: &types.NumberRange{
 					Start: 0,
 					End: 0,
 				},
@@ -31,7 +31,7 @@ func TestMsgRequestTransferBadge_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: types.MsgRequestTransferBadge{
 				Creator: sample.AccAddress(),
-				NumberRange: &types.NumberRange{
+				SubbadgeRange: &types.NumberRange{
 					Start: 0,
 					End: 0,
 

@@ -15,7 +15,7 @@ func NewMsgRequestTransferBadge(creator string, from uint64, amount uint64, badg
 		From:       from,
 		Amount:     amount,
 		BadgeId:    badgeId,
-		NumberRange: &subbadgeRange,
+		SubbadgeRange: &subbadgeRange,
 	}
 }
 
@@ -44,7 +44,7 @@ func (msg *MsgRequestTransferBadge) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 
 
-	if msg.NumberRange == nil || msg.NumberRange.Start > msg.NumberRange.End {
+	if msg.SubbadgeRange == nil || msg.SubbadgeRange.Start > msg.SubbadgeRange.End {
 		return ErrStartGreaterThanEnd
 	}
 

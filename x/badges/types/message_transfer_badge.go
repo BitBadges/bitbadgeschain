@@ -16,7 +16,7 @@ func NewMsgTransferBadge(creator string, from uint64, toAddresses []uint64, amou
 		ToAddresses:toAddresses,
 		Amounts:    amounts,
 		BadgeId:    badgeId,
-		NumberRange: &subbadgeRange,
+		SubbadgeRange: &subbadgeRange,
 	}
 }
 
@@ -47,7 +47,7 @@ func (msg *MsgTransferBadge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.NumberRange == nil || msg.NumberRange.Start > msg.NumberRange.End {
+	if msg.SubbadgeRange == nil || msg.SubbadgeRange.Start > msg.SubbadgeRange.End {
 		return ErrStartGreaterThanEnd
 	}
 

@@ -15,7 +15,7 @@ func NewMsgRevokeBadge(creator string, addresses []uint64, amounts []uint64, bad
 		Addresses:  addresses,
 		Amounts:    amounts,
 		BadgeId:    badgeId,
-		NumberRange: &subbadgeRange,
+		SubbadgeRange: &subbadgeRange,
 	}
 }
 

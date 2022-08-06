@@ -36,6 +36,7 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	}
 
 	originalSubassetId := badge.NextSubassetId
+	new_amounts := badge.SubassetsTotalSupply
 	for i, supply := range msg.Supplys {
 		for j := uint64(0); j < msg.AmountsToCreate[i]; j++ {
 			//Once here, we should be safe to mint
@@ -53,35 +54,8 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 
 			if supply != defaultSupply {
 				ctx.GasMeter().ConsumeGas(SubbadgeWithSupplyNotEqualToOne, "create new subbadge cost")
-				hasLastEntry := false
-				if len(badge.SubassetsTotalSupply) > 0 {
-					hasLastEntry = true
-				}
-
-				lastEntry := &types.Subasset{}
-				if hasLastEntry {
-					lastEntry = badge.SubassetsTotalSupply[len(badge.SubassetsTotalSupply)-1]
-				}
-
-				if hasLastEntry && lastEntry.Supply == supply && lastEntry.EndId == subasset_id - 1 {
-					badge.SubassetsTotalSupply[len(badge.SubassetsTotalSupply)-1] = &types.Subasset{
-						Supply:  lastEntry.Supply,
-						StartId: lastEntry.StartId,
-						EndId:   subasset_id,
-					}
-				} else if hasLastEntry && lastEntry.Supply == supply && lastEntry.EndId == 0 && lastEntry.StartId == subasset_id-1 {
-					badge.SubassetsTotalSupply[len(badge.SubassetsTotalSupply)-1] = &types.Subasset{
-						Supply:  lastEntry.Supply,
-						StartId: lastEntry.StartId,
-						EndId:   subasset_id,
-					}
-				} else {
-					badge.SubassetsTotalSupply = append(badge.SubassetsTotalSupply, &types.Subasset{
-						Supply:  supply,
-						StartId: subasset_id,
-						EndId:   0,
-					})
-				}
+				
+				new_amounts = UpdateBadgeBalanceBySubbadgeId(subasset_id, supply, new_amounts)
 			}
 			badge.NextSubassetId += 1
 
@@ -93,6 +67,7 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 			badgeBalanceInfo = newBadgeBalanceInfo
 		}
 	}
+	badge.SubassetsTotalSupply = new_amounts
 
 	if err := k.SetBadgeInStore(ctx, badge); err != nil {
 		return nil, err

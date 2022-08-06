@@ -34,22 +34,26 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 	
 	found = false
 
-	dummy_balances := make([]uint64, len(badge.FreezeAddressRanges))
-	for i, _ := range dummy_balances {
-		dummy_balances[i] = 1
+	new_amounts := []*types.RangesToAmounts{
+		{
+			Ranges: badge.FreezeAddressRanges,
+			Amount: 1,
+		},
 	}
-
-	new_freeze_address_ranges := badge.FreezeAddressRanges
 
 	for targetAddress := msg.Addresses.Start; targetAddress <= msg.Addresses.End; targetAddress++ {
 		newAmount := uint64(0)
 		if msg.Add {
 			newAmount = 1
 		}
-		new_freeze_address_ranges, dummy_balances = UpdateBadgeBalanceBySubbadgeId(targetAddress, newAmount, new_freeze_address_ranges, dummy_balances)
+		new_amounts = UpdateBadgeBalanceBySubbadgeId(targetAddress, newAmount, new_amounts)
 	}
-
-	badge.FreezeAddressRanges = new_freeze_address_ranges
+	if len(new_amounts) > 0 {
+		badge.FreezeAddressRanges = new_amounts[0].Ranges
+	} else {
+		badge.FreezeAddressRanges = []*types.NumberRange{}
+	}
+	
 
 
 	err := k.SetBadgeInStore(ctx, badge)

@@ -23,7 +23,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 				ToAddresses:      []uint64{ 0 },
 				Amounts:      []uint64{ 10 },
 				From:    1,
-				NumberRange: &types.NumberRange{
+				SubbadgeRange: &types.NumberRange{
 					Start: 0,
 					End: 0,
 				},
@@ -36,7 +36,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 				ToAddresses:      []uint64{ 0 },
 				Amounts:      []uint64{ 10 },
 				From:    1,
-				NumberRange: &types.NumberRange{
+				SubbadgeRange: &types.NumberRange{
 					Start: 0,
 					End: 0,
 				},
@@ -48,7 +48,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 				ToAddresses:      []uint64{ 0 },
 				Amounts:      []uint64{ 10 },
 				From:    0,
-				NumberRange: &types.NumberRange{
+				SubbadgeRange: &types.NumberRange{
 					Start: 0,
 					End: 0,
 				},
@@ -61,7 +61,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 				ToAddresses:      []uint64{ 0 },
 				Amounts:      []uint64{ 0 },
 				From:    7,
-				NumberRange: &types.NumberRange{
+				SubbadgeRange: &types.NumberRange{
 					Start: 0,
 					End: 0,
 				},
@@ -75,7 +75,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 				ToAddresses:      []uint64{ 0 },
 				Amounts:      []uint64{ 0 },
 				From:    7,
-				NumberRange: &types.NumberRange{
+				SubbadgeRange: &types.NumberRange{
 					Start: 10,
 					End: 0,
 				},

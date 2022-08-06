@@ -99,7 +99,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 					}
 				}
 				
-				for i := CurrPendingTransfer.NumberRange.Start; i <= CurrPendingTransfer.NumberRange.End; i++ {
+				for i := CurrPendingTransfer.SubbadgeRange.Start; i <= CurrPendingTransfer.SubbadgeRange.End; i++ {
 					if needToRevertBalances {
 						// Depending on if it is outgoing or not determines which party's balances to revert and add approvals back to
 						FromInfo := newCreatorBadgeBalanceInfo

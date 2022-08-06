@@ -36,14 +36,13 @@ func (suite *TestSuite) TestSelfDestruct() {
 	
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
-	suite.Require().Equal([]*types.Subasset{
+	suite.Require().Equal([]*types.RangesToAmounts{
 		{
-			StartId: 0,
-			EndId:   0,
-			Supply:  10000,
+			Ranges: []*types.NumberRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+			Amount: 10000,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
+	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromBalanceAmountsForSubbadgeId(0, bobBalanceInfo.BalanceAmounts))
 
 	err = SelfDestructBadge(suite, wctx, bob, 0)
 	suite.Require().Nil(err, "Error self destructing badge")
@@ -96,14 +95,13 @@ func (suite *TestSuite) TestSelfDestructNotManager() {
 	
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
-	suite.Require().Equal([]*types.Subasset{
+	suite.Require().Equal([]*types.RangesToAmounts{
 		{
-			StartId: 0,
-			EndId:   0,
-			Supply:  10000,
+			Ranges: []*types.NumberRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+			Amount: 10000,
 		},
 	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
+	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromBalanceAmountsForSubbadgeId(0, bobBalanceInfo.BalanceAmounts))
 
 	err = SelfDestructBadge(suite, wctx, alice, 0)
 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
