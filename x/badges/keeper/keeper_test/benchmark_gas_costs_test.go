@@ -430,34 +430,24 @@ func (suite *TestSuite) TestGasCosts() {
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("GetBadgeBalance", endGas - startGas)
 
+
+
+
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		addresses = []uint64{}
-		for i := 0; i < 1000; i++ {
-			addresses = append(addresses, firstAccountNumCreated + 1 + uint64(i) * 2)
+		for i := uint64(0); i < 1000; i++ {
+			err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 1, types.NumberRange{Start: i * 2, End: i * 2})
+			suite.Require().Nil(err, "Error transferring badge")
+			suite.Require().Nil(err, "Error transferring badge")
 		}
-		err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, addresses, []uint64{1}, 1, types.NumberRange{Start: 0, End: 0})
-		suite.Require().Nil(err, "Error transferring badge")
-		suite.Require().Nil(err, "Error transferring badge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
-		tbl.AddRow("TransferBadge - Forceful 1000 (Different Addresses, Same SubbadgeId)", endGas - startGas)
+		tbl.AddRow("TransferBadge - 1000 alternating subbadge IDs", endGas - startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		_, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated + 1)
+		badgeBalanceInfo, _ := GetBadgeBalance(suite, wctx, 1, 0, firstAccountNumCreated)
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("GetBadgeBalance", endGas - startGas)
 
-
-		err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, addresses, []uint64{1}, 1, types.NumberRange{Start: 0, End: 999})
-		suite.Require().Nil(err, "Error transferring badge")
-		suite.Require().Nil(err, "Error transferring badge")
-		endGas = suite.ctx.GasMeter().GasConsumed();
-		tbl.AddRow("TransferBadge - Forceful 1000 (Different Addresses, Diff SubbadgeId)", endGas - startGas)
-
-		startGas = suite.ctx.GasMeter().GasConsumed();
-		_, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated + 1)
-		endGas = suite.ctx.GasMeter().GasConsumed();
-		tbl.AddRow("GetBadgeBalance", endGas - startGas)
-
+		_ = badgeBalanceInfo
 
 		firstColumnFormatter := func(format string, vals ...interface{}) string {
 			return ""
