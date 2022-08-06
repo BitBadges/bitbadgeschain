@@ -48,7 +48,7 @@ func CmdFreezeAddress() *cobra.Command {
 
 			msg := types.NewMsgFreezeAddress(
 				clientCtx.GetFromAddress().String(),
-				types.SubbadgeRange{
+				types.NumberRange{
 					Start: argStartAddress,
 					End:   argEndAddress,
 				},

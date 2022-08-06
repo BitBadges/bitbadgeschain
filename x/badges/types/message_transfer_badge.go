@@ -9,14 +9,14 @@ const TypeMsgTransferBadge = "transfer_badge"
 
 var _ sdk.Msg = &MsgTransferBadge{}
 
-func NewMsgTransferBadge(creator string, from uint64, toAddresses []uint64, amounts []uint64, badgeId uint64, subbadgeRange SubbadgeRange) *MsgTransferBadge {
+func NewMsgTransferBadge(creator string, from uint64, toAddresses []uint64, amounts []uint64, badgeId uint64, subbadgeRange NumberRange) *MsgTransferBadge {
 	return &MsgTransferBadge{
 		Creator:    creator,
 		From:       from,
 		ToAddresses:toAddresses,
 		Amounts:    amounts,
 		BadgeId:    badgeId,
-		SubbadgeRange: &subbadgeRange,
+		NumberRange: &subbadgeRange,
 	}
 }
 
@@ -47,7 +47,7 @@ func (msg *MsgTransferBadge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.SubbadgeRange == nil || msg.SubbadgeRange.Start > msg.SubbadgeRange.End {
+	if msg.NumberRange == nil || msg.NumberRange.Start > msg.NumberRange.End {
 		return ErrStartGreaterThanEnd
 	}
 

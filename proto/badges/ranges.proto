@@ -1,0 +1,11 @@
+syntax = "proto3";
+package trevormil.bitbadgeschain.badges;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
+
+message NumberRange {
+    uint64 start = 1;
+    uint64 end = 2;
+}

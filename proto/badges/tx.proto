@@ -2,6 +2,7 @@ syntax = "proto3";
 package trevormil.bitbadgeschain.badges;
 
 // this line is used by starport scaffolding # proto/tx/import
+import "badges/ranges.proto";
 
 option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
@@ -56,13 +57,9 @@ message MsgTransferBadge {
     repeated uint64 toAddresses = 3;
     repeated uint64 amounts = 4;
     uint64 badgeId = 5;
-    SubbadgeRange subbadgeRange = 6;
+    NumberRange subbadgeRange = 6;
 }
 
-message SubbadgeRange {
-    uint64 start = 1;
-    uint64 end = 2;
-}
 
 message MsgTransferBadgeResponse {}
 
@@ -71,7 +68,7 @@ message MsgRequestTransferBadge {
     uint64 from = 2;
     uint64 amount = 4;
     uint64 badgeId = 5;
-    SubbadgeRange subbadgeRange = 6;
+    NumberRange subbadgeRange = 6;
 }
 
 message MsgRequestTransferBadgeResponse {}
@@ -80,7 +77,7 @@ message MsgHandlePendingTransfer {
     string creator = 1;
     bool accept = 2;
     uint64 badgeId = 3;
-    SubbadgeRange nonceRanges = 4;
+    NumberRange nonceRanges = 4;
 }
 
 message MsgHandlePendingTransferResponse {}
@@ -90,7 +87,7 @@ message MsgSetApproval {
     uint64 amount = 2;
     uint64 address = 3;
     uint64 badgeId = 4;
-    SubbadgeRange subbadgeRange = 5;
+    NumberRange subbadgeRange = 5;
 }
 
 message MsgSetApprovalResponse {}
@@ -100,14 +97,14 @@ message MsgRevokeBadge {
     repeated uint64 addresses = 2;
     repeated uint64 amounts = 3;
     uint64 badgeId = 4;
-    SubbadgeRange subbadgeRange = 5;
+    NumberRange subbadgeRange = 5;
 }
 
 message MsgRevokeBadgeResponse {}
 
 message MsgFreezeAddress {
   string creator = 1;
-  SubbadgeRange addresses = 2;
+  NumberRange addresses = 2;
   uint64 badgeId = 3;
   bool  add = 4;
 }

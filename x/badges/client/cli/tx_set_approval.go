@@ -51,7 +51,7 @@ func CmdSetApproval() *cobra.Command {
 				argAmount,
 				argAddress,
 				argBadgeId,
-				types.SubbadgeRange{
+				types.NumberRange{
 					Start: argSubbadgeIdStart,
 					End:   argSubbadgeIdEnd,
 				},

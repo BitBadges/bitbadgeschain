@@ -26,7 +26,7 @@ func SafeSubtract(left uint64, right uint64) (uint64, error) {
 	return left - right, nil
 }
 
-func GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(subbadgeId uint64, ids []*types.SubbadgeRange, balances []uint64) uint64 {
+func GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(subbadgeId uint64, ids []*types.NumberRange, balances []uint64) uint64 {
 	//TODO: binary search
 	for i, idObject := range ids {
 		if idObject.End >= subbadgeId && idObject.Start <= subbadgeId {
@@ -36,8 +36,8 @@ func GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(subbadgeId uint64, ids []*ty
 	return 0
 }
 
-func RemoveBadgeBalanceBySubbadgeId(subbadgeId uint64, ids []*types.SubbadgeRange, balances []uint64) ([]*types.SubbadgeRange, []uint64) {
-	newIds := []*types.SubbadgeRange{}
+func RemoveBadgeBalanceBySubbadgeId(subbadgeId uint64, ids []*types.NumberRange, balances []uint64) ([]*types.NumberRange, []uint64) {
+	newIds := []*types.NumberRange{}
 	newBalances := []uint64{}
 	for i, idObject := range ids {
 		if idObject.End >= subbadgeId && idObject.Start <= subbadgeId {
@@ -45,7 +45,7 @@ func RemoveBadgeBalanceBySubbadgeId(subbadgeId uint64, ids []*types.SubbadgeRang
 
 			//If we still have an existing before range, keep that up until subbadge - 1
 			if subbadgeId >= 1 && subbadgeId - 1 >= idObject.Start {
-				newIds = append(newIds, &types.SubbadgeRange{
+				newIds = append(newIds, &types.NumberRange{
 					Start: idObject.Start,
 					End:   subbadgeId - 1,
 				})
@@ -54,7 +54,7 @@ func RemoveBadgeBalanceBySubbadgeId(subbadgeId uint64, ids []*types.SubbadgeRang
 
 			//If we still have an existing after range, start that at subbadge + 1
 			if subbadgeId + 1 <= idObject.End {
-				newIds = append(newIds, &types.SubbadgeRange{
+				newIds = append(newIds, &types.NumberRange{
 					Start: subbadgeId + 1,
 					End:   idObject.End,
 				})
@@ -69,12 +69,12 @@ func RemoveBadgeBalanceBySubbadgeId(subbadgeId uint64, ids []*types.SubbadgeRang
 }
 
 //Precondition: Must be removed already (balance == 0)
-func SetBadgeBalanceBySubbadgeId(subbadgeId uint64, amount uint64, ids []*types.SubbadgeRange, balances []uint64) ([]*types.SubbadgeRange, []uint64) {
-	newIds := []*types.SubbadgeRange{}
+func SetBadgeBalanceBySubbadgeId(subbadgeId uint64, amount uint64, ids []*types.NumberRange, balances []uint64) ([]*types.NumberRange, []uint64) {
+	newIds := []*types.NumberRange{}
 	newBalances := []uint64{}
 
 	if len(ids) == 0 {
-		newIds = append(newIds, &types.SubbadgeRange{
+		newIds = append(newIds, &types.NumberRange{
 			Start: subbadgeId,
 			End:   subbadgeId,
 		})
@@ -83,7 +83,7 @@ func SetBadgeBalanceBySubbadgeId(subbadgeId uint64, amount uint64, ids []*types.
 	}
 	
 	if len(ids) > 0 && ids[0].Start > subbadgeId {
-		newIds = append(newIds, &types.SubbadgeRange{
+		newIds = append(newIds, &types.NumberRange{
 			Start: subbadgeId,
 			End:   subbadgeId,
 		})
@@ -92,14 +92,14 @@ func SetBadgeBalanceBySubbadgeId(subbadgeId uint64, amount uint64, ids []*types.
 
 	for i := 0; i < len(ids); i++ {
 		if i >= 1 && subbadgeId > ids[i - 1].End && subbadgeId < ids[i].Start {
-			newIds = append(newIds, &types.SubbadgeRange{
+			newIds = append(newIds, &types.NumberRange{
 				Start: subbadgeId,
 				End:   subbadgeId,
 			})
 			newBalances = append(newBalances, amount)
 		}
 
-		newIds = append(newIds, &types.SubbadgeRange{
+		newIds = append(newIds, &types.NumberRange{
 			Start: ids[i].Start,
 			End:   ids[i].End,
 		})
@@ -107,14 +107,14 @@ func SetBadgeBalanceBySubbadgeId(subbadgeId uint64, amount uint64, ids []*types.
 	}
 
 	if len(ids) > 0 && ids[len(ids)-1].End < subbadgeId {
-		newIds = append(newIds, &types.SubbadgeRange{
+		newIds = append(newIds, &types.NumberRange{
 			Start: subbadgeId,
 			End:   subbadgeId,
 		})
 		newBalances = append(newBalances, amount)
 	}
 
-	mergedIds := []*types.SubbadgeRange{
+	mergedIds := []*types.NumberRange{
 		newIds[0],
 	}
 	mergedBalances := []uint64{
@@ -133,7 +133,7 @@ func SetBadgeBalanceBySubbadgeId(subbadgeId uint64, amount uint64, ids []*types.
 }
 
 
-func UpdateBadgeBalanceBySubbadgeId(subbadgeId uint64, newAmount uint64, ids []*types.SubbadgeRange, balances []uint64) ([]*types.SubbadgeRange, []uint64) {
+func UpdateBadgeBalanceBySubbadgeId(subbadgeId uint64, newAmount uint64, ids []*types.NumberRange, balances []uint64) ([]*types.NumberRange, []uint64) {
 	ids, balances = RemoveBadgeBalanceBySubbadgeId(subbadgeId, ids, balances)
 	if newAmount != 0 {
 		ids, balances = SetBadgeBalanceBySubbadgeId(subbadgeId, newAmount, ids, balances)
@@ -185,7 +185,7 @@ func (k Keeper) RemoveFromBadgeBalance(ctx sdk.Context, badgeBalanceInfo types.B
 	return badgeBalanceInfo, nil
 }
 
-func (k Keeper) AddToBothPendingBadgeBalances(ctx sdk.Context, fromBadgeBalanceInfo types.BadgeBalanceInfo, toBadgeBalanceInfo types.BadgeBalanceInfo, subbadgeRange types.SubbadgeRange, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool) (types.BadgeBalanceInfo, types.BadgeBalanceInfo, error) {
+func (k Keeper) AddToBothPendingBadgeBalances(ctx sdk.Context, fromBadgeBalanceInfo types.BadgeBalanceInfo, toBadgeBalanceInfo types.BadgeBalanceInfo, subbadgeRange types.NumberRange, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool) (types.BadgeBalanceInfo, types.BadgeBalanceInfo, error) {
 	ctx.GasMeter().ConsumeGas(AddOrRemovePending * 2, "add to both pending balances")
 	if amount == 0 {
 		return fromBadgeBalanceInfo, toBadgeBalanceInfo, ErrBalanceIsZero
@@ -193,7 +193,7 @@ func (k Keeper) AddToBothPendingBadgeBalances(ctx sdk.Context, fromBadgeBalanceI
 
 	//Append pending transfers and update nonces
 	fromBadgeBalanceInfo.Pending = append(fromBadgeBalanceInfo.Pending, &types.PendingTransfer{
-		SubbadgeRange: &subbadgeRange,
+		NumberRange: &subbadgeRange,
 		Amount:            amount,
 		ApprovedBy:        approvedBy,
 		SendRequest:       sentByFrom,
@@ -204,7 +204,7 @@ func (k Keeper) AddToBothPendingBadgeBalances(ctx sdk.Context, fromBadgeBalanceI
 	})
 
 	toBadgeBalanceInfo.Pending = append(toBadgeBalanceInfo.Pending, &types.PendingTransfer{
-		SubbadgeRange: &subbadgeRange,
+		NumberRange: &subbadgeRange,
 		Amount:            amount,
 		ApprovedBy:        approvedBy,
 		SendRequest:       !sentByFrom,
@@ -248,7 +248,7 @@ func (k Keeper) RemovePending(ctx sdk.Context, badgeBalanceInfo types.BadgeBalan
 	return badgeBalanceInfo, nil
 }
 
-func (k Keeper) SetApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount uint64, address_num uint64, subbadgeRange types.SubbadgeRange) (types.BadgeBalanceInfo, error) {
+func (k Keeper) SetApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount uint64, address_num uint64, subbadgeRange types.NumberRange) (types.BadgeBalanceInfo, error) {
 	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "adjust approval")
 	
 
@@ -282,7 +282,7 @@ func (k Keeper) SetApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalance
 		new_approvals = append(new_approvals, &types.Approval{
 			Address: address_num,
 			Amounts: []uint64{amount},
-			SubbadgeRanges: []*types.SubbadgeRange{&subbadgeRange},
+			SubbadgeRanges: []*types.NumberRange{&subbadgeRange},
 		})
 	}
 
@@ -293,7 +293,7 @@ func (k Keeper) SetApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalance
 }
 
 //Will return an error if isn't approved for amounts
-func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount_to_remove uint64, address_num uint64, subbadgeRange types.SubbadgeRange) (types.BadgeBalanceInfo, error) {
+func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount_to_remove uint64, address_num uint64, subbadgeRange types.NumberRange) (types.BadgeBalanceInfo, error) {
 	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "adjust approval")
 	
 	new_approvals := []*types.Approval{}
@@ -343,7 +343,7 @@ func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, badgeBalanceInfo type
 	return badgeBalanceInfo, nil
 }
 
-func (k Keeper) AddBalanceToApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount_to_add uint64, address_num uint64, subbadgeRange types.SubbadgeRange) (types.BadgeBalanceInfo, error) {
+func (k Keeper) AddBalanceToApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount_to_add uint64, address_num uint64, subbadgeRange types.NumberRange) (types.BadgeBalanceInfo, error) {
 	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "adjust approval")
 
 

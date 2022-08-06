@@ -40,7 +40,7 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.SubbadgeRange{Start: 0, End: 0})
+	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.NumberRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error transferring badge")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -84,7 +84,7 @@ func (suite *TestSuite) TestTransferBadgePending() {
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.SubbadgeRange{Start: 0, End: 0})
+	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.NumberRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error transferring badge")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -142,7 +142,7 @@ func (suite *TestSuite) TestTransferBadgeForceBurn() {
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.SubbadgeRange{Start: 0, End: 0})
+	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.NumberRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error transferring badge")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -165,7 +165,7 @@ func (suite *TestSuite) TestTransferBadgeForceBurn() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(false, aliceBalanceInfo.Pending[0].SendRequest)
 
-	err = HandlePendingTransfers(suite, wctx, alice, true, 0, types.SubbadgeRange{Start: 0, End: 0})
+	err = HandlePendingTransfers(suite, wctx, alice, true, 0, types.NumberRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error accepting badge")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -174,7 +174,7 @@ func (suite *TestSuite) TestTransferBadgeForceBurn() {
 	aliceBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 	suite.Require().Equal(uint64(5000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, aliceBalanceInfo.IdsForBalances, aliceBalanceInfo.Balances))
 
-	err = TransferBadge(suite, wctx, alice, firstAccountNumCreated+1, []uint64{firstAccountNumCreated}, []uint64{5000}, 0, types.SubbadgeRange{Start: 0, End: 0})
+	err = TransferBadge(suite, wctx, alice, firstAccountNumCreated+1, []uint64{firstAccountNumCreated}, []uint64{5000}, 0, types.NumberRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error transferring badge")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -218,13 +218,13 @@ func (suite *TestSuite) TestApprovalsApproved() {
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = SetApproval(suite, wctx, bob, 1000000, firstAccountNumCreated+1, 0, types.SubbadgeRange{Start: 0, End: 0})
+	err = SetApproval(suite, wctx, bob, 1000000, firstAccountNumCreated+1, 0, types.NumberRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error setting approval")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	// suite.Require().Equal(uint64(1000000-5000), bobBalanceInfo.Approvals[0].Amount)
 
-	err = TransferBadge(suite, wctx, charlie, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.SubbadgeRange{Start: 0, End: 0})
+	err = TransferBadge(suite, wctx, charlie, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.NumberRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error transferring badge")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -265,10 +265,10 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = SetApproval(suite, wctx, bob, 10, firstAccountNumCreated+1, 0, types.SubbadgeRange{Start: 0, End: 0})
+	err = SetApproval(suite, wctx, bob, 10, firstAccountNumCreated+1, 0, types.NumberRange{Start: 0, End: 0})
 	suite.Require().Nil(err, "Error setting approval")
 
-	err = TransferBadge(suite, wctx, charlie, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.SubbadgeRange{Start: 0, End: 0})
+	err = TransferBadge(suite, wctx, charlie, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.NumberRange{Start: 0, End: 0})
 	suite.Require().EqualError(err, keeper.ErrInsufficientApproval.Error())
 }
 
@@ -306,6 +306,6 @@ func (suite *TestSuite) TestApprovalsNotApproved() {
 	}, badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(0, bobBalanceInfo.IdsForBalances, bobBalanceInfo.Balances))
 
-	err = TransferBadge(suite, wctx, charlie, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.SubbadgeRange{Start: 0, End: 0})
+	err = TransferBadge(suite, wctx, charlie, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{5000}, 0, types.NumberRange{Start: 0, End: 0})
 	suite.Require().EqualError(err, keeper.ErrInsufficientApproval.Error())
 }

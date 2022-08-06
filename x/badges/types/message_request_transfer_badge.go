@@ -9,13 +9,13 @@ const TypeMsgRequestTransferBadge = "request_transfer_badge"
 
 var _ sdk.Msg = &MsgRequestTransferBadge{}
 
-func NewMsgRequestTransferBadge(creator string, from uint64, amount uint64, badgeId uint64, subbadgeRange SubbadgeRange) *MsgRequestTransferBadge {
+func NewMsgRequestTransferBadge(creator string, from uint64, amount uint64, badgeId uint64, subbadgeRange NumberRange) *MsgRequestTransferBadge {
 	return &MsgRequestTransferBadge{
 		Creator:    creator,
 		From:       from,
 		Amount:     amount,
 		BadgeId:    badgeId,
-		SubbadgeRange: &subbadgeRange,
+		NumberRange: &subbadgeRange,
 	}
 }
 
@@ -44,7 +44,7 @@ func (msg *MsgRequestTransferBadge) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 
 
-	if msg.SubbadgeRange == nil || msg.SubbadgeRange.Start > msg.SubbadgeRange.End {
+	if msg.NumberRange == nil || msg.NumberRange.Start > msg.NumberRange.End {
 		return ErrStartGreaterThanEnd
 	}
 

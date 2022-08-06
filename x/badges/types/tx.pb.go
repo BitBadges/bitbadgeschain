@@ -268,12 +268,12 @@ func (m *MsgNewSubBadgeResponse) GetSubassetId() uint64 {
 }
 
 type MsgTransferBadge struct {
-	Creator       string         `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	From          uint64         `protobuf:"varint,2,opt,name=from,proto3" json:"from,omitempty"`
-	ToAddresses   []uint64       `protobuf:"varint,3,rep,packed,name=toAddresses,proto3" json:"toAddresses,omitempty"`
-	Amounts       []uint64       `protobuf:"varint,4,rep,packed,name=amounts,proto3" json:"amounts,omitempty"`
-	BadgeId       uint64         `protobuf:"varint,5,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	SubbadgeRange *SubbadgeRange `protobuf:"bytes,6,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
+	Creator       string       `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	From          uint64       `protobuf:"varint,2,opt,name=from,proto3" json:"from,omitempty"`
+	ToAddresses   []uint64     `protobuf:"varint,3,rep,packed,name=toAddresses,proto3" json:"toAddresses,omitempty"`
+	Amounts       []uint64     `protobuf:"varint,4,rep,packed,name=amounts,proto3" json:"amounts,omitempty"`
+	BadgeId       uint64       `protobuf:"varint,5,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
+	NumberRange *NumberRange `protobuf:"bytes,6,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
 }
 
 func (m *MsgTransferBadge) Reset()         { *m = MsgTransferBadge{} }
@@ -344,63 +344,11 @@ func (m *MsgTransferBadge) GetBadgeId() uint64 {
 	return 0
 }
 
-func (m *MsgTransferBadge) GetSubbadgeRange() *SubbadgeRange {
+func (m *MsgTransferBadge) GetSubbadgeRange() *NumberRange {
 	if m != nil {
-		return m.SubbadgeRange
+		return m.NumberRange
 	}
 	return nil
-}
-
-type SubbadgeRange struct {
-	Start uint64 `protobuf:"varint,1,opt,name=start,proto3" json:"start,omitempty"`
-	End   uint64 `protobuf:"varint,2,opt,name=end,proto3" json:"end,omitempty"`
-}
-
-func (m *SubbadgeRange) Reset()         { *m = SubbadgeRange{} }
-func (m *SubbadgeRange) String() string { return proto.CompactTextString(m) }
-func (*SubbadgeRange) ProtoMessage()    {}
-func (*SubbadgeRange) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{5}
-}
-func (m *SubbadgeRange) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *SubbadgeRange) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_SubbadgeRange.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *SubbadgeRange) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SubbadgeRange.Merge(m, src)
-}
-func (m *SubbadgeRange) XXX_Size() int {
-	return m.Size()
-}
-func (m *SubbadgeRange) XXX_DiscardUnknown() {
-	xxx_messageInfo_SubbadgeRange.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SubbadgeRange proto.InternalMessageInfo
-
-func (m *SubbadgeRange) GetStart() uint64 {
-	if m != nil {
-		return m.Start
-	}
-	return 0
-}
-
-func (m *SubbadgeRange) GetEnd() uint64 {
-	if m != nil {
-		return m.End
-	}
-	return 0
 }
 
 type MsgTransferBadgeResponse struct {
@@ -410,7 +358,7 @@ func (m *MsgTransferBadgeResponse) Reset()         { *m = MsgTransferBadgeRespon
 func (m *MsgTransferBadgeResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgTransferBadgeResponse) ProtoMessage()    {}
 func (*MsgTransferBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{6}
+	return fileDescriptor_bc897b33479788c9, []int{5}
 }
 func (m *MsgTransferBadgeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -440,18 +388,18 @@ func (m *MsgTransferBadgeResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgTransferBadgeResponse proto.InternalMessageInfo
 
 type MsgRequestTransferBadge struct {
-	Creator       string         `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	From          uint64         `protobuf:"varint,2,opt,name=from,proto3" json:"from,omitempty"`
-	Amount        uint64         `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
-	BadgeId       uint64         `protobuf:"varint,5,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	SubbadgeRange *SubbadgeRange `protobuf:"bytes,6,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
+	Creator       string       `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	From          uint64       `protobuf:"varint,2,opt,name=from,proto3" json:"from,omitempty"`
+	Amount        uint64       `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
+	BadgeId       uint64       `protobuf:"varint,5,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
+	NumberRange *NumberRange `protobuf:"bytes,6,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
 }
 
 func (m *MsgRequestTransferBadge) Reset()         { *m = MsgRequestTransferBadge{} }
 func (m *MsgRequestTransferBadge) String() string { return proto.CompactTextString(m) }
 func (*MsgRequestTransferBadge) ProtoMessage()    {}
 func (*MsgRequestTransferBadge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{7}
+	return fileDescriptor_bc897b33479788c9, []int{6}
 }
 func (m *MsgRequestTransferBadge) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -508,9 +456,9 @@ func (m *MsgRequestTransferBadge) GetBadgeId() uint64 {
 	return 0
 }
 
-func (m *MsgRequestTransferBadge) GetSubbadgeRange() *SubbadgeRange {
+func (m *MsgRequestTransferBadge) GetSubbadgeRange() *NumberRange {
 	if m != nil {
-		return m.SubbadgeRange
+		return m.NumberRange
 	}
 	return nil
 }
@@ -522,7 +470,7 @@ func (m *MsgRequestTransferBadgeResponse) Reset()         { *m = MsgRequestTrans
 func (m *MsgRequestTransferBadgeResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgRequestTransferBadgeResponse) ProtoMessage()    {}
 func (*MsgRequestTransferBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{8}
+	return fileDescriptor_bc897b33479788c9, []int{7}
 }
 func (m *MsgRequestTransferBadgeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -552,17 +500,17 @@ func (m *MsgRequestTransferBadgeResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgRequestTransferBadgeResponse proto.InternalMessageInfo
 
 type MsgHandlePendingTransfer struct {
-	Creator     string         `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Accept      bool           `protobuf:"varint,2,opt,name=accept,proto3" json:"accept,omitempty"`
-	BadgeId     uint64         `protobuf:"varint,3,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	NonceRanges *SubbadgeRange `protobuf:"bytes,4,opt,name=nonceRanges,proto3" json:"nonceRanges,omitempty"`
+	Creator     string       `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Accept      bool         `protobuf:"varint,2,opt,name=accept,proto3" json:"accept,omitempty"`
+	BadgeId     uint64       `protobuf:"varint,3,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
+	NonceRanges *NumberRange `protobuf:"bytes,4,opt,name=nonceRanges,proto3" json:"nonceRanges,omitempty"`
 }
 
 func (m *MsgHandlePendingTransfer) Reset()         { *m = MsgHandlePendingTransfer{} }
 func (m *MsgHandlePendingTransfer) String() string { return proto.CompactTextString(m) }
 func (*MsgHandlePendingTransfer) ProtoMessage()    {}
 func (*MsgHandlePendingTransfer) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{9}
+	return fileDescriptor_bc897b33479788c9, []int{8}
 }
 func (m *MsgHandlePendingTransfer) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -612,7 +560,7 @@ func (m *MsgHandlePendingTransfer) GetBadgeId() uint64 {
 	return 0
 }
 
-func (m *MsgHandlePendingTransfer) GetNonceRanges() *SubbadgeRange {
+func (m *MsgHandlePendingTransfer) GetNonceRanges() *NumberRange {
 	if m != nil {
 		return m.NonceRanges
 	}
@@ -626,7 +574,7 @@ func (m *MsgHandlePendingTransferResponse) Reset()         { *m = MsgHandlePendi
 func (m *MsgHandlePendingTransferResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgHandlePendingTransferResponse) ProtoMessage()    {}
 func (*MsgHandlePendingTransferResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{10}
+	return fileDescriptor_bc897b33479788c9, []int{9}
 }
 func (m *MsgHandlePendingTransferResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -656,18 +604,18 @@ func (m *MsgHandlePendingTransferResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgHandlePendingTransferResponse proto.InternalMessageInfo
 
 type MsgSetApproval struct {
-	Creator       string         `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Amount        uint64         `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	Address       uint64         `protobuf:"varint,3,opt,name=address,proto3" json:"address,omitempty"`
-	BadgeId       uint64         `protobuf:"varint,4,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	SubbadgeRange *SubbadgeRange `protobuf:"bytes,5,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
+	Creator       string       `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Amount        uint64       `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
+	Address       uint64       `protobuf:"varint,3,opt,name=address,proto3" json:"address,omitempty"`
+	BadgeId       uint64       `protobuf:"varint,4,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
+	NumberRange *NumberRange `protobuf:"bytes,5,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
 }
 
 func (m *MsgSetApproval) Reset()         { *m = MsgSetApproval{} }
 func (m *MsgSetApproval) String() string { return proto.CompactTextString(m) }
 func (*MsgSetApproval) ProtoMessage()    {}
 func (*MsgSetApproval) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{11}
+	return fileDescriptor_bc897b33479788c9, []int{10}
 }
 func (m *MsgSetApproval) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -724,9 +672,9 @@ func (m *MsgSetApproval) GetBadgeId() uint64 {
 	return 0
 }
 
-func (m *MsgSetApproval) GetSubbadgeRange() *SubbadgeRange {
+func (m *MsgSetApproval) GetSubbadgeRange() *NumberRange {
 	if m != nil {
-		return m.SubbadgeRange
+		return m.NumberRange
 	}
 	return nil
 }
@@ -738,7 +686,7 @@ func (m *MsgSetApprovalResponse) Reset()         { *m = MsgSetApprovalResponse{}
 func (m *MsgSetApprovalResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgSetApprovalResponse) ProtoMessage()    {}
 func (*MsgSetApprovalResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{12}
+	return fileDescriptor_bc897b33479788c9, []int{11}
 }
 func (m *MsgSetApprovalResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -768,18 +716,18 @@ func (m *MsgSetApprovalResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgSetApprovalResponse proto.InternalMessageInfo
 
 type MsgRevokeBadge struct {
-	Creator       string         `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Addresses     []uint64       `protobuf:"varint,2,rep,packed,name=addresses,proto3" json:"addresses,omitempty"`
-	Amounts       []uint64       `protobuf:"varint,3,rep,packed,name=amounts,proto3" json:"amounts,omitempty"`
-	BadgeId       uint64         `protobuf:"varint,4,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	SubbadgeRange *SubbadgeRange `protobuf:"bytes,5,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
+	Creator       string       `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Addresses     []uint64     `protobuf:"varint,2,rep,packed,name=addresses,proto3" json:"addresses,omitempty"`
+	Amounts       []uint64     `protobuf:"varint,3,rep,packed,name=amounts,proto3" json:"amounts,omitempty"`
+	BadgeId       uint64       `protobuf:"varint,4,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
+	NumberRange *NumberRange `protobuf:"bytes,5,opt,name=subbadgeRange,proto3" json:"subbadgeRange,omitempty"`
 }
 
 func (m *MsgRevokeBadge) Reset()         { *m = MsgRevokeBadge{} }
 func (m *MsgRevokeBadge) String() string { return proto.CompactTextString(m) }
 func (*MsgRevokeBadge) ProtoMessage()    {}
 func (*MsgRevokeBadge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{13}
+	return fileDescriptor_bc897b33479788c9, []int{12}
 }
 func (m *MsgRevokeBadge) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -836,9 +784,9 @@ func (m *MsgRevokeBadge) GetBadgeId() uint64 {
 	return 0
 }
 
-func (m *MsgRevokeBadge) GetSubbadgeRange() *SubbadgeRange {
+func (m *MsgRevokeBadge) GetSubbadgeRange() *NumberRange {
 	if m != nil {
-		return m.SubbadgeRange
+		return m.NumberRange
 	}
 	return nil
 }
@@ -850,7 +798,7 @@ func (m *MsgRevokeBadgeResponse) Reset()         { *m = MsgRevokeBadgeResponse{}
 func (m *MsgRevokeBadgeResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgRevokeBadgeResponse) ProtoMessage()    {}
 func (*MsgRevokeBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{14}
+	return fileDescriptor_bc897b33479788c9, []int{13}
 }
 func (m *MsgRevokeBadgeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -880,17 +828,17 @@ func (m *MsgRevokeBadgeResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgRevokeBadgeResponse proto.InternalMessageInfo
 
 type MsgFreezeAddress struct {
-	Creator   string         `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Addresses *SubbadgeRange `protobuf:"bytes,2,opt,name=addresses,proto3" json:"addresses,omitempty"`
-	BadgeId   uint64         `protobuf:"varint,3,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	Add       bool           `protobuf:"varint,4,opt,name=add,proto3" json:"add,omitempty"`
+	Creator   string       `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Addresses *NumberRange `protobuf:"bytes,2,opt,name=addresses,proto3" json:"addresses,omitempty"`
+	BadgeId   uint64       `protobuf:"varint,3,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
+	Add       bool         `protobuf:"varint,4,opt,name=add,proto3" json:"add,omitempty"`
 }
 
 func (m *MsgFreezeAddress) Reset()         { *m = MsgFreezeAddress{} }
 func (m *MsgFreezeAddress) String() string { return proto.CompactTextString(m) }
 func (*MsgFreezeAddress) ProtoMessage()    {}
 func (*MsgFreezeAddress) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{15}
+	return fileDescriptor_bc897b33479788c9, []int{14}
 }
 func (m *MsgFreezeAddress) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -926,7 +874,7 @@ func (m *MsgFreezeAddress) GetCreator() string {
 	return ""
 }
 
-func (m *MsgFreezeAddress) GetAddresses() *SubbadgeRange {
+func (m *MsgFreezeAddress) GetAddresses() *NumberRange {
 	if m != nil {
 		return m.Addresses
 	}
@@ -954,7 +902,7 @@ func (m *MsgFreezeAddressResponse) Reset()         { *m = MsgFreezeAddressRespon
 func (m *MsgFreezeAddressResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgFreezeAddressResponse) ProtoMessage()    {}
 func (*MsgFreezeAddressResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{16}
+	return fileDescriptor_bc897b33479788c9, []int{15}
 }
 func (m *MsgFreezeAddressResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -994,7 +942,7 @@ func (m *MsgUpdateUris) Reset()         { *m = MsgUpdateUris{} }
 func (m *MsgUpdateUris) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateUris) ProtoMessage()    {}
 func (*MsgUpdateUris) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{17}
+	return fileDescriptor_bc897b33479788c9, []int{16}
 }
 func (m *MsgUpdateUris) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1058,7 +1006,7 @@ func (m *MsgUpdateUrisResponse) Reset()         { *m = MsgUpdateUrisResponse{} }
 func (m *MsgUpdateUrisResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateUrisResponse) ProtoMessage()    {}
 func (*MsgUpdateUrisResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{18}
+	return fileDescriptor_bc897b33479788c9, []int{17}
 }
 func (m *MsgUpdateUrisResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1097,7 +1045,7 @@ func (m *MsgUpdatePermissions) Reset()         { *m = MsgUpdatePermissions{} }
 func (m *MsgUpdatePermissions) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdatePermissions) ProtoMessage()    {}
 func (*MsgUpdatePermissions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{19}
+	return fileDescriptor_bc897b33479788c9, []int{18}
 }
 func (m *MsgUpdatePermissions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1154,7 +1102,7 @@ func (m *MsgUpdatePermissionsResponse) Reset()         { *m = MsgUpdatePermissio
 func (m *MsgUpdatePermissionsResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdatePermissionsResponse) ProtoMessage()    {}
 func (*MsgUpdatePermissionsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{20}
+	return fileDescriptor_bc897b33479788c9, []int{19}
 }
 func (m *MsgUpdatePermissionsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1193,7 +1141,7 @@ func (m *MsgTransferManager) Reset()         { *m = MsgTransferManager{} }
 func (m *MsgTransferManager) String() string { return proto.CompactTextString(m) }
 func (*MsgTransferManager) ProtoMessage()    {}
 func (*MsgTransferManager) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{21}
+	return fileDescriptor_bc897b33479788c9, []int{20}
 }
 func (m *MsgTransferManager) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1250,7 +1198,7 @@ func (m *MsgTransferManagerResponse) Reset()         { *m = MsgTransferManagerRe
 func (m *MsgTransferManagerResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgTransferManagerResponse) ProtoMessage()    {}
 func (*MsgTransferManagerResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{22}
+	return fileDescriptor_bc897b33479788c9, []int{21}
 }
 func (m *MsgTransferManagerResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1289,7 +1237,7 @@ func (m *MsgRequestTransferManager) Reset()         { *m = MsgRequestTransferMan
 func (m *MsgRequestTransferManager) String() string { return proto.CompactTextString(m) }
 func (*MsgRequestTransferManager) ProtoMessage()    {}
 func (*MsgRequestTransferManager) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{23}
+	return fileDescriptor_bc897b33479788c9, []int{22}
 }
 func (m *MsgRequestTransferManager) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1346,7 +1294,7 @@ func (m *MsgRequestTransferManagerResponse) Reset()         { *m = MsgRequestTra
 func (m *MsgRequestTransferManagerResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgRequestTransferManagerResponse) ProtoMessage()    {}
 func (*MsgRequestTransferManagerResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{24}
+	return fileDescriptor_bc897b33479788c9, []int{23}
 }
 func (m *MsgRequestTransferManagerResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1384,7 +1332,7 @@ func (m *MsgSelfDestructBadge) Reset()         { *m = MsgSelfDestructBadge{} }
 func (m *MsgSelfDestructBadge) String() string { return proto.CompactTextString(m) }
 func (*MsgSelfDestructBadge) ProtoMessage()    {}
 func (*MsgSelfDestructBadge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{25}
+	return fileDescriptor_bc897b33479788c9, []int{24}
 }
 func (m *MsgSelfDestructBadge) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1434,7 +1382,7 @@ func (m *MsgSelfDestructBadgeResponse) Reset()         { *m = MsgSelfDestructBad
 func (m *MsgSelfDestructBadgeResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgSelfDestructBadgeResponse) ProtoMessage()    {}
 func (*MsgSelfDestructBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{26}
+	return fileDescriptor_bc897b33479788c9, []int{25}
 }
 func (m *MsgSelfDestructBadgeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1469,7 +1417,6 @@ func init() {
 	proto.RegisterType((*MsgNewSubBadge)(nil), "trevormil.bitbadgeschain.badges.MsgNewSubBadge")
 	proto.RegisterType((*MsgNewSubBadgeResponse)(nil), "trevormil.bitbadgeschain.badges.MsgNewSubBadgeResponse")
 	proto.RegisterType((*MsgTransferBadge)(nil), "trevormil.bitbadgeschain.badges.MsgTransferBadge")
-	proto.RegisterType((*SubbadgeRange)(nil), "trevormil.bitbadgeschain.badges.SubbadgeRange")
 	proto.RegisterType((*MsgTransferBadgeResponse)(nil), "trevormil.bitbadgeschain.badges.MsgTransferBadgeResponse")
 	proto.RegisterType((*MsgRequestTransferBadge)(nil), "trevormil.bitbadgeschain.badges.MsgRequestTransferBadge")
 	proto.RegisterType((*MsgRequestTransferBadgeResponse)(nil), "trevormil.bitbadgeschain.badges.MsgRequestTransferBadgeResponse")
@@ -1496,73 +1443,73 @@ func init() {
 func init() { proto.RegisterFile("badges/tx.proto", fileDescriptor_bc897b33479788c9) }
 
 var fileDescriptor_bc897b33479788c9 = []byte{
-	// 1055 bytes of a gzipped FileDescriptorProto
+	// 1042 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0x4f, 0x6f, 0xdc, 0x44,
-	0x14, 0x8f, 0xd7, 0x9b, 0x90, 0xbc, 0x65, 0x9b, 0x60, 0x92, 0xd4, 0x58, 0xd1, 0x76, 0x6b, 0x84,
-	0x94, 0x03, 0xda, 0x15, 0x69, 0x4b, 0x0b, 0x08, 0x89, 0x04, 0x84, 0x5a, 0xd4, 0x45, 0x91, 0x37,
-	0xbd, 0x70, 0x9b, 0x5d, 0x4f, 0x1c, 0x8b, 0x5d, 0xdb, 0xcc, 0x8c, 0x93, 0x16, 0x09, 0x2e, 0x9c,
-	0xb8, 0x21, 0x24, 0x24, 0x3e, 0x01, 0x9f, 0x01, 0xf1, 0x09, 0x38, 0x20, 0x51, 0x71, 0x82, 0x1b,
-	0x4a, 0xae, 0x7c, 0x08, 0x34, 0x63, 0x7b, 0x76, 0xbc, 0x6b, 0x77, 0xbd, 0xdb, 0xaa, 0x37, 0xcf,
-	0x9b, 0x79, 0xef, 0xfd, 0x7e, 0xef, 0xcf, 0xbc, 0x91, 0x61, 0x73, 0x80, 0x5c, 0x0f, 0xd3, 0x2e,
-	0x7b, 0xdc, 0x89, 0x48, 0xc8, 0x42, 0xe3, 0x06, 0x23, 0xf8, 0x3c, 0x24, 0x63, 0x7f, 0xd4, 0x19,
-	0xf8, 0x2c, 0xd9, 0x1d, 0x9e, 0x21, 0x3f, 0xe8, 0x24, 0xdf, 0xf6, 0x3f, 0x1a, 0x34, 0x7a, 0xd4,
-	0xfb, 0x1c, 0x5f, 0x1c, 0x71, 0x81, 0x61, 0xc2, 0x2b, 0x43, 0x82, 0x11, 0x0b, 0x89, 0xa9, 0xb5,
-	0xb5, 0xfd, 0x0d, 0x27, 0x5b, 0x1a, 0x5b, 0xa0, 0xc7, 0xc4, 0x37, 0x6b, 0x42, 0xca, 0x3f, 0x0d,
-	0x1b, 0x5e, 0xa5, 0xf1, 0x00, 0x51, 0x8a, 0xd9, 0x23, 0xe2, 0x53, 0x53, 0x17, 0x5b, 0x39, 0x99,
-	0xd1, 0x86, 0x46, 0x84, 0xc9, 0xd8, 0xa7, 0xd4, 0x0f, 0x03, 0x6a, 0xd6, 0xdb, 0xda, 0x7e, 0xdd,
-	0x51, 0x45, 0xdc, 0xca, 0x18, 0x33, 0xe4, 0x22, 0x86, 0xee, 0x23, 0x7a, 0x66, 0xae, 0x26, 0x56,
-	0x54, 0x99, 0x71, 0x1b, 0x76, 0x5c, 0x7c, 0x8a, 0xe2, 0x11, 0xeb, 0xa7, 0xc6, 0xfb, 0x71, 0x14,
-	0x8d, 0x9e, 0x98, 0x6b, 0xc2, 0x5e, 0xf1, 0xa6, 0xfd, 0x16, 0xbc, 0xae, 0x50, 0x73, 0x30, 0x8d,
-	0xc2, 0x80, 0x62, 0xe3, 0x1a, 0xd4, 0x7c, 0x57, 0xb0, 0xab, 0x3b, 0x35, 0xdf, 0xb5, 0xbf, 0x85,
-	0x6b, 0xc9, 0xb1, 0x7e, 0x3c, 0x98, 0x17, 0x84, 0x44, 0xb7, 0x96, 0xe9, 0xf2, 0x93, 0x54, 0x38,
-	0xe3, 0xec, 0xf5, 0xfd, 0xba, 0x93, 0x2d, 0x8d, 0x7d, 0xd8, 0x44, 0xe3, 0x30, 0x0e, 0x18, 0x3d,
-	0x09, 0x3f, 0xe6, 0xda, 0xd8, 0xac, 0x8b, 0x13, 0xd3, 0x62, 0xfb, 0x1e, 0xec, 0xe6, 0xfd, 0x4b,
-	0xa4, 0x2d, 0x80, 0x2c, 0x98, 0x0f, 0x32, 0xc4, 0x8a, 0xc4, 0xfe, 0x4f, 0x83, 0xad, 0x1e, 0xf5,
-	0x4e, 0x08, 0x0a, 0xe8, 0x29, 0x26, 0xf3, 0xc0, 0x1b, 0x50, 0x3f, 0x25, 0xe1, 0x38, 0x85, 0x2f,
-	0xbe, 0x79, 0x7e, 0x58, 0x78, 0xe8, 0xba, 0x04, 0x53, 0x8a, 0x33, 0x12, 0xaa, 0x88, 0xdb, 0x4b,
-	0x11, 0xa7, 0x04, 0xb2, 0x25, 0xdf, 0x11, 0x55, 0xf4, 0xc0, 0x15, 0x49, 0xab, 0x3b, 0xd9, 0xd2,
-	0x38, 0x81, 0x26, 0x8d, 0x07, 0x62, 0xe5, 0xa0, 0xc0, 0xc3, 0x22, 0x4f, 0x8d, 0x83, 0x4e, 0x67,
-	0x4e, 0x39, 0x76, 0xfa, 0xaa, 0x96, 0x93, 0x37, 0x62, 0xdf, 0x85, 0x66, 0x6e, 0xdf, 0xd8, 0x86,
-	0x55, 0xca, 0x10, 0x61, 0x69, 0x68, 0x92, 0x05, 0x2f, 0x54, 0x1c, 0x64, 0x49, 0xe2, 0x9f, 0xb6,
-	0x05, 0xe6, 0x74, 0x98, 0xb2, 0x18, 0xdb, 0x7f, 0x6a, 0x70, 0xbd, 0x47, 0x3d, 0x07, 0x7f, 0x15,
-	0x63, 0xca, 0x9e, 0x27, 0x94, 0xbb, 0xb0, 0x96, 0x44, 0x26, 0xad, 0xf2, 0x74, 0xf5, 0xd2, 0xc3,
-	0x74, 0x13, 0x6e, 0x94, 0x10, 0x92, 0xa4, 0x7f, 0xd5, 0x44, 0x44, 0xee, 0xa3, 0xc0, 0x1d, 0xe1,
-	0x63, 0x1c, 0xb8, 0x7e, 0x20, 0xc3, 0xf3, 0x0c, 0xd6, 0x9c, 0xe1, 0x70, 0x88, 0x23, 0x26, 0x78,
-	0xaf, 0x3b, 0xe9, 0x4a, 0x65, 0xa8, 0xe7, 0x19, 0x1e, 0x43, 0x23, 0x08, 0x83, 0x61, 0x82, 0x2c,
-	0x69, 0xff, 0xc5, 0xf9, 0xa9, 0x26, 0x6c, 0x1b, 0xda, 0x65, 0xc8, 0x25, 0xbd, 0x3f, 0x34, 0xd1,
-	0xd2, 0x7d, 0xcc, 0x0e, 0xa3, 0x88, 0x84, 0xe7, 0x68, 0x34, 0x87, 0x54, 0x92, 0xb6, 0xda, 0x74,
-	0xda, 0x50, 0xd2, 0x04, 0x19, 0xa9, 0x74, 0xa9, 0xd2, 0xad, 0xcf, 0x49, 0xe8, 0xea, 0x8b, 0x48,
-	0xa8, 0x29, 0x2e, 0x08, 0x85, 0x8d, 0x24, 0xfa, 0x57, 0x42, 0xd4, 0xc1, 0xe7, 0xe1, 0x97, 0x78,
-	0x5e, 0xcd, 0xee, 0xc1, 0x06, 0x92, 0x8d, 0x5e, 0x13, 0xad, 0x3c, 0x11, 0xa8, 0x6d, 0xae, 0x97,
-	0xb6, 0xf9, 0x4b, 0xa4, 0xab, 0x70, 0x92, 0x74, 0x7f, 0x49, 0xee, 0xbb, 0x4f, 0x09, 0xc6, 0x5f,
-	0xe3, 0xc3, 0x49, 0x36, 0x4a, 0x08, 0x3f, 0xcc, 0x13, 0x5e, 0x06, 0x5a, 0x3e, 0x40, 0x25, 0x45,
-	0xbe, 0x05, 0x3a, 0x72, 0x93, 0xe0, 0xac, 0x3b, 0xfc, 0x33, 0xbd, 0x70, 0x72, 0x38, 0x25, 0x89,
-	0x0b, 0x68, 0xf6, 0xa8, 0xf7, 0x28, 0x72, 0x11, 0xc3, 0x62, 0x44, 0x96, 0x13, 0x50, 0x5c, 0xd6,
-	0x66, 0x5c, 0xf2, 0x61, 0xac, 0x4f, 0x86, 0x71, 0x1b, 0x1a, 0xca, 0xe0, 0x15, 0x60, 0x36, 0x1c,
-	0x55, 0x64, 0x5f, 0x87, 0x9d, 0x9c, 0x63, 0x89, 0x68, 0x04, 0xdb, 0x72, 0xe3, 0x58, 0x99, 0xcc,
-	0xcb, 0x00, 0x9b, 0x9a, 0xf7, 0xfa, 0xcc, 0xbc, 0xb7, 0x5b, 0xb0, 0x57, 0xe4, 0x4d, 0xa2, 0x19,
-	0x80, 0xa1, 0x5c, 0xd6, 0x3d, 0x14, 0x20, 0xef, 0x99, 0x97, 0x52, 0x39, 0x96, 0xd2, 0x0e, 0xb6,
-	0xf7, 0xc0, 0x9a, 0xf5, 0x21, 0x11, 0x20, 0x78, 0x63, 0xf6, 0x02, 0x7d, 0x1e, 0x20, 0x69, 0x81,
-	0xe8, 0x93, 0x02, 0x79, 0x13, 0x6e, 0x96, 0xba, 0x90, 0x38, 0x3e, 0x13, 0x79, 0xe9, 0xe3, 0xd1,
-	0xe9, 0x27, 0x98, 0x32, 0x12, 0x0f, 0xd9, 0xbc, 0x16, 0x2f, 0x85, 0x90, 0x46, 0x7d, 0xc6, 0x56,
-	0xe6, 0xeb, 0xe0, 0xb7, 0x26, 0xe8, 0x3d, 0xea, 0x19, 0x01, 0xac, 0xcb, 0xb7, 0xe0, 0xdb, 0x73,
-	0x9b, 0x45, 0x79, 0x5e, 0x59, 0xb7, 0x17, 0x39, 0x2d, 0x9f, 0x38, 0x17, 0xd0, 0x50, 0x5f, 0x5e,
-	0xdd, 0x8a, 0x46, 0x32, 0x05, 0xeb, 0xee, 0x82, 0x0a, 0xd2, 0xf1, 0x37, 0xd0, 0xcc, 0x0f, 0xfb,
-	0x77, 0xaa, 0x58, 0xca, 0xa9, 0x58, 0xef, 0x2d, 0xac, 0x22, 0xdd, 0xff, 0xa8, 0xc1, 0x76, 0xe1,
-	0x9b, 0xe3, 0x5e, 0x15, 0x9b, 0x45, 0x9a, 0xd6, 0x47, 0xcb, 0x6a, 0x4a, 0x50, 0x3f, 0x69, 0xb0,
-	0x53, 0xfc, 0x26, 0xa8, 0xc4, 0xb4, 0x50, 0xd5, 0x3a, 0x5c, 0x5a, 0x55, 0x2d, 0x12, 0x75, 0x96,
-	0x57, 0x2a, 0x12, 0x45, 0xa1, 0x5a, 0x91, 0x14, 0xcc, 0x57, 0xee, 0x58, 0x9d, 0xad, 0xdd, 0x6a,
-	0x11, 0x96, 0x0a, 0xd5, 0x1c, 0x17, 0x4c, 0x3a, 0x5e, 0x9d, 0xf9, 0x29, 0x57, 0xa9, 0x3a, 0x73,
-	0x2a, 0xd5, 0xaa, 0xb3, 0x70, 0x46, 0x19, 0x0c, 0x40, 0x19, 0x50, 0x9d, 0x2a, 0x86, 0x26, 0xe7,
-	0xad, 0x77, 0x17, 0x3b, 0x2f, 0xbd, 0x7e, 0xaf, 0xc1, 0x6b, 0xb3, 0x53, 0xe8, 0x4e, 0x75, 0x6b,
-	0x8a, 0x9a, 0xf5, 0xe1, 0x52, 0x6a, 0x12, 0xcb, 0x77, 0x1a, 0x6c, 0x4e, 0x5f, 0xfd, 0xb7, 0x16,
-	0x69, 0xf7, 0x54, 0xc9, 0xfa, 0x60, 0x09, 0x25, 0x89, 0xe2, 0x67, 0x0d, 0x76, 0x4b, 0xe6, 0xd0,
-	0xfb, 0x4b, 0x74, 0x7b, 0x86, 0xe9, 0x68, 0x79, 0xdd, 0x5c, 0xb2, 0x66, 0x47, 0xd3, 0x9d, 0x6a,
-	0x9d, 0x36, 0xa5, 0x56, 0x2d, 0x59, 0xa5, 0xc3, 0xeb, 0xe8, 0xe1, 0xef, 0x97, 0x2d, 0xed, 0xe9,
-	0x65, 0x4b, 0xfb, 0xf7, 0xb2, 0xa5, 0xfd, 0x70, 0xd5, 0x5a, 0x79, 0x7a, 0xd5, 0x5a, 0xf9, 0xfb,
-	0xaa, 0xb5, 0xf2, 0xc5, 0x81, 0xe7, 0xb3, 0xb3, 0x78, 0xd0, 0x19, 0x86, 0xe3, 0xae, 0x74, 0xd1,
-	0xcd, 0xbb, 0xe8, 0x3e, 0xee, 0x66, 0xbf, 0x4d, 0x9e, 0x44, 0x98, 0x0e, 0xd6, 0xc4, 0xaf, 0x93,
-	0x5b, 0xff, 0x07, 0x00, 0x00, 0xff, 0xff, 0x39, 0x5e, 0x4a, 0x29, 0x4d, 0x11, 0x00, 0x00,
+	0x14, 0xcf, 0xac, 0xb7, 0x21, 0x79, 0x4b, 0x9a, 0xe0, 0x36, 0xa9, 0xb1, 0xa2, 0xed, 0xd6, 0x08,
+	0x29, 0x07, 0xb4, 0x2b, 0xd2, 0x16, 0x0a, 0x08, 0x89, 0x04, 0x84, 0xda, 0x8a, 0x8d, 0x2a, 0x6f,
+	0x7b, 0xe1, 0x36, 0x5e, 0x4f, 0x1c, 0x8b, 0x5d, 0xdb, 0xcc, 0x8c, 0x93, 0x16, 0x09, 0x2e, 0x9c,
+	0xb8, 0x21, 0x24, 0x24, 0x3e, 0x00, 0x9f, 0x81, 0x03, 0x9f, 0x00, 0x21, 0x21, 0xe5, 0x08, 0x37,
+	0x94, 0xdc, 0xf8, 0x14, 0xc8, 0x63, 0x7b, 0x76, 0xbc, 0x6b, 0x77, 0xbd, 0x1b, 0xa9, 0x37, 0xcf,
+	0x9f, 0xdf, 0x7b, 0xbf, 0xdf, 0xbc, 0xf7, 0xe6, 0x8d, 0x0c, 0x9b, 0x0e, 0x76, 0x3d, 0xc2, 0x7a,
+	0xfc, 0x79, 0x37, 0xa2, 0x21, 0x0f, 0xf5, 0xdb, 0x9c, 0x92, 0xd3, 0x90, 0x8e, 0xfd, 0x51, 0xd7,
+	0xf1, 0x79, 0xba, 0x3a, 0x3c, 0xc1, 0x7e, 0xd0, 0x4d, 0xbf, 0xcd, 0x1b, 0x19, 0x82, 0xe2, 0xc0,
+	0x23, 0x2c, 0x45, 0x59, 0xff, 0x20, 0x68, 0xf5, 0x99, 0x77, 0x44, 0xce, 0x0e, 0x93, 0x55, 0xdd,
+	0x80, 0xd7, 0x86, 0x94, 0x60, 0x1e, 0x52, 0x03, 0x75, 0xd0, 0xde, 0xba, 0x9d, 0x0f, 0xf5, 0x2d,
+	0xd0, 0x62, 0xea, 0x1b, 0x0d, 0x31, 0x9b, 0x7c, 0xea, 0x16, 0xbc, 0xce, 0x62, 0x07, 0x33, 0x46,
+	0xf8, 0x33, 0xea, 0x33, 0x43, 0x13, 0x4b, 0x85, 0x39, 0xbd, 0x03, 0xad, 0x88, 0xd0, 0xb1, 0xcf,
+	0x98, 0x1f, 0x06, 0xcc, 0x68, 0x76, 0xd0, 0x5e, 0xd3, 0x56, 0xa7, 0x12, 0x2b, 0x63, 0xc2, 0xb1,
+	0x8b, 0x39, 0x7e, 0x88, 0xd9, 0x89, 0x71, 0x2d, 0xb5, 0xa2, 0xce, 0xe9, 0xf7, 0x60, 0xdb, 0x25,
+	0xc7, 0x38, 0x1e, 0xf1, 0x41, 0x66, 0x7c, 0x10, 0x47, 0xd1, 0xe8, 0x85, 0xb1, 0x2a, 0xec, 0x95,
+	0x2f, 0x5a, 0x6f, 0xc3, 0x0d, 0x45, 0x9a, 0x4d, 0x58, 0x14, 0x06, 0x8c, 0xe8, 0xd7, 0xa1, 0xe1,
+	0xbb, 0x42, 0x5d, 0xd3, 0x6e, 0xf8, 0xae, 0xf5, 0x1d, 0x5c, 0x4f, 0xb7, 0x0d, 0x62, 0x67, 0xde,
+	0x21, 0xa4, 0xd8, 0x46, 0x8e, 0x4d, 0x76, 0x32, 0xe1, 0x2c, 0x51, 0xaf, 0xed, 0x35, 0xed, 0x7c,
+	0xa8, 0xef, 0xc1, 0x26, 0x1e, 0x87, 0x71, 0xc0, 0xd9, 0xd3, 0xf0, 0xd3, 0x04, 0x4d, 0x8c, 0xa6,
+	0xd8, 0x31, 0x3d, 0x6d, 0x3d, 0x80, 0x9d, 0xa2, 0x7f, 0xc9, 0xb4, 0x0d, 0x90, 0x1f, 0xe6, 0xa3,
+	0x9c, 0xb1, 0x32, 0x63, 0xfd, 0x87, 0x60, 0xab, 0xcf, 0xbc, 0xa7, 0x14, 0x07, 0xec, 0x98, 0xd0,
+	0x79, 0xe4, 0x75, 0x68, 0x1e, 0xd3, 0x70, 0x9c, 0xd1, 0x17, 0xdf, 0x49, 0x7c, 0x78, 0x78, 0xe0,
+	0xba, 0x94, 0x30, 0x46, 0x72, 0x11, 0xea, 0x54, 0x62, 0x2f, 0x63, 0x9c, 0x09, 0xc8, 0x87, 0xc9,
+	0x8a, 0x48, 0xa9, 0x47, 0xae, 0x08, 0x5a, 0xd3, 0xce, 0x87, 0xba, 0x0d, 0x1b, 0x2c, 0x76, 0xc4,
+	0xc8, 0x4e, 0xb2, 0x4d, 0xc4, 0xa9, 0xb5, 0xff, 0x4e, 0x77, 0x4e, 0x8e, 0x76, 0x8f, 0xe2, 0xb1,
+	0x43, 0xa8, 0xc0, 0xd8, 0x45, 0x13, 0x96, 0x09, 0xc6, 0xb4, 0xd6, 0xfc, 0xa0, 0xac, 0xbf, 0x10,
+	0xdc, 0xea, 0x33, 0xcf, 0x26, 0x5f, 0xc7, 0x84, 0xf1, 0xab, 0x9c, 0xc7, 0x0e, 0xac, 0xa6, 0xf2,
+	0xb2, 0x54, 0xcd, 0x46, 0xaf, 0x58, 0xeb, 0x1d, 0xb8, 0x5d, 0x21, 0x47, 0x4a, 0xfe, 0x0d, 0x89,
+	0xf3, 0x78, 0x88, 0x03, 0x77, 0x44, 0x9e, 0x90, 0xc0, 0xf5, 0x03, 0x79, 0x38, 0x2f, 0xd1, 0x9c,
+	0xe8, 0x1b, 0x0e, 0x49, 0xc4, 0x85, 0xea, 0x35, 0x3b, 0x1b, 0xa9, 0xfa, 0xb4, 0xa2, 0xbe, 0x23,
+	0x68, 0x05, 0x61, 0x30, 0x4c, 0x99, 0xa5, 0x15, 0xbc, 0xa8, 0x3a, 0xd5, 0x80, 0x65, 0x41, 0xa7,
+	0x8a, 0xb7, 0x14, 0xf7, 0x27, 0x12, 0x35, 0x39, 0x20, 0xfc, 0x20, 0x8a, 0x68, 0x78, 0x8a, 0x47,
+	0x73, 0x24, 0xa5, 0x21, 0x6b, 0x4c, 0x87, 0x0c, 0xa7, 0x59, 0x9c, 0x4b, 0xca, 0x86, 0xaa, 0xd8,
+	0xe6, 0x9c, 0x60, 0x5e, 0xbb, 0x7a, 0x30, 0x0d, 0x51, 0xdf, 0x8a, 0x16, 0x29, 0xf3, 0x3c, 0x95,
+	0x69, 0x93, 0xd3, 0xf0, 0x2b, 0x32, 0x2f, 0x5b, 0x77, 0x61, 0x1d, 0xcb, 0x3a, 0x6d, 0x88, 0x4a,
+	0x9c, 0x4c, 0xa8, 0x55, 0xaa, 0x55, 0x56, 0xe9, 0x2b, 0x13, 0xab, 0x28, 0x92, 0x62, 0x7f, 0x4d,
+	0x2f, 0xab, 0xcf, 0x29, 0x21, 0xdf, 0x90, 0x83, 0x49, 0x24, 0x2a, 0xe4, 0x3e, 0x2e, 0xca, 0x5d,
+	0x9c, 0x58, 0xf1, 0x70, 0x2a, 0x92, 0x7b, 0x0b, 0x34, 0xec, 0xa6, 0x07, 0xb3, 0x66, 0x27, 0x9f,
+	0xd9, 0x35, 0x53, 0x60, 0x29, 0x25, 0x9c, 0xc1, 0x46, 0x9f, 0x79, 0xcf, 0x22, 0x17, 0x73, 0x22,
+	0xba, 0x5b, 0x35, 0x7d, 0xc5, 0x65, 0x63, 0xc6, 0x65, 0xd2, 0x47, 0xb5, 0x49, 0x1f, 0xed, 0x40,
+	0x4b, 0xe9, 0x99, 0x82, 0xcc, 0xba, 0xad, 0x4e, 0x59, 0xb7, 0x60, 0xbb, 0xe0, 0x58, 0x32, 0x1a,
+	0xc1, 0x4d, 0xb9, 0xf0, 0x44, 0x69, 0xaa, 0xcb, 0x10, 0x9b, 0x6a, 0xd5, 0xda, 0x4c, 0xab, 0xb6,
+	0xda, 0xb0, 0x5b, 0xe6, 0x4d, 0xb2, 0x71, 0x40, 0x57, 0xae, 0xe8, 0x3e, 0x0e, 0xb0, 0xf7, 0xd2,
+	0xcb, 0xa8, 0x9a, 0x4b, 0x65, 0xed, 0x5a, 0xbb, 0x60, 0xce, 0xfa, 0x90, 0x0c, 0x30, 0xbc, 0x39,
+	0x7b, 0x71, 0x5e, 0x85, 0x48, 0x96, 0x20, 0xda, 0x24, 0x41, 0xde, 0x82, 0x3b, 0x95, 0x2e, 0x24,
+	0x8f, 0xc7, 0x22, 0x2e, 0x03, 0x32, 0x3a, 0xfe, 0x8c, 0x30, 0x4e, 0xe3, 0x21, 0x9f, 0x57, 0xde,
+	0x95, 0x14, 0xb2, 0x53, 0x9f, 0xb1, 0x95, 0xfb, 0xda, 0xff, 0x7d, 0x03, 0xb4, 0x3e, 0xf3, 0xf4,
+	0x00, 0xd6, 0xe4, 0x33, 0x6e, 0x7e, 0xa9, 0x28, 0x2f, 0x23, 0xf3, 0xde, 0x22, 0xbb, 0xe5, 0xeb,
+	0xe4, 0x0c, 0x5a, 0xea, 0xa3, 0xa9, 0x57, 0xd3, 0x48, 0x0e, 0x30, 0xdf, 0x5f, 0x10, 0x20, 0x1d,
+	0x7f, 0x0b, 0x1b, 0xc5, 0x16, 0xff, 0x6e, 0x1d, 0x4b, 0x05, 0x88, 0xf9, 0xc1, 0xc2, 0x10, 0xe9,
+	0xfe, 0x27, 0x04, 0x37, 0x4b, 0x5f, 0x1a, 0x0f, 0xea, 0xd8, 0x2c, 0x43, 0x9a, 0x9f, 0x2c, 0x8b,
+	0x94, 0xa4, 0x7e, 0x46, 0xb0, 0x5d, 0xfe, 0x16, 0xa8, 0xa5, 0xb4, 0x14, 0x6a, 0x1e, 0x2c, 0x0d,
+	0x55, 0x93, 0x44, 0xed, 0xe2, 0xb5, 0x92, 0x44, 0x01, 0xd4, 0x4b, 0x92, 0x92, 0xde, 0x9a, 0x38,
+	0x56, 0xfb, 0x6a, 0xaf, 0xde, 0x09, 0x4b, 0x40, 0x3d, 0xc7, 0x25, 0x7d, 0x2e, 0xc9, 0xce, 0x62,
+	0x8f, 0xab, 0x95, 0x9d, 0x05, 0x48, 0xbd, 0xec, 0x2c, 0xed, 0x51, 0x3a, 0x07, 0x50, 0x1a, 0x54,
+	0xb7, 0x8e, 0xa1, 0xc9, 0x7e, 0xf3, 0xbd, 0xc5, 0xf6, 0x4b, 0xaf, 0x3f, 0x20, 0x78, 0x63, 0xb6,
+	0x0b, 0xdd, 0xaf, 0x6f, 0x4d, 0x81, 0x99, 0x1f, 0x2f, 0x05, 0x93, 0x5c, 0xbe, 0x47, 0xb0, 0x39,
+	0x7d, 0xf5, 0xdf, 0x5d, 0xa4, 0xdc, 0x33, 0x90, 0xf9, 0xd1, 0x12, 0x20, 0xc9, 0xe2, 0x17, 0x04,
+	0x3b, 0x15, 0x7d, 0xe8, 0xc3, 0x25, 0xaa, 0x3d, 0xe7, 0x74, 0xb8, 0x3c, 0xb6, 0x10, 0xac, 0xd9,
+	0xd6, 0x74, 0xbf, 0x5e, 0xa5, 0x4d, 0xc1, 0xea, 0x05, 0xab, 0xb2, 0x79, 0x1d, 0x7e, 0xf1, 0xc7,
+	0x45, 0x1b, 0x9d, 0x5f, 0xb4, 0xd1, 0xbf, 0x17, 0x6d, 0xf4, 0xe3, 0x65, 0x7b, 0xe5, 0xfc, 0xb2,
+	0xbd, 0xf2, 0xf7, 0x65, 0x7b, 0xe5, 0xcb, 0x7d, 0xcf, 0xe7, 0x27, 0xb1, 0xd3, 0x1d, 0x86, 0xe3,
+	0x9e, 0x74, 0xd1, 0x2b, 0xba, 0xe8, 0x3d, 0xef, 0xe5, 0xbf, 0x41, 0x5e, 0x44, 0x84, 0x39, 0xab,
+	0xe2, 0xa7, 0xc6, 0xdd, 0xff, 0x03, 0x00, 0x00, 0xff, 0xff, 0xa5, 0x7b, 0x64, 0x1f, 0x1d, 0x11,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -2285,9 +2232,9 @@ func (m *MsgTransferBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.SubbadgeRange != nil {
+	if m.NumberRange != nil {
 		{
-			size, err := m.SubbadgeRange.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.NumberRange.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -2353,39 +2300,6 @@ func (m *MsgTransferBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *SubbadgeRange) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SubbadgeRange) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *SubbadgeRange) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.End != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.End))
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.Start != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Start))
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
 func (m *MsgTransferBadgeResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -2429,9 +2343,9 @@ func (m *MsgRequestTransferBadge) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	_ = i
 	var l int
 	_ = l
-	if m.SubbadgeRange != nil {
+	if m.NumberRange != nil {
 		{
-			size, err := m.SubbadgeRange.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.NumberRange.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -2589,9 +2503,9 @@ func (m *MsgSetApproval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.SubbadgeRange != nil {
+	if m.NumberRange != nil {
 		{
-			size, err := m.SubbadgeRange.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.NumberRange.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -2669,9 +2583,9 @@ func (m *MsgRevokeBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.SubbadgeRange != nil {
+	if m.NumberRange != nil {
 		{
-			size, err := m.SubbadgeRange.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.NumberRange.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -3285,24 +3199,9 @@ func (m *MsgTransferBadge) Size() (n int) {
 	if m.BadgeId != 0 {
 		n += 1 + sovTx(uint64(m.BadgeId))
 	}
-	if m.SubbadgeRange != nil {
-		l = m.SubbadgeRange.Size()
+	if m.NumberRange != nil {
+		l = m.NumberRange.Size()
 		n += 1 + l + sovTx(uint64(l))
-	}
-	return n
-}
-
-func (m *SubbadgeRange) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Start != 0 {
-		n += 1 + sovTx(uint64(m.Start))
-	}
-	if m.End != 0 {
-		n += 1 + sovTx(uint64(m.End))
 	}
 	return n
 }
@@ -3335,8 +3234,8 @@ func (m *MsgRequestTransferBadge) Size() (n int) {
 	if m.BadgeId != 0 {
 		n += 1 + sovTx(uint64(m.BadgeId))
 	}
-	if m.SubbadgeRange != nil {
-		l = m.SubbadgeRange.Size()
+	if m.NumberRange != nil {
+		l = m.NumberRange.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
@@ -3402,8 +3301,8 @@ func (m *MsgSetApproval) Size() (n int) {
 	if m.BadgeId != 0 {
 		n += 1 + sovTx(uint64(m.BadgeId))
 	}
-	if m.SubbadgeRange != nil {
-		l = m.SubbadgeRange.Size()
+	if m.NumberRange != nil {
+		l = m.NumberRange.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
@@ -3445,8 +3344,8 @@ func (m *MsgRevokeBadge) Size() (n int) {
 	if m.BadgeId != 0 {
 		n += 1 + sovTx(uint64(m.BadgeId))
 	}
-	if m.SubbadgeRange != nil {
-		l = m.SubbadgeRange.Size()
+	if m.NumberRange != nil {
+		l = m.NumberRange.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
@@ -4501,7 +4400,7 @@ func (m *MsgTransferBadge) Unmarshal(dAtA []byte) error {
 			}
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeRange", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NumberRange", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4528,101 +4427,13 @@ func (m *MsgTransferBadge) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.SubbadgeRange == nil {
-				m.SubbadgeRange = &SubbadgeRange{}
+			if m.NumberRange == nil {
+				m.NumberRange = &NumberRange{}
 			}
-			if err := m.SubbadgeRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.NumberRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SubbadgeRange) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SubbadgeRange: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SubbadgeRange: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Start", wireType)
-			}
-			m.Start = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Start |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field End", wireType)
-			}
-			m.End = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.End |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -4814,7 +4625,7 @@ func (m *MsgRequestTransferBadge) Unmarshal(dAtA []byte) error {
 			}
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeRange", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NumberRange", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4841,10 +4652,10 @@ func (m *MsgRequestTransferBadge) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.SubbadgeRange == nil {
-				m.SubbadgeRange = &SubbadgeRange{}
+			if m.NumberRange == nil {
+				m.NumberRange = &NumberRange{}
 			}
-			if err := m.SubbadgeRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.NumberRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5049,7 +4860,7 @@ func (m *MsgHandlePendingTransfer) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.NonceRanges == nil {
-				m.NonceRanges = &SubbadgeRange{}
+				m.NonceRanges = &NumberRange{}
 			}
 			if err := m.NonceRanges.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -5246,7 +5057,7 @@ func (m *MsgSetApproval) Unmarshal(dAtA []byte) error {
 			}
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeRange", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NumberRange", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5273,10 +5084,10 @@ func (m *MsgSetApproval) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.SubbadgeRange == nil {
-				m.SubbadgeRange = &SubbadgeRange{}
+			if m.NumberRange == nil {
+				m.NumberRange = &NumberRange{}
 			}
-			if err := m.SubbadgeRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.NumberRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5585,7 +5396,7 @@ func (m *MsgRevokeBadge) Unmarshal(dAtA []byte) error {
 			}
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeRange", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NumberRange", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5612,10 +5423,10 @@ func (m *MsgRevokeBadge) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.SubbadgeRange == nil {
-				m.SubbadgeRange = &SubbadgeRange{}
+			if m.NumberRange == nil {
+				m.NumberRange = &NumberRange{}
 			}
-			if err := m.SubbadgeRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.NumberRange.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5781,7 +5592,7 @@ func (m *MsgFreezeAddress) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Addresses == nil {
-				m.Addresses = &SubbadgeRange{}
+				m.Addresses = &NumberRange{}
 			}
 			if err := m.Addresses.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
