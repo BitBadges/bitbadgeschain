@@ -24,23 +24,10 @@ func (k msgServer) SelfDestructBadge(goCtx context.Context, msg *types.MsgSelfDe
 		return nil, ErrSenderIsNotManager
 	}
 
-	nextSubassetId := badge.NextSubassetId
-	
-	for i := uint64(0); i < nextSubassetId; i++ {
-		ManagerBalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId,)
-		SubassetSupply := uint64(1) //Default if not found
-		for _, subasset := range badge.SubassetsTotalSupply {
-			if subasset.StartId <= i && subasset.EndId >= i {
-				SubassetSupply = subasset.Supply
-				break
-			}
-		}
-
-		balanceInfo, found := k.GetBadgeBalanceFromStore(ctx, ManagerBalanceKey)
-		balance := GetBadgeBalanceFromIDsAndBalancesForSubbadgeId(i, balanceInfo.IdsForBalances, balanceInfo.Balances)
-		if !found || balance < SubassetSupply {
-			return nil, ErrMustOwnTotalSupplyToSelfDestruct
-		}
+	permissions := types.GetPermissions(badge.PermissionFlags)
+	//If manager has permissions to revoke, he can theoretically self destruct the badge by revoking all supply of everyone
+	if !permissions.CanRevoke() {
+		return nil, ErrBadgeCanNotBeSelfDestructed
 	}
 
 	k.DeleteBadgeFromStore(ctx, msg.BadgeId)
