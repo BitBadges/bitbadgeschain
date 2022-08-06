@@ -107,10 +107,9 @@ message MsgRevokeBadgeResponse {}
 
 message MsgFreezeAddress {
   string creator = 1;
-  repeated uint64 addresses = 2;
+  SubbadgeRange addresses = 2;
   uint64 badgeId = 3;
-  uint64 subbadgeId = 4;
-  bool  add = 5;
+  bool  add = 4;
 }
 
 message MsgFreezeAddressResponse {

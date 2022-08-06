@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"sort"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
@@ -11,45 +10,49 @@ import (
 
 func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddress) (*types.MsgFreezeAddressResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	CreatorAccountNum, badge, permissions, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, msg.Addresses, msg.BadgeId, msg.SubbadgeId, true,
-	)
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
-	if err != nil {
-		return nil, err
+
+	CreatorAccountNum := k.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
+
+	badge, found := k.GetBadgeFromStore(ctx, msg.BadgeId)
+	if !found {
+		return nil, ErrBadgeNotExists
 	}
+
+	if badge.Manager != CreatorAccountNum {
+		return nil, ErrSenderIsNotManager
+	}
+
+	permissions := types.GetPermissions(badge.PermissionFlags)
+	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
+
 
 	if !permissions.CanFreeze() {
 		return nil, ErrInvalidPermissions
 	}
 
-	ctx.GasMeter().ConsumeGas(FreezeOrUnfreezeAddress * uint64(len(msg.Addresses)), "pay per address frozen / unfrozen")
-	found := false
-	for _, targetAddress := range msg.Addresses {
-		new_addresses := []uint64{}
-		for _, address := range badge.FreezeAddresses {
-			if address == targetAddress {
-				found = true
-			} else {
-				new_addresses = append(new_addresses, address)
-			}
-		}
+	// ctx.GasMeter().ConsumeGas(FreezeOrUnfreezeAddress * uint64(len(msg.Addresses)), "pay per address frozen / unfrozen")
+	
+	found = false
 
-		if found && msg.Add {
-			return nil, ErrAddressAlreadyFrozen
-		} else if !found && msg.Add {
-			badge.FreezeAddresses = append(badge.FreezeAddresses, targetAddress)
-		} else if found && !msg.Add {
-			badge.FreezeAddresses = new_addresses
-		} else {
-			return nil, ErrAddressNotFrozen
-		}
+	dummy_balances := make([]uint64, len(badge.FreezeAddressRanges))
+	for i, _ := range dummy_balances {
+		dummy_balances[i] = 1
 	}
 
-	//sort the addresses in order
-	sort.Slice(badge.FreezeAddresses, func(i, j int) bool { return badge.FreezeAddresses[i] < badge.FreezeAddresses[j] })
+	new_freeze_address_ranges := badge.FreezeAddressRanges
 
-	err = k.SetBadgeInStore(ctx, badge)
+	for targetAddress := msg.Addresses.Start; targetAddress <= msg.Addresses.End; targetAddress++ {
+		newAmount := uint64(0)
+		if msg.Add {
+			newAmount = 1
+		}
+		new_freeze_address_ranges, dummy_balances = UpdateBadgeBalanceBySubbadgeId(targetAddress, newAmount, new_freeze_address_ranges, dummy_balances)
+	}
+
+	badge.FreezeAddressRanges = new_freeze_address_ranges
+
+
+	err := k.SetBadgeInStore(ctx, badge)
 	if err != nil {
 		return nil, err
 	}

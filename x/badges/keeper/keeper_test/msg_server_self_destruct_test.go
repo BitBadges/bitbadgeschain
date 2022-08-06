@@ -58,11 +58,11 @@ func (suite *TestSuite) TestSelfDestruct() {
 	err = CreateSubBadges(suite, wctx, bob, 1, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 	
-	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated+1}, []uint64{500}, 1, types.SubbadgeRange{Start: 0, End: 0})
-	suite.Require().Nil(err, "Error transferring subbadge")
+	err = UpdatePermissions(suite, wctx, bob, 1, 58)
+	suite.Require().Nil(err, "Error updating permissions")
 
 	err = SelfDestructBadge(suite, wctx, bob, 1)
-	suite.Require().EqualError(err, keeper.ErrMustOwnTotalSupplyToSelfDestruct.Error())
+	suite.Require().EqualError(err, keeper.ErrBadgeCanNotBeSelfDestructed.Error())
 }
 
 func (suite *TestSuite) TestSelfDestructNotManager() {

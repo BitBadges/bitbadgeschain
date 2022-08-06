@@ -2,6 +2,8 @@ syntax = "proto3";
 package trevormil.bitbadgeschain.badges;
 
 import "google/protobuf/any.proto";
+import "badges/tx.proto";
+
 
 option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
@@ -39,7 +41,7 @@ message BitBadge {
 
     // if frozen_by_default is true, this is an accumulator of unfrozen addresses; and vice versa for false
     //big.Int will always only be 32 uint64s long
-    repeated uint64 freeze_addresses = 10;
+    repeated SubbadgeRange freeze_address_ranges = 10;
 
     // uri for the subassets metadata stored off chain; include {id} in the string, it will be replaced with the subasset id
     // if not specified, uses a default Class (ID # 1) like metadata

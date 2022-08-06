@@ -168,8 +168,8 @@ func HandlePendingTransfers(suite *TestSuite, ctx context.Context, creator strin
 	return err
 }
 
-func FreezeAddresses(suite *TestSuite, ctx context.Context, creator string, addresses []uint64, badgeId uint64, subbadgeId uint64, add bool) error {
-	msg := types.NewMsgFreezeAddress(creator, addresses, badgeId, subbadgeId, add)
+func FreezeAddresses(suite *TestSuite, ctx context.Context, creator string, addresses types.SubbadgeRange, badgeId uint64, subbadgeId uint64, add bool) error {
+	msg := types.NewMsgFreezeAddress(creator, addresses, badgeId, add)
 	_, err := suite.msgServer.FreezeAddress(ctx, msg)
 	return err
 }

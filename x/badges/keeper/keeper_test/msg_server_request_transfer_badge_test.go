@@ -137,7 +137,7 @@ func (suite *TestSuite) TestRequestTransferFrozen() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(true, aliceBalanceInfo.Pending[0].SendRequest)
 
-	err = FreezeAddresses(suite, wctx, bob, []uint64{firstAccountNumCreated}, 0, 0, true)
+	err = FreezeAddresses(suite, wctx, bob, types.SubbadgeRange{ Start: firstAccountNumCreated, End: firstAccountNumCreated}, 0, 0, true)
 	suite.Require().Nil(err, "Error freezing address")
 
 	err = HandlePendingTransfers(suite, wctx, bob, true, 0, types.SubbadgeRange{Start: 0, End: 0})
@@ -204,10 +204,10 @@ func (suite *TestSuite) TestRequestTransferFrozenThenUnrozen() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(true, aliceBalanceInfo.Pending[0].SendRequest)
 
-	err = FreezeAddresses(suite, wctx, bob, []uint64{firstAccountNumCreated}, 0, 0, true)
+	err = FreezeAddresses(suite, wctx, bob, types.SubbadgeRange{ Start: firstAccountNumCreated, End: firstAccountNumCreated}, 0, 0, true)
 	suite.Require().Nil(err, "Error freezing address")
 
-	err = FreezeAddresses(suite, wctx, bob, []uint64{firstAccountNumCreated}, 0, 0, false)
+	err = FreezeAddresses(suite, wctx, bob, types.SubbadgeRange{ Start: firstAccountNumCreated, End: firstAccountNumCreated}, 0, 0, false)
 	suite.Require().Nil(err, "Error unfreezing address")
 
 	err = HandlePendingTransfers(suite, wctx, bob, true, 0, types.SubbadgeRange{Start: 0, End: 0})

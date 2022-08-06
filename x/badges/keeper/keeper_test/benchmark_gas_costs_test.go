@@ -56,7 +56,7 @@ func (suite *TestSuite) TestGasCosts() {
 		tbl.AddRow("CreateSubBadge 10000 (Supply 10000)", endGas - startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		err = FreezeAddresses(suite, wctx, bob, []uint64{100000}, 0, 0, true)
+		err = FreezeAddresses(suite, wctx, bob, types.SubbadgeRange{ Start: 1000, End: 1000}, 0, 0, true)
 		suite.Require().Nil(err, "Error creating subbadge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("Freeze 1 Address", endGas - startGas)
@@ -71,7 +71,7 @@ func (suite *TestSuite) TestGasCosts() {
 			addressesThroughTenThousand[j] = uint64(j)
 		}
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		err = FreezeAddresses(suite, wctx, bob, addressesThroughTenThousand, 0, 0, true)
+		err = FreezeAddresses(suite, wctx, bob, types.SubbadgeRange{ Start: 0, End: 9999}, 0, 0, true)
 		suite.Require().Nil(err, "Error creating subbadge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("Freeze 10000 Addresses", endGas - startGas)
@@ -82,7 +82,7 @@ func (suite *TestSuite) TestGasCosts() {
 		tbl.AddRow("GetBadge", endGas - startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		err = FreezeAddresses(suite, wctx, bob, []uint64{100000}, 0, 0, false)
+		err = FreezeAddresses(suite, wctx, bob, types.SubbadgeRange{ Start: 1000, End: 1000}, 0, 0, false)
 		suite.Require().Nil(err, "Error creating subbadge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("Unfreeze 1 Address", endGas - startGas)
@@ -93,7 +93,7 @@ func (suite *TestSuite) TestGasCosts() {
 		tbl.AddRow("GetBadge", endGas - startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed();
-		err = FreezeAddresses(suite, wctx, bob, addressesThroughTenThousand, 0, 0, false)
+		err = FreezeAddresses(suite, wctx, bob, types.SubbadgeRange{ Start: 0, End: 9999}, 0, 0, false)
 		suite.Require().Nil(err, "Error creating subbadge")
 		endGas = suite.ctx.GasMeter().GasConsumed();
 		tbl.AddRow("Unfreeze 10000 Address", endGas - startGas)

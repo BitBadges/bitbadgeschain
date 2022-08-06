@@ -52,17 +52,17 @@ func AccountNotFrozen(badge types.BitBadge, permissions types.PermissionFlags, a
 
 	can_transfer := false
 	if frozen_by_default {
-		unfrozen_addresses := badge.FreezeAddresses
-		for _, unfrozen_address := range unfrozen_addresses {
-			if unfrozen_address == address {
+		unfrozen_address_ranges := badge.FreezeAddressRanges
+		for _, unfrozen_address_range := range unfrozen_address_ranges {
+			if unfrozen_address_range.Start <= address && unfrozen_address_range.End >= address {
 				can_transfer = true
 			}
 		}
 	} else {
-		frozen_addresses := badge.FreezeAddresses
+		frozen_address_ranges := badge.FreezeAddressRanges
 		can_transfer = true
-		for _, frozen_address := range frozen_addresses {
-			if frozen_address == address {
+		for _, frozen_address_ranges := range frozen_address_ranges {
+			if frozen_address_ranges.Start <= address && frozen_address_ranges.End >= address {
 				can_transfer = false
 			}
 		}
