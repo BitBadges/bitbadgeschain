@@ -23,9 +23,11 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 				ToAddresses:      []uint64{ 0 },
 				Amounts:      []uint64{ 10 },
 				From:    1,
-				SubbadgeRange: &types.NumberRange{
-					Start: 0,
-					End: 0,
+				SubbadgeRanges: []*types.NumberRange{
+					{
+						Start: 0,
+						End: 0,
+					},
 				},
 			},
 			err: sdkerrors.ErrInvalidAddress,
@@ -36,9 +38,11 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 				ToAddresses:      []uint64{ 0 },
 				Amounts:      []uint64{ 10 },
 				From:    1,
-				SubbadgeRange: &types.NumberRange{
-					Start: 0,
-					End: 0,
+				SubbadgeRanges: []*types.NumberRange{
+					{
+						Start: 0,
+						End: 0,
+					},
 				},
 			},
 		}, {
@@ -48,9 +52,11 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 				ToAddresses:      []uint64{ 0 },
 				Amounts:      []uint64{ 10 },
 				From:    0,
-				SubbadgeRange: &types.NumberRange{
-					Start: 0,
-					End: 0,
+				SubbadgeRanges: []*types.NumberRange{
+					{
+						Start: 0,
+						End: 0,
+					},
 				},
 			},
 			err: types.ErrSenderAndReceiverSame,
@@ -61,9 +67,11 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 				ToAddresses:      []uint64{ 0 },
 				Amounts:      []uint64{ 0 },
 				From:    7,
-				SubbadgeRange: &types.NumberRange{
-					Start: 0,
-					End: 0,
+				SubbadgeRanges: []*types.NumberRange{
+					{
+						Start: 0,
+						End: 0,
+					},
 				},
 			},
 			err: types.ErrAmountEqualsZero,
@@ -75,9 +83,11 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 				ToAddresses:      []uint64{ 0 },
 				Amounts:      []uint64{ 0 },
 				From:    7,
-				SubbadgeRange: &types.NumberRange{
-					Start: 10,
-					End: 0,
+				SubbadgeRanges: []*types.NumberRange{
+					{
+						Start: 10,
+						End: 0,
+					},
 				},
 			},
 			err: types.ErrStartGreaterThanEnd,

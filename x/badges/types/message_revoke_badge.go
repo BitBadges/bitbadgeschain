@@ -9,13 +9,13 @@ const TypeMsgRevokeBadge = "revoke_badge"
 
 var _ sdk.Msg = &MsgRevokeBadge{}
 
-func NewMsgRevokeBadge(creator string, addresses []uint64, amounts []uint64, badgeId uint64, subbadgeRange NumberRange) *MsgRevokeBadge {
+func NewMsgRevokeBadge(creator string, addresses []uint64, amounts []uint64, badgeId uint64, subbadgeRanges []*NumberRange) *MsgRevokeBadge {
 	return &MsgRevokeBadge{
 		Creator:    creator,
 		Addresses:  addresses,
 		Amounts:    amounts,
 		BadgeId:    badgeId,
-		SubbadgeRange: &subbadgeRange,
+		SubbadgeRanges: subbadgeRanges,
 	}
 }
 
@@ -66,6 +66,16 @@ func (msg *MsgRevokeBadge) ValidateBasic() error {
 	for _, amount := range msg.Amounts {
 		if amount == 0 {
 			return ErrAmountEqualsZero
+		}
+	}
+
+	if msg.SubbadgeRanges == nil {
+		return ErrRangesIsNil
+	}
+
+	for _, subbadgeRange := range msg.SubbadgeRanges {
+		if subbadgeRange == nil || subbadgeRange.Start > subbadgeRange.End {
+			return ErrStartGreaterThanEnd
 		}
 	}
 

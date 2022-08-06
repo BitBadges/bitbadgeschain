@@ -147,37 +147,37 @@ func CreateSubBadges(suite *TestSuite, ctx context.Context, creator string, badg
 	return err
 }
 
-func RequestTransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, amount uint64, badgeId uint64, subbadgeRange types.NumberRange) error {
+func RequestTransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, amount uint64, badgeId uint64, subbadgeRange []*types.NumberRange) error {
 	msg := types.NewMsgRequestTransferBadge(creator, from, amount, badgeId, subbadgeRange)
 	_, err := suite.msgServer.RequestTransferBadge(ctx, msg)
 	return err
 }
 
-func RevokeBadges(suite *TestSuite, ctx context.Context, creator string, addresses []uint64, amounts []uint64, badgeId uint64, subbadgeRange types.NumberRange) error {
+func RevokeBadges(suite *TestSuite, ctx context.Context, creator string, addresses []uint64, amounts []uint64, badgeId uint64, subbadgeRange []*types.NumberRange) error {
 	msg := types.NewMsgRevokeBadge(creator, addresses, amounts, badgeId, subbadgeRange)
 	_, err := suite.msgServer.RevokeBadge(ctx, msg)
 	return err
 }
 
-func TransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, to []uint64, amounts []uint64, badgeId uint64, subbadgeRange types.NumberRange) error {
+func TransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, to []uint64, amounts []uint64, badgeId uint64, subbadgeRange []*types.NumberRange) error {
 	msg := types.NewMsgTransferBadge(creator, from, to, amounts, badgeId, subbadgeRange)
 	_, err := suite.msgServer.TransferBadge(ctx, msg)
 	return err
 }
 
-func SetApproval(suite *TestSuite, ctx context.Context, creator string, amount uint64, address uint64, badgeId uint64, subbadgeRange types.NumberRange) error {
+func SetApproval(suite *TestSuite, ctx context.Context, creator string, amount uint64, address uint64, badgeId uint64, subbadgeRange []*types.NumberRange) error {
 	msg := types.NewMsgSetApproval(creator, amount, address, badgeId, subbadgeRange)
 	_, err := suite.msgServer.SetApproval(ctx, msg)
 	return err
 }
 
-func HandlePendingTransfers(suite *TestSuite, ctx context.Context, creator string, accept bool, badgeId uint64, nonceRanges types.NumberRange) error {
+func HandlePendingTransfers(suite *TestSuite, ctx context.Context, creator string, accept bool, badgeId uint64, nonceRanges []*types.NumberRange) error {
 	msg := types.NewMsgHandlePendingTransfer(creator, accept, badgeId, nonceRanges)
 	_, err := suite.msgServer.HandlePendingTransfer(ctx, msg)
 	return err
 }
 
-func FreezeAddresses(suite *TestSuite, ctx context.Context, creator string, addresses types.NumberRange, badgeId uint64, subbadgeId uint64, add bool) error {
+func FreezeAddresses(suite *TestSuite, ctx context.Context, creator string, addresses []*types.NumberRange, badgeId uint64, subbadgeId uint64, add bool) error {
 	msg := types.NewMsgFreezeAddress(creator, addresses, badgeId, add)
 	_, err := suite.msgServer.FreezeAddress(ctx, msg)
 	return err

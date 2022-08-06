@@ -13,7 +13,7 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum, _, _, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, []uint64{msg.Address}, msg.BadgeId, msg.SubbadgeRange.End, false,
+		ctx, msg.Creator, []uint64{msg.Address}, msg.BadgeId, msg.SubbadgeRanges, false,
 	)
 	
 	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
@@ -31,10 +31,11 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 		badgeBalanceInfo = GetEmptyBadgeBalanceTemplate()
 	}
 
-
-	badgeBalanceInfo, err = k.Keeper.SetApproval(ctx, badgeBalanceInfo, msg.Amount, msg.Address, *msg.SubbadgeRange)
-	if err != nil {
-		return nil, err
+	for _, subbadgeRange := range msg.SubbadgeRanges {
+		badgeBalanceInfo, err = k.Keeper.SetApproval(ctx, badgeBalanceInfo, msg.Amount, msg.Address, *subbadgeRange)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if err := k.SetBadgeBalanceInStore(ctx, BalanceKey, badgeBalanceInfo); err != nil {
@@ -47,7 +48,7 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 			sdk.NewAttribute(sdk.AttributeKeyAction, "SetApproval"),
 			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
 			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
-			sdk.NewAttribute("SubbadgeRange", fmt.Sprint(msg.SubbadgeRange)),
+			sdk.NewAttribute("SubbadgeRanges", fmt.Sprint(msg.SubbadgeRanges)),
 			sdk.NewAttribute("ApprovedAddress", fmt.Sprint(msg.Address)),
 			sdk.NewAttribute("Amount", fmt.Sprint(msg.Amount)),
 		),

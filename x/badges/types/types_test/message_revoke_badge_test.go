@@ -20,13 +20,38 @@ func TestMsgRevokeBadge_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgRevokeBadge{
 				Creator: "invalid_address",
+				SubbadgeRanges: []*types.NumberRange{
+					{
+						Start: 0,
+						End: 0,
+					},
+				},
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: types.MsgRevokeBadge{
 				Creator: sample.AccAddress(),
+				SubbadgeRanges: []*types.NumberRange{
+					{
+						Start: 0,
+						End: 0,
+					},
+				},
 			},
+		}, 
+		{
+			name: "invalid subbadge range",
+			msg: types.MsgRevokeBadge{
+				Creator: sample.AccAddress(),
+				SubbadgeRanges: []*types.NumberRange{
+					{
+						Start: 10,
+						End: 0,
+					},
+				},
+			},
+			err: types.ErrStartGreaterThanEnd,
 		},
 	}
 	for _, tt := range tests {

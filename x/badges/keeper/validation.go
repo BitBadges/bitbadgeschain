@@ -5,14 +5,14 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func (k Keeper) UniversalValidateMsgAndReturnMsgInfo(ctx sdk.Context, MsgCreator string, AddressesToValidate []uint64, BadgeId uint64, SubbadgeId uint64, MustBeManager bool) (uint64, types.BitBadge, types.PermissionFlags, error) {
+func (k Keeper) UniversalValidateMsgAndReturnMsgInfo(ctx sdk.Context, MsgCreator string, AddressesToValidate []uint64, BadgeId uint64, SubbadgeRanges []*types.NumberRange, MustBeManager bool) (uint64, types.BitBadge, types.PermissionFlags, error) {
 	CreatorAccountNum := k.MustGetAccountNumberForBech32AddressString(ctx, MsgCreator)
 
 	if err := k.AssertAccountNumbersAreRegistered(ctx, AddressesToValidate); err != nil {
 		return CreatorAccountNum, types.BitBadge{}, types.PermissionFlags{}, err
 	}
 
-	badge, err := k.AssertBadgeAndSubBadgeExistsAndReturnBadge(ctx, BadgeId, SubbadgeId)
+	badge, err := k.AssertBadgeAndSubBadgeExistsAndReturnBadge(ctx, BadgeId, SubbadgeRanges)
 	if err != nil {
 		return CreatorAccountNum, types.BitBadge{}, types.PermissionFlags{}, err
 	}

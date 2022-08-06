@@ -19,13 +19,37 @@ func TestMsgFreezeAddress_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgFreezeAddress{
 				Creator: "invalid_address",
+				AddressRanges: []*types.NumberRange{
+					{
+						Start: 0,
+						End: 0,
+					},
+				},
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: types.MsgFreezeAddress{
 				Creator: sample.AccAddress(),
+				AddressRanges: []*types.NumberRange{
+					{
+						Start: 0,
+						End: 0,
+					},
+				},
 			},
+		}, {
+			name: "invalid subbadge range",
+			msg: types.MsgFreezeAddress{
+				Creator: sample.AccAddress(),
+				AddressRanges: []*types.NumberRange{
+					{
+						Start: 10,
+						End: 0,
+					},
+				},
+			},
+			err: types.ErrStartGreaterThanEnd,
 		},
 	}
 	for _, tt := range tests {

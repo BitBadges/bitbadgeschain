@@ -75,9 +75,11 @@ func CmdTransferBadge() *cobra.Command {
 				argToAddressesUint64,
 				argAmountsUint64,
 				argBadgeId,
-				types.NumberRange{
-					Start: argSubbadgeIdStart,
-					End:   argSubbadgeIdEnd,
+				[]*types.NumberRange{
+					{
+						Start: argSubbadgeIdStart,
+						End:   argSubbadgeIdEnd,
+					},
 				},
 			)
 

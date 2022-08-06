@@ -9,12 +9,12 @@ const TypeMsgHandlePendingTransfer = "handle_pending_transfer"
 
 var _ sdk.Msg = &MsgHandlePendingTransfer{}
 
-func NewMsgHandlePendingTransfer(creator string, accept bool, badgeId uint64, nonceRanges NumberRange) *MsgHandlePendingTransfer {
+func NewMsgHandlePendingTransfer(creator string, accept bool, badgeId uint64, nonceRanges []*NumberRange) *MsgHandlePendingTransfer {
 	return &MsgHandlePendingTransfer{
 		Creator:       creator,
 		Accept:        accept,
 		BadgeId:       badgeId,
-		NonceRanges:   &nonceRanges,
+		NonceRanges:   nonceRanges,
 	}
 }
 
@@ -43,6 +43,16 @@ func (msg *MsgHandlePendingTransfer) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	if msg.NonceRanges == nil {
+		return ErrRangesIsNil
+	}
+
+	for _, subbadgeRange := range msg.NonceRanges {
+		if subbadgeRange == nil || subbadgeRange.Start > subbadgeRange.End {
+			return ErrStartGreaterThanEnd
+		}
 	}
 	return nil
 }

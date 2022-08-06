@@ -41,17 +41,19 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 		},
 	}
 
-	for targetAddress := msg.Addresses.Start; targetAddress <= msg.Addresses.End; targetAddress++ {
-		newAmount := uint64(0)
-		if msg.Add {
-			newAmount = 1
+	for _, addressRange := range msg.AddressRanges {
+		for targetAddress := addressRange.Start; targetAddress <= addressRange.End; targetAddress++ {
+			newAmount := uint64(0)
+			if msg.Add {
+				newAmount = 1
+			}
+			new_amounts = UpdateBadgeBalanceBySubbadgeId(targetAddress, newAmount, new_amounts)
 		}
-		new_amounts = UpdateBadgeBalanceBySubbadgeId(targetAddress, newAmount, new_amounts)
-	}
-	if len(new_amounts) > 0 {
-		badge.FreezeAddressRanges = new_amounts[0].Ranges
-	} else {
-		badge.FreezeAddressRanges = []*types.NumberRange{}
+		if len(new_amounts) > 0 {
+			badge.FreezeAddressRanges = new_amounts[0].Ranges
+		} else {
+			badge.FreezeAddressRanges = []*types.NumberRange{}
+		}
 	}
 	
 
@@ -67,7 +69,7 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 			sdk.NewAttribute(sdk.AttributeKeyAction, "FreezeAddress"),
 			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
 			sdk.NewAttribute("BadgeID", fmt.Sprint(msg.BadgeId)),
-			sdk.NewAttribute("Addresses", fmt.Sprint(msg.Addresses)),
+			sdk.NewAttribute("AddressRanges", fmt.Sprint(msg.AddressRanges)),
 			sdk.NewAttribute("Add", fmt.Sprint(msg.Add)),
 		),
 	)

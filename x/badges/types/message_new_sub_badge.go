@@ -50,7 +50,6 @@ func (msg *MsgNewSubBadge) ValidateBasic() error {
 	}
 
 	for i, _ := range msg.Supplys {
-
 		if msg.AmountsToCreate[i] == 0 {
 			return ErrAmountEqualsZero
 		}

@@ -12,7 +12,7 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum, _, permissions, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, msg.Addresses, msg.BadgeId, msg.SubbadgeRange.End, true,
+		ctx, msg.Creator, msg.Addresses, msg.BadgeId, msg.SubbadgeRanges, true,
 	)
 	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 	if err != nil {
@@ -40,21 +40,22 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 		if !found {
 			return nil, ErrBadgeBalanceNotExists
 		}
-		
 
 		revokeAmount := msg.Amounts[i]
 
-		for i := msg.SubbadgeRange.Start; i <= msg.SubbadgeRange.End; i++ {
-			addressBalanceInfo, err = k.RemoveFromBadgeBalance(ctx, addressBalanceInfo, i, revokeAmount)
-			if err != nil {
-				return nil, err
-			}
+		for _, subbadgeRange := range msg.SubbadgeRanges {
+			for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
+				addressBalanceInfo, err = k.RemoveFromBadgeBalance(ctx, addressBalanceInfo, i, revokeAmount)
+				if err != nil {
+					return nil, err
+				}
 
-			managerBalanceInfo, err = k.AddToBadgeBalance(ctx, managerBalanceInfo, i, revokeAmount)
-			if err != nil {
-				return nil, err
-			}
+				managerBalanceInfo, err = k.AddToBadgeBalance(ctx, managerBalanceInfo, i, revokeAmount)
+				if err != nil {
+					return nil, err
+				}
 
+			}
 		}
 		err = k.SetBadgeBalanceInStore(ctx, AddressBalanceKey, addressBalanceInfo)
 		if err != nil {
@@ -75,7 +76,7 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 			sdk.NewAttribute(sdk.AttributeKeyAction, "RevokeBadge"),
 			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
 			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
-			sdk.NewAttribute("Subbadge Range", fmt.Sprint(msg.SubbadgeRange)),
+			sdk.NewAttribute("SubbadgeRanges", fmt.Sprint(msg.SubbadgeRanges)),
 			sdk.NewAttribute("Addresses", fmt.Sprint(msg.Addresses)),
 			sdk.NewAttribute("Amounts", fmt.Sprint(msg.Amounts)),
 		),

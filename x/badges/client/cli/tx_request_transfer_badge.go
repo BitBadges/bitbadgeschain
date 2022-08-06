@@ -51,9 +51,11 @@ func CmdRequestTransferBadge() *cobra.Command {
 				argFrom,
 				argAmount,
 				argBadgeId,
-				types.NumberRange{
-					Start: argSubbadgeIdStart,
-					End:   argSubbadgeIdEnd,
+				[]*types.NumberRange{
+					{
+						Start: argSubbadgeIdStart,
+						End:   argSubbadgeIdEnd,
+					},
 				},
 			)
 			if err := msg.ValidateBasic(); err != nil {

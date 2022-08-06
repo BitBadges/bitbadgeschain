@@ -59,10 +59,10 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 	balanceInfoCache := make(map[uint64]types.BadgeBalanceInfo, 0)
 
 	updated := false
-	
+	for _, nonceRange := range msg.NonceRanges {
 		//In the future, we can make this a binary search since this is all sorted by the nonces (append-only)
 		for _, CurrPendingTransfer := range creatorBadgeBalanceInfo.Pending {
-			if CurrPendingTransfer.ThisPendingNonce <= msg.NonceRanges.End && CurrPendingTransfer.ThisPendingNonce >= msg.NonceRanges.Start {
+			if CurrPendingTransfer.ThisPendingNonce <= nonceRange.End && CurrPendingTransfer.ThisPendingNonce >= nonceRange.Start {
 				updated = true
 				if CurrPendingTransfer.SendRequest && msg.Accept {
 					return nil, ErrCantAcceptOwnTransferRequest //Handle cases 2, 4
@@ -162,6 +162,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 				balanceInfoCache[OtherPartyAccountNum] = otherPartyBalanceInfo
 			}
 		}
+	}
 	
 
 	

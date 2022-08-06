@@ -11,7 +11,7 @@ import (
 func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgRequestTransferBadge) (*types.MsgRequestTransferBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	CreatorAccountNum, _, _, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, []uint64{msg.From}, msg.BadgeId, msg.SubbadgeRange.End, false,
+		ctx, msg.Creator, []uint64{msg.From}, msg.BadgeId, msg.SubbadgeRanges, false,
 	)
 	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 	if err != nil {
@@ -35,9 +35,11 @@ func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgReq
 		toBadgeBalanceInfo = GetEmptyBadgeBalanceTemplate()
 	}
 
-	fromBadgeBalanceInfo, toBadgeBalanceInfo, err = k.AddToBothPendingBadgeBalances(ctx, fromBadgeBalanceInfo, toBadgeBalanceInfo, *msg.SubbadgeRange, CreatorAccountNum, msg.From, msg.Amount, CreatorAccountNum, false)
-	if err != nil {
-		return nil, err
+	for _, subbadgeRange := range msg.SubbadgeRanges {
+		fromBadgeBalanceInfo, toBadgeBalanceInfo, err = k.AddToBothPendingBadgeBalances(ctx, fromBadgeBalanceInfo, toBadgeBalanceInfo, *subbadgeRange, CreatorAccountNum, msg.From, msg.Amount, CreatorAccountNum, false)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if err := k.SetBadgeBalanceInStore(ctx, FromBalanceKey, fromBadgeBalanceInfo); err != nil {
@@ -56,8 +58,7 @@ func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgReq
 			sdk.NewAttribute("From", fmt.Sprint(msg.From)),
 			sdk.NewAttribute("Amount", fmt.Sprint(msg.Amount)),
 			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
-			sdk.NewAttribute("SubbadgeId Start", fmt.Sprint(msg.SubbadgeRange.Start)),
-			sdk.NewAttribute("SubbadgeId End", fmt.Sprint(msg.SubbadgeRange.End)),
+			sdk.NewAttribute("SubbadgeRanges", fmt.Sprint(msg.SubbadgeRanges)),
 		),
 	)
 	return &types.MsgRequestTransferBadgeResponse{}, nil

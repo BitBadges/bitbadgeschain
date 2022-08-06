@@ -9,13 +9,13 @@ const TypeMsgRequestTransferBadge = "request_transfer_badge"
 
 var _ sdk.Msg = &MsgRequestTransferBadge{}
 
-func NewMsgRequestTransferBadge(creator string, from uint64, amount uint64, badgeId uint64, subbadgeRange NumberRange) *MsgRequestTransferBadge {
+func NewMsgRequestTransferBadge(creator string, from uint64, amount uint64, badgeId uint64, subbadgeRanges []*NumberRange) *MsgRequestTransferBadge {
 	return &MsgRequestTransferBadge{
 		Creator:    creator,
 		From:       from,
 		Amount:     amount,
 		BadgeId:    badgeId,
-		SubbadgeRange: &subbadgeRange,
+		SubbadgeRanges: subbadgeRanges,
 	}
 }
 
@@ -43,9 +43,14 @@ func (msg *MsgRequestTransferBadge) GetSignBytes() []byte {
 func (msg *MsgRequestTransferBadge) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 
+	if msg.SubbadgeRanges == nil {
+		return ErrRangesIsNil
+	}
 
-	if msg.SubbadgeRange == nil || msg.SubbadgeRange.Start > msg.SubbadgeRange.End {
-		return ErrStartGreaterThanEnd
+	for _, subbadgeRange := range msg.SubbadgeRanges {
+		if subbadgeRange == nil || subbadgeRange.Start > subbadgeRange.End {
+			return ErrStartGreaterThanEnd
+		}
 	}
 
 	if msg.Amount == 0 {

@@ -83,9 +83,11 @@ func CmdHandlePendingTransfer() *cobra.Command {
 				clientCtx.GetFromAddress().String(),
 				argAccept,
 				argBadgeId,
-				types.NumberRange{
-					Start: argStartingNonce,
-					End:   argEndingNonce,
+				[]*types.NumberRange{
+					{
+						Start: argStartingNonce,
+						End:   argEndingNonce,
+					},
 				},
 			)
 			if err := msg.ValidateBasic(); err != nil {

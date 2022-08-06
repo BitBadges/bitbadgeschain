@@ -51,9 +51,11 @@ func CmdSetApproval() *cobra.Command {
 				argAmount,
 				argAddress,
 				argBadgeId,
-				types.NumberRange{
-					Start: argSubbadgeIdStart,
-					End:   argSubbadgeIdEnd,
+				[]*types.NumberRange{
+					{
+						Start: argSubbadgeIdStart,
+						End:   argSubbadgeIdEnd,
+					},
 				},
 			)
 			if err := msg.ValidateBasic(); err != nil {

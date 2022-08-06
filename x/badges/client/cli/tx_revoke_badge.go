@@ -67,9 +67,11 @@ func CmdRevokeBadge() *cobra.Command {
 				argAddressesUInt64,
 				argAmountsUInt64,
 				argBadgeId,
-				types.NumberRange{
-					Start: argSubbadgeStartId,
-					End:   argSubbadgeEndId,
+				[]*types.NumberRange{
+					{
+						Start: argSubbadgeStartId,
+						End:   argSubbadgeEndId,
+					},
 				},
 			)
 			if err := msg.ValidateBasic(); err != nil {
