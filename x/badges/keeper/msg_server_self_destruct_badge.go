@@ -14,7 +14,7 @@ func (k msgServer) SelfDestructBadge(goCtx context.Context, msg *types.MsgSelfDe
 	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
 
 	badge, found := k.GetBadgeFromStore(ctx, msg.BadgeId)
-	
+
 	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 	if !found {
 		return nil, ErrBadgeNotExists

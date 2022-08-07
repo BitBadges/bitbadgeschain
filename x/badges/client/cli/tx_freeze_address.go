@@ -27,15 +27,12 @@ func CmdFreezeAddress() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
-
-			
 
 			argBadgeId, err := cast.ToUint64E(args[2])
 			if err != nil {
 				return err
 			}
-			
+
 			argAdd, err := cast.ToBoolE(args[3])
 			if err != nil {
 				return err

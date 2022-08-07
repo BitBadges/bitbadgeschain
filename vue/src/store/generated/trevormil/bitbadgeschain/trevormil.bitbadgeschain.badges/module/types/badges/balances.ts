@@ -1,12 +1,13 @@
 /* eslint-disable */
 import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
+import { RangesToAmounts, NumberRange } from "../badges/ranges";
 
 export const protobufPackage = "trevormil.bitbadgeschain.badges";
 
 /** indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes) */
 export interface BadgeBalanceInfo {
-  balance: number;
+  balanceAmounts: RangesToAmounts[];
   pending_nonce: number;
   /** IDs will be sorted in order of pending_nonce */
   pending: PendingTransfer[];
@@ -16,12 +17,12 @@ export interface BadgeBalanceInfo {
 }
 
 export interface Approval {
-  address_num: number;
-  amount: number;
+  address: number;
+  approvalAmounts: RangesToAmounts[];
 }
 
-/** Pending transfers will not be saved after accept / reject */
 export interface PendingTransfer {
+  subbadgeRange: NumberRange | undefined;
   this_pending_nonce: number;
   other_pending_nonce: number;
   amount: number;
@@ -30,30 +31,27 @@ export interface PendingTransfer {
   to: number;
   from: number;
   approved_by: number;
+  markedAsApproved: boolean;
 }
 
-const baseBadgeBalanceInfo: object = {
-  balance: 0,
-  pending_nonce: 0,
-  user_flags: 0,
-};
+const baseBadgeBalanceInfo: object = { pending_nonce: 0, user_flags: 0 };
 
 export const BadgeBalanceInfo = {
   encode(message: BadgeBalanceInfo, writer: Writer = Writer.create()): Writer {
-    if (message.balance !== 0) {
-      writer.uint32(8).uint64(message.balance);
+    for (const v of message.balanceAmounts) {
+      RangesToAmounts.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     if (message.pending_nonce !== 0) {
-      writer.uint32(16).uint64(message.pending_nonce);
+      writer.uint32(24).uint64(message.pending_nonce);
     }
     for (const v of message.pending) {
-      PendingTransfer.encode(v!, writer.uint32(26).fork()).ldelim();
+      PendingTransfer.encode(v!, writer.uint32(34).fork()).ldelim();
     }
     for (const v of message.approvals) {
-      Approval.encode(v!, writer.uint32(34).fork()).ldelim();
+      Approval.encode(v!, writer.uint32(42).fork()).ldelim();
     }
     if (message.user_flags !== 0) {
-      writer.uint32(40).uint64(message.user_flags);
+      writer.uint32(48).uint64(message.user_flags);
     }
     return writer;
   },
@@ -62,24 +60,27 @@ export const BadgeBalanceInfo = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseBadgeBalanceInfo } as BadgeBalanceInfo;
+    message.balanceAmounts = [];
     message.pending = [];
     message.approvals = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          message.balance = longToNumber(reader.uint64() as Long);
-          break;
         case 2:
-          message.pending_nonce = longToNumber(reader.uint64() as Long);
+          message.balanceAmounts.push(
+            RangesToAmounts.decode(reader, reader.uint32())
+          );
           break;
         case 3:
-          message.pending.push(PendingTransfer.decode(reader, reader.uint32()));
+          message.pending_nonce = longToNumber(reader.uint64() as Long);
           break;
         case 4:
-          message.approvals.push(Approval.decode(reader, reader.uint32()));
+          message.pending.push(PendingTransfer.decode(reader, reader.uint32()));
           break;
         case 5:
+          message.approvals.push(Approval.decode(reader, reader.uint32()));
+          break;
+        case 6:
           message.user_flags = longToNumber(reader.uint64() as Long);
           break;
         default:
@@ -92,12 +93,13 @@ export const BadgeBalanceInfo = {
 
   fromJSON(object: any): BadgeBalanceInfo {
     const message = { ...baseBadgeBalanceInfo } as BadgeBalanceInfo;
+    message.balanceAmounts = [];
     message.pending = [];
     message.approvals = [];
-    if (object.balance !== undefined && object.balance !== null) {
-      message.balance = Number(object.balance);
-    } else {
-      message.balance = 0;
+    if (object.balanceAmounts !== undefined && object.balanceAmounts !== null) {
+      for (const e of object.balanceAmounts) {
+        message.balanceAmounts.push(RangesToAmounts.fromJSON(e));
+      }
     }
     if (object.pending_nonce !== undefined && object.pending_nonce !== null) {
       message.pending_nonce = Number(object.pending_nonce);
@@ -124,7 +126,13 @@ export const BadgeBalanceInfo = {
 
   toJSON(message: BadgeBalanceInfo): unknown {
     const obj: any = {};
-    message.balance !== undefined && (obj.balance = message.balance);
+    if (message.balanceAmounts) {
+      obj.balanceAmounts = message.balanceAmounts.map((e) =>
+        e ? RangesToAmounts.toJSON(e) : undefined
+      );
+    } else {
+      obj.balanceAmounts = [];
+    }
     message.pending_nonce !== undefined &&
       (obj.pending_nonce = message.pending_nonce);
     if (message.pending) {
@@ -147,12 +155,13 @@ export const BadgeBalanceInfo = {
 
   fromPartial(object: DeepPartial<BadgeBalanceInfo>): BadgeBalanceInfo {
     const message = { ...baseBadgeBalanceInfo } as BadgeBalanceInfo;
+    message.balanceAmounts = [];
     message.pending = [];
     message.approvals = [];
-    if (object.balance !== undefined && object.balance !== null) {
-      message.balance = object.balance;
-    } else {
-      message.balance = 0;
+    if (object.balanceAmounts !== undefined && object.balanceAmounts !== null) {
+      for (const e of object.balanceAmounts) {
+        message.balanceAmounts.push(RangesToAmounts.fromPartial(e));
+      }
     }
     if (object.pending_nonce !== undefined && object.pending_nonce !== null) {
       message.pending_nonce = object.pending_nonce;
@@ -178,15 +187,15 @@ export const BadgeBalanceInfo = {
   },
 };
 
-const baseApproval: object = { address_num: 0, amount: 0 };
+const baseApproval: object = { address: 0 };
 
 export const Approval = {
   encode(message: Approval, writer: Writer = Writer.create()): Writer {
-    if (message.address_num !== 0) {
-      writer.uint32(8).uint64(message.address_num);
+    if (message.address !== 0) {
+      writer.uint32(8).uint64(message.address);
     }
-    if (message.amount !== 0) {
-      writer.uint32(16).uint64(message.amount);
+    for (const v of message.approvalAmounts) {
+      RangesToAmounts.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -195,14 +204,17 @@ export const Approval = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseApproval } as Approval;
+    message.approvalAmounts = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.address_num = longToNumber(reader.uint64() as Long);
+          message.address = longToNumber(reader.uint64() as Long);
           break;
         case 2:
-          message.amount = longToNumber(reader.uint64() as Long);
+          message.approvalAmounts.push(
+            RangesToAmounts.decode(reader, reader.uint32())
+          );
           break;
         default:
           reader.skipType(tag & 7);
@@ -214,38 +226,51 @@ export const Approval = {
 
   fromJSON(object: any): Approval {
     const message = { ...baseApproval } as Approval;
-    if (object.address_num !== undefined && object.address_num !== null) {
-      message.address_num = Number(object.address_num);
+    message.approvalAmounts = [];
+    if (object.address !== undefined && object.address !== null) {
+      message.address = Number(object.address);
     } else {
-      message.address_num = 0;
+      message.address = 0;
     }
-    if (object.amount !== undefined && object.amount !== null) {
-      message.amount = Number(object.amount);
-    } else {
-      message.amount = 0;
+    if (
+      object.approvalAmounts !== undefined &&
+      object.approvalAmounts !== null
+    ) {
+      for (const e of object.approvalAmounts) {
+        message.approvalAmounts.push(RangesToAmounts.fromJSON(e));
+      }
     }
     return message;
   },
 
   toJSON(message: Approval): unknown {
     const obj: any = {};
-    message.address_num !== undefined &&
-      (obj.address_num = message.address_num);
-    message.amount !== undefined && (obj.amount = message.amount);
+    message.address !== undefined && (obj.address = message.address);
+    if (message.approvalAmounts) {
+      obj.approvalAmounts = message.approvalAmounts.map((e) =>
+        e ? RangesToAmounts.toJSON(e) : undefined
+      );
+    } else {
+      obj.approvalAmounts = [];
+    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<Approval>): Approval {
     const message = { ...baseApproval } as Approval;
-    if (object.address_num !== undefined && object.address_num !== null) {
-      message.address_num = object.address_num;
+    message.approvalAmounts = [];
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
     } else {
-      message.address_num = 0;
+      message.address = 0;
     }
-    if (object.amount !== undefined && object.amount !== null) {
-      message.amount = object.amount;
-    } else {
-      message.amount = 0;
+    if (
+      object.approvalAmounts !== undefined &&
+      object.approvalAmounts !== null
+    ) {
+      for (const e of object.approvalAmounts) {
+        message.approvalAmounts.push(RangesToAmounts.fromPartial(e));
+      }
     }
     return message;
   },
@@ -259,15 +284,22 @@ const basePendingTransfer: object = {
   to: 0,
   from: 0,
   approved_by: 0,
+  markedAsApproved: false,
 };
 
 export const PendingTransfer = {
   encode(message: PendingTransfer, writer: Writer = Writer.create()): Writer {
+    if (message.subbadgeRange !== undefined) {
+      NumberRange.encode(
+        message.subbadgeRange,
+        writer.uint32(10).fork()
+      ).ldelim();
+    }
     if (message.this_pending_nonce !== 0) {
-      writer.uint32(8).uint64(message.this_pending_nonce);
+      writer.uint32(16).uint64(message.this_pending_nonce);
     }
     if (message.other_pending_nonce !== 0) {
-      writer.uint32(16).uint64(message.other_pending_nonce);
+      writer.uint32(24).uint64(message.other_pending_nonce);
     }
     if (message.amount !== 0) {
       writer.uint32(32).uint64(message.amount);
@@ -284,6 +316,9 @@ export const PendingTransfer = {
     if (message.approved_by !== 0) {
       writer.uint32(72).uint64(message.approved_by);
     }
+    if (message.markedAsApproved === true) {
+      writer.uint32(80).bool(message.markedAsApproved);
+    }
     return writer;
   },
 
@@ -295,9 +330,12 @@ export const PendingTransfer = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.this_pending_nonce = longToNumber(reader.uint64() as Long);
+          message.subbadgeRange = NumberRange.decode(reader, reader.uint32());
           break;
         case 2:
+          message.this_pending_nonce = longToNumber(reader.uint64() as Long);
+          break;
+        case 3:
           message.other_pending_nonce = longToNumber(reader.uint64() as Long);
           break;
         case 4:
@@ -315,6 +353,9 @@ export const PendingTransfer = {
         case 9:
           message.approved_by = longToNumber(reader.uint64() as Long);
           break;
+        case 10:
+          message.markedAsApproved = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -325,6 +366,11 @@ export const PendingTransfer = {
 
   fromJSON(object: any): PendingTransfer {
     const message = { ...basePendingTransfer } as PendingTransfer;
+    if (object.subbadgeRange !== undefined && object.subbadgeRange !== null) {
+      message.subbadgeRange = NumberRange.fromJSON(object.subbadgeRange);
+    } else {
+      message.subbadgeRange = undefined;
+    }
     if (
       object.this_pending_nonce !== undefined &&
       object.this_pending_nonce !== null
@@ -366,11 +412,23 @@ export const PendingTransfer = {
     } else {
       message.approved_by = 0;
     }
+    if (
+      object.markedAsApproved !== undefined &&
+      object.markedAsApproved !== null
+    ) {
+      message.markedAsApproved = Boolean(object.markedAsApproved);
+    } else {
+      message.markedAsApproved = false;
+    }
     return message;
   },
 
   toJSON(message: PendingTransfer): unknown {
     const obj: any = {};
+    message.subbadgeRange !== undefined &&
+      (obj.subbadgeRange = message.subbadgeRange
+        ? NumberRange.toJSON(message.subbadgeRange)
+        : undefined);
     message.this_pending_nonce !== undefined &&
       (obj.this_pending_nonce = message.this_pending_nonce);
     message.other_pending_nonce !== undefined &&
@@ -382,11 +440,18 @@ export const PendingTransfer = {
     message.from !== undefined && (obj.from = message.from);
     message.approved_by !== undefined &&
       (obj.approved_by = message.approved_by);
+    message.markedAsApproved !== undefined &&
+      (obj.markedAsApproved = message.markedAsApproved);
     return obj;
   },
 
   fromPartial(object: DeepPartial<PendingTransfer>): PendingTransfer {
     const message = { ...basePendingTransfer } as PendingTransfer;
+    if (object.subbadgeRange !== undefined && object.subbadgeRange !== null) {
+      message.subbadgeRange = NumberRange.fromPartial(object.subbadgeRange);
+    } else {
+      message.subbadgeRange = undefined;
+    }
     if (
       object.this_pending_nonce !== undefined &&
       object.this_pending_nonce !== null
@@ -427,6 +492,14 @@ export const PendingTransfer = {
       message.approved_by = object.approved_by;
     } else {
       message.approved_by = 0;
+    }
+    if (
+      object.markedAsApproved !== undefined &&
+      object.markedAsApproved !== null
+    ) {
+      message.markedAsApproved = object.markedAsApproved;
+    } else {
+      message.markedAsApproved = false;
     }
     return message;
   },

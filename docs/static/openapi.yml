@@ -30447,11 +30447,17 @@ paths:
                       Flag bits are in the following order from left to right;
                       leading zeroes are applied and any future additions will
                       be appended to the right
-                  freeze_addresses:
+                  freeze_address_ranges:
                     type: array
                     items:
-                      type: string
-                      format: uint64
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                          format: uint64
+                        end:
+                          type: string
+                          format: uint64
                     title: >-
                       if frozen_by_default is true, this is an accumulator of
                       unfrozen addresses; and vice versa for false
@@ -30477,19 +30483,26 @@ paths:
                     items:
                       type: object
                       properties:
-                        startId:
+                        ranges:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              start:
+                                type: string
+                                format: uint64
+                              end:
+                                type: string
+                                format: uint64
+                        amount:
                           type: string
                           format: uint64
-                        endId:
-                          type: string
-                          format: uint64
-                        supply:
-                          type: string
-                          format: uint64
-                      title: Only will be created if supply >= 0
                     title: >-
-                      only store if not 1 (default); will be sorted in order of
+                      only store if not == default; will be sorted in order of
                       subsasset ids; (maybe add defaut option in future)
+                  default_subasset_supply:
+                    type: string
+                    format: uint64
                 title: >-
                   BitBadge defines a badge type. Think of this like the smart
                   contract definition
@@ -30686,7 +30699,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/trevormil/bitbadgeschain/badges/get_balance/{badgeId}/{subbadgeId}/{address}':
+  '/trevormil/bitbadgeschain/badges/get_balance/{badgeId}/{address}':
     get:
       summary: Queries a list of GetBalance items.
       operationId: TrevormilBitbadgeschainBadgesGetBalance
@@ -30699,9 +30712,25 @@ paths:
               balanceInfo:
                 type: object
                 properties:
-                  balance:
-                    type: string
-                    format: uint64
+                  balanceAmounts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ranges:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              start:
+                                type: string
+                                format: uint64
+                              end:
+                                type: string
+                                format: uint64
+                        amount:
+                          type: string
+                          format: uint64
                   pending_nonce:
                     type: string
                     format: uint64
@@ -30710,6 +30739,15 @@ paths:
                     items:
                       type: object
                       properties:
+                        subbadgeRange:
+                          type: object
+                          properties:
+                            start:
+                              type: string
+                              format: uint64
+                            end:
+                              type: string
+                              format: uint64
                         this_pending_nonce:
                           type: string
                           format: uint64
@@ -30730,20 +30768,35 @@ paths:
                         approved_by:
                           type: string
                           format: uint64
-                      title: >-
-                        Pending transfers will not be saved after accept /
-                        reject
+                        markedAsApproved:
+                          type: boolean
                   approvals:
                     type: array
                     items:
                       type: object
                       properties:
-                        address_num:
+                        address:
                           type: string
                           format: uint64
-                        amount:
-                          type: string
-                          format: uint64
+                        approvalAmounts:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              ranges:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    start:
+                                      type: string
+                                      format: uint64
+                                    end:
+                                      type: string
+                                      format: uint64
+                              amount:
+                                type: string
+                                format: uint64
                   user_flags:
                     type: string
                     format: uint64
@@ -30935,11 +30988,6 @@ paths:
                         }
       parameters:
         - name: badgeId
-          in: path
-          required: true
-          type: string
-          format: uint64
-        - name: subbadgeId
           in: path
           required: true
           type: string
@@ -52669,18 +52717,50 @@ definitions:
   trevormil.bitbadgeschain.badges.Approval:
     type: object
     properties:
-      address_num:
+      address:
         type: string
         format: uint64
-      amount:
-        type: string
-        format: uint64
+      approvalAmounts:
+        type: array
+        items:
+          type: object
+          properties:
+            ranges:
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                    format: uint64
+                  end:
+                    type: string
+                    format: uint64
+            amount:
+              type: string
+              format: uint64
   trevormil.bitbadgeschain.badges.BadgeBalanceInfo:
     type: object
     properties:
-      balance:
-        type: string
-        format: uint64
+      balanceAmounts:
+        type: array
+        items:
+          type: object
+          properties:
+            ranges:
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                    format: uint64
+                  end:
+                    type: string
+                    format: uint64
+            amount:
+              type: string
+              format: uint64
       pending_nonce:
         type: string
         format: uint64
@@ -52689,6 +52769,15 @@ definitions:
         items:
           type: object
           properties:
+            subbadgeRange:
+              type: object
+              properties:
+                start:
+                  type: string
+                  format: uint64
+                end:
+                  type: string
+                  format: uint64
             this_pending_nonce:
               type: string
               format: uint64
@@ -52709,18 +52798,35 @@ definitions:
             approved_by:
               type: string
               format: uint64
-          title: Pending transfers will not be saved after accept / reject
+            markedAsApproved:
+              type: boolean
       approvals:
         type: array
         items:
           type: object
           properties:
-            address_num:
+            address:
               type: string
               format: uint64
-            amount:
-              type: string
-              format: uint64
+            approvalAmounts:
+              type: array
+              items:
+                type: object
+                properties:
+                  ranges:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                          format: uint64
+                        end:
+                          type: string
+                          format: uint64
+                  amount:
+                    type: string
+                    format: uint64
       user_flags:
         type: string
         format: uint64
@@ -52787,11 +52893,17 @@ definitions:
           Flag bits are in the following order from left to right; leading
           zeroes are applied and any future additions will be appended to the
           right
-      freeze_addresses:
+      freeze_address_ranges:
         type: array
         items:
-          type: string
-          format: uint64
+          type: object
+          properties:
+            start:
+              type: string
+              format: uint64
+            end:
+              type: string
+              format: uint64
         title: >-
           if frozen_by_default is true, this is an accumulator of unfrozen
           addresses; and vice versa for false
@@ -52815,19 +52927,26 @@ definitions:
         items:
           type: object
           properties:
-            startId:
+            ranges:
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                    format: uint64
+                  end:
+                    type: string
+                    format: uint64
+            amount:
               type: string
               format: uint64
-            endId:
-              type: string
-              format: uint64
-            supply:
-              type: string
-              format: uint64
-          title: Only will be created if supply >= 0
         title: >-
-          only store if not 1 (default); will be sorted in order of subsasset
+          only store if not == default; will be sorted in order of subsasset
           ids; (maybe add defaut option in future)
+      default_subasset_supply:
+        type: string
+        format: uint64
     title: >-
       BitBadge defines a badge type. Think of this like the smart contract
       definition
@@ -52847,6 +52966,8 @@ definitions:
       subassetId:
         type: string
         format: uint64
+  trevormil.bitbadgeschain.badges.MsgPruneBalancesResponse:
+    type: object
   trevormil.bitbadgeschain.badges.MsgRequestTransferBadgeResponse:
     type: object
   trevormil.bitbadgeschain.badges.MsgRequestTransferManagerResponse:
@@ -52865,12 +52986,30 @@ definitions:
     type: object
   trevormil.bitbadgeschain.badges.MsgUpdateUrisResponse:
     type: object
+  trevormil.bitbadgeschain.badges.NumberRange:
+    type: object
+    properties:
+      start:
+        type: string
+        format: uint64
+      end:
+        type: string
+        format: uint64
   trevormil.bitbadgeschain.badges.Params:
     type: object
     description: Params defines the parameters for the module.
   trevormil.bitbadgeschain.badges.PendingTransfer:
     type: object
     properties:
+      subbadgeRange:
+        type: object
+        properties:
+          start:
+            type: string
+            format: uint64
+          end:
+            type: string
+            format: uint64
       this_pending_nonce:
         type: string
         format: uint64
@@ -52891,7 +53030,8 @@ definitions:
       approved_by:
         type: string
         format: uint64
-    title: Pending transfers will not be saved after accept / reject
+      markedAsApproved:
+        type: boolean
   trevormil.bitbadgeschain.badges.QueryGetBadgeResponse:
     type: object
     properties:
@@ -52957,11 +53097,17 @@ definitions:
               Flag bits are in the following order from left to right; leading
               zeroes are applied and any future additions will be appended to
               the right
-          freeze_addresses:
+          freeze_address_ranges:
             type: array
             items:
-              type: string
-              format: uint64
+              type: object
+              properties:
+                start:
+                  type: string
+                  format: uint64
+                end:
+                  type: string
+                  format: uint64
             title: >-
               if frozen_by_default is true, this is an accumulator of unfrozen
               addresses; and vice versa for false
@@ -52985,19 +53131,26 @@ definitions:
             items:
               type: object
               properties:
-                startId:
+                ranges:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                        format: uint64
+                      end:
+                        type: string
+                        format: uint64
+                amount:
                   type: string
                   format: uint64
-                endId:
-                  type: string
-                  format: uint64
-                supply:
-                  type: string
-                  format: uint64
-              title: Only will be created if supply >= 0
             title: >-
-              only store if not 1 (default); will be sorted in order of
-              subsasset ids; (maybe add defaut option in future)
+              only store if not == default; will be sorted in order of subsasset
+              ids; (maybe add defaut option in future)
+          default_subasset_supply:
+            type: string
+            format: uint64
         title: >-
           BitBadge defines a badge type. Think of this like the smart contract
           definition
@@ -53007,9 +53160,25 @@ definitions:
       balanceInfo:
         type: object
         properties:
-          balance:
-            type: string
-            format: uint64
+          balanceAmounts:
+            type: array
+            items:
+              type: object
+              properties:
+                ranges:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                        format: uint64
+                      end:
+                        type: string
+                        format: uint64
+                amount:
+                  type: string
+                  format: uint64
           pending_nonce:
             type: string
             format: uint64
@@ -53018,6 +53187,15 @@ definitions:
             items:
               type: object
               properties:
+                subbadgeRange:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                      format: uint64
+                    end:
+                      type: string
+                      format: uint64
                 this_pending_nonce:
                   type: string
                   format: uint64
@@ -53038,18 +53216,35 @@ definitions:
                 approved_by:
                   type: string
                   format: uint64
-              title: Pending transfers will not be saved after accept / reject
+                markedAsApproved:
+                  type: boolean
           approvals:
             type: array
             items:
               type: object
               properties:
-                address_num:
+                address:
                   type: string
                   format: uint64
-                amount:
-                  type: string
-                  format: uint64
+                approvalAmounts:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      ranges:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            start:
+                              type: string
+                              format: uint64
+                            end:
+                              type: string
+                              format: uint64
+                      amount:
+                        type: string
+                        format: uint64
           user_flags:
             type: string
             format: uint64
@@ -53061,19 +53256,23 @@ definitions:
         description: params holds all the parameters of this module.
         type: object
     description: QueryParamsResponse is response type for the Query/Params RPC method.
-  trevormil.bitbadgeschain.badges.Subasset:
+  trevormil.bitbadgeschain.badges.RangesToAmounts:
     type: object
     properties:
-      startId:
+      ranges:
+        type: array
+        items:
+          type: object
+          properties:
+            start:
+              type: string
+              format: uint64
+            end:
+              type: string
+              format: uint64
+      amount:
         type: string
         format: uint64
-      endId:
-        type: string
-        format: uint64
-      supply:
-        type: string
-        format: uint64
-    title: Only will be created if supply >= 0
   trevormil.bitbadgeschain.collections.Params:
     type: object
     description: Params defines the parameters for the module.

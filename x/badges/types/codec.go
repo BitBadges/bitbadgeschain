@@ -21,6 +21,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgTransferManager{}, "badges/TransferManager", nil)
 	cdc.RegisterConcrete(&MsgRequestTransferManager{}, "badges/RequestTransferManager", nil)
 	cdc.RegisterConcrete(&MsgSelfDestructBadge{}, "badges/SelfDestructBadge", nil)
+	cdc.RegisterConcrete(&MsgPruneBalances{}, "badges/PruneBalances", nil)
 	// this line is used by starport scaffolding # 2
 }
 
@@ -63,6 +64,9 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgSelfDestructBadge{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgPruneBalances{},
 	)
 	// this line is used by starport scaffolding # 3
 

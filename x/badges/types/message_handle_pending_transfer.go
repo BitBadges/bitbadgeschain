@@ -11,10 +11,10 @@ var _ sdk.Msg = &MsgHandlePendingTransfer{}
 
 func NewMsgHandlePendingTransfer(creator string, accept bool, badgeId uint64, nonceRanges []*NumberRange, forcefulAccept bool) *MsgHandlePendingTransfer {
 	return &MsgHandlePendingTransfer{
-		Creator:       creator,
-		Accept:        accept,
-		BadgeId:       badgeId,
-		NonceRanges:   nonceRanges,
+		Creator:        creator,
+		Accept:         accept,
+		BadgeId:        badgeId,
+		NonceRanges:    nonceRanges,
 		ForcefulAccept: forcefulAccept,
 	}
 }

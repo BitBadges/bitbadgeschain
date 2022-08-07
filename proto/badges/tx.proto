@@ -21,6 +21,7 @@ service Msg {
     rpc TransferManager(MsgTransferManager) returns (MsgTransferManagerResponse);
     rpc RequestTransferManager(MsgRequestTransferManager) returns (MsgRequestTransferManagerResponse);
   rpc SelfDestructBadge(MsgSelfDestructBadge) returns (MsgSelfDestructBadgeResponse);
+  rpc PruneBalances(MsgPruneBalances) returns (MsgPruneBalancesResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -48,9 +49,6 @@ message MsgNewSubBadgeResponse {
     uint64 subassetId = 1;
 }
 
-//TODO: Add support for batch transfers, pending transfers, and requests
-// Need to take time to think of best way to implement it (best way may be to have multiple Msgs)
-
 message MsgTransferBadge {
     string creator = 1;
     uint64 from = 2;
@@ -58,6 +56,7 @@ message MsgTransferBadge {
     repeated uint64 amounts = 4;
     uint64 badgeId = 5;
     repeated NumberRange subbadgeRanges = 6;
+    uint64 expiration_time = 7;
 }
 
 
@@ -69,6 +68,7 @@ message MsgRequestTransferBadge {
     uint64 amount = 4;
     uint64 badgeId = 5;
     repeated NumberRange subbadgeRanges = 6;
+    uint64 expiration_time = 7;
 }
 
 message MsgRequestTransferBadgeResponse {}
@@ -89,6 +89,7 @@ message MsgSetApproval {
     uint64 address = 3;
     uint64 badgeId = 4;
     repeated NumberRange subbadgeRanges = 5;
+    uint64 expirationTime = 6;
 }
 
 message MsgSetApprovalResponse {}
@@ -156,6 +157,15 @@ message MsgSelfDestructBadge {
 }
 
 message MsgSelfDestructBadgeResponse {
+}
+
+message MsgPruneBalances {
+  string creator = 1;
+  repeated uint64 badgeIds = 2;
+  repeated uint64 addresses = 3;
+}
+
+message MsgPruneBalancesResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

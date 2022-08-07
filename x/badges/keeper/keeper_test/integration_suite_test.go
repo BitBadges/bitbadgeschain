@@ -107,11 +107,10 @@ func (suite *TestSuite) SetupTest() {
 	suite.msgServer = keeper.NewMsgServerImpl(app.BadgesKeeper)
 	suite.queryClient = queryClient
 
-	
 	bob_acc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.MustAccAddressFromBech32(bob))
 	alice_acc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.MustAccAddressFromBech32(alice))
 	charlie_acc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.MustAccAddressFromBech32(charlie))
-	
+
 	suite.app.AccountKeeper.SetAccount(suite.ctx, bob_acc)
 	suite.app.AccountKeeper.SetAccount(suite.ctx, alice_acc)
 	suite.app.AccountKeeper.SetAccount(suite.ctx, charlie_acc)
@@ -147,8 +146,8 @@ func CreateSubBadges(suite *TestSuite, ctx context.Context, creator string, badg
 	return err
 }
 
-func RequestTransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, amount uint64, badgeId uint64, subbadgeRange []*types.NumberRange) error {
-	msg := types.NewMsgRequestTransferBadge(creator, from, amount, badgeId, subbadgeRange)
+func RequestTransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, amount uint64, badgeId uint64, subbadgeRange []*types.NumberRange, expirationTime uint64) error {
+	msg := types.NewMsgRequestTransferBadge(creator, from, amount, badgeId, subbadgeRange, expirationTime)
 	_, err := suite.msgServer.RequestTransferBadge(ctx, msg)
 	return err
 }
@@ -159,14 +158,14 @@ func RevokeBadges(suite *TestSuite, ctx context.Context, creator string, address
 	return err
 }
 
-func TransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, to []uint64, amounts []uint64, badgeId uint64, subbadgeRange []*types.NumberRange) error {
-	msg := types.NewMsgTransferBadge(creator, from, to, amounts, badgeId, subbadgeRange)
+func TransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, to []uint64, amounts []uint64, badgeId uint64, subbadgeRange []*types.NumberRange, expirationTime uint64) error {
+	msg := types.NewMsgTransferBadge(creator, from, to, amounts, badgeId, subbadgeRange, 0)
 	_, err := suite.msgServer.TransferBadge(ctx, msg)
 	return err
 }
 
-func SetApproval(suite *TestSuite, ctx context.Context, creator string, amount uint64, address uint64, badgeId uint64, subbadgeRange []*types.NumberRange) error {
-	msg := types.NewMsgSetApproval(creator, amount, address, badgeId, subbadgeRange)
+func SetApproval(suite *TestSuite, ctx context.Context, creator string, amount uint64, address uint64, badgeId uint64, subbadgeRange []*types.NumberRange, expirationTime uint64) error {
+	msg := types.NewMsgSetApproval(creator, amount, address, badgeId, subbadgeRange, expirationTime)
 	_, err := suite.msgServer.SetApproval(ctx, msg)
 	return err
 }
@@ -213,7 +212,6 @@ func SelfDestructBadge(suite *TestSuite, ctx context.Context, creator string, ba
 	return err
 }
 
-
 /* Below, we should define all query handlers and use them within the other integration tests. */
 func GetBadge(suite *TestSuite, ctx context.Context, id uint64) (types.BitBadge, error) {
 	res, err := suite.app.BadgesKeeper.GetBadge(ctx, &types.QueryGetBadgeRequest{Id: uint64(id)})
@@ -226,8 +224,8 @@ func GetBadge(suite *TestSuite, ctx context.Context, id uint64) (types.BitBadge,
 
 func GetBadgeBalance(suite *TestSuite, ctx context.Context, badgeId uint64, subbadgeId uint64, address uint64) (types.BadgeBalanceInfo, error) {
 	res, err := suite.app.BadgesKeeper.GetBalance(ctx, &types.QueryGetBalanceRequest{
-		BadgeId:    uint64(badgeId),
-		Address:    uint64(address),
+		BadgeId: uint64(badgeId),
+		Address: uint64(address),
 	})
 
 	if err != nil {

@@ -20,7 +20,8 @@ message BadgeBalanceInfo {
 
 message Approval {
     uint64 address = 1;
-    repeated RangesToAmounts approvalAmounts = 2;
+    uint64 expirationTime = 2;
+    repeated RangesToAmounts approvalAmounts = 3;
 }
 
 message PendingTransfer {
@@ -33,4 +34,5 @@ message PendingTransfer {
     uint64 from = 7;
     uint64 approved_by = 9;
     bool markedAsApproved = 10;
+    uint64 expiration_time = 11;
 }

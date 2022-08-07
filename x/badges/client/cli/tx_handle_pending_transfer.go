@@ -78,7 +78,6 @@ func CmdHandlePendingTransfer() *cobra.Command {
 				return err
 			}
 
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err

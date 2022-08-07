@@ -68,8 +68,6 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 		return nil, err
 	}
 
-	
-
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),

@@ -22,7 +22,7 @@ func TestMsgFreezeAddress_ValidateBasic(t *testing.T) {
 				AddressRanges: []*types.NumberRange{
 					{
 						Start: 0,
-						End: 0,
+						End:   0,
 					},
 				},
 			},
@@ -34,7 +34,7 @@ func TestMsgFreezeAddress_ValidateBasic(t *testing.T) {
 				AddressRanges: []*types.NumberRange{
 					{
 						Start: 0,
-						End: 0,
+						End:   0,
 					},
 				},
 			},
@@ -45,7 +45,7 @@ func TestMsgFreezeAddress_ValidateBasic(t *testing.T) {
 				AddressRanges: []*types.NumberRange{
 					{
 						Start: 10,
-						End: 0,
+						End:   0,
 					},
 				},
 			},

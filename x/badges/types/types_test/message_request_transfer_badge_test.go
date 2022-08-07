@@ -22,11 +22,10 @@ func TestMsgRequestTransferBadge_ValidateBasic(t *testing.T) {
 				SubbadgeRanges: []*types.NumberRange{
 					{
 						Start: 0,
-						End: 0,
+						End:   0,
 					},
 				},
 				Amount: 10,
-
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
@@ -36,7 +35,7 @@ func TestMsgRequestTransferBadge_ValidateBasic(t *testing.T) {
 				SubbadgeRanges: []*types.NumberRange{
 					{
 						Start: 0,
-						End: 0,
+						End:   0,
 					},
 				},
 				Amount: 10,
@@ -48,7 +47,7 @@ func TestMsgRequestTransferBadge_ValidateBasic(t *testing.T) {
 				SubbadgeRanges: []*types.NumberRange{
 					{
 						Start: 10,
-						End: 0,
+						End:   0,
 					},
 				},
 			},

@@ -11,15 +11,12 @@
 
 export interface BadgesApproval {
   /** @format uint64 */
-  address_num?: string;
-
-  /** @format uint64 */
-  amount?: string;
+  address?: string;
+  approvalAmounts?: BadgesRangesToAmounts[];
 }
 
 export interface BadgesBadgeBalanceInfo {
-  /** @format uint64 */
-  balance?: string;
+  balanceAmounts?: BadgesRangesToAmounts[];
 
   /** @format uint64 */
   pending_nonce?: string;
@@ -53,12 +50,15 @@ export interface BadgesBitBadge {
    * @format uint64
    */
   permission_flags?: string;
-  freeze_addresses?: string[];
+  freeze_address_ranges?: BadgesNumberRange[];
   subasset_uri_format?: string;
 
   /** @format uint64 */
   next_subasset_id?: string;
-  subassets_total_supply?: BadgesSubasset[];
+  subassets_total_supply?: BadgesRangesToAmounts[];
+
+  /** @format uint64 */
+  default_subasset_supply?: string;
 }
 
 export type BadgesMsgFreezeAddressResponse = object;
@@ -74,6 +74,8 @@ export interface BadgesMsgNewSubBadgeResponse {
   /** @format uint64 */
   subassetId?: string;
 }
+
+export type BadgesMsgPruneBalancesResponse = object;
 
 export type BadgesMsgRequestTransferBadgeResponse = object;
 
@@ -93,12 +95,22 @@ export type BadgesMsgUpdatePermissionsResponse = object;
 
 export type BadgesMsgUpdateUrisResponse = object;
 
+export interface BadgesNumberRange {
+  /** @format uint64 */
+  start?: string;
+
+  /** @format uint64 */
+  end?: string;
+}
+
 /**
  * Params defines the parameters for the module.
  */
 export type BadgesParams = object;
 
 export interface BadgesPendingTransfer {
+  subbadgeRange?: BadgesNumberRange;
+
   /** @format uint64 */
   this_pending_nonce?: string;
 
@@ -117,6 +129,7 @@ export interface BadgesPendingTransfer {
 
   /** @format uint64 */
   approved_by?: string;
+  markedAsApproved?: boolean;
 }
 
 export interface BadgesQueryGetBadgeResponse {
@@ -135,15 +148,11 @@ export interface BadgesQueryParamsResponse {
   params?: BadgesParams;
 }
 
-export interface BadgesSubasset {
-  /** @format uint64 */
-  startId?: string;
+export interface BadgesRangesToAmounts {
+  ranges?: BadgesNumberRange[];
 
   /** @format uint64 */
-  endId?: string;
-
-  /** @format uint64 */
-  supply?: string;
+  amount?: string;
 }
 
 /**
@@ -488,11 +497,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QueryGetBalance
    * @summary Queries a list of GetBalance items.
-   * @request GET:/trevormil/bitbadgeschain/badges/get_balance/{badgeId}/{subbadgeId}/{address}
+   * @request GET:/trevormil/bitbadgeschain/badges/get_balance/{badgeId}/{address}
    */
-  queryGetBalance = (badgeId: string, subbadgeId: string, address: string, params: RequestParams = {}) =>
+  queryGetBalance = (badgeId: string, address: string, params: RequestParams = {}) =>
     this.request<BadgesQueryGetBalanceResponse, RpcStatus>({
-      path: `/trevormil/bitbadgeschain/badges/get_balance/${badgeId}/${subbadgeId}/${address}`,
+      path: `/trevormil/bitbadgeschain/badges/get_balance/${badgeId}/${address}`,
       method: "GET",
       format: "json",
       ...params,

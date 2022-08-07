@@ -23,17 +23,13 @@ func (suite *TestSuite) TestSelfDestruct() {
 
 	CreateBadges(suite, wctx, badgesToCreate)
 	badge, _ := GetBadge(suite, wctx, 0)
-	
-	
+
 	//Create subbadge 1 with supply > 1
 	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
-	
-	
+
 	bobBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	
-	
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.RangesToAmounts{
@@ -56,7 +52,7 @@ func (suite *TestSuite) TestSelfDestruct() {
 	//Create subbadge 1 with supply > 1
 	err = CreateSubBadges(suite, wctx, bob, 1, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
-	
+
 	err = UpdatePermissions(suite, wctx, bob, 1, 58)
 	suite.Require().Nil(err, "Error updating permissions")
 
@@ -81,18 +77,13 @@ func (suite *TestSuite) TestSelfDestructNotManager() {
 
 	CreateBadges(suite, wctx, badgesToCreate)
 	badge, _ := GetBadge(suite, wctx, 0)
-	
-	
 
 	//Create subbadge 1 with supply > 1
 	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
-	
-	
+
 	bobBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	
-	
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.RangesToAmounts{

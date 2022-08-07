@@ -19,14 +19,14 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid address",
 			msg: types.MsgTransferBadge{
-				Creator: "invalid_address",
-				ToAddresses:      []uint64{ 0 },
-				Amounts:      []uint64{ 10 },
-				From:    1,
+				Creator:     "invalid_address",
+				ToAddresses: []uint64{0},
+				Amounts:     []uint64{10},
+				From:        1,
 				SubbadgeRanges: []*types.NumberRange{
 					{
 						Start: 0,
-						End: 0,
+						End:   0,
 					},
 				},
 			},
@@ -34,43 +34,43 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 		}, {
 			name: "valid state",
 			msg: types.MsgTransferBadge{
-				Creator: sample.AccAddress(),
-				ToAddresses:      []uint64{ 0 },
-				Amounts:      []uint64{ 10 },
-				From:    1,
+				Creator:     sample.AccAddress(),
+				ToAddresses: []uint64{0},
+				Amounts:     []uint64{10},
+				From:        1,
 				SubbadgeRanges: []*types.NumberRange{
 					{
 						Start: 0,
-						End: 0,
+						End:   0,
 					},
 				},
 			},
 		}, {
 			name: "invalid addresses",
 			msg: types.MsgTransferBadge{
-				Creator: sample.AccAddress(),
-				ToAddresses:      []uint64{ 0 },
-				Amounts:      []uint64{ 10 },
-				From:    0,
+				Creator:     sample.AccAddress(),
+				ToAddresses: []uint64{0},
+				Amounts:     []uint64{10},
+				From:        0,
 				SubbadgeRanges: []*types.NumberRange{
 					{
 						Start: 0,
-						End: 0,
+						End:   0,
 					},
 				},
 			},
 			err: types.ErrSenderAndReceiverSame,
-		},  {
+		}, {
 			name: "invalid amounts",
 			msg: types.MsgTransferBadge{
-				Creator: sample.AccAddress(),
-				ToAddresses:      []uint64{ 0 },
-				Amounts:      []uint64{ 0 },
-				From:    7,
+				Creator:     sample.AccAddress(),
+				ToAddresses: []uint64{0},
+				Amounts:     []uint64{0},
+				From:        7,
 				SubbadgeRanges: []*types.NumberRange{
 					{
 						Start: 0,
-						End: 0,
+						End:   0,
 					},
 				},
 			},
@@ -79,14 +79,14 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid subbadge range",
 			msg: types.MsgTransferBadge{
-				Creator: sample.AccAddress(),
-				ToAddresses:      []uint64{ 0 },
-				Amounts:      []uint64{ 0 },
-				From:    7,
+				Creator:     sample.AccAddress(),
+				ToAddresses: []uint64{0},
+				Amounts:     []uint64{0},
+				From:        7,
 				SubbadgeRanges: []*types.NumberRange{
 					{
 						Start: 10,
-						End: 0,
+						End:   0,
 					},
 				},
 			},

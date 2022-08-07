@@ -24,7 +24,7 @@ func GetDetailsFromBalanceKey(id string) BalanceKeyDetails {
 	result := strings.Split(id, BalanceKeyDelimiter)
 	account_num, _ := strconv.ParseUint(result[0], 10, 64)
 	badge_id, _ := strconv.ParseUint(result[1], 10, 64)
-	
+
 	return BalanceKeyDetails{
 		account_num: account_num,
 		badge_id:    badge_id,

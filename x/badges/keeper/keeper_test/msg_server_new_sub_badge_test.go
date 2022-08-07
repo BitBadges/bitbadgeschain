@@ -68,7 +68,7 @@ func (suite *TestSuite) TestNewSubBadges() {
 			Amount: 10,
 		},
 	},
-	badge.SubassetsTotalSupply)
+		badge.SubassetsTotalSupply)
 	suite.Require().Equal(uint64(10), keeper.GetBadgeBalanceFromBalanceAmountsForSubbadgeId(2, bobBalanceInfo.BalanceAmounts))
 }
 

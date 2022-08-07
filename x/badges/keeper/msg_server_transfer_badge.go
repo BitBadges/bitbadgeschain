@@ -18,12 +18,11 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 	CreatorAccountNum, Badge, Permissions, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
 		ctx, msg.Creator, addresses_to_check, msg.BadgeId, msg.SubbadgeRanges, false,
 	)
-	
+
 	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 	if err != nil {
 		return nil, err
 	}
-
 
 	FromBalanceKey := GetBalanceKey(msg.From, msg.BadgeId)
 	fromBadgeBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, FromBalanceKey)
@@ -37,7 +36,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 		if !found {
 			toBadgeBalanceInfo = GetEmptyBadgeBalanceTemplate()
 		}
-		
+
 		for _, amount := range msg.Amounts {
 			handledForcefulTransfer := false
 			for _, subbadgeRange := range msg.SubbadgeRanges {
@@ -58,7 +57,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 					// Else, handle it by adding a pending transfer
 
 					// TODO: support forceful transfers when sending to reserved address numbers such as ETH NULL address
-					var reservedAddress = []uint64{ }
+					var reservedAddress = []uint64{}
 					sendingToReservedAddress := false
 					for _, address := range reservedAddress {
 						if address == to {
@@ -75,10 +74,9 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 						}
 					}
 				}
-			
-			
+
 				if !handledForcefulTransfer {
-					fromBadgeBalanceInfo, toBadgeBalanceInfo, err = k.AddToBothPendingBadgeBalances(ctx, fromBadgeBalanceInfo, toBadgeBalanceInfo, *subbadgeRange, to, msg.From, amount, CreatorAccountNum, true)
+					fromBadgeBalanceInfo, toBadgeBalanceInfo, err = k.AddToBothPendingBadgeBalances(ctx, fromBadgeBalanceInfo, toBadgeBalanceInfo, *subbadgeRange, to, msg.From, amount, CreatorAccountNum, true, msg.ExpirationTime)
 					if err != nil {
 						return nil, err
 					}
@@ -87,23 +85,13 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 		}
 		if err := k.SetBadgeBalanceInStore(ctx, ToBalanceKey, toBadgeBalanceInfo); err != nil {
 			return nil, err
-		}		
-	}	
-
-
-	
-
-	
-
-	
-
-	
+		}
+	}
 
 	if err := k.SetBadgeBalanceInStore(ctx, FromBalanceKey, fromBadgeBalanceInfo); err != nil {
 		return nil, err
 	}
 
-	
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),

@@ -1,6 +1,7 @@
 /* eslint-disable */
 import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
+import { NumberRange, RangesToAmounts } from "../badges/ranges";
 
 export const protobufPackage = "trevormil.bitbadgeschain.badges";
 
@@ -36,7 +37,7 @@ export interface BitBadge {
    * if frozen_by_default is true, this is an accumulator of unfrozen addresses; and vice versa for false
    * big.Int will always only be 32 uint64s long
    */
-  freeze_addresses: number[];
+  freeze_address_ranges: NumberRange[];
   /**
    * uri for the subassets metadata stored off chain; include {id} in the string, it will be replaced with the subasset id
    * if not specified, uses a default Class (ID # 1) like metadata
@@ -44,15 +45,9 @@ export interface BitBadge {
   subasset_uri_format: string;
   /** starts at 0; each subasset created will incrementally have an increasing ID # */
   next_subasset_id: number;
-  /** only store if not 1 (default); will be sorted in order of subsasset ids; (maybe add defaut option in future) */
-  subassets_total_supply: Subasset[];
-}
-
-/** Only will be created if supply >= 0 */
-export interface Subasset {
-  startId: number;
-  endId: number;
-  supply: number;
+  /** only store if not == default; will be sorted in order of subsasset ids; (maybe add defaut option in future) */
+  subassets_total_supply: RangesToAmounts[];
+  default_subasset_supply: number;
 }
 
 const baseBitBadge: object = {
@@ -61,9 +56,9 @@ const baseBitBadge: object = {
   metadata_hash: "",
   manager: 0,
   permission_flags: 0,
-  freeze_addresses: 0,
   subasset_uri_format: "",
   next_subasset_id: 0,
+  default_subasset_supply: 0,
 };
 
 export const BitBadge = {
@@ -83,11 +78,9 @@ export const BitBadge = {
     if (message.permission_flags !== 0) {
       writer.uint32(40).uint64(message.permission_flags);
     }
-    writer.uint32(82).fork();
-    for (const v of message.freeze_addresses) {
-      writer.uint64(v);
+    for (const v of message.freeze_address_ranges) {
+      NumberRange.encode(v!, writer.uint32(82).fork()).ldelim();
     }
-    writer.ldelim();
     if (message.subasset_uri_format !== "") {
       writer.uint32(90).string(message.subasset_uri_format);
     }
@@ -95,7 +88,10 @@ export const BitBadge = {
       writer.uint32(96).uint64(message.next_subasset_id);
     }
     for (const v of message.subassets_total_supply) {
-      Subasset.encode(v!, writer.uint32(106).fork()).ldelim();
+      RangesToAmounts.encode(v!, writer.uint32(106).fork()).ldelim();
+    }
+    if (message.default_subasset_supply !== 0) {
+      writer.uint32(112).uint64(message.default_subasset_supply);
     }
     return writer;
   },
@@ -104,7 +100,7 @@ export const BitBadge = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseBitBadge } as BitBadge;
-    message.freeze_addresses = [];
+    message.freeze_address_ranges = [];
     message.subassets_total_supply = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
@@ -125,18 +121,9 @@ export const BitBadge = {
           message.permission_flags = longToNumber(reader.uint64() as Long);
           break;
         case 10:
-          if ((tag & 7) === 2) {
-            const end2 = reader.uint32() + reader.pos;
-            while (reader.pos < end2) {
-              message.freeze_addresses.push(
-                longToNumber(reader.uint64() as Long)
-              );
-            }
-          } else {
-            message.freeze_addresses.push(
-              longToNumber(reader.uint64() as Long)
-            );
-          }
+          message.freeze_address_ranges.push(
+            NumberRange.decode(reader, reader.uint32())
+          );
           break;
         case 11:
           message.subasset_uri_format = reader.string();
@@ -146,7 +133,12 @@ export const BitBadge = {
           break;
         case 13:
           message.subassets_total_supply.push(
-            Subasset.decode(reader, reader.uint32())
+            RangesToAmounts.decode(reader, reader.uint32())
+          );
+          break;
+        case 14:
+          message.default_subasset_supply = longToNumber(
+            reader.uint64() as Long
           );
           break;
         default:
@@ -159,7 +151,7 @@ export const BitBadge = {
 
   fromJSON(object: any): BitBadge {
     const message = { ...baseBitBadge } as BitBadge;
-    message.freeze_addresses = [];
+    message.freeze_address_ranges = [];
     message.subassets_total_supply = [];
     if (object.id !== undefined && object.id !== null) {
       message.id = Number(object.id);
@@ -190,11 +182,11 @@ export const BitBadge = {
       message.permission_flags = 0;
     }
     if (
-      object.freeze_addresses !== undefined &&
-      object.freeze_addresses !== null
+      object.freeze_address_ranges !== undefined &&
+      object.freeze_address_ranges !== null
     ) {
-      for (const e of object.freeze_addresses) {
-        message.freeze_addresses.push(Number(e));
+      for (const e of object.freeze_address_ranges) {
+        message.freeze_address_ranges.push(NumberRange.fromJSON(e));
       }
     }
     if (
@@ -218,8 +210,16 @@ export const BitBadge = {
       object.subassets_total_supply !== null
     ) {
       for (const e of object.subassets_total_supply) {
-        message.subassets_total_supply.push(Subasset.fromJSON(e));
+        message.subassets_total_supply.push(RangesToAmounts.fromJSON(e));
       }
+    }
+    if (
+      object.default_subasset_supply !== undefined &&
+      object.default_subasset_supply !== null
+    ) {
+      message.default_subasset_supply = Number(object.default_subasset_supply);
+    } else {
+      message.default_subasset_supply = 0;
     }
     return message;
   },
@@ -233,10 +233,12 @@ export const BitBadge = {
     message.manager !== undefined && (obj.manager = message.manager);
     message.permission_flags !== undefined &&
       (obj.permission_flags = message.permission_flags);
-    if (message.freeze_addresses) {
-      obj.freeze_addresses = message.freeze_addresses.map((e) => e);
+    if (message.freeze_address_ranges) {
+      obj.freeze_address_ranges = message.freeze_address_ranges.map((e) =>
+        e ? NumberRange.toJSON(e) : undefined
+      );
     } else {
-      obj.freeze_addresses = [];
+      obj.freeze_address_ranges = [];
     }
     message.subasset_uri_format !== undefined &&
       (obj.subasset_uri_format = message.subasset_uri_format);
@@ -244,17 +246,19 @@ export const BitBadge = {
       (obj.next_subasset_id = message.next_subasset_id);
     if (message.subassets_total_supply) {
       obj.subassets_total_supply = message.subassets_total_supply.map((e) =>
-        e ? Subasset.toJSON(e) : undefined
+        e ? RangesToAmounts.toJSON(e) : undefined
       );
     } else {
       obj.subassets_total_supply = [];
     }
+    message.default_subasset_supply !== undefined &&
+      (obj.default_subasset_supply = message.default_subasset_supply);
     return obj;
   },
 
   fromPartial(object: DeepPartial<BitBadge>): BitBadge {
     const message = { ...baseBitBadge } as BitBadge;
-    message.freeze_addresses = [];
+    message.freeze_address_ranges = [];
     message.subassets_total_supply = [];
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
@@ -285,11 +289,11 @@ export const BitBadge = {
       message.permission_flags = 0;
     }
     if (
-      object.freeze_addresses !== undefined &&
-      object.freeze_addresses !== null
+      object.freeze_address_ranges !== undefined &&
+      object.freeze_address_ranges !== null
     ) {
-      for (const e of object.freeze_addresses) {
-        message.freeze_addresses.push(e);
+      for (const e of object.freeze_address_ranges) {
+        message.freeze_address_ranges.push(NumberRange.fromPartial(e));
       }
     }
     if (
@@ -313,97 +317,16 @@ export const BitBadge = {
       object.subassets_total_supply !== null
     ) {
       for (const e of object.subassets_total_supply) {
-        message.subassets_total_supply.push(Subasset.fromPartial(e));
+        message.subassets_total_supply.push(RangesToAmounts.fromPartial(e));
       }
     }
-    return message;
-  },
-};
-
-const baseSubasset: object = { startId: 0, endId: 0, supply: 0 };
-
-export const Subasset = {
-  encode(message: Subasset, writer: Writer = Writer.create()): Writer {
-    if (message.startId !== 0) {
-      writer.uint32(8).uint64(message.startId);
-    }
-    if (message.endId !== 0) {
-      writer.uint32(16).uint64(message.endId);
-    }
-    if (message.supply !== 0) {
-      writer.uint32(24).uint64(message.supply);
-    }
-    return writer;
-  },
-
-  decode(input: Reader | Uint8Array, length?: number): Subasset {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseSubasset } as Subasset;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.startId = longToNumber(reader.uint64() as Long);
-          break;
-        case 2:
-          message.endId = longToNumber(reader.uint64() as Long);
-          break;
-        case 3:
-          message.supply = longToNumber(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Subasset {
-    const message = { ...baseSubasset } as Subasset;
-    if (object.startId !== undefined && object.startId !== null) {
-      message.startId = Number(object.startId);
+    if (
+      object.default_subasset_supply !== undefined &&
+      object.default_subasset_supply !== null
+    ) {
+      message.default_subasset_supply = object.default_subasset_supply;
     } else {
-      message.startId = 0;
-    }
-    if (object.endId !== undefined && object.endId !== null) {
-      message.endId = Number(object.endId);
-    } else {
-      message.endId = 0;
-    }
-    if (object.supply !== undefined && object.supply !== null) {
-      message.supply = Number(object.supply);
-    } else {
-      message.supply = 0;
-    }
-    return message;
-  },
-
-  toJSON(message: Subasset): unknown {
-    const obj: any = {};
-    message.startId !== undefined && (obj.startId = message.startId);
-    message.endId !== undefined && (obj.endId = message.endId);
-    message.supply !== undefined && (obj.supply = message.supply);
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<Subasset>): Subasset {
-    const message = { ...baseSubasset } as Subasset;
-    if (object.startId !== undefined && object.startId !== null) {
-      message.startId = object.startId;
-    } else {
-      message.startId = 0;
-    }
-    if (object.endId !== undefined && object.endId !== null) {
-      message.endId = object.endId;
-    } else {
-      message.endId = 0;
-    }
-    if (object.supply !== undefined && object.supply !== null) {
-      message.supply = object.supply;
-    } else {
-      message.supply = 0;
+      message.default_subasset_supply = 0;
     }
     return message;
   },

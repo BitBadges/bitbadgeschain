@@ -15,7 +15,7 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 	CreatorAccountNum, _, _, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
 		ctx, msg.Creator, []uint64{msg.Address}, msg.BadgeId, msg.SubbadgeRanges, false,
 	)
-	
+
 	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 	}
 
 	for _, subbadgeRange := range msg.SubbadgeRanges {
-		badgeBalanceInfo, err = k.Keeper.SetApproval(ctx, badgeBalanceInfo, msg.Amount, msg.Address, *subbadgeRange)
+		badgeBalanceInfo, err = k.Keeper.SetApproval(ctx, badgeBalanceInfo, msg.Amount, msg.Address, *subbadgeRange, msg.ExpirationTime)
 		if err != nil {
 			return nil, err
 		}

@@ -6,52 +6,26 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
-
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgRevokeBadge_ValidateBasic(t *testing.T) {
+func TestMsgPruneBalances_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgRevokeBadge
+		msg  types.MsgPruneBalances
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgRevokeBadge{
+			msg: types.MsgPruneBalances{
 				Creator: "invalid_address",
-				SubbadgeRanges: []*types.NumberRange{
-					{
-						Start: 0,
-						End:   0,
-					},
-				},
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgRevokeBadge{
+			msg: types.MsgPruneBalances{
 				Creator: sample.AccAddress(),
-				SubbadgeRanges: []*types.NumberRange{
-					{
-						Start: 0,
-						End:   0,
-					},
-				},
 			},
-		},
-		{
-			name: "invalid subbadge range",
-			msg: types.MsgRevokeBadge{
-				Creator: sample.AccAddress(),
-				SubbadgeRanges: []*types.NumberRange{
-					{
-						Start: 10,
-						End:   0,
-					},
-				},
-			},
-			err: types.ErrStartGreaterThanEnd,
 		},
 	}
 	for _, tt := range tests {

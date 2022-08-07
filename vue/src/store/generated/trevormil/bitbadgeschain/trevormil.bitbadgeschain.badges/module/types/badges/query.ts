@@ -26,7 +26,6 @@ export interface QueryGetBadgeResponse {
 
 export interface QueryGetBalanceRequest {
   badgeId: number;
-  subbadgeId: number;
   address: number;
 }
 
@@ -250,11 +249,7 @@ export const QueryGetBadgeResponse = {
   },
 };
 
-const baseQueryGetBalanceRequest: object = {
-  badgeId: 0,
-  subbadgeId: 0,
-  address: 0,
-};
+const baseQueryGetBalanceRequest: object = { badgeId: 0, address: 0 };
 
 export const QueryGetBalanceRequest = {
   encode(
@@ -264,11 +259,8 @@ export const QueryGetBalanceRequest = {
     if (message.badgeId !== 0) {
       writer.uint32(8).uint64(message.badgeId);
     }
-    if (message.subbadgeId !== 0) {
-      writer.uint32(16).uint64(message.subbadgeId);
-    }
     if (message.address !== 0) {
-      writer.uint32(24).uint64(message.address);
+      writer.uint32(16).uint64(message.address);
     }
     return writer;
   },
@@ -284,9 +276,6 @@ export const QueryGetBalanceRequest = {
           message.badgeId = longToNumber(reader.uint64() as Long);
           break;
         case 2:
-          message.subbadgeId = longToNumber(reader.uint64() as Long);
-          break;
-        case 3:
           message.address = longToNumber(reader.uint64() as Long);
           break;
         default:
@@ -304,11 +293,6 @@ export const QueryGetBalanceRequest = {
     } else {
       message.badgeId = 0;
     }
-    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
-      message.subbadgeId = Number(object.subbadgeId);
-    } else {
-      message.subbadgeId = 0;
-    }
     if (object.address !== undefined && object.address !== null) {
       message.address = Number(object.address);
     } else {
@@ -320,7 +304,6 @@ export const QueryGetBalanceRequest = {
   toJSON(message: QueryGetBalanceRequest): unknown {
     const obj: any = {};
     message.badgeId !== undefined && (obj.badgeId = message.badgeId);
-    message.subbadgeId !== undefined && (obj.subbadgeId = message.subbadgeId);
     message.address !== undefined && (obj.address = message.address);
     return obj;
   },
@@ -333,11 +316,6 @@ export const QueryGetBalanceRequest = {
       message.badgeId = object.badgeId;
     } else {
       message.badgeId = 0;
-    }
-    if (object.subbadgeId !== undefined && object.subbadgeId !== null) {
-      message.subbadgeId = object.subbadgeId;
-    } else {
-      message.subbadgeId = 0;
     }
     if (object.address !== undefined && object.address !== null) {
       message.address = object.address;

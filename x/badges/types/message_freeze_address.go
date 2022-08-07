@@ -11,10 +11,10 @@ var _ sdk.Msg = &MsgFreezeAddress{}
 
 func NewMsgFreezeAddress(creator string, addresses []*NumberRange, badgeId uint64, add bool) *MsgFreezeAddress {
 	return &MsgFreezeAddress{
-		Creator:    creator,
-		AddressRanges:  addresses,
-		BadgeId:    badgeId,
-		Add:        add,
+		Creator:       creator,
+		AddressRanges: addresses,
+		BadgeId:       badgeId,
+		Add:           add,
 	}
 }
 

@@ -54,13 +54,13 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 
 			if supply != defaultSupply {
 				ctx.GasMeter().ConsumeGas(SubbadgeWithSupplyNotEqualToOne, "create new subbadge cost")
-				
+
 				new_amounts = UpdateBadgeBalanceBySubbadgeId(subasset_id, supply, new_amounts)
 			}
 			badge.NextSubassetId += 1
 
 			//Mint the total supply of subbadge to the manager
-			newBadgeBalanceInfo, err := k.AddToBadgeBalance(ctx, badgeBalanceInfo, subasset_id, supply); 
+			newBadgeBalanceInfo, err := k.AddToBadgeBalance(ctx, badgeBalanceInfo, subasset_id, supply)
 			if err != nil {
 				return nil, err
 			}
@@ -83,7 +83,7 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 			sdk.NewAttribute(sdk.AttributeKeyAction, "CreatedSubBadges"),
 			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
 			sdk.NewAttribute("FirstCreatedID", fmt.Sprint(originalSubassetId)),
-			sdk.NewAttribute("LastCreatedID", fmt.Sprint(badge.NextSubassetId - 1)),
+			sdk.NewAttribute("LastCreatedID", fmt.Sprint(badge.NextSubassetId-1)),
 		),
 	)
 

@@ -17,8 +17,8 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 		return nil, ErrBadgeNotExists
 	}
 	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
-	
-	err :=  *new(error)
+
+	err := *new(error)
 	/*
 		Outgoing : Creator -> OtherParty
 		Incoming : OtherParty -> CreatorAccountNum
@@ -40,7 +40,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 
 		3. Creator wants to cancel a request for transfer they sent -> Nothing additional and remove fom both
 		4. Creator wants to accept a request for transfer they sent -> Can accept if other party approved it
-			
+
 		5. Creator wants to reject a request for transfer they received -> Nothing Additional
 		6. Creator wants to accept a request for transfer they received -> Accept forcefully or mark as approved
 
@@ -66,7 +66,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 	}
 
 	newCreatorBadgeBalanceInfo := creatorBadgeBalanceInfo
-	
+
 	balanceInfoCache := make(map[uint64]types.BadgeBalanceInfo, 0)
 	balanceInfoUpdated := make(map[uint64]bool, 0)
 
@@ -76,31 +76,34 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 		for idx, CurrPendingTransfer := range creatorBadgeBalanceInfo.Pending {
 			if CurrPendingTransfer.ThisPendingNonce <= nonceRange.End && CurrPendingTransfer.ThisPendingNonce >= nonceRange.Start {
 				updated = true
+				expired := false
+				if CurrPendingTransfer.ExpirationTime != 0 {
+					expired = uint64(ctx.BlockTime().Unix()) > CurrPendingTransfer.ExpirationTime
+				}
+
 				sentAndWantToAccept := CurrPendingTransfer.SendRequest && msg.Accept
-				sentAndWantToCancel := CurrPendingTransfer.SendRequest && !msg.Accept    
+				sentAndWantToCancel := CurrPendingTransfer.SendRequest && !msg.Accept
 				receivedAndWantToAccept := !CurrPendingTransfer.SendRequest && msg.Accept
 				receivedAndWantToReject := !CurrPendingTransfer.SendRequest && !msg.Accept
 				outgoingTransfer := CurrPendingTransfer.From == CreatorAccountNum
-		
+
 				// Handle incoming / outgoing transfers
-				simpleAddToYourBalance := receivedAndWantToAccept && !outgoingTransfer //Remove from both
+				simpleAddToYourBalance := receivedAndWantToAccept && !outgoingTransfer      //Remove from both
 				needToRevertYourOutgoingTransfer := sentAndWantToCancel && outgoingTransfer //Remove from your pending and theirs if they haven't already
 
 				// Handle rejections (throw expensive revert computation back at the proposing party)
 				simpleRemoveFromYourPending := receivedAndWantToReject //Remove from only your pending
-				
+
 				// Handle transfer requests
 				acceptAndMarkAsApproved := !msg.ForcefulAccept && receivedAndWantToAccept && outgoingTransfer //Don't remove at all
 				forcefulAcceptAndTransfer := msg.ForcefulAccept && receivedAndWantToAccept && outgoingTransfer
-				finalizeOnlyAfterApproved := sentAndWantToAccept && !outgoingTransfer //Remove from both pending, full transfer, needs to be approved
+				finalizeOnlyAfterApproved := sentAndWantToAccept && !outgoingTransfer       //Remove from both pending, full transfer, needs to be approved
 				needToRevertYourTransferRequest := sentAndWantToCancel && !outgoingTransfer //Remove from both pendings if they haven't already
 
 				// Can't accept your own outgoing transfer
 				if sentAndWantToAccept && outgoingTransfer {
 					return nil, ErrCantAcceptOwnTransferRequest
 				}
-
-
 
 				//Get basic info
 				OtherPartyAccountNum := CurrPendingTransfer.From
@@ -110,12 +113,12 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 				OtherPartyBalanceKey := GetBalanceKey(OtherPartyAccountNum, msg.BadgeId)
 				OtherPartyNonce := CurrPendingTransfer.OtherPendingNonce
 				otherPartyBalanceInfo, ok := balanceInfoCache[OtherPartyAccountNum]
-				
+
 				// If its only a simple reject or accept, we don't need the other party's balances. Let the proposing party do the writes and reads
 				if !ok && (!simpleRemoveFromYourPending || !acceptAndMarkAsApproved) {
 					otherPartyBalanceInfo, found = k.GetBadgeBalanceFromStore(ctx, OtherPartyBalanceKey)
 					balanceInfoCache[OtherPartyAccountNum] = otherPartyBalanceInfo
-					
+
 					if !found {
 						if needToRevertYourOutgoingTransfer || needToRevertYourTransferRequest {
 
@@ -124,14 +127,20 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 						}
 					}
 				}
-				
+
 				for i := CurrPendingTransfer.SubbadgeRange.Start; i <= CurrPendingTransfer.SubbadgeRange.End; i++ {
 					if simpleAddToYourBalance {
+						if expired {
+							return nil, ErrPendingTransferExpired
+						}
 						newCreatorBadgeBalanceInfo, err = k.AddToBadgeBalance(ctx, newCreatorBadgeBalanceInfo, i, CurrPendingTransfer.Amount)
 						if err != nil {
 							return nil, err
 						}
-					} else if acceptAndMarkAsApproved{
+					} else if acceptAndMarkAsApproved {
+						if expired {
+							return nil, ErrPendingTransferExpired
+						}
 						newCreatorBadgeBalanceInfo.Pending[idx].MarkedAsApproved = true
 					} else if needToRevertYourOutgoingTransfer {
 						// Depending on if it is outgoing or not determines which party's balances to revert and add approvals back to
@@ -140,14 +149,14 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 							FromInfo = otherPartyBalanceInfo
 						}
 
-						FromInfo, err := k.AddToBadgeBalance(ctx, FromInfo, i, CurrPendingTransfer.Amount); 
+						FromInfo, err := k.AddToBadgeBalance(ctx, FromInfo, i, CurrPendingTransfer.Amount)
 						if err != nil {
 							return nil, err
 						}
 
 						//If it was sent via an approval, we need to add the approval back
 						if CurrPendingTransfer.ApprovedBy != CurrPendingTransfer.From {
-							FromInfo, err = k.AddBalanceToApproval(ctx, FromInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.ApprovedBy, types.NumberRange{Start: i, End: i}) 
+							FromInfo, err = k.AddBalanceToApproval(ctx, FromInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.ApprovedBy, types.NumberRange{Start: i, End: i})
 							if err != nil {
 								return nil, err
 							}
@@ -159,9 +168,13 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 							otherPartyBalanceInfo = FromInfo
 						}
 					} else if finalizeOnlyAfterApproved {
+						if expired {
+							return nil, ErrPendingTransferExpired
+						}
+
 						approved := false
 						for _, pending_info := range otherPartyBalanceInfo.Pending {
-							if pending_info.ThisPendingNonce == OtherPartyNonce && pending_info.OtherPendingNonce == CurrPendingTransfer.ThisPendingNonce && pending_info.MarkedAsApproved == true {
+							if pending_info.ThisPendingNonce == OtherPartyNonce && pending_info.OtherPendingNonce == CurrPendingTransfer.ThisPendingNonce && pending_info.MarkedAsApproved {
 								approved = true
 							}
 						}
@@ -186,6 +199,10 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 							return nil, err
 						}
 					} else if forcefulAcceptAndTransfer {
+						if expired {
+							return nil, ErrPendingTransferExpired
+						}
+						
 						newCreatorBadgeBalanceInfo, err = k.HandlePreTransfer(ctx, newCreatorBadgeBalanceInfo, badge, msg.BadgeId, i, CreatorAccountNum, OtherPartyAccountNum, CreatorAccountNum, CurrPendingTransfer.Amount)
 						if err != nil {
 							return nil, err
@@ -213,7 +230,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 
 					if !simpleRemoveFromYourPending {
 						otherPartyBalanceInfo, err = k.RemovePending(ctx, otherPartyBalanceInfo, OtherPartyNonce, CurrPendingTransfer.ThisPendingNonce)
-						
+
 						if err != nil {
 							if err == ErrPendingNotFound && (needToRevertYourOutgoingTransfer || needToRevertYourTransferRequest) {
 								//This is okay. Other party already removed it
@@ -231,9 +248,6 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 			}
 		}
 	}
-	
-
-	
 
 	if updated {
 		err = k.SetBadgeBalanceInStore(ctx, CreatorBalanceKey, newCreatorBadgeBalanceInfo)
@@ -241,7 +255,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 			return nil, err
 		}
 
-		for key, _ := range balanceInfoUpdated {
+		for key := range balanceInfoUpdated {
 			err = k.SetBadgeBalanceInStore(ctx, GetBalanceKey(key, msg.BadgeId), balanceInfoCache[key])
 			if err != nil {
 				return nil, err
@@ -258,7 +272,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 				sdk.NewAttribute("NonceRanges", fmt.Sprint(msg.NonceRanges)),
 			),
 		)
-		
+
 		return &types.MsgHandlePendingTransferResponse{}, nil
 	} else {
 		return nil, ErrNoPendingTransferFound

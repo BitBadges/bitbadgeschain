@@ -25,13 +25,12 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 	permissions := types.GetPermissions(badge.PermissionFlags)
 	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 
-
 	if !permissions.CanFreeze() {
 		return nil, ErrInvalidPermissions
 	}
 
 	// ctx.GasMeter().ConsumeGas(FreezeOrUnfreezeAddress * uint64(len(msg.Addresses)), "pay per address frozen / unfrozen")
-	
+
 	found = false
 
 	new_amounts := []*types.RangesToAmounts{
@@ -55,8 +54,6 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 			badge.FreezeAddressRanges = []*types.NumberRange{}
 		}
 	}
-	
-
 
 	err := k.SetBadgeInStore(ctx, badge)
 	if err != nil {

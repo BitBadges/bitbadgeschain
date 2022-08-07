@@ -58,10 +58,10 @@ func (k Keeper) GetBadgesFromStore(ctx sdk.Context) (badges []*types.BitBadge) {
 }
 
 // HasBadge determines whether the specified badgeID exists
-// func (k Keeper) StoreHasBadgeID(ctx sdk.Context, badgeID uint64) bool {
-// 	store := ctx.KVStore(k.storeKey)
-// 	return store.Has(badgeStoreKey(badgeID))
-// }
+func (k Keeper) StoreHasBadgeID(ctx sdk.Context, badgeID uint64) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(badgeStoreKey(badgeID))
+}
 
 // HasBadge determines whether the specified badgeID exists
 func (k Keeper) DeleteBadgeFromStore(ctx sdk.Context, badgeID uint64) {

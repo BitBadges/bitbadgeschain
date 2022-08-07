@@ -9,13 +9,14 @@ const TypeMsgRequestTransferBadge = "request_transfer_badge"
 
 var _ sdk.Msg = &MsgRequestTransferBadge{}
 
-func NewMsgRequestTransferBadge(creator string, from uint64, amount uint64, badgeId uint64, subbadgeRanges []*NumberRange) *MsgRequestTransferBadge {
+func NewMsgRequestTransferBadge(creator string, from uint64, amount uint64, badgeId uint64, subbadgeRanges []*NumberRange, expirationTime uint64) *MsgRequestTransferBadge {
 	return &MsgRequestTransferBadge{
-		Creator:    creator,
-		From:       from,
-		Amount:     amount,
-		BadgeId:    badgeId,
+		Creator:        creator,
+		From:           from,
+		Amount:         amount,
+		BadgeId:        badgeId,
 		SubbadgeRanges: subbadgeRanges,
+		ExpirationTime: expirationTime,
 	}
 }
 

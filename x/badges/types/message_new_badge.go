@@ -11,11 +11,11 @@ var _ sdk.Msg = &MsgNewBadge{}
 
 func NewMsgNewBadge(creator string, uri string, permissions uint64, subassetUris string, metadataHash string, defaultSupply uint64) *MsgNewBadge {
 	return &MsgNewBadge{
-		Creator:      creator,
-		Uri:          uri,
-		Permissions:  permissions,
-		SubassetUris: subassetUris,
-		MetadataHash: metadataHash,
+		Creator:               creator,
+		Uri:                   uri,
+		Permissions:           permissions,
+		SubassetUris:          subassetUris,
+		MetadataHash:          metadataHash,
 		DefaultSubassetSupply: defaultSupply,
 	}
 }

@@ -14,16 +14,16 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 
 	NextBadgeId := k.GetNextAssetId(ctx)
 	k.IncrementNextAssetId(ctx)
-	
+
 	// ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 	// ctx.GasMeter().ConsumeGas(BadgeCost, "create new badge cost")
 
 	badge := types.BitBadge{
-		Id:                NextBadgeId,
-		Uri:               msg.Uri,
-		Manager:           CreatorAccountNum,
-		PermissionFlags:   msg.Permissions,
-		SubassetUriFormat: msg.SubassetUris,
+		Id:                    NextBadgeId,
+		Uri:                   msg.Uri,
+		Manager:               CreatorAccountNum,
+		PermissionFlags:       msg.Permissions,
+		SubassetUriFormat:     msg.SubassetUris,
 		DefaultSubassetSupply: msg.DefaultSubassetSupply,
 		// SubassetsTotalSupply: []*types.Subasset{},
 		// NextSubassetId:       0,

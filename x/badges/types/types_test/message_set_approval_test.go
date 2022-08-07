@@ -6,7 +6,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
-	
+
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
@@ -23,7 +23,7 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 				SubbadgeRanges: []*types.NumberRange{
 					{
 						Start: 0,
-						End: 0,
+						End:   0,
 					},
 				},
 			},
@@ -35,7 +35,7 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 				SubbadgeRanges: []*types.NumberRange{
 					{
 						Start: 0,
-						End: 0,
+						End:   0,
 					},
 				},
 			},
@@ -46,7 +46,7 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 				SubbadgeRanges: []*types.NumberRange{
 					{
 						Start: 10,
-						End: 0,
+						End:   0,
 					},
 				},
 			},

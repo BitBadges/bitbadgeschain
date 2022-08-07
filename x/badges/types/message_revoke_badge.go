@@ -11,10 +11,10 @@ var _ sdk.Msg = &MsgRevokeBadge{}
 
 func NewMsgRevokeBadge(creator string, addresses []uint64, amounts []uint64, badgeId uint64, subbadgeRanges []*NumberRange) *MsgRevokeBadge {
 	return &MsgRevokeBadge{
-		Creator:    creator,
-		Addresses:  addresses,
-		Amounts:    amounts,
-		BadgeId:    badgeId,
+		Creator:        creator,
+		Addresses:      addresses,
+		Amounts:        amounts,
+		BadgeId:        badgeId,
 		SubbadgeRanges: subbadgeRanges,
 	}
 }
@@ -42,16 +42,15 @@ func (msg *MsgRevokeBadge) GetSignBytes() []byte {
 
 func duplicateInArray(arr []uint64) bool {
 	visited := make(map[uint64]bool, 0)
-	for i:=0; i<len(arr); i++{
-	   if visited[arr[i]] == true {
-		  return true
-	   } else {
-		  visited[arr[i]] = true
-	   }
+	for i := 0; i < len(arr); i++ {
+		if visited[arr[i]] == true {
+			return true
+		} else {
+			visited[arr[i]] = true
+		}
 	}
 	return false
 }
- 
 
 func (msg *MsgRevokeBadge) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)

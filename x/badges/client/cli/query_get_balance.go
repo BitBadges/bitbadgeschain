@@ -36,8 +36,8 @@ func CmdGetBalance() *cobra.Command {
 
 			params := &types.QueryGetBalanceRequest{
 
-				BadgeId:    reqBadgeId,
-				Address:    reqAddress,
+				BadgeId: reqBadgeId,
+				Address: reqAddress,
 			}
 
 			res, err := queryClient.GetBalance(cmd.Context(), params)

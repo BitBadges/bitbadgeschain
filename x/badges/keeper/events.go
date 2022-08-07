@@ -1,5 +1,3 @@
 package keeper
 
-const (
-	
-)
+const ()

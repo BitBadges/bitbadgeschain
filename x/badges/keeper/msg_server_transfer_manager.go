@@ -39,7 +39,7 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 		return nil, ErrAddressNeedsToOptInAndRequestManagerTransfer
 	}
 
-	//TODO: other permissions such as remove force mint, etc
+	//TODO: other handler permissions such as remove force mint, etc
 
 	badge.Manager = msg.Address
 

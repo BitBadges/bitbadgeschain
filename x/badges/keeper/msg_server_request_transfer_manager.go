@@ -13,7 +13,7 @@ func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgR
 
 	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
 	badge, found := k.GetBadgeFromStore(ctx, msg.BadgeId)
-	
+
 	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 	ctx.GasMeter().ConsumeGas(RequestTransferManagerCost, "create new subbadge cost")
 	if !found {
