@@ -15,7 +15,6 @@ message BadgeBalanceInfo {
     uint64 pending_nonce = 3;
     repeated PendingTransfer pending = 4; //IDs will be sorted in order of pending_nonce
     repeated Approval approvals = 5;
-    uint64 user_flags= 6; //TODO: for (hidden on profile, pinned, etc)
 }
 
 message Approval {

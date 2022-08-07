@@ -17,6 +17,7 @@ message BitBadge {
     string uri = 2;
 
     // this is permanent and never changable; use this for asserting the permanence of the metadata
+    // uri can point to other stuff in addition to metadata, this is only the hash of the metadata
     string metadata_hash = 3;
     
     // manager address of the class; can have special permissions; is used as the reserve address for the assets
