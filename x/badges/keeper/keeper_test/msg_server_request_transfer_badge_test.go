@@ -67,8 +67,13 @@ func (suite *TestSuite) TestRequestTransfer() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(true, aliceBalanceInfo.Pending[0].SendRequest)
 
-	err = HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.NumberRange{{Start: 0, End: 0}})
+	err = HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.NumberRange{{Start: 0, End: 0}}, false)
 	suite.Require().Nil(err, "Error accepting transfer")
+
+	err = HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.NumberRange{{Start: 0, End: 0}}, false)
+	suite.Require().Nil(err, "Error accepting badge")
+
+
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	suite.Require().Equal(uint64(5000), keeper.GetBadgeBalanceFromBalanceAmountsForSubbadgeId(0, bobBalanceInfo.BalanceAmounts))
 
@@ -140,9 +145,13 @@ func (suite *TestSuite) TestRequestTransferFrozen() {
 	err = FreezeAddresses(suite, wctx, bob, []*types.NumberRange{ {Start: firstAccountNumCreated, End: firstAccountNumCreated}}, 0, 0, true)
 	suite.Require().Nil(err, "Error freezing address")
 
-	err = HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.NumberRange{{Start: 0, End: 0}})
+	err = HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.NumberRange{{Start: 0, End: 0}}, false)
+	suite.Require().Nil(err, "Error freezing address")
+
+	err = HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.NumberRange{{Start: 0, End: 0}}, false)
 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 }
+
 func (suite *TestSuite) TestRequestTransferFrozenThenUnrozen() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
@@ -210,8 +219,13 @@ func (suite *TestSuite) TestRequestTransferFrozenThenUnrozen() {
 	err = FreezeAddresses(suite, wctx, bob, []*types.NumberRange{{ Start: firstAccountNumCreated, End: firstAccountNumCreated}}, 0, 0, false)
 	suite.Require().Nil(err, "Error unfreezing address")
 
-	err = HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.NumberRange{{Start: 0, End: 0}})
+	err = HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.NumberRange{{Start: 0, End: 0}}, false)
 	suite.Require().Nil(err, "Error accepting transfer")
+
+	err = HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.NumberRange{{Start: 0, End: 0}}, false)
+	suite.Require().Nil(err, "Error accepting transfer")
+
+
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	suite.Require().Equal(uint64(5000), keeper.GetBadgeBalanceFromBalanceAmountsForSubbadgeId(0, bobBalanceInfo.BalanceAmounts))
 

@@ -78,6 +78,7 @@ message MsgHandlePendingTransfer {
     bool accept = 2;
     uint64 badgeId = 3;
     repeated NumberRange nonceRanges = 4;
+    bool forcefulAccept = 5;
 }
 
 message MsgHandlePendingTransferResponse {}

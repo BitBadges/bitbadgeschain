@@ -23,7 +23,6 @@ message Approval {
     repeated RangesToAmounts approvalAmounts = 2;
 }
 
-//Pending transfers will not be saved after accept / reject
 message PendingTransfer {
     NumberRange subbadgeRange = 1;
     uint64 this_pending_nonce = 2;
@@ -33,4 +32,5 @@ message PendingTransfer {
     uint64 to = 6;
     uint64 from = 7;
     uint64 approved_by = 9;
+    bool markedAsApproved = 10;
 }

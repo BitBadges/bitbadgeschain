@@ -162,7 +162,7 @@ func (suite *TestSuite) TestTransferBadgeForceBurn() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(false, aliceBalanceInfo.Pending[0].SendRequest)
 
-	err = HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.NumberRange{{Start: 0, End: 0}})
+	err = HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.NumberRange{{Start: 0, End: 0}}, false)
 	suite.Require().Nil(err, "Error accepting badge")
 
 	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)

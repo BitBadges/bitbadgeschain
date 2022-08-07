@@ -15,9 +15,9 @@ var _ = strconv.Itoa(0)
 
 func CmdHandlePendingTransfer() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "handle-pending-transfer [accept] [badge-id] [starting-pending-id] [ending-pending-id]",
+		Use:   "handle-pending-transfer [accept] [badge-id] [starting-pending-id] [ending-pending-id] [forceful-accept]",
 		Short: "Broadcast message handlePendingTransfer",
-		Args:  cobra.ExactArgs(4),
+		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argAccept, err := cast.ToBoolE(args[0])
 			if err != nil {
@@ -73,6 +73,11 @@ func CmdHandlePendingTransfer() *cobra.Command {
 			// 	})
 			// }
 
+			forcefulAccept, err := cast.ToBoolE(args[4])
+			if err != nil {
+				return err
+			}
+
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -89,6 +94,7 @@ func CmdHandlePendingTransfer() *cobra.Command {
 						End:   argEndingNonce,
 					},
 				},
+				forcefulAccept,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

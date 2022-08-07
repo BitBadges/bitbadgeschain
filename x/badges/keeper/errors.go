@@ -36,4 +36,5 @@ var (
 	ErrAddressNeedsToOptInAndRequestManagerTransfer = sdkerrors.Register(types.ModuleName, 29, "address needs to opt in and request manager transfer")
 	ErrMustOwnTotalSupplyToSelfDestruct			  = sdkerrors.Register(types.ModuleName, 30, "must own total supply to self destruct")
 	ErrBadgeCanNotBeSelfDestructed			  	= sdkerrors.Register(types.ModuleName, 31, "badge can not be self destructed")
+	ErrNotApproved 								= sdkerrors.Register(types.ModuleName, 32, "not approved")
 )

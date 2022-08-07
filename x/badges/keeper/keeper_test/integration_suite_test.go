@@ -171,8 +171,8 @@ func SetApproval(suite *TestSuite, ctx context.Context, creator string, amount u
 	return err
 }
 
-func HandlePendingTransfers(suite *TestSuite, ctx context.Context, creator string, accept bool, badgeId uint64, nonceRanges []*types.NumberRange) error {
-	msg := types.NewMsgHandlePendingTransfer(creator, accept, badgeId, nonceRanges)
+func HandlePendingTransfers(suite *TestSuite, ctx context.Context, creator string, accept bool, badgeId uint64, nonceRanges []*types.NumberRange, forcefulAccept bool) error {
+	msg := types.NewMsgHandlePendingTransfer(creator, accept, badgeId, nonceRanges, forcefulAccept)
 	_, err := suite.msgServer.HandlePendingTransfer(ctx, msg)
 	return err
 }
