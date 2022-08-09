@@ -23,7 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// BitBadge defines a badge type. Think of this like the smart contract definition
+// BitBadge defines a badge type. Think of this like the smart contract definition.
 type BitBadge struct {
 	// id defines the unique identifier of the Badge classification, similar to the contract address of ERC721
 	// starts at 0 and increments by 1 each badge
@@ -31,6 +31,7 @@ type BitBadge struct {
 	// uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc)
 	Uri string `protobuf:"bytes,2,opt,name=uri,proto3" json:"uri,omitempty"`
 	// this is permanent and never changable; use this for asserting the permanence of the metadata
+	// uri can point to other stuff in addition to metadata, this is only the hash of the metadata
 	MetadataHash string `protobuf:"bytes,3,opt,name=metadata_hash,json=metadataHash,proto3" json:"metadata_hash,omitempty"`
 	// manager address of the class; can have special permissions; is used as the reserve address for the assets
 	Manager uint64 `protobuf:"varint,4,opt,name=manager,proto3" json:"manager,omitempty"`

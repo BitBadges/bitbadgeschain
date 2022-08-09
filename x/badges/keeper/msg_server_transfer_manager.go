@@ -11,26 +11,17 @@ import (
 func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransferManager) (*types.MsgTransferManagerResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
-
-	if err := k.AssertAccountNumbersAreRegistered(ctx, []uint64{msg.Address}); err != nil {
-		return nil, ErrAccountsAreNotRegistered
+	validationParams := UniversalValidationParams{
+		Creator: msg.Creator,
+		BadgeId: msg.BadgeId,
+		MustBeManager: true,
+		AccountsToCheckIfRegistered: []uint64{msg.Address},
+		CanManagerTransfer: true,
 	}
 
-	badge, found := k.GetBadgeFromStore(ctx, msg.BadgeId)
-	if !found {
-		return nil, ErrBadgeNotExists
-	}
-
-	//Transfer to new manager but first need to check privileges
-	if badge.Manager != CreatorAccountNum {
-		return nil, ErrSenderIsNotManager
-	}
-
-	permissions := types.GetPermissions(badge.PermissionFlags)
-	if !permissions.CanManagerTransfer() {
-		return nil, ErrInvalidPermissions
+	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, validationParams)
+	if err != nil {
+		return nil, err
 	}
 
 	ctx.GasMeter().ConsumeGas(TransferManagerCost, "transfer manager cost")

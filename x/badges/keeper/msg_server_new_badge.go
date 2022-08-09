@@ -11,9 +11,11 @@ import (
 func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*types.MsgNewBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
+	
+	// We shouldn't have to call UniversalValidate() because anyone can call this function
 
-	NextBadgeId := k.GetNextAssetId(ctx)
-	k.IncrementNextAssetId(ctx)
+	NextBadgeId := k.GetNextBadgeId(ctx)
+	k.IncrementNextBadgeId(ctx)
 
 	// ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 	// ctx.GasMeter().ConsumeGas(BadgeCost, "create new badge cost")

@@ -267,5 +267,5 @@ func (suite *TestSuite) TestRequestTransferToSelf() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.PendingNonce)
 
 	err = RequestTransferBadge(suite, wctx, bob, firstAccountNumCreated, 5000, 0, []*types.NumberRange{{Start: 0, End: 0}}, 0)
-	suite.Require().EqualError(err, keeper.ErrSenderAndReceiverSame.Error())
+	suite.Require().EqualError(err, keeper.ErrAccountCanNotEqualCreator.Error())
 }

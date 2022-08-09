@@ -11,27 +11,17 @@ import (
 func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddress) (*types.MsgFreezeAddressResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	CreatorAccountNum := k.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
-
-	badge, found := k.GetBadgeFromStore(ctx, msg.BadgeId)
-	if !found {
-		return nil, ErrBadgeNotExists
+	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, 
+		UniversalValidationParams{
+			Creator: msg.Creator,
+			BadgeId: msg.BadgeId,
+			MustBeManager: true,
+			CanFreeze: true,
+		},
+	)
+	if err != nil {
+		return nil, err
 	}
-
-	if badge.Manager != CreatorAccountNum {
-		return nil, ErrSenderIsNotManager
-	}
-
-	permissions := types.GetPermissions(badge.PermissionFlags)
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
-
-	if !permissions.CanFreeze() {
-		return nil, ErrInvalidPermissions
-	}
-
-	// ctx.GasMeter().ConsumeGas(FreezeOrUnfreezeAddress * uint64(len(msg.Addresses)), "pay per address frozen / unfrozen")
-
-	found = false
 
 	new_amounts := []*types.RangesToAmounts{
 		{
@@ -55,7 +45,7 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 		}
 	}
 
-	err := k.SetBadgeInStore(ctx, badge)
+	err = k.SetBadgeInStore(ctx, badge)
 	if err != nil {
 		return nil, err
 	}

@@ -11,23 +11,16 @@ import (
 func (k msgServer) SelfDestructBadge(goCtx context.Context, msg *types.MsgSelfDestructBadge) (*types.MsgSelfDestructBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
-
-	badge, found := k.GetBadgeFromStore(ctx, msg.BadgeId)
-
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
-	if !found {
-		return nil, ErrBadgeNotExists
+	validationParams := UniversalValidationParams{
+		Creator: msg.Creator,
+		BadgeId: msg.BadgeId,
+		MustBeManager: true,
+		CanRevoke: true,
 	}
 
-	if badge.Manager != CreatorAccountNum {
-		return nil, ErrSenderIsNotManager
-	}
-
-	permissions := types.GetPermissions(badge.PermissionFlags)
-	//If manager has permissions to revoke, he can theoretically self destruct the badge by revoking all supply of everyone
-	if !permissions.CanRevoke() {
-		return nil, ErrBadgeCanNotBeSelfDestructed
+	CreatorAccountNum, _, err := k.UniversalValidate(ctx, validationParams)
+	if err != nil {
+		return nil, err
 	}
 
 	k.DeleteBadgeFromStore(ctx, msg.BadgeId)

@@ -37,5 +37,7 @@ var (
 	ErrMustOwnTotalSupplyToSelfDestruct             = sdkerrors.Register(types.ModuleName, 30, "must own total supply to self destruct")
 	ErrBadgeCanNotBeSelfDestructed                  = sdkerrors.Register(types.ModuleName, 31, "badge can not be self destructed")
 	ErrNotApproved                                  = sdkerrors.Register(types.ModuleName, 32, "not approved")
-	ErrPendingTransferExpired					   = sdkerrors.Register(types.ModuleName, 33, "pending transfer expired")
+	ErrPendingTransferExpired					    = sdkerrors.Register(types.ModuleName, 33, "pending transfer expired")
+	ErrInvalidSubbadgeRange							= sdkerrors.Register(types.ModuleName, 34, "invalid subbadge range")
+	ErrAccountCanNotEqualCreator					= sdkerrors.Register(types.ModuleName, 35, "account can not equal creator")
 )

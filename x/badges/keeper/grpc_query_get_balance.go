@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// Queries a balance for the given address and badgeId and returns its contents.
 func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequest) (*types.QueryGetBalanceResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
@@ -16,31 +17,16 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Verify that the from and to addresses are registered;
-	account_nums := []uint64{}
-	account_nums = append(account_nums, req.Address)
-	err := k.AssertAccountNumbersAreRegistered(ctx, account_nums)
-	if err != nil {
-		return nil, err
-	}
-
-	_, found := k.GetBadgeFromStore(ctx, req.BadgeId)
-	if !found {
-		return nil, ErrBadgeNotExists
-	}
-
-	full_id := GetBalanceKey(
-		req.Address,
-		req.BadgeId,
-	)
-	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, full_id)
+	BalanceKey := ConstructBalanceKey(req.Address, req.BadgeId)
+	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, BalanceKey)
 	if found {
 		return &types.QueryGetBalanceResponse{
 			BalanceInfo: &badgeBalanceInfo,
 		}, nil
+	} else {
+		blankBadgeBalanceInfo := &types.BadgeBalanceInfo{}
+		return &types.QueryGetBalanceResponse{
+			BalanceInfo: blankBadgeBalanceInfo,
+		}, nil
 	}
-
-	return &types.QueryGetBalanceResponse{
-		BalanceInfo: &types.BadgeBalanceInfo{},
-	}, nil
 }

@@ -36,6 +36,7 @@ export interface MsgTransferBadge {
   amounts: number[];
   badgeId: number;
   subbadgeRanges: NumberRange[];
+  expiration_time: number;
 }
 
 export interface MsgTransferBadgeResponse {}
@@ -46,6 +47,7 @@ export interface MsgRequestTransferBadge {
   amount: number;
   badgeId: number;
   subbadgeRanges: NumberRange[];
+  expiration_time: number;
 }
 
 export interface MsgRequestTransferBadgeResponse {}
@@ -66,6 +68,7 @@ export interface MsgSetApproval {
   address: number;
   badgeId: number;
   subbadgeRanges: NumberRange[];
+  expirationTime: number;
 }
 
 export interface MsgSetApprovalResponse {}
@@ -131,8 +134,8 @@ export interface MsgSelfDestructBadgeResponse {}
 
 export interface MsgPruneBalances {
   creator: string;
-  badgeIds: number;
-  addresses: number;
+  badgeIds: number[];
+  addresses: number[];
 }
 
 export interface MsgPruneBalancesResponse {}
@@ -569,6 +572,7 @@ const baseMsgTransferBadge: object = {
   toAddresses: 0,
   amounts: 0,
   badgeId: 0,
+  expiration_time: 0,
 };
 
 export const MsgTransferBadge = {
@@ -594,6 +598,9 @@ export const MsgTransferBadge = {
     }
     for (const v of message.subbadgeRanges) {
       NumberRange.encode(v!, writer.uint32(50).fork()).ldelim();
+    }
+    if (message.expiration_time !== 0) {
+      writer.uint32(56).uint64(message.expiration_time);
     }
     return writer;
   },
@@ -642,6 +649,9 @@ export const MsgTransferBadge = {
             NumberRange.decode(reader, reader.uint32())
           );
           break;
+        case 7:
+          message.expiration_time = longToNumber(reader.uint64() as Long);
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -685,6 +695,14 @@ export const MsgTransferBadge = {
         message.subbadgeRanges.push(NumberRange.fromJSON(e));
       }
     }
+    if (
+      object.expiration_time !== undefined &&
+      object.expiration_time !== null
+    ) {
+      message.expiration_time = Number(object.expiration_time);
+    } else {
+      message.expiration_time = 0;
+    }
     return message;
   },
 
@@ -710,6 +728,8 @@ export const MsgTransferBadge = {
     } else {
       obj.subbadgeRanges = [];
     }
+    message.expiration_time !== undefined &&
+      (obj.expiration_time = message.expiration_time);
     return obj;
   },
 
@@ -747,6 +767,14 @@ export const MsgTransferBadge = {
       for (const e of object.subbadgeRanges) {
         message.subbadgeRanges.push(NumberRange.fromPartial(e));
       }
+    }
+    if (
+      object.expiration_time !== undefined &&
+      object.expiration_time !== null
+    ) {
+      message.expiration_time = object.expiration_time;
+    } else {
+      message.expiration_time = 0;
     }
     return message;
   },
@@ -809,6 +837,7 @@ const baseMsgRequestTransferBadge: object = {
   from: 0,
   amount: 0,
   badgeId: 0,
+  expiration_time: 0,
 };
 
 export const MsgRequestTransferBadge = {
@@ -830,6 +859,9 @@ export const MsgRequestTransferBadge = {
     }
     for (const v of message.subbadgeRanges) {
       NumberRange.encode(v!, writer.uint32(50).fork()).ldelim();
+    }
+    if (message.expiration_time !== 0) {
+      writer.uint32(56).uint64(message.expiration_time);
     }
     return writer;
   },
@@ -860,6 +892,9 @@ export const MsgRequestTransferBadge = {
           message.subbadgeRanges.push(
             NumberRange.decode(reader, reader.uint32())
           );
+          break;
+        case 7:
+          message.expiration_time = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -899,6 +934,14 @@ export const MsgRequestTransferBadge = {
         message.subbadgeRanges.push(NumberRange.fromJSON(e));
       }
     }
+    if (
+      object.expiration_time !== undefined &&
+      object.expiration_time !== null
+    ) {
+      message.expiration_time = Number(object.expiration_time);
+    } else {
+      message.expiration_time = 0;
+    }
     return message;
   },
 
@@ -915,6 +958,8 @@ export const MsgRequestTransferBadge = {
     } else {
       obj.subbadgeRanges = [];
     }
+    message.expiration_time !== undefined &&
+      (obj.expiration_time = message.expiration_time);
     return obj;
   },
 
@@ -949,6 +994,14 @@ export const MsgRequestTransferBadge = {
       for (const e of object.subbadgeRanges) {
         message.subbadgeRanges.push(NumberRange.fromPartial(e));
       }
+    }
+    if (
+      object.expiration_time !== undefined &&
+      object.expiration_time !== null
+    ) {
+      message.expiration_time = object.expiration_time;
+    } else {
+      message.expiration_time = 0;
     }
     return message;
   },
@@ -1215,6 +1268,7 @@ const baseMsgSetApproval: object = {
   amount: 0,
   address: 0,
   badgeId: 0,
+  expirationTime: 0,
 };
 
 export const MsgSetApproval = {
@@ -1233,6 +1287,9 @@ export const MsgSetApproval = {
     }
     for (const v of message.subbadgeRanges) {
       NumberRange.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.expirationTime !== 0) {
+      writer.uint32(48).uint64(message.expirationTime);
     }
     return writer;
   },
@@ -1261,6 +1318,9 @@ export const MsgSetApproval = {
           message.subbadgeRanges.push(
             NumberRange.decode(reader, reader.uint32())
           );
+          break;
+        case 6:
+          message.expirationTime = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -1298,6 +1358,11 @@ export const MsgSetApproval = {
         message.subbadgeRanges.push(NumberRange.fromJSON(e));
       }
     }
+    if (object.expirationTime !== undefined && object.expirationTime !== null) {
+      message.expirationTime = Number(object.expirationTime);
+    } else {
+      message.expirationTime = 0;
+    }
     return message;
   },
 
@@ -1314,6 +1379,8 @@ export const MsgSetApproval = {
     } else {
       obj.subbadgeRanges = [];
     }
+    message.expirationTime !== undefined &&
+      (obj.expirationTime = message.expirationTime);
     return obj;
   },
 
@@ -1344,6 +1411,11 @@ export const MsgSetApproval = {
       for (const e of object.subbadgeRanges) {
         message.subbadgeRanges.push(NumberRange.fromPartial(e));
       }
+    }
+    if (object.expirationTime !== undefined && object.expirationTime !== null) {
+      message.expirationTime = object.expirationTime;
+    } else {
+      message.expirationTime = 0;
     }
     return message;
   },
@@ -2501,12 +2573,16 @@ export const MsgPruneBalances = {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
-    if (message.badgeIds !== 0) {
-      writer.uint32(16).uint64(message.badgeIds);
+    writer.uint32(18).fork();
+    for (const v of message.badgeIds) {
+      writer.uint64(v);
     }
-    if (message.addresses !== 0) {
-      writer.uint32(24).uint64(message.addresses);
+    writer.ldelim();
+    writer.uint32(26).fork();
+    for (const v of message.addresses) {
+      writer.uint64(v);
     }
+    writer.ldelim();
     return writer;
   },
 
@@ -2514,6 +2590,8 @@ export const MsgPruneBalances = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseMsgPruneBalances } as MsgPruneBalances;
+    message.badgeIds = [];
+    message.addresses = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2521,10 +2599,24 @@ export const MsgPruneBalances = {
           message.creator = reader.string();
           break;
         case 2:
-          message.badgeIds = longToNumber(reader.uint64() as Long);
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.badgeIds.push(longToNumber(reader.uint64() as Long));
+            }
+          } else {
+            message.badgeIds.push(longToNumber(reader.uint64() as Long));
+          }
           break;
         case 3:
-          message.addresses = longToNumber(reader.uint64() as Long);
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.addresses.push(longToNumber(reader.uint64() as Long));
+            }
+          } else {
+            message.addresses.push(longToNumber(reader.uint64() as Long));
+          }
           break;
         default:
           reader.skipType(tag & 7);
@@ -2536,20 +2628,22 @@ export const MsgPruneBalances = {
 
   fromJSON(object: any): MsgPruneBalances {
     const message = { ...baseMsgPruneBalances } as MsgPruneBalances;
+    message.badgeIds = [];
+    message.addresses = [];
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = String(object.creator);
     } else {
       message.creator = "";
     }
     if (object.badgeIds !== undefined && object.badgeIds !== null) {
-      message.badgeIds = Number(object.badgeIds);
-    } else {
-      message.badgeIds = 0;
+      for (const e of object.badgeIds) {
+        message.badgeIds.push(Number(e));
+      }
     }
     if (object.addresses !== undefined && object.addresses !== null) {
-      message.addresses = Number(object.addresses);
-    } else {
-      message.addresses = 0;
+      for (const e of object.addresses) {
+        message.addresses.push(Number(e));
+      }
     }
     return message;
   },
@@ -2557,27 +2651,37 @@ export const MsgPruneBalances = {
   toJSON(message: MsgPruneBalances): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
-    message.badgeIds !== undefined && (obj.badgeIds = message.badgeIds);
-    message.addresses !== undefined && (obj.addresses = message.addresses);
+    if (message.badgeIds) {
+      obj.badgeIds = message.badgeIds.map((e) => e);
+    } else {
+      obj.badgeIds = [];
+    }
+    if (message.addresses) {
+      obj.addresses = message.addresses.map((e) => e);
+    } else {
+      obj.addresses = [];
+    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<MsgPruneBalances>): MsgPruneBalances {
     const message = { ...baseMsgPruneBalances } as MsgPruneBalances;
+    message.badgeIds = [];
+    message.addresses = [];
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
     } else {
       message.creator = "";
     }
     if (object.badgeIds !== undefined && object.badgeIds !== null) {
-      message.badgeIds = object.badgeIds;
-    } else {
-      message.badgeIds = 0;
+      for (const e of object.badgeIds) {
+        message.badgeIds.push(e);
+      }
     }
     if (object.addresses !== undefined && object.addresses !== null) {
-      message.addresses = object.addresses;
-    } else {
-      message.addresses = 0;
+      for (const e of object.addresses) {
+        message.addresses.push(e);
+      }
     }
     return message;
   },

@@ -57,7 +57,7 @@ func (suite *TestSuite) TestSelfDestruct() {
 	suite.Require().Nil(err, "Error updating permissions")
 
 	err = SelfDestructBadge(suite, wctx, bob, 1)
-	suite.Require().EqualError(err, keeper.ErrBadgeCanNotBeSelfDestructed.Error())
+	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }
 
 func (suite *TestSuite) TestSelfDestructNotManager() {

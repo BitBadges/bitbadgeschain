@@ -12,7 +12,7 @@ import (
 //NOTE: We assume that all badges are validly formed here
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// Set if defined; default 0
-	k.SetNextAssetId(ctx, genState.NextAssetId)
+	k.SetNextBadgeId(ctx, genState.NextBadgeId)
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetPort(ctx, genState.PortId)
 	// Only try to bind to port if it is not already bound, since we may already own
@@ -47,7 +47,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.Params = k.GetParams(ctx)
 
 	genesis.PortId = k.GetPort(ctx)
-	genesis.NextAssetId = k.GetNextAssetId(ctx)
+	genesis.NextBadgeId = k.GetNextBadgeId(ctx)
 
 	genesis.Badges = k.GetBadgesFromStore(ctx)
 	genesis.Balances = k.GetBadgeBalancesFromStore(ctx)

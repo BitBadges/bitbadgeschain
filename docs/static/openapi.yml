@@ -30403,6 +30403,9 @@ paths:
                     title: >-
                       this is permanent and never changable; use this for
                       asserting the permanence of the metadata
+
+                      uri can point to other stuff in addition to metadata, this
+                      is only the hash of the metadata
                   manager:
                     type: string
                     format: uint64
@@ -30770,12 +30773,18 @@ paths:
                           format: uint64
                         markedAsApproved:
                           type: boolean
+                        expiration_time:
+                          type: string
+                          format: uint64
                   approvals:
                     type: array
                     items:
                       type: object
                       properties:
                         address:
+                          type: string
+                          format: uint64
+                        expirationTime:
                           type: string
                           format: uint64
                         approvalAmounts:
@@ -30797,9 +30806,6 @@ paths:
                               amount:
                                 type: string
                                 format: uint64
-                  user_flags:
-                    type: string
-                    format: uint64
                 title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
         default:
           description: An unexpected error response.
@@ -52720,6 +52726,9 @@ definitions:
       address:
         type: string
         format: uint64
+      expirationTime:
+        type: string
+        format: uint64
       approvalAmounts:
         type: array
         items:
@@ -52800,12 +52809,18 @@ definitions:
               format: uint64
             markedAsApproved:
               type: boolean
+            expiration_time:
+              type: string
+              format: uint64
       approvals:
         type: array
         items:
           type: object
           properties:
             address:
+              type: string
+              format: uint64
+            expirationTime:
               type: string
               format: uint64
             approvalAmounts:
@@ -52827,9 +52842,6 @@ definitions:
                   amount:
                     type: string
                     format: uint64
-      user_flags:
-        type: string
-        format: uint64
     title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
   trevormil.bitbadgeschain.badges.BitBadge:
     type: object
@@ -52852,6 +52864,9 @@ definitions:
         title: >-
           this is permanent and never changable; use this for asserting the
           permanence of the metadata
+
+          uri can point to other stuff in addition to metadata, this is only the
+          hash of the metadata
       manager:
         type: string
         format: uint64
@@ -53032,6 +53047,9 @@ definitions:
         format: uint64
       markedAsApproved:
         type: boolean
+      expiration_time:
+        type: string
+        format: uint64
   trevormil.bitbadgeschain.badges.QueryGetBadgeResponse:
     type: object
     properties:
@@ -53056,6 +53074,9 @@ definitions:
             title: >-
               this is permanent and never changable; use this for asserting the
               permanence of the metadata
+
+              uri can point to other stuff in addition to metadata, this is only
+              the hash of the metadata
           manager:
             type: string
             format: uint64
@@ -53218,12 +53239,18 @@ definitions:
                   format: uint64
                 markedAsApproved:
                   type: boolean
+                expiration_time:
+                  type: string
+                  format: uint64
           approvals:
             type: array
             items:
               type: object
               properties:
                 address:
+                  type: string
+                  format: uint64
+                expirationTime:
                   type: string
                   format: uint64
                 approvalAmounts:
@@ -53245,9 +53272,6 @@ definitions:
                       amount:
                         type: string
                         format: uint64
-          user_flags:
-            type: string
-            format: uint64
         title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
   trevormil.bitbadgeschain.badges.QueryParamsResponse:
     type: object

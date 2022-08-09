@@ -5,26 +5,75 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func (k Keeper) UniversalValidateMsgAndReturnMsgInfo(ctx sdk.Context, MsgCreator string, AddressesToValidate []uint64, BadgeId uint64, SubbadgeRanges []*types.NumberRange, MustBeManager bool) (uint64, types.BitBadge, types.PermissionFlags, error) {
-	CreatorAccountNum := k.MustGetAccountNumberForBech32AddressString(ctx, MsgCreator)
+// Determines what to check universally for each Msg
+type UniversalValidationParams struct {
+	Creator 					string
+	BadgeId 					uint64
+	AccountsToCheckIfRegistered []uint64
+	AccountsThatCantEqualCreator[]uint64
+	SubbadgeRangesToValidate	[]*types.NumberRange
+	MustBeManager				bool
+	CanFreeze					bool
+	CanCreateSubbadges			bool
+	CanRevoke					bool
+	CanManagerTransfer			bool
+	CanUpdateUris				bool
+}
 
-	if err := k.AssertAccountNumbersAreRegistered(ctx, AddressesToValidate); err != nil {
-		return CreatorAccountNum, types.BitBadge{}, types.PermissionFlags{}, err
+// Validates everything about the Msg is valid and returns (creatorNum, badge, permissions, error). 
+func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationParams) (uint64, types.BitBadge, error) {
+	CreatorAccountNum := k.MustGetAccountNumberForBech32AddressString(ctx, params.Creator)
+
+	// Check if accounts are registered
+	if len(params.AccountsToCheckIfRegistered) > 0 {
+		if err := k.AssertAccountNumbersAreRegistered(ctx, params.AccountsToCheckIfRegistered); err != nil {
+			return CreatorAccountNum, types.BitBadge{}, err
+		}
+	}	
+
+	if len(params.AccountsThatCantEqualCreator) > 0 {
+		for _, account := range params.AccountsThatCantEqualCreator {
+			if account == CreatorAccountNum {
+				return CreatorAccountNum, types.BitBadge{}, ErrAccountCanNotEqualCreator
+			}
+		}
 	}
 
-	badge, err := k.AssertBadgeAndSubBadgeExistsAndReturnBadge(ctx, BadgeId, SubbadgeRanges)
+	// Assert badge and subbadge ranges exist and are well-formed
+	badge, err := k.GetBadgeAndAssertSubbadgeRangesAreValid(ctx, params.BadgeId, params.SubbadgeRangesToValidate)
 	if err != nil {
-		return CreatorAccountNum, types.BitBadge{}, types.PermissionFlags{}, err
+		return CreatorAccountNum, types.BitBadge{}, err
 	}
 
-	if MustBeManager && badge.Manager != CreatorAccountNum {
-		return CreatorAccountNum, types.BitBadge{}, types.PermissionFlags{}, ErrSenderIsNotManager
+	// Assert all permissions
+	if params.MustBeManager && badge.Manager != CreatorAccountNum {
+		return CreatorAccountNum, types.BitBadge{}, ErrSenderIsNotManager
 	}
 
 	permissions := types.GetPermissions(badge.PermissionFlags)
+	if params.CanFreeze && !permissions.CanFreeze() {
+		return CreatorAccountNum, types.BitBadge{}, ErrInvalidPermissions
+	}
 
-	return CreatorAccountNum, badge, permissions, nil
+	if params.CanCreateSubbadges && !permissions.CanCreateSubbadges() {
+		return CreatorAccountNum, types.BitBadge{}, ErrInvalidPermissions
+	}
+
+	if params.CanRevoke && !permissions.CanRevoke() {
+		return CreatorAccountNum, types.BitBadge{}, ErrInvalidPermissions
+	}
+
+	if params.CanManagerTransfer && !permissions.CanManagerTransfer() {
+		return CreatorAccountNum, types.BitBadge{}, ErrInvalidPermissions
+	}
+
+	if params.CanUpdateUris && !permissions.CanUpdateUris() {
+		return CreatorAccountNum, types.BitBadge{}, ErrInvalidPermissions
+	}
+
+	return CreatorAccountNum, badge, nil
 }
+
 
 func (k Keeper) HandlePreTransfer(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, badge types.BitBadge, badgeId uint64, subbadgeId uint64, from uint64, to uint64, requester uint64, amount uint64) (types.BadgeBalanceInfo, error) {
 	newBadgeBalanceInfo := badgeBalanceInfo

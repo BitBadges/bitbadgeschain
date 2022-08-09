@@ -7,7 +7,7 @@ import "badges/ranges.proto";
 
 option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
-// BitBadge defines a badge type. Think of this like the smart contract definition
+// BitBadge defines a badge type. Think of this like the smart contract definition.
 message BitBadge {
     // id defines the unique identifier of the Badge classification, similar to the contract address of ERC721
     // starts at 0 and increments by 1 each badge
@@ -38,7 +38,6 @@ message BitBadge {
         More permissions to be added
     */
     uint64 permission_flags = 5;
-    
 
     // if frozen_by_default is true, this is an accumulator of unfrozen addresses; and vice versa for false
     //big.Int will always only be 32 uint64s long

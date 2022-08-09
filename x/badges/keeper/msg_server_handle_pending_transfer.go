@@ -11,14 +11,16 @@ import (
 func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHandlePendingTransfer) (*types.MsgHandlePendingTransferResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	CreatorAccountNum := k.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
-	badge, found := k.GetBadgeFromStore(ctx, msg.BadgeId)
-	if !found {
-		return nil, ErrBadgeNotExists
+	validationParams := UniversalValidationParams{
+		Creator: msg.Creator,
+		BadgeId: msg.BadgeId,
 	}
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
 
-	err := *new(error)
+	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, validationParams)
+	if err != nil {
+		return nil, err
+	}
+
 	/*
 		Outgoing : Creator -> OtherParty
 		Incoming : OtherParty -> CreatorAccountNum
@@ -59,7 +61,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 			A cancels -> Remove from both pending
 	*/
 
-	CreatorBalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId)
+	CreatorBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
 	creatorBadgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, CreatorBalanceKey)
 	if !found {
 		return nil, ErrBadgeBalanceNotExists
@@ -72,6 +74,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 
 	updated := false
 	for _, nonceRange := range msg.NonceRanges {
+		//TODO: validate nonce ranges
 		//In the future, we can make this a binary search since this is all sorted by the nonces (append-only)
 		for idx, CurrPendingTransfer := range creatorBadgeBalanceInfo.Pending {
 			if CurrPendingTransfer.ThisPendingNonce <= nonceRange.End && CurrPendingTransfer.ThisPendingNonce >= nonceRange.Start {
@@ -110,7 +113,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 				if outgoingTransfer {
 					OtherPartyAccountNum = CurrPendingTransfer.To
 				}
-				OtherPartyBalanceKey := GetBalanceKey(OtherPartyAccountNum, msg.BadgeId)
+				OtherPartyBalanceKey := ConstructBalanceKey(OtherPartyAccountNum, msg.BadgeId)
 				OtherPartyNonce := CurrPendingTransfer.OtherPendingNonce
 				otherPartyBalanceInfo, ok := balanceInfoCache[OtherPartyAccountNum]
 
@@ -256,7 +259,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 		}
 
 		for key := range balanceInfoUpdated {
-			err = k.SetBadgeBalanceInStore(ctx, GetBalanceKey(key, msg.BadgeId), balanceInfoCache[key])
+			err = k.SetBadgeBalanceInStore(ctx, ConstructBalanceKey(key, msg.BadgeId), balanceInfoCache[key])
 			if err != nil {
 				return nil, err
 			}

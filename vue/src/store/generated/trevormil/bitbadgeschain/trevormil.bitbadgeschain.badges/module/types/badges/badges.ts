@@ -14,7 +14,10 @@ export interface BitBadge {
   id: number;
   /** uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc) */
   uri: string;
-  /** this is permanent and never changable; use this for asserting the permanence of the metadata */
+  /**
+   * this is permanent and never changable; use this for asserting the permanence of the metadata
+   * uri can point to other stuff in addition to metadata, this is only the hash of the metadata
+   */
   metadata_hash: string;
   /** manager address of the class; can have special permissions; is used as the reserve address for the assets */
   manager: number;

@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
@@ -17,12 +18,14 @@ var (
 	Placeholder = []byte{0xFF}
 
 	IDLength = 8
+
+	BalanceKeyDelimiter = "-"
 )
 
 // StoreKey is the store key string for nft
 const StoreKey = types.ModuleName
 
-// badgeStoreKey returns the byte representation of the nft class key
+// badgeStoreKey returns the byte representation of the badge key ([]byte{0x01} + badgeID)
 func badgeStoreKey(badgeID uint64) []byte {
 	key := make([]byte, len(BadgeKey)+IDLength)
 	copy(key, BadgeKey)
@@ -30,13 +33,30 @@ func badgeStoreKey(badgeID uint64) []byte {
 	return key
 }
 
-func badgeBalanceStoreKey(balance_id string) []byte {
-	key := make([]byte, len(BadgeBalanceKey)+len(balance_id))
+// Creates the balance key from an accountNumber and badgeID. Note this is not prefixed yet. It is just performing a delimited string concatenation.
+func ConstructBalanceKey(accountNumber uint64, id uint64) string {
+	badge_id_str := strconv.FormatUint(id, 10)
+	account_num_str := strconv.FormatUint(accountNumber, 10)
+	return account_num_str + BalanceKeyDelimiter + badge_id_str
+}
+
+// badgeBalanceStoreKey returns the byte representation of the badge balance store key ([]byte{0x02} + balanceKey)
+func badgeBalanceStoreKey(balanceKey string) []byte {
+	key := make([]byte, len(BadgeBalanceKey)+len(balanceKey))
 	copy(key, BadgeBalanceKey)
-	copy(key[len(BadgeBalanceKey):], []byte(balance_id))
+	copy(key[len(BadgeBalanceKey):], []byte(balanceKey))
 	return key
 }
 
+
+// Creates the transfer manager request key from an accountNumber and badgeID. Note this is not prefixed yet. It is just performing a delimited string concatenation.
+func ConstructTransferManagerRequestKey(badgeId uint64, accountNumber uint64) string {
+	badge_id_str := strconv.FormatUint(badgeId, 10)
+	account_num_str := strconv.FormatUint(accountNumber, 10)
+	return badge_id_str + BalanceKeyDelimiter + account_num_str + BalanceKeyDelimiter
+}
+
+// managerTransferRequestKey returns the byte representation of the manager transfer store key ([]byte{0x04} + id)
 func managerTransferRequestKey(id string) []byte {
 	key := make([]byte, len(TransferManagerKey)+len(id))
 	copy(key, TransferManagerKey)
@@ -44,76 +64,25 @@ func managerTransferRequestKey(id string) []byte {
 	return key
 }
 
-// // nftStoreKey returns the byte representation of the nft
-// func nftStoreKey(classID string) []byte {
-// 	key := make([]byte, len(NFTKey)+len(classID)+len(Delimiter))
-// 	copy(key, NFTKey)
-// 	copy(key[len(NFTKey):], classID)
-// 	copy(key[len(NFTKey)+len(classID):], Delimiter)
-// 	return key
-// }
+// nextAssetIdKey returns the byte representation of the next asset id key ([]byte{0x03})
+func nextAssetIDKey() []byte {
+	return NextAssetIDKey
+}
 
-// // classTotalSupply returns the byte representation of the ClassTotalSupply
-// func classTotalSupply(classID string) []byte {
-// 	key := make([]byte, len(ClassTotalSupply)+len(classID))
-// 	copy(key, ClassTotalSupply)
-// 	copy(key[len(ClassTotalSupply):], classID)
-// 	return key
-// }
+type BalanceKeyDetails struct {
+	badgeId    uint64
+	accountNum uint64
+}
 
-// // nftOfClassByOwnerStoreKey returns the byte representation of the nft owner
-// // Items are stored with the following key: values
-// // 0x03<owner><Delimiter(1 Byte)><classID><Delimiter(1 Byte)>
-// func nftOfClassByOwnerStoreKey(owner sdk.AccAddress, classID string) []byte {
-// 	owner = address.MustLengthPrefix(owner)
-// 	classIDBz := conv.UnsafeStrToBytes(classID)
+// Helper function to unparse a balance key and get the information from it.
+func GetDetailsFromBalanceKey(id string) BalanceKeyDetails {
+	result := strings.Split(id, BalanceKeyDelimiter)
+	account_num, _ := strconv.ParseUint(result[0], 10, 64)
+	badge_id, _ := strconv.ParseUint(result[1], 10, 64)
 
-// 	key := make([]byte, len(NFTOfClassByOwnerKey)+len(owner)+len(Delimiter)+len(classIDBz)+len(Delimiter))
-// 	copy(key, NFTOfClassByOwnerKey)
-// 	copy(key[len(NFTOfClassByOwnerKey):], owner)
-// 	copy(key[len(NFTOfClassByOwnerKey)+len(owner):], Delimiter)
-// 	copy(key[len(NFTOfClassByOwnerKey)+len(owner)+len(Delimiter):], classIDBz)
-// 	copy(key[len(NFTOfClassByOwnerKey)+len(owner)+len(Delimiter)+len(classIDBz):], Delimiter)
-// 	return key
-// }
+	return BalanceKeyDetails{
+		accountNum: account_num,
+		badgeId:    badge_id,
+	}
+}
 
-// // prefixNftOfClassByOwnerStoreKey returns the prefix of the result of the method nftOfClassByOwnerStoreKey
-// // Items are stored with the following key: values
-// // 0x03<owner><Delimiter>
-// func prefixNftOfClassByOwnerStoreKey(owner sdk.AccAddress) []byte {
-// 	owner = address.MustLengthPrefix(owner)
-
-// 	key := make([]byte, len(NFTOfClassByOwnerKey)+len(owner)+len(Delimiter))
-// 	copy(key, NFTOfClassByOwnerKey)
-// 	copy(key[len(NFTOfClassByOwnerKey):], owner)
-// 	copy(key[len(NFTOfClassByOwnerKey)+len(owner):], Delimiter)
-// 	return key
-// }
-
-// // Note: the full path of the nftOfClassByOwnerStoreKey stored in the store: 0x03<owner><Delimiter><classID><Delimiter><nftID>,
-// // the key of the prefix store query result constructed using the prefixNftOfClassByOwnerStoreKey function needs to remove the 0x03<owner><Delimiter> prefix
-// func parseNftOfClassByOwnerStoreKey(key []byte) (classID, nftID string) {
-// 	ret := bytes.Split(key, Delimiter)
-// 	if len(ret) != 2 {
-// 		panic("invalid nftOfClassByOwnerStoreKey")
-// 	}
-// 	classID = conv.UnsafeBytesToStr(ret[0])
-// 	nftID = string(ret[1])
-// 	return
-// }
-
-// // ownerStoreKey returns the byte representation of the nft owner
-// // Items are stored with the following key: values
-// // 0x04<classID><Delimiter(1 Byte)><nftID>
-// func ownerStoreKey(classID, nftID string) []byte {
-// 	// key is of format:
-// 	classIDBz := conv.UnsafeStrToBytes(classID)
-// 	nftIDBz := conv.UnsafeStrToBytes(nftID)
-
-// 	key := make([]byte, len(OwnerKey)+len(classIDBz)+len(Delimiter)+len(nftIDBz))
-// 	copy(key, OwnerKey)
-// 	copy(key[len(OwnerKey):], classIDBz)
-// 	copy(key[len(OwnerKey)+len(classIDBz):], Delimiter)
-// 	copy(key[len(OwnerKey)+len(classIDBz)+len(Delimiter):], nftIDBz)
-// 	return key
-// }

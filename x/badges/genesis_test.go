@@ -14,7 +14,7 @@ func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params:      types.DefaultParams(),
 		PortId:      types.PortID,
-		NextAssetId: 0,
+		NextBadgeId: 0,
 		Badges:      []*types.BitBadge{},
 		Balances:    []*types.BadgeBalanceInfo{},
 		BalanceIds:  []string{},
@@ -31,7 +31,7 @@ func TestGenesis(t *testing.T) {
 
 	require.Equal(t, genesisState.PortId, got.PortId)
 
-	require.Equal(t, genesisState.NextAssetId, got.NextAssetId)
+	require.Equal(t, genesisState.NextBadgeId, got.NextBadgeId)
 	require.Equal(t, genesisState.Badges, got.Badges)
 	require.Equal(t, genesisState.Balances, got.Balances)
 	require.Equal(t, genesisState.BalanceIds, got.BalanceIds)

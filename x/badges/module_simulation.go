@@ -92,7 +92,7 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	badgesGenesis := types.GenesisState{
 		Params:      types.DefaultParams(),
 		PortId:      types.PortID,
-		NextAssetId: 0,
+		NextBadgeId: 0,
 		Badges:      []*types.BitBadge{},
 		Balances:    []*types.BadgeBalanceInfo{},
 		BalanceIds:  []string{},

@@ -12,26 +12,32 @@ import (
 func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBadge) (*types.MsgTransferBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	addresses_to_check := []uint64{}
-	addresses_to_check = append(addresses_to_check, msg.ToAddresses...)
-	addresses_to_check = append(addresses_to_check, msg.From)
-	CreatorAccountNum, Badge, Permissions, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, addresses_to_check, msg.BadgeId, msg.SubbadgeRanges, false,
-	)
+	addressesToCheck := []uint64{}
+	addressesToCheck = append(addressesToCheck, msg.ToAddresses...)
+	addressesToCheck = append(addressesToCheck, msg.From)
+	
+	validationParams := UniversalValidationParams{
+		Creator: msg.Creator,
+		BadgeId: msg.BadgeId,
+		SubbadgeRangesToValidate: msg.SubbadgeRanges,
+		AccountsToCheckIfRegistered: addressesToCheck,
+	}
 
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
+	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, validationParams)
 	if err != nil {
 		return nil, err
 	}
 
-	FromBalanceKey := GetBalanceKey(msg.From, msg.BadgeId)
+	permissions := types.GetPermissions(badge.PermissionFlags)
+
+	FromBalanceKey := ConstructBalanceKey(msg.From, msg.BadgeId)
 	fromBadgeBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, FromBalanceKey)
 	if !found {
 		return nil, ErrBadgeBalanceNotExists
 	}
 
 	for _, to := range msg.ToAddresses {
-		ToBalanceKey := GetBalanceKey(to, msg.BadgeId)
+		ToBalanceKey := ConstructBalanceKey(to, msg.BadgeId)
 		toBadgeBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, ToBalanceKey)
 		if !found {
 			toBadgeBalanceInfo = GetEmptyBadgeBalanceTemplate()
@@ -42,7 +48,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 			for _, subbadgeRange := range msg.SubbadgeRanges {
 				for currSubbadgeId := subbadgeRange.Start; currSubbadgeId <= subbadgeRange.End; currSubbadgeId++ {
 					// Checks and handles if this account can transfer or is approved to transfer
-					fromBadgeBalanceInfo, err = k.HandlePreTransfer(ctx, fromBadgeBalanceInfo, Badge, msg.BadgeId, currSubbadgeId, msg.From, to, CreatorAccountNum, amount)
+					fromBadgeBalanceInfo, err = k.HandlePreTransfer(ctx, fromBadgeBalanceInfo, badge, msg.BadgeId, currSubbadgeId, msg.From, to, CreatorAccountNum, amount)
 					if err != nil {
 						return nil, err
 					}
@@ -66,7 +72,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 						}
 					}
 
-					if sendingToReservedAddress || Permissions.ForcefulTransfers() || Badge.Manager == to {
+					if sendingToReservedAddress || permissions.ForcefulTransfers() || badge.Manager == to {
 						handledForcefulTransfer = true
 						toBadgeBalanceInfo, err = k.AddToBadgeBalance(ctx, toBadgeBalanceInfo, currSubbadgeId, amount)
 						if err != nil {

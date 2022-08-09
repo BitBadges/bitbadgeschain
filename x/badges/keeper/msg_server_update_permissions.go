@@ -11,21 +11,18 @@ import (
 func (k msgServer) UpdatePermissions(goCtx context.Context, msg *types.MsgUpdatePermissions) (*types.MsgUpdatePermissionsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
-	badge, found := k.GetBadgeFromStore(ctx, msg.BadgeId)
-
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
-	if !found {
-		return nil, ErrBadgeNotExists
+	validationParams := UniversalValidationParams{
+		Creator: msg.Creator,
+		BadgeId: msg.BadgeId,
+		MustBeManager: true,
 	}
 
-	if badge.Manager != CreatorAccountNum {
-		return nil, ErrSenderIsNotManager
+	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, validationParams)
+	if err != nil {
+		return nil, err
 	}
 
-	ctx.GasMeter().ConsumeGas(BadgeUpdate, "badge update")
-
-	err := types.ValidatePermissionsUpdate(badge.PermissionFlags, msg.Permissions)
+	err = types.ValidatePermissionsUpdate(badge.PermissionFlags, msg.Permissions)
 	if err != nil {
 		return nil, err
 	}

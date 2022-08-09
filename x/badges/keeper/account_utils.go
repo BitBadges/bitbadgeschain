@@ -4,6 +4,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+//TODO: switch to social profiles
+
 func (k Keeper) GetOrCreateAccountNumberForAccAddressBech32(ctx sdk.Context, address sdk.AccAddress) uint64 {
 	account := k.accountKeeper.GetAccount(ctx, address)
 	if account == nil {

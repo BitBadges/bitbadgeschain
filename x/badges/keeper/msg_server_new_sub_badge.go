@@ -11,25 +11,20 @@ import (
 func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge) (*types.MsgNewSubBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
-
-	badge, found := k.GetBadgeFromStore(ctx, msg.Id)
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
-
-	if !found {
-		return nil, ErrBadgeNotExists
+	validationParams := UniversalValidationParams{
+		Creator: msg.Creator,
+		BadgeId: msg.Id,
+		MustBeManager: true,
+		CanCreateSubbadges: true,
 	}
 
-	if badge.Manager != CreatorAccountNum {
-		return nil, ErrSenderIsNotManager
+	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, validationParams)
+	if err != nil {
+		return nil, err
 	}
+	
 
-	permissions := types.GetPermissions(badge.PermissionFlags)
-	if !permissions.CanCreateSubbadges() {
-		return nil, ErrInvalidPermissions
-	}
-
-	ManagerBalanceKey := GetBalanceKey(CreatorAccountNum, msg.Id)
+	ManagerBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.Id)
 	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, ManagerBalanceKey)
 	if !found {
 		badgeBalanceInfo = GetEmptyBadgeBalanceTemplate()

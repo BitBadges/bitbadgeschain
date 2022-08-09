@@ -95,5 +95,5 @@ func (suite *TestSuite) TestApproveSelf() {
 	suite.Require().Equal(uint64(10000), keeper.GetBadgeBalanceFromBalanceAmountsForSubbadgeId(0, bobBalanceInfo.BalanceAmounts))
 
 	err = SetApproval(suite, wctx, bob, 1000, firstAccountNumCreated, 0, []*types.NumberRange{{Start: 0, End: 0}}, 0)
-	suite.Require().EqualError(err, keeper.ErrSenderAndReceiverSame.Error())
+	suite.Require().EqualError(err, keeper.ErrAccountCanNotEqualCreator.Error())
 }

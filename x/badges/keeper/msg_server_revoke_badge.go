@@ -11,19 +11,21 @@ import (
 func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge) (*types.MsgRevokeBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	CreatorAccountNum, _, permissions, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, msg.Addresses, msg.BadgeId, msg.SubbadgeRanges, true,
-	)
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
+	validationParams := UniversalValidationParams{
+		Creator: msg.Creator,
+		BadgeId: msg.BadgeId,
+		SubbadgeRangesToValidate: msg.SubbadgeRanges,
+		MustBeManager: true,
+		AccountsToCheckIfRegistered: msg.Addresses,
+		CanRevoke: true,
+	}
+
+	CreatorAccountNum, _, err := k.UniversalValidate(ctx, validationParams)
 	if err != nil {
 		return nil, err
 	}
 
-	if !permissions.CanRevoke() {
-		return nil, ErrInvalidPermissions
-	}
-
-	ManagerBalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId)
+	ManagerBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
 	managerBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, ManagerBalanceKey)
 	if !found {
 		return nil, ErrBadgeBalanceNotExists
@@ -35,7 +37,7 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 		}
 
 		// Note that we check for duplicates in ValidateBasic, so these addresses will be unique every time
-		AddressBalanceKey := GetBalanceKey(revokeAddress, msg.BadgeId)
+		AddressBalanceKey := ConstructBalanceKey(revokeAddress, msg.BadgeId)
 		addressBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, AddressBalanceKey)
 		if !found {
 			return nil, ErrBadgeBalanceNotExists

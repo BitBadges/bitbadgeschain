@@ -16,6 +16,6 @@ message GenesisState {
     repeated BitBadge badges = 3;
     repeated BadgeBalanceInfo balances = 4;
     repeated string balance_ids = 5;
-    uint64 nextAssetId = 6;
+    uint64 nextBadgeId = 6;
     // this line is used by starport scaffolding # genesis/proto/state
 }

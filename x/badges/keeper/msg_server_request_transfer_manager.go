@@ -11,14 +11,16 @@ import (
 func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgRequestTransferManager) (*types.MsgRequestTransferManagerResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
-	badge, found := k.GetBadgeFromStore(ctx, msg.BadgeId)
-
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
-	ctx.GasMeter().ConsumeGas(RequestTransferManagerCost, "create new subbadge cost")
-	if !found {
-		return nil, ErrBadgeNotExists
+	validationParams := UniversalValidationParams{
+		Creator: msg.Creator,
+		BadgeId: msg.BadgeId,
 	}
+
+	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, validationParams)
+	if err != nil {
+		return nil, err
+	}
+
 
 	//Redundant because this is locked so we shouldn't store anything
 	if msg.Add {

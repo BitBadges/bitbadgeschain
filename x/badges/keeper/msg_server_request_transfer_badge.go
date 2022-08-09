@@ -10,20 +10,21 @@ import (
 
 func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgRequestTransferBadge) (*types.MsgRequestTransferBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	CreatorAccountNum, _, _, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, []uint64{msg.From}, msg.BadgeId, msg.SubbadgeRanges, false,
-	)
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
+
+	validationParams := UniversalValidationParams{
+		Creator: msg.Creator,
+		BadgeId: msg.BadgeId,
+		SubbadgeRangesToValidate: msg.SubbadgeRanges,
+		AccountsThatCantEqualCreator: []uint64{msg.From},
+	}
+
+	CreatorAccountNum, _, err := k.UniversalValidate(ctx, validationParams)
 	if err != nil {
 		return nil, err
 	}
 
-	if CreatorAccountNum == msg.From {
-		return nil, ErrSenderAndReceiverSame // Can't request yourself for transfer
-	}
-
-	FromBalanceKey := GetBalanceKey(msg.From, msg.BadgeId)
-	ToBalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId)
+	FromBalanceKey := ConstructBalanceKey(msg.From, msg.BadgeId)
+	ToBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
 
 	fromBadgeBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, FromBalanceKey)
 	if !found {

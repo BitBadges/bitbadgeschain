@@ -12,20 +12,21 @@ import (
 func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval) (*types.MsgSetApprovalResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	CreatorAccountNum, _, _, err := k.Keeper.UniversalValidateMsgAndReturnMsgInfo(
-		ctx, msg.Creator, []uint64{msg.Address}, msg.BadgeId, msg.SubbadgeRanges, false,
-	)
+	validationParams := UniversalValidationParams{
+		Creator: msg.Creator,
+		BadgeId: msg.BadgeId,
+		AccountsToCheckIfRegistered: []uint64{msg.Address},
+		SubbadgeRangesToValidate: msg.SubbadgeRanges,
+		AccountsThatCantEqualCreator: []uint64{msg.Address},
+	}
 
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
+	CreatorAccountNum, _, err := k.UniversalValidate(ctx, validationParams)
 	if err != nil {
 		return nil, err
 	}
 
-	if CreatorAccountNum == msg.Address {
-		return nil, ErrSenderAndReceiverSame // Can't approve yourself
-	}
 
-	BalanceKey := GetBalanceKey(CreatorAccountNum, msg.BadgeId)
+	BalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
 	badgeBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, BalanceKey)
 	if !found {
 		badgeBalanceInfo = GetEmptyBadgeBalanceTemplate()

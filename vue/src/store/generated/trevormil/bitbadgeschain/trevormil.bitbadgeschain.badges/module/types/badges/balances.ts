@@ -12,12 +12,11 @@ export interface BadgeBalanceInfo {
   /** IDs will be sorted in order of pending_nonce */
   pending: PendingTransfer[];
   approvals: Approval[];
-  /** TODO: for (hidden on profile, pinned, etc) */
-  user_flags: number;
 }
 
 export interface Approval {
   address: number;
+  expirationTime: number;
   approvalAmounts: RangesToAmounts[];
 }
 
@@ -32,9 +31,10 @@ export interface PendingTransfer {
   from: number;
   approved_by: number;
   markedAsApproved: boolean;
+  expiration_time: number;
 }
 
-const baseBadgeBalanceInfo: object = { pending_nonce: 0, user_flags: 0 };
+const baseBadgeBalanceInfo: object = { pending_nonce: 0 };
 
 export const BadgeBalanceInfo = {
   encode(message: BadgeBalanceInfo, writer: Writer = Writer.create()): Writer {
@@ -49,9 +49,6 @@ export const BadgeBalanceInfo = {
     }
     for (const v of message.approvals) {
       Approval.encode(v!, writer.uint32(42).fork()).ldelim();
-    }
-    if (message.user_flags !== 0) {
-      writer.uint32(48).uint64(message.user_flags);
     }
     return writer;
   },
@@ -79,9 +76,6 @@ export const BadgeBalanceInfo = {
           break;
         case 5:
           message.approvals.push(Approval.decode(reader, reader.uint32()));
-          break;
-        case 6:
-          message.user_flags = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -116,11 +110,6 @@ export const BadgeBalanceInfo = {
         message.approvals.push(Approval.fromJSON(e));
       }
     }
-    if (object.user_flags !== undefined && object.user_flags !== null) {
-      message.user_flags = Number(object.user_flags);
-    } else {
-      message.user_flags = 0;
-    }
     return message;
   },
 
@@ -149,7 +138,6 @@ export const BadgeBalanceInfo = {
     } else {
       obj.approvals = [];
     }
-    message.user_flags !== undefined && (obj.user_flags = message.user_flags);
     return obj;
   },
 
@@ -178,24 +166,22 @@ export const BadgeBalanceInfo = {
         message.approvals.push(Approval.fromPartial(e));
       }
     }
-    if (object.user_flags !== undefined && object.user_flags !== null) {
-      message.user_flags = object.user_flags;
-    } else {
-      message.user_flags = 0;
-    }
     return message;
   },
 };
 
-const baseApproval: object = { address: 0 };
+const baseApproval: object = { address: 0, expirationTime: 0 };
 
 export const Approval = {
   encode(message: Approval, writer: Writer = Writer.create()): Writer {
     if (message.address !== 0) {
       writer.uint32(8).uint64(message.address);
     }
+    if (message.expirationTime !== 0) {
+      writer.uint32(16).uint64(message.expirationTime);
+    }
     for (const v of message.approvalAmounts) {
-      RangesToAmounts.encode(v!, writer.uint32(18).fork()).ldelim();
+      RangesToAmounts.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -212,6 +198,9 @@ export const Approval = {
           message.address = longToNumber(reader.uint64() as Long);
           break;
         case 2:
+          message.expirationTime = longToNumber(reader.uint64() as Long);
+          break;
+        case 3:
           message.approvalAmounts.push(
             RangesToAmounts.decode(reader, reader.uint32())
           );
@@ -232,6 +221,11 @@ export const Approval = {
     } else {
       message.address = 0;
     }
+    if (object.expirationTime !== undefined && object.expirationTime !== null) {
+      message.expirationTime = Number(object.expirationTime);
+    } else {
+      message.expirationTime = 0;
+    }
     if (
       object.approvalAmounts !== undefined &&
       object.approvalAmounts !== null
@@ -246,6 +240,8 @@ export const Approval = {
   toJSON(message: Approval): unknown {
     const obj: any = {};
     message.address !== undefined && (obj.address = message.address);
+    message.expirationTime !== undefined &&
+      (obj.expirationTime = message.expirationTime);
     if (message.approvalAmounts) {
       obj.approvalAmounts = message.approvalAmounts.map((e) =>
         e ? RangesToAmounts.toJSON(e) : undefined
@@ -263,6 +259,11 @@ export const Approval = {
       message.address = object.address;
     } else {
       message.address = 0;
+    }
+    if (object.expirationTime !== undefined && object.expirationTime !== null) {
+      message.expirationTime = object.expirationTime;
+    } else {
+      message.expirationTime = 0;
     }
     if (
       object.approvalAmounts !== undefined &&
@@ -285,6 +286,7 @@ const basePendingTransfer: object = {
   from: 0,
   approved_by: 0,
   markedAsApproved: false,
+  expiration_time: 0,
 };
 
 export const PendingTransfer = {
@@ -318,6 +320,9 @@ export const PendingTransfer = {
     }
     if (message.markedAsApproved === true) {
       writer.uint32(80).bool(message.markedAsApproved);
+    }
+    if (message.expiration_time !== 0) {
+      writer.uint32(88).uint64(message.expiration_time);
     }
     return writer;
   },
@@ -355,6 +360,9 @@ export const PendingTransfer = {
           break;
         case 10:
           message.markedAsApproved = reader.bool();
+          break;
+        case 11:
+          message.expiration_time = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -420,6 +428,14 @@ export const PendingTransfer = {
     } else {
       message.markedAsApproved = false;
     }
+    if (
+      object.expiration_time !== undefined &&
+      object.expiration_time !== null
+    ) {
+      message.expiration_time = Number(object.expiration_time);
+    } else {
+      message.expiration_time = 0;
+    }
     return message;
   },
 
@@ -442,6 +458,8 @@ export const PendingTransfer = {
       (obj.approved_by = message.approved_by);
     message.markedAsApproved !== undefined &&
       (obj.markedAsApproved = message.markedAsApproved);
+    message.expiration_time !== undefined &&
+      (obj.expiration_time = message.expiration_time);
     return obj;
   },
 
@@ -500,6 +518,14 @@ export const PendingTransfer = {
       message.markedAsApproved = object.markedAsApproved;
     } else {
       message.markedAsApproved = false;
+    }
+    if (
+      object.expiration_time !== undefined &&
+      object.expiration_time !== null
+    ) {
+      message.expiration_time = object.expiration_time;
+    } else {
+      message.expiration_time = 0;
     }
     return message;
   },

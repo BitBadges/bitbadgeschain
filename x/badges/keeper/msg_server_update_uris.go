@@ -11,23 +11,16 @@ import (
 func (k msgServer) UpdateUris(goCtx context.Context, msg *types.MsgUpdateUris) (*types.MsgUpdateUrisResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
-	badge, found := k.GetBadgeFromStore(ctx, msg.BadgeId)
-
-	ctx.GasMeter().ConsumeGas(FixedCostPerMsg, "fixed cost per transaction")
-	if !found {
-		return nil, ErrBadgeNotExists
+	validationParams := UniversalValidationParams{
+		Creator: msg.Creator,
+		BadgeId: msg.BadgeId,
+		MustBeManager: true,
+		CanUpdateUris: true,
 	}
 
-	if badge.Manager != CreatorAccountNum {
-		return nil, ErrSenderIsNotManager
-	}
-
-	ctx.GasMeter().ConsumeGas(BadgeUpdate, "badge update")
-
-	permissions := types.GetPermissions(badge.PermissionFlags)
-	if !permissions.CanUpdateUris() {
-		return nil, ErrInvalidPermissions
+	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, validationParams)
+	if err != nil {
+		return nil, err
 	}
 
 	badge.Uri = msg.Uri

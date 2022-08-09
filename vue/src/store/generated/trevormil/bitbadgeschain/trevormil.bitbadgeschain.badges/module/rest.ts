@@ -12,6 +12,9 @@
 export interface BadgesApproval {
   /** @format uint64 */
   address?: string;
+
+  /** @format uint64 */
+  expirationTime?: string;
   approvalAmounts?: BadgesRangesToAmounts[];
 }
 
@@ -22,9 +25,6 @@ export interface BadgesBadgeBalanceInfo {
   pending_nonce?: string;
   pending?: BadgesPendingTransfer[];
   approvals?: BadgesApproval[];
-
-  /** @format uint64 */
-  user_flags?: string;
 }
 
 export interface BadgesBitBadge {
@@ -130,6 +130,9 @@ export interface BadgesPendingTransfer {
   /** @format uint64 */
   approved_by?: string;
   markedAsApproved?: boolean;
+
+  /** @format uint64 */
+  expiration_time?: string;
 }
 
 export interface BadgesQueryGetBadgeResponse {

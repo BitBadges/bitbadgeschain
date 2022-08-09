@@ -29,7 +29,7 @@ func (suite *TestSuite) TestNewBadges() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	// Verify nextId increments correctly
-	nextId := suite.app.BadgesKeeper.GetNextAssetId(suite.ctx)
+	nextId := suite.app.BadgesKeeper.GetNextBadgeId(suite.ctx)
 	suite.Require().Equal(uint64(1), nextId)
 
 	// Verify badge details are correct
@@ -46,7 +46,7 @@ func (suite *TestSuite) TestNewBadges() {
 	suite.Require().Nil(err, "Error creating badge: %s")
 
 	// Verify nextId increments correctly
-	nextId = suite.app.BadgesKeeper.GetNextAssetId(suite.ctx)
+	nextId = suite.app.BadgesKeeper.GetNextBadgeId(suite.ctx)
 	suite.Require().Equal(uint64(2), nextId)
 	badge, _ = GetBadge(suite, wctx, 1)
 	suite.Require().Equal(uint64(1), badge.Id)

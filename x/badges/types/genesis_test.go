@@ -22,7 +22,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			desc: "valid genesis state",
 			genState: &types.GenesisState{
 				PortId:      types.PortID,
-				NextAssetId: 0,
+				NextBadgeId: 0,
 				Badges:      []*types.BitBadge{},
 				Balances:    []*types.BadgeBalanceInfo{},
 				BalanceIds:  []string{},
