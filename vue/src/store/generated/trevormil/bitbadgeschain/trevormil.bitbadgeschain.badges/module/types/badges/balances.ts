@@ -1,13 +1,13 @@
 /* eslint-disable */
 import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
-import { RangesToAmounts, NumberRange } from "../badges/ranges";
+import { BalanceToIds, NumberRange } from "../badges/ranges";
 
 export const protobufPackage = "trevormil.bitbadgeschain.badges";
 
 /** indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes) */
 export interface BadgeBalanceInfo {
-  balanceAmounts: RangesToAmounts[];
+  balanceAmounts: BalanceToIds[];
   pending_nonce: number;
   /** IDs will be sorted in order of pending_nonce */
   pending: PendingTransfer[];
@@ -17,7 +17,7 @@ export interface BadgeBalanceInfo {
 export interface Approval {
   address: number;
   expirationTime: number;
-  approvalAmounts: RangesToAmounts[];
+  approvalAmounts: BalanceToIds[];
 }
 
 export interface PendingTransfer {
@@ -39,7 +39,7 @@ const baseBadgeBalanceInfo: object = { pending_nonce: 0 };
 export const BadgeBalanceInfo = {
   encode(message: BadgeBalanceInfo, writer: Writer = Writer.create()): Writer {
     for (const v of message.balanceAmounts) {
-      RangesToAmounts.encode(v!, writer.uint32(18).fork()).ldelim();
+      BalanceToIds.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     if (message.pending_nonce !== 0) {
       writer.uint32(24).uint64(message.pending_nonce);
@@ -65,7 +65,7 @@ export const BadgeBalanceInfo = {
       switch (tag >>> 3) {
         case 2:
           message.balanceAmounts.push(
-            RangesToAmounts.decode(reader, reader.uint32())
+            BalanceToIds.decode(reader, reader.uint32())
           );
           break;
         case 3:
@@ -92,7 +92,7 @@ export const BadgeBalanceInfo = {
     message.approvals = [];
     if (object.balanceAmounts !== undefined && object.balanceAmounts !== null) {
       for (const e of object.balanceAmounts) {
-        message.balanceAmounts.push(RangesToAmounts.fromJSON(e));
+        message.balanceAmounts.push(BalanceToIds.fromJSON(e));
       }
     }
     if (object.pending_nonce !== undefined && object.pending_nonce !== null) {
@@ -117,7 +117,7 @@ export const BadgeBalanceInfo = {
     const obj: any = {};
     if (message.balanceAmounts) {
       obj.balanceAmounts = message.balanceAmounts.map((e) =>
-        e ? RangesToAmounts.toJSON(e) : undefined
+        e ? BalanceToIds.toJSON(e) : undefined
       );
     } else {
       obj.balanceAmounts = [];
@@ -148,7 +148,7 @@ export const BadgeBalanceInfo = {
     message.approvals = [];
     if (object.balanceAmounts !== undefined && object.balanceAmounts !== null) {
       for (const e of object.balanceAmounts) {
-        message.balanceAmounts.push(RangesToAmounts.fromPartial(e));
+        message.balanceAmounts.push(BalanceToIds.fromPartial(e));
       }
     }
     if (object.pending_nonce !== undefined && object.pending_nonce !== null) {
@@ -181,7 +181,7 @@ export const Approval = {
       writer.uint32(16).uint64(message.expirationTime);
     }
     for (const v of message.approvalAmounts) {
-      RangesToAmounts.encode(v!, writer.uint32(26).fork()).ldelim();
+      BalanceToIds.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -202,7 +202,7 @@ export const Approval = {
           break;
         case 3:
           message.approvalAmounts.push(
-            RangesToAmounts.decode(reader, reader.uint32())
+            BalanceToIds.decode(reader, reader.uint32())
           );
           break;
         default:
@@ -231,7 +231,7 @@ export const Approval = {
       object.approvalAmounts !== null
     ) {
       for (const e of object.approvalAmounts) {
-        message.approvalAmounts.push(RangesToAmounts.fromJSON(e));
+        message.approvalAmounts.push(BalanceToIds.fromJSON(e));
       }
     }
     return message;
@@ -244,7 +244,7 @@ export const Approval = {
       (obj.expirationTime = message.expirationTime);
     if (message.approvalAmounts) {
       obj.approvalAmounts = message.approvalAmounts.map((e) =>
-        e ? RangesToAmounts.toJSON(e) : undefined
+        e ? BalanceToIds.toJSON(e) : undefined
       );
     } else {
       obj.approvalAmounts = [];
@@ -270,7 +270,7 @@ export const Approval = {
       object.approvalAmounts !== null
     ) {
       for (const e of object.approvalAmounts) {
-        message.approvalAmounts.push(RangesToAmounts.fromPartial(e));
+        message.approvalAmounts.push(BalanceToIds.fromPartial(e));
       }
     }
     return message;

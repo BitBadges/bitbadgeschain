@@ -15,11 +15,11 @@ export interface BadgesApproval {
 
   /** @format uint64 */
   expirationTime?: string;
-  approvalAmounts?: BadgesRangesToAmounts[];
+  approvalAmounts?: BadgesBalanceToIds[];
 }
 
 export interface BadgesBadgeBalanceInfo {
-  balanceAmounts?: BadgesRangesToAmounts[];
+  balanceAmounts?: BadgesBalanceToIds[];
 
   /** @format uint64 */
   pending_nonce?: string;
@@ -55,7 +55,7 @@ export interface BadgesBitBadge {
 
   /** @format uint64 */
   next_subasset_id?: string;
-  subassets_total_supply?: BadgesRangesToAmounts[];
+  subassets_total_supply?: BadgesBalanceToIds[];
 
   /** @format uint64 */
   default_subasset_supply?: string;
@@ -151,7 +151,7 @@ export interface BadgesQueryParamsResponse {
   params?: BadgesParams;
 }
 
-export interface BadgesRangesToAmounts {
+export interface BadgesBalanceToIds {
   ranges?: BadgesNumberRange[];
 
   /** @format uint64 */

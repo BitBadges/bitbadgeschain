@@ -7,18 +7,18 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func GetEmptyBadgeBalanceTemplate() types.BadgeBalanceInfo {
-	return types.BadgeBalanceInfo{}
-}
+// Balances take the form of BalanceToIds[] in which we have a map of each balance to its corresuponding SubbadgeRange[]
 
-//Don't think it'll ever reach an overflow but this is here just in case
+// Safe adds two uint64s and returns an error if the result overflows uint64.
 func SafeAdd(left uint64, right uint64) (uint64, error) {
-	if left > math.MaxUint64-right {
+	sum := left + right
+	if sum < left {
 		return 0, ErrOverflow
 	}
-	return left + right, nil
+	return sum, nil
 }
 
+// Safe subtracts two uint64s and returns an error if the result underflows uint64.
 func SafeSubtract(left uint64, right uint64) (uint64, error) {
 	if right > left {
 		return 0, ErrOverflow
@@ -26,398 +26,315 @@ func SafeSubtract(left uint64, right uint64) (uint64, error) {
 	return left - right, nil
 }
 
-func GetBadgeBalanceFromBalanceAmountsForSubbadgeId(subbadgeId uint64, amounts []*types.RangesToAmounts) uint64 {
-	//TODO: binary search
-	for _, amountObj := range amounts {
-		if len(amountObj.Ranges) == 0 {
-			amountObj.Ranges = append(amountObj.Ranges, &types.NumberRange{Start: 0, End: 0})
-		}
-
-		for _, idObject := range amountObj.Ranges {
-			if idObject.End >= subbadgeId && idObject.Start <= subbadgeId {
-				return amountObj.Amount
-			} else if idObject.End == 0 && idObject.Start == subbadgeId {
-				return amountObj.Amount
-			}
-		}
-	}
-	return 0
+// Updates the balance for a specific subbadgeId from what it currently is to newAmount. 
+func UpdateBalanceForSubbadgeId(subbadgeId uint64, newAmount uint64, amounts []*types.BalanceToIds) []*types.BalanceToIds {
+	amounts = RemoveBalanceForSubbadgeId(subbadgeId, amounts)
+	amounts = SetBalanceForSubbadgeId(subbadgeId, newAmount, amounts)
+	return amounts
 }
 
-func RemoveBadgeBalanceBySubbadgeId(subbadgeId uint64, amounts []*types.RangesToAmounts) []*types.RangesToAmounts {
-	new_amounts := []*types.RangesToAmounts{}
-	for _, amountObj := range amounts {
-		for _, idObject := range amountObj.Ranges {
-			if idObject.End == 0 {
-				idObject.End = idObject.Start
+// Gets a balance for a specific subbadgeId.
+func GetBalanceForSubbadgeId(subbadgeId uint64, balancesArr []*types.BalanceToIds) uint64 {
+	for _, balanceObj := range balancesArr {
+		currBalance := balanceObj.Balance
+		currIds := balanceObj.Ids
+
+		// Handle the case where it omits an empty NumberRange because Start && End == 0
+		if len(currIds) == 0 {
+			currIds = append(currIds, &types.NumberRange{})
+		}
+
+		// SubbadgeRanges should be sorted by start IDs (and endIds but endIds can == 0), so we can binary search.
+		low := 0
+		high := len(currIds) - 1
+
+		for low <= high {
+			median := int(uint(low + high) >> 1)
+			currRange := currIds[median]
+			if currRange.End == 0 {
+				currRange.End = currRange.Start // If end == 0, set it to start by convention (done in order to save space)
+			}
+
+			if currIds[median].Start <= subbadgeId && currIds[median].End >= subbadgeId {
+				return currBalance
+			} else if currIds[median].Start > subbadgeId {
+				high = median - 1
+			} else {
+				low = median + 1
 			}
 		}
+	
+		if low == len(currIds) || !(currIds[low].Start <= subbadgeId && currIds[low].End >= subbadgeId) {
+			continue
+		} else {
+			return currBalance
+		}
+	}
 
-		if len(amountObj.Ranges) == 0 {
-			amountObj.Ranges = append(amountObj.Ranges, &types.NumberRange{Start: 0, End: 0})
+	return 0 //Not found; return 0
+}
+
+// Remove the balance for a specific subbadgeId.
+func RemoveBalanceForSubbadgeId(subbadgeId uint64, balanceObjs []*types.BalanceToIds) []*types.BalanceToIds {
+	newAmounts := []*types.BalanceToIds{}
+	for _, balanceObj := range balanceObjs {
+		// Handle the case where it omits an empty NumberRange because Start && End == 0
+		if len(balanceObj.Ids) == 0 {
+			balanceObj.Ids = append(balanceObj.Ids, &types.NumberRange{})
 		}
 
-		newIds := []*types.NumberRange{}
-		for _, idObject := range amountObj.Ranges {
-			if idObject.End >= subbadgeId && idObject.Start <= subbadgeId {
-				//Found current subbadge
+		// SubbadgeRanges should be sorted by start IDs (and endIds but endIds can == 0 with our added convention), so we can binary search.
+		low := 0
+		high := len(balanceObj.Ids) - 1
+		
+
+		for low <= high {
+			median := int(uint(low + high) >> 1)
+			currRange := balanceObj.Ids[median]
+			if currRange.End == 0 {
+				currRange.End = currRange.Start // If end == 0, set it to start by convention (done in order to save space)
+			}
+
+			if balanceObj.Ids[median].Start <= subbadgeId && balanceObj.Ids[median].End >= subbadgeId {
+				newIds := balanceObj.Ids[:median]
 
 				//If we still have an existing before range, keep that up until subbadge - 1
-				if subbadgeId >= 1 && subbadgeId-1 >= idObject.Start {
+				if subbadgeId >= 1 && subbadgeId - 1 >= currRange.Start {
+					//Don't store endIdx if end == start
+					endIdx := subbadgeId - 1
+					if endIdx == currRange.Start {
+						endIdx = 0
+					}
+
 					newIds = append(newIds, &types.NumberRange{
-						Start: idObject.Start,
-						End:   subbadgeId - 1,
+						Start: currRange.Start,
+						End:   endIdx,
 					})
 				}
 
 				//If we still have an existing after range, start that at subbadge + 1
-				if subbadgeId <= math.MaxUint64-1 && subbadgeId+1 <= idObject.End {
+				if subbadgeId <= math.MaxUint64-1 && subbadgeId + 1 <= currRange.End {
+					//Don't store endIdx if end == start
+					endIdx := currRange.End
+					if endIdx == subbadgeId + 1 {
+						endIdx = 0
+					}
+
 					newIds = append(newIds, &types.NumberRange{
 						Start: subbadgeId + 1,
-						End:   idObject.End,
+						End:   endIdx,
 					})
 				}
+
+				newIds = append(newIds, balanceObj.Ids[median+1:]...) 
+				balanceObj.Ids = newIds
+				break
+			} else if balanceObj.Ids[median].Start > subbadgeId {
+				high = median - 1
 			} else {
-				newIds = append(newIds, idObject)
+				low = median + 1
 			}
 		}
-		if len(newIds) > 0 {
-			new_amounts = append(new_amounts, &types.RangesToAmounts{
-				Ranges: newIds,
-				Amount: amountObj.Amount,
-			})
+		
+		if len(balanceObj.Ids) > 0 {
+			newAmounts = append(newAmounts, balanceObj)
 		}
 	}
-	return new_amounts
+	return newAmounts
 }
 
-//Precondition: Must be removed already (balance == 0)
-func SetBadgeBalanceBySubbadgeId(subbadgeId uint64, amount uint64, amounts []*types.RangesToAmounts) []*types.RangesToAmounts {
-	new_amounts := []*types.RangesToAmounts{}
-	balanceFound := false
+// Sets the balance for a specific subbadgeId. Assumes RemoveBalanceForSubbadgeId() was previously called.
+func SetBalanceForSubbadgeId(subbadgeId uint64, amount uint64, amounts []*types.BalanceToIds) []*types.BalanceToIds {
+	// Don't store if balance == 0
+	if amount == 0 {
+		return amounts
+	}
 
-	for _, amountObj := range amounts {
-		if amountObj.Amount != amount {
-			new_amounts = append(new_amounts, amountObj)
-			continue
+	// Balances will be sorted, so we can binary search to get the targetIdx
+	balanceLow := 0
+	balanceHigh := len(amounts) - 1
+	median := 0
+	hasEntryWithSameBalance := false
+	setIdx := 0
+	for balanceLow <= balanceHigh {
+		median = int(uint(balanceLow + balanceHigh) >> 1)
+		if amounts[median].Balance == amount {
+			hasEntryWithSameBalance = true
+			break;
+		} else if amounts[median].Balance > amount {
+			balanceHigh = median - 1
+		} else {
+			balanceLow = median + 1
 		}
-		balanceFound = true
+	}
+	
+	if len(amounts) != 0 {
+		setIdx = median + 1
+		if (amount <= amounts[median].Balance) {
+			setIdx = median
+		}
+	}
+
+
+	newAmounts := []*types.BalanceToIds{}
+	if !hasEntryWithSameBalance {
+		newAmounts = append(newAmounts, amounts[:setIdx]...)
+		newAmounts = append(newAmounts, &types.BalanceToIds{
+			Balance: amount,
+			Ids: []*types.NumberRange{{Start: subbadgeId}},
+		})
+		newAmounts = append(newAmounts, amounts[setIdx:]...)
+	} else {
+		newAmounts = amounts
+
+		//Handle case where we have it omits the empty case where Start && End == 0
+		if len(newAmounts[setIdx].Ids) == 0 {
+			newAmounts[setIdx].Ids = append(newAmounts[setIdx].Ids, &types.NumberRange{})
+		}
 
 		newIds := []*types.NumberRange{}
 
-		if len(amountObj.Ranges) == 0 {
+		insertIdx := 0
+		if newAmounts[setIdx].Ids[0].Start > subbadgeId {
+			//Handle case where subbadgeId is less than the starting subbadgeId (append to front)
+			insertIdx = 0
+			newIds = append(newIds, &types.NumberRange{Start: subbadgeId})
+			newIds = append(newIds, newAmounts[setIdx].Ids...)
+		} else if newAmounts[setIdx].Ids[len(newAmounts[setIdx].Ids)-1].End < subbadgeId {
+			//Handle case where subbadgeId is less than the starting subbadgeId (append to end)
+			insertIdx = len(newAmounts[setIdx].Ids)
+			newIds = append(newIds, newAmounts[setIdx].Ids...)
+			newIds = append(newIds, &types.NumberRange{Start: subbadgeId})
+		} else {
+			//Handle case where subbadgeId is somewhere within existing ranges (append and merge if necessary)
+			//Binary search to find the insertion index
+			low := 0
+			high := len(newAmounts[setIdx].Ids) - 2
+			// We assume it is removed so it won't be in the middle of an existing range
+			for low <= high {
+				median = int(uint(low + high) >> 1)
+				if newAmounts[setIdx].Ids[median].Start < subbadgeId && newAmounts[setIdx].Ids[median + 1].Start > subbadgeId {
+					break;
+				} else if newAmounts[setIdx].Ids[median].Start > subbadgeId {
+					high = median - 1
+				} else {
+					low = median + 1
+				}
+			}
+			
+			//insertIdx is the index where we need to insert the new subbadgeId
+			//Ex: [10, 20, 30] and we need to insert 25, insertIdx == 2
+			insertIdx = median + 1
+			if (newAmounts[setIdx].Ids[median].Start <= subbadgeId) {
+				insertIdx = median
+			}
+			newIds = append(newIds, newAmounts[setIdx].Ids[:insertIdx]...)
 			newIds = append(newIds, &types.NumberRange{
 				Start: subbadgeId,
-				End:   0,
 			})
-
-			new_amounts = append(new_amounts, &types.RangesToAmounts{
-				Ranges: newIds,
-				Amount: amountObj.Amount,
-			})
-		} else {
-			if len(amountObj.Ranges) > 0 && amountObj.Ranges[0].Start > subbadgeId {
-				newIds = append(newIds, &types.NumberRange{
-					Start: subbadgeId,
-					End:   subbadgeId,
-				})
-			}
-
-			for i := 0; i < len(amountObj.Ranges); i++ {
-				if i >= 1 && subbadgeId > amountObj.Ranges[i-1].End && subbadgeId < amountObj.Ranges[i].Start {
-					newIds = append(newIds, &types.NumberRange{
-						Start: subbadgeId,
-						End:   subbadgeId,
-					})
-				}
-
-				newIds = append(newIds, &types.NumberRange{
-					Start: amountObj.Ranges[i].Start,
-					End:   amountObj.Ranges[i].End,
-				})
-			}
-
-			if len(amountObj.Ranges) > 0 && amountObj.Ranges[len(amountObj.Ranges)-1].End < subbadgeId {
-				newIds = append(newIds, &types.NumberRange{
-					Start: subbadgeId,
-					End:   subbadgeId,
-				})
-			}
-
-			mergedIds := []*types.NumberRange{
-				newIds[0],
-			}
-			for idx := 1; idx < len(newIds); idx++ {
-				if newIds[idx].Start == mergedIds[len(mergedIds)-1].End+1 {
-					mergedIds[len(mergedIds)-1].End = newIds[idx].End
-				} else {
-					mergedIds = append(mergedIds, newIds[idx])
-				}
-			}
-
-			for idx := 0; idx < len(mergedIds); idx++ {
-				if mergedIds[idx].End == mergedIds[idx].Start {
-					mergedIds[idx].End = 0
-				}
-			}
-
-			new_amounts = append(new_amounts, &types.RangesToAmounts{
-				Ranges: mergedIds,
-				Amount: amountObj.Amount,
-			})
+			newIds = append(newIds, newAmounts[setIdx].Ids[insertIdx:]...)
 		}
-	}
 
-	if !balanceFound {
-		new_amounts = append(new_amounts, &types.RangesToAmounts{
-			Amount: amount,
-			Ranges: []*types.NumberRange{{Start: subbadgeId}},
-		})
-	}
+		//Handle cases where we need to merge with the previous or next range
+		needToMergeWithPrev := false
+		needToMergeWithNext := false
+		prevStartIdx := uint64(0)
+		nextEndIdx := uint64(0)
 
-	return new_amounts
+		if insertIdx > 0 {
+			prevStartIdx = newIds[insertIdx - 1].Start
+			prevEndIdx := newIds[insertIdx - 1].End
+			if prevEndIdx == 0 {
+				prevEndIdx = newIds[insertIdx - 1].Start
+			}
+
+			if prevEndIdx + 1 == subbadgeId {
+				needToMergeWithPrev = true
+			}
+		}
+
+		if insertIdx < len(newAmounts[setIdx].Ids) - 1 {
+			nextStartIdx := newIds[insertIdx + 1].Start
+			nextEndIdx = newIds[insertIdx + 1].End
+			if nextEndIdx == 0 {
+				nextEndIdx = newIds[insertIdx + 1].Start
+			}
+
+			if nextStartIdx - 1 == subbadgeId {
+				needToMergeWithNext = true
+			}
+		}
+
+
+		mergedIds := []*types.NumberRange{}
+		// 4 Cases: Need to merge with both, just next, just prev, or none
+		if needToMergeWithPrev && needToMergeWithNext {
+			mergedIds = append(mergedIds, newIds[:insertIdx - 1]...)
+			mergedIds = append(mergedIds, &types.NumberRange{
+				Start: prevStartIdx,
+				End:   nextEndIdx,
+			})
+			mergedIds = append(mergedIds, newIds[insertIdx + 2:]...)
+		} else if needToMergeWithPrev {
+			mergedIds = append(mergedIds, newIds[:insertIdx - 1]...)
+			mergedIds = append(mergedIds, &types.NumberRange{
+				Start: prevStartIdx,
+				End:   subbadgeId,
+			})
+			mergedIds = append(mergedIds, newIds[insertIdx + 1:]...)
+		} else if needToMergeWithNext {
+			mergedIds = append(mergedIds, newIds[:insertIdx]...)
+			mergedIds = append(mergedIds, &types.NumberRange{
+				Start: subbadgeId,
+				End:   nextEndIdx,
+			})
+			mergedIds = append(mergedIds, newIds[insertIdx + 2:]...)
+		} else {
+			mergedIds = newIds
+		}
+
+		newAmounts[setIdx].Ids = mergedIds
+	}
+	
+	return newAmounts
 }
 
-func UpdateBadgeBalanceBySubbadgeId(subbadgeId uint64, newAmount uint64, amounts []*types.RangesToAmounts) []*types.RangesToAmounts {
-	amounts = RemoveBadgeBalanceBySubbadgeId(subbadgeId, amounts)
-	if newAmount != 0 {
-		amounts = SetBadgeBalanceBySubbadgeId(subbadgeId, newAmount, amounts)
-	}
-
-	//TODO: make sure this is all sorted by subbadgeId
-	return amounts
-}
-
-func (k Keeper) AddToBadgeBalance(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, subbadgeId uint64, balance_to_add uint64) (types.BadgeBalanceInfo, error) {
-	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "simple add balance")
-	if balance_to_add == 0 {
+// Adds a balance for the subbadgeID
+func (k Keeper) AddBalanceForSubbadgeId(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, subbadgeId uint64, balanceToAdd uint64) (types.BadgeBalanceInfo, error) {
+	if balanceToAdd == 0 {
 		return badgeBalanceInfo, ErrBalanceIsZero
 	}
 
-	currBalance := GetBadgeBalanceFromBalanceAmountsForSubbadgeId(subbadgeId, badgeBalanceInfo.BalanceAmounts)
-	newBalance, err := SafeAdd(currBalance, balance_to_add)
+	currBalance := GetBalanceForSubbadgeId(subbadgeId, badgeBalanceInfo.BalanceAmounts)
+	newBalance, err := SafeAdd(currBalance, balanceToAdd)
 	if err != nil {
 		return badgeBalanceInfo, err
 	}
 
-	newAmounts := UpdateBadgeBalanceBySubbadgeId(subbadgeId, newBalance, badgeBalanceInfo.BalanceAmounts)
-
+	newAmounts := UpdateBalanceForSubbadgeId(subbadgeId, newBalance, badgeBalanceInfo.BalanceAmounts)
 	badgeBalanceInfo.BalanceAmounts = newAmounts
 
 	return badgeBalanceInfo, nil
 }
 
-func (k Keeper) RemoveFromBadgeBalance(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, subbadgeId uint64, balance_to_remove uint64) (types.BadgeBalanceInfo, error) {
-	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "simple remove balance")
-	if balance_to_remove == 0 {
+// Removes a balance for the subbadgeID
+func (k Keeper) RemoveBalanceForSubbadgeId(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, subbadgeId uint64, balanceToRemove uint64) (types.BadgeBalanceInfo, error) {
+	if balanceToRemove == 0 {
 		return badgeBalanceInfo, ErrBalanceIsZero
 	}
 
-	currBalance := GetBadgeBalanceFromBalanceAmountsForSubbadgeId(subbadgeId, badgeBalanceInfo.BalanceAmounts)
-	if currBalance < balance_to_remove {
+	currBalance := GetBalanceForSubbadgeId(subbadgeId, badgeBalanceInfo.BalanceAmounts)
+	if currBalance < balanceToRemove {
 		return badgeBalanceInfo, ErrBadgeBalanceTooLow
 	}
 
-	newBalance, err := SafeSubtract(currBalance, balance_to_remove)
-	newAmounts := UpdateBadgeBalanceBySubbadgeId(subbadgeId, newBalance, badgeBalanceInfo.BalanceAmounts)
-
-	badgeBalanceInfo.BalanceAmounts = newAmounts
-
+	newBalance, err := SafeSubtract(currBalance, balanceToRemove)
 	if err != nil {
 		return badgeBalanceInfo, err
 	}
+	
+	newAmounts := UpdateBalanceForSubbadgeId(subbadgeId, newBalance, badgeBalanceInfo.BalanceAmounts)
+	badgeBalanceInfo.BalanceAmounts = newAmounts
 
 	return badgeBalanceInfo, nil
-}
-
-func (k Keeper) AddToBothPendingBadgeBalances(ctx sdk.Context, fromBadgeBalanceInfo types.BadgeBalanceInfo, toBadgeBalanceInfo types.BadgeBalanceInfo, subbadgeRange types.NumberRange, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool, expirationTime uint64) (types.BadgeBalanceInfo, types.BadgeBalanceInfo, error) {
-	ctx.GasMeter().ConsumeGas(AddOrRemovePending*2, "add to both pending balances")
-	if amount == 0 {
-		return fromBadgeBalanceInfo, toBadgeBalanceInfo, ErrBalanceIsZero
-	}
-
-	//Append pending transfers and update nonces
-	fromBadgeBalanceInfo.Pending = append(fromBadgeBalanceInfo.Pending, &types.PendingTransfer{
-		SubbadgeRange:     &subbadgeRange,
-		Amount:            amount,
-		ApprovedBy:        approvedBy,
-		SendRequest:       sentByFrom,
-		To:                to,
-		From:              from,
-		ThisPendingNonce:  fromBadgeBalanceInfo.PendingNonce,
-		OtherPendingNonce: toBadgeBalanceInfo.PendingNonce,
-		ExpirationTime:   expirationTime,
-	})
-
-	toBadgeBalanceInfo.Pending = append(toBadgeBalanceInfo.Pending, &types.PendingTransfer{
-		SubbadgeRange:     &subbadgeRange,
-		Amount:            amount,
-		ApprovedBy:        approvedBy,
-		SendRequest:       !sentByFrom,
-		To:                to,
-		From:              from,
-		ThisPendingNonce:  toBadgeBalanceInfo.PendingNonce,
-		OtherPendingNonce: fromBadgeBalanceInfo.PendingNonce,
-		ExpirationTime:   expirationTime,
-	})
-
-	fromBadgeBalanceInfo.PendingNonce += 1
-	toBadgeBalanceInfo.PendingNonce += 1
-
-	return fromBadgeBalanceInfo, toBadgeBalanceInfo, nil
-}
-
-func (k Keeper) RemovePending(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, this_nonce uint64, other_nonce uint64) (types.BadgeBalanceInfo, error) {
-	ctx.GasMeter().ConsumeGas(AddOrRemovePending, "remove from pending")
-
-	new_pending := []*types.PendingTransfer{}
-	found := false
-	for _, pending_info := range badgeBalanceInfo.Pending {
-		if pending_info.ThisPendingNonce != this_nonce || pending_info.OtherPendingNonce != other_nonce {
-			new_pending = append(new_pending, pending_info)
-		} else {
-			found = true
-		}
-	}
-
-	if !found {
-		return badgeBalanceInfo, ErrPendingNotFound
-	}
-
-	if len(new_pending) == 0 {
-		badgeBalanceInfo.Pending = nil
-		badgeBalanceInfo.PendingNonce = 0
-	} else {
-		badgeBalanceInfo.Pending = new_pending
-	}
-
-	return badgeBalanceInfo, nil
-}
-
-func (k Keeper) SetApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount uint64, address_num uint64, subbadgeRange types.NumberRange, expirationTime uint64) (types.BadgeBalanceInfo, error) {
-	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "adjust approval")
-
-	new_approvals := []*types.Approval{}
-	found := false
-	//check for approval with same address / amount
-
-	//TODO: binary search
-	for _, approval := range badgeBalanceInfo.Approvals {
-		if approval.Address != address_num || approval.ExpirationTime != expirationTime {
-			new_approvals = append(new_approvals, approval)
-		} else {
-			found = true
-			//Remove completely if setting to zero
-			if amount != 0 {
-				newAmounts := approval.ApprovalAmounts
-				for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
-					newAmounts = UpdateBadgeBalanceBySubbadgeId(i, amount, newAmounts)
-				}
-
-				approval.ApprovalAmounts = newAmounts
-
-				new_approvals = append(new_approvals, approval)
-			}
-		}
-	}
-
-	if !found {
-		//Add new approval
-		new_approvals = append(new_approvals, &types.Approval{
-			Address: address_num,
-			ApprovalAmounts: []*types.RangesToAmounts{
-				{
-					Amount: amount,
-					Ranges: []*types.NumberRange{&subbadgeRange},
-				},
-			},
-			ExpirationTime: expirationTime,
-		})
-	}
-
-	//TODO: sort by address_num
-
-	badgeBalanceInfo.Approvals = new_approvals
-
-	return badgeBalanceInfo, nil
-}
-
-//Will return an error if isn't approved for amounts
-func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount_to_remove uint64, address_num uint64, subbadgeRange types.NumberRange) (types.BadgeBalanceInfo, error) {
-	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "adjust approval")
-
-	new_approvals := []*types.Approval{}
-	removed := false
-
-	//check for approval with same address / amount
-	for _, approval := range badgeBalanceInfo.Approvals {
-		if approval.Address == address_num {
-			newAmounts := approval.ApprovalAmounts
-			for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
-				currAmount := GetBadgeBalanceFromBalanceAmountsForSubbadgeId(i, approval.ApprovalAmounts)
-				if currAmount < amount_to_remove {
-					return badgeBalanceInfo, ErrInsufficientApproval
-				}
-
-				newAmount, err := SafeSubtract(currAmount, amount_to_remove)
-				if err != nil {
-					return badgeBalanceInfo, err
-				}
-
-				newAmounts = UpdateBadgeBalanceBySubbadgeId(i, newAmount, newAmounts)
-			}
-
-			approval.ApprovalAmounts = newAmounts
-
-			new_approvals = append(new_approvals, approval)
-
-			removed = true
-		} else {
-			new_approvals = append(new_approvals, approval)
-		}
-	}
-
-	if !removed {
-		return badgeBalanceInfo, ErrInsufficientApproval
-	}
-
-	if len(new_approvals) == 0 {
-		badgeBalanceInfo.Approvals = nil
-	} else {
-		badgeBalanceInfo.Approvals = new_approvals
-	}
-
-	return badgeBalanceInfo, nil
-}
-
-func (k Keeper) AddBalanceToApproval(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, amount_to_add uint64, address_num uint64, subbadgeRange types.NumberRange) (types.BadgeBalanceInfo, error) {
-	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "adjust approval")
-
-	new_approvals := []*types.Approval{}
-	//check for approval with same address / amount
-	for _, approval := range badgeBalanceInfo.Approvals {
-		if approval.Address == address_num {
-			newAmounts := approval.ApprovalAmounts
-			for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
-				currAmount := GetBadgeBalanceFromBalanceAmountsForSubbadgeId(i, newAmounts)
-				newAmount, err := SafeAdd(currAmount, amount_to_add)
-				if err != nil {
-					return badgeBalanceInfo, err
-				}
-
-				newAmounts = UpdateBadgeBalanceBySubbadgeId(i, newAmount, newAmounts)
-			}
-
-			approval.ApprovalAmounts = newAmounts
-
-			new_approvals = append(new_approvals, approval)
-		} else {
-			new_approvals = append(new_approvals, approval)
-		}
-	}
-
-	badgeBalanceInfo.Approvals = new_approvals
-
-	return badgeBalanceInfo, nil
-
 }

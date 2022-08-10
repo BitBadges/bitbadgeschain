@@ -8,10 +8,10 @@ import { BadgesPacketData } from "./module/types/badges/packet"
 import { NoData } from "./module/types/badges/packet"
 import { Params } from "./module/types/badges/params"
 import { NumberRange } from "./module/types/badges/ranges"
-import { RangesToAmounts } from "./module/types/badges/ranges"
+import { BalanceToIds } from "./module/types/badges/ranges"
 
 
-export { BitBadge, BadgeBalanceInfo, Approval, PendingTransfer, BadgesPacketData, NoData, Params, NumberRange, RangesToAmounts };
+export { BitBadge, BadgeBalanceInfo, Approval, PendingTransfer, BadgesPacketData, NoData, Params, NumberRange, BalanceToIds };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -62,7 +62,7 @@ const getDefaultState = () => {
 						NoData: getStructure(NoData.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						NumberRange: getStructure(NumberRange.fromPartial({})),
-						RangesToAmounts: getStructure(RangesToAmounts.fromPartial({})),
+						BalanceToIds: getStructure(BalanceToIds.fromPartial({})),
 						
 		},
 		_Registry: registry,

@@ -51,7 +51,7 @@ message BitBadge {
     uint64 next_subasset_id = 12;
 
     //only store if not == default; will be sorted in order of subsasset ids; (maybe add defaut option in future)
-    repeated RangesToAmounts subassets_total_supply = 13;
+    repeated BalanceToIds subassets_total_supply = 13;
     
     uint64 default_subasset_supply = 14;
 }

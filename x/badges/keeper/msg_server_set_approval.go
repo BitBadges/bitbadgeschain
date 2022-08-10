@@ -15,7 +15,6 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 	validationParams := UniversalValidationParams{
 		Creator: msg.Creator,
 		BadgeId: msg.BadgeId,
-		AccountsToCheckIfRegistered: []uint64{msg.Address},
 		SubbadgeRangesToValidate: msg.SubbadgeRanges,
 		AccountsThatCantEqualCreator: []uint64{msg.Address},
 	}
@@ -29,7 +28,7 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 	BalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
 	badgeBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, BalanceKey)
 	if !found {
-		badgeBalanceInfo = GetEmptyBadgeBalanceTemplate()
+		badgeBalanceInfo = types.BadgeBalanceInfo{}
 	}
 
 	for _, subbadgeRange := range msg.SubbadgeRanges {

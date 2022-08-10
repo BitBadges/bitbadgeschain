@@ -23,10 +23,10 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 		return nil, err
 	}
 
-	new_amounts := []*types.RangesToAmounts{
+	new_amounts := []*types.BalanceToIds{
 		{
-			Ranges: badge.FreezeAddressRanges,
-			Amount: 1,
+			Ids: badge.FreezeAddressRanges,
+			Balance: 1,
 		},
 	}
 
@@ -36,10 +36,10 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 			if msg.Add {
 				newAmount = 1
 			}
-			new_amounts = UpdateBadgeBalanceBySubbadgeId(targetAddress, newAmount, new_amounts)
+			new_amounts = UpdateBalanceForSubbadgeId(targetAddress, newAmount, new_amounts)
 		}
 		if len(new_amounts) > 0 {
-			badge.FreezeAddressRanges = new_amounts[0].Ranges
+			badge.FreezeAddressRanges = new_amounts[0].Ids
 		} else {
 			badge.FreezeAddressRanges = []*types.NumberRange{}
 		}

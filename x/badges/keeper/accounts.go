@@ -6,6 +6,7 @@ import (
 
 //TODO: switch to social profiles
 
+//Gets the account number for the given sdk.AccAddress. If it doesn't exist, we create a new one.
 func (k Keeper) GetOrCreateAccountNumberForAccAddressBech32(ctx sdk.Context, address sdk.AccAddress) uint64 {
 	account := k.accountKeeper.GetAccount(ctx, address)
 	if account == nil {
@@ -19,17 +20,4 @@ func (k Keeper) GetOrCreateAccountNumberForAccAddressBech32(ctx sdk.Context, add
 func (k Keeper) MustGetAccountNumberForBech32AddressString(ctx sdk.Context, address string) uint64 {
 	acc_address := sdk.MustAccAddressFromBech32(address)
 	return k.GetOrCreateAccountNumberForAccAddressBech32(ctx, acc_address)
-}
-
-//TODO: update this to be compatible with v0.46.0 AccountKeeper and test it
-// if not registered have a way to register and charge gas?
-func (k Keeper) AssertAccountNumbersAreRegistered(ctx sdk.Context, accountNums []uint64) error {
-	// for _, accountNum := range accountNums {
-	// 	address := k.accountKeeper.GetAccountAddressByID(ctx, accountNum)
-	// 	if address == "" {
-	// 		return ErrAccountsAreNotRegistered
-	// 	}
-	// }
-
-	return nil
 }

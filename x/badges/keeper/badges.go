@@ -5,7 +5,7 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-//Gets badge and throws error if it does not exist. Alternative to GetBadgeFromStore which returns a bool not error.
+//Gets badge and throws error if it does not exist. Alternative to GetBadgeFromStore which returns a found bool, not an error.
 func (k Keeper) GetBadgeE(ctx sdk.Context, badgeId uint64) (types.BitBadge, error) {
 	badge, found := k.GetBadgeFromStore(ctx, badgeId)
 	if !found {
@@ -24,6 +24,7 @@ func (k Keeper) GetBadgeAndAssertSubbadgeRangesAreValid(ctx sdk.Context, badgeId
 	}
 
 	for _, subbadgeRange := range subbadgeRanges {
+		// Subbadge ranges can set end == 0 to save storage space. By convention, this means end == start
 		if subbadgeRange.End == 0 {
 			subbadgeRange.End = subbadgeRange.Start
 		} 

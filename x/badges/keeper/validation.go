@@ -5,11 +5,10 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-// Determines what to check universally for each Msg
+// Determines what to validate for each Msg
 type UniversalValidationParams struct {
 	Creator 					string
 	BadgeId 					uint64
-	AccountsToCheckIfRegistered []uint64
 	AccountsThatCantEqualCreator[]uint64
 	SubbadgeRangesToValidate	[]*types.NumberRange
 	MustBeManager				bool
@@ -23,13 +22,6 @@ type UniversalValidationParams struct {
 // Validates everything about the Msg is valid and returns (creatorNum, badge, permissions, error). 
 func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationParams) (uint64, types.BitBadge, error) {
 	CreatorAccountNum := k.MustGetAccountNumberForBech32AddressString(ctx, params.Creator)
-
-	// Check if accounts are registered
-	if len(params.AccountsToCheckIfRegistered) > 0 {
-		if err := k.AssertAccountNumbersAreRegistered(ctx, params.AccountsToCheckIfRegistered); err != nil {
-			return CreatorAccountNum, types.BitBadge{}, err
-		}
-	}	
 
 	if len(params.AccountsThatCantEqualCreator) > 0 {
 		for _, account := range params.AccountsThatCantEqualCreator {

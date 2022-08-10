@@ -11,7 +11,7 @@ option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
 //indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
 message BadgeBalanceInfo {
-    repeated RangesToAmounts balanceAmounts = 2;
+    repeated BalanceToIds balanceAmounts = 2;
     uint64 pending_nonce = 3;
     repeated PendingTransfer pending = 4; //IDs will be sorted in order of pending_nonce
     repeated Approval approvals = 5;
@@ -20,7 +20,7 @@ message BadgeBalanceInfo {
 message Approval {
     uint64 address = 1;
     uint64 expirationTime = 2;
-    repeated RangesToAmounts approvalAmounts = 3;
+    repeated BalanceToIds approvalAmounts = 3;
 }
 
 message PendingTransfer {

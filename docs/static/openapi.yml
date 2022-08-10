@@ -53280,7 +53280,7 @@ definitions:
         description: params holds all the parameters of this module.
         type: object
     description: QueryParamsResponse is response type for the Query/Params RPC method.
-  trevormil.bitbadgeschain.badges.RangesToAmounts:
+  trevormil.bitbadgeschain.badges.BalanceToIds:
     type: object
     properties:
       ranges:

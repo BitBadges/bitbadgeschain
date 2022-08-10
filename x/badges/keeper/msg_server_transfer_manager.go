@@ -15,10 +15,8 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 		Creator: msg.Creator,
 		BadgeId: msg.BadgeId,
 		MustBeManager: true,
-		AccountsToCheckIfRegistered: []uint64{msg.Address},
 		CanManagerTransfer: true,
 	}
-
 	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, validationParams)
 	if err != nil {
 		return nil, err

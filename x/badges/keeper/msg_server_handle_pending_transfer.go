@@ -136,7 +136,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 						if expired {
 							return nil, ErrPendingTransferExpired
 						}
-						newCreatorBadgeBalanceInfo, err = k.AddToBadgeBalance(ctx, newCreatorBadgeBalanceInfo, i, CurrPendingTransfer.Amount)
+						newCreatorBadgeBalanceInfo, err = k.AddBalanceForSubbadgeId(ctx, newCreatorBadgeBalanceInfo, i, CurrPendingTransfer.Amount)
 						if err != nil {
 							return nil, err
 						}
@@ -152,7 +152,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 							FromInfo = otherPartyBalanceInfo
 						}
 
-						FromInfo, err := k.AddToBadgeBalance(ctx, FromInfo, i, CurrPendingTransfer.Amount)
+						FromInfo, err := k.AddBalanceForSubbadgeId(ctx, FromInfo, i, CurrPendingTransfer.Amount)
 						if err != nil {
 							return nil, err
 						}
@@ -192,12 +192,12 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 							return nil, ErrAddressFrozen
 						}
 
-						otherPartyBalanceInfo, err = k.RemoveFromBadgeBalance(ctx, otherPartyBalanceInfo, i, CurrPendingTransfer.Amount)
+						otherPartyBalanceInfo, err = k.RemoveBalanceForSubbadgeId(ctx, otherPartyBalanceInfo, i, CurrPendingTransfer.Amount)
 						if err != nil {
 							return nil, err
 						}
 
-						newCreatorBadgeBalanceInfo, err = k.AddToBadgeBalance(ctx, newCreatorBadgeBalanceInfo, i, CurrPendingTransfer.Amount)
+						newCreatorBadgeBalanceInfo, err = k.AddBalanceForSubbadgeId(ctx, newCreatorBadgeBalanceInfo, i, CurrPendingTransfer.Amount)
 						if err != nil {
 							return nil, err
 						}
@@ -211,12 +211,12 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 							return nil, err
 						}
 
-						newCreatorBadgeBalanceInfo, err = k.RemoveFromBadgeBalance(ctx, newCreatorBadgeBalanceInfo, i, CurrPendingTransfer.Amount)
+						newCreatorBadgeBalanceInfo, err = k.RemoveBalanceForSubbadgeId(ctx, newCreatorBadgeBalanceInfo, i, CurrPendingTransfer.Amount)
 						if err != nil {
 							return nil, err
 						}
 
-						otherPartyBalanceInfo, err = k.AddToBadgeBalance(ctx, otherPartyBalanceInfo, i, CurrPendingTransfer.Amount)
+						otherPartyBalanceInfo, err = k.AddBalanceForSubbadgeId(ctx, otherPartyBalanceInfo, i, CurrPendingTransfer.Amount)
 						if err != nil {
 							return nil, err
 						}

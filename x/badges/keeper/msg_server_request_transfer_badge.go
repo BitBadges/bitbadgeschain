@@ -33,11 +33,11 @@ func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgReq
 
 	toBadgeBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, ToBalanceKey)
 	if !found {
-		toBadgeBalanceInfo = GetEmptyBadgeBalanceTemplate()
+		toBadgeBalanceInfo = types.BadgeBalanceInfo{}
 	}
 
 	for _, subbadgeRange := range msg.SubbadgeRanges {
-		fromBadgeBalanceInfo, toBadgeBalanceInfo, err = k.AddToBothPendingBadgeBalances(ctx, fromBadgeBalanceInfo, toBadgeBalanceInfo, *subbadgeRange, CreatorAccountNum, msg.From, msg.Amount, CreatorAccountNum, false, msg.ExpirationTime)
+		fromBadgeBalanceInfo, toBadgeBalanceInfo, err = k.AppendPendingTransferForBothParties(ctx, fromBadgeBalanceInfo, toBadgeBalanceInfo, *subbadgeRange, CreatorAccountNum, msg.From, msg.Amount, CreatorAccountNum, false, msg.ExpirationTime)
 		if err != nil {
 			return nil, err
 		}

@@ -27,7 +27,7 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	ManagerBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.Id)
 	badgeBalanceInfo, found := k.GetBadgeBalanceFromStore(ctx, ManagerBalanceKey)
 	if !found {
-		badgeBalanceInfo = GetEmptyBadgeBalanceTemplate()
+		badgeBalanceInfo = types.BadgeBalanceInfo{}
 	}
 
 	originalSubassetId := badge.NextSubassetId
@@ -50,12 +50,12 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 			if supply != defaultSupply {
 				ctx.GasMeter().ConsumeGas(SubbadgeWithSupplyNotEqualToOne, "create new subbadge cost")
 
-				new_amounts = UpdateBadgeBalanceBySubbadgeId(subasset_id, supply, new_amounts)
+				new_amounts = UpdateBalanceForSubbadgeId(subasset_id, supply, new_amounts)
 			}
 			badge.NextSubassetId += 1
 
 			//Mint the total supply of subbadge to the manager
-			newBadgeBalanceInfo, err := k.AddToBadgeBalance(ctx, badgeBalanceInfo, subasset_id, supply)
+			newBadgeBalanceInfo, err := k.AddBalanceForSubbadgeId(ctx, badgeBalanceInfo, subasset_id, supply)
 			if err != nil {
 				return nil, err
 			}

@@ -155,11 +155,11 @@ func (suite *TestSuite) TestGasCosts() {
 		tbl.AddRow("GetBadgeBalance", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.NumberRange{{Start: 0, End: 0}}, false)
+		err = HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.NumberRange{{Start: 2, End: 2}}, false)
 		suite.Require().Nil(err, "Error accepting badge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("HandlePendingTransfer (Reject) - 1", endGas-startGas)
-		err = HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.NumberRange{{Start: 0, End: 0}}, false)
+		err = HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.NumberRange{{Start: 2, End: 2}}, false)
 		suite.Require().Nil(err, "Error accepting badge")
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
@@ -203,7 +203,7 @@ func (suite *TestSuite) TestGasCosts() {
 		tbl.AddRow("GetBadgeBalance", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.NumberRange{{Start: 0, End: 0}}, true)
+		err = HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.NumberRange{{Start: 4, End: 4}}, true)
 		suite.Require().Nil(err, "Error accepting badge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("Accept RequestTransfer - 1", endGas-startGas)
@@ -251,11 +251,11 @@ func (suite *TestSuite) TestGasCosts() {
 		tbl.AddRow("GetBadgeBalance", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.NumberRange{{Start: 0, End: 0}}, false)
+		err = HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.NumberRange{{Start: 0, End: 999}}, false)
 		suite.Require().Nil(err, "Error accepting badge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("Reject RequestTransfer - 1", endGas-startGas)
-		err = HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.NumberRange{{Start: 0, End: 0}}, false)
+		err = HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.NumberRange{{Start: 0, End: 999}}, false)
 		suite.Require().Nil(err, "Error accepting badge")
 
 		startGas = suite.ctx.GasMeter().GasConsumed()

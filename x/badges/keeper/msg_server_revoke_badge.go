@@ -16,7 +16,6 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 		BadgeId: msg.BadgeId,
 		SubbadgeRangesToValidate: msg.SubbadgeRanges,
 		MustBeManager: true,
-		AccountsToCheckIfRegistered: msg.Addresses,
 		CanRevoke: true,
 	}
 
@@ -47,12 +46,12 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 
 		for _, subbadgeRange := range msg.SubbadgeRanges {
 			for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
-				addressBalanceInfo, err = k.RemoveFromBadgeBalance(ctx, addressBalanceInfo, i, revokeAmount)
+				addressBalanceInfo, err = k.RemoveBalanceForSubbadgeId(ctx, addressBalanceInfo, i, revokeAmount)
 				if err != nil {
 					return nil, err
 				}
 
-				managerBalanceInfo, err = k.AddToBadgeBalance(ctx, managerBalanceInfo, i, revokeAmount)
+				managerBalanceInfo, err = k.AddBalanceForSubbadgeId(ctx, managerBalanceInfo, i, revokeAmount)
 				if err != nil {
 					return nil, err
 				}
