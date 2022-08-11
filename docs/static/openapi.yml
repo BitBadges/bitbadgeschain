@@ -52748,7 +52748,7 @@ definitions:
             amount:
               type: string
               format: uint64
-  trevormil.bitbadgeschain.badges.BadgeBalanceInfo:
+  trevormil.bitbadgeschain.badges.UserBalanceInfo:
     type: object
     properties:
       balanceAmounts:
@@ -53001,7 +53001,7 @@ definitions:
     type: object
   trevormil.bitbadgeschain.badges.MsgUpdateUrisResponse:
     type: object
-  trevormil.bitbadgeschain.badges.NumberRange:
+  trevormil.bitbadgeschain.badges.IdRange:
     type: object
     properties:
       start:

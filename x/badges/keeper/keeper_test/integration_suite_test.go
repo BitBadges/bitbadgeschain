@@ -146,37 +146,37 @@ func CreateSubBadges(suite *TestSuite, ctx context.Context, creator string, badg
 	return err
 }
 
-func RequestTransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, amount uint64, badgeId uint64, subbadgeRange []*types.NumberRange, expirationTime uint64) error {
+func RequestTransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, amount uint64, badgeId uint64, subbadgeRange []*types.IdRange, expirationTime uint64) error {
 	msg := types.NewMsgRequestTransferBadge(creator, from, amount, badgeId, subbadgeRange, expirationTime)
 	_, err := suite.msgServer.RequestTransferBadge(ctx, msg)
 	return err
 }
 
-func RevokeBadges(suite *TestSuite, ctx context.Context, creator string, addresses []uint64, amounts []uint64, badgeId uint64, subbadgeRange []*types.NumberRange) error {
+func RevokeBadges(suite *TestSuite, ctx context.Context, creator string, addresses []uint64, amounts []uint64, badgeId uint64, subbadgeRange []*types.IdRange) error {
 	msg := types.NewMsgRevokeBadge(creator, addresses, amounts, badgeId, subbadgeRange)
 	_, err := suite.msgServer.RevokeBadge(ctx, msg)
 	return err
 }
 
-func TransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, to []uint64, amounts []uint64, badgeId uint64, subbadgeRange []*types.NumberRange, expirationTime uint64) error {
+func TransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, to []uint64, amounts []uint64, badgeId uint64, subbadgeRange []*types.IdRange, expirationTime uint64) error {
 	msg := types.NewMsgTransferBadge(creator, from, to, amounts, badgeId, subbadgeRange, 0)
 	_, err := suite.msgServer.TransferBadge(ctx, msg)
 	return err
 }
 
-func SetApproval(suite *TestSuite, ctx context.Context, creator string, amount uint64, address uint64, badgeId uint64, subbadgeRange []*types.NumberRange, expirationTime uint64) error {
+func SetApproval(suite *TestSuite, ctx context.Context, creator string, amount uint64, address uint64, badgeId uint64, subbadgeRange []*types.IdRange, expirationTime uint64) error {
 	msg := types.NewMsgSetApproval(creator, amount, address, badgeId, subbadgeRange, expirationTime)
 	_, err := suite.msgServer.SetApproval(ctx, msg)
 	return err
 }
 
-func HandlePendingTransfers(suite *TestSuite, ctx context.Context, creator string, accept bool, badgeId uint64, nonceRanges []*types.NumberRange, forcefulAccept bool) error {
+func HandlePendingTransfers(suite *TestSuite, ctx context.Context, creator string, accept bool, badgeId uint64, nonceRanges []*types.IdRange, forcefulAccept bool) error {
 	msg := types.NewMsgHandlePendingTransfer(creator, accept, badgeId, nonceRanges, forcefulAccept)
 	_, err := suite.msgServer.HandlePendingTransfer(ctx, msg)
 	return err
 }
 
-func FreezeAddresses(suite *TestSuite, ctx context.Context, creator string, addresses []*types.NumberRange, badgeId uint64, subbadgeId uint64, add bool) error {
+func FreezeAddresses(suite *TestSuite, ctx context.Context, creator string, addresses []*types.IdRange, badgeId uint64, subbadgeId uint64, add bool) error {
 	msg := types.NewMsgFreezeAddress(creator, addresses, badgeId, add)
 	_, err := suite.msgServer.FreezeAddress(ctx, msg)
 	return err
@@ -222,14 +222,14 @@ func GetBadge(suite *TestSuite, ctx context.Context, id uint64) (types.BitBadge,
 	return *res.Badge, nil
 }
 
-func GetBadgeBalance(suite *TestSuite, ctx context.Context, badgeId uint64, subbadgeId uint64, address uint64) (types.BadgeBalanceInfo, error) {
+func GetUserBalance(suite *TestSuite, ctx context.Context, badgeId uint64, subbadgeId uint64, address uint64) (types.UserBalanceInfo, error) {
 	res, err := suite.app.BadgesKeeper.GetBalance(ctx, &types.QueryGetBalanceRequest{
 		BadgeId: uint64(badgeId),
 		Address: uint64(address),
 	})
 
 	if err != nil {
-		return types.BadgeBalanceInfo{}, err
+		return types.UserBalanceInfo{}, err
 	}
 
 	return *res.BalanceInfo, nil

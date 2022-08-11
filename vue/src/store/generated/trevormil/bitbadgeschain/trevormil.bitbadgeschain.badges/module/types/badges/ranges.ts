@@ -4,20 +4,20 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "trevormil.bitbadgeschain.badges";
 
-export interface NumberRange {
+export interface IdRange {
     start: number;
     end: number;
 }
 
 export interface BalanceToIds {
-    Ids: NumberRange[];
+    Ids: IdRange[];
     amount: number;
 }
 
-const baseNumberRange: object = { start: 0, end: 0 };
+const baseIdRange: object = { start: 0, end: 0 };
 
-export const NumberRange = {
-    encode(message: NumberRange, writer: Writer = Writer.create()): Writer {
+export const IdRange = {
+    encode(message: IdRange, writer: Writer = Writer.create()): Writer {
         if (message.start !== 0) {
             writer.uint32(8).uint64(message.start);
         }
@@ -27,10 +27,10 @@ export const NumberRange = {
         return writer;
     },
 
-    decode(input: Reader | Uint8Array, length?: number): NumberRange {
+    decode(input: Reader | Uint8Array, length?: number): IdRange {
         const reader = input instanceof Uint8Array ? new Reader(input) : input;
         let end = length === undefined ? reader.len : reader.pos + length;
-        const message = { ...baseNumberRange } as NumberRange;
+        const message = { ...baseIdRange } as IdRange;
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
@@ -48,8 +48,8 @@ export const NumberRange = {
         return message;
     },
 
-    fromJSON(object: any): NumberRange {
-        const message = { ...baseNumberRange } as NumberRange;
+    fromJSON(object: any): IdRange {
+        const message = { ...baseIdRange } as IdRange;
         if (object.start !== undefined && object.start !== null) {
             message.start = Number(object.start);
         } else {
@@ -63,15 +63,15 @@ export const NumberRange = {
         return message;
     },
 
-    toJSON(message: NumberRange): unknown {
+    toJSON(message: IdRange): unknown {
         const obj: any = {};
         message.start !== undefined && (obj.start = message.start);
         message.end !== undefined && (obj.end = message.end);
         return obj;
     },
 
-    fromPartial(object: DeepPartial<NumberRange>): NumberRange {
-        const message = { ...baseNumberRange } as NumberRange;
+    fromPartial(object: DeepPartial<IdRange>): IdRange {
+        const message = { ...baseIdRange } as IdRange;
         if (object.start !== undefined && object.start !== null) {
             message.start = object.start;
         } else {
@@ -91,7 +91,7 @@ const baseBalanceToIds: object = { amount: 0 };
 export const BalanceToIds = {
     encode(message: BalanceToIds, writer: Writer = Writer.create()): Writer {
         for (const v of message.ranges) {
-            NumberRange.encode(v!, writer.uint32(10).fork()).ldelim();
+            IdRange.encode(v!, writer.uint32(10).fork()).ldelim();
         }
         if (message.amount !== 0) {
             writer.uint32(16).uint64(message.amount);
@@ -108,7 +108,7 @@ export const BalanceToIds = {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.ranges.push(NumberRange.decode(reader, reader.uint32()));
+                    message.ranges.push(IdRange.decode(reader, reader.uint32()));
                     break;
                 case 2:
                     message.amount = longToNumber(reader.uint64() as Long);
@@ -126,7 +126,7 @@ export const BalanceToIds = {
         message.ranges = [];
         if (object.ranges !== undefined && object.ranges !== null) {
             for (const e of object.ranges) {
-                message.ranges.push(NumberRange.fromJSON(e));
+                message.ranges.push(IdRange.fromJSON(e));
             }
         }
         if (object.amount !== undefined && object.amount !== null) {
@@ -141,7 +141,7 @@ export const BalanceToIds = {
         const obj: any = {};
         if (message.ranges) {
             obj.ranges = message.ranges.map((e) =>
-                e ? NumberRange.toJSON(e) : undefined
+                e ? IdRange.toJSON(e) : undefined
             );
         } else {
             obj.ranges = [];
@@ -155,7 +155,7 @@ export const BalanceToIds = {
         message.ranges = [];
         if (object.ranges !== undefined && object.ranges !== null) {
             for (const e of object.ranges) {
-                message.ranges.push(NumberRange.fromPartial(e));
+                message.ranges.push(IdRange.fromPartial(e));
             }
         }
         if (object.amount !== undefined && object.amount !== null) {

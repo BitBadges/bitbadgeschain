@@ -12,33 +12,30 @@ import (
 func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval) (*types.MsgSetApprovalResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	validationParams := UniversalValidationParams{
+	CreatorAccountNum, _, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator: msg.Creator,
 		BadgeId: msg.BadgeId,
 		SubbadgeRangesToValidate: msg.SubbadgeRanges,
 		AccountsThatCantEqualCreator: []uint64{msg.Address},
-	}
-
-	CreatorAccountNum, _, err := k.UniversalValidate(ctx, validationParams)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-
-	BalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
-	badgeBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, BalanceKey)
+	creatorBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
+	creatorBalanceInfo, found := k.Keeper.GetUserBalanceFromStore(ctx, creatorBalanceKey)
 	if !found {
-		badgeBalanceInfo = types.BadgeBalanceInfo{}
+		creatorBalanceInfo = types.UserBalanceInfo{}
 	}
 
 	for _, subbadgeRange := range msg.SubbadgeRanges {
-		badgeBalanceInfo, err = k.Keeper.SetApproval(ctx, badgeBalanceInfo, msg.Amount, msg.Address, *subbadgeRange, msg.ExpirationTime)
+		creatorBalanceInfo, err = k.Keeper.SetApproval(ctx, creatorBalanceInfo, msg.Amount, msg.Address, *subbadgeRange, msg.ExpirationTime)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if err := k.SetBadgeBalanceInStore(ctx, BalanceKey, badgeBalanceInfo); err != nil {
+	if err := k.SetUserBalanceInStore(ctx, creatorBalanceKey, creatorBalanceInfo); err != nil {
 		return nil, err
 	}
 

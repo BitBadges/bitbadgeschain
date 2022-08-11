@@ -24,7 +24,7 @@ func TestGenesisState_Validate(t *testing.T) {
 				PortId:      types.PortID,
 				NextBadgeId: 0,
 				Badges:      []*types.BitBadge{},
-				Balances:    []*types.BadgeBalanceInfo{},
+				Balances:    []*types.UserBalanceInfo{},
 				BalanceIds:  []string{},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},

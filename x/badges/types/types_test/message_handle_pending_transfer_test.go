@@ -21,7 +21,7 @@ func TestMsgHandlePendingTransfer_ValidateBasic(t *testing.T) {
 			msg: types.MsgHandlePendingTransfer{
 				Creator: "invalid_address",
 
-				NonceRanges: []*types.NumberRange{
+				NonceRanges: []*types.IdRange{
 					{
 						Start: 0,
 						End:   0,
@@ -33,7 +33,7 @@ func TestMsgHandlePendingTransfer_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: types.MsgHandlePendingTransfer{
 				Creator: sample.AccAddress(),
-				NonceRanges: []*types.NumberRange{
+				NonceRanges: []*types.IdRange{
 					{
 						Start: 0,
 						End:   0,
@@ -44,7 +44,7 @@ func TestMsgHandlePendingTransfer_ValidateBasic(t *testing.T) {
 			name: "invalid subbadge range",
 			msg: types.MsgHandlePendingTransfer{
 				Creator: sample.AccAddress(),
-				NonceRanges: []*types.NumberRange{
+				NonceRanges: []*types.IdRange{
 					{
 						Start: 10,
 						End:   0,

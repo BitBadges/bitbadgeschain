@@ -52,7 +52,7 @@ message QueryGetBalanceRequest {
 }
 
 message QueryGetBalanceResponse {
-    BadgeBalanceInfo balanceInfo = 1;
+  UserBalanceInfo balanceInfo = 1;
 }
 
 // this line is used by starport scaffolding # 3

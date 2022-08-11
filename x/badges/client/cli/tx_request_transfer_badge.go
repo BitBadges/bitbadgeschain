@@ -56,7 +56,7 @@ func CmdRequestTransferBadge() *cobra.Command {
 				argFrom,
 				argAmount,
 				argBadgeId,
-				[]*types.NumberRange{
+				[]*types.IdRange{
 					{
 						Start: argSubbadgeIdStart,
 						End:   argSubbadgeIdEnd,

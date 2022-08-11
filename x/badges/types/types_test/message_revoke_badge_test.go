@@ -20,7 +20,7 @@ func TestMsgRevokeBadge_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgRevokeBadge{
 				Creator: "invalid_address",
-				SubbadgeRanges: []*types.NumberRange{
+				SubbadgeRanges: []*types.IdRange{
 					{
 						Start: 0,
 						End:   0,
@@ -32,7 +32,7 @@ func TestMsgRevokeBadge_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: types.MsgRevokeBadge{
 				Creator: sample.AccAddress(),
-				SubbadgeRanges: []*types.NumberRange{
+				SubbadgeRanges: []*types.IdRange{
 					{
 						Start: 0,
 						End:   0,
@@ -44,7 +44,7 @@ func TestMsgRevokeBadge_ValidateBasic(t *testing.T) {
 			name: "invalid subbadge range",
 			msg: types.MsgRevokeBadge{
 				Creator: sample.AccAddress(),
-				SubbadgeRanges: []*types.NumberRange{
+				SubbadgeRanges: []*types.IdRange{
 					{
 						Start: 10,
 						End:   0,

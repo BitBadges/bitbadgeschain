@@ -5,13 +5,12 @@ package trevormil.bitbadgeschain.badges;
 
 option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
-
-message NumberRange {
+message IdRange {
     uint64 start = 1;
     uint64 end = 2; // If end == 0, we assume end == start. This can be done to save space since 0 is omitted if empty.
 }
 
-message BalanceToIds {
+message BalanceObject {
     uint64 balance = 1;
-    repeated NumberRange ids = 2;
+    repeated IdRange id_ranges = 2;
 }

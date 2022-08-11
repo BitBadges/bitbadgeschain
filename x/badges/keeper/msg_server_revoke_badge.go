@@ -11,60 +11,54 @@ import (
 func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge) (*types.MsgRevokeBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	validationParams := UniversalValidationParams{
+	CreatorAccountNum, _, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator: msg.Creator,
 		BadgeId: msg.BadgeId,
 		SubbadgeRangesToValidate: msg.SubbadgeRanges,
+		AccountsThatCantEqualCreator: msg.Addresses,
 		MustBeManager: true,
 		CanRevoke: true,
-	}
-
-	CreatorAccountNum, _, err := k.UniversalValidate(ctx, validationParams)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	ManagerBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
-	managerBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, ManagerBalanceKey)
+	managerBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
+	managerBalanceInfo, found := k.Keeper.GetUserBalanceFromStore(ctx, managerBalanceKey)
 	if !found {
-		return nil, ErrBadgeBalanceNotExists
+		return nil, ErrUserBalanceNotExists
 	}
 
 	for i, revokeAddress := range msg.Addresses {
-		if revokeAddress == CreatorAccountNum {
-			return nil, ErrSenderAndReceiverSame
-		}
-
 		// Note that we check for duplicates in ValidateBasic, so these addresses will be unique every time
-		AddressBalanceKey := ConstructBalanceKey(revokeAddress, msg.BadgeId)
-		addressBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, AddressBalanceKey)
+		addressBalanceKey := ConstructBalanceKey(revokeAddress, msg.BadgeId)
+		addressBalanceInfo, found := k.Keeper.GetUserBalanceFromStore(ctx, addressBalanceKey)
 		if !found {
-			return nil, ErrBadgeBalanceNotExists
+			return nil, ErrUserBalanceNotExists
 		}
 
 		revokeAmount := msg.Amounts[i]
-
 		for _, subbadgeRange := range msg.SubbadgeRanges {
-			for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
-				addressBalanceInfo, err = k.RemoveBalanceForSubbadgeId(ctx, addressBalanceInfo, i, revokeAmount)
+			for id := subbadgeRange.Start; id <= subbadgeRange.End; id++ {
+				addressBalanceInfo, err = SubtractBalanceForId(ctx, addressBalanceInfo, id, revokeAmount)
 				if err != nil {
 					return nil, err
 				}
 
-				managerBalanceInfo, err = k.AddBalanceForSubbadgeId(ctx, managerBalanceInfo, i, revokeAmount)
+				managerBalanceInfo, err = AddBalanceForId(ctx, managerBalanceInfo, id, revokeAmount)
 				if err != nil {
 					return nil, err
 				}
-
 			}
 		}
-		err = k.SetBadgeBalanceInStore(ctx, AddressBalanceKey, addressBalanceInfo)
+		
+		err = k.SetUserBalanceInStore(ctx, addressBalanceKey, addressBalanceInfo)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	err = k.SetBadgeBalanceInStore(ctx, ManagerBalanceKey, managerBalanceInfo)
+	err = k.SetUserBalanceInStore(ctx, managerBalanceKey, managerBalanceInfo)
 	if err != nil {
 		return nil, err
 	}

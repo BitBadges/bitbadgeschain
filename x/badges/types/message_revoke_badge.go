@@ -9,7 +9,7 @@ const TypeMsgRevokeBadge = "revoke_badge"
 
 var _ sdk.Msg = &MsgRevokeBadge{}
 
-func NewMsgRevokeBadge(creator string, addresses []uint64, amounts []uint64, badgeId uint64, subbadgeRanges []*NumberRange) *MsgRevokeBadge {
+func NewMsgRevokeBadge(creator string, addresses []uint64, amounts []uint64, badgeId uint64, subbadgeRanges []*IdRange) *MsgRevokeBadge {
 	return &MsgRevokeBadge{
 		Creator:        creator,
 		Addresses:      addresses,

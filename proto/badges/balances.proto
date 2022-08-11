@@ -10,9 +10,9 @@ import "badges/ranges.proto";
 option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
 //indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
-message BadgeBalanceInfo {
-    repeated BalanceToIds balanceAmounts = 2;
-    uint64 pending_nonce = 3;
+message UserBalanceInfo {
+    repeated BalanceObject balanceAmounts = 2;
+    uint64 pendingNonce = 3;
     repeated PendingTransfer pending = 4; //IDs will be sorted in order of pending_nonce
     repeated Approval approvals = 5;
 }
@@ -20,18 +20,18 @@ message BadgeBalanceInfo {
 message Approval {
     uint64 address = 1;
     uint64 expirationTime = 2;
-    repeated BalanceToIds approvalAmounts = 3;
+    repeated BalanceObject approvalAmounts = 3;
 }
 
 message PendingTransfer {
-    NumberRange subbadgeRange = 1;
-    uint64 this_pending_nonce = 2;
-    uint64 other_pending_nonce = 3;
+    IdRange subbadgeRange = 1;
+    uint64 thisPendingNonce = 2;
+    uint64 otherPendingNonce = 3;
     uint64 amount = 4;
-    bool send_request = 5; //vs. receive request
+    bool sent = 5;
     uint64 to = 6;
     uint64 from = 7;
-    uint64 approved_by = 9;
-    bool markedAsApproved = 10;
-    uint64 expiration_time = 11;
+    uint64 approvedBy = 9;
+    bool markedAsAccepted = 10;
+    uint64 expirationTime = 11;
 }

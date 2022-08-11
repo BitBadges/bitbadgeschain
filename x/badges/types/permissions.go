@@ -16,7 +16,7 @@ const (
 	frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
 */
 //TODO: Add test cases for these permissions
-type PermissionFlags struct {
+type Permissions struct {
 	can_manager_transfer bool
 	can_update_uris      bool
 	forceful_transfers   bool
@@ -80,8 +80,8 @@ func ValidatePermissionsUpdate(oldPermissions uint64, newPermissions uint64) err
 	return nil
 }
 
-func GetPermissions(permissions uint64) PermissionFlags {
-	var flags PermissionFlags = PermissionFlags{}
+func GetPermissions(permissions uint64) Permissions {
+	var flags Permissions = Permissions{}
 	for i := 0; i <= NumPermissions; i++ {
 		mask := uint64(1) << i
 		masked_n := permissions & mask
@@ -94,34 +94,34 @@ func GetPermissions(permissions uint64) PermissionFlags {
 	return flags
 }
 
-func (p *PermissionFlags) CanManagerTransfer() bool {
+func (p *Permissions) CanManagerTransfer() bool {
 	return p.can_manager_transfer
 }
 
-func (p *PermissionFlags) CanUpdateUris() bool {
+func (p *Permissions) CanUpdateUris() bool {
 	return p.can_update_uris
 }
 
-func (p *PermissionFlags) ForcefulTransfers() bool {
+func (p *Permissions) ForcefulTransfers() bool {
 	return p.forceful_transfers
 }
 
-func (p *PermissionFlags) CanCreateSubbadges() bool {
+func (p *Permissions) CanCreateSubbadges() bool {
 	return p.can_create
 }
 
-func (p *PermissionFlags) CanRevoke() bool {
+func (p *Permissions) CanRevoke() bool {
 	return p.can_revoke
 }
 
-func (p *PermissionFlags) CanFreeze() bool {
+func (p *Permissions) CanFreeze() bool {
 	return p.can_freeze
 }
-func (p *PermissionFlags) FrozenByDefault() bool {
+func (p *Permissions) FrozenByDefault() bool {
 	return p.frozen_by_default
 }
 
-func SetPermissionsFlags(permission bool, digit_index int, flags *PermissionFlags) {
+func SetPermissionsFlags(permission bool, digit_index int, flags *Permissions) {
 	if digit_index == 7 {
 		flags.can_manager_transfer = permission
 	} else if digit_index == 6 {

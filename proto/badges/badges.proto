@@ -18,7 +18,7 @@ message BitBadge {
 
     // this is permanent and never changable; use this for asserting the permanence of the metadata
     // uri can point to other stuff in addition to metadata, this is only the hash of the metadata
-    string metadata_hash = 3;
+    string metadataHash = 3;
     
     // manager address of the class; can have special permissions; is used as the reserve address for the assets
     uint64 manager = 4;
@@ -37,21 +37,21 @@ message BitBadge {
 
         More permissions to be added
     */
-    uint64 permission_flags = 5;
+    uint64 permissions = 5;
 
     // if frozen_by_default is true, this is an accumulator of unfrozen addresses; and vice versa for false
     //big.Int will always only be 32 uint64s long
-    repeated NumberRange freeze_address_ranges = 10;
+    repeated IdRange freezeRanges = 10;
 
     // uri for the subassets metadata stored off chain; include {id} in the string, it will be replaced with the subasset id
     // if not specified, uses a default Class (ID # 1) like metadata
-    string subasset_uri_format = 11;
+    string subassetUriFormat = 11;
 
     // starts at 0; each subasset created will incrementally have an increasing ID #
-    uint64 next_subasset_id = 12;
+    uint64 nextSubassetId = 12;
 
     //only store if not == default; will be sorted in order of subsasset ids; (maybe add defaut option in future)
-    repeated BalanceToIds subassets_total_supply = 13;
+    repeated BalanceObject subassetSupplys = 13;
     
-    uint64 default_subasset_supply = 14;
+    uint64 defaultSubassetSupply = 14;
 }

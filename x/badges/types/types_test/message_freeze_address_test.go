@@ -19,7 +19,7 @@ func TestMsgFreezeAddress_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgFreezeAddress{
 				Creator: "invalid_address",
-				AddressRanges: []*types.NumberRange{
+				AddressRanges: []*types.IdRange{
 					{
 						Start: 0,
 						End:   0,
@@ -31,7 +31,7 @@ func TestMsgFreezeAddress_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: types.MsgFreezeAddress{
 				Creator: sample.AccAddress(),
-				AddressRanges: []*types.NumberRange{
+				AddressRanges: []*types.IdRange{
 					{
 						Start: 0,
 						End:   0,
@@ -42,7 +42,7 @@ func TestMsgFreezeAddress_ValidateBasic(t *testing.T) {
 			name: "invalid subbadge range",
 			msg: types.MsgFreezeAddress{
 				Creator: sample.AccAddress(),
-				AddressRanges: []*types.NumberRange{
+				AddressRanges: []*types.IdRange{
 					{
 						Start: 10,
 						End:   0,

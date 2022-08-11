@@ -69,79 +69,53 @@ func (k Keeper) DeleteBadgeFromStore(ctx sdk.Context, badgeID uint64) {
 	store.Delete(badgeStoreKey(badgeID))
 }
 
-/****************************************BADGE BALANCES****************************************/
-// Sets a badge balance in the store using BadgeBalanceKey ([]byte{0x02}) as the prefix. No check if store has key already.
-func (k Keeper) SetBadgeBalanceInStore(ctx sdk.Context, balanceKey string, badgeBalanceInfo types.BadgeBalanceInfo) error {
+/****************************************USER BALANCES****************************************/
+// Sets a user balance in the store using UserBalanceKey ([]byte{0x02}) as the prefix. No check if store has key already.
+func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, userBalanceInfo types.UserBalanceInfo) error {
 	currTime := uint64(ctx.BlockTime().Unix())
-	//TODO: neaten up and comment
-	//If you have received a pending request that is expired, first write to this store no matter who it is from can just delete it
-	//Or, if you sent a transfer request (which has no funds in escrow), you can just delete it
-	prunedPending := make([]*types.PendingTransfer, 0)
-	prunedApprovals := make([]*types.Approval, 0)
+	userBalanceInfo.Pending = PruneExpiredPending(currTime, GetDetailsFromBalanceKey(balanceKey).accountNum, userBalanceInfo.Pending)
+	userBalanceInfo.Approvals = PruneExpiredApprovals(currTime, userBalanceInfo.Approvals)
 
-	details := GetDetailsFromBalanceKey(balanceKey)
-	thisAccountNum := details.accountNum
-	for _, pendingTransfer := range badgeBalanceInfo.Pending {
-		if pendingTransfer.ExpirationTime != 0 && pendingTransfer.ExpirationTime < currTime && !pendingTransfer.SendRequest {
-			continue
-		} else if pendingTransfer.ExpirationTime != 0 && pendingTransfer.ExpirationTime < currTime && pendingTransfer.SendRequest && pendingTransfer.From == thisAccountNum {
-			continue
-		} else {
-			prunedPending = append(prunedPending, pendingTransfer)
-		}
-	}
-	badgeBalanceInfo.Pending = prunedPending
-
-	//Remove any approvals that are expired
-	for _, approval := range badgeBalanceInfo.Approvals {
-		if approval.ExpirationTime != 0 && approval.ExpirationTime < currTime {
-			continue
-		} else {
-			prunedApprovals = append(prunedApprovals, approval)
-		}
-	}
-	badgeBalanceInfo.Approvals = prunedApprovals
-
-	marshaled_badge_balance_info, err := k.cdc.Marshal(&badgeBalanceInfo)
+	marshaled_badge_balance_info, err := k.cdc.Marshal(&userBalanceInfo)
 	if err != nil {
-		return sdkerrors.Wrap(err, "Marshal types.BadgeBalanceInfo failed")
+		return sdkerrors.Wrap(err, "Marshal types.UserBalanceInfo failed")
 	}
 
 	store := ctx.KVStore(k.storeKey)
-	store.Set(badgeBalanceStoreKey(balanceKey), marshaled_badge_balance_info)
+	store.Set(userBalanceStoreKey(balanceKey), marshaled_badge_balance_info)
 	return nil
 }
 
-// Gets a badge balance from the store according to the balanceID.
-func (k Keeper) GetBadgeBalanceFromStore(ctx sdk.Context, balanceKey string) (types.BadgeBalanceInfo, bool) {
+// Gets a user balance from the store according to the balanceID.
+func (k Keeper) GetUserBalanceFromStore(ctx sdk.Context, balanceKey string) (types.UserBalanceInfo, bool) {
 	store := ctx.KVStore(k.storeKey)
-	marshaled_badge_balance_info := store.Get(badgeBalanceStoreKey(balanceKey))
+	marshaled_badge_balance_info := store.Get(userBalanceStoreKey(balanceKey))
 
-	var badgeBalanceInfo types.BadgeBalanceInfo
+	var userBalanceInfo types.UserBalanceInfo
 	if len(marshaled_badge_balance_info) == 0 {
-		return badgeBalanceInfo, false
+		return userBalanceInfo, false
 	}
-	k.cdc.MustUnmarshal(marshaled_badge_balance_info, &badgeBalanceInfo)
-	return badgeBalanceInfo, true
+	k.cdc.MustUnmarshal(marshaled_badge_balance_info, &userBalanceInfo)
+	return userBalanceInfo, true
 }
 
-// GetBadgeBalancesFromStore defines a method for returning all badge balances information by key.
-func (k Keeper) GetBadgeBalancesFromStore(ctx sdk.Context) (addresses []*types.BadgeBalanceInfo) {
+// GetUserBalancesFromStore defines a method for returning all user balances information by key.
+func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (addresses []*types.UserBalanceInfo) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, BadgeBalanceKey)
+	iterator := sdk.KVStorePrefixIterator(store, UserBalanceKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		var badgeBalanceInfo types.BadgeBalanceInfo
-		k.cdc.MustUnmarshal(iterator.Value(), &badgeBalanceInfo)
-		addresses = append(addresses, &badgeBalanceInfo)
+		var userBalanceInfo types.UserBalanceInfo
+		k.cdc.MustUnmarshal(iterator.Value(), &userBalanceInfo)
+		addresses = append(addresses, &userBalanceInfo)
 	}
 	return
 }
 
-// GetBadgeBalanceIdsFromStore defines a method for returning all keys of all badge balances.
-func (k Keeper) GetBadgeBalanceIdsFromStore(ctx sdk.Context) (ids []string) {
+// GetUserBalanceIdsFromStore defines a method for returning all keys of all user balances.
+func (k Keeper) GetUserBalanceIdsFromStore(ctx sdk.Context) (ids []string) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, BadgeBalanceKey)
+	iterator := sdk.KVStorePrefixIterator(store, UserBalanceKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		ids = append(ids, string(iterator.Value()))
@@ -149,16 +123,16 @@ func (k Keeper) GetBadgeBalanceIdsFromStore(ctx sdk.Context) (ids []string) {
 	return
 }
 
-// StoreHasBadgeBalanceID determines whether the specified badge balanceID exists in the store
-func (k Keeper) StoreHasBadgeBalance(ctx sdk.Context, balanceKey string) bool {
+// StoreHasUserBalanceID determines whether the specified user balanceID exists in the store
+func (k Keeper) StoreHasUserBalance(ctx sdk.Context, balanceKey string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(badgeBalanceStoreKey(balanceKey))
+	return store.Has(userBalanceStoreKey(balanceKey))
 }
 
-// DeleteBadgeBalanceFromStore deletes a badge balance from the store.
-func (k Keeper) DeleteBadgeBalanceFromStore(ctx sdk.Context, balanceKey string) {
+// DeleteUserBalanceFromStore deletes a user balance from the store.
+func (k Keeper) DeleteUserBalanceFromStore(ctx sdk.Context, balanceKey string) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(badgeBalanceStoreKey(balanceKey))
+	store.Delete(userBalanceStoreKey(balanceKey))
 }
 
 /****************************************TRANSFER MANAGER REQUESTS****************************************/

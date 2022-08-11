@@ -20,9 +20,9 @@ service Msg {
     rpc UpdatePermissions(MsgUpdatePermissions) returns (MsgUpdatePermissionsResponse);
     rpc TransferManager(MsgTransferManager) returns (MsgTransferManagerResponse);
     rpc RequestTransferManager(MsgRequestTransferManager) returns (MsgRequestTransferManagerResponse);
-  rpc SelfDestructBadge(MsgSelfDestructBadge) returns (MsgSelfDestructBadgeResponse);
-  rpc PruneBalances(MsgPruneBalances) returns (MsgPruneBalancesResponse);
-// this line is used by starport scaffolding # proto/tx/rpc
+    rpc SelfDestructBadge(MsgSelfDestructBadge) returns (MsgSelfDestructBadgeResponse);
+    rpc PruneBalances(MsgPruneBalances) returns (MsgPruneBalancesResponse);
+    // this line is used by starport scaffolding # proto/tx/rpc
 }
 
 message MsgNewBadge {
@@ -55,7 +55,7 @@ message MsgTransferBadge {
     repeated uint64 toAddresses = 3;
     repeated uint64 amounts = 4;
     uint64 badgeId = 5;
-    repeated NumberRange subbadgeRanges = 6;
+    repeated IdRange subbadgeRanges = 6;
     uint64 expiration_time = 7;
 }
 
@@ -67,7 +67,7 @@ message MsgRequestTransferBadge {
     uint64 from = 2;
     uint64 amount = 4;
     uint64 badgeId = 5;
-    repeated NumberRange subbadgeRanges = 6;
+    repeated IdRange subbadgeRanges = 6;
     uint64 expiration_time = 7;
 }
 
@@ -77,7 +77,7 @@ message MsgHandlePendingTransfer {
     string creator = 1;
     bool accept = 2;
     uint64 badgeId = 3;
-    repeated NumberRange nonceRanges = 4;
+    repeated IdRange nonceRanges = 4;
     bool forcefulAccept = 5;
 }
 
@@ -88,7 +88,7 @@ message MsgSetApproval {
     uint64 amount = 2;
     uint64 address = 3;
     uint64 badgeId = 4;
-    repeated NumberRange subbadgeRanges = 5;
+    repeated IdRange subbadgeRanges = 5;
     uint64 expirationTime = 6;
 }
 
@@ -99,14 +99,14 @@ message MsgRevokeBadge {
     repeated uint64 addresses = 2;
     repeated uint64 amounts = 3;
     uint64 badgeId = 4;
-    repeated NumberRange subbadgeRanges = 5;
+    repeated IdRange subbadgeRanges = 5;
 }
 
 message MsgRevokeBadgeResponse {}
 
 message MsgFreezeAddress {
   string creator = 1;
-  repeated NumberRange addressRanges = 2;
+  repeated IdRange addressRanges = 2;
   uint64 badgeId = 3;
   bool  add = 4;
 }

@@ -11,20 +11,17 @@ import (
 func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgRequestTransferManager) (*types.MsgRequestTransferManagerResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	validationParams := UniversalValidationParams{
+	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator: msg.Creator,
 		BadgeId: msg.BadgeId,
-	}
-
-	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, validationParams)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-
 	//Redundant because this is locked so we shouldn't store anything
 	if msg.Add {
-		permissions := types.GetPermissions(badge.PermissionFlags)
+		permissions := types.GetPermissions(badge.Permissions)
 		if !permissions.CanManagerTransfer() {
 			return nil, ErrInvalidPermissions
 		}

@@ -12,83 +12,43 @@ import (
 func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBadge) (*types.MsgTransferBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	validationParams := UniversalValidationParams{
+	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator: msg.Creator,
 		BadgeId: msg.BadgeId,
 		SubbadgeRangesToValidate: msg.SubbadgeRanges,
-	}
-	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, validationParams)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	permissions := types.GetPermissions(badge.PermissionFlags)
-
-	FromBalanceKey := ConstructBalanceKey(msg.From, msg.BadgeId)
-	fromBadgeBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, FromBalanceKey)
+	fromBalanceKey := ConstructBalanceKey(msg.From, msg.BadgeId)
+	fromUserBalanceInfo, found := k.Keeper.GetUserBalanceFromStore(ctx, fromBalanceKey)
 	if !found {
-		return nil, ErrBadgeBalanceNotExists
+		return nil, ErrUserBalanceNotExists
 	}
 
 	for _, to := range msg.ToAddresses {
-		ToBalanceKey := ConstructBalanceKey(to, msg.BadgeId)
-		toBadgeBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, ToBalanceKey)
+		toBalanceKey := ConstructBalanceKey(to, msg.BadgeId)
+		toUserBalanceInfo, found := k.Keeper.GetUserBalanceFromStore(ctx, toBalanceKey)
 		if !found {
-			toBadgeBalanceInfo = types.BadgeBalanceInfo{}
+			toUserBalanceInfo = types.UserBalanceInfo{}
 		}
 
 		for _, amount := range msg.Amounts {
-			handledForcefulTransfer := false
 			for _, subbadgeRange := range msg.SubbadgeRanges {
-				for currSubbadgeId := subbadgeRange.Start; currSubbadgeId <= subbadgeRange.End; currSubbadgeId++ {
-					// Checks and handles if this account can transfer or is approved to transfer
-					fromBadgeBalanceInfo, err = k.HandlePreTransfer(ctx, fromBadgeBalanceInfo, badge, msg.BadgeId, currSubbadgeId, msg.From, to, CreatorAccountNum, amount)
-					if err != nil {
-						return nil, err
-					}
-
-					//We will always remove from "From" balance for both forceful (transfer it) and pending (put it in escrow)
-					fromBadgeBalanceInfo, err = k.RemoveBalanceForSubbadgeId(ctx, fromBadgeBalanceInfo, currSubbadgeId, amount)
-					if err != nil {
-						return nil, err
-					}
-
-					// Handle the transfer forcefully (no pending) if forceful transfers is set or "burning" (sending to manager address)
-					// Else, handle it by adding a pending transfer
-
-					// TODO: support forceful transfers when sending to reserved address numbers such as ETH NULL address
-					var reservedAddress = []uint64{}
-					sendingToReservedAddress := false
-					for _, address := range reservedAddress {
-						if address == to {
-							sendingToReservedAddress = true
-							break
-						}
-					}
-
-					if sendingToReservedAddress || permissions.ForcefulTransfers() || badge.Manager == to {
-						handledForcefulTransfer = true
-						toBadgeBalanceInfo, err = k.AddBalanceForSubbadgeId(ctx, toBadgeBalanceInfo, currSubbadgeId, amount)
-						if err != nil {
-							return nil, err
-						}
-					}
-				}
-
-				if !handledForcefulTransfer {
-					fromBadgeBalanceInfo, toBadgeBalanceInfo, err = k.AppendPendingTransferForBothParties(ctx, fromBadgeBalanceInfo, toBadgeBalanceInfo, *subbadgeRange, to, msg.From, amount, CreatorAccountNum, true, msg.ExpirationTime)
-					if err != nil {
-						return nil, err
-					}
+				fromUserBalanceInfo, toUserBalanceInfo, err = k.HandleTransfer(ctx, badge, *subbadgeRange, fromUserBalanceInfo, toUserBalanceInfo, amount, msg.From, to, CreatorAccountNum, msg.ExpirationTime)
+				if err != nil {
+					return nil, err
 				}
 			}
 		}
-		if err := k.SetBadgeBalanceInStore(ctx, ToBalanceKey, toBadgeBalanceInfo); err != nil {
+
+		if err := k.SetUserBalanceInStore(ctx, toBalanceKey, toUserBalanceInfo); err != nil {
 			return nil, err
 		}
 	}
 
-	if err := k.SetBadgeBalanceInStore(ctx, FromBalanceKey, fromBadgeBalanceInfo); err != nil {
+	if err := k.SetUserBalanceInStore(ctx, fromBalanceKey, fromUserBalanceInfo); err != nil {
 		return nil, err
 	}
 
@@ -96,12 +56,11 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeyAction, "TransferBadge"),
-			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
 			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
 			sdk.NewAttribute("SubbadgeRanges", fmt.Sprint(msg.SubbadgeRanges)),
 			sdk.NewAttribute("Amounts", fmt.Sprint(msg.Amounts)),
 			sdk.NewAttribute("From", fmt.Sprint(msg.From)),
-			sdk.NewAttribute("ToAddresses", fmt.Sprint(msg.ToAddresses)),
+			sdk.NewAttribute("To", fmt.Sprint(msg.ToAddresses)),
 		),
 	)
 

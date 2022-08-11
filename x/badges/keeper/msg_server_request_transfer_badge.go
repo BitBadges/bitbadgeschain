@@ -11,43 +11,41 @@ import (
 func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgRequestTransferBadge) (*types.MsgRequestTransferBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	validationParams := UniversalValidationParams{
+	CreatorAccountNum, _, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator: msg.Creator,
 		BadgeId: msg.BadgeId,
 		SubbadgeRangesToValidate: msg.SubbadgeRanges,
 		AccountsThatCantEqualCreator: []uint64{msg.From},
-	}
-
-	CreatorAccountNum, _, err := k.UniversalValidate(ctx, validationParams)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	FromBalanceKey := ConstructBalanceKey(msg.From, msg.BadgeId)
-	ToBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
+	fromBalanceKey := ConstructBalanceKey(msg.From, msg.BadgeId)
+	toBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
 
-	fromBadgeBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, FromBalanceKey)
+	fromUserBalanceInfo, found := k.Keeper.GetUserBalanceFromStore(ctx, fromBalanceKey)
 	if !found {
-		return nil, ErrBadgeBalanceNotExists
+		return nil, ErrUserBalanceNotExists
 	}
 
-	toBadgeBalanceInfo, found := k.Keeper.GetBadgeBalanceFromStore(ctx, ToBalanceKey)
+	toUserBalanceInfo, found := k.Keeper.GetUserBalanceFromStore(ctx, toBalanceKey)
 	if !found {
-		toBadgeBalanceInfo = types.BadgeBalanceInfo{}
+		toUserBalanceInfo = types.UserBalanceInfo{}
 	}
 
 	for _, subbadgeRange := range msg.SubbadgeRanges {
-		fromBadgeBalanceInfo, toBadgeBalanceInfo, err = k.AppendPendingTransferForBothParties(ctx, fromBadgeBalanceInfo, toBadgeBalanceInfo, *subbadgeRange, CreatorAccountNum, msg.From, msg.Amount, CreatorAccountNum, false, msg.ExpirationTime)
+		fromUserBalanceInfo, toUserBalanceInfo, err = k.AppendPendingTransferForBothParties(ctx, fromUserBalanceInfo, toUserBalanceInfo, *subbadgeRange, CreatorAccountNum, msg.From, msg.Amount, CreatorAccountNum, false, msg.ExpirationTime)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if err := k.SetBadgeBalanceInStore(ctx, FromBalanceKey, fromBadgeBalanceInfo); err != nil {
+	if err := k.SetUserBalanceInStore(ctx, fromBalanceKey, fromUserBalanceInfo); err != nil {
 		return nil, err
 	}
 
-	if err := k.SetBadgeBalanceInStore(ctx, ToBalanceKey, toBadgeBalanceInfo); err != nil {
+	if err := k.SetUserBalanceInStore(ctx, toBalanceKey, toUserBalanceInfo); err != nil {
 		return nil, err
 	}
 

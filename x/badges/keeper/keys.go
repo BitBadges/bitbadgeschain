@@ -9,7 +9,7 @@ import (
 
 var (
 	BadgeKey           = []byte{0x01}
-	BadgeBalanceKey    = []byte{0x02}
+	UserBalanceKey    = []byte{0x02}
 	NextAssetIDKey     = []byte{0x03}
 	TransferManagerKey = []byte{0x04}
 	// ClassTotalSupply     = []byte{0x05}
@@ -68,11 +68,11 @@ func badgeStoreKey(badgeID uint64) []byte {
 	return key
 }
 
-// badgeBalanceStoreKey returns the byte representation of the badge balance store key ([]byte{0x02} + balanceKey)
-func badgeBalanceStoreKey(balanceKey string) []byte {
-	key := make([]byte, len(BadgeBalanceKey)+len(balanceKey))
-	copy(key, BadgeBalanceKey)
-	copy(key[len(BadgeBalanceKey):], []byte(balanceKey))
+// userBalanceStoreKey returns the byte representation of the badge balance store key ([]byte{0x02} + balanceKey)
+func userBalanceStoreKey(balanceKey string) []byte {
+	key := make([]byte, len(UserBalanceKey)+len(balanceKey))
+	copy(key, UserBalanceKey)
+	copy(key[len(UserBalanceKey):], []byte(balanceKey))
 	return key
 }
 

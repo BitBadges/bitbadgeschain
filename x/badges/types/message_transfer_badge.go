@@ -9,7 +9,7 @@ const TypeMsgTransferBadge = "transfer_badge"
 
 var _ sdk.Msg = &MsgTransferBadge{}
 
-func NewMsgTransferBadge(creator string, from uint64, toAddresses []uint64, amounts []uint64, badgeId uint64, subbadgeRanges []*NumberRange, expirationTime uint64) *MsgTransferBadge {
+func NewMsgTransferBadge(creator string, from uint64, toAddresses []uint64, amounts []uint64, badgeId uint64, subbadgeRanges []*IdRange, expirationTime uint64) *MsgTransferBadge {
 	return &MsgTransferBadge{
 		Creator:        creator,
 		From:           from,

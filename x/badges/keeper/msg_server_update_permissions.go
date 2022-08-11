@@ -11,23 +11,21 @@ import (
 func (k msgServer) UpdatePermissions(goCtx context.Context, msg *types.MsgUpdatePermissions) (*types.MsgUpdatePermissionsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	validationParams := UniversalValidationParams{
+	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator: msg.Creator,
 		BadgeId: msg.BadgeId,
 		MustBeManager: true,
-	}
-
-	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, validationParams)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	err = types.ValidatePermissionsUpdate(badge.PermissionFlags, msg.Permissions)
+	err = types.ValidatePermissionsUpdate(badge.Permissions, msg.Permissions)
 	if err != nil {
 		return nil, err
 	}
 
-	badge.PermissionFlags = msg.Permissions
+	badge.Permissions = msg.Permissions
 
 	if err := k.SetBadgeInStore(ctx, badge); err != nil {
 		return nil, err
@@ -37,9 +35,7 @@ func (k msgServer) UpdatePermissions(goCtx context.Context, msg *types.MsgUpdate
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeyAction, "UpdatePermissions"),
-			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
 			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
-			sdk.NewAttribute("NewPermissions", fmt.Sprint(msg.Permissions)),
 		),
 	)
 

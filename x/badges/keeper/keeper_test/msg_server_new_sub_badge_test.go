@@ -28,48 +28,48 @@ func (suite *TestSuite) TestNewSubBadges() {
 	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
-	bobBalanceInfo, _ := GetBadgeBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
-	suite.Require().Equal([]*types.BalanceToIds{
+	suite.Require().Equal([]*types.BalanceObject{
 		{
-			Ids: []*types.NumberRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
 			Balance: 10,
 		},
-	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10), keeper.GetBalanceForSubbadgeId(0, bobBalanceInfo.BalanceAmounts))
+	}, badge.SubassetSupplys)
+	suite.Require().Equal(uint64(10), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
 
 	//Create subbadge 2 with supply == 1
 	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{1}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	badge, _ = GetBadge(suite, wctx, 0)
-	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 1, firstAccountNumCreated)
+	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 1, firstAccountNumCreated)
 
 	suite.Require().Equal(uint64(2), badge.NextSubassetId)
-	suite.Require().Equal([]*types.BalanceToIds{
+	suite.Require().Equal([]*types.BalanceObject{
 		{
-			Ids: []*types.NumberRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
 			Balance: 10,
 		},
-	}, badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(1), keeper.GetBalanceForSubbadgeId(1, bobBalanceInfo.BalanceAmounts))
+	}, badge.SubassetSupplys)
+	suite.Require().Equal(uint64(1), keeper.GetBalanceForId(1, bobBalanceInfo.BalanceAmounts))
 
 	//Create subbadge 2 with supply == 10
 	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{10}, []uint64{2})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
-	bobBalanceInfo, _ = GetBadgeBalance(suite, wctx, 0, 2, firstAccountNumCreated)
+	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 2, firstAccountNumCreated)
 
 	suite.Require().Equal(uint64(4), badge.NextSubassetId)
-	suite.Require().Equal([]*types.BalanceToIds{
+	suite.Require().Equal([]*types.BalanceObject{
 		{
-			Ids: []*types.NumberRange{{Start: 0, End: 0}, {Start: 2, End: 3}}, //0 to 0 range so it will be nil
+			IdRanges: []*types.IdRange{{Start: 0, End: 0}, {Start: 2, End: 3}}, //0 to 0 range so it will be nil
 			Balance: 10,
 		},
 	},
-		badge.SubassetsTotalSupply)
-	suite.Require().Equal(uint64(10), keeper.GetBalanceForSubbadgeId(2, bobBalanceInfo.BalanceAmounts))
+		badge.SubassetSupplys)
+	suite.Require().Equal(uint64(10), keeper.GetBalanceForId(2, bobBalanceInfo.BalanceAmounts))
 }
 
 func (suite *TestSuite) TestNewSubBadgesNotManager() {

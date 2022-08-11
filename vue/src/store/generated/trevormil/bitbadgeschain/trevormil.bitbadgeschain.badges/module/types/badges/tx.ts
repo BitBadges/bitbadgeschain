@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { Reader, util, configure, Writer } from "protobufjs/minimal";
 import * as Long from "long";
-import { NumberRange } from "../badges/ranges";
+import { IdRange } from "../badges/ranges";
 
 export const protobufPackage = "trevormil.bitbadgeschain.badges";
 
@@ -35,7 +35,7 @@ export interface MsgTransferBadge {
     toAddresses: number[];
     amounts: number[];
     badgeId: number;
-    subbadgeIds: NumberRange[];
+    subbadgeIds: IdRange[];
     expiration_time: number;
 }
 
@@ -46,7 +46,7 @@ export interface MsgRequestTransferBadge {
     from: number;
     amount: number;
     badgeId: number;
-    subbadgeIds: NumberRange[];
+    subbadgeIds: IdRange[];
     expiration_time: number;
 }
 
@@ -56,7 +56,7 @@ export interface MsgHandlePendingTransfer {
     creator: string;
     accept: boolean;
     badgeId: number;
-    nonceIds: NumberRange[];
+    nonceIds: IdRange[];
     forcefulAccept: boolean;
 }
 
@@ -67,7 +67,7 @@ export interface MsgSetApproval {
     amount: number;
     address: number;
     badgeId: number;
-    subbadgeIds: NumberRange[];
+    subbadgeIds: IdRange[];
     expirationTime: number;
 }
 
@@ -78,14 +78,14 @@ export interface MsgRevokeBadge {
     addresses: number[];
     amounts: number[];
     badgeId: number;
-    subbadgeIds: NumberRange[];
+    subbadgeIds: IdRange[];
 }
 
 export interface MsgRevokeBadgeResponse { }
 
 export interface MsgFreezeAddress {
     creator: string;
-    addressIds: NumberRange[];
+    addressIds: IdRange[];
     badgeId: number;
     add: boolean;
 }
@@ -597,7 +597,7 @@ export const MsgTransferBadge = {
             writer.uint32(40).uint64(message.badgeId);
         }
         for (const v of message.subbadgeRanges) {
-            NumberRange.encode(v!, writer.uint32(50).fork()).ldelim();
+            IdRange.encode(v!, writer.uint32(50).fork()).ldelim();
         }
         if (message.expiration_time !== 0) {
             writer.uint32(56).uint64(message.expiration_time);
@@ -646,7 +646,7 @@ export const MsgTransferBadge = {
                     break;
                 case 6:
                     message.subbadgeRanges.push(
-                        NumberRange.decode(reader, reader.uint32())
+                        IdRange.decode(reader, reader.uint32())
                     );
                     break;
                 case 7:
@@ -692,7 +692,7 @@ export const MsgTransferBadge = {
         }
         if (object.subbadgeRanges !== undefined && object.subbadgeRanges !== null) {
             for (const e of object.subbadgeRanges) {
-                message.subbadgeRanges.push(NumberRange.fromJSON(e));
+                message.subbadgeRanges.push(IdRange.fromJSON(e));
             }
         }
         if (
@@ -723,7 +723,7 @@ export const MsgTransferBadge = {
         message.badgeId !== undefined && (obj.badgeId = message.badgeId);
         if (message.subbadgeRanges) {
             obj.subbadgeRanges = message.subbadgeRanges.map((e) =>
-                e ? NumberRange.toJSON(e) : undefined
+                e ? IdRange.toJSON(e) : undefined
             );
         } else {
             obj.subbadgeRanges = [];
@@ -765,7 +765,7 @@ export const MsgTransferBadge = {
         }
         if (object.subbadgeRanges !== undefined && object.subbadgeRanges !== null) {
             for (const e of object.subbadgeRanges) {
-                message.subbadgeRanges.push(NumberRange.fromPartial(e));
+                message.subbadgeRanges.push(IdRange.fromPartial(e));
             }
         }
         if (
@@ -858,7 +858,7 @@ export const MsgRequestTransferBadge = {
             writer.uint32(40).uint64(message.badgeId);
         }
         for (const v of message.subbadgeRanges) {
-            NumberRange.encode(v!, writer.uint32(50).fork()).ldelim();
+            IdRange.encode(v!, writer.uint32(50).fork()).ldelim();
         }
         if (message.expiration_time !== 0) {
             writer.uint32(56).uint64(message.expiration_time);
@@ -890,7 +890,7 @@ export const MsgRequestTransferBadge = {
                     break;
                 case 6:
                     message.subbadgeRanges.push(
-                        NumberRange.decode(reader, reader.uint32())
+                        IdRange.decode(reader, reader.uint32())
                     );
                     break;
                 case 7:
@@ -931,7 +931,7 @@ export const MsgRequestTransferBadge = {
         }
         if (object.subbadgeRanges !== undefined && object.subbadgeRanges !== null) {
             for (const e of object.subbadgeRanges) {
-                message.subbadgeRanges.push(NumberRange.fromJSON(e));
+                message.subbadgeRanges.push(IdRange.fromJSON(e));
             }
         }
         if (
@@ -953,7 +953,7 @@ export const MsgRequestTransferBadge = {
         message.badgeId !== undefined && (obj.badgeId = message.badgeId);
         if (message.subbadgeRanges) {
             obj.subbadgeRanges = message.subbadgeRanges.map((e) =>
-                e ? NumberRange.toJSON(e) : undefined
+                e ? IdRange.toJSON(e) : undefined
             );
         } else {
             obj.subbadgeRanges = [];
@@ -992,7 +992,7 @@ export const MsgRequestTransferBadge = {
         }
         if (object.subbadgeRanges !== undefined && object.subbadgeRanges !== null) {
             for (const e of object.subbadgeRanges) {
-                message.subbadgeRanges.push(NumberRange.fromPartial(e));
+                message.subbadgeRanges.push(IdRange.fromPartial(e));
             }
         }
         if (
@@ -1081,7 +1081,7 @@ export const MsgHandlePendingTransfer = {
             writer.uint32(24).uint64(message.badgeId);
         }
         for (const v of message.nonceRanges) {
-            NumberRange.encode(v!, writer.uint32(34).fork()).ldelim();
+            IdRange.encode(v!, writer.uint32(34).fork()).ldelim();
         }
         if (message.forcefulAccept === true) {
             writer.uint32(40).bool(message.forcefulAccept);
@@ -1112,7 +1112,7 @@ export const MsgHandlePendingTransfer = {
                     message.badgeId = longToNumber(reader.uint64() as Long);
                     break;
                 case 4:
-                    message.nonceRanges.push(NumberRange.decode(reader, reader.uint32()));
+                    message.nonceRanges.push(IdRange.decode(reader, reader.uint32()));
                     break;
                 case 5:
                     message.forcefulAccept = reader.bool();
@@ -1147,7 +1147,7 @@ export const MsgHandlePendingTransfer = {
         }
         if (object.nonceRanges !== undefined && object.nonceRanges !== null) {
             for (const e of object.nonceRanges) {
-                message.nonceRanges.push(NumberRange.fromJSON(e));
+                message.nonceRanges.push(IdRange.fromJSON(e));
             }
         }
         if (object.forcefulAccept !== undefined && object.forcefulAccept !== null) {
@@ -1165,7 +1165,7 @@ export const MsgHandlePendingTransfer = {
         message.badgeId !== undefined && (obj.badgeId = message.badgeId);
         if (message.nonceRanges) {
             obj.nonceRanges = message.nonceRanges.map((e) =>
-                e ? NumberRange.toJSON(e) : undefined
+                e ? IdRange.toJSON(e) : undefined
             );
         } else {
             obj.nonceRanges = [];
@@ -1199,7 +1199,7 @@ export const MsgHandlePendingTransfer = {
         }
         if (object.nonceRanges !== undefined && object.nonceRanges !== null) {
             for (const e of object.nonceRanges) {
-                message.nonceRanges.push(NumberRange.fromPartial(e));
+                message.nonceRanges.push(IdRange.fromPartial(e));
             }
         }
         if (object.forcefulAccept !== undefined && object.forcefulAccept !== null) {
@@ -1286,7 +1286,7 @@ export const MsgSetApproval = {
             writer.uint32(32).uint64(message.badgeId);
         }
         for (const v of message.subbadgeRanges) {
-            NumberRange.encode(v!, writer.uint32(42).fork()).ldelim();
+            IdRange.encode(v!, writer.uint32(42).fork()).ldelim();
         }
         if (message.expirationTime !== 0) {
             writer.uint32(48).uint64(message.expirationTime);
@@ -1316,7 +1316,7 @@ export const MsgSetApproval = {
                     break;
                 case 5:
                     message.subbadgeRanges.push(
-                        NumberRange.decode(reader, reader.uint32())
+                        IdRange.decode(reader, reader.uint32())
                     );
                     break;
                 case 6:
@@ -1355,7 +1355,7 @@ export const MsgSetApproval = {
         }
         if (object.subbadgeRanges !== undefined && object.subbadgeRanges !== null) {
             for (const e of object.subbadgeRanges) {
-                message.subbadgeRanges.push(NumberRange.fromJSON(e));
+                message.subbadgeRanges.push(IdRange.fromJSON(e));
             }
         }
         if (object.expirationTime !== undefined && object.expirationTime !== null) {
@@ -1374,7 +1374,7 @@ export const MsgSetApproval = {
         message.badgeId !== undefined && (obj.badgeId = message.badgeId);
         if (message.subbadgeRanges) {
             obj.subbadgeRanges = message.subbadgeRanges.map((e) =>
-                e ? NumberRange.toJSON(e) : undefined
+                e ? IdRange.toJSON(e) : undefined
             );
         } else {
             obj.subbadgeRanges = [];
@@ -1409,7 +1409,7 @@ export const MsgSetApproval = {
         }
         if (object.subbadgeRanges !== undefined && object.subbadgeRanges !== null) {
             for (const e of object.subbadgeRanges) {
-                message.subbadgeRanges.push(NumberRange.fromPartial(e));
+                message.subbadgeRanges.push(IdRange.fromPartial(e));
             }
         }
         if (object.expirationTime !== undefined && object.expirationTime !== null) {
@@ -1485,7 +1485,7 @@ export const MsgRevokeBadge = {
             writer.uint32(32).uint64(message.badgeId);
         }
         for (const v of message.subbadgeRanges) {
-            NumberRange.encode(v!, writer.uint32(42).fork()).ldelim();
+            IdRange.encode(v!, writer.uint32(42).fork()).ldelim();
         }
         return writer;
     },
@@ -1528,7 +1528,7 @@ export const MsgRevokeBadge = {
                     break;
                 case 5:
                     message.subbadgeRanges.push(
-                        NumberRange.decode(reader, reader.uint32())
+                        IdRange.decode(reader, reader.uint32())
                     );
                     break;
                 default:
@@ -1566,7 +1566,7 @@ export const MsgRevokeBadge = {
         }
         if (object.subbadgeRanges !== undefined && object.subbadgeRanges !== null) {
             for (const e of object.subbadgeRanges) {
-                message.subbadgeRanges.push(NumberRange.fromJSON(e));
+                message.subbadgeRanges.push(IdRange.fromJSON(e));
             }
         }
         return message;
@@ -1588,7 +1588,7 @@ export const MsgRevokeBadge = {
         message.badgeId !== undefined && (obj.badgeId = message.badgeId);
         if (message.subbadgeRanges) {
             obj.subbadgeRanges = message.subbadgeRanges.map((e) =>
-                e ? NumberRange.toJSON(e) : undefined
+                e ? IdRange.toJSON(e) : undefined
             );
         } else {
             obj.subbadgeRanges = [];
@@ -1623,7 +1623,7 @@ export const MsgRevokeBadge = {
         }
         if (object.subbadgeRanges !== undefined && object.subbadgeRanges !== null) {
             for (const e of object.subbadgeRanges) {
-                message.subbadgeRanges.push(NumberRange.fromPartial(e));
+                message.subbadgeRanges.push(IdRange.fromPartial(e));
             }
         }
         return message;
@@ -1676,7 +1676,7 @@ export const MsgFreezeAddress = {
             writer.uint32(10).string(message.creator);
         }
         for (const v of message.addressRanges) {
-            NumberRange.encode(v!, writer.uint32(18).fork()).ldelim();
+            IdRange.encode(v!, writer.uint32(18).fork()).ldelim();
         }
         if (message.badgeId !== 0) {
             writer.uint32(24).uint64(message.badgeId);
@@ -1700,7 +1700,7 @@ export const MsgFreezeAddress = {
                     break;
                 case 2:
                     message.addressRanges.push(
-                        NumberRange.decode(reader, reader.uint32())
+                        IdRange.decode(reader, reader.uint32())
                     );
                     break;
                 case 3:
@@ -1727,7 +1727,7 @@ export const MsgFreezeAddress = {
         }
         if (object.addressRanges !== undefined && object.addressRanges !== null) {
             for (const e of object.addressRanges) {
-                message.addressRanges.push(NumberRange.fromJSON(e));
+                message.addressRanges.push(IdRange.fromJSON(e));
             }
         }
         if (object.badgeId !== undefined && object.badgeId !== null) {
@@ -1748,7 +1748,7 @@ export const MsgFreezeAddress = {
         message.creator !== undefined && (obj.creator = message.creator);
         if (message.addressRanges) {
             obj.addressRanges = message.addressRanges.map((e) =>
-                e ? NumberRange.toJSON(e) : undefined
+                e ? IdRange.toJSON(e) : undefined
             );
         } else {
             obj.addressRanges = [];
@@ -1768,7 +1768,7 @@ export const MsgFreezeAddress = {
         }
         if (object.addressRanges !== undefined && object.addressRanges !== null) {
             for (const e of object.addressRanges) {
-                message.addressRanges.push(NumberRange.fromPartial(e));
+                message.addressRanges.push(IdRange.fromPartial(e));
             }
         }
         if (object.badgeId !== undefined && object.badgeId !== null) {

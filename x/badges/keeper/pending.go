@@ -6,44 +6,44 @@ import (
 )
 
 // Appends the pending transfer to both parties balance informations and increments the nonce. Since we append, they will alwyas be sorted by the nonce.
-func (k Keeper) AppendPendingTransferForBothParties(ctx sdk.Context, fromBadgeBalanceInfo types.BadgeBalanceInfo, toBadgeBalanceInfo types.BadgeBalanceInfo, subbadgeRange types.NumberRange, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool, expirationTime uint64) (types.BadgeBalanceInfo, types.BadgeBalanceInfo, error) {
+func (k Keeper) AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, subbadgeRange types.IdRange, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool, expirationTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
 	if amount == 0 {
-		return fromBadgeBalanceInfo, toBadgeBalanceInfo, ErrBalanceIsZero
+		return fromUserBalanceInfo, toUserBalanceInfo, ErrBalanceIsZero
 	}
 
-	fromBadgeBalanceInfo.Pending = append(fromBadgeBalanceInfo.Pending, &types.PendingTransfer{
+	fromUserBalanceInfo.Pending = append(fromUserBalanceInfo.Pending, &types.PendingTransfer{
 		SubbadgeRange:     &subbadgeRange,
 		Amount:            amount,
 		ApprovedBy:        approvedBy,
-		SendRequest:       sentByFrom, // different 
+		Sent:       	   sentByFrom, // different 
 		To:                to,
 		From:              from,
-		ThisPendingNonce:  fromBadgeBalanceInfo.PendingNonce, // this / other nonces are swapped 
-		OtherPendingNonce: toBadgeBalanceInfo.PendingNonce,
+		ThisPendingNonce:  fromUserBalanceInfo.PendingNonce, // this / other nonces are swapped 
+		OtherPendingNonce: toUserBalanceInfo.PendingNonce,
 		ExpirationTime:    expirationTime,
 	})
 
-	toBadgeBalanceInfo.Pending = append(toBadgeBalanceInfo.Pending, &types.PendingTransfer{
+	toUserBalanceInfo.Pending = append(toUserBalanceInfo.Pending, &types.PendingTransfer{
 		SubbadgeRange:     &subbadgeRange,
 		Amount:            amount,
 		ApprovedBy:        approvedBy,
-		SendRequest:       !sentByFrom, // different 
+		Sent:       	   !sentByFrom, // different 
 		To:                to,
 		From:              from,
-		ThisPendingNonce:  toBadgeBalanceInfo.PendingNonce, // this / other nonces are swapped 
-		OtherPendingNonce: fromBadgeBalanceInfo.PendingNonce,
+		ThisPendingNonce:  toUserBalanceInfo.PendingNonce, // this / other nonces are swapped 
+		OtherPendingNonce: fromUserBalanceInfo.PendingNonce,
 		ExpirationTime:    expirationTime,
 	})
 
-	fromBadgeBalanceInfo.PendingNonce += 1
-	toBadgeBalanceInfo.PendingNonce += 1
+	fromUserBalanceInfo.PendingNonce += 1
+	toUserBalanceInfo.PendingNonce += 1
 
-	return fromBadgeBalanceInfo, toBadgeBalanceInfo, nil
+	return fromUserBalanceInfo, toUserBalanceInfo, nil
 }
 
-//Removes pending transfer from the badgeBalanceInfo. 
-func (k Keeper) RemovePending(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, thisNonce uint64, other_nonce uint64) (types.BadgeBalanceInfo, error) {
-	pending := badgeBalanceInfo.Pending
+//Removes pending transfer from the userBalanceInfo. 
+func (k Keeper) RemovePending(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, thisNonce uint64, other_nonce uint64) (types.UserBalanceInfo, error) {
+	pending := userBalanceInfo.Pending
 	low := 0
 	high := len(pending) - 1
 
@@ -62,13 +62,27 @@ func (k Keeper) RemovePending(ctx sdk.Context, badgeBalanceInfo types.BadgeBalan
 	}
 
 	if foundIdx == -1 {
-		return badgeBalanceInfo, ErrPendingNotFound
+		return userBalanceInfo, ErrPendingNotFound
 	}
 	
 	newPending := []*types.PendingTransfer{}
 	newPending = append(newPending, pending[:foundIdx]...)
 	newPending = append(newPending, pending[foundIdx + 1:]...)
-	badgeBalanceInfo.Pending = newPending
+	userBalanceInfo.Pending = newPending
 
-	return badgeBalanceInfo, nil
+	return userBalanceInfo, nil
+}
+
+func PruneExpiredPending(currTime uint64, accountNum uint64, pending []*types.PendingTransfer) []*types.PendingTransfer {
+	prunedPending := make([]*types.PendingTransfer, 0)
+	for _, pendingTransfer := range pending {
+		if pendingTransfer.ExpirationTime != 0 && pendingTransfer.ExpirationTime < currTime && !pendingTransfer.Sent {
+			continue
+		} else if pendingTransfer.ExpirationTime != 0 && pendingTransfer.ExpirationTime < currTime && pendingTransfer.Sent && pendingTransfer.From == accountNum {
+			continue
+		} else {
+			prunedPending = append(prunedPending, pendingTransfer)
+		}
+	}
+	return prunedPending
 }

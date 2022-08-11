@@ -65,9 +65,9 @@ func CmdHandlePendingTransfer() *cobra.Command {
 			// 	return types.ErrInvalidArgumentLengths
 			// }
 
-			// nonceRanges := []*types.NumberRange{}
+			// nonceRanges := []*types.IdRange{}
 			// for i := 0; i < len(argStartingNoncesUint64); i++ {
-			// 	nonceRanges = append(nonceRanges, &types.NumberRange{
+			// 	nonceRanges = append(nonceRanges, &types.IdRange{
 			// 		Start: argStartingNoncesUint64[i],
 			// 		End:   argEndingNoncesUint64[i],
 			// 	})
@@ -87,7 +87,7 @@ func CmdHandlePendingTransfer() *cobra.Command {
 				clientCtx.GetFromAddress().String(),
 				argAccept,
 				argBadgeId,
-				[]*types.NumberRange{
+				[]*types.IdRange{
 					{
 						Start: argStartingNonce,
 						End:   argEndingNonce,

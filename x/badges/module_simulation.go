@@ -94,7 +94,7 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 		PortId:      types.PortID,
 		NextBadgeId: 0,
 		Badges:      []*types.BitBadge{},
-		Balances:    []*types.BadgeBalanceInfo{},
+		Balances:    []*types.UserBalanceInfo{},
 		BalanceIds:  []string{},
 		// this line is used by starport scaffolding # simapp/module/genesisState
 	}

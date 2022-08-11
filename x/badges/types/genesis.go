@@ -16,7 +16,7 @@ func DefaultGenesis() *GenesisState {
 		Params:      DefaultParams(),
 		NextBadgeId: 0,
 		Badges:      []*BitBadge{},
-		Balances:    []*BadgeBalanceInfo{},
+		Balances:    []*UserBalanceInfo{},
 		BalanceIds:  []string{},
 	}
 }

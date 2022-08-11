@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
@@ -19,7 +18,7 @@ func (k msgServer) PruneBalances(goCtx context.Context, msg *types.MsgPruneBalan
 		if badgeId < nextBadgeId && !k.StoreHasBadgeID(ctx, badgeId) {
 			ctx.BlockGasMeter().RefundGas(PruneBalanceRefundAmountPerBadge, "prune balances refund per badge")
 			for _, address := range msg.Addresses {
-				k.DeleteBadgeBalanceFromStore(ctx, ConstructBalanceKey(address, badgeId))
+				k.DeleteUserBalanceFromStore(ctx, ConstructBalanceKey(address, badgeId))
 				ctx.BlockGasMeter().RefundGas(PruneBalanceRefundAmountPerAddress, "prune balances refund per address")
 			}
 		} else {
@@ -31,8 +30,6 @@ func (k msgServer) PruneBalances(goCtx context.Context, msg *types.MsgPruneBalan
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeyAction, "PrunedBalances"),
-			sdk.NewAttribute("Addresses", fmt.Sprint(msg.Addresses)),
-			sdk.NewAttribute("BadgeIds", fmt.Sprint(msg.BadgeIds)),
 		),
 	)
 

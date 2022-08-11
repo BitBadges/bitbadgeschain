@@ -10,7 +10,7 @@ type UniversalValidationParams struct {
 	Creator 					string
 	BadgeId 					uint64
 	AccountsThatCantEqualCreator[]uint64
-	SubbadgeRangesToValidate	[]*types.NumberRange
+	SubbadgeRangesToValidate	[]*types.IdRange
 	MustBeManager				bool
 	CanFreeze					bool
 	CanCreateSubbadges			bool
@@ -42,7 +42,7 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationPar
 		return CreatorAccountNum, types.BitBadge{}, ErrSenderIsNotManager
 	}
 
-	permissions := types.GetPermissions(badge.PermissionFlags)
+	permissions := types.GetPermissions(badge.Permissions)
 	if params.CanFreeze && !permissions.CanFreeze() {
 		return CreatorAccountNum, types.BitBadge{}, ErrInvalidPermissions
 	}
@@ -66,52 +66,3 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationPar
 	return CreatorAccountNum, badge, nil
 }
 
-
-func (k Keeper) HandlePreTransfer(ctx sdk.Context, badgeBalanceInfo types.BadgeBalanceInfo, badge types.BitBadge, badgeId uint64, subbadgeId uint64, from uint64, to uint64, requester uint64, amount uint64) (types.BadgeBalanceInfo, error) {
-	newBadgeBalanceInfo := badgeBalanceInfo
-	permissions := types.GetPermissions(badge.PermissionFlags)
-
-	can_transfer := AccountNotFrozen(badge, permissions, from)
-	if !can_transfer {
-		return badgeBalanceInfo, ErrAddressFrozen
-	}
-
-	// Check and handle approvals if requester != from
-	if from != requester {
-		postApprovalBadgeBalanceInfo, err := k.RemoveBalanceFromApproval(ctx, newBadgeBalanceInfo, amount, requester, types.NumberRange{Start: subbadgeId, End: subbadgeId}) //if pending and cancelled, this approval will be added back
-		newBadgeBalanceInfo = postApprovalBadgeBalanceInfo
-		if err != nil {
-			return badgeBalanceInfo, err
-		}
-	}
-
-	return newBadgeBalanceInfo, nil
-}
-
-func AccountNotFrozen(badge types.BitBadge, permissions types.PermissionFlags, address uint64) bool {
-	frozen_by_default := permissions.FrozenByDefault()
-
-	can_transfer := false
-	if frozen_by_default {
-		unfrozen_address_ranges := badge.FreezeAddressRanges
-		for _, unfrozen_address_range := range unfrozen_address_ranges {
-			if unfrozen_address_range.Start <= address && unfrozen_address_range.End >= address {
-				can_transfer = true
-			} else if unfrozen_address_range.Start == address && unfrozen_address_range.End == 0 {
-				can_transfer = true
-			}
-		}
-	} else {
-		frozen_address_ranges := badge.FreezeAddressRanges
-		can_transfer = true
-		for _, frozen_address_ranges := range frozen_address_ranges {
-			if frozen_address_ranges.Start <= address && frozen_address_ranges.End >= address {
-				can_transfer = false
-			} else if frozen_address_ranges.Start == address && frozen_address_ranges.End == 0 {
-				can_transfer = false
-			}
-		}
-	}
-
-	return can_transfer
-}

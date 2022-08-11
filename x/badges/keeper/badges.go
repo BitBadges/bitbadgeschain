@@ -17,7 +17,7 @@ func (k Keeper) GetBadgeE(ctx sdk.Context, badgeId uint64) (types.BitBadge, erro
 
 
 // Gets the badge details from the store if it exists. Throws error if subbadge ranges are invalid or the subbadge does not yet exist.
-func (k Keeper) GetBadgeAndAssertSubbadgeRangesAreValid(ctx sdk.Context, badgeId uint64, subbadgeRanges []*types.NumberRange) (types.BitBadge, error) {
+func (k Keeper) GetBadgeAndAssertSubbadgeRangesAreValid(ctx sdk.Context, badgeId uint64, subbadgeRanges []*types.IdRange) (types.BitBadge, error) {
 	badge, err := k.GetBadgeE(ctx, badgeId)
 	if err != nil {
 		return badge, err

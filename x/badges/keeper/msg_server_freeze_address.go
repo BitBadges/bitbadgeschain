@@ -11,24 +11,22 @@ import (
 func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddress) (*types.MsgFreezeAddressResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, 
-		UniversalValidationParams{
-			Creator: msg.Creator,
-			BadgeId: msg.BadgeId,
-			MustBeManager: true,
-			CanFreeze: true,
-		},
-	)
+	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
+		Creator: msg.Creator,
+		BadgeId: msg.BadgeId,
+		MustBeManager: true,
+		CanFreeze: true,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	new_amounts := []*types.BalanceToIds{
-		{
-			Ids: badge.FreezeAddressRanges,
-			Balance: 1,
-		},
-	}
+	//For convenience, we will use the same logic as balanceObjects with setting all addresses in digest to balance = 1
+	//We will set all new addresses that we want to add to balance == 1 and all addresses that we want to remove to balance == 0
+	newBalanceObjects := []*types.BalanceObject{{
+		IdRanges: badge.FreezeRanges,
+		Balance: 1,
+	}}
 
 	for _, addressRange := range msg.AddressRanges {
 		for targetAddress := addressRange.Start; targetAddress <= addressRange.End; targetAddress++ {
@@ -36,13 +34,15 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 			if msg.Add {
 				newAmount = 1
 			}
-			new_amounts = UpdateBalanceForSubbadgeId(targetAddress, newAmount, new_amounts)
-		}
-		if len(new_amounts) > 0 {
-			badge.FreezeAddressRanges = new_amounts[0].Ids
-		} else {
-			badge.FreezeAddressRanges = []*types.NumberRange{}
-		}
+			
+			newBalanceObjects = UpdateBalanceForId(targetAddress, newAmount, newBalanceObjects)
+		}		
+	}
+
+	if len(newBalanceObjects) > 0 {
+		badge.FreezeRanges = newBalanceObjects[0].IdRanges
+	} else {
+		badge.FreezeRanges = nil
 	}
 
 	err = k.SetBadgeInStore(ctx, badge)
@@ -54,7 +54,6 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeyAction, "FreezeAddress"),
-			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
 			sdk.NewAttribute("BadgeID", fmt.Sprint(msg.BadgeId)),
 			sdk.NewAttribute("AddressRanges", fmt.Sprint(msg.AddressRanges)),
 			sdk.NewAttribute("Add", fmt.Sprint(msg.Add)),

@@ -33,7 +33,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	}
 
 	for idx, balance := range genState.Balances {
-		if err := k.SetBadgeBalanceInStore(ctx, genState.BalanceIds[idx], *balance); err != nil {
+		if err := k.SetUserBalanceInStore(ctx, genState.BalanceIds[idx], *balance); err != nil {
 			panic(err)
 		}
 	}
@@ -50,8 +50,8 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.NextBadgeId = k.GetNextBadgeId(ctx)
 
 	genesis.Badges = k.GetBadgesFromStore(ctx)
-	genesis.Balances = k.GetBadgeBalancesFromStore(ctx)
-	genesis.BalanceIds = k.GetBadgeBalanceIdsFromStore(ctx)
+	genesis.Balances = k.GetUserBalancesFromStore(ctx)
+	genesis.BalanceIds = k.GetUserBalanceIdsFromStore(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

@@ -1,7 +1,7 @@
 /* eslint-disable */
 import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
-import { NumberRange, BalanceToIds } from "../badges/ranges";
+import { IdRange, BalanceToIds } from "../badges/ranges";
 
 export const protobufPackage = "trevormil.bitbadgeschain.badges";
 
@@ -40,7 +40,7 @@ export interface BitBadge {
      * if frozen_by_default is true, this is an accumulator of unfrozen addresses; and vice versa for false
      * big.Int will always only be 32 uint64s long
      */
-    freeze_address_Ids: NumberRange[];
+    freeze_address_Ids: IdRange[];
     /**
      * uri for the subassets metadata stored off chain; include {id} in the string, it will be replaced with the subasset id
      * if not specified, uses a default Class (ID # 1) like metadata
@@ -82,7 +82,7 @@ export const BitBadge = {
             writer.uint32(40).uint64(message.permission_flags);
         }
         for (const v of message.freeze_address_ranges) {
-            NumberRange.encode(v!, writer.uint32(82).fork()).ldelim();
+            IdRange.encode(v!, writer.uint32(82).fork()).ldelim();
         }
         if (message.subasset_uri_format !== "") {
             writer.uint32(90).string(message.subasset_uri_format);
@@ -125,7 +125,7 @@ export const BitBadge = {
                     break;
                 case 10:
                     message.freeze_address_ranges.push(
-                        NumberRange.decode(reader, reader.uint32())
+                        IdRange.decode(reader, reader.uint32())
                     );
                     break;
                 case 11:
@@ -189,7 +189,7 @@ export const BitBadge = {
             object.freeze_address_ranges !== null
         ) {
             for (const e of object.freeze_address_ranges) {
-                message.freeze_address_ranges.push(NumberRange.fromJSON(e));
+                message.freeze_address_ranges.push(IdRange.fromJSON(e));
             }
         }
         if (
@@ -238,7 +238,7 @@ export const BitBadge = {
             (obj.permission_flags = message.permission_flags);
         if (message.freeze_address_ranges) {
             obj.freeze_address_ranges = message.freeze_address_ranges.map((e) =>
-                e ? NumberRange.toJSON(e) : undefined
+                e ? IdRange.toJSON(e) : undefined
             );
         } else {
             obj.freeze_address_ranges = [];
@@ -296,7 +296,7 @@ export const BitBadge = {
             object.freeze_address_ranges !== null
         ) {
             for (const e of object.freeze_address_ranges) {
-                message.freeze_address_ranges.push(NumberRange.fromPartial(e));
+                message.freeze_address_ranges.push(IdRange.fromPartial(e));
             }
         }
         if (
