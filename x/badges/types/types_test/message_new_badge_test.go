@@ -23,6 +23,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 				Uri:          "https://bitbadge.com/badge.svg",
 				SubassetUris: "https://bitbadge.com/badge.svg",
 				Permissions:  15,
+				FreezeAddressRanges: []*types.IdRange{},
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
@@ -32,6 +33,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 				Uri:          "https://bitbadge.com/badge.svg",
 				SubassetUris: "https://bitbadge.com/badge.svg",
 				Permissions:  15,
+				FreezeAddressRanges: []*types.IdRange{},
 			},
 		}, {
 			name: "invalid URI",
@@ -40,6 +42,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 				Uri:          "ht",
 				SubassetUris: "https://bitbadge.com/badge.svg",
 				Permissions:  15,
+				FreezeAddressRanges: []*types.IdRange{},
 			},
 
 			err: types.ErrInvalidBadgeURI,
@@ -51,6 +54,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 				Uri:          "http://x.com",
 				SubassetUris: "sfd",
 				Permissions:  15,
+				FreezeAddressRanges: []*types.IdRange{},
 			},
 			err: types.ErrInvalidBadgeURI,
 		},
@@ -61,6 +65,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 				Uri:          "http://x.com",
 				SubassetUris: "http://x.com",
 				Permissions:  10000,
+				FreezeAddressRanges: []*types.IdRange{},
 			},
 			err: types.ErrInvalidPermissionsLeadingZeroes,
 		},

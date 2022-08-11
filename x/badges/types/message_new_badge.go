@@ -9,7 +9,7 @@ const TypeMsgNewBadge = "new_badge"
 
 var _ sdk.Msg = &MsgNewBadge{}
 
-func NewMsgNewBadge(creator string, uri string, permissions uint64, subassetUris string, metadataHash string, defaultSupply uint64) *MsgNewBadge {
+func NewMsgNewBadge(creator string, uri string, permissions uint64, subassetUris string, metadataHash string, defaultSupply uint64, amountsToCreate []uint64, supplysToCreate []uint64, freezeAddressRanges []*IdRange) *MsgNewBadge {
 	return &MsgNewBadge{
 		Creator:               creator,
 		Uri:                   uri,
@@ -17,6 +17,9 @@ func NewMsgNewBadge(creator string, uri string, permissions uint64, subassetUris
 		SubassetUris:          subassetUris,
 		MetadataHash:          metadataHash,
 		DefaultSubassetSupply: defaultSupply,
+		SubassetAmountsToCreate: amountsToCreate,
+		SubassetSupplys: supplysToCreate,
+		FreezeAddressRanges: freezeAddressRanges,
 	}
 }
 
@@ -63,6 +66,27 @@ func (msg *MsgNewBadge) ValidateBasic() error {
 	if err := ValidateMetadata(msg.MetadataHash); err != nil {
 		return err
 	}
+
+	if len(msg.SubassetAmountsToCreate) != len(msg.SubassetSupplys) {
+		return ErrInvalidSupplyAndAmounts
+	}
+
+	for i, _ := range msg.SubassetSupplys {
+		if msg.SubassetAmountsToCreate[i] == 0 {
+			return ErrAmountEqualsZero
+		}
+	}
+
+	if msg.FreezeAddressRanges == nil {
+		return ErrRangesIsNil
+	}
+
+	for _, subbadgeRange := range msg.FreezeAddressRanges {
+		if subbadgeRange == nil || subbadgeRange.Start > subbadgeRange.End {
+			return ErrStartGreaterThanEnd
+		}
+	}
+
 
 	return nil
 }

@@ -32,6 +32,9 @@ message MsgNewBadge {
     uint64 permissions = 4;
     string metadataHash = 5;
     uint64 defaultSubassetSupply = 6;
+    repeated uint64 subassetSupplys = 7;
+    repeated uint64 subassetAmountsToCreate = 8;
+    repeated IdRange freezeAddressRanges = 9;
 }
 
 message MsgNewBadgeResponse {

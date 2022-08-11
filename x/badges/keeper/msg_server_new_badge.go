@@ -21,12 +21,25 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 		Id:                    NextBadgeId,
 		Uri:                   msg.Uri,
 		Manager:               CreatorAccountNum,
-		Permissions:       msg.Permissions,
+		Permissions:       	   msg.Permissions,
 		SubassetUriFormat:     msg.SubassetUris,
 		DefaultSubassetSupply: msg.DefaultSubassetSupply,
+		FreezeRanges: 		   msg.FreezeAddressRanges,
 		// SubassetSupplys: []*types.Subasset{},
 		// NextSubassetId:       0,
-		// FreezeAddresses:      []uint64{},
+	}
+
+	if len(msg.SubassetSupplys) != 0 {
+		managerBalanceInfo := types.UserBalanceInfo{}
+		err := *new(error)
+		badge, managerBalanceInfo, err = CreateSubassets(ctx, badge, managerBalanceInfo, msg.SubassetSupplys, msg.SubassetAmountsToCreate)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := k.SetUserBalanceInStore(ctx, ConstructBalanceKey(CreatorAccountNum, badge.Id), managerBalanceInfo); err != nil {
+			return nil, err
+		}
 	}
 
 	if err := k.SetBadgeInStore(ctx, badge); err != nil {

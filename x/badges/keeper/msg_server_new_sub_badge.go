@@ -28,30 +28,11 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	}
 
 	originalSubassetId := badge.NextSubassetId
-	newSubassetSupplys := badge.SubassetSupplys
-	defaultSupply := badge.DefaultSubassetSupply
-	if badge.DefaultSubassetSupply == 0 {
-		defaultSupply = 1
+
+	badge, managerBalanceInfo, err = CreateSubassets(ctx, badge, managerBalanceInfo, msg.Supplys, msg.AmountsToCreate)
+	if err != nil {
+		return nil, err
 	}
-
-	// Update supplys and mint total supply for each to manager. Don't store if supply == default
-	for i, supply := range msg.Supplys {
-		for j := uint64(0); j < msg.AmountsToCreate[i]; j++ {
-			nextSubassetId := badge.NextSubassetId
-
-			// We conventionalize supply == 0 as default, so we don't store if it is the default
-			if supply != 0 && supply != defaultSupply {
-				newSubassetSupplys = UpdateBalanceForId(nextSubassetId, supply, newSubassetSupplys)
-			}
-			badge.NextSubassetId += 1
-
-			managerBalanceInfo, err = AddBalanceForId(ctx, managerBalanceInfo, nextSubassetId, supply)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-	badge.SubassetSupplys = newSubassetSupplys
 
 	if err := k.SetBadgeInStore(ctx, badge); err != nil {
 		return nil, err

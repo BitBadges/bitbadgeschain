@@ -6,6 +6,39 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
+
+func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	badgesToCreate := []BadgesToCreate{
+		{
+			Badge: types.MsgNewBadge{
+				Uri:          validUri,
+				Permissions:  62,
+				SubassetUris: validUri,
+				FreezeAddressRanges: []*types.IdRange{
+					{Start: firstAccountNumCreated + 1},
+				},
+			},
+			Amount:  1,
+			Creator: bob,
+		},
+	}
+
+	CreateBadges(suite, wctx, badgesToCreate)
+
+	//Create subbadge 1 with supply > 1
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	suite.Require().Nil(err, "Error creating subbadge")
+	// badge, _ := GetBadge(suite, wctx, 0)
+
+	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+	suite.Require().Nil(err, "Error transferring badge")
+
+	err = TransferBadge(suite, wctx, alice, firstAccountNumCreated+1, []uint64{firstAccountNumCreated}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
+}
+
 func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
