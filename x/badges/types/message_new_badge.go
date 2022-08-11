@@ -9,17 +9,17 @@ const TypeMsgNewBadge = "new_badge"
 
 var _ sdk.Msg = &MsgNewBadge{}
 
-func NewMsgNewBadge(creator string, uri string, permissions uint64, subassetUris string, metadataHash string, defaultSupply uint64, amountsToCreate []uint64, supplysToCreate []uint64, freezeAddressRanges []*IdRange) *MsgNewBadge {
+func NewMsgNewBadge(creator string, uri string, permissions uint64, subassetUris string, bytesToStore []byte, defaultSupply uint64, amountsToCreate []uint64, supplysToCreate []uint64, freezeAddressRanges []*IdRange) *MsgNewBadge {
 	return &MsgNewBadge{
-		Creator:               creator,
-		Uri:                   uri,
-		Permissions:           permissions,
-		SubassetUris:          subassetUris,
-		MetadataHash:          metadataHash,
-		DefaultSubassetSupply: defaultSupply,
+		Creator:                 creator,
+		Uri:                     uri,
+		Permissions:             permissions,
+		SubassetUris:            subassetUris,
+		DefaultSubassetSupply:   defaultSupply,
 		SubassetAmountsToCreate: amountsToCreate,
-		SubassetSupplys: supplysToCreate,
-		FreezeAddressRanges: freezeAddressRanges,
+		SubassetSupplys:         supplysToCreate,
+		FreezeAddressRanges:     freezeAddressRanges,
+		ArbitraryBytes:          bytesToStore,
 	}
 }
 
@@ -63,7 +63,7 @@ func (msg *MsgNewBadge) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateMetadata(msg.MetadataHash); err != nil {
+	if err := ValidateBytes(msg.ArbitraryBytes); err != nil {
 		return err
 	}
 
@@ -86,7 +86,6 @@ func (msg *MsgNewBadge) ValidateBasic() error {
 			return ErrStartGreaterThanEnd
 		}
 	}
-
 
 	return nil
 }

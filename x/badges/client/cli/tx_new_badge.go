@@ -16,13 +16,13 @@ var _ = strconv.Itoa(0)
 
 func CmdNewBadge() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "new-badge [uri] [permissions] [subasset-uris] [metadata-hash] [default-supply] [subasset-supplys] [subasset-amounts] [freeze-start] [freeze-end]",
+		Use:   "new-badge [uri] [permissions] [subasset-uris] [bytes-string] [default-supply] [subasset-supplys] [subasset-amounts] [freeze-start] [freeze-end]",
 		Short: "Broadcast message newBadge",
 		Args:  cobra.ExactArgs(9),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argUri := args[0]
 			argSubassetUris := args[2]
-			argMetadataHash := args[3]
+			argBytesStr := []byte(args[3])
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -78,7 +78,7 @@ func CmdNewBadge() *cobra.Command {
 				argUri,
 				permissions,
 				argSubassetUris,
-				argMetadataHash,
+				argBytesStr,
 				defaultSupply,
 				argAmountsUInt64,
 				argSupplysUInt64,

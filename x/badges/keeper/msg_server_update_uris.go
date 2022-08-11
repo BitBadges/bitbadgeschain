@@ -12,8 +12,8 @@ func (k msgServer) UpdateUris(goCtx context.Context, msg *types.MsgUpdateUris) (
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator: msg.Creator,
-		BadgeId: msg.BadgeId,
+		Creator:       msg.Creator,
+		BadgeId:       msg.BadgeId,
 		MustBeManager: true,
 		CanUpdateUris: true,
 	})

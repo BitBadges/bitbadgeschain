@@ -9,7 +9,7 @@ import (
 
 var (
 	BadgeKey           = []byte{0x01}
-	UserBalanceKey    = []byte{0x02}
+	UserBalanceKey     = []byte{0x02}
 	NextAssetIDKey     = []byte{0x03}
 	TransferManagerKey = []byte{0x04}
 	// ClassTotalSupply     = []byte{0x05}

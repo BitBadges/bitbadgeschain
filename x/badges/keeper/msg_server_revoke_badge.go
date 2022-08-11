@@ -12,12 +12,12 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum, _, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator: msg.Creator,
-		BadgeId: msg.BadgeId,
-		SubbadgeRangesToValidate: msg.SubbadgeRanges,
+		Creator:                      msg.Creator,
+		BadgeId:                      msg.BadgeId,
+		SubbadgeRangesToValidate:     msg.SubbadgeRanges,
 		AccountsThatCantEqualCreator: msg.Addresses,
-		MustBeManager: true,
-		CanRevoke: true,
+		MustBeManager:                true,
+		CanRevoke:                    true,
 	})
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 				}
 			}
 		}
-		
+
 		err = k.SetUserBalanceInStore(ctx, addressBalanceKey, addressBalanceInfo)
 		if err != nil {
 			return nil, err

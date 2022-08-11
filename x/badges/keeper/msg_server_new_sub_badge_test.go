@@ -34,7 +34,7 @@ func (suite *TestSuite) TestNewSubBadges() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10,
+			Balance:  10,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -50,7 +50,7 @@ func (suite *TestSuite) TestNewSubBadges() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10,
+			Balance:  10,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(1), keeper.GetBalanceForId(1, bobBalanceInfo.BalanceAmounts))
@@ -65,7 +65,7 @@ func (suite *TestSuite) TestNewSubBadges() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}, {Start: 2, End: 3}}, //0 to 0 range so it will be nil
-			Balance: 10,
+			Balance:  10,
 		},
 	},
 		badge.SubassetSupplys)
@@ -78,10 +78,10 @@ func (suite *TestSuite) TestNewSubbadgesDirectlyUponCreatingNewBadge() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
-				Permissions:  62,
-				SubassetUris: validUri,
-				SubassetSupplys: []uint64{10},
+				Uri:                     validUri,
+				Permissions:             62,
+				SubassetUris:            validUri,
+				SubassetSupplys:         []uint64{10},
 				SubassetAmountsToCreate: []uint64{1},
 			},
 			Amount:  1,
@@ -99,7 +99,7 @@ func (suite *TestSuite) TestNewSubbadgesDirectlyUponCreatingNewBadge() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10,
+			Balance:  10,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -115,7 +115,7 @@ func (suite *TestSuite) TestNewSubbadgesDirectlyUponCreatingNewBadge() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10,
+			Balance:  10,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(1), keeper.GetBalanceForId(1, bobBalanceInfo.BalanceAmounts))
@@ -130,7 +130,7 @@ func (suite *TestSuite) TestNewSubbadgesDirectlyUponCreatingNewBadge() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}, {Start: 2, End: 3}}, //0 to 0 range so it will be nil
-			Balance: 10,
+			Balance:  10,
 		},
 	},
 		badge.SubassetSupplys)

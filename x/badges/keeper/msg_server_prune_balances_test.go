@@ -35,7 +35,7 @@ func (suite *TestSuite) TestPruneBalances() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -64,5 +64,5 @@ func (suite *TestSuite) TestPruneBalances() {
 	suite.Require().Equal(0, len(bobBalanceInfo.Approvals))
 	suite.Require().Equal(uint64(0), (bobBalanceInfo.PendingNonce))
 	suite.Require().Equal(0, len(bobBalanceInfo.Pending))
-	
+
 }

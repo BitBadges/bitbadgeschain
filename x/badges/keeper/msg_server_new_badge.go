@@ -11,20 +11,25 @@ import (
 func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*types.MsgNewBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
-	
+
 	// We shouldn't have to call UniversalValidate() because anyone can call this function
 
 	NextBadgeId := k.GetNextBadgeId(ctx)
 	k.IncrementNextBadgeId(ctx)
 
+	if len(msg.ArbitraryBytes) > 256 {
+		return nil, types.ErrBytesGreaterThan256
+	}
+
 	badge := types.BitBadge{
 		Id:                    NextBadgeId,
 		Uri:                   msg.Uri,
 		Manager:               CreatorAccountNum,
-		Permissions:       	   msg.Permissions,
+		Permissions:           msg.Permissions,
 		SubassetUriFormat:     msg.SubassetUris,
 		DefaultSubassetSupply: msg.DefaultSubassetSupply,
-		FreezeRanges: 		   msg.FreezeAddressRanges,
+		FreezeRanges:          msg.FreezeAddressRanges,
+		ArbitraryBytes:        msg.ArbitraryBytes,
 		// SubassetSupplys: []*types.Subasset{},
 		// NextSubassetId:       0,
 	}

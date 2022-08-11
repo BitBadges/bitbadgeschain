@@ -22,7 +22,8 @@ service Msg {
     rpc RequestTransferManager(MsgRequestTransferManager) returns (MsgRequestTransferManagerResponse);
     rpc SelfDestructBadge(MsgSelfDestructBadge) returns (MsgSelfDestructBadgeResponse);
     rpc PruneBalances(MsgPruneBalances) returns (MsgPruneBalancesResponse);
-    // this line is used by starport scaffolding # proto/tx/rpc
+      rpc UpdateBytes(MsgUpdateBytes) returns (MsgUpdateBytesResponse);
+// this line is used by starport scaffolding # proto/tx/rpc
 }
 
 message MsgNewBadge {
@@ -30,7 +31,7 @@ message MsgNewBadge {
     string uri = 2;
     string subassetUris = 3;
     uint64 permissions = 4;
-    string metadataHash = 5;
+    bytes arbitraryBytes = 5;
     uint64 defaultSubassetSupply = 6;
     repeated uint64 subassetSupplys = 7;
     repeated uint64 subassetAmountsToCreate = 8;
@@ -169,6 +170,15 @@ message MsgPruneBalances {
 }
 
 message MsgPruneBalancesResponse {
+}
+
+message MsgUpdateBytes {
+  string creator = 1;
+  uint64 badgeId = 2;
+  bytes newBytes = 3;
+}
+
+message MsgUpdateBytesResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

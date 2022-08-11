@@ -28,7 +28,9 @@ export interface BadgesBitBadge {
   /** @format uint64 */
   id?: string;
   uri?: string;
-  metadataHash?: string;
+
+  /** @format byte */
+  arbitraryBytes?: string;
 
   /** @format uint64 */
   manager?: string;
@@ -95,6 +97,8 @@ export type BadgesMsgSetApprovalResponse = object;
 export type BadgesMsgTransferBadgeResponse = object;
 
 export type BadgesMsgTransferManagerResponse = object;
+
+export type BadgesMsgUpdateBytesResponse = object;
 
 export type BadgesMsgUpdatePermissionsResponse = object;
 

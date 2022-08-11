@@ -10,7 +10,7 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRa
 	permissions := types.GetPermissions(badge.Permissions)
 	err := *new(error)
 	sendingToReservedAddress := false //TODO: implement this; Check if to Address is reserved; if so, we automatically forceful transfer
-	
+
 	//If we can forceful transfer, do it. Else, add it to pending.
 	if sendingToReservedAddress || permissions.ForcefulTransfers() || badge.Manager == to {
 		fromUserBalanceInfo, toUserBalanceInfo, err = k.ForcefulTransfer(ctx, badge, subbadgeRange, fromUserBalanceInfo, toUserBalanceInfo, amount, from, to, approvedBy, expirationTime)
@@ -69,7 +69,7 @@ func (k Keeper) PendingTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeR
 		if err != nil {
 			return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
 		}
-		
+
 		fromUserBalanceInfo, err = k.DeductApprovals(ctx, fromUserBalanceInfo, badge, badge.Id, currSubbadgeId, from, to, approvedBy, amount)
 		if err != nil {
 			return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
@@ -119,22 +119,22 @@ func (k Keeper) RevertEscrowedBalancesAndApprovals(ctx sdk.Context, userBalanceI
 			return types.UserBalanceInfo{}, err
 		}
 	}
-	
+
 	return userBalanceInfo, nil
 }
 
-// Checks if account is frozen or not. 
+// Checks if account is frozen or not.
 func IsAccountFrozen(badge types.BitBadge, permissions types.Permissions, address uint64) bool {
 	frozenByDefault := permissions.FrozenByDefault()
 
 	accountIsFrozen := false
 	if frozenByDefault {
-		_, found := SearchIdRangesForId(address, badge.FreezeRanges)	
+		_, found := SearchIdRangesForId(address, badge.FreezeRanges)
 		if !found {
 			accountIsFrozen = true
 		}
 	} else {
-		_, found := SearchIdRangesForId(address, badge.FreezeRanges)	
+		_, found := SearchIdRangesForId(address, badge.FreezeRanges)
 		if found {
 			accountIsFrozen = true
 		}
@@ -143,7 +143,7 @@ func IsAccountFrozen(badge types.BitBadge, permissions types.Permissions, addres
 }
 
 // Returns an error if account is Frozen
-func (k Keeper) AssertAccountNotFrozen(ctx sdk.Context, badge types.BitBadge, from uint64) (error) {
+func (k Keeper) AssertAccountNotFrozen(ctx sdk.Context, badge types.BitBadge, from uint64) error {
 	permissions := types.GetPermissions(badge.Permissions)
 
 	accountIsFrozen := IsAccountFrozen(badge, permissions, from)

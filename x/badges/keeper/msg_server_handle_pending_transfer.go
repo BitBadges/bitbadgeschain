@@ -62,9 +62,9 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 						return nil, ErrPendingTransferExpired
 					}
 				}
-				
+
 				outgoingTransfer := CurrPendingTransfer.From == CreatorAccountNum
-				
+
 				//Normal transfer flags
 				acceptOwnOutgoingTransfer := CurrPendingTransfer.Sent && msg.Accept && outgoingTransfer
 				acceptIncomingTransfer := !CurrPendingTransfer.Sent && msg.Accept && !outgoingTransfer
@@ -109,7 +109,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 					} else if acceptTransferRequestButMarkAsApproved {
 						creatorBalanceInfo.Pending[idx].MarkedAsAccepted = true
 					} else if cancelOwnOutgoingTransfer {
-						creatorBalanceInfo, err = k.RevertEscrowedBalancesAndApprovals(ctx, creatorBalanceInfo, i,CurrPendingTransfer.From, CurrPendingTransfer.ApprovedBy, CurrPendingTransfer.Amount)
+						creatorBalanceInfo, err = k.RevertEscrowedBalancesAndApprovals(ctx, creatorBalanceInfo, i, CurrPendingTransfer.From, CurrPendingTransfer.ApprovedBy, CurrPendingTransfer.Amount)
 					} else if finalizeOwnTransferRequestAfterApprovedByOtherParty {
 						idx, found := SearchPendingByNonce(otherPartyBalanceInfo.Pending, otherPartyNonce)
 						if found {
@@ -129,7 +129,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 						return nil, err
 					}
 				}
-				
+
 				if needToRemoveAtLeastOneFromPending {
 					creatorBalanceInfo, err = k.RemovePending(ctx, creatorBalanceInfo, CurrPendingTransfer.ThisPendingNonce, otherPartyNonce)
 					if err != nil {
@@ -147,7 +147,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 							}
 						}
 					}
-				}			
+				}
 			}
 		}
 	}

@@ -7,19 +7,20 @@ import (
 
 // Determines what to validate for each Msg
 type UniversalValidationParams struct {
-	Creator 					string
-	BadgeId 					uint64
-	AccountsThatCantEqualCreator[]uint64
-	SubbadgeRangesToValidate	[]*types.IdRange
-	MustBeManager				bool
-	CanFreeze					bool
-	CanCreateSubbadges			bool
-	CanRevoke					bool
-	CanManagerTransfer			bool
-	CanUpdateUris				bool
+	Creator                      string
+	BadgeId                      uint64
+	AccountsThatCantEqualCreator []uint64
+	SubbadgeRangesToValidate     []*types.IdRange
+	MustBeManager                bool
+	CanFreeze                    bool
+	CanCreateSubbadges           bool
+	CanRevoke                    bool
+	CanManagerTransfer           bool
+	CanUpdateUris                bool
+	CanUpdateBytes			   	 bool
 }
 
-// Validates everything about the Msg is valid and returns (creatorNum, badge, permissions, error). 
+// Validates everything about the Msg is valid and returns (creatorNum, badge, permissions, error).
 func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationParams) (uint64, types.BitBadge, error) {
 	CreatorAccountNum := k.MustGetAccountNumberForBech32AddressString(ctx, params.Creator)
 
@@ -63,6 +64,9 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationPar
 		return CreatorAccountNum, types.BitBadge{}, ErrInvalidPermissions
 	}
 
+	if params.CanUpdateBytes && !permissions.CanUpdateBytes() {
+		return CreatorAccountNum, types.BitBadge{}, ErrInvalidPermissions
+	}
+
 	return CreatorAccountNum, badge, nil
 }
-

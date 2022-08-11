@@ -22,7 +22,7 @@ func SafeSubtract(left uint64, right uint64) (uint64, error) {
 	return left - right, nil
 }
 
-// Updates the balance for a specific id from what it currently is to newAmount. 
+// Updates the balance for a specific id from what it currently is to newAmount.
 func UpdateBalanceForId(id uint64, newAmount uint64, balanceObjects []*types.BalanceObject) []*types.BalanceObject {
 	balanceObjects = DeleteBalanceForId(id, balanceObjects)
 	balanceObjects = SetBalanceForId(id, newAmount, balanceObjects)
@@ -62,7 +62,7 @@ func SubtractBalanceForId(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo
 	if err != nil {
 		return userBalanceInfo, err
 	}
-	
+
 	userBalanceInfo.BalanceAmounts = UpdateBalanceForId(id, newBalance, userBalanceInfo.BalanceAmounts)
 	return userBalanceInfo, nil
 }
@@ -77,7 +77,7 @@ func DeleteBalanceForId(id uint64, balanceObjects []*types.BalanceObject) []*typ
 		if found {
 			newIdRanges := append([]*types.IdRange{}, balanceObj.IdRanges[:idx]...)
 			newIdRanges = append(newIdRanges, RemoveIdFromIdRange(id, *balanceObj.IdRanges[idx])...)
-			newIdRanges = append(newIdRanges, balanceObj.IdRanges[idx+1:]...) 
+			newIdRanges = append(newIdRanges, balanceObj.IdRanges[idx+1:]...)
 			balanceObj.IdRanges = newIdRanges
 		}
 
@@ -87,7 +87,6 @@ func DeleteBalanceForId(id uint64, balanceObjects []*types.BalanceObject) []*typ
 	}
 	return newBalanceObjects
 }
-
 
 // Sets the balance for a specific id.
 func SetBalanceForId(id uint64, amount uint64, balanceObjects []*types.BalanceObject) []*types.BalanceObject {
@@ -100,7 +99,7 @@ func SetBalanceForId(id uint64, amount uint64, balanceObjects []*types.BalanceOb
 	if !found {
 		newBalanceObjects = append(newBalanceObjects, balanceObjects[:idx]...)
 		newBalanceObjects = append(newBalanceObjects, &types.BalanceObject{
-			Balance: amount,
+			Balance:  amount,
 			IdRanges: []*types.IdRange{GetIdRangeToInsert(id, id)},
 		})
 		newBalanceObjects = append(newBalanceObjects, balanceObjects[idx:]...)
@@ -109,32 +108,32 @@ func SetBalanceForId(id uint64, amount uint64, balanceObjects []*types.BalanceOb
 		oldIdRanges := GetIdRangesWithOmitEmptyCaseHandled(newBalanceObjects[idx].IdRanges)
 		newBalanceObjects[idx].IdRanges = InsertIdRange(id, oldIdRanges)
 	}
-	
+
 	return newBalanceObjects
 }
 
 // Balances will be sorted, so we can binary search to get the targetIdx. Returns the index to insert at if not found
-func SearchBalanceObjectsForBalanceAndGetIdxToInsertIfNotFound(targetAmount uint64, balanceObjects []*types.BalanceObject) (int, bool){
+func SearchBalanceObjectsForBalanceAndGetIdxToInsertIfNotFound(targetAmount uint64, balanceObjects []*types.BalanceObject) (int, bool) {
 	balanceLow := 0
 	balanceHigh := len(balanceObjects) - 1
 	median := 0
 	hasEntryWithSameBalance := false
 	setIdx := 0
 	for balanceLow <= balanceHigh {
-		median = int(uint(balanceLow + balanceHigh) >> 1)
+		median = int(uint(balanceLow+balanceHigh) >> 1)
 		if balanceObjects[median].Balance == targetAmount {
 			hasEntryWithSameBalance = true
-			break;
+			break
 		} else if balanceObjects[median].Balance > targetAmount {
 			balanceHigh = median - 1
 		} else {
 			balanceLow = median + 1
 		}
 	}
-	
+
 	if len(balanceObjects) != 0 {
 		setIdx = median + 1
-		if (targetAmount <= balanceObjects[median].Balance) {
+		if targetAmount <= balanceObjects[median].Balance {
 			setIdx = median
 		}
 	}

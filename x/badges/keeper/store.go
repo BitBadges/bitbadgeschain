@@ -26,6 +26,7 @@ func (k Keeper) SetBadgeInStore(ctx sdk.Context, badge types.BitBadge) error {
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.BitBadge failed")
 	}
+
 	store := ctx.KVStore(k.storeKey)
 	store.Set(badgeStoreKey(badge.Id), marshaled_badge)
 	return nil
@@ -44,7 +45,7 @@ func (k Keeper) GetBadgeFromStore(ctx sdk.Context, badgeID uint64) (types.BitBad
 	return badge, true
 }
 
-// GetBadgesFromStore defines a method for returning all badges information by key. 
+// GetBadgesFromStore defines a method for returning all badges information by key.
 func (k Keeper) GetBadgesFromStore(ctx sdk.Context) (badges []*types.BitBadge) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, BadgeKey)
@@ -179,8 +180,8 @@ func (k Keeper) SetNextBadgeId(ctx sdk.Context, nextID uint64) {
 	store.Set(nextAssetIDKey(), []byte(strconv.FormatInt(int64(nextID), 10)))
 }
 
-// Increments the next badge ID by 1. 
+// Increments the next badge ID by 1.
 func (k Keeper) IncrementNextBadgeId(ctx sdk.Context) {
 	nextID := k.GetNextBadgeId(ctx)
-	k.SetNextBadgeId(ctx, nextID + 1)
+	k.SetNextBadgeId(ctx, nextID+1)
 }

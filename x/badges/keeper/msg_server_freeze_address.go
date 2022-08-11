@@ -12,10 +12,10 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator: msg.Creator,
-		BadgeId: msg.BadgeId,
+		Creator:       msg.Creator,
+		BadgeId:       msg.BadgeId,
 		MustBeManager: true,
-		CanFreeze: true,
+		CanFreeze:     true,
 	})
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 	//We will set all new addresses that we want to add to balance == 1 and all addresses that we want to remove to balance == 0
 	newBalanceObjects := []*types.BalanceObject{{
 		IdRanges: badge.FreezeRanges,
-		Balance: 1,
+		Balance:  1,
 	}}
 
 	for _, addressRange := range msg.AddressRanges {
@@ -34,9 +34,9 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 			if msg.Add {
 				newAmount = 1
 			}
-			
+
 			newBalanceObjects = UpdateBalanceForId(targetAddress, newAmount, newBalanceObjects)
-		}		
+		}
 	}
 
 	if len(newBalanceObjects) > 0 {

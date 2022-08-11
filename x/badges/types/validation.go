@@ -39,9 +39,9 @@ func ValidateAddress(address string) error {
 	return nil
 }
 
-func ValidateMetadata(hash string) error {
-	if !reMetadata.MatchString(hash) {
-		return sdkerrors.Wrapf(ErrInvalidBadgeHash, "invalid metadata hash: %s", hash)
+func ValidateBytes(bytesToCheck []byte) error {
+	if len(bytesToCheck) > 256 {
+		return ErrBytesGreaterThan256
 	}
 	return nil
 }

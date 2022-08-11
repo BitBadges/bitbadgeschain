@@ -12,15 +12,15 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator: msg.Creator,
-		BadgeId: msg.Id,
-		MustBeManager: true,
+		Creator:            msg.Creator,
+		BadgeId:            msg.Id,
+		MustBeManager:      true,
 		CanCreateSubbadges: true,
 	})
 	if err != nil {
 		return nil, err
 	}
-	
+
 	managerBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.Id)
 	managerBalanceInfo, found := k.GetUserBalanceFromStore(ctx, managerBalanceKey)
 	if !found {

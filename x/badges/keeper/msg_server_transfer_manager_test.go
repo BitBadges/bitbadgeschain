@@ -152,7 +152,6 @@ func (suite *TestSuite) TestManagerCantBeTransferred() {
 	err := CreateBadges(suite, wctx, badgesToCreate)
 	suite.Require().Nil(err, "Error creating badge")
 
-
 	err = TransferManager(suite, wctx, bob, 0, firstAccountNumCreated+1)
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }

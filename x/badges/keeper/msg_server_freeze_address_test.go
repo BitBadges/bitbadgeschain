@@ -6,7 +6,6 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-
 func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
@@ -68,7 +67,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -122,7 +121,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefault() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -169,7 +168,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefaultAddAndRemove() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -196,7 +195,6 @@ func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefaultAddAndRemove() {
 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 }
 
-
 func (suite *TestSuite) TestFreezeCantFreeze() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
@@ -217,5 +215,3 @@ func (suite *TestSuite) TestFreezeCantFreeze() {
 	err := FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: firstAccountNumCreated, End: firstAccountNumCreated}}, 0, 0, true)
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }
-
-

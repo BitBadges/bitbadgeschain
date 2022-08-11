@@ -10,8 +10,11 @@ export interface MsgNewBadge {
   uri: string;
   subassetUris: string;
   permissions: number;
-  metadataHash: string;
+  arbitraryBytes: Uint8Array;
   defaultSubassetSupply: number;
+  subassetSupplys: number[];
+  subassetAmountsToCreate: number[];
+  freezeAddressRanges: IdRange[];
 }
 
 export interface MsgNewBadgeResponse {
@@ -140,13 +143,22 @@ export interface MsgPruneBalances {
 
 export interface MsgPruneBalancesResponse {}
 
+export interface MsgUpdateBytes {
+  creator: string;
+  badgeId: number;
+  newBytes: string;
+}
+
+export interface MsgUpdateBytesResponse {}
+
 const baseMsgNewBadge: object = {
   creator: "",
   uri: "",
   subassetUris: "",
   permissions: 0,
-  metadataHash: "",
   defaultSubassetSupply: 0,
+  subassetSupplys: 0,
+  subassetAmountsToCreate: 0,
 };
 
 export const MsgNewBadge = {
@@ -163,11 +175,24 @@ export const MsgNewBadge = {
     if (message.permissions !== 0) {
       writer.uint32(32).uint64(message.permissions);
     }
-    if (message.metadataHash !== "") {
-      writer.uint32(42).string(message.metadataHash);
+    if (message.arbitraryBytes.length !== 0) {
+      writer.uint32(42).bytes(message.arbitraryBytes);
     }
     if (message.defaultSubassetSupply !== 0) {
       writer.uint32(48).uint64(message.defaultSubassetSupply);
+    }
+    writer.uint32(58).fork();
+    for (const v of message.subassetSupplys) {
+      writer.uint64(v);
+    }
+    writer.ldelim();
+    writer.uint32(66).fork();
+    for (const v of message.subassetAmountsToCreate) {
+      writer.uint64(v);
+    }
+    writer.ldelim();
+    for (const v of message.freezeAddressRanges) {
+      IdRange.encode(v!, writer.uint32(74).fork()).ldelim();
     }
     return writer;
   },
@@ -176,6 +201,9 @@ export const MsgNewBadge = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseMsgNewBadge } as MsgNewBadge;
+    message.subassetSupplys = [];
+    message.subassetAmountsToCreate = [];
+    message.freezeAddressRanges = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -192,10 +220,41 @@ export const MsgNewBadge = {
           message.permissions = longToNumber(reader.uint64() as Long);
           break;
         case 5:
-          message.metadataHash = reader.string();
+          message.arbitraryBytes = reader.bytes();
           break;
         case 6:
           message.defaultSubassetSupply = longToNumber(reader.uint64() as Long);
+          break;
+        case 7:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.subassetSupplys.push(
+                longToNumber(reader.uint64() as Long)
+              );
+            }
+          } else {
+            message.subassetSupplys.push(longToNumber(reader.uint64() as Long));
+          }
+          break;
+        case 8:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.subassetAmountsToCreate.push(
+                longToNumber(reader.uint64() as Long)
+              );
+            }
+          } else {
+            message.subassetAmountsToCreate.push(
+              longToNumber(reader.uint64() as Long)
+            );
+          }
+          break;
+        case 9:
+          message.freezeAddressRanges.push(
+            IdRange.decode(reader, reader.uint32())
+          );
           break;
         default:
           reader.skipType(tag & 7);
@@ -207,6 +266,9 @@ export const MsgNewBadge = {
 
   fromJSON(object: any): MsgNewBadge {
     const message = { ...baseMsgNewBadge } as MsgNewBadge;
+    message.subassetSupplys = [];
+    message.subassetAmountsToCreate = [];
+    message.freezeAddressRanges = [];
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = String(object.creator);
     } else {
@@ -227,10 +289,8 @@ export const MsgNewBadge = {
     } else {
       message.permissions = 0;
     }
-    if (object.metadataHash !== undefined && object.metadataHash !== null) {
-      message.metadataHash = String(object.metadataHash);
-    } else {
-      message.metadataHash = "";
+    if (object.arbitraryBytes !== undefined && object.arbitraryBytes !== null) {
+      message.arbitraryBytes = bytesFromBase64(object.arbitraryBytes);
     }
     if (
       object.defaultSubassetSupply !== undefined &&
@@ -239,6 +299,30 @@ export const MsgNewBadge = {
       message.defaultSubassetSupply = Number(object.defaultSubassetSupply);
     } else {
       message.defaultSubassetSupply = 0;
+    }
+    if (
+      object.subassetSupplys !== undefined &&
+      object.subassetSupplys !== null
+    ) {
+      for (const e of object.subassetSupplys) {
+        message.subassetSupplys.push(Number(e));
+      }
+    }
+    if (
+      object.subassetAmountsToCreate !== undefined &&
+      object.subassetAmountsToCreate !== null
+    ) {
+      for (const e of object.subassetAmountsToCreate) {
+        message.subassetAmountsToCreate.push(Number(e));
+      }
+    }
+    if (
+      object.freezeAddressRanges !== undefined &&
+      object.freezeAddressRanges !== null
+    ) {
+      for (const e of object.freezeAddressRanges) {
+        message.freezeAddressRanges.push(IdRange.fromJSON(e));
+      }
     }
     return message;
   },
@@ -251,15 +335,41 @@ export const MsgNewBadge = {
       (obj.subassetUris = message.subassetUris);
     message.permissions !== undefined &&
       (obj.permissions = message.permissions);
-    message.metadataHash !== undefined &&
-      (obj.metadataHash = message.metadataHash);
+    message.arbitraryBytes !== undefined &&
+      (obj.arbitraryBytes = base64FromBytes(
+        message.arbitraryBytes !== undefined
+          ? message.arbitraryBytes
+          : new Uint8Array()
+      ));
     message.defaultSubassetSupply !== undefined &&
       (obj.defaultSubassetSupply = message.defaultSubassetSupply);
+    if (message.subassetSupplys) {
+      obj.subassetSupplys = message.subassetSupplys.map((e) => e);
+    } else {
+      obj.subassetSupplys = [];
+    }
+    if (message.subassetAmountsToCreate) {
+      obj.subassetAmountsToCreate = message.subassetAmountsToCreate.map(
+        (e) => e
+      );
+    } else {
+      obj.subassetAmountsToCreate = [];
+    }
+    if (message.freezeAddressRanges) {
+      obj.freezeAddressRanges = message.freezeAddressRanges.map((e) =>
+        e ? IdRange.toJSON(e) : undefined
+      );
+    } else {
+      obj.freezeAddressRanges = [];
+    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<MsgNewBadge>): MsgNewBadge {
     const message = { ...baseMsgNewBadge } as MsgNewBadge;
+    message.subassetSupplys = [];
+    message.subassetAmountsToCreate = [];
+    message.freezeAddressRanges = [];
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
     } else {
@@ -280,10 +390,10 @@ export const MsgNewBadge = {
     } else {
       message.permissions = 0;
     }
-    if (object.metadataHash !== undefined && object.metadataHash !== null) {
-      message.metadataHash = object.metadataHash;
+    if (object.arbitraryBytes !== undefined && object.arbitraryBytes !== null) {
+      message.arbitraryBytes = object.arbitraryBytes;
     } else {
-      message.metadataHash = "";
+      message.arbitraryBytes = new Uint8Array();
     }
     if (
       object.defaultSubassetSupply !== undefined &&
@@ -292,6 +402,30 @@ export const MsgNewBadge = {
       message.defaultSubassetSupply = object.defaultSubassetSupply;
     } else {
       message.defaultSubassetSupply = 0;
+    }
+    if (
+      object.subassetSupplys !== undefined &&
+      object.subassetSupplys !== null
+    ) {
+      for (const e of object.subassetSupplys) {
+        message.subassetSupplys.push(e);
+      }
+    }
+    if (
+      object.subassetAmountsToCreate !== undefined &&
+      object.subassetAmountsToCreate !== null
+    ) {
+      for (const e of object.subassetAmountsToCreate) {
+        message.subassetAmountsToCreate.push(e);
+      }
+    }
+    if (
+      object.freezeAddressRanges !== undefined &&
+      object.freezeAddressRanges !== null
+    ) {
+      for (const e of object.freezeAddressRanges) {
+        message.freezeAddressRanges.push(IdRange.fromPartial(e));
+      }
     }
     return message;
   },
@@ -2729,6 +2863,133 @@ export const MsgPruneBalancesResponse = {
   },
 };
 
+const baseMsgUpdateBytes: object = { creator: "", badgeId: 0, newBytes: "" };
+
+export const MsgUpdateBytes = {
+  encode(message: MsgUpdateBytes, writer: Writer = Writer.create()): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.badgeId !== 0) {
+      writer.uint32(16).uint64(message.badgeId);
+    }
+    if (message.newBytes !== "") {
+      writer.uint32(26).string(message.newBytes);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgUpdateBytes {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgUpdateBytes } as MsgUpdateBytes;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.badgeId = longToNumber(reader.uint64() as Long);
+          break;
+        case 3:
+          message.newBytes = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgUpdateBytes {
+    const message = { ...baseMsgUpdateBytes } as MsgUpdateBytes;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = Number(object.badgeId);
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.newBytes !== undefined && object.newBytes !== null) {
+      message.newBytes = String(object.newBytes);
+    } else {
+      message.newBytes = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgUpdateBytes): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.badgeId !== undefined && (obj.badgeId = message.badgeId);
+    message.newBytes !== undefined && (obj.newBytes = message.newBytes);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgUpdateBytes>): MsgUpdateBytes {
+    const message = { ...baseMsgUpdateBytes } as MsgUpdateBytes;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = object.badgeId;
+    } else {
+      message.badgeId = 0;
+    }
+    if (object.newBytes !== undefined && object.newBytes !== null) {
+      message.newBytes = object.newBytes;
+    } else {
+      message.newBytes = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgUpdateBytesResponse: object = {};
+
+export const MsgUpdateBytesResponse = {
+  encode(_: MsgUpdateBytesResponse, writer: Writer = Writer.create()): Writer {
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgUpdateBytesResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgUpdateBytesResponse } as MsgUpdateBytesResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgUpdateBytesResponse {
+    const message = { ...baseMsgUpdateBytesResponse } as MsgUpdateBytesResponse;
+    return message;
+  },
+
+  toJSON(_: MsgUpdateBytesResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(_: DeepPartial<MsgUpdateBytesResponse>): MsgUpdateBytesResponse {
+    const message = { ...baseMsgUpdateBytesResponse } as MsgUpdateBytesResponse;
+    return message;
+  },
+};
+
 /** Msg defines the Msg service. */
 export interface Msg {
   NewBadge(request: MsgNewBadge): Promise<MsgNewBadgeResponse>;
@@ -2756,8 +3017,9 @@ export interface Msg {
   SelfDestructBadge(
     request: MsgSelfDestructBadge
   ): Promise<MsgSelfDestructBadgeResponse>;
-  /** this line is used by starport scaffolding # proto/tx/rpc */
   PruneBalances(request: MsgPruneBalances): Promise<MsgPruneBalancesResponse>;
+  /** this line is used by starport scaffolding # proto/tx/rpc */
+  UpdateBytes(request: MsgUpdateBytes): Promise<MsgUpdateBytesResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -2942,6 +3204,18 @@ export class MsgClientImpl implements Msg {
       MsgPruneBalancesResponse.decode(new Reader(data))
     );
   }
+
+  UpdateBytes(request: MsgUpdateBytes): Promise<MsgUpdateBytesResponse> {
+    const data = MsgUpdateBytes.encode(request).finish();
+    const promise = this.rpc.request(
+      "trevormil.bitbadgeschain.badges.Msg",
+      "UpdateBytes",
+      data
+    );
+    return promise.then((data) =>
+      MsgUpdateBytesResponse.decode(new Reader(data))
+    );
+  }
 }
 
 interface Rpc {
@@ -2961,6 +3235,29 @@ var globalThis: any = (() => {
   if (typeof global !== "undefined") return global;
   throw "Unable to locate global object";
 })();
+
+const atob: (b64: string) => string =
+  globalThis.atob ||
+  ((b64) => globalThis.Buffer.from(b64, "base64").toString("binary"));
+function bytesFromBase64(b64: string): Uint8Array {
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; ++i) {
+    arr[i] = bin.charCodeAt(i);
+  }
+  return arr;
+}
+
+const btoa: (bin: string) => string =
+  globalThis.btoa ||
+  ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
+function base64FromBytes(arr: Uint8Array): string {
+  const bin: string[] = [];
+  for (let i = 0; i < arr.byteLength; ++i) {
+    bin.push(String.fromCharCode(arr[i]));
+  }
+  return btoa(bin.join(""));
+}
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin

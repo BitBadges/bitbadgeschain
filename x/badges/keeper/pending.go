@@ -15,10 +15,10 @@ func (k Keeper) AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBal
 		SubbadgeRange:     &subbadgeRange,
 		Amount:            amount,
 		ApprovedBy:        approvedBy,
-		Sent:       	   sentByFrom, // different 
+		Sent:              sentByFrom, // different
 		To:                to,
 		From:              from,
-		ThisPendingNonce:  fromUserBalanceInfo.PendingNonce, // this / other nonces are swapped 
+		ThisPendingNonce:  fromUserBalanceInfo.PendingNonce, // this / other nonces are swapped
 		OtherPendingNonce: toUserBalanceInfo.PendingNonce,
 		ExpirationTime:    expirationTime,
 	})
@@ -27,10 +27,10 @@ func (k Keeper) AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBal
 		SubbadgeRange:     &subbadgeRange,
 		Amount:            amount,
 		ApprovedBy:        approvedBy,
-		Sent:       	   !sentByFrom, // different 
+		Sent:              !sentByFrom, // different
 		To:                to,
 		From:              from,
-		ThisPendingNonce:  toUserBalanceInfo.PendingNonce, // this / other nonces are swapped 
+		ThisPendingNonce:  toUserBalanceInfo.PendingNonce, // this / other nonces are swapped
 		OtherPendingNonce: fromUserBalanceInfo.PendingNonce,
 		ExpirationTime:    expirationTime,
 	})
@@ -41,7 +41,7 @@ func (k Keeper) AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBal
 	return fromUserBalanceInfo, toUserBalanceInfo, nil
 }
 
-//Removes pending transfer from the userBalanceInfo. 
+//Removes pending transfer from the userBalanceInfo.
 func (k Keeper) RemovePending(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, thisNonce uint64, other_nonce uint64) (types.UserBalanceInfo, error) {
 	pending := userBalanceInfo.Pending
 	low := 0
@@ -49,7 +49,7 @@ func (k Keeper) RemovePending(ctx sdk.Context, userBalanceInfo types.UserBalance
 
 	foundIdx := -1
 	for low <= high {
-		median := int(uint(low + high) >> 1)
+		median := int(uint(low+high) >> 1)
 		currPending := pending[median]
 		if currPending.ThisPendingNonce == thisNonce && currPending.OtherPendingNonce == other_nonce {
 			foundIdx = median
@@ -64,10 +64,10 @@ func (k Keeper) RemovePending(ctx sdk.Context, userBalanceInfo types.UserBalance
 	if foundIdx == -1 {
 		return userBalanceInfo, ErrPendingNotFound
 	}
-	
+
 	newPending := []*types.PendingTransfer{}
 	newPending = append(newPending, pending[:foundIdx]...)
-	newPending = append(newPending, pending[foundIdx + 1:]...)
+	newPending = append(newPending, pending[foundIdx+1:]...)
 	userBalanceInfo.Pending = newPending
 
 	return userBalanceInfo, nil
@@ -83,7 +83,7 @@ func PruneExpiredPending(currTime uint64, accountNum uint64, pending []*types.Pe
 		// } else if pendingTransfer.ExpirationTime != 0 && pendingTransfer.ExpirationTime < currTime && pendingTransfer.Sent && pendingTransfer.From == accountNum {
 		// 	continue
 		// } else {
-			prunedPending = append(prunedPending, pendingTransfer)
+		prunedPending = append(prunedPending, pendingTransfer)
 		// }
 	}
 	return prunedPending
@@ -95,7 +95,7 @@ func SearchPendingByNonce(pending []*types.PendingTransfer, nonce uint64) (int, 
 	high := len(pending) - 1
 
 	for low <= high {
-		median := int(uint(low + high) >> 1)
+		median := int(uint(low+high) >> 1)
 		currPending := pending[median]
 
 		if currPending.ThisPendingNonce == nonce {

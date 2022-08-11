@@ -30398,14 +30398,15 @@ paths:
                     title: >-
                       uri for the class metadata stored off chain. must match a
                       valid metadata standard (bitbadge, collection, etc)
-                  metadataHash:
+                  arbitraryBytes:
                     type: string
+                    format: byte
                     title: >-
-                      this is permanent and never changable; use this for
-                      asserting the permanence of the metadata
+                      these bytes can be used to store anything on-chain about
+                      the badge. This can be updatable or not depending on the
+                      permissions set.
 
-                      uri can point to other stuff in addition to metadata, this
-                      is only the hash of the metadata
+                      Max 256 bytes allowed
                   manager:
                     type: string
                     format: uint64
@@ -52784,14 +52785,14 @@ definitions:
         title: >-
           uri for the class metadata stored off chain. must match a valid
           metadata standard (bitbadge, collection, etc)
-      metadataHash:
+      arbitraryBytes:
         type: string
+        format: byte
         title: >-
-          this is permanent and never changable; use this for asserting the
-          permanence of the metadata
+          these bytes can be used to store anything on-chain about the badge.
+          This can be updatable or not depending on the permissions set.
 
-          uri can point to other stuff in addition to metadata, this is only the
-          hash of the metadata
+          Max 256 bytes allowed
       manager:
         type: string
         format: uint64
@@ -52931,6 +52932,8 @@ definitions:
     type: object
   trevormil.bitbadgeschain.badges.MsgTransferManagerResponse:
     type: object
+  trevormil.bitbadgeschain.badges.MsgUpdateBytesResponse:
+    type: object
   trevormil.bitbadgeschain.badges.MsgUpdatePermissionsResponse:
     type: object
   trevormil.bitbadgeschain.badges.MsgUpdateUrisResponse:
@@ -52994,14 +52997,15 @@ definitions:
             title: >-
               uri for the class metadata stored off chain. must match a valid
               metadata standard (bitbadge, collection, etc)
-          metadataHash:
+          arbitraryBytes:
             type: string
+            format: byte
             title: >-
-              this is permanent and never changable; use this for asserting the
-              permanence of the metadata
+              these bytes can be used to store anything on-chain about the
+              badge. This can be updatable or not depending on the permissions
+              set.
 
-              uri can point to other stuff in addition to metadata, this is only
-              the hash of the metadata
+              Max 256 bytes allowed
           manager:
             type: string
             format: uint64

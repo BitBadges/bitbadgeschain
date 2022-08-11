@@ -15,7 +15,6 @@ func (k Keeper) GetBadgeE(ctx sdk.Context, badgeId uint64) (types.BitBadge, erro
 	return badge, nil
 }
 
-
 // Gets the badge details from the store if it exists. Throws error if subbadge ranges are invalid or the subbadge does not yet exist.
 func (k Keeper) GetBadgeAndAssertSubbadgeRangesAreValid(ctx sdk.Context, badgeId uint64, subbadgeRanges []*types.IdRange) (types.BitBadge, error) {
 	badge, err := k.GetBadgeE(ctx, badgeId)
@@ -27,7 +26,7 @@ func (k Keeper) GetBadgeAndAssertSubbadgeRangesAreValid(ctx sdk.Context, badgeId
 		// Subbadge ranges can set end == 0 to save storage space. By convention, this means end == start
 		if subbadgeRange.End == 0 {
 			subbadgeRange.End = subbadgeRange.Start
-		} 
+		}
 
 		if subbadgeRange.Start > subbadgeRange.End {
 			return types.BitBadge{}, ErrInvalidSubbadgeRange
@@ -41,7 +40,7 @@ func (k Keeper) GetBadgeAndAssertSubbadgeRangesAreValid(ctx sdk.Context, badgeId
 	return badge, nil
 }
 
-func CreateSubassets(ctx sdk.Context, badge types.BitBadge, managerBalanceInfo types.UserBalanceInfo, supplys []uint64, amounts[]uint64) (types.BitBadge, types.UserBalanceInfo, error) {
+func CreateSubassets(ctx sdk.Context, badge types.BitBadge, managerBalanceInfo types.UserBalanceInfo, supplys []uint64, amounts []uint64) (types.BitBadge, types.UserBalanceInfo, error) {
 	newSubassetSupplys := badge.SubassetSupplys
 	defaultSupply := badge.DefaultSubassetSupply
 	if badge.DefaultSubassetSupply == 0 {

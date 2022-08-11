@@ -19,29 +19,29 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid address",
 			msg: types.MsgNewBadge{
-				Creator:      "invalid_address",
-				Uri:          "https://bitbadge.com/badge.svg",
-				SubassetUris: "https://bitbadge.com/badge.svg",
-				Permissions:  15,
+				Creator:             "invalid_address",
+				Uri:                 "https://bitbadge.com/badge.svg",
+				SubassetUris:        "https://bitbadge.com/badge.svg",
+				Permissions:         15,
 				FreezeAddressRanges: []*types.IdRange{},
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid state",
 			msg: types.MsgNewBadge{
-				Creator:      sample.AccAddress(),
-				Uri:          "https://bitbadge.com/badge.svg",
-				SubassetUris: "https://bitbadge.com/badge.svg",
-				Permissions:  15,
+				Creator:             sample.AccAddress(),
+				Uri:                 "https://bitbadge.com/badge.svg",
+				SubassetUris:        "https://bitbadge.com/badge.svg",
+				Permissions:         15,
 				FreezeAddressRanges: []*types.IdRange{},
 			},
 		}, {
 			name: "invalid URI",
 			msg: types.MsgNewBadge{
-				Creator:      sample.AccAddress(),
-				Uri:          "ht",
-				SubassetUris: "https://bitbadge.com/badge.svg",
-				Permissions:  15,
+				Creator:             sample.AccAddress(),
+				Uri:                 "ht",
+				SubassetUris:        "https://bitbadge.com/badge.svg",
+				Permissions:         15,
 				FreezeAddressRanges: []*types.IdRange{},
 			},
 
@@ -50,10 +50,10 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid Subasset URI",
 			msg: types.MsgNewBadge{
-				Creator:      sample.AccAddress(),
-				Uri:          "http://x.com",
-				SubassetUris: "sfd",
-				Permissions:  15,
+				Creator:             sample.AccAddress(),
+				Uri:                 "http://x.com",
+				SubassetUris:        "sfd",
+				Permissions:         15,
 				FreezeAddressRanges: []*types.IdRange{},
 			},
 			err: types.ErrInvalidBadgeURI,
@@ -61,10 +61,10 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid Permissions",
 			msg: types.MsgNewBadge{
-				Creator:      sample.AccAddress(),
-				Uri:          "http://x.com",
-				SubassetUris: "http://x.com",
-				Permissions:  10000,
+				Creator:             sample.AccAddress(),
+				Uri:                 "http://x.com",
+				SubassetUris:        "http://x.com",
+				Permissions:         10000,
 				FreezeAddressRanges: []*types.IdRange{},
 			},
 			err: types.ErrInvalidPermissionsLeadingZeroes,

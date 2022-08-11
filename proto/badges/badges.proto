@@ -16,9 +16,9 @@ message BitBadge {
     // uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc)
     string uri = 2;
 
-    // this is permanent and never changable; use this for asserting the permanence of the metadata
-    // uri can point to other stuff in addition to metadata, this is only the hash of the metadata
-    string metadataHash = 3;
+    // these bytes can be used to store anything on-chain about the badge. This can be updatable or not depending on the permissions set.
+    // Max 256 bytes allowed
+    bytes arbitraryBytes = 3;
     
     // manager address of the class; can have special permissions; is used as the reserve address for the assets
     uint64 manager = 4;

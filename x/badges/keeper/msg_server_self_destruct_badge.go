@@ -12,10 +12,10 @@ func (k msgServer) SelfDestructBadge(goCtx context.Context, msg *types.MsgSelfDe
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	_, _, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator: msg.Creator,
-		BadgeId: msg.BadgeId,
+		Creator:       msg.Creator,
+		BadgeId:       msg.BadgeId,
 		MustBeManager: true,
-		CanRevoke: true,
+		CanRevoke:     true,
 	})
 	if err != nil {
 		return nil, err

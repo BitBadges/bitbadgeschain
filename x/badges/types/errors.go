@@ -28,4 +28,5 @@ var (
 	ErrDefaultSupplyEqualsZero           = sdkerrors.Register(ModuleName, 1516, "default supply equals zero")
 	ErrInvalidArgumentLengths            = sdkerrors.Register(ModuleName, 1517, "invalid argument lengths")
 	ErrRangesIsNil                       = sdkerrors.Register(ModuleName, 1518, "ranges is nil")
+	ErrBytesGreaterThan256               = sdkerrors.Register(ModuleName, 1519, "bytes greater than 256")
 )

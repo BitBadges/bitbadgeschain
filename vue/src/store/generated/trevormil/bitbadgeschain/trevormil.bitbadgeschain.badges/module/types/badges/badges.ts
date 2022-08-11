@@ -15,10 +15,10 @@ export interface BitBadge {
   /** uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc) */
   uri: string;
   /**
-   * this is permanent and never changable; use this for asserting the permanence of the metadata
-   * uri can point to other stuff in addition to metadata, this is only the hash of the metadata
+   * these bytes can be used to store anything on-chain about the badge. This can be updatable or not depending on the permissions set.
+   * Max 256 bytes allowed
    */
-  metadataHash: string;
+  arbitraryBytes: Uint8Array;
   /** manager address of the class; can have special permissions; is used as the reserve address for the assets */
   manager: number;
   /**
@@ -56,7 +56,6 @@ export interface BitBadge {
 const baseBitBadge: object = {
   id: 0,
   uri: "",
-  metadataHash: "",
   manager: 0,
   permissions: 0,
   subassetUriFormat: "",
@@ -72,8 +71,8 @@ export const BitBadge = {
     if (message.uri !== "") {
       writer.uint32(18).string(message.uri);
     }
-    if (message.metadataHash !== "") {
-      writer.uint32(26).string(message.metadataHash);
+    if (message.arbitraryBytes.length !== 0) {
+      writer.uint32(26).bytes(message.arbitraryBytes);
     }
     if (message.manager !== 0) {
       writer.uint32(32).uint64(message.manager);
@@ -115,7 +114,7 @@ export const BitBadge = {
           message.uri = reader.string();
           break;
         case 3:
-          message.metadataHash = reader.string();
+          message.arbitraryBytes = reader.bytes();
           break;
         case 4:
           message.manager = longToNumber(reader.uint64() as Long);
@@ -162,10 +161,8 @@ export const BitBadge = {
     } else {
       message.uri = "";
     }
-    if (object.metadataHash !== undefined && object.metadataHash !== null) {
-      message.metadataHash = String(object.metadataHash);
-    } else {
-      message.metadataHash = "";
+    if (object.arbitraryBytes !== undefined && object.arbitraryBytes !== null) {
+      message.arbitraryBytes = bytesFromBase64(object.arbitraryBytes);
     }
     if (object.manager !== undefined && object.manager !== null) {
       message.manager = Number(object.manager);
@@ -218,8 +215,12 @@ export const BitBadge = {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
     message.uri !== undefined && (obj.uri = message.uri);
-    message.metadataHash !== undefined &&
-      (obj.metadataHash = message.metadataHash);
+    message.arbitraryBytes !== undefined &&
+      (obj.arbitraryBytes = base64FromBytes(
+        message.arbitraryBytes !== undefined
+          ? message.arbitraryBytes
+          : new Uint8Array()
+      ));
     message.manager !== undefined && (obj.manager = message.manager);
     message.permissions !== undefined &&
       (obj.permissions = message.permissions);
@@ -260,10 +261,10 @@ export const BitBadge = {
     } else {
       message.uri = "";
     }
-    if (object.metadataHash !== undefined && object.metadataHash !== null) {
-      message.metadataHash = object.metadataHash;
+    if (object.arbitraryBytes !== undefined && object.arbitraryBytes !== null) {
+      message.arbitraryBytes = object.arbitraryBytes;
     } else {
-      message.metadataHash = "";
+      message.arbitraryBytes = new Uint8Array();
     }
     if (object.manager !== undefined && object.manager !== null) {
       message.manager = object.manager;
@@ -322,6 +323,29 @@ var globalThis: any = (() => {
   if (typeof global !== "undefined") return global;
   throw "Unable to locate global object";
 })();
+
+const atob: (b64: string) => string =
+  globalThis.atob ||
+  ((b64) => globalThis.Buffer.from(b64, "base64").toString("binary"));
+function bytesFromBase64(b64: string): Uint8Array {
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; ++i) {
+    arr[i] = bin.charCodeAt(i);
+  }
+  return arr;
+}
+
+const btoa: (bin: string) => string =
+  globalThis.btoa ||
+  ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
+function base64FromBytes(arr: Uint8Array): string {
+  const bin: string[] = [];
+  for (let i = 0; i < arr.byteLength; ++i) {
+    bin.push(String.fromCharCode(arr[i]));
+  }
+  return btoa(bin.join(""));
+}
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin

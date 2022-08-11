@@ -36,7 +36,7 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -79,7 +79,7 @@ func (suite *TestSuite) TestTransferBadgePending() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -136,7 +136,7 @@ func (suite *TestSuite) TestTransferBadgeForceBurn() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -211,7 +211,7 @@ func (suite *TestSuite) TestApprovalsApproved() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -257,7 +257,7 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -297,7 +297,7 @@ func (suite *TestSuite) TestApprovalsNotApprovedAtAll() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -334,7 +334,7 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -345,7 +345,6 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 	err = TransferBadge(suite, wctx, charlie, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
 	suite.Require().EqualError(err, keeper.ErrOverflow.Error()) //underflow
 }
-
 
 func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -375,7 +374,7 @@ func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -415,7 +414,7 @@ func (suite *TestSuite) TestApprovalOverflow() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -461,7 +460,7 @@ func (suite *TestSuite) TestTransferUnderflowNotEnoughBalance() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -498,7 +497,7 @@ func (suite *TestSuite) TestPendingTransferUnderflowNotEnoughBalance() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -506,7 +505,6 @@ func (suite *TestSuite) TestPendingTransferUnderflowNotEnoughBalance() {
 	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{math.MaxUint64}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
 	suite.Require().EqualError(err, keeper.ErrOverflow.Error())
 }
-
 
 func (suite *TestSuite) TestTransferInvalidSubbadgeRanges() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -536,7 +534,7 @@ func (suite *TestSuite) TestTransferInvalidSubbadgeRanges() {
 	suite.Require().Equal([]*types.BalanceObject{
 		{
 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance: 10000,
+			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
@@ -547,7 +545,6 @@ func (suite *TestSuite) TestTransferInvalidSubbadgeRanges() {
 	err = TransferBadge(suite, wctx, charlie, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{10}, 0, []*types.IdRange{{Start: 0, End: math.MaxUint64}}, 0)
 	suite.Require().EqualError(err, keeper.ErrSubBadgeNotExists.Error())
 }
-
 
 func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -580,7 +577,6 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 	suite.Require().Nil(err, "Error transfering badge")
 }
 
-
 func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
@@ -601,14 +597,13 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 	//Create subbadge 1 with supply > 1
 	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{10000})
 	suite.Require().Nil(err, "Error creating subbadges")
-	
+
 	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{10}, 0, []*types.IdRange{{Start: 501, End: 1000}}, 0)
 	suite.Require().Nil(err, "Error transfering badge")
 
 	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{10}, 0, []*types.IdRange{{Start: 500, End: 500}}, 0)
 	suite.Require().Nil(err, "Error transfering badge")
 }
-
 
 func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -630,7 +625,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	//Create subbadge 1 with supply > 1
 	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{10000})
 	suite.Require().Nil(err, "Error creating subbadges")
-	
+
 	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{10}, 0, []*types.IdRange{{Start: 0, End: 100}}, 0)
 	suite.Require().Nil(err, "Error transfering badge")
 
@@ -648,7 +643,6 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 
 	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{10}, 0, []*types.IdRange{{Start: 1000, End: 1100}}, 0)
 	suite.Require().Nil(err, "Error transfering badge")
-
 
 	err = TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{10}, 0, []*types.IdRange{{Start: 150}}, 0)
 	suite.Require().Nil(err, "Error transfering badge")

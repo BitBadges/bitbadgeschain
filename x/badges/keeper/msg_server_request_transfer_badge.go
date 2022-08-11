@@ -12,9 +12,9 @@ func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgReq
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum, _, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator: msg.Creator,
-		BadgeId: msg.BadgeId,
-		SubbadgeRangesToValidate: msg.SubbadgeRanges,
+		Creator:                      msg.Creator,
+		BadgeId:                      msg.BadgeId,
+		SubbadgeRangesToValidate:     msg.SubbadgeRanges,
 		AccountsThatCantEqualCreator: []uint64{msg.From},
 	})
 	if err != nil {

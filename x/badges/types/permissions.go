@@ -1,7 +1,7 @@
 package types
 
 const (
-	NumPermissions = 7
+	NumPermissions = 8
 )
 
 /*
@@ -17,6 +17,7 @@ const (
 */
 //TODO: Add test cases for these permissions
 type Permissions struct {
+	can_update_bytes     bool
 	can_manager_transfer bool
 	can_update_uris      bool
 	forceful_transfers   bool
@@ -121,8 +122,14 @@ func (p *Permissions) FrozenByDefault() bool {
 	return p.frozen_by_default
 }
 
+func (p *Permissions) CanUpdateBytes() bool {
+	return p.can_update_bytes
+}
+
 func SetPermissionsFlags(permission bool, digit_index int, flags *Permissions) {
-	if digit_index == 7 {
+	if digit_index == 8 {
+		flags.can_update_bytes = permission
+	} else if digit_index == 7 {
 		flags.can_manager_transfer = permission
 	} else if digit_index == 6 {
 		flags.can_update_uris = permission

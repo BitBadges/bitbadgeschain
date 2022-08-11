@@ -129,7 +129,7 @@ type BadgesToCreate struct {
 func CreateBadges(suite *TestSuite, ctx context.Context, badges []BadgesToCreate) error {
 	for _, badge := range badges {
 		for i := 0; i < int(badge.Amount); i++ {
-			msg := types.NewMsgNewBadge(badge.Creator, badge.Badge.Uri, badge.Badge.Permissions, badge.Badge.SubassetUris, badge.Badge.MetadataHash, badge.Badge.DefaultSubassetSupply, badge.Badge.SubassetAmountsToCreate, badge.Badge.SubassetSupplys, badge.Badge.FreezeAddressRanges)
+			msg := types.NewMsgNewBadge(badge.Creator, badge.Badge.Uri, badge.Badge.Permissions, badge.Badge.SubassetUris, badge.Badge.ArbitraryBytes, badge.Badge.DefaultSubassetSupply, badge.Badge.SubassetAmountsToCreate, badge.Badge.SubassetSupplys, badge.Badge.FreezeAddressRanges)
 			_, err := suite.msgServer.NewBadge(ctx, msg)
 			if err != nil {
 				return err
@@ -212,7 +212,7 @@ func SelfDestructBadge(suite *TestSuite, ctx context.Context, creator string, ba
 	return err
 }
 
-func PruneBalances(suite *TestSuite, ctx context.Context, creator string, addresses[]uint64, badgeIds []uint64) error {
+func PruneBalances(suite *TestSuite, ctx context.Context, creator string, addresses []uint64, badgeIds []uint64) error {
 	msg := types.NewMsgPruneBalances(creator, badgeIds, addresses)
 	_, err := suite.msgServer.PruneBalances(ctx, msg)
 	return err

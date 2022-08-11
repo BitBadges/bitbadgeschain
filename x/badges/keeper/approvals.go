@@ -29,7 +29,7 @@ func (k Keeper) SetApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceIn
 				Address: address_num,
 				ApprovalAmounts: []*types.BalanceObject{
 					{
-						Balance: amount,
+						Balance:  amount,
 						IdRanges: []*types.IdRange{&subbadgeRange},
 					},
 				},
@@ -66,7 +66,7 @@ func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, userBalanceInfo types
 	userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts
 
 	if len(newAmounts) == 0 {
-		userBalanceInfo.Approvals = append(userBalanceInfo.Approvals[:idx], userBalanceInfo.Approvals[idx+1:]...);
+		userBalanceInfo.Approvals = append(userBalanceInfo.Approvals[:idx], userBalanceInfo.Approvals[idx+1:]...)
 	}
 
 	return userBalanceInfo, nil
@@ -97,30 +97,29 @@ func (k Keeper) AddBalanceToApproval(ctx sdk.Context, userBalanceInfo types.User
 	return userBalanceInfo, nil
 }
 
-
 // Approvals will be sorted, so we can binary search to get the targetIdx and expirationTime. Returns the index to insert at if not found
-func SearchApprovalsForMatchingeAndGetIdxToInsertIfNotFound(targetAddress uint64, approvals []*types.Approval) (int, bool){
+func SearchApprovalsForMatchingeAndGetIdxToInsertIfNotFound(targetAddress uint64, approvals []*types.Approval) (int, bool) {
 	low := 0
 	high := len(approvals) - 1
 	median := 0
 	matchingEntry := false
 	setIdx := 0
 	for low <= high {
-		median = int(uint(low + high) >> 1)
+		median = int(uint(low+high) >> 1)
 
-		if approvals[median].Address == targetAddress  {
+		if approvals[median].Address == targetAddress {
 			matchingEntry = true
-			break;
-		} else if approvals[median].Address > targetAddress{
+			break
+		} else if approvals[median].Address > targetAddress {
 			high = median - 1
 		} else {
 			low = median + 1
 		}
 	}
-	
+
 	if len(approvals) != 0 {
 		setIdx = median + 1
-		if (targetAddress <= approvals[median].Address)  {
+		if targetAddress <= approvals[median].Address {
 			setIdx = median
 		}
 	}

@@ -13,9 +13,9 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum, _, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator: msg.Creator,
-		BadgeId: msg.BadgeId,
-		SubbadgeRangesToValidate: msg.SubbadgeRanges,
+		Creator:                      msg.Creator,
+		BadgeId:                      msg.BadgeId,
+		SubbadgeRangesToValidate:     msg.SubbadgeRanges,
 		AccountsThatCantEqualCreator: []uint64{msg.Address},
 	})
 	if err != nil {

@@ -11,8 +11,8 @@ func SearchIdRangesForId(id uint64, idRanges []*types.IdRange) (int, bool) {
 	low := 0
 	high := len(idRanges) - 1
 	for low <= high {
-		median := int(uint(low + high) >> 1)
-		
+		median := int(uint(low+high) >> 1)
+
 		currRange := idRanges[median]
 		if currRange.End == 0 {
 			currRange.End = currRange.Start // If end == 0, set it to start by convention (done in order to save space)
@@ -51,23 +51,23 @@ func GetIdRangeToInsert(start uint64, end uint64) *types.IdRange {
 }
 
 // Assumes id is not already in a range. Gets the index to insert at. Ex. [10, 20, 30] and inserting 25 would return index 2
-func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) (int) {
+func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) int {
 	low := 0
 	high := len(targetIds) - 2
 	median := 0
 	for low <= high {
-		median = int(uint(low + high) >> 1)
-		if targetIds[median].Start < id && targetIds[median + 1].Start > id {
-			break;
+		median = int(uint(low+high) >> 1)
+		if targetIds[median].Start < id && targetIds[median+1].Start > id {
+			break
 		} else if targetIds[median].Start > id {
 			high = median - 1
 		} else {
 			low = median + 1
 		}
 	}
-	
+
 	insertIdx := median + 1
-	if (targetIds[median].Start <= id) {
+	if targetIds[median].Start <= id {
 		insertIdx = median
 	}
 
@@ -85,44 +85,43 @@ func MergePrevOrNextIfNecessary(ids []*types.IdRange, insertedAtIdx int) []*type
 	id := ids[insertedAtIdx].Start
 
 	if insertedAtIdx > 0 {
-		prevStartIdx = ids[insertedAtIdx - 1].Start
-		prevEndIdx := ids[insertedAtIdx - 1].End
+		prevStartIdx = ids[insertedAtIdx-1].Start
+		prevEndIdx := ids[insertedAtIdx-1].End
 		if prevEndIdx == 0 {
-			prevEndIdx = ids[insertedAtIdx - 1].Start
+			prevEndIdx = ids[insertedAtIdx-1].Start
 		}
 
-		if prevEndIdx + 1 == id {
+		if prevEndIdx+1 == id {
 			needToMergeWithPrev = true
 		}
 	}
 
-	if insertedAtIdx < len(ids) - 1 {
-		nextStartIdx := ids[insertedAtIdx + 1].Start
-		nextEndIdx = ids[insertedAtIdx + 1].End
+	if insertedAtIdx < len(ids)-1 {
+		nextStartIdx := ids[insertedAtIdx+1].Start
+		nextEndIdx = ids[insertedAtIdx+1].End
 		if nextEndIdx == 0 {
-			nextEndIdx = ids[insertedAtIdx + 1].Start
+			nextEndIdx = ids[insertedAtIdx+1].Start
 		}
 
-		if nextStartIdx - 1 == id {
+		if nextStartIdx-1 == id {
 			needToMergeWithNext = true
 		}
 	}
 
-
 	mergedIds := []*types.IdRange{}
 	// 4 Cases: Need to merge with both, just next, just prev, or none
 	if needToMergeWithPrev && needToMergeWithNext {
-		mergedIds = append(mergedIds, ids[:insertedAtIdx - 1]...)
+		mergedIds = append(mergedIds, ids[:insertedAtIdx-1]...)
 		mergedIds = append(mergedIds, GetIdRangeToInsert(prevStartIdx, nextEndIdx))
-		mergedIds = append(mergedIds, ids[insertedAtIdx + 2:]...)
+		mergedIds = append(mergedIds, ids[insertedAtIdx+2:]...)
 	} else if needToMergeWithPrev {
-		mergedIds = append(mergedIds, ids[:insertedAtIdx - 1]...)
+		mergedIds = append(mergedIds, ids[:insertedAtIdx-1]...)
 		mergedIds = append(mergedIds, GetIdRangeToInsert(prevStartIdx, id))
-		mergedIds = append(mergedIds, ids[insertedAtIdx + 1:]...)
+		mergedIds = append(mergedIds, ids[insertedAtIdx+1:]...)
 	} else if needToMergeWithNext {
 		mergedIds = append(mergedIds, ids[:insertedAtIdx]...)
 		mergedIds = append(mergedIds, GetIdRangeToInsert(id, nextEndIdx))
-		mergedIds = append(mergedIds, ids[insertedAtIdx + 2:]...)
+		mergedIds = append(mergedIds, ids[insertedAtIdx+2:]...)
 	} else {
 		mergedIds = ids
 	}
@@ -131,7 +130,7 @@ func MergePrevOrNextIfNecessary(ids []*types.IdRange, insertedAtIdx int) []*type
 }
 
 //Inserts an id to the id ranges. Handles merging if necessary
-func InsertIdRange(id uint64, ids []*types.IdRange) ([]*types.IdRange) {
+func InsertIdRange(id uint64, ids []*types.IdRange) []*types.IdRange {
 	newIds := []*types.IdRange{}
 	insertIdAtIdx := 0
 	if ids[0].Start > id {
@@ -153,16 +152,16 @@ func InsertIdRange(id uint64, ids []*types.IdRange) ([]*types.IdRange) {
 	return newIds
 }
 
-// Removes an id from a single id range. Removing can make this range be split into 0, 1, or 2 new ranges. 
+// Removes an id from a single id range. Removing can make this range be split into 0, 1, or 2 new ranges.
 func RemoveIdFromIdRange(id uint64, rangeObject types.IdRange) []*types.IdRange {
 	newRanges := []*types.IdRange{}
-	if id >= 1 && id - 1 >= rangeObject.Start {
-		newRanges = append(newRanges, GetIdRangeToInsert(rangeObject.Start, id - 1))
+	if id >= 1 && id-1 >= rangeObject.Start {
+		newRanges = append(newRanges, GetIdRangeToInsert(rangeObject.Start, id-1))
 	}
 
-	if id <= math.MaxUint64-1 && id + 1 <= rangeObject.End {
-		newRanges = append(newRanges, GetIdRangeToInsert(id + 1, rangeObject.End)) //Note rangeObject.End could == 0 but by removing the id, the range would just be removed
+	if id <= math.MaxUint64-1 && id+1 <= rangeObject.End {
+		newRanges = append(newRanges, GetIdRangeToInsert(id+1, rangeObject.End)) //Note rangeObject.End could == 0 but by removing the id, the range would just be removed
 	}
-	
+
 	return newRanges
 }

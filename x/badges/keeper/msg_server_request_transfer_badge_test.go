@@ -270,7 +270,6 @@ func (suite *TestSuite) TestRequestTransferToSelf() {
 	suite.Require().EqualError(err, keeper.ErrAccountCanNotEqualCreator.Error())
 }
 
-
 func (suite *TestSuite) TestTryToAcceptTranferRequestBeforeMarkedAsApproved() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
@@ -309,7 +308,7 @@ func (suite *TestSuite) TestTryToAcceptTranferRequestBeforeMarkedAsApproved() {
 
 	err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 5000, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
 	suite.Require().Nil(err, "Error requesting transfer")
-	
+
 	err = HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.IdRange{{Start: 0, End: 0}}, false)
 	suite.Require().EqualError(err, keeper.ErrNotApproved.Error())
 }
