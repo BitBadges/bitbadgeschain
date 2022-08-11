@@ -57,7 +57,11 @@ func CreateSubassets(ctx sdk.Context, badge types.BitBadge, managerBalanceInfo t
 			if supply != 0 && supply != defaultSupply {
 				newSubassetSupplys = UpdateBalanceForId(nextSubassetId, supply, newSubassetSupplys)
 			}
-			badge.NextSubassetId += 1
+			
+			badge.NextSubassetId, err = SafeAdd(badge.NextSubassetId, 1)
+			if err != nil {
+				return types.BitBadge{}, types.UserBalanceInfo{}, err
+			}
 
 			managerBalanceInfo, err = AddBalanceForId(ctx, managerBalanceInfo, nextSubassetId, supply)
 			if err != nil {
