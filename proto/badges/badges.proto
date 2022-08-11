@@ -3,7 +3,7 @@ package trevormil.bitbadgeschain.badges;
 
 import "google/protobuf/any.proto";
 import "badges/ranges.proto";
-
+import "badges/uris.proto";
 
 option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
@@ -14,7 +14,7 @@ message BitBadge {
     uint64 id = 1;
   
     // uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc)
-    string uri = 2;
+    UriObject uri = 2;
 
     // these bytes can be used to store anything on-chain about the badge. This can be updatable or not depending on the permissions set.
     // Max 256 bytes allowed
@@ -42,10 +42,6 @@ message BitBadge {
     // if frozen_by_default is true, this is an accumulator of unfrozen addresses; and vice versa for false
     //big.Int will always only be 32 uint64s long
     repeated IdRange freezeRanges = 10;
-
-    // uri for the subassets metadata stored off chain; include {id} in the string, it will be replaced with the subasset id
-    // if not specified, uses a default Class (ID # 1) like metadata
-    string subassetUriFormat = 11;
 
     // starts at 0; each subasset created will incrementally have an increasing ID #
     uint64 nextSubassetId = 12;

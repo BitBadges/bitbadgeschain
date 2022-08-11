@@ -28,8 +28,6 @@ const (
 	alice                  = "cosmos1jmjfq0tplp9tmx4v9uemw72y4d2wa5nr3xn9d3"
 	bob                    = "cosmos1xyxs3skf3f4jfqeuv89yyaqvjc6lffavxqhc8g"
 	charlie                = "cosmos1e0w5t53nrq7p66fye6c8p0ynyhf6y24l4yuxd7"
-	validUri               = "https://example.com/badge.json"
-	invalidUri             = "invaliduri"
 	firstAccountNumCreated = uint64(7) //Just how it is. I believe the first 6 are validator node accounts
 )
 
@@ -129,7 +127,7 @@ type BadgesToCreate struct {
 func CreateBadges(suite *TestSuite, ctx context.Context, badges []BadgesToCreate) error {
 	for _, badge := range badges {
 		for i := 0; i < int(badge.Amount); i++ {
-			msg := types.NewMsgNewBadge(badge.Creator, badge.Badge.Uri, badge.Badge.Permissions, badge.Badge.SubassetUris, badge.Badge.ArbitraryBytes, badge.Badge.DefaultSubassetSupply, badge.Badge.SubassetAmountsToCreate, badge.Badge.SubassetSupplys, badge.Badge.FreezeAddressRanges)
+			msg := types.NewMsgNewBadge(badge.Creator, *badge.Badge.Uri, badge.Badge.Permissions, badge.Badge.ArbitraryBytes, badge.Badge.DefaultSubassetSupply, badge.Badge.SubassetAmountsToCreate, badge.Badge.SubassetSupplys, badge.Badge.FreezeAddressRanges)
 			_, err := suite.msgServer.NewBadge(ctx, msg)
 			if err != nil {
 				return err
@@ -194,8 +192,8 @@ func TransferManager(suite *TestSuite, ctx context.Context, creator string, badg
 	return err
 }
 
-func UpdateURIs(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, uri string, subassetUri string) error {
-	msg := types.NewMsgUpdateUris(creator, badgeId, uri, subassetUri)
+func UpdateURIs(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, uri types.UriObject) error {
+	msg := types.NewMsgUpdateUris(creator, badgeId, uri)
 	_, err := suite.msgServer.UpdateUris(ctx, msg)
 	return err
 }

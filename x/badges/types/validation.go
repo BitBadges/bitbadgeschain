@@ -20,10 +20,18 @@ var (
 )
 
 // ValidateURI returns whether the uri is valid
-func ValidateURI(uri string) error {
-	if !reUri.MatchString(uri) {
+func ValidateURI(uriObject UriObject) error {
+
+	uri, err := GetUriFromUriObject(uriObject)
+	if err != nil || !reUri.MatchString(uri) {
 		return sdkerrors.Wrapf(ErrInvalidBadgeURI, "invalid uri: %s", uri)
 	}
+
+	subassetUri, err := GetSubassetUriFromUriObject(uriObject)
+	if err != nil || !reUri.MatchString(subassetUri) {
+		return sdkerrors.Wrapf(ErrInvalidBadgeURI, "invalid uri: %s", uri)
+	}
+
 	return nil
 }
 

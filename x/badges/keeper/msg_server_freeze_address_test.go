@@ -12,9 +12,16 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 				FreezeAddressRanges: []*types.IdRange{
 					{Start: firstAccountNumCreated + 1},
 				},
@@ -44,9 +51,16 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,
@@ -98,9 +112,16 @@ func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefault() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  63,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,
@@ -145,9 +166,16 @@ func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefaultAddAndRemove() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  63,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,
@@ -201,9 +229,16 @@ func (suite *TestSuite) TestFreezeCantFreeze() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  0,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,

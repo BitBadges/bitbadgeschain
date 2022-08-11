@@ -9,17 +9,16 @@ const TypeMsgNewBadge = "new_badge"
 
 var _ sdk.Msg = &MsgNewBadge{}
 
-func NewMsgNewBadge(creator string, uri string, permissions uint64, subassetUris string, bytesToStore []byte, defaultSupply uint64, amountsToCreate []uint64, supplysToCreate []uint64, freezeAddressRanges []*IdRange) *MsgNewBadge {
+func NewMsgNewBadge(creator string, uriObject UriObject, permissions uint64,  bytesToStore []byte, defaultSupply uint64, amountsToCreate []uint64, supplysToCreate []uint64, freezeAddressRanges []*IdRange) *MsgNewBadge {
 	return &MsgNewBadge{
 		Creator:                 creator,
-		Uri:                     uri,
-		Permissions:             permissions,
-		SubassetUris:            subassetUris,
+		Uri:                     &uriObject,
 		DefaultSubassetSupply:   defaultSupply,
 		SubassetAmountsToCreate: amountsToCreate,
 		SubassetSupplys:         supplysToCreate,
 		FreezeAddressRanges:     freezeAddressRanges,
 		ArbitraryBytes:          bytesToStore,
+		Permissions: 		   	 permissions,
 	}
 }
 
@@ -51,13 +50,10 @@ func (msg *MsgNewBadge) ValidateBasic() error {
 	}
 
 	//Validate well-formedness of the message entries
-	if err := ValidateURI(msg.Uri); err != nil {
+	if err := ValidateURI(*msg.Uri); err != nil {
 		return err
 	}
 
-	if err := ValidateURI(msg.SubassetUris); err != nil {
-		return err
-	}
 
 	if err := ValidatePermissions(msg.Permissions); err != nil {
 		return err

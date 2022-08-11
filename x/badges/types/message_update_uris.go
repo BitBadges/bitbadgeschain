@@ -9,12 +9,11 @@ const TypeMsgUpdateUris = "update_uris"
 
 var _ sdk.Msg = &MsgUpdateUris{}
 
-func NewMsgUpdateUris(creator string, badgeId uint64, uri string, subassetUri string) *MsgUpdateUris {
+func NewMsgUpdateUris(creator string, badgeId uint64, uri UriObject) *MsgUpdateUris {
 	return &MsgUpdateUris{
 		Creator:     creator,
 		BadgeId:     badgeId,
-		Uri:         uri,
-		SubassetUri: subassetUri,
+		Uri:         &uri,
 	}
 }
 
@@ -45,12 +44,9 @@ func (msg *MsgUpdateUris) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 	//Validate well-formedness of the message entries
-	if err := ValidateURI(msg.Uri); err != nil {
+	if err := ValidateURI(*msg.Uri); err != nil {
 		return err
 	}
 
-	if err := ValidateURI(msg.SubassetUri); err != nil {
-		return err
-	}
 	return nil
 }

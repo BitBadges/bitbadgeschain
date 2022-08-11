@@ -3,6 +3,7 @@ package trevormil.bitbadgeschain.badges;
 
 // this line is used by starport scaffolding # proto/tx/import
 import "badges/ranges.proto";
+import "badges/uris.proto";
 
 option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
@@ -28,8 +29,7 @@ service Msg {
 
 message MsgNewBadge {
     string creator = 1;
-    string uri = 2;
-    string subassetUris = 3;
+    UriObject uri = 2;
     uint64 permissions = 4;
     bytes arbitraryBytes = 5;
     uint64 defaultSubassetSupply = 6;
@@ -121,8 +121,7 @@ message MsgFreezeAddressResponse {
 message MsgUpdateUris {
   string creator = 1;
   uint64 badgeId = 2;
-  string uri = 3;
-  string subassetUri = 4;
+  UriObject uri = 3;
 }
 
 message MsgUpdateUrisResponse {

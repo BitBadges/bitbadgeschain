@@ -26,7 +26,6 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 		Uri:                   msg.Uri,
 		Manager:               CreatorAccountNum,
 		Permissions:           msg.Permissions,
-		SubassetUriFormat:     msg.SubassetUris,
 		DefaultSubassetSupply: msg.DefaultSubassetSupply,
 		FreezeRanges:          msg.FreezeAddressRanges,
 		ArbitraryBytes:        msg.ArbitraryBytes,

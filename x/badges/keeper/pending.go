@@ -34,9 +34,16 @@ func AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo ty
 		OtherPendingNonce: fromUserBalanceInfo.PendingNonce,
 		ExpirationTime:    expirationTime,
 	})
-
-	fromUserBalanceInfo.PendingNonce += 1
-	toUserBalanceInfo.PendingNonce += 1
+	err := *new(error)
+	fromUserBalanceInfo.PendingNonce, err = SafeAdd(fromUserBalanceInfo.PendingNonce, 1)
+	if err != nil {
+		return fromUserBalanceInfo, toUserBalanceInfo, err
+	}
+	
+	toUserBalanceInfo.PendingNonce, err = SafeAdd(toUserBalanceInfo.PendingNonce, 1)
+	if err != nil {
+		return fromUserBalanceInfo, toUserBalanceInfo, err
+	}
 
 	return fromUserBalanceInfo, toUserBalanceInfo, nil
 }

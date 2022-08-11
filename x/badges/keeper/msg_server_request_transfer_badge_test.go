@@ -12,18 +12,32 @@ func (suite *TestSuite) TestRequestTransfer() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,
 		},
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: alice,
@@ -86,18 +100,32 @@ func (suite *TestSuite) TestRequestTransferFrozen() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,
 		},
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: alice,
@@ -157,18 +185,32 @@ func (suite *TestSuite) TestRequestTransferFrozenThenUnrozen() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,
 		},
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: alice,
@@ -236,18 +278,32 @@ func (suite *TestSuite) TestRequestTransferToSelf() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,
 		},
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: alice,
@@ -276,18 +332,32 @@ func (suite *TestSuite) TestTryToAcceptTranferRequestBeforeMarkedAsApproved() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,
 		},
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: alice,

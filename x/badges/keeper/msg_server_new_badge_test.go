@@ -15,9 +15,15 @@ func (suite *TestSuite) TestNewBadges() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,
@@ -34,8 +40,13 @@ func (suite *TestSuite) TestNewBadges() {
 
 	// Verify badge details are correct
 	suite.Require().Equal(uint64(0), badge.NextSubassetId)
-	suite.Require().Equal(validUri, badge.Uri)
-	suite.Require().Equal(validUri, badge.SubassetUriFormat)
+	suite.Require().Equal(&types.UriObject{
+		Uri: 	[]byte("example.com/"),
+		Scheme: 1,
+		IdxRangeToRemove: &types.IdRange{},
+		InsertSubassetBytesIdx: 0,
+		InsertIdIdx: 10,
+	}, badge.Uri)
 	suite.Require().Equal([]*types.BalanceObject(nil), badge.SubassetSupplys)
 	suite.Require().Equal(firstAccountNumCreated, badge.Manager) //7 is the first ID it creates
 	suite.Require().Equal(perms, badge.Permissions)

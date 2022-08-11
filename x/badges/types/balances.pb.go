@@ -23,7 +23,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-//indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
 type UserBalanceInfo struct {
 	BalanceAmounts []*BalanceObject   `protobuf:"bytes,2,rep,name=balanceAmounts,proto3" json:"balanceAmounts,omitempty"`
 	PendingNonce   uint64             `protobuf:"varint,3,opt,name=pendingNonce,proto3" json:"pendingNonce,omitempty"`

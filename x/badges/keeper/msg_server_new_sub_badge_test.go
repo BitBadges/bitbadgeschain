@@ -12,9 +12,16 @@ func (suite *TestSuite) TestNewSubBadges() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,
@@ -78,9 +85,16 @@ func (suite *TestSuite) TestNewSubbadgesDirectlyUponCreatingNewBadge() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:                     validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:             62,
-				SubassetUris:            validUri,
+				
 				SubassetSupplys:         []uint64{10},
 				SubassetAmountsToCreate: []uint64{1},
 			},
@@ -143,9 +157,16 @@ func (suite *TestSuite) TestNewSubBadgesNotManager() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,
@@ -170,9 +191,16 @@ func (suite *TestSuite) TestNewSubBadgeCreateIsLocked() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  0,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,

@@ -9,7 +9,6 @@ import "badges/ranges.proto";
 
 option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
-//indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
 message UserBalanceInfo {
     repeated BalanceObject balanceAmounts = 2;
     uint64 pendingNonce = 3;

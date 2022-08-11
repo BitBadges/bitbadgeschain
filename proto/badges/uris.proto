@@ -1,0 +1,17 @@
+syntax = "proto3";
+package trevormil.bitbadgeschain.badges;
+
+import "badges/ranges.proto";
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
+
+message UriObject {
+    uint64 scheme = 1; //If this == 0, we assume it's included in the uri itself. Else, we define a few predefined int -> scheme maps such as 1 -> http://
+    //We can add more URI backwards compatible space savers in the future here like .com or .io
+    bytes uri = 2;
+    IdRange idxRangeToRemove = 4;  //Idx range to remove from the uri for the subasset
+    uint64 insertSubassetBytesIdx = 5; //Idx to insert new bytes at after removing idx range
+    bytes bytesToInsert = 6;
+    uint64 insertIdIdx = 7;
+}

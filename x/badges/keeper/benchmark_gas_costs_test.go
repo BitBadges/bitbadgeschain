@@ -39,9 +39,16 @@ func (suite *TestSuite) TestGasCosts() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  46,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,
@@ -51,9 +58,16 @@ func (suite *TestSuite) TestGasCosts() {
 	badgesToCreate2 := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:          validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:  62,
-				SubassetUris: validUri,
+				
 			},
 			Amount:  1,
 			Creator: bob,
@@ -73,9 +87,16 @@ func (suite *TestSuite) TestGasCosts() {
 	badgesToCreateAllInOne := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:                     validUri,
+				Uri:         &types.UriObject{
+					Uri: 	[]byte("example.com/"),
+					Scheme: 1,
+					IdxRangeToRemove: &types.IdRange{},
+					InsertSubassetBytesIdx: 0,
+					
+					InsertIdIdx: 10,
+				},
 				Permissions:             62,
-				SubassetUris:            validUri,
+				
 				SubassetSupplys:         []uint64{1000000, 1, 10000},
 				SubassetAmountsToCreate: []uint64{1, 10000, 10000},
 				FreezeAddressRanges: []*types.IdRange{

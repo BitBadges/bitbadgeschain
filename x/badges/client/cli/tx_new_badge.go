@@ -22,6 +22,7 @@ func CmdNewBadge() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argUri := args[0]
 			argSubassetUris := args[2]
+			_ = argSubassetUris
 			argBytesStr := []byte(args[3])
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -73,11 +74,15 @@ func CmdNewBadge() *cobra.Command {
 				return err
 			}
 
+			//TODO: parse differences between uris and subasseturis
+
+
 			msg := types.NewMsgNewBadge(
 				clientCtx.GetFromAddress().String(),
-				argUri,
+				types.UriObject{
+					Uri: []byte(argUri),
+				},
 				permissions,
-				argSubassetUris,
 				argBytesStr,
 				defaultSupply,
 				argAmountsUInt64,
