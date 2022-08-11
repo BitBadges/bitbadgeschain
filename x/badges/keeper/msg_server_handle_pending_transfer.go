@@ -46,8 +46,8 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 	didUpdateBalanceInfo := make(map[uint64]bool, 0)
 
 	updated := false
+	//TODO: In the future, we can make this a binary search since this is all sorted by the nonces (append-only)
 	for _, nonceRange := range msg.NonceRanges {
-		//TODO: In the future, we can make this a binary search since this is all sorted by the nonces (append-only)
 		for idx, CurrPendingTransfer := range creatorBalanceInfo.Pending {
 			if CurrPendingTransfer.ThisPendingNonce <= nonceRange.End && CurrPendingTransfer.ThisPendingNonce >= nonceRange.Start {
 				updated = true
@@ -108,17 +108,15 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 					} else if cancelOwnOutgoingTransfer {
 						creatorBalanceInfo, err = k.RevertEscrowedBalancesAndApprovals(ctx, creatorBalanceInfo, i,CurrPendingTransfer.From, CurrPendingTransfer.ApprovedBy, CurrPendingTransfer.Amount)
 					} else if finalizeOwnTransferRequestAfterApprovedByOtherParty {
-						//TODO: clean this up
-						approved := false
-						for _, pending_info := range otherPartyBalanceInfo.Pending {
-							if pending_info.ThisPendingNonce == otherPartyNonce && pending_info.OtherPendingNonce == CurrPendingTransfer.ThisPendingNonce && pending_info.MarkedAsAccepted {
-								approved = true
+						idx, found := SearchPendingByNonce(otherPartyBalanceInfo.Pending, otherPartyNonce)
+						if found {
+							if !otherPartyBalanceInfo.Pending[idx].MarkedAsAccepted {
+								return nil, ErrNotApproved
 							}
-						}
-
-						if !approved {
+						} else {
 							return nil, ErrNotApproved
 						}
+
 						otherPartyBalanceInfo, creatorBalanceInfo, err = k.ForcefulTransfer(ctx, badge, types.IdRange{Start: i, End: i}, otherPartyBalanceInfo, creatorBalanceInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.From, CurrPendingTransfer.To, CurrPendingTransfer.From, CurrPendingTransfer.ExpirationTime)
 					} else if acceptTransferRequestForcefully {
 						creatorBalanceInfo, otherPartyBalanceInfo, err = k.ForcefulTransfer(ctx, badge, types.IdRange{Start: i, End: i}, creatorBalanceInfo, otherPartyBalanceInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.From, CurrPendingTransfer.To, CreatorAccountNum, CurrPendingTransfer.ExpirationTime)
@@ -146,7 +144,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 							}
 						}
 					}
-				}				
+				}			
 			}
 		}
 	}

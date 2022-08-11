@@ -22,7 +22,7 @@ var (
 	ErrInvalidPermissions                           = sdkerrors.Register(types.ModuleName, 15, "the badge permissions that are set do not allow this action")
 	ErrBalanceIsZero                                = sdkerrors.Register(types.ModuleName, 16, "the balance to add can't be zero")
 	ErrInvalidUri                                   = sdkerrors.Register(types.ModuleName, 17, "invalid format of uri")
-	ErrUserBalanceTooLow                           = sdkerrors.Register(types.ModuleName, 18, "the badge balance is too low to perform this action")
+	ErrUserBalanceTooLow                            = sdkerrors.Register(types.ModuleName, 18, "the badge balance is too low to perform this action")
 	ErrSenderAndReceiverSame                        = sdkerrors.Register(types.ModuleName, 19, "sender and receiver cannot be the same")
 	ErrCantAcceptOwnTransferRequest                 = sdkerrors.Register(types.ModuleName, 20, "cannot accept own transfer request")
 	ErrInsufficientApproval                         = sdkerrors.Register(types.ModuleName, 21, "insufficient approval")

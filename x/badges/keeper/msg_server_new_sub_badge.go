@@ -41,8 +41,6 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 
 			// We conventionalize supply == 0 as default, so we don't store if it is the default
 			if supply != 0 && supply != defaultSupply {
-				ctx.GasMeter().ConsumeGas(SubbadgeWithSupplyNotEqualToOne, "create new subbadge cost")
-
 				newSubassetSupplys = UpdateBalanceForId(nextSubassetId, supply, newSubassetSupplys)
 			}
 			badge.NextSubassetId += 1

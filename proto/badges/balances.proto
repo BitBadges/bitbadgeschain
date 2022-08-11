@@ -19,7 +19,7 @@ message UserBalanceInfo {
 
 message Approval {
     uint64 address = 1;
-    uint64 expirationTime = 2;
+    // uint64 expirationTime = 2; Can maybe add this in the future but gets tricky with which ones you want to deduct / add from, etc. Probably best to just leave it as is
     repeated BalanceObject approvalAmounts = 3;
 }
 

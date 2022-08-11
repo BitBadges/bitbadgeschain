@@ -7,138 +7,124 @@ import (
 
 // Sets an approval amount for an address, expirationTime pair.
 func (k Keeper) SetApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount uint64, address_num uint64, subbadgeRange types.IdRange, expirationTime uint64) (types.UserBalanceInfo, error) {
-	newApprovals := []*types.Approval{}
-	found := false
-	//check for approval with same address / amount
+	idx, found := SearchApprovalsForMatchingeAndGetIdxToInsertIfNotFound(address_num, userBalanceInfo.Approvals)
 
-	//TODO: binary search
-	for _, approval := range userBalanceInfo.Approvals {
-		if approval.Address != address_num || approval.ExpirationTime != expirationTime {
-			newApprovals = append(newApprovals, approval)
-		} else {
-			found = true
-			//Remove completely if setting to zero
-			if amount != 0 {
-				newAmounts := approval.ApprovalAmounts
-				for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
-					newAmounts = UpdateBalanceForId(i, amount, newAmounts)
-				}
-
-				approval.ApprovalAmounts = newAmounts
-
-				newApprovals = append(newApprovals, approval)
-			}
-		}
-	}
-
-	if !found {
-		//Add new approval
-		newApprovals = append(newApprovals, &types.Approval{
-			Address: address_num,
-			ApprovalAmounts: []*types.BalanceObject{
-				{
-					Balance: amount,
-					IdRanges: []*types.IdRange{&subbadgeRange},
-				},
-			},
-			ExpirationTime: expirationTime,
-		})
-	}
-
-	//TODO: sort by address_num
-
-	userBalanceInfo.Approvals = newApprovals
-
-	return userBalanceInfo, nil
-}
-
-//Will return an error if isn't approved for amounts
-func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount_to_remove uint64, address_num uint64, subbadgeRange types.IdRange) (types.UserBalanceInfo, error) {
-	newApprovals := []*types.Approval{}
-	removed := false
-
-	//check for approval with same address / amount
-	for _, approval := range userBalanceInfo.Approvals {
-		if approval.Address == address_num {
+	if found {
+		approval := userBalanceInfo.Approvals[idx]
+		if amount != 0 {
 			newAmounts := approval.ApprovalAmounts
 			for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
-				currAmount := GetBalanceForId(i, approval.ApprovalAmounts)
-				if currAmount < amount_to_remove {
-					return userBalanceInfo, ErrInsufficientApproval
-				}
-
-				newAmount, err := SafeSubtract(currAmount, amount_to_remove)
-				if err != nil {
-					return userBalanceInfo, err
-				}
-
-				newAmounts = UpdateBalanceForId(i, newAmount, newAmounts)
+				newAmounts = UpdateBalanceForId(i, amount, newAmounts)
 			}
 
-			approval.ApprovalAmounts = newAmounts
-
-			newApprovals = append(newApprovals, approval)
-
-			removed = true
-		} else {
-			newApprovals = append(newApprovals, approval)
+			userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts
 		}
-	}
-
-	if !removed {
-		return userBalanceInfo, ErrInsufficientApproval
-	}
-
-	if len(newApprovals) == 0 {
-		userBalanceInfo.Approvals = nil
 	} else {
+		newApprovals := []*types.Approval{}
+		newApprovals = append(newApprovals, userBalanceInfo.Approvals[:idx]...)
+		if amount != 0 {
+			newApprovals = append(newApprovals, &types.Approval{
+				Address: address_num,
+				ApprovalAmounts: []*types.BalanceObject{
+					{
+						Balance: amount,
+						IdRanges: []*types.IdRange{&subbadgeRange},
+					},
+				},
+			})
+		}
+		newApprovals = append(newApprovals, userBalanceInfo.Approvals[idx:]...)
+
 		userBalanceInfo.Approvals = newApprovals
 	}
 
 	return userBalanceInfo, nil
 }
 
-func (k Keeper) AddBalanceToApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount_to_add uint64, address_num uint64, subbadgeRange types.IdRange) (types.UserBalanceInfo, error) {
-	ctx.GasMeter().ConsumeGas(SimpleAdjustBalanceOrApproval, "adjust approval")
-
-	newApprovals := []*types.Approval{}
-	//check for approval with same address / amount
-	for _, approval := range userBalanceInfo.Approvals {
-		if approval.Address == address_num {
-			newAmounts := approval.ApprovalAmounts
-			for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
-				currAmount := GetBalanceForId(i, newAmounts)
-				newAmount, err := SafeAdd(currAmount, amount_to_add)
-				if err != nil {
-					return userBalanceInfo, err
-				}
-
-				newAmounts = UpdateBalanceForId(i, newAmount, newAmounts)
-			}
-
-			approval.ApprovalAmounts = newAmounts
-
-			newApprovals = append(newApprovals, approval)
-		} else {
-			newApprovals = append(newApprovals, approval)
-		}
+//Remove a balance from the approval amount
+func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount_to_remove uint64, address_num uint64, subbadgeRange types.IdRange) (types.UserBalanceInfo, error) {
+	idx, found := SearchApprovalsForMatchingeAndGetIdxToInsertIfNotFound(address_num, userBalanceInfo.Approvals)
+	if !found {
+		return userBalanceInfo, ErrInsufficientApproval
 	}
 
-	userBalanceInfo.Approvals = newApprovals
+	approval := userBalanceInfo.Approvals[idx]
+	newAmounts := approval.ApprovalAmounts
+	for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
+		currAmount := GetBalanceForId(i, approval.ApprovalAmounts)
+
+		newAmount, err := SafeSubtract(currAmount, amount_to_remove)
+		if err != nil {
+			return userBalanceInfo, err
+		}
+
+		newAmounts = UpdateBalanceForId(i, newAmount, newAmounts)
+	}
+
+	userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts
+
+	if len(newAmounts) == 0 {
+		userBalanceInfo.Approvals = append(userBalanceInfo.Approvals[:idx], userBalanceInfo.Approvals[idx+1:]...);
+	}
 
 	return userBalanceInfo, nil
-
 }
 
-//Prune expired approvals to save space
-func PruneExpiredApprovals(currTime uint64, approvals []*types.Approval) []*types.Approval {
-	prunedApprovals := make([]*types.Approval, 0)
-	for _, approval := range approvals {
-		if approval.ExpirationTime != 0 && approval.ExpirationTime < currTime {
-			continue
+//Add a balance to the approval amount
+func (k Keeper) AddBalanceToApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount_to_add uint64, address_num uint64, subbadgeRange types.IdRange) (types.UserBalanceInfo, error) {
+	idx, found := SearchApprovalsForMatchingeAndGetIdxToInsertIfNotFound(address_num, userBalanceInfo.Approvals)
+	if !found {
+		return userBalanceInfo, ErrInsufficientApproval
+	}
+
+	approval := userBalanceInfo.Approvals[idx]
+	newAmounts := approval.ApprovalAmounts
+	for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
+		currAmount := GetBalanceForId(i, newAmounts)
+		newAmount, err := SafeAdd(currAmount, amount_to_add)
+		if err != nil {
+			return userBalanceInfo, err
+		}
+
+		newAmounts = UpdateBalanceForId(i, newAmount, newAmounts)
+	}
+
+	userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts
+
+	if len(newAmounts) == 0 {
+		userBalanceInfo.Approvals = append(userBalanceInfo.Approvals[:idx], userBalanceInfo.Approvals[idx+1:]...);
+	}
+
+	return userBalanceInfo, nil
+}
+
+
+// Approvals will be sorted, so we can binary search to get the targetIdx and expirationTime. Returns the index to insert at if not found
+func SearchApprovalsForMatchingeAndGetIdxToInsertIfNotFound(targetAddress uint64, approvals []*types.Approval) (int, bool){
+	low := 0
+	high := len(approvals) - 1
+	median := 0
+	matchingEntry := false
+	setIdx := 0
+	for low <= high {
+		median = int(uint(low + high) >> 1)
+
+		if approvals[median].Address == targetAddress  {
+			matchingEntry = true
+			break;
+		} else if approvals[median].Address > targetAddress{
+			high = median - 1
 		} else {
-			prunedApprovals = append(prunedApprovals, approval)
+			low = median + 1
 		}
 	}
-	return prunedApprovals
+	
+	if len(approvals) != 0 {
+		setIdx = median + 1
+		if (targetAddress <= approvals[median].Address)  {
+			setIdx = median
+		}
+	}
+
+	return setIdx, matchingEntry
 }

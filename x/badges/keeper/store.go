@@ -74,7 +74,6 @@ func (k Keeper) DeleteBadgeFromStore(ctx sdk.Context, badgeID uint64) {
 func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, userBalanceInfo types.UserBalanceInfo) error {
 	currTime := uint64(ctx.BlockTime().Unix())
 	userBalanceInfo.Pending = PruneExpiredPending(currTime, GetDetailsFromBalanceKey(balanceKey).accountNum, userBalanceInfo.Pending)
-	userBalanceInfo.Approvals = PruneExpiredApprovals(currTime, userBalanceInfo.Approvals)
 
 	marshaled_badge_balance_info, err := k.cdc.Marshal(&userBalanceInfo)
 	if err != nil {

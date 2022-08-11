@@ -73,16 +73,39 @@ func (k Keeper) RemovePending(ctx sdk.Context, userBalanceInfo types.UserBalance
 	return userBalanceInfo, nil
 }
 
+// Prunes pending transfers that have expired
 func PruneExpiredPending(currTime uint64, accountNum uint64, pending []*types.PendingTransfer) []*types.PendingTransfer {
 	prunedPending := make([]*types.PendingTransfer, 0)
 	for _, pendingTransfer := range pending {
-		if pendingTransfer.ExpirationTime != 0 && pendingTransfer.ExpirationTime < currTime && !pendingTransfer.Sent {
-			continue
-		} else if pendingTransfer.ExpirationTime != 0 && pendingTransfer.ExpirationTime < currTime && pendingTransfer.Sent && pendingTransfer.From == accountNum {
-			continue
-		} else {
+		//TODO: prune expired pending transfers
+		// if pendingTransfer.ExpirationTime != 0 && pendingTransfer.ExpirationTime < currTime && !pendingTransfer.Sent {
+		// 	continue
+		// } else if pendingTransfer.ExpirationTime != 0 && pendingTransfer.ExpirationTime < currTime && pendingTransfer.Sent && pendingTransfer.From == accountNum {
+		// 	continue
+		// } else {
 			prunedPending = append(prunedPending, pendingTransfer)
-		}
+		// }
 	}
 	return prunedPending
+}
+
+// Binary search pending by nonce
+func SearchPendingByNonce(pending []*types.PendingTransfer, nonce uint64) (int, bool) {
+	low := 0
+	high := len(pending) - 1
+
+	for low <= high {
+		median := int(uint(low + high) >> 1)
+		currPending := pending[median]
+
+		if currPending.ThisPendingNonce == nonce {
+			return median, true
+		} else if currPending.ThisPendingNonce > nonce {
+			high = median - 1
+		} else {
+			low = median + 1
+		}
+	}
+
+	return -1, false
 }
