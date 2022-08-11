@@ -40,4 +40,5 @@ var (
 	ErrPendingTransferExpired					    = sdkerrors.Register(types.ModuleName, 33, "pending transfer expired")
 	ErrInvalidSubbadgeRange							= sdkerrors.Register(types.ModuleName, 34, "invalid subbadge range")
 	ErrAccountCanNotEqualCreator					= sdkerrors.Register(types.ModuleName, 35, "account can not equal creator")
+	ErrCantPruneBalanceYet							= sdkerrors.Register(types.ModuleName, 36, "cant prune balance yet")
 )

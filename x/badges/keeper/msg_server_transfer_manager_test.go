@@ -133,3 +133,26 @@ func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }
+
+func (suite *TestSuite) TestManagerCantBeTransferred() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	badgesToCreate := []BadgesToCreate{
+		{
+			Badge: types.MsgNewBadge{
+				Uri:          validUri,
+				Permissions:  0,
+				SubassetUris: validUri,
+			},
+			Amount:  1,
+			Creator: bob,
+		},
+	}
+
+	err := CreateBadges(suite, wctx, badgesToCreate)
+	suite.Require().Nil(err, "Error creating badge")
+
+
+	err = TransferManager(suite, wctx, bob, 0, firstAccountNumCreated+1)
+	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
+}

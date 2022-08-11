@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"math"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
@@ -82,18 +84,15 @@ func (k Keeper) AddBalanceToApproval(ctx sdk.Context, userBalanceInfo types.User
 	for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
 		currAmount := GetBalanceForId(i, newAmounts)
 		newAmount, err := SafeAdd(currAmount, amount_to_add)
+		//In the rare case that we overflow on an approval, we just set it to the max
 		if err != nil {
-			return userBalanceInfo, err
+			newAmount = math.MaxUint64
 		}
 
 		newAmounts = UpdateBalanceForId(i, newAmount, newAmounts)
 	}
 
 	userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts
-
-	if len(newAmounts) == 0 {
-		userBalanceInfo.Approvals = append(userBalanceInfo.Approvals[:idx], userBalanceInfo.Approvals[idx+1:]...);
-	}
 
 	return userBalanceInfo, nil
 }

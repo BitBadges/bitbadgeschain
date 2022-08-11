@@ -48,6 +48,9 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 	updated := false
 	//TODO: In the future, we can make this a binary search since this is all sorted by the nonces (append-only)
 	for _, nonceRange := range msg.NonceRanges {
+		if nonceRange.End == 0 {
+			nonceRange.End = nonceRange.Start
+		}
 		for idx, CurrPendingTransfer := range creatorBalanceInfo.Pending {
 			if CurrPendingTransfer.ThisPendingNonce <= nonceRange.End && CurrPendingTransfer.ThisPendingNonce >= nonceRange.Start {
 				updated = true

@@ -94,7 +94,7 @@ func (m *UserBalanceInfo) GetApprovals() []*Approval {
 
 type Approval struct {
 	Address uint64 `protobuf:"varint,1,opt,name=address,proto3" json:"address,omitempty"`
-	// uint64 expirationTime = 2;
+	// uint64 expirationTime = 2; Can maybe add this in the future but gets tricky with which ones you want to deduct / add from, etc. Probably best to just leave it as is
 	ApprovalAmounts []*BalanceObject `protobuf:"bytes,3,rep,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
 }
 

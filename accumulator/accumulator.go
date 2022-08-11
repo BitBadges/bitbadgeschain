@@ -3,7 +3,6 @@ package accumulator
 
 import (
 	"crypto/rand"
-	"io"
 	"math/big"
 
 	"golang.org/x/crypto/sha3"
@@ -63,37 +62,37 @@ var bigTwo = big.NewInt(2)
 // as part of a trusted setup phase.
 
 // This is mainly still here for testing purposes. We replace this with the Universal Ones above
-func GenerateKey(random io.Reader) (*PublicKey, *PrivateKey, error) {
-	for {
-		p, err := rand.Prime(random, 1024)
-		if err != nil {
-			return nil, nil, err
-		}
+// func GenerateKey(random io.Reader) (*PublicKey, *PrivateKey, error) {
+// 	for {
+// 		p, err := rand.Prime(random, 1024)
+// 		if err != nil {
+// 			return nil, nil, err
+// 		}
 
-		q, err := rand.Prime(random, 1024)
-		if err != nil {
-			return nil, nil, err
-		}
+// 		q, err := rand.Prime(random, 1024)
+// 		if err != nil {
+// 			return nil, nil, err
+// 		}
 
-		pminus1 := new(big.Int).Sub(p, bigOne)
-		qminus1 := new(big.Int).Sub(q, bigOne)
-		totient := new(big.Int).Mul(pminus1, qminus1)
+// 		pminus1 := new(big.Int).Sub(p, bigOne)
+// 		qminus1 := new(big.Int).Sub(q, bigOne)
+// 		totient := new(big.Int).Mul(pminus1, qminus1)
 
-		g := new(big.Int).GCD(nil, nil, base, totient)
-		if g.Cmp(bigOne) == 0 {
-			privateKey := &PrivateKey{
-				P:       p,
-				Q:       q,
-				N:       new(big.Int).Mul(p, q),
-				Totient: totient,
-			}
-			publicKey := &PublicKey{
-				N: new(big.Int).Set(privateKey.N),
-			}
-			return publicKey, privateKey, nil
-		}
-	}
-}
+// 		g := new(big.Int).GCD(nil, nil, base, totient)
+// 		if g.Cmp(bigOne) == 0 {
+// 			privateKey := &PrivateKey{
+// 				P:       p,
+// 				Q:       q,
+// 				N:       new(big.Int).Mul(p, q),
+// 				Totient: totient,
+// 			}
+// 			publicKey := &PublicKey{
+// 				N: new(big.Int).Set(privateKey.N),
+// 			}
+// 			return publicKey, privateKey, nil
+// 		}
+// 	}
+// }
 
 func (key *PrivateKey) Accumulate(items ...[]byte) (acc *big.Int, witnesses []*big.Int) {
 	primes := make([]*big.Int, len(items))

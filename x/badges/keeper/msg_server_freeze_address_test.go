@@ -162,3 +162,27 @@ func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefaultAddAndRemove() {
 	err = TransferBadge(suite, wctx, alice, firstAccountNumCreated+1, []uint64{firstAccountNumCreated}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 }
+
+
+func (suite *TestSuite) TestFreezeCantFreeze() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	badgesToCreate := []BadgesToCreate{
+		{
+			Badge: types.MsgNewBadge{
+				Uri:          validUri,
+				Permissions:  0,
+				SubassetUris: validUri,
+			},
+			Amount:  1,
+			Creator: bob,
+		},
+	}
+
+	CreateBadges(suite, wctx, badgesToCreate)
+
+	err := FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: firstAccountNumCreated, End: firstAccountNumCreated}}, 0, 0, true)
+	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
+}
+
+

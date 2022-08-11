@@ -269,3 +269,47 @@ func (suite *TestSuite) TestRequestTransferToSelf() {
 	err = RequestTransferBadge(suite, wctx, bob, firstAccountNumCreated, 5000, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
 	suite.Require().EqualError(err, keeper.ErrAccountCanNotEqualCreator.Error())
 }
+
+
+func (suite *TestSuite) TestTryToAcceptTranferRequestBeforeMarkedAsApproved() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	badgesToCreate := []BadgesToCreate{
+		{
+			Badge: types.MsgNewBadge{
+				Uri:          validUri,
+				Permissions:  62,
+				SubassetUris: validUri,
+			},
+			Amount:  1,
+			Creator: bob,
+		},
+		{
+			Badge: types.MsgNewBadge{
+				Uri:          validUri,
+				Permissions:  62,
+				SubassetUris: validUri,
+			},
+			Amount:  1,
+			Creator: alice,
+		},
+	}
+
+	CreateBadges(suite, wctx, badgesToCreate)
+
+	//Create subbadge 1 with supply > 1
+	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	suite.Require().Nil(err, "Error creating subbadge")
+
+	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	aliceBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
+	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(0), bobBalanceInfo.PendingNonce)
+	suite.Require().Equal(uint64(0), aliceBalanceInfo.PendingNonce)
+
+	err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 5000, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+	suite.Require().Nil(err, "Error requesting transfer")
+	
+	err = HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.IdRange{{Start: 0, End: 0}}, false)
+	suite.Require().EqualError(err, keeper.ErrNotApproved.Error())
+}

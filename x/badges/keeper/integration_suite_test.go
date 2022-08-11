@@ -159,7 +159,7 @@ func RevokeBadges(suite *TestSuite, ctx context.Context, creator string, address
 }
 
 func TransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, to []uint64, amounts []uint64, badgeId uint64, subbadgeRange []*types.IdRange, expirationTime uint64) error {
-	msg := types.NewMsgTransferBadge(creator, from, to, amounts, badgeId, subbadgeRange, 0)
+	msg := types.NewMsgTransferBadge(creator, from, to, amounts, badgeId, subbadgeRange, expirationTime)
 	_, err := suite.msgServer.TransferBadge(ctx, msg)
 	return err
 }
@@ -209,6 +209,12 @@ func UpdatePermissions(suite *TestSuite, ctx context.Context, creator string, ba
 func SelfDestructBadge(suite *TestSuite, ctx context.Context, creator string, badgeId uint64) error {
 	msg := types.NewMsgSelfDestructBadge(creator, badgeId)
 	_, err := suite.msgServer.SelfDestructBadge(ctx, msg)
+	return err
+}
+
+func PruneBalances(suite *TestSuite, ctx context.Context, creator string, addresses[]uint64, badgeIds []uint64) error {
+	msg := types.NewMsgPruneBalances(creator, badgeIds, addresses)
+	_, err := suite.msgServer.PruneBalances(ctx, msg)
 	return err
 }
 

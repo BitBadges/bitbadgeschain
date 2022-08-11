@@ -30398,7 +30398,7 @@ paths:
                     title: >-
                       uri for the class metadata stored off chain. must match a
                       valid metadata standard (bitbadge, collection, etc)
-                  metadata_hash:
+                  metadataHash:
                     type: string
                     title: >-
                       this is permanent and never changable; use this for
@@ -30412,7 +30412,7 @@ paths:
                     title: >-
                       manager address of the class; can have special
                       permissions; is used as the reserve address for the assets
-                  permission_flags:
+                  permissions:
                     type: string
                     format: uint64
                     description: >-
@@ -30450,7 +30450,7 @@ paths:
                       Flag bits are in the following order from left to right;
                       leading zeroes are applied and any future additions will
                       be appended to the right
-                  freeze_address_ranges:
+                  freezeRanges:
                     type: array
                     items:
                       type: object
@@ -30466,7 +30466,7 @@ paths:
                       unfrozen addresses; and vice versa for false
 
                       big.Int will always only be 32 uint64s long
-                  subasset_uri_format:
+                  subassetUriFormat:
                     type: string
                     title: >-
                       uri for the subassets metadata stored off chain; include
@@ -30475,18 +30475,21 @@ paths:
 
                       if not specified, uses a default Class (ID # 1) like
                       metadata
-                  next_subasset_id:
+                  nextSubassetId:
                     type: string
                     format: uint64
                     title: >-
                       starts at 0; each subasset created will incrementally have
                       an increasing ID #
-                  subassets_total_supply:
+                  subassetSupplys:
                     type: array
                     items:
                       type: object
                       properties:
-                        ranges:
+                        balance:
+                          type: string
+                          format: uint64
+                        id_ranges:
                           type: array
                           items:
                             type: object
@@ -30497,18 +30500,15 @@ paths:
                               end:
                                 type: string
                                 format: uint64
-                        amount:
-                          type: string
-                          format: uint64
                     title: >-
                       only store if not == default; will be sorted in order of
                       subsasset ids; (maybe add defaut option in future)
-                  default_subasset_supply:
+                  defaultSubassetSupply:
                     type: string
                     format: uint64
-                title: >-
+                description: >-
                   BitBadge defines a badge type. Think of this like the smart
-                  contract definition
+                  contract definition.
         default:
           description: An unexpected error response.
           schema:
@@ -30720,7 +30720,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        ranges:
+                        balance:
+                          type: string
+                          format: uint64
+                        id_ranges:
                           type: array
                           items:
                             type: object
@@ -30731,10 +30734,7 @@ paths:
                               end:
                                 type: string
                                 format: uint64
-                        amount:
-                          type: string
-                          format: uint64
-                  pending_nonce:
+                  pendingNonce:
                     type: string
                     format: uint64
                   pending:
@@ -30751,16 +30751,16 @@ paths:
                             end:
                               type: string
                               format: uint64
-                        this_pending_nonce:
+                        thisPendingNonce:
                           type: string
                           format: uint64
-                        other_pending_nonce:
+                        otherPendingNonce:
                           type: string
                           format: uint64
                         amount:
                           type: string
                           format: uint64
-                        send_request:
+                        sent:
                           type: boolean
                         to:
                           type: string
@@ -30768,12 +30768,12 @@ paths:
                         from:
                           type: string
                           format: uint64
-                        approved_by:
+                        approvedBy:
                           type: string
                           format: uint64
-                        markedAsApproved:
+                        markedAsAccepted:
                           type: boolean
-                        expiration_time:
+                        expirationTime:
                           type: string
                           format: uint64
                   approvals:
@@ -30784,15 +30784,15 @@ paths:
                         address:
                           type: string
                           format: uint64
-                        expirationTime:
-                          type: string
-                          format: uint64
                         approvalAmounts:
                           type: array
                           items:
                             type: object
                             properties:
-                              ranges:
+                              balance:
+                                type: string
+                                format: uint64
+                              id_ranges:
                                 type: array
                                 items:
                                   type: object
@@ -30803,9 +30803,11 @@ paths:
                                     end:
                                       type: string
                                       format: uint64
-                              amount:
-                                type: string
-                                format: uint64
+                          title: >-
+                            uint64 expirationTime = 2; Can maybe add this in the
+                            future but gets tricky with which ones you want to
+                            deduct / add from, etc. Probably best to just leave
+                            it as is
                 title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
         default:
           description: An unexpected error response.
@@ -52726,15 +52728,15 @@ definitions:
       address:
         type: string
         format: uint64
-      expirationTime:
-        type: string
-        format: uint64
       approvalAmounts:
         type: array
         items:
           type: object
           properties:
-            ranges:
+            balance:
+              type: string
+              format: uint64
+            id_ranges:
               type: array
               items:
                 type: object
@@ -52745,104 +52747,27 @@ definitions:
                   end:
                     type: string
                     format: uint64
-            amount:
-              type: string
-              format: uint64
-  trevormil.bitbadgeschain.badges.UserBalanceInfo:
+        title: >-
+          uint64 expirationTime = 2; Can maybe add this in the future but gets
+          tricky with which ones you want to deduct / add from, etc. Probably
+          best to just leave it as is
+  trevormil.bitbadgeschain.badges.BalanceObject:
     type: object
     properties:
-      balanceAmounts:
-        type: array
-        items:
-          type: object
-          properties:
-            ranges:
-              type: array
-              items:
-                type: object
-                properties:
-                  start:
-                    type: string
-                    format: uint64
-                  end:
-                    type: string
-                    format: uint64
-            amount:
-              type: string
-              format: uint64
-      pending_nonce:
+      balance:
         type: string
         format: uint64
-      pending:
+      id_ranges:
         type: array
         items:
           type: object
           properties:
-            subbadgeRange:
-              type: object
-              properties:
-                start:
-                  type: string
-                  format: uint64
-                end:
-                  type: string
-                  format: uint64
-            this_pending_nonce:
+            start:
               type: string
               format: uint64
-            other_pending_nonce:
+            end:
               type: string
               format: uint64
-            amount:
-              type: string
-              format: uint64
-            send_request:
-              type: boolean
-            to:
-              type: string
-              format: uint64
-            from:
-              type: string
-              format: uint64
-            approved_by:
-              type: string
-              format: uint64
-            markedAsApproved:
-              type: boolean
-            expiration_time:
-              type: string
-              format: uint64
-      approvals:
-        type: array
-        items:
-          type: object
-          properties:
-            address:
-              type: string
-              format: uint64
-            expirationTime:
-              type: string
-              format: uint64
-            approvalAmounts:
-              type: array
-              items:
-                type: object
-                properties:
-                  ranges:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        start:
-                          type: string
-                          format: uint64
-                        end:
-                          type: string
-                          format: uint64
-                  amount:
-                    type: string
-                    format: uint64
-    title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
   trevormil.bitbadgeschain.badges.BitBadge:
     type: object
     properties:
@@ -52859,7 +52784,7 @@ definitions:
         title: >-
           uri for the class metadata stored off chain. must match a valid
           metadata standard (bitbadge, collection, etc)
-      metadata_hash:
+      metadataHash:
         type: string
         title: >-
           this is permanent and never changable; use this for asserting the
@@ -52873,7 +52798,7 @@ definitions:
         title: >-
           manager address of the class; can have special permissions; is used as
           the reserve address for the assets
-      permission_flags:
+      permissions:
         type: string
         format: uint64
         description: >-
@@ -52908,7 +52833,7 @@ definitions:
           Flag bits are in the following order from left to right; leading
           zeroes are applied and any future additions will be appended to the
           right
-      freeze_address_ranges:
+      freezeRanges:
         type: array
         items:
           type: object
@@ -52924,25 +52849,28 @@ definitions:
           addresses; and vice versa for false
 
           big.Int will always only be 32 uint64s long
-      subasset_uri_format:
+      subassetUriFormat:
         type: string
         title: >-
           uri for the subassets metadata stored off chain; include {id} in the
           string, it will be replaced with the subasset id
 
           if not specified, uses a default Class (ID # 1) like metadata
-      next_subasset_id:
+      nextSubassetId:
         type: string
         format: uint64
         title: >-
           starts at 0; each subasset created will incrementally have an
           increasing ID #
-      subassets_total_supply:
+      subassetSupplys:
         type: array
         items:
           type: object
           properties:
-            ranges:
+            balance:
+              type: string
+              format: uint64
+            id_ranges:
               type: array
               items:
                 type: object
@@ -52953,18 +52881,24 @@ definitions:
                   end:
                     type: string
                     format: uint64
-            amount:
-              type: string
-              format: uint64
         title: >-
           only store if not == default; will be sorted in order of subsasset
           ids; (maybe add defaut option in future)
-      default_subasset_supply:
+      defaultSubassetSupply:
         type: string
         format: uint64
-    title: >-
+    description: >-
       BitBadge defines a badge type. Think of this like the smart contract
-      definition
+      definition.
+  trevormil.bitbadgeschain.badges.IdRange:
+    type: object
+    properties:
+      start:
+        type: string
+        format: uint64
+      end:
+        type: string
+        format: uint64
   trevormil.bitbadgeschain.badges.MsgFreezeAddressResponse:
     type: object
   trevormil.bitbadgeschain.badges.MsgHandlePendingTransferResponse:
@@ -53001,15 +52935,6 @@ definitions:
     type: object
   trevormil.bitbadgeschain.badges.MsgUpdateUrisResponse:
     type: object
-  trevormil.bitbadgeschain.badges.IdRange:
-    type: object
-    properties:
-      start:
-        type: string
-        format: uint64
-      end:
-        type: string
-        format: uint64
   trevormil.bitbadgeschain.badges.Params:
     type: object
     description: Params defines the parameters for the module.
@@ -53025,16 +52950,16 @@ definitions:
           end:
             type: string
             format: uint64
-      this_pending_nonce:
+      thisPendingNonce:
         type: string
         format: uint64
-      other_pending_nonce:
+      otherPendingNonce:
         type: string
         format: uint64
       amount:
         type: string
         format: uint64
-      send_request:
+      sent:
         type: boolean
       to:
         type: string
@@ -53042,12 +52967,12 @@ definitions:
       from:
         type: string
         format: uint64
-      approved_by:
+      approvedBy:
         type: string
         format: uint64
-      markedAsApproved:
+      markedAsAccepted:
         type: boolean
-      expiration_time:
+      expirationTime:
         type: string
         format: uint64
   trevormil.bitbadgeschain.badges.QueryGetBadgeResponse:
@@ -53069,7 +52994,7 @@ definitions:
             title: >-
               uri for the class metadata stored off chain. must match a valid
               metadata standard (bitbadge, collection, etc)
-          metadata_hash:
+          metadataHash:
             type: string
             title: >-
               this is permanent and never changable; use this for asserting the
@@ -53083,7 +53008,7 @@ definitions:
             title: >-
               manager address of the class; can have special permissions; is
               used as the reserve address for the assets
-          permission_flags:
+          permissions:
             type: string
             format: uint64
             description: >-
@@ -53118,7 +53043,7 @@ definitions:
               Flag bits are in the following order from left to right; leading
               zeroes are applied and any future additions will be appended to
               the right
-          freeze_address_ranges:
+          freezeRanges:
             type: array
             items:
               type: object
@@ -53134,25 +53059,28 @@ definitions:
               addresses; and vice versa for false
 
               big.Int will always only be 32 uint64s long
-          subasset_uri_format:
+          subassetUriFormat:
             type: string
             title: >-
               uri for the subassets metadata stored off chain; include {id} in
               the string, it will be replaced with the subasset id
 
               if not specified, uses a default Class (ID # 1) like metadata
-          next_subasset_id:
+          nextSubassetId:
             type: string
             format: uint64
             title: >-
               starts at 0; each subasset created will incrementally have an
               increasing ID #
-          subassets_total_supply:
+          subassetSupplys:
             type: array
             items:
               type: object
               properties:
-                ranges:
+                balance:
+                  type: string
+                  format: uint64
+                id_ranges:
                   type: array
                   items:
                     type: object
@@ -53163,18 +53091,15 @@ definitions:
                       end:
                         type: string
                         format: uint64
-                amount:
-                  type: string
-                  format: uint64
             title: >-
               only store if not == default; will be sorted in order of subsasset
               ids; (maybe add defaut option in future)
-          default_subasset_supply:
+          defaultSubassetSupply:
             type: string
             format: uint64
-        title: >-
+        description: >-
           BitBadge defines a badge type. Think of this like the smart contract
-          definition
+          definition.
   trevormil.bitbadgeschain.badges.QueryGetBalanceResponse:
     type: object
     properties:
@@ -53186,7 +53111,10 @@ definitions:
             items:
               type: object
               properties:
-                ranges:
+                balance:
+                  type: string
+                  format: uint64
+                id_ranges:
                   type: array
                   items:
                     type: object
@@ -53197,10 +53125,7 @@ definitions:
                       end:
                         type: string
                         format: uint64
-                amount:
-                  type: string
-                  format: uint64
-          pending_nonce:
+          pendingNonce:
             type: string
             format: uint64
           pending:
@@ -53217,16 +53142,16 @@ definitions:
                     end:
                       type: string
                       format: uint64
-                this_pending_nonce:
+                thisPendingNonce:
                   type: string
                   format: uint64
-                other_pending_nonce:
+                otherPendingNonce:
                   type: string
                   format: uint64
                 amount:
                   type: string
                   format: uint64
-                send_request:
+                sent:
                   type: boolean
                 to:
                   type: string
@@ -53234,12 +53159,12 @@ definitions:
                 from:
                   type: string
                   format: uint64
-                approved_by:
+                approvedBy:
                   type: string
                   format: uint64
-                markedAsApproved:
+                markedAsAccepted:
                   type: boolean
-                expiration_time:
+                expirationTime:
                   type: string
                   format: uint64
           approvals:
@@ -53250,15 +53175,15 @@ definitions:
                 address:
                   type: string
                   format: uint64
-                expirationTime:
-                  type: string
-                  format: uint64
                 approvalAmounts:
                   type: array
                   items:
                     type: object
                     properties:
-                      ranges:
+                      balance:
+                        type: string
+                        format: uint64
+                      id_ranges:
                         type: array
                         items:
                           type: object
@@ -53269,9 +53194,10 @@ definitions:
                             end:
                               type: string
                               format: uint64
-                      amount:
-                        type: string
-                        format: uint64
+                  title: >-
+                    uint64 expirationTime = 2; Can maybe add this in the future
+                    but gets tricky with which ones you want to deduct / add
+                    from, etc. Probably best to just leave it as is
         title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
   trevormil.bitbadgeschain.badges.QueryParamsResponse:
     type: object
@@ -53280,23 +53206,102 @@ definitions:
         description: params holds all the parameters of this module.
         type: object
     description: QueryParamsResponse is response type for the Query/Params RPC method.
-  trevormil.bitbadgeschain.badges.BalanceToIds:
+  trevormil.bitbadgeschain.badges.UserBalanceInfo:
     type: object
     properties:
-      ranges:
+      balanceAmounts:
         type: array
         items:
           type: object
           properties:
-            start:
+            balance:
               type: string
               format: uint64
-            end:
-              type: string
-              format: uint64
-      amount:
+            id_ranges:
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                    format: uint64
+                  end:
+                    type: string
+                    format: uint64
+      pendingNonce:
         type: string
         format: uint64
+      pending:
+        type: array
+        items:
+          type: object
+          properties:
+            subbadgeRange:
+              type: object
+              properties:
+                start:
+                  type: string
+                  format: uint64
+                end:
+                  type: string
+                  format: uint64
+            thisPendingNonce:
+              type: string
+              format: uint64
+            otherPendingNonce:
+              type: string
+              format: uint64
+            amount:
+              type: string
+              format: uint64
+            sent:
+              type: boolean
+            to:
+              type: string
+              format: uint64
+            from:
+              type: string
+              format: uint64
+            approvedBy:
+              type: string
+              format: uint64
+            markedAsAccepted:
+              type: boolean
+            expirationTime:
+              type: string
+              format: uint64
+      approvals:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+              format: uint64
+            approvalAmounts:
+              type: array
+              items:
+                type: object
+                properties:
+                  balance:
+                    type: string
+                    format: uint64
+                  id_ranges:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                          format: uint64
+                        end:
+                          type: string
+                          format: uint64
+              title: >-
+                uint64 expirationTime = 2; Can maybe add this in the future but
+                gets tricky with which ones you want to deduct / add from, etc.
+                Probably best to just leave it as is
+    title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
   trevormil.bitbadgeschain.collections.Params:
     type: object
     description: Params defines the parameters for the module.

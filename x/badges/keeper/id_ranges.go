@@ -71,7 +71,8 @@ func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) (int) {
 		insertIdx = median
 	}
 
-	return insertIdx
+	//We return insertIdx + 1 because this function uses (curr, next) pairs so if we find that we have to insert at a certain (curr, next) pair where insertIdx == currIdx, we actually insert in between
+	return insertIdx + 1
 }
 
 // We inserted a new id at insertedAtIdx, this can cause the prev or next to have to merge if id + 1 or id - 1 overlaps with prev or next range. Handle this here.
@@ -95,7 +96,7 @@ func MergePrevOrNextIfNecessary(ids []*types.IdRange, insertedAtIdx int) []*type
 		}
 	}
 
-	if insertedAtIdx < len(ids) - 2 {
+	if insertedAtIdx < len(ids) - 1 {
 		nextStartIdx := ids[insertedAtIdx + 1].Start
 		nextEndIdx = ids[insertedAtIdx + 1].End
 		if nextEndIdx == 0 {
