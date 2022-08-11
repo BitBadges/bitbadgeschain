@@ -35,7 +35,7 @@ func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgReq
 	}
 
 	for _, subbadgeRange := range msg.SubbadgeRanges {
-		fromUserBalanceInfo, toUserBalanceInfo, err = k.AppendPendingTransferForBothParties(ctx, fromUserBalanceInfo, toUserBalanceInfo, *subbadgeRange, CreatorAccountNum, msg.From, msg.Amount, CreatorAccountNum, false, msg.ExpirationTime)
+		fromUserBalanceInfo, toUserBalanceInfo, err = AppendPendingTransferForBothParties(ctx, fromUserBalanceInfo, toUserBalanceInfo, *subbadgeRange, CreatorAccountNum, msg.From, msg.Amount, CreatorAccountNum, false, msg.ExpirationTime)
 		if err != nil {
 			return nil, err
 		}

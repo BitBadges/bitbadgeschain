@@ -6,7 +6,7 @@ import (
 )
 
 // Appends the pending transfer to both parties balance informations and increments the nonce. Since we append, they will alwyas be sorted by the nonce.
-func (k Keeper) AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, subbadgeRange types.IdRange, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool, expirationTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
+func AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, subbadgeRange types.IdRange, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool, expirationTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
 	if amount == 0 {
 		return fromUserBalanceInfo, toUserBalanceInfo, ErrBalanceIsZero
 	}
@@ -42,7 +42,7 @@ func (k Keeper) AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBal
 }
 
 //Removes pending transfer from the userBalanceInfo.
-func (k Keeper) RemovePending(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, thisNonce uint64, other_nonce uint64) (types.UserBalanceInfo, error) {
+func RemovePending(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, thisNonce uint64, other_nonce uint64) (types.UserBalanceInfo, error) {
 	pending := userBalanceInfo.Pending
 	low := 0
 	high := len(pending) - 1

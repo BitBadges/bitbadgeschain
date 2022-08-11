@@ -8,7 +8,7 @@ import (
 )
 
 // Sets an approval amount for an address, expirationTime pair.
-func (k Keeper) SetApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount uint64, address_num uint64, subbadgeRange types.IdRange, expirationTime uint64) (types.UserBalanceInfo, error) {
+func SetApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount uint64, address_num uint64, subbadgeRange types.IdRange, expirationTime uint64) (types.UserBalanceInfo, error) {
 	idx, found := SearchApprovalsForMatchingeAndGetIdxToInsertIfNotFound(address_num, userBalanceInfo.Approvals)
 
 	if found {
@@ -44,7 +44,7 @@ func (k Keeper) SetApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceIn
 }
 
 //Remove a balance from the approval amount
-func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount_to_remove uint64, address_num uint64, subbadgeRange types.IdRange) (types.UserBalanceInfo, error) {
+func RemoveBalanceFromApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount_to_remove uint64, address_num uint64, subbadgeRange types.IdRange) (types.UserBalanceInfo, error) {
 	idx, found := SearchApprovalsForMatchingeAndGetIdxToInsertIfNotFound(address_num, userBalanceInfo.Approvals)
 	if !found {
 		return userBalanceInfo, ErrInsufficientApproval
@@ -73,7 +73,7 @@ func (k Keeper) RemoveBalanceFromApproval(ctx sdk.Context, userBalanceInfo types
 }
 
 //Add a balance to the approval amount
-func (k Keeper) AddBalanceToApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount_to_add uint64, address_num uint64, subbadgeRange types.IdRange) (types.UserBalanceInfo, error) {
+func AddBalanceToApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount_to_add uint64, address_num uint64, subbadgeRange types.IdRange) (types.UserBalanceInfo, error) {
 	idx, found := SearchApprovalsForMatchingeAndGetIdxToInsertIfNotFound(address_num, userBalanceInfo.Approvals)
 	if !found {
 		return userBalanceInfo, ErrInsufficientApproval
