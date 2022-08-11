@@ -72,6 +72,26 @@ func (suite *TestSuite) TestGasCosts() {
 		addresses = append(addresses, firstAccountNumCreated+1+uint64(i))
 	}
 
+	badgesToCreateAllInOne := []BadgesToCreate{
+		{
+			Badge: types.MsgNewBadge{
+				Uri:          validUri,
+				Permissions:  62,
+				SubassetUris: validUri,
+				SubassetSupplys: []uint64{1000000, 1, 10000},
+				SubassetAmountsToCreate: []uint64{1, 10000, 10000},
+				FreezeAddressRanges: []*types.IdRange{
+					{
+						Start: 1000,
+						End:   1000,
+					},
+				},
+			},
+			Amount:  1,
+			Creator: bob,
+		},
+	}
+
 	RunFunctionsAndPrintGasCosts(suite, tbl, []GasFunction{
 		{ F: func() { CreateBadges(suite, wctx, badgesToCreate) }},
 		{ F: func() { GetBadge(suite, wctx, 0) }},
@@ -338,5 +358,6 @@ func (suite *TestSuite) TestGasCosts() {
 		{ F: func() {
 			GetUserBalance(suite, wctx, 1, 0, firstAccountNumCreated)
 		}},
+		{ F: func() { CreateBadges(suite, wctx, badgesToCreateAllInOne) }},
 	})
 }
