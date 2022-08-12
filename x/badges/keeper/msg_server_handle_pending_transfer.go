@@ -50,7 +50,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 		if nonceRange.End == 0 {
 			nonceRange.End = nonceRange.Start
 		}
-		
+
 		for idx, CurrPendingTransfer := range creatorBalanceInfo.Pending {
 			if CurrPendingTransfer.ThisPendingNonce <= nonceRange.End && CurrPendingTransfer.ThisPendingNonce >= nonceRange.Start {
 
@@ -113,13 +113,14 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 					}
 				}
 
+				//TODO: batch this
 				for i := CurrPendingTransfer.SubbadgeRange.Start; i <= CurrPendingTransfer.SubbadgeRange.End; i++ {
 					if acceptIncomingTransfer {
-						creatorBalanceInfo, err = AddBalanceForId(ctx, creatorBalanceInfo, i, CurrPendingTransfer.Amount)
+						creatorBalanceInfo, err = AddBalancesForIdRanges(ctx, creatorBalanceInfo, []*types.IdRange{{Start: i, End: i}}, CurrPendingTransfer.Amount)
 					} else if acceptTransferRequestButMarkAsApproved {
 						creatorBalanceInfo.Pending[idx].MarkedAsAccepted = true
 					} else if cancelOwnOutgoingTransfer {
-						creatorBalanceInfo, err = RevertEscrowedBalancesAndApprovals(ctx, creatorBalanceInfo, i, CurrPendingTransfer.From, CurrPendingTransfer.ApprovedBy, CurrPendingTransfer.Amount)
+						creatorBalanceInfo, err = RevertEscrowedBalancesAndApprovals(ctx, creatorBalanceInfo, types.IdRange{Start:i, End: i}, CurrPendingTransfer.From, CurrPendingTransfer.ApprovedBy, CurrPendingTransfer.Amount)
 					} else if finalizeOwnTransferRequestAfterApprovedByOtherParty {
 						idx, found := SearchPendingByNonce(otherPartyBalanceInfo.Pending, otherPartyNonce)
 						if found {

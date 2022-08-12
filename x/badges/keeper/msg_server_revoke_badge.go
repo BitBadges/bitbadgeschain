@@ -29,7 +29,6 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 		return nil, ErrUserBalanceNotExists
 	}
 
-	//TODO: Batch
 	for i, revokeAddress := range msg.Addresses {
 		// Note that we check for duplicates in ValidateBasic, so these addresses will be unique every time
 		addressBalanceKey := ConstructBalanceKey(revokeAddress, msg.BadgeId)
@@ -39,19 +38,14 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 		}
 
 		revokeAmount := msg.Amounts[i]
-		//TODO: Batch
-		for _, subbadgeRange := range msg.SubbadgeRanges {
-			for id := subbadgeRange.Start; id <= subbadgeRange.End; id++ {
-				addressBalanceInfo, err = SubtractBalanceForId(ctx, addressBalanceInfo, id, revokeAmount)
-				if err != nil {
-					return nil, err
-				}
+		addressBalanceInfo, err = SubtractBalancesForIdRanges(ctx, addressBalanceInfo, msg.SubbadgeRanges, revokeAmount)
+		if err != nil {
+			return nil, err
+		}
 
-				managerBalanceInfo, err = AddBalanceForId(ctx, managerBalanceInfo, id, revokeAmount)
-				if err != nil {
-					return nil, err
-				}
-			}
+		managerBalanceInfo, err = AddBalancesForIdRanges(ctx, managerBalanceInfo, msg.SubbadgeRanges, revokeAmount)
+		if err != nil {
+			return nil, err
 		}
 
 		err = k.SetUserBalanceInStore(ctx, addressBalanceKey, addressBalanceInfo)

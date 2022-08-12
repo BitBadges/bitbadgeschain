@@ -52,7 +52,7 @@ func (suite *TestSuite) TestRequestTransfer() {
 
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	aliceBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 	suite.Require().Equal(uint64(0), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.PendingNonce)
 
@@ -60,7 +60,7 @@ func (suite *TestSuite) TestRequestTransfer() {
 	suite.Require().Nil(err, "Error requesting transfer")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 	suite.Require().Equal(uint64(5000), bobBalanceInfo.Pending[0].Amount)
 	suite.Require().Equal(uint64(1), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(firstAccountNumCreated+1, bobBalanceInfo.Pending[0].ApprovedBy)
@@ -71,7 +71,7 @@ func (suite *TestSuite) TestRequestTransfer() {
 	suite.Require().Equal(false, bobBalanceInfo.Pending[0].Sent)
 
 	aliceBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(0), keeper.GetBalanceForId(0, aliceBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(0), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, aliceBalanceInfo.BalanceAmounts)[0].Balance)
 	suite.Require().Equal(uint64(5000), aliceBalanceInfo.Pending[0].Amount)
 	suite.Require().Equal(uint64(1), aliceBalanceInfo.PendingNonce)
 	suite.Require().Equal(firstAccountNumCreated+1, aliceBalanceInfo.Pending[0].ApprovedBy)
@@ -88,10 +88,10 @@ func (suite *TestSuite) TestRequestTransfer() {
 	suite.Require().Nil(err, "Error accepting badge")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(5000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(5000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
 	aliceBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(5000), keeper.GetBalanceForId(0, aliceBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(5000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, aliceBalanceInfo.BalanceAmounts)[0].Balance)
 }
 
 func (suite *TestSuite) TestRequestTransferFrozen() {
@@ -140,7 +140,7 @@ func (suite *TestSuite) TestRequestTransferFrozen() {
 
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	aliceBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 	suite.Require().Equal(uint64(0), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.PendingNonce)
 
@@ -148,7 +148,7 @@ func (suite *TestSuite) TestRequestTransferFrozen() {
 	suite.Require().Nil(err, "Error requesting transfer")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 	suite.Require().Equal(uint64(5000), bobBalanceInfo.Pending[0].Amount)
 	suite.Require().Equal(uint64(1), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(firstAccountNumCreated+1, bobBalanceInfo.Pending[0].ApprovedBy)
@@ -159,7 +159,7 @@ func (suite *TestSuite) TestRequestTransferFrozen() {
 	suite.Require().Equal(false, bobBalanceInfo.Pending[0].Sent)
 
 	aliceBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(0), keeper.GetBalanceForId(0, aliceBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(0), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, aliceBalanceInfo.BalanceAmounts)[0].Balance)
 	suite.Require().Equal(uint64(5000), aliceBalanceInfo.Pending[0].Amount)
 	suite.Require().Equal(uint64(1), aliceBalanceInfo.PendingNonce)
 	suite.Require().Equal(firstAccountNumCreated+1, aliceBalanceInfo.Pending[0].ApprovedBy)
@@ -225,7 +225,7 @@ func (suite *TestSuite) TestRequestTransferFrozenThenUnrozen() {
 
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	aliceBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 	suite.Require().Equal(uint64(0), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.PendingNonce)
 
@@ -233,7 +233,7 @@ func (suite *TestSuite) TestRequestTransferFrozenThenUnrozen() {
 	suite.Require().Nil(err, "Error requesting transfer")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 	suite.Require().Equal(uint64(5000), bobBalanceInfo.Pending[0].Amount)
 	suite.Require().Equal(uint64(1), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(firstAccountNumCreated+1, bobBalanceInfo.Pending[0].ApprovedBy)
@@ -244,7 +244,7 @@ func (suite *TestSuite) TestRequestTransferFrozenThenUnrozen() {
 	suite.Require().Equal(false, bobBalanceInfo.Pending[0].Sent)
 
 	aliceBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(0), keeper.GetBalanceForId(0, aliceBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(0), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, aliceBalanceInfo.BalanceAmounts)[0].Balance)
 	suite.Require().Equal(uint64(5000), aliceBalanceInfo.Pending[0].Amount)
 	suite.Require().Equal(uint64(1), aliceBalanceInfo.PendingNonce)
 	suite.Require().Equal(firstAccountNumCreated+1, aliceBalanceInfo.Pending[0].ApprovedBy)
@@ -267,10 +267,10 @@ func (suite *TestSuite) TestRequestTransferFrozenThenUnrozen() {
 	suite.Require().Nil(err, "Error accepting transfer")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(5000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(5000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
 	aliceBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(5000), keeper.GetBalanceForId(0, aliceBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(5000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, aliceBalanceInfo.BalanceAmounts)[0].Balance)
 }
 func (suite *TestSuite) TestRequestTransferToSelf() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -318,7 +318,7 @@ func (suite *TestSuite) TestRequestTransferToSelf() {
 
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	aliceBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 	suite.Require().Equal(uint64(0), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.PendingNonce)
 
@@ -372,7 +372,7 @@ func (suite *TestSuite) TestTryToAcceptTranferRequestBeforeMarkedAsApproved() {
 
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
 	aliceBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 	suite.Require().Equal(uint64(0), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.PendingNonce)
 

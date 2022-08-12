@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"math"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
@@ -31,41 +33,88 @@ func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount uint64, balanc
 }
 
 // Gets a balance for a specific id
-func GetBalanceForId(id uint64, balanceObjects []*types.BalanceObject) uint64 {
+func GetBalancesForIdRanges(ranges []*types.IdRange, balanceObjects []*types.BalanceObject) []*types.BalanceObject {
+	rangeBalanceObjects := []*types.BalanceObject{}
+
 	for _, balanceObj := range balanceObjects {
 		balanceObj.IdRanges = GetIdRangesWithOmitEmptyCaseHandled(balanceObj.IdRanges)
+		
+		
+		for _, rangeToGet := range ranges {
+			idxRange, found := GetIdxSpanForRange(*rangeToGet, balanceObj.IdRanges)
+			if found {
+				everythingBefore := types.IdRange{
+					Start: 0, 
+					End: rangeToGet.Start - 1, 
+				}
 
-		_, found := SearchIdRangesForId(id, balanceObj.IdRanges)
-		if found {
-			return balanceObj.Balance
+				everythingAfter := types.IdRange{
+					Start: rangeToGet.End + 1, 
+					End: math.MaxUint64,
+				}
+				newIdRanges := []*types.IdRange{}
+				for i := idxRange.Start; i <= idxRange.End; i++ {
+					currRange := balanceObj.IdRanges[i]
+					if rangeToGet.Start > 0 {
+						newIdRanges = append(newIdRanges, RemoveIdsFromIdRange(everythingBefore, *currRange)...)
+					}
+
+					
+					if rangeToGet.End < math.MaxUint64 {
+						if len(newIdRanges) == 0 {
+							newIdRanges = append(newIdRanges, RemoveIdsFromIdRange(everythingAfter, *currRange)...)
+						} else {
+							finalIdRanges := []*types.IdRange{}
+							for _, newIdRange := range newIdRanges {
+								finalIdRanges = append(finalIdRanges, RemoveIdsFromIdRange(everythingAfter, *newIdRange)...)
+							}
+							newIdRanges = finalIdRanges
+						}
+					}
+				}
+
+				rangeBalanceObjects = UpdateBalancesForIdRanges(newIdRanges, balanceObj.Balance, rangeBalanceObjects)
+				// newIdRanges = append(newIdRanges, RemoveIdsFromIdRange(*rangeToGet, *balanceObj.IdRanges[idxRange.End])...)
+			}
 		}
 	}
 
-	return 0 //Not found; return 0
-}
-
-//TODO: Batch this and subtract
-// Adds a balance for the id
-func AddBalanceForId(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, id uint64, balanceToAdd uint64) (types.UserBalanceInfo, error) {
-	currBalance := GetBalanceForId(id, userBalanceInfo.BalanceAmounts)
-	newBalance, err := SafeAdd(currBalance, balanceToAdd)
-	if err != nil {
-		return userBalanceInfo, err
+	if len(rangeBalanceObjects) == 0 {
+		rangeBalanceObjects = append(rangeBalanceObjects, &types.BalanceObject{
+			Balance:  0,
+			IdRanges: ranges,
+		})
 	}
 
-	userBalanceInfo.BalanceAmounts = UpdateBalancesForIdRanges([]*types.IdRange{{Start: id, End: id}}, newBalance, userBalanceInfo.BalanceAmounts)
+	return rangeBalanceObjects
+}
+
+// Adds a balance for the id
+func AddBalancesForIdRanges(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, ranges []*types.IdRange, balanceToAdd uint64) (types.UserBalanceInfo, error) {
+	currBalances := GetBalancesForIdRanges(ranges, userBalanceInfo.BalanceAmounts)
+	for _, balanceObj := range currBalances {
+		newBalance, err := SafeAdd(balanceObj.Balance, balanceToAdd)
+		if err != nil {
+			return userBalanceInfo, err
+		}
+
+		userBalanceInfo.BalanceAmounts = UpdateBalancesForIdRanges(balanceObj.IdRanges, newBalance, userBalanceInfo.BalanceAmounts)
+	}
 	return userBalanceInfo, nil
 }
 
 // Subtracts a balance for the id
-func SubtractBalanceForId(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, id uint64, balanceToRemove uint64) (types.UserBalanceInfo, error) {
-	currBalance := GetBalanceForId(id, userBalanceInfo.BalanceAmounts)
-	newBalance, err := SafeSubtract(currBalance, balanceToRemove)
-	if err != nil {
-		return userBalanceInfo, err
-	}
+func SubtractBalancesForIdRanges(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, ranges []*types.IdRange, balanceToRemove uint64) (types.UserBalanceInfo, error) {
+	currBalances := GetBalancesForIdRanges(ranges, userBalanceInfo.BalanceAmounts)
+	
+	for _, balanceObj := range currBalances {
+		newBalance, err := SafeSubtract(balanceObj.Balance, balanceToRemove)
+		if err != nil {
+			return userBalanceInfo, err
+		}
 
-	userBalanceInfo.BalanceAmounts = UpdateBalancesForIdRanges([]*types.IdRange{{Start: id, End: id}}, newBalance, userBalanceInfo.BalanceAmounts)
+		userBalanceInfo.BalanceAmounts = UpdateBalancesForIdRanges(balanceObj.IdRanges, newBalance, userBalanceInfo.BalanceAmounts)
+	}
 	return userBalanceInfo, nil
 }
 
@@ -83,8 +132,9 @@ func DeleteBalanceForIdRanges(ranges []*types.IdRange, balanceObjects []*types.B
 				}
 
 				newIdRanges := append([]*types.IdRange{}, balanceObj.IdRanges[:idxRange.Start]...)
-				newIdRanges = append(newIdRanges, RemoveIdsFromIdRange(*rangeToDelete, *balanceObj.IdRanges[idxRange.Start])...)
-				newIdRanges = append(newIdRanges, RemoveIdsFromIdRange(*rangeToDelete, *balanceObj.IdRanges[idxRange.End])...)
+				for i := idxRange.Start; i <= idxRange.End; i++ {
+					newIdRanges = append(newIdRanges, RemoveIdsFromIdRange(*rangeToDelete, *balanceObj.IdRanges[i])...)
+				}
 				newIdRanges = append(newIdRanges, balanceObj.IdRanges[idxRange.End + 1:]...)
 				balanceObj.IdRanges = newIdRanges
 			}

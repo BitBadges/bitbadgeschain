@@ -43,16 +43,17 @@ func ForcefulTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types
 		if err != nil {
 			return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
 		}
+	}
 
-		fromUserBalanceInfo, err = SubtractBalanceForId(ctx, fromUserBalanceInfo, currSubbadgeId, amount)
-		if err != nil {
-			return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
-		}
+	err := *new(error)
+	fromUserBalanceInfo, err = SubtractBalancesForIdRanges(ctx, fromUserBalanceInfo, []*types.IdRange{&subbadgeRange}, amount)
+	if err != nil {
+		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
+	}
 
-		toUserBalanceInfo, err = AddBalanceForId(ctx, toUserBalanceInfo, currSubbadgeId, amount)
-		if err != nil {
-			return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
-		}
+	toUserBalanceInfo, err = AddBalancesForIdRanges(ctx, toUserBalanceInfo, []*types.IdRange{&subbadgeRange}, amount)
+	if err != nil {
+		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
 	}
 
 	return fromUserBalanceInfo, toUserBalanceInfo, nil
@@ -78,11 +79,11 @@ func PendingTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.
 		if err != nil {
 			return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
 		}
+	}
 
-		fromUserBalanceInfo, err = SubtractBalanceForId(ctx, fromUserBalanceInfo, currSubbadgeId, amount)
-		if err != nil {
-			return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
-		}
+	fromUserBalanceInfo, err = SubtractBalancesForIdRanges(ctx, fromUserBalanceInfo, []*types.IdRange{&subbadgeRange}, amount)
+	if err != nil {
+		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
 	}
 
 	fromUserBalanceInfo, toUserBalanceInfo, err = AppendPendingTransferForBothParties(ctx, fromUserBalanceInfo, toUserBalanceInfo, subbadgeRange, to, from, amount, approvedBy, true, expirationTime, cantCancelBeforeTime)
@@ -109,16 +110,16 @@ func DeductApprovals(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, bad
 }
 
 // Deduct approvals fromrequester if requester != from
-func RevertEscrowedBalancesAndApprovals(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, id uint64, from uint64, approvedBy uint64, amount uint64) (types.UserBalanceInfo, error) {
+func RevertEscrowedBalancesAndApprovals(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, rangeToRevert types.IdRange, from uint64, approvedBy uint64, amount uint64) (types.UserBalanceInfo, error) {
 	err := *new(error)
-	userBalanceInfo, err = AddBalanceForId(ctx, userBalanceInfo, id, amount)
+	userBalanceInfo, err = AddBalancesForIdRanges(ctx, userBalanceInfo, []*types.IdRange{&rangeToRevert}, amount)
 	if err != nil {
 		return types.UserBalanceInfo{}, err
 	}
 
 	//If it was sent via an approval, we need to add the approval back
 	if approvedBy != from {
-		userBalanceInfo, err = AddBalanceToApproval(ctx, userBalanceInfo, amount, approvedBy, types.IdRange{Start: id, End: id})
+		userBalanceInfo, err = AddBalanceToApproval(ctx, userBalanceInfo, amount, approvedBy, rangeToRevert)
 		if err != nil {
 			return types.UserBalanceInfo{}, err
 		}

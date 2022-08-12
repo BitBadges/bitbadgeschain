@@ -44,18 +44,17 @@ func GetIdxSpanForRange(targetRange types.IdRange, idRanges []*types.IdRange) (t
 			currRange.End = currRange.Start // If end == 0, set it to start by convention (done in order to save space)
 		}
 
+		targetEnd := targetRange.End
+		if targetEnd == 0 {
+			targetEnd = targetRange.Start
+		}
+
 		if idRanges[median].Start <= targetId && idRanges[median].End >= targetId {
 			//check both sides of this median
 			start := median
 			end := median
 
-			targetEnd := targetRange.End
-			if targetEnd == 0 {
-				targetEnd = targetRange.Start
-			}
-
 			median += 1
-
 			for median < len(idRanges) {
 				currRange = idRanges[median]
 				if currRange.End == 0 {
@@ -65,6 +64,29 @@ func GetIdxSpanForRange(targetRange types.IdRange, idRanges []*types.IdRange) (t
 				if (currRange.Start <= targetEnd && currRange.End >= targetEnd) {
 					end = median
 					median += 1
+				} else {
+					break
+				}
+			}
+
+			return *GetIdRangeToInsert(uint64(start), uint64(end)), true
+		} else if idRanges[median].Start <= targetEnd && idRanges[median].End >= targetEnd {
+			//check both sides of this median
+			start := median
+			end := median
+
+			
+
+			median -= 1
+			for median >= 0 {
+				currRange = idRanges[median]
+				if currRange.End == 0 {
+					currRange.End = currRange.Start // If end == 0, set it to start by convention (done in order to save space)
+				}
+
+				if (currRange.Start <= targetId && currRange.Start >= targetId) {
+					start = median
+					median -= 1
 				} else {
 					break
 				}
@@ -140,7 +162,7 @@ func GetIdxToInsertForNewIdRange(rangeToAdd types.IdRange, targetIds []*types.Id
 
 		if currRange.End < rangeToAdd.Start && targetIds[median+1].Start > rangeToAdd.End {
 			break
-		} else if currRange.End > rangeToAdd.Start {
+		} else if currRange.End < rangeToAdd.Start {
 			high = median - 1
 		} else {
 			low = median + 1
@@ -148,7 +170,7 @@ func GetIdxToInsertForNewIdRange(rangeToAdd types.IdRange, targetIds []*types.Id
 	}
 
 	insertIdx := median + 1
-	if targetIds[median].End <= rangeToAdd.Start {
+	if targetIds[median].End >= rangeToAdd.Start {
 		insertIdx = median
 	}
 
@@ -298,12 +320,12 @@ func RemoveIdsFromIdRange(rangeToRemove types.IdRange, rangeObject types.IdRange
 	} else if rangeToRemove.Start <= rangeObject.Start && rangeToRemove.End >= rangeObject.End {
 		// Overlaps both; remove whole thing
 		// Do nothing
-	} else if rangeToRemove.Start <= rangeObject.Start && rangeToRemove.End < rangeObject.End {
+	} else if rangeToRemove.Start <= rangeObject.Start && rangeToRemove.End < rangeObject.End && rangeToRemove.End >= rangeObject.Start {
 		// Still have some at the end
 		newRanges = append(newRanges, GetIdRangeToInsert(rangeToRemove.End+1, rangeObject.End))
-	} else if rangeToRemove.Start > rangeObject.Start && rangeToRemove.End >= rangeObject.End {
+	} else if rangeToRemove.Start > rangeObject.Start && rangeToRemove.End >= rangeObject.End && rangeToRemove.Start <= rangeObject.End {
 		// Still have some at the start
-		newRanges = append(newRanges, GetIdRangeToInsert(rangeObject.Start, rangeToRemove.Start-1))
+		newRanges = append(newRanges, GetIdRangeToInsert(rangeObject.Start, rangeToRemove.Start-1))	
 	} else {
 		// Doesn't overlap at all
 		newRanges = append(newRanges, GetIdRangeToInsert(rangeObject.Start, rangeObject.End))

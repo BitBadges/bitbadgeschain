@@ -44,7 +44,7 @@ func (suite *TestSuite) TestNewSubBadges() {
 			Balance:  10,
 		},
 	}, badge.SubassetSupplys)
-	suite.Require().Equal(uint64(10), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(10), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
 	//Create subbadge 2 with supply == 1
 	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{1}, []uint64{1})
@@ -60,7 +60,7 @@ func (suite *TestSuite) TestNewSubBadges() {
 			Balance:  10,
 		},
 	}, badge.SubassetSupplys)
-	suite.Require().Equal(uint64(1), keeper.GetBalanceForId(1, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(1), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
 	//Create subbadge 2 with supply == 10
 	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{10}, []uint64{2})
@@ -76,7 +76,7 @@ func (suite *TestSuite) TestNewSubBadges() {
 		},
 	},
 		badge.SubassetSupplys)
-	suite.Require().Equal(uint64(10), keeper.GetBalanceForId(2, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(10), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 2}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 }
 
 func (suite *TestSuite) TestNewSubbadgesDirectlyUponCreatingNewBadge() {
@@ -116,7 +116,7 @@ func (suite *TestSuite) TestNewSubbadgesDirectlyUponCreatingNewBadge() {
 			Balance:  10,
 		},
 	}, badge.SubassetSupplys)
-	suite.Require().Equal(uint64(10), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(10), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
 	//Create subbadge 2 with supply == 1
 	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{1}, []uint64{1})
@@ -132,7 +132,7 @@ func (suite *TestSuite) TestNewSubbadgesDirectlyUponCreatingNewBadge() {
 			Balance:  10,
 		},
 	}, badge.SubassetSupplys)
-	suite.Require().Equal(uint64(1), keeper.GetBalanceForId(1, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(1), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
 	//Create subbadge 2 with supply == 10
 	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{10}, []uint64{2})
@@ -148,7 +148,7 @@ func (suite *TestSuite) TestNewSubbadgesDirectlyUponCreatingNewBadge() {
 		},
 	},
 		badge.SubassetSupplys)
-	suite.Require().Equal(uint64(10), keeper.GetBalanceForId(2, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(10), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 2}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 }
 
 func (suite *TestSuite) TestNewSubBadgesNotManager() {

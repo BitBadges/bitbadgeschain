@@ -49,15 +49,14 @@ func RemoveBalanceFromApproval(ctx sdk.Context, userBalanceInfo types.UserBalanc
 
 	approval := userBalanceInfo.Approvals[idx]
 	newAmounts := approval.ApprovalAmounts
-	for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
-		currAmount := GetBalanceForId(i, approval.ApprovalAmounts)
-
-		newAmount, err := SafeSubtract(currAmount, amount_to_remove)
+	currBalances := GetBalancesForIdRanges([]*types.IdRange{&subbadgeRange}, approval.ApprovalAmounts)
+	for _, balanceObj := range currBalances {
+		newBalance, err := SafeSubtract(balanceObj.Balance, amount_to_remove)
 		if err != nil {
 			return userBalanceInfo, err
 		}
-		//TODO: bacth this
-		newAmounts = UpdateBalancesForIdRanges([]*types.IdRange{{Start: i, End: i}}, newAmount, newAmounts)
+
+		newAmounts = UpdateBalancesForIdRanges(balanceObj.IdRanges, newBalance, approval.ApprovalAmounts)
 	}
 
 	userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts
@@ -78,15 +77,14 @@ func AddBalanceToApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo
 
 	approval := userBalanceInfo.Approvals[idx]
 	newAmounts := approval.ApprovalAmounts
-	for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
-		currAmount := GetBalanceForId(i, newAmounts)
-		newAmount, err := SafeAdd(currAmount, amount_to_add)
-		//In the rare case that we overflow on an approval, we just set it to the max
+	currBalances := GetBalancesForIdRanges([]*types.IdRange{&subbadgeRange}, approval.ApprovalAmounts)
+	for _, balanceObj := range currBalances {
+		newBalance, err := SafeAdd(balanceObj.Balance, amount_to_add)
 		if err != nil {
-			newAmount = math.MaxUint64
+			newBalance = math.MaxUint64
 		}
 
-		newAmounts = UpdateBalancesForIdRanges([]*types.IdRange{{Start: i, End: i}}, newAmount, newAmounts)
+		newAmounts = UpdateBalancesForIdRanges(balanceObj.IdRanges, newBalance, approval.ApprovalAmounts)
 	}
 
 	userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts

@@ -45,7 +45,7 @@ func (suite *TestSuite) TestPruneBalances() {
 			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalanceForId(0, bobBalanceInfo.BalanceAmounts))
+	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
 	err = PruneBalances(suite, wctx, bob, []uint64{firstAccountNumCreated}, []uint64{0})
 	suite.Require().EqualError(err, keeper.ErrCantPruneBalanceYet.Error())

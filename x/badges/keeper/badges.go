@@ -46,19 +46,10 @@ func CreateSubassets(ctx sdk.Context, badge types.BitBadge, managerBalanceInfo t
 	if badge.DefaultSubassetSupply == 0 {
 		defaultSupply = 1
 	}
-	
+
 	err := *new(error)
 	// Update supplys and mint total supply for each to manager. Don't store if supply == default
 	for i, supply := range supplys {
-		for j := uint64(0); j < amounts[i]; j++ {
-			//TODO: batch
-			nextSubassetId := badge.NextSubassetId
-			managerBalanceInfo, err = AddBalanceForId(ctx, managerBalanceInfo, nextSubassetId + j, supply)
-			if err != nil {
-				return types.BitBadge{}, types.UserBalanceInfo{}, err
-			}
-		}
-
 		amountToCreate := amounts[i]
 		nextSubassetId := badge.NextSubassetId
 		// We conventionalize supply == 0 as default, so we don't store if it is the default
@@ -66,10 +57,17 @@ func CreateSubassets(ctx sdk.Context, badge types.BitBadge, managerBalanceInfo t
 			newSubassetSupplys = UpdateBalancesForIdRanges([]*types.IdRange{{Start: nextSubassetId, End: nextSubassetId + amountToCreate - 1}}, supply, newSubassetSupplys)
 		}
 
+		managerBalanceInfo, err = AddBalancesForIdRanges(ctx, managerBalanceInfo, []*types.IdRange{{Start: nextSubassetId, End: nextSubassetId + amountToCreate - 1}}, supply)
+		if err != nil {
+			return types.BitBadge{}, types.UserBalanceInfo{}, err
+		}
+
 		badge.NextSubassetId, err = SafeAdd(badge.NextSubassetId, amountToCreate)
 		if err != nil {
 			return types.BitBadge{}, types.UserBalanceInfo{}, err
 		}
+
+		
 	}
 	badge.SubassetSupplys = newSubassetSupplys
 
