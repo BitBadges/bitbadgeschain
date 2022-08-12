@@ -15,10 +15,7 @@ func SetApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount 
 		approval := userBalanceInfo.Approvals[idx]
 		if amount != 0 {
 			newAmounts := approval.ApprovalAmounts
-			for i := subbadgeRange.Start; i <= subbadgeRange.End; i++ {
-				newAmounts = UpdateBalanceForId(i, amount, newAmounts)
-			}
-
+			newAmounts = UpdateBalancesForIdRanges([]*types.IdRange{&subbadgeRange}, amount, newAmounts)
 			userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts
 		}
 	} else {
@@ -59,8 +56,8 @@ func RemoveBalanceFromApproval(ctx sdk.Context, userBalanceInfo types.UserBalanc
 		if err != nil {
 			return userBalanceInfo, err
 		}
-
-		newAmounts = UpdateBalanceForId(i, newAmount, newAmounts)
+		//TODO: bacth this
+		newAmounts = UpdateBalancesForIdRanges([]*types.IdRange{{Start: i, End: i}}, newAmount, newAmounts)
 	}
 
 	userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts
@@ -89,7 +86,7 @@ func AddBalanceToApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo
 			newAmount = math.MaxUint64
 		}
 
-		newAmounts = UpdateBalanceForId(i, newAmount, newAmounts)
+		newAmounts = UpdateBalancesForIdRanges([]*types.IdRange{{Start: i, End: i}}, newAmount, newAmounts)
 	}
 
 	userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts

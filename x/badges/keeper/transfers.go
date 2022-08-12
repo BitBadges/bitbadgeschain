@@ -31,6 +31,8 @@ func ForcefulTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types
 	// 2. Remove approvals if approvedBy != from
 	// 3. Deduct from "From" balance
 	// 4. Add to "To" balance
+
+	//TODO: Batch
 	for currSubbadgeId := subbadgeRange.Start; currSubbadgeId <= subbadgeRange.End; currSubbadgeId++ {
 		err := AssertAccountNotFrozen(ctx, badge, from)
 		if err != nil {
@@ -64,6 +66,8 @@ func PendingTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.
 	// 3. Deduct from "From" balance
 	// 4. Append pending transfers to both parties
 	// 5. If the pending tranfer is eventually accepted, we simply add the balance. If it is removed, we revert the balance and approvals.
+	
+	//TODO: Batch
 	for currSubbadgeId := subbadgeRange.Start; currSubbadgeId <= subbadgeRange.End; currSubbadgeId++ {
 		err := AssertAccountNotFrozen(ctx, badge, from)
 		if err != nil {

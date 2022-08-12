@@ -34,6 +34,7 @@ func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgReq
 		toUserBalanceInfo = types.UserBalanceInfo{}
 	}
 
+	//TODO: Maybe have []subbadgeRange within pending transfers instead of creating new ones each time
 	for _, subbadgeRange := range msg.SubbadgeRanges {
 		fromUserBalanceInfo, toUserBalanceInfo, err = AppendPendingTransferForBothParties(ctx, fromUserBalanceInfo, toUserBalanceInfo, *subbadgeRange, CreatorAccountNum, msg.From, msg.Amount, CreatorAccountNum, false, msg.ExpirationTime, msg.CantCancelBeforeTime)
 		if err != nil {

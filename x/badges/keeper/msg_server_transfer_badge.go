@@ -34,6 +34,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 			toUserBalanceInfo = types.UserBalanceInfo{}
 		}
 
+		//TODO: Batch
 		for _, amount := range msg.Amounts {
 			for _, subbadgeRange := range msg.SubbadgeRanges {
 				fromUserBalanceInfo, toUserBalanceInfo, err = HandleTransfer(ctx, badge, *subbadgeRange, fromUserBalanceInfo, toUserBalanceInfo, amount, msg.From, to, CreatorAccountNum, msg.ExpirationTime, msg.CantCancelBeforeTime)

@@ -28,16 +28,11 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 		Balance:  1,
 	}}
 
-	for _, addressRange := range msg.AddressRanges {
-		for targetAddress := addressRange.Start; targetAddress <= addressRange.End; targetAddress++ {
-			newAmount := uint64(0)
-			if msg.Add {
-				newAmount = 1
-			}
-
-			newBalanceObjects = UpdateBalanceForId(targetAddress, newAmount, newBalanceObjects)
-		}
+	newAmount := uint64(0)
+	if msg.Add {
+		newAmount = 1
 	}
+	newBalanceObjects = UpdateBalancesForIdRanges(msg.AddressRanges, newAmount, newBalanceObjects)
 
 	if len(newBalanceObjects) > 0 {
 		badge.FreezeRanges = newBalanceObjects[0].IdRanges
