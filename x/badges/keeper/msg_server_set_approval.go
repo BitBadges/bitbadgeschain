@@ -28,7 +28,6 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 		creatorBalanceInfo = types.UserBalanceInfo{}
 	}
 
-	//TODO: Batch
 	for _, subbadgeRange := range msg.SubbadgeRanges {
 		creatorBalanceInfo, err = SetApproval(ctx, creatorBalanceInfo, msg.Amount, msg.Address, *subbadgeRange, msg.ExpirationTime)
 		if err != nil {

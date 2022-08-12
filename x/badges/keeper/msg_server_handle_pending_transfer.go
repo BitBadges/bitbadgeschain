@@ -112,34 +112,32 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 						return nil, ErrUserBalanceNotExists
 					}
 				}
-
-				//TODO: batch this
-				for i := CurrPendingTransfer.SubbadgeRange.Start; i <= CurrPendingTransfer.SubbadgeRange.End; i++ {
-					if acceptIncomingTransfer {
-						creatorBalanceInfo, err = AddBalancesForIdRanges(ctx, creatorBalanceInfo, []*types.IdRange{{Start: i, End: i}}, CurrPendingTransfer.Amount)
-					} else if acceptTransferRequestButMarkAsApproved {
-						creatorBalanceInfo.Pending[idx].MarkedAsAccepted = true
-					} else if cancelOwnOutgoingTransfer {
-						creatorBalanceInfo, err = RevertEscrowedBalancesAndApprovals(ctx, creatorBalanceInfo, types.IdRange{Start:i, End: i}, CurrPendingTransfer.From, CurrPendingTransfer.ApprovedBy, CurrPendingTransfer.Amount)
-					} else if finalizeOwnTransferRequestAfterApprovedByOtherParty {
-						idx, found := SearchPendingByNonce(otherPartyBalanceInfo.Pending, otherPartyNonce)
-						if found {
-							if !otherPartyBalanceInfo.Pending[idx].MarkedAsAccepted {
-								return nil, ErrNotApproved
-							}
-						} else {
+				
+				if acceptIncomingTransfer {
+					creatorBalanceInfo, err = AddBalancesForIdRanges(ctx, creatorBalanceInfo, []*types.IdRange{CurrPendingTransfer.SubbadgeRange}, CurrPendingTransfer.Amount)
+				} else if acceptTransferRequestButMarkAsApproved {
+					creatorBalanceInfo.Pending[idx].MarkedAsAccepted = true
+				} else if cancelOwnOutgoingTransfer {
+					creatorBalanceInfo, err = RevertEscrowedBalancesAndApprovals(ctx, creatorBalanceInfo, *CurrPendingTransfer.SubbadgeRange, CurrPendingTransfer.From, CurrPendingTransfer.ApprovedBy, CurrPendingTransfer.Amount)
+				} else if finalizeOwnTransferRequestAfterApprovedByOtherParty {
+					idx, found := SearchPendingByNonce(otherPartyBalanceInfo.Pending, otherPartyNonce)
+					if found {
+						if !otherPartyBalanceInfo.Pending[idx].MarkedAsAccepted {
 							return nil, ErrNotApproved
 						}
-
-						otherPartyBalanceInfo, creatorBalanceInfo, err = ForcefulTransfer(ctx, badge, types.IdRange{Start: i, End: i}, otherPartyBalanceInfo, creatorBalanceInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.From, CurrPendingTransfer.To, CurrPendingTransfer.From, CurrPendingTransfer.ExpirationTime)
-					} else if acceptTransferRequestForcefully {
-						creatorBalanceInfo, otherPartyBalanceInfo, err = ForcefulTransfer(ctx, badge, types.IdRange{Start: i, End: i}, creatorBalanceInfo, otherPartyBalanceInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.From, CurrPendingTransfer.To, CreatorAccountNum, CurrPendingTransfer.ExpirationTime)
+					} else {
+						return nil, ErrNotApproved
 					}
 
-					if err != nil {
-						return nil, err
-					}
+					otherPartyBalanceInfo, creatorBalanceInfo, err = ForcefulTransfer(ctx, badge, *CurrPendingTransfer.SubbadgeRange, otherPartyBalanceInfo, creatorBalanceInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.From, CurrPendingTransfer.To, CurrPendingTransfer.From, CurrPendingTransfer.ExpirationTime)
+				} else if acceptTransferRequestForcefully {
+					creatorBalanceInfo, otherPartyBalanceInfo, err = ForcefulTransfer(ctx, badge, *CurrPendingTransfer.SubbadgeRange, creatorBalanceInfo, otherPartyBalanceInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.From, CurrPendingTransfer.To, CreatorAccountNum, CurrPendingTransfer.ExpirationTime)
 				}
+
+				if err != nil {
+					return nil, err
+				}
+				
 
 				if needToRemoveAtLeastOneFromPending {
 					creatorBalanceInfo, err = RemovePending(ctx, creatorBalanceInfo, CurrPendingTransfer.ThisPendingNonce, otherPartyNonce)

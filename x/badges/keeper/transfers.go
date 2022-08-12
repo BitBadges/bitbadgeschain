@@ -31,21 +31,16 @@ func ForcefulTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types
 	// 2. Remove approvals if approvedBy != from
 	// 3. Deduct from "From" balance
 	// 4. Add to "To" balance
-
-	//TODO: Batch
-	for currSubbadgeId := subbadgeRange.Start; currSubbadgeId <= subbadgeRange.End; currSubbadgeId++ {
-		err := AssertAccountNotFrozen(ctx, badge, from)
-		if err != nil {
-			return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
-		}
-
-		fromUserBalanceInfo, err = DeductApprovals(ctx, fromUserBalanceInfo, badge, badge.Id, currSubbadgeId, from, to, approvedBy, amount)
-		if err != nil {
-			return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
-		}
+	err := AssertAccountNotFrozen(ctx, badge, from)
+	if err != nil {
+		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
 	}
 
-	err := *new(error)
+	fromUserBalanceInfo, err = DeductApprovals(ctx, fromUserBalanceInfo, badge, badge.Id, subbadgeRange, from, to, approvedBy, amount)
+	if err != nil {
+		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
+	}
+	
 	fromUserBalanceInfo, err = SubtractBalancesForIdRanges(ctx, fromUserBalanceInfo, []*types.IdRange{&subbadgeRange}, amount)
 	if err != nil {
 		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
@@ -61,25 +56,20 @@ func ForcefulTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types
 
 // Removes balances and approvals, and puts them in escrow. Adds a pending transfer to both parties' pending.
 func PendingTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.IdRange, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, amount uint64, from uint64, to uint64, approvedBy uint64, expirationTime uint64, cantCancelBeforeTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
-	err := *new(error)
 	// 1. Check if the from address is frozen
 	// 2. Remove approvals if approvedBy != from
 	// 3. Deduct from "From" balance
 	// 4. Append pending transfers to both parties
 	// 5. If the pending tranfer is eventually accepted, we simply add the balance. If it is removed, we revert the balance and approvals.
-	
-	//TODO: Batch
-	for currSubbadgeId := subbadgeRange.Start; currSubbadgeId <= subbadgeRange.End; currSubbadgeId++ {
-		err := AssertAccountNotFrozen(ctx, badge, from)
-		if err != nil {
-			return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
-		}
-
-		fromUserBalanceInfo, err = DeductApprovals(ctx, fromUserBalanceInfo, badge, badge.Id, currSubbadgeId, from, to, approvedBy, amount)
-		if err != nil {
-			return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
-		}
+	err := AssertAccountNotFrozen(ctx, badge, from)
+	if err != nil {
+		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
 	}
+
+	fromUserBalanceInfo, err = DeductApprovals(ctx, fromUserBalanceInfo, badge, badge.Id, subbadgeRange, from, to, approvedBy, amount)
+		if err != nil {
+			return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
+		}
 
 	fromUserBalanceInfo, err = SubtractBalancesForIdRanges(ctx, fromUserBalanceInfo, []*types.IdRange{&subbadgeRange}, amount)
 	if err != nil {
@@ -95,11 +85,11 @@ func PendingTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.
 }
 
 // Deduct approvals fromrequester if requester != from
-func DeductApprovals(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, badge types.BitBadge, badgeId uint64, subbadgeId uint64, from uint64, to uint64, requester uint64, amount uint64) (types.UserBalanceInfo, error) {
+func DeductApprovals(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, badge types.BitBadge, badgeId uint64, rangeToDeduct types.IdRange, from uint64, to uint64, requester uint64, amount uint64) (types.UserBalanceInfo, error) {
 	newUserBalanceInfo := userBalanceInfo
 
 	if from != requester {
-		postApprovalUserBalanceInfo, err := RemoveBalanceFromApproval(ctx, newUserBalanceInfo, amount, requester, types.IdRange{Start: subbadgeId, End: subbadgeId})
+		postApprovalUserBalanceInfo, err := RemoveBalanceFromApproval(ctx, newUserBalanceInfo, amount, requester, rangeToDeduct)
 		newUserBalanceInfo = postApprovalUserBalanceInfo
 		if err != nil {
 			return userBalanceInfo, err
