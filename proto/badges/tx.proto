@@ -61,6 +61,7 @@ message MsgTransferBadge {
     uint64 badgeId = 5;
     repeated IdRange subbadgeRanges = 6;
     uint64 expiration_time = 7;
+    uint64 cantCancelBeforeTime = 8;
 }
 
 
@@ -73,6 +74,7 @@ message MsgRequestTransferBadge {
     uint64 badgeId = 5;
     repeated IdRange subbadgeRanges = 6;
     uint64 expiration_time = 7;
+    uint64 cantCancelBeforeTime = 8;
 }
 
 message MsgRequestTransferBadgeResponse {}

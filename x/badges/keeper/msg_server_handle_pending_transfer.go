@@ -45,7 +45,6 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 	balanceInfoCache := make(map[uint64]types.UserBalanceInfo, 0)
 	didUpdateBalanceInfo := make(map[uint64]bool, 0)
 
-	updated := false
 	//TODO: In the future, we can make this a binary search since this is all sorted by the nonces (append-only)
 	for _, nonceRange := range msg.NonceRanges {
 		if nonceRange.End == 0 {
@@ -53,15 +52,21 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 		}
 		for idx, CurrPendingTransfer := range creatorBalanceInfo.Pending {
 			if CurrPendingTransfer.ThisPendingNonce <= nonceRange.End && CurrPendingTransfer.ThisPendingNonce >= nonceRange.Start {
-				updated = true
 
 				// Handle accepting after expiration time
+				expired := uint64(ctx.BlockTime().Unix()) > CurrPendingTransfer.ExpirationTime
 				if msg.Accept && CurrPendingTransfer.ExpirationTime != 0 {
-					expired := uint64(ctx.BlockTime().Unix()) > CurrPendingTransfer.ExpirationTime
 					if expired {
 						return nil, ErrPendingTransferExpired
 					}
+				} 
+				
+				pastCancelDeadline := true //if set to 0, it is cancellable at any time
+				if CurrPendingTransfer.CantCancelBeforeTime != 0 {
+					pastCancelDeadline = uint64(ctx.BlockTime().Unix()) > CurrPendingTransfer.CantCancelBeforeTime
 				}
+
+				
 
 				outgoingTransfer := CurrPendingTransfer.From == CreatorAccountNum
 
@@ -81,6 +86,10 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 				acceptTransferRequestForcefully := msg.ForcefulAccept && !CurrPendingTransfer.Sent && msg.Accept && outgoingTransfer
 				rejectTransferRequest := !CurrPendingTransfer.Sent && !msg.Accept
 				cancelOwnTransferRequest := CurrPendingTransfer.Sent && !msg.Accept && !outgoingTransfer
+
+				if !pastCancelDeadline && (cancelOwnOutgoingTransfer || cancelOwnTransferRequest) {
+					return nil, ErrCantCancelYet
+				}
 
 				//Other helper flags
 				onlyUpdatingCreatorBalance := rejectIncomingTransfer || rejectTransferRequest || acceptTransferRequestButMarkAsApproved
@@ -150,10 +159,6 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 				}
 			}
 		}
-	}
-
-	if !updated {
-		return nil, ErrNoPendingTransferFound
 	}
 
 	err = k.SetUserBalanceInStore(ctx, creatorBalanceKey, creatorBalanceInfo)

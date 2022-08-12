@@ -9,7 +9,7 @@ const TypeMsgRequestTransferBadge = "request_transfer_badge"
 
 var _ sdk.Msg = &MsgRequestTransferBadge{}
 
-func NewMsgRequestTransferBadge(creator string, from uint64, amount uint64, badgeId uint64, subbadgeRanges []*IdRange, expirationTime uint64) *MsgRequestTransferBadge {
+func NewMsgRequestTransferBadge(creator string, from uint64, amount uint64, badgeId uint64, subbadgeRanges []*IdRange, expirationTime uint64, cantCancelBeforeTime uint64) *MsgRequestTransferBadge {
 	return &MsgRequestTransferBadge{
 		Creator:        creator,
 		From:           from,
@@ -17,6 +17,7 @@ func NewMsgRequestTransferBadge(creator string, from uint64, amount uint64, badg
 		BadgeId:        badgeId,
 		SubbadgeRanges: subbadgeRanges,
 		ExpirationTime: expirationTime,
+		CantCancelBeforeTime: cantCancelBeforeTime,
 	}
 }
 
@@ -43,6 +44,10 @@ func (msg *MsgRequestTransferBadge) GetSignBytes() []byte {
 
 func (msg *MsgRequestTransferBadge) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
+
+	if msg.ExpirationTime != 0 && msg.CantCancelBeforeTime > msg.ExpirationTime {
+		return ErrCancelTimeIsGreaterThanExpirationTime
+	}
 
 	if msg.SubbadgeRanges == nil {
 		return ErrRangesIsNil

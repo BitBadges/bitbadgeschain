@@ -6,7 +6,7 @@ import (
 )
 
 // Handles a full transfer from one user to another. If it is to be a forceful transfer, it will transfer the balances and approvals. If it is a pending transfer, it will add it to the pending transfers.
-func HandleTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.IdRange, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, amount uint64, from uint64, to uint64, approvedBy uint64, expirationTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
+func HandleTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.IdRange, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, amount uint64, from uint64, to uint64, approvedBy uint64, expirationTime uint64, cantCancelBeforeTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
 	permissions := types.GetPermissions(badge.Permissions)
 	err := *new(error)
 	sendingToReservedAddress := false //TODO: implement this; Check if to Address is reserved; if so, we automatically forceful transfer
@@ -15,7 +15,7 @@ func HandleTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.I
 	if sendingToReservedAddress || permissions.ForcefulTransfers() || badge.Manager == to {
 		fromUserBalanceInfo, toUserBalanceInfo, err = ForcefulTransfer(ctx, badge, subbadgeRange, fromUserBalanceInfo, toUserBalanceInfo, amount, from, to, approvedBy, expirationTime)
 	} else {
-		fromUserBalanceInfo, toUserBalanceInfo, err = PendingTransfer(ctx, badge, subbadgeRange, fromUserBalanceInfo, toUserBalanceInfo, amount, from, to, approvedBy, expirationTime)
+		fromUserBalanceInfo, toUserBalanceInfo, err = PendingTransfer(ctx, badge, subbadgeRange, fromUserBalanceInfo, toUserBalanceInfo, amount, from, to, approvedBy, expirationTime, cantCancelBeforeTime)
 	}
 
 	if err != nil {
@@ -57,7 +57,7 @@ func ForcefulTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types
 }
 
 // Removes balances and approvals, and puts them in escrow. Adds a pending transfer to both parties' pending.
-func PendingTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.IdRange, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, amount uint64, from uint64, to uint64, approvedBy uint64, expirationTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
+func PendingTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.IdRange, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, amount uint64, from uint64, to uint64, approvedBy uint64, expirationTime uint64, cantCancelBeforeTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
 	err := *new(error)
 	// 1. Check if the from address is frozen
 	// 2. Remove approvals if approvedBy != from
@@ -81,7 +81,7 @@ func PendingTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.
 		}
 	}
 
-	fromUserBalanceInfo, toUserBalanceInfo, err = AppendPendingTransferForBothParties(ctx, fromUserBalanceInfo, toUserBalanceInfo, subbadgeRange, to, from, amount, approvedBy, true, expirationTime)
+	fromUserBalanceInfo, toUserBalanceInfo, err = AppendPendingTransferForBothParties(ctx, fromUserBalanceInfo, toUserBalanceInfo, subbadgeRange, to, from, amount, approvedBy, true, expirationTime, cantCancelBeforeTime)
 	if err != nil {
 		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
 	}

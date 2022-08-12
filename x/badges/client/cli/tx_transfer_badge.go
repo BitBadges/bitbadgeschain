@@ -16,9 +16,9 @@ var _ = strconv.Itoa(0)
 
 func CmdTransferBadge() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "transfer-badge [from] [to] [amount] [badge-id] [subbadge-id-start] [subbadge-id-end] [expiry-time]",
+		Use:   "transfer-badge [from] [to] [amount] [badge-id] [subbadge-id-start] [subbadge-id-end] [expiry-time] [cant-cancel-before-time]",
 		Short: "Broadcast message transferBadge",
-		Args:  cobra.ExactArgs(7),
+		Args:  cobra.ExactArgs(8),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argFrom, err := cast.ToUint64E(args[0])
 			if err != nil {
@@ -68,6 +68,11 @@ func CmdTransferBadge() *cobra.Command {
 				return err
 			}
 
+			argCantCancelBeforeTime, err := cast.ToUint64E(args[7])
+			if err != nil {
+				return err
+			}
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -86,6 +91,7 @@ func CmdTransferBadge() *cobra.Command {
 					},
 				},
 				argExpirationTime,
+				argCantCancelBeforeTime,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {

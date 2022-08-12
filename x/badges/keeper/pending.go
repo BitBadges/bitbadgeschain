@@ -6,10 +6,13 @@ import (
 )
 
 // Appends the pending transfer to both parties balance informations and increments the nonce. Since we append, they will alwyas be sorted by the nonce.
-func AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, subbadgeRange types.IdRange, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool, expirationTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
+func AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, subbadgeRange types.IdRange, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool, expirationTime uint64, cantCancelBeforeTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
 	if amount == 0 {
 		return fromUserBalanceInfo, toUserBalanceInfo, ErrBalanceIsZero
+	} else if expirationTime != 0 && cantCancelBeforeTime > expirationTime {
+		return fromUserBalanceInfo, toUserBalanceInfo, ErrCancelTimeIsGreaterThanExpirationTime
 	}
+
 
 	fromUserBalanceInfo.Pending = append(fromUserBalanceInfo.Pending, &types.PendingTransfer{
 		SubbadgeRange:     &subbadgeRange,
@@ -21,6 +24,7 @@ func AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo ty
 		ThisPendingNonce:  fromUserBalanceInfo.PendingNonce, // this / other nonces are swapped
 		OtherPendingNonce: toUserBalanceInfo.PendingNonce,
 		ExpirationTime:    expirationTime,
+		CantCancelBeforeTime: cantCancelBeforeTime,
 	})
 
 	toUserBalanceInfo.Pending = append(toUserBalanceInfo.Pending, &types.PendingTransfer{
@@ -33,6 +37,7 @@ func AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo ty
 		ThisPendingNonce:  toUserBalanceInfo.PendingNonce, // this / other nonces are swapped
 		OtherPendingNonce: fromUserBalanceInfo.PendingNonce,
 		ExpirationTime:    expirationTime,
+		CantCancelBeforeTime: cantCancelBeforeTime,
 	})
 	err := *new(error)
 	fromUserBalanceInfo.PendingNonce, err = SafeAdd(fromUserBalanceInfo.PendingNonce, 1)
@@ -84,14 +89,13 @@ func RemovePending(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, thisN
 func PruneExpiredPending(currTime uint64, accountNum uint64, pending []*types.PendingTransfer) []*types.PendingTransfer {
 	prunedPending := make([]*types.PendingTransfer, 0)
 	for _, pendingTransfer := range pending {
-		//TODO: prune expired pending transfers
-		// if pendingTransfer.ExpirationTime != 0 && pendingTransfer.ExpirationTime < currTime && !pendingTransfer.Sent {
-		// 	continue
-		// } else if pendingTransfer.ExpirationTime != 0 && pendingTransfer.ExpirationTime < currTime && pendingTransfer.Sent && pendingTransfer.From == accountNum {
-		// 	continue
-		// } else {
-		prunedPending = append(prunedPending, pendingTransfer)
-		// }
+		expired := pendingTransfer.ExpirationTime != 0 && pendingTransfer.ExpirationTime < currTime
+	
+		if expired && !pendingTransfer.Sent {
+			continue
+		} else {
+			prunedPending = append(prunedPending, pendingTransfer)
+		}
 	}
 	return prunedPending
 }

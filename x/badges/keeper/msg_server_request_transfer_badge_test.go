@@ -56,7 +56,7 @@ func (suite *TestSuite) TestRequestTransfer() {
 	suite.Require().Equal(uint64(0), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.PendingNonce)
 
-	err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 5000, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+	err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 5000, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 	suite.Require().Nil(err, "Error requesting transfer")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -144,7 +144,7 @@ func (suite *TestSuite) TestRequestTransferFrozen() {
 	suite.Require().Equal(uint64(0), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.PendingNonce)
 
-	err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 5000, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+	err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 5000, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 	suite.Require().Nil(err, "Error requesting transfer")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -229,7 +229,7 @@ func (suite *TestSuite) TestRequestTransferFrozenThenUnrozen() {
 	suite.Require().Equal(uint64(0), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.PendingNonce)
 
-	err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 5000, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+	err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 5000, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 	suite.Require().Nil(err, "Error requesting transfer")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
@@ -322,7 +322,7 @@ func (suite *TestSuite) TestRequestTransferToSelf() {
 	suite.Require().Equal(uint64(0), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.PendingNonce)
 
-	err = RequestTransferBadge(suite, wctx, bob, firstAccountNumCreated, 5000, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+	err = RequestTransferBadge(suite, wctx, bob, firstAccountNumCreated, 5000, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 	suite.Require().EqualError(err, keeper.ErrAccountCanNotEqualCreator.Error())
 }
 
@@ -376,7 +376,7 @@ func (suite *TestSuite) TestTryToAcceptTranferRequestBeforeMarkedAsApproved() {
 	suite.Require().Equal(uint64(0), bobBalanceInfo.PendingNonce)
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.PendingNonce)
 
-	err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 5000, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+	err = RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 5000, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 	suite.Require().Nil(err, "Error requesting transfer")
 
 	err = HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.IdRange{{Start: 0, End: 0}}, false)

@@ -9,7 +9,7 @@ const TypeMsgTransferBadge = "transfer_badge"
 
 var _ sdk.Msg = &MsgTransferBadge{}
 
-func NewMsgTransferBadge(creator string, from uint64, toAddresses []uint64, amounts []uint64, badgeId uint64, subbadgeRanges []*IdRange, expirationTime uint64) *MsgTransferBadge {
+func NewMsgTransferBadge(creator string, from uint64, toAddresses []uint64, amounts []uint64, badgeId uint64, subbadgeRanges []*IdRange, expirationTime uint64, cantCancelBeforeTime uint64) *MsgTransferBadge {
 	return &MsgTransferBadge{
 		Creator:        creator,
 		From:           from,
@@ -18,6 +18,7 @@ func NewMsgTransferBadge(creator string, from uint64, toAddresses []uint64, amou
 		BadgeId:        badgeId,
 		SubbadgeRanges: subbadgeRanges,
 		ExpirationTime: expirationTime,
+		CantCancelBeforeTime: cantCancelBeforeTime,
 	}
 }
 
@@ -50,6 +51,10 @@ func (msg *MsgTransferBadge) ValidateBasic() error {
 
 	if msg.SubbadgeRanges == nil {
 		return ErrRangesIsNil
+	}
+
+	if msg.ExpirationTime != 0 && msg.CantCancelBeforeTime > msg.ExpirationTime {
+		return ErrCancelTimeIsGreaterThanExpirationTime
 	}
 
 	for _, subbadgeRange := range msg.SubbadgeRanges {

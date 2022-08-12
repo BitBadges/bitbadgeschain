@@ -144,8 +144,8 @@ func CreateSubBadges(suite *TestSuite, ctx context.Context, creator string, badg
 	return err
 }
 
-func RequestTransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, amount uint64, badgeId uint64, subbadgeRange []*types.IdRange, expirationTime uint64) error {
-	msg := types.NewMsgRequestTransferBadge(creator, from, amount, badgeId, subbadgeRange, expirationTime)
+func RequestTransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, amount uint64, badgeId uint64, subbadgeRange []*types.IdRange, expirationTime uint64, cantCancelBeforeTime uint64) error {
+	msg := types.NewMsgRequestTransferBadge(creator, from, amount, badgeId, subbadgeRange, expirationTime, cantCancelBeforeTime)
 	_, err := suite.msgServer.RequestTransferBadge(ctx, msg)
 	return err
 }
@@ -156,8 +156,8 @@ func RevokeBadges(suite *TestSuite, ctx context.Context, creator string, address
 	return err
 }
 
-func TransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, to []uint64, amounts []uint64, badgeId uint64, subbadgeRange []*types.IdRange, expirationTime uint64) error {
-	msg := types.NewMsgTransferBadge(creator, from, to, amounts, badgeId, subbadgeRange, expirationTime)
+func TransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, to []uint64, amounts []uint64, badgeId uint64, subbadgeRange []*types.IdRange, expirationTime uint64, cantCancelBeforeTime uint64) error {
+	msg := types.NewMsgTransferBadge(creator, from, to, amounts, badgeId, subbadgeRange, expirationTime, cantCancelBeforeTime)
 	_, err := suite.msgServer.TransferBadge(ctx, msg)
 	return err
 }

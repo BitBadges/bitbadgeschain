@@ -149,7 +149,7 @@ func (suite *TestSuite) TestGasCosts() {
 			GetBadge(suite, wctx, 0)
 		}},
 		{F: func() {
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 			suite.Require().Nil(err, "Error transferring badge")
 		}},
 		{F: func() {
@@ -163,7 +163,7 @@ func (suite *TestSuite) TestGasCosts() {
 			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 		}},
 		{F: func() {
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 999}}, 0)
+			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)
 			suite.Require().Nil(err, "Error transferring badge")
 		}},
 		{F: func() {
@@ -177,7 +177,7 @@ func (suite *TestSuite) TestGasCosts() {
 			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 		}},
 		{F: func() {
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 			suite.Require().Nil(err, "Error transferring badge")
 		}},
 		{F: func() {
@@ -198,7 +198,7 @@ func (suite *TestSuite) TestGasCosts() {
 			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 		}},
 		{F: func() {
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 0, []*types.IdRange{{Start: 1000, End: 1999}}, 0)
+			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 0, []*types.IdRange{{Start: 1000, End: 1999}}, 0, 0)
 			suite.Require().Nil(err, "Error transferring badge")
 		}},
 		{F: func() {
@@ -218,7 +218,7 @@ func (suite *TestSuite) TestGasCosts() {
 			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 		}},
 		{F: func() {
-			err := RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+			err := RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 			suite.Require().Nil(err, "Error transferring badge")
 		}},
 		{F: func() {
@@ -232,7 +232,7 @@ func (suite *TestSuite) TestGasCosts() {
 			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 		}},
 		{F: func() {
-			err := RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, []*types.IdRange{{Start: 1000, End: 1999}}, 0)
+			err := RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, []*types.IdRange{{Start: 1000, End: 1999}}, 0, 0)
 			suite.Require().Nil(err, "Error transferring badge")
 		}},
 		{F: func() {
@@ -246,7 +246,7 @@ func (suite *TestSuite) TestGasCosts() {
 			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 		}},
 		{F: func() {
-			err := RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+			err := RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 			suite.Require().Nil(err, "Error transferring badge")
 		}},
 		{F: func() {
@@ -266,7 +266,7 @@ func (suite *TestSuite) TestGasCosts() {
 			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 		}},
 		{F: func() {
-			err := RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, []*types.IdRange{{Start: 0, End: 999}}, 0)
+			err := RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)
 			suite.Require().Nil(err, "Error transferring badge")
 		}},
 		{F: func() {
@@ -337,14 +337,14 @@ func (suite *TestSuite) TestGasCosts() {
 			suite.Require().Nil(err, "Error creating subbadge")
 		}},
 		{F: func() {
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 0}}, 0)
+			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 			suite.Require().Nil(err, "Error transferring badge")
 		}},
 		{F: func() {
 			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 		}},
 		{F: func() {
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 999}}, 0)
+			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)
 			suite.Require().Nil(err, "Error transferring badge")
 		}},
 		{F: func() {
@@ -352,7 +352,7 @@ func (suite *TestSuite) TestGasCosts() {
 		}},
 		{F: func() {
 
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, addresses, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 0}}, 0)
+			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, addresses, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 			suite.Require().Nil(err, "Error transferring badge")
 			suite.Require().Nil(err, "Error transferring badge")
 		}},
@@ -360,7 +360,7 @@ func (suite *TestSuite) TestGasCosts() {
 			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
 		}},
 		{F: func() {
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, addresses, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 999}}, 0)
+			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, addresses, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)
 			suite.Require().Nil(err, "Error transferring badge")
 			suite.Require().Nil(err, "Error transferring badge")
 		}},
@@ -369,7 +369,7 @@ func (suite *TestSuite) TestGasCosts() {
 		}},
 		{F: func() {
 			for i := uint64(0); i < 1000; i++ {
-				err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 1, []*types.IdRange{{Start: i * 2, End: i * 2}}, 0)
+				err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 1, []*types.IdRange{{Start: i * 2, End: i * 2}}, 0, 0)
 				suite.Require().Nil(err, "Error transferring badge")
 				suite.Require().Nil(err, "Error transferring badge")
 			}

@@ -33,4 +33,5 @@ message PendingTransfer {
     uint64 approvedBy = 9;
     bool markedAsAccepted = 10;
     uint64 expirationTime = 11;
+    uint64 cantCancelBeforeTime = 12;
 }
