@@ -1,4 +1,4 @@
-package types
+package types_test
 
 import (
 	"testing"
@@ -9,23 +9,36 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgPruneBalances_ValidateBasic(t *testing.T) {
+func TestMsgUpdateBytes_ValidateBasic(t *testing.T) {
+	var arr []byte
+	for i := 0; i <= 260; i++ {
+		arr = append(arr, byte(i))
+	}
+
 	tests := []struct {
 		name string
-		msg  types.MsgPruneBalances
+		msg  types.MsgUpdateBytes
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgPruneBalances{
+			msg: types.MsgUpdateBytes{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgPruneBalances{
+			msg: types.MsgUpdateBytes{
 				Creator: sample.AccAddress(),
 			},
+		},
+		{
+			name: "invalid bytes",
+			msg: types.MsgUpdateBytes{
+				Creator: sample.AccAddress(),
+				NewBytes: arr,
+			},
+			err: types.ErrBytesGreaterThan256,
 		},
 	}
 	for _, tt := range tests {

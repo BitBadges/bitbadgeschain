@@ -1,4 +1,4 @@
-package types
+package types_test
 
 import (
 	"testing"
@@ -70,11 +70,11 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgNewBadge{
 				Creator:             sample.AccAddress(),
 				Uri:         &types.UriObject{
-					Uri: 	[]byte(""),
+					Uri: 	[]byte("example.com/"),
 					Scheme: 0,
 					IdxRangeToRemove: &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					BytesToInsert: []byte{},
+					BytesToInsert: []byte("  "),
 					InsertIdIdx: 10,
 				},
 				Permissions:         15,

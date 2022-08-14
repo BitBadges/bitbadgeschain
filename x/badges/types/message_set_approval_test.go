@@ -1,4 +1,4 @@
-package types
+package types_test
 
 import (
 	"testing"
@@ -10,15 +10,15 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgRevokeBadge_ValidateBasic(t *testing.T) {
+func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgRevokeBadge
+		msg  types.MsgSetApproval
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgRevokeBadge{
+			msg: types.MsgSetApproval{
 				Creator: "invalid_address",
 				SubbadgeRanges: []*types.IdRange{
 					{
@@ -30,7 +30,7 @@ func TestMsgRevokeBadge_ValidateBasic(t *testing.T) {
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgRevokeBadge{
+			msg: types.MsgSetApproval{
 				Creator: sample.AccAddress(),
 				SubbadgeRanges: []*types.IdRange{
 					{
@@ -39,10 +39,9 @@ func TestMsgRevokeBadge_ValidateBasic(t *testing.T) {
 					},
 				},
 			},
-		},
-		{
+		}, {
 			name: "invalid subbadge range",
-			msg: types.MsgRevokeBadge{
+			msg: types.MsgSetApproval{
 				Creator: sample.AccAddress(),
 				SubbadgeRanges: []*types.IdRange{
 					{

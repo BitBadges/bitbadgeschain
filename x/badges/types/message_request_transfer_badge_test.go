@@ -1,4 +1,4 @@
-package types
+package types_test
 
 import (
 	"testing"
@@ -6,27 +6,52 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
-
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgRequestTransferManager_ValidateBasic(t *testing.T) {
+func TestMsgRequestTransferBadge_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgRequestTransferManager
+		msg  types.MsgRequestTransferBadge
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgRequestTransferManager{
+			msg: types.MsgRequestTransferBadge{
 				Creator: "invalid_address",
+				SubbadgeRanges: []*types.IdRange{
+					{
+						Start: 0,
+						End:   0,
+					},
+				},
+				Amount: 10,
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgRequestTransferManager{
+			msg: types.MsgRequestTransferBadge{
 				Creator: sample.AccAddress(),
+				SubbadgeRanges: []*types.IdRange{
+					{
+						Start: 0,
+						End:   0,
+					},
+				},
+				Amount: 10,
 			},
+		}, {
+			name: "invalid subbadge range",
+			msg: types.MsgRequestTransferBadge{
+				Creator: sample.AccAddress(),
+				SubbadgeRanges: []*types.IdRange{
+					{
+						Start: 10,
+						End:   1,
+					},
+				},
+			},
+			err: types.ErrStartGreaterThanEnd,
 		},
 	}
 	for _, tt := range tests {

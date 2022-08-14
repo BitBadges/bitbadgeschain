@@ -1,4 +1,4 @@
-package types
+package types_test
 
 import (
 	"testing"
@@ -10,21 +10,21 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgTransferManager_ValidateBasic(t *testing.T) {
+func TestMsgSelfDestructBadge_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgTransferManager
+		msg  types.MsgSelfDestructBadge
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgTransferManager{
+			msg: types.MsgSelfDestructBadge{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgTransferManager{
+			msg: types.MsgSelfDestructBadge{
 				Creator: sample.AccAddress(),
 			},
 		},

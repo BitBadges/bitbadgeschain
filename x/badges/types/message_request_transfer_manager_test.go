@@ -1,4 +1,4 @@
-package types
+package types_test
 
 import (
 	"testing"
@@ -10,47 +10,23 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgSetApproval_ValidateBasic(t *testing.T) {
+func TestMsgRequestTransferManager_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgSetApproval
+		msg  types.MsgRequestTransferManager
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgSetApproval{
+			msg: types.MsgRequestTransferManager{
 				Creator: "invalid_address",
-				SubbadgeRanges: []*types.IdRange{
-					{
-						Start: 0,
-						End:   0,
-					},
-				},
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgSetApproval{
+			msg: types.MsgRequestTransferManager{
 				Creator: sample.AccAddress(),
-				SubbadgeRanges: []*types.IdRange{
-					{
-						Start: 0,
-						End:   0,
-					},
-				},
 			},
-		}, {
-			name: "invalid subbadge range",
-			msg: types.MsgSetApproval{
-				Creator: sample.AccAddress(),
-				SubbadgeRanges: []*types.IdRange{
-					{
-						Start: 10,
-						End:   1,
-					},
-				},
-			},
-			err: types.ErrStartGreaterThanEnd,
 		},
 	}
 	for _, tt := range tests {

@@ -1,4 +1,4 @@
-package types
+package types_test
 
 import (
 	"testing"
@@ -6,25 +6,24 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
-
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgUpdatePermissions_ValidateBasic(t *testing.T) {
+func TestMsgPruneBalances_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgUpdatePermissions
+		msg  types.MsgPruneBalances
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgUpdatePermissions{
+			msg: types.MsgPruneBalances{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgUpdatePermissions{
+			msg: types.MsgPruneBalances{
 				Creator: sample.AccAddress(),
 			},
 		},

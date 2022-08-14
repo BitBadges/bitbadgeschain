@@ -1,4 +1,4 @@
-package types
+package types_test
 
 import (
 	"testing"
@@ -6,39 +6,52 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
+
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgUpdateBytes_ValidateBasic(t *testing.T) {
-	var arr []byte
-	for i := 0; i <= 260; i++ {
-		arr = append(arr, byte(i))
-	}
-
+func TestMsgRevokeBadge_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgUpdateBytes
+		msg  types.MsgRevokeBadge
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgUpdateBytes{
+			msg: types.MsgRevokeBadge{
 				Creator: "invalid_address",
+				SubbadgeRanges: []*types.IdRange{
+					{
+						Start: 0,
+						End:   0,
+					},
+				},
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgUpdateBytes{
+			msg: types.MsgRevokeBadge{
 				Creator: sample.AccAddress(),
+				SubbadgeRanges: []*types.IdRange{
+					{
+						Start: 0,
+						End:   0,
+					},
+				},
 			},
 		},
 		{
-			name: "invalid bytes",
-			msg: types.MsgUpdateBytes{
+			name: "invalid subbadge range",
+			msg: types.MsgRevokeBadge{
 				Creator: sample.AccAddress(),
-				NewBytes: arr,
+				SubbadgeRanges: []*types.IdRange{
+					{
+						Start: 10,
+						End:   1,
+					},
+				},
 			},
-			err: types.ErrBytesGreaterThan256,
+			err: types.ErrStartGreaterThanEnd,
 		},
 	}
 	for _, tt := range tests {
