@@ -22,10 +22,11 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+//A URI object defines a uri and subasset uri for a badge and its subbadges. Designed to save storage and avoid reused text and common patterns.
 type UriObject struct {
 	Scheme uint64 `protobuf:"varint,1,opt,name=scheme,proto3" json:"scheme,omitempty"`
-	//We can add more URI backwards compatible space savers in the future here like .com or .io
-	Uri                    []byte   `protobuf:"bytes,2,opt,name=uri,proto3" json:"uri,omitempty"`
+	Uri    []byte `protobuf:"bytes,2,opt,name=uri,proto3" json:"uri,omitempty"`
+	//The four fields below are used to convert the uri from above to the subasset URI.
 	IdxRangeToRemove       *IdRange `protobuf:"bytes,4,opt,name=idxRangeToRemove,proto3" json:"idxRangeToRemove,omitempty"`
 	InsertSubassetBytesIdx uint64   `protobuf:"varint,5,opt,name=insertSubassetBytesIdx,proto3" json:"insertSubassetBytesIdx,omitempty"`
 	BytesToInsert          []byte   `protobuf:"bytes,6,opt,name=bytesToInsert,proto3" json:"bytesToInsert,omitempty"`

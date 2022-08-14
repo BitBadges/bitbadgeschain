@@ -28,36 +28,26 @@ type BitBadge struct {
 	// id defines the unique identifier of the Badge classification, similar to the contract address of ERC721
 	// starts at 0 and increments by 1 each badge
 	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	// uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc)
+	// uri object for the badge uri and subasset uris stored off chain. Stored in a special UriObject that attemtps to save space and avoid reused plaintext storage such as http:// and duplicate text for uri and subasset uris
+	// data returned should corresponds to the Badge standard defined.
 	Uri *UriObject `protobuf:"bytes,2,opt,name=uri,proto3" json:"uri,omitempty"`
 	// these bytes can be used to store anything on-chain about the badge. This can be updatable or not depending on the permissions set.
 	// Max 256 bytes allowed
 	ArbitraryBytes []byte `protobuf:"bytes,3,opt,name=arbitraryBytes,proto3" json:"arbitraryBytes,omitempty"`
 	// manager address of the class; can have special permissions; is used as the reserve address for the assets
 	Manager uint64 `protobuf:"varint,4,opt,name=manager,proto3" json:"manager,omitempty"`
-	//
-	//Flag bits are in the following order from left to right; leading zeroes are applied and any future additions will be appended to the right
-	//
-	//can_manager_transfer: can the manager transfer managerial privileges to another address
-	//can_update_uris: can the manager update the uris of the class and subassets; if false, locked forever
-	//forceful_transfers: if true, one can send a badge to an account without pending approval; these badges should not by default be displayed on public profiles (can also use collections)
-	//can_create: when true, manager can create more subassets of the class; once set to false, it is locked
-	//can_revoke: when true, manager can revoke subassets of the class (including null address); once set to false, it is locked
-	//can_freeze: when true, manager can freeze addresseses from transferring; once set to false, it is locked
-	//frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
-	//manager is not frozen by default
-	//
-	//More permissions to be added
+	//Store permissions packed in a uint where the bits correspond to permissions from left to right; leading zeroes are applied and any future additions will be appended to the right. See types/permissions.go
 	Permissions uint64 `protobuf:"varint,5,opt,name=permissions,proto3" json:"permissions,omitempty"`
-	// if frozen_by_default is true, this is an accumulator of unfrozen addresses; and vice versa for false
-	//big.Int will always only be 32 uint64s long
+	//FreezeRanges defines what addresses are frozen or unfrozen. If permissions.FrozenByDefault is false, this is used for frozen addresses. If true, this is used for unfrozen addresses.
 	FreezeRanges []*IdRange `protobuf:"bytes,10,rep,name=freezeRanges,proto3" json:"freezeRanges,omitempty"`
-	// starts at 0; each subasset created will incrementally have an increasing ID #
+	// Starts at 0. Each subasset created will incrementally have an increasing ID #. Can't overflow.
 	NextSubassetId uint64 `protobuf:"varint,12,opt,name=nextSubassetId,proto3" json:"nextSubassetId,omitempty"`
-	//only store if not == default; will be sorted in order of subsasset ids; (maybe add defaut option in future)
-	SubassetSupplys       []*BalanceObject `protobuf:"bytes,13,rep,name=subassetSupplys,proto3" json:"subassetSupplys,omitempty"`
-	DefaultSubassetSupply uint64           `protobuf:"varint,14,opt,name=defaultSubassetSupply,proto3" json:"defaultSubassetSupply,omitempty"`
-	Standard              uint64           `protobuf:"varint,15,opt,name=standard,proto3" json:"standard,omitempty"`
+	//Subasset supplys are stored if the subasset supply != default. Balance => SubbadgeIdRange map
+	SubassetSupplys []*BalanceObject `protobuf:"bytes,13,rep,name=subassetSupplys,proto3" json:"subassetSupplys,omitempty"`
+	//Default subasset supply. If == 0, we assume default == 1.
+	DefaultSubassetSupply uint64 `protobuf:"varint,14,opt,name=defaultSubassetSupply,proto3" json:"defaultSubassetSupply,omitempty"`
+	//Defines what standard this badge should implement. Must obey the rules of that standard.
+	Standard uint64 `protobuf:"varint,15,opt,name=standard,proto3" json:"standard,omitempty"`
 }
 
 func (m *BitBadge) Reset()         { *m = BitBadge{} }

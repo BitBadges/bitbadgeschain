@@ -22,6 +22,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+//Id ranges define a range of IDs from start to end. Can be used for subbadgeIds, nonces, addresses anything. If end == 0, we assume end == start. Start must be >= end.
 type IdRange struct {
 	Start uint64 `protobuf:"varint,1,opt,name=start,proto3" json:"start,omitempty"`
 	End   uint64 `protobuf:"varint,2,opt,name=end,proto3" json:"end,omitempty"`
@@ -74,6 +75,7 @@ func (m *IdRange) GetEnd() uint64 {
 	return 0
 }
 
+//Defines a balance object. The specified balance holds for all ids specified within the id ranges array.
 type BalanceObject struct {
 	Balance  uint64     `protobuf:"varint,1,opt,name=balance,proto3" json:"balance,omitempty"`
 	IdRanges []*IdRange `protobuf:"bytes,2,rep,name=id_ranges,json=idRanges,proto3" json:"id_ranges,omitempty"`
