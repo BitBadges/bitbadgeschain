@@ -2,7 +2,6 @@ package cli
 
 import (
 	"strconv"
-	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -16,7 +15,7 @@ var _ = strconv.Itoa(0)
 
 func CmdNewBadge() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "new-badge [uri] [permissions] [subasset-uris] [bytes-string] [default-supply] [subasset-supplys] [subasset-amounts] [freeze-start] [freeze-end] [standard]",
+		Use:   "new-badge [uri] [permissions] [subasset-uris] [bytes-string] [default-supply] [subasset-supplys] [subasset-amounts] [freeze-starts] [freeze-ends] [standard]",
 		Short: "Broadcast message newBadge",
 		Args:  cobra.ExactArgs(10),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -40,36 +39,17 @@ func CmdNewBadge() *cobra.Command {
 				return err
 			}
 
-			argSupplysStringArr := strings.Split(args[5], ",")
-
-			argSupplysUInt64 := []uint64{}
-			for _, supply := range argSupplysStringArr {
-				println(supply)
-				supplyAsUint64, err := cast.ToUint64E(supply)
-				if err != nil {
-					return err
-				}
-
-				argSupplysUInt64 = append(argSupplysUInt64, supplyAsUint64)
-			}
-
-			argAmountsStringArr := strings.Split(args[6], ",")
-
-			argAmountsUInt64 := []uint64{}
-			for _, amount := range argAmountsStringArr {
-				amountAsUint64, err := cast.ToUint64E(amount)
-				if err != nil {
-					return err
-				}
-
-				argAmountsUInt64 = append(argAmountsUInt64, amountAsUint64)
-			}
-
-			argStartAddress, err := cast.ToUint64E(args[7])
+			argSupplysUInt64, err := GetIdArrFromString(args[5])
 			if err != nil {
 				return err
 			}
-			argEndAddress, err := cast.ToUint64E(args[8])
+
+			argAmountsUInt64, err := GetIdArrFromString(args[6])
+			if err != nil {
+				return err
+			}
+
+			freezeRanges, err := GetIdRanges(args[7], args[8])
 			if err != nil {
 				return err
 			}
@@ -79,25 +59,20 @@ func CmdNewBadge() *cobra.Command {
 				return err
 			}
 
-			//TODO: parse differences between uris and subasseturis
-
+			uriObject, err := GetUriObject(argUri, argSubassetUris)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgNewBadge(
 				clientCtx.GetFromAddress().String(),
-				types.UriObject{
-					Uri: []byte(argUri),
-				},
+				uriObject,
 				permissions,
 				argBytesStr,
 				defaultSupply,
 				argAmountsUInt64,
 				argSupplysUInt64,
-				[]*types.IdRange{
-					{
-						Start: argStartAddress,
-						End:   argEndAddress,
-					},
-				},
+				freezeRanges,
 				argStandard,
 			)
 			if err := msg.ValidateBasic(); err != nil {

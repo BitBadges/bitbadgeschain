@@ -2,7 +2,6 @@ package cli
 
 import (
 	"strconv"
-	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -25,40 +24,22 @@ func CmdTransferBadge() *cobra.Command {
 				return err
 			}
 
-			argToAddresses := strings.Split(args[1], ",")
-
-			argToAddressesUint64 := []uint64{}
-			for _, toAddress := range argToAddresses {
-				addressAsUint64, err := cast.ToUint64E(toAddress)
-				if err != nil {
-					return err
-				}
-
-				argToAddressesUint64 = append(argToAddressesUint64, addressAsUint64)
+			argToAddressesUint64, err := GetIdArrFromString(args[1])
+			if err != nil {
+				return err
 			}
 
-			argAmounts := strings.Split(args[2], ",")
-
-			argAmountsUint64 := []uint64{}
-			for _, amount := range argAmounts {
-				amountAsUint64, err := cast.ToUint64E(amount)
-				if err != nil {
-					return err
-				}
-
-				argAmountsUint64 = append(argAmountsUint64, amountAsUint64)
+			argAmountsUint64, err := GetIdArrFromString(args[2])
+			if err != nil {
+				return err
 			}
 
 			argBadgeId, err := cast.ToUint64E(args[3])
 			if err != nil {
 				return err
 			}
-			argSubbadgeIdStart, err := cast.ToUint64E(args[4])
-			if err != nil {
-				return err
-			}
 
-			argSubbadgeIdEnd, err := cast.ToUint64E(args[5])
+			argSubbadgeRanges, err := GetIdRanges(args[4], args[5])
 			if err != nil {
 				return err
 			}
@@ -84,12 +65,7 @@ func CmdTransferBadge() *cobra.Command {
 				argToAddressesUint64,
 				argAmountsUint64,
 				argBadgeId,
-				[]*types.IdRange{
-					{
-						Start: argSubbadgeIdStart,
-						End:   argSubbadgeIdEnd,
-					},
-				},
+				argSubbadgeRanges,
 				argExpirationTime,
 				argCantCancelBeforeTime,
 			)

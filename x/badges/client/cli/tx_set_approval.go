@@ -31,12 +31,7 @@ func CmdSetApproval() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			argSubbadgeIdStart, err := cast.ToUint64E(args[3])
-			if err != nil {
-				return err
-			}
-
-			argSubbadgeIdEnd, err := cast.ToUint64E(args[4])
+			argSubbadgeRanges, err := GetIdRanges(args[3], args[4])
 			if err != nil {
 				return err
 			}
@@ -56,12 +51,7 @@ func CmdSetApproval() *cobra.Command {
 				argAmount,
 				argAddress,
 				argBadgeId,
-				[]*types.IdRange{
-					{
-						Start: argSubbadgeIdStart,
-						End:   argSubbadgeIdEnd,
-					},
-				},
+				argSubbadgeRanges,
 				argExpirationTime,
 			)
 			if err := msg.ValidateBasic(); err != nil {

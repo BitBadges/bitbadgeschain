@@ -2,7 +2,6 @@ package cli
 
 import (
 	"strconv"
-	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -25,29 +24,14 @@ func CmdNewSubBadge() *cobra.Command {
 				return err
 			}
 
-			argSupplysStringArr := strings.Split(args[1], ",")
-
-			argSupplysUInt64 := []uint64{}
-			for _, supply := range argSupplysStringArr {
-				println(supply)
-				supplyAsUint64, err := cast.ToUint64E(supply)
-				if err != nil {
-					return err
-				}
-
-				argSupplysUInt64 = append(argSupplysUInt64, supplyAsUint64)
+			argSupplysUint64, err := GetIdArrFromString(args[1])
+			if err != nil {
+				return err
 			}
 
-			argAmountsStringArr := strings.Split(args[2], ",")
-
-			argAmountsUInt64 := []uint64{}
-			for _, amount := range argAmountsStringArr {
-				amountAsUint64, err := cast.ToUint64E(amount)
-				if err != nil {
-					return err
-				}
-
-				argAmountsUInt64 = append(argAmountsUInt64, amountAsUint64)
+			argAmountsUint64, err := GetIdArrFromString(args[2])
+			if err != nil {
+				return err
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -58,8 +42,8 @@ func CmdNewSubBadge() *cobra.Command {
 			msg := types.NewMsgNewSubBadge(
 				clientCtx.GetFromAddress().String(),
 				argId,
-				argSupplysUInt64,
-				argAmountsUInt64,
+				argSupplysUint64,
+				argAmountsUint64,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {

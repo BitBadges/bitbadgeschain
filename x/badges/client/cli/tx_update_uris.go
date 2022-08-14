@@ -33,14 +33,15 @@ func CmdUpdateUris() *cobra.Command {
 				return err
 			}
 
-			//TODO: parse differences between uris and subasset uris
+			uriObject, err := GetUriObject(argUri, argSubassetUri)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgUpdateUris(
 				clientCtx.GetFromAddress().String(),
 				argBadgeId,
-				types.UriObject{
-					Uri:      []byte(argUri),
-				},
+				uriObject,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

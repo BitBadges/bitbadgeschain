@@ -15,15 +15,14 @@ var _ = strconv.Itoa(0)
 
 func CmdFreezeAddress() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "freeze-address [start-address] [end-address] [badge-id] [add]",
+		Use:   "freeze-address [start-addresses] [end-addresses] [badge-id] [add]",
 		Short: "Broadcast message freezeAddress",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argStartAddress, err := cast.ToUint64E(args[0])
-			if err != nil {
-				return err
-			}
-			argEndAddress, err := cast.ToUint64E(args[1])
+			argStartAddresses := args[0]
+			argEndAddresses := args[1]
+
+			addressRanges, err := GetIdRanges(argStartAddresses, argEndAddresses)
 			if err != nil {
 				return err
 			}
@@ -45,12 +44,7 @@ func CmdFreezeAddress() *cobra.Command {
 
 			msg := types.NewMsgFreezeAddress(
 				clientCtx.GetFromAddress().String(),
-				[]*types.IdRange{
-					{
-						Start: argStartAddress,
-						End:   argEndAddress,
-					},
-				},
+				addressRanges,
 				argBadgeId,
 				argAdd,
 			)
