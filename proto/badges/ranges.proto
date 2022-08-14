@@ -5,11 +5,13 @@ package trevormil.bitbadgeschain.badges;
 
 option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
 
+//Id ranges define a range of IDs from start to end. Can be used for subbadgeIds, nonces, addresses anything. If end == 0, we assume end == start. Start must be >= end.
 message IdRange {
     uint64 start = 1;
-    uint64 end = 2; // If end == 0, we assume end == start. This can be done to save space since 0 is omitted if empty.
+    uint64 end = 2;
 }
 
+//Defines a balance object. The specified balance holds for all ids specified within the id ranges array.
 message BalanceObject {
     uint64 balance = 1;
     repeated IdRange id_ranges = 2;
