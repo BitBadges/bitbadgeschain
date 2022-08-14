@@ -59,7 +59,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 					},
 				},
 			},
-			err: types.ErrSenderAndReceiverSame,
+			err: types.ErrElementCantEqualThis,
 		}, {
 			name: "invalid amounts",
 			msg: types.MsgTransferBadge{
@@ -74,7 +74,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 					},
 				},
 			},
-			err: types.ErrAmountEqualsZero,
+			err: types.ErrElementCantEqualThis,
 		},
 		{
 			name: "invalid subbadge range",
@@ -86,7 +86,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 				SubbadgeRanges: []*types.IdRange{
 					{
 						Start: 10,
-						End:   0,
+						End:   1,
 					},
 				},
 			},

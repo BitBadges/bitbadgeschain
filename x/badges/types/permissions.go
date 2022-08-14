@@ -7,30 +7,41 @@ const (
 /*
 	Flag bits are in the following order from left to right; leading zeroes are applied and any future additions will be appended to the right
 
-	can_manager_transfer: can the manager transfer the managerial ownership of the badge to another account
-	can_update_uris: can the manager update the uris of the class and subassets; if false, locked forever
-	forceful_transfers: if true, one can send a badge to an account without pending approval; these badges should not by default be displayed on public profiles (can also use collections)
-	can_create: when true, manager can create more subassets of the class; once set to false, it is locked
-	can_revoke: when true, manager can revoke subassets of the class (including null address); once set to false, it is locked
-	can_freeze: when true, manager can freeze addresseses from transferring; once set to false, it is locked
-	frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
+	CanUpdateBytes: can the manager update the bytes of the badge; if false, locked forever
+	CanManagerTransfer: can the manager transfer the managerial ownership of the badge to another account
+	CanUpdateUris: can the manager update the uris of the class and subassets; if false, locked forever
+	ForcefulTransfers: if true, one can send a badge to an account without pending approval; these badges should not by default be displayed on public profiles (can also use collections)
+	CanCreate: when true, manager can create more subassets of the class; once set to false, it is locked
+	CanRevoke: when true, manager can revoke subassets of the class (including null address); once set to false, it is locked
+	CanFreeze: when true, manager can freeze addresseses from transferring; once set to false, it is locked
+	FrozenByDefault: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
 */
-//TODO: Add test cases for these permissions
+
 type Permissions struct {
-	can_update_bytes     bool
-	can_manager_transfer bool
-	can_update_uris      bool
-	forceful_transfers   bool
-	can_create           bool
-	can_revoke           bool
-	can_freeze           bool
-	frozen_by_default    bool
+	CanUpdateBytes     bool
+	CanManagerTransfer bool
+	CanUpdateUris      bool
+	ForcefulTransfers   bool
+	CanCreate           bool
+	CanRevoke           bool
+	CanFreeze           bool
+	FrozenByDefault    bool
 }
 
-//Check leading zeroes
+const (
+	CanUpdateBytesDigit = 8
+	CanManagerTransferDigit = 7
+	CanUpdateUrisDigit = 6
+	ForcefulTransfersDigit = 5
+	CanCreateDigit = 4
+	CanRevokeDigit = 3
+	CanFreezeDigit = 2
+	FrozenByDefaultDigit = 1
+)
+
+//Validate permissions are validly formed., Disallows leading zeroes.
 func ValidatePermissions(permissions uint64) error {
-	tempPermissions := permissions
-	tempPermissions = tempPermissions >> NumPermissions
+	tempPermissions := permissions >> NumPermissions
 
 	if tempPermissions != 0 {
 		return ErrInvalidPermissionsLeadingZeroes
@@ -39,6 +50,7 @@ func ValidatePermissions(permissions uint64) error {
 	return nil
 }
 
+// Validate that the new permissions are valid and is not changing anything that they can't.
 func ValidatePermissionsUpdate(oldPermissions uint64, newPermissions uint64) error {
 	if err := ValidatePermissions(newPermissions); err != nil {
 		return err
@@ -51,36 +63,42 @@ func ValidatePermissionsUpdate(oldPermissions uint64, newPermissions uint64) err
 	oldFlags := GetPermissions(oldPermissions)
 	newFlags := GetPermissions(newPermissions)
 
-	if !oldFlags.can_update_uris && newFlags.can_update_uris {
+	if !oldFlags.CanUpdateUris && newFlags.CanUpdateUris {
 		return ErrInvalidPermissionsUpdateLocked
 	}
 
-	if !oldFlags.can_create && newFlags.can_create {
+	if !oldFlags.CanUpdateBytes && newFlags.CanUpdateBytes {
 		return ErrInvalidPermissionsUpdateLocked
 	}
 
-	if !oldFlags.can_freeze && newFlags.can_freeze {
+	if !oldFlags.CanCreate && newFlags.CanCreate {
 		return ErrInvalidPermissionsUpdateLocked
 	}
 
-	if !oldFlags.can_revoke && newFlags.can_revoke {
+	if !oldFlags.CanFreeze && newFlags.CanFreeze {
 		return ErrInvalidPermissionsUpdateLocked
 	}
 
-	if !oldFlags.can_manager_transfer && newFlags.can_manager_transfer {
+	if !oldFlags.CanRevoke && newFlags.CanRevoke {
 		return ErrInvalidPermissionsUpdateLocked
 	}
 
-	if oldFlags.forceful_transfers != newFlags.forceful_transfers {
+	if !oldFlags.CanManagerTransfer && newFlags.CanManagerTransfer {
+		return ErrInvalidPermissionsUpdateLocked
+	}
+
+	if oldFlags.ForcefulTransfers != newFlags.ForcefulTransfers {
 		return ErrInvalidPermissionsUpdatePermanent
 	}
-	if oldFlags.frozen_by_default != newFlags.frozen_by_default {
+
+	if oldFlags.FrozenByDefault != newFlags.FrozenByDefault {
 		return ErrInvalidPermissionsUpdateLocked
 	}
 
 	return nil
 }
 
+// Get permissions from permissions number
 func GetPermissions(permissions uint64) Permissions {
 	var flags Permissions = Permissions{}
 	for i := 0; i <= NumPermissions; i++ {
@@ -95,53 +113,23 @@ func GetPermissions(permissions uint64) Permissions {
 	return flags
 }
 
-func (p *Permissions) CanManagerTransfer() bool {
-	return p.can_manager_transfer
-}
-
-func (p *Permissions) CanUpdateUris() bool {
-	return p.can_update_uris
-}
-
-func (p *Permissions) ForcefulTransfers() bool {
-	return p.forceful_transfers
-}
-
-func (p *Permissions) CanCreateSubbadges() bool {
-	return p.can_create
-}
-
-func (p *Permissions) CanRevoke() bool {
-	return p.can_revoke
-}
-
-func (p *Permissions) CanFreeze() bool {
-	return p.can_freeze
-}
-func (p *Permissions) FrozenByDefault() bool {
-	return p.frozen_by_default
-}
-
-func (p *Permissions) CanUpdateBytes() bool {
-	return p.can_update_bytes
-}
-
-func SetPermissionsFlags(permission bool, digit_index int, flags *Permissions) {
-	if digit_index == 8 {
-		flags.can_update_bytes = permission
-	} else if digit_index == 7 {
-		flags.can_manager_transfer = permission
-	} else if digit_index == 6 {
-		flags.can_update_uris = permission
-	} else if digit_index == 5 {
-		flags.forceful_transfers = permission
-	} else if digit_index == 4 {
-		flags.can_create = permission
-	} else if digit_index == 3 {
-		flags.can_revoke = permission
-	} else if digit_index == 2 {
-		flags.can_freeze = permission
-	} else if digit_index == 1 {
-		flags.frozen_by_default = permission
+//Sets the permission flags for a digit.
+func SetPermissionsFlags(permission bool, digit int, flags *Permissions) {
+	if digit == CanUpdateBytesDigit {
+		flags.CanUpdateBytes = permission
+	} else if digit == CanManagerTransferDigit {
+		flags.CanManagerTransfer = permission
+	} else if digit == CanUpdateUrisDigit {
+		flags.CanUpdateUris = permission
+	} else if digit == ForcefulTransfersDigit {
+		flags.ForcefulTransfers = permission
+	} else if digit == CanCreateDigit {
+		flags.CanCreate = permission
+	} else if digit == CanRevokeDigit {
+		flags.CanRevoke = permission
+	} else if digit == CanFreezeDigit {
+		flags.CanFreeze = permission
+	} else if digit == FrozenByDefaultDigit {
+		flags.FrozenByDefault = permission
 	}
 }

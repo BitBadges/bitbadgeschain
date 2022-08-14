@@ -22,7 +22,7 @@ func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgR
 	//Redundant because this is locked so we shouldn't store anything
 	if msg.Add {
 		permissions := types.GetPermissions(badge.Permissions)
-		if !permissions.CanManagerTransfer() {
+		if !permissions.CanManagerTransfer {
 			return nil, ErrInvalidPermissions
 		}
 

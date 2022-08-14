@@ -45,14 +45,9 @@ func (msg *MsgFreezeAddress) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.AddressRanges == nil {
-		return ErrRangesIsNil
-	}
-
-	for _, subbadgeRange := range msg.AddressRanges {
-		if subbadgeRange == nil || subbadgeRange.Start > subbadgeRange.End {
-			return ErrStartGreaterThanEnd
-		}
+	err = ValidateRangesAreValid(msg.AddressRanges)
+	if err != nil {
+		return err
 	}
 	return nil
 }

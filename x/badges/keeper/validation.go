@@ -44,27 +44,27 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationPar
 	}
 
 	permissions := types.GetPermissions(badge.Permissions)
-	if params.CanFreeze && !permissions.CanFreeze() {
+	if params.CanFreeze && !permissions.CanFreeze {
 		return CreatorAccountNum, types.BitBadge{}, ErrInvalidPermissions
 	}
 
-	if params.CanCreateSubbadges && !permissions.CanCreateSubbadges() {
+	if params.CanCreateSubbadges && !permissions.CanCreate {
 		return CreatorAccountNum, types.BitBadge{}, ErrInvalidPermissions
 	}
 
-	if params.CanRevoke && !permissions.CanRevoke() {
+	if params.CanRevoke && !permissions.CanRevoke {
 		return CreatorAccountNum, types.BitBadge{}, ErrInvalidPermissions
 	}
 
-	if params.CanManagerTransfer && !permissions.CanManagerTransfer() {
+	if params.CanManagerTransfer && !permissions.CanManagerTransfer {
 		return CreatorAccountNum, types.BitBadge{}, ErrInvalidPermissions
 	}
 
-	if params.CanUpdateUris && !permissions.CanUpdateUris() {
+	if params.CanUpdateUris && !permissions.CanUpdateUris {
 		return CreatorAccountNum, types.BitBadge{}, ErrInvalidPermissions
 	}
 
-	if params.CanUpdateBytes && !permissions.CanUpdateBytes() {
+	if params.CanUpdateBytes && !permissions.CanUpdateBytes {
 		return CreatorAccountNum, types.BitBadge{}, ErrInvalidPermissions
 	}
 

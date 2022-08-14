@@ -49,10 +49,15 @@ func (msg *MsgNewSubBadge) ValidateBasic() error {
 		return ErrInvalidSupplyAndAmounts
 	}
 
-	for i, _ := range msg.Supplys {
-		if msg.AmountsToCreate[i] == 0 {
-			return ErrAmountEqualsZero
-		}
+	err = ValidateNoElementIsX(msg.Supplys, 0)
+	if err != nil {
+		return err
 	}
+
+	err = ValidateNoElementIsX(msg.AmountsToCreate, 0)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

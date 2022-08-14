@@ -47,7 +47,7 @@ func TestMsgRevokeBadge_ValidateBasic(t *testing.T) {
 				SubbadgeRanges: []*types.IdRange{
 					{
 						Start: 10,
-						End:   0,
+						End:   1,
 					},
 				},
 			},

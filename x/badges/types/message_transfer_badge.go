@@ -57,27 +57,28 @@ func (msg *MsgTransferBadge) ValidateBasic() error {
 		return ErrCancelTimeIsGreaterThanExpirationTime
 	}
 
-	for _, subbadgeRange := range msg.SubbadgeRanges {
-		if subbadgeRange == nil || subbadgeRange.Start > subbadgeRange.End {
-			return ErrStartGreaterThanEnd
-		}
+	err = ValidateRangesAreValid(msg.SubbadgeRanges)
+	if err != nil {
+		return err
 	}
 
 	if duplicateInArray(msg.ToAddresses) {
 		return ErrDuplicateAddresses
 	}
 
-	for _, toAddress := range msg.ToAddresses {
-		//Can't send to same address
-		if toAddress == msg.From {
-			return ErrSenderAndReceiverSame
-		}
+	if duplicateInArray(msg.Amounts) {
+		return ErrDuplicateAmounts
 	}
 
-	for _, amount := range msg.Amounts {
-		if amount == uint64(0) {
-			return ErrAmountEqualsZero
-		}
+	err = ValidateNoElementIsX(msg.ToAddresses, msg.From)
+	if err != nil {
+		return err
 	}
+
+	err = ValidateNoElementIsX(msg.Amounts, 0)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -44,27 +44,22 @@ func (msg *MsgRequestTransferBadge) GetSignBytes() []byte {
 
 func (msg *MsgRequestTransferBadge) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
 
 	if msg.ExpirationTime != 0 && msg.CantCancelBeforeTime > msg.ExpirationTime {
 		return ErrCancelTimeIsGreaterThanExpirationTime
 	}
 
-	if msg.SubbadgeRanges == nil {
-		return ErrRangesIsNil
-	}
-
-	for _, subbadgeRange := range msg.SubbadgeRanges {
-		if subbadgeRange == nil || subbadgeRange.Start > subbadgeRange.End {
-			return ErrStartGreaterThanEnd
-		}
+	err = ValidateRangesAreValid(msg.SubbadgeRanges)
+	if err != nil {
+		return err
 	}
 
 	if msg.Amount == 0 {
 		return ErrAmountEqualsZero
 	}
 
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
 	return nil
 }

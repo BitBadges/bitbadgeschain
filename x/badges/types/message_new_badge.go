@@ -50,11 +50,9 @@ func (msg *MsgNewBadge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	//Validate well-formedness of the message entries
 	if err := ValidateURI(*msg.Uri); err != nil {
 		return err
 	}
-
 
 	if err := ValidatePermissions(msg.Permissions); err != nil {
 		return err
@@ -68,20 +66,19 @@ func (msg *MsgNewBadge) ValidateBasic() error {
 		return ErrInvalidSupplyAndAmounts
 	}
 
-	for i, _ := range msg.SubassetSupplys {
-		if msg.SubassetAmountsToCreate[i] == 0 {
-			return ErrAmountEqualsZero
-		}
+	err = ValidateNoElementIsX(msg.SubassetAmountsToCreate, 0)
+	if err != nil {
+		return err
 	}
 
-	if msg.FreezeAddressRanges == nil {
-		return ErrRangesIsNil
+	err = ValidateNoElementIsX(msg.SubassetSupplys, 0)
+	if err != nil {
+		return err
 	}
 
-	for _, subbadgeRange := range msg.FreezeAddressRanges {
-		if subbadgeRange == nil || subbadgeRange.Start > subbadgeRange.End {
-			return ErrStartGreaterThanEnd
-		}
+	err = ValidateRangesAreValid(msg.FreezeAddressRanges)
+	if err != nil {
+		return err
 	}
 
 	return nil

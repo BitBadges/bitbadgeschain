@@ -38,7 +38,7 @@ func TestMsgNewSubBadge_ValidateBasic(t *testing.T) {
 				Supplys:         []uint64{10},
 				AmountsToCreate: []uint64{0},
 			},
-			err: types.ErrAmountEqualsZero,
+			err: types.ErrElementCantEqualThis,
 		}, {
 			name: "mismatching lengths",
 			msg: types.MsgNewSubBadge{

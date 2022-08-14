@@ -43,5 +43,14 @@ func (msg *MsgPruneBalances) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	if duplicateInArray(msg.BadgeIds) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "duplicate badge ids")
+	}
+
+	if duplicateInArray(msg.Addresses) {
+		return ErrDuplicateAddresses
+	}
+	
 	return nil
 }

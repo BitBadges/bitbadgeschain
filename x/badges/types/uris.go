@@ -1,6 +1,6 @@
 package types
 
-//TODO: test this actually works correctly
+// Gets a subasset URI string from a uri object
 func GetSubassetUriFromUriObject(uriObject UriObject) (string, error) {
 	uri, err := GetUriFromUriObject(uriObject)
 	if err != nil {
@@ -14,7 +14,7 @@ func GetSubassetUriFromUriObject(uriObject UriObject) (string, error) {
 	return subassetUri, nil
 }
 
-
+// Gets main URI string from a uri object
 func GetUriFromUriObject(uriObject UriObject) (string, error) {
 	uri := ""
 	if uriObject.Scheme != 0 {

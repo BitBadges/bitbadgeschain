@@ -45,7 +45,7 @@ func TestMsgFreezeAddress_ValidateBasic(t *testing.T) {
 				AddressRanges: []*types.IdRange{
 					{
 						Start: 10,
-						End:   0,
+						End:   1,
 					},
 				},
 			},

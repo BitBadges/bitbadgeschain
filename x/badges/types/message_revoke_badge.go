@@ -43,7 +43,7 @@ func (msg *MsgRevokeBadge) GetSignBytes() []byte {
 func duplicateInArray(arr []uint64) bool {
 	visited := make(map[uint64]bool, 0)
 	for i := 0; i < len(arr); i++ {
-		if visited[arr[i]] == true {
+		if visited[arr[i]] {
 			return true
 		} else {
 			visited[arr[i]] = true
@@ -62,24 +62,22 @@ func (msg *MsgRevokeBadge) ValidateBasic() error {
 		return ErrInvalidAmountsAndAddressesLength
 	}
 
-	for _, amount := range msg.Amounts {
-		if amount == 0 {
-			return ErrAmountEqualsZero
-		}
+	err = ValidateNoElementIsX(msg.Amounts, 0)
+	if err != nil {
+		return err
 	}
 
-	if msg.SubbadgeRanges == nil {
-		return ErrRangesIsNil
-	}
-
-	for _, subbadgeRange := range msg.SubbadgeRanges {
-		if subbadgeRange == nil || subbadgeRange.Start > subbadgeRange.End {
-			return ErrStartGreaterThanEnd
-		}
+	err = ValidateRangesAreValid(msg.SubbadgeRanges)
+	if err != nil {
+		return err
 	}
 
 	if duplicateInArray(msg.Addresses) {
 		return ErrDuplicateAddresses
+	}
+
+	if duplicateInArray(msg.Amounts) {
+		return ErrDuplicateAmounts
 	}
 
 	return nil

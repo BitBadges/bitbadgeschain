@@ -12,7 +12,7 @@ func HandleTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.I
 	sendingToReservedAddress := false //TODO: implement this; Check if to Address is reserved; if so, we automatically forceful transfer
 
 	//If we can forceful transfer, do it. Else, add it to pending.
-	if sendingToReservedAddress || permissions.ForcefulTransfers() || badge.Manager == to {
+	if sendingToReservedAddress || permissions.ForcefulTransfers || badge.Manager == to {
 		fromUserBalanceInfo, toUserBalanceInfo, err = ForcefulTransfer(ctx, badge, subbadgeRange, fromUserBalanceInfo, toUserBalanceInfo, amount, from, to, approvedBy, expirationTime)
 	} else {
 		fromUserBalanceInfo, toUserBalanceInfo, err = PendingTransfer(ctx, badge, subbadgeRange, fromUserBalanceInfo, toUserBalanceInfo, amount, from, to, approvedBy, expirationTime, cantCancelBeforeTime)
@@ -120,7 +120,7 @@ func RevertEscrowedBalancesAndApprovals(ctx sdk.Context, userBalanceInfo types.U
 
 // Checks if account is frozen or not.
 func IsAccountFrozen(badge types.BitBadge, permissions types.Permissions, address uint64) bool {
-	frozenByDefault := permissions.FrozenByDefault()
+	frozenByDefault := permissions.FrozenByDefault
 
 	accountIsFrozen := false
 	if frozenByDefault {

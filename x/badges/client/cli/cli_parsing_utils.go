@@ -7,14 +7,6 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-const (
-	String = iota
-	Uint64
-	Bool
-	Uint64Array
-	Uri
-)
-
 func GetUriObject(uri string, subassetUri string) (types.UriObject, error) {
 	//TODO: get uri object from uri and subasset uri
 	return types.UriObject{

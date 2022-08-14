@@ -6,6 +6,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
+	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 func TestMsgUpdateBytes_ValidateBasic(t *testing.T) {
@@ -16,28 +17,28 @@ func TestMsgUpdateBytes_ValidateBasic(t *testing.T) {
 
 	tests := []struct {
 		name string
-		msg  MsgUpdateBytes
+		msg  types.MsgUpdateBytes
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgUpdateBytes{
+			msg: types.MsgUpdateBytes{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgUpdateBytes{
+			msg: types.MsgUpdateBytes{
 				Creator: sample.AccAddress(),
 			},
 		},
 		{
 			name: "invalid bytes",
-			msg: MsgUpdateBytes{
+			msg: types.MsgUpdateBytes{
 				Creator: sample.AccAddress(),
 				NewBytes: arr,
 			},
-			err: ErrBytesGreaterThan256,
+			err: types.ErrBytesGreaterThan256,
 		},
 	}
 	for _, tt := range tests {

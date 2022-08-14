@@ -46,14 +46,9 @@ func (msg *MsgHandlePendingTransfer) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.NonceRanges == nil {
-		return ErrRangesIsNil
-	}
-
-	for _, nonceRange := range msg.NonceRanges {
-		if nonceRange == nil || nonceRange.Start > nonceRange.End {
-			return ErrStartGreaterThanEnd
-		}
+	err = ValidateRangesAreValid(msg.NonceRanges)
+	if err != nil {
+		return err
 	}
 	return nil
 }

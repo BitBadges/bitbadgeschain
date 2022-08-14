@@ -51,10 +51,10 @@ func (msg *MsgSetApproval) ValidateBasic() error {
 		return ErrRangesIsNil
 	}
 
-	for _, subbadgeRange := range msg.SubbadgeRanges {
-		if subbadgeRange == nil || subbadgeRange.Start > subbadgeRange.End {
-			return ErrStartGreaterThanEnd
-		}
+	err = ValidateRangesAreValid(msg.SubbadgeRanges)
+	if err != nil {
+		return err
 	}
+	
 	return nil
 }

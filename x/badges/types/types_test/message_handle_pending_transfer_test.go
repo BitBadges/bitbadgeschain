@@ -47,7 +47,7 @@ func TestMsgHandlePendingTransfer_ValidateBasic(t *testing.T) {
 				NonceRanges: []*types.IdRange{
 					{
 						Start: 10,
-						End:   0,
+						End:   1,
 					},
 				},
 			},
