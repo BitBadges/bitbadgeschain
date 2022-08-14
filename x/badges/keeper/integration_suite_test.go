@@ -127,7 +127,7 @@ type BadgesToCreate struct {
 func CreateBadges(suite *TestSuite, ctx context.Context, badges []BadgesToCreate) error {
 	for _, badge := range badges {
 		for i := 0; i < int(badge.Amount); i++ {
-			msg := types.NewMsgNewBadge(badge.Creator, *badge.Badge.Uri, badge.Badge.Permissions, badge.Badge.ArbitraryBytes, badge.Badge.DefaultSubassetSupply, badge.Badge.SubassetAmountsToCreate, badge.Badge.SubassetSupplys, badge.Badge.FreezeAddressRanges)
+			msg := types.NewMsgNewBadge(badge.Creator, *badge.Badge.Uri, badge.Badge.Permissions, badge.Badge.ArbitraryBytes, badge.Badge.DefaultSubassetSupply, badge.Badge.SubassetAmountsToCreate, badge.Badge.SubassetSupplys, badge.Badge.FreezeAddressRanges, badge.Badge.Standard)
 			_, err := suite.msgServer.NewBadge(ctx, msg)
 			if err != nil {
 				return err

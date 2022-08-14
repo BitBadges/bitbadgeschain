@@ -50,4 +50,6 @@ message BitBadge {
     repeated BalanceObject subassetSupplys = 13;
     
     uint64 defaultSubassetSupply = 14;
+
+    uint64 standard = 15;
 }

@@ -36,6 +36,7 @@ message MsgNewBadge {
     repeated uint64 subassetSupplys = 7;
     repeated uint64 subassetAmountsToCreate = 8;
     repeated IdRange freezeAddressRanges = 9;
+    uint64 standard = 10;
 }
 
 message MsgNewBadgeResponse {
