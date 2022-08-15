@@ -10,6 +10,7 @@ import (
 // Sets an approval amount for an address.
 func SetApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount uint64, addressNum uint64, subbadgeRange *types.IdRange) (types.UserBalanceInfo, error) {
 	idx, found := SearchApprovals(addressNum, userBalanceInfo.Approvals)
+	subbadgeRange = NormalizeIdRange(subbadgeRange)
 
 	if found {
 		//Update existing approval object for address

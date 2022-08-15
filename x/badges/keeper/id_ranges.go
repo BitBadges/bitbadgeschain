@@ -269,10 +269,10 @@ func SortIdRangesAndMergeIfNecessary(ids []*types.IdRange) []*types.IdRange {
 					//they overlap and we can merge them
 					newIdRanges[len(newIdRanges)-1].End = currRange.End
 				}
-			} else if currRange.End <= prevInsertedRange.End {
+			} 
+			// else if currRange.End <= prevInsertedRange.End {
 				//Start must be >= because it is sorted, so we can just skip this range since currRange is already completely enclosed by prevRange
-				// newIdRanges = append(newIdRanges, GetIdRangeToInsert(currRange.Start, currRange.End))
-			}
+			// }
 		}
 		return newIdRanges
 	} else {

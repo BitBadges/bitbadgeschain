@@ -59,7 +59,10 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalanceObjects
 						Start: 0,
 						End: idRange.Start - 1, 
 					}
-					newIdRanges = append(newIdRanges, RemoveIdsFromIdRange(everythingBefore, newIdRanges[0])...)
+					idRangesWithEverythingBeforeRemoved := []*types.IdRange{}
+					idRangesWithEverythingBeforeRemoved = append(idRangesWithEverythingBeforeRemoved, RemoveIdsFromIdRange(everythingBefore, newIdRanges[0])...)
+					idRangesWithEverythingBeforeRemoved = append(idRangesWithEverythingBeforeRemoved, newIdRanges[1:]...)
+					newIdRanges = idRangesWithEverythingBeforeRemoved
 				}
 				
 				//Remove everything after the end of the range. Only need to remove from last idx since it is sorted.
@@ -68,7 +71,10 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalanceObjects
 						Start: idRange.End + 1, 
 						End: math.MaxUint64,
 					}
-					newIdRanges = append(newIdRanges, RemoveIdsFromIdRange(everythingAfter, newIdRanges[len(newIdRanges)-1])...)
+					idRangesWithEverythingAfterRemoved := []*types.IdRange{}
+					idRangesWithEverythingAfterRemoved = append(idRangesWithEverythingAfterRemoved, newIdRanges[0:len(newIdRanges) - 1]...)
+					idRangesWithEverythingAfterRemoved = append(idRangesWithEverythingAfterRemoved, RemoveIdsFromIdRange(everythingAfter, newIdRanges[len(newIdRanges)-1])...)
+					newIdRanges = idRangesWithEverythingAfterRemoved
 				}
 
 				for _, newIdRange := range newIdRanges {
