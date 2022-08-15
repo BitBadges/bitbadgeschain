@@ -36,6 +36,7 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 func (suite *TestSuite) TestGasCosts() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
+	//Initial variable definitions
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
@@ -81,7 +82,7 @@ func (suite *TestSuite) TestGasCosts() {
 
 	addresses := []uint64{}
 	for i := 0; i < 1000; i++ {
-		addresses = append(addresses, firstAccountNumCreated+1+uint64(i))
+		addresses = append(addresses, aliceAccountNum+uint64(i))
 	}
 
 	badgesToCreateAllInOne := []BadgesToCreate{
@@ -114,269 +115,82 @@ func (suite *TestSuite) TestGasCosts() {
 	RunFunctionsAndPrintGasCosts(suite, tbl, []GasFunction{
 		{F: func() { CreateBadges(suite, wctx, badgesToCreate) }},
 		{F: func() { GetBadge(suite, wctx, 0) }},
-		{F: func() {
-			err := CreateSubBadges(suite, wctx, bob, 0, []uint64{1000000}, []uint64{1})
-			suite.Require().Nil(err, "Error creating subbadge")
-		}},
-		{F: func() {
-			err := CreateSubBadges(suite, wctx, bob, 0, []uint64{1}, []uint64{10000})
-			suite.Require().Nil(err, "Error creating subbadge")
-		}},
-		{F: func() {
-			err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{10000})
-			suite.Require().Nil(err, "Error creating subbadge")
-		}},
-		{F: func() {
-			err := FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 1000, End: 1000}}, 0, 0, true)
-			suite.Require().Nil(err, "Error creating subbadge")
-		}},
+		{F: func() { CreateSubBadges(suite, wctx, bob, 0, []uint64{1000000}, []uint64{1}) }},
+		{F: func() { CreateSubBadges(suite, wctx, bob, 0, []uint64{1}, []uint64{10000})}},
+		{F: func() { CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{10000})}},
+		{F: func() { FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 1000, End: 1000}}, 0, true)}},
 		{F: func() { GetBadge(suite, wctx, 0) }},
-		{F: func() {
-			err := FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 0, End: 9999}}, 0, 0, true)
-			suite.Require().Nil(err, "Error creating subbadge")
-		}},
+		{F: func() { FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 0, End: 9999}}, 0, true)}},
 		{F: func() { GetBadge(suite, wctx, 0) }},
-		{F: func() {
-			err := FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 1000, End: 1000}}, 0, 0, false)
-			suite.Require().Nil(err, "Error creating subbadge")
-		}},
+		{F: func() { FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 1000, End: 1000}}, 0, false)}},
 		{F: func() { GetBadge(suite, wctx, 0) }},
-		{F: func() {
-			err := FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 0, End: 9999}}, 0, 0, false)
-			suite.Require().Nil(err, "Error creating subbadge")
-		}},
-		{F: func() {
-			GetBadge(suite, wctx, 0)
-		}},
-		{F: func() {
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.IdRange{{Start: 0, End: 0}}, false)
-			suite.Require().Nil(err, "Error accepting badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.IdRange{{Start: 0, End: 999}}, false)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 2, End: 2}}, false)
-			suite.Require().Nil(err, "Error accepting badge")
-		}},
-		{
-			IgnoreGas: true,
-			F: func() {
-				err := HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 2, End: 2}}, false)
-				suite.Require().Nil(err, "Error accepting badge")
-			},
-		},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 0, []*types.IdRange{{Start: 1000, End: 1999}}, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			err := HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 0, End: 999}}, true)
-			suite.Require().Nil(err, "Error transferring badge")
-		},
-			IgnoreGas: true,
-		},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.IdRange{{Start: 4, End: 4}}, true)
-			suite.Require().Nil(err, "Error accepting badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, []*types.IdRange{{Start: 1000, End: 1999}}, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.IdRange{{Start: 0, End: 999}}, true)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false)
-			suite.Require().Nil(err, "Error accepting badge")
-		}},
-		{F: func() {
-			err := HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false)
-			suite.Require().Nil(err, "Error accepting badge")
-		},
-			IgnoreGas: true,
-		},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := RequestTransferBadge(suite, wctx, alice, firstAccountNumCreated, 1, 0, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			err := HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false)
-			suite.Require().Nil(err, "Error accepting badge")
-		},
-			IgnoreGas: true,
-		},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := RevokeBadges(suite, wctx, bob, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 0}})
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := RevokeBadges(suite, wctx, bob, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 0, []*types.IdRange{{Start: 1000, End: 1999}})
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-		}},
-		{F: func() {
-			err := SetApproval(suite, wctx, bob, 10000, firstAccountNumCreated+1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-		}},
-		{F: func() {
-			err := SetApproval(suite, wctx, bob, 10, firstAccountNumCreated+1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-		}},
-		{F: func() {
-			err := SetApproval(suite, wctx, bob, 10, firstAccountNumCreated+1, 0, []*types.IdRange{{Start: 0, End: 999}}, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-		}},
-		{F: func() {
-			CreateBadges(suite, wctx, badgesToCreate2)
-		}},
-		{F: func() {
-			GetBadge(suite, wctx, 1)
-		}},
-		{F: func() {
-			err := CreateSubBadges(suite, wctx, bob, 1, []uint64{10000}, []uint64{10000})
-			suite.Require().Nil(err, "Error creating subbadge")
-		}},
-		{F: func() {
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, addresses, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
-			err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, addresses, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)
-			suite.Require().Nil(err, "Error transferring badge")
-			suite.Require().Nil(err, "Error transferring badge")
-		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated+1)
-		}},
-		{F: func() {
+		{F: func() { FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 0, End: 9999}}, 0, false)}},
+		{F: func() { GetBadge(suite, wctx, 0) }},
+		{F: func() { TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.IdRange{{Start: 0, End: 0}}, false) }},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.IdRange{{Start: 0, End: 999}}, false)}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 2, End: 2}}, false) }},
+		{ IgnoreGas: true, F: func() { HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 2, End: 2}}, false)},},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.IdRange{{Start: 1000, End: 1999}}, 0, 0)}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false)}},
+		{F: func() { HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 0, End: 999}}, true)}, IgnoreGas: true,},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.IdRange{{Start: 4, End: 4}}, true) }},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.IdRange{{Start: 1000, End: 1999}}, 0, 0)}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.IdRange{{Start: 0, End: 999}}, true)}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false) }},
+		{F: func() { HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false) }, IgnoreGas: true,},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false)}},
+		{F: func() { HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false) }, IgnoreGas: true,},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { RevokeBadges(suite, wctx, bob, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 0}})}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { RevokeBadges(suite, wctx, bob, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.IdRange{{Start: 1000, End: 1999}})}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { GetUserBalance(suite, wctx, 0, bobAccountNum) }},
+		{F: func() { SetApproval(suite, wctx, bob, 10000, aliceAccountNum, 0, []*types.IdRange{{Start: 0, End: 0}})}},
+		{F: func() { GetUserBalance(suite, wctx, 0, bobAccountNum) }},
+		{F: func() { SetApproval(suite, wctx, bob, 10, aliceAccountNum, 0, []*types.IdRange{{Start: 0, End: 0}})}},
+		{F: func() { GetUserBalance(suite, wctx, 0, bobAccountNum) }},
+		{F: func() { SetApproval(suite, wctx, bob, 10, aliceAccountNum, 0, []*types.IdRange{{Start: 0, End: 999}})}},
+		{F: func() { GetUserBalance(suite, wctx, 0, bobAccountNum) }},
+		{F: func() { CreateBadges(suite, wctx, badgesToCreate2) }},
+		{F: func() { GetBadge(suite, wctx, 1) }},
+		{F: func() { CreateSubBadges(suite, wctx, bob, 1, []uint64{10000}, []uint64{10000})}},
+		{F: func() { TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { TransferBadge(suite, wctx, bob, bobAccountNum, addresses, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { TransferBadge(suite, wctx, bob, bobAccountNum, addresses, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)}},
+		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
+		{F: func() { 
 			for i := uint64(0); i < 1000; i++ {
-				err := TransferBadge(suite, wctx, bob, firstAccountNumCreated, []uint64{firstAccountNumCreated + 1}, []uint64{1}, 1, []*types.IdRange{{Start: i * 2, End: i * 2}}, 0, 0)
-				suite.Require().Nil(err, "Error transferring badge")
-				suite.Require().Nil(err, "Error transferring badge")
+ 				TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.IdRange{{Start: i * 2, End: i * 2}}, 0, 0)
 			}
 		}},
-		{F: func() {
-			GetUserBalance(suite, wctx, 1, 0, firstAccountNumCreated)
-		}},
+		{F: func() { GetUserBalance(suite, wctx, 1, bobAccountNum) }},
 		{F: func() { CreateBadges(suite, wctx, badgesToCreateAllInOne) }},
 	})
 }

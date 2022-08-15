@@ -19,11 +19,11 @@ func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgR
 		return nil, err
 	}
 
-	//Redundant because this is locked so we shouldn't store anything
+	
 	if msg.Add {
 		permissions := types.GetPermissions(badge.Permissions)
 		if !permissions.CanManagerTransfer {
-			return nil, ErrInvalidPermissions
+			return nil, ErrInvalidPermissions //Manager can never transfer, so we don't unnecessarily store stuff
 		}
 
 		if err := k.CreateTransferManagerRequest(ctx, msg.BadgeId, CreatorAccountNum); err != nil {

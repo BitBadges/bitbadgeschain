@@ -6,16 +6,17 @@ import (
 )
 
 // Appends the pending transfer to both parties balance informations and increments the nonce. Since we append, they will alwyas be sorted by the nonce.
-func AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, subbadgeRange types.IdRange, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool, expirationTime uint64, cantCancelBeforeTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
+func AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, subbadgeRange *types.IdRange, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool, expirationTime uint64, cantCancelBeforeTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
 	if amount == 0 {
 		return fromUserBalanceInfo, toUserBalanceInfo, ErrBalanceIsZero
-	} else if expirationTime != 0 && cantCancelBeforeTime > expirationTime {
+	}
+
+	if expirationTime != 0 && cantCancelBeforeTime > expirationTime {
 		return fromUserBalanceInfo, toUserBalanceInfo, ErrCancelTimeIsGreaterThanExpirationTime
 	}
 
-
 	fromUserBalanceInfo.Pending = append(fromUserBalanceInfo.Pending, &types.PendingTransfer{
-		SubbadgeRange:     &subbadgeRange,
+		SubbadgeRange:     subbadgeRange,
 		Amount:            amount,
 		ApprovedBy:        approvedBy,
 		Sent:              sentByFrom, // different
@@ -28,7 +29,7 @@ func AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo ty
 	})
 
 	toUserBalanceInfo.Pending = append(toUserBalanceInfo.Pending, &types.PendingTransfer{
-		SubbadgeRange:     &subbadgeRange,
+		SubbadgeRange:     subbadgeRange,
 		Amount:            amount,
 		ApprovedBy:        approvedBy,
 		Sent:              !sentByFrom, // different
@@ -39,8 +40,9 @@ func AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo ty
 		ExpirationTime:    expirationTime,
 		CantCancelBeforeTime: cantCancelBeforeTime,
 	})
+
 	err := *new(error)
-	fromUserBalanceInfo.PendingNonce, err = SafeAdd(fromUserBalanceInfo.PendingNonce, 1)
+	fromUserBalanceInfo.PendingNonce, err = SafeAdd(fromUserBalanceInfo.PendingNonce, 1) //nonces shouldn't reach the case where they overflow but this is just for safety
 	if err != nil {
 		return fromUserBalanceInfo, toUserBalanceInfo, err
 	}
@@ -55,42 +57,25 @@ func AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo ty
 
 //Removes pending transfer from the userBalanceInfo.
 func RemovePending(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, thisNonce uint64, other_nonce uint64) (types.UserBalanceInfo, error) {
-	pending := userBalanceInfo.Pending
-	low := 0
-	high := len(pending) - 1
-
-	foundIdx := -1
-	for low <= high {
-		median := int(uint(low+high) >> 1)
-		currPending := pending[median]
-		if currPending.ThisPendingNonce == thisNonce && currPending.OtherPendingNonce == other_nonce {
-			foundIdx = median
-			break
-		} else if currPending.ThisPendingNonce > thisNonce {
-			high = median - 1
-		} else {
-			low = median + 1
-		}
-	}
-
-	if foundIdx == -1 {
+	idx, found :=  SearchPendingByNonce(userBalanceInfo.Pending, thisNonce)
+	if !found {
 		return userBalanceInfo, ErrPendingNotFound
 	}
 
 	newPending := []*types.PendingTransfer{}
-	newPending = append(newPending, pending[:foundIdx]...)
-	newPending = append(newPending, pending[foundIdx+1:]...)
+	newPending = append(newPending, userBalanceInfo.Pending[:idx]...)
+	newPending = append(newPending, userBalanceInfo.Pending[idx+1:]...)
 	userBalanceInfo.Pending = newPending
-
 	return userBalanceInfo, nil
 }
 
 // Prunes pending transfers that have expired
 func PruneExpiredPending(currTime uint64, accountNum uint64, pending []*types.PendingTransfer) []*types.PendingTransfer {
-	prunedPending := make([]*types.PendingTransfer, 0)
+	prunedPending := []*types.PendingTransfer{}
 	for _, pendingTransfer := range pending {
 		expired := pendingTransfer.ExpirationTime != 0 && pendingTransfer.ExpirationTime < currTime
-	
+		
+		//Only prune received pending transfers that you can't accept anymore
 		if expired && !pendingTransfer.Sent {
 			continue
 		} else {

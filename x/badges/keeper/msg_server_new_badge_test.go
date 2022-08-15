@@ -48,7 +48,7 @@ func (suite *TestSuite) TestNewBadges() {
 		InsertIdIdx: 10,
 	}, badge.Uri)
 	suite.Require().Equal([]*types.BalanceObject(nil), badge.SubassetSupplys)
-	suite.Require().Equal(firstAccountNumCreated, badge.Manager) //7 is the first ID it creates
+	suite.Require().Equal(bobAccountNum, badge.Manager) //7 is the first ID it creates
 	suite.Require().Equal(perms, badge.Permissions)
 	suite.Require().Equal([]*types.IdRange(nil), badge.FreezeRanges)
 	suite.Require().Equal(uint64(0), badge.Id)

@@ -27,7 +27,7 @@ message BitBadge {
     //Store permissions packed in a uint where the bits correspond to permissions from left to right; leading zeroes are applied and any future additions will be appended to the right. See types/permissions.go
     uint64 permissions = 5;
 
-   //FreezeRanges defines what addresses are frozen or unfrozen. If permissions.FrozenByDefault is false, this is used for frozen addresses. If true, this is used for unfrozen addresses.
+    //FreezeRanges defines what addresses are frozen or unfrozen. If permissions.FrozenByDefault is false, this is used for frozen addresses. If true, this is used for unfrozen addresses.
     repeated IdRange freezeRanges = 10;
 
     // Starts at 0. Each subasset created will incrementally have an increasing ID #. Can't overflow.
@@ -36,7 +36,7 @@ message BitBadge {
     //Subasset supplys are stored if the subasset supply != default. Balance => SubbadgeIdRange map  
     repeated BalanceObject subassetSupplys = 13;
     
-    //Default subasset supply. If == 0, we assume default == 1.
+    //Default subasset supply. If == 0, we assume == 1.
     uint64 defaultSubassetSupply = 14;
 
     //Defines what standard this badge should implement. Must obey the rules of that standard.

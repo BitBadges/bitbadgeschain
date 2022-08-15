@@ -38,11 +38,11 @@ func (suite *TestSuite) TestTransferManager() {
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 0, firstAccountNumCreated+1)
+	err = TransferManager(suite, wctx, bob, 0, aliceAccountNum)
 	suite.Require().Nil(err, "Error transferring manager")
 
 	badge, _ := GetBadge(suite, wctx, 0)
-	suite.Require().Equal(firstAccountNumCreated+1, badge.Manager)
+	suite.Require().Equal(aliceAccountNum, badge.Manager)
 }
 
 func (suite *TestSuite) TestRequestTransferManager() {
@@ -83,11 +83,11 @@ func (suite *TestSuite) TestRequestTransferManager() {
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 0, firstAccountNumCreated+1)
+	err = TransferManager(suite, wctx, bob, 0, aliceAccountNum)
 	suite.Require().Nil(err, "Error transferring manager")
 
 	badge, _ := GetBadge(suite, wctx, 0)
-	suite.Require().Equal(firstAccountNumCreated+1, badge.Manager)
+	suite.Require().Equal(aliceAccountNum, badge.Manager)
 }
 
 func (suite *TestSuite) TestRemovedRequestTransferManager() {
@@ -125,7 +125,7 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 	err = RequestTransferManager(suite, wctx, alice, 0, false)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 0, firstAccountNumCreated+1)
+	err = TransferManager(suite, wctx, bob, 0, aliceAccountNum)
 	suite.Require().EqualError(err, keeper.ErrAddressNeedsToOptInAndRequestManagerTransfer.Error())
 }
 
@@ -187,6 +187,6 @@ func (suite *TestSuite) TestManagerCantBeTransferred() {
 	err := CreateBadges(suite, wctx, badgesToCreate)
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = TransferManager(suite, wctx, bob, 0, firstAccountNumCreated+1)
+	err = TransferManager(suite, wctx, bob, 0, aliceAccountNum)
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }

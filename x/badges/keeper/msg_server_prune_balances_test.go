@@ -36,7 +36,7 @@ func (suite *TestSuite) TestPruneBalances() {
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 
-	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.BalanceObject{
@@ -47,10 +47,10 @@ func (suite *TestSuite) TestPruneBalances() {
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
-	err = PruneBalances(suite, wctx, bob, []uint64{firstAccountNumCreated}, []uint64{0})
+	err = PruneBalances(suite, wctx, bob, []uint64{bobAccountNum}, []uint64{0})
 	suite.Require().EqualError(err, keeper.ErrCantPruneBalanceYet.Error())
 
-	err = PruneBalances(suite, wctx, bob, []uint64{firstAccountNumCreated}, []uint64{10})
+	err = PruneBalances(suite, wctx, bob, []uint64{bobAccountNum}, []uint64{10})
 	suite.Require().EqualError(err, keeper.ErrCantPruneBalanceYet.Error())
 
 	err = SelfDestructBadge(suite, wctx, bob, 0)
@@ -59,13 +59,13 @@ func (suite *TestSuite) TestPruneBalances() {
 	badge, err = GetBadge(suite, wctx, 0)
 	suite.Require().NotNil(err, "We should get a not exists error here now")
 
-	_, err = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	_, err = GetUserBalance(suite, wctx, 0, bobAccountNum)
 	suite.Require().Nil(err, "Error getting balance info")
 
-	err = PruneBalances(suite, wctx, bob, []uint64{firstAccountNumCreated}, []uint64{0})
+	err = PruneBalances(suite, wctx, bob, []uint64{bobAccountNum}, []uint64{0})
 	suite.Require().Nil(err, "Error pruning balances")
 
-	bobBalanceInfo, err = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	bobBalanceInfo, err = GetUserBalance(suite, wctx, 0, bobAccountNum)
 	suite.Require().Nil(err, "Error pruning balances")
 	suite.Require().Equal(0, len(bobBalanceInfo.BalanceAmounts))
 	suite.Require().Equal(0, len(bobBalanceInfo.Approvals))

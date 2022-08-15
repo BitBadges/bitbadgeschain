@@ -9,14 +9,13 @@ const TypeMsgSetApproval = "set_approval"
 
 var _ sdk.Msg = &MsgSetApproval{}
 
-func NewMsgSetApproval(creator string, amount uint64, address uint64, badgeId uint64, subbadgeRanges []*IdRange, expirationTime uint64) *MsgSetApproval {
+func NewMsgSetApproval(creator string, amount uint64, address uint64, badgeId uint64, subbadgeRanges []*IdRange) *MsgSetApproval {
 	return &MsgSetApproval{
 		Creator:        creator,
 		Amount:         amount,
 		Address:        address,
 		BadgeId:        badgeId,
 		SubbadgeRanges: subbadgeRanges,
-		ExpirationTime: expirationTime,
 	}
 }
 

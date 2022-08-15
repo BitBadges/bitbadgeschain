@@ -35,7 +35,7 @@ func (suite *TestSuite) TestSetApproval() {
 	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
-	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.BalanceObject{
@@ -46,25 +46,25 @@ func (suite *TestSuite) TestSetApproval() {
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
-	err = SetApproval(suite, wctx, bob, 1000, firstAccountNumCreated+1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+	err = SetApproval(suite, wctx, bob, 1000, aliceAccountNum, 0, []*types.IdRange{{Start: 0, End: 0}})
 	suite.Require().Nil(err, "Error setting approval")
 
-	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
-	suite.Require().Equal(uint64(firstAccountNumCreated+1), bobBalanceInfo.Approvals[0].Address)
+	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
+	suite.Require().Equal(uint64(aliceAccountNum), bobBalanceInfo.Approvals[0].Address)
 	suite.Require().Equal(uint64(1000), bobBalanceInfo.Approvals[0].ApprovalAmounts[0].Balance)
 
-	err = SetApproval(suite, wctx, bob, 500, firstAccountNumCreated+2, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+	err = SetApproval(suite, wctx, bob, 500, charlieAccountNum, 0, []*types.IdRange{{Start: 0, End: 0}})
 	suite.Require().Nil(err, "Error setting approval")
 
-	err = SetApproval(suite, wctx, bob, 500, firstAccountNumCreated+1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+	err = SetApproval(suite, wctx, bob, 500, aliceAccountNum, 0, []*types.IdRange{{Start: 0, End: 0}})
 	suite.Require().Nil(err, "Error setting approval")
 
-	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
 
-	suite.Require().Equal(uint64(firstAccountNumCreated+2), bobBalanceInfo.Approvals[1].Address)
+	suite.Require().Equal(uint64(charlieAccountNum), bobBalanceInfo.Approvals[1].Address)
 	suite.Require().Equal(uint64(500), bobBalanceInfo.Approvals[1].ApprovalAmounts[0].Balance)
 
-	suite.Require().Equal(uint64(firstAccountNumCreated+1), bobBalanceInfo.Approvals[0].Address)
+	suite.Require().Equal(uint64(aliceAccountNum), bobBalanceInfo.Approvals[0].Address)
 	suite.Require().Equal(uint64(500), bobBalanceInfo.Approvals[0].ApprovalAmounts[0].Balance)
 }
 
@@ -97,7 +97,7 @@ func (suite *TestSuite) TestSetApprovalNoPrevBalanceInStore() {
 	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
-	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.BalanceObject{
@@ -108,7 +108,7 @@ func (suite *TestSuite) TestSetApprovalNoPrevBalanceInStore() {
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
-	err = SetApproval(suite, wctx, charlie, 1000, firstAccountNumCreated+1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+	err = SetApproval(suite, wctx, charlie, 1000, aliceAccountNum, 0, []*types.IdRange{{Start: 0, End: 0}})
 	suite.Require().Nil(err, "Error setting approval")
 }
 
@@ -141,7 +141,7 @@ func (suite *TestSuite) TestApproveSelf() {
 	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
-	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, 0, firstAccountNumCreated)
+	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
 
 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
 	suite.Require().Equal([]*types.BalanceObject{
@@ -152,6 +152,6 @@ func (suite *TestSuite) TestApproveSelf() {
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
-	err = SetApproval(suite, wctx, bob, 1000, firstAccountNumCreated, 0, []*types.IdRange{{Start: 0, End: 0}}, 0)
+	err = SetApproval(suite, wctx, bob, 1000, bobAccountNum, 0, []*types.IdRange{{Start: 0, End: 0}})
 	suite.Require().EqualError(err, keeper.ErrAccountCanNotEqualCreator.Error())
 }

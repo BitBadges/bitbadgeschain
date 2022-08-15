@@ -40,6 +40,8 @@ func (k Keeper) GetBadgeAndAssertSubbadgeRangesAreValid(ctx sdk.Context, badgeId
 	return badge, nil
 }
 
+//For each (supply, amountToCreate) pair, we create amountToCreate subbadges with specified supply. We also mint total supply to manager. Error if IDs overflow.
+//We assume that lengths of supplys and amountsToCreate are equal before entering this function. Also amountsToCreate[i] can never be zero.
 func CreateSubassets(ctx sdk.Context, badge types.BitBadge, managerBalanceInfo types.UserBalanceInfo, supplys []uint64, amounts []uint64) (types.BitBadge, types.UserBalanceInfo, error) {
 	newSubassetSupplys := badge.SubassetSupplys
 	defaultSupply := badge.DefaultSubassetSupply
@@ -48,13 +50,21 @@ func CreateSubassets(ctx sdk.Context, badge types.BitBadge, managerBalanceInfo t
 	}
 
 	err := *new(error)
-	// Update supplys and mint total supply for each to manager. Don't store if supply == default
+	//Update supplys and mint total supply for each to manager. Don't store if supply == default
+	//Subasset supplys are stored as []*types.BalanceObject, so we can use the balance update functions
 	for i, supply := range supplys {
 		amountToCreate := amounts[i]
 		nextSubassetId := badge.NextSubassetId
-		// We conventionalize supply == 0 as default, so we don't store if it is the default
+
+		// We conventionalize supply == 0 as default, and we don't store if supply == default
 		if supply != 0 && supply != defaultSupply {
-			newSubassetSupplys = UpdateBalancesForIdRanges([]*types.IdRange{{Start: nextSubassetId, End: nextSubassetId + amountToCreate - 1}}, supply, newSubassetSupplys)
+			newSubassetSupplys = UpdateBalancesForIdRanges(
+				[]*types.IdRange{
+					{Start: nextSubassetId, End: nextSubassetId + amountToCreate - 1},
+				}, 
+				supply, 
+				newSubassetSupplys,
+			)
 		}
 
 		managerBalanceInfo, err = AddBalancesForIdRanges(ctx, managerBalanceInfo, []*types.IdRange{{Start: nextSubassetId, End: nextSubassetId + amountToCreate - 1}}, supply)
@@ -62,12 +72,10 @@ func CreateSubassets(ctx sdk.Context, badge types.BitBadge, managerBalanceInfo t
 			return types.BitBadge{}, types.UserBalanceInfo{}, err
 		}
 
-		badge.NextSubassetId, err = SafeAdd(badge.NextSubassetId, amountToCreate)
+		badge.NextSubassetId, err = SafeAdd(badge.NextSubassetId, amountToCreate) //error on ID overflow
 		if err != nil {
 			return types.BitBadge{}, types.UserBalanceInfo{}, err
 		}
-
-		
 	}
 	badge.SubassetSupplys = newSubassetSupplys
 

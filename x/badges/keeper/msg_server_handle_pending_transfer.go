@@ -41,7 +41,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 		return nil, ErrUserBalanceNotExists
 	}
 
-	//We will store user balances in a cache and a didUpdate accountNum -> bool map to keep track of which ones are updated to avoid unnecessary writes.
+	//We will store user balances in a cache and a didUpdate accountNum -> bool map to keep track of which ones are updated to avoid unnecessary writes if we didn't update anything.
 	balanceInfoCache := make(map[uint64]types.UserBalanceInfo, 0)
 	didUpdateBalanceInfo := make(map[uint64]bool, 0)
 
@@ -51,46 +51,44 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 				nonceRange.End = nonceRange.Start
 			}
 
-			if CurrPendingTransfer.ThisPendingNonce <= nonceRange.End && CurrPendingTransfer.ThisPendingNonce >= nonceRange.Start {
-				
-			} else {
+			if !(CurrPendingTransfer.ThisPendingNonce <= nonceRange.End && CurrPendingTransfer.ThisPendingNonce >= nonceRange.Start) {
 				continue
 			}
 
-			// Handle accepting after expiration time
+			//Handle trying to accept after expiration time
 			expired := uint64(ctx.BlockTime().Unix()) > CurrPendingTransfer.ExpirationTime
 			if msg.Accept && CurrPendingTransfer.ExpirationTime != 0 {
 				if expired {
 					return nil, ErrPendingTransferExpired
 				}
-			} 
-			
-			pastCancelDeadline := true //if set to 0, it is cancellable at any time
-			if CurrPendingTransfer.CantCancelBeforeTime != 0 {
-				pastCancelDeadline = uint64(ctx.BlockTime().Unix()) > CurrPendingTransfer.CantCancelBeforeTime
 			}
 
-			
-
+			//An outgoingTransfer is when the balances of the badge are being transferred from the account calling this function.
+			//This doesn't depend at all on whether it was sent by this account (could be a request) or if it is being accepted or rejected.
 			outgoingTransfer := CurrPendingTransfer.From == CreatorAccountNum
 
-			//Normal transfer flags
+			//Normal transfer flags (top four) and transfer request flags (bottom five) - Only one of these nine flags will be true
 			acceptOwnOutgoingTransfer := CurrPendingTransfer.Sent && msg.Accept && outgoingTransfer
 			acceptIncomingTransfer := !CurrPendingTransfer.Sent && msg.Accept && !outgoingTransfer
 			cancelOwnOutgoingTransfer := CurrPendingTransfer.Sent && !msg.Accept && outgoingTransfer
 			rejectIncomingTransfer := !CurrPendingTransfer.Sent && !msg.Accept
 
-			if acceptOwnOutgoingTransfer {
-				return nil, ErrCantAcceptOwnTransferRequest
-			}
-
-			//Pending transfer flags
 			finalizeOwnTransferRequestAfterApprovedByOtherParty := CurrPendingTransfer.Sent && msg.Accept && !outgoingTransfer
+			//These two are the same scenario but split into forceful and non-forceful transfers, so manager doesn't have to pay gas for every transfer request
 			acceptTransferRequestButMarkAsApproved := !msg.ForcefulAccept && !CurrPendingTransfer.Sent && msg.Accept && outgoingTransfer
 			acceptTransferRequestForcefully := msg.ForcefulAccept && !CurrPendingTransfer.Sent && msg.Accept && outgoingTransfer
 			rejectTransferRequest := !CurrPendingTransfer.Sent && !msg.Accept
 			cancelOwnTransferRequest := CurrPendingTransfer.Sent && !msg.Accept && !outgoingTransfer
 
+			if acceptOwnOutgoingTransfer {
+				return nil, ErrCantAcceptOwnTransferRequest
+			}
+
+			//Check if before cancellation deadline and throw error if cancellation attempt
+			pastCancelDeadline := true //if set to 0, it is cancellable at any time
+			if CurrPendingTransfer.CantCancelBeforeTime != 0 {
+				pastCancelDeadline = uint64(ctx.BlockTime().Unix()) > CurrPendingTransfer.CantCancelBeforeTime
+			}
 			if !pastCancelDeadline && (cancelOwnOutgoingTransfer || cancelOwnTransferRequest) {
 				return nil, ErrCantCancelYet
 			}
@@ -98,7 +96,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 			//Other helper flags
 			onlyUpdatingCreatorBalance := rejectIncomingTransfer || rejectTransferRequest || acceptTransferRequestButMarkAsApproved
 			otherPartyMayHaveRemovedAlready := cancelOwnOutgoingTransfer || cancelOwnTransferRequest
-			needToRemoveAtLeastOneFromPending := !acceptTransferRequestButMarkAsApproved
+			needToRemoveFromThisPending := !acceptTransferRequestButMarkAsApproved
 
 			//Get basic information about the other party and update cache if not already in cache
 			otherPartyAccountNum := CurrPendingTransfer.From
@@ -108,6 +106,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 			otherPartyBalanceKey := ConstructBalanceKey(otherPartyAccountNum, msg.BadgeId)
 			otherPartyNonce := CurrPendingTransfer.OtherPendingNonce
 			otherPartyBalanceInfo, ok := balanceInfoCache[otherPartyAccountNum]
+			//If we need the other party's balances and not in cache, get it from store
 			if !ok && !onlyUpdatingCreatorBalance {
 				otherPartyBalanceInfo, found = k.GetUserBalanceFromStore(ctx, otherPartyBalanceKey)
 				balanceInfoCache[otherPartyAccountNum] = otherPartyBalanceInfo
@@ -116,13 +115,18 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 				}
 			}
 			
+			//If we need to do something with the balances or pending transfers, update that
 			if acceptIncomingTransfer {
+				//Simple add to "To" balance
 				creatorBalanceInfo, err = AddBalancesForIdRanges(ctx, creatorBalanceInfo, []*types.IdRange{CurrPendingTransfer.SubbadgeRange}, CurrPendingTransfer.Amount)
 			} else if acceptTransferRequestButMarkAsApproved {
+				//Just mark as accepted, don't remove from pending or do anything yet. Outsource gas to requester
 				creatorBalanceInfo.Pending[idx].MarkedAsAccepted = true
 			} else if cancelOwnOutgoingTransfer {
-				creatorBalanceInfo, err = RevertEscrowedBalancesAndApprovals(ctx, creatorBalanceInfo, *CurrPendingTransfer.SubbadgeRange, CurrPendingTransfer.From, CurrPendingTransfer.ApprovedBy, CurrPendingTransfer.Amount)
+				//Previously escrowed balances and approvals. Need to revert
+				creatorBalanceInfo, err = RevertEscrowedBalancesAndApprovals(ctx, creatorBalanceInfo, CurrPendingTransfer.SubbadgeRange, CurrPendingTransfer.From, CurrPendingTransfer.ApprovedBy, CurrPendingTransfer.Amount)
 			} else if finalizeOwnTransferRequestAfterApprovedByOtherParty {
+				//If other party marked as accepted, you can go ahead and finalize the transfer forcefully.
 				idx, found := SearchPendingByNonce(otherPartyBalanceInfo.Pending, otherPartyNonce)
 				if found {
 					if !otherPartyBalanceInfo.Pending[idx].MarkedAsAccepted {
@@ -132,17 +136,17 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 					return nil, ErrNotApproved
 				}
 
-				otherPartyBalanceInfo, creatorBalanceInfo, err = ForcefulTransfer(ctx, badge, *CurrPendingTransfer.SubbadgeRange, otherPartyBalanceInfo, creatorBalanceInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.From, CurrPendingTransfer.To, CurrPendingTransfer.From, CurrPendingTransfer.ExpirationTime)
+				otherPartyBalanceInfo, creatorBalanceInfo, err = ForcefulTransfer(ctx, badge, CurrPendingTransfer.SubbadgeRange, otherPartyBalanceInfo, creatorBalanceInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.From, CurrPendingTransfer.To, CurrPendingTransfer.From, CurrPendingTransfer.ExpirationTime)
 			} else if acceptTransferRequestForcefully {
-				creatorBalanceInfo, otherPartyBalanceInfo, err = ForcefulTransfer(ctx, badge, *CurrPendingTransfer.SubbadgeRange, creatorBalanceInfo, otherPartyBalanceInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.From, CurrPendingTransfer.To, CreatorAccountNum, CurrPendingTransfer.ExpirationTime)
+				//Accept a transfer request forcefully
+				creatorBalanceInfo, otherPartyBalanceInfo, err = ForcefulTransfer(ctx, badge, CurrPendingTransfer.SubbadgeRange, creatorBalanceInfo, otherPartyBalanceInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.From, CurrPendingTransfer.To, CreatorAccountNum, CurrPendingTransfer.ExpirationTime)
 			}
-
 			if err != nil {
 				return nil, err
 			}
 			
-
-			if needToRemoveAtLeastOneFromPending {
+			//Remove from this party's pending and other party's pending if applicable
+			if needToRemoveFromThisPending {
 				creatorBalanceInfo, err = RemovePending(ctx, creatorBalanceInfo, CurrPendingTransfer.ThisPendingNonce, otherPartyNonce)
 				if err != nil {
 					return nil, err
@@ -151,12 +155,13 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 				//Try to remove from the other party's pending, but in some situations it may have already been removed
 				if !onlyUpdatingCreatorBalance {
 					otherPartyBalanceInfo, err = RemovePending(ctx, otherPartyBalanceInfo, otherPartyNonce, CurrPendingTransfer.ThisPendingNonce)
-					didUpdateBalanceInfo[otherPartyAccountNum] = true
 					balanceInfoCache[otherPartyAccountNum] = otherPartyBalanceInfo
 					if err != nil {
 						if !(err == ErrPendingNotFound && otherPartyMayHaveRemovedAlready) {
 							return nil, err
 						}
+					} else {
+						didUpdateBalanceInfo[otherPartyAccountNum] = true
 					}
 				}
 			}

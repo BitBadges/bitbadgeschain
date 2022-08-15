@@ -42,5 +42,7 @@ var (
 	ErrAccountCanNotEqualCreator                    = sdkerrors.Register(types.ModuleName, 35, "account can not equal creator")
 	ErrCantPruneBalanceYet                          = sdkerrors.Register(types.ModuleName, 36, "cant prune balance yet")
 	ErrCantCancelYet								= sdkerrors.Register(types.ModuleName, 37, "cant cancel yet")
-	ErrCancelTimeIsGreaterThanExpirationTime	   = sdkerrors.Register(types.ModuleName, 38, "cancel time is greater than expiration time")
+	ErrCancelTimeIsGreaterThanExpirationTime	    = sdkerrors.Register(types.ModuleName, 38, "cancel time is greater than expiration time")
+	ErrApprovalForAddressDoesntExist				= sdkerrors.Register(types.ModuleName, 39, "approval for address doesn't exist")
+	ErrUnderflow									= sdkerrors.Register(types.ModuleName, 40, "error underflow")
 )

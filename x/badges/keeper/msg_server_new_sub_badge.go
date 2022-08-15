@@ -21,13 +21,13 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 		return nil, err
 	}
 
+	originalSubassetId := badge.NextSubassetId
+
 	managerBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.Id)
 	managerBalanceInfo, found := k.GetUserBalanceFromStore(ctx, managerBalanceKey)
 	if !found {
 		managerBalanceInfo = types.UserBalanceInfo{}
 	}
-
-	originalSubassetId := badge.NextSubassetId
 
 	badge, managerBalanceInfo, err = CreateSubassets(ctx, badge, managerBalanceInfo, msg.Supplys, msg.AmountsToCreate)
 	if err != nil {

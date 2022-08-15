@@ -20,23 +20,22 @@ func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgReq
 	if err != nil {
 		return nil, err
 	}
-
+	
 	fromBalanceKey := ConstructBalanceKey(msg.From, msg.BadgeId)
-	toBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
-
 	fromUserBalanceInfo, found := k.Keeper.GetUserBalanceFromStore(ctx, fromBalanceKey)
 	if !found {
 		return nil, ErrUserBalanceNotExists
 	}
 
+	toBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
 	toUserBalanceInfo, found := k.Keeper.GetUserBalanceFromStore(ctx, toBalanceKey)
 	if !found {
 		toUserBalanceInfo = types.UserBalanceInfo{}
 	}
 
-	//TODO: Maybe have []subbadgeRange within pending transfers instead of creating new ones each time
+	//TODO: Maybe have []subbadgeRange within pending transfers instead of creating new transfers each time
 	for _, subbadgeRange := range msg.SubbadgeRanges {
-		fromUserBalanceInfo, toUserBalanceInfo, err = AppendPendingTransferForBothParties(ctx, fromUserBalanceInfo, toUserBalanceInfo, *subbadgeRange, CreatorAccountNum, msg.From, msg.Amount, CreatorAccountNum, false, msg.ExpirationTime, msg.CantCancelBeforeTime)
+		fromUserBalanceInfo, toUserBalanceInfo, err = AppendPendingTransferForBothParties(ctx, fromUserBalanceInfo, toUserBalanceInfo, subbadgeRange, CreatorAccountNum, msg.From, msg.Amount, CreatorAccountNum, false, msg.ExpirationTime, msg.CantCancelBeforeTime)
 		if err != nil {
 			return nil, err
 		}

@@ -5,14 +5,14 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-// Handles a full transfer from one user to another. If it is to be a forceful transfer, it will transfer the balances and approvals. If it is a pending transfer, it will add it to the pending transfers.
-func HandleTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.IdRange, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, amount uint64, from uint64, to uint64, approvedBy uint64, expirationTime uint64, cantCancelBeforeTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
+// Handles a transfer from one address to another. If it can be a forceful transfer, it will forcefully transfer the balances and approvals. If it is a pending transfer, it will add it to the pending transfers.
+func HandleTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange *types.IdRange, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, amount uint64, from uint64, to uint64, approvedBy uint64, expirationTime uint64, cantCancelBeforeTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
 	permissions := types.GetPermissions(badge.Permissions)
 	err := *new(error)
 	sendingToReservedAddress := false //TODO: implement this; Check if to Address is reserved; if so, we automatically forceful transfer
 
-	//If we can forceful transfer, do it. Else, add it to pending.
-	if sendingToReservedAddress || permissions.ForcefulTransfers || badge.Manager == to {
+	canForcefulTransfer := sendingToReservedAddress || permissions.ForcefulTransfers || badge.Manager == to
+	if canForcefulTransfer {
 		fromUserBalanceInfo, toUserBalanceInfo, err = ForcefulTransfer(ctx, badge, subbadgeRange, fromUserBalanceInfo, toUserBalanceInfo, amount, from, to, approvedBy, expirationTime)
 	} else {
 		fromUserBalanceInfo, toUserBalanceInfo, err = PendingTransfer(ctx, badge, subbadgeRange, fromUserBalanceInfo, toUserBalanceInfo, amount, from, to, approvedBy, expirationTime, cantCancelBeforeTime)
@@ -26,7 +26,7 @@ func HandleTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.I
 }
 
 //Forceful transfers will transfer the balances and deduct from approvals directly without adding it to pending.
-func ForcefulTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.IdRange, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, amount uint64, from uint64, to uint64, approvedBy uint64, expirationTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
+func ForcefulTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange *types.IdRange, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, amount uint64, from uint64, to uint64, approvedBy uint64, expirationTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
 	// 1. Check if the from address is frozen
 	// 2. Remove approvals if approvedBy != from
 	// 3. Deduct from "From" balance
@@ -41,12 +41,12 @@ func ForcefulTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types
 		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
 	}
 	
-	fromUserBalanceInfo, err = SubtractBalancesForIdRanges(ctx, fromUserBalanceInfo, []*types.IdRange{&subbadgeRange}, amount)
+	fromUserBalanceInfo, err = SubtractBalancesForIdRanges(ctx, fromUserBalanceInfo, []*types.IdRange{subbadgeRange}, amount)
 	if err != nil {
 		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
 	}
 
-	toUserBalanceInfo, err = AddBalancesForIdRanges(ctx, toUserBalanceInfo, []*types.IdRange{&subbadgeRange}, amount)
+	toUserBalanceInfo, err = AddBalancesForIdRanges(ctx, toUserBalanceInfo, []*types.IdRange{subbadgeRange}, amount)
 	if err != nil {
 		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
 	}
@@ -54,24 +54,24 @@ func ForcefulTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types
 	return fromUserBalanceInfo, toUserBalanceInfo, nil
 }
 
-// Removes balances and approvals, and puts them in escrow. Adds a pending transfer to both parties' pending.
-func PendingTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.IdRange, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, amount uint64, from uint64, to uint64, approvedBy uint64, expirationTime uint64, cantCancelBeforeTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
+// Removes balances and approvals from "From" address and puts them in escrow. Adds the pending transfer object to both parties' pending array.
+func PendingTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange *types.IdRange, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, amount uint64, from uint64, to uint64, approvedBy uint64, expirationTime uint64, cantCancelBeforeTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
 	// 1. Check if the from address is frozen
 	// 2. Remove approvals if approvedBy != from
 	// 3. Deduct from "From" balance
 	// 4. Append pending transfers to both parties
-	// 5. If the pending tranfer is eventually accepted, we simply add the balance. If it is removed, we revert the balance and approvals.
+	// 5. If the pending tranfer is eventually accepted, we simply add the balance to "To". If it is removed, we revert the balance and approvals.
 	err := AssertAccountNotFrozen(ctx, badge, from)
 	if err != nil {
 		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
 	}
 
 	fromUserBalanceInfo, err = DeductApprovals(ctx, fromUserBalanceInfo, badge, badge.Id, subbadgeRange, from, to, approvedBy, amount)
-		if err != nil {
-			return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
-		}
+	if err != nil {
+		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
+	}
 
-	fromUserBalanceInfo, err = SubtractBalancesForIdRanges(ctx, fromUserBalanceInfo, []*types.IdRange{&subbadgeRange}, amount)
+	fromUserBalanceInfo, err = SubtractBalancesForIdRanges(ctx, fromUserBalanceInfo, []*types.IdRange{subbadgeRange}, amount)
 	if err != nil {
 		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
 	}
@@ -84,13 +84,13 @@ func PendingTransfer(ctx sdk.Context, badge types.BitBadge, subbadgeRange types.
 	return fromUserBalanceInfo, toUserBalanceInfo, nil
 }
 
-// Deduct approvals fromrequester if requester != from
-func DeductApprovals(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, badge types.BitBadge, badgeId uint64, rangeToDeduct types.IdRange, from uint64, to uint64, requester uint64, amount uint64) (types.UserBalanceInfo, error) {
+// Deduct approvals from requester if requester != from
+func DeductApprovals(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, badge types.BitBadge, badgeId uint64, rangeToDeduct *types.IdRange, from uint64, to uint64, requester uint64, amount uint64) (types.UserBalanceInfo, error) {
 	newUserBalanceInfo := userBalanceInfo
 
 	if from != requester {
-		postApprovalUserBalanceInfo, err := RemoveBalanceFromApproval(ctx, newUserBalanceInfo, amount, requester, rangeToDeduct)
-		newUserBalanceInfo = postApprovalUserBalanceInfo
+		err := *new(error)
+		newUserBalanceInfo, err = RemoveBalanceFromApproval(ctx, newUserBalanceInfo, amount, requester, rangeToDeduct)
 		if err != nil {
 			return userBalanceInfo, err
 		}
@@ -99,10 +99,10 @@ func DeductApprovals(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, bad
 	return newUserBalanceInfo, nil
 }
 
-// Deduct approvals fromrequester if requester != from
-func RevertEscrowedBalancesAndApprovals(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, rangeToRevert types.IdRange, from uint64, approvedBy uint64, amount uint64) (types.UserBalanceInfo, error) {
+// Revert escrowed balances and approvals if a pending transfer is rejected / cancelled. 
+func RevertEscrowedBalancesAndApprovals(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, rangeToRevert *types.IdRange, from uint64, approvedBy uint64, amount uint64) (types.UserBalanceInfo, error) {
 	err := *new(error)
-	userBalanceInfo, err = AddBalancesForIdRanges(ctx, userBalanceInfo, []*types.IdRange{&rangeToRevert}, amount)
+	userBalanceInfo, err = AddBalancesForIdRanges(ctx, userBalanceInfo, []*types.IdRange{rangeToRevert}, amount)
 	if err != nil {
 		return types.UserBalanceInfo{}, err
 	}

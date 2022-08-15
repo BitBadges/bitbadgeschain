@@ -1,26 +1,22 @@
 package keeper
 
 import (
-	"math"
-
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-// Binary search ID ranges for a specific ID. Return idx, true if found. And -1, false if not
+// Search ID ranges for a specific ID. Return (idx, true) if found. And (-1, false) if not.
 func SearchIdRangesForId(id uint64, idRanges []*types.IdRange) (int, bool) {
+	//Binary search because ID ranges will be sorted
 	low := 0
 	high := len(idRanges) - 1
 	for low <= high {
 		median := int(uint(low+high) >> 1)
 
-		currRange := idRanges[median]
-		if currRange.End == 0 {
-			currRange.End = currRange.Start // If end == 0, set it to start by convention (done in order to save space)
-		}
+		currRange := NormalizeIdRange(idRanges[median])
 
-		if idRanges[median].Start <= id && idRanges[median].End >= id {
+		if currRange.Start <= id && currRange.End >= id {
 			return median, true
-		} else if idRanges[median].Start > id {
+		} else if currRange.Start > id {
 			high = median - 1
 		} else {
 			low = median + 1
@@ -30,77 +26,32 @@ func SearchIdRangesForId(id uint64, idRanges []*types.IdRange) (int, bool) {
 	return -1, false
 }
 
+// Search a set of ranges to find what indexes a specific ID range overlaps. Return overlapping idxs as a IdRange, true if found. And empty IdRang, false if not
+func GetIdxSpanForRange(targetRange *types.IdRange, idRanges []*types.IdRange) (*types.IdRange, bool) {
+	//its search for start, if found set to that
+	//if not found, set to insertIdx + 0 (because we already incremented by 1)
+	//if end is found, set to that
+	//else set to insertIdx - 1 (because we already incremented by 1)
+	targetRange = NormalizeIdRange(targetRange)
 
-// Binary search ID ranges for a specific ID range idxs. Return idxs, true if found. And -1, false if not
-func GetIdxSpanForRange(targetRange types.IdRange, idRanges []*types.IdRange) (types.IdRange, bool) {
-	low := 0
-	high := len(idRanges) - 1
-	targetId := targetRange.Start
-	for low <= high {
-		median := int(uint(low+high) >> 1)
-
-		currRange := idRanges[median]
-		if currRange.End == 0 {
-			currRange.End = currRange.Start // If end == 0, set it to start by convention (done in order to save space)
-		}
-
-		targetEnd := targetRange.End
-		if targetEnd == 0 {
-			targetEnd = targetRange.Start
-		}
-
-		if idRanges[median].Start <= targetId && idRanges[median].End >= targetId {
-			//check both sides of this median
-			start := median
-			end := median
-
-			median += 1
-			for median < len(idRanges) {
-				currRange = idRanges[median]
-				if currRange.End == 0 {
-					currRange.End = currRange.Start // If end == 0, set it to start by convention (done in order to save space)
-				}
-
-				if (currRange.Start <= targetEnd && currRange.End >= targetEnd) {
-					end = median
-					median += 1
-				} else {
-					break
-				}
-			}
-
-			return *GetIdRangeToInsert(uint64(start), uint64(end)), true
-		} else if idRanges[median].Start <= targetEnd && idRanges[median].End >= targetEnd {
-			//check both sides of this median
-			start := median
-			end := median
-
-			
-
-			median -= 1
-			for median >= 0 {
-				currRange = idRanges[median]
-				if currRange.End == 0 {
-					currRange.End = currRange.Start // If end == 0, set it to start by convention (done in order to save space)
-				}
-
-				if (currRange.Start <= targetId && currRange.Start >= targetId) {
-					start = median
-					median -= 1
-				} else {
-					break
-				}
-			}
-
-			return *GetIdRangeToInsert(uint64(start), uint64(end)), true
-		} else if idRanges[median].Start > targetId {
-			high = median - 1
-		} else {
-			low = median + 1
-		}
+	startIdx, startFound := SearchIdRangesForId(targetRange.Start, idRanges)
+	if !startFound {
+		startIdx = GetIdxToInsertForNewId(targetRange.Start, idRanges)
 	}
 
-	return types.IdRange{}, false
+	endIdx, endFound := SearchIdRangesForId(targetRange.End, idRanges)
+	if !endFound {
+		endIdx = GetIdxToInsertForNewId(targetRange.End, idRanges) - 1
+	}
+
+	if startIdx <= endIdx {
+		return &types.IdRange{
+			Start: uint64(startIdx),
+			End:   uint64(endIdx),
+		}, true
+	} else {
+		return &types.IdRange{}, false
+	}
 }
 
 // Handle the case where it omits an empty IdRange because Start && End == 0. This is in the case where we have a non-empty balance and an empty idRanges.
@@ -123,62 +74,60 @@ func GetIdRangeToInsert(start uint64, end uint64) *types.IdRange {
 	}
 }
 
+// Normalizes an existing ID range with the additional convention of storing end == 0 when end == start
+func NormalizeIdRange(rangeToNormalize *types.IdRange) *types.IdRange {
+	if rangeToNormalize.End == 0 {
+		rangeToNormalize.End = rangeToNormalize.Start
+	}
+
+	return &types.IdRange{
+		Start: rangeToNormalize.Start,
+		End:   rangeToNormalize.End,
+	}
+}
+
 // Assumes id is not already in a range. Gets the index to insert at. Ex. [10, 20, 30] and inserting 25 would return index 2
 func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) int {
+	//Since we assume the id is not already in there, we can just compare start positions of the existing idRanges and see where it falls between
+	if len(targetIds) == 0 {
+		return 0
+	} else if len(targetIds) == 1 {
+		if targetIds[0].Start > id { //assumes not in already so we don't have to handle that case
+			return 0
+		} else {
+			return 1
+		}
+	}
+
 	low := 0
 	high := len(targetIds) - 2
 	median := 0
 	for low <= high {
 		median = int(uint(low+high) >> 1)
-		if targetIds[median].Start < id && targetIds[median+1].Start > id {
+		currRange := NormalizeIdRange(targetIds[median])
+		nextRange := NormalizeIdRange(targetIds[median+1])
+
+		if currRange.Start < id && nextRange.Start > id {
 			break
-		} else if targetIds[median].Start > id {
+		} else if currRange.Start > id {
 			high = median - 1
 		} else {
 			low = median + 1
 		}
 	}
 
+	currRange := NormalizeIdRange(targetIds[median])
 	insertIdx := median + 1
-	if targetIds[median].Start <= id {
+	if currRange.Start <= id {
 		insertIdx = median
 	}
 
-	//We return insertIdx + 1 because this function uses (curr, next) pairs so if we find that we have to insert at a certain (curr, next) pair where insertIdx == currIdx, we actually insert in between
+	//We return insertIdx + 1 because this function uses (curr, next) pairs so if we find that we have to insert at a certain (curr, next) pair where insertIdx == currIdx, we actually insert at the "next" position
 	return insertIdx + 1
 }
 
-// Assumes id is not already in a range. Gets the index to insert at. Ex. [10, 20, 30] and inserting 25 would return index 2
-func GetIdxToInsertForNewIdRange(rangeToAdd types.IdRange, targetIds []*types.IdRange) int {
-	low := 0
-	high := len(targetIds) - 2
-	median := 0
-	for low <= high {
-		median = int(uint(low+high) >> 1)
-		currRange := targetIds[median]
-		if currRange.End == 0 {
-			currRange.End = currRange.Start // If end == 0, set it to start by convention (done in order to save space)
-		}
-
-		if currRange.End < rangeToAdd.Start && targetIds[median+1].Start > rangeToAdd.End {
-			break
-		} else if currRange.End < rangeToAdd.Start {
-			high = median - 1
-		} else {
-			low = median + 1
-		}
-	}
-
-	insertIdx := median + 1
-	if targetIds[median].End >= rangeToAdd.Start {
-		insertIdx = median
-	}
-
-	return insertIdx
-}
-
 // We inserted a new id at insertedAtIdx, this can cause the prev or next to have to merge if id + 1 or id - 1 overlaps with prev or next range. Handle this here.
-func MergePrevOrNextIfNecessary(ids []*types.IdRange, insertedAtIdx int) []*types.IdRange {
+func MergePrevOrNextIfPossible(ids []*types.IdRange, insertedAtIdx int) []*types.IdRange {
 	//Handle cases where we need to merge with the previous or next range
 	needToMergeWithPrev := false
 	needToMergeWithNext := false
@@ -187,11 +136,9 @@ func MergePrevOrNextIfNecessary(ids []*types.IdRange, insertedAtIdx int) []*type
 	id := ids[insertedAtIdx].Start
 
 	if insertedAtIdx > 0 {
-		prevStartIdx = ids[insertedAtIdx-1].Start
-		prevEndIdx := ids[insertedAtIdx-1].End
-		if prevEndIdx == 0 {
-			prevEndIdx = ids[insertedAtIdx-1].Start
-		}
+		prev := NormalizeIdRange(ids[insertedAtIdx-1])
+		prevStartIdx = prev.Start
+		prevEndIdx := prev.End
 
 		if prevEndIdx+1 == id {
 			needToMergeWithPrev = true
@@ -199,11 +146,9 @@ func MergePrevOrNextIfNecessary(ids []*types.IdRange, insertedAtIdx int) []*type
 	}
 
 	if insertedAtIdx < len(ids)-1 {
-		nextStartIdx := ids[insertedAtIdx+1].Start
-		nextEndIdx = ids[insertedAtIdx+1].End
-		if nextEndIdx == 0 {
-			nextEndIdx = ids[insertedAtIdx+1].Start
-		}
+		next := NormalizeIdRange(ids[insertedAtIdx+1])
+		nextStartIdx := next.Start
+		nextEndIdx = next.End
 
 		if nextStartIdx-1 == id {
 			needToMergeWithNext = true
@@ -211,7 +156,7 @@ func MergePrevOrNextIfNecessary(ids []*types.IdRange, insertedAtIdx int) []*type
 	}
 
 	mergedIds := []*types.IdRange{}
-	// 4 Cases: Need to merge with both, just next, just prev, or none
+	// 4 Cases: Need to merge with both, just next, just prev, or neither
 	if needToMergeWithPrev && needToMergeWithNext {
 		mergedIds = append(mergedIds, ids[:insertedAtIdx-1]...)
 		mergedIds = append(mergedIds, GetIdRangeToInsert(prevStartIdx, nextEndIdx))
@@ -231,87 +176,40 @@ func MergePrevOrNextIfNecessary(ids []*types.IdRange, insertedAtIdx int) []*type
 	return mergedIds
 }
 
-//Inserts an id to the id ranges. Handles merging if necessary
-func InsertIdRange(id uint64, ids []*types.IdRange) []*types.IdRange {
+// Inserts a range into its correct position. Assumes range is already deleted and not present at all, so we only search for where start fits in.
+func InsertRangeToIdRanges(rangeToAdd *types.IdRange, ids[]*types.IdRange) []*types.IdRange {
 	newIds := []*types.IdRange{}
 	insertIdAtIdx := 0
-	if (ids[len(ids)-1].End == 0) {
-		ids[len(ids)-1].End = ids[len(ids)-1].Start
-	}
+	rangeToAdd = NormalizeIdRange(rangeToAdd)
+	lastRange := NormalizeIdRange(ids[len(ids)-1])
 
-	if ids[0].Start > id {
-		newIds = append(newIds, GetIdRangeToInsert(id, id))
-		newIds = append(newIds, ids...)
-	} else if ids[len(ids)-1].End < id {
-		insertIdAtIdx = len(ids)
-		newIds = append(newIds, ids...)
-		newIds = append(newIds, GetIdRangeToInsert(id, id))
-	} else {
-		insertIdAtIdx = GetIdxToInsertForNewId(id, ids)
-		newIds = append(newIds, ids[:insertIdAtIdx]...)
-		newIds = append(newIds, GetIdRangeToInsert(id, id))
-		newIds = append(newIds, ids[insertIdAtIdx:]...)
-	}
-
-	newIds = MergePrevOrNextIfNecessary(newIds, insertIdAtIdx)
-
-	return newIds
-}
-
-func InsertRangeToIdRanges(rangeToAdd types.IdRange, ids[]*types.IdRange) []*types.IdRange {
-	newIds := []*types.IdRange{}
-	insertIdAtIdx := 0
-	if rangeToAdd.End == 0 {
-		rangeToAdd.End = rangeToAdd.Start
-	}
-
-	if (ids[len(ids)-1].End == 0) {
-		ids[len(ids)-1].End = ids[len(ids)-1].Start
-	}
-
+	//Three cases: Goes at beginning, end, or somewhere in the middle
 	if ids[0].Start > rangeToAdd.End {
 		newIds = append(newIds, GetIdRangeToInsert(rangeToAdd.Start, rangeToAdd.End))
 		newIds = append(newIds, ids...)
-	} else if ids[len(ids)-1].End < rangeToAdd.Start {
+	} else if lastRange.End < rangeToAdd.Start {
 		insertIdAtIdx = len(ids)
 		newIds = append(newIds, ids...)
 		newIds = append(newIds, GetIdRangeToInsert(rangeToAdd.Start, rangeToAdd.End))
 	} else {
-		insertIdAtIdx = GetIdxToInsertForNewIdRange(rangeToAdd, ids)
+		insertIdAtIdx = GetIdxToInsertForNewId(rangeToAdd.Start, ids) //Only lookup start since we assume the whole range isn't included already
 		newIds = append(newIds, ids[:insertIdAtIdx]...)
 		newIds = append(newIds, GetIdRangeToInsert(rangeToAdd.Start, rangeToAdd.End))
 		newIds = append(newIds, ids[insertIdAtIdx:]...)
 	}
 
-	newIds = MergePrevOrNextIfNecessary(newIds, insertIdAtIdx)
+	newIds = MergePrevOrNextIfPossible(newIds, insertIdAtIdx)
 
 	return newIds
 }
 
-// Removes an id from a single id range. Removing can make this range be split into 0, 1, or 2 new ranges.
-func RemoveIdFromIdRange(id uint64, rangeObject types.IdRange) []*types.IdRange {
+// Removes all ids within an id range from an id range. Removing can make this range be split into 0, 1, or 2 new ranges.
+func RemoveIdsFromIdRange(rangeToRemove *types.IdRange, rangeObject *types.IdRange) []*types.IdRange {
+	//TODO: check this is correct
 	newRanges := []*types.IdRange{}
-	if id >= 1 && id-1 >= rangeObject.Start {
-		newRanges = append(newRanges, GetIdRangeToInsert(rangeObject.Start, id-1))
-	}
+	rangeToRemove = NormalizeIdRange(rangeToRemove)
+	rangeObject = NormalizeIdRange(rangeObject)
 
-	if id <= math.MaxUint64-1 && id+1 <= rangeObject.End {
-		newRanges = append(newRanges, GetIdRangeToInsert(id+1, rangeObject.End)) //Note rangeObject.End could == 0 but by removing the id, the range would just be removed
-	}
-
-	return newRanges
-}
-
-// Removes an id range from a single id range. Removing can make this range be split into 0, 1, or 2 new ranges.
-func RemoveIdsFromIdRange(rangeToRemove types.IdRange, rangeObject types.IdRange) []*types.IdRange {
-	newRanges := []*types.IdRange{}
-	if rangeToRemove.End == 0 {
-		rangeToRemove.End = rangeToRemove.Start
-	}
-
-	if rangeObject.End == 0 {
-		rangeObject.End = rangeObject.Start
-	}
 
 	if rangeToRemove.Start > rangeObject.Start && rangeToRemove.End < rangeObject.End {
 		// Completely in the middle
@@ -334,10 +232,9 @@ func RemoveIdsFromIdRange(rangeToRemove types.IdRange, rangeObject types.IdRange
 	return newRanges
 }
 
-
+//Will sort the ID ranges in order and merge overlapping IDs if we can
 func SortIdRangesAndMergeIfNecessary(ids []*types.IdRange) []*types.IdRange {
-	origIds := ids
-
+	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
 	var n = len(ids)
     for i := 1; i < n; i++ {
         j := i
@@ -351,42 +248,34 @@ func SortIdRangesAndMergeIfNecessary(ids []*types.IdRange) []*types.IdRange {
         }
     }
 	
-	newIdRanges := []*types.IdRange{}
+	//Merge overlapping ranges
 	if n > 0 {
+		newIdRanges := []*types.IdRange{}
 		newIdRanges = append(newIdRanges, GetIdRangeToInsert(ids[0].Start, ids[0].End))
 
 		for i := 1; i < n; i++ {
-			prevRange := newIdRanges[i-1]
-			if prevRange.End == 0 {
-				prevRange.End = prevRange.Start
-			}
+			prevInsertedRange := NormalizeIdRange(newIdRanges[len(newIdRanges)-1])
+			currRange := NormalizeIdRange(ids[i])
 
-			currRange := ids[i]
-			if currRange.End == 0 {
-				currRange.End = currRange.Start
-			}
-
-
-			if ids[i].Start == prevRange.Start {
-				newIdRanges[i - 1].End = currRange.End
-			} else if ids[i].End > prevRange.End {
-				if ids[i].Start > prevRange.End + 1 {
-					newIdRanges = append(newIdRanges, GetIdRangeToInsert(ids[i].Start, ids[i].End))
+			if currRange.Start == prevInsertedRange.Start {
+				//Both have same start, so we set to currRange.End because currRange.End is greater due to our sorting
+				newIdRanges[len(newIdRanges)-1].End = currRange.End
+			} else if currRange.End > prevInsertedRange.End {
+				//We have different starts and curr end is greater than prev end
+				if currRange.Start > prevInsertedRange.End + 1 {
+					//We have a gap between the prev range end and curr range start, so we just append currRange
+					newIdRanges = append(newIdRanges, GetIdRangeToInsert(currRange.Start, currRange.End))
 				} else {
-					newIdRanges[i - 1].End = currRange.End
+					//they overlap and we can merge them
+					newIdRanges[len(newIdRanges)-1].End = currRange.End
 				}
-			} else {
-				newIdRanges = append(newIdRanges, GetIdRangeToInsert(ids[i].Start, ids[i].End))
+			} else if currRange.End <= prevInsertedRange.End {
+				//Start must be >= because it is sorted, so we can just skip this range since currRange is already completely enclosed by prevRange
+				// newIdRanges = append(newIdRanges, GetIdRangeToInsert(currRange.Start, currRange.End))
 			}
 		}
+		return newIdRanges
+	} else {
+		return ids
 	}
-	
-	for i := 0; i < len(newIdRanges); i++ {
-		if newIdRanges[i].End != origIds[i].End || newIdRanges[i].Start != origIds[i].Start {
-			x := 2 +2
-			_ = x
-		}
-	}
-	
-	return newIdRanges
 }

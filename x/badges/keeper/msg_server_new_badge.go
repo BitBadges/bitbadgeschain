@@ -17,10 +17,6 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 	NextBadgeId := k.GetNextBadgeId(ctx)
 	k.IncrementNextBadgeId(ctx)
 
-	if len(msg.ArbitraryBytes) > 256 {
-		return nil, types.ErrBytesGreaterThan256
-	}
-
 	badge := types.BitBadge{
 		Id:                    NextBadgeId,
 		Uri:                   msg.Uri,
