@@ -7,9 +7,9 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func GetUriObject(uri string, subassetUri string) (types.UriObject, error) {
+func GetUriObject(uri string, subassetUri string) (*types.UriObject, error) {
 	//TODO: get uri object from uri and subasset uri
-	return types.UriObject{
+	return &types.UriObject{
 		Uri:         []byte(uri),
 	}, nil
 }

@@ -66,14 +66,14 @@ func CmdNewBadge() *cobra.Command {
 
 			msg := types.NewMsgNewBadge(
 				clientCtx.GetFromAddress().String(),
-				uriObject,
-				permissions,
-				argBytesStr,
+				argStandard,
 				defaultSupply,
 				argAmountsUInt64,
 				argSupplysUInt64,
+				uriObject,
+				permissions,
 				freezeRanges,
-				argStandard,
+				argBytesStr,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

@@ -33,7 +33,7 @@ func (suite *TestSuite) TestUpdateURIs() {
 	err = CreateBadges(suite, wctx, badgesToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	err = UpdateURIs(suite, wctx, bob, 0, types.UriObject{
+	err = UpdateURIs(suite, wctx, bob, 0, &types.UriObject{
 					Uri: 	[]byte("example.com/"),
 					Scheme: 1,
 					IdxRangeToRemove: &types.IdRange{},
@@ -83,7 +83,7 @@ func (suite *TestSuite) TestCantUpdate() {
 	err = CreateBadges(suite, wctx, badgesToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	err = UpdateURIs(suite, wctx, bob, 0, types.UriObject{
+	err = UpdateURIs(suite, wctx, bob, 0, &types.UriObject{
 					Uri: 	[]byte("example.com/"),
 					Scheme: 1,
 					IdxRangeToRemove: &types.IdRange{},
@@ -124,7 +124,7 @@ func (suite *TestSuite) TestCantUpdateNotManager() {
 	err = CreateBadges(suite, wctx, badgesToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	err = UpdateURIs(suite, wctx, alice, 0, types.UriObject{
+	err = UpdateURIs(suite, wctx, alice, 0, &types.UriObject{
 					Uri: 	[]byte("example.com/"),
 					Scheme: 1,
 					IdxRangeToRemove: &types.IdRange{},

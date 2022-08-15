@@ -9,10 +9,10 @@ const TypeMsgNewSubBadge = "new_sub_badge"
 
 var _ sdk.Msg = &MsgNewSubBadge{}
 
-func NewMsgNewSubBadge(creator string, id uint64, supplys []uint64, amountsToCreate []uint64) *MsgNewSubBadge {
+func NewMsgNewSubBadge(creator string, badgeId uint64, supplys []uint64, amountsToCreate []uint64) *MsgNewSubBadge {
 	return &MsgNewSubBadge{
 		Creator:         creator,
-		Id:              id,
+		Id:              badgeId,
 		Supplys:         supplys,
 		AmountsToCreate: amountsToCreate,
 	}

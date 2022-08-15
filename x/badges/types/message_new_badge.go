@@ -9,10 +9,10 @@ const TypeMsgNewBadge = "new_badge"
 
 var _ sdk.Msg = &MsgNewBadge{}
 
-func NewMsgNewBadge(creator string, uriObject UriObject, permissions uint64, bytesToStore []byte, defaultSupply uint64, amountsToCreate []uint64, supplysToCreate []uint64, freezeAddressRanges []*IdRange, standard uint64) *MsgNewBadge {
+func NewMsgNewBadge(creator string, standard uint64, defaultSupply uint64, amountsToCreate []uint64, supplysToCreate []uint64, uriObject *UriObject, permissions uint64, freezeAddressRanges []*IdRange, bytesToStore []byte, ) *MsgNewBadge {
 	return &MsgNewBadge{
 		Creator:                 creator,
-		Uri:                     &uriObject,
+		Uri:                     uriObject,
 		DefaultSubassetSupply:   defaultSupply,
 		SubassetAmountsToCreate: amountsToCreate,
 		SubassetSupplys:         supplysToCreate,
