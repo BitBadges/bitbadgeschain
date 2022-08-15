@@ -13,7 +13,7 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 
 	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:            msg.Creator,
-		BadgeId:            msg.Id,
+		BadgeId:            msg.BadgeId,
 		MustBeManager:      true,
 		CanCreateSubbadges: true,
 	})
@@ -23,7 +23,7 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 
 	originalSubassetId := badge.NextSubassetId
 
-	managerBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.Id)
+	managerBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
 	managerBalanceInfo, found := k.GetUserBalanceFromStore(ctx, managerBalanceKey)
 	if !found {
 		managerBalanceInfo = types.UserBalanceInfo{}
@@ -53,6 +53,6 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 	)
 
 	return &types.MsgNewSubBadgeResponse{
-		SubassetId: badge.NextSubassetId,
+		NextSubassetId: badge.NextSubassetId,
 	}, nil
 }

@@ -44,7 +44,7 @@ type BitBadge struct {
 	NextSubassetId uint64 `protobuf:"varint,12,opt,name=nextSubassetId,proto3" json:"nextSubassetId,omitempty"`
 	//Subasset supplys are stored if the subasset supply != default. Balance => SubbadgeIdRange map
 	SubassetSupplys []*BalanceObject `protobuf:"bytes,13,rep,name=subassetSupplys,proto3" json:"subassetSupplys,omitempty"`
-	//Default subasset supply. If == 0, we assume default == 1.
+	//Default subasset supply. If == 0, we assume == 1.
 	DefaultSubassetSupply uint64 `protobuf:"varint,14,opt,name=defaultSubassetSupply,proto3" json:"defaultSubassetSupply,omitempty"`
 	//Defines what standard this badge should implement. Must obey the rules of that standard.
 	Standard uint64 `protobuf:"varint,15,opt,name=standard,proto3" json:"standard,omitempty"`

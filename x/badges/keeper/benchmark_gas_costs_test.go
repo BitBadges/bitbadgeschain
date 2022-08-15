@@ -201,7 +201,7 @@ func (suite *TestSuite) TestGasCosts() {
 }
 
 
-func (suite *TestSuite) TestGasCostsOldVersion() {
+func (suite *TestSuite) TestGasCostsOldVersionWithRequireChecks() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	for i := 0; i < 1; i++ {
