@@ -81,14 +81,14 @@ func SetApproval(suite *TestSuite, ctx context.Context, creator string, amount u
 	return err
 }
 
-func HandlePendingTransfers(suite *TestSuite, ctx context.Context, creator string, accept bool, badgeId uint64, nonceRanges []*types.IdRange, forcefulAccept bool) error {
-	msg := types.NewMsgHandlePendingTransfer(creator, accept, badgeId, nonceRanges, forcefulAccept)
+func HandlePendingTransfers(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, nonceRanges []*types.IdRange, accept bool, forcefulAccept bool) error {
+	msg := types.NewMsgHandlePendingTransfer(creator, badgeId, nonceRanges, accept, forcefulAccept)
 	_, err := suite.msgServer.HandlePendingTransfer(ctx, msg)
 	return err
 }
 
-func FreezeAddresses(suite *TestSuite, ctx context.Context, creator string, addresses []*types.IdRange, badgeId uint64, add bool) error {
-	msg := types.NewMsgFreezeAddress(creator, addresses, badgeId, add)
+func FreezeAddresses(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, add bool, addresses []*types.IdRange) error {
+	msg := types.NewMsgFreezeAddress(creator, badgeId, add, addresses)
 	_, err := suite.msgServer.FreezeAddress(ctx, msg)
 	return err
 }

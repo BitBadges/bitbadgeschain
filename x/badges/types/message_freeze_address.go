@@ -9,7 +9,7 @@ const TypeMsgFreezeAddress = "freeze_address"
 
 var _ sdk.Msg = &MsgFreezeAddress{}
 
-func NewMsgFreezeAddress(creator string, addresses []*IdRange, badgeId uint64, add bool) *MsgFreezeAddress {
+func NewMsgFreezeAddress(creator string, badgeId uint64, add bool, addresses []*IdRange) *MsgFreezeAddress {
 	return &MsgFreezeAddress{
 		Creator:       creator,
 		AddressRanges: addresses,

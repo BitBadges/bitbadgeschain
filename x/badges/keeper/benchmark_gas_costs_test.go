@@ -123,49 +123,49 @@ func (suite *TestSuite) TestGasCosts() {
 		{F: func() { CreateSubBadges(suite, wctx, bob, 0, []uint64{1000000}, []uint64{1}) }},
 		{F: func() { CreateSubBadges(suite, wctx, bob, 0, []uint64{1}, []uint64{10000})}},
 		{F: func() { CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{10000})}},
-		{F: func() { FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 1000, End: 1000}}, 0, true)}},
+		{F: func() { FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: 1000, End: 1000}})}},
 		{F: func() { GetBadge(suite, wctx, 0) }},
-		{F: func() { FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 0, End: 9999}}, 0, true)}},
+		{F: func() { FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: 0, End: 9999}})}},
 		{F: func() { GetBadge(suite, wctx, 0) }},
-		{F: func() { FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 1000, End: 1000}}, 0, false)}},
+		{F: func() { FreezeAddresses(suite, wctx, bob, 0, false, []*types.IdRange{{Start: 1000, End: 1000}})}},
 		{F: func() { GetBadge(suite, wctx, 0) }},
-		{F: func() { FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 0, End: 9999}}, 0, false)}},
+		{F: func() { FreezeAddresses(suite, wctx, bob, 0, false, []*types.IdRange{{Start: 0, End: 9999}})}},
 		{F: func() { GetBadge(suite, wctx, 0) }},
 		{F: func() { TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)}},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
-		{F: func() { HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.IdRange{{Start: 0, End: 0}}, false) }},
+		{F: func() { HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false) }},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
 		{F: func() { TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)}},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
-		{F: func() { HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.IdRange{{Start: 0, End: 999}}, false)}},
+		{F: func() { HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 999}}, true, false)}},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
 		{F: func() { TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)}},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
-		{F: func() { HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 2, End: 2}}, false) }},
-		{ IgnoreGas: true, F: func() { HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 2, End: 2}}, false)},},
+		{F: func() { HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 2, End: 2}}, false, false) }},
+		{ IgnoreGas: true, F: func() { HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 2, End: 2}}, false, false)},},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
 		{F: func() { TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.IdRange{{Start: 1000, End: 1999}}, 0, 0)}},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
-		{F: func() { HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false)}},
-		{F: func() { HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 0, End: 999}}, true)}, IgnoreGas: true,},
+		{F: func() { HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 999}}, false, false)}},
+		{F: func() { HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 999}}, false, true)}, IgnoreGas: true,},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
 		{F: func() { RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)}},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
-		{F: func() { HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.IdRange{{Start: 4, End: 4}}, true) }},
+		{F: func() { HandlePendingTransfers(suite, wctx, bob,  0, []*types.IdRange{{Start: 4, End: 4}} ,true, true) }},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
 		{F: func() { RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.IdRange{{Start: 1000, End: 1999}}, 0, 0)}},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
-		{F: func() { HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.IdRange{{Start: 0, End: 999}}, true)}},
+		{F: func() { HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 999}}, true, true)}},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
 		{F: func() { RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)}},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
-		{F: func() { HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false) }},
-		{F: func() { HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false) }, IgnoreGas: true,},
+		{F: func() { HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 999}}, false, false) }},
+		{F: func() { HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 999}}, false, false) }, IgnoreGas: true,},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
 		{F: func() { RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)}},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
-		{F: func() { HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false)}},
-		{F: func() { HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false) }, IgnoreGas: true,},
+		{F: func() { HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 999}}, false, false)}},
+		{F: func() { HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 999}}, false, false) }, IgnoreGas: true,},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
 		{F: func() { GetUserBalance(suite, wctx, 0, aliceAccountNum) }},
 		{F: func() { RevokeBadges(suite, wctx, bob, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.IdRange{{Start: 0, End: 0}})}},
@@ -254,7 +254,7 @@ func (suite *TestSuite) TestGasCostsOldVersion() {
 		tbl.AddRow("CreateSubBadge 10000 (Supply 10000)", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 1000, End: 1000}}, 0, true)
+		err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: 1000, End: 1000}})
 		suite.Require().Nil(err, "Error creating subbadge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("Freeze 1 Address", endGas-startGas)
@@ -269,7 +269,7 @@ func (suite *TestSuite) TestGasCostsOldVersion() {
 			addressesThroughTenThousand[j] = uint64(j)
 		}
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 0, End: 9999}}, 0, true)
+		err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: 0, End: 9999}})
 		suite.Require().Nil(err, "Error creating subbadge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("Freeze 10000 Addresses", endGas-startGas)
@@ -280,7 +280,7 @@ func (suite *TestSuite) TestGasCostsOldVersion() {
 		tbl.AddRow("GetBadge", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 1000, End: 1000}}, 0, false)
+		err = FreezeAddresses(suite, wctx, bob, 0, false, []*types.IdRange{{Start: 1000, End: 1000}})
 		suite.Require().Nil(err, "Error creating subbadge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("Unfreeze 1 Address", endGas-startGas)
@@ -291,7 +291,7 @@ func (suite *TestSuite) TestGasCostsOldVersion() {
 		tbl.AddRow("GetBadge", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: 0, End: 9999}}, 0, false)
+		err = FreezeAddresses(suite, wctx, bob, 0, false, []*types.IdRange{{Start: 0, End: 9999}})
 		suite.Require().Nil(err, "Error creating subbadge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("Unfreeze 10000 Address", endGas-startGas)
@@ -313,7 +313,7 @@ func (suite *TestSuite) TestGasCostsOldVersion() {
 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.IdRange{{Start: 0, End: 0}}, false)
+		err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
 		suite.Require().Nil(err, "Error accepting badge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("HandlePendingTransfer - 1", endGas-startGas)
@@ -335,7 +335,7 @@ func (suite *TestSuite) TestGasCostsOldVersion() {
 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.IdRange{{Start: 0, End: 999}}, false)
+		err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 999}}, true, false)
 		suite.Require().Nil(err, "Error transferring badge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("HandlePendingTransfer - 1000", endGas-startGas)
@@ -357,11 +357,11 @@ func (suite *TestSuite) TestGasCostsOldVersion() {
 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 2, End: 2}}, false)
+		err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 2, End: 2}}, false, false)
 		suite.Require().Nil(err, "Error accepting badge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("HandlePendingTransfer (Reject) - 1", endGas-startGas)
-		err = HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 2, End: 2}}, false)
+		err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 2, End: 2}}, false, false)
 		suite.Require().Nil(err, "Error accepting badge")
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
@@ -381,11 +381,11 @@ func (suite *TestSuite) TestGasCostsOldVersion() {
 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false)
+		err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 999}}, false, false)
 		suite.Require().Nil(err, "Error transferring badge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("HandlePendingTransfer (Reject) - 1000", endGas-startGas)
-		err = HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 0, End: 999}}, true)
+		err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 999}}, false, true)
 		suite.Require().Nil(err, "Error transferring badge")
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
@@ -405,7 +405,7 @@ func (suite *TestSuite) TestGasCostsOldVersion() {
 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.IdRange{{Start: 4, End: 4}}, true)
+		err = HandlePendingTransfers(suite, wctx, bob,  0, []*types.IdRange{{Start: 4, End: 4}}, true, true)
 		suite.Require().Nil(err, "Error accepting badge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("Accept RequestTransfer - 1", endGas-startGas)
@@ -429,11 +429,11 @@ func (suite *TestSuite) TestGasCostsOldVersion() {
 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = HandlePendingTransfers(suite, wctx, bob, true, 0, []*types.IdRange{{Start: 0, End: 999}}, true)
+		err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 999}}, true, true)
 		suite.Require().Nil(err, "Error transferring badge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("Accept RequestTransfer - 1000", endGas-startGas)
-		// err = HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.IdRange{{Start: 0, End: 999}}, 0, 0)
+		// err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 999}}, true, 0, 0)
 		// suite.Require().Nil(err, "Error transferring badge")
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
@@ -453,11 +453,11 @@ func (suite *TestSuite) TestGasCostsOldVersion() {
 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false)
+		err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 999}}, false, false)
 		suite.Require().Nil(err, "Error accepting badge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("Reject RequestTransfer - 1", endGas-startGas)
-		err = HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false)
+		err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 999}}, false, false)
 		suite.Require().Nil(err, "Error accepting badge")
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
@@ -477,11 +477,11 @@ func (suite *TestSuite) TestGasCostsOldVersion() {
 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false)
+		err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 999}}, false, false)
 		suite.Require().Nil(err, "Error transferring badge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("Reject RequestTransfer - 1000", endGas-startGas)
-		err = HandlePendingTransfers(suite, wctx, alice, false, 0, []*types.IdRange{{Start: 0, End: 999}}, false)
+		err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 999}}, false, false)
 		suite.Require().Nil(err, "Error accepting badge")
 
 		startGas = suite.ctx.GasMeter().GasConsumed()

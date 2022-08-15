@@ -9,7 +9,7 @@ const TypeMsgHandlePendingTransfer = "handle_pending_transfer"
 
 var _ sdk.Msg = &MsgHandlePendingTransfer{}
 
-func NewMsgHandlePendingTransfer(creator string, accept bool, badgeId uint64, nonceRanges []*IdRange, forcefulAccept bool) *MsgHandlePendingTransfer {
+func NewMsgHandlePendingTransfer(creator string, badgeId uint64, nonceRanges []*IdRange, accept bool, forcefulAccept bool) *MsgHandlePendingTransfer {
 	return &MsgHandlePendingTransfer{
 		Creator:        creator,
 		Accept:         accept,

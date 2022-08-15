@@ -185,7 +185,7 @@ func (suite *TestSuite) TestTransferBadgeForceBurn() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(false, aliceBalanceInfo.Pending[0].Sent)
 
-	err = HandlePendingTransfers(suite, wctx, alice, true, 0, []*types.IdRange{{Start: 0, End: 0}}, false)
+	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
 	suite.Require().Nil(err, "Error accepting badge")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -491,7 +491,7 @@ func (suite *TestSuite) TestApprovalOverflow() {
 	err = SetApproval(suite, wctx, bob, math.MaxUint64, charlieAccountNum, 0, []*types.IdRange{{Start: 0, End: 0}})
 	suite.Require().Nil(err, "Error setting approval")
 
-	err = HandlePendingTransfers(suite, wctx, bob, false, 0, []*types.IdRange{{Start: 0, End: 0}}, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, false,  false)
 	suite.Require().Nil(err, "Error setting approval")
 }
 

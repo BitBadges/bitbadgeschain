@@ -97,7 +97,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 
 	suite.Require().Equal(uint64(5000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, aliceBalanceInfo.BalanceAmounts)[0].Balance)
 
-	err = FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: aliceAccountNum, End: aliceAccountNum}}, 0, true)
+	err = FreezeAddresses(suite, wctx, bob,  0, true, []*types.IdRange{{Start: aliceAccountNum, End: aliceAccountNum}})
 	suite.Require().Nil(err, "Error freezing address")
 
 	badge, _ = GetBadge(suite, wctx, 0)
@@ -150,7 +150,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefault() {
 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 
-	err = FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}}, 0, true)
+	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}})
 	suite.Require().Nil(err, "Error unfreezing address")
 
 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
@@ -204,16 +204,16 @@ func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefaultAddAndRemove() {
 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 
-	err = FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}}, 0, true)
+	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}})
 	suite.Require().Nil(err, "Error unfreezing address")
 
-	err = FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}}, 0, false)
+	err = FreezeAddresses(suite, wctx, bob, 0, false, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}})
 	suite.Require().Nil(err, "Error unfreezing address")
 
 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 
-	err = FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}}, 0, true)
+	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}})
 	suite.Require().Nil(err, "Error unfreezing address")
 
 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
@@ -247,6 +247,6 @@ func (suite *TestSuite) TestFreezeCantFreeze() {
 
 	CreateBadges(suite, wctx, badgesToCreate)
 
-	err := FreezeAddresses(suite, wctx, bob, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}}, 0, true)
+	err := FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}})
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }

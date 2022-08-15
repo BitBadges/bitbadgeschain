@@ -44,9 +44,9 @@ func CmdFreezeAddress() *cobra.Command {
 
 			msg := types.NewMsgFreezeAddress(
 				clientCtx.GetFromAddress().String(),
-				addressRanges,
 				argBadgeId,
 				argAdd,
+				addressRanges,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
