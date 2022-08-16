@@ -14,7 +14,7 @@ type GasFunction struct {
 	F         func()
 }
 
-const PRINT_MODE = false
+const PRINT_MODE = true
 
 func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions []GasFunction) {
 	for _, f := range functions {
