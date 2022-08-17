@@ -23,10 +23,7 @@ func (k Keeper) GetBadgeAndAssertSubbadgeRangesAreValid(ctx sdk.Context, badgeId
 	}
 
 	for _, subbadgeRange := range subbadgeRanges {
-		// Subbadge ranges can set end == 0 to save storage space. By convention, this means end == start
-		if subbadgeRange.End == 0 {
-			subbadgeRange.End = subbadgeRange.Start
-		}
+		subbadgeRange = NormalizeIdRange(subbadgeRange)
 
 		if subbadgeRange.Start > subbadgeRange.End {
 			return types.BitBadge{}, ErrInvalidSubbadgeRange

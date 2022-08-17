@@ -32,9 +32,15 @@ func (suite *TestSuite) TestSetApprovals() {
 		},
 	}
 
+	randomAcccountNum := uint64(30)
+	err := *new(error)
 	for _, subbadgeRange := range subbadgeRanges {
-		userBalanceInfo, _ = keeper.SetApproval(suite.ctx, userBalanceInfo, 1000, aliceAccountNum, &subbadgeRange)
-		userBalanceInfo, _ = keeper.SetApproval(suite.ctx, userBalanceInfo, 1000, charlieAccountNum, &subbadgeRange)
+		userBalanceInfo, err = keeper.SetApproval(suite.ctx, userBalanceInfo, 1000, aliceAccountNum, &subbadgeRange)
+		suite.Require().NoError(err)
+		userBalanceInfo, err = keeper.SetApproval(suite.ctx, userBalanceInfo, 1000, charlieAccountNum, &subbadgeRange)
+		suite.Require().NoError(err)
+		userBalanceInfo, err = keeper.SetApproval(suite.ctx, userBalanceInfo, 1000, randomAcccountNum, &subbadgeRange)
+		suite.Require().NoError(err)
 	}
 
 	suite.Require().Equal(userBalanceInfo.Approvals[0].Address, aliceAccountNum)
@@ -66,16 +72,24 @@ func (suite *TestSuite) TestSetApprovals() {
 	}
 
 	for _, subbadgeRange := range subbadgeRangesToRemove {
-		userBalanceInfo, _ = keeper.SetApproval(suite.ctx, userBalanceInfo, 0, aliceAccountNum, &subbadgeRange)
-		userBalanceInfo, _ = keeper.SetApproval(suite.ctx, userBalanceInfo, 0, charlieAccountNum, &subbadgeRange)
+		userBalanceInfo, err = keeper.SetApproval(suite.ctx, userBalanceInfo, 0, aliceAccountNum, &subbadgeRange)
+		suite.Require().NoError(err)
+		userBalanceInfo, err = keeper.SetApproval(suite.ctx, userBalanceInfo, 0, charlieAccountNum, &subbadgeRange)
+		suite.Require().NoError(err)
+		userBalanceInfo, err = keeper.SetApproval(suite.ctx, userBalanceInfo, 0, randomAcccountNum, &subbadgeRange)
+		suite.Require().NoError(err)
 	}
 	
 	suite.Require().Equal(userBalanceInfo.Approvals[0].Address, aliceAccountNum)
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].Balance, uint64(1000))
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].IdRanges, []*types.IdRange{{Start: 2, End: 34}})
 
-	userBalanceInfo, _ = keeper.SetApproval(suite.ctx, userBalanceInfo, 0, aliceAccountNum, &types.IdRange{Start: 2, End: 34})
-	userBalanceInfo, _ = keeper.SetApproval(suite.ctx, userBalanceInfo, 0, charlieAccountNum, &types.IdRange{Start: 2, End: 34})
+	userBalanceInfo, err = keeper.SetApproval(suite.ctx, userBalanceInfo, 0, aliceAccountNum, &types.IdRange{Start: 2, End: 34})
+	suite.Require().NoError(err)
+	userBalanceInfo, err = keeper.SetApproval(suite.ctx, userBalanceInfo, 0, charlieAccountNum, &types.IdRange{Start: 2, End: 34})
+	suite.Require().NoError(err)
+	userBalanceInfo, err = keeper.SetApproval(suite.ctx, userBalanceInfo, 0, randomAcccountNum, &types.IdRange{Start: 2, End: 34})
+	suite.Require().NoError(err)
 	suite.Require().Equal(len(userBalanceInfo.Approvals), 0)
 }
 
@@ -102,15 +116,45 @@ func (suite *TestSuite) TestRemoveApprovals() {
 			Start: 35,
 			End:   100,
 		},
+		{
+			Start: 135,
+			End:   200,
+		},
+		{
+			Start: 235,
+			End:   300,
+		},
+		{
+			Start: 335,
+			End:   400,
+		},
 	}
 
+	err := *new(error)
 	for _, subbadgeRange := range subbadgeRanges {
-		userBalanceInfo, _ = keeper.SetApproval(suite.ctx, userBalanceInfo, 1000, aliceAccountNum, &subbadgeRange)
+		userBalanceInfo, err = keeper.SetApproval(suite.ctx, userBalanceInfo, 1000, aliceAccountNum, &subbadgeRange)
+		suite.Require().NoError(err)
 	}
 
 	suite.Require().Equal(userBalanceInfo.Approvals[0].Address, aliceAccountNum)
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].Balance, uint64(1000))
-	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].IdRanges, []*types.IdRange{{Start: 0, End: 100}})
+	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].IdRanges, []*types.IdRange{
+		{ 
+			Start: 0, End: 100,
+		}, 
+		{
+			Start: 135,
+			End:   200,
+		},
+		{
+			Start: 235,
+			End:   300,
+		},
+		{
+			Start: 335,
+			End:   400,
+		},
+	})
 
 	subbadgeRangesToRemove := []types.IdRange{
 		{
@@ -128,7 +172,8 @@ func (suite *TestSuite) TestRemoveApprovals() {
 	}
 
 	for _, subbadgeRange := range subbadgeRangesToRemove {
-		userBalanceInfo, _ = keeper.RemoveBalanceFromApproval(suite.ctx, userBalanceInfo, 1, aliceAccountNum, &subbadgeRange)
+		userBalanceInfo, err = keeper.RemoveBalanceFromApproval(suite.ctx, userBalanceInfo, 1, aliceAccountNum, &subbadgeRange)
+		suite.Require().NoError(err)
 	}
 	
 	suite.Require().Equal(userBalanceInfo.Approvals[0].Address, aliceAccountNum)
@@ -295,8 +340,10 @@ func (suite *TestSuite) TestRemoveApprovalsUnderflow() {
 		},
 	}
 
+	err := *new(error)
 	for _, subbadgeRange := range subbadgeRanges {
-		userBalanceInfo, _ = keeper.SetApproval(suite.ctx, userBalanceInfo, 1000, aliceAccountNum, &subbadgeRange)
+		userBalanceInfo, err = keeper.SetApproval(suite.ctx, userBalanceInfo, 1000, aliceAccountNum, &subbadgeRange)
+		suite.Require().NoError(err)
 	}
 
 	suite.Require().Equal(userBalanceInfo.Approvals[0].Address, aliceAccountNum)
@@ -317,7 +364,7 @@ func (suite *TestSuite) TestRemoveApprovalsUnderflow() {
 			End:   100,
 		},
 	}
-	err := *new(error)
+	
 	for _, subbadgeRange := range subbadgeRangesToRemove {
 		userBalanceInfo, err = keeper.RemoveBalanceFromApproval(suite.ctx, userBalanceInfo, math.MaxUint64, aliceAccountNum, &subbadgeRange)
 		suite.Require().EqualError(err, keeper.ErrUnderflow.Error())
