@@ -118,7 +118,6 @@ func AddBalanceToApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo
 	//Basic flow is we get the current approval amounts and ranges in currApprovalAmounts for all IDs in our specified subbadgeRange, 
 	//and for each unique balance found (which also has its own corresponding []IdRange), we update the balances to balance + amountToAdd
 	approval := userBalanceInfo.Approvals[idx]
-	newAmounts := approval.ApprovalAmounts
 	currApprovalAmounts := GetBalancesForIdRanges([]*types.IdRange{subbadgeRange}, approval.ApprovalAmounts)
 	for _, currApprovalAmountObj := range currApprovalAmounts {
 		newBalance, err := SafeAdd(currApprovalAmountObj.Balance, amountToAdd)
@@ -126,10 +125,10 @@ func AddBalanceToApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo
 			newBalance = math.MaxUint64
 		}
 
-		newAmounts = UpdateBalancesForIdRanges(currApprovalAmountObj.IdRanges, newBalance, approval.ApprovalAmounts)
+		approval.ApprovalAmounts = UpdateBalancesForIdRanges(currApprovalAmountObj.IdRanges, newBalance, approval.ApprovalAmounts)
 	}
 
-	userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts
+	userBalanceInfo.Approvals[idx].ApprovalAmounts = approval.ApprovalAmounts
 
 	return GetBalanceInfoToInsertToStorage(userBalanceInfo), nil
 }
