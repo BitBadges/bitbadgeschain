@@ -35,7 +35,7 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 		}
 	}
 
-	if err := k.SetUserBalanceInStore(ctx, creatorBalanceKey, creatorBalanceInfo); err != nil {
+	if err := k.SetUserBalanceInStore(ctx, creatorBalanceKey, GetBalanceInfoToInsertToStorage(creatorBalanceInfo)); err != nil {
 		return nil, err
 	}
 

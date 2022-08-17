@@ -38,7 +38,7 @@ func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge)
 		return nil, err
 	}
 
-	if err := k.SetUserBalanceInStore(ctx, managerBalanceKey, managerBalanceInfo); err != nil {
+	if err := k.SetUserBalanceInStore(ctx, managerBalanceKey, GetBalanceInfoToInsertToStorage(managerBalanceInfo)); err != nil {
 		return nil, err
 	}
 

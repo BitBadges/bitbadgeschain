@@ -168,14 +168,14 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 		}
 	}
 
-	err = k.SetUserBalanceInStore(ctx, creatorBalanceKey, creatorBalanceInfo)
+	err = k.SetUserBalanceInStore(ctx, creatorBalanceKey, GetBalanceInfoToInsertToStorage(creatorBalanceInfo))
 	if err != nil {
 		return nil, err
 	}
 
 	//For all user balances that we did update, update the store
 	for key := range didUpdateBalanceInfo {
-		err = k.SetUserBalanceInStore(ctx, ConstructBalanceKey(key, msg.BadgeId), balanceInfoCache[key])
+		err = k.SetUserBalanceInStore(ctx, ConstructBalanceKey(key, msg.BadgeId), GetBalanceInfoToInsertToStorage(balanceInfoCache[key]))
 		if err != nil {
 			return nil, err
 		}

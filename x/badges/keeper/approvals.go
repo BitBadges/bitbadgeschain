@@ -18,6 +18,11 @@ func SetApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount 
 		newAmounts := approval.ApprovalAmounts
 		newAmounts = UpdateBalancesForIdRanges([]*types.IdRange{subbadgeRange}, amount, newAmounts)
 		userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts
+
+		if (len(userBalanceInfo.Approvals[idx].ApprovalAmounts) == 0) {
+			//If we end up in the event where this address does not have any more approvals after being removed, we don't have to store it anymore
+			userBalanceInfo.Approvals = append(userBalanceInfo.Approvals[:idx], userBalanceInfo.Approvals[idx+1:]...)
+		}
 	} else {
 		//Add new approval object for address at idx, if amount != 0
 		newApprovals := []*types.Approval{}
@@ -28,7 +33,7 @@ func SetApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount 
 				ApprovalAmounts: []*types.BalanceObject{
 					{
 						Balance:  amount,
-						IdRanges: []*types.IdRange{subbadgeRange},
+						IdRanges: []*types.IdRange{GetIdRangeToInsert(subbadgeRange.Start, subbadgeRange.End)},
 					},
 				},
 			})
@@ -38,7 +43,9 @@ func SetApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount 
 		userBalanceInfo.Approvals = newApprovals
 	}
 
-	return userBalanceInfo, nil
+	
+
+	return GetBalanceInfoToInsertToStorage(userBalanceInfo), nil
 }
 
 //Remove a balance from the approval amount for address
@@ -76,7 +83,7 @@ func RemoveBalanceFromApproval(ctx sdk.Context, userBalanceInfo types.UserBalanc
 		userBalanceInfo.Approvals = append(userBalanceInfo.Approvals[:idx], userBalanceInfo.Approvals[idx+1:]...)
 	}
 
-	return userBalanceInfo, nil
+	return GetBalanceInfoToInsertToStorage(userBalanceInfo), nil
 }
 
 //Add a balance to the approval amount
@@ -95,13 +102,13 @@ func AddBalanceToApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo
 			ApprovalAmounts: []*types.BalanceObject{
 				{
 					Balance:  amountToAdd,
-					IdRanges: []*types.IdRange{subbadgeRange},
+					IdRanges: []*types.IdRange{GetIdRangeToInsert(subbadgeRange.Start, subbadgeRange.End)},
 				},
 			},
 		})
 		newApprovals = append(newApprovals, userBalanceInfo.Approvals[idx:]...)
 		userBalanceInfo.Approvals = newApprovals
-		return userBalanceInfo, ErrInsufficientApproval
+		return userBalanceInfo, nil
 	}
 
 	//This may be a bit confusing because we have the following structure:
@@ -124,7 +131,7 @@ func AddBalanceToApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo
 
 	userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts
 
-	return userBalanceInfo, nil
+	return GetBalanceInfoToInsertToStorage(userBalanceInfo), nil
 }
 
 // Approvals will be sorted, so we can binary search to get the targetIdx. 

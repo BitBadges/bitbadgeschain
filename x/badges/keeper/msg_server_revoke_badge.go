@@ -50,13 +50,13 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 			return nil, err
 		}
 
-		err = k.SetUserBalanceInStore(ctx, addressBalanceKey, addressBalanceInfo)
+		err = k.SetUserBalanceInStore(ctx, addressBalanceKey, GetBalanceInfoToInsertToStorage(addressBalanceInfo))
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	err = k.SetUserBalanceInStore(ctx, managerBalanceKey, managerBalanceInfo)
+	err = k.SetUserBalanceInStore(ctx, managerBalanceKey, GetBalanceInfoToInsertToStorage(managerBalanceInfo))
 	if err != nil {
 		return nil, err
 	}

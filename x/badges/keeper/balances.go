@@ -114,7 +114,7 @@ func AddBalancesForIdRanges(ctx sdk.Context, userBalanceInfo types.UserBalanceIn
 
 		userBalanceInfo.BalanceAmounts = UpdateBalancesForIdRanges(currBalanceObj.IdRanges, newBalance, userBalanceInfo.BalanceAmounts)
 	}
-	return userBalanceInfo, nil
+	return GetBalanceInfoToInsertToStorage(userBalanceInfo), nil
 }
 
 // Subtracts a balance to all ids specified in []ranges
@@ -128,7 +128,7 @@ func SubtractBalancesForIdRanges(ctx sdk.Context, userBalanceInfo types.UserBala
 
 		userBalanceInfo.BalanceAmounts = UpdateBalancesForIdRanges(currBalanceObj.IdRanges, newBalance, userBalanceInfo.BalanceAmounts)
 	}
-	return userBalanceInfo, nil
+	return GetBalanceInfoToInsertToStorage(userBalanceInfo), nil
 }
 
 // Deletes the balance for a specific id.
@@ -136,20 +136,21 @@ func DeleteBalanceForIdRanges(ranges []*types.IdRange, balanceObjects []*types.B
 	newBalanceObjects := []*types.BalanceObject{}
 	for _, balanceObj := range balanceObjects {
 		balanceObj.IdRanges = GetIdRangesWithOmitEmptyCaseHandled(balanceObj.IdRanges)
-
+		
 		for _, rangeToDelete := range ranges {
-			idxSpan, found := GetIdxSpanForRange(rangeToDelete, balanceObj.IdRanges)
+			currRanges := balanceObj.IdRanges
+			idxSpan, found := GetIdxSpanForRange(rangeToDelete, currRanges)
 			if found {
 				if idxSpan.End == 0 {
 					idxSpan.End = idxSpan.Start
 				}
 
 				//Remove the ids within the rangeToDelete from existing ranges
-				newIdRanges := append([]*types.IdRange{}, balanceObj.IdRanges[:idxSpan.Start]...)
+				newIdRanges := append([]*types.IdRange{}, currRanges[:idxSpan.Start]...)
 				for i := idxSpan.Start; i <= idxSpan.End; i++ {
-					newIdRanges = append(newIdRanges, RemoveIdsFromIdRange(rangeToDelete, balanceObj.IdRanges[i])...)
+					newIdRanges = append(newIdRanges, RemoveIdsFromIdRange(rangeToDelete, currRanges[i])...)
 				}
-				newIdRanges = append(newIdRanges, balanceObj.IdRanges[idxSpan.End + 1:]...)
+				newIdRanges = append(newIdRanges, currRanges[idxSpan.End + 1:]...)
 				balanceObj.IdRanges = newIdRanges
 			}
 		}
@@ -175,9 +176,13 @@ func SetBalanceForIdRanges(ranges []*types.IdRange, amount uint64, balanceObject
 	if !found {
 		//We don't have an existing object with such a balance
 		newBalanceObjects = append(newBalanceObjects, balanceObjects[:idx]...)
+		rangesToInsert := []*types.IdRange{}
+		for _, rangeToAdd := range ranges {
+			rangesToInsert = append(rangesToInsert, GetIdRangeToInsert(rangeToAdd.Start, rangeToAdd.End))
+		}
 		newBalanceObjects = append(newBalanceObjects, &types.BalanceObject{
 			Balance:  amount,
-			IdRanges: ranges,
+			IdRanges: rangesToInsert,
 		})
 		newBalanceObjects = append(newBalanceObjects, balanceObjects[idx:]...)
 	} else {
@@ -220,4 +225,17 @@ func SearchBalanceObjectsForBalanceAndGetIdxToInsertIfNotFound(targetAmount uint
 	}
 
 	return idx, hasEntryWithSameBalance
+}
+
+func GetBalanceInfoToInsertToStorage(balanceInfo types.UserBalanceInfo) types.UserBalanceInfo {
+	for _, balanceObject := range balanceInfo.BalanceAmounts {
+		balanceObject.IdRanges = GetIdRangesToInsertToStorage(balanceObject.IdRanges)
+	}
+
+	for _, approvalObject := range balanceInfo.Approvals {
+		for _, approvalAmountObject := range approvalObject.ApprovalAmounts {
+			approvalAmountObject.IdRanges = GetIdRangesToInsertToStorage(approvalAmountObject.IdRanges)
+		}
+	}
+	return balanceInfo
 }

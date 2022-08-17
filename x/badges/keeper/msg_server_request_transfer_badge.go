@@ -41,11 +41,11 @@ func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgReq
 		}
 	}
 
-	if err := k.SetUserBalanceInStore(ctx, fromBalanceKey, fromUserBalanceInfo); err != nil {
+	if err := k.SetUserBalanceInStore(ctx, fromBalanceKey, GetBalanceInfoToInsertToStorage(fromUserBalanceInfo)); err != nil {
 		return nil, err
 	}
 
-	if err := k.SetUserBalanceInStore(ctx, toBalanceKey, toUserBalanceInfo); err != nil {
+	if err := k.SetUserBalanceInStore(ctx, toBalanceKey, GetBalanceInfoToInsertToStorage(toUserBalanceInfo)); err != nil {
 		return nil, err
 	}
 
