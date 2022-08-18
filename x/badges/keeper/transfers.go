@@ -89,7 +89,7 @@ func DeductApprovals(userBalanceInfo types.UserBalanceInfo, badge types.BitBadge
 
 	if from != requester {
 		err := *new(error)
-		newUserBalanceInfo, err = RemoveBalanceFromApproval(newUserBalanceInfo, amount, requester, rangeToDeduct)
+		newUserBalanceInfo, err = RemoveBalanceFromApproval(newUserBalanceInfo, amount, requester, []*types.IdRange{rangeToDeduct})
 		if err != nil {
 			return userBalanceInfo, err
 		}
@@ -108,7 +108,7 @@ func RevertEscrowedBalancesAndApprovals(userBalanceInfo types.UserBalanceInfo, r
 
 	//If it was sent via an approval, we need to add the approval back
 	if approvedBy != from {
-		userBalanceInfo, err = AddBalanceToApproval(userBalanceInfo, amount, approvedBy, rangeToRevert)
+		userBalanceInfo, err = AddBalanceToApproval(userBalanceInfo, amount, approvedBy, []*types.IdRange{rangeToRevert})
 		if err != nil {
 			return types.UserBalanceInfo{}, err
 		}

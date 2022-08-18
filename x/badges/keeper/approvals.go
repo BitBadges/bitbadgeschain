@@ -48,7 +48,7 @@ func SetApproval(userBalanceInfo types.UserBalanceInfo, amount uint64, addressNu
 }
 
 //Remove a balance from the approval amount for address
-func RemoveBalanceFromApproval(userBalanceInfo types.UserBalanceInfo, amountToRemove uint64, addressNum uint64, subbadgeRange *types.IdRange) (types.UserBalanceInfo, error) {
+func RemoveBalanceFromApproval(userBalanceInfo types.UserBalanceInfo, amountToRemove uint64, addressNum uint64, subbadgeRanges []*types.IdRange) (types.UserBalanceInfo, error) {
 	if amountToRemove == 0 {
 		return userBalanceInfo, nil
 	}
@@ -66,7 +66,7 @@ func RemoveBalanceFromApproval(userBalanceInfo types.UserBalanceInfo, amountToRe
 	
 	//Basic flow is we get the current approval amounts and ranges in currApprovalAmounts for all IDs in our specified subbadgeRange, 
 	//and for each unique balance found (which also has its own corresponding []IdRange), we update the balances to balance - amountToRemove.
-	currApprovalAmounts := GetBalancesForIdRanges([]*types.IdRange{subbadgeRange}, approval.ApprovalAmounts)
+	currApprovalAmounts := GetBalancesForIdRanges(subbadgeRanges, approval.ApprovalAmounts)
 	for _, currApprovalAmountObj := range currApprovalAmounts {
 		newBalance, err := SafeSubtract(currApprovalAmountObj.Balance, amountToRemove)
 		if err != nil {
@@ -86,7 +86,7 @@ func RemoveBalanceFromApproval(userBalanceInfo types.UserBalanceInfo, amountToRe
 }
 
 //Add a balance to the approval amount
-func AddBalanceToApproval(userBalanceInfo types.UserBalanceInfo, amountToAdd uint64, addressNum uint64, subbadgeRange *types.IdRange) (types.UserBalanceInfo, error) {
+func AddBalanceToApproval(userBalanceInfo types.UserBalanceInfo, amountToAdd uint64, addressNum uint64, subbadgeRanges []*types.IdRange) (types.UserBalanceInfo, error) {
 	if amountToAdd == 0 {
 		return userBalanceInfo, nil
 	}
@@ -96,12 +96,17 @@ func AddBalanceToApproval(userBalanceInfo types.UserBalanceInfo, amountToAdd uin
 		//We just need to add a new approval for this address with only this approval amount
 		newApprovals := []*types.Approval{}
 		newApprovals = append(newApprovals, userBalanceInfo.Approvals[:idx]...)
+		idRangesToInsert := []*types.IdRange{}
+		for _, subbadgeRange := range subbadgeRanges {
+			idRangesToInsert = append(idRangesToInsert, GetIdRangeToInsert(subbadgeRange.Start, subbadgeRange.End))
+		}
+
 		newApprovals = append(newApprovals, &types.Approval{
 			Address: addressNum,
 			ApprovalAmounts: []*types.BalanceObject{
 				{
 					Balance:  amountToAdd,
-					IdRanges: []*types.IdRange{GetIdRangeToInsert(subbadgeRange.Start, subbadgeRange.End)},
+					IdRanges: idRangesToInsert,
 				},
 			},
 		})
@@ -117,7 +122,7 @@ func AddBalanceToApproval(userBalanceInfo types.UserBalanceInfo, amountToAdd uin
 	//Basic flow is we get the current approval amounts and ranges in currApprovalAmounts for all IDs in our specified subbadgeRange, 
 	//and for each unique balance found (which also has its own corresponding []IdRange), we update the balances to balance + amountToAdd
 	approval := userBalanceInfo.Approvals[idx]
-	currApprovalAmounts := GetBalancesForIdRanges([]*types.IdRange{subbadgeRange}, approval.ApprovalAmounts)
+	currApprovalAmounts := GetBalancesForIdRanges(subbadgeRanges, approval.ApprovalAmounts)
 	for _, currApprovalAmountObj := range currApprovalAmounts {
 		newBalance, err := SafeAdd(currApprovalAmountObj.Balance, amountToAdd)
 		if err != nil {
