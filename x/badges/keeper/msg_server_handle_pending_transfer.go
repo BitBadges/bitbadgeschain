@@ -118,13 +118,13 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 			//If we need to do something with the balances or pending transfers, update that
 			if acceptIncomingTransfer {
 				//Simple add to "To" balance
-				creatorBalanceInfo, err = AddBalancesForIdRanges(ctx, creatorBalanceInfo, []*types.IdRange{CurrPendingTransfer.SubbadgeRange}, CurrPendingTransfer.Amount)
+				creatorBalanceInfo, err = AddBalancesForIdRanges(creatorBalanceInfo, []*types.IdRange{CurrPendingTransfer.SubbadgeRange}, CurrPendingTransfer.Amount)
 			} else if acceptTransferRequestButMarkAsApproved {
 				//Just mark as accepted, don't remove from pending or do anything yet. Outsource gas to requester
 				creatorBalanceInfo.Pending[idx].MarkedAsAccepted = true
 			} else if cancelOwnOutgoingTransfer {
 				//Previously escrowed balances and approvals. Need to revert
-				creatorBalanceInfo, err = RevertEscrowedBalancesAndApprovals(ctx, creatorBalanceInfo, CurrPendingTransfer.SubbadgeRange, CurrPendingTransfer.From, CurrPendingTransfer.ApprovedBy, CurrPendingTransfer.Amount)
+				creatorBalanceInfo, err = RevertEscrowedBalancesAndApprovals(creatorBalanceInfo, CurrPendingTransfer.SubbadgeRange, CurrPendingTransfer.From, CurrPendingTransfer.ApprovedBy, CurrPendingTransfer.Amount)
 			} else if finalizeOwnTransferRequestAfterApprovedByOtherParty {
 				//If other party marked as accepted, you can go ahead and finalize the transfer forcefully.
 				idx, found := SearchPendingByNonce(otherPartyBalanceInfo.Pending, otherPartyNonce)
@@ -136,10 +136,10 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 					return nil, ErrNotApproved
 				}
 
-				otherPartyBalanceInfo, creatorBalanceInfo, err = ForcefulTransfer(ctx, badge, CurrPendingTransfer.SubbadgeRange, otherPartyBalanceInfo, creatorBalanceInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.From, CurrPendingTransfer.To, CurrPendingTransfer.From, CurrPendingTransfer.ExpirationTime)
+				otherPartyBalanceInfo, creatorBalanceInfo, err = ForcefulTransfer(badge, CurrPendingTransfer.SubbadgeRange, otherPartyBalanceInfo, creatorBalanceInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.From, CurrPendingTransfer.To, CurrPendingTransfer.From, CurrPendingTransfer.ExpirationTime)
 			} else if acceptTransferRequestForcefully {
 				//Accept a transfer request forcefully
-				creatorBalanceInfo, otherPartyBalanceInfo, err = ForcefulTransfer(ctx, badge, CurrPendingTransfer.SubbadgeRange, creatorBalanceInfo, otherPartyBalanceInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.From, CurrPendingTransfer.To, CreatorAccountNum, CurrPendingTransfer.ExpirationTime)
+				creatorBalanceInfo, otherPartyBalanceInfo, err = ForcefulTransfer(badge, CurrPendingTransfer.SubbadgeRange, creatorBalanceInfo, otherPartyBalanceInfo, CurrPendingTransfer.Amount, CurrPendingTransfer.From, CurrPendingTransfer.To, CreatorAccountNum, CurrPendingTransfer.ExpirationTime)
 			}
 			if err != nil {
 				return nil, err
@@ -147,14 +147,14 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 			
 			//Remove from this party's pending and other party's pending if applicable
 			if needToRemoveFromThisPending {
-				creatorBalanceInfo, err = RemovePending(ctx, creatorBalanceInfo, CurrPendingTransfer.ThisPendingNonce, otherPartyNonce)
+				creatorBalanceInfo, err = RemovePending(creatorBalanceInfo, CurrPendingTransfer.ThisPendingNonce, otherPartyNonce)
 				if err != nil {
 					return nil, err
 				}
 
 				//Try to remove from the other party's pending, but in some situations it may have already been removed
 				if !onlyUpdatingCreatorBalance {
-					otherPartyBalanceInfo, err = RemovePending(ctx, otherPartyBalanceInfo, otherPartyNonce, CurrPendingTransfer.ThisPendingNonce)
+					otherPartyBalanceInfo, err = RemovePending(otherPartyBalanceInfo, otherPartyNonce, CurrPendingTransfer.ThisPendingNonce)
 					balanceInfoCache[otherPartyAccountNum] = otherPartyBalanceInfo
 					if err != nil {
 						if !(err == ErrPendingNotFound && otherPartyMayHaveRemovedAlready) {

@@ -87,3 +87,7 @@ func (suite *TestSuite) TestGetBadgeAndAssertSubbadges() {
 	})
 	suite.Require().EqualError(err, keeper.ErrSubBadgeNotExists.Error())
 }
+
+func (suite *TestSuite) TestCreateSubassets() {
+
+}

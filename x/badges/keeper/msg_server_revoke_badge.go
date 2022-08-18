@@ -40,12 +40,12 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 		revokeAmount := msg.Amounts[i]
 		
 		//Subtract from address and add to manager
-		addressBalanceInfo, err = SubtractBalancesForIdRanges(ctx, addressBalanceInfo, msg.SubbadgeRanges, revokeAmount)
+		addressBalanceInfo, err = SubtractBalancesForIdRanges(addressBalanceInfo, msg.SubbadgeRanges, revokeAmount)
 		if err != nil {
 			return nil, err
 		}
 
-		managerBalanceInfo, err = AddBalancesForIdRanges(ctx, managerBalanceInfo, msg.SubbadgeRanges, revokeAmount)
+		managerBalanceInfo, err = AddBalancesForIdRanges(managerBalanceInfo, msg.SubbadgeRanges, revokeAmount)
 		if err != nil {
 			return nil, err
 		}

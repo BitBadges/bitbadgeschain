@@ -39,7 +39,7 @@ func (k Keeper) GetBadgeAndAssertSubbadgeRangesAreValid(ctx sdk.Context, badgeId
 
 //For each (supply, amountToCreate) pair, we create amountToCreate subbadges with specified supply. We also mint total supply to manager. Error if IDs overflow.
 //We assume that lengths of supplys and amountsToCreate are equal before entering this function. Also amountsToCreate[i] can never be zero.
-func CreateSubassets(ctx sdk.Context, badge types.BitBadge, managerBalanceInfo types.UserBalanceInfo, supplys []uint64, amounts []uint64) (types.BitBadge, types.UserBalanceInfo, error) {
+func CreateSubassets(badge types.BitBadge, managerBalanceInfo types.UserBalanceInfo, supplys []uint64, amounts []uint64) (types.BitBadge, types.UserBalanceInfo, error) {
 	newSubassetSupplys := badge.SubassetSupplys
 	defaultSupply := badge.DefaultSubassetSupply
 	if badge.DefaultSubassetSupply == 0 {
@@ -64,7 +64,7 @@ func CreateSubassets(ctx sdk.Context, badge types.BitBadge, managerBalanceInfo t
 			)
 		}
 
-		managerBalanceInfo, err = AddBalancesForIdRanges(ctx, managerBalanceInfo, []*types.IdRange{{Start: nextSubassetId, End: nextSubassetId + amountToCreate - 1}}, supply)
+		managerBalanceInfo, err = AddBalancesForIdRanges(managerBalanceInfo, []*types.IdRange{{Start: nextSubassetId, End: nextSubassetId + amountToCreate - 1}}, supply)
 		if err != nil {
 			return types.BitBadge{}, types.UserBalanceInfo{}, err
 		}

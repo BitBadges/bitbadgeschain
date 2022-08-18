@@ -3,7 +3,6 @@ package keeper
 import (
 	"math"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
@@ -104,7 +103,7 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalanceObjects
 }
 
 // Adds a balance to all ids specified in []ranges
-func AddBalancesForIdRanges(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, ranges []*types.IdRange, balanceToAdd uint64) (types.UserBalanceInfo, error) {
+func AddBalancesForIdRanges(userBalanceInfo types.UserBalanceInfo, ranges []*types.IdRange, balanceToAdd uint64) (types.UserBalanceInfo, error) {
 	currBalances := GetBalancesForIdRanges(ranges, userBalanceInfo.BalanceAmounts)
 	for _, currBalanceObj := range currBalances {
 		newBalance, err := SafeAdd(currBalanceObj.Balance, balanceToAdd)
@@ -118,7 +117,7 @@ func AddBalancesForIdRanges(ctx sdk.Context, userBalanceInfo types.UserBalanceIn
 }
 
 // Subtracts a balance to all ids specified in []ranges
-func SubtractBalancesForIdRanges(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, ranges []*types.IdRange, balanceToRemove uint64) (types.UserBalanceInfo, error) {
+func SubtractBalancesForIdRanges(userBalanceInfo types.UserBalanceInfo, ranges []*types.IdRange, balanceToRemove uint64) (types.UserBalanceInfo, error) {
 	currBalances := GetBalancesForIdRanges(ranges, userBalanceInfo.BalanceAmounts)
 	for _, currBalanceObj := range currBalances {
 		newBalance, err := SafeSubtract(currBalanceObj.Balance, balanceToRemove)

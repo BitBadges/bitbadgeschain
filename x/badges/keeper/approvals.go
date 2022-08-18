@@ -3,12 +3,11 @@ package keeper
 import (
 	"math"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 // Sets an approval amount for an address.
-func SetApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount uint64, addressNum uint64, subbadgeRange *types.IdRange) (types.UserBalanceInfo, error) {
+func SetApproval(userBalanceInfo types.UserBalanceInfo, amount uint64, addressNum uint64, subbadgeRange *types.IdRange) (types.UserBalanceInfo, error) {
 	idx, found := SearchApprovals(addressNum, userBalanceInfo.Approvals)
 	subbadgeRange = NormalizeIdRange(subbadgeRange)
 
@@ -49,7 +48,7 @@ func SetApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amount 
 }
 
 //Remove a balance from the approval amount for address
-func RemoveBalanceFromApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amountToRemove uint64, addressNum uint64, subbadgeRange *types.IdRange) (types.UserBalanceInfo, error) {
+func RemoveBalanceFromApproval(userBalanceInfo types.UserBalanceInfo, amountToRemove uint64, addressNum uint64, subbadgeRange *types.IdRange) (types.UserBalanceInfo, error) {
 	if amountToRemove == 0 {
 		return userBalanceInfo, nil
 	}
@@ -87,7 +86,7 @@ func RemoveBalanceFromApproval(ctx sdk.Context, userBalanceInfo types.UserBalanc
 }
 
 //Add a balance to the approval amount
-func AddBalanceToApproval(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, amountToAdd uint64, addressNum uint64, subbadgeRange *types.IdRange) (types.UserBalanceInfo, error) {
+func AddBalanceToApproval(userBalanceInfo types.UserBalanceInfo, amountToAdd uint64, addressNum uint64, subbadgeRange *types.IdRange) (types.UserBalanceInfo, error) {
 	if amountToAdd == 0 {
 		return userBalanceInfo, nil
 	}

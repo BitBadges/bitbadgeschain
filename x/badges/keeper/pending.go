@@ -1,12 +1,11 @@
 package keeper
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 // Appends the pending transfer to both parties balance informations and increments the nonce. Since we append, they will alwyas be sorted by the nonce.
-func AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, subbadgeRange *types.IdRange, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool, expirationTime uint64, cantCancelBeforeTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
+func AppendPendingTransferForBothParties(fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, subbadgeRange *types.IdRange, to uint64, from uint64, amount uint64, approvedBy uint64, sentByFrom bool, expirationTime uint64, cantCancelBeforeTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
 	if amount == 0 {
 		return fromUserBalanceInfo, toUserBalanceInfo, ErrBalanceIsZero
 	}
@@ -56,7 +55,7 @@ func AppendPendingTransferForBothParties(ctx sdk.Context, fromUserBalanceInfo ty
 }
 
 //Removes pending transfer from the userBalanceInfo.
-func RemovePending(ctx sdk.Context, userBalanceInfo types.UserBalanceInfo, thisNonce uint64, other_nonce uint64) (types.UserBalanceInfo, error) {
+func RemovePending(userBalanceInfo types.UserBalanceInfo, thisNonce uint64, other_nonce uint64) (types.UserBalanceInfo, error) {
 	idx, found :=  SearchPendingByNonce(userBalanceInfo.Pending, thisNonce)
 	if !found {
 		return userBalanceInfo, ErrPendingNotFound

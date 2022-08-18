@@ -29,7 +29,7 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 	}
 
 	for _, subbadgeRange := range msg.SubbadgeRanges {
-		creatorBalanceInfo, err = SetApproval(ctx, creatorBalanceInfo, msg.Amount, msg.Address, subbadgeRange)
+		creatorBalanceInfo, err = SetApproval(creatorBalanceInfo, msg.Amount, msg.Address, subbadgeRange)
 		if err != nil {
 			return nil, err
 		}
