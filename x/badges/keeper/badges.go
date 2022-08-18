@@ -53,8 +53,12 @@ func CreateSubassets(badge types.BitBadge, managerBalanceInfo types.UserBalanceI
 		amountToCreate := amounts[i]
 		nextSubassetId := badge.NextSubassetId
 
+		if supply == 0 {
+			supply = defaultSupply
+		}
+
 		// We conventionalize supply == 0 as default, and we don't store if supply == default
-		if supply != 0 && supply != defaultSupply {
+		if supply != defaultSupply {
 			newSubassetSupplys = UpdateBalancesForIdRanges(
 				[]*types.IdRange{
 					{Start: nextSubassetId, End: nextSubassetId + amountToCreate - 1},

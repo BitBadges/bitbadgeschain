@@ -136,8 +136,10 @@ func MergePrevOrNextIfPossible(targetIds []*types.IdRange, insertedAtIdx int) []
 	prevStartIdx := uint64(0)
 	nextEndIdx := uint64(0)
 	ids := targetIds
-	idStart := ids[insertedAtIdx].Start
-	idEnd := ids[insertedAtIdx].End
+	
+	id := NormalizeIdRange(ids[insertedAtIdx])
+	idStart := id.Start
+	idEnd := id.End
 
 	if insertedAtIdx > 0 {
 		prev := NormalizeIdRange(ids[insertedAtIdx-1])
