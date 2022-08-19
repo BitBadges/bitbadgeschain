@@ -51,6 +51,6 @@ func (msg *MsgPruneBalances) ValidateBasic() error {
 	if duplicateInArray(msg.Addresses) {
 		return ErrDuplicateAddresses
 	}
-	
+
 	return nil
 }

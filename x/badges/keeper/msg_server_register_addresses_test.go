@@ -6,13 +6,7 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func (suite *TestSuite) TestAccountsAreCreatedAndStoredCorrectly() {
-	sample := "cosmos1f6k8dr0hzafe78uhnmcg7e9qm07ejue8mmd8xq"
-	sampleAccNumber := suite.app.BadgesKeeper.GetOrCreateAccountNumberForAccAddressBech32(suite.ctx, sdk.MustAccAddressFromBech32(sample))
-	suite.Equal(sampleAccNumber, uint64(1010)) //see test suite setup for why it is 1010
-}
-
-func (suite *TestSuite) TestTransferToUnregisteredAccount() {
+func (suite *TestSuite) TestRegisterAddresses() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	badgesToCreate := []BadgesToCreate{
@@ -51,6 +45,12 @@ func (suite *TestSuite) TestTransferToUnregisteredAccount() {
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
-	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{999999}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
+	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{1010}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 	suite.Require().EqualError(err, keeper.ErrAccountNotRegistered.Error())
+
+	err = RegisterAddresses(suite, wctx, bob, []string{"cosmos1f6k8dr0hzafe78uhnmcg7e9qm07ejue8mmd8xq"})
+	suite.Require().Nil(err, "Error registering addresses")
+
+	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{1010}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
+	suite.Require().Nil(err, "Error transferring to rregistered address")
 }

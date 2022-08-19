@@ -24,6 +24,7 @@ service Msg {
     rpc SelfDestructBadge(MsgSelfDestructBadge) returns (MsgSelfDestructBadgeResponse);
     rpc PruneBalances(MsgPruneBalances) returns (MsgPruneBalancesResponse);
       rpc UpdateBytes(MsgUpdateBytes) returns (MsgUpdateBytesResponse);
+  rpc RegisterAddresses(MsgRegisterAddresses) returns (MsgRegisterAddressesResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -201,6 +202,15 @@ message MsgUpdateBytes {
 }
 
 message MsgUpdateBytesResponse {
+}
+
+message MsgRegisterAddresses {
+  string creator = 1;
+  repeated string addressesToRegister = 2;
+}
+
+message MsgRegisterAddressesResponse {
+    IdRange registeredAddressNumbers = 1;
 }
 
 // this line is used by starport scaffolding # proto/tx/message

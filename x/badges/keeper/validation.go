@@ -18,7 +18,7 @@ type UniversalValidationParams struct {
 	CanRevoke                    bool
 	CanManagerTransfer           bool
 	CanUpdateUris                bool
-	CanUpdateBytes			   	 bool
+	CanUpdateBytes               bool
 }
 
 // Validates everything about the Msg is valid and returns (creatorNum, badge, permissions, error).
@@ -34,7 +34,7 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationPar
 	}
 
 	if len(params.AccountsToCheckRegistration) > 0 {
-		nextAccountNumber := k.accountKeeper.GetNextAccountNumber(ctx)
+		nextAccountNumber := k.accountKeeper.GetNextAccountNumber(ctx) //TODO: this increments each time we call this; we just want to get w/o incrementing 
 		for _, accountNumber := range params.AccountsToCheckRegistration {
 			//Probably a better way to do this such as only read once at beginning of block, but we check that addresses are valid and not > Next Account Number because then we would be sending to an unregistered address
 			if accountNumber >= nextAccountNumber {
@@ -42,8 +42,6 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationPar
 			}
 		}
 	}
-	
-	
 
 	// Assert badge and subbadge ranges exist and are well-formed
 	badge, err := k.GetBadgeAndAssertSubbadgeRangesAreValid(ctx, params.BadgeId, params.SubbadgeRangesToValidate)

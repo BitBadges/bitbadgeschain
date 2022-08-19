@@ -136,7 +136,7 @@ func MergePrevOrNextIfPossible(targetIds []*types.IdRange, insertedAtIdx int) []
 	prevStartIdx := uint64(0)
 	nextEndIdx := uint64(0)
 	ids := targetIds
-	
+
 	id := NormalizeIdRange(ids[insertedAtIdx])
 	idStart := id.Start
 	idEnd := id.End
@@ -216,7 +216,6 @@ func RemoveIdsFromIdRange(rangeToRemove *types.IdRange, rangeObject *types.IdRan
 	rangeToRemove = NormalizeIdRange(rangeToRemove)
 	rangeObject = NormalizeIdRange(rangeObject)
 
-
 	if rangeToRemove.Start > rangeObject.Start && rangeToRemove.End < rangeObject.End {
 		// Completely in the middle
 		newRanges = append(newRanges, GetIdRangeToInsert(rangeObject.Start, rangeToRemove.Start-1))
@@ -229,7 +228,7 @@ func RemoveIdsFromIdRange(rangeToRemove *types.IdRange, rangeObject *types.IdRan
 		newRanges = append(newRanges, GetIdRangeToInsert(rangeToRemove.End+1, rangeObject.End))
 	} else if rangeToRemove.Start > rangeObject.Start && rangeToRemove.End >= rangeObject.End && rangeToRemove.Start <= rangeObject.End {
 		// Still have some at the start
-		newRanges = append(newRanges, GetIdRangeToInsert(rangeObject.Start, rangeToRemove.Start-1))	
+		newRanges = append(newRanges, GetIdRangeToInsert(rangeObject.Start, rangeToRemove.Start-1))
 	} else {
 		// Doesn't overlap at all
 		newRanges = append(newRanges, GetIdRangeToInsert(rangeObject.Start, rangeObject.End))
@@ -242,18 +241,18 @@ func RemoveIdsFromIdRange(rangeToRemove *types.IdRange, rangeObject *types.IdRan
 func SortIdRangesAndMergeIfNecessary(ids []*types.IdRange) []*types.IdRange {
 	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
 	var n = len(ids)
-    for i := 1; i < n; i++ {
-        j := i
-        for j > 0 {
-            if ids[j-1].Start > ids[j].Start {
-                ids[j-1], ids[j] = ids[j], ids[j-1]
-            } else if ids[j-1].Start == ids[j].Start && ids[j-1].End > ids[j].End {
+	for i := 1; i < n; i++ {
+		j := i
+		for j > 0 {
+			if ids[j-1].Start > ids[j].Start {
+				ids[j-1], ids[j] = ids[j], ids[j-1]
+			} else if ids[j-1].Start == ids[j].Start && ids[j-1].End > ids[j].End {
 				ids[j-1], ids[j] = ids[j], ids[j-1]
 			}
-            j = j - 1
-        }
-    }
-	
+			j = j - 1
+		}
+	}
+
 	//Merge overlapping ranges
 	if n > 0 {
 		newIdRanges := []*types.IdRange{}
@@ -268,16 +267,16 @@ func SortIdRangesAndMergeIfNecessary(ids []*types.IdRange) []*types.IdRange {
 				newIdRanges[len(newIdRanges)-1].End = currRange.End
 			} else if currRange.End > prevInsertedRange.End {
 				//We have different starts and curr end is greater than prev end
-				if currRange.Start > prevInsertedRange.End + 1 {
+				if currRange.Start > prevInsertedRange.End+1 {
 					//We have a gap between the prev range end and curr range start, so we just append currRange
 					newIdRanges = append(newIdRanges, GetIdRangeToInsert(currRange.Start, currRange.End))
 				} else {
 					//they overlap and we can merge them
 					newIdRanges[len(newIdRanges)-1].End = currRange.End
 				}
-			} 
+			}
 			// else if currRange.End <= prevInsertedRange.End {
-				//Start must be >= because it is sorted, so we can just skip this range since currRange is already completely enclosed by prevRange
+			//Start must be >= because it is sorted, so we can just skip this range since currRange is already completely enclosed by prevRange
 			// }
 		}
 		return newIdRanges

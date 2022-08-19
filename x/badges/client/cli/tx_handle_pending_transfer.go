@@ -35,7 +35,7 @@ func CmdHandlePendingTransfer() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
+
 			forcefulAccept, err := cast.ToBoolE(args[4])
 			if err != nil {
 				return err

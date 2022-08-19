@@ -10,7 +10,7 @@ import (
 func GetUriObject(uri string, subassetUri string) (*types.UriObject, error) {
 	//TODO: get uri object from uri and subasset uri
 	return &types.UriObject{
-		Uri:         []byte(uri),
+		Uri: []byte(uri),
 	}, nil
 }
 
@@ -36,7 +36,7 @@ func GetIdArrFromString(str string) ([]uint64, error) {
 
 	return argStartingNoncesUint64, nil
 }
- 
+
 func GetIdRanges(startStrs string, endStrs string) ([]*types.IdRange, error) {
 	argStartingNoncesUint64, err := GetIdArrFromString(startStrs)
 	if err != nil {

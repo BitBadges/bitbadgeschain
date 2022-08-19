@@ -29,9 +29,9 @@ func SimulateMsgNewSubBadge(
 		}
 
 		msg := &types.MsgNewSubBadge{
-			Creator: simAccount.Address.String(),
-			BadgeId: r.Uint64(),
-			Supplys: randomAccounts,
+			Creator:         simAccount.Address.String(),
+			BadgeId:         r.Uint64(),
+			Supplys:         randomAccounts,
 			AmountsToCreate: randomAmounts,
 		}
 

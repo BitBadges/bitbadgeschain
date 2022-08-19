@@ -99,6 +99,8 @@ export interface BadgesMsgNewSubBadgeResponse {
 
 export type BadgesMsgPruneBalancesResponse = object;
 
+export type BadgesMsgRegisterAddressesResponse = object;
+
 export type BadgesMsgRequestTransferBadgeResponse = object;
 
 export type BadgesMsgRequestTransferManagerResponse = object;

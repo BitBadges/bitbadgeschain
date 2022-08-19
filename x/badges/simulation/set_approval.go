@@ -34,7 +34,7 @@ func SimulateMsgSetApproval(
 					End:   r.Uint64(),
 				},
 			},
-			Amount: r.Uint64(),
+			Amount:  r.Uint64(),
 			Address: r.Uint64(),
 			BadgeId: r.Uint64(),
 		}

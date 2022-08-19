@@ -44,9 +44,9 @@ func SimulateMsgRevokeBadge(
 					End:   r.Uint64(),
 				},
 			},
-			BadgeId: r.Uint64(),
+			BadgeId:   r.Uint64(),
 			Addresses: randomAccounts,
-			Amounts: randomAmounts,
+			Amounts:   randomAmounts,
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

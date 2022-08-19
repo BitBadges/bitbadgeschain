@@ -14,16 +14,15 @@ func (suite *TestSuite) TestHandleAcceptIncomingRequest() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  46,
-				
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -114,16 +113,15 @@ func (suite *TestSuite) TestHandleAcceptIncomingRequestWithApproval() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  46,
-				
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -214,16 +212,15 @@ func (suite *TestSuite) TestHandleRejectIncomingRequest() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  46,
-				
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -292,16 +289,15 @@ func (suite *TestSuite) TestHandleRejectIncomingRequestWithApproval() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  46,
-				
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -376,16 +372,15 @@ func (suite *TestSuite) TestHandleCancelOutgoingRequestWithApproval() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  46,
-				
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -457,16 +452,15 @@ func (suite *TestSuite) TestHandleCancelOutgoingRequest() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  46,
-				
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -524,16 +518,15 @@ func (suite *TestSuite) TestBadgeDoesntExist() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  46,
-				
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -556,16 +549,15 @@ func (suite *TestSuite) TestAcceptExpiredTransfer() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  46,
-				
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -626,16 +618,15 @@ func (suite *TestSuite) TestNonexistentPendingTransfer() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  46,
-				
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -670,16 +661,15 @@ func (suite *TestSuite) TestPendingBinarySearch() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  46,
-				
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -728,16 +718,15 @@ func (suite *TestSuite) TestPruneExpiredTransfer() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  46,
-				
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -762,7 +751,7 @@ func (suite *TestSuite) TestPruneExpiredTransfer() {
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
-	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, uint64(suite.ctx.BlockTime().Unix() - 1), 0)
+	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, uint64(suite.ctx.BlockTime().Unix()-1), 0)
 	suite.Require().Nil(err, "Error transferring badge")
 
 	suite.ctx = suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(time.Second * 20000))
@@ -788,24 +777,21 @@ func (suite *TestSuite) TestPruneExpiredTransfer() {
 	suite.Require().Nil(err, "Error reverting transfer")
 }
 
-
-
 func (suite *TestSuite) TestCancelBeforeTimesForTransfer() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  46,
-				
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -869,16 +855,15 @@ func (suite *TestSuite) TestAcceptForcefullyAfterApproved() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  46,
-				
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,

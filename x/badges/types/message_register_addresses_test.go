@@ -1,4 +1,4 @@
-package types_test
+package types
 
 import (
 	"testing"
@@ -6,39 +6,35 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/trevormil/bitbadgeschain/testutil/sample"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgUpdateBytes_ValidateBasic(t *testing.T) {
-	var arr []byte
-	for i := 0; i <= 260; i++ {
-		arr = append(arr, byte(i))
-	}
-
+func TestMsgRegisterAddresses_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgUpdateBytes
+		msg  MsgRegisterAddresses
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgUpdateBytes{
+			msg: MsgRegisterAddresses{
 				Creator: "invalid_address",
+				AddressesToRegister: []string{},
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgUpdateBytes{
+			msg: MsgRegisterAddresses{
 				Creator: sample.AccAddress(),
+				AddressesToRegister: []string{sample.AccAddress()},
 			},
 		},
 		{
-			name: "invalid bytes",
-			msg: types.MsgUpdateBytes{
-				Creator:  sample.AccAddress(),
-				NewBytes: arr,
+			name: "invalid address",
+			msg: MsgRegisterAddresses{
+				Creator: sample.AccAddress(),
+				AddressesToRegister: []string{},
 			},
-			err: types.ErrBytesGreaterThan256,
+			err: sdkerrors.ErrInvalidAddress,
 		},
 	}
 	for _, tt := range tests {

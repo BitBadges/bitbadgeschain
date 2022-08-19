@@ -20,13 +20,13 @@ func SimulateMsgRequestTransferManager(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		randInt := r.Uint64()
 		randBool := false
-		if randInt % 2 == 0 {
+		if randInt%2 == 0 {
 			randBool = true
 		}
 		msg := &types.MsgRequestTransferManager{
 			Creator: simAccount.Address.String(),
 			BadgeId: r.Uint64(),
-			Add:	 randBool,
+			Add:     randBool,
 		}
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
 	}

@@ -12,16 +12,16 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  62,
-				
+				Permissions: 62,
+
 				FreezeAddressRanges: []*types.IdRange{
 					{Start: aliceAccountNum},
 				},
@@ -51,16 +51,15 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  62,
-				
+				Permissions: 62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -97,7 +96,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 
 	suite.Require().Equal(uint64(5000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, aliceBalanceInfo.BalanceAmounts)[0].Balance)
 
-	err = FreezeAddresses(suite, wctx, bob,  0, true, []*types.IdRange{{Start: aliceAccountNum, End: aliceAccountNum}})
+	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: aliceAccountNum, End: aliceAccountNum}})
 	suite.Require().Nil(err, "Error freezing address")
 
 	badge, _ = GetBadge(suite, wctx, 0)
@@ -112,16 +111,15 @@ func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefault() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  63,
-				
+				Permissions: 63,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -166,16 +164,15 @@ func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefaultAddAndRemove() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  63,
-				
+				Permissions: 63,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -229,16 +226,15 @@ func (suite *TestSuite) TestFreezeCantFreeze() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  0,
-				
+				Permissions: 0,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -257,15 +253,15 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefaultOmitEmptyCase(
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  62,
+				Permissions: 62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -291,12 +287,12 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefaultOmitEmptyCase(
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
-	err = FreezeAddresses(suite, wctx, bob,  0, true, []*types.IdRange{{Start: 0, End: 0}})
+	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: 0, End: 0}})
 	suite.Require().Nil(err, "Error freezing address")
 
 	badge, _ = GetBadge(suite, wctx, 0)
 
-	err = FreezeAddresses(suite, wctx, bob,  0, true, []*types.IdRange{{Start: 1, End: 0}})
+	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: 1, End: 0}})
 	suite.Require().Nil(err, "Error freezing address")
 
 	badge, _ = GetBadge(suite, wctx, 0)

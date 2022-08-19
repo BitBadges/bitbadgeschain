@@ -161,7 +161,6 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			Start: 0,
 			End:   1,
 		},
-		
 	}, balanceObjects)
 
 	suite.Require().Equal(gottenBalanceObjects, []*types.BalanceObject{
@@ -212,7 +211,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			},
 		},
 	})
-	
+
 	balanceObjects = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
 		{
 			Start: 2,
@@ -321,9 +320,9 @@ func (suite *TestSuite) TestSubtractBalances() {
 
 	suite.Require().Equal(userBalanceInfo.BalanceAmounts[0].Balance, uint64(1000))
 	suite.Require().Equal(userBalanceInfo.BalanceAmounts[0].IdRanges, []*types.IdRange{
-		{ 
+		{
 			Start: 0, End: 100,
-		}, 
+		},
 		{
 			Start: 135,
 			End:   200,
@@ -420,7 +419,7 @@ func (suite *TestSuite) TestAddBalancesForIdRanges() {
 		userBalanceInfo, _ = keeper.AddBalancesForIdRanges(userBalanceInfo, []*types.IdRange{subbadgeRangeToAdd}, 1)
 		suite.Require().Nil(err, "error adding balance to approval")
 	}
-	
+
 	suite.Require().Equal(userBalanceInfo.BalanceAmounts[0].Balance, uint64(1000))
 	suite.Require().Equal(userBalanceInfo.BalanceAmounts[0].IdRanges, []*types.IdRange{{Start: 0, End: 0}, {Start: 2, End: 34}})
 
@@ -481,8 +480,6 @@ func (suite *TestSuite) TestAddBalancesOverflow() {
 	}
 }
 
-
-
 func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 	userBalanceInfo := types.UserBalanceInfo{}
 	subbadgeRanges := []types.IdRange{
@@ -506,7 +503,7 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 
 	err := *new(error)
 	for _, subbadgeRange := range subbadgeRanges {
-		userBalanceInfo, err = keeper.AddBalancesForIdRanges(userBalanceInfo, []*types.IdRange{&subbadgeRange}, 1000, )
+		userBalanceInfo, err = keeper.AddBalancesForIdRanges(userBalanceInfo, []*types.IdRange{&subbadgeRange}, 1000)
 		suite.Require().NoError(err)
 	}
 
@@ -527,9 +524,9 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 			End:   100,
 		},
 	}
-	
+
 	for _, subbadgeRange := range subbadgeRangesToRemove {
-		userBalanceInfo, err = keeper.SubtractBalancesForIdRanges(userBalanceInfo, []*types.IdRange{subbadgeRange}, math.MaxUint64, )
+		userBalanceInfo, err = keeper.SubtractBalancesForIdRanges(userBalanceInfo, []*types.IdRange{subbadgeRange}, math.MaxUint64)
 		suite.Require().EqualError(err, keeper.ErrUnderflow.Error())
 	}
 }

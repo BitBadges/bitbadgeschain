@@ -19,14 +19,14 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid address",
 			msg: types.MsgNewBadge{
-				Creator:             "invalid_address",
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Creator: "invalid_address",
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					BytesToInsert: []byte{},
-					InsertIdIdx: 10,
+					BytesToInsert:          []byte{},
+					InsertIdIdx:            10,
 				},
 				Permissions:         15,
 				FreezeAddressRanges: []*types.IdRange{},
@@ -35,14 +35,14 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		}, {
 			name: "valid state",
 			msg: types.MsgNewBadge{
-				Creator:             sample.AccAddress(),
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Creator: sample.AccAddress(),
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					BytesToInsert: []byte{},
-					InsertIdIdx: 10,
+					BytesToInsert:          []byte{},
+					InsertIdIdx:            10,
 				},
 				Permissions:         15,
 				FreezeAddressRanges: []*types.IdRange{},
@@ -50,14 +50,14 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		}, {
 			name: "invalid URI",
 			msg: types.MsgNewBadge{
-				Creator:             sample.AccAddress(),
-				Uri:         &types.UriObject{
-					Uri: 	[]byte(""),
-					Scheme: 0,
-					IdxRangeToRemove: &types.IdRange{},
+				Creator: sample.AccAddress(),
+				Uri: &types.UriObject{
+					Uri:                    []byte(""),
+					Scheme:                 0,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					BytesToInsert: []byte{},
-					InsertIdIdx: 10,
+					BytesToInsert:          []byte{},
+					InsertIdIdx:            10,
 				},
 				Permissions:         15,
 				FreezeAddressRanges: []*types.IdRange{},
@@ -68,14 +68,14 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid Subasset URI",
 			msg: types.MsgNewBadge{
-				Creator:             sample.AccAddress(),
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 0,
-					IdxRangeToRemove: &types.IdRange{},
+				Creator: sample.AccAddress(),
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 0,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					BytesToInsert: []byte("  "),
-					InsertIdIdx: 10,
+					BytesToInsert:          []byte("  "),
+					InsertIdIdx:            10,
 				},
 				Permissions:         15,
 				FreezeAddressRanges: []*types.IdRange{},
@@ -85,14 +85,14 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid Permissions",
 			msg: types.MsgNewBadge{
-				Creator:             sample.AccAddress(),
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Creator: sample.AccAddress(),
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					BytesToInsert: []byte{},
-					InsertIdIdx: 10,
+					BytesToInsert:          []byte{},
+					InsertIdIdx:            10,
 				},
 				Permissions:         10000,
 				FreezeAddressRanges: []*types.IdRange{},

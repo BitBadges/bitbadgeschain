@@ -39,7 +39,7 @@ func ForcefulTransfer(badge types.BitBadge, subbadgeRange *types.IdRange, fromUs
 	if err != nil {
 		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
 	}
-	
+
 	fromUserBalanceInfo, err = SubtractBalancesForIdRanges(fromUserBalanceInfo, []*types.IdRange{subbadgeRange}, amount)
 	if err != nil {
 		return types.UserBalanceInfo{}, types.UserBalanceInfo{}, err
@@ -98,7 +98,7 @@ func DeductApprovals(userBalanceInfo types.UserBalanceInfo, badge types.BitBadge
 	return newUserBalanceInfo, nil
 }
 
-// Revert escrowed balances and approvals if a pending transfer is rejected / cancelled. 
+// Revert escrowed balances and approvals if a pending transfer is rejected / cancelled.
 func RevertEscrowedBalancesAndApprovals(userBalanceInfo types.UserBalanceInfo, rangeToRevert *types.IdRange, from uint64, approvedBy uint64, amount uint64) (types.UserBalanceInfo, error) {
 	err := *new(error)
 	userBalanceInfo, err = AddBalancesForIdRanges(userBalanceInfo, []*types.IdRange{rangeToRevert}, amount)

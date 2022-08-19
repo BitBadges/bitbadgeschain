@@ -10,19 +10,18 @@ import (
 
 func (suite *TestSuite) TestGetBadge() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
-	
+
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					InsertIdIdx: 10,
+					InsertIdIdx:            10,
 				},
-				Permissions:  62,
-				
+				Permissions: 62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -42,19 +41,19 @@ func (suite *TestSuite) TestGetBadge() {
 
 func (suite *TestSuite) TestGetBadgeAndAssertSubbadges() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
-	
+
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					InsertIdIdx: 10,
+					InsertIdIdx:            10,
 				},
-				Permissions:  62,
-				SubassetSupplys: []uint64{1},
+				Permissions:             62,
+				SubassetSupplys:         []uint64{1},
 				SubassetAmountsToCreate: []uint64{1},
 			},
 			Amount:  1,
@@ -92,18 +91,18 @@ func (suite *TestSuite) TestGetBadgeAndAssertSubbadges() {
 
 func (suite *TestSuite) TestCreateSubassets() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
-	
+
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					InsertIdIdx: 10,
+					InsertIdIdx:            10,
 				},
-				Permissions:  62,
+				Permissions: 62,
 			},
 			Amount:  1,
 			Creator: bob,

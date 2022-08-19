@@ -21,7 +21,7 @@ func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgReq
 	if err != nil {
 		return nil, err
 	}
-	
+
 	fromBalanceKey := ConstructBalanceKey(msg.From, msg.BadgeId)
 	fromUserBalanceInfo, found := k.Keeper.GetUserBalanceFromStore(ctx, fromBalanceKey)
 	if !found {

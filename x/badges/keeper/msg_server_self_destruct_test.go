@@ -12,16 +12,15 @@ func (suite *TestSuite) TestSelfDestruct() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  62,
-				
+				Permissions: 62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -45,7 +44,7 @@ func (suite *TestSuite) TestSelfDestruct() {
 			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start:0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
+	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
 	err = SelfDestructBadge(suite, wctx, bob, 0)
 	suite.Require().Nil(err, "Error self destructing badge")
@@ -73,16 +72,15 @@ func (suite *TestSuite) TestSelfDestructNotManager() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  62,
-				
+				Permissions: 62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -106,7 +104,7 @@ func (suite *TestSuite) TestSelfDestructNotManager() {
 			Balance:  10000,
 		},
 	}, badge.SubassetSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start:0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
+	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
 	err = SelfDestructBadge(suite, wctx, alice, 0)
 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())

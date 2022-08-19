@@ -62,8 +62,8 @@ func CreateSubassets(badge types.BitBadge, managerBalanceInfo types.UserBalanceI
 			newSubassetSupplys = UpdateBalancesForIdRanges(
 				[]*types.IdRange{
 					{Start: nextSubassetId, End: nextSubassetId + amountToCreate - 1},
-				}, 
-				supply, 
+				},
+				supply,
 				newSubassetSupplys,
 			)
 		}

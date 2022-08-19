@@ -114,7 +114,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 					return nil, ErrUserBalanceNotExists
 				}
 			}
-			
+
 			//If we need to do something with the balances or pending transfers, update that
 			if acceptIncomingTransfer {
 				//Simple add to "To" balance
@@ -144,7 +144,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 			if err != nil {
 				return nil, err
 			}
-			
+
 			//Remove from this party's pending and other party's pending if applicable
 			if needToRemoveFromThisPending {
 				creatorBalanceInfo, err = RemovePending(creatorBalanceInfo, CurrPendingTransfer.ThisPendingNonce, otherPartyNonce)

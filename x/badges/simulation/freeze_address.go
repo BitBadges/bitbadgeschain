@@ -20,14 +20,14 @@ func SimulateMsgFreezeAddress(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		randInt := r.Uint64()
 		randBool := false
-		if randInt % 2 == 0 {
+		if randInt%2 == 0 {
 			randBool = true
 		}
 
 		msg := &types.MsgFreezeAddress{
 			Creator: simAccount.Address.String(),
 			BadgeId: r.Uint64(),
-			Add:	 randBool,
+			Add:     randBool,
 			AddressRanges: []*types.IdRange{
 				{
 					Start: r.Uint64(),

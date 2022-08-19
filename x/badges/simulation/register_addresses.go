@@ -10,7 +10,7 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
-func SimulateMsgUpdateBytes(
+func SimulateMsgRegisterAddresses(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	k keeper.Keeper,
@@ -18,12 +18,12 @@ func SimulateMsgUpdateBytes(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := &types.MsgUpdateBytes{
-			Creator:  simAccount.Address.String(),
-			BadgeId:  r.Uint64(),
-			NewBytes: []byte(simtypes.RandStringOfLength(r, r.Intn(300))),
+		msg := &types.MsgRegisterAddresses{
+			Creator: simAccount.Address.String(),
 		}
 
-		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
+		// TODO: Handling the RegisterAddresses simulation
+
+		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "RegisterAddresses simulation not implemented"), nil, nil
 	}
 }

@@ -54,6 +54,6 @@ func (msg *MsgSetApproval) ValidateBasic() error {
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }

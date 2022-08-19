@@ -23,7 +23,6 @@ func SafeSubtract(left uint64, right uint64) (uint64, error) {
 	return left - right, nil
 }
 
-
 // Updates the balance for a specific id from what it currently is to newAmount.
 func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount uint64, balanceObjects []*types.BalanceObject) []*types.BalanceObject {
 	ranges = SortIdRangesAndMergeIfNecessary(ranges)
@@ -37,7 +36,7 @@ func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount uint64, balanc
 	return balanceObjects
 }
 
-// Gets the balances for specified ID ranges. Returns a new []*types.BalanceObject where only the specified ID ranges and their balances are included. Appends balance == 0 objects so all IDs are accounted for, even if not found. 
+// Gets the balances for specified ID ranges. Returns a new []*types.BalanceObject where only the specified ID ranges and their balances are included. Appends balance == 0 objects so all IDs are accounted for, even if not found.
 func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalanceObjects []*types.BalanceObject) []*types.BalanceObject {
 	balanceObjectsForSpecifiedRanges := []*types.BalanceObject{}
 	idRanges = SortIdRangesAndMergeIfNecessary(idRanges)
@@ -45,37 +44,37 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalanceObjects
 	for _, userBalanceObj := range currentUserBalanceObjects {
 		userBalanceObj.IdRanges = GetIdRangesWithOmitEmptyCaseHandled(userBalanceObj.IdRanges)
 
-		//For each specified range, search the current userBalanceObj's IdRanges to see if there is any overlap. 
+		//For each specified range, search the current userBalanceObj's IdRanges to see if there is any overlap.
 		//If so, we add the overlapping range and current balance to the new []*types.BalanceObjects to be returned.
-		
+
 		for _, idRange := range idRanges {
 			idxSpan, found := GetIdxSpanForRange(idRange, userBalanceObj.IdRanges)
 			if found {
 				idxSpan = NormalizeIdRange(idxSpan)
 
 				//Set newIdRanges to the ranges where there is overlap
-				newIdRanges := userBalanceObj.IdRanges[idxSpan.Start:idxSpan.End + 1]
+				newIdRanges := userBalanceObj.IdRanges[idxSpan.Start : idxSpan.End+1]
 
 				//Remove everything before the start of the range. Only need to remove from idx 0 since it is sorted.
 				if idRange.Start > 0 && len(newIdRanges) > 0 {
 					everythingBefore := &types.IdRange{
 						Start: 0,
-						End: idRange.Start - 1, 
+						End:   idRange.Start - 1,
 					}
 					idRangesWithEverythingBeforeRemoved := []*types.IdRange{}
 					idRangesWithEverythingBeforeRemoved = append(idRangesWithEverythingBeforeRemoved, RemoveIdsFromIdRange(everythingBefore, newIdRanges[0])...)
 					idRangesWithEverythingBeforeRemoved = append(idRangesWithEverythingBeforeRemoved, newIdRanges[1:]...)
 					newIdRanges = idRangesWithEverythingBeforeRemoved
 				}
-				
+
 				//Remove everything after the end of the range. Only need to remove from last idx since it is sorted.
 				if idRange.End < math.MaxUint64 && len(newIdRanges) > 0 {
 					everythingAfter := &types.IdRange{
-						Start: idRange.End + 1, 
-						End: math.MaxUint64,
+						Start: idRange.End + 1,
+						End:   math.MaxUint64,
 					}
 					idRangesWithEverythingAfterRemoved := []*types.IdRange{}
-					idRangesWithEverythingAfterRemoved = append(idRangesWithEverythingAfterRemoved, newIdRanges[0:len(newIdRanges) - 1]...)
+					idRangesWithEverythingAfterRemoved = append(idRangesWithEverythingAfterRemoved, newIdRanges[0:len(newIdRanges)-1]...)
 					idRangesWithEverythingAfterRemoved = append(idRangesWithEverythingAfterRemoved, RemoveIdsFromIdRange(everythingAfter, newIdRanges[len(newIdRanges)-1])...)
 					newIdRanges = idRangesWithEverythingAfterRemoved
 				}
@@ -96,7 +95,7 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalanceObjects
 	if len(idRangesNotFound) > 0 {
 		updatedBalanceObjects := []*types.BalanceObject{}
 		updatedBalanceObjects = append(updatedBalanceObjects, &types.BalanceObject{
-			Balance: 0,
+			Balance:  0,
 			IdRanges: idRangesNotFound,
 		})
 		updatedBalanceObjects = append(updatedBalanceObjects, balanceObjectsForSpecifiedRanges...)
@@ -146,7 +145,7 @@ func DeleteBalanceForIdRanges(ranges []*types.IdRange, balanceObjects []*types.B
 	newBalanceObjects := []*types.BalanceObject{}
 	for _, balanceObj := range balanceObjects {
 		balanceObj.IdRanges = GetIdRangesWithOmitEmptyCaseHandled(balanceObj.IdRanges)
-		
+
 		for _, rangeToDelete := range ranges {
 			currRanges := balanceObj.IdRanges
 			idxSpan, found := GetIdxSpanForRange(rangeToDelete, currRanges)
@@ -160,7 +159,7 @@ func DeleteBalanceForIdRanges(ranges []*types.IdRange, balanceObjects []*types.B
 				for i := idxSpan.Start; i <= idxSpan.End; i++ {
 					newIdRanges = append(newIdRanges, RemoveIdsFromIdRange(rangeToDelete, currRanges[i])...)
 				}
-				newIdRanges = append(newIdRanges, currRanges[idxSpan.End + 1:]...)
+				newIdRanges = append(newIdRanges, currRanges[idxSpan.End+1:]...)
 				balanceObj.IdRanges = newIdRanges
 			}
 		}

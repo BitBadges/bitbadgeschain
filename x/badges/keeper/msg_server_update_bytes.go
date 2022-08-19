@@ -12,9 +12,9 @@ func (k msgServer) UpdateBytes(goCtx context.Context, msg *types.MsgUpdateBytes)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator:       msg.Creator,
-		BadgeId:       msg.BadgeId,
-		MustBeManager: true,
+		Creator:        msg.Creator,
+		BadgeId:        msg.BadgeId,
+		MustBeManager:  true,
 		CanUpdateBytes: true,
 	})
 	if err != nil {

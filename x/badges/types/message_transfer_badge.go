@@ -11,13 +11,13 @@ var _ sdk.Msg = &MsgTransferBadge{}
 
 func NewMsgTransferBadge(creator string, from uint64, toAddresses []uint64, amounts []uint64, badgeId uint64, subbadgeRanges []*IdRange, expirationTime uint64, cantCancelBeforeTime uint64) *MsgTransferBadge {
 	return &MsgTransferBadge{
-		Creator:        creator,
-		From:           from,
-		ToAddresses:    toAddresses,
-		Amounts:        amounts,
-		BadgeId:        badgeId,
-		SubbadgeRanges: subbadgeRanges,
-		ExpirationTime: expirationTime,
+		Creator:              creator,
+		From:                 from,
+		ToAddresses:          toAddresses,
+		Amounts:              amounts,
+		BadgeId:              badgeId,
+		SubbadgeRanges:       subbadgeRanges,
+		ExpirationTime:       expirationTime,
 		CantCancelBeforeTime: cantCancelBeforeTime,
 	}
 }

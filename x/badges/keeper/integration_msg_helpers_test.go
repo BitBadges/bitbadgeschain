@@ -135,3 +135,8 @@ func PruneBalances(suite *TestSuite, ctx context.Context, creator string, addres
 	return err
 }
 
+func RegisterAddresses(suite *TestSuite, ctx context.Context, creator string, addresses []string) error {
+	msg := types.NewMsgRegisterAddresses(creator, addresses)
+	_, err := suite.msgServer.RegisterAddresses(ctx, msg)
+	return err
+}

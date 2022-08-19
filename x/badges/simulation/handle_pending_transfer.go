@@ -20,23 +20,22 @@ func SimulateMsgHandlePendingTransfer(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		randInt := r.Uint64()
 		randBool := false
-		if randInt % 2 == 0 {
+		if randInt%2 == 0 {
 			randBool = true
 		}
 
 		randInt2 := r.Uint64()
 		randBool2 := false
-		if randInt2 % 2 == 0 {
+		if randInt2%2 == 0 {
 			randBool2 = true
 		}
 
-
 		msg := &types.MsgHandlePendingTransfer{
-			Creator: simAccount.Address.String(),
-			Accept: randBool,
+			Creator:        simAccount.Address.String(),
+			Accept:         randBool,
 			ForcefulAccept: randBool2,
-			BadgeId: r.Uint64(),
-			NonceRanges:[]*types.IdRange{
+			BadgeId:        r.Uint64(),
+			NonceRanges: []*types.IdRange{
 				{
 					Start: r.Uint64(),
 					End:   r.Uint64(),

@@ -47,7 +47,6 @@ func (suite *TestSuite) TestSetApprovals() {
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].Balance, uint64(1000))
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].IdRanges, []*types.IdRange{{Start: 0, End: 100}})
 
-
 	suite.Require().Equal(userBalanceInfo.Approvals[1].Address, charlieAccountNum)
 	suite.Require().Equal(userBalanceInfo.Approvals[1].ApprovalAmounts[0].Balance, uint64(1000))
 	suite.Require().Equal(userBalanceInfo.Approvals[1].ApprovalAmounts[0].IdRanges, []*types.IdRange{{Start: 0, End: 100}})
@@ -79,7 +78,7 @@ func (suite *TestSuite) TestSetApprovals() {
 		userBalanceInfo, err = keeper.SetApproval(userBalanceInfo, 0, randomAcccountNum, &subbadgeRange)
 		suite.Require().NoError(err)
 	}
-	
+
 	suite.Require().Equal(userBalanceInfo.Approvals[0].Address, aliceAccountNum)
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].Balance, uint64(1000))
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].IdRanges, []*types.IdRange{{Start: 2, End: 34}})
@@ -139,9 +138,9 @@ func (suite *TestSuite) TestRemoveApprovals() {
 	suite.Require().Equal(userBalanceInfo.Approvals[0].Address, aliceAccountNum)
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].Balance, uint64(1000))
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].IdRanges, []*types.IdRange{
-		{ 
+		{
 			Start: 0, End: 100,
-		}, 
+		},
 		{
 			Start: 135,
 			End:   200,
@@ -175,11 +174,10 @@ func (suite *TestSuite) TestRemoveApprovals() {
 		userBalanceInfo, err = keeper.RemoveBalanceFromApproval(userBalanceInfo, 1, aliceAccountNum, []*types.IdRange{subbadgeRange})
 		suite.Require().NoError(err)
 	}
-	
+
 	suite.Require().Equal(userBalanceInfo.Approvals[0].Address, aliceAccountNum)
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].Balance, uint64(998))
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].IdRanges, []*types.IdRange{{Start: 35, End: 0}})
-
 
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[1].Balance, uint64(999))
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[1].IdRanges, []*types.IdRange{{Start: 1, End: 0}, {Start: 36, End: 100}})
@@ -212,11 +210,10 @@ func (suite *TestSuite) TestAddApprovals() {
 
 	err := *new(error)
 	for _, subbadgeRange := range subbadgeRanges {
-		userBalanceInfo, err = keeper.AddBalanceToApproval(userBalanceInfo, 1000, aliceAccountNum,  []*types.IdRange{subbadgeRange})
+		userBalanceInfo, err = keeper.AddBalanceToApproval(userBalanceInfo, 1000, aliceAccountNum, []*types.IdRange{subbadgeRange})
 		suite.Require().Nil(err, "error adding balance to approval")
 	}
 
-	
 	suite.Require().Equal(userBalanceInfo.Approvals[0].Address, aliceAccountNum)
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].Balance, uint64(1000))
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].IdRanges, []*types.IdRange{{Start: 0, End: 34}, {Start: 36, End: 100}})
@@ -241,11 +238,10 @@ func (suite *TestSuite) TestAddApprovals() {
 	}
 
 	for _, subbadgeRange := range subbadgeRangesToRemove {
-		userBalanceInfo, _ = keeper.AddBalanceToApproval(userBalanceInfo, 1, aliceAccountNum,  []*types.IdRange{subbadgeRange})
+		userBalanceInfo, _ = keeper.AddBalanceToApproval(userBalanceInfo, 1, aliceAccountNum, []*types.IdRange{subbadgeRange})
 		suite.Require().Nil(err, "error adding balance to approval")
 	}
-	
-	
+
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].Balance, uint64(1000))
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].IdRanges, []*types.IdRange{{Start: 0, End: 0}, {Start: 2, End: 34}})
 
@@ -284,11 +280,10 @@ func (suite *TestSuite) TestAddApprovalsOverflow() {
 
 	err := *new(error)
 	for _, subbadgeRange := range subbadgeRanges {
-		userBalanceInfo, err = keeper.AddBalanceToApproval(userBalanceInfo, 1000, aliceAccountNum,  []*types.IdRange{subbadgeRange})
+		userBalanceInfo, err = keeper.AddBalanceToApproval(userBalanceInfo, 1000, aliceAccountNum, []*types.IdRange{subbadgeRange})
 		suite.Require().Nil(err, "error adding balance to approval")
 	}
 
-	
 	suite.Require().Equal(userBalanceInfo.Approvals[0].Address, aliceAccountNum)
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].Balance, uint64(1000))
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].IdRanges, []*types.IdRange{{Start: 0, End: 34}, {Start: 36, End: 100}})
@@ -305,15 +300,13 @@ func (suite *TestSuite) TestAddApprovalsOverflow() {
 	}
 
 	for _, subbadgeRange := range subbadgeRangesToAdd {
-		userBalanceInfo, err = keeper.AddBalanceToApproval(userBalanceInfo, math.MaxUint64, aliceAccountNum,  []*types.IdRange{subbadgeRange})
+		userBalanceInfo, err = keeper.AddBalanceToApproval(userBalanceInfo, math.MaxUint64, aliceAccountNum, []*types.IdRange{subbadgeRange})
 		suite.Require().Nil(err, "we should just set to uint64 max and not overflow")
 	}
 
 	suite.Require().Equal(userBalanceInfo.Approvals[0].Address, aliceAccountNum)
 	suite.Require().Equal(userBalanceInfo.Approvals[0].ApprovalAmounts[0].Balance, uint64(math.MaxUint64))
 }
-
-
 
 func (suite *TestSuite) TestRemoveApprovalsUnderflow() {
 	userBalanceInfo := types.UserBalanceInfo{}
@@ -364,9 +357,9 @@ func (suite *TestSuite) TestRemoveApprovalsUnderflow() {
 			End:   100,
 		},
 	}
-	
+
 	for _, subbadgeRange := range subbadgeRangesToRemove {
-		userBalanceInfo, err = keeper.RemoveBalanceFromApproval(userBalanceInfo, math.MaxUint64, aliceAccountNum,  []*types.IdRange{subbadgeRange})
+		userBalanceInfo, err = keeper.RemoveBalanceFromApproval(userBalanceInfo, math.MaxUint64, aliceAccountNum, []*types.IdRange{subbadgeRange})
 		suite.Require().EqualError(err, keeper.ErrUnderflow.Error())
 	}
 }

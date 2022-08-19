@@ -64,7 +64,6 @@ func ValidateRangesAreValid(subbadgeRanges []*IdRange) error {
 	return nil
 }
 
-
 //Validates no element is X
 func ValidateNoElementIsX(amounts []uint64, x uint64) error {
 	for _, amount := range amounts {

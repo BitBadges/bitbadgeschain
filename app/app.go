@@ -229,8 +229,8 @@ type App struct {
 	ScopedTransferKeeper   capabilitykeeper.ScopedKeeper
 	ScopedMonitoringKeeper capabilitykeeper.ScopedKeeper
 
-	ScopedBadgesKeeper      capabilitykeeper.ScopedKeeper
-	BadgesKeeper            badgesmodulekeeper.Keeper
+	ScopedBadgesKeeper capabilitykeeper.ScopedKeeper
+	BadgesKeeper       badgesmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -428,7 +428,6 @@ func NewApp(
 	)
 	badgesModule := badgesmodule.NewAppModule(appCodec, app.BadgesKeeper, app.AccountKeeper, app.BankKeeper)
 
-	
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create static IBC router, add transfer route, then set and seal it

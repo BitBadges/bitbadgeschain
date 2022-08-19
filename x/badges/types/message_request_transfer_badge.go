@@ -11,12 +11,12 @@ var _ sdk.Msg = &MsgRequestTransferBadge{}
 
 func NewMsgRequestTransferBadge(creator string, from uint64, amount uint64, badgeId uint64, subbadgeRanges []*IdRange, expirationTime uint64, cantCancelBeforeTime uint64) *MsgRequestTransferBadge {
 	return &MsgRequestTransferBadge{
-		Creator:        creator,
-		From:           from,
-		Amount:         amount,
-		BadgeId:        badgeId,
-		SubbadgeRanges: subbadgeRanges,
-		ExpirationTime: expirationTime,
+		Creator:              creator,
+		From:                 from,
+		Amount:               amount,
+		BadgeId:              badgeId,
+		SubbadgeRanges:       subbadgeRanges,
+		ExpirationTime:       expirationTime,
 		CantCancelBeforeTime: cantCancelBeforeTime,
 	}
 }

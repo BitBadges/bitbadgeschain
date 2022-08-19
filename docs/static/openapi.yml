@@ -52887,6 +52887,8 @@ definitions:
         format: uint64
   trevormil.bitbadgeschain.badges.MsgPruneBalancesResponse:
     type: object
+  trevormil.bitbadgeschain.badges.MsgRegisterAddressesResponse:
+    type: object
   trevormil.bitbadgeschain.badges.MsgRequestTransferBadgeResponse:
     type: object
   trevormil.bitbadgeschain.badges.MsgRequestTransferManagerResponse:

@@ -15,14 +15,14 @@ func (suite *TestSuite) TestUpdateURIs() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					InsertIdIdx: 10,
+					InsertIdIdx:            10,
 				},
-				Permissions:  62 + 128,
+				Permissions: 62 + 128,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -33,25 +33,25 @@ func (suite *TestSuite) TestUpdateURIs() {
 	suite.Require().Nil(err, "Error creating badge: %s")
 
 	err = UpdateURIs(suite, wctx, bob, 0, &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-					
-					InsertIdIdx: 10,
-				},)
+		Uri:                    []byte("example.com/"),
+		Scheme:                 1,
+		IdxRangeToRemove:       &types.IdRange{},
+		InsertSubassetBytesIdx: 0,
+
+		InsertIdIdx: 10,
+	})
 	suite.Require().Nil(err, "Error updating uris")
 	badge, _ := GetBadge(suite, wctx, 0)
 	suite.Require().Equal(&types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-					
-					InsertIdIdx: 10,
-				}, badge.Uri)
+		Uri:                    []byte("example.com/"),
+		Scheme:                 1,
+		IdxRangeToRemove:       &types.IdRange{},
+		InsertSubassetBytesIdx: 0,
 
-	err = UpdatePermissions(suite, wctx, bob, 0, 60 + 128)
+		InsertIdIdx: 10,
+	}, badge.Uri)
+
+	err = UpdatePermissions(suite, wctx, bob, 0, 60+128)
 	suite.Require().Nil(err, "Error updating permissions")
 
 	err = UpdateBytes(suite, wctx, bob, 0, []byte("example.com/"))
@@ -67,15 +67,15 @@ func (suite *TestSuite) TestCantUpdate() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  0,
+				Permissions: 0,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -86,13 +86,13 @@ func (suite *TestSuite) TestCantUpdate() {
 	suite.Require().Nil(err, "Error creating badge: %s")
 
 	err = UpdateURIs(suite, wctx, bob, 0, &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-					
-					InsertIdIdx: 10,
-				})
+		Uri:                    []byte("example.com/"),
+		Scheme:                 1,
+		IdxRangeToRemove:       &types.IdRange{},
+		InsertSubassetBytesIdx: 0,
+
+		InsertIdIdx: 10,
+	})
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 
 	err = UpdatePermissions(suite, wctx, bob, 0, 123)
@@ -111,15 +111,15 @@ func (suite *TestSuite) TestCantUpdateNotManager() {
 	badgesToCreate := []BadgesToCreate{
 		{
 			Badge: types.MsgNewBadge{
-				Uri:         &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
+				Uri: &types.UriObject{
+					Uri:                    []byte("example.com/"),
+					Scheme:                 1,
+					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					
+
 					InsertIdIdx: 10,
 				},
-				Permissions:  0,
+				Permissions: 0,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -130,13 +130,13 @@ func (suite *TestSuite) TestCantUpdateNotManager() {
 	suite.Require().Nil(err, "Error creating badge: %s")
 
 	err = UpdateURIs(suite, wctx, alice, 0, &types.UriObject{
-					Uri: 	[]byte("example.com/"),
-					Scheme: 1,
-					IdxRangeToRemove: &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-					
-					InsertIdIdx: 10,
-				})
+		Uri:                    []byte("example.com/"),
+		Scheme:                 1,
+		IdxRangeToRemove:       &types.IdRange{},
+		InsertSubassetBytesIdx: 0,
+
+		InsertIdIdx: 10,
+	})
 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
 
 	err = UpdatePermissions(suite, wctx, alice, 0, 77)

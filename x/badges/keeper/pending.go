@@ -15,28 +15,28 @@ func AppendPendingTransferForBothParties(fromUserBalanceInfo types.UserBalanceIn
 	}
 
 	fromUserBalanceInfo.Pending = append(fromUserBalanceInfo.Pending, &types.PendingTransfer{
-		SubbadgeRange:     subbadgeRange,
-		Amount:            amount,
-		ApprovedBy:        approvedBy,
-		Sent:              sentByFrom, // different
-		To:                to,
-		From:              from,
-		ThisPendingNonce:  fromUserBalanceInfo.PendingNonce, // this / other nonces are swapped
-		OtherPendingNonce: toUserBalanceInfo.PendingNonce,
-		ExpirationTime:    expirationTime,
+		SubbadgeRange:        subbadgeRange,
+		Amount:               amount,
+		ApprovedBy:           approvedBy,
+		Sent:                 sentByFrom, // different
+		To:                   to,
+		From:                 from,
+		ThisPendingNonce:     fromUserBalanceInfo.PendingNonce, // this / other nonces are swapped
+		OtherPendingNonce:    toUserBalanceInfo.PendingNonce,
+		ExpirationTime:       expirationTime,
 		CantCancelBeforeTime: cantCancelBeforeTime,
 	})
 
 	toUserBalanceInfo.Pending = append(toUserBalanceInfo.Pending, &types.PendingTransfer{
-		SubbadgeRange:     subbadgeRange,
-		Amount:            amount,
-		ApprovedBy:        approvedBy,
-		Sent:              !sentByFrom, // different
-		To:                to,
-		From:              from,
-		ThisPendingNonce:  toUserBalanceInfo.PendingNonce, // this / other nonces are swapped
-		OtherPendingNonce: fromUserBalanceInfo.PendingNonce,
-		ExpirationTime:    expirationTime,
+		SubbadgeRange:        subbadgeRange,
+		Amount:               amount,
+		ApprovedBy:           approvedBy,
+		Sent:                 !sentByFrom, // different
+		To:                   to,
+		From:                 from,
+		ThisPendingNonce:     toUserBalanceInfo.PendingNonce, // this / other nonces are swapped
+		OtherPendingNonce:    fromUserBalanceInfo.PendingNonce,
+		ExpirationTime:       expirationTime,
 		CantCancelBeforeTime: cantCancelBeforeTime,
 	})
 
@@ -45,7 +45,7 @@ func AppendPendingTransferForBothParties(fromUserBalanceInfo types.UserBalanceIn
 	if err != nil {
 		return fromUserBalanceInfo, toUserBalanceInfo, err
 	}
-	
+
 	toUserBalanceInfo.PendingNonce, err = SafeAdd(toUserBalanceInfo.PendingNonce, 1)
 	if err != nil {
 		return fromUserBalanceInfo, toUserBalanceInfo, err
@@ -56,7 +56,7 @@ func AppendPendingTransferForBothParties(fromUserBalanceInfo types.UserBalanceIn
 
 //Removes pending transfer from the userBalanceInfo.
 func RemovePending(userBalanceInfo types.UserBalanceInfo, thisNonce uint64, other_nonce uint64) (types.UserBalanceInfo, error) {
-	idx, found :=  SearchPendingByNonce(userBalanceInfo.Pending, thisNonce)
+	idx, found := SearchPendingByNonce(userBalanceInfo.Pending, thisNonce)
 	if !found {
 		return userBalanceInfo, ErrPendingNotFound
 	}
@@ -73,7 +73,7 @@ func PruneExpiredPending(currTime uint64, accountNum uint64, pending []*types.Pe
 	prunedPending := []*types.PendingTransfer{}
 	for _, pendingTransfer := range pending {
 		expired := pendingTransfer.ExpirationTime != 0 && pendingTransfer.ExpirationTime < currTime
-		
+
 		//Only prune received pending transfers that you can't accept anymore
 		if expired && !pendingTransfer.Sent {
 			continue

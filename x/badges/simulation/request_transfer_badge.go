@@ -20,11 +20,11 @@ func SimulateMsgRequestTransferBadge(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 
 		msg := &types.MsgRequestTransferBadge{
-			Creator: simAccount.Address.String(),
-			From:   r.Uint64(),
-			Amount: r.Uint64(),
-			BadgeId: r.Uint64(),
-			ExpirationTime: r.Uint64(),
+			Creator:              simAccount.Address.String(),
+			From:                 r.Uint64(),
+			Amount:               r.Uint64(),
+			BadgeId:              r.Uint64(),
+			ExpirationTime:       r.Uint64(),
 			CantCancelBeforeTime: r.Uint64(),
 			SubbadgeRanges: []*types.IdRange{
 				{
@@ -40,7 +40,6 @@ func SimulateMsgRequestTransferBadge(
 					End:   r.Uint64(),
 				},
 			},
-
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

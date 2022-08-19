@@ -24,50 +24,54 @@ var (
 )
 
 const (
-	opWeightMsgNewBadge = "op_weight_msg_new_badge"
+	opWeightMsgNewBadge          = "op_weight_msg_new_badge"
 	defaultWeightMsgNewBadge int = 1000
 
-	opWeightMsgNewSubBadge = "op_weight_msg_new_sub_badge"
+	opWeightMsgNewSubBadge          = "op_weight_msg_new_sub_badge"
 	defaultWeightMsgNewSubBadge int = 250
 
-	opWeightMsgTransferBadge = "op_weight_msg_transfer_badge"
+	opWeightMsgTransferBadge          = "op_weight_msg_transfer_badge"
 	defaultWeightMsgTransferBadge int = 10000
 
-	opWeightMsgRequestTransferBadge = "op_weight_msg_request_transfer_badge"
+	opWeightMsgRequestTransferBadge          = "op_weight_msg_request_transfer_badge"
 	defaultWeightMsgRequestTransferBadge int = 10000
 
-	opWeightMsgHandlePendingTransfer = "op_weight_msg_handle_pending_transfer"
+	opWeightMsgHandlePendingTransfer          = "op_weight_msg_handle_pending_transfer"
 	defaultWeightMsgHandlePendingTransfer int = 10000
 
-	opWeightMsgSetApproval = "op_weight_msg_set_approval"
+	opWeightMsgSetApproval          = "op_weight_msg_set_approval"
 	defaultWeightMsgSetApproval int = 500
 
-	opWeightMsgRevokeBadge = "op_weight_msg_revoke_badge"
+	opWeightMsgRevokeBadge          = "op_weight_msg_revoke_badge"
 	defaultWeightMsgRevokeBadge int = 100
 
-	opWeightMsgFreezeAddress = "op_weight_msg_freeze_address"
+	opWeightMsgFreezeAddress          = "op_weight_msg_freeze_address"
 	defaultWeightMsgFreezeAddress int = 100
 
-	opWeightMsgUpdateUris = "op_weight_msg_update_uris"
+	opWeightMsgUpdateUris          = "op_weight_msg_update_uris"
 	defaultWeightMsgUpdateUris int = 100
 
-	opWeightMsgUpdatePermissions = "op_weight_msg_update_permissions"
+	opWeightMsgUpdatePermissions          = "op_weight_msg_update_permissions"
 	defaultWeightMsgUpdatePermissions int = 100
 
-	opWeightMsgTransferManager = "op_weight_msg_transfer_manager"
+	opWeightMsgTransferManager          = "op_weight_msg_transfer_manager"
 	defaultWeightMsgTransferManager int = 100
 
-	opWeightMsgRequestTransferManager = "op_weight_msg_request_transfer_manager"
+	opWeightMsgRequestTransferManager          = "op_weight_msg_request_transfer_manager"
 	defaultWeightMsgRequestTransferManager int = 100
 
-	opWeightMsgSelfDestructBadge = "op_weight_msg_self_destruct_badge"
+	opWeightMsgSelfDestructBadge          = "op_weight_msg_self_destruct_badge"
 	defaultWeightMsgSelfDestructBadge int = 100
 
-	opWeightMsgPruneBalances = "op_weight_msg_prune_balances"
+	opWeightMsgPruneBalances          = "op_weight_msg_prune_balances"
 	defaultWeightMsgPruneBalances int = 500
 
-	opWeightMsgUpdateBytes = "op_weight_msg_update_bytes"
+	opWeightMsgUpdateBytes          = "op_weight_msg_update_bytes"
 	defaultWeightMsgUpdateBytes int = 100
+
+	opWeightMsgRegisterAddresses = "op_weight_msg_register_addresses"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgRegisterAddresses int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const
 )
@@ -271,6 +275,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgUpdateBytes,
 		badgessimulation.SimulateMsgUpdateBytes(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgRegisterAddresses int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgRegisterAddresses, &weightMsgRegisterAddresses, nil,
+		func(_ *rand.Rand) {
+			weightMsgRegisterAddresses = defaultWeightMsgRegisterAddresses
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgRegisterAddresses,
+		badgessimulation.SimulateMsgRegisterAddresses(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

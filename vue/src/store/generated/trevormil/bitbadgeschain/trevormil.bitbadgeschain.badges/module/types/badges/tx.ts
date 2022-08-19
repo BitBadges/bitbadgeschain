@@ -181,6 +181,13 @@ export interface MsgUpdateBytes {
 
 export interface MsgUpdateBytesResponse {}
 
+export interface MsgRegisterAddresses {
+  creator: string;
+  addressesToRegister: number;
+}
+
+export interface MsgRegisterAddressesResponse {}
+
 const baseMsgNewBadge: object = {
   creator: "",
   permissions: 0,
@@ -3030,6 +3037,143 @@ export const MsgUpdateBytesResponse = {
   },
 };
 
+const baseMsgRegisterAddresses: object = {
+  creator: "",
+  addressesToRegister: 0,
+};
+
+export const MsgRegisterAddresses = {
+  encode(
+    message: MsgRegisterAddresses,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.addressesToRegister !== 0) {
+      writer.uint32(16).uint64(message.addressesToRegister);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgRegisterAddresses {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgRegisterAddresses } as MsgRegisterAddresses;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.addressesToRegister = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRegisterAddresses {
+    const message = { ...baseMsgRegisterAddresses } as MsgRegisterAddresses;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (
+      object.addressesToRegister !== undefined &&
+      object.addressesToRegister !== null
+    ) {
+      message.addressesToRegister = Number(object.addressesToRegister);
+    } else {
+      message.addressesToRegister = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgRegisterAddresses): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.addressesToRegister !== undefined &&
+      (obj.addressesToRegister = message.addressesToRegister);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgRegisterAddresses>): MsgRegisterAddresses {
+    const message = { ...baseMsgRegisterAddresses } as MsgRegisterAddresses;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (
+      object.addressesToRegister !== undefined &&
+      object.addressesToRegister !== null
+    ) {
+      message.addressesToRegister = object.addressesToRegister;
+    } else {
+      message.addressesToRegister = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgRegisterAddressesResponse: object = {};
+
+export const MsgRegisterAddressesResponse = {
+  encode(
+    _: MsgRegisterAddressesResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgRegisterAddressesResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgRegisterAddressesResponse,
+    } as MsgRegisterAddressesResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgRegisterAddressesResponse {
+    const message = {
+      ...baseMsgRegisterAddressesResponse,
+    } as MsgRegisterAddressesResponse;
+    return message;
+  },
+
+  toJSON(_: MsgRegisterAddressesResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<MsgRegisterAddressesResponse>
+  ): MsgRegisterAddressesResponse {
+    const message = {
+      ...baseMsgRegisterAddressesResponse,
+    } as MsgRegisterAddressesResponse;
+    return message;
+  },
+};
+
 /** Msg defines the Msg service. */
 export interface Msg {
   NewBadge(request: MsgNewBadge): Promise<MsgNewBadgeResponse>;
@@ -3058,8 +3202,11 @@ export interface Msg {
     request: MsgSelfDestructBadge
   ): Promise<MsgSelfDestructBadgeResponse>;
   PruneBalances(request: MsgPruneBalances): Promise<MsgPruneBalancesResponse>;
-  /** this line is used by starport scaffolding # proto/tx/rpc */
   UpdateBytes(request: MsgUpdateBytes): Promise<MsgUpdateBytesResponse>;
+  /** this line is used by starport scaffolding # proto/tx/rpc */
+  RegisterAddresses(
+    request: MsgRegisterAddresses
+  ): Promise<MsgRegisterAddressesResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -3254,6 +3401,20 @@ export class MsgClientImpl implements Msg {
     );
     return promise.then((data) =>
       MsgUpdateBytesResponse.decode(new Reader(data))
+    );
+  }
+
+  RegisterAddresses(
+    request: MsgRegisterAddresses
+  ): Promise<MsgRegisterAddressesResponse> {
+    const data = MsgRegisterAddresses.encode(request).finish();
+    const promise = this.rpc.request(
+      "trevormil.bitbadgeschain.badges.Msg",
+      "RegisterAddresses",
+      data
+    );
+    return promise.then((data) =>
+      MsgRegisterAddressesResponse.decode(new Reader(data))
     );
   }
 }

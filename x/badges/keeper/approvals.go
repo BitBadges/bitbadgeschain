@@ -18,7 +18,7 @@ func SetApproval(userBalanceInfo types.UserBalanceInfo, amount uint64, addressNu
 		newAmounts = UpdateBalancesForIdRanges([]*types.IdRange{subbadgeRange}, amount, newAmounts)
 		userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts
 
-		if (len(userBalanceInfo.Approvals[idx].ApprovalAmounts) == 0) {
+		if len(userBalanceInfo.Approvals[idx].ApprovalAmounts) == 0 {
 			//If we end up in the event where this address does not have any more approvals after being removed, we don't have to store it anymore
 			userBalanceInfo.Approvals = append(userBalanceInfo.Approvals[:idx], userBalanceInfo.Approvals[idx+1:]...)
 		}
@@ -42,8 +42,6 @@ func SetApproval(userBalanceInfo types.UserBalanceInfo, amount uint64, addressNu
 		userBalanceInfo.Approvals = newApprovals
 	}
 
-	
-
 	return GetBalanceInfoToInsertToStorage(userBalanceInfo), nil
 }
 
@@ -52,19 +50,19 @@ func RemoveBalanceFromApproval(userBalanceInfo types.UserBalanceInfo, amountToRe
 	if amountToRemove == 0 {
 		return userBalanceInfo, nil
 	}
-	
+
 	idx, found := SearchApprovals(addressNum, userBalanceInfo.Approvals)
 	if !found {
 		return userBalanceInfo, ErrApprovalForAddressDoesntExist
 	}
 
-	approval := userBalanceInfo.Approvals[idx]	
-	
+	approval := userBalanceInfo.Approvals[idx]
+
 	//This may be a bit confusing because we have the following structure:
 	//	userBalanceInfo.Approvals is of type []Approval
 	//	Approval is defined as { Address: uint64; ApprovalAmounts: []*types.BalanceObject }
-	
-	//Basic flow is we get the current approval amounts and ranges in currApprovalAmounts for all IDs in our specified subbadgeRange, 
+
+	//Basic flow is we get the current approval amounts and ranges in currApprovalAmounts for all IDs in our specified subbadgeRange,
 	//and for each unique balance found (which also has its own corresponding []IdRange), we update the balances to balance - amountToRemove.
 	currApprovalAmounts := GetBalancesForIdRanges(subbadgeRanges, approval.ApprovalAmounts)
 	for _, currApprovalAmountObj := range currApprovalAmounts {
@@ -90,7 +88,7 @@ func AddBalanceToApproval(userBalanceInfo types.UserBalanceInfo, amountToAdd uin
 	if amountToAdd == 0 {
 		return userBalanceInfo, nil
 	}
-	
+
 	idx, found := SearchApprovals(addressNum, userBalanceInfo.Approvals)
 	if !found {
 		//We just need to add a new approval for this address with only this approval amount
@@ -118,8 +116,8 @@ func AddBalanceToApproval(userBalanceInfo types.UserBalanceInfo, amountToAdd uin
 	//This may be a bit confusing because we have the following structure:
 	//	userBalanceInfo.Approvals is of type []Approval
 	//	Approval is defined as { Address: uint64; ApprovalAmounts: []*types.BalanceObject }
-	
-	//Basic flow is we get the current approval amounts and ranges in currApprovalAmounts for all IDs in our specified subbadgeRange, 
+
+	//Basic flow is we get the current approval amounts and ranges in currApprovalAmounts for all IDs in our specified subbadgeRange,
 	//and for each unique balance found (which also has its own corresponding []IdRange), we update the balances to balance + amountToAdd
 	approval := userBalanceInfo.Approvals[idx]
 	currApprovalAmounts := GetBalancesForIdRanges(subbadgeRanges, approval.ApprovalAmounts)
@@ -137,7 +135,7 @@ func AddBalanceToApproval(userBalanceInfo types.UserBalanceInfo, amountToAdd uin
 	return GetBalanceInfoToInsertToStorage(userBalanceInfo), nil
 }
 
-// Approvals will be sorted, so we can binary search to get the targetIdx. 
+// Approvals will be sorted, so we can binary search to get the targetIdx.
 // If found, returns (the index it was found at, true). Else, returns (index to insert at, false).
 func SearchApprovals(targetAddress uint64, approvals []*types.Approval) (int, bool) {
 	low := 0

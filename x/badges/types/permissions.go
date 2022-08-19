@@ -21,22 +21,22 @@ type Permissions struct {
 	CanUpdateBytes     bool
 	CanManagerTransfer bool
 	CanUpdateUris      bool
-	ForcefulTransfers   bool
-	CanCreate           bool
-	CanRevoke           bool
-	CanFreeze           bool
+	ForcefulTransfers  bool
+	CanCreate          bool
+	CanRevoke          bool
+	CanFreeze          bool
 	FrozenByDefault    bool
 }
 
 const (
-	CanUpdateBytesDigit = 8
+	CanUpdateBytesDigit     = 8
 	CanManagerTransferDigit = 7
-	CanUpdateUrisDigit = 6
-	ForcefulTransfersDigit = 5
-	CanCreateDigit = 4
-	CanRevokeDigit = 3
-	CanFreezeDigit = 2
-	FrozenByDefaultDigit = 1
+	CanUpdateUrisDigit      = 6
+	ForcefulTransfersDigit  = 5
+	CanCreateDigit          = 4
+	CanRevokeDigit          = 3
+	CanFreezeDigit          = 2
+	FrozenByDefaultDigit    = 1
 )
 
 //Validate permissions are validly formed., Disallows leading zeroes.

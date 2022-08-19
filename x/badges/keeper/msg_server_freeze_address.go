@@ -21,8 +21,6 @@ func (k msgServer) FreezeAddress(goCtx context.Context, msg *types.MsgFreezeAddr
 		return nil, err
 	}
 
-
-
 	//For convenience, we will use the same logic as balanceObjects with setting all addresses currently in digest to balance = 1
 	//We will set all new addresses that we want to add to balance == 1 and all addresses that we want to remove to balance == 0
 	newBalanceObjects := []*types.BalanceObject{}

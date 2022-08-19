@@ -11,9 +11,9 @@ var _ sdk.Msg = &MsgUpdateUris{}
 
 func NewMsgUpdateUris(creator string, badgeId uint64, uri *UriObject) *MsgUpdateUris {
 	return &MsgUpdateUris{
-		Creator:     creator,
-		BadgeId:     badgeId,
-		Uri:         uri,
+		Creator: creator,
+		BadgeId: badgeId,
+		Uri:     uri,
 	}
 }
 

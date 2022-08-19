@@ -29,9 +29,9 @@ func SimulateMsgPruneBalances(
 		}
 
 		msg := &types.MsgPruneBalances{
-			Creator: simAccount.Address.String(),
+			Creator:   simAccount.Address.String(),
 			Addresses: randomAccounts,
-			BadgeIds: randomAmounts,
+			BadgeIds:  randomAmounts,
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
