@@ -1,6 +1,7 @@
 /* eslint-disable */
 import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
+import { UriObject } from "../badges/uris";
 import { IdRange, BalanceObject } from "../badges/ranges";
 
 export const protobufPackage = "trevormil.bitbadgeschain.badges";
@@ -12,8 +13,11 @@ export interface BitBadge {
    * starts at 0 and increments by 1 each badge
    */
   id: number;
-  /** uri for the class metadata stored off chain. must match a valid metadata standard (bitbadge, collection, etc) */
-  uri: string;
+  /**
+   * uri object for the badge uri and subasset uris stored off chain. Stored in a special UriObject that attemtps to save space and avoid reused plaintext storage such as http:// and duplicate text for uri and subasset uris
+   * data returned should corresponds to the Badge standard defined.
+   */
+  uri: UriObject | undefined;
   /**
    * these bytes can be used to store anything on-chain about the badge. This can be updatable or not depending on the permissions set.
    * Max 256 bytes allowed
@@ -21,46 +25,27 @@ export interface BitBadge {
   arbitraryBytes: Uint8Array;
   /** manager address of the class; can have special permissions; is used as the reserve address for the assets */
   manager: number;
-  /**
-   * Flag bits are in the following order from left to right; leading zeroes are applied and any future additions will be appended to the right
-   *
-   * can_manager_transfer: can the manager transfer managerial privileges to another address
-   * can_update_uris: can the manager update the uris of the class and subassets; if false, locked forever
-   * forceful_transfers: if true, one can send a badge to an account without pending approval; these badges should not by default be displayed on public profiles (can also use collections)
-   * can_create: when true, manager can create more subassets of the class; once set to false, it is locked
-   * can_revoke: when true, manager can revoke subassets of the class (including null address); once set to false, it is locked
-   * can_freeze: when true, manager can freeze addresseses from transferring; once set to false, it is locked
-   * frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
-   * manager is not frozen by default
-   *
-   * More permissions to be added
-   */
+  /** Store permissions packed in a uint where the bits correspond to permissions from left to right; leading zeroes are applied and any future additions will be appended to the right. See types/permissions.go */
   permissions: number;
-  /**
-   * if frozen_by_default is true, this is an accumulator of unfrozen addresses; and vice versa for false
-   * big.Int will always only be 32 uint64s long
-   */
+  /** FreezeRanges defines what addresses are frozen or unfrozen. If permissions.FrozenByDefault is false, this is used for frozen addresses. If true, this is used for unfrozen addresses. */
   freezeRanges: IdRange[];
-  /**
-   * uri for the subassets metadata stored off chain; include {id} in the string, it will be replaced with the subasset id
-   * if not specified, uses a default Class (ID # 1) like metadata
-   */
-  subassetUriFormat: string;
-  /** starts at 0; each subasset created will incrementally have an increasing ID # */
+  /** Starts at 0. Each subasset created will incrementally have an increasing ID #. Can't overflow. */
   nextSubassetId: number;
-  /** only store if not == default; will be sorted in order of subsasset ids; (maybe add defaut option in future) */
+  /** Subasset supplys are stored if the subasset supply != default. Balance => SubbadgeIdRange map */
   subassetSupplys: BalanceObject[];
+  /** Default subasset supply. If == 0, we assume == 1. */
   defaultSubassetSupply: number;
+  /** Defines what standard this badge should implement. Must obey the rules of that standard. */
+  standard: number;
 }
 
 const baseBitBadge: object = {
   id: 0,
-  uri: "",
   manager: 0,
   permissions: 0,
-  subassetUriFormat: "",
   nextSubassetId: 0,
   defaultSubassetSupply: 0,
+  standard: 0,
 };
 
 export const BitBadge = {
@@ -68,8 +53,8 @@ export const BitBadge = {
     if (message.id !== 0) {
       writer.uint32(8).uint64(message.id);
     }
-    if (message.uri !== "") {
-      writer.uint32(18).string(message.uri);
+    if (message.uri !== undefined) {
+      UriObject.encode(message.uri, writer.uint32(18).fork()).ldelim();
     }
     if (message.arbitraryBytes.length !== 0) {
       writer.uint32(26).bytes(message.arbitraryBytes);
@@ -83,9 +68,6 @@ export const BitBadge = {
     for (const v of message.freezeRanges) {
       IdRange.encode(v!, writer.uint32(82).fork()).ldelim();
     }
-    if (message.subassetUriFormat !== "") {
-      writer.uint32(90).string(message.subassetUriFormat);
-    }
     if (message.nextSubassetId !== 0) {
       writer.uint32(96).uint64(message.nextSubassetId);
     }
@@ -94,6 +76,9 @@ export const BitBadge = {
     }
     if (message.defaultSubassetSupply !== 0) {
       writer.uint32(112).uint64(message.defaultSubassetSupply);
+    }
+    if (message.standard !== 0) {
+      writer.uint32(120).uint64(message.standard);
     }
     return writer;
   },
@@ -111,7 +96,7 @@ export const BitBadge = {
           message.id = longToNumber(reader.uint64() as Long);
           break;
         case 2:
-          message.uri = reader.string();
+          message.uri = UriObject.decode(reader, reader.uint32());
           break;
         case 3:
           message.arbitraryBytes = reader.bytes();
@@ -125,9 +110,6 @@ export const BitBadge = {
         case 10:
           message.freezeRanges.push(IdRange.decode(reader, reader.uint32()));
           break;
-        case 11:
-          message.subassetUriFormat = reader.string();
-          break;
         case 12:
           message.nextSubassetId = longToNumber(reader.uint64() as Long);
           break;
@@ -138,6 +120,9 @@ export const BitBadge = {
           break;
         case 14:
           message.defaultSubassetSupply = longToNumber(reader.uint64() as Long);
+          break;
+        case 15:
+          message.standard = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -157,9 +142,9 @@ export const BitBadge = {
       message.id = 0;
     }
     if (object.uri !== undefined && object.uri !== null) {
-      message.uri = String(object.uri);
+      message.uri = UriObject.fromJSON(object.uri);
     } else {
-      message.uri = "";
+      message.uri = undefined;
     }
     if (object.arbitraryBytes !== undefined && object.arbitraryBytes !== null) {
       message.arbitraryBytes = bytesFromBase64(object.arbitraryBytes);
@@ -178,14 +163,6 @@ export const BitBadge = {
       for (const e of object.freezeRanges) {
         message.freezeRanges.push(IdRange.fromJSON(e));
       }
-    }
-    if (
-      object.subassetUriFormat !== undefined &&
-      object.subassetUriFormat !== null
-    ) {
-      message.subassetUriFormat = String(object.subassetUriFormat);
-    } else {
-      message.subassetUriFormat = "";
     }
     if (object.nextSubassetId !== undefined && object.nextSubassetId !== null) {
       message.nextSubassetId = Number(object.nextSubassetId);
@@ -208,13 +185,19 @@ export const BitBadge = {
     } else {
       message.defaultSubassetSupply = 0;
     }
+    if (object.standard !== undefined && object.standard !== null) {
+      message.standard = Number(object.standard);
+    } else {
+      message.standard = 0;
+    }
     return message;
   },
 
   toJSON(message: BitBadge): unknown {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
-    message.uri !== undefined && (obj.uri = message.uri);
+    message.uri !== undefined &&
+      (obj.uri = message.uri ? UriObject.toJSON(message.uri) : undefined);
     message.arbitraryBytes !== undefined &&
       (obj.arbitraryBytes = base64FromBytes(
         message.arbitraryBytes !== undefined
@@ -231,8 +214,6 @@ export const BitBadge = {
     } else {
       obj.freezeRanges = [];
     }
-    message.subassetUriFormat !== undefined &&
-      (obj.subassetUriFormat = message.subassetUriFormat);
     message.nextSubassetId !== undefined &&
       (obj.nextSubassetId = message.nextSubassetId);
     if (message.subassetSupplys) {
@@ -244,6 +225,7 @@ export const BitBadge = {
     }
     message.defaultSubassetSupply !== undefined &&
       (obj.defaultSubassetSupply = message.defaultSubassetSupply);
+    message.standard !== undefined && (obj.standard = message.standard);
     return obj;
   },
 
@@ -257,9 +239,9 @@ export const BitBadge = {
       message.id = 0;
     }
     if (object.uri !== undefined && object.uri !== null) {
-      message.uri = object.uri;
+      message.uri = UriObject.fromPartial(object.uri);
     } else {
-      message.uri = "";
+      message.uri = undefined;
     }
     if (object.arbitraryBytes !== undefined && object.arbitraryBytes !== null) {
       message.arbitraryBytes = object.arbitraryBytes;
@@ -281,14 +263,6 @@ export const BitBadge = {
         message.freezeRanges.push(IdRange.fromPartial(e));
       }
     }
-    if (
-      object.subassetUriFormat !== undefined &&
-      object.subassetUriFormat !== null
-    ) {
-      message.subassetUriFormat = object.subassetUriFormat;
-    } else {
-      message.subassetUriFormat = "";
-    }
     if (object.nextSubassetId !== undefined && object.nextSubassetId !== null) {
       message.nextSubassetId = object.nextSubassetId;
     } else {
@@ -309,6 +283,11 @@ export const BitBadge = {
       message.defaultSubassetSupply = object.defaultSubassetSupply;
     } else {
       message.defaultSubassetSupply = 0;
+    }
+    if (object.standard !== undefined && object.standard !== null) {
+      message.standard = object.standard;
+    } else {
+      message.standard = 0;
     }
     return message;
   },

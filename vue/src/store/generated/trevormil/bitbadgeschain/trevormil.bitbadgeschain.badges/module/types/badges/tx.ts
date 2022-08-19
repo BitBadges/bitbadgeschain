@@ -1,37 +1,50 @@
 /* eslint-disable */
 import { Reader, util, configure, Writer } from "protobufjs/minimal";
 import * as Long from "long";
+import { UriObject } from "../badges/uris";
 import { IdRange } from "../badges/ranges";
 
 export const protobufPackage = "trevormil.bitbadgeschain.badges";
 
 export interface MsgNewBadge {
+  /** See badges.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty. */
   creator: string;
-  uri: string;
-  subassetUris: string;
+  uri: UriObject | undefined;
   permissions: number;
   arbitraryBytes: Uint8Array;
   defaultSubassetSupply: number;
+  freezeAddressRanges: IdRange[];
+  standard: number;
+  /**
+   * Subasset supplys and amounts to create must be same length. For each idx, we create amounts[idx] subbadges each with a supply of supplys[idx].
+   * If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
+   */
   subassetSupplys: number[];
   subassetAmountsToCreate: number[];
-  freezeAddressRanges: IdRange[];
 }
 
 export interface MsgNewBadgeResponse {
+  /** ID of created badge */
   id: number;
 }
 
 export interface MsgNewSubBadge {
   creator: string;
-  id: number;
+  badgeId: number;
+  /**
+   * Subasset supplys and amounts to create must be same length. For each idx, we create amounts[idx] subbadges each with a supply of supplys[idx].
+   * If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
+   */
   supplys: number[];
   amountsToCreate: number[];
 }
 
 export interface MsgNewSubBadgeResponse {
-  subassetId: number;
+  /** ID of next subbadgeId after creating all subbadges. */
+  nextSubassetId: number;
 }
 
+/** For each amount, for each toAddress, we will attempt to transfer all the subbadgeIds for the badge with ID badgeId. */
 export interface MsgTransferBadge {
   creator: string;
   from: number;
@@ -39,43 +52,53 @@ export interface MsgTransferBadge {
   amounts: number[];
   badgeId: number;
   subbadgeRanges: IdRange[];
+  /** If 0, never expires and assumed to be the max possible time. */
   expiration_time: number;
+  /** If 0, always cancellable. Must be <= expiration_time. */
+  cantCancelBeforeTime: number;
 }
 
 export interface MsgTransferBadgeResponse {}
 
+/** For each amount, for each toAddress, we will request a transfer all the subbadgeIds for the badge with ID badgeId. Other party must approve / reject the transfer request. */
 export interface MsgRequestTransferBadge {
   creator: string;
   from: number;
   amount: number;
   badgeId: number;
   subbadgeRanges: IdRange[];
+  /** If 0, never expires and assumed to be the max possible time. */
   expiration_time: number;
+  /** If 0, always cancellable. Must be <= expiration_time. */
+  cantCancelBeforeTime: number;
 }
 
 export interface MsgRequestTransferBadgeResponse {}
 
+/** For all pending transfers of the badge where ThisPendingNonce is within some nonceRange in nonceRanges, we accept or deny the pending transfer. */
 export interface MsgHandlePendingTransfer {
   creator: string;
   accept: boolean;
   badgeId: number;
   nonceRanges: IdRange[];
+  /** Forceful accept is an option to accept the transfer forcefully instead of just marking it as approved. */
   forcefulAccept: boolean;
 }
 
 export interface MsgHandlePendingTransferResponse {}
 
+/** Sets an approval (no add or remove), just set it for an address. */
 export interface MsgSetApproval {
   creator: string;
   amount: number;
   address: number;
   badgeId: number;
   subbadgeRanges: IdRange[];
-  expirationTime: number;
 }
 
 export interface MsgSetApprovalResponse {}
 
+/** For each address and for each amount, revoke badge. */
 export interface MsgRevokeBadge {
   creator: string;
   addresses: number[];
@@ -86,6 +109,7 @@ export interface MsgRevokeBadge {
 
 export interface MsgRevokeBadgeResponse {}
 
+/** Add or remove addreses from the freeze address range */
 export interface MsgFreezeAddress {
   creator: string;
   addressRanges: IdRange[];
@@ -95,15 +119,16 @@ export interface MsgFreezeAddress {
 
 export interface MsgFreezeAddressResponse {}
 
+/** Update badge Uris with new URI object, if permitted. */
 export interface MsgUpdateUris {
   creator: string;
   badgeId: number;
-  uri: string;
-  subassetUri: string;
+  uri: UriObject | undefined;
 }
 
 export interface MsgUpdateUrisResponse {}
 
+/** Update badge permissions with new permissions, if permitted. */
 export interface MsgUpdatePermissions {
   creator: string;
   badgeId: number;
@@ -112,6 +137,7 @@ export interface MsgUpdatePermissions {
 
 export interface MsgUpdatePermissionsResponse {}
 
+/** Transfer manager to this address. Recipient must have made a request. */
 export interface MsgTransferManager {
   creator: string;
   badgeId: number;
@@ -120,6 +146,7 @@ export interface MsgTransferManager {
 
 export interface MsgTransferManagerResponse {}
 
+/** Add / remove request for manager to be transferred. */
 export interface MsgRequestTransferManager {
   creator: string;
   badgeId: number;
@@ -128,6 +155,7 @@ export interface MsgRequestTransferManager {
 
 export interface MsgRequestTransferManagerResponse {}
 
+/** Self destructs the badge, if permitted. */
 export interface MsgSelfDestructBadge {
   creator: string;
   badgeId: number;
@@ -135,6 +163,7 @@ export interface MsgSelfDestructBadge {
 
 export interface MsgSelfDestructBadgeResponse {}
 
+/** Prunes balances of self destructed badges. Can be called by anyone */
 export interface MsgPruneBalances {
   creator: string;
   badgeIds: number[];
@@ -143,20 +172,20 @@ export interface MsgPruneBalances {
 
 export interface MsgPruneBalancesResponse {}
 
+/** Update badge bytes, if permitted */
 export interface MsgUpdateBytes {
   creator: string;
   badgeId: number;
-  newBytes: string;
+  newBytes: Uint8Array;
 }
 
 export interface MsgUpdateBytesResponse {}
 
 const baseMsgNewBadge: object = {
   creator: "",
-  uri: "",
-  subassetUris: "",
   permissions: 0,
   defaultSubassetSupply: 0,
+  standard: 0,
   subassetSupplys: 0,
   subassetAmountsToCreate: 0,
 };
@@ -166,11 +195,8 @@ export const MsgNewBadge = {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
-    if (message.uri !== "") {
-      writer.uint32(18).string(message.uri);
-    }
-    if (message.subassetUris !== "") {
-      writer.uint32(26).string(message.subassetUris);
+    if (message.uri !== undefined) {
+      UriObject.encode(message.uri, writer.uint32(18).fork()).ldelim();
     }
     if (message.permissions !== 0) {
       writer.uint32(32).uint64(message.permissions);
@@ -180,6 +206,12 @@ export const MsgNewBadge = {
     }
     if (message.defaultSubassetSupply !== 0) {
       writer.uint32(48).uint64(message.defaultSubassetSupply);
+    }
+    for (const v of message.freezeAddressRanges) {
+      IdRange.encode(v!, writer.uint32(74).fork()).ldelim();
+    }
+    if (message.standard !== 0) {
+      writer.uint32(80).uint64(message.standard);
     }
     writer.uint32(58).fork();
     for (const v of message.subassetSupplys) {
@@ -191,9 +223,6 @@ export const MsgNewBadge = {
       writer.uint64(v);
     }
     writer.ldelim();
-    for (const v of message.freezeAddressRanges) {
-      IdRange.encode(v!, writer.uint32(74).fork()).ldelim();
-    }
     return writer;
   },
 
@@ -201,9 +230,9 @@ export const MsgNewBadge = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseMsgNewBadge } as MsgNewBadge;
+    message.freezeAddressRanges = [];
     message.subassetSupplys = [];
     message.subassetAmountsToCreate = [];
-    message.freezeAddressRanges = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -211,10 +240,7 @@ export const MsgNewBadge = {
           message.creator = reader.string();
           break;
         case 2:
-          message.uri = reader.string();
-          break;
-        case 3:
-          message.subassetUris = reader.string();
+          message.uri = UriObject.decode(reader, reader.uint32());
           break;
         case 4:
           message.permissions = longToNumber(reader.uint64() as Long);
@@ -224,6 +250,14 @@ export const MsgNewBadge = {
           break;
         case 6:
           message.defaultSubassetSupply = longToNumber(reader.uint64() as Long);
+          break;
+        case 9:
+          message.freezeAddressRanges.push(
+            IdRange.decode(reader, reader.uint32())
+          );
+          break;
+        case 10:
+          message.standard = longToNumber(reader.uint64() as Long);
           break;
         case 7:
           if ((tag & 7) === 2) {
@@ -251,11 +285,6 @@ export const MsgNewBadge = {
             );
           }
           break;
-        case 9:
-          message.freezeAddressRanges.push(
-            IdRange.decode(reader, reader.uint32())
-          );
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -266,23 +295,18 @@ export const MsgNewBadge = {
 
   fromJSON(object: any): MsgNewBadge {
     const message = { ...baseMsgNewBadge } as MsgNewBadge;
+    message.freezeAddressRanges = [];
     message.subassetSupplys = [];
     message.subassetAmountsToCreate = [];
-    message.freezeAddressRanges = [];
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = String(object.creator);
     } else {
       message.creator = "";
     }
     if (object.uri !== undefined && object.uri !== null) {
-      message.uri = String(object.uri);
+      message.uri = UriObject.fromJSON(object.uri);
     } else {
-      message.uri = "";
-    }
-    if (object.subassetUris !== undefined && object.subassetUris !== null) {
-      message.subassetUris = String(object.subassetUris);
-    } else {
-      message.subassetUris = "";
+      message.uri = undefined;
     }
     if (object.permissions !== undefined && object.permissions !== null) {
       message.permissions = Number(object.permissions);
@@ -301,6 +325,19 @@ export const MsgNewBadge = {
       message.defaultSubassetSupply = 0;
     }
     if (
+      object.freezeAddressRanges !== undefined &&
+      object.freezeAddressRanges !== null
+    ) {
+      for (const e of object.freezeAddressRanges) {
+        message.freezeAddressRanges.push(IdRange.fromJSON(e));
+      }
+    }
+    if (object.standard !== undefined && object.standard !== null) {
+      message.standard = Number(object.standard);
+    } else {
+      message.standard = 0;
+    }
+    if (
       object.subassetSupplys !== undefined &&
       object.subassetSupplys !== null
     ) {
@@ -316,23 +353,14 @@ export const MsgNewBadge = {
         message.subassetAmountsToCreate.push(Number(e));
       }
     }
-    if (
-      object.freezeAddressRanges !== undefined &&
-      object.freezeAddressRanges !== null
-    ) {
-      for (const e of object.freezeAddressRanges) {
-        message.freezeAddressRanges.push(IdRange.fromJSON(e));
-      }
-    }
     return message;
   },
 
   toJSON(message: MsgNewBadge): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
-    message.uri !== undefined && (obj.uri = message.uri);
-    message.subassetUris !== undefined &&
-      (obj.subassetUris = message.subassetUris);
+    message.uri !== undefined &&
+      (obj.uri = message.uri ? UriObject.toJSON(message.uri) : undefined);
     message.permissions !== undefined &&
       (obj.permissions = message.permissions);
     message.arbitraryBytes !== undefined &&
@@ -343,6 +371,14 @@ export const MsgNewBadge = {
       ));
     message.defaultSubassetSupply !== undefined &&
       (obj.defaultSubassetSupply = message.defaultSubassetSupply);
+    if (message.freezeAddressRanges) {
+      obj.freezeAddressRanges = message.freezeAddressRanges.map((e) =>
+        e ? IdRange.toJSON(e) : undefined
+      );
+    } else {
+      obj.freezeAddressRanges = [];
+    }
+    message.standard !== undefined && (obj.standard = message.standard);
     if (message.subassetSupplys) {
       obj.subassetSupplys = message.subassetSupplys.map((e) => e);
     } else {
@@ -355,35 +391,23 @@ export const MsgNewBadge = {
     } else {
       obj.subassetAmountsToCreate = [];
     }
-    if (message.freezeAddressRanges) {
-      obj.freezeAddressRanges = message.freezeAddressRanges.map((e) =>
-        e ? IdRange.toJSON(e) : undefined
-      );
-    } else {
-      obj.freezeAddressRanges = [];
-    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<MsgNewBadge>): MsgNewBadge {
     const message = { ...baseMsgNewBadge } as MsgNewBadge;
+    message.freezeAddressRanges = [];
     message.subassetSupplys = [];
     message.subassetAmountsToCreate = [];
-    message.freezeAddressRanges = [];
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
     } else {
       message.creator = "";
     }
     if (object.uri !== undefined && object.uri !== null) {
-      message.uri = object.uri;
+      message.uri = UriObject.fromPartial(object.uri);
     } else {
-      message.uri = "";
-    }
-    if (object.subassetUris !== undefined && object.subassetUris !== null) {
-      message.subassetUris = object.subassetUris;
-    } else {
-      message.subassetUris = "";
+      message.uri = undefined;
     }
     if (object.permissions !== undefined && object.permissions !== null) {
       message.permissions = object.permissions;
@@ -404,6 +428,19 @@ export const MsgNewBadge = {
       message.defaultSubassetSupply = 0;
     }
     if (
+      object.freezeAddressRanges !== undefined &&
+      object.freezeAddressRanges !== null
+    ) {
+      for (const e of object.freezeAddressRanges) {
+        message.freezeAddressRanges.push(IdRange.fromPartial(e));
+      }
+    }
+    if (object.standard !== undefined && object.standard !== null) {
+      message.standard = object.standard;
+    } else {
+      message.standard = 0;
+    }
+    if (
       object.subassetSupplys !== undefined &&
       object.subassetSupplys !== null
     ) {
@@ -417,14 +454,6 @@ export const MsgNewBadge = {
     ) {
       for (const e of object.subassetAmountsToCreate) {
         message.subassetAmountsToCreate.push(e);
-      }
-    }
-    if (
-      object.freezeAddressRanges !== undefined &&
-      object.freezeAddressRanges !== null
-    ) {
-      for (const e of object.freezeAddressRanges) {
-        message.freezeAddressRanges.push(IdRange.fromPartial(e));
       }
     }
     return message;
@@ -491,7 +520,7 @@ export const MsgNewBadgeResponse = {
 
 const baseMsgNewSubBadge: object = {
   creator: "",
-  id: 0,
+  badgeId: 0,
   supplys: 0,
   amountsToCreate: 0,
 };
@@ -501,8 +530,8 @@ export const MsgNewSubBadge = {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
-    if (message.id !== 0) {
-      writer.uint32(16).uint64(message.id);
+    if (message.badgeId !== 0) {
+      writer.uint32(16).uint64(message.badgeId);
     }
     writer.uint32(26).fork();
     for (const v of message.supplys) {
@@ -530,7 +559,7 @@ export const MsgNewSubBadge = {
           message.creator = reader.string();
           break;
         case 2:
-          message.id = longToNumber(reader.uint64() as Long);
+          message.badgeId = longToNumber(reader.uint64() as Long);
           break;
         case 3:
           if ((tag & 7) === 2) {
@@ -571,10 +600,10 @@ export const MsgNewSubBadge = {
     } else {
       message.creator = "";
     }
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id);
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = Number(object.badgeId);
     } else {
-      message.id = 0;
+      message.badgeId = 0;
     }
     if (object.supplys !== undefined && object.supplys !== null) {
       for (const e of object.supplys) {
@@ -595,7 +624,7 @@ export const MsgNewSubBadge = {
   toJSON(message: MsgNewSubBadge): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
-    message.id !== undefined && (obj.id = message.id);
+    message.badgeId !== undefined && (obj.badgeId = message.badgeId);
     if (message.supplys) {
       obj.supplys = message.supplys.map((e) => e);
     } else {
@@ -618,10 +647,10 @@ export const MsgNewSubBadge = {
     } else {
       message.creator = "";
     }
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
+    if (object.badgeId !== undefined && object.badgeId !== null) {
+      message.badgeId = object.badgeId;
     } else {
-      message.id = 0;
+      message.badgeId = 0;
     }
     if (object.supplys !== undefined && object.supplys !== null) {
       for (const e of object.supplys) {
@@ -640,15 +669,15 @@ export const MsgNewSubBadge = {
   },
 };
 
-const baseMsgNewSubBadgeResponse: object = { subassetId: 0 };
+const baseMsgNewSubBadgeResponse: object = { nextSubassetId: 0 };
 
 export const MsgNewSubBadgeResponse = {
   encode(
     message: MsgNewSubBadgeResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.subassetId !== 0) {
-      writer.uint32(8).uint64(message.subassetId);
+    if (message.nextSubassetId !== 0) {
+      writer.uint32(8).uint64(message.nextSubassetId);
     }
     return writer;
   },
@@ -661,7 +690,7 @@ export const MsgNewSubBadgeResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.subassetId = longToNumber(reader.uint64() as Long);
+          message.nextSubassetId = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -673,17 +702,18 @@ export const MsgNewSubBadgeResponse = {
 
   fromJSON(object: any): MsgNewSubBadgeResponse {
     const message = { ...baseMsgNewSubBadgeResponse } as MsgNewSubBadgeResponse;
-    if (object.subassetId !== undefined && object.subassetId !== null) {
-      message.subassetId = Number(object.subassetId);
+    if (object.nextSubassetId !== undefined && object.nextSubassetId !== null) {
+      message.nextSubassetId = Number(object.nextSubassetId);
     } else {
-      message.subassetId = 0;
+      message.nextSubassetId = 0;
     }
     return message;
   },
 
   toJSON(message: MsgNewSubBadgeResponse): unknown {
     const obj: any = {};
-    message.subassetId !== undefined && (obj.subassetId = message.subassetId);
+    message.nextSubassetId !== undefined &&
+      (obj.nextSubassetId = message.nextSubassetId);
     return obj;
   },
 
@@ -691,10 +721,10 @@ export const MsgNewSubBadgeResponse = {
     object: DeepPartial<MsgNewSubBadgeResponse>
   ): MsgNewSubBadgeResponse {
     const message = { ...baseMsgNewSubBadgeResponse } as MsgNewSubBadgeResponse;
-    if (object.subassetId !== undefined && object.subassetId !== null) {
-      message.subassetId = object.subassetId;
+    if (object.nextSubassetId !== undefined && object.nextSubassetId !== null) {
+      message.nextSubassetId = object.nextSubassetId;
     } else {
-      message.subassetId = 0;
+      message.nextSubassetId = 0;
     }
     return message;
   },
@@ -707,6 +737,7 @@ const baseMsgTransferBadge: object = {
   amounts: 0,
   badgeId: 0,
   expiration_time: 0,
+  cantCancelBeforeTime: 0,
 };
 
 export const MsgTransferBadge = {
@@ -735,6 +766,9 @@ export const MsgTransferBadge = {
     }
     if (message.expiration_time !== 0) {
       writer.uint32(56).uint64(message.expiration_time);
+    }
+    if (message.cantCancelBeforeTime !== 0) {
+      writer.uint32(64).uint64(message.cantCancelBeforeTime);
     }
     return writer;
   },
@@ -783,6 +817,9 @@ export const MsgTransferBadge = {
           break;
         case 7:
           message.expiration_time = longToNumber(reader.uint64() as Long);
+          break;
+        case 8:
+          message.cantCancelBeforeTime = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -835,6 +872,14 @@ export const MsgTransferBadge = {
     } else {
       message.expiration_time = 0;
     }
+    if (
+      object.cantCancelBeforeTime !== undefined &&
+      object.cantCancelBeforeTime !== null
+    ) {
+      message.cantCancelBeforeTime = Number(object.cantCancelBeforeTime);
+    } else {
+      message.cantCancelBeforeTime = 0;
+    }
     return message;
   },
 
@@ -862,6 +907,8 @@ export const MsgTransferBadge = {
     }
     message.expiration_time !== undefined &&
       (obj.expiration_time = message.expiration_time);
+    message.cantCancelBeforeTime !== undefined &&
+      (obj.cantCancelBeforeTime = message.cantCancelBeforeTime);
     return obj;
   },
 
@@ -907,6 +954,14 @@ export const MsgTransferBadge = {
       message.expiration_time = object.expiration_time;
     } else {
       message.expiration_time = 0;
+    }
+    if (
+      object.cantCancelBeforeTime !== undefined &&
+      object.cantCancelBeforeTime !== null
+    ) {
+      message.cantCancelBeforeTime = object.cantCancelBeforeTime;
+    } else {
+      message.cantCancelBeforeTime = 0;
     }
     return message;
   },
@@ -970,6 +1025,7 @@ const baseMsgRequestTransferBadge: object = {
   amount: 0,
   badgeId: 0,
   expiration_time: 0,
+  cantCancelBeforeTime: 0,
 };
 
 export const MsgRequestTransferBadge = {
@@ -994,6 +1050,9 @@ export const MsgRequestTransferBadge = {
     }
     if (message.expiration_time !== 0) {
       writer.uint32(56).uint64(message.expiration_time);
+    }
+    if (message.cantCancelBeforeTime !== 0) {
+      writer.uint32(64).uint64(message.cantCancelBeforeTime);
     }
     return writer;
   },
@@ -1025,6 +1084,9 @@ export const MsgRequestTransferBadge = {
           break;
         case 7:
           message.expiration_time = longToNumber(reader.uint64() as Long);
+          break;
+        case 8:
+          message.cantCancelBeforeTime = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -1072,6 +1134,14 @@ export const MsgRequestTransferBadge = {
     } else {
       message.expiration_time = 0;
     }
+    if (
+      object.cantCancelBeforeTime !== undefined &&
+      object.cantCancelBeforeTime !== null
+    ) {
+      message.cantCancelBeforeTime = Number(object.cantCancelBeforeTime);
+    } else {
+      message.cantCancelBeforeTime = 0;
+    }
     return message;
   },
 
@@ -1090,6 +1160,8 @@ export const MsgRequestTransferBadge = {
     }
     message.expiration_time !== undefined &&
       (obj.expiration_time = message.expiration_time);
+    message.cantCancelBeforeTime !== undefined &&
+      (obj.cantCancelBeforeTime = message.cantCancelBeforeTime);
     return obj;
   },
 
@@ -1132,6 +1204,14 @@ export const MsgRequestTransferBadge = {
       message.expiration_time = object.expiration_time;
     } else {
       message.expiration_time = 0;
+    }
+    if (
+      object.cantCancelBeforeTime !== undefined &&
+      object.cantCancelBeforeTime !== null
+    ) {
+      message.cantCancelBeforeTime = object.cantCancelBeforeTime;
+    } else {
+      message.cantCancelBeforeTime = 0;
     }
     return message;
   },
@@ -1398,7 +1478,6 @@ const baseMsgSetApproval: object = {
   amount: 0,
   address: 0,
   badgeId: 0,
-  expirationTime: 0,
 };
 
 export const MsgSetApproval = {
@@ -1417,9 +1496,6 @@ export const MsgSetApproval = {
     }
     for (const v of message.subbadgeRanges) {
       IdRange.encode(v!, writer.uint32(42).fork()).ldelim();
-    }
-    if (message.expirationTime !== 0) {
-      writer.uint32(48).uint64(message.expirationTime);
     }
     return writer;
   },
@@ -1446,9 +1522,6 @@ export const MsgSetApproval = {
           break;
         case 5:
           message.subbadgeRanges.push(IdRange.decode(reader, reader.uint32()));
-          break;
-        case 6:
-          message.expirationTime = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -1486,11 +1559,6 @@ export const MsgSetApproval = {
         message.subbadgeRanges.push(IdRange.fromJSON(e));
       }
     }
-    if (object.expirationTime !== undefined && object.expirationTime !== null) {
-      message.expirationTime = Number(object.expirationTime);
-    } else {
-      message.expirationTime = 0;
-    }
     return message;
   },
 
@@ -1507,8 +1575,6 @@ export const MsgSetApproval = {
     } else {
       obj.subbadgeRanges = [];
     }
-    message.expirationTime !== undefined &&
-      (obj.expirationTime = message.expirationTime);
     return obj;
   },
 
@@ -1539,11 +1605,6 @@ export const MsgSetApproval = {
       for (const e of object.subbadgeRanges) {
         message.subbadgeRanges.push(IdRange.fromPartial(e));
       }
-    }
-    if (object.expirationTime !== undefined && object.expirationTime !== null) {
-      message.expirationTime = object.expirationTime;
-    } else {
-      message.expirationTime = 0;
     }
     return message;
   },
@@ -1961,12 +2022,7 @@ export const MsgFreezeAddressResponse = {
   },
 };
 
-const baseMsgUpdateUris: object = {
-  creator: "",
-  badgeId: 0,
-  uri: "",
-  subassetUri: "",
-};
+const baseMsgUpdateUris: object = { creator: "", badgeId: 0 };
 
 export const MsgUpdateUris = {
   encode(message: MsgUpdateUris, writer: Writer = Writer.create()): Writer {
@@ -1976,11 +2032,8 @@ export const MsgUpdateUris = {
     if (message.badgeId !== 0) {
       writer.uint32(16).uint64(message.badgeId);
     }
-    if (message.uri !== "") {
-      writer.uint32(26).string(message.uri);
-    }
-    if (message.subassetUri !== "") {
-      writer.uint32(34).string(message.subassetUri);
+    if (message.uri !== undefined) {
+      UriObject.encode(message.uri, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -1999,10 +2052,7 @@ export const MsgUpdateUris = {
           message.badgeId = longToNumber(reader.uint64() as Long);
           break;
         case 3:
-          message.uri = reader.string();
-          break;
-        case 4:
-          message.subassetUri = reader.string();
+          message.uri = UriObject.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -2025,14 +2075,9 @@ export const MsgUpdateUris = {
       message.badgeId = 0;
     }
     if (object.uri !== undefined && object.uri !== null) {
-      message.uri = String(object.uri);
+      message.uri = UriObject.fromJSON(object.uri);
     } else {
-      message.uri = "";
-    }
-    if (object.subassetUri !== undefined && object.subassetUri !== null) {
-      message.subassetUri = String(object.subassetUri);
-    } else {
-      message.subassetUri = "";
+      message.uri = undefined;
     }
     return message;
   },
@@ -2041,9 +2086,8 @@ export const MsgUpdateUris = {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.badgeId !== undefined && (obj.badgeId = message.badgeId);
-    message.uri !== undefined && (obj.uri = message.uri);
-    message.subassetUri !== undefined &&
-      (obj.subassetUri = message.subassetUri);
+    message.uri !== undefined &&
+      (obj.uri = message.uri ? UriObject.toJSON(message.uri) : undefined);
     return obj;
   },
 
@@ -2060,14 +2104,9 @@ export const MsgUpdateUris = {
       message.badgeId = 0;
     }
     if (object.uri !== undefined && object.uri !== null) {
-      message.uri = object.uri;
+      message.uri = UriObject.fromPartial(object.uri);
     } else {
-      message.uri = "";
-    }
-    if (object.subassetUri !== undefined && object.subassetUri !== null) {
-      message.subassetUri = object.subassetUri;
-    } else {
-      message.subassetUri = "";
+      message.uri = undefined;
     }
     return message;
   },
@@ -2863,7 +2902,7 @@ export const MsgPruneBalancesResponse = {
   },
 };
 
-const baseMsgUpdateBytes: object = { creator: "", badgeId: 0, newBytes: "" };
+const baseMsgUpdateBytes: object = { creator: "", badgeId: 0 };
 
 export const MsgUpdateBytes = {
   encode(message: MsgUpdateBytes, writer: Writer = Writer.create()): Writer {
@@ -2873,8 +2912,8 @@ export const MsgUpdateBytes = {
     if (message.badgeId !== 0) {
       writer.uint32(16).uint64(message.badgeId);
     }
-    if (message.newBytes !== "") {
-      writer.uint32(26).string(message.newBytes);
+    if (message.newBytes.length !== 0) {
+      writer.uint32(26).bytes(message.newBytes);
     }
     return writer;
   },
@@ -2893,7 +2932,7 @@ export const MsgUpdateBytes = {
           message.badgeId = longToNumber(reader.uint64() as Long);
           break;
         case 3:
-          message.newBytes = reader.string();
+          message.newBytes = reader.bytes();
           break;
         default:
           reader.skipType(tag & 7);
@@ -2916,9 +2955,7 @@ export const MsgUpdateBytes = {
       message.badgeId = 0;
     }
     if (object.newBytes !== undefined && object.newBytes !== null) {
-      message.newBytes = String(object.newBytes);
-    } else {
-      message.newBytes = "";
+      message.newBytes = bytesFromBase64(object.newBytes);
     }
     return message;
   },
@@ -2927,7 +2964,10 @@ export const MsgUpdateBytes = {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.badgeId !== undefined && (obj.badgeId = message.badgeId);
-    message.newBytes !== undefined && (obj.newBytes = message.newBytes);
+    message.newBytes !== undefined &&
+      (obj.newBytes = base64FromBytes(
+        message.newBytes !== undefined ? message.newBytes : new Uint8Array()
+      ));
     return obj;
   },
 
@@ -2946,7 +2986,7 @@ export const MsgUpdateBytes = {
     if (object.newBytes !== undefined && object.newBytes !== null) {
       message.newBytes = object.newBytes;
     } else {
-      message.newBytes = "";
+      message.newBytes = new Uint8Array();
     }
     return message;
   },

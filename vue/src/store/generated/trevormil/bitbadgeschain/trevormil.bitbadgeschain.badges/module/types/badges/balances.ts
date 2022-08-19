@@ -5,32 +5,44 @@ import { BalanceObject, IdRange } from "../badges/ranges";
 
 export const protobufPackage = "trevormil.bitbadgeschain.badges";
 
-/** indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes) */
+/** Defines a user balance object for a badge w/ the user's balances, nonce, pending transfers, and approvals. All subbadge IDs for a badge are handled within this object. */
 export interface UserBalanceInfo {
+  /** The user's balance for each subbadge. */
   balanceAmounts: BalanceObject[];
+  /** Nonce for pending transfers. Increments by 1 each time. */
   pendingNonce: number;
-  /** IDs will be sorted in order of pending_nonce */
+  /** IDs will be sorted in order of this account's pending nonce. */
   pending: PendingTransfer[];
+  /** Approvals are sorted in order of address number. */
   approvals: Approval[];
 }
 
+/** Defines an approval object for a specific address. */
 export interface Approval {
+  /** account number for the address */
   address: number;
-  /** uint64 expirationTime = 2; Can maybe add this in the future but gets tricky with which ones you want to deduct / add from, etc. Probably best to just leave it as is */
+  /** approval balances for every subbadgeId */
   approvalAmounts: BalanceObject[];
 }
 
+/** Defines a pending transfer object for two addresses. A pending transfer will be stored in both parties' balance objects. */
 export interface PendingTransfer {
   subbadgeRange: IdRange | undefined;
+  /** This pending nonce is the nonce of the account for which this transfer is stored. Other is the other party's. Will be swapped for the other party's stored pending transfer. */
   thisPendingNonce: number;
   otherPendingNonce: number;
   amount: number;
+  /** Sent defines who initiated this pending transfer */
   sent: boolean;
   to: number;
   from: number;
   approvedBy: number;
+  /** For non forceful accepts, this will be true if the other party has accepted but doesn't want to pay the gas fees. */
   markedAsAccepted: boolean;
+  /** Can't be accepted after expiration time. If == 0, we assume it never expires. */
   expirationTime: number;
+  /** Can't cancel before must be less than expiration time. If == 0, we assume can cancel at any time. */
+  cantCancelBeforeTime: number;
 }
 
 const baseUserBalanceInfo: object = { pendingNonce: 0 };
@@ -177,7 +189,7 @@ export const Approval = {
       writer.uint32(8).uint64(message.address);
     }
     for (const v of message.approvalAmounts) {
-      BalanceObject.encode(v!, writer.uint32(26).fork()).ldelim();
+      BalanceObject.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -193,7 +205,7 @@ export const Approval = {
         case 1:
           message.address = longToNumber(reader.uint64() as Long);
           break;
-        case 3:
+        case 2:
           message.approvalAmounts.push(
             BalanceObject.decode(reader, reader.uint32())
           );
@@ -268,6 +280,7 @@ const basePendingTransfer: object = {
   approvedBy: 0,
   markedAsAccepted: false,
   expirationTime: 0,
+  cantCancelBeforeTime: 0,
 };
 
 export const PendingTransfer = {
@@ -301,6 +314,9 @@ export const PendingTransfer = {
     }
     if (message.expirationTime !== 0) {
       writer.uint32(88).uint64(message.expirationTime);
+    }
+    if (message.cantCancelBeforeTime !== 0) {
+      writer.uint32(96).uint64(message.cantCancelBeforeTime);
     }
     return writer;
   },
@@ -341,6 +357,9 @@ export const PendingTransfer = {
           break;
         case 11:
           message.expirationTime = longToNumber(reader.uint64() as Long);
+          break;
+        case 12:
+          message.cantCancelBeforeTime = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -411,6 +430,14 @@ export const PendingTransfer = {
     } else {
       message.expirationTime = 0;
     }
+    if (
+      object.cantCancelBeforeTime !== undefined &&
+      object.cantCancelBeforeTime !== null
+    ) {
+      message.cantCancelBeforeTime = Number(object.cantCancelBeforeTime);
+    } else {
+      message.cantCancelBeforeTime = 0;
+    }
     return message;
   },
 
@@ -433,6 +460,8 @@ export const PendingTransfer = {
       (obj.markedAsAccepted = message.markedAsAccepted);
     message.expirationTime !== undefined &&
       (obj.expirationTime = message.expirationTime);
+    message.cantCancelBeforeTime !== undefined &&
+      (obj.cantCancelBeforeTime = message.cantCancelBeforeTime);
     return obj;
   },
 
@@ -496,6 +525,14 @@ export const PendingTransfer = {
       message.expirationTime = object.expirationTime;
     } else {
       message.expirationTime = 0;
+    }
+    if (
+      object.cantCancelBeforeTime !== undefined &&
+      object.cantCancelBeforeTime !== null
+    ) {
+      message.cantCancelBeforeTime = object.cantCancelBeforeTime;
+    } else {
+      message.cantCancelBeforeTime = 0;
     }
     return message;
   },

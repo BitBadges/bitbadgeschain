@@ -9,12 +9,18 @@
  * ---------------------------------------------------------------
  */
 
+/**
+ * Defines an approval object for a specific address.
+ */
 export interface BadgesApproval {
   /** @format uint64 */
   address?: string;
   approvalAmounts?: BadgesBalanceObject[];
 }
 
+/**
+ * Defines a balance object. The specified balance holds for all ids specified within the id ranges array.
+ */
 export interface BadgesBalanceObject {
   /** @format uint64 */
   balance?: string;
@@ -27,7 +33,12 @@ export interface BadgesBalanceObject {
 export interface BadgesBitBadge {
   /** @format uint64 */
   id?: string;
-  uri?: string;
+
+  /**
+   * uri object for the badge uri and subasset uris stored off chain. Stored in a special UriObject that attemtps to save space and avoid reused plaintext storage such as http:// and duplicate text for uri and subasset uris
+   * data returned should corresponds to the Badge standard defined.
+   */
+  uri?: BadgesUriObject;
 
   /** @format byte */
   arbitraryBytes?: string;
@@ -35,31 +46,35 @@ export interface BadgesBitBadge {
   /** @format uint64 */
   manager?: string;
 
+  /** @format uint64 */
+  permissions?: string;
+
+  /** FreezeRanges defines what addresses are frozen or unfrozen. If permissions.FrozenByDefault is false, this is used for frozen addresses. If true, this is used for unfrozen addresses. */
+  freezeRanges?: BadgesIdRange[];
+
   /**
-   * can_manager_transfer: can the manager transfer managerial privileges to another address
-   * can_update_uris: can the manager update the uris of the class and subassets; if false, locked forever
-   * forceful_transfers: if true, one can send a badge to an account without pending approval; these badges should not by default be displayed on public profiles (can also use collections)
-   * can_create: when true, manager can create more subassets of the class; once set to false, it is locked
-   * can_revoke: when true, manager can revoke subassets of the class (including null address); once set to false, it is locked
-   * can_freeze: when true, manager can freeze addresseses from transferring; once set to false, it is locked
-   * frozen_by_default: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
-   * manager is not frozen by default
-   *
-   * More permissions to be added
+   * Starts at 0. Each subasset created will incrementally have an increasing ID #. Can't overflow.
    * @format uint64
    */
-  permissions?: string;
-  freezeRanges?: BadgesIdRange[];
-  subassetUriFormat?: string;
-
-  /** @format uint64 */
   nextSubassetId?: string;
   subassetSupplys?: BadgesBalanceObject[];
 
-  /** @format uint64 */
+  /**
+   * Default subasset supply. If == 0, we assume == 1.
+   * @format uint64
+   */
   defaultSubassetSupply?: string;
+
+  /**
+   * Defines what standard this badge should implement. Must obey the rules of that standard.
+   * @format uint64
+   */
+  standard?: string;
 }
 
+/**
+ * Id ranges define a range of IDs from start to end. Can be used for subbadgeIds, nonces, addresses anything. If end == 0, we assume end == start. Start must be >= end.
+ */
 export interface BadgesIdRange {
   /** @format uint64 */
   start?: string;
@@ -79,7 +94,7 @@ export interface BadgesMsgNewBadgeResponse {
 
 export interface BadgesMsgNewSubBadgeResponse {
   /** @format uint64 */
-  subassetId?: string;
+  nextSubassetId?: string;
 }
 
 export type BadgesMsgPruneBalancesResponse = object;
@@ -109,7 +124,11 @@ export type BadgesMsgUpdateUrisResponse = object;
  */
 export type BadgesParams = object;
 
+/**
+ * Defines a pending transfer object for two addresses. A pending transfer will be stored in both parties' balance objects.
+ */
 export interface BadgesPendingTransfer {
+  /** Id ranges define a range of IDs from start to end. Can be used for subbadgeIds, nonces, addresses anything. If end == 0, we assume end == start. Start must be >= end. */
   subbadgeRange?: BadgesIdRange;
 
   /** @format uint64 */
@@ -134,6 +153,9 @@ export interface BadgesPendingTransfer {
 
   /** @format uint64 */
   expirationTime?: string;
+
+  /** @format uint64 */
+  cantCancelBeforeTime?: string;
 }
 
 export interface BadgesQueryGetBadgeResponse {
@@ -142,6 +164,7 @@ export interface BadgesQueryGetBadgeResponse {
 }
 
 export interface BadgesQueryGetBalanceResponse {
+  /** Defines a user balance object for a badge w/ the user's balances, nonce, pending transfers, and approvals. All subbadge IDs for a badge are handled within this object. */
   balanceInfo?: BadgesUserBalanceInfo;
 }
 
@@ -153,6 +176,35 @@ export interface BadgesQueryParamsResponse {
   params?: BadgesParams;
 }
 
+/**
+ * A URI object defines a uri and subasset uri for a badge and its subbadges. Designed to save storage and avoid reused text and common patterns.
+ */
+export interface BadgesUriObject {
+  /** @format uint64 */
+  decodeScheme?: string;
+
+  /** @format uint64 */
+  scheme?: string;
+
+  /** @format byte */
+  uri?: string;
+
+  /** The four fields below are used to convert the uri from above to the subasset URI. */
+  idxRangeToRemove?: BadgesIdRange;
+
+  /** @format uint64 */
+  insertSubassetBytesIdx?: string;
+
+  /** @format byte */
+  bytesToInsert?: string;
+
+  /** @format uint64 */
+  insertIdIdx?: string;
+}
+
+/**
+ * Defines a user balance object for a badge w/ the user's balances, nonce, pending transfers, and approvals. All subbadge IDs for a badge are handled within this object.
+ */
 export interface BadgesUserBalanceInfo {
   balanceAmounts?: BadgesBalanceObject[];
 

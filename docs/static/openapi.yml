@@ -30394,10 +30394,46 @@ paths:
 
                       starts at 0 and increments by 1 each badge
                   uri:
-                    type: string
-                    title: >-
-                      uri for the class metadata stored off chain. must match a
-                      valid metadata standard (bitbadge, collection, etc)
+                    description: >-
+                      uri object for the badge uri and subasset uris stored off
+                      chain. Stored in a special UriObject that attemtps to save
+                      space and avoid reused plaintext storage such as http://
+                      and duplicate text for uri and subasset uris
+
+                      data returned should corresponds to the Badge standard
+                      defined.
+                    type: object
+                    properties:
+                      decodeScheme:
+                        type: string
+                        format: uint64
+                      scheme:
+                        type: string
+                        format: uint64
+                      uri:
+                        type: string
+                        format: byte
+                      idxRangeToRemove:
+                        description: >-
+                          The four fields below are used to convert the uri from
+                          above to the subasset URI.
+                        type: object
+                        properties:
+                          start:
+                            type: string
+                            format: uint64
+                          end:
+                            type: string
+                            format: uint64
+                      insertSubassetBytesIdx:
+                        type: string
+                        format: uint64
+                      bytesToInsert:
+                        type: string
+                        format: byte
+                      insertIdIdx:
+                        type: string
+                        format: uint64
                   arbitraryBytes:
                     type: string
                     format: byte
@@ -30416,41 +30452,11 @@ paths:
                   permissions:
                     type: string
                     format: uint64
-                    description: >-
-                      can_manager_transfer: can the manager transfer managerial
-                      privileges to another address
-
-                      can_update_uris: can the manager update the uris of the
-                      class and subassets; if false, locked forever
-
-                      forceful_transfers: if true, one can send a badge to an
-                      account without pending approval; these badges should not
-                      by default be displayed on public profiles (can also use
-                      collections)
-
-                      can_create: when true, manager can create more subassets
-                      of the class; once set to false, it is locked
-
-                      can_revoke: when true, manager can revoke subassets of the
-                      class (including null address); once set to false, it is
-                      locked
-
-                      can_freeze: when true, manager can freeze addresseses from
-                      transferring; once set to false, it is locked
-
-                      frozen_by_default: when true, all addresses are considered
-                      frozen and must be unfrozen to transfer; when false, all
-                      addresses are considered unfrozen and must be frozen to
-                      freeze
-
-                      manager is not frozen by default
-
-
-                      More permissions to be added
                     title: >-
-                      Flag bits are in the following order from left to right;
-                      leading zeroes are applied and any future additions will
-                      be appended to the right
+                      Store permissions packed in a uint where the bits
+                      correspond to permissions from left to right; leading
+                      zeroes are applied and any future additions will be
+                      appended to the right. See types/permissions.go
                   freezeRanges:
                     type: array
                     items:
@@ -30462,26 +30468,21 @@ paths:
                         end:
                           type: string
                           format: uint64
-                    title: >-
-                      if frozen_by_default is true, this is an accumulator of
-                      unfrozen addresses; and vice versa for false
-
-                      big.Int will always only be 32 uint64s long
-                  subassetUriFormat:
-                    type: string
-                    title: >-
-                      uri for the subassets metadata stored off chain; include
-                      {id} in the string, it will be replaced with the subasset
-                      id
-
-                      if not specified, uses a default Class (ID # 1) like
-                      metadata
+                      description: >-
+                        Id ranges define a range of IDs from start to end. Can
+                        be used for subbadgeIds, nonces, addresses anything. If
+                        end == 0, we assume end == start. Start must be >= end.
+                    description: >-
+                      FreezeRanges defines what addresses are frozen or
+                      unfrozen. If permissions.FrozenByDefault is false, this is
+                      used for frozen addresses. If true, this is used for
+                      unfrozen addresses.
                   nextSubassetId:
                     type: string
                     format: uint64
-                    title: >-
-                      starts at 0; each subasset created will incrementally have
-                      an increasing ID #
+                    description: >-
+                      Starts at 0. Each subasset created will incrementally have
+                      an increasing ID #. Can't overflow.
                   subassetSupplys:
                     type: array
                     items:
@@ -30501,12 +30502,27 @@ paths:
                               end:
                                 type: string
                                 format: uint64
+                            description: >-
+                              Id ranges define a range of IDs from start to end.
+                              Can be used for subbadgeIds, nonces, addresses
+                              anything. If end == 0, we assume end == start.
+                              Start must be >= end.
+                      description: >-
+                        Defines a balance object. The specified balance holds
+                        for all ids specified within the id ranges array.
                     title: >-
-                      only store if not == default; will be sorted in order of
-                      subsasset ids; (maybe add defaut option in future)
+                      Subasset supplys are stored if the subasset supply !=
+                      default. Balance => SubbadgeIdRange map
                   defaultSubassetSupply:
                     type: string
                     format: uint64
+                    description: 'Default subasset supply. If == 0, we assume == 1.'
+                  standard:
+                    type: string
+                    format: uint64
+                    description: >-
+                      Defines what standard this badge should implement. Must
+                      obey the rules of that standard.
                 description: >-
                   BitBadge defines a badge type. Think of this like the smart
                   contract definition.
@@ -30735,6 +30751,14 @@ paths:
                               end:
                                 type: string
                                 format: uint64
+                            description: >-
+                              Id ranges define a range of IDs from start to end.
+                              Can be used for subbadgeIds, nonces, addresses
+                              anything. If end == 0, we assume end == start.
+                              Start must be >= end.
+                      description: >-
+                        Defines a balance object. The specified balance holds
+                        for all ids specified within the id ranges array.
                   pendingNonce:
                     type: string
                     format: uint64
@@ -30752,6 +30776,11 @@ paths:
                             end:
                               type: string
                               format: uint64
+                          description: >-
+                            Id ranges define a range of IDs from start to end.
+                            Can be used for subbadgeIds, nonces, addresses
+                            anything. If end == 0, we assume end == start. Start
+                            must be >= end.
                         thisPendingNonce:
                           type: string
                           format: uint64
@@ -30777,6 +30806,13 @@ paths:
                         expirationTime:
                           type: string
                           format: uint64
+                        cantCancelBeforeTime:
+                          type: string
+                          format: uint64
+                      description: >-
+                        Defines a pending transfer object for two addresses. A
+                        pending transfer will be stored in both parties' balance
+                        objects.
                   approvals:
                     type: array
                     items:
@@ -30804,12 +30840,20 @@ paths:
                                     end:
                                       type: string
                                       format: uint64
-                          title: >-
-                            uint64 expirationTime = 2; Can maybe add this in the
-                            future but gets tricky with which ones you want to
-                            deduct / add from, etc. Probably best to just leave
-                            it as is
-                title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
+                                  description: >-
+                                    Id ranges define a range of IDs from start
+                                    to end. Can be used for subbadgeIds, nonces,
+                                    addresses anything. If end == 0, we assume
+                                    end == start. Start must be >= end.
+                            description: >-
+                              Defines a balance object. The specified balance
+                              holds for all ids specified within the id ranges
+                              array.
+                      description: Defines an approval object for a specific address.
+                description: >-
+                  Defines a user balance object for a badge w/ the user's
+                  balances, nonce, pending transfers, and approvals. All
+                  subbadge IDs for a badge are handled within this object.
         default:
           description: An unexpected error response.
           schema:
@@ -31209,114 +31253,6 @@ paths:
                           "@type": "type.googleapis.com/google.protobuf.Duration",
                           "value": "1.212s"
                         }
-      tags:
-        - Query
-  /trevormil/bitbadgeschain/collections/params:
-    get:
-      summary: Parameters queries the parameters of the module.
-      operationId: TrevormilBitbadgeschainCollectionsParams
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              params:
-                description: params holds all the parameters of this module.
-                type: object
-            description: >-
-              QueryParamsResponse is response type for the Query/Params RPC
-              method.
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      tags:
-        - Query
-  /trevormil/bitbadgeschain/education/params:
-    get:
-      summary: Parameters queries the parameters of the module.
-      operationId: TrevormilBitbadgeschainEducationParams
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              params:
-                description: params holds all the parameters of this module.
-                type: object
-            description: >-
-              QueryParamsResponse is response type for the Query/Params RPC
-              method.
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      tags:
-        - Query
-  /trevormil/bitbadgeschain/social/params:
-    get:
-      summary: Parameters queries the parameters of the module.
-      operationId: TrevormilBitbadgeschainSocialParams
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              params:
-                description: params holds all the parameters of this module.
-                type: object
-            description: >-
-              QueryParamsResponse is response type for the Query/Params RPC
-              method.
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
       tags:
         - Query
 definitions:
@@ -52748,10 +52684,14 @@ definitions:
                   end:
                     type: string
                     format: uint64
-        title: >-
-          uint64 expirationTime = 2; Can maybe add this in the future but gets
-          tricky with which ones you want to deduct / add from, etc. Probably
-          best to just leave it as is
+                description: >-
+                  Id ranges define a range of IDs from start to end. Can be used
+                  for subbadgeIds, nonces, addresses anything. If end == 0, we
+                  assume end == start. Start must be >= end.
+          description: >-
+            Defines a balance object. The specified balance holds for all ids
+            specified within the id ranges array.
+    description: Defines an approval object for a specific address.
   trevormil.bitbadgeschain.badges.BalanceObject:
     type: object
     properties:
@@ -52769,6 +52709,13 @@ definitions:
             end:
               type: string
               format: uint64
+          description: >-
+            Id ranges define a range of IDs from start to end. Can be used for
+            subbadgeIds, nonces, addresses anything. If end == 0, we assume end
+            == start. Start must be >= end.
+    description: >-
+      Defines a balance object. The specified balance holds for all ids
+      specified within the id ranges array.
   trevormil.bitbadgeschain.badges.BitBadge:
     type: object
     properties:
@@ -52781,10 +52728,45 @@ definitions:
 
           starts at 0 and increments by 1 each badge
       uri:
-        type: string
-        title: >-
-          uri for the class metadata stored off chain. must match a valid
-          metadata standard (bitbadge, collection, etc)
+        description: >-
+          uri object for the badge uri and subasset uris stored off chain.
+          Stored in a special UriObject that attemtps to save space and avoid
+          reused plaintext storage such as http:// and duplicate text for uri
+          and subasset uris
+
+          data returned should corresponds to the Badge standard defined.
+        type: object
+        properties:
+          decodeScheme:
+            type: string
+            format: uint64
+          scheme:
+            type: string
+            format: uint64
+          uri:
+            type: string
+            format: byte
+          idxRangeToRemove:
+            description: >-
+              The four fields below are used to convert the uri from above to
+              the subasset URI.
+            type: object
+            properties:
+              start:
+                type: string
+                format: uint64
+              end:
+                type: string
+                format: uint64
+          insertSubassetBytesIdx:
+            type: string
+            format: uint64
+          bytesToInsert:
+            type: string
+            format: byte
+          insertIdIdx:
+            type: string
+            format: uint64
       arbitraryBytes:
         type: string
         format: byte
@@ -52802,38 +52784,11 @@ definitions:
       permissions:
         type: string
         format: uint64
-        description: >-
-          can_manager_transfer: can the manager transfer managerial privileges
-          to another address
-
-          can_update_uris: can the manager update the uris of the class and
-          subassets; if false, locked forever
-
-          forceful_transfers: if true, one can send a badge to an account
-          without pending approval; these badges should not by default be
-          displayed on public profiles (can also use collections)
-
-          can_create: when true, manager can create more subassets of the class;
-          once set to false, it is locked
-
-          can_revoke: when true, manager can revoke subassets of the class
-          (including null address); once set to false, it is locked
-
-          can_freeze: when true, manager can freeze addresseses from
-          transferring; once set to false, it is locked
-
-          frozen_by_default: when true, all addresses are considered frozen and
-          must be unfrozen to transfer; when false, all addresses are considered
-          unfrozen and must be frozen to freeze
-
-          manager is not frozen by default
-
-
-          More permissions to be added
         title: >-
-          Flag bits are in the following order from left to right; leading
-          zeroes are applied and any future additions will be appended to the
-          right
+          Store permissions packed in a uint where the bits correspond to
+          permissions from left to right; leading zeroes are applied and any
+          future additions will be appended to the right. See
+          types/permissions.go
       freezeRanges:
         type: array
         items:
@@ -52845,24 +52800,20 @@ definitions:
             end:
               type: string
               format: uint64
-        title: >-
-          if frozen_by_default is true, this is an accumulator of unfrozen
-          addresses; and vice versa for false
-
-          big.Int will always only be 32 uint64s long
-      subassetUriFormat:
-        type: string
-        title: >-
-          uri for the subassets metadata stored off chain; include {id} in the
-          string, it will be replaced with the subasset id
-
-          if not specified, uses a default Class (ID # 1) like metadata
+          description: >-
+            Id ranges define a range of IDs from start to end. Can be used for
+            subbadgeIds, nonces, addresses anything. If end == 0, we assume end
+            == start. Start must be >= end.
+        description: >-
+          FreezeRanges defines what addresses are frozen or unfrozen. If
+          permissions.FrozenByDefault is false, this is used for frozen
+          addresses. If true, this is used for unfrozen addresses.
       nextSubassetId:
         type: string
         format: uint64
-        title: >-
-          starts at 0; each subasset created will incrementally have an
-          increasing ID #
+        description: >-
+          Starts at 0. Each subasset created will incrementally have an
+          increasing ID #. Can't overflow.
       subassetSupplys:
         type: array
         items:
@@ -52882,12 +52833,26 @@ definitions:
                   end:
                     type: string
                     format: uint64
+                description: >-
+                  Id ranges define a range of IDs from start to end. Can be used
+                  for subbadgeIds, nonces, addresses anything. If end == 0, we
+                  assume end == start. Start must be >= end.
+          description: >-
+            Defines a balance object. The specified balance holds for all ids
+            specified within the id ranges array.
         title: >-
-          only store if not == default; will be sorted in order of subsasset
-          ids; (maybe add defaut option in future)
+          Subasset supplys are stored if the subasset supply != default. Balance
+          => SubbadgeIdRange map
       defaultSubassetSupply:
         type: string
         format: uint64
+        description: 'Default subasset supply. If == 0, we assume == 1.'
+      standard:
+        type: string
+        format: uint64
+        description: >-
+          Defines what standard this badge should implement. Must obey the rules
+          of that standard.
     description: >-
       BitBadge defines a badge type. Think of this like the smart contract
       definition.
@@ -52900,6 +52865,10 @@ definitions:
       end:
         type: string
         format: uint64
+    description: >-
+      Id ranges define a range of IDs from start to end. Can be used for
+      subbadgeIds, nonces, addresses anything. If end == 0, we assume end ==
+      start. Start must be >= end.
   trevormil.bitbadgeschain.badges.MsgFreezeAddressResponse:
     type: object
   trevormil.bitbadgeschain.badges.MsgHandlePendingTransferResponse:
@@ -52913,7 +52882,7 @@ definitions:
   trevormil.bitbadgeschain.badges.MsgNewSubBadgeResponse:
     type: object
     properties:
-      subassetId:
+      nextSubassetId:
         type: string
         format: uint64
   trevormil.bitbadgeschain.badges.MsgPruneBalancesResponse:
@@ -52953,6 +52922,10 @@ definitions:
           end:
             type: string
             format: uint64
+        description: >-
+          Id ranges define a range of IDs from start to end. Can be used for
+          subbadgeIds, nonces, addresses anything. If end == 0, we assume end ==
+          start. Start must be >= end.
       thisPendingNonce:
         type: string
         format: uint64
@@ -52978,6 +52951,12 @@ definitions:
       expirationTime:
         type: string
         format: uint64
+      cantCancelBeforeTime:
+        type: string
+        format: uint64
+    description: >-
+      Defines a pending transfer object for two addresses. A pending transfer
+      will be stored in both parties' balance objects.
   trevormil.bitbadgeschain.badges.QueryGetBadgeResponse:
     type: object
     properties:
@@ -52993,10 +52972,45 @@ definitions:
 
               starts at 0 and increments by 1 each badge
           uri:
-            type: string
-            title: >-
-              uri for the class metadata stored off chain. must match a valid
-              metadata standard (bitbadge, collection, etc)
+            description: >-
+              uri object for the badge uri and subasset uris stored off chain.
+              Stored in a special UriObject that attemtps to save space and
+              avoid reused plaintext storage such as http:// and duplicate text
+              for uri and subasset uris
+
+              data returned should corresponds to the Badge standard defined.
+            type: object
+            properties:
+              decodeScheme:
+                type: string
+                format: uint64
+              scheme:
+                type: string
+                format: uint64
+              uri:
+                type: string
+                format: byte
+              idxRangeToRemove:
+                description: >-
+                  The four fields below are used to convert the uri from above
+                  to the subasset URI.
+                type: object
+                properties:
+                  start:
+                    type: string
+                    format: uint64
+                  end:
+                    type: string
+                    format: uint64
+              insertSubassetBytesIdx:
+                type: string
+                format: uint64
+              bytesToInsert:
+                type: string
+                format: byte
+              insertIdIdx:
+                type: string
+                format: uint64
           arbitraryBytes:
             type: string
             format: byte
@@ -53015,38 +53029,11 @@ definitions:
           permissions:
             type: string
             format: uint64
-            description: >-
-              can_manager_transfer: can the manager transfer managerial
-              privileges to another address
-
-              can_update_uris: can the manager update the uris of the class and
-              subassets; if false, locked forever
-
-              forceful_transfers: if true, one can send a badge to an account
-              without pending approval; these badges should not by default be
-              displayed on public profiles (can also use collections)
-
-              can_create: when true, manager can create more subassets of the
-              class; once set to false, it is locked
-
-              can_revoke: when true, manager can revoke subassets of the class
-              (including null address); once set to false, it is locked
-
-              can_freeze: when true, manager can freeze addresseses from
-              transferring; once set to false, it is locked
-
-              frozen_by_default: when true, all addresses are considered frozen
-              and must be unfrozen to transfer; when false, all addresses are
-              considered unfrozen and must be frozen to freeze
-
-              manager is not frozen by default
-
-
-              More permissions to be added
             title: >-
-              Flag bits are in the following order from left to right; leading
-              zeroes are applied and any future additions will be appended to
-              the right
+              Store permissions packed in a uint where the bits correspond to
+              permissions from left to right; leading zeroes are applied and any
+              future additions will be appended to the right. See
+              types/permissions.go
           freezeRanges:
             type: array
             items:
@@ -53058,24 +53045,20 @@ definitions:
                 end:
                   type: string
                   format: uint64
-            title: >-
-              if frozen_by_default is true, this is an accumulator of unfrozen
-              addresses; and vice versa for false
-
-              big.Int will always only be 32 uint64s long
-          subassetUriFormat:
-            type: string
-            title: >-
-              uri for the subassets metadata stored off chain; include {id} in
-              the string, it will be replaced with the subasset id
-
-              if not specified, uses a default Class (ID # 1) like metadata
+              description: >-
+                Id ranges define a range of IDs from start to end. Can be used
+                for subbadgeIds, nonces, addresses anything. If end == 0, we
+                assume end == start. Start must be >= end.
+            description: >-
+              FreezeRanges defines what addresses are frozen or unfrozen. If
+              permissions.FrozenByDefault is false, this is used for frozen
+              addresses. If true, this is used for unfrozen addresses.
           nextSubassetId:
             type: string
             format: uint64
-            title: >-
-              starts at 0; each subasset created will incrementally have an
-              increasing ID #
+            description: >-
+              Starts at 0. Each subasset created will incrementally have an
+              increasing ID #. Can't overflow.
           subassetSupplys:
             type: array
             items:
@@ -53095,12 +53078,26 @@ definitions:
                       end:
                         type: string
                         format: uint64
+                    description: >-
+                      Id ranges define a range of IDs from start to end. Can be
+                      used for subbadgeIds, nonces, addresses anything. If end
+                      == 0, we assume end == start. Start must be >= end.
+              description: >-
+                Defines a balance object. The specified balance holds for all
+                ids specified within the id ranges array.
             title: >-
-              only store if not == default; will be sorted in order of subsasset
-              ids; (maybe add defaut option in future)
+              Subasset supplys are stored if the subasset supply != default.
+              Balance => SubbadgeIdRange map
           defaultSubassetSupply:
             type: string
             format: uint64
+            description: 'Default subasset supply. If == 0, we assume == 1.'
+          standard:
+            type: string
+            format: uint64
+            description: >-
+              Defines what standard this badge should implement. Must obey the
+              rules of that standard.
         description: >-
           BitBadge defines a badge type. Think of this like the smart contract
           definition.
@@ -53129,6 +53126,13 @@ definitions:
                       end:
                         type: string
                         format: uint64
+                    description: >-
+                      Id ranges define a range of IDs from start to end. Can be
+                      used for subbadgeIds, nonces, addresses anything. If end
+                      == 0, we assume end == start. Start must be >= end.
+              description: >-
+                Defines a balance object. The specified balance holds for all
+                ids specified within the id ranges array.
           pendingNonce:
             type: string
             format: uint64
@@ -53146,6 +53150,10 @@ definitions:
                     end:
                       type: string
                       format: uint64
+                  description: >-
+                    Id ranges define a range of IDs from start to end. Can be
+                    used for subbadgeIds, nonces, addresses anything. If end ==
+                    0, we assume end == start. Start must be >= end.
                 thisPendingNonce:
                   type: string
                   format: uint64
@@ -53171,6 +53179,12 @@ definitions:
                 expirationTime:
                   type: string
                   format: uint64
+                cantCancelBeforeTime:
+                  type: string
+                  format: uint64
+              description: >-
+                Defines a pending transfer object for two addresses. A pending
+                transfer will be stored in both parties' balance objects.
           approvals:
             type: array
             items:
@@ -53198,11 +53212,19 @@ definitions:
                             end:
                               type: string
                               format: uint64
-                  title: >-
-                    uint64 expirationTime = 2; Can maybe add this in the future
-                    but gets tricky with which ones you want to deduct / add
-                    from, etc. Probably best to just leave it as is
-        title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
+                          description: >-
+                            Id ranges define a range of IDs from start to end.
+                            Can be used for subbadgeIds, nonces, addresses
+                            anything. If end == 0, we assume end == start. Start
+                            must be >= end.
+                    description: >-
+                      Defines a balance object. The specified balance holds for
+                      all ids specified within the id ranges array.
+              description: Defines an approval object for a specific address.
+        description: >-
+          Defines a user balance object for a badge w/ the user's balances,
+          nonce, pending transfers, and approvals. All subbadge IDs for a badge
+          are handled within this object.
   trevormil.bitbadgeschain.badges.QueryParamsResponse:
     type: object
     properties:
@@ -53210,6 +53232,42 @@ definitions:
         description: params holds all the parameters of this module.
         type: object
     description: QueryParamsResponse is response type for the Query/Params RPC method.
+  trevormil.bitbadgeschain.badges.UriObject:
+    type: object
+    properties:
+      decodeScheme:
+        type: string
+        format: uint64
+      scheme:
+        type: string
+        format: uint64
+      uri:
+        type: string
+        format: byte
+      idxRangeToRemove:
+        description: >-
+          The four fields below are used to convert the uri from above to the
+          subasset URI.
+        type: object
+        properties:
+          start:
+            type: string
+            format: uint64
+          end:
+            type: string
+            format: uint64
+      insertSubassetBytesIdx:
+        type: string
+        format: uint64
+      bytesToInsert:
+        type: string
+        format: byte
+      insertIdIdx:
+        type: string
+        format: uint64
+    description: >-
+      A URI object defines a uri and subasset uri for a badge and its subbadges.
+      Designed to save storage and avoid reused text and common patterns.
   trevormil.bitbadgeschain.badges.UserBalanceInfo:
     type: object
     properties:
@@ -53232,6 +53290,13 @@ definitions:
                   end:
                     type: string
                     format: uint64
+                description: >-
+                  Id ranges define a range of IDs from start to end. Can be used
+                  for subbadgeIds, nonces, addresses anything. If end == 0, we
+                  assume end == start. Start must be >= end.
+          description: >-
+            Defines a balance object. The specified balance holds for all ids
+            specified within the id ranges array.
       pendingNonce:
         type: string
         format: uint64
@@ -53249,6 +53314,10 @@ definitions:
                 end:
                   type: string
                   format: uint64
+              description: >-
+                Id ranges define a range of IDs from start to end. Can be used
+                for subbadgeIds, nonces, addresses anything. If end == 0, we
+                assume end == start. Start must be >= end.
             thisPendingNonce:
               type: string
               format: uint64
@@ -53274,6 +53343,12 @@ definitions:
             expirationTime:
               type: string
               format: uint64
+            cantCancelBeforeTime:
+              type: string
+              format: uint64
+          description: >-
+            Defines a pending transfer object for two addresses. A pending
+            transfer will be stored in both parties' balance objects.
       approvals:
         type: array
         items:
@@ -53301,38 +53376,15 @@ definitions:
                         end:
                           type: string
                           format: uint64
-              title: >-
-                uint64 expirationTime = 2; Can maybe add this in the future but
-                gets tricky with which ones you want to deduct / add from, etc.
-                Probably best to just leave it as is
-    title: indexed by badgeid-subassetid-uniqueaccountnumber (26 bytes)
-  trevormil.bitbadgeschain.collections.Params:
-    type: object
-    description: Params defines the parameters for the module.
-  trevormil.bitbadgeschain.collections.QueryParamsResponse:
-    type: object
-    properties:
-      params:
-        description: params holds all the parameters of this module.
-        type: object
-    description: QueryParamsResponse is response type for the Query/Params RPC method.
-  trevormil.bitbadgeschain.education.Params:
-    type: object
-    description: Params defines the parameters for the module.
-  trevormil.bitbadgeschain.education.QueryParamsResponse:
-    type: object
-    properties:
-      params:
-        description: params holds all the parameters of this module.
-        type: object
-    description: QueryParamsResponse is response type for the Query/Params RPC method.
-  trevormil.bitbadgeschain.social.Params:
-    type: object
-    description: Params defines the parameters for the module.
-  trevormil.bitbadgeschain.social.QueryParamsResponse:
-    type: object
-    properties:
-      params:
-        description: params holds all the parameters of this module.
-        type: object
-    description: QueryParamsResponse is response type for the Query/Params RPC method.
+                      description: >-
+                        Id ranges define a range of IDs from start to end. Can
+                        be used for subbadgeIds, nonces, addresses anything. If
+                        end == 0, we assume end == start. Start must be >= end.
+                description: >-
+                  Defines a balance object. The specified balance holds for all
+                  ids specified within the id ranges array.
+          description: Defines an approval object for a specific address.
+    description: >-
+      Defines a user balance object for a badge w/ the user's balances, nonce,
+      pending transfers, and approvals. All subbadge IDs for a badge are handled
+      within this object.

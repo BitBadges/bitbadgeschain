@@ -4,12 +4,13 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "trevormil.bitbadgeschain.badges";
 
+/** Id ranges define a range of IDs from start to end. Can be used for subbadgeIds, nonces, addresses anything. If end == 0, we assume end == start. Start must be >= end. */
 export interface IdRange {
   start: number;
-  /** If end == 0, we assume end == start. This can be done to save space since 0 is omitted if empty. */
   end: number;
 }
 
+/** Defines a balance object. The specified balance holds for all ids specified within the id ranges array. */
 export interface BalanceObject {
   balance: number;
   id_ranges: IdRange[];
