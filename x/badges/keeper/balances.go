@@ -40,6 +40,7 @@ func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount uint64, balanc
 // Gets the balances for specified ID ranges. Returns a new []*types.BalanceObject where only the specified ID ranges and their balances are included. Appends balance == 0 objects so all IDs are accounted for, even if not found. 
 func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalanceObjects []*types.BalanceObject) []*types.BalanceObject {
 	balanceObjectsForSpecifiedRanges := []*types.BalanceObject{}
+	idRanges = SortIdRangesAndMergeIfNecessary(idRanges)
 	idRangesNotFound := idRanges
 	for _, userBalanceObj := range currentUserBalanceObjects {
 		userBalanceObj.IdRanges = GetIdRangesWithOmitEmptyCaseHandled(userBalanceObj.IdRanges)
@@ -182,8 +183,6 @@ func SetBalanceForIdRanges(ranges []*types.IdRange, amount uint64, balanceObject
 		return balanceObjects
 	}
 
-	ranges = SortIdRangesAndMergeIfNecessary(ranges)
-	
 	idx, found := SearchBalanceObjects(amount, balanceObjects)
 	newBalanceObjects := []*types.BalanceObject{}
 	if !found {

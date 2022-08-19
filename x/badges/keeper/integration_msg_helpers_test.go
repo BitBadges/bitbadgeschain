@@ -117,6 +117,12 @@ func UpdatePermissions(suite *TestSuite, ctx context.Context, creator string, ba
 	return err
 }
 
+func UpdateBytes(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, bytes []byte) error {
+	msg := types.NewMsgUpdateBytes(creator, badgeId, bytes)
+	_, err := suite.msgServer.UpdateBytes(ctx, msg)
+	return err
+}
+
 func SelfDestructBadge(suite *TestSuite, ctx context.Context, creator string, badgeId uint64) error {
 	msg := types.NewMsgSelfDestructBadge(creator, badgeId)
 	_, err := suite.msgServer.SelfDestructBadge(ctx, msg)

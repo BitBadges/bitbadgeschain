@@ -148,6 +148,43 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		},
 	})
 
+	gottenBalanceObjects = keeper.GetBalancesForIdRanges([]*types.IdRange{
+		{
+			Start: 3,
+			End:   math.MaxUint64,
+		},
+		{
+			Start: 0,
+			End:   2,
+		},
+		{
+			Start: 0,
+			End:   1,
+		},
+		
+	}, balanceObjects)
+
+	suite.Require().Equal(gottenBalanceObjects, []*types.BalanceObject{
+		{
+			Balance: 0,
+			IdRanges: []*types.IdRange{
+				{
+					Start: 2,
+					End:   math.MaxUint64,
+				},
+			},
+		},
+		{
+			Balance: 10,
+			IdRanges: []*types.IdRange{
+				{
+					Start: 0,
+					End:   1,
+				},
+			},
+		},
+	})
+
 	balanceObjects = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
 		{
 			Start: 1,
