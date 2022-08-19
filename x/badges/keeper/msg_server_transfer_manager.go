@@ -16,6 +16,7 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 		BadgeId:            msg.BadgeId,
 		MustBeManager:      true,
 		CanManagerTransfer: true,
+		AccountsToCheckRegistration: []uint64{msg.Address},
 	})
 	if err != nil {
 		return nil, err

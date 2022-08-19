@@ -17,6 +17,7 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 		BadgeId:                      msg.BadgeId,
 		SubbadgeRangesToValidate:     msg.SubbadgeRanges,
 		AccountsThatCantEqualCreator: []uint64{msg.Address},
+		AccountsToCheckRegistration:  []uint64{msg.Address},
 	})
 	if err != nil {
 		return nil, err

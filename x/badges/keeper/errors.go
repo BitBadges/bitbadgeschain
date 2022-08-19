@@ -45,4 +45,5 @@ var (
 	ErrCancelTimeIsGreaterThanExpirationTime	    = sdkerrors.Register(types.ModuleName, 38, "cancel time is greater than expiration time")
 	ErrApprovalForAddressDoesntExist				= sdkerrors.Register(types.ModuleName, 39, "approval for address doesn't exist")
 	ErrUnderflow									= sdkerrors.Register(types.ModuleName, 40, "error underflow")
+	ErrAccountNotRegistered							= sdkerrors.Register(types.ModuleName, 41, "account not registered")
 )

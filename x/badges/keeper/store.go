@@ -183,5 +183,5 @@ func (k Keeper) SetNextBadgeId(ctx sdk.Context, nextID uint64) {
 // Increments the next badge ID by 1.
 func (k Keeper) IncrementNextBadgeId(ctx sdk.Context) {
 	nextID := k.GetNextBadgeId(ctx)
-	k.SetNextBadgeId(ctx, nextID+1)
+	k.SetNextBadgeId(ctx, nextID+1) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
 }

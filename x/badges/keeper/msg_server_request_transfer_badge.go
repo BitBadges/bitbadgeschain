@@ -16,6 +16,7 @@ func (k msgServer) RequestTransferBadge(goCtx context.Context, msg *types.MsgReq
 		BadgeId:                      msg.BadgeId,
 		SubbadgeRangesToValidate:     msg.SubbadgeRanges,
 		AccountsThatCantEqualCreator: []uint64{msg.From},
+		AccountsToCheckRegistration:  []uint64{msg.From},
 	})
 	if err != nil {
 		return nil, err

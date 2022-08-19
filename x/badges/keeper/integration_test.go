@@ -113,6 +113,10 @@ func (suite *TestSuite) SetupTest() {
 	suite.app.AccountKeeper.SetAccount(suite.ctx, bob_acc)
 	suite.app.AccountKeeper.SetAccount(suite.ctx, alice_acc)
 	suite.app.AccountKeeper.SetAccount(suite.ctx, charlie_acc)
+
+	for i := uint64(0); i < 1000; i++ {
+		suite.app.AccountKeeper.SetAccount(suite.ctx, suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.AccAddress([]byte{byte(i)})))
+	}
 }
 
 func TestBadgesKeeperTestSuite(t *testing.T) {

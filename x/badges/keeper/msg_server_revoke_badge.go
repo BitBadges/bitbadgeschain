@@ -18,6 +18,7 @@ func (k msgServer) RevokeBadge(goCtx context.Context, msg *types.MsgRevokeBadge)
 		AccountsThatCantEqualCreator: msg.Addresses,
 		MustBeManager:                true,
 		CanRevoke:                    true,
+		AccountsToCheckRegistration:  msg.Addresses,
 	})
 	if err != nil {
 		return nil, err

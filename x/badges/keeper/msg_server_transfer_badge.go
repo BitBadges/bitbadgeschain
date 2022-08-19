@@ -12,10 +12,14 @@ import (
 func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBadge) (*types.MsgTransferBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	accsToCheck := []uint64{msg.From}
+	accsToCheck = append(accsToCheck, msg.ToAddresses...)
+
 	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:                  msg.Creator,
 		BadgeId:                  msg.BadgeId,
 		SubbadgeRangesToValidate: msg.SubbadgeRanges,
+		AccountsToCheckRegistration: accsToCheck,
 	})
 	if err != nil {
 		return nil, err

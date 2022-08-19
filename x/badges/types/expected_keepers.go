@@ -10,7 +10,7 @@ type AccountKeeper interface {
 	GetAccount(ctx sdk.Context, addr sdk.AccAddress) types.AccountI
 	NewAccountWithAddress(ctx sdk.Context, addr sdk.AccAddress) types.AccountI
 	SetAccount(ctx sdk.Context, acc types.AccountI)
-	// TODO: Uncomment this: GetAccountAddressByID(ctx sdk.Context, id uint64) string
+	GetNextAccountNumber(ctx sdk.Context) uint64 
 	// Methods imported from account should be defined here
 }
 

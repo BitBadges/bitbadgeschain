@@ -11,6 +11,7 @@ type UniversalValidationParams struct {
 	BadgeId                      uint64
 	AccountsThatCantEqualCreator []uint64
 	SubbadgeRangesToValidate     []*types.IdRange
+	AccountsToCheckRegistration  []uint64
 	MustBeManager                bool
 	CanFreeze                    bool
 	CanCreateSubbadges           bool
@@ -31,6 +32,18 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationPar
 			}
 		}
 	}
+
+	if len(params.AccountsToCheckRegistration) > 0 {
+		nextAccountNumber := k.accountKeeper.GetNextAccountNumber(ctx)
+		for _, accountNumber := range params.AccountsToCheckRegistration {
+			//Probably a better way to do this such as only read once at beginning of block, but we check that addresses are valid and not > Next Account Number because then we would be sending to an unregistered address
+			if accountNumber >= nextAccountNumber {
+				return CreatorAccountNum, types.BitBadge{}, ErrAccountNotRegistered
+			}
+		}
+	}
+	
+	
 
 	// Assert badge and subbadge ranges exist and are well-formed
 	badge, err := k.GetBadgeAndAssertSubbadgeRangesAreValid(ctx, params.BadgeId, params.SubbadgeRangesToValidate)
