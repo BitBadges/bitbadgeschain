@@ -25,63 +25,48 @@ var (
 
 const (
 	opWeightMsgNewBadge = "op_weight_msg_new_badge"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgNewBadge int = 100
+	defaultWeightMsgNewBadge int = 1000
 
 	opWeightMsgNewSubBadge = "op_weight_msg_new_sub_badge"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgNewSubBadge int = 100
+	defaultWeightMsgNewSubBadge int = 250
 
 	opWeightMsgTransferBadge = "op_weight_msg_transfer_badge"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgTransferBadge int = 100
+	defaultWeightMsgTransferBadge int = 10000
 
 	opWeightMsgRequestTransferBadge = "op_weight_msg_request_transfer_badge"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgRequestTransferBadge int = 100
+	defaultWeightMsgRequestTransferBadge int = 10000
 
 	opWeightMsgHandlePendingTransfer = "op_weight_msg_handle_pending_transfer"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgHandlePendingTransfer int = 100
+	defaultWeightMsgHandlePendingTransfer int = 10000
 
 	opWeightMsgSetApproval = "op_weight_msg_set_approval"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgSetApproval int = 100
+	defaultWeightMsgSetApproval int = 500
 
 	opWeightMsgRevokeBadge = "op_weight_msg_revoke_badge"
-	// TODO: Determine the simulation weight value
 	defaultWeightMsgRevokeBadge int = 100
 
 	opWeightMsgFreezeAddress = "op_weight_msg_freeze_address"
-	// TODO: Determine the simulation weight value
 	defaultWeightMsgFreezeAddress int = 100
 
 	opWeightMsgUpdateUris = "op_weight_msg_update_uris"
-	// TODO: Determine the simulation weight value
 	defaultWeightMsgUpdateUris int = 100
 
 	opWeightMsgUpdatePermissions = "op_weight_msg_update_permissions"
-	// TODO: Determine the simulation weight value
 	defaultWeightMsgUpdatePermissions int = 100
 
 	opWeightMsgTransferManager = "op_weight_msg_transfer_manager"
-	// TODO: Determine the simulation weight value
 	defaultWeightMsgTransferManager int = 100
 
 	opWeightMsgRequestTransferManager = "op_weight_msg_request_transfer_manager"
-	// TODO: Determine the simulation weight value
 	defaultWeightMsgRequestTransferManager int = 100
 
 	opWeightMsgSelfDestructBadge = "op_weight_msg_self_destruct_badge"
-	// TODO: Determine the simulation weight value
 	defaultWeightMsgSelfDestructBadge int = 100
 
 	opWeightMsgPruneBalances = "op_weight_msg_prune_balances"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgPruneBalances int = 100
+	defaultWeightMsgPruneBalances int = 500
 
 	opWeightMsgUpdateBytes = "op_weight_msg_update_bytes"
-	// TODO: Determine the simulation weight value
 	defaultWeightMsgUpdateBytes int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const

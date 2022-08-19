@@ -20,10 +20,9 @@ func SimulateMsgSelfDestructBadge(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgSelfDestructBadge{
 			Creator: simAccount.Address.String(),
+			BadgeId: r.Uint64(),
 		}
 
-		// TODO: Handling the SelfDestructBadge simulation
-
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "SelfDestructBadge simulation not implemented"), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
 	}
 }

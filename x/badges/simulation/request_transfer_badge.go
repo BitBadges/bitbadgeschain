@@ -18,12 +18,31 @@ func SimulateMsgRequestTransferBadge(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
+
 		msg := &types.MsgRequestTransferBadge{
 			Creator: simAccount.Address.String(),
+			From:   r.Uint64(),
+			Amount: r.Uint64(),
+			BadgeId: r.Uint64(),
+			ExpirationTime: r.Uint64(),
+			CantCancelBeforeTime: r.Uint64(),
+			SubbadgeRanges: []*types.IdRange{
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+			},
+
 		}
 
-		// TODO: Handling the RequestTransferBadge simulation
-
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "RequestTransferBadge simulation not implemented"), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
 	}
 }

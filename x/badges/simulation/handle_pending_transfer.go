@@ -18,12 +18,40 @@ func SimulateMsgHandlePendingTransfer(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := &types.MsgHandlePendingTransfer{
-			Creator: simAccount.Address.String(),
+		randInt := r.Uint64()
+		randBool := false
+		if randInt % 2 == 0 {
+			randBool = true
 		}
 
-		// TODO: Handling the HandlePendingTransfer simulation
+		randInt2 := r.Uint64()
+		randBool2 := false
+		if randInt2 % 2 == 0 {
+			randBool2 = true
+		}
 
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "HandlePendingTransfer simulation not implemented"), nil, nil
+
+		msg := &types.MsgHandlePendingTransfer{
+			Creator: simAccount.Address.String(),
+			Accept: randBool,
+			ForcefulAccept: randBool2,
+			BadgeId: r.Uint64(),
+			NonceRanges:[]*types.IdRange{
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+			},
+		}
+
+		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
 	}
 }

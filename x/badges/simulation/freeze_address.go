@@ -18,12 +18,32 @@ func SimulateMsgFreezeAddress(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := &types.MsgFreezeAddress{
-			Creator: simAccount.Address.String(),
+		randInt := r.Uint64()
+		randBool := false
+		if randInt % 2 == 0 {
+			randBool = true
 		}
 
-		// TODO: Handling the FreezeAddress simulation
+		msg := &types.MsgFreezeAddress{
+			Creator: simAccount.Address.String(),
+			BadgeId: r.Uint64(),
+			Add:	 randBool,
+			AddressRanges: []*types.IdRange{
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+			},
+		}
 
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "FreezeAddress simulation not implemented"), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
 	}
 }

@@ -20,10 +20,10 @@ func SimulateMsgTransferManager(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgTransferManager{
 			Creator: simAccount.Address.String(),
+			BadgeId: r.Uint64(),
+			Address: r.Uint64(),
 		}
 
-		// TODO: Handling the TransferManager simulation
-
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "TransferManager simulation not implemented"), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
 	}
 }

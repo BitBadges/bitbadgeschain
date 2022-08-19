@@ -18,12 +18,52 @@ func SimulateMsgNewBadge(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := &types.MsgNewBadge{
-			Creator: simAccount.Address.String(),
+		randomAccounts := []uint64{}
+		for i := 0; i < r.Intn(10); i++ {
+			randomAccounts = append(randomAccounts, r.Uint64())
 		}
 
-		// TODO: Handling the NewBadge simulation
+		randomAmounts := []uint64{}
+		for i := 0; i < r.Intn(10); i++ {
+			randomAmounts = append(randomAmounts, r.Uint64())
+		}
 
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "NewBadge simulation not implemented"), nil, nil
+		msg := &types.MsgNewBadge{
+			Creator: simAccount.Address.String(),
+			FreezeAddressRanges: []*types.IdRange{
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+			},
+			SubassetSupplys: randomAccounts,
+			SubassetAmountsToCreate: randomAmounts,
+			Permissions: r.Uint64(),
+			DefaultSubassetSupply: r.Uint64(),
+			Standard: r.Uint64(),
+			ArbitraryBytes:   []byte(simtypes.RandStringOfLength(r, r.Intn(256))),
+			Uri:    &types.UriObject{
+				Uri: []byte(simtypes.RandStringOfLength(r, r.Intn(100))),
+				Scheme: uint64(r.Intn(10)),
+				DecodeScheme: uint64(r.Intn(10)),
+				IdxRangeToRemove: &types.IdRange{
+					Start: uint64(r.Intn(10)),
+					End: uint64(r.Intn(10)),
+				},
+				InsertSubassetBytesIdx: uint64(r.Intn(10)),
+				BytesToInsert: []byte(simtypes.RandStringOfLength(r, r.Intn(100))),
+				InsertIdIdx: uint64(r.Intn(10)),
+			},
+		}
+
+		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
 	}
 }

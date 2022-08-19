@@ -20,10 +20,25 @@ func SimulateMsgSetApproval(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgSetApproval{
 			Creator: simAccount.Address.String(),
+			SubbadgeRanges: []*types.IdRange{
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+				{
+					Start: r.Uint64(),
+					End:   r.Uint64(),
+				},
+			},
+			Amount: r.Uint64(),
+			Address: r.Uint64(),
+			BadgeId: r.Uint64(),
 		}
 
-		// TODO: Handling the SetApproval simulation
-
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "SetApproval simulation not implemented"), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
 	}
 }

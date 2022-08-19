@@ -20,10 +20,11 @@ func SimulateMsgUpdatePermissions(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgUpdatePermissions{
 			Creator: simAccount.Address.String(),
+			BadgeId: r.Uint64(),
+			Permissions: r.Uint64(),
 		}
 
-		// TODO: Handling the UpdatePermissions simulation
 
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "UpdatePermissions simulation not implemented"), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
 	}
 }

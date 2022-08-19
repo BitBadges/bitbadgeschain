@@ -29,8 +29,6 @@ service Msg {
 
 //The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
 
-//TODO: change subasset -> subbadge
-
 message MsgNewBadge {
     // See badges.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
     string creator = 1; 

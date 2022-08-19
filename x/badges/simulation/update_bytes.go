@@ -20,10 +20,10 @@ func SimulateMsgUpdateBytes(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgUpdateBytes{
 			Creator: simAccount.Address.String(),
+			BadgeId: r.Uint64(),
+			NewBytes:   []byte(simtypes.RandStringOfLength(r, r.Intn(300))),
 		}
 
-		// TODO: Handling the UpdateBytes simulation
-
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "UpdateBytes simulation not implemented"), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
 	}
 }

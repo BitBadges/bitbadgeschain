@@ -212,7 +212,6 @@ func InsertRangeToIdRanges(rangeToAdd *types.IdRange, targetIds []*types.IdRange
 
 // Removes all ids within an id range from an id range. Removing can make this range be split into 0, 1, or 2 new ranges.
 func RemoveIdsFromIdRange(rangeToRemove *types.IdRange, rangeObject *types.IdRange) []*types.IdRange {
-	//TODO: check this is correct
 	newRanges := []*types.IdRange{}
 	rangeToRemove = NormalizeIdRange(rangeToRemove)
 	rangeObject = NormalizeIdRange(rangeObject)
