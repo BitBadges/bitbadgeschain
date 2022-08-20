@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ignite/cli/ignite/pkg/cosmoscmd"
 	"github.com/stretchr/testify/suite"
 
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -18,7 +17,9 @@ import (
 	"github.com/trevormil/bitbadgeschain/x/badges/types"
 
 	bitbadgesapp "github.com/trevormil/bitbadgeschain/app"
+	"github.com/trevormil/bitbadgeschain/encoding"
 
+	"github.com/ignite/cli/ignite/pkg/cosmoscmd"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -68,7 +69,14 @@ func (suite *TestSuite) SetupTest() {
 		panic("Error constructing simapp")
 	}
 
-	encoding := cosmoscmd.MakeEncodingConfig(bitbadgesapp.ModuleBasics)
+	encoding := encoding.MakeConfig(bitbadgesapp.ModuleBasics)
+
+	cosmoscmdEncodingConfig := cosmoscmd.EncodingConfig{
+		Marshaler: encoding.Marshaler,
+		TxConfig:  encoding.TxConfig,
+		InterfaceRegistry: encoding.InterfaceRegistry,
+		Amino: encoding.Amino,
+	}
 
 	app := bitbadgesapp.NewApp(
 		logger,
@@ -78,7 +86,7 @@ func (suite *TestSuite) SetupTest() {
 		map[int64]bool{},
 		bitbadgesapp.DefaultNodeHome,
 		0,
-		encoding,
+		cosmoscmdEncodingConfig,
 		simapp.EmptyAppOptions{},
 	)
 

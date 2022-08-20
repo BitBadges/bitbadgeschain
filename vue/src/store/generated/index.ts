@@ -1,6 +1,7 @@
 // THIS FILE IS GENERATED AUTOMATICALLY. DO NOT MODIFY.
 
 import CosmosCosmosSdkCosmosAuthV1Beta1 from './cosmos/cosmos-sdk/cosmos.auth.v1beta1'
+import CosmosCosmosSdkCosmosAuthzV1Beta1 from './cosmos/cosmos-sdk/cosmos.authz.v1beta1'
 import CosmosCosmosSdkCosmosBankV1Beta1 from './cosmos/cosmos-sdk/cosmos.bank.v1beta1'
 import CosmosCosmosSdkCosmosBaseTendermintV1Beta1 from './cosmos/cosmos-sdk/cosmos.base.tendermint.v1beta1'
 import CosmosCosmosSdkCosmosCrisisV1Beta1 from './cosmos/cosmos-sdk/cosmos.crisis.v1beta1'
@@ -20,6 +21,13 @@ import CosmosIbcGoIbcCoreChannelV1 from './cosmos/ibc-go/ibc.core.channel.v1'
 import CosmosIbcGoIbcCoreClientV1 from './cosmos/ibc-go/ibc.core.client.v1'
 import CosmosIbcGoIbcCoreConnectionV1 from './cosmos/ibc-go/ibc.core.connection.v1'
 import CosmosIbcGoIbcCorePortV1 from './cosmos/ibc-go/ibc.core.port.v1'
+import IbcGoV3IbcApplicationsInterchainAccountsControllerV1 from './ibc-go/v3/ibc.applications.interchain_accounts.controller.v1'
+import IbcGoV3IbcApplicationsInterchainAccountsHostV1 from './ibc-go/v3/ibc.applications.interchain_accounts.host.v1'
+import IbcGoV3IbcApplicationsTransferV1 from './ibc-go/v3/ibc.applications.transfer.v1'
+import IbcGoV3IbcCoreChannelV1 from './ibc-go/v3/ibc.core.channel.v1'
+import IbcGoV3IbcCoreClientV1 from './ibc-go/v3/ibc.core.client.v1'
+import IbcGoV3IbcCoreConnectionV1 from './ibc-go/v3/ibc.core.connection.v1'
+import TendermintSpnTendermintSpnMonitoringp from './tendermint/spn/tendermint.spn.monitoringp'
 import TrevormilBitbadgeschainTrevormilBitbadgeschainBadges from './trevormil/bitbadgeschain/trevormil.bitbadgeschain.badges'
 import TrevormilBitbadgeschainTrevormilBitbadgeschainCollections from './trevormil/bitbadgeschain/trevormil.bitbadgeschain.collections'
 import TrevormilBitbadgeschainTrevormilBitbadgeschainEducation from './trevormil/bitbadgeschain/trevormil.bitbadgeschain.education'
@@ -28,6 +36,7 @@ import TrevormilBitbadgeschainTrevormilBitbadgeschainSocial from './trevormil/bi
 
 export default { 
   CosmosCosmosSdkCosmosAuthV1Beta1: load(CosmosCosmosSdkCosmosAuthV1Beta1, 'cosmos.auth.v1beta1'),
+  CosmosCosmosSdkCosmosAuthzV1Beta1: load(CosmosCosmosSdkCosmosAuthzV1Beta1, 'cosmos.authz.v1beta1'),
   CosmosCosmosSdkCosmosBankV1Beta1: load(CosmosCosmosSdkCosmosBankV1Beta1, 'cosmos.bank.v1beta1'),
   CosmosCosmosSdkCosmosBaseTendermintV1Beta1: load(CosmosCosmosSdkCosmosBaseTendermintV1Beta1, 'cosmos.base.tendermint.v1beta1'),
   CosmosCosmosSdkCosmosCrisisV1Beta1: load(CosmosCosmosSdkCosmosCrisisV1Beta1, 'cosmos.crisis.v1beta1'),
@@ -47,6 +56,13 @@ export default {
   CosmosIbcGoIbcCoreClientV1: load(CosmosIbcGoIbcCoreClientV1, 'ibc.core.client.v1'),
   CosmosIbcGoIbcCoreConnectionV1: load(CosmosIbcGoIbcCoreConnectionV1, 'ibc.core.connection.v1'),
   CosmosIbcGoIbcCorePortV1: load(CosmosIbcGoIbcCorePortV1, 'ibc.core.port.v1'),
+  IbcGoV3IbcApplicationsInterchainAccountsControllerV1: load(IbcGoV3IbcApplicationsInterchainAccountsControllerV1, 'ibc.applications.interchain_accounts.controller.v1'),
+  IbcGoV3IbcApplicationsInterchainAccountsHostV1: load(IbcGoV3IbcApplicationsInterchainAccountsHostV1, 'ibc.applications.interchain_accounts.host.v1'),
+  IbcGoV3IbcApplicationsTransferV1: load(IbcGoV3IbcApplicationsTransferV1, 'ibc.applications.transfer.v1'),
+  IbcGoV3IbcCoreChannelV1: load(IbcGoV3IbcCoreChannelV1, 'ibc.core.channel.v1'),
+  IbcGoV3IbcCoreClientV1: load(IbcGoV3IbcCoreClientV1, 'ibc.core.client.v1'),
+  IbcGoV3IbcCoreConnectionV1: load(IbcGoV3IbcCoreConnectionV1, 'ibc.core.connection.v1'),
+  TendermintSpnTendermintSpnMonitoringp: load(TendermintSpnTendermintSpnMonitoringp, 'tendermint.spn.monitoringp'),
   TrevormilBitbadgeschainTrevormilBitbadgeschainBadges: load(TrevormilBitbadgeschainTrevormilBitbadgeschainBadges, 'trevormil.bitbadgeschain.badges'),
   TrevormilBitbadgeschainTrevormilBitbadgeschainCollections: load(TrevormilBitbadgeschainTrevormilBitbadgeschainCollections, 'trevormil.bitbadgeschain.collections'),
   TrevormilBitbadgeschainTrevormilBitbadgeschainEducation: load(TrevormilBitbadgeschainTrevormilBitbadgeschainEducation, 'trevormil.bitbadgeschain.education'),

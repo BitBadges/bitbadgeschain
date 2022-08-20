@@ -99,7 +99,10 @@ export interface BadgesMsgNewSubBadgeResponse {
 
 export type BadgesMsgPruneBalancesResponse = object;
 
-export type BadgesMsgRegisterAddressesResponse = object;
+export interface BadgesMsgRegisterAddressesResponse {
+  /** Id ranges define a range of IDs from start to end. Can be used for subbadgeIds, nonces, addresses anything. If end == 0, we assume end == start. Start must be >= end. */
+  registeredAddressNumbers?: BadgesIdRange;
+}
 
 export type BadgesMsgRequestTransferBadgeResponse = object;
 

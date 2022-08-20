@@ -18,6 +18,7 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/trevormil/bitbadgeschain/app"
+	"github.com/trevormil/bitbadgeschain/encoding"
 )
 
 func init() {
@@ -72,8 +73,15 @@ func BenchmarkSimulation(b *testing.B) {
 		require.NoError(b, err)
 	})
 
-	encoding := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
+	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
 
+	cosmoscmdEncodingConfig := cosmoscmd.EncodingConfig{
+		Marshaler: encodingConfig.Marshaler,
+		TxConfig:  encodingConfig.TxConfig,
+		InterfaceRegistry: encodingConfig.InterfaceRegistry,
+		Amino: encodingConfig.Amino,
+	}
+	
 	app := app.New(
 		logger,
 		db,
@@ -82,7 +90,7 @@ func BenchmarkSimulation(b *testing.B) {
 		map[int64]bool{},
 		app.DefaultNodeHome,
 		0,
-		encoding,
+		cosmoscmdEncodingConfig,
 		simapp.EmptyAppOptions{},
 	)
 

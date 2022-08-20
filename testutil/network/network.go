@@ -19,7 +19,9 @@ import (
 	tmdb "github.com/tendermint/tm-db"
 
 	"github.com/trevormil/bitbadgeschain/app"
+	"github.com/trevormil/bitbadgeschain/encoding"
 )
+
 
 type (
 	Network = network.Network
@@ -46,7 +48,15 @@ func New(t *testing.T, configs ...network.Config) *network.Network {
 // DefaultConfig will initialize config for the network with custom application,
 // genesis and single validator. All other parameters are inherited from cosmos-sdk/testutil/network.DefaultConfig
 func DefaultConfig() network.Config {
-	encoding := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
+	encoding := encoding.MakeConfig(app.ModuleBasics)
+
+	cosmoscmdEncodingConfig := cosmoscmd.EncodingConfig{
+		Marshaler: encoding.Marshaler,
+		TxConfig:  encoding.TxConfig,
+		InterfaceRegistry: encoding.InterfaceRegistry,
+		Amino: encoding.Amino,
+	}
+
 	return network.Config{
 		Codec:             encoding.Marshaler,
 		TxConfig:          encoding.TxConfig,
@@ -56,7 +66,7 @@ func DefaultConfig() network.Config {
 		AppConstructor: func(val network.Validator) servertypes.Application {
 			return app.New(
 				val.Ctx.Logger, tmdb.NewMemDB(), nil, true, map[int64]bool{}, val.Ctx.Config.RootDir, 0,
-				encoding,
+				cosmoscmdEncodingConfig,
 				simapp.EmptyAppOptions{},
 				baseapp.SetPruning(storetypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
 				baseapp.SetMinGasPrices(val.AppConfig.MinGasPrices),

@@ -183,10 +183,12 @@ export interface MsgUpdateBytesResponse {}
 
 export interface MsgRegisterAddresses {
   creator: string;
-  addressesToRegister: number;
+  addressesToRegister: string[];
 }
 
-export interface MsgRegisterAddressesResponse {}
+export interface MsgRegisterAddressesResponse {
+  registeredAddressNumbers: IdRange | undefined;
+}
 
 const baseMsgNewBadge: object = {
   creator: "",
@@ -3039,7 +3041,7 @@ export const MsgUpdateBytesResponse = {
 
 const baseMsgRegisterAddresses: object = {
   creator: "",
-  addressesToRegister: 0,
+  addressesToRegister: "",
 };
 
 export const MsgRegisterAddresses = {
@@ -3050,8 +3052,8 @@ export const MsgRegisterAddresses = {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
-    if (message.addressesToRegister !== 0) {
-      writer.uint32(16).uint64(message.addressesToRegister);
+    for (const v of message.addressesToRegister) {
+      writer.uint32(18).string(v!);
     }
     return writer;
   },
@@ -3060,6 +3062,7 @@ export const MsgRegisterAddresses = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseMsgRegisterAddresses } as MsgRegisterAddresses;
+    message.addressesToRegister = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -3067,7 +3070,7 @@ export const MsgRegisterAddresses = {
           message.creator = reader.string();
           break;
         case 2:
-          message.addressesToRegister = longToNumber(reader.uint64() as Long);
+          message.addressesToRegister.push(reader.string());
           break;
         default:
           reader.skipType(tag & 7);
@@ -3079,6 +3082,7 @@ export const MsgRegisterAddresses = {
 
   fromJSON(object: any): MsgRegisterAddresses {
     const message = { ...baseMsgRegisterAddresses } as MsgRegisterAddresses;
+    message.addressesToRegister = [];
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = String(object.creator);
     } else {
@@ -3088,9 +3092,9 @@ export const MsgRegisterAddresses = {
       object.addressesToRegister !== undefined &&
       object.addressesToRegister !== null
     ) {
-      message.addressesToRegister = Number(object.addressesToRegister);
-    } else {
-      message.addressesToRegister = 0;
+      for (const e of object.addressesToRegister) {
+        message.addressesToRegister.push(String(e));
+      }
     }
     return message;
   },
@@ -3098,13 +3102,17 @@ export const MsgRegisterAddresses = {
   toJSON(message: MsgRegisterAddresses): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
-    message.addressesToRegister !== undefined &&
-      (obj.addressesToRegister = message.addressesToRegister);
+    if (message.addressesToRegister) {
+      obj.addressesToRegister = message.addressesToRegister.map((e) => e);
+    } else {
+      obj.addressesToRegister = [];
+    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<MsgRegisterAddresses>): MsgRegisterAddresses {
     const message = { ...baseMsgRegisterAddresses } as MsgRegisterAddresses;
+    message.addressesToRegister = [];
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
     } else {
@@ -3114,9 +3122,9 @@ export const MsgRegisterAddresses = {
       object.addressesToRegister !== undefined &&
       object.addressesToRegister !== null
     ) {
-      message.addressesToRegister = object.addressesToRegister;
-    } else {
-      message.addressesToRegister = 0;
+      for (const e of object.addressesToRegister) {
+        message.addressesToRegister.push(e);
+      }
     }
     return message;
   },
@@ -3126,9 +3134,15 @@ const baseMsgRegisterAddressesResponse: object = {};
 
 export const MsgRegisterAddressesResponse = {
   encode(
-    _: MsgRegisterAddressesResponse,
+    message: MsgRegisterAddressesResponse,
     writer: Writer = Writer.create()
   ): Writer {
+    if (message.registeredAddressNumbers !== undefined) {
+      IdRange.encode(
+        message.registeredAddressNumbers,
+        writer.uint32(10).fork()
+      ).ldelim();
+    }
     return writer;
   },
 
@@ -3144,6 +3158,12 @@ export const MsgRegisterAddressesResponse = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          message.registeredAddressNumbers = IdRange.decode(
+            reader,
+            reader.uint32()
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3152,24 +3172,48 @@ export const MsgRegisterAddressesResponse = {
     return message;
   },
 
-  fromJSON(_: any): MsgRegisterAddressesResponse {
+  fromJSON(object: any): MsgRegisterAddressesResponse {
     const message = {
       ...baseMsgRegisterAddressesResponse,
     } as MsgRegisterAddressesResponse;
+    if (
+      object.registeredAddressNumbers !== undefined &&
+      object.registeredAddressNumbers !== null
+    ) {
+      message.registeredAddressNumbers = IdRange.fromJSON(
+        object.registeredAddressNumbers
+      );
+    } else {
+      message.registeredAddressNumbers = undefined;
+    }
     return message;
   },
 
-  toJSON(_: MsgRegisterAddressesResponse): unknown {
+  toJSON(message: MsgRegisterAddressesResponse): unknown {
     const obj: any = {};
+    message.registeredAddressNumbers !== undefined &&
+      (obj.registeredAddressNumbers = message.registeredAddressNumbers
+        ? IdRange.toJSON(message.registeredAddressNumbers)
+        : undefined);
     return obj;
   },
 
   fromPartial(
-    _: DeepPartial<MsgRegisterAddressesResponse>
+    object: DeepPartial<MsgRegisterAddressesResponse>
   ): MsgRegisterAddressesResponse {
     const message = {
       ...baseMsgRegisterAddressesResponse,
     } as MsgRegisterAddressesResponse;
+    if (
+      object.registeredAddressNumbers !== undefined &&
+      object.registeredAddressNumbers !== null
+    ) {
+      message.registeredAddressNumbers = IdRange.fromPartial(
+        object.registeredAddressNumbers
+      );
+    } else {
+      message.registeredAddressNumbers = undefined;
+    }
     return message;
   },
 };
