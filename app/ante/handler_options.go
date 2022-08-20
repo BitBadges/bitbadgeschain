@@ -23,7 +23,6 @@ type HandlerOptions struct {
 	FeegrantKeeper  ante.FeegrantKeeper
 	SignModeHandler authsigning.SignModeHandler
 	SigGasConsumer  func(meter sdk.GasMeter, sig signing.SignatureV2, params authtypes.Params) error
-	MaxTxGasWanted  uint64
 }
 
 func (options HandlerOptions) Validate() error {
@@ -38,29 +37,6 @@ func (options HandlerOptions) Validate() error {
 	}
 	return nil
 }
-
-// func newEthAnteHandler(options HandlerOptions) sdk.AnteHandler {
-// 	return sdk.ChainAnteDecorators(
-// 		RejectMessagesDecorator{}, // reject MsgEthereumTxs
-// 		ante.NewSetUpContextDecorator(),
-// 		// NOTE: extensions option decorator removed
-// 		// ante.NewRejectExtensionOptionsDecorator(),
-// 		ante.NewMempoolFeeDecorator(),
-// 		ante.NewValidateBasicDecorator(),
-// 		ante.NewTxTimeoutHeightDecorator(),
-// 		ante.NewValidateMemoDecorator(options.AccountKeeper),
-// 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-// 		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
-// 		// SetPubKeyDecorator must be called before all signature verification decorators
-// 		ante.NewSetPubKeyDecorator(options.AccountKeeper),
-// 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
-// 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
-// 		// Note: signature verification uses EIP instead of the cosmos signature validator
-// 		NewEthSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
-// 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
-// 		ibcante.NewAnteDecorator(options.IBCKeeper),
-// 	)
-// }
 
 func newCosmosAnteHandler(options HandlerOptions) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(

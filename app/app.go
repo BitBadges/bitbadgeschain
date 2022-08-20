@@ -103,8 +103,6 @@ import (
 	badgesmodule "github.com/trevormil/bitbadgeschain/x/badges"
 	badgesmodulekeeper "github.com/trevormil/bitbadgeschain/x/badges/keeper"
 	badgesmoduletypes "github.com/trevormil/bitbadgeschain/x/badges/types"
-
-	srvflags "github.com/evmos/ethermint/server/flags"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -593,9 +591,7 @@ func NewApp(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	
-	// use Ethermint's custom AnteHandler
-
-	maxGasWanted := cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted))
+	// use custom AnteHandler
 	options := ante.HandlerOptions{
 		AccountKeeper:   app.AccountKeeper,
 		BankKeeper:      app.BankKeeper,
@@ -603,7 +599,6 @@ func NewApp(
 		IBCKeeper:       app.IBCKeeper,
 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 		SigGasConsumer:  authante.DefaultSigVerificationGasConsumer,
-		MaxTxGasWanted:  maxGasWanted,
 	}
 
 	if err := options.Validate(); err != nil {
