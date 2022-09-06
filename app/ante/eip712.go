@@ -156,7 +156,7 @@ func VerifySignature(
 
 		// @contract: this code is reached only when Msg has Web3Tx extension (so this custom Ante handler flow),
 		// and the signature is SIGN_MODE_LEGACY_AMINO_JSON which is supported for EIP712 for now
-
+	
 		msgs := tx.GetMsgs()
 		if len(msgs) == 0 {
 			return sdkerrors.Wrap(sdkerrors.ErrNoSignatures, "tx doesn't contain any msgs to verify signature")
@@ -173,7 +173,7 @@ func VerifySignature(
 			},
 			msgs, tx.GetMemo(),
 		)
-
+		
 		signerChainID, err := ethermint.ParseChainID(signerData.ChainID)
 		if err != nil {
 			return sdkerrors.Wrapf(err, "failed to parse chainID: %s", signerData.ChainID)
@@ -214,15 +214,73 @@ func VerifySignature(
 		feeDelegation := &eip712.FeeDelegationOptions{
 			FeePayer: feePayer,
 		}
-
+		
+		//TODO: types do not get registered correctly for string[]
 		typedData, err := eip712.WrapTxToTypedData(ethermintCodec, extOpt.TypedDataChainID, msgs[0], txBytes, feeDelegation)
 		if err != nil {
 			return sdkerrors.Wrap(err, "failed to pack tx data in EIP712 object")
 		}
 
+		
+		//TODO: this is hardcoded
+		// typedData.Types = apitypes.Types{
+			
+			
+		// 	"Coin": {
+		// 		{Name: "denom", Type: "string"},
+		// 		{Name: "amount", Type: "string"},
+		// 	},
+		// 	"EIP712Domain": {
+		// 		{
+		// 			Name: "name",
+		// 			Type: "string",
+		// 		},
+		// 		{
+		// 			Name: "version",
+		// 			Type: "string",
+		// 		},
+		// 		{
+		// 			Name: "chainId",
+		// 			Type: "uint256",
+		// 		},
+		// 		{
+		// 			Name: "verifyingContract",
+		// 			Type: "string",
+		// 		},
+		// 		{
+		// 			Name: "salt",
+		// 			Type: "string",
+		// 		},
+		// 	},
+		// 	"Fee": {
+		// 		{Name: "feePayer", Type: "string"},
+		// 		{Name: "amount", Type: "Coin[]"},
+		// 		{Name: "gas", Type: "string"},
+		// 	},
+			
+		// 	"Msg": {
+		// 		{Name: "type", Type: "string"},
+		// 		{Name: "value", Type: "MsgValue"},
+		// 	},
+		// 	"MsgValue": {
+		// 		{Name: "creator", Type: "string"},
+		// 		{Name: "addressesToRegister", Type: "string[]"},
+		// 	},
+		// 	"Tx": {
+		// 		{Name: "account_number", Type: "string"},
+		// 		{Name: "chain_id", Type: "string"},
+		// 		{Name: "fee", Type: "Fee"},
+		// 		{Name: "memo", Type: "string"},
+		// 		{Name: "msgs", Type: "Msg[]"},
+		// 		{Name: "sequence", Type: "string"},
+		// 		// Note timeout_height was removed because it was not getting filled with the legacyTx
+		// 		// {Name: "timeout_height", Type: "string"},
+		// 	},
+		// }
+
 		sigHash, err := eip712.ComputeTypedDataHash(typedData)
 		if err != nil {
-			return err
+			return sdkerrors.Wrapf(err, "%s failed to compute typed data hash", typedData.PrimaryType)
 		}
 
 		feePayerSig := extOpt.FeePayerSig
