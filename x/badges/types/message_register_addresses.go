@@ -33,14 +33,14 @@ func (msg *MsgRegisterAddresses) GetSigners() []sdk.AccAddress {
 }
 
 func (msg *MsgRegisterAddresses) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
+	bz := AminoCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
 func (msg *MsgRegisterAddresses) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address for MsgRegisterAddresses (%s)", err)
 	}
 
 	if len(msg.AddressesToRegister) == 0 {
