@@ -3,10 +3,10 @@ package types_test
 import (
 	"testing"
 
+	"github.com/bitbadges/bitbadgeschain/testutil/sample"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
-	"github.com/trevormil/bitbadgeschain/testutil/sample"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 func TestMsgUpdateBytes_ValidateBasic(t *testing.T) {

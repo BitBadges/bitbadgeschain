@@ -1,5 +1,5 @@
 syntax = "proto3";
-package trevormil.bitbadgeschain.badges;
+package bitbadges.bitbadgeschain.badges;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
@@ -9,21 +9,21 @@ import "badges/params.proto";
 import "badges/badges.proto";
 import "badges/balances.proto";
 
-option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 // Query defines the gRPC querier service.
 service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/trevormil/bitbadgeschain/badges/params";
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/params";
   }
   // Queries a list of GetBadge items.
 	rpc GetBadge(QueryGetBadgeRequest) returns (QueryGetBadgeResponse) {
-		option (google.api.http).get = "/trevormil/bitbadgeschain/badges/get_badge/{id}";
+		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_badge/{id}";
 	}
 // Queries a list of GetBalance items.
 	rpc GetBalance(QueryGetBalanceRequest) returns (QueryGetBalanceResponse) {
-		option (google.api.http).get = "/trevormil/bitbadgeschain/badges/get_balance/{badgeId}/{address}";
+		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_balance/{badgeId}/{address}";
 	}
 
 // this line is used by starport scaffolding # 2

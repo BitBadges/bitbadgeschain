@@ -3,7 +3,7 @@ package keeper
 import (
 	"math"
 
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 // Safe adds two uint64s and returns an error if the result overflows uint64.

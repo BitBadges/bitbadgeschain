@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 
-	enccodec "github.com/trevormil/bitbadgeschain/encoding/codec"
+	enccodec "github.com/bitbadges/bitbadgeschain/encoding/codec"
 )
 
 // MakeConfig creates an EncodingConfig for testing

@@ -3,8 +3,8 @@ package keeper
 import (
 	"testing"
 
-	"github.com/trevormil/bitbadgeschain/x/badges/keeper"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"

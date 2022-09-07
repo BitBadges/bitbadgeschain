@@ -3,15 +3,15 @@ package badges
 import (
 	"math/rand"
 
+	"github.com/bitbadges/bitbadgeschain/testutil/sample"
+	badgessimulation "github.com/bitbadges/bitbadgeschain/x/badges/simulation"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
-	"github.com/trevormil/bitbadgeschain/testutil/sample"
-	badgessimulation "github.com/trevormil/bitbadgeschain/x/badges/simulation"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 // avoid unused import issue

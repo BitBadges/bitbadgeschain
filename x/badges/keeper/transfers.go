@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 // Handles a transfer from one address to another. If it can be a forceful transfer, it will forcefully transfer the balances and approvals. If it is a pending transfer, it will add it to the pending transfers.

@@ -1,8 +1,8 @@
 package keeper
 
 import (
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 //Gets badge and throws error if it does not exist. Alternative to GetBadgeFromStore which returns a found bool, not an error.

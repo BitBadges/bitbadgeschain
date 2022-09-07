@@ -3,8 +3,8 @@ package keeper_test
 import (
 	"math"
 
-	"github.com/trevormil/bitbadgeschain/x/badges/keeper"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 func (suite *TestSuite) TestSetApprovals() {

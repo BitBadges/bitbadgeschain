@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 func (k msgServer) NewSubBadge(goCtx context.Context, msg *types.MsgNewSubBadge) (*types.MsgNewSubBadgeResponse, error) {

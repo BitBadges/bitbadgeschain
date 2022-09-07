@@ -1,9 +1,9 @@
 package keeper_test
 
 import (
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/rodaine/table"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 var tbl = table.New("Function Name", "Gas Consumed")

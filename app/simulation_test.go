@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bitbadges/bitbadgeschain/app"
+	"github.com/bitbadges/bitbadgeschain/encoding"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -17,8 +19,6 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/trevormil/bitbadgeschain/app"
-	"github.com/trevormil/bitbadgeschain/encoding"
 )
 
 func init() {

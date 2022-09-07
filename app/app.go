@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/bitbadges/bitbadgeschain/app/ante"
+	"github.com/bitbadges/bitbadgeschain/encoding"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
@@ -91,8 +93,6 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
-	"github.com/trevormil/bitbadgeschain/app/ante"
-	"github.com/trevormil/bitbadgeschain/encoding"
 
 	"github.com/ignite/cli/ignite/pkg/cosmoscmd"
 	"github.com/ignite/cli/ignite/pkg/openapiconsole"
@@ -101,10 +101,10 @@ import (
 	monitoringpkeeper "github.com/tendermint/spn/x/monitoringp/keeper"
 	monitoringptypes "github.com/tendermint/spn/x/monitoringp/types"
 
-	"github.com/trevormil/bitbadgeschain/docs"
-	badgesmodule "github.com/trevormil/bitbadgeschain/x/badges"
-	badgesmodulekeeper "github.com/trevormil/bitbadgeschain/x/badges/keeper"
-	badgesmoduletypes "github.com/trevormil/bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/docs"
+	badgesmodule "github.com/bitbadges/bitbadgeschain/x/badges"
+	badgesmodulekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	badgesmoduletypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"

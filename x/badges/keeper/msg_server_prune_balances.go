@@ -3,8 +3,8 @@ package keeper
 import (
 	"context"
 
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 func (k msgServer) PruneBalances(goCtx context.Context, msg *types.MsgPruneBalances) (*types.MsgPruneBalancesResponse, error) {

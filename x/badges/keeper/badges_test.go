@@ -3,9 +3,9 @@ package keeper_test
 import (
 	"math"
 
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/trevormil/bitbadgeschain/x/badges/keeper"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 func (suite *TestSuite) TestGetBadge() {

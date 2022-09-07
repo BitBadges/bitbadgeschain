@@ -18,8 +18,8 @@ import (
 	tmrand "github.com/tendermint/tendermint/libs/rand"
 	tmdb "github.com/tendermint/tm-db"
 
-	"github.com/trevormil/bitbadgeschain/app"
-	"github.com/trevormil/bitbadgeschain/encoding"
+	"github.com/bitbadges/bitbadgeschain/app"
+	"github.com/bitbadges/bitbadgeschain/encoding"
 )
 
 

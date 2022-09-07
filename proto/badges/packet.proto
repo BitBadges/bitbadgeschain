@@ -1,9 +1,9 @@
 syntax = "proto3";
-package trevormil.bitbadgeschain.badges;
+package bitbadges.bitbadgeschain.badges;
 
 // this line is used by starport scaffolding # proto/packet/import
 
-option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 message BadgesPacketData {
     oneof packet {

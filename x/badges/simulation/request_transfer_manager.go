@@ -3,11 +3,11 @@ package simulation
 import (
 	"math/rand"
 
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	"github.com/trevormil/bitbadgeschain/x/badges/keeper"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 func SimulateMsgRequestTransferManager(

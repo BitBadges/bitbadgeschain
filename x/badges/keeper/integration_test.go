@@ -9,15 +9,15 @@ import (
 
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/trevormil/bitbadgeschain/x/badges/keeper"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 
-	bitbadgesapp "github.com/trevormil/bitbadgeschain/app"
-	"github.com/trevormil/bitbadgeschain/encoding"
+	bitbadgesapp "github.com/bitbadges/bitbadgeschain/app"
+	"github.com/bitbadges/bitbadgeschain/encoding"
 
 	"github.com/ignite/cli/ignite/pkg/cosmoscmd"
 	abci "github.com/tendermint/tendermint/abci/types"

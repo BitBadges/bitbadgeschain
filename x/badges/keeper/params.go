@@ -1,8 +1,8 @@
 package keeper
 
 import (
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 // GetParams get all parameters as types.Params

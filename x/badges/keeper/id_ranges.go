@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 // Search ID ranges for a specific ID. Return (idx, true) if found. And (-1, false) if not.

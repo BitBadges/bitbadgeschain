@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 // Appends the pending transfer to both parties balance informations and increments the nonce. Since we append, they will alwyas be sorted by the nonce.

@@ -361,11 +361,11 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"trevormil", "bitbadgeschain", "badges", "params"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"bitbadges", "bitbadgeschain", "badges", "params"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetBadge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"trevormil", "bitbadgeschain", "badges", "get_badge", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetBadge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"bitbadges", "bitbadgeschain", "badges", "get_badge", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetBalance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"trevormil", "bitbadgeschain", "badges", "get_balance", "badgeId", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetBalance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"bitbadges", "bitbadgeschain", "badges", "get_balance", "badgeId", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

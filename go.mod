@@ -1,4 +1,4 @@
-module github.com/trevormil/bitbadgeschain
+module github.com/bitbadges/bitbadgeschain
 
 go 1.18
 

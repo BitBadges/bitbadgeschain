@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"context"
 
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 /* Query helpers */

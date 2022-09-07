@@ -3,11 +3,11 @@ package badges_test
 import (
 	"testing"
 
+	keepertest "github.com/bitbadges/bitbadgeschain/testutil/keeper"
+	"github.com/bitbadges/bitbadgeschain/testutil/nullify"
+	"github.com/bitbadges/bitbadgeschain/x/badges"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/stretchr/testify/require"
-	keepertest "github.com/trevormil/bitbadgeschain/testutil/keeper"
-	"github.com/trevormil/bitbadgeschain/testutil/nullify"
-	"github.com/trevormil/bitbadgeschain/x/badges"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 func TestGenesis(t *testing.T) {

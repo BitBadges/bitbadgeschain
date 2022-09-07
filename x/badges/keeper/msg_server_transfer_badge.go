@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 //Only handles from => to (pending and forceful) (not other way around)

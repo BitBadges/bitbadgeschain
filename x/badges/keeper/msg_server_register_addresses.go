@@ -3,9 +3,9 @@ package keeper
 import (
 	"context"
 
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 func (k msgServer) RegisterAddresses(goCtx context.Context, msg *types.MsgRegisterAddresses) (*types.MsgRegisterAddressesResponse, error) {

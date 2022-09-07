@@ -31,11 +31,11 @@ import (
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
+	bitbadgesapp "github.com/bitbadges/bitbadgeschain/app"
+	ante "github.com/bitbadges/bitbadgeschain/app/ante"
+	"github.com/bitbadges/bitbadgeschain/encoding"
 	"github.com/evmos/ethermint/tests"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
-	bitbadgesapp "github.com/trevormil/bitbadgeschain/app"
-	ante "github.com/trevormil/bitbadgeschain/app/ante"
-	"github.com/trevormil/bitbadgeschain/encoding"
 
 	"github.com/ignite/cli/ignite/pkg/cosmoscmd"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"

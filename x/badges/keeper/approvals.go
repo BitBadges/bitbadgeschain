@@ -3,7 +3,7 @@ package keeper
 import (
 	"math"
 
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 // Sets an approval amount for an address.

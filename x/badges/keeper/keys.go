@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 var (

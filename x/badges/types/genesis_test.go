@@ -3,8 +3,8 @@ package types_test
 import (
 	"testing"
 
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/stretchr/testify/require"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 func TestGenesisState_Validate(t *testing.T) {

@@ -3,8 +3,8 @@ package cli
 import (
 	"strings"
 
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/spf13/cast"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 func GetUriObject(uri string, subassetUri string) (*types.UriObject, error) {

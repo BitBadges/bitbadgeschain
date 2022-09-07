@@ -1,9 +1,9 @@
 syntax = "proto3";
-package trevormil.bitbadgeschain.badges;
+package bitbadges.bitbadgeschain.badges;
 
 // this line is used by starport scaffolding # proto/tx/import
 
-option go_package = "github.com/trevormil/bitbadgeschain/x/badges/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 //Id ranges define a range of IDs from start to end. Can be used for subbadgeIds, nonces, addresses anything. If end == 0, we assume end == start. Start must be >= end.
 message IdRange {

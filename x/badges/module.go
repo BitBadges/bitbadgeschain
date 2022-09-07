@@ -11,15 +11,15 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
+	"github.com/bitbadges/bitbadgeschain/x/badges/client/cli"
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
-	"github.com/trevormil/bitbadgeschain/x/badges/client/cli"
-	"github.com/trevormil/bitbadgeschain/x/badges/keeper"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 var (

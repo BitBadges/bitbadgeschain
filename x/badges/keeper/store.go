@@ -3,9 +3,9 @@ package keeper
 import (
 	"strconv"
 
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/trevormil/bitbadgeschain/x/badges/types"
 )
 
 // The following methods are used for the badge store and everything associated with badges.
