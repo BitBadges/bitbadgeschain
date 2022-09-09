@@ -19,6 +19,8 @@ import (
 	"github.com/evmos/ethermint/ethereum/eip712"
 	ethermint "github.com/evmos/ethermint/types"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
+
+	badges "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 var ethermintCodec codec.ProtoCodecMarshaler
@@ -215,68 +217,22 @@ func VerifySignature(
 			FeePayer: feePayer,
 		}
 		
-		//TODO: types do not get registered correctly for string[]
-		typedData, err := eip712.WrapTxToTypedData(ethermintCodec, extOpt.TypedDataChainID, msgs[0], txBytes, feeDelegation)
+		firstMsg := msgs[0] //since EIP712 doesn't support multiple types in same array so all must be same message type
+		
+		typedData, err := eip712.WrapTxToTypedData(ethermintCodec, extOpt.TypedDataChainID, firstMsg, txBytes, feeDelegation)
 		if err != nil {
 			return sdkerrors.Wrap(err, "failed to pack tx data in EIP712 object")
 		}
-
 		
-		//TODO: this is hardcoded
-		// typedData.Types = apitypes.Types{
-			
-			
-		// 	"Coin": {
-		// 		{Name: "denom", Type: "string"},
-		// 		{Name: "amount", Type: "string"},
-		// 	},
-		// 	"EIP712Domain": {
-		// 		{
-		// 			Name: "name",
-		// 			Type: "string",
-		// 		},
-		// 		{
-		// 			Name: "version",
-		// 			Type: "string",
-		// 		},
-		// 		{
-		// 			Name: "chainId",
-		// 			Type: "uint256",
-		// 		},
-		// 		{
-		// 			Name: "verifyingContract",
-		// 			Type: "string",
-		// 		},
-		// 		{
-		// 			Name: "salt",
-		// 			Type: "string",
-		// 		},
-		// 	},
-		// 	"Fee": {
-		// 		{Name: "feePayer", Type: "string"},
-		// 		{Name: "amount", Type: "Coin[]"},
-		// 		{Name: "gas", Type: "string"},
-		// 	},
-			
-		// 	"Msg": {
-		// 		{Name: "type", Type: "string"},
-		// 		{Name: "value", Type: "MsgValue"},
-		// 	},
-		// 	"MsgValue": {
-		// 		{Name: "creator", Type: "string"},
-		// 		{Name: "addressesToRegister", Type: "string[]"},
-		// 	},
-		// 	"Tx": {
-		// 		{Name: "account_number", Type: "string"},
-		// 		{Name: "chain_id", Type: "string"},
-		// 		{Name: "fee", Type: "Fee"},
-		// 		{Name: "memo", Type: "string"},
-		// 		{Name: "msgs", Type: "Msg[]"},
-		// 		{Name: "sequence", Type: "string"},
-		// 		// Note timeout_height was removed because it was not getting filled with the legacyTx
-		// 		// {Name: "timeout_height", Type: "string"},
-		// 	},
-		// }
+		//TODO: types of string[] or uint64[] do not get registered as [] in MsgValue, so the types generated for firstMsg is actually overriden for our badges module below
+		//TODO: this shouldn't be needed; override MsgValue type with hardcoded badges module types 
+		wrappedFirstMsg, ok := firstMsg.(legacytx.LegacyMsg)
+		if ok {
+			if wrappedFirstMsg.Route() == "badges" {
+				actualMsgValueTypes := badges.GetMsgValueTypes(wrappedFirstMsg.Type())
+				typedData.Types["MsgValue"] = actualMsgValueTypes
+			}
+		}
 
 		sigHash, err := eip712.ComputeTypedDataHash(typedData)
 		if err != nil {

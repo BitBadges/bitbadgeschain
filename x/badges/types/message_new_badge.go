@@ -40,7 +40,7 @@ func (msg *MsgNewBadge) GetSigners() []sdk.AccAddress {
 }
 
 func (msg *MsgNewBadge) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
+	bz := AminoCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 

@@ -34,7 +34,7 @@ func (msg *MsgRequestTransferManager) GetSigners() []sdk.AccAddress {
 }
 
 func (msg *MsgRequestTransferManager) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
+	bz := AminoCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 

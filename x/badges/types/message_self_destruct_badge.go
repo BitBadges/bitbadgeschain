@@ -33,7 +33,7 @@ func (msg *MsgSelfDestructBadge) GetSigners() []sdk.AccAddress {
 }
 
 func (msg *MsgSelfDestructBadge) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
+	bz := AminoCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
