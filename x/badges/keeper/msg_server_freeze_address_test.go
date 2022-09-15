@@ -13,7 +13,7 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -52,7 +52,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -112,7 +112,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefault() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -165,7 +165,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefaultAddAndRemove() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -227,7 +227,7 @@ func (suite *TestSuite) TestFreezeCantFreeze() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -254,7 +254,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefaultOmitEmptyCase(
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,

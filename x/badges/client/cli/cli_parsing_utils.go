@@ -10,7 +10,7 @@ import (
 func GetUriObject(uri string, subassetUri string) (*types.UriObject, error) {
 	//TODO: get uri object from uri and subasset uri
 	return &types.UriObject{
-		Uri: []byte(uri),
+		Uri: uri,
 	}, nil
 }
 

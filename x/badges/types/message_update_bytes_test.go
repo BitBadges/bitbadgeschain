@@ -15,6 +15,7 @@ func TestMsgUpdateBytes_ValidateBasic(t *testing.T) {
 		arr = append(arr, byte(i))
 	}
 
+
 	tests := []struct {
 		name string
 		msg  types.MsgUpdateBytes
@@ -36,7 +37,7 @@ func TestMsgUpdateBytes_ValidateBasic(t *testing.T) {
 			name: "invalid bytes",
 			msg: types.MsgUpdateBytes{
 				Creator:  sample.AccAddress(),
-				NewBytes: arr,
+				NewBytes: string(arr),
 			},
 			err: types.ErrBytesGreaterThan256,
 		},

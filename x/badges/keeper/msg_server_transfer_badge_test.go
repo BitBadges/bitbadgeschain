@@ -15,7 +15,7 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -64,7 +64,7 @@ func (suite *TestSuite) TestTransferBadgePending() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -127,7 +127,7 @@ func (suite *TestSuite) TestTransferBadgeForceBurn() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -208,7 +208,7 @@ func (suite *TestSuite) TestApprovalsApproved() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -260,7 +260,7 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -306,7 +306,7 @@ func (suite *TestSuite) TestApprovalsNotApprovedAtAll() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -349,7 +349,7 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -395,7 +395,7 @@ func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -441,7 +441,7 @@ func (suite *TestSuite) TestApprovalOverflow() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -493,7 +493,7 @@ func (suite *TestSuite) TestTransferUnderflowNotEnoughBalance() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -536,7 +536,7 @@ func (suite *TestSuite) TestPendingTransferUnderflowNotEnoughBalance() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -579,7 +579,7 @@ func (suite *TestSuite) TestTransferInvalidSubbadgeRanges() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -625,7 +625,7 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -662,7 +662,7 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -696,7 +696,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,

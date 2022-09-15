@@ -35,7 +35,7 @@ message MsgNewBadge {
     string creator = 1; 
     UriObject uri = 2;
     uint64 permissions = 4;
-    bytes arbitraryBytes = 5;
+    string arbitraryBytes = 5;
     uint64 defaultSubassetSupply = 6;
     repeated IdRange freezeAddressRanges = 9;
     uint64 standard = 10; 
@@ -198,7 +198,7 @@ message MsgPruneBalancesResponse {
 message MsgUpdateBytes {
   string creator = 1;
   uint64 badgeId = 2;
-  bytes newBytes = 3;
+  string newBytes = 3;
 }
 
 message MsgUpdateBytesResponse {

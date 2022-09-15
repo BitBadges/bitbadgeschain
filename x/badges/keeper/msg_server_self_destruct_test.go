@@ -13,7 +13,7 @@ func (suite *TestSuite) TestSelfDestruct() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -73,7 +73,7 @@ func (suite *TestSuite) TestSelfDestructNotManager() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,

@@ -21,11 +21,11 @@ func TestMsgUpdateUris_ValidateBasic(t *testing.T) {
 			msg: types.MsgUpdateUris{
 				Creator: "invalid_address",
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					BytesToInsert:          []byte{},
+					BytesToInsert:          "",
 					InsertIdIdx:            10,
 				},
 			},
@@ -35,11 +35,11 @@ func TestMsgUpdateUris_ValidateBasic(t *testing.T) {
 			msg: types.MsgUpdateUris{
 				Creator: sample.AccAddress(),
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					BytesToInsert:          []byte{},
+					BytesToInsert:          "",
 					InsertIdIdx:            10,
 				},
 			},

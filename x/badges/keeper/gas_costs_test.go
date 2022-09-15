@@ -46,7 +46,7 @@ func (suite *TestSuite) TestGasCosts() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -64,7 +64,7 @@ func (suite *TestSuite) TestGasCosts() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -92,7 +92,7 @@ func (suite *TestSuite) TestGasCosts() {
 		{
 			Badge: types.MsgNewBadge{
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
@@ -256,7 +256,7 @@ func (suite *TestSuite) TestGasCostsOldVersionWithRequireChecks() {
 			{
 				Badge: types.MsgNewBadge{
 					Uri: &types.UriObject{
-						Uri:                    []byte("example.com/"),
+						Uri:                    "example.com/",
 						Scheme:                 1,
 						IdxRangeToRemove:       &types.IdRange{},
 						InsertSubassetBytesIdx: 0,
@@ -604,7 +604,7 @@ func (suite *TestSuite) TestGasCostsOldVersionWithRequireChecks() {
 			{
 				Badge: types.MsgNewBadge{
 					Uri: &types.UriObject{
-						Uri:                    []byte("example.com/"),
+						Uri:                    "example.com/",
 						Scheme:                 1,
 						IdxRangeToRemove:       &types.IdRange{},
 						InsertSubassetBytesIdx: 0,

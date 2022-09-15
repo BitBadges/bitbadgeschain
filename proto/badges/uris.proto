@@ -10,12 +10,12 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 message UriObject {
     uint64 decodeScheme = 1; //This will be == 0 represeting plaintext URLs for now, but in the future, if we want to add other decoding / encoding schemes like Base64, etc, we just define a new decoding scheme
     uint64 scheme = 2; //Helps to save space by not storing methods like https:// every time. If this == 0, we assume it's included in the uri itself. Else, we define a few predefined int -> scheme maps in uris.go that will prefix the uri bytes.
-    bytes uri = 3; //The uri bytes to store. Will be converted to a string. To be manipulated according to other properties of this URI object.
+    string uri = 3; //The uri bytes to store. Will be converted to a string. To be manipulated according to other properties of this URI object.
     
     //The four fields below are used to convert the uri from above to the subasset URI.
     IdRange idxRangeToRemove = 4;  //Remove this range of characters from the uri for the subasset. Leave nil if no removal is needed.
     uint64 insertSubassetBytesIdx = 5; 
-    bytes bytesToInsert = 6; //After removing the above range, insert these bytes at insertSubassetBytesIdx. insertSubassetBytesIdx is the idx after the range removal, not before.
+    string bytesToInsert = 6; //After removing the above range, insert these bytes at insertSubassetBytesIdx. insertSubassetBytesIdx is the idx after the range removal, not before.
     uint64 insertIdIdx = 7; //This is the idx where we insert the id number of the subbadge. For example, ex.com/ and insertIdIdx == 6, the subasset URI for ID 0 would be ex.com/0
 }
 

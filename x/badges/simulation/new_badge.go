@@ -49,9 +49,9 @@ func SimulateMsgNewBadge(
 			Permissions:             r.Uint64(),
 			DefaultSubassetSupply:   r.Uint64(),
 			Standard:                r.Uint64(),
-			ArbitraryBytes:          []byte(simtypes.RandStringOfLength(r, r.Intn(256))),
+			ArbitraryBytes:          simtypes.RandStringOfLength(r, r.Intn(256)),
 			Uri: &types.UriObject{
-				Uri:          []byte(simtypes.RandStringOfLength(r, r.Intn(100))),
+				Uri:          simtypes.RandStringOfLength(r, r.Intn(100)),
 				Scheme:       uint64(r.Intn(10)),
 				DecodeScheme: uint64(r.Intn(10)),
 				IdxRangeToRemove: &types.IdRange{
@@ -59,7 +59,7 @@ func SimulateMsgNewBadge(
 					End:   uint64(r.Intn(10)),
 				},
 				InsertSubassetBytesIdx: uint64(r.Intn(10)),
-				BytesToInsert:          []byte(simtypes.RandStringOfLength(r, r.Intn(100))),
+				BytesToInsert:          simtypes.RandStringOfLength(r, r.Intn(100)),
 				InsertIdIdx:            uint64(r.Intn(10)),
 			},
 		}

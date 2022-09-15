@@ -23,7 +23,7 @@ func SimulateMsgUpdateUris(
 			Creator: simAccount.Address.String(),
 			BadgeId: r.Uint64(),
 			Uri: &types.UriObject{
-				Uri:          []byte(simtypes.RandStringOfLength(r, r.Intn(100))),
+				Uri:          simtypes.RandStringOfLength(r, r.Intn(100)),
 				Scheme:       uint64(r.Intn(10)),
 				DecodeScheme: uint64(r.Intn(10)),
 				IdxRangeToRemove: &types.IdRange{
@@ -31,7 +31,7 @@ func SimulateMsgUpdateUris(
 					End:   uint64(r.Intn(10)),
 				},
 				InsertSubassetBytesIdx: uint64(r.Intn(10)),
-				BytesToInsert:          []byte(simtypes.RandStringOfLength(r, r.Intn(100))),
+				BytesToInsert:          simtypes.RandStringOfLength(r, r.Intn(100)),
 				InsertIdIdx:            uint64(r.Intn(10)),
 			},
 		}

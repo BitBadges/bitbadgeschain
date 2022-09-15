@@ -9,7 +9,7 @@ const TypeMsgUpdateBytes = "update_bytes"
 
 var _ sdk.Msg = &MsgUpdateBytes{}
 
-func NewMsgUpdateBytes(creator string, badgeId uint64, newBytes []byte) *MsgUpdateBytes {
+func NewMsgUpdateBytes(creator string, badgeId uint64, newBytes string) *MsgUpdateBytes {
 	return &MsgUpdateBytes{
 		Creator:  creator,
 		BadgeId:  badgeId,

@@ -22,7 +22,7 @@ func CmdNewBadge() *cobra.Command {
 			argUri := args[0]
 			argSubassetUris := args[2]
 			_ = argSubassetUris
-			argBytesStr := []byte(args[3])
+			argBytesStr := args[3]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {

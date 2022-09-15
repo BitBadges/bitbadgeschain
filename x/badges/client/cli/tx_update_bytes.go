@@ -23,7 +23,7 @@ func CmdUpdateBytes() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			argNewBytes := []byte(args[1])
+			argNewBytes := args[1]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {

@@ -21,7 +21,7 @@ func SimulateMsgUpdateBytes(
 		msg := &types.MsgUpdateBytes{
 			Creator:  simAccount.Address.String(),
 			BadgeId:  r.Uint64(),
-			NewBytes: []byte(simtypes.RandStringOfLength(r, r.Intn(300))),
+			NewBytes: simtypes.RandStringOfLength(r, r.Intn(300)),
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

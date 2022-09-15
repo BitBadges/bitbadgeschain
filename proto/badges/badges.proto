@@ -19,7 +19,7 @@ message BitBadge {
 
     // these bytes can be used to store anything on-chain about the badge. This can be updatable or not depending on the permissions set.
     // Max 256 bytes allowed
-    bytes arbitraryBytes = 3;
+    string arbitraryBytes = 3;
     
     // manager address of the class; can have special permissions; is used as the reserve address for the assets
     uint64 manager = 4;

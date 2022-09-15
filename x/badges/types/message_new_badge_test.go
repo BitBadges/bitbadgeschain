@@ -21,11 +21,11 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgNewBadge{
 				Creator: "invalid_address",
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					BytesToInsert:          []byte{},
+					BytesToInsert:          "",
 					InsertIdIdx:            10,
 				},
 				Permissions:         15,
@@ -37,11 +37,11 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgNewBadge{
 				Creator: sample.AccAddress(),
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					BytesToInsert:          []byte{},
+					BytesToInsert:          "",
 					InsertIdIdx:            10,
 				},
 				Permissions:         15,
@@ -52,11 +52,11 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgNewBadge{
 				Creator: sample.AccAddress(),
 				Uri: &types.UriObject{
-					Uri:                    []byte(""),
+					Uri:                    "",
 					Scheme:                 0,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					BytesToInsert:          []byte{},
+					BytesToInsert:          "",
 					InsertIdIdx:            10,
 				},
 				Permissions:         15,
@@ -70,11 +70,11 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgNewBadge{
 				Creator: sample.AccAddress(),
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 0,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					BytesToInsert:          []byte("  "),
+					BytesToInsert:          "",
 					InsertIdIdx:            10,
 				},
 				Permissions:         15,
@@ -87,11 +87,11 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgNewBadge{
 				Creator: sample.AccAddress(),
 				Uri: &types.UriObject{
-					Uri:                    []byte("example.com/"),
+					Uri:                    "example.com/",
 					Scheme:                 1,
 					IdxRangeToRemove:       &types.IdRange{},
 					InsertSubassetBytesIdx: 0,
-					BytesToInsert:          []byte{},
+					BytesToInsert:          "",
 					InsertIdIdx:            10,
 				},
 				Permissions:         10000,

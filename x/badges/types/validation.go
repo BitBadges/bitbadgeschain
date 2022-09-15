@@ -38,7 +38,7 @@ func ValidateAddress(address string) error {
 }
 
 // Validate bytes we store are valid. We don't allow users to store anything > 256 bytes in a badge.
-func ValidateBytes(bytesToCheck []byte) error {
+func ValidateBytes(bytesToCheck string) error {
 	if len(bytesToCheck) > 256 {
 		return ErrBytesGreaterThan256
 	}
