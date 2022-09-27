@@ -44,7 +44,6 @@ paths:
                         format: uint64
                       uri:
                         type: string
-                        format: byte
                       idxRangeToRemove:
                         description: >-
                           The four fields below are used to convert the uri from
@@ -62,13 +61,11 @@ paths:
                         format: uint64
                       bytesToInsert:
                         type: string
-                        format: byte
                       insertIdIdx:
                         type: string
                         format: uint64
                   arbitraryBytes:
                     type: string
-                    format: byte
                     title: >-
                       these bytes can be used to store anything on-chain about
                       the badge. This can be updatable or not depending on the
@@ -34485,7 +34482,6 @@ definitions:
             format: uint64
           uri:
             type: string
-            format: byte
           idxRangeToRemove:
             description: >-
               The four fields below are used to convert the uri from above to
@@ -34503,13 +34499,11 @@ definitions:
             format: uint64
           bytesToInsert:
             type: string
-            format: byte
           insertIdIdx:
             type: string
             format: uint64
       arbitraryBytes:
         type: string
-        format: byte
         title: >-
           these bytes can be used to store anything on-chain about the badge.
           This can be updatable or not depending on the permissions set.
@@ -34745,7 +34739,6 @@ definitions:
                 format: uint64
               uri:
                 type: string
-                format: byte
               idxRangeToRemove:
                 description: >-
                   The four fields below are used to convert the uri from above
@@ -34763,13 +34756,11 @@ definitions:
                 format: uint64
               bytesToInsert:
                 type: string
-                format: byte
               insertIdIdx:
                 type: string
                 format: uint64
           arbitraryBytes:
             type: string
-            format: byte
             title: >-
               these bytes can be used to store anything on-chain about the
               badge. This can be updatable or not depending on the permissions
@@ -34999,7 +34990,6 @@ definitions:
         format: uint64
       uri:
         type: string
-        format: byte
       idxRangeToRemove:
         description: >-
           The four fields below are used to convert the uri from above to the
@@ -35017,7 +35007,6 @@ definitions:
         format: uint64
       bytesToInsert:
         type: string
-        format: byte
       insertIdIdx:
         type: string
         format: uint64

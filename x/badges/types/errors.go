@@ -33,4 +33,6 @@ var (
 	ErrCancelTimeIsGreaterThanExpirationTime = sdkerrors.Register(ModuleName, 1521, "cancel time is greater than expiration time")
 	ErrDuplicateAmounts                      = sdkerrors.Register(ModuleName, 1522, "duplicate amounts")
 	ErrElementCantEqualThis                  = sdkerrors.Register(ModuleName, 1523, "element cant equal this")
+	ErrInvalidIdRangeSpecified			   = sdkerrors.Register(ModuleName, 1524, "invalid id range specified")
+	ErrInvalidTypedData					  = sdkerrors.Register(ModuleName, 1525, "invalid typed data")
 )

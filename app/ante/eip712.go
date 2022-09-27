@@ -226,13 +226,19 @@ func VerifySignature(
 		
 		//TODO: types of string[] or uint64[] do not get registered as [] in MsgValue, so the types generated for firstMsg is actually overriden for our badges module below
 		//TODO: this shouldn't be needed; override MsgValue type with hardcoded badges module types 
+		//TODO: also readds omit empty fields
+		//This probably isn't a best practice. We should look to change this in the future
 		wrappedFirstMsg, ok := firstMsg.(legacytx.LegacyMsg)
 		if ok {
 			if wrappedFirstMsg.Route() == "badges" {
-				actualMsgValueTypes := badges.GetMsgValueTypes(wrappedFirstMsg.Type())
-				typedData.Types["MsgValue"] = actualMsgValueTypes
+				typedData, err = badges.NormalizeEIP712TypedData(typedData, wrappedFirstMsg.Type())
+				if err != nil {
+					return sdkerrors.Wrap(err, "failed to normalize EIP712 typed data for badges module")
+				}
 			}
 		}
+
+		// return sdkerrors.Wrapf(sdkerrors.ErrInvalidChainID, "%s", typedData)
 
 		sigHash, err := eip712.ComputeTypedDataHash(typedData)
 		if err != nil {
