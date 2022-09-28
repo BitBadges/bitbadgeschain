@@ -74,6 +74,7 @@ func CmdNewBadge() *cobra.Command {
 				permissions,
 				freezeRanges,
 				argBytesStr,
+				[]*types.WhitelistMintInfo{}, //TODO: add whitelist capabilities to CLI
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

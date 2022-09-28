@@ -9,6 +9,11 @@ import "badges/ranges.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
+message WhitelistMintInfo {
+    repeated uint64 addresses = 1;
+    repeated BalanceObject balanceAmounts = 2;
+}
+
 //Defines a user balance object for a badge w/ the user's balances, nonce, pending transfers, and approvals. All subbadge IDs for a badge are handled within this object.
 message UserBalanceInfo {
     repeated BalanceObject balanceAmounts = 2; //The user's balance for each subbadge.

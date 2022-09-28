@@ -37,6 +37,24 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 			return nil, err
 		}
 
+		for _, whitelistedRecipientInfo := range msg.WhitelistedRecipients {
+			for _, address := range whitelistedRecipientInfo.Addresses {
+				recipientBalanceInfo := types.UserBalanceInfo{}
+				for _, balanceObj := range whitelistedRecipientInfo.BalanceAmounts {
+					for _, idRange := range balanceObj.IdRanges {
+					 	managerBalanceInfo, recipientBalanceInfo, err = ForcefulTransfer(badge, idRange, managerBalanceInfo, recipientBalanceInfo, balanceObj.Balance, CreatorAccountNum, address, CreatorAccountNum, 0)
+						if err != nil {
+							return nil, err
+						}
+					}
+				}
+
+				if err := k.SetUserBalanceInStore(ctx, ConstructBalanceKey(address, badge.Id), GetBalanceInfoToInsertToStorage(recipientBalanceInfo)); err != nil {
+					return nil, err
+				}
+			}
+		}
+
 		if err := k.SetUserBalanceInStore(ctx, ConstructBalanceKey(CreatorAccountNum, badge.Id), GetBalanceInfoToInsertToStorage(managerBalanceInfo)); err != nil {
 			return nil, err
 		}

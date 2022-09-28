@@ -35133,6 +35133,40 @@ definitions:
       Defines a user balance object for a badge w/ the user's balances, nonce,
       pending transfers, and approvals. All subbadge IDs for a badge are handled
       within this object.
+  bitbadges.bitbadgeschain.badges.WhitelistMintInfo:
+    type: object
+    properties:
+      addresses:
+        type: array
+        items:
+          type: string
+          format: uint64
+      balanceAmounts:
+        type: array
+        items:
+          type: object
+          properties:
+            balance:
+              type: string
+              format: uint64
+            id_ranges:
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                    format: uint64
+                  end:
+                    type: string
+                    format: uint64
+                description: >-
+                  Id ranges define a range of IDs from start to end. Can be used
+                  for subbadgeIds, nonces, addresses anything. If end == 0, we
+                  assume end == start. Start must be >= end.
+          description: >-
+            Defines a balance object. The specified balance holds for all ids
+            specified within the id ranges array.
   google.protobuf.Any:
     type: object
     properties:

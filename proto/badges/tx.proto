@@ -4,6 +4,7 @@ package bitbadges.bitbadgeschain.badges;
 // this line is used by starport scaffolding # proto/tx/import
 import "badges/ranges.proto";
 import "badges/uris.proto";
+import "badges/balances.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
@@ -42,8 +43,11 @@ message MsgNewBadge {
 
     //Subasset supplys and amounts to create must be same length. For each idx, we create amounts[idx] subbadges each with a supply of supplys[idx].
     //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
+    //TODO: convert this into one struct?
     repeated uint64 subassetSupplys = 7;
-    repeated uint64 subassetAmountsToCreate = 8;    
+    repeated uint64 subassetAmountsToCreate = 8;
+
+    repeated WhitelistMintInfo whitelistedRecipients = 11;
 }
 
 message MsgNewBadgeResponse {
