@@ -13,7 +13,7 @@ type TypedDataMessage struct {
 
 //Certain fields are omitted when serialized with Proto and Amino. EIP712 doesn't support optional fields, so we add the omitted empty values back in here.
 func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (apitypes.TypedData, error) {
-	actualMsgValueTypes, addUri, addIdRange := GetMsgValueTypes(msgType)
+	actualMsgValueTypes, addUri, addIdRange, addWhitelistInfo := GetMsgValueTypes(msgType)
 	typedData.Types["MsgValue"] = actualMsgValueTypes
 	if addUri {
 		typedData.Types["UriObject"] = []apitypes.Type{
@@ -34,6 +34,18 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 		}
 	}
 
+	if addWhitelistInfo {
+		typedData.Types["WhitelistMintInfo"] = []apitypes.Type{
+			{ Name: "addresses", Type: "uint64[]" },
+			{ Name: "balanceAmounts", Type: "BalanceObject[]" },
+		}
+
+		typedData.Types["BalanceObject"] = []apitypes.Type{
+			{ Name: "balance", Type: "uint64" },
+			{ Name: "id_ranges", Type: "IdRange[]" },
+		}
+	}
+
 
 
 	//Add empty values for fields if omitted. EIP712 was signed with the fields, so we have to read them back here
@@ -49,26 +61,40 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 		} else if typeObj.Type == "string" && msgValueForType == nil {
 			firstMsg[typeObj.Name] = ""
 		} else if typeObj.Type == "uint64" && msgValueForType == nil {
-			// b, err := parseInteger("uint64", 0)
-			// if err != nil {
-			// 	return typedData, err
-			// }
 			firstMsg[typeObj.Name] = "0"
-		} 
-		// else if typeObj.Type == "IdRange" {
-		// 	if msgValueForType == nil {
-		// 		typedData.Message[typeObj.Name] = map[string]interface{}{
-		// 			"start": uint64(0),
-		// 			"end": uint64(0),
-		// 		}
-		// 	}
-		// 	currStart := msgValueForType["start"]
-		// 	currEnd := msgValueForType["start"]
-		// 	currIdRange, ok := 
-		// 	if !ok {
-		// 		return typedData, ErrInvalidIdRangeSpecified
-		// 	}
+		} else if typeObj.Type == "bool" && msgValueForType == nil {
+			firstMsg[typeObj.Name] = false
+		} else if typeObj.Type == "IdRange[]" {
+			idRanges, ok := msgValueForType.([]interface{})
+			if !ok {
+				return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "3. message is not a map[string]interface{}")
+			}
 
+			for _, idRangeObj := range idRanges {
+				idRange, ok := idRangeObj.(map[string]interface{})
+				if !ok {
+					return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "4. message is not a map[string]interface{}")
+				}
+				if idRange["start"] == nil {
+					idRange["start"] = "0"
+				} 
+				if idRange["end"] == nil {
+					idRange["end"] = "0"
+				}
+			}
+			// if msgValueForType == nil {
+			// 	typedData.Message[typeObj.Name] = map[string]interface{}{
+			// 		"start": uint64(0),
+			// 		"end": uint64(0),
+			// 	}
+			// }
+			// currStart := msgValueForType["start"]
+			// currEnd := msgValueForType["start"]
+			// currIdRange, ok := 
+			// if !ok {
+			// 	return typedData, ErrInvalidIdRangeSpecified
+			// }
+		}
 		// 	typedData.Message[typeObj.Name] = apitypes.IdRange{
 		// 		Start: uint64(0),
 		// 		End: uint64(0),
@@ -90,6 +116,7 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 		
 	}
 
+	//TODO: this is awful code. I'm sorry. I'll fix it later
 	//Add empty values for fields if omitted. EIP712 was signed with the fields, so we have to read them back here
 	for _, typeObj := range typedData.Types["UriObject"] {
 		uriObject, ok := typedData.Message["msgs"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["uri"].(map[string]interface{})//TODO: multuple messages
@@ -132,11 +159,47 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 		}
 	}
 
+	if addWhitelistInfo {
+		whitelistIdRangesArr, ok := typedData.Message["msgs"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["whitelistedRecipients"] //TODO: multuple messages
+		if !ok {
+			return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "1. message is not a map[string]interface{}")
+		}
+		whitelistValuesArr := whitelistIdRangesArr.([]interface{})
+		if !ok {
+			return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "2. message is not a []interface{}")
+		}
+
+		for _, whitelistValue := range whitelistValuesArr {
+			balanceAmounts := whitelistValue.(map[string]interface{})["balanceAmounts"].([]interface{})
+			if !ok {
+				return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "2. message is not a []interface{}")
+			}
+			for _, balanceAmount := range balanceAmounts {
+				idRanges, ok := balanceAmount.(map[string]interface{})["id_ranges"].([]interface{})
+				if !ok {
+					return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "3. message is not a map[string]interface{}")
+				}
+				for _, idRangeObj := range idRanges {
+					idRange, ok := idRangeObj.(map[string]interface{})
+					if !ok {
+						return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "4. message is not a map[string]interface{}")
+					}
+					if idRange["start"] == nil {
+						idRange["start"] = "0"
+					} 
+					if idRange["end"] == nil {
+						idRange["end"] = "0"
+					}
+				}
+			}
+		}
+	}
+
 	return typedData, nil
 }
 
 //first bool is if URI is needed, second is if ID Range is needed
-func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool) {
+func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool, bool) {
 	switch route {
 	case TypeMsgNewBadge:
 		return []apitypes.Type{ 
@@ -149,14 +212,16 @@ func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool) {
 			{ Name: "standard", Type: "uint64" },
 			{ Name: "subassetSupplys", Type: "uint64[]" },
 			{ Name: "subassetAmountsToCreate", Type: "uint64[]" },
-		}, true, true
+			{ Name: "whitelistedRecipients", Type: "WhitelistMintInfo[]" },
+			
+		}, true, true, true
 	case TypeMsgNewSubBadge:
 		return []apitypes.Type{ 
 			{ Name: "creator", Type: "string" },
 			{ Name: "badgeId", Type: "uint64" },
 			{ Name: "supplys", Type: "uint64[]" },
 			{ Name: "amountsToCreate", Type: "uint64[]" },
-		}, false, false
+		}, false, false, false
 	case TypeMsgTransferBadge:
 		return []apitypes.Type{	  { Name: "creator", Type: "string" },
 			{ Name: "from", Type: "uint64" },
@@ -166,7 +231,7 @@ func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool) {
 			{ Name: "subbadgeRanges", Type: "IdRange[]" },
 			{ Name: "expiration_time", Type: "uint64" },
 			{ Name: "cantCancelBeforeTime", Type: "uint64" },
-		}, false, true
+		}, false, true, false
 	case TypeMsgRequestTransferBadge:
 		return []apitypes.Type{{ Name: "creator", Type: "string" },
 			{ Name: "from", Type: "uint64" },
@@ -175,14 +240,14 @@ func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool) {
 			{ Name: "subbadgeRanges", Type: "IdRange[]" },
 			{ Name: "expiration_time", Type: "uint64" },
 			{ Name: "cantCancelBeforeTime", Type: "uint64" },
-		}, false, true
+		}, false, true, false
 	case TypeMsgHandlePendingTransfer:
 		return []apitypes.Type{{ Name: "creator", Type: "string" },
 			{ Name: "accept", Type: "bool" },
 			{ Name: "badgeId", Type: "uint64" },
 			{ Name: "nonceRanges", Type: "IdRange[]" },
 			{ Name: "forcefulAccept", Type: "bool" },
-		}, false, true
+		}, false, true, false
 	case TypeMsgSetApproval:
 		return []apitypes.Type{
 			{ Name: "creator", Type: "string" },
@@ -190,60 +255,60 @@ func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool) {
 			{ Name: "address", Type: "uint64" },
 			{ Name: "badgeId", Type: "uint64" },
 			{ Name: "subbadgeRanges", Type: "IdRange[]" },
-		}, false, true
+		}, false, true, false
 	case TypeMsgRevokeBadge:
 		return []apitypes.Type{  { Name: "creator", Type: "string" },
 			{ Name: "addresses", Type: "uint64[]" },
 			{ Name: "amounts", Type: "uint64[]" },
 			{ Name: "badgeId", Type: "uint64" },
 			{ Name: "subbadgeRanges", Type: "IdRange[]" },
-		}, false, true
+		}, false, true, false
 	case TypeMsgFreezeAddress:
 		return []apitypes.Type{
 			{ Name: "creator", Type: "string" },
 			{ Name: "addressRanges", Type: "IdRange[]" },
 			{ Name: "badgeId", Type: "uint64" },
 			{ Name: "add", Type: "bool" },
-		}, false, true
+		}, false, true, false
 	case TypeMsgUpdateUris:
 		return []apitypes.Type{	 { Name: "creator", Type: "string" },
 			{ Name: "badgeId", Type: "uint64" },
 			{ Name: "uri", Type: "UriObject" },
-		}, true, true
+		}, true, true, false
 	case TypeMsgUpdatePermissions:
 		return []apitypes.Type{{ Name: "creator", Type: "string" },
 			{ Name: "badgeId", Type: "uint64" },
 			{ Name: "permissions", Type: "uint64" },
-		}, false, false
+		}, false, false, false
 	case TypeMsgUpdateBytes:
 		return []apitypes.Type{  { Name: "creator", Type: "string" },
 			{ Name: "badgeId", Type: "uint64" },
 			{ Name: "newBytes", Type: "string" },
-		}, false, false
+		}, false, false, false
 	case TypeMsgTransferManager:
 		return []apitypes.Type{ { Name: "creator", Type: "string" },
 			{ Name: "badgeId", Type: "uint64" },
 			{ Name: "address", Type: "uint64" },
-		}, false, false
+		}, false, false, false
 	case TypeMsgRequestTransferManager:
 		return []apitypes.Type{ { Name: "creator", Type: "string" },
 			{ Name: "badgeId", Type: "uint64" },
 			{ Name: "add", Type: "bool" },
-		}, false, false
+		}, false, false, false
 	case TypeMsgSelfDestructBadge:
 		return []apitypes.Type{ { Name: "creator", Type: "string" },
 			{ Name: "badgeId", Type: "uint64" },
-		}, false, false
+		}, false, false, false
 	case TypeMsgPruneBalances:
 		return []apitypes.Type{ { Name: "creator", Type: "string" },
 			{ Name: "badgeIds", Type: "uint64[]" },
 			{ Name: "addresses", Type: "uint64[]" },
-		}, false, false
+		}, false, false, false
 	case TypeMsgRegisterAddresses:
 		return []apitypes.Type{{ Name: "creator", Type: "string" },
 			{ Name: "addressesToRegister", Type: "string[]" },
-		}, false, false
+		}, false, false, false
 	default:
-		return []apitypes.Type{}, false, false
+		return []apitypes.Type{}, false, false, false
 	};
 }
