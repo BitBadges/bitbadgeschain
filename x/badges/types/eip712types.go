@@ -7,11 +7,37 @@ import (
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 )
 
-type TypedDataMessage struct {
-	msgs []map[string]interface{}
+// NormalizeEmptyTypes is a recursive function that adds empty values to fields that are omitted when serialized with Proto and Amino. 
+// EIP712 doesn't support optional fields, so we add the omitted empty values back in here.
+// This includes empty strings, when a uint64 is 0, and when a bool is false.
+func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Type, mapObject map[string]interface{}) (map[string]interface{}, error) {
+	for _, typeObj := range typeObjArr {
+		typeStr := typeObj.Type
+		value := mapObject[typeObj.Name]
+
+		if strings.Contains(typeStr, "[]") && value == nil {
+			mapObject[typeObj.Name] = []interface{}{}
+		} else if typeStr == "string" && value == nil {
+			mapObject[typeObj.Name] = ""
+		} else if typeStr == "uint64" && value == nil {
+			mapObject[typeObj.Name] = "0"
+		} else if typeStr == "bool" && value == nil {
+			mapObject[typeObj.Name] = false
+		} else {
+			innerMap, ok := mapObject[typeObj.Name].(map[string]interface{})
+			if ok {
+				newMap, err := NormalizeEmptyTypes(typedData, typedData.Types[typeStr], innerMap)
+				if err != nil {
+					return mapObject, err
+				}
+				mapObject[typeObj.Name] = newMap
+			}
+		}
+	}
+	return mapObject, nil
 }
 
-//Certain fields are omitted when serialized with Proto and Amino. EIP712 doesn't support optional fields, so we add the omitted empty values back in here.
+//Certain fields are omitted (when uint64 is 0, bool is false, etc) when serialized with Proto and Amino. EIP712 doesn't support optional fields, so we add the omitted empty values back in here.
 func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (apitypes.TypedData, error) {
 	actualMsgValueTypes, addUri, addIdRange, addWhitelistInfo := GetMsgValueTypes(msgType)
 	typedData.Types["MsgValue"] = actualMsgValueTypes
@@ -46,154 +72,17 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 		}
 	}
 
-
-
-	//Add empty values for fields if omitted. EIP712 was signed with the fields, so we have to read them back here
-	for _, typeObj := range typedData.Types["MsgValue"] {
-		firstMsg, ok := typedData.Message["msgs"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{}) //TODO: multuple messages
-		if !ok {
-			return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "message is not a map[string]interface{}")
-		}
-		msgValueForType := firstMsg[typeObj.Name]
-
-		if strings.Contains(typeObj.Type, "[]") && msgValueForType == nil {
-			firstMsg[typeObj.Name] = []interface{}{}
-		} else if typeObj.Type == "string" && msgValueForType == nil {
-			firstMsg[typeObj.Name] = ""
-		} else if typeObj.Type == "uint64" && msgValueForType == nil {
-			firstMsg[typeObj.Name] = "0"
-		} else if typeObj.Type == "bool" && msgValueForType == nil {
-			firstMsg[typeObj.Name] = false
-		} else if typeObj.Type == "IdRange[]" {
-			idRanges, ok := msgValueForType.([]interface{})
-			if !ok {
-				return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "3. message is not a map[string]interface{}")
-			}
-
-			for _, idRangeObj := range idRanges {
-				idRange, ok := idRangeObj.(map[string]interface{})
-				if !ok {
-					return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "4. message is not a map[string]interface{}")
-				}
-				if idRange["start"] == nil {
-					idRange["start"] = "0"
-				} 
-				if idRange["end"] == nil {
-					idRange["end"] = "0"
-				}
-			}
-			// if msgValueForType == nil {
-			// 	typedData.Message[typeObj.Name] = map[string]interface{}{
-			// 		"start": uint64(0),
-			// 		"end": uint64(0),
-			// 	}
-			// }
-			// currStart := msgValueForType["start"]
-			// currEnd := msgValueForType["start"]
-			// currIdRange, ok := 
-			// if !ok {
-			// 	return typedData, ErrInvalidIdRangeSpecified
-			// }
-		}
-		// 	typedData.Message[typeObj.Name] = apitypes.IdRange{
-		// 		Start: uint64(0),
-		// 		End: uint64(0),
-		// 	}
-		// } else if typeObj.Type == "IdRange[]" && msgValueForType == nil {
-		// 	typedData.Message[typeObj.Name] = apitypes.IdRange{
-		// 		Start: uint64(0),
-		// 		End: uint64(0),
-		// 	}
-		// } else if typeObj.Type == "UriObject" && msgValueForType == nil {
-		// 	typedData.Message[typeObj.Name] = apitypes.IdRange{
-		// 		Start: uint64(0),
-		// 		End: uint64(0),
-		// 	}
-		// }
-
-
-
-		
+	msgValue, ok := typedData.Message["msgs"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})
+	if !ok {
+		return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "message is not a map[string]interface{}")
+	}
+	
+	normalizedMsgValue, err := NormalizeEmptyTypes(typedData, typedData.Types["MsgValue"], msgValue)
+	if err != nil {
+		return typedData, err
 	}
 
-	//TODO: this is awful code. I'm sorry. I'll fix it later
-	//Add empty values for fields if omitted. EIP712 was signed with the fields, so we have to read them back here
-	for _, typeObj := range typedData.Types["UriObject"] {
-		uriObject, ok := typedData.Message["msgs"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["uri"].(map[string]interface{})//TODO: multuple messages
-		if !ok {
-			return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "message is not a map[string]interface{}")
-		}
-		uriObjValueForType := uriObject[typeObj.Name]
-
-		if strings.Contains(typeObj.Type, "[]") && uriObjValueForType == nil {
-			uriObject[typeObj.Name] = []interface{}{}
-		} else if typeObj.Type == "string" && uriObjValueForType == nil {
-			uriObject[typeObj.Name] = ""
-		} else if typeObj.Type == "uint64" && uriObjValueForType == nil {
-			// b, err := parseInteger("uint64", 0)
-			// if err != nil {
-			// 	return typedData, err
-			// }
-			uriObject[typeObj.Name] = "0"
-		}
-	}
-
-	if addUri {
-		uriObject, ok := typedData.Message["msgs"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["uri"].(map[string]interface{})//TODO: multuple messages
-		if !ok {
-			return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "message is not a map[string]interface{}")
-		}
-		uriObjValueForType := uriObject["idxRangeToRemove"].(map[string]interface{})
-
-		if uriObjValueForType == nil {
-			uriObject["idxRangeToRemove"] = map[string]interface{}{
-				"start": "0",
-				"end": "0",
-			}
-		} 
-		if uriObjValueForType["start"] == nil {
-			uriObjValueForType["start"] = "0"
-		} 
-		if uriObjValueForType["end"] == nil {
-			uriObjValueForType["end"] = "0"
-		}
-	}
-
-	if addWhitelistInfo {
-		whitelistIdRangesArr, ok := typedData.Message["msgs"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["whitelistedRecipients"] //TODO: multuple messages
-		if !ok {
-			return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "1. message is not a map[string]interface{}")
-		}
-		whitelistValuesArr := whitelistIdRangesArr.([]interface{})
-		if !ok {
-			return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "2. message is not a []interface{}")
-		}
-
-		for _, whitelistValue := range whitelistValuesArr {
-			balanceAmounts := whitelistValue.(map[string]interface{})["balanceAmounts"].([]interface{})
-			if !ok {
-				return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "2. message is not a []interface{}")
-			}
-			for _, balanceAmount := range balanceAmounts {
-				idRanges, ok := balanceAmount.(map[string]interface{})["idRanges"].([]interface{})
-				if !ok {
-					return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "3. message is not a map[string]interface{}")
-				}
-				for _, idRangeObj := range idRanges {
-					idRange, ok := idRangeObj.(map[string]interface{})
-					if !ok {
-						return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "4. message is not a map[string]interface{}")
-					}
-					if idRange["start"] == nil {
-						idRange["start"] = "0"
-					} 
-					if idRange["end"] == nil {
-						idRange["end"] = "0"
-					}
-				}
-			}
-		}
-	}
+	typedData.Message["msgs"].([]interface{})[0].(map[string]interface{})["value"] = normalizedMsgValue
 
 	return typedData, nil
 }
