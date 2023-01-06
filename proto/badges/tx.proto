@@ -76,8 +76,8 @@ message MsgTransferBadge {
     repeated uint64 amounts = 4;
     uint64 badgeId = 5;
     repeated IdRange subbadgeRanges = 6;
-    uint64 expiration_time = 7; //If 0, never expires and assumed to be the max possible time.
-    uint64 cantCancelBeforeTime = 8; //If 0, always cancellable. Must be <= expiration_time.
+    uint64 expirationTime = 7; //If 0, never expires and assumed to be the max possible time.
+    uint64 cantCancelBeforeTime = 8; //If 0, always cancellable. Must be <= expirationTime.
 }
 
 message MsgTransferBadgeResponse {}
@@ -89,8 +89,8 @@ message MsgRequestTransferBadge {
     uint64 amount = 4;
     uint64 badgeId = 5;
     repeated IdRange subbadgeRanges = 6;
-    uint64 expiration_time = 7; //If 0, never expires and assumed to be the max possible time.
-    uint64 cantCancelBeforeTime = 8; //If 0, always cancellable. Must be <= expiration_time.
+    uint64 expirationTime = 7; //If 0, never expires and assumed to be the max possible time.
+    uint64 cantCancelBeforeTime = 8; //If 0, always cancellable. Must be <= expirationTime.
 }
 
 message MsgRequestTransferBadgeResponse {}

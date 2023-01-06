@@ -42,7 +42,7 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 
 		typedData.Types["BalanceObject"] = []apitypes.Type{
 			{ Name: "balance", Type: "uint64" },
-			{ Name: "id_ranges", Type: "IdRange[]" },
+			{ Name: "idRanges", Type: "IdRange[]" },
 		}
 	}
 
@@ -175,7 +175,7 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 				return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "2. message is not a []interface{}")
 			}
 			for _, balanceAmount := range balanceAmounts {
-				idRanges, ok := balanceAmount.(map[string]interface{})["id_ranges"].([]interface{})
+				idRanges, ok := balanceAmount.(map[string]interface{})["idRanges"].([]interface{})
 				if !ok {
 					return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "3. message is not a map[string]interface{}")
 				}
@@ -229,7 +229,7 @@ func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool, bool) {
 			{ Name: "amounts", Type: "uint64[]" },
 			{ Name: "badgeId", Type: "uint64" },
 			{ Name: "subbadgeRanges", Type: "IdRange[]" },
-			{ Name: "expiration_time", Type: "uint64" },
+			{ Name: "expirationTime", Type: "uint64" },
 			{ Name: "cantCancelBeforeTime", Type: "uint64" },
 		}, false, true, false
 	case TypeMsgRequestTransferBadge:
@@ -238,7 +238,7 @@ func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool, bool) {
 			{ Name: "amount", Type: "uint64" },
 			{ Name: "badgeId", Type: "uint64" },
 			{ Name: "subbadgeRanges", Type: "IdRange[]" },
-			{ Name: "expiration_time", Type: "uint64" },
+			{ Name: "expirationTime", Type: "uint64" },
 			{ Name: "cantCancelBeforeTime", Type: "uint64" },
 		}, false, true, false
 	case TypeMsgHandlePendingTransfer:

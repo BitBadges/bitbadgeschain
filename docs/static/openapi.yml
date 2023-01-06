@@ -39,15 +39,34 @@ paths:
                       decodeScheme:
                         type: string
                         format: uint64
+                        title: >-
+                          This will be == 0 represeting plaintext URLs for now,
+                          but in the future, if we want to add other decoding /
+                          encoding schemes like Base64, etc, we just define a
+                          new decoding scheme
                       scheme:
                         type: string
                         format: uint64
+                        description: >-
+                          Helps to save space by not storing methods like
+                          https:// every time. If this == 0, we assume it's
+                          included in the uri itself. Else, we define a few
+                          predefined int -> scheme maps in uris.go that will
+                          prefix the uri bytes.
                       uri:
                         type: string
+                        description: >-
+                          The uri bytes to store. Will be converted to a string.
+                          To be manipulated according to other properties of
+                          this URI object.
                       idxRangeToRemove:
                         description: >-
                           The four fields below are used to convert the uri from
                           above to the subasset URI.
+
+
+                          Remove this range of characters from the uri for the
+                          subasset. Leave nil if no removal is needed.
                         type: object
                         properties:
                           start:
@@ -61,9 +80,17 @@ paths:
                         format: uint64
                       bytesToInsert:
                         type: string
+                        description: >-
+                          After removing the above range, insert these bytes at
+                          insertSubassetBytesIdx. insertSubassetBytesIdx is the
+                          idx after the range removal, not before.
                       insertIdIdx:
                         type: string
                         format: uint64
+                        title: >-
+                          This is the idx where we insert the id number of the
+                          subbadge. For example, ex.com/ and insertIdIdx == 6,
+                          the subasset URI for ID 0 would be ex.com/0
                   arbitraryBytes:
                     type: string
                     title: >-
@@ -120,7 +147,7 @@ paths:
                         balance:
                           type: string
                           format: uint64
-                        id_ranges:
+                        idRanges:
                           type: array
                           items:
                             type: object
@@ -369,7 +396,7 @@ paths:
                         balance:
                           type: string
                           format: uint64
-                        id_ranges:
+                        idRanges:
                           type: array
                           items:
                             type: object
@@ -388,9 +415,11 @@ paths:
                       description: >-
                         Defines a balance object. The specified balance holds
                         for all ids specified within the id ranges array.
+                    description: The user's balance for each subbadge.
                   pendingNonce:
                     type: string
                     format: uint64
+                    description: Nonce for pending transfers. Increments by 1 each time.
                   pending:
                     type: array
                     items:
@@ -413,6 +442,11 @@ paths:
                         thisPendingNonce:
                           type: string
                           format: uint64
+                          description: >-
+                            This pending nonce is the nonce of the account for
+                            which this transfer is stored. Other is the other
+                            party's. Will be swapped for the other party's
+                            stored pending transfer.
                         otherPendingNonce:
                           type: string
                           format: uint64
@@ -421,6 +455,7 @@ paths:
                           format: uint64
                         sent:
                           type: boolean
+                          title: Sent defines who initiated this pending transfer
                         to:
                           type: string
                           format: uint64
@@ -432,16 +467,29 @@ paths:
                           format: uint64
                         markedAsAccepted:
                           type: boolean
+                          description: >-
+                            For non forceful accepts, this will be true if the
+                            other party has accepted but doesn't want to pay the
+                            gas fees.
                         expirationTime:
                           type: string
                           format: uint64
+                          description: >-
+                            Can't be accepted after expiration time. If == 0, we
+                            assume it never expires.
                         cantCancelBeforeTime:
                           type: string
                           format: uint64
+                          description: >-
+                            Can't cancel before must be less than expiration
+                            time. If == 0, we assume can cancel at any time.
                       description: >-
                         Defines a pending transfer object for two addresses. A
                         pending transfer will be stored in both parties' balance
                         objects.
+                    description: >-
+                      IDs will be sorted in order of this account's pending
+                      nonce.
                   approvals:
                     type: array
                     items:
@@ -450,6 +498,7 @@ paths:
                         address:
                           type: string
                           format: uint64
+                          title: account number for the address
                         approvalAmounts:
                           type: array
                           items:
@@ -458,7 +507,7 @@ paths:
                               balance:
                                 type: string
                                 format: uint64
-                              id_ranges:
+                              idRanges:
                                 type: array
                                 items:
                                   type: object
@@ -478,7 +527,9 @@ paths:
                               Defines a balance object. The specified balance
                               holds for all ids specified within the id ranges
                               array.
+                          title: approval balances for every subbadgeId
                       description: Defines an approval object for a specific address.
+                    description: Approvals are sorted in order of address number.
                 description: >-
                   Defines a user balance object for a badge w/ the user's
                   balances, nonce, pending transfers, and approvals. All
@@ -34402,6 +34453,7 @@ definitions:
       address:
         type: string
         format: uint64
+        title: account number for the address
       approvalAmounts:
         type: array
         items:
@@ -34410,7 +34462,7 @@ definitions:
             balance:
               type: string
               format: uint64
-            id_ranges:
+            idRanges:
               type: array
               items:
                 type: object
@@ -34428,6 +34480,7 @@ definitions:
           description: >-
             Defines a balance object. The specified balance holds for all ids
             specified within the id ranges array.
+        title: approval balances for every subbadgeId
     description: Defines an approval object for a specific address.
   bitbadges.bitbadgeschain.badges.BalanceObject:
     type: object
@@ -34435,7 +34488,7 @@ definitions:
       balance:
         type: string
         format: uint64
-      id_ranges:
+      idRanges:
         type: array
         items:
           type: object
@@ -34477,15 +34530,31 @@ definitions:
           decodeScheme:
             type: string
             format: uint64
+            title: >-
+              This will be == 0 represeting plaintext URLs for now, but in the
+              future, if we want to add other decoding / encoding schemes like
+              Base64, etc, we just define a new decoding scheme
           scheme:
             type: string
             format: uint64
+            description: >-
+              Helps to save space by not storing methods like https:// every
+              time. If this == 0, we assume it's included in the uri itself.
+              Else, we define a few predefined int -> scheme maps in uris.go
+              that will prefix the uri bytes.
           uri:
             type: string
+            description: >-
+              The uri bytes to store. Will be converted to a string. To be
+              manipulated according to other properties of this URI object.
           idxRangeToRemove:
             description: >-
               The four fields below are used to convert the uri from above to
               the subasset URI.
+
+
+              Remove this range of characters from the uri for the subasset.
+              Leave nil if no removal is needed.
             type: object
             properties:
               start:
@@ -34499,9 +34568,17 @@ definitions:
             format: uint64
           bytesToInsert:
             type: string
+            description: >-
+              After removing the above range, insert these bytes at
+              insertSubassetBytesIdx. insertSubassetBytesIdx is the idx after
+              the range removal, not before.
           insertIdIdx:
             type: string
             format: uint64
+            title: >-
+              This is the idx where we insert the id number of the subbadge. For
+              example, ex.com/ and insertIdIdx == 6, the subasset URI for ID 0
+              would be ex.com/0
       arbitraryBytes:
         type: string
         title: >-
@@ -34556,7 +34633,7 @@ definitions:
             balance:
               type: string
               format: uint64
-            id_ranges:
+            idRanges:
               type: array
               items:
                 type: object
@@ -34613,12 +34690,14 @@ definitions:
       id:
         type: string
         format: uint64
+        title: ID of created badge
   bitbadges.bitbadgeschain.badges.MsgNewSubBadgeResponse:
     type: object
     properties:
       nextSubassetId:
         type: string
         format: uint64
+        description: ID of next subbadgeId after creating all subbadges.
   bitbadges.bitbadgeschain.badges.MsgPruneBalancesResponse:
     type: object
   bitbadges.bitbadgeschain.badges.MsgRegisterAddressesResponse:
@@ -34679,6 +34758,10 @@ definitions:
       thisPendingNonce:
         type: string
         format: uint64
+        description: >-
+          This pending nonce is the nonce of the account for which this transfer
+          is stored. Other is the other party's. Will be swapped for the other
+          party's stored pending transfer.
       otherPendingNonce:
         type: string
         format: uint64
@@ -34687,6 +34770,7 @@ definitions:
         format: uint64
       sent:
         type: boolean
+        title: Sent defines who initiated this pending transfer
       to:
         type: string
         format: uint64
@@ -34698,12 +34782,21 @@ definitions:
         format: uint64
       markedAsAccepted:
         type: boolean
+        description: >-
+          For non forceful accepts, this will be true if the other party has
+          accepted but doesn't want to pay the gas fees.
       expirationTime:
         type: string
         format: uint64
+        description: >-
+          Can't be accepted after expiration time. If == 0, we assume it never
+          expires.
       cantCancelBeforeTime:
         type: string
         format: uint64
+        description: >-
+          Can't cancel before must be less than expiration time. If == 0, we
+          assume can cancel at any time.
     description: >-
       Defines a pending transfer object for two addresses. A pending transfer
       will be stored in both parties' balance objects.
@@ -34734,15 +34827,31 @@ definitions:
               decodeScheme:
                 type: string
                 format: uint64
+                title: >-
+                  This will be == 0 represeting plaintext URLs for now, but in
+                  the future, if we want to add other decoding / encoding
+                  schemes like Base64, etc, we just define a new decoding scheme
               scheme:
                 type: string
                 format: uint64
+                description: >-
+                  Helps to save space by not storing methods like https:// every
+                  time. If this == 0, we assume it's included in the uri itself.
+                  Else, we define a few predefined int -> scheme maps in uris.go
+                  that will prefix the uri bytes.
               uri:
                 type: string
+                description: >-
+                  The uri bytes to store. Will be converted to a string. To be
+                  manipulated according to other properties of this URI object.
               idxRangeToRemove:
                 description: >-
                   The four fields below are used to convert the uri from above
                   to the subasset URI.
+
+
+                  Remove this range of characters from the uri for the subasset.
+                  Leave nil if no removal is needed.
                 type: object
                 properties:
                   start:
@@ -34756,9 +34865,17 @@ definitions:
                 format: uint64
               bytesToInsert:
                 type: string
+                description: >-
+                  After removing the above range, insert these bytes at
+                  insertSubassetBytesIdx. insertSubassetBytesIdx is the idx
+                  after the range removal, not before.
               insertIdIdx:
                 type: string
                 format: uint64
+                title: >-
+                  This is the idx where we insert the id number of the subbadge.
+                  For example, ex.com/ and insertIdIdx == 6, the subasset URI
+                  for ID 0 would be ex.com/0
           arbitraryBytes:
             type: string
             title: >-
@@ -34814,7 +34931,7 @@ definitions:
                 balance:
                   type: string
                   format: uint64
-                id_ranges:
+                idRanges:
                   type: array
                   items:
                     type: object
@@ -34862,7 +34979,7 @@ definitions:
                 balance:
                   type: string
                   format: uint64
-                id_ranges:
+                idRanges:
                   type: array
                   items:
                     type: object
@@ -34880,9 +34997,11 @@ definitions:
               description: >-
                 Defines a balance object. The specified balance holds for all
                 ids specified within the id ranges array.
+            description: The user's balance for each subbadge.
           pendingNonce:
             type: string
             format: uint64
+            description: Nonce for pending transfers. Increments by 1 each time.
           pending:
             type: array
             items:
@@ -34904,6 +35023,10 @@ definitions:
                 thisPendingNonce:
                   type: string
                   format: uint64
+                  description: >-
+                    This pending nonce is the nonce of the account for which
+                    this transfer is stored. Other is the other party's. Will be
+                    swapped for the other party's stored pending transfer.
                 otherPendingNonce:
                   type: string
                   format: uint64
@@ -34912,6 +35035,7 @@ definitions:
                   format: uint64
                 sent:
                   type: boolean
+                  title: Sent defines who initiated this pending transfer
                 to:
                   type: string
                   format: uint64
@@ -34923,15 +35047,25 @@ definitions:
                   format: uint64
                 markedAsAccepted:
                   type: boolean
+                  description: >-
+                    For non forceful accepts, this will be true if the other
+                    party has accepted but doesn't want to pay the gas fees.
                 expirationTime:
                   type: string
                   format: uint64
+                  description: >-
+                    Can't be accepted after expiration time. If == 0, we assume
+                    it never expires.
                 cantCancelBeforeTime:
                   type: string
                   format: uint64
+                  description: >-
+                    Can't cancel before must be less than expiration time. If ==
+                    0, we assume can cancel at any time.
               description: >-
                 Defines a pending transfer object for two addresses. A pending
                 transfer will be stored in both parties' balance objects.
+            description: IDs will be sorted in order of this account's pending nonce.
           approvals:
             type: array
             items:
@@ -34940,6 +35074,7 @@ definitions:
                 address:
                   type: string
                   format: uint64
+                  title: account number for the address
                 approvalAmounts:
                   type: array
                   items:
@@ -34948,7 +35083,7 @@ definitions:
                       balance:
                         type: string
                         format: uint64
-                      id_ranges:
+                      idRanges:
                         type: array
                         items:
                           type: object
@@ -34967,7 +35102,9 @@ definitions:
                     description: >-
                       Defines a balance object. The specified balance holds for
                       all ids specified within the id ranges array.
+                  title: approval balances for every subbadgeId
               description: Defines an approval object for a specific address.
+            description: Approvals are sorted in order of address number.
         description: >-
           Defines a user balance object for a badge w/ the user's balances,
           nonce, pending transfers, and approvals. All subbadge IDs for a badge
@@ -34985,15 +35122,31 @@ definitions:
       decodeScheme:
         type: string
         format: uint64
+        title: >-
+          This will be == 0 represeting plaintext URLs for now, but in the
+          future, if we want to add other decoding / encoding schemes like
+          Base64, etc, we just define a new decoding scheme
       scheme:
         type: string
         format: uint64
+        description: >-
+          Helps to save space by not storing methods like https:// every time.
+          If this == 0, we assume it's included in the uri itself. Else, we
+          define a few predefined int -> scheme maps in uris.go that will prefix
+          the uri bytes.
       uri:
         type: string
+        description: >-
+          The uri bytes to store. Will be converted to a string. To be
+          manipulated according to other properties of this URI object.
       idxRangeToRemove:
         description: >-
           The four fields below are used to convert the uri from above to the
           subasset URI.
+
+
+          Remove this range of characters from the uri for the subasset. Leave
+          nil if no removal is needed.
         type: object
         properties:
           start:
@@ -35007,9 +35160,17 @@ definitions:
         format: uint64
       bytesToInsert:
         type: string
+        description: >-
+          After removing the above range, insert these bytes at
+          insertSubassetBytesIdx. insertSubassetBytesIdx is the idx after the
+          range removal, not before.
       insertIdIdx:
         type: string
         format: uint64
+        title: >-
+          This is the idx where we insert the id number of the subbadge. For
+          example, ex.com/ and insertIdIdx == 6, the subasset URI for ID 0 would
+          be ex.com/0
     description: >-
       A URI object defines a uri and subasset uri for a badge and its subbadges.
       Designed to save storage and avoid reused text and common patterns.
@@ -35024,7 +35185,7 @@ definitions:
             balance:
               type: string
               format: uint64
-            id_ranges:
+            idRanges:
               type: array
               items:
                 type: object
@@ -35042,9 +35203,11 @@ definitions:
           description: >-
             Defines a balance object. The specified balance holds for all ids
             specified within the id ranges array.
+        description: The user's balance for each subbadge.
       pendingNonce:
         type: string
         format: uint64
+        description: Nonce for pending transfers. Increments by 1 each time.
       pending:
         type: array
         items:
@@ -35066,6 +35229,10 @@ definitions:
             thisPendingNonce:
               type: string
               format: uint64
+              description: >-
+                This pending nonce is the nonce of the account for which this
+                transfer is stored. Other is the other party's. Will be swapped
+                for the other party's stored pending transfer.
             otherPendingNonce:
               type: string
               format: uint64
@@ -35074,6 +35241,7 @@ definitions:
               format: uint64
             sent:
               type: boolean
+              title: Sent defines who initiated this pending transfer
             to:
               type: string
               format: uint64
@@ -35085,15 +35253,25 @@ definitions:
               format: uint64
             markedAsAccepted:
               type: boolean
+              description: >-
+                For non forceful accepts, this will be true if the other party
+                has accepted but doesn't want to pay the gas fees.
             expirationTime:
               type: string
               format: uint64
+              description: >-
+                Can't be accepted after expiration time. If == 0, we assume it
+                never expires.
             cantCancelBeforeTime:
               type: string
               format: uint64
+              description: >-
+                Can't cancel before must be less than expiration time. If == 0,
+                we assume can cancel at any time.
           description: >-
             Defines a pending transfer object for two addresses. A pending
             transfer will be stored in both parties' balance objects.
+        description: IDs will be sorted in order of this account's pending nonce.
       approvals:
         type: array
         items:
@@ -35102,6 +35280,7 @@ definitions:
             address:
               type: string
               format: uint64
+              title: account number for the address
             approvalAmounts:
               type: array
               items:
@@ -35110,7 +35289,7 @@ definitions:
                   balance:
                     type: string
                     format: uint64
-                  id_ranges:
+                  idRanges:
                     type: array
                     items:
                       type: object
@@ -35128,7 +35307,9 @@ definitions:
                 description: >-
                   Defines a balance object. The specified balance holds for all
                   ids specified within the id ranges array.
+              title: approval balances for every subbadgeId
           description: Defines an approval object for a specific address.
+        description: Approvals are sorted in order of address number.
     description: >-
       Defines a user balance object for a badge w/ the user's balances, nonce,
       pending transfers, and approvals. All subbadge IDs for a badge are handled
@@ -35149,7 +35330,7 @@ definitions:
             balance:
               type: string
               format: uint64
-            id_ranges:
+            idRanges:
               type: array
               items:
                 type: object
