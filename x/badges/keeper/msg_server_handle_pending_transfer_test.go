@@ -81,7 +81,7 @@ func (suite *TestSuite) TestHandleAcceptIncomingRequest() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(false, aliceBalanceInfo.Pending[0].Sent)
 
-	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().Nil(err, "Error accepting badge")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -184,7 +184,7 @@ func (suite *TestSuite) TestHandleAcceptIncomingRequestWithApproval() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(false, aliceBalanceInfo.Pending[0].Sent)
 
-	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().Nil(err, "Error accepting badge")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -283,10 +283,10 @@ func (suite *TestSuite) TestHandleRejectIncomingRequest() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(false, aliceBalanceInfo.Pending[0].Sent)
 
-	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, false, false)
+	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{0})
 	suite.Require().Nil(err, "Error accepting badge")
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, false, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{0})
 	suite.Require().Nil(err, "Error accepting badge")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -368,10 +368,10 @@ func (suite *TestSuite) TestHandleRejectIncomingRequestWithApproval() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(false, aliceBalanceInfo.Pending[0].Sent)
 
-	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, false, false)
+	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{0})
 	suite.Require().Nil(err, "Error accepting badge")
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, false, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{0})
 	suite.Require().Nil(err, "Error accepting badge")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -456,7 +456,7 @@ func (suite *TestSuite) TestHandleCancelOutgoingRequestWithApproval() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(false, aliceBalanceInfo.Pending[0].Sent)
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, false, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{0})
 	suite.Require().Nil(err, "Error accepting badge")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -538,7 +538,7 @@ func (suite *TestSuite) TestHandleCancelOutgoingRequest() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(false, aliceBalanceInfo.Pending[0].Sent)
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().EqualError(err, keeper.ErrCantAcceptOwnTransferRequest.Error())
 }
 
@@ -574,7 +574,7 @@ func (suite *TestSuite) TestBadgeDoesntExist() {
 	})
 	suite.Require().Nil(err, "Error creating subbadge")
 
-	err = HandlePendingTransfers(suite, wctx, bob, 1000, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 1000, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().EqualError(err, keeper.ErrBadgeNotExists.Error())
 }
 
@@ -648,7 +648,7 @@ func (suite *TestSuite) TestAcceptExpiredTransfer() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(false, aliceBalanceInfo.Pending[0].Sent)
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().EqualError(err, keeper.ErrPendingTransferExpired.Error())
 }
 
@@ -696,7 +696,7 @@ func (suite *TestSuite) TestNonexistentPendingTransfer() {
 	}, badge.SubassetSupplys)
 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().Nil(err, "Error handling transfer")
 }
 
@@ -749,16 +749,16 @@ func (suite *TestSuite) TestPendingBinarySearch() {
 		suite.Require().Nil(err, "Error transferring badge")
 	}
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 5, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 5, End: 0}}, []uint64{1})
 	suite.Require().Nil(err, "Error handling badge")
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 95, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 95, End: 0}}, []uint64{1})
 	suite.Require().Nil(err, "Error handling badge")
 
-	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 5, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 5, End: 0}}, []uint64{1})
 	suite.Require().Nil(err, "Error handling badge")
 
-	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 95, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 95, End: 0}}, []uint64{1})
 	suite.Require().Nil(err, "Error handling badge")
 }
 
@@ -825,10 +825,10 @@ func (suite *TestSuite) TestPruneExpiredTransfer() {
 	aliceBalanceInfo, _ := GetUserBalance(suite, wctx, 0, aliceAccountNum)
 	suite.Require().Equal(0, len(aliceBalanceInfo.Pending))
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().EqualError(err, keeper.ErrPendingTransferExpired.Error())
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, false, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{0})
 	suite.Require().Nil(err, "Error reverting transfer")
 }
 
@@ -899,13 +899,13 @@ func (suite *TestSuite) TestCancelBeforeTimesForTransfer() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(false, aliceBalanceInfo.Pending[0].Sent)
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, false, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{0})
 	suite.Require().EqualError(err, keeper.ErrCantCancelYet.Error())
 
 	suite.ctx = suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(time.Second * 20000))
 	wctx = sdk.WrapSDKContext(suite.ctx)
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, false, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{0})
 	suite.Require().Nil(err, "error cancelling transfer")
 }
 
@@ -976,9 +976,9 @@ func (suite *TestSuite) TestAcceptForcefullyAfterApproved() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(false, aliceBalanceInfo.Pending[0].Sent)
 
-	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().Nil(err, "error marking transfer as approved")
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, false, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{0})
 	suite.Require().Nil(err, "error cancelling transfer")
 }

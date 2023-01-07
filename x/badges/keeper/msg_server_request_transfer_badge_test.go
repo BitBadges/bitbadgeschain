@@ -84,13 +84,13 @@ func (suite *TestSuite) TestRequestTransfer() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(true, aliceBalanceInfo.Pending[0].Sent)
 
-	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().EqualError(err, keeper.ErrNotApproved.Error())
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().Nil(err, "Error accepting transfer")
 
-	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().Nil(err, "Error accepting badge")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -178,10 +178,10 @@ func (suite *TestSuite) TestRequestTransferForcefulAccept() {
 	suite.Require().Equal(uint64(0), aliceBalanceInfo.Pending[0].OtherPendingNonce)
 	suite.Require().Equal(true, aliceBalanceInfo.Pending[0].Sent)
 
-	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().EqualError(err, keeper.ErrNotApproved.Error())
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, true, true)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{2})
 	suite.Require().Nil(err, "Error accepting transfer")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -272,10 +272,10 @@ func (suite *TestSuite) TestRequestTransferFrozen() {
 	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}})
 	suite.Require().Nil(err, "Error freezing address")
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().Nil(err, "Error freezing address")
 
-	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 }
 
@@ -363,10 +363,10 @@ func (suite *TestSuite) TestRequestTransferFrozenThenUnrozen() {
 	err = FreezeAddresses(suite, wctx, bob, 0, false, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}})
 	suite.Require().Nil(err, "Error unfreezing address")
 
-	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().Nil(err, "Error accepting transfer")
 
-	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().Nil(err, "Error accepting transfer")
 
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -488,6 +488,6 @@ func (suite *TestSuite) TestTryToAcceptTranferRequestBeforeMarkedAsApproved() {
 	err = RequestTransferBadge(suite, wctx, alice, bobAccountNum, 5000, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 	suite.Require().Nil(err, "Error requesting transfer")
 
-	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, true, false)
+	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
 	suite.Require().EqualError(err, keeper.ErrNotApproved.Error())
 }

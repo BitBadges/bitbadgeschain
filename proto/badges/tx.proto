@@ -100,11 +100,11 @@ message MsgRequestTransferBadgeResponse {}
 //For all pending transfers of the badge where ThisPendingNonce is within some nonceRange in nonceRanges, we accept or deny the pending transfer.
 message MsgHandlePendingTransfer {
     string creator = 1;
-    bool accept = 2;
+    repeated uint64 actions = 2; //0 = deny, 1 = approve, 2 = forceful accept; //If len == 1, we apply the action to all, else must be equal length to nonceRanges.
     uint64 badgeId = 3;
     repeated IdRange nonceRanges = 4;
-    bool forcefulAccept = 5; //Forceful accept is an option to accept the transfer forcefully instead of just marking it as approved.
 }
+
 
 message MsgHandlePendingTransferResponse {}
 

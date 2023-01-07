@@ -35,4 +35,8 @@ var (
 	ErrElementCantEqualThis                  = sdkerrors.Register(ModuleName, 1523, "element cant equal this")
 	ErrInvalidIdRangeSpecified			   = sdkerrors.Register(ModuleName, 1524, "invalid id range specified")
 	ErrInvalidTypedData					  = sdkerrors.Register(ModuleName, 1525, "invalid typed data")
+	ErrActionOutOfRange					  = sdkerrors.Register(ModuleName, 1526, "action out of range")
+	ErrActionsEmpty					  = sdkerrors.Register(ModuleName, 1527, "actions empty")
+	ErrActionsLengthNotEqualToRangesLength	  = sdkerrors.Register(ModuleName, 1528, "actions length not equal to ranges length")
+
 )

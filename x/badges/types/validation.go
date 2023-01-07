@@ -64,6 +64,26 @@ func ValidateRangesAreValid(subbadgeRanges []*IdRange) error {
 	return nil
 }
 
+func ValidateActionsAreValid(actions []uint64, rangesLength int) error {
+	for _, action := range actions {
+		if action > 2 {
+			return ErrActionOutOfRange
+		}
+	}
+
+	if len(actions) == 0 {
+		return ErrActionsEmpty
+	}
+
+	if len(actions) == 1 {
+		return nil
+	} else if len(actions) != rangesLength {
+		return ErrActionsLengthNotEqualToRangesLength
+	}
+
+	return nil
+}
+
 //Validates no element is X
 func ValidateNoElementIsX(amounts []uint64, x uint64) error {
 	for _, amount := range amounts {

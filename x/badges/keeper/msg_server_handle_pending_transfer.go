@@ -47,6 +47,15 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 
 	for idx, CurrPendingTransfer := range creatorBalanceInfo.Pending {
 		for _, nonceRange := range msg.NonceRanges {
+			action := msg.Actions[0]
+			if len(msg.Actions) > 1 {
+				action = msg.Actions[idx]
+			}
+			accept := action == 1 || action == 2
+			forcefulAccept := action == 2
+			
+			
+
 			if nonceRange.End == 0 {
 				nonceRange.End = nonceRange.Start
 			}
@@ -57,7 +66,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 
 			//Handle trying to accept after expiration time
 			expired := uint64(ctx.BlockTime().Unix()) > CurrPendingTransfer.ExpirationTime
-			if msg.Accept && CurrPendingTransfer.ExpirationTime != 0 {
+			if accept && CurrPendingTransfer.ExpirationTime != 0 {
 				if expired {
 					return nil, ErrPendingTransferExpired
 				}
@@ -68,17 +77,17 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 			outgoingTransfer := CurrPendingTransfer.From == CreatorAccountNum
 
 			//Normal transfer flags (top four) and transfer request flags (bottom five) - Only one of these nine flags will be true
-			acceptOwnOutgoingTransfer := CurrPendingTransfer.Sent && msg.Accept && outgoingTransfer
-			acceptIncomingTransfer := !CurrPendingTransfer.Sent && msg.Accept && !outgoingTransfer
-			cancelOwnOutgoingTransfer := CurrPendingTransfer.Sent && !msg.Accept && outgoingTransfer
-			rejectIncomingTransfer := !CurrPendingTransfer.Sent && !msg.Accept
+			acceptOwnOutgoingTransfer := CurrPendingTransfer.Sent && accept && outgoingTransfer
+			acceptIncomingTransfer := !CurrPendingTransfer.Sent && accept && !outgoingTransfer
+			cancelOwnOutgoingTransfer := CurrPendingTransfer.Sent && !accept && outgoingTransfer
+			rejectIncomingTransfer := !CurrPendingTransfer.Sent && !accept
 
-			finalizeOwnTransferRequestAfterApprovedByOtherParty := CurrPendingTransfer.Sent && msg.Accept && !outgoingTransfer
+			finalizeOwnTransferRequestAfterApprovedByOtherParty := CurrPendingTransfer.Sent && accept && !outgoingTransfer
 			//These two are the same scenario but split into forceful and non-forceful transfers, so manager doesn't have to pay gas for every transfer request
-			acceptTransferRequestButMarkAsApproved := !msg.ForcefulAccept && !CurrPendingTransfer.Sent && msg.Accept && outgoingTransfer
-			acceptTransferRequestForcefully := msg.ForcefulAccept && !CurrPendingTransfer.Sent && msg.Accept && outgoingTransfer
-			rejectTransferRequest := !CurrPendingTransfer.Sent && !msg.Accept
-			cancelOwnTransferRequest := CurrPendingTransfer.Sent && !msg.Accept && !outgoingTransfer
+			acceptTransferRequestButMarkAsApproved := !forcefulAccept && !CurrPendingTransfer.Sent && accept && outgoingTransfer
+			acceptTransferRequestForcefully := forcefulAccept && !CurrPendingTransfer.Sent && accept && outgoingTransfer
+			rejectTransferRequest := !CurrPendingTransfer.Sent && !accept
+			cancelOwnTransferRequest := CurrPendingTransfer.Sent && !accept && !outgoingTransfer
 
 			if acceptOwnOutgoingTransfer {
 				return nil, ErrCantAcceptOwnTransferRequest
@@ -186,7 +195,7 @@ func (k msgServer) HandlePendingTransfer(goCtx context.Context, msg *types.MsgHa
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeyAction, "HandledPendingTransfers"),
 			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
-			sdk.NewAttribute("Accepted", fmt.Sprint(msg.Accept)),
+			sdk.NewAttribute("Actions", fmt.Sprint(msg.Actions)),
 			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
 			sdk.NewAttribute("NonceRanges", fmt.Sprint(msg.NonceRanges)),
 		),

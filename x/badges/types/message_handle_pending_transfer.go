@@ -9,13 +9,12 @@ const TypeMsgHandlePendingTransfer = "handle_pending_transfer"
 
 var _ sdk.Msg = &MsgHandlePendingTransfer{}
 
-func NewMsgHandlePendingTransfer(creator string, badgeId uint64, nonceRanges []*IdRange, accept bool, forcefulAccept bool) *MsgHandlePendingTransfer {
+func NewMsgHandlePendingTransfer(creator string, badgeId uint64, nonceRanges []*IdRange, actions []uint64) *MsgHandlePendingTransfer {
 	return &MsgHandlePendingTransfer{
 		Creator:        creator,
-		Accept:         accept,
 		BadgeId:        badgeId,
 		NonceRanges:    nonceRanges,
-		ForcefulAccept: forcefulAccept,
+		Actions:        actions,
 	}
 }
 
@@ -47,6 +46,11 @@ func (msg *MsgHandlePendingTransfer) ValidateBasic() error {
 	}
 
 	err = ValidateRangesAreValid(msg.NonceRanges)
+	if err != nil {
+		return err
+	}
+
+	err = ValidateActionsAreValid(msg.Actions, len(msg.NonceRanges))
 	if err != nil {
 		return err
 	}
