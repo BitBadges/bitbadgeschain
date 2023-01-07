@@ -13,6 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 
+	"github.com/ethereum/go-ethereum/common/math"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
@@ -21,6 +22,8 @@ import (
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
 	badges "github.com/bitbadges/bitbadgeschain/x/badges/types"
+
+	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 )
 
 var ethermintCodec codec.ProtoCodecMarshaler
@@ -222,6 +225,13 @@ func VerifySignature(
 		typedData, err := eip712.WrapTxToTypedData(ethermintCodec, extOpt.TypedDataChainID, firstMsg, txBytes, feeDelegation)
 		if err != nil {
 			return sdkerrors.Wrap(err, "failed to pack tx data in EIP712 object")
+		}
+		typedData.Domain = apitypes.TypedDataDomain{
+			Name:              "BitBadges",
+			Version:           "1.0.0",
+			ChainId:           math.NewHexOrDecimal256(int64(extOpt.TypedDataChainID)),
+			VerifyingContract: "cosmos",
+			Salt:              "0",
 		}
 		
 		//TODO: types of string[] or uint64[] do not get registered as [] in MsgValue, so the types generated for firstMsg is actually overriden for our badges module below
