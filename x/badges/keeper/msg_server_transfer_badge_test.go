@@ -33,7 +33,12 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -82,7 +87,12 @@ func (suite *TestSuite) TestTransferBadgePending() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -145,7 +155,12 @@ func (suite *TestSuite) TestTransferBadgeForceBurn() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -226,7 +241,12 @@ func (suite *TestSuite) TestApprovalsApproved() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -278,7 +298,12 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -324,7 +349,12 @@ func (suite *TestSuite) TestApprovalsNotApprovedAtAll() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -367,7 +397,12 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -413,7 +448,12 @@ func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -459,7 +499,12 @@ func (suite *TestSuite) TestApprovalOverflow() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -511,7 +556,12 @@ func (suite *TestSuite) TestTransferUnderflowNotEnoughBalance() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -554,7 +604,12 @@ func (suite *TestSuite) TestPendingTransferUnderflowNotEnoughBalance() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -597,7 +652,12 @@ func (suite *TestSuite) TestTransferInvalidSubbadgeRanges() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -642,7 +702,12 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 	CreateBadges(suite, wctx, badgesToCreate)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{10000})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 10000,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadges")
 
 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{10}, 0, []*types.IdRange{{Start: 0, End: 499}}, 0, 0)
@@ -679,7 +744,12 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 	CreateBadges(suite, wctx, badgesToCreate)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{10000})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 10000,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadges")
 
 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{10}, 0, []*types.IdRange{{Start: 501, End: 1000}}, 0, 0)
@@ -713,7 +783,12 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	CreateBadges(suite, wctx, badgesToCreate)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{10000})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 10000,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadges")
 
 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{10}, 0, []*types.IdRange{{Start: 0, End: 100}}, 0, 0)

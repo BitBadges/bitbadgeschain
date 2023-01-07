@@ -9,18 +9,17 @@ const TypeMsgNewBadge = "new_badge"
 
 var _ sdk.Msg = &MsgNewBadge{}
 
-func NewMsgNewBadge(creator string, standard uint64, defaultSupply uint64, amountsToCreate []uint64, supplysToCreate []uint64, uriObject *UriObject, permissions uint64, freezeAddressRanges []*IdRange, bytesToStore string, whitelistedRecipients []*WhitelistMintInfo) *MsgNewBadge {
+func NewMsgNewBadge(creator string, standard uint64, defaultSupply uint64, subassetsToCreate []*SubassetSupplyAndAmount, uriObject *UriObject, permissions uint64, freezeAddressRanges []*IdRange, bytesToStore string, whitelistedRecipients []*WhitelistMintInfo) *MsgNewBadge {
 	return &MsgNewBadge{
-		Creator:                 creator,
-		Uri:                     uriObject,
-		DefaultSubassetSupply:   defaultSupply,
-		SubassetAmountsToCreate: amountsToCreate,
-		SubassetSupplys:         supplysToCreate,
-		FreezeAddressRanges:     freezeAddressRanges,
-		ArbitraryBytes:          bytesToStore,
-		Permissions:             permissions,
-		Standard:                standard,
-		WhitelistedRecipients:   whitelistedRecipients,
+		Creator:                 	creator,
+		Uri:                     	uriObject,
+		DefaultSubassetSupply:   	defaultSupply,
+		SubassetSupplysAndAmounts:	subassetsToCreate,
+		FreezeAddressRanges:    	freezeAddressRanges,
+		ArbitraryBytes:          	bytesToStore,
+		Permissions:             	permissions,
+		Standard:                	standard,
+		WhitelistedRecipients:   	whitelistedRecipients,
 	}
 }
 
@@ -63,16 +62,20 @@ func (msg *MsgNewBadge) ValidateBasic() error {
 		return err
 	}
 
-	if len(msg.SubassetAmountsToCreate) != len(msg.SubassetSupplys) {
-		return ErrInvalidSupplyAndAmounts
+
+	amounts := make([]uint64, len(msg.SubassetSupplysAndAmounts))
+	supplys := make([]uint64, len(msg.SubassetSupplysAndAmounts))
+	for i, subasset := range msg.SubassetSupplysAndAmounts {
+		amounts[i] = subasset.Amount
+		supplys[i] = subasset.Supply
 	}
 
-	err = ValidateNoElementIsX(msg.SubassetAmountsToCreate, 0)
+	err = ValidateNoElementIsX(amounts, 0)
 	if err != nil {
 		return err
 	}
 
-	err = ValidateNoElementIsX(msg.SubassetSupplys, 0)
+	err = ValidateNoElementIsX(supplys, 0)
 	if err != nil {
 		return err
 	}

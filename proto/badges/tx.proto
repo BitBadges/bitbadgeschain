@@ -31,6 +31,11 @@ service Msg {
 
 //The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
 
+message SubassetSupplyAndAmount {
+    uint64 supply = 1;
+    uint64 amount = 2;
+}
+
 message MsgNewBadge {
     // See badges.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
     string creator = 1; 
@@ -41,11 +46,9 @@ message MsgNewBadge {
     repeated IdRange freezeAddressRanges = 9;
     uint64 standard = 10; 
 
-    //Subasset supplys and amounts to create must be same length. For each idx, we create amounts[idx] subbadges each with a supply of supplys[idx].
+    //Subasset supplys and amounts to create. For each idx, we create amounts[idx] subbadges each with a supply of supplys[idx].
     //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
-    //TODO: convert this into one struct?
-    repeated uint64 subassetSupplys = 7;
-    repeated uint64 subassetAmountsToCreate = 8;
+    repeated SubassetSupplyAndAmount subassetSupplysAndAmounts = 7;
 
     repeated WhitelistMintInfo whitelistedRecipients = 11;
 }
@@ -60,8 +63,7 @@ message MsgNewSubBadge {
 
     //Subasset supplys and amounts to create must be same length. For each idx, we create amounts[idx] subbadges each with a supply of supplys[idx].
     //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
-    repeated uint64 supplys = 3;
-    repeated uint64 amountsToCreate = 4;
+    repeated SubassetSupplyAndAmount subassetSupplysAndAmounts = 7;
 }
 
 message MsgNewSubBadgeResponse {

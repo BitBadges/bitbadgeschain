@@ -31,7 +31,12 @@ func (suite *TestSuite) TestNewSubBadges() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -46,7 +51,12 @@ func (suite *TestSuite) TestNewSubBadges() {
 	suite.Require().Equal(uint64(10), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
 	//Create subbadge 2 with supply == 1
-	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{1}, []uint64{1})
+	err = CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 1,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	badge, _ = GetBadge(suite, wctx, 0)
@@ -64,7 +74,12 @@ func (suite *TestSuite) TestNewSubBadges() {
 	suite.Require().Equal(uint64(1), bobBalanceInfo.BalanceAmounts[0].IdRanges[0].Start)
 
 	//Create subbadge 2 with supply == 10
-	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{10}, []uint64{2})
+	err = CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10,
+			Amount: 2,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -98,9 +113,12 @@ func (suite *TestSuite) TestNewSubbadgesDirectlyUponCreatingNewBadge() {
 					InsertIdIdx: 10,
 				},
 				Permissions: 62,
-
-				SubassetSupplys:         []uint64{10},
-				SubassetAmountsToCreate: []uint64{1},
+				SubassetSupplysAndAmounts: []*types.SubassetSupplyAndAmount{
+					{
+						Supply: 10,
+						Amount: 1,
+					},
+				},
 			},
 			Amount:  1,
 			Creator: bob,
@@ -123,7 +141,12 @@ func (suite *TestSuite) TestNewSubbadgesDirectlyUponCreatingNewBadge() {
 	suite.Require().Equal(uint64(10), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
 
 	//Create subbadge 2 with supply == 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{1}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 1,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	badge, _ = GetBadge(suite, wctx, 0)
@@ -140,7 +163,12 @@ func (suite *TestSuite) TestNewSubbadgesDirectlyUponCreatingNewBadge() {
 	suite.Require().Equal(uint64(1), bobBalanceInfo.BalanceAmounts[0].IdRanges[0].Start)
 
 	//Create subbadge 2 with supply == 10
-	err = CreateSubBadges(suite, wctx, bob, 0, []uint64{10}, []uint64{2})
+	err = CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10,
+			Amount: 2,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -182,14 +210,24 @@ func (suite *TestSuite) TestNewSubBadgesNotManager() {
 	}
 
 	CreateBadges(suite, wctx, badgesToCreate)
-	err := CreateSubBadges(suite, wctx, alice, 0, []uint64{10}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, alice, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10,
+			Amount: 1,
+		},
+	})
 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
 }
 
 func (suite *TestSuite) TestNewSubBadgeBadgeNotExists() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	err := CreateSubBadges(suite, wctx, alice, 0, []uint64{10}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, alice, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10,
+			Amount: 1,
+		},
+	})
 	suite.Require().EqualError(err, keeper.ErrBadgeNotExists.Error())
 }
 
@@ -215,6 +253,11 @@ func (suite *TestSuite) TestNewSubBadgeCreateIsLocked() {
 	}
 
 	CreateBadges(suite, wctx, badgesToCreate)
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10,
+			Amount: 1,
+		},
+	})
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }

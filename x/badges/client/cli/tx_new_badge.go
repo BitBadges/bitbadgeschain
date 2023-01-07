@@ -64,12 +64,19 @@ func CmdNewBadge() *cobra.Command {
 				return err
 			}
 
+			argSubassetSupplysAndAmounts := make([]*types.SubassetSupplyAndAmount, len(argSupplysUInt64))
+			for i := 0; i < len(argSupplysUInt64); i++ {
+				argSubassetSupplysAndAmounts[i] = &types.SubassetSupplyAndAmount{
+					Supply: argSupplysUInt64[i],
+					Amount: argAmountsUInt64[i],
+				}
+			}
+
 			msg := types.NewMsgNewBadge(
 				clientCtx.GetFromAddress().String(),
 				argStandard,
 				defaultSupply,
-				argAmountsUInt64,
-				argSupplysUInt64,
+				argSubassetSupplysAndAmounts,
 				uriObject,
 				permissions,
 				freezeRanges,

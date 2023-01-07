@@ -29,10 +29,10 @@ func (k msgServer) NewBadge(goCtx context.Context, msg *types.MsgNewBadge) (*typ
 		// NextSubassetId:       0,
 	}
 
-	if len(msg.SubassetSupplys) != 0 {
+	if len(msg.SubassetSupplysAndAmounts) != 0 {
 		managerBalanceInfo := types.UserBalanceInfo{}
 		err := *new(error)
-		badge, managerBalanceInfo, err = CreateSubassets(badge, managerBalanceInfo, msg.SubassetSupplys, msg.SubassetAmountsToCreate)
+		badge, managerBalanceInfo, err = CreateSubassets(badge, managerBalanceInfo, msg.SubassetSupplysAndAmounts)
 		if err != nil {
 			return nil, err
 		}

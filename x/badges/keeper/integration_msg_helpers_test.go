@@ -40,7 +40,7 @@ type BadgesToCreate struct {
 func CreateBadges(suite *TestSuite, ctx context.Context, badgesToCreate []BadgesToCreate) error {
 	for _, badgeToCreate := range badgesToCreate {
 		for i := 0; i < int(badgeToCreate.Amount); i++ {
-			msg := types.NewMsgNewBadge(badgeToCreate.Creator, badgeToCreate.Badge.Standard, badgeToCreate.Badge.DefaultSubassetSupply, badgeToCreate.Badge.SubassetAmountsToCreate, badgeToCreate.Badge.SubassetSupplys, badgeToCreate.Badge.Uri, badgeToCreate.Badge.Permissions, badgeToCreate.Badge.FreezeAddressRanges, badgeToCreate.Badge.ArbitraryBytes, badgeToCreate.Badge.WhitelistedRecipients)
+			msg := types.NewMsgNewBadge(badgeToCreate.Creator, badgeToCreate.Badge.Standard, badgeToCreate.Badge.DefaultSubassetSupply, badgeToCreate.Badge.SubassetSupplysAndAmounts, badgeToCreate.Badge.Uri, badgeToCreate.Badge.Permissions, badgeToCreate.Badge.FreezeAddressRanges, badgeToCreate.Badge.ArbitraryBytes, badgeToCreate.Badge.WhitelistedRecipients)
 			_, err := suite.msgServer.NewBadge(ctx, msg)
 			if err != nil {
 				return err
@@ -51,8 +51,8 @@ func CreateBadges(suite *TestSuite, ctx context.Context, badgesToCreate []Badges
 	return nil
 }
 
-func CreateSubBadges(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, supplys []uint64, amounts []uint64) error {
-	msg := types.NewMsgNewSubBadge(creator, badgeId, supplys, amounts)
+func CreateSubBadges(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, supplysAndAmounts []*types.SubassetSupplyAndAmount) error {
+	msg := types.NewMsgNewSubBadge(creator, badgeId, supplysAndAmounts)
 	_, err := suite.msgServer.NewSubBadge(ctx, msg)
 	return err
 }

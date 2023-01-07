@@ -81,8 +81,12 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 					InsertSubassetBytesIdx: 0,
 					InsertIdIdx:            10,
 				},
-				SubassetSupplys: []uint64{10},
-				SubassetAmountsToCreate: []uint64{10},
+				SubassetSupplysAndAmounts: []*types.SubassetSupplyAndAmount{
+					{
+						Supply: 10,
+						Amount: 10,
+					},
+				},
 				Permissions: perms,
 				WhitelistedRecipients: []*types.WhitelistMintInfo{
 					{
@@ -160,8 +164,12 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipientsOverflow() {
 					InsertSubassetBytesIdx: 0,
 					InsertIdIdx:            10,
 				},
-				SubassetSupplys: []uint64{10},
-				SubassetAmountsToCreate: []uint64{10},
+				SubassetSupplysAndAmounts: []*types.SubassetSupplyAndAmount{
+					{
+						Supply: 10,
+						Amount: 10,
+					},
+				},
 				Permissions: perms,
 				WhitelistedRecipients: []*types.WhitelistMintInfo{
 					{

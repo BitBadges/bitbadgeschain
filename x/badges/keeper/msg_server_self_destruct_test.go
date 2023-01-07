@@ -31,7 +31,12 @@ func (suite *TestSuite) TestSelfDestruct() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 
@@ -56,7 +61,12 @@ func (suite *TestSuite) TestSelfDestruct() {
 	badge, _ = GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err = CreateSubBadges(suite, wctx, bob, 1, []uint64{10000}, []uint64{1})
+	err = CreateSubBadges(suite, wctx, bob, 1, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	err = UpdatePermissions(suite, wctx, bob, 1, 58)
@@ -91,7 +101,12 @@ func (suite *TestSuite) TestSelfDestructNotManager() {
 	badge, _ := GetBadge(suite, wctx, 0)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 	badge, _ = GetBadge(suite, wctx, 0)
 

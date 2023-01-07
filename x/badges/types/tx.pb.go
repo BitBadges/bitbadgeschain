@@ -27,6 +27,58 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type SubassetSupplyAndAmount struct {
+	Supply uint64 `protobuf:"varint,1,opt,name=supply,proto3" json:"supply,omitempty"`
+	Amount uint64 `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
+}
+
+func (m *SubassetSupplyAndAmount) Reset()         { *m = SubassetSupplyAndAmount{} }
+func (m *SubassetSupplyAndAmount) String() string { return proto.CompactTextString(m) }
+func (*SubassetSupplyAndAmount) ProtoMessage()    {}
+func (*SubassetSupplyAndAmount) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{0}
+}
+func (m *SubassetSupplyAndAmount) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *SubassetSupplyAndAmount) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_SubassetSupplyAndAmount.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *SubassetSupplyAndAmount) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SubassetSupplyAndAmount.Merge(m, src)
+}
+func (m *SubassetSupplyAndAmount) XXX_Size() int {
+	return m.Size()
+}
+func (m *SubassetSupplyAndAmount) XXX_DiscardUnknown() {
+	xxx_messageInfo_SubassetSupplyAndAmount.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SubassetSupplyAndAmount proto.InternalMessageInfo
+
+func (m *SubassetSupplyAndAmount) GetSupply() uint64 {
+	if m != nil {
+		return m.Supply
+	}
+	return 0
+}
+
+func (m *SubassetSupplyAndAmount) GetAmount() uint64 {
+	if m != nil {
+		return m.Amount
+	}
+	return 0
+}
+
 type MsgNewBadge struct {
 	// See badges.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
 	Creator               string     `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
@@ -36,19 +88,17 @@ type MsgNewBadge struct {
 	DefaultSubassetSupply uint64     `protobuf:"varint,6,opt,name=defaultSubassetSupply,proto3" json:"defaultSubassetSupply,omitempty"`
 	FreezeAddressRanges   []*IdRange `protobuf:"bytes,9,rep,name=freezeAddressRanges,proto3" json:"freezeAddressRanges,omitempty"`
 	Standard              uint64     `protobuf:"varint,10,opt,name=standard,proto3" json:"standard,omitempty"`
-	//Subasset supplys and amounts to create must be same length. For each idx, we create amounts[idx] subbadges each with a supply of supplys[idx].
+	//Subasset supplys and amounts to create. For each idx, we create amounts[idx] subbadges each with a supply of supplys[idx].
 	//If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
-	//TODO: convert this into one struct?
-	SubassetSupplys         []uint64             `protobuf:"varint,7,rep,packed,name=subassetSupplys,proto3" json:"subassetSupplys,omitempty"`
-	SubassetAmountsToCreate []uint64             `protobuf:"varint,8,rep,packed,name=subassetAmountsToCreate,proto3" json:"subassetAmountsToCreate,omitempty"`
-	WhitelistedRecipients   []*WhitelistMintInfo `protobuf:"bytes,11,rep,name=whitelistedRecipients,proto3" json:"whitelistedRecipients,omitempty"`
+	SubassetSupplysAndAmounts []*SubassetSupplyAndAmount `protobuf:"bytes,7,rep,name=subassetSupplysAndAmounts,proto3" json:"subassetSupplysAndAmounts,omitempty"`
+	WhitelistedRecipients     []*WhitelistMintInfo       `protobuf:"bytes,11,rep,name=whitelistedRecipients,proto3" json:"whitelistedRecipients,omitempty"`
 }
 
 func (m *MsgNewBadge) Reset()         { *m = MsgNewBadge{} }
 func (m *MsgNewBadge) String() string { return proto.CompactTextString(m) }
 func (*MsgNewBadge) ProtoMessage()    {}
 func (*MsgNewBadge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{0}
+	return fileDescriptor_bc897b33479788c9, []int{1}
 }
 func (m *MsgNewBadge) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -126,16 +176,9 @@ func (m *MsgNewBadge) GetStandard() uint64 {
 	return 0
 }
 
-func (m *MsgNewBadge) GetSubassetSupplys() []uint64 {
+func (m *MsgNewBadge) GetSubassetSupplysAndAmounts() []*SubassetSupplyAndAmount {
 	if m != nil {
-		return m.SubassetSupplys
-	}
-	return nil
-}
-
-func (m *MsgNewBadge) GetSubassetAmountsToCreate() []uint64 {
-	if m != nil {
-		return m.SubassetAmountsToCreate
+		return m.SubassetSupplysAndAmounts
 	}
 	return nil
 }
@@ -155,7 +198,7 @@ func (m *MsgNewBadgeResponse) Reset()         { *m = MsgNewBadgeResponse{} }
 func (m *MsgNewBadgeResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgNewBadgeResponse) ProtoMessage()    {}
 func (*MsgNewBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{1}
+	return fileDescriptor_bc897b33479788c9, []int{2}
 }
 func (m *MsgNewBadgeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -196,15 +239,14 @@ type MsgNewSubBadge struct {
 	BadgeId uint64 `protobuf:"varint,2,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
 	//Subasset supplys and amounts to create must be same length. For each idx, we create amounts[idx] subbadges each with a supply of supplys[idx].
 	//If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
-	Supplys         []uint64 `protobuf:"varint,3,rep,packed,name=supplys,proto3" json:"supplys,omitempty"`
-	AmountsToCreate []uint64 `protobuf:"varint,4,rep,packed,name=amountsToCreate,proto3" json:"amountsToCreate,omitempty"`
+	SubassetSupplysAndAmounts []*SubassetSupplyAndAmount `protobuf:"bytes,7,rep,name=subassetSupplysAndAmounts,proto3" json:"subassetSupplysAndAmounts,omitempty"`
 }
 
 func (m *MsgNewSubBadge) Reset()         { *m = MsgNewSubBadge{} }
 func (m *MsgNewSubBadge) String() string { return proto.CompactTextString(m) }
 func (*MsgNewSubBadge) ProtoMessage()    {}
 func (*MsgNewSubBadge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{2}
+	return fileDescriptor_bc897b33479788c9, []int{3}
 }
 func (m *MsgNewSubBadge) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -247,16 +289,9 @@ func (m *MsgNewSubBadge) GetBadgeId() uint64 {
 	return 0
 }
 
-func (m *MsgNewSubBadge) GetSupplys() []uint64 {
+func (m *MsgNewSubBadge) GetSubassetSupplysAndAmounts() []*SubassetSupplyAndAmount {
 	if m != nil {
-		return m.Supplys
-	}
-	return nil
-}
-
-func (m *MsgNewSubBadge) GetAmountsToCreate() []uint64 {
-	if m != nil {
-		return m.AmountsToCreate
+		return m.SubassetSupplysAndAmounts
 	}
 	return nil
 }
@@ -269,7 +304,7 @@ func (m *MsgNewSubBadgeResponse) Reset()         { *m = MsgNewSubBadgeResponse{}
 func (m *MsgNewSubBadgeResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgNewSubBadgeResponse) ProtoMessage()    {}
 func (*MsgNewSubBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{3}
+	return fileDescriptor_bc897b33479788c9, []int{4}
 }
 func (m *MsgNewSubBadgeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -321,7 +356,7 @@ func (m *MsgTransferBadge) Reset()         { *m = MsgTransferBadge{} }
 func (m *MsgTransferBadge) String() string { return proto.CompactTextString(m) }
 func (*MsgTransferBadge) ProtoMessage()    {}
 func (*MsgTransferBadge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{4}
+	return fileDescriptor_bc897b33479788c9, []int{5}
 }
 func (m *MsgTransferBadge) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -413,7 +448,7 @@ func (m *MsgTransferBadgeResponse) Reset()         { *m = MsgTransferBadgeRespon
 func (m *MsgTransferBadgeResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgTransferBadgeResponse) ProtoMessage()    {}
 func (*MsgTransferBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{5}
+	return fileDescriptor_bc897b33479788c9, []int{6}
 }
 func (m *MsgTransferBadgeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -457,7 +492,7 @@ func (m *MsgRequestTransferBadge) Reset()         { *m = MsgRequestTransferBadge
 func (m *MsgRequestTransferBadge) String() string { return proto.CompactTextString(m) }
 func (*MsgRequestTransferBadge) ProtoMessage()    {}
 func (*MsgRequestTransferBadge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{6}
+	return fileDescriptor_bc897b33479788c9, []int{7}
 }
 func (m *MsgRequestTransferBadge) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -542,7 +577,7 @@ func (m *MsgRequestTransferBadgeResponse) Reset()         { *m = MsgRequestTrans
 func (m *MsgRequestTransferBadgeResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgRequestTransferBadgeResponse) ProtoMessage()    {}
 func (*MsgRequestTransferBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{7}
+	return fileDescriptor_bc897b33479788c9, []int{8}
 }
 func (m *MsgRequestTransferBadgeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -584,7 +619,7 @@ func (m *MsgHandlePendingTransfer) Reset()         { *m = MsgHandlePendingTransf
 func (m *MsgHandlePendingTransfer) String() string { return proto.CompactTextString(m) }
 func (*MsgHandlePendingTransfer) ProtoMessage()    {}
 func (*MsgHandlePendingTransfer) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{8}
+	return fileDescriptor_bc897b33479788c9, []int{9}
 }
 func (m *MsgHandlePendingTransfer) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -655,7 +690,7 @@ func (m *MsgHandlePendingTransferResponse) Reset()         { *m = MsgHandlePendi
 func (m *MsgHandlePendingTransferResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgHandlePendingTransferResponse) ProtoMessage()    {}
 func (*MsgHandlePendingTransferResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{9}
+	return fileDescriptor_bc897b33479788c9, []int{10}
 }
 func (m *MsgHandlePendingTransferResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -697,7 +732,7 @@ func (m *MsgSetApproval) Reset()         { *m = MsgSetApproval{} }
 func (m *MsgSetApproval) String() string { return proto.CompactTextString(m) }
 func (*MsgSetApproval) ProtoMessage()    {}
 func (*MsgSetApproval) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{10}
+	return fileDescriptor_bc897b33479788c9, []int{11}
 }
 func (m *MsgSetApproval) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -768,7 +803,7 @@ func (m *MsgSetApprovalResponse) Reset()         { *m = MsgSetApprovalResponse{}
 func (m *MsgSetApprovalResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgSetApprovalResponse) ProtoMessage()    {}
 func (*MsgSetApprovalResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{11}
+	return fileDescriptor_bc897b33479788c9, []int{12}
 }
 func (m *MsgSetApprovalResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -810,7 +845,7 @@ func (m *MsgRevokeBadge) Reset()         { *m = MsgRevokeBadge{} }
 func (m *MsgRevokeBadge) String() string { return proto.CompactTextString(m) }
 func (*MsgRevokeBadge) ProtoMessage()    {}
 func (*MsgRevokeBadge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{12}
+	return fileDescriptor_bc897b33479788c9, []int{13}
 }
 func (m *MsgRevokeBadge) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -881,7 +916,7 @@ func (m *MsgRevokeBadgeResponse) Reset()         { *m = MsgRevokeBadgeResponse{}
 func (m *MsgRevokeBadgeResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgRevokeBadgeResponse) ProtoMessage()    {}
 func (*MsgRevokeBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{13}
+	return fileDescriptor_bc897b33479788c9, []int{14}
 }
 func (m *MsgRevokeBadgeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -922,7 +957,7 @@ func (m *MsgFreezeAddress) Reset()         { *m = MsgFreezeAddress{} }
 func (m *MsgFreezeAddress) String() string { return proto.CompactTextString(m) }
 func (*MsgFreezeAddress) ProtoMessage()    {}
 func (*MsgFreezeAddress) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{14}
+	return fileDescriptor_bc897b33479788c9, []int{15}
 }
 func (m *MsgFreezeAddress) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -986,7 +1021,7 @@ func (m *MsgFreezeAddressResponse) Reset()         { *m = MsgFreezeAddressRespon
 func (m *MsgFreezeAddressResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgFreezeAddressResponse) ProtoMessage()    {}
 func (*MsgFreezeAddressResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{15}
+	return fileDescriptor_bc897b33479788c9, []int{16}
 }
 func (m *MsgFreezeAddressResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1026,7 +1061,7 @@ func (m *MsgUpdateUris) Reset()         { *m = MsgUpdateUris{} }
 func (m *MsgUpdateUris) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateUris) ProtoMessage()    {}
 func (*MsgUpdateUris) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{16}
+	return fileDescriptor_bc897b33479788c9, []int{17}
 }
 func (m *MsgUpdateUris) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1083,7 +1118,7 @@ func (m *MsgUpdateUrisResponse) Reset()         { *m = MsgUpdateUrisResponse{} }
 func (m *MsgUpdateUrisResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateUrisResponse) ProtoMessage()    {}
 func (*MsgUpdateUrisResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{17}
+	return fileDescriptor_bc897b33479788c9, []int{18}
 }
 func (m *MsgUpdateUrisResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1123,7 +1158,7 @@ func (m *MsgUpdatePermissions) Reset()         { *m = MsgUpdatePermissions{} }
 func (m *MsgUpdatePermissions) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdatePermissions) ProtoMessage()    {}
 func (*MsgUpdatePermissions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{18}
+	return fileDescriptor_bc897b33479788c9, []int{19}
 }
 func (m *MsgUpdatePermissions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1180,7 +1215,7 @@ func (m *MsgUpdatePermissionsResponse) Reset()         { *m = MsgUpdatePermissio
 func (m *MsgUpdatePermissionsResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdatePermissionsResponse) ProtoMessage()    {}
 func (*MsgUpdatePermissionsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{19}
+	return fileDescriptor_bc897b33479788c9, []int{20}
 }
 func (m *MsgUpdatePermissionsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1220,7 +1255,7 @@ func (m *MsgTransferManager) Reset()         { *m = MsgTransferManager{} }
 func (m *MsgTransferManager) String() string { return proto.CompactTextString(m) }
 func (*MsgTransferManager) ProtoMessage()    {}
 func (*MsgTransferManager) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{20}
+	return fileDescriptor_bc897b33479788c9, []int{21}
 }
 func (m *MsgTransferManager) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1277,7 +1312,7 @@ func (m *MsgTransferManagerResponse) Reset()         { *m = MsgTransferManagerRe
 func (m *MsgTransferManagerResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgTransferManagerResponse) ProtoMessage()    {}
 func (*MsgTransferManagerResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{21}
+	return fileDescriptor_bc897b33479788c9, []int{22}
 }
 func (m *MsgTransferManagerResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1317,7 +1352,7 @@ func (m *MsgRequestTransferManager) Reset()         { *m = MsgRequestTransferMan
 func (m *MsgRequestTransferManager) String() string { return proto.CompactTextString(m) }
 func (*MsgRequestTransferManager) ProtoMessage()    {}
 func (*MsgRequestTransferManager) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{22}
+	return fileDescriptor_bc897b33479788c9, []int{23}
 }
 func (m *MsgRequestTransferManager) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1374,7 +1409,7 @@ func (m *MsgRequestTransferManagerResponse) Reset()         { *m = MsgRequestTra
 func (m *MsgRequestTransferManagerResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgRequestTransferManagerResponse) ProtoMessage()    {}
 func (*MsgRequestTransferManagerResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{23}
+	return fileDescriptor_bc897b33479788c9, []int{24}
 }
 func (m *MsgRequestTransferManagerResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1413,7 +1448,7 @@ func (m *MsgSelfDestructBadge) Reset()         { *m = MsgSelfDestructBadge{} }
 func (m *MsgSelfDestructBadge) String() string { return proto.CompactTextString(m) }
 func (*MsgSelfDestructBadge) ProtoMessage()    {}
 func (*MsgSelfDestructBadge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{24}
+	return fileDescriptor_bc897b33479788c9, []int{25}
 }
 func (m *MsgSelfDestructBadge) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1463,7 +1498,7 @@ func (m *MsgSelfDestructBadgeResponse) Reset()         { *m = MsgSelfDestructBad
 func (m *MsgSelfDestructBadgeResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgSelfDestructBadgeResponse) ProtoMessage()    {}
 func (*MsgSelfDestructBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{25}
+	return fileDescriptor_bc897b33479788c9, []int{26}
 }
 func (m *MsgSelfDestructBadgeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1503,7 +1538,7 @@ func (m *MsgPruneBalances) Reset()         { *m = MsgPruneBalances{} }
 func (m *MsgPruneBalances) String() string { return proto.CompactTextString(m) }
 func (*MsgPruneBalances) ProtoMessage()    {}
 func (*MsgPruneBalances) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{26}
+	return fileDescriptor_bc897b33479788c9, []int{27}
 }
 func (m *MsgPruneBalances) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1560,7 +1595,7 @@ func (m *MsgPruneBalancesResponse) Reset()         { *m = MsgPruneBalancesRespon
 func (m *MsgPruneBalancesResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgPruneBalancesResponse) ProtoMessage()    {}
 func (*MsgPruneBalancesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{27}
+	return fileDescriptor_bc897b33479788c9, []int{28}
 }
 func (m *MsgPruneBalancesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1600,7 +1635,7 @@ func (m *MsgUpdateBytes) Reset()         { *m = MsgUpdateBytes{} }
 func (m *MsgUpdateBytes) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateBytes) ProtoMessage()    {}
 func (*MsgUpdateBytes) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{28}
+	return fileDescriptor_bc897b33479788c9, []int{29}
 }
 func (m *MsgUpdateBytes) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1657,7 +1692,7 @@ func (m *MsgUpdateBytesResponse) Reset()         { *m = MsgUpdateBytesResponse{}
 func (m *MsgUpdateBytesResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateBytesResponse) ProtoMessage()    {}
 func (*MsgUpdateBytesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{29}
+	return fileDescriptor_bc897b33479788c9, []int{30}
 }
 func (m *MsgUpdateBytesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1695,7 +1730,7 @@ func (m *MsgRegisterAddresses) Reset()         { *m = MsgRegisterAddresses{} }
 func (m *MsgRegisterAddresses) String() string { return proto.CompactTextString(m) }
 func (*MsgRegisterAddresses) ProtoMessage()    {}
 func (*MsgRegisterAddresses) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{30}
+	return fileDescriptor_bc897b33479788c9, []int{31}
 }
 func (m *MsgRegisterAddresses) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1746,7 +1781,7 @@ func (m *MsgRegisterAddressesResponse) Reset()         { *m = MsgRegisterAddress
 func (m *MsgRegisterAddressesResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgRegisterAddressesResponse) ProtoMessage()    {}
 func (*MsgRegisterAddressesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{31}
+	return fileDescriptor_bc897b33479788c9, []int{32}
 }
 func (m *MsgRegisterAddressesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1783,6 +1818,7 @@ func (m *MsgRegisterAddressesResponse) GetRegisteredAddressNumbers() *IdRange {
 }
 
 func init() {
+	proto.RegisterType((*SubassetSupplyAndAmount)(nil), "bitbadges.bitbadgeschain.badges.SubassetSupplyAndAmount")
 	proto.RegisterType((*MsgNewBadge)(nil), "bitbadges.bitbadgeschain.badges.MsgNewBadge")
 	proto.RegisterType((*MsgNewBadgeResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgNewBadgeResponse")
 	proto.RegisterType((*MsgNewSubBadge)(nil), "bitbadges.bitbadgeschain.badges.MsgNewSubBadge")
@@ -1820,93 +1856,93 @@ func init() {
 func init() { proto.RegisterFile("badges/tx.proto", fileDescriptor_bc897b33479788c9) }
 
 var fileDescriptor_bc897b33479788c9 = []byte{
-	// 1369 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x58, 0x4f, 0x8f, 0xdb, 0xc4,
-	0x1b, 0xae, 0xe3, 0xec, 0x6e, 0xf6, 0x8d, 0xba, 0x6d, 0xbd, 0xbb, 0xad, 0x7f, 0x56, 0x95, 0xa6,
-	0xfe, 0x89, 0x2a, 0x42, 0x28, 0x81, 0x6d, 0x0b, 0xe5, 0x9f, 0xd4, 0xdd, 0x22, 0xc4, 0x56, 0xa4,
-	0xac, 0xbc, 0x5b, 0x21, 0xf5, 0xc4, 0x24, 0x9e, 0x64, 0x0d, 0x59, 0xdb, 0xcc, 0x8c, 0xbb, 0xbb,
-	0x48, 0x1c, 0x10, 0x1c, 0xe0, 0x86, 0x90, 0x90, 0xf8, 0x06, 0x20, 0xf1, 0x1d, 0x38, 0x71, 0xe8,
-	0x09, 0xf5, 0x88, 0x38, 0xa1, 0xf6, 0x8b, 0x20, 0x8f, 0xc7, 0xd3, 0xb1, 0xe3, 0x24, 0x4e, 0x56,
-	0xe2, 0xc0, 0x2d, 0xf3, 0x8e, 0x9f, 0xf7, 0xcf, 0x33, 0xef, 0xbc, 0x7e, 0x1c, 0xb8, 0xd0, 0x43,
-	0xee, 0x10, 0xd3, 0x0e, 0x3b, 0x69, 0x87, 0x24, 0x60, 0x81, 0x71, 0xad, 0xe7, 0xb1, 0xc4, 0xd6,
-	0x96, 0xbf, 0xfa, 0x87, 0xc8, 0xf3, 0xdb, 0xc9, 0x6f, 0x6b, 0x5d, 0x20, 0x08, 0xf2, 0xe3, 0x87,
-	0x38, 0xca, 0xba, 0x24, 0x8c, 0x11, 0xf1, 0x52, 0xd3, 0xa6, 0x30, 0xf5, 0xd0, 0x08, 0xf9, 0xfd,
-	0xf4, 0x49, 0xfb, 0xd7, 0x2a, 0xd4, 0xbb, 0x74, 0xf8, 0x00, 0x1f, 0xef, 0xc4, 0xfb, 0x86, 0x09,
-	0x2b, 0x7d, 0x82, 0x11, 0x0b, 0x88, 0xa9, 0x35, 0xb5, 0xd6, 0xaa, 0x93, 0x2e, 0x8d, 0x77, 0x40,
-	0x8f, 0x88, 0x67, 0x56, 0x9a, 0x5a, 0xab, 0xbe, 0xf5, 0x72, 0x7b, 0x46, 0x5e, 0xed, 0x87, 0xc4,
-	0xfb, 0xa8, 0xf7, 0x29, 0xee, 0x33, 0x27, 0x86, 0x19, 0x4d, 0xa8, 0x87, 0x98, 0x1c, 0x79, 0x94,
-	0x7a, 0x81, 0x4f, 0xcd, 0x6a, 0x53, 0x6b, 0x55, 0x1d, 0xd5, 0x64, 0xdc, 0x80, 0x35, 0x44, 0x7a,
-	0x1e, 0x23, 0x88, 0x9c, 0xee, 0x9c, 0x32, 0x4c, 0xcd, 0x25, 0x9e, 0x40, 0xce, 0x6a, 0xdc, 0x82,
-	0x4d, 0x17, 0x0f, 0x50, 0x34, 0x62, 0xfb, 0x51, 0x0f, 0x51, 0x8a, 0xd9, 0x7e, 0x14, 0x86, 0xa3,
-	0x53, 0x73, 0x99, 0xfb, 0x2c, 0xde, 0x34, 0x1e, 0xc1, 0xfa, 0x80, 0x60, 0xfc, 0x05, 0xde, 0x76,
-	0x5d, 0x82, 0x29, 0x75, 0x38, 0x5d, 0xe6, 0x6a, 0x53, 0x6f, 0xd5, 0xb7, 0x5a, 0x33, 0xab, 0xd9,
-	0x75, 0x39, 0xc0, 0x29, 0x72, 0x62, 0x58, 0x50, 0xa3, 0x0c, 0xf9, 0x2e, 0x22, 0xae, 0x09, 0x3c,
-	0x09, 0xb9, 0x36, 0x5a, 0x70, 0x81, 0x66, 0x32, 0xa1, 0xe6, 0x4a, 0x53, 0x6f, 0x55, 0x9d, 0xbc,
-	0xd9, 0xb8, 0x03, 0x57, 0x52, 0xd3, 0xf6, 0x51, 0x10, 0xf9, 0x8c, 0x1e, 0x04, 0xf7, 0x62, 0xee,
-	0xb1, 0x59, 0xe3, 0x88, 0x49, 0xdb, 0xc6, 0x21, 0x6c, 0x1e, 0x1f, 0x7a, 0x0c, 0x8f, 0x3c, 0xca,
-	0xb0, 0xeb, 0xe0, 0xbe, 0x17, 0x7a, 0xd8, 0x67, 0xd4, 0xac, 0xf3, 0xea, 0xb6, 0x66, 0x56, 0xf7,
-	0x71, 0x8a, 0xee, 0x7a, 0x3e, 0xdb, 0xf5, 0x07, 0x81, 0x53, 0xec, 0xd0, 0x7e, 0x09, 0xd6, 0x95,
-	0x66, 0x71, 0x30, 0x0d, 0x03, 0x9f, 0x62, 0x63, 0x0d, 0x2a, 0x9e, 0xcb, 0xfb, 0xa5, 0xea, 0x54,
-	0x3c, 0xd7, 0xfe, 0x56, 0x83, 0xb5, 0xe4, 0xb9, 0xfd, 0xa8, 0x37, 0xab, 0xaf, 0x4c, 0x58, 0xe1,
-	0x69, 0xec, 0xba, 0xbc, 0xb7, 0xaa, 0x4e, 0xba, 0x8c, 0x77, 0xa8, 0xe0, 0x4c, 0xe7, 0x0c, 0xa4,
-	0xcb, 0x98, 0x55, 0x94, 0xe3, 0xa8, 0x9a, 0xb0, 0x9a, 0x33, 0xdb, 0x77, 0xe1, 0x72, 0x36, 0x13,
-	0x99, 0xf4, 0x0d, 0x58, 0xf3, 0xf1, 0x89, 0xec, 0x93, 0xdd, 0xb4, 0x80, 0x9c, 0xd5, 0xfe, 0xbd,
-	0x02, 0x17, 0xbb, 0x74, 0x78, 0x40, 0x90, 0x4f, 0x07, 0x98, 0xcc, 0x2a, 0xc7, 0x80, 0xea, 0x80,
-	0x04, 0x47, 0xa2, 0x16, 0xfe, 0x3b, 0x6e, 0x7e, 0x16, 0x88, 0x9e, 0xc1, 0x69, 0x31, 0xaa, 0x29,
-	0xf6, 0x27, 0x32, 0x17, 0x85, 0xa4, 0x4b, 0x95, 0x9e, 0xa5, 0x2c, 0x3d, 0x7b, 0xb0, 0x46, 0xa3,
-	0x1e, 0x5f, 0x89, 0x6e, 0x5e, 0x9e, 0xb3, 0x9b, 0x73, 0xf8, 0x98, 0x12, 0x7c, 0x12, 0x7a, 0x04,
-	0x31, 0x2f, 0xf0, 0x0f, 0xbc, 0x23, 0x6c, 0xae, 0x24, 0x94, 0x64, 0xad, 0xc6, 0x16, 0x6c, 0xf4,
-	0x91, 0xcf, 0xee, 0xc5, 0x83, 0x64, 0xb4, 0x83, 0x07, 0x01, 0xc1, 0xfc, 0xe9, 0x1a, 0x7f, 0xba,
-	0x70, 0xcf, 0xb6, 0xc0, 0xcc, 0xb3, 0x98, 0x1e, 0x85, 0xfd, 0x73, 0x05, 0xae, 0x74, 0xe9, 0xd0,
-	0xc1, 0x9f, 0x47, 0x98, 0xb2, 0xb3, 0x30, 0x7d, 0x19, 0x96, 0x13, 0xe2, 0xc4, 0x84, 0x11, 0xab,
-	0xff, 0x0c, 0x8b, 0xd7, 0xe1, 0xda, 0x04, 0xa2, 0x24, 0x99, 0x7f, 0x69, 0x9c, 0xe9, 0x0f, 0x90,
-	0xef, 0x8e, 0xf0, 0x1e, 0xf6, 0x5d, 0xcf, 0x97, 0xb4, 0x4f, 0x61, 0x33, 0x66, 0xae, 0xdf, 0xc7,
-	0x21, 0xe3, 0x7c, 0xd6, 0x1c, 0xb1, 0x52, 0x99, 0xd3, 0xb3, 0xcc, 0xdd, 0x87, 0xba, 0x1f, 0xf8,
-	0xfd, 0x94, 0xb6, 0xea, 0x9c, 0xb4, 0xa9, 0xe0, 0x98, 0xb3, 0x41, 0x40, 0xfa, 0x78, 0x10, 0x8d,
-	0xb6, 0x93, 0x2c, 0x96, 0x78, 0x16, 0x39, 0xab, 0x6d, 0x43, 0x73, 0x52, 0x6d, 0x92, 0x80, 0x27,
-	0xc9, 0xf4, 0xd9, 0xc7, 0x6c, 0x3b, 0x0c, 0x49, 0xf0, 0x18, 0x8d, 0x66, 0x94, 0x9d, 0x34, 0x4c,
-	0x25, 0xdf, 0x30, 0x28, 0xb9, 0x9d, 0x69, 0xd9, 0x62, 0xa9, 0x12, 0x52, 0x9d, 0xd5, 0x4a, 0x4b,
-	0x67, 0x6b, 0x25, 0xdb, 0xe4, 0xd3, 0x4b, 0xa9, 0x44, 0x16, 0xf9, 0x47, 0x52, 0xa4, 0x83, 0x1f,
-	0x07, 0x9f, 0xe1, 0x59, 0x37, 0xe5, 0x2a, 0xac, 0x22, 0x39, 0x7d, 0x2a, 0x7c, 0xbe, 0xbc, 0x30,
-	0xa8, 0xb3, 0x47, 0x9f, 0x38, 0x7b, 0xfe, 0xa5, 0x52, 0x95, 0x7a, 0x64, 0xa9, 0xbf, 0x68, 0x7c,
-	0x00, 0xbf, 0xaf, 0xbe, 0x79, 0xa7, 0x14, 0xfb, 0x00, 0xce, 0xa3, 0xcc, 0x3b, 0xbe, 0x32, 0x67,
-	0x66, 0x59, 0xf8, 0x94, 0x0b, 0x70, 0x11, 0x74, 0xe4, 0x26, 0xd4, 0xd4, 0x9c, 0xf8, 0xa7, 0x18,
-	0x72, 0x99, 0x4c, 0x65, 0x19, 0x5f, 0x69, 0x70, 0xbe, 0x4b, 0x87, 0x0f, 0x43, 0x17, 0x31, 0xfc,
-	0x90, 0x78, 0x74, 0xa1, 0x77, 0xa2, 0x50, 0x61, 0xfa, 0x42, 0x2a, 0xcc, 0xbe, 0x02, 0x9b, 0x99,
-	0x14, 0x64, 0x72, 0x23, 0xd8, 0x90, 0x1b, 0x7b, 0x8a, 0x28, 0x5b, 0x24, 0xc5, 0x9c, 0xd4, 0xd3,
-	0xc7, 0xa4, 0x9e, 0xdd, 0x80, 0xab, 0x45, 0xd1, 0x64, 0x36, 0x3d, 0x30, 0x94, 0x77, 0x45, 0x17,
-	0xf9, 0x68, 0x38, 0x75, 0x76, 0x4d, 0x95, 0x10, 0xc5, 0xd7, 0xd8, 0xbe, 0x0a, 0xd6, 0x78, 0x0c,
-	0x99, 0x01, 0x82, 0xff, 0x8d, 0xcf, 0xd9, 0xb3, 0x24, 0x22, 0x7a, 0x45, 0x7f, 0xd1, 0x2b, 0xff,
-	0x87, 0xeb, 0x13, 0x43, 0xc8, 0x3c, 0xee, 0xf3, 0x73, 0xd9, 0xc7, 0xa3, 0xc1, 0x7b, 0x98, 0x32,
-	0x12, 0xf5, 0xd9, 0xc2, 0x72, 0x4a, 0xb0, 0x3e, 0xe6, 0x4b, 0xc6, 0x1a, 0xf0, 0x6b, 0xb6, 0x47,
-	0x22, 0x1f, 0xef, 0x88, 0x8f, 0x84, 0x29, 0x71, 0x2c, 0xa8, 0x09, 0xc7, 0xe9, 0x48, 0x91, 0xeb,
-	0xec, 0xbc, 0xd1, 0x73, 0xf3, 0x46, 0x5c, 0x92, 0x4c, 0x1c, 0x99, 0xc3, 0x27, 0x7c, 0xaa, 0x25,
-	0x9d, 0x91, 0xc8, 0xfd, 0x45, 0xc8, 0xb6, 0xa0, 0xe6, 0xe3, 0xe3, 0xe4, 0x23, 0x42, 0xe7, 0x20,
-	0xb9, 0x16, 0x73, 0x46, 0x89, 0xa0, 0x74, 0xdd, 0x06, 0x3f, 0x90, 0x61, 0xac, 0x7a, 0x49, 0x46,
-	0x9b, 0x4d, 0xc8, 0xe0, 0x55, 0x58, 0x97, 0x65, 0x1d, 0x04, 0x29, 0x92, 0xd3, 0xb1, 0xea, 0x14,
-	0x6d, 0xd9, 0xdf, 0x68, 0xfc, 0x10, 0xc6, 0x82, 0x48, 0x55, 0xea, 0x82, 0x49, 0xc4, 0x26, 0x76,
-	0xc5, 0xf6, 0x83, 0xe8, 0xa8, 0x87, 0x09, 0xe5, 0xd1, 0xe7, 0x19, 0x64, 0x13, 0x3d, 0x6d, 0xfd,
-	0x76, 0x11, 0xf4, 0x2e, 0x1d, 0x1a, 0x3e, 0xd4, 0xe4, 0x97, 0xdf, 0x2b, 0x33, 0xfd, 0x2a, 0xd2,
-	0xdf, 0xba, 0x35, 0xcf, 0xd3, 0xb2, 0xba, 0x63, 0xa8, 0xab, 0x1f, 0x05, 0x9d, 0x92, 0x4e, 0x52,
-	0x80, 0xf5, 0xc6, 0x9c, 0x00, 0x19, 0xf8, 0x4b, 0x38, 0x9f, 0x95, 0x95, 0xaf, 0x95, 0xf1, 0x94,
-	0x81, 0x58, 0x6f, 0xce, 0x0d, 0x91, 0xe1, 0x7f, 0xd0, 0x60, 0xa3, 0x50, 0xdd, 0xde, 0x29, 0xe3,
-	0xb3, 0x08, 0x69, 0xdd, 0x5d, 0x14, 0x29, 0x93, 0xfa, 0x51, 0x83, 0xcd, 0x62, 0x95, 0x58, 0xaa,
-	0xd2, 0x42, 0xa8, 0xb5, 0xbd, 0x30, 0x54, 0x6d, 0x12, 0x55, 0xbb, 0x95, 0x6a, 0x12, 0x05, 0x50,
-	0xae, 0x49, 0x0a, 0x34, 0x55, 0x1c, 0x58, 0xd5, 0x53, 0x9d, 0x72, 0x0c, 0x4b, 0x40, 0xb9, 0xc0,
-	0x05, 0x0a, 0x27, 0xee, 0xce, 0xac, 0xba, 0x29, 0xd5, 0x9d, 0x19, 0x48, 0xb9, 0xee, 0x2c, 0x54,
-	0x26, 0x06, 0x03, 0x50, 0x54, 0x49, 0xbb, 0x8c, 0xa3, 0x17, 0xcf, 0x5b, 0xaf, 0xcf, 0xf7, 0xbc,
-	0x8c, 0xfa, 0x9d, 0x06, 0x97, 0xc6, 0x05, 0xc7, 0xed, 0xf2, 0xde, 0x14, 0x98, 0xf5, 0xee, 0x42,
-	0x30, 0x99, 0xcb, 0xd7, 0x1a, 0x5c, 0xc8, 0xbf, 0xe5, 0x6f, 0xce, 0x73, 0xdd, 0x05, 0xc8, 0x7a,
-	0x7b, 0x01, 0x90, 0xcc, 0xe2, 0x27, 0x0d, 0x2e, 0x4f, 0x90, 0x1c, 0x6f, 0x2d, 0x70, 0xdb, 0xd3,
-	0x9c, 0x76, 0x16, 0xc7, 0x66, 0x0e, 0x6b, 0x5c, 0x85, 0xdc, 0x2e, 0x77, 0xd3, 0x72, 0xb0, 0x72,
-	0x87, 0x35, 0x51, 0xa7, 0xc4, 0xb7, 0x25, 0x2b, 0x52, 0x4a, 0xdd, 0x96, 0x0c, 0xa4, 0xdc, 0x6d,
-	0x29, 0x94, 0x28, 0xf1, 0x94, 0x50, 0xf5, 0x49, 0xa7, 0x7c, 0xe7, 0x71, 0x40, 0xb9, 0x29, 0x51,
-	0xa0, 0x4f, 0xf8, 0x19, 0x8c, 0xab, 0x93, 0xdb, 0xe5, 0x4e, 0x37, 0x07, 0x2b, 0x77, 0x06, 0x13,
-	0x65, 0xca, 0xce, 0x87, 0x4f, 0x9e, 0x35, 0xb4, 0xa7, 0xcf, 0x1a, 0xda, 0xdf, 0xcf, 0x1a, 0xda,
-	0xf7, 0xcf, 0x1b, 0xe7, 0x9e, 0x3e, 0x6f, 0x9c, 0xfb, 0xf3, 0x79, 0xe3, 0xdc, 0xa3, 0xad, 0xa1,
-	0xc7, 0x0e, 0xa3, 0x5e, 0xbb, 0x1f, 0x1c, 0x75, 0xa4, 0xe3, 0x4e, 0x36, 0x44, 0xe7, 0xa4, 0x93,
-	0xfe, 0xcf, 0x7d, 0x1a, 0x62, 0xda, 0x5b, 0xe6, 0xff, 0x45, 0xdf, 0xfc, 0x27, 0x00, 0x00, 0xff,
-	0xff, 0x26, 0xe0, 0x13, 0x68, 0xfe, 0x16, 0x00, 0x00,
+	// 1363 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x58, 0x4f, 0x8f, 0xdb, 0x44,
+	0x14, 0xaf, 0xe3, 0xec, 0x6e, 0xf6, 0x45, 0xdd, 0xb6, 0xde, 0xdd, 0xd6, 0xb5, 0xaa, 0x74, 0x6b,
+	0x44, 0x55, 0x21, 0x94, 0xc0, 0xb6, 0x85, 0xf2, 0x4f, 0x6a, 0x02, 0x42, 0x6c, 0x45, 0xca, 0xca,
+	0xdb, 0x0a, 0xa9, 0x27, 0xc6, 0xf6, 0x24, 0x6b, 0x48, 0x6c, 0x33, 0x33, 0xee, 0xee, 0x22, 0x71,
+	0x40, 0x70, 0xe1, 0x86, 0x90, 0x90, 0xf8, 0x06, 0xf0, 0x21, 0x10, 0x5c, 0x38, 0xf4, 0x84, 0x7a,
+	0x44, 0x9c, 0x50, 0xfb, 0x45, 0x90, 0xc7, 0xf6, 0xec, 0x38, 0xb1, 0x37, 0x4e, 0x56, 0x02, 0x89,
+	0x5b, 0x66, 0x3c, 0xbf, 0xf7, 0xe7, 0x37, 0xef, 0x3d, 0xff, 0x1c, 0x38, 0x67, 0x23, 0x77, 0x88,
+	0x69, 0x87, 0x1d, 0xb6, 0x43, 0x12, 0xb0, 0x40, 0xbb, 0x6a, 0x7b, 0x2c, 0xd9, 0x6b, 0x8b, 0x5f,
+	0xce, 0x3e, 0xf2, 0xfc, 0x76, 0xf2, 0xdb, 0x58, 0x4f, 0x11, 0x04, 0xf9, 0xf1, 0x21, 0x8e, 0x32,
+	0x2e, 0xa4, 0x9b, 0x11, 0xf1, 0xb2, 0xad, 0xcd, 0x74, 0xcb, 0x46, 0x23, 0xe4, 0x3b, 0xd9, 0x49,
+	0x73, 0x07, 0x2e, 0xed, 0x45, 0x36, 0xa2, 0x14, 0xb3, 0xbd, 0x28, 0x0c, 0x47, 0x47, 0x5d, 0xdf,
+	0xed, 0x8e, 0x83, 0xc8, 0x67, 0xda, 0x45, 0x58, 0xa6, 0x7c, 0x4b, 0x57, 0xb6, 0x94, 0x1b, 0x75,
+	0x2b, 0x5d, 0xc5, 0xfb, 0x88, 0x9f, 0xd0, 0x6b, 0xc9, 0x7e, 0xb2, 0x32, 0x7f, 0xab, 0x43, 0xb3,
+	0x4f, 0x87, 0xf7, 0xf1, 0x41, 0x2f, 0x76, 0xa5, 0xe9, 0xb0, 0xe2, 0x10, 0x8c, 0x58, 0x40, 0xb8,
+	0x81, 0x55, 0x2b, 0x5b, 0x6a, 0x6f, 0x83, 0x1a, 0x11, 0x8f, 0xc3, 0x9b, 0xdb, 0x2f, 0xb5, 0x67,
+	0xa4, 0xd8, 0x7e, 0x48, 0xbc, 0x8f, 0xec, 0x4f, 0xb1, 0xc3, 0xac, 0x18, 0xa6, 0x6d, 0x41, 0x33,
+	0xc4, 0x64, 0xec, 0x51, 0xea, 0x05, 0x3e, 0xd5, 0xeb, 0x3c, 0x08, 0x79, 0x4b, 0xbb, 0x0e, 0x6b,
+	0x88, 0xd8, 0x1e, 0x23, 0x88, 0x1c, 0xf5, 0x8e, 0x18, 0xa6, 0xfa, 0x12, 0x0f, 0x60, 0x62, 0x57,
+	0xbb, 0x05, 0x9b, 0x2e, 0x1e, 0xa0, 0x68, 0xc4, 0xf2, 0x1c, 0xe8, 0xcb, 0xdc, 0x66, 0xf1, 0x43,
+	0xed, 0x11, 0xac, 0x0f, 0x08, 0xc6, 0x5f, 0xe0, 0xae, 0xeb, 0x12, 0x4c, 0xa9, 0xc5, 0x99, 0xd7,
+	0x57, 0xb7, 0xd4, 0x1b, 0xcd, 0xed, 0x1b, 0x33, 0xb3, 0xd9, 0x71, 0x39, 0xc0, 0x2a, 0x32, 0xa2,
+	0x19, 0xd0, 0xa0, 0x0c, 0xf9, 0x2e, 0x22, 0xae, 0x0e, 0x3c, 0x08, 0xb1, 0xd6, 0x1e, 0xc3, 0x65,
+	0x9a, 0x8b, 0x84, 0x8a, 0xbb, 0xa2, 0xfa, 0x0a, 0xf7, 0x7e, 0x67, 0xa6, 0xf7, 0x92, 0xcb, 0xb6,
+	0xca, 0x4d, 0x6b, 0xfb, 0xb0, 0x79, 0xb0, 0xef, 0x31, 0x3c, 0xf2, 0x28, 0xc3, 0xae, 0x85, 0x1d,
+	0x2f, 0xf4, 0x70, 0xec, 0xb3, 0xc9, 0x7d, 0x6e, 0xcf, 0xf4, 0xf9, 0x71, 0x86, 0xee, 0x7b, 0x3e,
+	0xdb, 0xf1, 0x07, 0x81, 0x55, 0x6c, 0xd0, 0x7c, 0x11, 0xd6, 0xa5, 0x02, 0xb2, 0x30, 0x0d, 0x03,
+	0x9f, 0x62, 0x6d, 0x0d, 0x6a, 0x9e, 0x9b, 0x16, 0x61, 0xcd, 0x73, 0xcd, 0x5f, 0x14, 0x58, 0x4b,
+	0xce, 0xed, 0x45, 0xf6, 0xac, 0x5a, 0xd3, 0x61, 0x85, 0x87, 0xb1, 0xe3, 0xa6, 0xe5, 0x9a, 0x2d,
+	0xff, 0x2b, 0x3e, 0xcd, 0xbb, 0x70, 0x31, 0x1f, 0xbd, 0x48, 0xf4, 0x3a, 0xac, 0xf9, 0xf8, 0x50,
+	0xd4, 0xdb, 0x4e, 0x96, 0xf4, 0xc4, 0xae, 0xf9, 0x7b, 0x0d, 0xce, 0xf7, 0xe9, 0xf0, 0x01, 0x41,
+	0x3e, 0x1d, 0x60, 0x32, 0x8b, 0x02, 0x0d, 0xea, 0x03, 0x12, 0x8c, 0xd3, 0xfc, 0xf9, 0xef, 0xb8,
+	0x89, 0x58, 0x90, 0xd6, 0x1e, 0xa6, 0xba, 0xba, 0xa5, 0xc6, 0x4d, 0x24, 0x6d, 0xc5, 0xf6, 0x50,
+	0x4a, 0x46, 0x9d, 0x3f, 0xcd, 0x96, 0x32, 0xa5, 0x4b, 0x79, 0x4a, 0x77, 0x61, 0x8d, 0x46, 0x36,
+	0x5f, 0xa5, 0x5d, 0xb1, 0x3c, 0x67, 0x57, 0x4c, 0xe0, 0x63, 0x4a, 0xf0, 0x61, 0xe8, 0x11, 0xc4,
+	0xbc, 0xc0, 0x7f, 0xe0, 0x8d, 0xb1, 0xbe, 0x92, 0x50, 0x92, 0xdf, 0xd5, 0xb6, 0x61, 0xc3, 0x41,
+	0x3e, 0x7b, 0x37, 0x9e, 0x6d, 0xa3, 0x1e, 0x1e, 0x04, 0x04, 0xf3, 0xd3, 0x0d, 0x7e, 0xba, 0xf0,
+	0x99, 0x69, 0x80, 0x3e, 0xc9, 0x62, 0x76, 0x15, 0xe6, 0x4f, 0x35, 0xb8, 0xd4, 0xa7, 0x43, 0x0b,
+	0x7f, 0x1e, 0x61, 0xca, 0x4e, 0xc3, 0xf4, 0xf1, 0xb8, 0xac, 0xcb, 0xe3, 0xf2, 0x7f, 0xc3, 0xe2,
+	0x35, 0xb8, 0x5a, 0x42, 0x94, 0x20, 0xf3, 0x2f, 0x85, 0x33, 0xfd, 0x01, 0xf2, 0xdd, 0x11, 0xde,
+	0xc5, 0xbe, 0xeb, 0xf9, 0x82, 0xf6, 0x13, 0xd8, 0x8c, 0x99, 0x73, 0x1c, 0x1c, 0x26, 0x2f, 0x9a,
+	0x86, 0x95, 0xae, 0x64, 0xe6, 0xd4, 0x3c, 0x73, 0xf7, 0xa0, 0xe9, 0x07, 0xbe, 0x93, 0xd1, 0x56,
+	0x9f, 0x93, 0x36, 0x19, 0x1c, 0x73, 0x36, 0x08, 0x88, 0x83, 0x07, 0xd1, 0xa8, 0x9b, 0x44, 0xb1,
+	0xc4, 0xa3, 0x98, 0xd8, 0x35, 0x4d, 0xd8, 0x2a, 0xcb, 0x4d, 0x10, 0xf0, 0x24, 0x99, 0x58, 0x7b,
+	0x98, 0x75, 0xc3, 0x90, 0x04, 0x8f, 0xd1, 0x68, 0x46, 0xda, 0x05, 0xef, 0x57, 0xde, 0x90, 0x49,
+	0x77, 0x66, 0x69, 0xa7, 0x4b, 0x99, 0x90, 0xfa, 0xac, 0x52, 0x5a, 0x3a, 0x5d, 0x29, 0x99, 0x3a,
+	0x9f, 0x5e, 0x52, 0x26, 0x22, 0xc9, 0x3f, 0x92, 0x24, 0x2d, 0xfc, 0x38, 0xf8, 0x0c, 0xcf, 0xea,
+	0x94, 0x2b, 0xb0, 0x8a, 0xc4, 0xf4, 0xa9, 0xf1, 0xf9, 0x72, 0xbc, 0x21, 0xcf, 0x1e, 0xb5, 0x74,
+	0xf6, 0xfc, 0x4b, 0xa9, 0x4a, 0xf9, 0x88, 0x54, 0x7f, 0x56, 0xf8, 0x00, 0x7e, 0x5f, 0x7e, 0x83,
+	0x9f, 0x90, 0xec, 0x7d, 0x38, 0x8b, 0x72, 0x5a, 0xa1, 0x36, 0x67, 0x64, 0x79, 0xf8, 0x09, 0x0d,
+	0x70, 0x1e, 0x54, 0xe4, 0x26, 0xd4, 0x34, 0xac, 0xf8, 0x67, 0x3a, 0xe4, 0x72, 0x91, 0x8a, 0x34,
+	0xbe, 0x52, 0xe0, 0x6c, 0x9f, 0x0e, 0x1f, 0x86, 0x2e, 0x62, 0xf8, 0x21, 0xf1, 0xe8, 0x42, 0xef,
+	0xd1, 0x54, 0xcd, 0xa9, 0x0b, 0xa9, 0x39, 0xf3, 0x12, 0x6c, 0xe6, 0x42, 0x10, 0xc1, 0x8d, 0x60,
+	0x43, 0x3c, 0xd8, 0x95, 0xc4, 0xdd, 0x22, 0x21, 0x4e, 0x48, 0x46, 0x75, 0x4a, 0x32, 0x9a, 0x2d,
+	0xb8, 0x52, 0xe4, 0x4d, 0x44, 0x63, 0x83, 0x26, 0xbd, 0x2b, 0xfa, 0xc8, 0x47, 0xc3, 0x13, 0x67,
+	0x57, 0x79, 0x2c, 0xa5, 0x6d, 0x6c, 0x5e, 0x01, 0x63, 0xda, 0x87, 0x88, 0x00, 0xc1, 0xe5, 0xe9,
+	0x39, 0x7b, 0x9a, 0x40, 0xd2, 0x5a, 0x51, 0x8f, 0x6b, 0xe5, 0x05, 0xb8, 0x56, 0xea, 0x42, 0xc4,
+	0x71, 0x8f, 0xdf, 0xcb, 0x1e, 0x1e, 0x0d, 0xde, 0xc3, 0x94, 0x91, 0xc8, 0x61, 0x0b, 0x4b, 0xb0,
+	0x94, 0xf5, 0x29, 0x5b, 0xc2, 0xd7, 0x80, 0xb7, 0xd9, 0x2e, 0x89, 0x7c, 0xdc, 0x4b, 0xbf, 0x5b,
+	0x4e, 0xf0, 0x63, 0x40, 0x23, 0x35, 0x9c, 0x8d, 0x14, 0xb1, 0xce, 0xcf, 0x1b, 0x75, 0x62, 0xde,
+	0xa4, 0x4d, 0x92, 0xf3, 0x23, 0x62, 0xf8, 0x84, 0x4f, 0xb5, 0xa4, 0x32, 0x92, 0xcf, 0x86, 0x45,
+	0xc8, 0x36, 0xa0, 0xe1, 0xe3, 0x83, 0xe4, 0x63, 0x44, 0xe5, 0x20, 0xb1, 0x4e, 0xe7, 0x8c, 0xe4,
+	0x41, 0xaa, 0xba, 0x0d, 0x7e, 0x21, 0xc3, 0x58, 0x29, 0x93, 0x9c, 0x36, 0x2b, 0x89, 0xe0, 0x15,
+	0x58, 0x17, 0x69, 0x3d, 0x08, 0x32, 0x24, 0xa7, 0x63, 0xd5, 0x2a, 0x7a, 0x64, 0x7e, 0xa3, 0xf0,
+	0x4b, 0x98, 0x72, 0x22, 0x54, 0xa9, 0x0b, 0x3a, 0x49, 0x1f, 0x62, 0x37, 0x7d, 0x7c, 0x3f, 0x1a,
+	0xdb, 0x98, 0x50, 0xee, 0x7d, 0x9e, 0x41, 0x56, 0x6a, 0x69, 0xfb, 0xd7, 0xf3, 0xa0, 0xf6, 0xe9,
+	0x50, 0xf3, 0xa1, 0x21, 0xbe, 0x20, 0x5f, 0x9e, 0x69, 0x57, 0xfa, 0x5c, 0x30, 0x6e, 0xcd, 0x73,
+	0x5a, 0x64, 0x77, 0x00, 0x4d, 0xf9, 0x43, 0xa2, 0x53, 0xd1, 0x48, 0x06, 0x30, 0x5e, 0x9f, 0x13,
+	0x20, 0x1c, 0x7f, 0x09, 0x67, 0xf3, 0xb2, 0xf2, 0xd5, 0x2a, 0x96, 0x72, 0x10, 0xe3, 0x8d, 0xb9,
+	0x21, 0xc2, 0xfd, 0xf7, 0x0a, 0x6c, 0x14, 0xaa, 0xdb, 0x3b, 0x55, 0x6c, 0x16, 0x21, 0x8d, 0xbb,
+	0x8b, 0x22, 0x45, 0x50, 0x3f, 0x28, 0xb0, 0x59, 0xac, 0x12, 0x2b, 0x65, 0x5a, 0x08, 0x35, 0xba,
+	0x0b, 0x43, 0xe5, 0x22, 0x91, 0xb5, 0x5b, 0xa5, 0x22, 0x91, 0x00, 0xd5, 0x8a, 0xa4, 0x40, 0x53,
+	0xc5, 0x8e, 0x65, 0x3d, 0xd5, 0xa9, 0xc6, 0xb0, 0x00, 0x54, 0x73, 0x5c, 0xa0, 0x70, 0xe2, 0xea,
+	0xcc, 0xab, 0x9b, 0x4a, 0xd5, 0x99, 0x83, 0x54, 0xab, 0xce, 0x42, 0x65, 0xa2, 0x31, 0x00, 0x49,
+	0x95, 0xb4, 0xab, 0x18, 0x3a, 0x3e, 0x6f, 0xbc, 0x36, 0xdf, 0x79, 0xe1, 0xf5, 0x5b, 0x05, 0x2e,
+	0x4c, 0x0b, 0x8e, 0xdb, 0xd5, 0xad, 0x49, 0x30, 0xe3, 0x9d, 0x85, 0x60, 0x22, 0x96, 0xaf, 0x15,
+	0x38, 0x37, 0xf9, 0x96, 0xbf, 0x39, 0x4f, 0xbb, 0xa7, 0x20, 0xe3, 0xad, 0x05, 0x40, 0x22, 0x8a,
+	0x1f, 0x15, 0xb8, 0x58, 0x22, 0x39, 0xde, 0x5c, 0xa0, 0xdb, 0xb3, 0x98, 0x7a, 0x8b, 0x63, 0x73,
+	0x97, 0x35, 0xad, 0x42, 0x6e, 0x57, 0xeb, 0xb4, 0x09, 0x58, 0xb5, 0xcb, 0x2a, 0xd5, 0x29, 0x71,
+	0xb7, 0xe4, 0x45, 0x4a, 0xa5, 0x6e, 0xc9, 0x41, 0xaa, 0x75, 0x4b, 0xa1, 0x44, 0x89, 0xa7, 0x84,
+	0xac, 0x4f, 0x3a, 0xd5, 0x2b, 0x8f, 0x03, 0xaa, 0x4d, 0x89, 0x02, 0x7d, 0xc2, 0xef, 0x60, 0x5a,
+	0x9d, 0xdc, 0xae, 0x76, 0xbb, 0x13, 0xb0, 0x6a, 0x77, 0x50, 0x2a, 0x53, 0x7a, 0x1f, 0x3e, 0x79,
+	0xd6, 0x52, 0x9e, 0x3e, 0x6b, 0x29, 0x7f, 0x3f, 0x6b, 0x29, 0xdf, 0x3d, 0x6f, 0x9d, 0x79, 0xfa,
+	0xbc, 0x75, 0xe6, 0xcf, 0xe7, 0xad, 0x33, 0x8f, 0xb6, 0x87, 0x1e, 0xdb, 0x8f, 0xec, 0xb6, 0x13,
+	0x8c, 0x3b, 0xc2, 0x70, 0x27, 0xef, 0xa2, 0x73, 0xd8, 0xc9, 0xfe, 0x7a, 0x3f, 0x0a, 0x31, 0xb5,
+	0x97, 0xf9, 0xdf, 0xe3, 0x37, 0xff, 0x09, 0x00, 0x00, 0xff, 0xff, 0x8d, 0x57, 0x5a, 0xd8, 0x91,
+	0x17, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -2529,6 +2565,39 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 	Metadata: "badges/tx.proto",
 }
 
+func (m *SubassetSupplyAndAmount) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SubassetSupplyAndAmount) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SubassetSupplyAndAmount) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Amount != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Amount))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.Supply != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Supply))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *MsgNewBadge) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -2582,41 +2651,19 @@ func (m *MsgNewBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x4a
 		}
 	}
-	if len(m.SubassetAmountsToCreate) > 0 {
-		dAtA2 := make([]byte, len(m.SubassetAmountsToCreate)*10)
-		var j1 int
-		for _, num := range m.SubassetAmountsToCreate {
-			for num >= 1<<7 {
-				dAtA2[j1] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j1++
+	if len(m.SubassetSupplysAndAmounts) > 0 {
+		for iNdEx := len(m.SubassetSupplysAndAmounts) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.SubassetSupplysAndAmounts[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
-			dAtA2[j1] = uint8(num)
-			j1++
+			i--
+			dAtA[i] = 0x3a
 		}
-		i -= j1
-		copy(dAtA[i:], dAtA2[:j1])
-		i = encodeVarintTx(dAtA, i, uint64(j1))
-		i--
-		dAtA[i] = 0x42
-	}
-	if len(m.SubassetSupplys) > 0 {
-		dAtA4 := make([]byte, len(m.SubassetSupplys)*10)
-		var j3 int
-		for _, num := range m.SubassetSupplys {
-			for num >= 1<<7 {
-				dAtA4[j3] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j3++
-			}
-			dAtA4[j3] = uint8(num)
-			j3++
-		}
-		i -= j3
-		copy(dAtA[i:], dAtA4[:j3])
-		i = encodeVarintTx(dAtA, i, uint64(j3))
-		i--
-		dAtA[i] = 0x3a
 	}
 	if m.DefaultSubassetSupply != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.DefaultSubassetSupply))
@@ -2705,41 +2752,19 @@ func (m *MsgNewSubBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.AmountsToCreate) > 0 {
-		dAtA7 := make([]byte, len(m.AmountsToCreate)*10)
-		var j6 int
-		for _, num := range m.AmountsToCreate {
-			for num >= 1<<7 {
-				dAtA7[j6] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j6++
+	if len(m.SubassetSupplysAndAmounts) > 0 {
+		for iNdEx := len(m.SubassetSupplysAndAmounts) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.SubassetSupplysAndAmounts[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
-			dAtA7[j6] = uint8(num)
-			j6++
+			i--
+			dAtA[i] = 0x3a
 		}
-		i -= j6
-		copy(dAtA[i:], dAtA7[:j6])
-		i = encodeVarintTx(dAtA, i, uint64(j6))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.Supplys) > 0 {
-		dAtA9 := make([]byte, len(m.Supplys)*10)
-		var j8 int
-		for _, num := range m.Supplys {
-			for num >= 1<<7 {
-				dAtA9[j8] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j8++
-			}
-			dAtA9[j8] = uint8(num)
-			j8++
-		}
-		i -= j8
-		copy(dAtA[i:], dAtA9[:j8])
-		i = encodeVarintTx(dAtA, i, uint64(j8))
-		i--
-		dAtA[i] = 0x1a
 	}
 	if m.BadgeId != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
@@ -2834,38 +2859,38 @@ func (m *MsgTransferBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x28
 	}
 	if len(m.Amounts) > 0 {
-		dAtA11 := make([]byte, len(m.Amounts)*10)
-		var j10 int
+		dAtA3 := make([]byte, len(m.Amounts)*10)
+		var j2 int
 		for _, num := range m.Amounts {
 			for num >= 1<<7 {
-				dAtA11[j10] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA3[j2] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j10++
+				j2++
 			}
-			dAtA11[j10] = uint8(num)
-			j10++
+			dAtA3[j2] = uint8(num)
+			j2++
 		}
-		i -= j10
-		copy(dAtA[i:], dAtA11[:j10])
-		i = encodeVarintTx(dAtA, i, uint64(j10))
+		i -= j2
+		copy(dAtA[i:], dAtA3[:j2])
+		i = encodeVarintTx(dAtA, i, uint64(j2))
 		i--
 		dAtA[i] = 0x22
 	}
 	if len(m.ToAddresses) > 0 {
-		dAtA13 := make([]byte, len(m.ToAddresses)*10)
-		var j12 int
+		dAtA5 := make([]byte, len(m.ToAddresses)*10)
+		var j4 int
 		for _, num := range m.ToAddresses {
 			for num >= 1<<7 {
-				dAtA13[j12] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA5[j4] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j12++
+				j4++
 			}
-			dAtA13[j12] = uint8(num)
-			j12++
+			dAtA5[j4] = uint8(num)
+			j4++
 		}
-		i -= j12
-		copy(dAtA[i:], dAtA13[:j12])
-		i = encodeVarintTx(dAtA, i, uint64(j12))
+		i -= j4
+		copy(dAtA[i:], dAtA5[:j4])
+		i = encodeVarintTx(dAtA, i, uint64(j4))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -3213,38 +3238,38 @@ func (m *MsgRevokeBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x20
 	}
 	if len(m.Amounts) > 0 {
-		dAtA15 := make([]byte, len(m.Amounts)*10)
-		var j14 int
+		dAtA7 := make([]byte, len(m.Amounts)*10)
+		var j6 int
 		for _, num := range m.Amounts {
 			for num >= 1<<7 {
-				dAtA15[j14] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA7[j6] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j14++
+				j6++
 			}
-			dAtA15[j14] = uint8(num)
-			j14++
+			dAtA7[j6] = uint8(num)
+			j6++
 		}
-		i -= j14
-		copy(dAtA[i:], dAtA15[:j14])
-		i = encodeVarintTx(dAtA, i, uint64(j14))
+		i -= j6
+		copy(dAtA[i:], dAtA7[:j6])
+		i = encodeVarintTx(dAtA, i, uint64(j6))
 		i--
 		dAtA[i] = 0x1a
 	}
 	if len(m.Addresses) > 0 {
-		dAtA17 := make([]byte, len(m.Addresses)*10)
-		var j16 int
+		dAtA9 := make([]byte, len(m.Addresses)*10)
+		var j8 int
 		for _, num := range m.Addresses {
 			for num >= 1<<7 {
-				dAtA17[j16] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA9[j8] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j16++
+				j8++
 			}
-			dAtA17[j16] = uint8(num)
-			j16++
+			dAtA9[j8] = uint8(num)
+			j8++
 		}
-		i -= j16
-		copy(dAtA[i:], dAtA17[:j16])
-		i = encodeVarintTx(dAtA, i, uint64(j16))
+		i -= j8
+		copy(dAtA[i:], dAtA9[:j8])
+		i = encodeVarintTx(dAtA, i, uint64(j8))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -3706,38 +3731,38 @@ func (m *MsgPruneBalances) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if len(m.Addresses) > 0 {
-		dAtA20 := make([]byte, len(m.Addresses)*10)
-		var j19 int
+		dAtA12 := make([]byte, len(m.Addresses)*10)
+		var j11 int
 		for _, num := range m.Addresses {
 			for num >= 1<<7 {
-				dAtA20[j19] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA12[j11] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j19++
+				j11++
 			}
-			dAtA20[j19] = uint8(num)
-			j19++
+			dAtA12[j11] = uint8(num)
+			j11++
 		}
-		i -= j19
-		copy(dAtA[i:], dAtA20[:j19])
-		i = encodeVarintTx(dAtA, i, uint64(j19))
+		i -= j11
+		copy(dAtA[i:], dAtA12[:j11])
+		i = encodeVarintTx(dAtA, i, uint64(j11))
 		i--
 		dAtA[i] = 0x1a
 	}
 	if len(m.BadgeIds) > 0 {
-		dAtA22 := make([]byte, len(m.BadgeIds)*10)
-		var j21 int
+		dAtA14 := make([]byte, len(m.BadgeIds)*10)
+		var j13 int
 		for _, num := range m.BadgeIds {
 			for num >= 1<<7 {
-				dAtA22[j21] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA14[j13] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j21++
+				j13++
 			}
-			dAtA22[j21] = uint8(num)
-			j21++
+			dAtA14[j13] = uint8(num)
+			j13++
 		}
-		i -= j21
-		copy(dAtA[i:], dAtA22[:j21])
-		i = encodeVarintTx(dAtA, i, uint64(j21))
+		i -= j13
+		copy(dAtA[i:], dAtA14[:j13])
+		i = encodeVarintTx(dAtA, i, uint64(j13))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -3924,6 +3949,21 @@ func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *SubassetSupplyAndAmount) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Supply != 0 {
+		n += 1 + sovTx(uint64(m.Supply))
+	}
+	if m.Amount != 0 {
+		n += 1 + sovTx(uint64(m.Amount))
+	}
+	return n
+}
+
 func (m *MsgNewBadge) Size() (n int) {
 	if m == nil {
 		return 0
@@ -3948,19 +3988,11 @@ func (m *MsgNewBadge) Size() (n int) {
 	if m.DefaultSubassetSupply != 0 {
 		n += 1 + sovTx(uint64(m.DefaultSubassetSupply))
 	}
-	if len(m.SubassetSupplys) > 0 {
-		l = 0
-		for _, e := range m.SubassetSupplys {
-			l += sovTx(uint64(e))
+	if len(m.SubassetSupplysAndAmounts) > 0 {
+		for _, e := range m.SubassetSupplysAndAmounts {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
 		}
-		n += 1 + sovTx(uint64(l)) + l
-	}
-	if len(m.SubassetAmountsToCreate) > 0 {
-		l = 0
-		for _, e := range m.SubassetAmountsToCreate {
-			l += sovTx(uint64(e))
-		}
-		n += 1 + sovTx(uint64(l)) + l
 	}
 	if len(m.FreezeAddressRanges) > 0 {
 		for _, e := range m.FreezeAddressRanges {
@@ -4005,19 +4037,11 @@ func (m *MsgNewSubBadge) Size() (n int) {
 	if m.BadgeId != 0 {
 		n += 1 + sovTx(uint64(m.BadgeId))
 	}
-	if len(m.Supplys) > 0 {
-		l = 0
-		for _, e := range m.Supplys {
-			l += sovTx(uint64(e))
+	if len(m.SubassetSupplysAndAmounts) > 0 {
+		for _, e := range m.SubassetSupplysAndAmounts {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
 		}
-		n += 1 + sovTx(uint64(l)) + l
-	}
-	if len(m.AmountsToCreate) > 0 {
-		l = 0
-		for _, e := range m.AmountsToCreate {
-			l += sovTx(uint64(e))
-		}
-		n += 1 + sovTx(uint64(l)) + l
 	}
 	return n
 }
@@ -4525,6 +4549,94 @@ func sovTx(x uint64) (n int) {
 func sozTx(x uint64) (n int) {
 	return sovTx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
+func (m *SubassetSupplyAndAmount) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SubassetSupplyAndAmount: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SubassetSupplyAndAmount: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Supply", wireType)
+			}
+			m.Supply = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Supply |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			m.Amount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Amount |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -4693,157 +4805,39 @@ func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 7:
-			if wireType == 0 {
-				var v uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SubassetSupplysAndAmounts", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
 				}
-				m.SubassetSupplys = append(m.SubassetSupplys, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthTx
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthTx
-				}
-				if postIndex > l {
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
 				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
 				}
-				elementCount = count
-				if elementCount != 0 && len(m.SubassetSupplys) == 0 {
-					m.SubassetSupplys = make([]uint64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowTx
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.SubassetSupplys = append(m.SubassetSupplys, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field SubassetSupplys", wireType)
 			}
-		case 8:
-			if wireType == 0 {
-				var v uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.SubassetAmountsToCreate = append(m.SubassetAmountsToCreate, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthTx
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthTx
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
-				}
-				elementCount = count
-				if elementCount != 0 && len(m.SubassetAmountsToCreate) == 0 {
-					m.SubassetAmountsToCreate = make([]uint64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowTx
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.SubassetAmountsToCreate = append(m.SubassetAmountsToCreate, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field SubassetAmountsToCreate", wireType)
+			if msglen < 0 {
+				return ErrInvalidLengthTx
 			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.SubassetSupplysAndAmounts = append(m.SubassetSupplysAndAmounts, &SubassetSupplyAndAmount{})
+			if err := m.SubassetSupplysAndAmounts[len(m.SubassetSupplysAndAmounts)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 9:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FreezeAddressRanges", wireType)
@@ -5101,158 +5095,40 @@ func (m *MsgNewSubBadge) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 3:
-			if wireType == 0 {
-				var v uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SubassetSupplysAndAmounts", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
 				}
-				m.Supplys = append(m.Supplys, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthTx
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthTx
-				}
-				if postIndex > l {
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
 				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
 				}
-				elementCount = count
-				if elementCount != 0 && len(m.Supplys) == 0 {
-					m.Supplys = make([]uint64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowTx
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Supplys = append(m.Supplys, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Supplys", wireType)
 			}
-		case 4:
-			if wireType == 0 {
-				var v uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.AmountsToCreate = append(m.AmountsToCreate, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthTx
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthTx
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
-				}
-				elementCount = count
-				if elementCount != 0 && len(m.AmountsToCreate) == 0 {
-					m.AmountsToCreate = make([]uint64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowTx
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.AmountsToCreate = append(m.AmountsToCreate, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field AmountsToCreate", wireType)
+			if msglen < 0 {
+				return ErrInvalidLengthTx
 			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.SubassetSupplysAndAmounts = append(m.SubassetSupplysAndAmounts, &SubassetSupplyAndAmount{})
+			if err := m.SubassetSupplysAndAmounts[len(m.SubassetSupplysAndAmounts)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])

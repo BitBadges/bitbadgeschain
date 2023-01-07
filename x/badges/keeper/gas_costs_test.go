@@ -100,9 +100,20 @@ func (suite *TestSuite) TestGasCosts() {
 					InsertIdIdx: 10,
 				},
 				Permissions: 62,
-
-				SubassetSupplys:         []uint64{1000000, 1, 10000},
-				SubassetAmountsToCreate: []uint64{1, 10000, 10000},
+				SubassetSupplysAndAmounts: []*types.SubassetSupplyAndAmount{
+					{
+						Supply: 1000000,
+						Amount: 1,
+					},
+					{
+						Supply: 1,
+						Amount: 10000,
+					},
+					{
+						Supply: 10000,
+						Amount: 10000,
+					},
+				},
 				FreezeAddressRanges: []*types.IdRange{
 					{
 						Start: 1000,
@@ -118,9 +129,24 @@ func (suite *TestSuite) TestGasCosts() {
 	RunFunctionsAndPrintGasCosts(suite, tbl, []GasFunction{
 		{F: func() { CreateBadges(suite, wctx, badgesToCreate) }},
 		{F: func() { GetBadge(suite, wctx, 0) }},
-		{F: func() { CreateSubBadges(suite, wctx, bob, 0, []uint64{1000000}, []uint64{1}) }},
-		{F: func() { CreateSubBadges(suite, wctx, bob, 0, []uint64{1}, []uint64{10000}) }},
-		{F: func() { CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{10000}) }},
+		{F: func() { CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 1000000,
+			Amount: 1,
+		},
+	}) }},
+		{F: func() { CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 1,
+			Amount: 10000,
+		},
+	}) }},
+		{F: func() { CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 10000,
+		},
+	}) }},
 		{F: func() { FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: 1000, End: 1000}}) }},
 		{F: func() { GetBadge(suite, wctx, 0) }},
 		{F: func() { FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: 0, End: 9999}}) }},
@@ -221,7 +247,12 @@ func (suite *TestSuite) TestGasCosts() {
 		{F: func() { GetUserBalance(suite, wctx, 0, bobAccountNum) }},
 		{F: func() { CreateBadges(suite, wctx, badgesToCreate2) }},
 		{F: func() { GetBadge(suite, wctx, 1) }},
-		{F: func() { CreateSubBadges(suite, wctx, bob, 1, []uint64{10000}, []uint64{10000}) }},
+		{F: func() { CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 10000,
+		},
+	}) }},
 		{F: func() {
 			TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 		}},
@@ -282,19 +313,34 @@ func (suite *TestSuite) TestGasCostsOldVersionWithRequireChecks() {
 		tbl.AddRow("GetBadge", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err := CreateSubBadges(suite, wctx, bob, 0, []uint64{1000000}, []uint64{1})
+		err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 1000000,
+			Amount: 1,
+		},
+	})
 		suite.Require().Nil(err, "Error creating subbadge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("CreateSubBadge 1 (Supply 10000)", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = CreateSubBadges(suite, wctx, bob, 0, []uint64{1}, []uint64{10000})
+		err = CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 1,
+			Amount: 10000,
+		},
+	})
 		suite.Require().Nil(err, "Error creating subbadge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("CreateSubBadge 10000 (Supply 1)", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{10000})
+		err = CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 10000,
+		},
+	})
 		suite.Require().Nil(err, "Error creating subbadge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("CreateSubBadge 10000 (Supply 10000)", endGas-startGas)
@@ -629,7 +675,12 @@ func (suite *TestSuite) TestGasCostsOldVersionWithRequireChecks() {
 		tbl.AddRow("GetBadge", endGas-startGas)
 
 		startGas = suite.ctx.GasMeter().GasConsumed()
-		err = CreateSubBadges(suite, wctx, bob, 1, []uint64{10000}, []uint64{10000})
+		err = CreateSubBadges(suite, wctx, bob, 1, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 10000,
+		},
+	})
 		suite.Require().Nil(err, "Error creating subbadge")
 		endGas = suite.ctx.GasMeter().GasConsumed()
 		tbl.AddRow("CreateSubBadge 10000 (Supply 10000)", endGas-startGas)

@@ -45,7 +45,12 @@ func (suite *TestSuite) TestRequestTransfer() {
 	CreateBadges(suite, wctx, badgesToCreate)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -134,7 +139,12 @@ func (suite *TestSuite) TestRequestTransferForcefulAccept() {
 	CreateBadges(suite, wctx, badgesToCreate)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -220,7 +230,12 @@ func (suite *TestSuite) TestRequestTransferFrozen() {
 	CreateBadges(suite, wctx, badgesToCreate)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -303,7 +318,12 @@ func (suite *TestSuite) TestRequestTransferFrozenThenUnrozen() {
 	CreateBadges(suite, wctx, badgesToCreate)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -394,7 +414,12 @@ func (suite *TestSuite) TestRequestTransferToSelf() {
 	CreateBadges(suite, wctx, badgesToCreate)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -446,7 +471,12 @@ func (suite *TestSuite) TestTryToAcceptTranferRequestBeforeMarkedAsApproved() {
 	CreateBadges(suite, wctx, badgesToCreate)
 
 	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []uint64{10000}, []uint64{1})
+	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 10000,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subbadge")
 
 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)

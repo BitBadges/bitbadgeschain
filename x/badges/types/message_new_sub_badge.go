@@ -9,12 +9,11 @@ const TypeMsgNewSubBadge = "new_sub_badge"
 
 var _ sdk.Msg = &MsgNewSubBadge{}
 
-func NewMsgNewSubBadge(creator string, badgeId uint64, supplys []uint64, amountsToCreate []uint64) *MsgNewSubBadge {
+func NewMsgNewSubBadge(creator string, badgeId uint64, supplysAndAmounts []*SubassetSupplyAndAmount) *MsgNewSubBadge {
 	return &MsgNewSubBadge{
 		Creator:         creator,
 		BadgeId:         badgeId,
-		Supplys:         supplys,
-		AmountsToCreate: amountsToCreate,
+		SubassetSupplysAndAmounts: supplysAndAmounts,
 	}
 }
 
@@ -45,16 +44,19 @@ func (msg *MsgNewSubBadge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if len(msg.Supplys) != len(msg.AmountsToCreate) {
-		return ErrInvalidSupplyAndAmounts
+	amounts := make([]uint64, len(msg.SubassetSupplysAndAmounts))
+	supplys := make([]uint64, len(msg.SubassetSupplysAndAmounts))
+	for i, subasset := range msg.SubassetSupplysAndAmounts {
+		amounts[i] = subasset.Amount
+		supplys[i] = subasset.Supply
 	}
 
-	err = ValidateNoElementIsX(msg.Supplys, 0)
+	err = ValidateNoElementIsX(amounts, 0)
 	if err != nil {
 		return err
 	}
 
-	err = ValidateNoElementIsX(msg.AmountsToCreate, 0)
+	err = ValidateNoElementIsX(supplys, 0)
 	if err != nil {
 		return err
 	}

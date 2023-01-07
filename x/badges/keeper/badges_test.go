@@ -53,8 +53,12 @@ func (suite *TestSuite) TestGetBadgeAndAssertSubbadges() {
 					InsertIdIdx:            10,
 				},
 				Permissions:             62,
-				SubassetSupplys:         []uint64{1},
-				SubassetAmountsToCreate: []uint64{1},
+				SubassetSupplysAndAmounts: []*types.SubassetSupplyAndAmount{
+					{
+						Supply: 1,
+						Amount: 1,
+					},
+				},
 			},
 			Amount:  1,
 			Creator: bob,
@@ -115,7 +119,12 @@ func (suite *TestSuite) TestCreateSubassets() {
 	suite.Require().Nil(err, "Error getting badge: %s")
 	balanceInfo := types.UserBalanceInfo{}
 
-	badge, balanceInfo, err = keeper.CreateSubassets(badge, balanceInfo, []uint64{1}, []uint64{1})
+	badge, balanceInfo, err = keeper.CreateSubassets(badge, balanceInfo, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 1,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subassets: %s")
 	suite.Require().Equal(badge.SubassetSupplys, []*types.BalanceObject(nil))
 	suite.Require().Equal(balanceInfo.BalanceAmounts[0].Balance, uint64(1))
@@ -126,7 +135,12 @@ func (suite *TestSuite) TestCreateSubassets() {
 		},
 	})
 
-	badge, balanceInfo, err = keeper.CreateSubassets(badge, balanceInfo, []uint64{1}, []uint64{1})
+	badge, balanceInfo, err = keeper.CreateSubassets(badge, balanceInfo, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 1,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subassets: %s")
 	suite.Require().Equal(badge.SubassetSupplys, []*types.BalanceObject(nil))
 	suite.Require().Equal(balanceInfo.BalanceAmounts[0].Balance, uint64(1))
@@ -137,7 +151,12 @@ func (suite *TestSuite) TestCreateSubassets() {
 		},
 	})
 
-	badge, balanceInfo, err = keeper.CreateSubassets(badge, balanceInfo, []uint64{0}, []uint64{1})
+	badge, balanceInfo, err = keeper.CreateSubassets(badge, balanceInfo, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 0,
+			Amount: 1,
+		},
+	})
 	suite.Require().Nil(err, "Error creating subassets: %s")
 	suite.Require().Equal(badge.SubassetSupplys, []*types.BalanceObject(nil))
 	suite.Require().Equal(balanceInfo.BalanceAmounts[0].Balance, uint64(1))
@@ -148,6 +167,11 @@ func (suite *TestSuite) TestCreateSubassets() {
 		},
 	})
 
-	badge, balanceInfo, err = keeper.CreateSubassets(badge, balanceInfo, []uint64{1}, []uint64{math.MaxUint64})
+	badge, balanceInfo, err = keeper.CreateSubassets(badge, balanceInfo, []*types.SubassetSupplyAndAmount{
+		{
+			Supply: 1,
+			Amount: math.MaxUint64,
+		},
+	})
 	suite.Require().EqualError(err, keeper.ErrOverflow.Error())
 }

@@ -39,11 +39,18 @@ func CmdNewSubBadge() *cobra.Command {
 				return err
 			}
 
+			argSubassetSupplysAndAmounts := make([]*types.SubassetSupplyAndAmount, len(argSupplysUint64))
+			for i := 0; i < len(argSupplysUint64); i++ {
+				argSubassetSupplysAndAmounts[i] = &types.SubassetSupplyAndAmount{
+					Supply: argSupplysUint64[i],
+					Amount: argAmountsUint64[i],
+				}
+			}
+
 			msg := types.NewMsgNewSubBadge(
 				clientCtx.GetFromAddress().String(),
 				argId,
-				argSupplysUint64,
-				argAmountsUint64,
+				argSubassetSupplysAndAmounts,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {

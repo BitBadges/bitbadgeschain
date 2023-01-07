@@ -18,15 +18,14 @@ func SimulateMsgNewBadge(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		randomAccounts := []uint64{}
+		randomSubassets := []*types.SubassetSupplyAndAmount{}
 		for i := 0; i < r.Intn(10); i++ {
-			randomAccounts = append(randomAccounts, r.Uint64())
+			randomSubassets = append(randomSubassets, &types.SubassetSupplyAndAmount{
+				Supply: r.Uint64(),
+				Amount: r.Uint64(),
+			});		
 		}
 
-		randomAmounts := []uint64{}
-		for i := 0; i < r.Intn(10); i++ {
-			randomAmounts = append(randomAmounts, r.Uint64())
-		}
 
 		msg := &types.MsgNewBadge{
 			Creator: simAccount.Address.String(),
@@ -44,8 +43,7 @@ func SimulateMsgNewBadge(
 					End:   r.Uint64(),
 				},
 			},
-			SubassetSupplys:         randomAccounts,
-			SubassetAmountsToCreate: randomAmounts,
+			SubassetSupplysAndAmounts: randomSubassets,
 			Permissions:             r.Uint64(),
 			DefaultSubassetSupply:   r.Uint64(),
 			Standard:                r.Uint64(),
