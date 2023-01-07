@@ -7,10 +7,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
-	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
-	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
-	host "github.com/cosmos/ibc-go/v3/modules/core/24-host"
-	ibcexported "github.com/cosmos/ibc-go/v3/modules/core/exported"
+	channeltypes "github.com/cosmos/ibc-go/v5/modules/core/04-channel/types"
+	porttypes "github.com/cosmos/ibc-go/v5/modules/core/05-port/types"
+	host "github.com/cosmos/ibc-go/v5/modules/core/24-host"
+	ibcexported "github.com/cosmos/ibc-go/v5/modules/core/exported"
 )
 
 // OnChanOpenInit implements the IBCModule interface
@@ -133,7 +133,7 @@ func (am AppModule) OnRecvPacket(
 
 	var modulePacketData types.BadgesPacketData
 	if err := modulePacketData.Unmarshal(modulePacket.GetData()); err != nil {
-		return channeltypes.NewErrorAcknowledgement(sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal packet data: %s", err.Error()).Error())
+		return channeltypes.NewErrorAcknowledgement(sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal packet data: %s", err.Error()))
 	}
 
 	// Dispatch packet
@@ -141,7 +141,7 @@ func (am AppModule) OnRecvPacket(
 	// this line is used by starport scaffolding # ibc/packet/module/recv
 	default:
 		errMsg := fmt.Sprintf("unrecognized %s packet type: %T", types.ModuleName, packet)
-		return channeltypes.NewErrorAcknowledgement(errMsg)
+		return channeltypes.NewErrorAcknowledgement(sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg))
 	}
 
 	// NOTE: acknowledgement will be written synchronously during IBC handler execution.

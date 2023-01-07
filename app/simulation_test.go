@@ -76,7 +76,7 @@ func BenchmarkSimulation(b *testing.B) {
 	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
 
 	cosmoscmdEncodingConfig := cosmoscmd.EncodingConfig{
-		Marshaler: encodingConfig.Marshaler,
+		Marshaler: encodingConfig.Codec,
 		TxConfig:  encodingConfig.TxConfig,
 		InterfaceRegistry: encodingConfig.InterfaceRegistry,
 		Amino: encodingConfig.Amino,

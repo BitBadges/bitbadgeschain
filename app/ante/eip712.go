@@ -10,7 +10,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
-	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 
 	"github.com/ethereum/go-ethereum/common/math"
@@ -177,6 +177,7 @@ func VerifySignature(
 				Gas:    tx.GetGas(),
 			},
 			msgs, tx.GetMemo(),
+			nil,
 		)
 		
 		signerChainID, err := ethermint.ParseChainID(signerData.ChainID)
@@ -193,13 +194,7 @@ func VerifySignature(
 			return sdkerrors.Wrap(sdkerrors.ErrUnknownExtensionOptions, "tx doesnt contain expected amount of extension options")
 		}
 
-		var optIface ethermint.ExtensionOptionsWeb3TxI
-
-		if err := ethermintCodec.UnpackAny(opts[0], &optIface); err != nil {
-			return sdkerrors.Wrap(err, "failed to proto-unpack ExtensionOptionsWeb3Tx")
-		}
-
-		extOpt, ok := optIface.(*ethermint.ExtensionOptionsWeb3Tx)
+		extOpt, ok := opts[0].GetCachedValue().(*ethermint.ExtensionOptionsWeb3Tx)
 		if !ok {
 			return sdkerrors.Wrap(sdkerrors.ErrInvalidChainID, "unknown extension option")
 		}
@@ -249,8 +244,7 @@ func VerifySignature(
 		}
 
 		// return sdkerrors.Wrapf(sdkerrors.ErrInvalidChainID, "%s", typedData)
-
-		sigHash, err := eip712.ComputeTypedDataHash(typedData)
+		sigHash, _, err := apitypes.TypedDataAndHash(typedData)
 		if err != nil {
 			return sdkerrors.Wrapf(err, "%s failed to compute typed data hash", typedData.PrimaryType)
 		}

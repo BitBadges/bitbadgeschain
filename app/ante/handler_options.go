@@ -8,8 +8,8 @@ import (
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	ibcante "github.com/cosmos/ibc-go/v3/modules/core/ante"
-	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
+	ibcante "github.com/cosmos/ibc-go/v5/modules/core/ante"
+	ibckeeper "github.com/cosmos/ibc-go/v5/modules/core/keeper"
 
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
@@ -23,6 +23,7 @@ type HandlerOptions struct {
 	FeegrantKeeper  ante.FeegrantKeeper
 	SignModeHandler authsigning.SignModeHandler
 	SigGasConsumer  func(meter sdk.GasMeter, sig signing.SignatureV2, params authtypes.Params) error
+	TxFeeChecker    ante.TxFeeChecker
 }
 
 func (options HandlerOptions) Validate() error {
@@ -41,21 +42,21 @@ func (options HandlerOptions) Validate() error {
 func newCosmosAnteHandler(options HandlerOptions) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
 		ante.NewSetUpContextDecorator(),
-		ante.NewRejectExtensionOptionsDecorator(),
-		ante.NewMempoolFeeDecorator(),
+		// ante.NewRejectExtensionOptionsDecorator(),
+		// ante.NewMempoolFeeDecorator(),
 
 		ante.NewValidateBasicDecorator(),
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
+		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
 		// SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewSetPubKeyDecorator(options.AccountKeeper),
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
 		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
-		ibcante.NewAnteDecorator(options.IBCKeeper),
+		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
 	)
 }
 
@@ -64,12 +65,13 @@ func newCosmosAnteHandlerEip712(options HandlerOptions) sdk.AnteHandler {
 		ante.NewSetUpContextDecorator(),
 		// NOTE: extensions option decorator removed
 		// ante.NewRejectExtensionOptionsDecorator(),
-		ante.NewMempoolFeeDecorator(),
+		
+		// ante.NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
+		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
 		// SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewSetPubKeyDecorator(options.AccountKeeper),
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
@@ -77,6 +79,6 @@ func newCosmosAnteHandlerEip712(options HandlerOptions) sdk.AnteHandler {
 		// Note: signature verification uses EIP instead of the cosmos signature validator
 		NewEip712SigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
-		ibcante.NewAnteDecorator(options.IBCKeeper),
+		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
 	)
 }

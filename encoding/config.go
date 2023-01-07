@@ -18,7 +18,7 @@ func MakeConfig(mb module.BasicManager) params.EncodingConfig {
 
 	encodingConfig := params.EncodingConfig{
 		InterfaceRegistry: interfaceRegistry,
-		Marshaler:         marshaler,
+		Codec:         	   marshaler,
 		TxConfig:          tx.NewTxConfig(marshaler, tx.DefaultSignModes),
 		Amino:             cdc,
 	}

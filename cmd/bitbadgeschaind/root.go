@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/bitbadges/bitbadgeschain/encoding"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -36,6 +37,12 @@ import (
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
+
+	snapshottypes "github.com/cosmos/cosmos-sdk/snapshots/types"
+
+	sdkserver "github.com/cosmos/cosmos-sdk/server"
+
+	tmcfg "github.com/tendermint/tendermint/config"
 )
 
 
@@ -139,7 +146,7 @@ func NewRootCmd(
 	bitbadgesEncodingConfig := encoding.MakeConfig(moduleBasics)
 	encodingConfig := cosmoscmd.EncodingConfig{
 		InterfaceRegistry: bitbadgesEncodingConfig.InterfaceRegistry,
-		Marshaler:         bitbadgesEncodingConfig.Marshaler,
+		Marshaler:         bitbadgesEncodingConfig.Codec,
 		TxConfig:          bitbadgesEncodingConfig.TxConfig,
 		Amino:             bitbadgesEncodingConfig.Amino,
 	}
@@ -176,10 +183,10 @@ func NewRootCmd(
 			}
 
 			customAppTemplate, customAppConfig := initAppConfig()
+			customTMConfig := initTendermintConfig()
 
-			if err := server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig); err != nil {
+			if err := server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, customTMConfig); err != nil {
 				return err
-
 			}
 
 			// startProxyForTunneledPeers(initClientCtx, cmd) TODO: took this out
@@ -288,6 +295,21 @@ func queryCommand(moduleBasics module.BasicManager) *cobra.Command {
 	return cmd
 }
 
+// initTendermintConfig helps to override default Tendermint Config values.
+// return tmcfg.DefaultConfig if no custom configuration is required for the application.
+func initTendermintConfig() *tmcfg.Config {
+	cfg := tmcfg.DefaultConfig()
+	cfg.Consensus.TimeoutCommit = time.Second
+	// use v0 since v1 severely impacts the node's performance
+	cfg.Mempool.Version = tmcfg.MempoolV0
+
+	// to put a higher strain on node memory, use these values:
+	// cfg.P2P.MaxNumInboundPeers = 100
+	// cfg.P2P.MaxNumOutboundPeers = 40
+
+	return cfg
+}
+
 // txCommand returns the sub-command to send transactions to the app
 func txCommand(moduleBasics module.BasicManager) *cobra.Command {
 	cmd := &cobra.Command{
@@ -368,6 +390,12 @@ func (a appCreator) newApp(
 		panic(err)
 	}
 
+	snapshotOptions := snapshottypes.NewSnapshotOptions(
+		cast.ToUint64(appOpts.Get(sdkserver.FlagStateSyncSnapshotInterval)),
+		cast.ToUint32(appOpts.Get(sdkserver.FlagStateSyncSnapshotKeepRecent)),
+	)
+
+
 	return a.buildApp(
 		logger,
 		db,
@@ -386,9 +414,7 @@ func (a appCreator) newApp(
 		baseapp.SetInterBlockCache(cache),
 		baseapp.SetTrace(cast.ToBool(appOpts.Get(server.FlagTrace))),
 		baseapp.SetIndexEvents(cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents))),
-		baseapp.SetSnapshotStore(snapshotStore),
-		baseapp.SetSnapshotInterval(cast.ToUint64(appOpts.Get(server.FlagStateSyncSnapshotInterval))),
-		baseapp.SetSnapshotKeepRecent(cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent))),
+		baseapp.SetSnapshot(snapshotStore, snapshotOptions),
 	)
 }
 

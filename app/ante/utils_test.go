@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 	types2 "github.com/cosmos/cosmos-sdk/x/bank/types"
 	types3 "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -40,6 +40,8 @@ import (
 	"github.com/ignite/cli/ignite/pkg/cosmoscmd"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmtypes "github.com/tendermint/tendermint/types"
+
+	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 )
 
 type AnteTestSuite struct {
@@ -91,7 +93,7 @@ func (suite *AnteTestSuite) SetupTest() {
 
 
 	cosmoscmdEncodingConfig := cosmoscmd.EncodingConfig{
-		Marshaler: encodingConfig.Marshaler,
+		Marshaler: encodingConfig.Codec,
 		TxConfig:  encodingConfig.TxConfig,
 		InterfaceRegistry: encodingConfig.InterfaceRegistry,
 		Amino: encodingConfig.Amino,
@@ -199,13 +201,13 @@ func (suite *AnteTestSuite) CreateTestEIP712CosmosTxBuilder(
 	fee := legacytx.NewStdFee(gas, gasAmount)
 	accNumber := suite.app.AccountKeeper.GetAccount(suite.ctx, from).GetAccountNumber()
 
-	data := legacytx.StdSignBytes(chainId, accNumber, nonce, 0, fee, []sdk.Msg{msg}, "")
+	data := legacytx.StdSignBytes(chainId, accNumber, nonce, 0, fee, []sdk.Msg{msg}, "", nil)
 	typedData, err := eip712.WrapTxToTypedData(ethermintCodec, ethChainId, msg, data, &eip712.FeeDelegationOptions{
 		FeePayer: from,
 	})
 	suite.Require().NoError(err)
 
-	sigHash, err := eip712.ComputeTypedDataHash(typedData)
+	sigHash, _,  err := apitypes.TypedDataAndHash(typedData)
 	suite.Require().NoError(err)
 
 	// Sign typedData

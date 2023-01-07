@@ -8,6 +8,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/ignite/cli/ignite/pkg/cosmosibckeeper"
 )
@@ -16,8 +17,8 @@ type (
 	Keeper struct {
 		*cosmosibckeeper.Keeper
 		cdc        codec.BinaryCodec
-		storeKey   sdk.StoreKey
-		memKey     sdk.StoreKey
+		storeKey   storetypes.StoreKey
+		memKey     storetypes.StoreKey
 		paramstore paramtypes.Subspace
 
 		accountKeeper types.AccountKeeper
@@ -27,7 +28,7 @@ type (
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeKey,
-	memKey sdk.StoreKey,
+	memKey storetypes.StoreKey,
 	ps paramtypes.Subspace,
 	channelKeeper cosmosibckeeper.ChannelKeeper,
 	portKeeper cosmosibckeeper.PortKeeper,

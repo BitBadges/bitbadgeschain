@@ -72,7 +72,7 @@ func (suite *TestSuite) SetupTest() {
 	encoding := encoding.MakeConfig(bitbadgesapp.ModuleBasics)
 
 	cosmoscmdEncodingConfig := cosmoscmd.EncodingConfig{
-		Marshaler: encoding.Marshaler,
+		Marshaler: encoding.Codec,
 		TxConfig:  encoding.TxConfig,
 		InterfaceRegistry: encoding.InterfaceRegistry,
 		Amino: encoding.Amino,
