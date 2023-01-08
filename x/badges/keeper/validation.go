@@ -34,13 +34,28 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationPar
 	}
 
 	if len(params.AccountsToCheckRegistration) > 0 {
-		nextAccountNumber := k.accountKeeper.GetNextAccountNumber(ctx) //TODO: this increments each time we call this; we just want to get w/o incrementing 
-		for _, accountNumber := range params.AccountsToCheckRegistration {
-			//Probably a better way to do this such as only read once at beginning of block, but we check that addresses are valid and not > Next Account Number because then we would be sending to an unregistered address
-			if accountNumber >= nextAccountNumber {
-				return CreatorAccountNum, types.BitBadge{}, ErrAccountNotRegistered
-			}
-		}
+		// We have three options here. I currently think doing nothing is what I will go with.
+		
+		// 1. Do nothing and put blame on users
+		// 2. Check if account exists through GetNextAccountNumber() and if not, return error. Less Gas. Increments account number each time.
+			//Since account number is incremented each time, there will be gaps in the account numbers, and that blame is placed on the users.
+		// 3. Check if account exists through HasAccountAddressByID() and if not, return error. More Gas
+
+		//Option 2
+		// nextAccountNumber := k.accountKeeper.GetNextAccountNumber(ctx) 
+		// for _, accountNumber := range params.AccountsToCheckRegistration {
+		// 	//Probably a better way to do this such as only read once at beginning of block, but we check that addresses are valid and not > Next Account Number because then we would be sending to an unregistered address
+		// 	if accountNumber >= nextAccountNumber {
+		// 		return CreatorAccountNum, types.BitBadge{}, ErrAccountNotRegistered
+		// 	}
+		// }
+
+		//Option 3
+		// for _, accountNumber := range params.AccountsToCheckRegistration {
+		// 	if !k.accountKeeper.HasAccountAddressByID(ctx, accountNumber) { 
+		// 		return CreatorAccountNum, types.BitBadge{}, ErrAccountNotRegistered
+		// 	}
+		// }
 	}
 
 	// Assert badge and subbadge ranges exist and are well-formed

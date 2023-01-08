@@ -1,8 +1,8 @@
 package keeper_test
 
 import (
-	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	// "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	// "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -16,50 +16,51 @@ func (suite *TestSuite) TestAccountsAreCreatedAndStoredCorrectly() {
 	suite.Equal(sampleAccNumber, uint64(1010)) //see test suite setup for why it is 1010
 }
 
-func (suite *TestSuite) TestTransferToUnregisteredAccount() {
-	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	badgesToCreate := []BadgesToCreate{
-		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
+// func (suite *TestSuite) TestTransferToUnregisteredAccount() {
+// 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-					InsertIdIdx: 10,
-				},
-				Permissions: 62,
-			},
-			Amount:  1,
-			Creator: bob,
-		},
-	}
+// 	badgesToCreate := []BadgesToCreate{
+// 		{
+// 			Badge: types.MsgNewBadge{
+// 				Uri: &types.UriObject{
+// 					Uri:                    "example.com/",
+// 					Scheme:                 1,
+// 					IdxRangeToRemove:       &types.IdRange{},
+// 					InsertSubassetBytesIdx: 0,
 
-	CreateBadges(suite, wctx, badgesToCreate)
-	badge, _ := GetBadge(suite, wctx, 0)
+// 					InsertIdIdx: 10,
+// 				},
+// 				Permissions: 62,
+// 			},
+// 			Amount:  1,
+// 			Creator: bob,
+// 		},
+// 	}
 
-	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
-		{
-			Supply: 10000,
-			Amount: 1,
-		},
-	})
-	suite.Require().Nil(err, "Error creating subbadge")
-	badge, _ = GetBadge(suite, wctx, 0)
-	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
+// 	CreateBadges(suite, wctx, badgesToCreate)
+// 	badge, _ := GetBadge(suite, wctx, 0)
 
-	suite.Require().Equal(uint64(1), badge.NextSubassetId)
-	suite.Require().Equal([]*types.BalanceObject{
-		{
-			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-			Balance:  10000,
-		},
-	}, badge.SubassetSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
+// 	//Create subbadge 1 with supply > 1
+// 	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+// 		{
+// 			Supply: 10000,
+// 			Amount: 1,
+// 		},
+// 	})
+// 	suite.Require().Nil(err, "Error creating subbadge")
+// 	badge, _ = GetBadge(suite, wctx, 0)
+// 	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
 
-	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{999999}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
-	suite.Require().EqualError(err, keeper.ErrAccountNotRegistered.Error())
-}
+// 	suite.Require().Equal(uint64(1), badge.NextSubassetId)
+// 	suite.Require().Equal([]*types.BalanceObject{
+// 		{
+// 			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+// 			Balance:  10000,
+// 		},
+// 	}, badge.SubassetSupplys)
+// 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
+
+// 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{999999}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
+// 	suite.Require().EqualError(err, keeper.ErrAccountNotRegistered.Error())
+// }

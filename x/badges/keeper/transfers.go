@@ -8,7 +8,7 @@ import (
 func HandleTransfer(badge types.BitBadge, subbadgeRange *types.IdRange, fromUserBalanceInfo types.UserBalanceInfo, toUserBalanceInfo types.UserBalanceInfo, amount uint64, from uint64, to uint64, approvedBy uint64, expirationTime uint64, cantCancelBeforeTime uint64) (types.UserBalanceInfo, types.UserBalanceInfo, error) {
 	permissions := types.GetPermissions(badge.Permissions)
 	err := *new(error)
-	sendingToReservedAddress := false //TODO: implement this; Check if to Address is reserved; if so, we automatically forceful transfer
+	sendingToReservedAddress := IsReservedAddress(to)
 
 	canForcefulTransfer := sendingToReservedAddress || permissions.ForcefulTransfers || badge.Manager == to
 	if canForcefulTransfer {

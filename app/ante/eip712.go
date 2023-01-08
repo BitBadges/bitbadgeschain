@@ -229,10 +229,10 @@ func VerifySignature(
 			Salt:              "0",
 		}
 		
-		//TODO: types of string[] or uint64[] do not get registered as [] in MsgValue, so the types generated for firstMsg is actually overriden for our badges module below
-		//TODO: this shouldn't be needed; override MsgValue type with hardcoded badges module types 
-		//TODO: also readds omit empty fields
-		//This probably isn't a best practice. We should look to change this in the future
+		
+		//Normalize the typedData to handle empty (0, "", false), nested objects, and arrays. 
+		//Also, add in any missing types for the EIP712 typedData specific to our badges module. 
+		//Only check first message because eip712 only supports one message per tx
 		wrappedFirstMsg, ok := firstMsg.(legacytx.LegacyMsg)
 		if ok {
 			if wrappedFirstMsg.Route() == "badges" {

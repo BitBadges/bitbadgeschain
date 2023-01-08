@@ -7,7 +7,7 @@ import (
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 
 	"github.com/bitbadges/bitbadgeschain/app"
-	"github.com/bitbadges/bitbadgeschain/cmd/bitbadgesd/cmd"
+	"github.com/bitbadges/bitbadgeschain/cmd/bitbadgeschaind/cmd"
 )
 
 func main() {

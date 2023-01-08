@@ -70,7 +70,6 @@ const (
 	defaultWeightMsgUpdateBytes int = 100
 
 	opWeightMsgRegisterAddresses = "op_weight_msg_register_addresses"
-	// TODO: Determine the simulation weight value
 	defaultWeightMsgRegisterAddresses int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const

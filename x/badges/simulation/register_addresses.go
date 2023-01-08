@@ -22,8 +22,6 @@ func SimulateMsgRegisterAddresses(
 			Creator: simAccount.Address.String(),
 		}
 
-		// TODO: Handling the RegisterAddresses simulation
-
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "RegisterAddresses simulation not implemented"), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
 	}
 }
