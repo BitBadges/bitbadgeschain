@@ -1,6 +1,6 @@
 version: 1
 build:
-  main: cmd/bitbadgesd
+  main: cmd/bitbadgeschaind
   proto:
     path: proto
     third_party_paths:
