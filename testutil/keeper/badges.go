@@ -72,10 +72,10 @@ func BadgesKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 		storeKey,
 		memStoreKey,
 		paramsSubspace,
-		// badgesChannelKeeper{},
-		nil,
+		badgesChannelKeeper{},
 		badgesPortKeeper{},
 		capabilityKeeper.ScopeToModule("BadgesScopedKeeper"),
+		nil,
 		nil,
 	)
 

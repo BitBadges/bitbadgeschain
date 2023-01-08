@@ -246,7 +246,7 @@ func VerifySignature(
 		// return sdkerrors.Wrapf(sdkerrors.ErrInvalidChainID, "%s", typedData)
 		sigHash, _, err := apitypes.TypedDataAndHash(typedData)
 		if err != nil {
-			return sdkerrors.Wrapf(err, "%s failed to compute typed data hash", typedData.PrimaryType)
+			return sdkerrors.Wrapf(err, "%s failed to compute typed data hash", typedData)
 		}
 
 		feePayerSig := extOpt.FeePayerSig

@@ -3,14 +3,13 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
-
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/ignite/cli/ignite/pkg/cosmosibckeeper"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 type (
@@ -22,6 +21,7 @@ type (
 		paramstore paramtypes.Subspace
 
 		accountKeeper types.AccountKeeper
+		bankKeeper    types.BankKeeper
 	}
 )
 
@@ -34,6 +34,7 @@ func NewKeeper(
 	portKeeper cosmosibckeeper.PortKeeper,
 	scopedKeeper cosmosibckeeper.ScopedKeeper,
 	accountKeeper types.AccountKeeper,
+	 bankKeeper types.BankKeeper,
 ) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -52,7 +53,8 @@ func NewKeeper(
 		storeKey:      storeKey,
 		memKey:        memKey,
 		paramstore:    ps,
-		accountKeeper: accountKeeper,
+		accountKeeper: accountKeeper, 
+		bankKeeper: bankKeeper,
 	}
 }
 

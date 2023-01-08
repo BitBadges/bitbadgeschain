@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"encoding/json"
 	"testing"
 	"time"
 
@@ -12,14 +11,11 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	bitbadgesapp "github.com/bitbadges/bitbadgeschain/app"
-	"github.com/bitbadges/bitbadgeschain/encoding"
 
-	"github.com/ignite/cli/ignite/pkg/cosmoscmd"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -61,46 +57,9 @@ type TestSuite struct {
 
 //Bunch of weird config stuff to setup the app. Inherited most from Cosmos SDK tutorials and existing Cosmos SDK modules.
 func (suite *TestSuite) SetupTest() {
-	simapp.FlagEnabledValue = true
-	simapp.FlagCommitValue = true
-
-	_, db, _, logger, _, err := simapp.SetupSimulation("goleveldb-app-sim", "Simulation")
-	if err != nil {
-		panic("Error constructing simapp")
-	}
-
-	encoding := encoding.MakeConfig(bitbadgesapp.ModuleBasics)
-
-	cosmoscmdEncodingConfig := cosmoscmd.EncodingConfig{
-		Marshaler: encoding.Codec,
-		TxConfig:  encoding.TxConfig,
-		InterfaceRegistry: encoding.InterfaceRegistry,
-		Amino: encoding.Amino,
-	}
-
-	app := bitbadgesapp.NewApp(
-		logger,
-		db,
-		nil,
-		true,
-		map[int64]bool{},
-		bitbadgesapp.DefaultNodeHome,
-		0,
-		cosmoscmdEncodingConfig,
-		simapp.EmptyAppOptions{},
+	app := bitbadgesapp.Setup(
+		false, nil,
 	)
-
-	genesisState := bitbadgesapp.NewDefaultGenesisState(app.AppCodec())
-	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
-	if err != nil {
-		panic(err)
-	}
-
-	app.InitChain(abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		AppStateBytes:   stateBytes,
-		ConsensusParams: DefaultConsensusParams,
-	})
 
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 

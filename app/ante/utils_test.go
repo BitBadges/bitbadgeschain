@@ -37,11 +37,12 @@ import (
 	"github.com/evmos/ethermint/tests"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
-	"github.com/ignite/cli/ignite/pkg/cosmoscmd"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
+
+	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 )
 
 type AnteTestSuite struct {
@@ -92,7 +93,7 @@ func (suite *AnteTestSuite) SetupTest() {
 	encodingConfig.Amino.RegisterConcrete(&testdata.TestMsg{}, "testdata.TestMsg", nil)
 
 
-	cosmoscmdEncodingConfig := cosmoscmd.EncodingConfig{
+	appParamsConfig := appparams.EncodingConfig{
 		Marshaler: encodingConfig.Codec,
 		TxConfig:  encodingConfig.TxConfig,
 		InterfaceRegistry: encodingConfig.InterfaceRegistry,
@@ -107,7 +108,7 @@ func (suite *AnteTestSuite) SetupTest() {
 		map[int64]bool{},
 		bitbadgesapp.DefaultNodeHome,
 		0,
-		cosmoscmdEncodingConfig,
+		appParamsConfig,
 		simapp.EmptyAppOptions{},
 	)
 

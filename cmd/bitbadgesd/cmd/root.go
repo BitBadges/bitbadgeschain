@@ -1,16 +1,12 @@
-package main
-
-//99% copied from the "github.com/ignite/cli/ignite/pkg/cosmoscmd"
-//Needed custom encodingConfig so needed to use bitbadgeschain/encoding/config's MakeConfig()
+package cmd
 
 import (
 	"errors"
 	"io"
 	"os"
 	"path/filepath"
-	"time"
+	"strings"
 
-	"github.com/bitbadges/bitbadgeschain/encoding"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
@@ -22,135 +18,32 @@ import (
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/snapshots"
+	snapshottypes "github.com/cosmos/cosmos-sdk/snapshots/types"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/module"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	"github.com/ignite/cli/ignite/pkg/cosmoscmd"
+	"github.com/ignite/cli/ignite/services/network"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	tmcfg "github.com/tendermint/tendermint/config"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	snapshottypes "github.com/cosmos/cosmos-sdk/snapshots/types"
+	// this line is used by starport scaffolding # root/moduleImport
 
-	sdkserver "github.com/cosmos/cosmos-sdk/server"
-
-	tmcfg "github.com/tendermint/tendermint/config"
+	"github.com/bitbadges/bitbadgeschain/app"
+	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 )
-
-
-type (
-	// AppBuilder is a method that allows to build an app
-	AppBuilder func(
-		logger log.Logger,
-		db dbm.DB,
-		traceStore io.Writer,
-		loadLatest bool,
-		skipUpgradeHeights map[int64]bool,
-		homePath string,
-		invCheckPeriod uint,
-		encodingConfig cosmoscmd.EncodingConfig,
-		appOpts servertypes.AppOptions,
-		baseAppOptions ...func(*baseapp.BaseApp),
-	) cosmoscmd.App
-
-	// App represents a Cosmos SDK application that can be run as a server and with an exportable state
-	App interface {
-		servertypes.Application
-		ExportableApp
-	}
-
-	// ExportableApp represents an app with an exportable state
-	ExportableApp interface {
-		ExportAppStateAndValidators(
-			forZeroHeight bool,
-			jailAllowedAddrs []string,
-		) (servertypes.ExportedApp, error)
-		LoadHeight(height int64) error
-	}
-
-	// appCreator is an app creator
-	appCreator struct {
-		encodingConfig cosmoscmd.EncodingConfig
-		buildApp       AppBuilder
-	}
-)
-
-// Option configures root command option.
-type Option func(*rootOptions)
-
-// scaffoldingOptions keeps set of options to apply scaffolding.
-type rootOptions struct {
-	addSubCmds         []*cobra.Command
-	startCmdCustomizer func(*cobra.Command)
-	envPrefix          string
-}
-
-func newRootOptions(options ...Option) rootOptions {
-	opts := rootOptions{}
-	opts.apply(options...)
-	return opts
-}
-
-func (s *rootOptions) apply(options ...Option) {
-	for _, o := range options {
-		o(s)
-	}
-}
-
-// AddSubCmd adds sub commands.
-func AddSubCmd(cmd ...*cobra.Command) Option {
-	return func(o *rootOptions) {
-		o.addSubCmds = append(o.addSubCmds, cmd...)
-	}
-}
-
-// CustomizeStartCmd accepts a handler to customize the start command.
-func CustomizeStartCmd(h func(startCmd *cobra.Command)) Option {
-	return func(o *rootOptions) {
-		o.startCmdCustomizer = h
-	}
-}
-
-// WithEnvPrefix accepts a new prefix for environment variables.
-func WithEnvPrefix(envPrefix string) Option {
-	return func(o *rootOptions) {
-		o.envPrefix = envPrefix
-	}
-}
-
 
 // NewRootCmd creates a new root command for a Cosmos SDK application
-func NewRootCmd(
-	appName,
-	accountAddressPrefix,
-	defaultNodeHome,
-	defaultChainID string,
-	moduleBasics module.BasicManager,
-	buildApp AppBuilder,
-	options ...Option,
-) (*cobra.Command, cosmoscmd.EncodingConfig) {
-	rootOptions := newRootOptions(options...)
-
-	
-	// Set config for prefixes
-	cosmoscmd.SetPrefixes(accountAddressPrefix)
-
-	bitbadgesEncodingConfig := encoding.MakeConfig(moduleBasics)
-	encodingConfig := cosmoscmd.EncodingConfig{
-		InterfaceRegistry: bitbadgesEncodingConfig.InterfaceRegistry,
-		Marshaler:         bitbadgesEncodingConfig.Codec,
-		TxConfig:          bitbadgesEncodingConfig.TxConfig,
-		Amino:             bitbadgesEncodingConfig.Amino,
-	}
-
+func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
+	encodingConfig := app.MakeEncodingConfig()
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Marshaler).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
@@ -158,12 +51,11 @@ func NewRootCmd(
 		WithLegacyAmino(encodingConfig.Amino).
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
-		WithBroadcastMode(flags.BroadcastBlock).
-		WithHomeDir(defaultNodeHome).
-		WithViper(rootOptions.envPrefix)
+		WithHomeDir(app.DefaultNodeHome).
+		WithViper("")
 
 	rootCmd := &cobra.Command{
-		Use:   appName + "d",
+		Use:   app.Name + "d",
 		Short: "Stargate CosmosHub App",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			// set the default command outputs
@@ -184,94 +76,78 @@ func NewRootCmd(
 
 			customAppTemplate, customAppConfig := initAppConfig()
 			customTMConfig := initTendermintConfig()
-
-			if err := server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, customTMConfig); err != nil {
-				return err
-			}
-
-			// startProxyForTunneledPeers(initClientCtx, cmd) TODO: took this out
-
-			return nil
+			return server.InterceptConfigsPreRunHandler(
+				cmd, customAppTemplate, customAppConfig, customTMConfig,
+			)
 		},
 	}
 
-	initRootCmd(
-		rootCmd,
-		encodingConfig,
-		defaultNodeHome,
-		moduleBasics,
-		buildApp,
-		rootOptions,
-	)
+	initRootCmd(rootCmd, encodingConfig)
 	overwriteFlagDefaults(rootCmd, map[string]string{
-		flags.FlagChainID:        defaultChainID,
+		flags.FlagChainID:        strings.ReplaceAll(app.Name, "-", ""),
 		flags.FlagKeyringBackend: "test",
 	})
 
 	return rootCmd, encodingConfig
 }
 
+// initTendermintConfig helps to override default Tendermint Config values.
+// return tmcfg.DefaultConfig if no custom configuration is required for the application.
+func initTendermintConfig() *tmcfg.Config {
+	cfg := tmcfg.DefaultConfig()
+	return cfg
+}
+
 func initRootCmd(
 	rootCmd *cobra.Command,
-	encodingConfig cosmoscmd.EncodingConfig,
-	defaultNodeHome string,
-	moduleBasics module.BasicManager,
-	buildApp AppBuilder,
-	options rootOptions,
+	encodingConfig appparams.EncodingConfig,
 ) {
+	// Set config
+	initSDKConfig()
+
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(moduleBasics, defaultNodeHome),
-		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, defaultNodeHome),
+		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
+		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 		genutilcli.MigrateGenesisCmd(),
 		genutilcli.GenTxCmd(
-			moduleBasics,
+			app.ModuleBasics,
 			encodingConfig.TxConfig,
 			banktypes.GenesisBalancesIterator{},
-			defaultNodeHome,
+			app.DefaultNodeHome,
 		),
-		genutilcli.ValidateGenesisCmd(moduleBasics),
-		cosmoscmd.AddGenesisAccountCmd(defaultNodeHome),
+		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
+		AddGenesisAccountCmd(app.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		debug.Cmd(),
 		config.Cmd(),
+		// this line is used by starport scaffolding # root/commands
 	)
 
 	a := appCreator{
 		encodingConfig,
-		buildApp,
 	}
 
 	// add server commands
 	server.AddCommands(
 		rootCmd,
-		defaultNodeHome,
+		app.DefaultNodeHome,
 		a.newApp,
 		a.appExport,
-		func(cmd *cobra.Command) {
-			addModuleInitFlags(cmd)
-
-			if options.startCmdCustomizer != nil {
-				options.startCmdCustomizer(cmd)
-			}
-		},
+		addModuleInitFlags,
 	)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
-		queryCommand(moduleBasics),
-		txCommand(moduleBasics),
-		keys.Commands(defaultNodeHome),
+		queryCommand(),
+		txCommand(),
+		keys.Commands(app.DefaultNodeHome),
+		startWithTunnelingCommand(a, app.DefaultNodeHome),
 	)
-
-	// add user given sub commands.
-	for _, cmd := range options.addSubCmds {
-		rootCmd.AddCommand(cmd)
-	}
 }
 
 // queryCommand returns the sub-command to send queries to the app
-func queryCommand(moduleBasics module.BasicManager) *cobra.Command {
+func queryCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "query",
 		Aliases:                    []string{"q"},
@@ -289,29 +165,14 @@ func queryCommand(moduleBasics module.BasicManager) *cobra.Command {
 		authcmd.QueryTxCmd(),
 	)
 
-	moduleBasics.AddQueryCommands(cmd)
+	app.ModuleBasics.AddQueryCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
 }
 
-// initTendermintConfig helps to override default Tendermint Config values.
-// return tmcfg.DefaultConfig if no custom configuration is required for the application.
-func initTendermintConfig() *tmcfg.Config {
-	cfg := tmcfg.DefaultConfig()
-	cfg.Consensus.TimeoutCommit = time.Second
-	// use v0 since v1 severely impacts the node's performance
-	cfg.Mempool.Version = tmcfg.MempoolV0
-
-	// to put a higher strain on node memory, use these values:
-	// cfg.P2P.MaxNumInboundPeers = 100
-	// cfg.P2P.MaxNumOutboundPeers = 40
-
-	return cfg
-}
-
 // txCommand returns the sub-command to send transactions to the app
-func txCommand(moduleBasics module.BasicManager) *cobra.Command {
+func txCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "tx",
 		Short:                      "Transactions subcommands",
@@ -331,14 +192,38 @@ func txCommand(moduleBasics module.BasicManager) *cobra.Command {
 		authcmd.GetDecodeCommand(),
 	)
 
-	moduleBasics.AddTxCommands(cmd)
+	app.ModuleBasics.AddTxCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
 }
 
+// startWithTunnelingCommand returns a new start command with http tunneling
+// enabled.
+func startWithTunnelingCommand(appCreator appCreator, defaultNodeHome string) *cobra.Command {
+	startCmd := server.StartCmd(appCreator.newApp, defaultNodeHome)
+	startCmd.Use = "start-with-http-tunneling"
+	startCmd.Short = "Run the full node with http tunneling"
+	// Backup existing PreRunE, since we'll override it.
+	startPreRunE := startCmd.PreRunE
+	startCmd.PreRunE = func(cmd *cobra.Command, args []string) error {
+		var (
+			ctx       = cmd.Context()
+			clientCtx = client.GetClientContextFromCmd(cmd)
+			serverCtx = server.GetServerContextFromCmd(cmd)
+		)
+		network.StartProxyForTunneledPeers(ctx, clientCtx, serverCtx)
+		if startPreRunE == nil {
+			return nil
+		}
+		return startPreRunE(cmd, args)
+	}
+	return startCmd
+}
+
 func addModuleInitFlags(startCmd *cobra.Command) {
 	crisis.AddModuleInitFlags(startCmd)
+	// this line is used by starport scaffolding # root/arguments
 }
 
 func overwriteFlagDefaults(c *cobra.Command, defaults map[string]string) {
@@ -355,6 +240,10 @@ func overwriteFlagDefaults(c *cobra.Command, defaults map[string]string) {
 	for _, c := range c.Commands() {
 		overwriteFlagDefaults(c, defaults)
 	}
+}
+
+type appCreator struct {
+	encodingConfig appparams.EncodingConfig
 }
 
 // newApp creates a new Cosmos SDK app
@@ -381,7 +270,7 @@ func (a appCreator) newApp(
 	}
 
 	snapshotDir := filepath.Join(cast.ToString(appOpts.Get(flags.FlagHome)), "data", "snapshots")
-	snapshotDB, err := sdk.NewLevelDB("metadata", snapshotDir)
+	snapshotDB, err := dbm.NewDB("metadata", dbm.GoLevelDBBackend, snapshotDir)
 	if err != nil {
 		panic(err)
 	}
@@ -391,12 +280,11 @@ func (a appCreator) newApp(
 	}
 
 	snapshotOptions := snapshottypes.NewSnapshotOptions(
-		cast.ToUint64(appOpts.Get(sdkserver.FlagStateSyncSnapshotInterval)),
-		cast.ToUint32(appOpts.Get(sdkserver.FlagStateSyncSnapshotKeepRecent)),
+		cast.ToUint64(appOpts.Get(server.FlagStateSyncSnapshotInterval)),
+		cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent)),
 	)
 
-
-	return a.buildApp(
+	return app.New(
 		logger,
 		db,
 		traceStore,
@@ -415,6 +303,8 @@ func (a appCreator) newApp(
 		baseapp.SetTrace(cast.ToBool(appOpts.Get(server.FlagTrace))),
 		baseapp.SetIndexEvents(cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents))),
 		baseapp.SetSnapshot(snapshotStore, snapshotOptions),
+		baseapp.SetIAVLCacheSize(cast.ToInt(appOpts.Get(server.FlagIAVLCacheSize))),
+		baseapp.SetIAVLDisableFastNode(cast.ToBool(appOpts.Get(server.FlagDisableIAVLFastNode))),
 	)
 }
 
@@ -428,15 +318,12 @@ func (a appCreator) appExport(
 	jailAllowedAddrs []string,
 	appOpts servertypes.AppOptions,
 ) (servertypes.ExportedApp, error) {
-
-	var exportableApp ExportableApp
-
 	homePath, ok := appOpts.Get(flags.FlagHome).(string)
 	if !ok || homePath == "" {
 		return servertypes.ExportedApp{}, errors.New("application home not set")
 	}
 
-	exportableApp = a.buildApp(
+	app := app.New(
 		logger,
 		db,
 		traceStore,
@@ -449,12 +336,12 @@ func (a appCreator) appExport(
 	)
 
 	if height != -1 {
-		if err := exportableApp.LoadHeight(height); err != nil {
+		if err := app.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	}
 
-	return exportableApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
+	return app.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
 }
 
 // initAppConfig helps to override default appConfig template and configs.

@@ -94,6 +94,16 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 		}
 	}
 
+	//Remove the types in typedData.Types that begin with the prefix Type
+	//This is to get around the logic in the ethermint eip712 logic which assigns
+	//a new type to each unknown field by Type + FieldName.
+	//We don't want to use this because it is wrong and we add the types in this file.
+	for key := range typedData.Types {
+		if strings.HasPrefix(key, "Type") {
+			delete(typedData.Types, key)
+		}
+	}
+
 	msgValue, ok := typedData.Message["msgs"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})
 	if !ok {
 		return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "message is not a map[string]interface{}")
