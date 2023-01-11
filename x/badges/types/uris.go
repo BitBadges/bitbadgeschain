@@ -9,7 +9,7 @@ func GetSubassetUriFromUriObject(uriObject UriObject) (string, error) {
 
 	subassetUri := uri[:uriObject.IdxRangeToRemove.Start] + uri[uriObject.IdxRangeToRemove.End:]
 	subassetUri = subassetUri[:uriObject.InsertSubassetBytesIdx] + string(uriObject.BytesToInsert) + subassetUri[uriObject.InsertSubassetBytesIdx:]
-	subassetUri = subassetUri[:uriObject.InsertIdIdx] + "0" + subassetUri[uriObject.InsertIdIdx:]
+	subassetUri = subassetUri[:uriObject.InsertIdIdx] + "{id}" + subassetUri[uriObject.InsertIdIdx:]
 
 	return subassetUri, nil
 }
