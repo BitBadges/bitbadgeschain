@@ -26,7 +26,7 @@ service Msg {
     rpc PruneBalances(MsgPruneBalances) returns (MsgPruneBalancesResponse);
     rpc UpdateBytes(MsgUpdateBytes) returns (MsgUpdateBytesResponse);
     rpc RegisterAddresses(MsgRegisterAddresses) returns (MsgRegisterAddressesResponse);
-// this line is used by starport scaffolding # proto/tx/rpc
+    // this line is used by starport scaffolding # proto/tx/rpc
 }
 
 //The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
