@@ -15,31 +15,24 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
-
 		switch msg := msg.(type) {
-		case *types.MsgNewBadge:
-			res, err := msgServer.NewBadge(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgNewCollection:
+			res, err := msgServer.NewCollection(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgNewSubBadge:
-			res, err := msgServer.NewSubBadge(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgMintBadge:
+			res, err := msgServer.MintBadge(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgTransferBadge:
 			res, err := msgServer.TransferBadge(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgRequestTransferBadge:
-			res, err := msgServer.RequestTransferBadge(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgHandlePendingTransfer:
-			res, err := msgServer.HandlePendingTransfer(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgSetApproval:
 			res, err := msgServer.SetApproval(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgRevokeBadge:
-			res, err := msgServer.RevokeBadge(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgUpdateDisallowedTransfers:
+			res, err := msgServer.UpdateDisallowedTransfers(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgFreezeAddress:
-			res, err := msgServer.FreezeAddress(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgUpdateManagerApprovedTransfers:
+			res, err := msgServer.UpdateManagerApprovedTransfers(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgUpdateUris:
 			res, err := msgServer.UpdateUris(sdk.WrapSDKContext(ctx), msg)
@@ -52,12 +45,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgRequestTransferManager:
 			res, err := msgServer.RequestTransferManager(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgSelfDestructBadge:
-			res, err := msgServer.SelfDestructBadge(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgPruneBalances:
-			res, err := msgServer.PruneBalances(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgUpdateBytes:
 			res, err := msgServer.UpdateBytes(sdk.WrapSDKContext(ctx), msg)

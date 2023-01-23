@@ -8,19 +8,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (suite *TestSuite) TestGetBadge() {
+func (suite *TestSuite) TestGetCollection() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	badgesToCreate := []BadgesToCreate{
+	collectionsToCreate := []CollectionsToCreate{
 		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-					InsertIdIdx:            10,
-				},
+			Collection: types.MsgNewCollection{
+				CollectionUri: "https://example.com/",
+				BadgeUri: "https://example.com/{id}",
 				Permissions: 62,
 			},
 			Amount:  1,
@@ -28,32 +23,27 @@ func (suite *TestSuite) TestGetBadge() {
 		},
 	}
 
-	err := CreateBadges(suite, wctx, badgesToCreate)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	badge, err := suite.app.BadgesKeeper.GetBadgeE(suite.ctx, 0)
+	badge, err := suite.app.BadgesKeeper.GetCollectionE(suite.ctx, 0)
 	suite.Require().Nil(err, "Error getting badge: %s")
-	suite.Require().Equal(badge.Id, uint64(0))
+	suite.Require().Equal(badge.CollectionId, uint64(0))
 
-	badge, err = suite.app.BadgesKeeper.GetBadgeE(suite.ctx, 1)
-	suite.Require().EqualError(err, keeper.ErrBadgeNotExists.Error())
+	badge, err = suite.app.BadgesKeeper.GetCollectionE(suite.ctx, 1)
+	suite.Require().EqualError(err, keeper.ErrCollectionNotExists.Error())
 }
 
-func (suite *TestSuite) TestGetBadgeAndAssertSubbadges() {
+func (suite *TestSuite) TestGetBadgeAndAssertBadges() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	badgesToCreate := []BadgesToCreate{
+	collectionsToCreate := []CollectionsToCreate{
 		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-					InsertIdIdx:            10,
-				},
+			Collection: types.MsgNewCollection{
+				BadgeUri: "https://example.com/{id}",
+				CollectionUri: "https://example.com",
 				Permissions:             62,
-				SubassetSupplysAndAmounts: []*types.SubassetSupplyAndAmount{
+				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
 						Supply: 1,
 						Amount: 1,
@@ -65,10 +55,10 @@ func (suite *TestSuite) TestGetBadgeAndAssertSubbadges() {
 		},
 	}
 
-	err := CreateBadges(suite, wctx, badgesToCreate)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	_, err = suite.app.BadgesKeeper.GetBadgeAndAssertSubbadgeRangesAreValid(suite.ctx, 0, []*types.IdRange{
+	_, err = suite.app.BadgesKeeper.GetCollectionAndAssertBadgeIdsAreValid(suite.ctx, 0, []*types.IdRange{
 		{
 			Start: 0,
 			End:   0,
@@ -76,36 +66,31 @@ func (suite *TestSuite) TestGetBadgeAndAssertSubbadges() {
 	})
 	suite.Require().Nil(err, "Error getting badge: %s")
 
-	_, err = suite.app.BadgesKeeper.GetBadgeAndAssertSubbadgeRangesAreValid(suite.ctx, 0, []*types.IdRange{
+	_, err = suite.app.BadgesKeeper.GetCollectionAndAssertBadgeIdsAreValid(suite.ctx, 0, []*types.IdRange{
 		{
 			Start: 20,
 			End:   10,
 		},
 	})
-	suite.Require().EqualError(err, keeper.ErrInvalidSubbadgeRange.Error())
+	suite.Require().EqualError(err, keeper.ErrInvalidBadgeRange.Error())
 
-	_, err = suite.app.BadgesKeeper.GetBadgeAndAssertSubbadgeRangesAreValid(suite.ctx, 0, []*types.IdRange{
+	_, err = suite.app.BadgesKeeper.GetCollectionAndAssertBadgeIdsAreValid(suite.ctx, 0, []*types.IdRange{
 		{
 			Start: 0,
 			End:   10,
 		},
 	})
-	suite.Require().EqualError(err, keeper.ErrSubBadgeNotExists.Error())
+	suite.Require().EqualError(err, keeper.ErrBadgeNotExists.Error())
 }
 
-func (suite *TestSuite) TestCreateSubassets() {
+func (suite *TestSuite) TestCreateBadges() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	badgesToCreate := []BadgesToCreate{
+	collectionsToCreate := []CollectionsToCreate{
 		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-					InsertIdIdx:            10,
-				},
+			Collection: types.MsgNewCollection{
+				BadgeUri: "https://example.com/{id}",
+				CollectionUri: "https://example.com",
 				Permissions: 62,
 			},
 			Amount:  1,
@@ -113,65 +98,168 @@ func (suite *TestSuite) TestCreateSubassets() {
 		},
 	}
 
-	err := CreateBadges(suite, wctx, badgesToCreate)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
-	badge, err := GetBadge(suite, wctx, 0)
+	badge, err := GetCollection(suite, wctx, 0)
 	suite.Require().Nil(err, "Error getting badge: %s")
-	balanceInfo := types.UserBalanceInfo{}
+	balance := types.UserBalance{}
 
-	badge, balanceInfo, err = keeper.CreateSubassets(badge, balanceInfo, []*types.SubassetSupplyAndAmount{
+	badge, err = suite.app.BadgesKeeper.CreateBadges(suite.ctx, badge, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 1,
 			Amount: 1,
 		},
-	})
+	}, []*types.Transfers{
+		{
+			ToAddresses: []uint64{bobAccountNum},
+			Balances: []*types.Balance{
+				{
+					Balance: 1,
+					BadgeIds: []*types.IdRange{
+						{
+							Start: 0,
+							End:   0,
+						},
+					},
+				},
+			},
+		},
+	}, []*types.Claim{}, bob)
 	suite.Require().Nil(err, "Error creating subassets: %s")
-	suite.Require().Equal(badge.SubassetSupplys, []*types.BalanceObject(nil))
-	suite.Require().Equal(balanceInfo.BalanceAmounts[0].Balance, uint64(1))
-	suite.Require().Equal(balanceInfo.BalanceAmounts[0].IdRanges, []*types.IdRange{
+
+
+	suite.Require().Equal(badge.MaxSupplys, []*types.Balance{
+		{
+			Balance: 1,
+			BadgeIds: []*types.IdRange{
+				{
+					Start: 0,
+					End:   0,
+				},
+			},
+		},
+	})
+
+	balance, err = GetUserBalance(suite, wctx, 0, bobAccountNum)
+	suite.Require().Nil(err, "Error getting user balance: %s")
+	suite.Require().Equal(balance.Balances[0].Balance, uint64(1))
+	suite.Require().Equal(balance.Balances[0].BadgeIds, []*types.IdRange{
 		{
 			Start: 0,
 			End:   0,
 		},
 	})
 
-	badge, balanceInfo, err = keeper.CreateSubassets(badge, balanceInfo, []*types.SubassetSupplyAndAmount{
+	badge, err = suite.app.BadgesKeeper.CreateBadges(suite.ctx, badge, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 1,
 			Amount: 1,
 		},
-	})
+	}, []*types.Transfers{
+		{
+			ToAddresses: []uint64{bobAccountNum},
+			Balances: []*types.Balance{
+				{
+					Balance: 1,
+					BadgeIds: []*types.IdRange{
+						{
+							Start: 1,
+							End:   1,
+						},
+					},
+				},
+			},
+		},
+	}, []*types.Claim{}, bob)
+	suite.Require().Nil(err, "Error getting user balance: %s")
+
+	balance, err = GetUserBalance(suite, wctx, 0, bobAccountNum)
+	suite.Require().Nil(err, "Error getting user balance: %s")
 	suite.Require().Nil(err, "Error creating subassets: %s")
-	suite.Require().Equal(badge.SubassetSupplys, []*types.BalanceObject(nil))
-	suite.Require().Equal(balanceInfo.BalanceAmounts[0].Balance, uint64(1))
-	suite.Require().Equal(balanceInfo.BalanceAmounts[0].IdRanges, []*types.IdRange{
+	suite.Require().Equal(badge.MaxSupplys, []*types.Balance{
+		{
+			Balance: 1,
+			BadgeIds: []*types.IdRange{
+				{
+					Start: 0,
+					End:   1,
+				},
+			},
+		},
+	})
+	suite.Require().Equal(balance.Balances[0].Balance, uint64(1))
+	suite.Require().Equal(balance.Balances[0].BadgeIds, []*types.IdRange{
 		{
 			Start: 0,
 			End:   1,
 		},
 	})
 
-	badge, balanceInfo, err = keeper.CreateSubassets(badge, balanceInfo, []*types.SubassetSupplyAndAmount{
+	badge, err = suite.app.BadgesKeeper.CreateBadges(suite.ctx, badge, []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 0,
+			Supply: 1,
 			Amount: 1,
 		},
-	})
+	}, []*types.Transfers{
+		{
+			ToAddresses: []uint64{bobAccountNum},
+			Balances: []*types.Balance{
+				{
+					Balance: 1,
+					BadgeIds: []*types.IdRange{
+						{
+							Start: 2,
+							End:   2,
+						},
+					},
+				},
+			},
+		},
+	}, []*types.Claim{}, bob)
+	suite.Require().Nil(err, "Error getting user balance: %s")
+
+	balance, err = GetUserBalance(suite, wctx, 0, bobAccountNum)
+	suite.Require().Nil(err, "Error getting user balance: %s")
 	suite.Require().Nil(err, "Error creating subassets: %s")
-	suite.Require().Equal(badge.SubassetSupplys, []*types.BalanceObject(nil))
-	suite.Require().Equal(balanceInfo.BalanceAmounts[0].Balance, uint64(1))
-	suite.Require().Equal(balanceInfo.BalanceAmounts[0].IdRanges, []*types.IdRange{
+	suite.Require().Equal(badge.MaxSupplys, []*types.Balance{
+		{
+			Balance: 1,
+			BadgeIds: []*types.IdRange{
+				{
+					Start: 0,
+					End:   2,
+				},
+			},
+		},
+	})
+	suite.Require().Equal(balance.Balances[0].Balance, uint64(1))
+	suite.Require().Equal(balance.Balances[0].BadgeIds, []*types.IdRange{
 		{
 			Start: 0,
 			End:   2,
 		},
 	})
 
-	badge, balanceInfo, err = keeper.CreateSubassets(badge, balanceInfo, []*types.SubassetSupplyAndAmount{
+	badge, err = suite.app.BadgesKeeper.CreateBadges(suite.ctx, badge, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 1,
 			Amount: math.MaxUint64,
 		},
-	})
+	}, []*types.Transfers{
+		{
+			ToAddresses: []uint64{bobAccountNum},
+			Balances: []*types.Balance{
+				{
+					Balance: 1,
+					BadgeIds: []*types.IdRange{
+						{
+							Start: 3,
+							End:   3,
+						},
+					},
+				},
+			},
+		},
+	}, []*types.Claim{}, bob)
 	suite.Require().EqualError(err, keeper.ErrOverflow.Error())
 }

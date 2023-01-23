@@ -32,23 +32,29 @@ func SimulateMsgTransferBadge(
 		msg := &types.MsgTransferBadge{
 			Creator:              simAccount.Address.String(),
 			From:                 r.Uint64(),
-			ToAddresses:          randomAccounts,
-			Amounts:              randomAmounts,
-			BadgeId:              r.Uint64(),
-			ExpirationTime:       r.Uint64(),
-			CantCancelBeforeTime: r.Uint64(),
-			SubbadgeRanges: []*types.IdRange{
+			CollectionId:         r.Uint64(),
+			Transfers: []*types.Transfers{
 				{
-					Start: r.Uint64(),
-					End:   r.Uint64(),
-				},
-				{
-					Start: r.Uint64(),
-					End:   r.Uint64(),
-				},
-				{
-					Start: r.Uint64(),
-					End:   r.Uint64(),
+					ToAddresses: randomAccounts,
+					Balances: []*types.Balance{
+						{
+							Balance: r.Uint64(),
+							BadgeIds:  []*types.IdRange{
+								{
+									Start: r.Uint64(),
+									End:   r.Uint64(),
+								},
+								{
+									Start: r.Uint64(),
+									End:   r.Uint64(),
+								},
+								{
+									Start: r.Uint64(),
+									End:   r.Uint64(),
+								},
+							},
+						},
+					},
 				},
 			},
 		}

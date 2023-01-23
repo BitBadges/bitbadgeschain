@@ -30,20 +30,15 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(CmdNewBadge())
-	cmd.AddCommand(CmdNewSubBadge())
+	cmd.AddCommand(CmdNewCollection())
+	cmd.AddCommand(CmdMintBadge())
 	cmd.AddCommand(CmdTransferBadge())
-	cmd.AddCommand(CmdRequestTransferBadge())
-	cmd.AddCommand(CmdHandlePendingTransfer())
 	cmd.AddCommand(CmdSetApproval())
-	cmd.AddCommand(CmdRevokeBadge())
-	cmd.AddCommand(CmdFreezeAddress())
+	cmd.AddCommand(CmdUpdateDisallowedTransfers())
 	cmd.AddCommand(CmdUpdateUris())
 	cmd.AddCommand(CmdUpdatePermissions())
 	cmd.AddCommand(CmdTransferManager())
 	cmd.AddCommand(CmdRequestTransferManager())
-	cmd.AddCommand(CmdSelfDestructBadge())
-	cmd.AddCommand(CmdPruneBalances())
 	cmd.AddCommand(CmdUpdateBytes())
 	cmd.AddCommand(CmdRegisterAddresses())
 	// this line is used by starport scaffolding # 1

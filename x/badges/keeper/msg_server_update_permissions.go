@@ -13,7 +13,7 @@ func (k msgServer) UpdatePermissions(goCtx context.Context, msg *types.MsgUpdate
 
 	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:       msg.Creator,
-		BadgeId:       msg.BadgeId,
+		CollectionId:       msg.CollectionId,
 		MustBeManager: true,
 	})
 	if err != nil {
@@ -27,7 +27,7 @@ func (k msgServer) UpdatePermissions(goCtx context.Context, msg *types.MsgUpdate
 
 	badge.Permissions = msg.Permissions
 
-	if err := k.SetBadgeInStore(ctx, badge); err != nil {
+	if err := k.SetCollectionInStore(ctx, badge); err != nil {
 		return nil, err
 	}
 
@@ -35,7 +35,7 @@ func (k msgServer) UpdatePermissions(goCtx context.Context, msg *types.MsgUpdate
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeyAction, "UpdatePermissions"),
-			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
+			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.CollectionId)),
 		),
 	)
 

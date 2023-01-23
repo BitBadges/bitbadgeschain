@@ -12,10 +12,15 @@ import (
 func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval) (*types.MsgSetApprovalResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	rangesToValidate := []*types.IdRange{}
+	for _, balance := range msg.Balances {
+		rangesToValidate = append(rangesToValidate, balance.BadgeIds...)
+	}
+
 	CreatorAccountNum, _, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:                      msg.Creator,
-		BadgeId:                      msg.BadgeId,
-		SubbadgeRangesToValidate:     msg.SubbadgeRanges,
+		CollectionId:                      msg.CollectionId,
+		BadgeIdRangesToValidate:     	  rangesToValidate,
 		AccountsThatCantEqualCreator: []uint64{msg.Address},
 		AccountsToCheckRegistration:  []uint64{msg.Address},
 	})
@@ -23,20 +28,23 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 		return nil, err
 	}
 
-	creatorBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.BadgeId)
-	creatorBalanceInfo, found := k.Keeper.GetUserBalanceFromStore(ctx, creatorBalanceKey)
+	creatorBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.CollectionId)
+	creatorbalance, found := k.Keeper.GetUserBalanceFromStore(ctx, creatorBalanceKey)
 	if !found {
-		creatorBalanceInfo = types.UserBalanceInfo{}
+		creatorbalance = types.UserBalance{}
 	}
 
-	for _, subbadgeRange := range msg.SubbadgeRanges {
-		creatorBalanceInfo, err = SetApproval(creatorBalanceInfo, msg.Amount, msg.Address, subbadgeRange)
-		if err != nil {
-			return nil, err
+	for _, balance := range msg.Balances {
+		amount := balance.Balance
+		for _, badgeIdRange := range balance.BadgeIds {
+			creatorbalance, err = SetApproval(creatorbalance, amount, msg.Address, badgeIdRange)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	if err := k.SetUserBalanceInStore(ctx, creatorBalanceKey, GetBalanceInfoToInsertToStorage(creatorBalanceInfo)); err != nil {
+	if err := k.SetUserBalanceInStore(ctx, creatorBalanceKey, GetBalanceToInsertToStorage(creatorbalance)); err != nil {
 		return nil, err
 	}
 
@@ -45,10 +53,9 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeyAction, "SetApproval"),
 			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
-			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
-			sdk.NewAttribute("SubbadgeRanges", fmt.Sprint(msg.SubbadgeRanges)),
+			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.CollectionId)),
+			sdk.NewAttribute("BadgeIdRanges", fmt.Sprint(msg.Balances)),
 			sdk.NewAttribute("ApprovedAddress", fmt.Sprint(msg.Address)),
-			sdk.NewAttribute("Amount", fmt.Sprint(msg.Amount)),
 		),
 	)
 

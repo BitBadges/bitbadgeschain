@@ -22,9 +22,10 @@ func TestGenesisState_Validate(t *testing.T) {
 			desc: "valid genesis state",
 			genState: &types.GenesisState{
 				PortId:      types.PortID,
-				NextBadgeId: 0,
-				Badges:      []*types.BitBadge{},
-				Balances:    []*types.UserBalanceInfo{},
+				NextCollectionId: 0,
+				NextClaimId: 0,
+				Collections:     []*types.BadgeCollection{},
+				Balances:    []*types.UserBalance{},
 				BalanceIds:  []string{},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},

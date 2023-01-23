@@ -13,23 +13,23 @@ func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgR
 
 	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator: msg.Creator,
-		BadgeId: msg.BadgeId,
+		CollectionId: msg.CollectionId,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	if msg.Add {
+	if msg.AddRequest {
 		permissions := types.GetPermissions(badge.Permissions)
-		if !permissions.CanManagerTransfer {
+		if !permissions.CanManagerBeTransferred {
 			return nil, ErrInvalidPermissions //Manager can never transfer, so we don't unnecessarily store stuff
 		}
 
-		if err := k.CreateTransferManagerRequest(ctx, msg.BadgeId, CreatorAccountNum); err != nil {
+		if err := k.CreateTransferManagerRequest(ctx, msg.CollectionId, CreatorAccountNum); err != nil {
 			return nil, err
 		}
 	} else {
-		if err := k.RemoveTransferManagerRequest(ctx, msg.BadgeId, CreatorAccountNum); err != nil {
+		if err := k.RemoveTransferManagerRequest(ctx, msg.CollectionId, CreatorAccountNum); err != nil {
 			return nil, err
 		}
 	}
@@ -39,8 +39,8 @@ func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgR
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeyAction, "RequestTransferManager"),
 			sdk.NewAttribute("Creator", fmt.Sprint(CreatorAccountNum)),
-			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
-			sdk.NewAttribute("AddRequest", fmt.Sprint(msg.Add)),
+			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.CollectionId)),
+			sdk.NewAttribute("AddRequest", fmt.Sprint(msg.AddRequest)),
 		),
 	)
 

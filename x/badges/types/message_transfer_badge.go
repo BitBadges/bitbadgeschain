@@ -9,21 +9,13 @@ const TypeMsgTransferBadge = "transfer_badge"
 
 var _ sdk.Msg = &MsgTransferBadge{}
 
-func NewMsgTransferBadge(creator string, from uint64, toAddresses []uint64, amounts []uint64, badgeId uint64, subbadgeRanges []*IdRange, expirationTime uint64, cantCancelBeforeTime uint64) *MsgTransferBadge {
+func NewMsgTransferBadge(creator string, collectionId uint64, from uint64, transfers []*Transfers) *MsgTransferBadge {
 	return &MsgTransferBadge{
 		Creator:              creator,
+		CollectionId:		  collectionId,
 		From:                 from,
-		ToAddresses:          toAddresses,
-		Amounts:              amounts,
-		BadgeId:              badgeId,
-		SubbadgeRanges:       subbadgeRanges,
-		ExpirationTime:       expirationTime,
-		CantCancelBeforeTime: cantCancelBeforeTime,
+		Transfers: 			  transfers,
 	}
-}
-
-func (msg *MsgTransferBadge) Route() string {
-	return RouterKey
 }
 
 func (msg *MsgTransferBadge) Type() string {
@@ -49,35 +41,35 @@ func (msg *MsgTransferBadge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.SubbadgeRanges == nil {
-		return ErrRangesIsNil
+
+	if msg.Transfers == nil || len(msg.Transfers) == 0 {
+		return ErrInvalidLengthBalances
 	}
 
-	if msg.ExpirationTime != 0 && msg.CantCancelBeforeTime > msg.ExpirationTime {
-		return ErrCancelTimeIsGreaterThanExpirationTime
-	}
+	for _, transfer := range msg.Transfers {
+		for _, balance := range transfer.Balances {
+			if balance == nil {
+				return ErrInvalidLengthBalances
+			}
 
-	err = ValidateRangesAreValid(msg.SubbadgeRanges)
-	if err != nil {
-		return err
-	}
+			if balance.Balance == 0 {
+				return ErrAmountEqualsZero
+			}
 
-	if duplicateInArray(msg.ToAddresses) {
-		return ErrDuplicateAddresses
-	}
+			err = ValidateRangesAreValid(balance.BadgeIds)
+			if err != nil {
+				return err
+			}
+		}
 
-	if duplicateInArray(msg.Amounts) {
-		return ErrDuplicateAmounts
-	}
+		if duplicateInArray(transfer.ToAddresses) {
+			return ErrDuplicateAddresses
+		}
 
-	err = ValidateNoElementIsX(msg.ToAddresses, msg.From)
-	if err != nil {
-		return err
-	}
-
-	err = ValidateNoElementIsX(msg.Amounts, 0)
-	if err != nil {
-		return err
+		err = ValidateNoElementIsX(transfer.ToAddresses, msg.From)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

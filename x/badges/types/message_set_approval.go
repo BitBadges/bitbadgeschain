@@ -9,13 +9,12 @@ const TypeMsgSetApproval = "set_approval"
 
 var _ sdk.Msg = &MsgSetApproval{}
 
-func NewMsgSetApproval(creator string, amount uint64, address uint64, badgeId uint64, subbadgeRanges []*IdRange) *MsgSetApproval {
+func NewMsgSetApproval(creator string, collectionId uint64, address uint64, balances []*Balance) *MsgSetApproval {
 	return &MsgSetApproval{
 		Creator:        creator,
-		Amount:         amount,
 		Address:        address,
-		BadgeId:        badgeId,
-		SubbadgeRanges: subbadgeRanges,
+		CollectionId:  collectionId,
+		Balances:  		balances,
 	}
 }
 
@@ -46,13 +45,17 @@ func (msg *MsgSetApproval) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.SubbadgeRanges == nil {
-		return ErrRangesIsNil
-	}
+	if msg.Balances != nil {
+		for _, balance := range msg.Balances {
+			if balance.BadgeIds == nil {
+				return ErrRangesIsNil
+			}
 
-	err = ValidateRangesAreValid(msg.SubbadgeRanges)
-	if err != nil {
-		return err
+			err = ValidateRangesAreValid(balance.BadgeIds)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil

@@ -27,23 +27,25 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type SubassetSupplyAndAmount struct {
+//BadgeSupplyAndAmount is used to define the supply and amount of badges to create.
+//We create x amount of badges each with a supply of y.
+type BadgeSupplyAndAmount struct {
 	Supply uint64 `protobuf:"varint,1,opt,name=supply,proto3" json:"supply,omitempty"`
 	Amount uint64 `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
 }
 
-func (m *SubassetSupplyAndAmount) Reset()         { *m = SubassetSupplyAndAmount{} }
-func (m *SubassetSupplyAndAmount) String() string { return proto.CompactTextString(m) }
-func (*SubassetSupplyAndAmount) ProtoMessage()    {}
-func (*SubassetSupplyAndAmount) Descriptor() ([]byte, []int) {
+func (m *BadgeSupplyAndAmount) Reset()         { *m = BadgeSupplyAndAmount{} }
+func (m *BadgeSupplyAndAmount) String() string { return proto.CompactTextString(m) }
+func (*BadgeSupplyAndAmount) ProtoMessage()    {}
+func (*BadgeSupplyAndAmount) Descriptor() ([]byte, []int) {
 	return fileDescriptor_bc897b33479788c9, []int{0}
 }
-func (m *SubassetSupplyAndAmount) XXX_Unmarshal(b []byte) error {
+func (m *BadgeSupplyAndAmount) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *SubassetSupplyAndAmount) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *BadgeSupplyAndAmount) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_SubassetSupplyAndAmount.Marshal(b, m, deterministic)
+		return xxx_messageInfo_BadgeSupplyAndAmount.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -53,59 +55,51 @@ func (m *SubassetSupplyAndAmount) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
-func (m *SubassetSupplyAndAmount) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SubassetSupplyAndAmount.Merge(m, src)
+func (m *BadgeSupplyAndAmount) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BadgeSupplyAndAmount.Merge(m, src)
 }
-func (m *SubassetSupplyAndAmount) XXX_Size() int {
+func (m *BadgeSupplyAndAmount) XXX_Size() int {
 	return m.Size()
 }
-func (m *SubassetSupplyAndAmount) XXX_DiscardUnknown() {
-	xxx_messageInfo_SubassetSupplyAndAmount.DiscardUnknown(m)
+func (m *BadgeSupplyAndAmount) XXX_DiscardUnknown() {
+	xxx_messageInfo_BadgeSupplyAndAmount.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_SubassetSupplyAndAmount proto.InternalMessageInfo
+var xxx_messageInfo_BadgeSupplyAndAmount proto.InternalMessageInfo
 
-func (m *SubassetSupplyAndAmount) GetSupply() uint64 {
+func (m *BadgeSupplyAndAmount) GetSupply() uint64 {
 	if m != nil {
 		return m.Supply
 	}
 	return 0
 }
 
-func (m *SubassetSupplyAndAmount) GetAmount() uint64 {
+func (m *BadgeSupplyAndAmount) GetAmount() uint64 {
 	if m != nil {
 		return m.Amount
 	}
 	return 0
 }
 
-type MsgNewBadge struct {
-	// See badges.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
-	Creator               string     `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Uri                   *UriObject `protobuf:"bytes,2,opt,name=uri,proto3" json:"uri,omitempty"`
-	Permissions           uint64     `protobuf:"varint,4,opt,name=permissions,proto3" json:"permissions,omitempty"`
-	ArbitraryBytes        string     `protobuf:"bytes,5,opt,name=arbitraryBytes,proto3" json:"arbitraryBytes,omitempty"`
-	DefaultSubassetSupply uint64     `protobuf:"varint,6,opt,name=defaultSubassetSupply,proto3" json:"defaultSubassetSupply,omitempty"`
-	FreezeAddressRanges   []*IdRange `protobuf:"bytes,9,rep,name=freezeAddressRanges,proto3" json:"freezeAddressRanges,omitempty"`
-	Standard              uint64     `protobuf:"varint,10,opt,name=standard,proto3" json:"standard,omitempty"`
-	//Subasset supplys and amounts to create. For each idx, we create amounts[idx] subbadges each with a supply of supplys[idx].
-	//If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
-	SubassetSupplysAndAmounts []*SubassetSupplyAndAmount `protobuf:"bytes,7,rep,name=subassetSupplysAndAmounts,proto3" json:"subassetSupplysAndAmounts,omitempty"`
-	WhitelistedRecipients     []*WhitelistMintInfo       `protobuf:"bytes,11,rep,name=whitelistedRecipients,proto3" json:"whitelistedRecipients,omitempty"`
+//Upon badge creation, the manager will first be minted these badges, and then, they will subsequently be transferred to these addresses according to permissions.ForcefulTransfers.
+//Used to only need one signature for MsgNewBadge.
+type Transfers struct {
+	ToAddresses []uint64   `protobuf:"varint,1,rep,packed,name=toAddresses,proto3" json:"toAddresses,omitempty"`
+	Balances    []*Balance `protobuf:"bytes,2,rep,name=balances,proto3" json:"balances,omitempty"`
 }
 
-func (m *MsgNewBadge) Reset()         { *m = MsgNewBadge{} }
-func (m *MsgNewBadge) String() string { return proto.CompactTextString(m) }
-func (*MsgNewBadge) ProtoMessage()    {}
-func (*MsgNewBadge) Descriptor() ([]byte, []int) {
+func (m *Transfers) Reset()         { *m = Transfers{} }
+func (m *Transfers) String() string { return proto.CompactTextString(m) }
+func (*Transfers) ProtoMessage()    {}
+func (*Transfers) Descriptor() ([]byte, []int) {
 	return fileDescriptor_bc897b33479788c9, []int{1}
 }
-func (m *MsgNewBadge) XXX_Unmarshal(b []byte) error {
+func (m *Transfers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgNewBadge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *Transfers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgNewBadge.Marshal(b, m, deterministic)
+		return xxx_messageInfo_Transfers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -115,97 +109,175 @@ func (m *MsgNewBadge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
-func (m *MsgNewBadge) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgNewBadge.Merge(m, src)
+func (m *Transfers) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Transfers.Merge(m, src)
 }
-func (m *MsgNewBadge) XXX_Size() int {
+func (m *Transfers) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgNewBadge) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgNewBadge.DiscardUnknown(m)
+func (m *Transfers) XXX_DiscardUnknown() {
+	xxx_messageInfo_Transfers.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgNewBadge proto.InternalMessageInfo
+var xxx_messageInfo_Transfers proto.InternalMessageInfo
 
-func (m *MsgNewBadge) GetCreator() string {
+func (m *Transfers) GetToAddresses() []uint64 {
+	if m != nil {
+		return m.ToAddresses
+	}
+	return nil
+}
+
+func (m *Transfers) GetBalances() []*Balance {
+	if m != nil {
+		return m.Balances
+	}
+	return nil
+}
+
+type MsgNewCollection struct {
+	// See badges.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
+	Creator                  string             `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionUri            string             `protobuf:"bytes,2,opt,name=collectionUri,proto3" json:"collectionUri,omitempty"`
+	BadgeUri                 string             `protobuf:"bytes,3,opt,name=badgeUri,proto3" json:"badgeUri,omitempty"`
+	Permissions              uint64             `protobuf:"varint,4,opt,name=permissions,proto3" json:"permissions,omitempty"`
+	Bytes                    string             `protobuf:"bytes,5,opt,name=bytes,proto3" json:"bytes,omitempty"`
+	DisallowedTransfers      []*TransferMapping `protobuf:"bytes,6,rep,name=disallowedTransfers,proto3" json:"disallowedTransfers,omitempty"`
+	ManagerApprovedTransfers []*TransferMapping `protobuf:"bytes,7,rep,name=managerApprovedTransfers,proto3" json:"managerApprovedTransfers,omitempty"`
+	Standard                 uint64             `protobuf:"varint,8,opt,name=standard,proto3" json:"standard,omitempty"`
+	//Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
+	//If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
+	BadgeSupplys []*BadgeSupplyAndAmount `protobuf:"bytes,9,rep,name=badgeSupplys,proto3" json:"badgeSupplys,omitempty"`
+	Transfers    []*Transfers            `protobuf:"bytes,10,rep,name=transfers,proto3" json:"transfers,omitempty"`
+	Claims       []*Claim                `protobuf:"bytes,11,rep,name=claims,proto3" json:"claims,omitempty"`
+}
+
+func (m *MsgNewCollection) Reset()         { *m = MsgNewCollection{} }
+func (m *MsgNewCollection) String() string { return proto.CompactTextString(m) }
+func (*MsgNewCollection) ProtoMessage()    {}
+func (*MsgNewCollection) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{2}
+}
+func (m *MsgNewCollection) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgNewCollection) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgNewCollection.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgNewCollection) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgNewCollection.Merge(m, src)
+}
+func (m *MsgNewCollection) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgNewCollection) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgNewCollection.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgNewCollection proto.InternalMessageInfo
+
+func (m *MsgNewCollection) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgNewBadge) GetUri() *UriObject {
+func (m *MsgNewCollection) GetCollectionUri() string {
 	if m != nil {
-		return m.Uri
+		return m.CollectionUri
 	}
-	return nil
+	return ""
 }
 
-func (m *MsgNewBadge) GetPermissions() uint64 {
+func (m *MsgNewCollection) GetBadgeUri() string {
+	if m != nil {
+		return m.BadgeUri
+	}
+	return ""
+}
+
+func (m *MsgNewCollection) GetPermissions() uint64 {
 	if m != nil {
 		return m.Permissions
 	}
 	return 0
 }
 
-func (m *MsgNewBadge) GetArbitraryBytes() string {
+func (m *MsgNewCollection) GetBytes() string {
 	if m != nil {
-		return m.ArbitraryBytes
+		return m.Bytes
 	}
 	return ""
 }
 
-func (m *MsgNewBadge) GetDefaultSubassetSupply() uint64 {
+func (m *MsgNewCollection) GetDisallowedTransfers() []*TransferMapping {
 	if m != nil {
-		return m.DefaultSubassetSupply
-	}
-	return 0
-}
-
-func (m *MsgNewBadge) GetFreezeAddressRanges() []*IdRange {
-	if m != nil {
-		return m.FreezeAddressRanges
+		return m.DisallowedTransfers
 	}
 	return nil
 }
 
-func (m *MsgNewBadge) GetStandard() uint64 {
+func (m *MsgNewCollection) GetManagerApprovedTransfers() []*TransferMapping {
+	if m != nil {
+		return m.ManagerApprovedTransfers
+	}
+	return nil
+}
+
+func (m *MsgNewCollection) GetStandard() uint64 {
 	if m != nil {
 		return m.Standard
 	}
 	return 0
 }
 
-func (m *MsgNewBadge) GetSubassetSupplysAndAmounts() []*SubassetSupplyAndAmount {
+func (m *MsgNewCollection) GetBadgeSupplys() []*BadgeSupplyAndAmount {
 	if m != nil {
-		return m.SubassetSupplysAndAmounts
+		return m.BadgeSupplys
 	}
 	return nil
 }
 
-func (m *MsgNewBadge) GetWhitelistedRecipients() []*WhitelistMintInfo {
+func (m *MsgNewCollection) GetTransfers() []*Transfers {
 	if m != nil {
-		return m.WhitelistedRecipients
+		return m.Transfers
 	}
 	return nil
 }
 
-type MsgNewBadgeResponse struct {
-	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+func (m *MsgNewCollection) GetClaims() []*Claim {
+	if m != nil {
+		return m.Claims
+	}
+	return nil
 }
 
-func (m *MsgNewBadgeResponse) Reset()         { *m = MsgNewBadgeResponse{} }
-func (m *MsgNewBadgeResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgNewBadgeResponse) ProtoMessage()    {}
-func (*MsgNewBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{2}
+type MsgNewCollectionResponse struct {
+	CollectionId uint64 `protobuf:"varint,1,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
 }
-func (m *MsgNewBadgeResponse) XXX_Unmarshal(b []byte) error {
+
+func (m *MsgNewCollectionResponse) Reset()         { *m = MsgNewCollectionResponse{} }
+func (m *MsgNewCollectionResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgNewCollectionResponse) ProtoMessage()    {}
+func (*MsgNewCollectionResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{3}
+}
+func (m *MsgNewCollectionResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgNewBadgeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgNewCollectionResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgNewBadgeResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgNewCollectionResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -215,45 +287,46 @@ func (m *MsgNewBadgeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (m *MsgNewBadgeResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgNewBadgeResponse.Merge(m, src)
+func (m *MsgNewCollectionResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgNewCollectionResponse.Merge(m, src)
 }
-func (m *MsgNewBadgeResponse) XXX_Size() int {
+func (m *MsgNewCollectionResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgNewBadgeResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgNewBadgeResponse.DiscardUnknown(m)
+func (m *MsgNewCollectionResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgNewCollectionResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgNewBadgeResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgNewCollectionResponse proto.InternalMessageInfo
 
-func (m *MsgNewBadgeResponse) GetId() uint64 {
+func (m *MsgNewCollectionResponse) GetCollectionId() uint64 {
 	if m != nil {
-		return m.Id
+		return m.CollectionId
 	}
 	return 0
 }
 
-type MsgNewSubBadge struct {
-	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	BadgeId uint64 `protobuf:"varint,2,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	//Subasset supplys and amounts to create must be same length. For each idx, we create amounts[idx] subbadges each with a supply of supplys[idx].
-	//If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
-	SubassetSupplysAndAmounts []*SubassetSupplyAndAmount `protobuf:"bytes,7,rep,name=subassetSupplysAndAmounts,proto3" json:"subassetSupplysAndAmounts,omitempty"`
+//This handles both minting more of existing badges and creating new badges.
+type MsgMintBadge struct {
+	Creator      string                  `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionId uint64                  `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
+	BadgeSupplys []*BadgeSupplyAndAmount `protobuf:"bytes,3,rep,name=badgeSupplys,proto3" json:"badgeSupplys,omitempty"`
+	Transfers    []*Transfers            `protobuf:"bytes,4,rep,name=transfers,proto3" json:"transfers,omitempty"`
+	Claims       []*Claim                `protobuf:"bytes,5,rep,name=claims,proto3" json:"claims,omitempty"`
 }
 
-func (m *MsgNewSubBadge) Reset()         { *m = MsgNewSubBadge{} }
-func (m *MsgNewSubBadge) String() string { return proto.CompactTextString(m) }
-func (*MsgNewSubBadge) ProtoMessage()    {}
-func (*MsgNewSubBadge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{3}
+func (m *MsgMintBadge) Reset()         { *m = MsgMintBadge{} }
+func (m *MsgMintBadge) String() string { return proto.CompactTextString(m) }
+func (*MsgMintBadge) ProtoMessage()    {}
+func (*MsgMintBadge) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{4}
 }
-func (m *MsgNewSubBadge) XXX_Unmarshal(b []byte) error {
+func (m *MsgMintBadge) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgNewSubBadge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgMintBadge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgNewSubBadge.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgMintBadge.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -263,55 +336,69 @@ func (m *MsgNewSubBadge) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return b[:n], nil
 	}
 }
-func (m *MsgNewSubBadge) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgNewSubBadge.Merge(m, src)
+func (m *MsgMintBadge) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgMintBadge.Merge(m, src)
 }
-func (m *MsgNewSubBadge) XXX_Size() int {
+func (m *MsgMintBadge) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgNewSubBadge) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgNewSubBadge.DiscardUnknown(m)
+func (m *MsgMintBadge) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgMintBadge.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgNewSubBadge proto.InternalMessageInfo
+var xxx_messageInfo_MsgMintBadge proto.InternalMessageInfo
 
-func (m *MsgNewSubBadge) GetCreator() string {
+func (m *MsgMintBadge) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgNewSubBadge) GetBadgeId() uint64 {
+func (m *MsgMintBadge) GetCollectionId() uint64 {
 	if m != nil {
-		return m.BadgeId
+		return m.CollectionId
 	}
 	return 0
 }
 
-func (m *MsgNewSubBadge) GetSubassetSupplysAndAmounts() []*SubassetSupplyAndAmount {
+func (m *MsgMintBadge) GetBadgeSupplys() []*BadgeSupplyAndAmount {
 	if m != nil {
-		return m.SubassetSupplysAndAmounts
+		return m.BadgeSupplys
 	}
 	return nil
 }
 
-type MsgNewSubBadgeResponse struct {
-	NextSubassetId uint64 `protobuf:"varint,1,opt,name=nextSubassetId,proto3" json:"nextSubassetId,omitempty"`
+func (m *MsgMintBadge) GetTransfers() []*Transfers {
+	if m != nil {
+		return m.Transfers
+	}
+	return nil
 }
 
-func (m *MsgNewSubBadgeResponse) Reset()         { *m = MsgNewSubBadgeResponse{} }
-func (m *MsgNewSubBadgeResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgNewSubBadgeResponse) ProtoMessage()    {}
-func (*MsgNewSubBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{4}
+func (m *MsgMintBadge) GetClaims() []*Claim {
+	if m != nil {
+		return m.Claims
+	}
+	return nil
 }
-func (m *MsgNewSubBadgeResponse) XXX_Unmarshal(b []byte) error {
+
+type MsgMintBadgeResponse struct {
+	NextBadgeId uint64 `protobuf:"varint,1,opt,name=nextBadgeId,proto3" json:"nextBadgeId,omitempty"`
+}
+
+func (m *MsgMintBadgeResponse) Reset()         { *m = MsgMintBadgeResponse{} }
+func (m *MsgMintBadgeResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgMintBadgeResponse) ProtoMessage()    {}
+func (*MsgMintBadgeResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{5}
+}
+func (m *MsgMintBadgeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgNewSubBadgeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgMintBadgeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgNewSubBadgeResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgMintBadgeResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -321,42 +408,38 @@ func (m *MsgNewSubBadgeResponse) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-func (m *MsgNewSubBadgeResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgNewSubBadgeResponse.Merge(m, src)
+func (m *MsgMintBadgeResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgMintBadgeResponse.Merge(m, src)
 }
-func (m *MsgNewSubBadgeResponse) XXX_Size() int {
+func (m *MsgMintBadgeResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgNewSubBadgeResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgNewSubBadgeResponse.DiscardUnknown(m)
+func (m *MsgMintBadgeResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgMintBadgeResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgNewSubBadgeResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgMintBadgeResponse proto.InternalMessageInfo
 
-func (m *MsgNewSubBadgeResponse) GetNextSubassetId() uint64 {
+func (m *MsgMintBadgeResponse) GetNextBadgeId() uint64 {
 	if m != nil {
-		return m.NextSubassetId
+		return m.NextBadgeId
 	}
 	return 0
 }
 
-//For each amount, for each toAddress, we will attempt to transfer all the subbadgeIds for the badge with ID badgeId.
+//For each amount, for each toAddress, we will attempt to transfer all the badgeIds for the badge with ID badgeId.
 type MsgTransferBadge struct {
-	Creator              string     `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	From                 uint64     `protobuf:"varint,2,opt,name=from,proto3" json:"from,omitempty"`
-	ToAddresses          []uint64   `protobuf:"varint,3,rep,packed,name=toAddresses,proto3" json:"toAddresses,omitempty"`
-	Amounts              []uint64   `protobuf:"varint,4,rep,packed,name=amounts,proto3" json:"amounts,omitempty"`
-	BadgeId              uint64     `protobuf:"varint,5,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	SubbadgeRanges       []*IdRange `protobuf:"bytes,6,rep,name=subbadgeRanges,proto3" json:"subbadgeRanges,omitempty"`
-	ExpirationTime       uint64     `protobuf:"varint,7,opt,name=expirationTime,proto3" json:"expirationTime,omitempty"`
-	CantCancelBeforeTime uint64     `protobuf:"varint,8,opt,name=cantCancelBeforeTime,proto3" json:"cantCancelBeforeTime,omitempty"`
+	Creator      string       `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionId uint64       `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
+	From         uint64       `protobuf:"varint,3,opt,name=from,proto3" json:"from,omitempty"`
+	Transfers    []*Transfers `protobuf:"bytes,4,rep,name=transfers,proto3" json:"transfers,omitempty"`
 }
 
 func (m *MsgTransferBadge) Reset()         { *m = MsgTransferBadge{} }
 func (m *MsgTransferBadge) String() string { return proto.CompactTextString(m) }
 func (*MsgTransferBadge) ProtoMessage()    {}
 func (*MsgTransferBadge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{5}
+	return fileDescriptor_bc897b33479788c9, []int{6}
 }
 func (m *MsgTransferBadge) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -392,6 +475,13 @@ func (m *MsgTransferBadge) GetCreator() string {
 	return ""
 }
 
+func (m *MsgTransferBadge) GetCollectionId() uint64 {
+	if m != nil {
+		return m.CollectionId
+	}
+	return 0
+}
+
 func (m *MsgTransferBadge) GetFrom() uint64 {
 	if m != nil {
 		return m.From
@@ -399,46 +489,11 @@ func (m *MsgTransferBadge) GetFrom() uint64 {
 	return 0
 }
 
-func (m *MsgTransferBadge) GetToAddresses() []uint64 {
+func (m *MsgTransferBadge) GetTransfers() []*Transfers {
 	if m != nil {
-		return m.ToAddresses
+		return m.Transfers
 	}
 	return nil
-}
-
-func (m *MsgTransferBadge) GetAmounts() []uint64 {
-	if m != nil {
-		return m.Amounts
-	}
-	return nil
-}
-
-func (m *MsgTransferBadge) GetBadgeId() uint64 {
-	if m != nil {
-		return m.BadgeId
-	}
-	return 0
-}
-
-func (m *MsgTransferBadge) GetSubbadgeRanges() []*IdRange {
-	if m != nil {
-		return m.SubbadgeRanges
-	}
-	return nil
-}
-
-func (m *MsgTransferBadge) GetExpirationTime() uint64 {
-	if m != nil {
-		return m.ExpirationTime
-	}
-	return 0
-}
-
-func (m *MsgTransferBadge) GetCantCancelBeforeTime() uint64 {
-	if m != nil {
-		return m.CantCancelBeforeTime
-	}
-	return 0
 }
 
 type MsgTransferBadgeResponse struct {
@@ -448,7 +503,7 @@ func (m *MsgTransferBadgeResponse) Reset()         { *m = MsgTransferBadgeRespon
 func (m *MsgTransferBadgeResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgTransferBadgeResponse) ProtoMessage()    {}
 func (*MsgTransferBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{6}
+	return fileDescriptor_bc897b33479788c9, []int{7}
 }
 func (m *MsgTransferBadgeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -477,254 +532,19 @@ func (m *MsgTransferBadgeResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgTransferBadgeResponse proto.InternalMessageInfo
 
-//For each amount, for each toAddress, we will request a transfer all the subbadgeIds for the badge with ID badgeId. Other party must approve / reject the transfer request.
-type MsgRequestTransferBadge struct {
-	Creator              string     `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	From                 uint64     `protobuf:"varint,2,opt,name=from,proto3" json:"from,omitempty"`
-	Amount               uint64     `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
-	BadgeId              uint64     `protobuf:"varint,5,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	SubbadgeRanges       []*IdRange `protobuf:"bytes,6,rep,name=subbadgeRanges,proto3" json:"subbadgeRanges,omitempty"`
-	ExpirationTime       uint64     `protobuf:"varint,7,opt,name=expirationTime,proto3" json:"expirationTime,omitempty"`
-	CantCancelBeforeTime uint64     `protobuf:"varint,8,opt,name=cantCancelBeforeTime,proto3" json:"cantCancelBeforeTime,omitempty"`
-}
-
-func (m *MsgRequestTransferBadge) Reset()         { *m = MsgRequestTransferBadge{} }
-func (m *MsgRequestTransferBadge) String() string { return proto.CompactTextString(m) }
-func (*MsgRequestTransferBadge) ProtoMessage()    {}
-func (*MsgRequestTransferBadge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{7}
-}
-func (m *MsgRequestTransferBadge) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgRequestTransferBadge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgRequestTransferBadge.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgRequestTransferBadge) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgRequestTransferBadge.Merge(m, src)
-}
-func (m *MsgRequestTransferBadge) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgRequestTransferBadge) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgRequestTransferBadge.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgRequestTransferBadge proto.InternalMessageInfo
-
-func (m *MsgRequestTransferBadge) GetCreator() string {
-	if m != nil {
-		return m.Creator
-	}
-	return ""
-}
-
-func (m *MsgRequestTransferBadge) GetFrom() uint64 {
-	if m != nil {
-		return m.From
-	}
-	return 0
-}
-
-func (m *MsgRequestTransferBadge) GetAmount() uint64 {
-	if m != nil {
-		return m.Amount
-	}
-	return 0
-}
-
-func (m *MsgRequestTransferBadge) GetBadgeId() uint64 {
-	if m != nil {
-		return m.BadgeId
-	}
-	return 0
-}
-
-func (m *MsgRequestTransferBadge) GetSubbadgeRanges() []*IdRange {
-	if m != nil {
-		return m.SubbadgeRanges
-	}
-	return nil
-}
-
-func (m *MsgRequestTransferBadge) GetExpirationTime() uint64 {
-	if m != nil {
-		return m.ExpirationTime
-	}
-	return 0
-}
-
-func (m *MsgRequestTransferBadge) GetCantCancelBeforeTime() uint64 {
-	if m != nil {
-		return m.CantCancelBeforeTime
-	}
-	return 0
-}
-
-type MsgRequestTransferBadgeResponse struct {
-}
-
-func (m *MsgRequestTransferBadgeResponse) Reset()         { *m = MsgRequestTransferBadgeResponse{} }
-func (m *MsgRequestTransferBadgeResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgRequestTransferBadgeResponse) ProtoMessage()    {}
-func (*MsgRequestTransferBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{8}
-}
-func (m *MsgRequestTransferBadgeResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgRequestTransferBadgeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgRequestTransferBadgeResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgRequestTransferBadgeResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgRequestTransferBadgeResponse.Merge(m, src)
-}
-func (m *MsgRequestTransferBadgeResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgRequestTransferBadgeResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgRequestTransferBadgeResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgRequestTransferBadgeResponse proto.InternalMessageInfo
-
-//For all pending transfers of the badge where ThisPendingNonce is within some nonceRange in nonceRanges, we accept or deny the pending transfer.
-type MsgHandlePendingTransfer struct {
-	Creator     string     `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Actions     []uint64   `protobuf:"varint,2,rep,packed,name=actions,proto3" json:"actions,omitempty"`
-	BadgeId     uint64     `protobuf:"varint,3,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	NonceRanges []*IdRange `protobuf:"bytes,4,rep,name=nonceRanges,proto3" json:"nonceRanges,omitempty"`
-}
-
-func (m *MsgHandlePendingTransfer) Reset()         { *m = MsgHandlePendingTransfer{} }
-func (m *MsgHandlePendingTransfer) String() string { return proto.CompactTextString(m) }
-func (*MsgHandlePendingTransfer) ProtoMessage()    {}
-func (*MsgHandlePendingTransfer) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{9}
-}
-func (m *MsgHandlePendingTransfer) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgHandlePendingTransfer) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgHandlePendingTransfer.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgHandlePendingTransfer) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgHandlePendingTransfer.Merge(m, src)
-}
-func (m *MsgHandlePendingTransfer) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgHandlePendingTransfer) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgHandlePendingTransfer.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgHandlePendingTransfer proto.InternalMessageInfo
-
-func (m *MsgHandlePendingTransfer) GetCreator() string {
-	if m != nil {
-		return m.Creator
-	}
-	return ""
-}
-
-func (m *MsgHandlePendingTransfer) GetActions() []uint64 {
-	if m != nil {
-		return m.Actions
-	}
-	return nil
-}
-
-func (m *MsgHandlePendingTransfer) GetBadgeId() uint64 {
-	if m != nil {
-		return m.BadgeId
-	}
-	return 0
-}
-
-func (m *MsgHandlePendingTransfer) GetNonceRanges() []*IdRange {
-	if m != nil {
-		return m.NonceRanges
-	}
-	return nil
-}
-
-type MsgHandlePendingTransferResponse struct {
-}
-
-func (m *MsgHandlePendingTransferResponse) Reset()         { *m = MsgHandlePendingTransferResponse{} }
-func (m *MsgHandlePendingTransferResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgHandlePendingTransferResponse) ProtoMessage()    {}
-func (*MsgHandlePendingTransferResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{10}
-}
-func (m *MsgHandlePendingTransferResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgHandlePendingTransferResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgHandlePendingTransferResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgHandlePendingTransferResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgHandlePendingTransferResponse.Merge(m, src)
-}
-func (m *MsgHandlePendingTransferResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgHandlePendingTransferResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgHandlePendingTransferResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgHandlePendingTransferResponse proto.InternalMessageInfo
-
 //Sets an approval (no add or remove), just set it for an address.
 type MsgSetApproval struct {
-	Creator        string     `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Amount         uint64     `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	Address        uint64     `protobuf:"varint,3,opt,name=address,proto3" json:"address,omitempty"`
-	BadgeId        uint64     `protobuf:"varint,4,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	SubbadgeRanges []*IdRange `protobuf:"bytes,5,rep,name=subbadgeRanges,proto3" json:"subbadgeRanges,omitempty"`
+	Creator      string     `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionId uint64     `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
+	Address      uint64     `protobuf:"varint,3,opt,name=address,proto3" json:"address,omitempty"`
+	Balances     []*Balance `protobuf:"bytes,4,rep,name=balances,proto3" json:"balances,omitempty"`
 }
 
 func (m *MsgSetApproval) Reset()         { *m = MsgSetApproval{} }
 func (m *MsgSetApproval) String() string { return proto.CompactTextString(m) }
 func (*MsgSetApproval) ProtoMessage()    {}
 func (*MsgSetApproval) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{11}
+	return fileDescriptor_bc897b33479788c9, []int{8}
 }
 func (m *MsgSetApproval) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -760,9 +580,9 @@ func (m *MsgSetApproval) GetCreator() string {
 	return ""
 }
 
-func (m *MsgSetApproval) GetAmount() uint64 {
+func (m *MsgSetApproval) GetCollectionId() uint64 {
 	if m != nil {
-		return m.Amount
+		return m.CollectionId
 	}
 	return 0
 }
@@ -774,16 +594,9 @@ func (m *MsgSetApproval) GetAddress() uint64 {
 	return 0
 }
 
-func (m *MsgSetApproval) GetBadgeId() uint64 {
+func (m *MsgSetApproval) GetBalances() []*Balance {
 	if m != nil {
-		return m.BadgeId
-	}
-	return 0
-}
-
-func (m *MsgSetApproval) GetSubbadgeRanges() []*IdRange {
-	if m != nil {
-		return m.SubbadgeRanges
+		return m.Balances
 	}
 	return nil
 }
@@ -795,7 +608,7 @@ func (m *MsgSetApprovalResponse) Reset()         { *m = MsgSetApprovalResponse{}
 func (m *MsgSetApprovalResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgSetApprovalResponse) ProtoMessage()    {}
 func (*MsgSetApprovalResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{12}
+	return fileDescriptor_bc897b33479788c9, []int{9}
 }
 func (m *MsgSetApprovalResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -824,27 +637,181 @@ func (m *MsgSetApprovalResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetApprovalResponse proto.InternalMessageInfo
 
-//For each address and for each amount, revoke badge.
-type MsgRevokeBadge struct {
-	Creator        string     `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Addresses      []uint64   `protobuf:"varint,2,rep,packed,name=addresses,proto3" json:"addresses,omitempty"`
-	Amounts        []uint64   `protobuf:"varint,3,rep,packed,name=amounts,proto3" json:"amounts,omitempty"`
-	BadgeId        uint64     `protobuf:"varint,4,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	SubbadgeRanges []*IdRange `protobuf:"bytes,5,rep,name=subbadgeRanges,proto3" json:"subbadgeRanges,omitempty"`
+type MsgUpdateDisallowedTransfers struct {
+	Creator             string             `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionId        uint64             `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
+	DisallowedTransfers []*TransferMapping `protobuf:"bytes,3,rep,name=disallowedTransfers,proto3" json:"disallowedTransfers,omitempty"`
 }
 
-func (m *MsgRevokeBadge) Reset()         { *m = MsgRevokeBadge{} }
-func (m *MsgRevokeBadge) String() string { return proto.CompactTextString(m) }
-func (*MsgRevokeBadge) ProtoMessage()    {}
-func (*MsgRevokeBadge) Descriptor() ([]byte, []int) {
+func (m *MsgUpdateDisallowedTransfers) Reset()         { *m = MsgUpdateDisallowedTransfers{} }
+func (m *MsgUpdateDisallowedTransfers) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateDisallowedTransfers) ProtoMessage()    {}
+func (*MsgUpdateDisallowedTransfers) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{10}
+}
+func (m *MsgUpdateDisallowedTransfers) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateDisallowedTransfers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateDisallowedTransfers.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateDisallowedTransfers) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateDisallowedTransfers.Merge(m, src)
+}
+func (m *MsgUpdateDisallowedTransfers) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateDisallowedTransfers) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateDisallowedTransfers.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateDisallowedTransfers proto.InternalMessageInfo
+
+func (m *MsgUpdateDisallowedTransfers) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgUpdateDisallowedTransfers) GetCollectionId() uint64 {
+	if m != nil {
+		return m.CollectionId
+	}
+	return 0
+}
+
+func (m *MsgUpdateDisallowedTransfers) GetDisallowedTransfers() []*TransferMapping {
+	if m != nil {
+		return m.DisallowedTransfers
+	}
+	return nil
+}
+
+type MsgUpdateDisallowedTransfersResponse struct {
+}
+
+func (m *MsgUpdateDisallowedTransfersResponse) Reset()         { *m = MsgUpdateDisallowedTransfersResponse{} }
+func (m *MsgUpdateDisallowedTransfersResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateDisallowedTransfersResponse) ProtoMessage()    {}
+func (*MsgUpdateDisallowedTransfersResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{11}
+}
+func (m *MsgUpdateDisallowedTransfersResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateDisallowedTransfersResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateDisallowedTransfersResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateDisallowedTransfersResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateDisallowedTransfersResponse.Merge(m, src)
+}
+func (m *MsgUpdateDisallowedTransfersResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateDisallowedTransfersResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateDisallowedTransfersResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateDisallowedTransfersResponse proto.InternalMessageInfo
+
+type MsgUpdateManagerApprovedTransfers struct {
+	Creator                  string             `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionId             uint64             `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
+	ManagerApprovedTransfers []*TransferMapping `protobuf:"bytes,3,rep,name=managerApprovedTransfers,proto3" json:"managerApprovedTransfers,omitempty"`
+}
+
+func (m *MsgUpdateManagerApprovedTransfers) Reset()         { *m = MsgUpdateManagerApprovedTransfers{} }
+func (m *MsgUpdateManagerApprovedTransfers) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateManagerApprovedTransfers) ProtoMessage()    {}
+func (*MsgUpdateManagerApprovedTransfers) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{12}
+}
+func (m *MsgUpdateManagerApprovedTransfers) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateManagerApprovedTransfers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateManagerApprovedTransfers.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateManagerApprovedTransfers) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateManagerApprovedTransfers.Merge(m, src)
+}
+func (m *MsgUpdateManagerApprovedTransfers) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateManagerApprovedTransfers) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateManagerApprovedTransfers.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateManagerApprovedTransfers proto.InternalMessageInfo
+
+func (m *MsgUpdateManagerApprovedTransfers) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgUpdateManagerApprovedTransfers) GetCollectionId() uint64 {
+	if m != nil {
+		return m.CollectionId
+	}
+	return 0
+}
+
+func (m *MsgUpdateManagerApprovedTransfers) GetManagerApprovedTransfers() []*TransferMapping {
+	if m != nil {
+		return m.ManagerApprovedTransfers
+	}
+	return nil
+}
+
+type MsgUpdateManagerApprovedTransfersResponse struct {
+}
+
+func (m *MsgUpdateManagerApprovedTransfersResponse) Reset() {
+	*m = MsgUpdateManagerApprovedTransfersResponse{}
+}
+func (m *MsgUpdateManagerApprovedTransfersResponse) String() string {
+	return proto.CompactTextString(m)
+}
+func (*MsgUpdateManagerApprovedTransfersResponse) ProtoMessage() {}
+func (*MsgUpdateManagerApprovedTransfersResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_bc897b33479788c9, []int{13}
 }
-func (m *MsgRevokeBadge) XXX_Unmarshal(b []byte) error {
+func (m *MsgUpdateManagerApprovedTransfersResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgRevokeBadge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgUpdateManagerApprovedTransfersResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgRevokeBadge.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgUpdateManagerApprovedTransfersResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -854,206 +821,31 @@ func (m *MsgRevokeBadge) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return b[:n], nil
 	}
 }
-func (m *MsgRevokeBadge) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgRevokeBadge.Merge(m, src)
+func (m *MsgUpdateManagerApprovedTransfersResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateManagerApprovedTransfersResponse.Merge(m, src)
 }
-func (m *MsgRevokeBadge) XXX_Size() int {
+func (m *MsgUpdateManagerApprovedTransfersResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgRevokeBadge) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgRevokeBadge.DiscardUnknown(m)
+func (m *MsgUpdateManagerApprovedTransfersResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateManagerApprovedTransfersResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgRevokeBadge proto.InternalMessageInfo
-
-func (m *MsgRevokeBadge) GetCreator() string {
-	if m != nil {
-		return m.Creator
-	}
-	return ""
-}
-
-func (m *MsgRevokeBadge) GetAddresses() []uint64 {
-	if m != nil {
-		return m.Addresses
-	}
-	return nil
-}
-
-func (m *MsgRevokeBadge) GetAmounts() []uint64 {
-	if m != nil {
-		return m.Amounts
-	}
-	return nil
-}
-
-func (m *MsgRevokeBadge) GetBadgeId() uint64 {
-	if m != nil {
-		return m.BadgeId
-	}
-	return 0
-}
-
-func (m *MsgRevokeBadge) GetSubbadgeRanges() []*IdRange {
-	if m != nil {
-		return m.SubbadgeRanges
-	}
-	return nil
-}
-
-type MsgRevokeBadgeResponse struct {
-}
-
-func (m *MsgRevokeBadgeResponse) Reset()         { *m = MsgRevokeBadgeResponse{} }
-func (m *MsgRevokeBadgeResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgRevokeBadgeResponse) ProtoMessage()    {}
-func (*MsgRevokeBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{14}
-}
-func (m *MsgRevokeBadgeResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgRevokeBadgeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgRevokeBadgeResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgRevokeBadgeResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgRevokeBadgeResponse.Merge(m, src)
-}
-func (m *MsgRevokeBadgeResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgRevokeBadgeResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgRevokeBadgeResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgRevokeBadgeResponse proto.InternalMessageInfo
-
-//Add or remove addreses from the freeze address range
-type MsgFreezeAddress struct {
-	Creator       string     `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	AddressRanges []*IdRange `protobuf:"bytes,2,rep,name=addressRanges,proto3" json:"addressRanges,omitempty"`
-	BadgeId       uint64     `protobuf:"varint,3,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	Add           bool       `protobuf:"varint,4,opt,name=add,proto3" json:"add,omitempty"`
-}
-
-func (m *MsgFreezeAddress) Reset()         { *m = MsgFreezeAddress{} }
-func (m *MsgFreezeAddress) String() string { return proto.CompactTextString(m) }
-func (*MsgFreezeAddress) ProtoMessage()    {}
-func (*MsgFreezeAddress) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{15}
-}
-func (m *MsgFreezeAddress) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgFreezeAddress) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgFreezeAddress.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgFreezeAddress) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgFreezeAddress.Merge(m, src)
-}
-func (m *MsgFreezeAddress) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgFreezeAddress) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgFreezeAddress.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgFreezeAddress proto.InternalMessageInfo
-
-func (m *MsgFreezeAddress) GetCreator() string {
-	if m != nil {
-		return m.Creator
-	}
-	return ""
-}
-
-func (m *MsgFreezeAddress) GetAddressRanges() []*IdRange {
-	if m != nil {
-		return m.AddressRanges
-	}
-	return nil
-}
-
-func (m *MsgFreezeAddress) GetBadgeId() uint64 {
-	if m != nil {
-		return m.BadgeId
-	}
-	return 0
-}
-
-func (m *MsgFreezeAddress) GetAdd() bool {
-	if m != nil {
-		return m.Add
-	}
-	return false
-}
-
-type MsgFreezeAddressResponse struct {
-}
-
-func (m *MsgFreezeAddressResponse) Reset()         { *m = MsgFreezeAddressResponse{} }
-func (m *MsgFreezeAddressResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgFreezeAddressResponse) ProtoMessage()    {}
-func (*MsgFreezeAddressResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{16}
-}
-func (m *MsgFreezeAddressResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgFreezeAddressResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgFreezeAddressResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgFreezeAddressResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgFreezeAddressResponse.Merge(m, src)
-}
-func (m *MsgFreezeAddressResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgFreezeAddressResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgFreezeAddressResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgFreezeAddressResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgUpdateManagerApprovedTransfersResponse proto.InternalMessageInfo
 
 //Update badge Uris with new URI object, if permitted.
 type MsgUpdateUris struct {
-	Creator string     `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	BadgeId uint64     `protobuf:"varint,2,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	Uri     *UriObject `protobuf:"bytes,3,opt,name=uri,proto3" json:"uri,omitempty"`
+	Creator       string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionId  uint64 `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
+	CollectionUri string `protobuf:"bytes,3,opt,name=collectionUri,proto3" json:"collectionUri,omitempty"`
+	BadgeUri      string `protobuf:"bytes,4,opt,name=badgeUri,proto3" json:"badgeUri,omitempty"`
 }
 
 func (m *MsgUpdateUris) Reset()         { *m = MsgUpdateUris{} }
 func (m *MsgUpdateUris) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateUris) ProtoMessage()    {}
 func (*MsgUpdateUris) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{17}
+	return fileDescriptor_bc897b33479788c9, []int{14}
 }
 func (m *MsgUpdateUris) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1089,18 +881,25 @@ func (m *MsgUpdateUris) GetCreator() string {
 	return ""
 }
 
-func (m *MsgUpdateUris) GetBadgeId() uint64 {
+func (m *MsgUpdateUris) GetCollectionId() uint64 {
 	if m != nil {
-		return m.BadgeId
+		return m.CollectionId
 	}
 	return 0
 }
 
-func (m *MsgUpdateUris) GetUri() *UriObject {
+func (m *MsgUpdateUris) GetCollectionUri() string {
 	if m != nil {
-		return m.Uri
+		return m.CollectionUri
 	}
-	return nil
+	return ""
+}
+
+func (m *MsgUpdateUris) GetBadgeUri() string {
+	if m != nil {
+		return m.BadgeUri
+	}
+	return ""
 }
 
 type MsgUpdateUrisResponse struct {
@@ -1110,7 +909,7 @@ func (m *MsgUpdateUrisResponse) Reset()         { *m = MsgUpdateUrisResponse{} }
 func (m *MsgUpdateUrisResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateUrisResponse) ProtoMessage()    {}
 func (*MsgUpdateUrisResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{18}
+	return fileDescriptor_bc897b33479788c9, []int{15}
 }
 func (m *MsgUpdateUrisResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1141,16 +940,16 @@ var xxx_messageInfo_MsgUpdateUrisResponse proto.InternalMessageInfo
 
 //Update badge permissions with new permissions, if permitted.
 type MsgUpdatePermissions struct {
-	Creator     string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	BadgeId     uint64 `protobuf:"varint,2,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	Permissions uint64 `protobuf:"varint,3,opt,name=permissions,proto3" json:"permissions,omitempty"`
+	Creator      string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionId uint64 `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
+	Permissions  uint64 `protobuf:"varint,3,opt,name=permissions,proto3" json:"permissions,omitempty"`
 }
 
 func (m *MsgUpdatePermissions) Reset()         { *m = MsgUpdatePermissions{} }
 func (m *MsgUpdatePermissions) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdatePermissions) ProtoMessage()    {}
 func (*MsgUpdatePermissions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{19}
+	return fileDescriptor_bc897b33479788c9, []int{16}
 }
 func (m *MsgUpdatePermissions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1186,9 +985,9 @@ func (m *MsgUpdatePermissions) GetCreator() string {
 	return ""
 }
 
-func (m *MsgUpdatePermissions) GetBadgeId() uint64 {
+func (m *MsgUpdatePermissions) GetCollectionId() uint64 {
 	if m != nil {
-		return m.BadgeId
+		return m.CollectionId
 	}
 	return 0
 }
@@ -1207,7 +1006,7 @@ func (m *MsgUpdatePermissionsResponse) Reset()         { *m = MsgUpdatePermissio
 func (m *MsgUpdatePermissionsResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdatePermissionsResponse) ProtoMessage()    {}
 func (*MsgUpdatePermissionsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{20}
+	return fileDescriptor_bc897b33479788c9, []int{17}
 }
 func (m *MsgUpdatePermissionsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1238,16 +1037,16 @@ var xxx_messageInfo_MsgUpdatePermissionsResponse proto.InternalMessageInfo
 
 //Transfer manager to this address. Recipient must have made a request.
 type MsgTransferManager struct {
-	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	BadgeId uint64 `protobuf:"varint,2,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	Address uint64 `protobuf:"varint,3,opt,name=address,proto3" json:"address,omitempty"`
+	Creator      string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionId uint64 `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
+	Address      uint64 `protobuf:"varint,3,opt,name=address,proto3" json:"address,omitempty"`
 }
 
 func (m *MsgTransferManager) Reset()         { *m = MsgTransferManager{} }
 func (m *MsgTransferManager) String() string { return proto.CompactTextString(m) }
 func (*MsgTransferManager) ProtoMessage()    {}
 func (*MsgTransferManager) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{21}
+	return fileDescriptor_bc897b33479788c9, []int{18}
 }
 func (m *MsgTransferManager) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1283,9 +1082,9 @@ func (m *MsgTransferManager) GetCreator() string {
 	return ""
 }
 
-func (m *MsgTransferManager) GetBadgeId() uint64 {
+func (m *MsgTransferManager) GetCollectionId() uint64 {
 	if m != nil {
-		return m.BadgeId
+		return m.CollectionId
 	}
 	return 0
 }
@@ -1304,7 +1103,7 @@ func (m *MsgTransferManagerResponse) Reset()         { *m = MsgTransferManagerRe
 func (m *MsgTransferManagerResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgTransferManagerResponse) ProtoMessage()    {}
 func (*MsgTransferManagerResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{22}
+	return fileDescriptor_bc897b33479788c9, []int{19}
 }
 func (m *MsgTransferManagerResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1335,16 +1134,16 @@ var xxx_messageInfo_MsgTransferManagerResponse proto.InternalMessageInfo
 
 //Add / remove request for manager to be transferred.
 type MsgRequestTransferManager struct {
-	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	BadgeId uint64 `protobuf:"varint,2,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	Add     bool   `protobuf:"varint,3,opt,name=add,proto3" json:"add,omitempty"`
+	Creator      string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionId uint64 `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
+	AddRequest   bool   `protobuf:"varint,3,opt,name=addRequest,proto3" json:"addRequest,omitempty"`
 }
 
 func (m *MsgRequestTransferManager) Reset()         { *m = MsgRequestTransferManager{} }
 func (m *MsgRequestTransferManager) String() string { return proto.CompactTextString(m) }
 func (*MsgRequestTransferManager) ProtoMessage()    {}
 func (*MsgRequestTransferManager) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{23}
+	return fileDescriptor_bc897b33479788c9, []int{20}
 }
 func (m *MsgRequestTransferManager) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1380,16 +1179,16 @@ func (m *MsgRequestTransferManager) GetCreator() string {
 	return ""
 }
 
-func (m *MsgRequestTransferManager) GetBadgeId() uint64 {
+func (m *MsgRequestTransferManager) GetCollectionId() uint64 {
 	if m != nil {
-		return m.BadgeId
+		return m.CollectionId
 	}
 	return 0
 }
 
-func (m *MsgRequestTransferManager) GetAdd() bool {
+func (m *MsgRequestTransferManager) GetAddRequest() bool {
 	if m != nil {
-		return m.Add
+		return m.AddRequest
 	}
 	return false
 }
@@ -1401,7 +1200,7 @@ func (m *MsgRequestTransferManagerResponse) Reset()         { *m = MsgRequestTra
 func (m *MsgRequestTransferManagerResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgRequestTransferManagerResponse) ProtoMessage()    {}
 func (*MsgRequestTransferManagerResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{24}
+	return fileDescriptor_bc897b33479788c9, []int{21}
 }
 func (m *MsgRequestTransferManagerResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1430,204 +1229,18 @@ func (m *MsgRequestTransferManagerResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRequestTransferManagerResponse proto.InternalMessageInfo
 
-//Self destructs the badge, if permitted.
-type MsgSelfDestructBadge struct {
-	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	BadgeId uint64 `protobuf:"varint,2,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-}
-
-func (m *MsgSelfDestructBadge) Reset()         { *m = MsgSelfDestructBadge{} }
-func (m *MsgSelfDestructBadge) String() string { return proto.CompactTextString(m) }
-func (*MsgSelfDestructBadge) ProtoMessage()    {}
-func (*MsgSelfDestructBadge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{25}
-}
-func (m *MsgSelfDestructBadge) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgSelfDestructBadge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgSelfDestructBadge.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgSelfDestructBadge) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgSelfDestructBadge.Merge(m, src)
-}
-func (m *MsgSelfDestructBadge) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgSelfDestructBadge) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgSelfDestructBadge.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgSelfDestructBadge proto.InternalMessageInfo
-
-func (m *MsgSelfDestructBadge) GetCreator() string {
-	if m != nil {
-		return m.Creator
-	}
-	return ""
-}
-
-func (m *MsgSelfDestructBadge) GetBadgeId() uint64 {
-	if m != nil {
-		return m.BadgeId
-	}
-	return 0
-}
-
-type MsgSelfDestructBadgeResponse struct {
-}
-
-func (m *MsgSelfDestructBadgeResponse) Reset()         { *m = MsgSelfDestructBadgeResponse{} }
-func (m *MsgSelfDestructBadgeResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgSelfDestructBadgeResponse) ProtoMessage()    {}
-func (*MsgSelfDestructBadgeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{26}
-}
-func (m *MsgSelfDestructBadgeResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgSelfDestructBadgeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgSelfDestructBadgeResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgSelfDestructBadgeResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgSelfDestructBadgeResponse.Merge(m, src)
-}
-func (m *MsgSelfDestructBadgeResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgSelfDestructBadgeResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgSelfDestructBadgeResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgSelfDestructBadgeResponse proto.InternalMessageInfo
-
-//Prunes balances of self destructed badges. Can be called by anyone
-type MsgPruneBalances struct {
-	Creator   string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	BadgeIds  []uint64 `protobuf:"varint,2,rep,packed,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	Addresses []uint64 `protobuf:"varint,3,rep,packed,name=addresses,proto3" json:"addresses,omitempty"`
-}
-
-func (m *MsgPruneBalances) Reset()         { *m = MsgPruneBalances{} }
-func (m *MsgPruneBalances) String() string { return proto.CompactTextString(m) }
-func (*MsgPruneBalances) ProtoMessage()    {}
-func (*MsgPruneBalances) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{27}
-}
-func (m *MsgPruneBalances) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgPruneBalances) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgPruneBalances.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgPruneBalances) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgPruneBalances.Merge(m, src)
-}
-func (m *MsgPruneBalances) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgPruneBalances) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgPruneBalances.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgPruneBalances proto.InternalMessageInfo
-
-func (m *MsgPruneBalances) GetCreator() string {
-	if m != nil {
-		return m.Creator
-	}
-	return ""
-}
-
-func (m *MsgPruneBalances) GetBadgeIds() []uint64 {
-	if m != nil {
-		return m.BadgeIds
-	}
-	return nil
-}
-
-func (m *MsgPruneBalances) GetAddresses() []uint64 {
-	if m != nil {
-		return m.Addresses
-	}
-	return nil
-}
-
-type MsgPruneBalancesResponse struct {
-}
-
-func (m *MsgPruneBalancesResponse) Reset()         { *m = MsgPruneBalancesResponse{} }
-func (m *MsgPruneBalancesResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgPruneBalancesResponse) ProtoMessage()    {}
-func (*MsgPruneBalancesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{28}
-}
-func (m *MsgPruneBalancesResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgPruneBalancesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgPruneBalancesResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgPruneBalancesResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgPruneBalancesResponse.Merge(m, src)
-}
-func (m *MsgPruneBalancesResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgPruneBalancesResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgPruneBalancesResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgPruneBalancesResponse proto.InternalMessageInfo
-
 //Update badge bytes, if permitted
 type MsgUpdateBytes struct {
-	Creator  string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	BadgeId  uint64 `protobuf:"varint,2,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
-	NewBytes string `protobuf:"bytes,3,opt,name=newBytes,proto3" json:"newBytes,omitempty"`
+	Creator      string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionId uint64 `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
+	NewBytes     string `protobuf:"bytes,3,opt,name=newBytes,proto3" json:"newBytes,omitempty"`
 }
 
 func (m *MsgUpdateBytes) Reset()         { *m = MsgUpdateBytes{} }
 func (m *MsgUpdateBytes) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateBytes) ProtoMessage()    {}
 func (*MsgUpdateBytes) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{29}
+	return fileDescriptor_bc897b33479788c9, []int{22}
 }
 func (m *MsgUpdateBytes) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1663,9 +1276,9 @@ func (m *MsgUpdateBytes) GetCreator() string {
 	return ""
 }
 
-func (m *MsgUpdateBytes) GetBadgeId() uint64 {
+func (m *MsgUpdateBytes) GetCollectionId() uint64 {
 	if m != nil {
-		return m.BadgeId
+		return m.CollectionId
 	}
 	return 0
 }
@@ -1684,7 +1297,7 @@ func (m *MsgUpdateBytesResponse) Reset()         { *m = MsgUpdateBytesResponse{}
 func (m *MsgUpdateBytesResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateBytesResponse) ProtoMessage()    {}
 func (*MsgUpdateBytesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{30}
+	return fileDescriptor_bc897b33479788c9, []int{23}
 }
 func (m *MsgUpdateBytesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1722,7 +1335,7 @@ func (m *MsgRegisterAddresses) Reset()         { *m = MsgRegisterAddresses{} }
 func (m *MsgRegisterAddresses) String() string { return proto.CompactTextString(m) }
 func (*MsgRegisterAddresses) ProtoMessage()    {}
 func (*MsgRegisterAddresses) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{31}
+	return fileDescriptor_bc897b33479788c9, []int{24}
 }
 func (m *MsgRegisterAddresses) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1773,7 +1386,7 @@ func (m *MsgRegisterAddressesResponse) Reset()         { *m = MsgRegisterAddress
 func (m *MsgRegisterAddressesResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgRegisterAddressesResponse) ProtoMessage()    {}
 func (*MsgRegisterAddressesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{32}
+	return fileDescriptor_bc897b33479788c9, []int{25}
 }
 func (m *MsgRegisterAddressesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1810,23 +1423,20 @@ func (m *MsgRegisterAddressesResponse) GetRegisteredAddressNumbers() *IdRange {
 }
 
 func init() {
-	proto.RegisterType((*SubassetSupplyAndAmount)(nil), "bitbadges.bitbadgeschain.badges.SubassetSupplyAndAmount")
-	proto.RegisterType((*MsgNewBadge)(nil), "bitbadges.bitbadgeschain.badges.MsgNewBadge")
-	proto.RegisterType((*MsgNewBadgeResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgNewBadgeResponse")
-	proto.RegisterType((*MsgNewSubBadge)(nil), "bitbadges.bitbadgeschain.badges.MsgNewSubBadge")
-	proto.RegisterType((*MsgNewSubBadgeResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgNewSubBadgeResponse")
+	proto.RegisterType((*BadgeSupplyAndAmount)(nil), "bitbadges.bitbadgeschain.badges.BadgeSupplyAndAmount")
+	proto.RegisterType((*Transfers)(nil), "bitbadges.bitbadgeschain.badges.Transfers")
+	proto.RegisterType((*MsgNewCollection)(nil), "bitbadges.bitbadgeschain.badges.MsgNewCollection")
+	proto.RegisterType((*MsgNewCollectionResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgNewCollectionResponse")
+	proto.RegisterType((*MsgMintBadge)(nil), "bitbadges.bitbadgeschain.badges.MsgMintBadge")
+	proto.RegisterType((*MsgMintBadgeResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgMintBadgeResponse")
 	proto.RegisterType((*MsgTransferBadge)(nil), "bitbadges.bitbadgeschain.badges.MsgTransferBadge")
 	proto.RegisterType((*MsgTransferBadgeResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgTransferBadgeResponse")
-	proto.RegisterType((*MsgRequestTransferBadge)(nil), "bitbadges.bitbadgeschain.badges.MsgRequestTransferBadge")
-	proto.RegisterType((*MsgRequestTransferBadgeResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgRequestTransferBadgeResponse")
-	proto.RegisterType((*MsgHandlePendingTransfer)(nil), "bitbadges.bitbadgeschain.badges.MsgHandlePendingTransfer")
-	proto.RegisterType((*MsgHandlePendingTransferResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgHandlePendingTransferResponse")
 	proto.RegisterType((*MsgSetApproval)(nil), "bitbadges.bitbadgeschain.badges.MsgSetApproval")
 	proto.RegisterType((*MsgSetApprovalResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgSetApprovalResponse")
-	proto.RegisterType((*MsgRevokeBadge)(nil), "bitbadges.bitbadgeschain.badges.MsgRevokeBadge")
-	proto.RegisterType((*MsgRevokeBadgeResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgRevokeBadgeResponse")
-	proto.RegisterType((*MsgFreezeAddress)(nil), "bitbadges.bitbadgeschain.badges.MsgFreezeAddress")
-	proto.RegisterType((*MsgFreezeAddressResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgFreezeAddressResponse")
+	proto.RegisterType((*MsgUpdateDisallowedTransfers)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateDisallowedTransfers")
+	proto.RegisterType((*MsgUpdateDisallowedTransfersResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateDisallowedTransfersResponse")
+	proto.RegisterType((*MsgUpdateManagerApprovedTransfers)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateManagerApprovedTransfers")
+	proto.RegisterType((*MsgUpdateManagerApprovedTransfersResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateManagerApprovedTransfersResponse")
 	proto.RegisterType((*MsgUpdateUris)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateUris")
 	proto.RegisterType((*MsgUpdateUrisResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateUrisResponse")
 	proto.RegisterType((*MsgUpdatePermissions)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdatePermissions")
@@ -1835,10 +1445,6 @@ func init() {
 	proto.RegisterType((*MsgTransferManagerResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgTransferManagerResponse")
 	proto.RegisterType((*MsgRequestTransferManager)(nil), "bitbadges.bitbadgeschain.badges.MsgRequestTransferManager")
 	proto.RegisterType((*MsgRequestTransferManagerResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgRequestTransferManagerResponse")
-	proto.RegisterType((*MsgSelfDestructBadge)(nil), "bitbadges.bitbadgeschain.badges.MsgSelfDestructBadge")
-	proto.RegisterType((*MsgSelfDestructBadgeResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgSelfDestructBadgeResponse")
-	proto.RegisterType((*MsgPruneBalances)(nil), "bitbadges.bitbadgeschain.badges.MsgPruneBalances")
-	proto.RegisterType((*MsgPruneBalancesResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgPruneBalancesResponse")
 	proto.RegisterType((*MsgUpdateBytes)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateBytes")
 	proto.RegisterType((*MsgUpdateBytesResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateBytesResponse")
 	proto.RegisterType((*MsgRegisterAddresses)(nil), "bitbadges.bitbadgeschain.badges.MsgRegisterAddresses")
@@ -1848,91 +1454,76 @@ func init() {
 func init() { proto.RegisterFile("badges/tx.proto", fileDescriptor_bc897b33479788c9) }
 
 var fileDescriptor_bc897b33479788c9 = []byte{
-	// 1344 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x58, 0x4f, 0x6f, 0xe3, 0x44,
-	0x14, 0x5f, 0xc7, 0xd9, 0x36, 0x7d, 0xd1, 0x76, 0x77, 0xdd, 0x76, 0xd7, 0x6b, 0x55, 0xd9, 0xae,
-	0x11, 0xab, 0x0a, 0xa1, 0x04, 0xb2, 0x5b, 0x58, 0xfe, 0x49, 0xdb, 0x80, 0x10, 0x5d, 0x91, 0x52,
-	0xb9, 0xad, 0x90, 0xf6, 0xc4, 0x38, 0x9e, 0xa4, 0x86, 0xc4, 0x0e, 0x33, 0xe3, 0xfe, 0x41, 0xe2,
-	0x80, 0xe0, 0xc2, 0x0d, 0x21, 0x21, 0xf1, 0x0d, 0xe0, 0x03, 0x70, 0x44, 0x70, 0xe1, 0xb0, 0x27,
-	0xb4, 0x47, 0x8e, 0xa8, 0xfd, 0x22, 0xc8, 0x63, 0x7b, 0x3a, 0x4e, 0xec, 0xc6, 0x49, 0x25, 0x90,
-	0xb8, 0x65, 0xde, 0xcc, 0xef, 0xfd, 0x9b, 0xf7, 0x9e, 0x7f, 0x13, 0xb8, 0x6e, 0x23, 0xa7, 0x87,
-	0x69, 0x83, 0x1d, 0xd7, 0x87, 0xc4, 0x67, 0xbe, 0x76, 0xd7, 0x76, 0x59, 0x24, 0xab, 0x8b, 0x5f,
-	0x9d, 0x03, 0xe4, 0x7a, 0xf5, 0xe8, 0xb7, 0xb1, 0x14, 0x23, 0x08, 0xf2, 0xc2, 0x43, 0x1c, 0x65,
-	0xdc, 0x8c, 0x85, 0x01, 0x71, 0x13, 0xd1, 0x4a, 0x2c, 0xb2, 0x51, 0x1f, 0x79, 0x9d, 0xe4, 0xa4,
-	0xb9, 0x05, 0xb7, 0x77, 0x03, 0x1b, 0x51, 0x8a, 0xd9, 0x6e, 0x30, 0x1c, 0xf6, 0x4f, 0x36, 0x3d,
-	0x67, 0x73, 0xe0, 0x07, 0x1e, 0xd3, 0x6e, 0xc1, 0x1c, 0xe5, 0x22, 0x5d, 0x59, 0x53, 0xd6, 0xcb,
-	0x56, 0xbc, 0x0a, 0xe5, 0x88, 0x9f, 0xd0, 0x4b, 0x91, 0x3c, 0x5a, 0x99, 0xbf, 0x97, 0xa1, 0xda,
-	0xa6, 0xbd, 0x6d, 0x7c, 0xd4, 0x0a, 0x4d, 0x69, 0x3a, 0xcc, 0x77, 0x08, 0x46, 0xcc, 0x27, 0x5c,
-	0xc1, 0x82, 0x95, 0x2c, 0xb5, 0xb7, 0x41, 0x0d, 0x88, 0xcb, 0xe1, 0xd5, 0xe6, 0x4b, 0xf5, 0x09,
-	0x21, 0xd6, 0xf7, 0x89, 0xfb, 0x91, 0xfd, 0x29, 0xee, 0x30, 0x2b, 0x84, 0x69, 0x6b, 0x50, 0x1d,
-	0x62, 0x32, 0x70, 0x29, 0x75, 0x7d, 0x8f, 0xea, 0x65, 0xee, 0x84, 0x2c, 0xd2, 0xee, 0xc3, 0x22,
-	0x22, 0xb6, 0xcb, 0x08, 0x22, 0x27, 0xad, 0x13, 0x86, 0xa9, 0x7e, 0x95, 0x3b, 0x30, 0x22, 0xd5,
-	0x1e, 0xc2, 0x8a, 0x83, 0xbb, 0x28, 0xe8, 0xb3, 0x74, 0x0e, 0xf4, 0x39, 0xae, 0x33, 0x7b, 0x53,
-	0x7b, 0x0a, 0x4b, 0x5d, 0x82, 0xf1, 0x17, 0x78, 0xd3, 0x71, 0x08, 0xa6, 0xd4, 0xe2, 0x99, 0xd7,
-	0x17, 0xd6, 0xd4, 0xf5, 0x6a, 0x73, 0x7d, 0x62, 0x34, 0x5b, 0x0e, 0x07, 0x58, 0x59, 0x4a, 0x34,
-	0x03, 0x2a, 0x94, 0x21, 0xcf, 0x41, 0xc4, 0xd1, 0x81, 0x3b, 0x21, 0xd6, 0xda, 0x21, 0xdc, 0xa1,
-	0x29, 0x4f, 0xa8, 0xb8, 0x2b, 0xaa, 0xcf, 0x73, 0xeb, 0x8f, 0x26, 0x5a, 0xcf, 0xb9, 0x6c, 0x2b,
-	0x5f, 0xb5, 0x76, 0x00, 0x2b, 0x47, 0x07, 0x2e, 0xc3, 0x7d, 0x97, 0x32, 0xec, 0x58, 0xb8, 0xe3,
-	0x0e, 0x5d, 0x1c, 0xda, 0xac, 0x72, 0x9b, 0xcd, 0x89, 0x36, 0x3f, 0x4e, 0xd0, 0x6d, 0xd7, 0x63,
-	0x5b, 0x5e, 0xd7, 0xb7, 0xb2, 0x15, 0x9a, 0x2f, 0xc2, 0x92, 0x54, 0x40, 0x16, 0xa6, 0x43, 0xdf,
-	0xa3, 0x58, 0x5b, 0x84, 0x92, 0xeb, 0xc4, 0x45, 0x58, 0x72, 0x1d, 0xf3, 0x57, 0x05, 0x16, 0xa3,
-	0x73, 0xbb, 0x81, 0x3d, 0xa9, 0xd6, 0x74, 0x98, 0xe7, 0x6e, 0x6c, 0x39, 0x71, 0xb9, 0x26, 0xcb,
-	0xff, 0x2a, 0x9f, 0xe6, 0x63, 0xb8, 0x95, 0xf6, 0x5e, 0x04, 0x7a, 0x1f, 0x16, 0x3d, 0x7c, 0x2c,
-	0xea, 0x6d, 0x2b, 0x09, 0x7a, 0x44, 0x6a, 0xfe, 0x51, 0x82, 0x1b, 0x6d, 0xda, 0xdb, 0x23, 0xc8,
-	0xa3, 0x5d, 0x4c, 0x26, 0xa5, 0x40, 0x83, 0x72, 0x97, 0xf8, 0x83, 0x38, 0x7e, 0xfe, 0x3b, 0x6c,
-	0x22, 0xe6, 0xc7, 0xb5, 0x87, 0xa9, 0xae, 0xae, 0xa9, 0x61, 0x13, 0x49, 0xa2, 0x50, 0x1f, 0x8a,
-	0x93, 0x51, 0xe6, 0xbb, 0xc9, 0x52, 0x4e, 0xe9, 0xd5, 0x74, 0x4a, 0x77, 0x60, 0x91, 0x06, 0x36,
-	0x5f, 0xc5, 0x5d, 0x31, 0x37, 0x65, 0x57, 0x8c, 0xe0, 0xc3, 0x94, 0xe0, 0xe3, 0xa1, 0x4b, 0x10,
-	0x73, 0x7d, 0x6f, 0xcf, 0x1d, 0x60, 0x7d, 0x3e, 0x4a, 0x49, 0x5a, 0xaa, 0x35, 0x61, 0xb9, 0x83,
-	0x3c, 0xf6, 0x6e, 0x38, 0xdb, 0xfa, 0x2d, 0xdc, 0xf5, 0x09, 0xe6, 0xa7, 0x2b, 0xfc, 0x74, 0xe6,
-	0x9e, 0x69, 0x80, 0x3e, 0x9a, 0xc5, 0xe4, 0x2a, 0xcc, 0x9f, 0x4a, 0x70, 0xbb, 0x4d, 0x7b, 0x16,
-	0xfe, 0x3c, 0xc0, 0x94, 0x5d, 0x26, 0xd3, 0xe7, 0xe3, 0xb2, 0x2c, 0x8f, 0xcb, 0xff, 0x4d, 0x16,
-	0xef, 0xc1, 0xdd, 0x9c, 0x44, 0x89, 0x64, 0xfe, 0xa2, 0xf0, 0x4c, 0x7f, 0x80, 0x3c, 0xa7, 0x8f,
-	0x77, 0xb0, 0xe7, 0xb8, 0x9e, 0x48, 0xfb, 0xc5, 0xad, 0x8b, 0x3a, 0x8c, 0x0f, 0xf9, 0x52, 0x5c,
-	0x81, 0xd1, 0x52, 0xce, 0x9d, 0x9a, 0xce, 0xdd, 0x13, 0xa8, 0x7a, 0xbe, 0xd7, 0x49, 0x12, 0x57,
-	0x9e, 0x32, 0x71, 0x32, 0xd8, 0x34, 0x61, 0x2d, 0xcf, 0x6b, 0x11, 0xda, 0xb3, 0x68, 0x16, 0xed,
-	0x62, 0xb6, 0x39, 0x1c, 0x12, 0xff, 0x10, 0xf5, 0x2f, 0x08, 0x28, 0xe7, 0xcb, 0xc9, 0x03, 0x8d,
-	0xfa, 0x2e, 0x09, 0x27, 0x5e, 0xca, 0x81, 0x96, 0x27, 0x15, 0xc9, 0xd5, 0xcb, 0x15, 0x89, 0xa9,
-	0xf3, 0xb9, 0x24, 0x45, 0x22, 0x82, 0xfc, 0x33, 0x0a, 0xd2, 0xc2, 0x87, 0xfe, 0x67, 0x78, 0x52,
-	0x0f, 0xac, 0xc2, 0x02, 0x12, 0x73, 0x25, 0xba, 0xb7, 0x73, 0x81, 0x3c, 0x55, 0xd4, 0xdc, 0xa9,
-	0xf2, 0x2f, 0x85, 0x2a, 0xc5, 0x23, 0x42, 0xfd, 0x59, 0xe1, 0xa3, 0xf5, 0x7d, 0xf9, 0xdb, 0x7c,
-	0x41, 0xb0, 0xdb, 0x70, 0x0d, 0xa5, 0x58, 0x40, 0x69, 0x4a, 0xcf, 0xd2, 0xf0, 0x0b, 0x0a, 0xfb,
-	0x06, 0xa8, 0xc8, 0x89, 0x52, 0x53, 0xb1, 0xc2, 0x9f, 0xf1, 0xf8, 0x4a, 0x79, 0x2a, 0xc2, 0xf8,
-	0x4a, 0x81, 0x6b, 0x6d, 0xda, 0xdb, 0x1f, 0x3a, 0x88, 0xe1, 0x7d, 0xe2, 0xd2, 0x99, 0xbe, 0x90,
-	0x31, 0x4f, 0x53, 0x67, 0xe2, 0x69, 0xe6, 0x6d, 0x58, 0x49, 0xb9, 0x20, 0x9c, 0xeb, 0xc3, 0xb2,
-	0xd8, 0xd8, 0x91, 0x68, 0xdb, 0x2c, 0x2e, 0x8e, 0x90, 0x41, 0x75, 0x8c, 0x0c, 0x9a, 0x35, 0x58,
-	0xcd, 0xb2, 0x26, 0xbc, 0xb1, 0x41, 0x93, 0xbe, 0x02, 0x6d, 0xe4, 0xa1, 0xde, 0xa4, 0xa9, 0x94,
-	0xe3, 0x4b, 0x6e, 0x1b, 0x9b, 0xab, 0x60, 0x8c, 0xdb, 0x10, 0x1e, 0x20, 0xb8, 0x33, 0x3e, 0x41,
-	0x2f, 0xe3, 0x48, 0x5c, 0x2b, 0xea, 0x79, 0xad, 0xbc, 0x00, 0xf7, 0x72, 0x4d, 0x08, 0x3f, 0x9e,
-	0xf0, 0x7b, 0xd9, 0xc5, 0xfd, 0xee, 0x7b, 0x98, 0x32, 0x12, 0x74, 0xd8, 0xcc, 0xe4, 0x2a, 0xce,
-	0xfa, 0x98, 0x2e, 0x61, 0xab, 0xcb, 0xdb, 0x6c, 0x87, 0x04, 0x1e, 0x6e, 0xc5, 0x2f, 0x92, 0x0b,
-	0xec, 0x18, 0x50, 0x89, 0x15, 0x27, 0x23, 0x45, 0xac, 0xd3, 0xf3, 0x46, 0x1d, 0x99, 0x37, 0x71,
-	0x93, 0xa4, 0xec, 0x08, 0x1f, 0x3e, 0xe1, 0x53, 0x2d, 0xaa, 0x8c, 0xe8, 0x41, 0x30, 0x4b, 0xb2,
-	0x0d, 0xa8, 0x78, 0xf8, 0x28, 0x7a, 0x66, 0xa8, 0x1c, 0x24, 0xd6, 0xf1, 0x9c, 0x91, 0x2c, 0x48,
-	0x55, 0xb7, 0xcc, 0x2f, 0xa4, 0x17, 0x72, 0x60, 0x92, 0x62, 0x5d, 0x39, 0x1e, 0xbc, 0x02, 0x4b,
-	0x22, 0xac, 0x3d, 0x3f, 0x41, 0xf2, 0x74, 0x2c, 0x58, 0x59, 0x5b, 0xe6, 0x37, 0x0a, 0xbf, 0x84,
-	0x31, 0x23, 0x82, 0x6f, 0x3a, 0xa0, 0x93, 0x78, 0x13, 0x3b, 0xf1, 0xf6, 0x76, 0x30, 0xb0, 0x31,
-	0xa1, 0xdc, 0xfa, 0x34, 0x83, 0x2c, 0x57, 0x53, 0xf3, 0xb7, 0x1b, 0xa0, 0xb6, 0x69, 0x4f, 0xf3,
-	0xa0, 0x22, 0xde, 0x86, 0x2f, 0x4f, 0xd4, 0x2b, 0x3d, 0x04, 0x8c, 0x87, 0xd3, 0x9c, 0x16, 0xd1,
-	0x1d, 0x41, 0x55, 0x7e, 0x22, 0x34, 0x0a, 0x2a, 0x49, 0x00, 0xc6, 0xeb, 0x53, 0x02, 0x84, 0xe1,
-	0x2f, 0xe1, 0x5a, 0x9a, 0x30, 0xbe, 0x5a, 0x44, 0x53, 0x0a, 0x62, 0xbc, 0x31, 0x35, 0x44, 0x98,
-	0xff, 0x5e, 0x81, 0xe5, 0x4c, 0xde, 0xfa, 0xa8, 0x88, 0xce, 0x2c, 0xa4, 0xf1, 0x78, 0x56, 0xa4,
-	0x70, 0xea, 0x07, 0x05, 0x56, 0xb2, 0xf9, 0x5f, 0xa1, 0x48, 0x33, 0xa1, 0xc6, 0xe6, 0xcc, 0x50,
-	0xb9, 0x48, 0x64, 0xee, 0x56, 0xa8, 0x48, 0x24, 0x40, 0xb1, 0x22, 0xc9, 0xe0, 0x54, 0xa1, 0x61,
-	0x99, 0x4f, 0x35, 0x8a, 0x65, 0x58, 0x00, 0x8a, 0x19, 0xce, 0x60, 0x38, 0x61, 0x75, 0xa6, 0xd9,
-	0x4d, 0xa1, 0xea, 0x4c, 0x41, 0x8a, 0x55, 0x67, 0x26, 0x33, 0xd1, 0x18, 0x80, 0xc4, 0x4a, 0xea,
-	0x45, 0x14, 0x9d, 0x9f, 0x37, 0x5e, 0x9b, 0xee, 0xbc, 0xb0, 0xfa, 0xad, 0x02, 0x37, 0xc7, 0x09,
-	0xc7, 0x46, 0x71, 0x6d, 0x12, 0xcc, 0x78, 0x67, 0x26, 0x98, 0xf0, 0xe5, 0x6b, 0x05, 0xae, 0x8f,
-	0x7e, 0xe5, 0x1f, 0x4c, 0xd3, 0xee, 0x31, 0xc8, 0x78, 0x6b, 0x06, 0x90, 0xf0, 0xe2, 0x47, 0x05,
-	0x6e, 0xe5, 0x50, 0x8e, 0x37, 0x67, 0xe8, 0xf6, 0xc4, 0xa7, 0xd6, 0xec, 0xd8, 0xd4, 0x65, 0x8d,
-	0xb3, 0x90, 0x8d, 0x62, 0x9d, 0x36, 0x02, 0x2b, 0x76, 0x59, 0xb9, 0x3c, 0x25, 0xec, 0x96, 0x34,
-	0x49, 0x29, 0xd4, 0x2d, 0x29, 0x48, 0xb1, 0x6e, 0xc9, 0xa4, 0x28, 0xe1, 0x94, 0x90, 0xf9, 0x49,
-	0xa3, 0x78, 0xe5, 0x71, 0x40, 0xb1, 0x29, 0x91, 0xc1, 0x4f, 0xf8, 0x1d, 0x8c, 0xb3, 0x93, 0x8d,
-	0x62, 0xb7, 0x3b, 0x02, 0x2b, 0x76, 0x07, 0xb9, 0x34, 0xa5, 0xf5, 0xe1, 0xb3, 0xd3, 0x9a, 0xf2,
-	0xfc, 0xb4, 0xa6, 0xfc, 0x7d, 0x5a, 0x53, 0xbe, 0x3b, 0xab, 0x5d, 0x79, 0x7e, 0x56, 0xbb, 0xf2,
-	0xd7, 0x59, 0xed, 0xca, 0xd3, 0x66, 0xcf, 0x65, 0x07, 0x81, 0x5d, 0xef, 0xf8, 0x83, 0x86, 0x50,
-	0xdc, 0x48, 0x9b, 0x68, 0x1c, 0x37, 0x92, 0x3f, 0xd5, 0x4f, 0x86, 0x98, 0xda, 0x73, 0xfc, 0x8f,
-	0xef, 0x07, 0xff, 0x04, 0x00, 0x00, 0xff, 0xff, 0xa6, 0x4d, 0x91, 0xb5, 0x6b, 0x17, 0x00, 0x00,
+	// 1098 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x58, 0xcd, 0x6f, 0xdc, 0x44,
+	0x14, 0x8f, 0x63, 0xe7, 0x63, 0xdf, 0x26, 0x14, 0x26, 0x69, 0x70, 0xad, 0xca, 0x2c, 0xa6, 0xaa,
+	0x02, 0x88, 0xdd, 0x92, 0x2a, 0x7c, 0xaa, 0x95, 0xb2, 0x2d, 0x88, 0x22, 0x5c, 0x21, 0xb7, 0x39,
+	0xc0, 0x6d, 0xbc, 0x9e, 0xba, 0x46, 0x5e, 0xdb, 0xf5, 0x78, 0x9b, 0xec, 0xa1, 0x27, 0xb8, 0x70,
+	0x82, 0x23, 0x57, 0xfe, 0x01, 0x04, 0xff, 0x01, 0x47, 0x6e, 0xf4, 0xc8, 0x11, 0x25, 0x77, 0xee,
+	0xdc, 0x2a, 0x8f, 0xed, 0x59, 0x7b, 0xbd, 0xce, 0x7a, 0x3f, 0x7a, 0xdb, 0x79, 0x7e, 0xbf, 0xf7,
+	0x7e, 0xbf, 0xd7, 0x99, 0xf7, 0x5e, 0x03, 0x97, 0x4c, 0x6c, 0xd9, 0x84, 0x76, 0xa2, 0xd3, 0x76,
+	0x10, 0xfa, 0x91, 0x8f, 0xde, 0x30, 0x9d, 0x28, 0xb1, 0xb5, 0xf9, 0xaf, 0xde, 0x63, 0xec, 0x78,
+	0xed, 0xe4, 0xb7, 0xb2, 0x93, 0x22, 0x42, 0xec, 0xc5, 0x4e, 0x0c, 0xa5, 0x5c, 0x4e, 0x8d, 0x26,
+	0x76, 0xb1, 0xd7, 0xe3, 0xe6, 0xcc, 0xb7, 0xe7, 0x62, 0xa7, 0x9f, 0x1a, 0xb5, 0xcf, 0x61, 0xb7,
+	0x1b, 0x9b, 0x1f, 0x0c, 0x82, 0xc0, 0x1d, 0x1e, 0x79, 0xd6, 0x51, 0xdf, 0x1f, 0x78, 0x11, 0xda,
+	0x83, 0x75, 0xca, 0x4c, 0xb2, 0xd0, 0x12, 0xf6, 0x25, 0x23, 0x3d, 0xc5, 0x76, 0xcc, 0x3c, 0xe4,
+	0xd5, 0xc4, 0x9e, 0x9c, 0x34, 0x0a, 0x8d, 0x87, 0x21, 0xf6, 0xe8, 0x23, 0x12, 0x52, 0xd4, 0x82,
+	0x66, 0xe4, 0x1f, 0x59, 0x56, 0x48, 0x28, 0x25, 0x54, 0x16, 0x5a, 0xe2, 0xbe, 0x64, 0xe4, 0x4d,
+	0xe8, 0x2e, 0x6c, 0x66, 0xec, 0xe4, 0xd5, 0x96, 0xb8, 0xdf, 0x3c, 0xd8, 0x6f, 0x4f, 0xd1, 0xda,
+	0xee, 0x26, 0x00, 0x83, 0x23, 0xb5, 0xff, 0x25, 0x78, 0x55, 0xa7, 0xf6, 0x7d, 0x72, 0x72, 0xc7,
+	0x77, 0x5d, 0xd2, 0x8b, 0x1c, 0xdf, 0x43, 0x32, 0x6c, 0xf4, 0x42, 0x82, 0x23, 0x3f, 0x64, 0xd4,
+	0x1b, 0x46, 0x76, 0x44, 0xd7, 0x60, 0xbb, 0xc7, 0xfd, 0x8e, 0x43, 0x87, 0x49, 0x68, 0x18, 0x45,
+	0x23, 0x52, 0x62, 0x6a, 0x96, 0x4d, 0x62, 0x07, 0x91, 0x39, 0xf0, 0x73, 0x2c, 0x2c, 0x20, 0x61,
+	0xdf, 0xa1, 0xd4, 0xf1, 0x3d, 0x2a, 0x4b, 0xac, 0x04, 0x79, 0x13, 0xda, 0x85, 0x35, 0x73, 0x18,
+	0x11, 0x2a, 0xaf, 0x31, 0x68, 0x72, 0x40, 0x26, 0xec, 0x58, 0x0e, 0xc5, 0xae, 0xeb, 0x9f, 0x10,
+	0x8b, 0xd7, 0x49, 0x5e, 0x67, 0xca, 0x6f, 0x4c, 0x55, 0x9e, 0x21, 0x74, 0x1c, 0x04, 0x8e, 0x67,
+	0x1b, 0x93, 0x82, 0x21, 0x17, 0xe4, 0x3e, 0xf6, 0xb0, 0x4d, 0xc2, 0xa3, 0x20, 0x08, 0xfd, 0xa7,
+	0xf9, 0x44, 0x1b, 0x73, 0x26, 0xaa, 0x8c, 0x18, 0x57, 0x89, 0x46, 0xd8, 0xb3, 0x70, 0x68, 0xc9,
+	0x9b, 0xac, 0x0c, 0xfc, 0x8c, 0xbe, 0x81, 0x2d, 0x73, 0x74, 0xa7, 0xa8, 0xdc, 0x60, 0xd9, 0x0f,
+	0x6b, 0xfc, 0x03, 0x97, 0x2f, 0xa2, 0x51, 0x08, 0x85, 0xbe, 0x80, 0x46, 0xc4, 0x55, 0x01, 0x8b,
+	0xfb, 0x4e, 0x6d, 0x55, 0xd4, 0x18, 0x81, 0xd1, 0x6d, 0x58, 0x4f, 0x1e, 0x82, 0xdc, 0x64, 0x61,
+	0xae, 0x4f, 0x0d, 0x73, 0x27, 0x76, 0x37, 0x52, 0x94, 0x76, 0x1b, 0xe4, 0xf1, 0xab, 0x67, 0x10,
+	0x1a, 0xf8, 0x1e, 0x25, 0x48, 0x83, 0xad, 0xd1, 0x9d, 0xba, 0x67, 0xa5, 0x4f, 0xa8, 0x60, 0xd3,
+	0xfe, 0x58, 0x85, 0x2d, 0x9d, 0xda, 0xba, 0xe3, 0x45, 0x4c, 0xf7, 0x05, 0xf7, 0x76, 0x3c, 0xdc,
+	0x6a, 0x39, 0x5c, 0xa9, 0xe6, 0xe2, 0x4b, 0xaa, 0xb9, 0xb4, 0x9c, 0x9a, 0xaf, 0xcd, 0x55, 0xf3,
+	0x8f, 0x60, 0x37, 0x5f, 0x32, 0x5e, 0xef, 0x16, 0x34, 0x3d, 0x72, 0x9a, 0x18, 0x79, 0xb9, 0xf3,
+	0x26, 0xed, 0x37, 0x81, 0x75, 0x8a, 0x8c, 0xd5, 0x32, 0x2a, 0x8e, 0x40, 0x7a, 0x14, 0xfa, 0x7d,
+	0xd6, 0x23, 0x24, 0x83, 0xfd, 0x5e, 0x5e, 0xa9, 0x34, 0x85, 0x5d, 0xaf, 0x02, 0xdf, 0x4c, 0x6e,
+	0x2c, 0xe6, 0x15, 0x9d, 0xda, 0x0f, 0x48, 0x94, 0xbc, 0x4b, 0xec, 0x2e, 0x28, 0x45, 0x86, 0x0d,
+	0x9c, 0xb4, 0xe6, 0x54, 0x4d, 0x76, 0x2c, 0xf4, 0x69, 0x69, 0xee, 0x3e, 0x2d, 0xc3, 0x5e, 0x91,
+	0x2f, 0x97, 0xf2, 0xa7, 0x00, 0x57, 0x75, 0x6a, 0x1f, 0x07, 0x16, 0x8e, 0xc8, 0xdd, 0x09, 0x5d,
+	0x6d, 0x31, 0x61, 0x15, 0x7d, 0x57, 0x5c, 0x62, 0xdf, 0xd5, 0xae, 0xc3, 0xb5, 0x8b, 0x14, 0x70,
+	0xa9, 0x7f, 0x0b, 0xf0, 0x26, 0x77, 0xd4, 0xab, 0xfa, 0xea, 0x62, 0x7a, 0x2f, 0x9a, 0x01, 0xe2,
+	0xb2, 0x67, 0x80, 0xf6, 0x2e, 0xbc, 0x3d, 0x55, 0x10, 0x97, 0xff, 0x93, 0x00, 0xdb, 0xdc, 0xfb,
+	0x38, 0x74, 0x16, 0x95, 0x5a, 0x1a, 0xe6, 0xe2, 0xb4, 0x61, 0x2e, 0x15, 0x87, 0xb9, 0xf6, 0x3a,
+	0x5c, 0x2e, 0x10, 0xe2, 0x54, 0x9f, 0xb2, 0x36, 0x93, 0x7c, 0xf8, 0x3a, 0x37, 0xdb, 0x17, 0x23,
+	0x3c, 0xb6, 0x3b, 0x88, 0xa5, 0xdd, 0x41, 0x53, 0x73, 0x6f, 0x21, 0x97, 0x97, 0xf3, 0x72, 0x01,
+	0xe5, 0x7a, 0x42, 0x5a, 0xf1, 0x97, 0xf5, 0xf4, 0xb5, 0xab, 0xa0, 0x94, 0xb3, 0x71, 0x2e, 0x43,
+	0xb8, 0xa2, 0x53, 0xdb, 0x20, 0x4f, 0x06, 0x84, 0x46, 0xcb, 0xa5, 0xa4, 0x02, 0x60, 0xcb, 0x4a,
+	0x43, 0x33, 0x56, 0x9b, 0x46, 0xce, 0xa2, 0xbd, 0xc5, 0xde, 0xd1, 0xe4, 0xd4, 0x9c, 0xdf, 0x77,
+	0xac, 0x45, 0x26, 0xb5, 0xec, 0xb2, 0x1d, 0x6c, 0x31, 0x52, 0x0a, 0x6c, 0x7a, 0xe4, 0x84, 0x45,
+	0xca, 0xb6, 0xc2, 0xec, 0x9c, 0xb6, 0xb7, 0x5c, 0x2e, 0xce, 0xc2, 0x64, 0x37, 0xc9, 0x20, 0xb6,
+	0x43, 0x23, 0x12, 0x8e, 0xd6, 0xdf, 0x6a, 0x2e, 0x37, 0x60, 0x07, 0x67, 0x6e, 0x0f, 0xfd, 0x0c,
+	0xc9, 0x76, 0xe4, 0x86, 0x31, 0xe9, 0x93, 0xf6, 0x43, 0xd2, 0x42, 0x4b, 0x49, 0xf8, 0x74, 0xb4,
+	0x40, 0x0e, 0xd3, 0x8f, 0xc4, 0x4a, 0x3f, 0xdf, 0x1f, 0xf4, 0xcd, 0xb8, 0x29, 0xc4, 0xd9, 0xeb,
+	0xf4, 0xf4, 0x7b, 0x96, 0x11, 0xff, 0x0f, 0xc3, 0xa8, 0x8c, 0x74, 0xf0, 0xdf, 0x16, 0x88, 0x3a,
+	0xb5, 0xd1, 0x33, 0xd8, 0x2e, 0xee, 0xe3, 0xef, 0x4f, 0x0d, 0x3e, 0xbe, 0x47, 0x29, 0x1f, 0xcf,
+	0x0c, 0xe1, 0x62, 0x9f, 0x40, 0x63, 0xb4, 0x52, 0xbd, 0x57, 0x27, 0x0e, 0x77, 0x57, 0x0e, 0x67,
+	0x72, 0xe7, 0x29, 0x9f, 0xc1, 0x76, 0x71, 0xaf, 0xa8, 0xa5, 0xb8, 0x00, 0xa9, 0xa7, 0x78, 0xe2,
+	0x36, 0x80, 0x4e, 0xa0, 0x99, 0xdf, 0x04, 0x3a, 0x75, 0x22, 0xe5, 0x00, 0xca, 0x87, 0x33, 0x02,
+	0x78, 0xe2, 0x5f, 0x05, 0xb8, 0x52, 0x3d, 0xb8, 0x6f, 0xd5, 0x09, 0x5b, 0x09, 0x57, 0x3e, 0x5b,
+	0x08, 0xce, 0x39, 0xfe, 0x2e, 0x80, 0x3a, 0x65, 0xe2, 0x76, 0xeb, 0x67, 0xaa, 0x8a, 0xa1, 0x7c,
+	0xb9, 0x78, 0x0c, 0x4e, 0x39, 0x02, 0xc8, 0x0d, 0xc9, 0x76, 0xfd, 0xc8, 0xb1, 0xbf, 0xf2, 0xc1,
+	0x6c, 0xfe, 0x3c, 0xeb, 0x8f, 0x02, 0xbc, 0x56, 0x9e, 0x78, 0x87, 0xf5, 0xa3, 0xe5, 0x60, 0xca,
+	0xad, 0xb9, 0x60, 0x9c, 0xcb, 0xf7, 0x02, 0x5c, 0x1a, 0x1f, 0x29, 0x37, 0x67, 0x79, 0x20, 0x29,
+	0x48, 0xf9, 0x74, 0x0e, 0x10, 0x67, 0xf1, 0x8b, 0x00, 0x7b, 0x15, 0xf3, 0xed, 0x93, 0x3a, 0x71,
+	0x27, 0x63, 0x95, 0xee, 0xfc, 0xd8, 0xfc, 0x93, 0xcf, 0x4f, 0xb6, 0x4e, 0xfd, 0x72, 0x33, 0x40,
+	0xbd, 0x27, 0x3f, 0x61, 0x9e, 0xb1, 0x5b, 0x52, 0x9e, 0x66, 0x87, 0xf5, 0x24, 0x8d, 0xc1, 0xea,
+	0xdd, 0x92, 0xca, 0xb1, 0xd6, 0xfd, 0xea, 0xaf, 0x33, 0x55, 0x78, 0x7e, 0xa6, 0x0a, 0xff, 0x9e,
+	0xa9, 0xc2, 0xcf, 0xe7, 0xea, 0xca, 0xf3, 0x73, 0x75, 0xe5, 0x9f, 0x73, 0x75, 0xe5, 0xdb, 0x03,
+	0xdb, 0x89, 0x1e, 0x0f, 0xcc, 0x76, 0xcf, 0xef, 0x77, 0x78, 0xe0, 0x4e, 0x31, 0x45, 0xe7, 0xb4,
+	0x93, 0xfd, 0xb1, 0x6d, 0x18, 0x10, 0x6a, 0xae, 0xb3, 0x3f, 0x87, 0xdd, 0x7c, 0x11, 0x00, 0x00,
+	0xff, 0xff, 0x5d, 0xa2, 0x67, 0xe0, 0x83, 0x13, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1947,20 +1538,16 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
-	NewBadge(ctx context.Context, in *MsgNewBadge, opts ...grpc.CallOption) (*MsgNewBadgeResponse, error)
-	NewSubBadge(ctx context.Context, in *MsgNewSubBadge, opts ...grpc.CallOption) (*MsgNewSubBadgeResponse, error)
+	NewCollection(ctx context.Context, in *MsgNewCollection, opts ...grpc.CallOption) (*MsgNewCollectionResponse, error)
+	MintBadge(ctx context.Context, in *MsgMintBadge, opts ...grpc.CallOption) (*MsgMintBadgeResponse, error)
 	TransferBadge(ctx context.Context, in *MsgTransferBadge, opts ...grpc.CallOption) (*MsgTransferBadgeResponse, error)
-	RequestTransferBadge(ctx context.Context, in *MsgRequestTransferBadge, opts ...grpc.CallOption) (*MsgRequestTransferBadgeResponse, error)
-	HandlePendingTransfer(ctx context.Context, in *MsgHandlePendingTransfer, opts ...grpc.CallOption) (*MsgHandlePendingTransferResponse, error)
 	SetApproval(ctx context.Context, in *MsgSetApproval, opts ...grpc.CallOption) (*MsgSetApprovalResponse, error)
-	RevokeBadge(ctx context.Context, in *MsgRevokeBadge, opts ...grpc.CallOption) (*MsgRevokeBadgeResponse, error)
-	FreezeAddress(ctx context.Context, in *MsgFreezeAddress, opts ...grpc.CallOption) (*MsgFreezeAddressResponse, error)
+	UpdateDisallowedTransfers(ctx context.Context, in *MsgUpdateDisallowedTransfers, opts ...grpc.CallOption) (*MsgUpdateDisallowedTransfersResponse, error)
+	UpdateManagerApprovedTransfers(ctx context.Context, in *MsgUpdateManagerApprovedTransfers, opts ...grpc.CallOption) (*MsgUpdateManagerApprovedTransfersResponse, error)
 	UpdateUris(ctx context.Context, in *MsgUpdateUris, opts ...grpc.CallOption) (*MsgUpdateUrisResponse, error)
 	UpdatePermissions(ctx context.Context, in *MsgUpdatePermissions, opts ...grpc.CallOption) (*MsgUpdatePermissionsResponse, error)
 	TransferManager(ctx context.Context, in *MsgTransferManager, opts ...grpc.CallOption) (*MsgTransferManagerResponse, error)
 	RequestTransferManager(ctx context.Context, in *MsgRequestTransferManager, opts ...grpc.CallOption) (*MsgRequestTransferManagerResponse, error)
-	SelfDestructBadge(ctx context.Context, in *MsgSelfDestructBadge, opts ...grpc.CallOption) (*MsgSelfDestructBadgeResponse, error)
-	PruneBalances(ctx context.Context, in *MsgPruneBalances, opts ...grpc.CallOption) (*MsgPruneBalancesResponse, error)
 	UpdateBytes(ctx context.Context, in *MsgUpdateBytes, opts ...grpc.CallOption) (*MsgUpdateBytesResponse, error)
 	RegisterAddresses(ctx context.Context, in *MsgRegisterAddresses, opts ...grpc.CallOption) (*MsgRegisterAddressesResponse, error)
 }
@@ -1973,18 +1560,18 @@ func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 	return &msgClient{cc}
 }
 
-func (c *msgClient) NewBadge(ctx context.Context, in *MsgNewBadge, opts ...grpc.CallOption) (*MsgNewBadgeResponse, error) {
-	out := new(MsgNewBadgeResponse)
-	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/NewBadge", in, out, opts...)
+func (c *msgClient) NewCollection(ctx context.Context, in *MsgNewCollection, opts ...grpc.CallOption) (*MsgNewCollectionResponse, error) {
+	out := new(MsgNewCollectionResponse)
+	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/NewCollection", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgClient) NewSubBadge(ctx context.Context, in *MsgNewSubBadge, opts ...grpc.CallOption) (*MsgNewSubBadgeResponse, error) {
-	out := new(MsgNewSubBadgeResponse)
-	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/NewSubBadge", in, out, opts...)
+func (c *msgClient) MintBadge(ctx context.Context, in *MsgMintBadge, opts ...grpc.CallOption) (*MsgMintBadgeResponse, error) {
+	out := new(MsgMintBadgeResponse)
+	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/MintBadge", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2000,24 +1587,6 @@ func (c *msgClient) TransferBadge(ctx context.Context, in *MsgTransferBadge, opt
 	return out, nil
 }
 
-func (c *msgClient) RequestTransferBadge(ctx context.Context, in *MsgRequestTransferBadge, opts ...grpc.CallOption) (*MsgRequestTransferBadgeResponse, error) {
-	out := new(MsgRequestTransferBadgeResponse)
-	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/RequestTransferBadge", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *msgClient) HandlePendingTransfer(ctx context.Context, in *MsgHandlePendingTransfer, opts ...grpc.CallOption) (*MsgHandlePendingTransferResponse, error) {
-	out := new(MsgHandlePendingTransferResponse)
-	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/HandlePendingTransfer", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *msgClient) SetApproval(ctx context.Context, in *MsgSetApproval, opts ...grpc.CallOption) (*MsgSetApprovalResponse, error) {
 	out := new(MsgSetApprovalResponse)
 	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/SetApproval", in, out, opts...)
@@ -2027,18 +1596,18 @@ func (c *msgClient) SetApproval(ctx context.Context, in *MsgSetApproval, opts ..
 	return out, nil
 }
 
-func (c *msgClient) RevokeBadge(ctx context.Context, in *MsgRevokeBadge, opts ...grpc.CallOption) (*MsgRevokeBadgeResponse, error) {
-	out := new(MsgRevokeBadgeResponse)
-	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/RevokeBadge", in, out, opts...)
+func (c *msgClient) UpdateDisallowedTransfers(ctx context.Context, in *MsgUpdateDisallowedTransfers, opts ...grpc.CallOption) (*MsgUpdateDisallowedTransfersResponse, error) {
+	out := new(MsgUpdateDisallowedTransfersResponse)
+	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/UpdateDisallowedTransfers", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgClient) FreezeAddress(ctx context.Context, in *MsgFreezeAddress, opts ...grpc.CallOption) (*MsgFreezeAddressResponse, error) {
-	out := new(MsgFreezeAddressResponse)
-	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/FreezeAddress", in, out, opts...)
+func (c *msgClient) UpdateManagerApprovedTransfers(ctx context.Context, in *MsgUpdateManagerApprovedTransfers, opts ...grpc.CallOption) (*MsgUpdateManagerApprovedTransfersResponse, error) {
+	out := new(MsgUpdateManagerApprovedTransfersResponse)
+	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/UpdateManagerApprovedTransfers", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2081,24 +1650,6 @@ func (c *msgClient) RequestTransferManager(ctx context.Context, in *MsgRequestTr
 	return out, nil
 }
 
-func (c *msgClient) SelfDestructBadge(ctx context.Context, in *MsgSelfDestructBadge, opts ...grpc.CallOption) (*MsgSelfDestructBadgeResponse, error) {
-	out := new(MsgSelfDestructBadgeResponse)
-	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/SelfDestructBadge", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *msgClient) PruneBalances(ctx context.Context, in *MsgPruneBalances, opts ...grpc.CallOption) (*MsgPruneBalancesResponse, error) {
-	out := new(MsgPruneBalancesResponse)
-	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/PruneBalances", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *msgClient) UpdateBytes(ctx context.Context, in *MsgUpdateBytes, opts ...grpc.CallOption) (*MsgUpdateBytesResponse, error) {
 	out := new(MsgUpdateBytesResponse)
 	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/UpdateBytes", in, out, opts...)
@@ -2119,20 +1670,16 @@ func (c *msgClient) RegisterAddresses(ctx context.Context, in *MsgRegisterAddres
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
-	NewBadge(context.Context, *MsgNewBadge) (*MsgNewBadgeResponse, error)
-	NewSubBadge(context.Context, *MsgNewSubBadge) (*MsgNewSubBadgeResponse, error)
+	NewCollection(context.Context, *MsgNewCollection) (*MsgNewCollectionResponse, error)
+	MintBadge(context.Context, *MsgMintBadge) (*MsgMintBadgeResponse, error)
 	TransferBadge(context.Context, *MsgTransferBadge) (*MsgTransferBadgeResponse, error)
-	RequestTransferBadge(context.Context, *MsgRequestTransferBadge) (*MsgRequestTransferBadgeResponse, error)
-	HandlePendingTransfer(context.Context, *MsgHandlePendingTransfer) (*MsgHandlePendingTransferResponse, error)
 	SetApproval(context.Context, *MsgSetApproval) (*MsgSetApprovalResponse, error)
-	RevokeBadge(context.Context, *MsgRevokeBadge) (*MsgRevokeBadgeResponse, error)
-	FreezeAddress(context.Context, *MsgFreezeAddress) (*MsgFreezeAddressResponse, error)
+	UpdateDisallowedTransfers(context.Context, *MsgUpdateDisallowedTransfers) (*MsgUpdateDisallowedTransfersResponse, error)
+	UpdateManagerApprovedTransfers(context.Context, *MsgUpdateManagerApprovedTransfers) (*MsgUpdateManagerApprovedTransfersResponse, error)
 	UpdateUris(context.Context, *MsgUpdateUris) (*MsgUpdateUrisResponse, error)
 	UpdatePermissions(context.Context, *MsgUpdatePermissions) (*MsgUpdatePermissionsResponse, error)
 	TransferManager(context.Context, *MsgTransferManager) (*MsgTransferManagerResponse, error)
 	RequestTransferManager(context.Context, *MsgRequestTransferManager) (*MsgRequestTransferManagerResponse, error)
-	SelfDestructBadge(context.Context, *MsgSelfDestructBadge) (*MsgSelfDestructBadgeResponse, error)
-	PruneBalances(context.Context, *MsgPruneBalances) (*MsgPruneBalancesResponse, error)
 	UpdateBytes(context.Context, *MsgUpdateBytes) (*MsgUpdateBytesResponse, error)
 	RegisterAddresses(context.Context, *MsgRegisterAddresses) (*MsgRegisterAddressesResponse, error)
 }
@@ -2141,29 +1688,23 @@ type MsgServer interface {
 type UnimplementedMsgServer struct {
 }
 
-func (*UnimplementedMsgServer) NewBadge(ctx context.Context, req *MsgNewBadge) (*MsgNewBadgeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NewBadge not implemented")
+func (*UnimplementedMsgServer) NewCollection(ctx context.Context, req *MsgNewCollection) (*MsgNewCollectionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewCollection not implemented")
 }
-func (*UnimplementedMsgServer) NewSubBadge(ctx context.Context, req *MsgNewSubBadge) (*MsgNewSubBadgeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NewSubBadge not implemented")
+func (*UnimplementedMsgServer) MintBadge(ctx context.Context, req *MsgMintBadge) (*MsgMintBadgeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MintBadge not implemented")
 }
 func (*UnimplementedMsgServer) TransferBadge(ctx context.Context, req *MsgTransferBadge) (*MsgTransferBadgeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TransferBadge not implemented")
 }
-func (*UnimplementedMsgServer) RequestTransferBadge(ctx context.Context, req *MsgRequestTransferBadge) (*MsgRequestTransferBadgeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RequestTransferBadge not implemented")
-}
-func (*UnimplementedMsgServer) HandlePendingTransfer(ctx context.Context, req *MsgHandlePendingTransfer) (*MsgHandlePendingTransferResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method HandlePendingTransfer not implemented")
-}
 func (*UnimplementedMsgServer) SetApproval(ctx context.Context, req *MsgSetApproval) (*MsgSetApprovalResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetApproval not implemented")
 }
-func (*UnimplementedMsgServer) RevokeBadge(ctx context.Context, req *MsgRevokeBadge) (*MsgRevokeBadgeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RevokeBadge not implemented")
+func (*UnimplementedMsgServer) UpdateDisallowedTransfers(ctx context.Context, req *MsgUpdateDisallowedTransfers) (*MsgUpdateDisallowedTransfersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateDisallowedTransfers not implemented")
 }
-func (*UnimplementedMsgServer) FreezeAddress(ctx context.Context, req *MsgFreezeAddress) (*MsgFreezeAddressResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FreezeAddress not implemented")
+func (*UnimplementedMsgServer) UpdateManagerApprovedTransfers(ctx context.Context, req *MsgUpdateManagerApprovedTransfers) (*MsgUpdateManagerApprovedTransfersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateManagerApprovedTransfers not implemented")
 }
 func (*UnimplementedMsgServer) UpdateUris(ctx context.Context, req *MsgUpdateUris) (*MsgUpdateUrisResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUris not implemented")
@@ -2177,12 +1718,6 @@ func (*UnimplementedMsgServer) TransferManager(ctx context.Context, req *MsgTran
 func (*UnimplementedMsgServer) RequestTransferManager(ctx context.Context, req *MsgRequestTransferManager) (*MsgRequestTransferManagerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestTransferManager not implemented")
 }
-func (*UnimplementedMsgServer) SelfDestructBadge(ctx context.Context, req *MsgSelfDestructBadge) (*MsgSelfDestructBadgeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SelfDestructBadge not implemented")
-}
-func (*UnimplementedMsgServer) PruneBalances(ctx context.Context, req *MsgPruneBalances) (*MsgPruneBalancesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PruneBalances not implemented")
-}
 func (*UnimplementedMsgServer) UpdateBytes(ctx context.Context, req *MsgUpdateBytes) (*MsgUpdateBytesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateBytes not implemented")
 }
@@ -2194,38 +1729,38 @@ func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
 	s.RegisterService(&_Msg_serviceDesc, srv)
 }
 
-func _Msg_NewBadge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgNewBadge)
+func _Msg_NewCollection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgNewCollection)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).NewBadge(ctx, in)
+		return srv.(MsgServer).NewCollection(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bitbadges.bitbadgeschain.badges.Msg/NewBadge",
+		FullMethod: "/bitbadges.bitbadgeschain.badges.Msg/NewCollection",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).NewBadge(ctx, req.(*MsgNewBadge))
+		return srv.(MsgServer).NewCollection(ctx, req.(*MsgNewCollection))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_NewSubBadge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgNewSubBadge)
+func _Msg_MintBadge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgMintBadge)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).NewSubBadge(ctx, in)
+		return srv.(MsgServer).MintBadge(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bitbadges.bitbadgeschain.badges.Msg/NewSubBadge",
+		FullMethod: "/bitbadges.bitbadgeschain.badges.Msg/MintBadge",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).NewSubBadge(ctx, req.(*MsgNewSubBadge))
+		return srv.(MsgServer).MintBadge(ctx, req.(*MsgMintBadge))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2248,42 +1783,6 @@ func _Msg_TransferBadge_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_RequestTransferBadge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgRequestTransferBadge)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).RequestTransferBadge(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/bitbadges.bitbadgeschain.badges.Msg/RequestTransferBadge",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).RequestTransferBadge(ctx, req.(*MsgRequestTransferBadge))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Msg_HandlePendingTransfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgHandlePendingTransfer)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).HandlePendingTransfer(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/bitbadges.bitbadgeschain.badges.Msg/HandlePendingTransfer",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).HandlePendingTransfer(ctx, req.(*MsgHandlePendingTransfer))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Msg_SetApproval_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MsgSetApproval)
 	if err := dec(in); err != nil {
@@ -2302,38 +1801,38 @@ func _Msg_SetApproval_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_RevokeBadge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgRevokeBadge)
+func _Msg_UpdateDisallowedTransfers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateDisallowedTransfers)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).RevokeBadge(ctx, in)
+		return srv.(MsgServer).UpdateDisallowedTransfers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bitbadges.bitbadgeschain.badges.Msg/RevokeBadge",
+		FullMethod: "/bitbadges.bitbadgeschain.badges.Msg/UpdateDisallowedTransfers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).RevokeBadge(ctx, req.(*MsgRevokeBadge))
+		return srv.(MsgServer).UpdateDisallowedTransfers(ctx, req.(*MsgUpdateDisallowedTransfers))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_FreezeAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgFreezeAddress)
+func _Msg_UpdateManagerApprovedTransfers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateManagerApprovedTransfers)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).FreezeAddress(ctx, in)
+		return srv.(MsgServer).UpdateManagerApprovedTransfers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bitbadges.bitbadgeschain.badges.Msg/FreezeAddress",
+		FullMethod: "/bitbadges.bitbadgeschain.badges.Msg/UpdateManagerApprovedTransfers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).FreezeAddress(ctx, req.(*MsgFreezeAddress))
+		return srv.(MsgServer).UpdateManagerApprovedTransfers(ctx, req.(*MsgUpdateManagerApprovedTransfers))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2410,42 +1909,6 @@ func _Msg_RequestTransferManager_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_SelfDestructBadge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgSelfDestructBadge)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).SelfDestructBadge(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/bitbadges.bitbadgeschain.badges.Msg/SelfDestructBadge",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).SelfDestructBadge(ctx, req.(*MsgSelfDestructBadge))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Msg_PruneBalances_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgPruneBalances)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).PruneBalances(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/bitbadges.bitbadgeschain.badges.Msg/PruneBalances",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).PruneBalances(ctx, req.(*MsgPruneBalances))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Msg_UpdateBytes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MsgUpdateBytes)
 	if err := dec(in); err != nil {
@@ -2487,36 +1950,28 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "NewBadge",
-			Handler:    _Msg_NewBadge_Handler,
+			MethodName: "NewCollection",
+			Handler:    _Msg_NewCollection_Handler,
 		},
 		{
-			MethodName: "NewSubBadge",
-			Handler:    _Msg_NewSubBadge_Handler,
+			MethodName: "MintBadge",
+			Handler:    _Msg_MintBadge_Handler,
 		},
 		{
 			MethodName: "TransferBadge",
 			Handler:    _Msg_TransferBadge_Handler,
 		},
 		{
-			MethodName: "RequestTransferBadge",
-			Handler:    _Msg_RequestTransferBadge_Handler,
-		},
-		{
-			MethodName: "HandlePendingTransfer",
-			Handler:    _Msg_HandlePendingTransfer_Handler,
-		},
-		{
 			MethodName: "SetApproval",
 			Handler:    _Msg_SetApproval_Handler,
 		},
 		{
-			MethodName: "RevokeBadge",
-			Handler:    _Msg_RevokeBadge_Handler,
+			MethodName: "UpdateDisallowedTransfers",
+			Handler:    _Msg_UpdateDisallowedTransfers_Handler,
 		},
 		{
-			MethodName: "FreezeAddress",
-			Handler:    _Msg_FreezeAddress_Handler,
+			MethodName: "UpdateManagerApprovedTransfers",
+			Handler:    _Msg_UpdateManagerApprovedTransfers_Handler,
 		},
 		{
 			MethodName: "UpdateUris",
@@ -2535,14 +1990,6 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_RequestTransferManager_Handler,
 		},
 		{
-			MethodName: "SelfDestructBadge",
-			Handler:    _Msg_SelfDestructBadge_Handler,
-		},
-		{
-			MethodName: "PruneBalances",
-			Handler:    _Msg_PruneBalances_Handler,
-		},
-		{
 			MethodName: "UpdateBytes",
 			Handler:    _Msg_UpdateBytes_Handler,
 		},
@@ -2555,7 +2002,7 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 	Metadata: "badges/tx.proto",
 }
 
-func (m *SubassetSupplyAndAmount) Marshal() (dAtA []byte, err error) {
+func (m *BadgeSupplyAndAmount) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -2565,12 +2012,12 @@ func (m *SubassetSupplyAndAmount) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *SubassetSupplyAndAmount) MarshalTo(dAtA []byte) (int, error) {
+func (m *BadgeSupplyAndAmount) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *SubassetSupplyAndAmount) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *BadgeSupplyAndAmount) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -2588,7 +2035,7 @@ func (m *SubassetSupplyAndAmount) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgNewBadge) Marshal() (dAtA []byte, err error) {
+func (m *Transfers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -2598,20 +2045,75 @@ func (m *MsgNewBadge) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgNewBadge) MarshalTo(dAtA []byte) (int, error) {
+func (m *Transfers) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgNewBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *Transfers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.WhitelistedRecipients) > 0 {
-		for iNdEx := len(m.WhitelistedRecipients) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.Balances) > 0 {
+		for iNdEx := len(m.Balances) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.WhitelistedRecipients[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.Balances[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.ToAddresses) > 0 {
+		dAtA2 := make([]byte, len(m.ToAddresses)*10)
+		var j1 int
+		for _, num := range m.ToAddresses {
+			for num >= 1<<7 {
+				dAtA2[j1] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j1++
+			}
+			dAtA2[j1] = uint8(num)
+			j1++
+		}
+		i -= j1
+		copy(dAtA[i:], dAtA2[:j1])
+		i = encodeVarintTx(dAtA, i, uint64(j1))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgNewCollection) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgNewCollection) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Claims) > 0 {
+		for iNdEx := len(m.Claims) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Claims[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -2622,15 +2124,24 @@ func (m *MsgNewBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x5a
 		}
 	}
-	if m.Standard != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Standard))
-		i--
-		dAtA[i] = 0x50
-	}
-	if len(m.FreezeAddressRanges) > 0 {
-		for iNdEx := len(m.FreezeAddressRanges) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.Transfers) > 0 {
+		for iNdEx := len(m.Transfers) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.FreezeAddressRanges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.Transfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x52
+		}
+	}
+	if len(m.BadgeSupplys) > 0 {
+		for iNdEx := len(m.BadgeSupplys) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.BadgeSupplys[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -2641,10 +2152,15 @@ func (m *MsgNewBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x4a
 		}
 	}
-	if len(m.SubassetSupplysAndAmounts) > 0 {
-		for iNdEx := len(m.SubassetSupplysAndAmounts) - 1; iNdEx >= 0; iNdEx-- {
+	if m.Standard != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Standard))
+		i--
+		dAtA[i] = 0x40
+	}
+	if len(m.ManagerApprovedTransfers) > 0 {
+		for iNdEx := len(m.ManagerApprovedTransfers) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.SubassetSupplysAndAmounts[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.ManagerApprovedTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -2655,15 +2171,24 @@ func (m *MsgNewBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x3a
 		}
 	}
-	if m.DefaultSubassetSupply != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.DefaultSubassetSupply))
-		i--
-		dAtA[i] = 0x30
+	if len(m.DisallowedTransfers) > 0 {
+		for iNdEx := len(m.DisallowedTransfers) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.DisallowedTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x32
+		}
 	}
-	if len(m.ArbitraryBytes) > 0 {
-		i -= len(m.ArbitraryBytes)
-		copy(dAtA[i:], m.ArbitraryBytes)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.ArbitraryBytes)))
+	if len(m.Bytes) > 0 {
+		i -= len(m.Bytes)
+		copy(dAtA[i:], m.Bytes)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Bytes)))
 		i--
 		dAtA[i] = 0x2a
 	}
@@ -2672,15 +2197,17 @@ func (m *MsgNewBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x20
 	}
-	if m.Uri != nil {
-		{
-			size, err := m.Uri.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTx(dAtA, i, uint64(size))
-		}
+	if len(m.BadgeUri) > 0 {
+		i -= len(m.BadgeUri)
+		copy(dAtA[i:], m.BadgeUri)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.BadgeUri)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.CollectionUri) > 0 {
+		i -= len(m.CollectionUri)
+		copy(dAtA[i:], m.CollectionUri)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.CollectionUri)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -2694,7 +2221,7 @@ func (m *MsgNewBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgNewBadgeResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgNewCollectionResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -2704,25 +2231,25 @@ func (m *MsgNewBadgeResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgNewBadgeResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgNewCollectionResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgNewBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgNewCollectionResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Id != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Id))
+	if m.CollectionId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CollectionId))
 		i--
 		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgNewSubBadge) Marshal() (dAtA []byte, err error) {
+func (m *MsgMintBadge) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -2732,20 +2259,20 @@ func (m *MsgNewSubBadge) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgNewSubBadge) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgMintBadge) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgNewSubBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgMintBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.SubassetSupplysAndAmounts) > 0 {
-		for iNdEx := len(m.SubassetSupplysAndAmounts) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.Claims) > 0 {
+		for iNdEx := len(m.Claims) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.SubassetSupplysAndAmounts[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.Claims[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -2753,11 +2280,39 @@ func (m *MsgNewSubBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x3a
+			dAtA[i] = 0x2a
 		}
 	}
-	if m.BadgeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
+	if len(m.Transfers) > 0 {
+		for iNdEx := len(m.Transfers) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Transfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.BadgeSupplys) > 0 {
+		for iNdEx := len(m.BadgeSupplys) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.BadgeSupplys[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if m.CollectionId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CollectionId))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -2771,7 +2326,7 @@ func (m *MsgNewSubBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgNewSubBadgeResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgMintBadgeResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -2781,18 +2336,18 @@ func (m *MsgNewSubBadgeResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgNewSubBadgeResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgMintBadgeResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgNewSubBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgMintBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.NextSubassetId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.NextSubassetId))
+	if m.NextBadgeId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.NextBadgeId))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -2819,20 +2374,10 @@ func (m *MsgTransferBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.CantCancelBeforeTime != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.CantCancelBeforeTime))
-		i--
-		dAtA[i] = 0x40
-	}
-	if m.ExpirationTime != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.ExpirationTime))
-		i--
-		dAtA[i] = 0x38
-	}
-	if len(m.SubbadgeRanges) > 0 {
-		for iNdEx := len(m.SubbadgeRanges) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.Transfers) > 0 {
+		for iNdEx := len(m.Transfers) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.SubbadgeRanges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.Transfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -2840,52 +2385,16 @@ func (m *MsgTransferBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x32
+			dAtA[i] = 0x22
 		}
-	}
-	if m.BadgeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
-		i--
-		dAtA[i] = 0x28
-	}
-	if len(m.Amounts) > 0 {
-		dAtA3 := make([]byte, len(m.Amounts)*10)
-		var j2 int
-		for _, num := range m.Amounts {
-			for num >= 1<<7 {
-				dAtA3[j2] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j2++
-			}
-			dAtA3[j2] = uint8(num)
-			j2++
-		}
-		i -= j2
-		copy(dAtA[i:], dAtA3[:j2])
-		i = encodeVarintTx(dAtA, i, uint64(j2))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.ToAddresses) > 0 {
-		dAtA5 := make([]byte, len(m.ToAddresses)*10)
-		var j4 int
-		for _, num := range m.ToAddresses {
-			for num >= 1<<7 {
-				dAtA5[j4] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j4++
-			}
-			dAtA5[j4] = uint8(num)
-			j4++
-		}
-		i -= j4
-		copy(dAtA[i:], dAtA5[:j4])
-		i = encodeVarintTx(dAtA, i, uint64(j4))
-		i--
-		dAtA[i] = 0x1a
 	}
 	if m.From != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.From))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.CollectionId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CollectionId))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -2922,188 +2431,6 @@ func (m *MsgTransferBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgRequestTransferBadge) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgRequestTransferBadge) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgRequestTransferBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.CantCancelBeforeTime != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.CantCancelBeforeTime))
-		i--
-		dAtA[i] = 0x40
-	}
-	if m.ExpirationTime != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.ExpirationTime))
-		i--
-		dAtA[i] = 0x38
-	}
-	if len(m.SubbadgeRanges) > 0 {
-		for iNdEx := len(m.SubbadgeRanges) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.SubbadgeRanges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x32
-		}
-	}
-	if m.BadgeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
-		i--
-		dAtA[i] = 0x28
-	}
-	if m.Amount != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Amount))
-		i--
-		dAtA[i] = 0x20
-	}
-	if m.From != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.From))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgRequestTransferBadgeResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgRequestTransferBadgeResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgRequestTransferBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgHandlePendingTransfer) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgHandlePendingTransfer) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgHandlePendingTransfer) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.NonceRanges) > 0 {
-		for iNdEx := len(m.NonceRanges) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.NonceRanges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x22
-		}
-	}
-	if m.BadgeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
-		i--
-		dAtA[i] = 0x18
-	}
-	if len(m.Actions) > 0 {
-		dAtA7 := make([]byte, len(m.Actions)*10)
-		var j6 int
-		for _, num := range m.Actions {
-			for num >= 1<<7 {
-				dAtA7[j6] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j6++
-			}
-			dAtA7[j6] = uint8(num)
-			j6++
-		}
-		i -= j6
-		copy(dAtA[i:], dAtA7[:j6])
-		i = encodeVarintTx(dAtA, i, uint64(j6))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgHandlePendingTransferResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgHandlePendingTransferResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgHandlePendingTransferResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
 func (m *MsgSetApproval) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -3124,10 +2451,10 @@ func (m *MsgSetApproval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.SubbadgeRanges) > 0 {
-		for iNdEx := len(m.SubbadgeRanges) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.Balances) > 0 {
+		for iNdEx := len(m.Balances) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.SubbadgeRanges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.Balances[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -3135,21 +2462,16 @@ func (m *MsgSetApproval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x2a
+			dAtA[i] = 0x22
 		}
-	}
-	if m.BadgeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
-		i--
-		dAtA[i] = 0x20
 	}
 	if m.Address != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.Address))
 		i--
 		dAtA[i] = 0x18
 	}
-	if m.Amount != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Amount))
+	if m.CollectionId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CollectionId))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -3186,7 +2508,7 @@ func (m *MsgSetApprovalResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgRevokeBadge) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateDisallowedTransfers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -3196,20 +2518,20 @@ func (m *MsgRevokeBadge) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgRevokeBadge) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateDisallowedTransfers) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgRevokeBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateDisallowedTransfers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.SubbadgeRanges) > 0 {
-		for iNdEx := len(m.SubbadgeRanges) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.DisallowedTransfers) > 0 {
+		for iNdEx := len(m.DisallowedTransfers) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.SubbadgeRanges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.DisallowedTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -3217,49 +2539,13 @@ func (m *MsgRevokeBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x2a
+			dAtA[i] = 0x1a
 		}
 	}
-	if m.BadgeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
+	if m.CollectionId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CollectionId))
 		i--
-		dAtA[i] = 0x20
-	}
-	if len(m.Amounts) > 0 {
-		dAtA9 := make([]byte, len(m.Amounts)*10)
-		var j8 int
-		for _, num := range m.Amounts {
-			for num >= 1<<7 {
-				dAtA9[j8] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j8++
-			}
-			dAtA9[j8] = uint8(num)
-			j8++
-		}
-		i -= j8
-		copy(dAtA[i:], dAtA9[:j8])
-		i = encodeVarintTx(dAtA, i, uint64(j8))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Addresses) > 0 {
-		dAtA11 := make([]byte, len(m.Addresses)*10)
-		var j10 int
-		for _, num := range m.Addresses {
-			for num >= 1<<7 {
-				dAtA11[j10] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j10++
-			}
-			dAtA11[j10] = uint8(num)
-			j10++
-		}
-		i -= j10
-		copy(dAtA[i:], dAtA11[:j10])
-		i = encodeVarintTx(dAtA, i, uint64(j10))
-		i--
-		dAtA[i] = 0x12
+		dAtA[i] = 0x10
 	}
 	if len(m.Creator) > 0 {
 		i -= len(m.Creator)
@@ -3271,7 +2557,7 @@ func (m *MsgRevokeBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgRevokeBadgeResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateDisallowedTransfersResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -3281,12 +2567,12 @@ func (m *MsgRevokeBadgeResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgRevokeBadgeResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateDisallowedTransfersResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgRevokeBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateDisallowedTransfersResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -3294,7 +2580,7 @@ func (m *MsgRevokeBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgFreezeAddress) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateManagerApprovedTransfers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -3304,35 +2590,20 @@ func (m *MsgFreezeAddress) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgFreezeAddress) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateManagerApprovedTransfers) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgFreezeAddress) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateManagerApprovedTransfers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Add {
-		i--
-		if m.Add {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x20
-	}
-	if m.BadgeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
-		i--
-		dAtA[i] = 0x18
-	}
-	if len(m.AddressRanges) > 0 {
-		for iNdEx := len(m.AddressRanges) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.ManagerApprovedTransfers) > 0 {
+		for iNdEx := len(m.ManagerApprovedTransfers) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.AddressRanges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.ManagerApprovedTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -3340,8 +2611,13 @@ func (m *MsgFreezeAddress) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x12
+			dAtA[i] = 0x1a
 		}
+	}
+	if m.CollectionId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CollectionId))
+		i--
+		dAtA[i] = 0x10
 	}
 	if len(m.Creator) > 0 {
 		i -= len(m.Creator)
@@ -3353,7 +2629,7 @@ func (m *MsgFreezeAddress) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgFreezeAddressResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateManagerApprovedTransfersResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -3363,12 +2639,12 @@ func (m *MsgFreezeAddressResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgFreezeAddressResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateManagerApprovedTransfersResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgFreezeAddressResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateManagerApprovedTransfersResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -3396,20 +2672,22 @@ func (m *MsgUpdateUris) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Uri != nil {
-		{
-			size, err := m.Uri.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTx(dAtA, i, uint64(size))
-		}
+	if len(m.BadgeUri) > 0 {
+		i -= len(m.BadgeUri)
+		copy(dAtA[i:], m.BadgeUri)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.BadgeUri)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.CollectionUri) > 0 {
+		i -= len(m.CollectionUri)
+		copy(dAtA[i:], m.CollectionUri)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.CollectionUri)))
 		i--
 		dAtA[i] = 0x1a
 	}
-	if m.BadgeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
+	if m.CollectionId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CollectionId))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -3471,8 +2749,8 @@ func (m *MsgUpdatePermissions) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x18
 	}
-	if m.BadgeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
+	if m.CollectionId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CollectionId))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -3534,8 +2812,8 @@ func (m *MsgTransferManager) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x18
 	}
-	if m.BadgeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
+	if m.CollectionId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CollectionId))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -3592,9 +2870,9 @@ func (m *MsgRequestTransferManager) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	_ = i
 	var l int
 	_ = l
-	if m.Add {
+	if m.AddRequest {
 		i--
-		if m.Add {
+		if m.AddRequest {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -3602,8 +2880,8 @@ func (m *MsgRequestTransferManager) MarshalToSizedBuffer(dAtA []byte) (int, erro
 		i--
 		dAtA[i] = 0x18
 	}
-	if m.BadgeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
+	if m.CollectionId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CollectionId))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -3640,153 +2918,6 @@ func (m *MsgRequestTransferManagerResponse) MarshalToSizedBuffer(dAtA []byte) (i
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgSelfDestructBadge) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgSelfDestructBadge) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgSelfDestructBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.BadgeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgSelfDestructBadgeResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgSelfDestructBadgeResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgSelfDestructBadgeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgPruneBalances) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgPruneBalances) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgPruneBalances) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Addresses) > 0 {
-		dAtA14 := make([]byte, len(m.Addresses)*10)
-		var j13 int
-		for _, num := range m.Addresses {
-			for num >= 1<<7 {
-				dAtA14[j13] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j13++
-			}
-			dAtA14[j13] = uint8(num)
-			j13++
-		}
-		i -= j13
-		copy(dAtA[i:], dAtA14[:j13])
-		i = encodeVarintTx(dAtA, i, uint64(j13))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.BadgeIds) > 0 {
-		dAtA16 := make([]byte, len(m.BadgeIds)*10)
-		var j15 int
-		for _, num := range m.BadgeIds {
-			for num >= 1<<7 {
-				dAtA16[j15] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j15++
-			}
-			dAtA16[j15] = uint8(num)
-			j15++
-		}
-		i -= j15
-		copy(dAtA[i:], dAtA16[:j15])
-		i = encodeVarintTx(dAtA, i, uint64(j15))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgPruneBalancesResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgPruneBalancesResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgPruneBalancesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
 func (m *MsgUpdateBytes) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -3814,8 +2945,8 @@ func (m *MsgUpdateBytes) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if m.BadgeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.BadgeId))
+	if m.CollectionId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CollectionId))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -3937,7 +3068,7 @@ func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *SubassetSupplyAndAmount) Size() (n int) {
+func (m *BadgeSupplyAndAmount) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3952,7 +3083,29 @@ func (m *SubassetSupplyAndAmount) Size() (n int) {
 	return n
 }
 
-func (m *MsgNewBadge) Size() (n int) {
+func (m *Transfers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.ToAddresses) > 0 {
+		l = 0
+		for _, e := range m.ToAddresses {
+			l += sovTx(uint64(e))
+		}
+		n += 1 + sovTx(uint64(l)) + l
+	}
+	if len(m.Balances) > 0 {
+		for _, e := range m.Balances {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *MsgNewCollection) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3962,28 +3115,29 @@ func (m *MsgNewBadge) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.Uri != nil {
-		l = m.Uri.Size()
+	l = len(m.CollectionUri)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.BadgeUri)
+	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
 	if m.Permissions != 0 {
 		n += 1 + sovTx(uint64(m.Permissions))
 	}
-	l = len(m.ArbitraryBytes)
+	l = len(m.Bytes)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.DefaultSubassetSupply != 0 {
-		n += 1 + sovTx(uint64(m.DefaultSubassetSupply))
-	}
-	if len(m.SubassetSupplysAndAmounts) > 0 {
-		for _, e := range m.SubassetSupplysAndAmounts {
+	if len(m.DisallowedTransfers) > 0 {
+		for _, e := range m.DisallowedTransfers {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if len(m.FreezeAddressRanges) > 0 {
-		for _, e := range m.FreezeAddressRanges {
+	if len(m.ManagerApprovedTransfers) > 0 {
+		for _, e := range m.ManagerApprovedTransfers {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -3991,8 +3145,20 @@ func (m *MsgNewBadge) Size() (n int) {
 	if m.Standard != 0 {
 		n += 1 + sovTx(uint64(m.Standard))
 	}
-	if len(m.WhitelistedRecipients) > 0 {
-		for _, e := range m.WhitelistedRecipients {
+	if len(m.BadgeSupplys) > 0 {
+		for _, e := range m.BadgeSupplys {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.Transfers) > 0 {
+		for _, e := range m.Transfers {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.Claims) > 0 {
+		for _, e := range m.Claims {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -4000,19 +3166,19 @@ func (m *MsgNewBadge) Size() (n int) {
 	return n
 }
 
-func (m *MsgNewBadgeResponse) Size() (n int) {
+func (m *MsgNewCollectionResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Id != 0 {
-		n += 1 + sovTx(uint64(m.Id))
+	if m.CollectionId != 0 {
+		n += 1 + sovTx(uint64(m.CollectionId))
 	}
 	return n
 }
 
-func (m *MsgNewSubBadge) Size() (n int) {
+func (m *MsgMintBadge) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -4022,11 +3188,23 @@ func (m *MsgNewSubBadge) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.BadgeId != 0 {
-		n += 1 + sovTx(uint64(m.BadgeId))
+	if m.CollectionId != 0 {
+		n += 1 + sovTx(uint64(m.CollectionId))
 	}
-	if len(m.SubassetSupplysAndAmounts) > 0 {
-		for _, e := range m.SubassetSupplysAndAmounts {
+	if len(m.BadgeSupplys) > 0 {
+		for _, e := range m.BadgeSupplys {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.Transfers) > 0 {
+		for _, e := range m.Transfers {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.Claims) > 0 {
+		for _, e := range m.Claims {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -4034,14 +3212,14 @@ func (m *MsgNewSubBadge) Size() (n int) {
 	return n
 }
 
-func (m *MsgNewSubBadgeResponse) Size() (n int) {
+func (m *MsgMintBadgeResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.NextSubassetId != 0 {
-		n += 1 + sovTx(uint64(m.NextSubassetId))
+	if m.NextBadgeId != 0 {
+		n += 1 + sovTx(uint64(m.NextBadgeId))
 	}
 	return n
 }
@@ -4056,123 +3234,22 @@ func (m *MsgTransferBadge) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
+	if m.CollectionId != 0 {
+		n += 1 + sovTx(uint64(m.CollectionId))
+	}
 	if m.From != 0 {
 		n += 1 + sovTx(uint64(m.From))
 	}
-	if len(m.ToAddresses) > 0 {
-		l = 0
-		for _, e := range m.ToAddresses {
-			l += sovTx(uint64(e))
-		}
-		n += 1 + sovTx(uint64(l)) + l
-	}
-	if len(m.Amounts) > 0 {
-		l = 0
-		for _, e := range m.Amounts {
-			l += sovTx(uint64(e))
-		}
-		n += 1 + sovTx(uint64(l)) + l
-	}
-	if m.BadgeId != 0 {
-		n += 1 + sovTx(uint64(m.BadgeId))
-	}
-	if len(m.SubbadgeRanges) > 0 {
-		for _, e := range m.SubbadgeRanges {
+	if len(m.Transfers) > 0 {
+		for _, e := range m.Transfers {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
-	}
-	if m.ExpirationTime != 0 {
-		n += 1 + sovTx(uint64(m.ExpirationTime))
-	}
-	if m.CantCancelBeforeTime != 0 {
-		n += 1 + sovTx(uint64(m.CantCancelBeforeTime))
 	}
 	return n
 }
 
 func (m *MsgTransferBadgeResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *MsgRequestTransferBadge) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Creator)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if m.From != 0 {
-		n += 1 + sovTx(uint64(m.From))
-	}
-	if m.Amount != 0 {
-		n += 1 + sovTx(uint64(m.Amount))
-	}
-	if m.BadgeId != 0 {
-		n += 1 + sovTx(uint64(m.BadgeId))
-	}
-	if len(m.SubbadgeRanges) > 0 {
-		for _, e := range m.SubbadgeRanges {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
-	if m.ExpirationTime != 0 {
-		n += 1 + sovTx(uint64(m.ExpirationTime))
-	}
-	if m.CantCancelBeforeTime != 0 {
-		n += 1 + sovTx(uint64(m.CantCancelBeforeTime))
-	}
-	return n
-}
-
-func (m *MsgRequestTransferBadgeResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *MsgHandlePendingTransfer) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Creator)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if len(m.Actions) > 0 {
-		l = 0
-		for _, e := range m.Actions {
-			l += sovTx(uint64(e))
-		}
-		n += 1 + sovTx(uint64(l)) + l
-	}
-	if m.BadgeId != 0 {
-		n += 1 + sovTx(uint64(m.BadgeId))
-	}
-	if len(m.NonceRanges) > 0 {
-		for _, e := range m.NonceRanges {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *MsgHandlePendingTransferResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -4191,17 +3268,14 @@ func (m *MsgSetApproval) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.Amount != 0 {
-		n += 1 + sovTx(uint64(m.Amount))
+	if m.CollectionId != 0 {
+		n += 1 + sovTx(uint64(m.CollectionId))
 	}
 	if m.Address != 0 {
 		n += 1 + sovTx(uint64(m.Address))
 	}
-	if m.BadgeId != 0 {
-		n += 1 + sovTx(uint64(m.BadgeId))
-	}
-	if len(m.SubbadgeRanges) > 0 {
-		for _, e := range m.SubbadgeRanges {
+	if len(m.Balances) > 0 {
+		for _, e := range m.Balances {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -4218,7 +3292,7 @@ func (m *MsgSetApprovalResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgRevokeBadge) Size() (n int) {
+func (m *MsgUpdateDisallowedTransfers) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -4228,25 +3302,11 @@ func (m *MsgRevokeBadge) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if len(m.Addresses) > 0 {
-		l = 0
-		for _, e := range m.Addresses {
-			l += sovTx(uint64(e))
-		}
-		n += 1 + sovTx(uint64(l)) + l
+	if m.CollectionId != 0 {
+		n += 1 + sovTx(uint64(m.CollectionId))
 	}
-	if len(m.Amounts) > 0 {
-		l = 0
-		for _, e := range m.Amounts {
-			l += sovTx(uint64(e))
-		}
-		n += 1 + sovTx(uint64(l)) + l
-	}
-	if m.BadgeId != 0 {
-		n += 1 + sovTx(uint64(m.BadgeId))
-	}
-	if len(m.SubbadgeRanges) > 0 {
-		for _, e := range m.SubbadgeRanges {
+	if len(m.DisallowedTransfers) > 0 {
+		for _, e := range m.DisallowedTransfers {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -4254,7 +3314,7 @@ func (m *MsgRevokeBadge) Size() (n int) {
 	return n
 }
 
-func (m *MsgRevokeBadgeResponse) Size() (n int) {
+func (m *MsgUpdateDisallowedTransfersResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -4263,7 +3323,7 @@ func (m *MsgRevokeBadgeResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgFreezeAddress) Size() (n int) {
+func (m *MsgUpdateManagerApprovedTransfers) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -4273,22 +3333,19 @@ func (m *MsgFreezeAddress) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if len(m.AddressRanges) > 0 {
-		for _, e := range m.AddressRanges {
+	if m.CollectionId != 0 {
+		n += 1 + sovTx(uint64(m.CollectionId))
+	}
+	if len(m.ManagerApprovedTransfers) > 0 {
+		for _, e := range m.ManagerApprovedTransfers {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if m.BadgeId != 0 {
-		n += 1 + sovTx(uint64(m.BadgeId))
-	}
-	if m.Add {
-		n += 2
-	}
 	return n
 }
 
-func (m *MsgFreezeAddressResponse) Size() (n int) {
+func (m *MsgUpdateManagerApprovedTransfersResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -4307,11 +3364,15 @@ func (m *MsgUpdateUris) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.BadgeId != 0 {
-		n += 1 + sovTx(uint64(m.BadgeId))
+	if m.CollectionId != 0 {
+		n += 1 + sovTx(uint64(m.CollectionId))
 	}
-	if m.Uri != nil {
-		l = m.Uri.Size()
+	l = len(m.CollectionUri)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.BadgeUri)
+	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
@@ -4336,8 +3397,8 @@ func (m *MsgUpdatePermissions) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.BadgeId != 0 {
-		n += 1 + sovTx(uint64(m.BadgeId))
+	if m.CollectionId != 0 {
+		n += 1 + sovTx(uint64(m.CollectionId))
 	}
 	if m.Permissions != 0 {
 		n += 1 + sovTx(uint64(m.Permissions))
@@ -4364,8 +3425,8 @@ func (m *MsgTransferManager) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.BadgeId != 0 {
-		n += 1 + sovTx(uint64(m.BadgeId))
+	if m.CollectionId != 0 {
+		n += 1 + sovTx(uint64(m.CollectionId))
 	}
 	if m.Address != 0 {
 		n += 1 + sovTx(uint64(m.Address))
@@ -4392,77 +3453,16 @@ func (m *MsgRequestTransferManager) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.BadgeId != 0 {
-		n += 1 + sovTx(uint64(m.BadgeId))
+	if m.CollectionId != 0 {
+		n += 1 + sovTx(uint64(m.CollectionId))
 	}
-	if m.Add {
+	if m.AddRequest {
 		n += 2
 	}
 	return n
 }
 
 func (m *MsgRequestTransferManagerResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *MsgSelfDestructBadge) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Creator)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if m.BadgeId != 0 {
-		n += 1 + sovTx(uint64(m.BadgeId))
-	}
-	return n
-}
-
-func (m *MsgSelfDestructBadgeResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *MsgPruneBalances) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Creator)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if len(m.BadgeIds) > 0 {
-		l = 0
-		for _, e := range m.BadgeIds {
-			l += sovTx(uint64(e))
-		}
-		n += 1 + sovTx(uint64(l)) + l
-	}
-	if len(m.Addresses) > 0 {
-		l = 0
-		for _, e := range m.Addresses {
-			l += sovTx(uint64(e))
-		}
-		n += 1 + sovTx(uint64(l)) + l
-	}
-	return n
-}
-
-func (m *MsgPruneBalancesResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -4481,8 +3481,8 @@ func (m *MsgUpdateBytes) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.BadgeId != 0 {
-		n += 1 + sovTx(uint64(m.BadgeId))
+	if m.CollectionId != 0 {
+		n += 1 + sovTx(uint64(m.CollectionId))
 	}
 	l = len(m.NewBytes)
 	if l > 0 {
@@ -4538,7 +3538,7 @@ func sovTx(x uint64) (n int) {
 func sozTx(x uint64) (n int) {
 	return sovTx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *SubassetSupplyAndAmount) Unmarshal(dAtA []byte) error {
+func (m *BadgeSupplyAndAmount) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4561,10 +3561,10 @@ func (m *SubassetSupplyAndAmount) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: SubassetSupplyAndAmount: wiretype end group for non-group")
+			return fmt.Errorf("proto: BadgeSupplyAndAmount: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SubassetSupplyAndAmount: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: BadgeSupplyAndAmount: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -4626,7 +3626,7 @@ func (m *SubassetSupplyAndAmount) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
+func (m *Transfers) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4649,10 +3649,170 @@ func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgNewBadge: wiretype end group for non-group")
+			return fmt.Errorf("proto: Transfers: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgNewBadge: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Transfers: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType == 0 {
+				var v uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowTx
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.ToAddresses = append(m.ToAddresses, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowTx
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthTx
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthTx
+				}
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				var count int
+				for _, integer := range dAtA[iNdEx:postIndex] {
+					if integer < 128 {
+						count++
+					}
+				}
+				elementCount = count
+				if elementCount != 0 && len(m.ToAddresses) == 0 {
+					m.ToAddresses = make([]uint64, 0, elementCount)
+				}
+				for iNdEx < postIndex {
+					var v uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowTx
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.ToAddresses = append(m.ToAddresses, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field ToAddresses", wireType)
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Balances", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Balances = append(m.Balances, &Balance{})
+			if err := m.Balances[len(m.Balances)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgNewCollection: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgNewCollection: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -4689,9 +3849,9 @@ func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionUri", wireType)
 			}
-			var msglen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -4701,27 +3861,55 @@ func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTx
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTx
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Uri == nil {
-				m.Uri = &UriObject{}
+			m.CollectionUri = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BadgeUri", wireType)
 			}
-			if err := m.Uri.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.BadgeUri = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 0 {
@@ -4744,7 +3932,7 @@ func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 			}
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ArbitraryBytes", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Bytes", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4772,13 +3960,13 @@ func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ArbitraryBytes = string(dAtA[iNdEx:postIndex])
+			m.Bytes = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 6:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DefaultSubassetSupply", wireType)
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DisallowedTransfers", wireType)
 			}
-			m.DefaultSubassetSupply = 0
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -4788,14 +3976,29 @@ func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DefaultSubassetSupply |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DisallowedTransfers = append(m.DisallowedTransfers, &TransferMapping{})
+			if err := m.DisallowedTransfers[len(m.DisallowedTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SubassetSupplysAndAmounts", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ManagerApprovedTransfers", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4822,46 +4025,12 @@ func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SubassetSupplysAndAmounts = append(m.SubassetSupplysAndAmounts, &SubassetSupplyAndAmount{})
-			if err := m.SubassetSupplysAndAmounts[len(m.SubassetSupplysAndAmounts)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.ManagerApprovedTransfers = append(m.ManagerApprovedTransfers, &TransferMapping{})
+			if err := m.ManagerApprovedTransfers[len(m.ManagerApprovedTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FreezeAddressRanges", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.FreezeAddressRanges = append(m.FreezeAddressRanges, &IdRange{})
-			if err := m.FreezeAddressRanges[len(m.FreezeAddressRanges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 10:
+		case 8:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Standard", wireType)
 			}
@@ -4880,9 +4049,9 @@ func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 11:
+		case 9:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistedRecipients", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field BadgeSupplys", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4909,8 +4078,76 @@ func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.WhitelistedRecipients = append(m.WhitelistedRecipients, &WhitelistMintInfo{})
-			if err := m.WhitelistedRecipients[len(m.WhitelistedRecipients)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.BadgeSupplys = append(m.BadgeSupplys, &BadgeSupplyAndAmount{})
+			if err := m.BadgeSupplys[len(m.BadgeSupplys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Transfers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Transfers = append(m.Transfers, &Transfers{})
+			if err := m.Transfers[len(m.Transfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Claims", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Claims = append(m.Claims, &Claim{})
+			if err := m.Claims[len(m.Claims)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4935,7 +4172,7 @@ func (m *MsgNewBadge) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgNewBadgeResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgNewCollectionResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4958,17 +4195,17 @@ func (m *MsgNewBadgeResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgNewBadgeResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgNewCollectionResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgNewBadgeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgNewCollectionResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
 			}
-			m.Id = 0
+			m.CollectionId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -4978,7 +4215,7 @@ func (m *MsgNewBadgeResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Id |= uint64(b&0x7F) << shift
+				m.CollectionId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -5004,7 +4241,7 @@ func (m *MsgNewBadgeResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgNewSubBadge) Unmarshal(dAtA []byte) error {
+func (m *MsgMintBadge) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -5027,10 +4264,10 @@ func (m *MsgNewSubBadge) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgNewSubBadge: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgMintBadge: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgNewSubBadge: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgMintBadge: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -5067,9 +4304,9 @@ func (m *MsgNewSubBadge) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
 			}
-			m.BadgeId = 0
+			m.CollectionId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -5079,14 +4316,14 @@ func (m *MsgNewSubBadge) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.BadgeId |= uint64(b&0x7F) << shift
+				m.CollectionId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-		case 7:
+		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SubassetSupplysAndAmounts", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field BadgeSupplys", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5113,8 +4350,76 @@ func (m *MsgNewSubBadge) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SubassetSupplysAndAmounts = append(m.SubassetSupplysAndAmounts, &SubassetSupplyAndAmount{})
-			if err := m.SubassetSupplysAndAmounts[len(m.SubassetSupplysAndAmounts)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.BadgeSupplys = append(m.BadgeSupplys, &BadgeSupplyAndAmount{})
+			if err := m.BadgeSupplys[len(m.BadgeSupplys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Transfers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Transfers = append(m.Transfers, &Transfers{})
+			if err := m.Transfers[len(m.Transfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Claims", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Claims = append(m.Claims, &Claim{})
+			if err := m.Claims[len(m.Claims)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5139,7 +4444,7 @@ func (m *MsgNewSubBadge) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgNewSubBadgeResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgMintBadgeResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -5162,17 +4467,17 @@ func (m *MsgNewSubBadgeResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgNewSubBadgeResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgMintBadgeResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgNewSubBadgeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgMintBadgeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NextSubassetId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NextBadgeId", wireType)
 			}
-			m.NextSubassetId = 0
+			m.NextBadgeId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -5182,7 +4487,7 @@ func (m *MsgNewSubBadgeResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.NextSubassetId |= uint64(b&0x7F) << shift
+				m.NextBadgeId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -5271,6 +4576,25 @@ func (m *MsgTransferBadge) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			m.CollectionId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.CollectionId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
 			}
 			m.From = 0
@@ -5288,180 +4612,9 @@ func (m *MsgTransferBadge) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 3:
-			if wireType == 0 {
-				var v uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.ToAddresses = append(m.ToAddresses, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthTx
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthTx
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
-				}
-				elementCount = count
-				if elementCount != 0 && len(m.ToAddresses) == 0 {
-					m.ToAddresses = make([]uint64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowTx
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.ToAddresses = append(m.ToAddresses, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field ToAddresses", wireType)
-			}
 		case 4:
-			if wireType == 0 {
-				var v uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.Amounts = append(m.Amounts, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthTx
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthTx
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
-				}
-				elementCount = count
-				if elementCount != 0 && len(m.Amounts) == 0 {
-					m.Amounts = make([]uint64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowTx
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Amounts = append(m.Amounts, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Amounts", wireType)
-			}
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
-			}
-			m.BadgeId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.BadgeId |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeRanges", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Transfers", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5488,49 +4641,11 @@ func (m *MsgTransferBadge) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SubbadgeRanges = append(m.SubbadgeRanges, &IdRange{})
-			if err := m.SubbadgeRanges[len(m.SubbadgeRanges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.Transfers = append(m.Transfers, &Transfers{})
+			if err := m.Transfers[len(m.Transfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 7:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ExpirationTime", wireType)
-			}
-			m.ExpirationTime = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.ExpirationTime |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 8:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CantCancelBeforeTime", wireType)
-			}
-			m.CantCancelBeforeTime = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.CantCancelBeforeTime |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -5579,528 +4694,6 @@ func (m *MsgTransferBadgeResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgTransferBadgeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgRequestTransferBadge) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgRequestTransferBadge: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgRequestTransferBadge: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
-			}
-			m.From = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.From |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
-			}
-			m.Amount = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Amount |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
-			}
-			m.BadgeId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.BadgeId |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeRanges", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.SubbadgeRanges = append(m.SubbadgeRanges, &IdRange{})
-			if err := m.SubbadgeRanges[len(m.SubbadgeRanges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ExpirationTime", wireType)
-			}
-			m.ExpirationTime = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.ExpirationTime |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 8:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CantCancelBeforeTime", wireType)
-			}
-			m.CantCancelBeforeTime = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.CantCancelBeforeTime |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgRequestTransferBadgeResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgRequestTransferBadgeResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgRequestTransferBadgeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgHandlePendingTransfer) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgHandlePendingTransfer: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgHandlePendingTransfer: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType == 0 {
-				var v uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.Actions = append(m.Actions, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthTx
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthTx
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
-				}
-				elementCount = count
-				if elementCount != 0 && len(m.Actions) == 0 {
-					m.Actions = make([]uint64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowTx
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Actions = append(m.Actions, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Actions", wireType)
-			}
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
-			}
-			m.BadgeId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.BadgeId |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NonceRanges", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.NonceRanges = append(m.NonceRanges, &IdRange{})
-			if err := m.NonceRanges[len(m.NonceRanges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgHandlePendingTransferResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgHandlePendingTransferResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgHandlePendingTransferResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -6187,9 +4780,9 @@ func (m *MsgSetApproval) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
 			}
-			m.Amount = 0
+			m.CollectionId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -6199,7 +4792,7 @@ func (m *MsgSetApproval) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Amount |= uint64(b&0x7F) << shift
+				m.CollectionId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -6224,27 +4817,8 @@ func (m *MsgSetApproval) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
-			}
-			m.BadgeId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.BadgeId |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeRanges", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Balances", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6271,8 +4845,8 @@ func (m *MsgSetApproval) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SubbadgeRanges = append(m.SubbadgeRanges, &IdRange{})
-			if err := m.SubbadgeRanges[len(m.SubbadgeRanges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.Balances = append(m.Balances, &Balance{})
+			if err := m.Balances[len(m.Balances)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -6347,7 +4921,7 @@ func (m *MsgSetApprovalResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgRevokeBadge) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateDisallowedTransfers) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -6370,10 +4944,10 @@ func (m *MsgRevokeBadge) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgRevokeBadge: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateDisallowedTransfers: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgRevokeBadge: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateDisallowedTransfers: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -6409,162 +4983,10 @@ func (m *MsgRevokeBadge) Unmarshal(dAtA []byte) error {
 			m.Creator = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType == 0 {
-				var v uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.Addresses = append(m.Addresses, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthTx
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthTx
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
-				}
-				elementCount = count
-				if elementCount != 0 && len(m.Addresses) == 0 {
-					m.Addresses = make([]uint64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowTx
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Addresses = append(m.Addresses, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Addresses", wireType)
-			}
-		case 3:
-			if wireType == 0 {
-				var v uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.Amounts = append(m.Amounts, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthTx
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthTx
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
-				}
-				elementCount = count
-				if elementCount != 0 && len(m.Amounts) == 0 {
-					m.Amounts = make([]uint64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowTx
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Amounts = append(m.Amounts, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Amounts", wireType)
-			}
-		case 4:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
 			}
-			m.BadgeId = 0
+			m.CollectionId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -6574,14 +4996,14 @@ func (m *MsgRevokeBadge) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.BadgeId |= uint64(b&0x7F) << shift
+				m.CollectionId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-		case 5:
+		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SubbadgeRanges", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DisallowedTransfers", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6608,8 +5030,8 @@ func (m *MsgRevokeBadge) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SubbadgeRanges = append(m.SubbadgeRanges, &IdRange{})
-			if err := m.SubbadgeRanges[len(m.SubbadgeRanges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.DisallowedTransfers = append(m.DisallowedTransfers, &TransferMapping{})
+			if err := m.DisallowedTransfers[len(m.DisallowedTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -6634,7 +5056,7 @@ func (m *MsgRevokeBadge) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgRevokeBadgeResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateDisallowedTransfersResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -6657,10 +5079,10 @@ func (m *MsgRevokeBadgeResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgRevokeBadgeResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateDisallowedTransfersResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgRevokeBadgeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateDisallowedTransfersResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -6684,7 +5106,7 @@ func (m *MsgRevokeBadgeResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgFreezeAddress) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateManagerApprovedTransfers) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -6707,10 +5129,10 @@ func (m *MsgFreezeAddress) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgFreezeAddress: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateManagerApprovedTransfers: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgFreezeAddress: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateManagerApprovedTransfers: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -6746,8 +5168,27 @@ func (m *MsgFreezeAddress) Unmarshal(dAtA []byte) error {
 			m.Creator = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			m.CollectionId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.CollectionId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AddressRanges", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ManagerApprovedTransfers", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6774,50 +5215,11 @@ func (m *MsgFreezeAddress) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AddressRanges = append(m.AddressRanges, &IdRange{})
-			if err := m.AddressRanges[len(m.AddressRanges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.ManagerApprovedTransfers = append(m.ManagerApprovedTransfers, &TransferMapping{})
+			if err := m.ManagerApprovedTransfers[len(m.ManagerApprovedTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
-			}
-			m.BadgeId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.BadgeId |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Add", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Add = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -6839,7 +5241,7 @@ func (m *MsgFreezeAddress) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgFreezeAddressResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateManagerApprovedTransfersResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -6862,10 +5264,10 @@ func (m *MsgFreezeAddressResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgFreezeAddressResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateManagerApprovedTransfersResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgFreezeAddressResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateManagerApprovedTransfersResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -6952,9 +5354,9 @@ func (m *MsgUpdateUris) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
 			}
-			m.BadgeId = 0
+			m.CollectionId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -6964,16 +5366,16 @@ func (m *MsgUpdateUris) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.BadgeId |= uint64(b&0x7F) << shift
+				m.CollectionId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionUri", wireType)
 			}
-			var msglen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -6983,27 +5385,55 @@ func (m *MsgUpdateUris) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTx
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTx
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Uri == nil {
-				m.Uri = &UriObject{}
+			m.CollectionUri = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BadgeUri", wireType)
 			}
-			if err := m.Uri.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.BadgeUri = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -7139,9 +5569,9 @@ func (m *MsgUpdatePermissions) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
 			}
-			m.BadgeId = 0
+			m.CollectionId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -7151,7 +5581,7 @@ func (m *MsgUpdatePermissions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.BadgeId |= uint64(b&0x7F) << shift
+				m.CollectionId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -7309,9 +5739,9 @@ func (m *MsgTransferManager) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
 			}
-			m.BadgeId = 0
+			m.CollectionId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -7321,7 +5751,7 @@ func (m *MsgTransferManager) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.BadgeId |= uint64(b&0x7F) << shift
+				m.CollectionId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -7479,9 +5909,9 @@ func (m *MsgRequestTransferManager) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
 			}
-			m.BadgeId = 0
+			m.CollectionId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -7491,14 +5921,14 @@ func (m *MsgRequestTransferManager) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.BadgeId |= uint64(b&0x7F) << shift
+				m.CollectionId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Add", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AddRequest", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -7515,7 +5945,7 @@ func (m *MsgRequestTransferManager) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.Add = bool(v != 0)
+			m.AddRequest = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -7564,441 +5994,6 @@ func (m *MsgRequestTransferManagerResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgRequestTransferManagerResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgSelfDestructBadge) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgSelfDestructBadge: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgSelfDestructBadge: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
-			}
-			m.BadgeId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.BadgeId |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgSelfDestructBadgeResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgSelfDestructBadgeResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgSelfDestructBadgeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgPruneBalances) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgPruneBalances: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgPruneBalances: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType == 0 {
-				var v uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.BadgeIds = append(m.BadgeIds, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthTx
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthTx
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
-				}
-				elementCount = count
-				if elementCount != 0 && len(m.BadgeIds) == 0 {
-					m.BadgeIds = make([]uint64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowTx
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.BadgeIds = append(m.BadgeIds, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
-			}
-		case 3:
-			if wireType == 0 {
-				var v uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.Addresses = append(m.Addresses, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowTx
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthTx
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthTx
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
-				}
-				elementCount = count
-				if elementCount != 0 && len(m.Addresses) == 0 {
-					m.Addresses = make([]uint64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowTx
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Addresses = append(m.Addresses, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Addresses", wireType)
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgPruneBalancesResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgPruneBalancesResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgPruneBalancesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -8085,9 +6080,9 @@ func (m *MsgUpdateBytes) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
 			}
-			m.BadgeId = 0
+			m.CollectionId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -8097,7 +6092,7 @@ func (m *MsgUpdateBytes) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.BadgeId |= uint64(b&0x7F) << shift
+				m.CollectionId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

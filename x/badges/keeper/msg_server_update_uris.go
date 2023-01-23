@@ -13,7 +13,7 @@ func (k msgServer) UpdateUris(goCtx context.Context, msg *types.MsgUpdateUris) (
 
 	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:       msg.Creator,
-		BadgeId:       msg.BadgeId,
+		CollectionId:       msg.CollectionId,
 		MustBeManager: true,
 		CanUpdateUris: true,
 	})
@@ -21,9 +21,12 @@ func (k msgServer) UpdateUris(goCtx context.Context, msg *types.MsgUpdateUris) (
 		return nil, err
 	}
 
-	badge.Uri = msg.Uri
+	//Already validated in ValidateBasic
+	badge.BadgeUri = msg.BadgeUri
+	badge.CollectionUri = msg.CollectionUri
 
-	if err := k.SetBadgeInStore(ctx, badge); err != nil {
+
+	if err := k.SetCollectionInStore(ctx, badge); err != nil {
 		return nil, err
 	}
 
@@ -31,7 +34,7 @@ func (k msgServer) UpdateUris(goCtx context.Context, msg *types.MsgUpdateUris) (
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeyAction, "UpdateURIs"),
-			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
+			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.CollectionId)),
 		),
 	)
 

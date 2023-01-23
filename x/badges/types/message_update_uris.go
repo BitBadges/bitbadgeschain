@@ -1,6 +1,8 @@
 package types
 
 import (
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -9,11 +11,12 @@ const TypeMsgUpdateUris = "update_uris"
 
 var _ sdk.Msg = &MsgUpdateUris{}
 
-func NewMsgUpdateUris(creator string, badgeId uint64, uri *UriObject) *MsgUpdateUris {
+func NewMsgUpdateUris(creator string, collectionId uint64, collectionUri string, badgeUri string) *MsgUpdateUris {
 	return &MsgUpdateUris{
 		Creator: creator,
-		BadgeId: badgeId,
-		Uri:     uri,
+		CollectionId: collectionId,
+		CollectionUri: collectionUri,
+		BadgeUri: badgeUri,
 	}
 }
 
@@ -43,9 +46,19 @@ func (msg *MsgUpdateUris) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
 	//Validate well-formedness of the message entries
-	if err := ValidateURI(*msg.Uri); err != nil {
+	if err := ValidateURI(*&msg.BadgeUri); err != nil {
 		return err
+	}
+
+	if err := ValidateURI(*&msg.CollectionUri); err != nil {
+		return err
+	}
+
+	hasId := strings.Contains(msg.BadgeUri, "{id}")
+	if !hasId {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "badgeUri must contain \"{id}\"")
 	}
 
 	return nil

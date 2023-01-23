@@ -122,7 +122,8 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 //first bool is if URI is needed, second is if ID Range is needed
 func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool, bool, bool) {
 	switch route {
-	case TypeMsgNewBadge:
+	case TypeMsgNewCollection:
+		//TODO:
 		return []apitypes.Type{ 
 			{ Name: "creator", Type: "string" },
 			{ Name: "uri", Type: "UriObject" },
@@ -131,15 +132,16 @@ func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool, bool, bool) {
 			{ Name: "defaultSubassetSupply", Type: "uint64" },
 			{ Name: "freezeAddressRanges", Type: "IdRange[]" },
 			{ Name: "standard", Type: "uint64" },
-			{ Name: "subassetSupplysAndAmounts", Type: "SubassetAmountAndSupply[]" },
+			{ Name: "BadgeSupplys", Type: "SubassetAmountAndSupply[]" },
 			{ Name: "whitelistedRecipients", Type: "WhitelistMintInfo[]" },
 			
 		}, true, true, true, true
-	case TypeMsgNewSubBadge:
+	case TypeMsgMintBadge:
+		//TODO:
 		return []apitypes.Type{ 
 			{ Name: "creator", Type: "string" },
 			{ Name: "badgeId", Type: "uint64" },
-			{ Name: "subassetSupplysAndAmounts", Type: "SubassetAmountAndSupply[]" },
+			{ Name: "BadgeSupplys", Type: "SubassetAmountAndSupply[]" },
 		}, false, false, false, true
 	case TypeMsgTransferBadge:
 		return []apitypes.Type{	  { Name: "creator", Type: "string" },
@@ -147,25 +149,9 @@ func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool, bool, bool) {
 			{ Name: "toAddresses", Type: "uint64[]" },
 			{ Name: "amounts", Type: "uint64[]" },
 			{ Name: "badgeId", Type: "uint64" },
-			{ Name: "subbadgeRanges", Type: "IdRange[]" },
+			{ Name: "badgeIdRanges", Type: "IdRange[]" },
 			{ Name: "expirationTime", Type: "uint64" },
 			{ Name: "cantCancelBeforeTime", Type: "uint64" },
-		}, false, true, false, false
-	case TypeMsgRequestTransferBadge:
-		return []apitypes.Type{{ Name: "creator", Type: "string" },
-			{ Name: "from", Type: "uint64" },
-			{ Name: "amount", Type: "uint64" },
-			{ Name: "badgeId", Type: "uint64" },
-			{ Name: "subbadgeRanges", Type: "IdRange[]" },
-			{ Name: "expirationTime", Type: "uint64" },
-			{ Name: "cantCancelBeforeTime", Type: "uint64" },
-		}, false, true, false, false
-	case TypeMsgHandlePendingTransfer:
-		return []apitypes.Type{
-			{ Name: "creator", Type: "string" },
-			{ Name: "actions", Type: "uint64[]" },
-			{ Name: "badgeId", Type: "uint64" },
-			{ Name: "nonceRanges", Type: "IdRange[]" },
 		}, false, true, false, false
 	case TypeMsgSetApproval:
 		return []apitypes.Type{
@@ -173,17 +159,20 @@ func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool, bool, bool) {
 			{ Name: "amount", Type: "uint64" },
 			{ Name: "address", Type: "uint64" },
 			{ Name: "badgeId", Type: "uint64" },
-			{ Name: "subbadgeRanges", Type: "IdRange[]" },
+			{ Name: "badgeIdRanges", Type: "IdRange[]" },
 		}, false, true, false, false
-	case TypeMsgRevokeBadge:
-		return []apitypes.Type{  { Name: "creator", Type: "string" },
-			{ Name: "addresses", Type: "uint64[]" },
-			{ Name: "amounts", Type: "uint64[]" },
-			{ Name: "badgeId", Type: "uint64" },
-			{ Name: "subbadgeRanges", Type: "IdRange[]" },
-		}, false, true, false, false
-	case TypeMsgFreezeAddress:
+	
+	case TypeMsgUpdateDisallowedTransfers:
 		return []apitypes.Type{
+			//TODO:
+			{ Name: "creator", Type: "string" },
+			{ Name: "addressRanges", Type: "IdRange[]" },
+			{ Name: "badgeId", Type: "uint64" },
+			{ Name: "add", Type: "bool" },
+		}, false, true, false, false
+	case TypeMsgUpdateManagerApprovedTransfers:
+		return []apitypes.Type{
+			//TODO:
 			{ Name: "creator", Type: "string" },
 			{ Name: "addressRanges", Type: "IdRange[]" },
 			{ Name: "badgeId", Type: "uint64" },
@@ -213,15 +202,6 @@ func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool, bool, bool) {
 		return []apitypes.Type{ { Name: "creator", Type: "string" },
 			{ Name: "badgeId", Type: "uint64" },
 			{ Name: "add", Type: "bool" },
-		}, false, false, false, false
-	case TypeMsgSelfDestructBadge:
-		return []apitypes.Type{ { Name: "creator", Type: "string" },
-			{ Name: "badgeId", Type: "uint64" },
-		}, false, false, false, false
-	case TypeMsgPruneBalances:
-		return []apitypes.Type{ { Name: "creator", Type: "string" },
-			{ Name: "badgeIds", Type: "uint64[]" },
-			{ Name: "addresses", Type: "uint64[]" },
 		}, false, false, false, false
 	case TypeMsgRegisterAddresses:
 		return []apitypes.Type{{ Name: "creator", Type: "string" },

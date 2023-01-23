@@ -14,15 +14,23 @@ var (
 	reUri       = regexp.MustCompile(fmt.Sprintf(`^%s$`, reUriString))
 )
 
-// Validate uri and subasset uri returns whether both the uri and subasset uri is valid. Max 100 characters each.
-func ValidateURI(uriObject UriObject) error {
-	uri, err := GetUriFromUriObject(uriObject)
-	if err != nil || !reUri.MatchString(uri) {
-		return sdkerrors.Wrapf(ErrInvalidBadgeURI, "invalid uri: %s", uri)
-	}
+func duplicateInArray(arr []uint64) bool {
+	visited := make(map[uint64]bool, 0)
+	for i:=0; i<len(arr); i++{
 
-	subassetUri, err := GetSubassetUriFromUriObject(uriObject)
-	if err != nil || !reUri.MatchString(subassetUri) {
+	   if visited[arr[i]] == true{
+		  return true
+	   } else {
+		  visited[arr[i]] = true
+	   }
+	}
+	return false
+ }
+
+// Validate uri and subasset uri returns whether both the uri and subasset uri is valid. Max 100 characters each.
+func ValidateURI(uri string) error {
+	regexMatch := reUri.MatchString(uri)
+	if !regexMatch {
 		return sdkerrors.Wrapf(ErrInvalidBadgeURI, "invalid uri: %s", uri)
 	}
 
@@ -46,18 +54,18 @@ func ValidateBytes(bytesToCheck string) error {
 }
 
 //Validates ranges are valid. If end == 0, we assume end == start.
-func ValidateRangesAreValid(subbadgeRanges []*IdRange) error {
+func ValidateRangesAreValid(badgeIdRanges []*IdRange) error {
 
-	for _, subbadgeRange := range subbadgeRanges {
-		if subbadgeRange == nil {
+	for _, badgeIdRange := range badgeIdRanges {
+		if badgeIdRange == nil {
 			return ErrRangesIsNil
 		}
 
-		if subbadgeRange.End == 0 {
-			subbadgeRange.End = subbadgeRange.Start
+		if badgeIdRange.End == 0 {
+			badgeIdRange.End = badgeIdRange.Start
 		}
 
-		if subbadgeRange.Start > subbadgeRange.End {
+		if badgeIdRange.Start > badgeIdRange.End {
 			return ErrStartGreaterThanEnd
 		}
 	}

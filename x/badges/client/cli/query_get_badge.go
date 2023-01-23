@@ -11,10 +11,10 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdGetBadge() *cobra.Command {
+func CmdGetCollection() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-badge [id]",
-		Short: "Query getBadge",
+		Use:   "get-collection [id]",
+		Short: "Query getCollection",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqId, err := strconv.ParseUint(args[0], 10, 64)
@@ -29,11 +29,11 @@ func CmdGetBadge() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryGetBadgeRequest{
+			params := &types.QueryGetCollectionRequest{
 				Id: reqId,
 			}
 
-			res, err := queryClient.GetBadge(cmd.Context(), params)
+			res, err := queryClient.GetCollection(cmd.Context(), params)
 			if err != nil {
 				return err
 			}

@@ -9,11 +9,11 @@ const TypeMsgRequestTransferManager = "request_transfer_manager"
 
 var _ sdk.Msg = &MsgRequestTransferManager{}
 
-func NewMsgRequestTransferManager(creator string, badgeId uint64, add bool) *MsgRequestTransferManager {
+func NewMsgRequestTransferManager(creator string, collectionId uint64, addRequest bool) *MsgRequestTransferManager {
 	return &MsgRequestTransferManager{
 		Creator: creator,
-		BadgeId: badgeId,
-		Add:     add,
+		CollectionId: collectionId,
+		AddRequest: addRequest,
 	}
 }
 

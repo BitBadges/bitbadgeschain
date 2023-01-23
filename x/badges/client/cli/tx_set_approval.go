@@ -15,7 +15,7 @@ var _ = strconv.Itoa(0)
 
 func CmdSetApproval() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-approval [amount] [address] [badge-id] [subbadge-id-start] [subbadge-id-end] [expiry-time]",
+		Use:   "set-approval [amount] [address] [badge-id] [badge-id-start] [badge-id-end] [expiry-time]",
 		Short: "Broadcast message setApproval",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -31,7 +31,7 @@ func CmdSetApproval() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			argSubbadgeRanges, err := GetIdRanges(args[3], args[4])
+			argBadgeIdRanges, err := GetIdRanges(args[3], args[4])
 			if err != nil {
 				return err
 			}
@@ -43,10 +43,15 @@ func CmdSetApproval() *cobra.Command {
 
 			msg := types.NewMsgSetApproval(
 				clientCtx.GetFromAddress().String(),
-				argAmount,
-				argAddress,
 				argBadgeId,
-				argSubbadgeRanges,
+				argAddress,
+				[]*types.Balance{
+					{
+						Balance: argAmount,
+						BadgeIds: argBadgeIdRanges,
+					},
+				},
+				
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

@@ -38,5 +38,5 @@ var (
 	ErrActionOutOfRange					  = sdkerrors.Register(ModuleName, 1526, "action out of range")
 	ErrActionsEmpty					  = sdkerrors.Register(ModuleName, 1527, "actions empty")
 	ErrActionsLengthNotEqualToRangesLength	  = sdkerrors.Register(ModuleName, 1528, "actions length not equal to ranges length")
-
+	ErrNotImplemented				  = sdkerrors.Register(ModuleName, 1529, "not implemented")
 )

@@ -7,132 +7,132 @@ import (
 )
 
 // Sets an approval amount for an address.
-func SetApproval(userBalanceInfo types.UserBalanceInfo, amount uint64, addressNum uint64, subbadgeRange *types.IdRange) (types.UserBalanceInfo, error) {
-	idx, found := SearchApprovals(addressNum, userBalanceInfo.Approvals)
-	subbadgeRange = NormalizeIdRange(subbadgeRange)
+func SetApproval(UserBalance types.UserBalance, amount uint64, addressNum uint64, badgeIdRange *types.IdRange) (types.UserBalance, error) {
+	idx, found := SearchApprovals(addressNum, UserBalance.Approvals)
+	badgeIdRange = NormalizeIdRange(badgeIdRange)
 
 	if found {
 		//Update existing approval object for address
-		approval := userBalanceInfo.Approvals[idx]
-		newAmounts := approval.ApprovalAmounts
-		newAmounts = UpdateBalancesForIdRanges([]*types.IdRange{subbadgeRange}, amount, newAmounts)
-		userBalanceInfo.Approvals[idx].ApprovalAmounts = newAmounts
+		approval := UserBalance.Approvals[idx]
+		newAmounts := approval.Balances
+		newAmounts = UpdateBalancesForIdRanges([]*types.IdRange{badgeIdRange}, amount, newAmounts)
+		UserBalance.Approvals[idx].Balances = newAmounts
 
-		if len(userBalanceInfo.Approvals[idx].ApprovalAmounts) == 0 {
+		if len(UserBalance.Approvals[idx].Balances) == 0 {
 			//If we end up in the event where this address does not have any more approvals after being removed, we don't have to store it anymore
-			userBalanceInfo.Approvals = append(userBalanceInfo.Approvals[:idx], userBalanceInfo.Approvals[idx+1:]...)
+			UserBalance.Approvals = append(UserBalance.Approvals[:idx], UserBalance.Approvals[idx+1:]...)
 		}
 	} else {
 		//Add new approval object for address at idx, if amount != 0
 		newApprovals := []*types.Approval{}
-		newApprovals = append(newApprovals, userBalanceInfo.Approvals[:idx]...)
+		newApprovals = append(newApprovals, UserBalance.Approvals[:idx]...)
 		if amount != 0 {
 			newApprovals = append(newApprovals, &types.Approval{
 				Address: addressNum,
-				ApprovalAmounts: []*types.BalanceObject{
+				Balances: []*types.Balance{
 					{
 						Balance:  amount,
-						IdRanges: []*types.IdRange{GetIdRangeToInsert(subbadgeRange.Start, subbadgeRange.End)},
+						BadgeIds: []*types.IdRange{GetIdRangeToInsert(badgeIdRange.Start, badgeIdRange.End)},
 					},
 				},
 			})
 		}
-		newApprovals = append(newApprovals, userBalanceInfo.Approvals[idx:]...)
+		newApprovals = append(newApprovals, UserBalance.Approvals[idx:]...)
 
-		userBalanceInfo.Approvals = newApprovals
+		UserBalance.Approvals = newApprovals
 	}
 
-	return GetBalanceInfoToInsertToStorage(userBalanceInfo), nil
+	return GetBalanceToInsertToStorage(UserBalance), nil
 }
 
 //Remove a balance from the approval amount for address
-func RemoveBalanceFromApproval(userBalanceInfo types.UserBalanceInfo, amountToRemove uint64, addressNum uint64, subbadgeRanges []*types.IdRange) (types.UserBalanceInfo, error) {
+func RemoveBalanceFromApproval(UserBalance types.UserBalance, amountToRemove uint64, addressNum uint64, badgeIdRanges []*types.IdRange) (types.UserBalance, error) {
 	if amountToRemove == 0 {
-		return userBalanceInfo, nil
+		return UserBalance, nil
 	}
 
-	idx, found := SearchApprovals(addressNum, userBalanceInfo.Approvals)
+	idx, found := SearchApprovals(addressNum, UserBalance.Approvals)
 	if !found {
-		return userBalanceInfo, ErrApprovalForAddressDoesntExist
+		return UserBalance, ErrApprovalForAddressDoesntExist
 	}
 
-	approval := userBalanceInfo.Approvals[idx]
+	approval := UserBalance.Approvals[idx]
 
 	//This may be a bit confusing because we have the following structure:
-	//	userBalanceInfo.Approvals is of type []Approval
-	//	Approval is defined as { Address: uint64; ApprovalAmounts: []*types.BalanceObject }
+	//	UserBalance.Approvals is of type []Approval
+	//	Approval is defined as { Address: uint64; Balances: []*types.Balance }
 
-	//Basic flow is we get the current approval amounts and ranges in currApprovalAmounts for all IDs in our specified subbadgeRange,
+	//Basic flow is we get the current approval amounts and ranges in currApprovalAmounts for all IDs in our specified badgeIdRange,
 	//and for each unique balance found (which also has its own corresponding []IdRange), we update the balances to balance - amountToRemove.
-	currApprovalAmounts := GetBalancesForIdRanges(subbadgeRanges, approval.ApprovalAmounts)
+	currApprovalAmounts := GetBalancesForIdRanges(badgeIdRanges, approval.Balances)
 	for _, currApprovalAmountObj := range currApprovalAmounts {
 		newBalance, err := SafeSubtract(currApprovalAmountObj.Balance, amountToRemove)
 		if err != nil {
-			return userBalanceInfo, err
+			return UserBalance, err
 		}
 
-		approval.ApprovalAmounts = UpdateBalancesForIdRanges(currApprovalAmountObj.IdRanges, newBalance, approval.ApprovalAmounts)
+		approval.Balances = UpdateBalancesForIdRanges(currApprovalAmountObj.BadgeIds, newBalance, approval.Balances)
 	}
 
-	userBalanceInfo.Approvals[idx].ApprovalAmounts = approval.ApprovalAmounts
-	if len(approval.ApprovalAmounts) == 0 {
+	UserBalance.Approvals[idx].Balances = approval.Balances
+	if len(approval.Balances) == 0 {
 		//If we end up in the event where this address does not have any more approvals after being removed, we don't have to store it anymore
-		userBalanceInfo.Approvals = append(userBalanceInfo.Approvals[:idx], userBalanceInfo.Approvals[idx+1:]...)
+		UserBalance.Approvals = append(UserBalance.Approvals[:idx], UserBalance.Approvals[idx+1:]...)
 	}
 
-	return GetBalanceInfoToInsertToStorage(userBalanceInfo), nil
+	return GetBalanceToInsertToStorage(UserBalance), nil
 }
 
 //Add a balance to the approval amount
-func AddBalanceToApproval(userBalanceInfo types.UserBalanceInfo, amountToAdd uint64, addressNum uint64, subbadgeRanges []*types.IdRange) (types.UserBalanceInfo, error) {
+func AddBalanceToApproval(UserBalance types.UserBalance, amountToAdd uint64, addressNum uint64, badgeIdRanges []*types.IdRange) (types.UserBalance, error) {
 	if amountToAdd == 0 {
-		return userBalanceInfo, nil
+		return UserBalance, nil
 	}
 
-	idx, found := SearchApprovals(addressNum, userBalanceInfo.Approvals)
+	idx, found := SearchApprovals(addressNum, UserBalance.Approvals)
 	if !found {
 		//We just need to add a new approval for this address with only this approval amount
 		newApprovals := []*types.Approval{}
-		newApprovals = append(newApprovals, userBalanceInfo.Approvals[:idx]...)
+		newApprovals = append(newApprovals, UserBalance.Approvals[:idx]...)
 		idRangesToInsert := []*types.IdRange{}
-		for _, subbadgeRange := range subbadgeRanges {
-			idRangesToInsert = append(idRangesToInsert, GetIdRangeToInsert(subbadgeRange.Start, subbadgeRange.End))
+		for _, badgeIdRange := range badgeIdRanges {
+			idRangesToInsert = append(idRangesToInsert, GetIdRangeToInsert(badgeIdRange.Start, badgeIdRange.End))
 		}
 
 		newApprovals = append(newApprovals, &types.Approval{
 			Address: addressNum,
-			ApprovalAmounts: []*types.BalanceObject{
+			Balances: []*types.Balance{
 				{
 					Balance:  amountToAdd,
-					IdRanges: idRangesToInsert,
+					BadgeIds: idRangesToInsert,
 				},
 			},
 		})
-		newApprovals = append(newApprovals, userBalanceInfo.Approvals[idx:]...)
-		userBalanceInfo.Approvals = newApprovals
-		return userBalanceInfo, nil
+		newApprovals = append(newApprovals, UserBalance.Approvals[idx:]...)
+		UserBalance.Approvals = newApprovals
+		return UserBalance, nil
 	}
 
 	//This may be a bit confusing because we have the following structure:
-	//	userBalanceInfo.Approvals is of type []Approval
-	//	Approval is defined as { Address: uint64; ApprovalAmounts: []*types.BalanceObject }
+	//	UserBalance.Approvals is of type []Approval
+	//	Approval is defined as { Address: uint64; Balances: []*types.Balance }
 
-	//Basic flow is we get the current approval amounts and ranges in currApprovalAmounts for all IDs in our specified subbadgeRange,
+	//Basic flow is we get the current approval amounts and ranges in currApprovalAmounts for all IDs in our specified badgeIdRange,
 	//and for each unique balance found (which also has its own corresponding []IdRange), we update the balances to balance + amountToAdd
-	approval := userBalanceInfo.Approvals[idx]
-	currApprovalAmounts := GetBalancesForIdRanges(subbadgeRanges, approval.ApprovalAmounts)
+	approval := UserBalance.Approvals[idx]
+	currApprovalAmounts := GetBalancesForIdRanges(badgeIdRanges, approval.Balances)
 	for _, currApprovalAmountObj := range currApprovalAmounts {
 		newBalance, err := SafeAdd(currApprovalAmountObj.Balance, amountToAdd)
 		if err != nil {
 			newBalance = math.MaxUint64
 		}
 
-		approval.ApprovalAmounts = UpdateBalancesForIdRanges(currApprovalAmountObj.IdRanges, newBalance, approval.ApprovalAmounts)
+		approval.Balances = UpdateBalancesForIdRanges(currApprovalAmountObj.BadgeIds, newBalance, approval.Balances)
 	}
 
-	userBalanceInfo.Approvals[idx].ApprovalAmounts = approval.ApprovalAmounts
+	UserBalance.Approvals[idx].Balances = approval.Balances
 
-	return GetBalanceInfoToInsertToStorage(userBalanceInfo), nil
+	return GetBalanceToInsertToStorage(UserBalance), nil
 }
 
 // Approvals will be sorted, so we can binary search to get the targetIdx.

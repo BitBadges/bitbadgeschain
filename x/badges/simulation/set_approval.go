@@ -20,23 +20,26 @@ func SimulateMsgSetApproval(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgSetApproval{
 			Creator: simAccount.Address.String(),
-			SubbadgeRanges: []*types.IdRange{
+			Balances: []*types.Balance{
 				{
-					Start: r.Uint64(),
-					End:   r.Uint64(),
-				},
-				{
-					Start: r.Uint64(),
-					End:   r.Uint64(),
-				},
-				{
-					Start: r.Uint64(),
-					End:   r.Uint64(),
+					Balance: r.Uint64(),
+					BadgeIds: []*types.IdRange{
+						{
+							Start: r.Uint64(),
+							End:   r.Uint64(),
+						},
+						{
+							Start: r.Uint64(),
+							End:   r.Uint64(),
+						},
+						{
+							Start: r.Uint64(),
+							End:   r.Uint64(),
+						},
+					},
 				},
 			},
-			Amount:  r.Uint64(),
-			Address: r.Uint64(),
-			BadgeId: r.Uint64(),
+			CollectionId: r.Uint64(),
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

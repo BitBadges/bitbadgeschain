@@ -31,13 +31,13 @@ Details: This standard defines the parent standard for all BitBadges on the BitB
 BitBadges are defined with the following fields stored on-chain: 
 ```
     uint64 id = 1; //Unique ID of the BitBadge
-    UriObject uri = 2; //URI of the BitBadge and all subbadges
+    UriObject uri = 2; //URI of the BitBadge and all badges
     bytes arbitraryBytes = 3; //Arbitrary bytes field (max 256 bytes)
     uint64 manager = 4; //Address number of the BitBadge manager
     uint64 permissions = 5; //Permissions (multiple bools packed into a uint64)
     repeated IdRange freezeRanges = 6; //Address numbers frozen or unfrozen
-    uint64 nextSubassetId = 7; //Next subbadge ID to be used
-    repeated BalanceObject subassetSupplys = 8; //Subasset total supplies
+    uint64 nextSubassetId = 7; //Next badge ID to be used
+    repeated BalanceObject BadgeSupplys = 8; //Subasset total supplies
     uint64 defaultSubassetSupply = 9; //Default subasset supply
     uint64 standard = 10; //Standard the badge implements
 ```

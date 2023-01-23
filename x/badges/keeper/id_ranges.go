@@ -238,7 +238,7 @@ func RemoveIdsFromIdRange(rangeToRemove *types.IdRange, rangeObject *types.IdRan
 }
 
 //Will sort the ID ranges in order and merge overlapping IDs if we can
-func SortIdRangesAndMergeIfNecessary(ids []*types.IdRange) []*types.IdRange {
+func SortIdRangesAndMerge(ids []*types.IdRange) []*types.IdRange {
 	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
 	var n = len(ids)
 	for i := 1; i < n; i++ {

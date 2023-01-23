@@ -20,73 +20,91 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgTransferBadge{
 				Creator:     "invalid_address",
-				ToAddresses: []uint64{0},
-				Amounts:     []uint64{10},
 				From:        1,
-				SubbadgeRanges: []*types.IdRange{
+				Transfers: []*types.Transfers{
 					{
-						Start: 0,
-						End:   0,
+						ToAddresses: []uint64{0},
+						Balances: []*types.Balance{
+							{
+								Balance: 10,
+								BadgeIds: []*types.IdRange{
+									{
+										Start: 0,
+										End:   0,
+									},
+								},
+							},
+						},
 					},
 				},
+
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid state",
 			msg: types.MsgTransferBadge{
 				Creator:     sample.AccAddress(),
-				ToAddresses: []uint64{0},
-				Amounts:     []uint64{10},
 				From:        1,
-				SubbadgeRanges: []*types.IdRange{
+				Transfers: []*types.Transfers{
 					{
-						Start: 0,
-						End:   0,
+						ToAddresses: []uint64{0},
+						Balances: []*types.Balance{
+							{
+								Balance: 10,
+								BadgeIds: []*types.IdRange{
+									{
+										Start: 0,
+										End:   0,
+									},
+								},
+							},
+						},
 					},
 				},
 			},
-		}, {
-			name: "invalid addresses",
-			msg: types.MsgTransferBadge{
-				Creator:     sample.AccAddress(),
-				ToAddresses: []uint64{0},
-				Amounts:     []uint64{10},
-				From:        0,
-				SubbadgeRanges: []*types.IdRange{
-					{
-						Start: 0,
-						End:   0,
-					},
-				},
-			},
-			err: types.ErrElementCantEqualThis,
 		}, {
 			name: "invalid amounts",
 			msg: types.MsgTransferBadge{
 				Creator:     sample.AccAddress(),
-				ToAddresses: []uint64{0},
-				Amounts:     []uint64{0},
 				From:        7,
-				SubbadgeRanges: []*types.IdRange{
+				Transfers: []*types.Transfers{
 					{
-						Start: 0,
-						End:   0,
+						ToAddresses: []uint64{0},
+						Balances: []*types.Balance{
+							{
+								Balance: 0,
+								BadgeIds: []*types.IdRange{
+									{
+										Start: 0,
+										End:   0,
+									},
+								},
+							},
+						},
 					},
 				},
 			},
-			err: types.ErrElementCantEqualThis,
+			err: types.ErrAmountEqualsZero,
 		},
 		{
-			name: "invalid subbadge range",
+			name: "invalid badge range",
 			msg: types.MsgTransferBadge{
 				Creator:     sample.AccAddress(),
-				ToAddresses: []uint64{0},
-				Amounts:     []uint64{0},
 				From:        7,
-				SubbadgeRanges: []*types.IdRange{
+				Transfers: []*types.Transfers{
 					{
-						Start: 10,
-						End:   1,
+						ToAddresses: []uint64{0},
+						Balances: []*types.Balance{
+							{
+								Balance: 10,
+								BadgeIds: []*types.IdRange{
+									{
+										Start: 10,
+										End:   1,
+									},
+								},
+							},
+						},
 					},
 				},
 			},

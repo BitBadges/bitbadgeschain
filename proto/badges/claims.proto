@@ -1,0 +1,20 @@
+syntax = "proto3";
+package bitbadges.bitbadgeschain.badges;
+
+// this line is used by starport scaffolding # proto/tx/import
+import "badges/balances.proto";
+import "badges/ranges.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
+
+//Defines a claim object. Claims are used to transfer badges via a claiming process.
+//Stored in own store. Claimed leaves are also stored in unique store.
+message Claim {
+    Balance balance = 1; //Current balance of the claim store.
+    uint64 from = 2; //Address of the one who created the claim (used for refunds)
+    uint64 amount = 3; //Amount per claim
+    uint64 type = 4; //Type of claim (ex: addresses, codes, secret words, etc)
+    string data = 5; //Data for the claim. We use this for a Merkle root. Max 96 chars.
+    string uri = 6; //Optional URI for the claim. Max 100 chars.
+    IdRange timeRange = 7; //Time range when the claim is valid
+}

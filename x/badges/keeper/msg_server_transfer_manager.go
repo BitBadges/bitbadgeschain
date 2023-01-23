@@ -13,27 +13,27 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 
 	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:                     msg.Creator,
-		BadgeId:                     msg.BadgeId,
+		CollectionId:                msg.CollectionId,
 		MustBeManager:               true,
-		CanManagerTransfer:          true,
+		CanManagerBeTransferred:     true,
 		AccountsToCheckRegistration: []uint64{msg.Address},
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	requested := k.HasAddressRequestedManagerTransfer(ctx, msg.BadgeId, msg.Address)
+	requested := k.HasAddressRequestedManagerTransfer(ctx, msg.CollectionId, msg.Address)
 	if !requested {
 		return nil, ErrAddressNeedsToOptInAndRequestManagerTransfer
 	}
 
 	badge.Manager = msg.Address
 
-	if err := k.RemoveTransferManagerRequest(ctx, msg.BadgeId, msg.Address); err != nil {
+	if err := k.RemoveTransferManagerRequest(ctx, msg.CollectionId, msg.Address); err != nil {
 		return nil, err
 	}
 
-	if err := k.SetBadgeInStore(ctx, badge); err != nil {
+	if err := k.SetCollectionInStore(ctx, badge); err != nil {
 		return nil, err
 	}
 
@@ -41,7 +41,7 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeyAction, "TransferManager"),
-			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
+			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.CollectionId)),
 		),
 	)
 

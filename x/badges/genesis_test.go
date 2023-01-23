@@ -14,9 +14,9 @@ func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params:      types.DefaultParams(),
 		PortId:      types.PortID,
-		NextBadgeId: 0,
-		Badges:      []*types.BitBadge{},
-		Balances:    []*types.UserBalanceInfo{},
+		NextCollectionId: 0,
+		Collections:      []*types.BadgeCollection{},
+		Balances:    []*types.UserBalance{},
 		BalanceIds:  []string{},
 		// this line is used by starport scaffolding # genesis/test/state
 	}
@@ -31,8 +31,8 @@ func TestGenesis(t *testing.T) {
 
 	require.Equal(t, genesisState.PortId, got.PortId)
 
-	require.Equal(t, genesisState.NextBadgeId, got.NextBadgeId)
-	require.Equal(t, genesisState.Badges, got.Badges)
+	require.Equal(t, genesisState.NextCollectionId, got.NextCollectionId)
+	require.Equal(t, genesisState.Collections, got.Collections)
 	require.Equal(t, genesisState.Balances, got.Balances)
 	require.Equal(t, genesisState.BalanceIds, got.BalanceIds)
 	// this line is used by starport scaffolding # genesis/test/assert

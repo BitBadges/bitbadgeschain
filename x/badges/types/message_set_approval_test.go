@@ -20,10 +20,15 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgSetApproval{
 				Creator: "invalid_address",
-				SubbadgeRanges: []*types.IdRange{
+				Balances: []*types.Balance{
 					{
-						Start: 0,
-						End:   0,
+						Balance: 1,
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 0,
+								End:   0,
+							},
+						},
 					},
 				},
 			},
@@ -32,21 +37,31 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: types.MsgSetApproval{
 				Creator: sample.AccAddress(),
-				SubbadgeRanges: []*types.IdRange{
+				Balances: []*types.Balance{
 					{
-						Start: 0,
-						End:   0,
+						Balance: 1,
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 0,
+								End:   0,
+							},
+						},
 					},
 				},
 			},
 		}, {
-			name: "invalid subbadge range",
+			name: "invalid badgeId range",
 			msg: types.MsgSetApproval{
 				Creator: sample.AccAddress(),
-				SubbadgeRanges: []*types.IdRange{
+				Balances: []*types.Balance{
 					{
-						Start: 10,
-						End:   1,
+						Balance: 1,
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 10,
+								End:   1,
+							},
+						},
 					},
 				},
 			},

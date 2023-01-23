@@ -3,42 +3,26 @@ package bitbadges.bitbadgeschain.badges;
 
 import "gogoproto/gogo.proto";
 import "badges/params.proto";
-import "badges/badges.proto";
 import "badges/ranges.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
-message WhitelistMintInfo {
-    repeated uint64 addresses = 1;
-    repeated BalanceObject balanceAmounts = 2;
+
+//Defines a balance object. The specified balance holds for all ids specified within the id ranges array.
+message Balance {
+    uint64 balance = 1;
+    repeated IdRange badgeIds = 2;
 }
 
-//Defines a user balance object for a badge w/ the user's balances, nonce, pending transfers, and approvals. All subbadge IDs for a badge are handled within this object.
-message UserBalanceInfo {
-    repeated BalanceObject balanceAmounts = 2; //The user's balance for each subbadge.
-    uint64 pendingNonce = 3; //Nonce for pending transfers. Increments by 1 each time.
-    repeated PendingTransfer pending = 4; //IDs will be sorted in order of this account's pending nonce.
-    repeated Approval approvals = 5; //Approvals are sorted in order of address number.
+//Defines a user balance object for a badge w/ the user's balances, nonce, pending transfers, and approvals. All badge IDs for a collection are handled within this object.
+message UserBalance {
+    repeated Balance balances = 1; //The user's balance for each badge ID.
+    repeated Approval approvals = 2; //Approvals are sorted in order of address number.
 }
 
-//Defines an approval object for a specific address.
+//Defines an approval object for specific addresses.
 message Approval {
-    uint64 address = 1; //account number for the address
-    repeated BalanceObject approvalAmounts = 2; //approval balances for every subbadgeId
-}
-
-//Defines a pending transfer object for two addresses. A pending transfer will be stored in both parties' balance objects. 
-message PendingTransfer {
-    IdRange subbadgeRange = 1;
-    uint64 thisPendingNonce = 2; //This pending nonce is the nonce of the account for which this transfer is stored. Other is the other party's. Will be swapped for the other party's stored pending transfer.
-    uint64 otherPendingNonce = 3; 
-    uint64 amount = 4;
-    bool sent = 5; //Sent defines who initiated this pending transfer
-    uint64 to = 6;
-    uint64 from = 7;
-    uint64 approvedBy = 9;
-    bool markedAsAccepted = 10; //For non forceful accepts, this will be true if the other party has accepted but doesn't want to pay the gas fees.
-    uint64 expirationTime = 11; //Can't be accepted after expiration time. If == 0, we assume it never expires.
-    uint64 cantCancelBeforeTime = 12; //Can't cancel before must be less than expiration time. If == 0, we assume can cancel at any time.
+    uint64 address = 1;
+    repeated Balance balances = 2; //approval balances for every badgeId
 }

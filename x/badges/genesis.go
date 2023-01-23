@@ -12,7 +12,9 @@ import (
 //NOTE: We assume that all badges are validly formed here
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// Set if defined; default 0
-	k.SetNextBadgeId(ctx, genState.NextBadgeId)
+	k.SetNextCollectionId(ctx, genState.NextCollectionId)
+	// Set if defined; default 0
+	k.SetNextClaimId(ctx, genState.NextCollectionId)
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetPort(ctx, genState.PortId)
 	// Only try to bind to port if it is not already bound, since we may already own
@@ -26,8 +28,8 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		}
 	}
 
-	for _, badge := range genState.Badges {
-		if err := k.SetBadgeInStore(ctx, *badge); err != nil {
+	for _, badge := range genState.Collections {
+		if err := k.SetCollectionInStore(ctx, *badge); err != nil {
 			panic(err)
 		}
 	}
@@ -47,9 +49,10 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.Params = k.GetParams(ctx)
 
 	genesis.PortId = k.GetPort(ctx)
-	genesis.NextBadgeId = k.GetNextBadgeId(ctx)
+	genesis.NextCollectionId = k.GetNextCollectionId(ctx)
+	genesis.NextClaimId = k.GetNextClaimId(ctx)
 
-	genesis.Badges = k.GetBadgesFromStore(ctx)
+	genesis.Collections = k.GetCollectionsFromStore(ctx)
 	genesis.Balances = k.GetUserBalancesFromStore(ctx)
 	genesis.BalanceIds = k.GetUserBalanceIdsFromStore(ctx)
 	// this line is used by starport scaffolding # genesis/module/export

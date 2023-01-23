@@ -8,20 +8,16 @@ import (
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgNewBadge{}, "badges/NewBadge", nil)
-	cdc.RegisterConcrete(&MsgNewSubBadge{}, "badges/NewSubBadge", nil)
+	cdc.RegisterConcrete(&MsgNewCollection{}, "badges/NewCollection", nil)
+	cdc.RegisterConcrete(&MsgMintBadge{}, "badges/MintBadge", nil)
 	cdc.RegisterConcrete(&MsgTransferBadge{}, "badges/TransferBadge", nil)
-	cdc.RegisterConcrete(&MsgRequestTransferBadge{}, "badges/RequestTransferBadge", nil)
-	cdc.RegisterConcrete(&MsgHandlePendingTransfer{}, "badges/HandlePendingTransfer", nil)
 	cdc.RegisterConcrete(&MsgSetApproval{}, "badges/SetApproval", nil)
-	cdc.RegisterConcrete(&MsgRevokeBadge{}, "badges/RevokeBadge", nil)
-	cdc.RegisterConcrete(&MsgFreezeAddress{}, "badges/FreezeAddress", nil)
+	cdc.RegisterConcrete(&MsgUpdateDisallowedTransfers{}, "badges/UpdateDisallowedTransfers", nil)
+	cdc.RegisterConcrete(&MsgUpdateManagerApprovedTransfers{}, "badges/UpdateManagerApprovedTransfers", nil)
 	cdc.RegisterConcrete(&MsgUpdateUris{}, "badges/UpdateUris", nil)
 	cdc.RegisterConcrete(&MsgUpdatePermissions{}, "badges/UpdatePermissions", nil)
 	cdc.RegisterConcrete(&MsgTransferManager{}, "badges/TransferManager", nil)
 	cdc.RegisterConcrete(&MsgRequestTransferManager{}, "badges/RequestTransferManager", nil)
-	cdc.RegisterConcrete(&MsgSelfDestructBadge{}, "badges/SelfDestructBadge", nil)
-	cdc.RegisterConcrete(&MsgPruneBalances{}, "badges/PruneBalances", nil)
 	cdc.RegisterConcrete(&MsgUpdateBytes{}, "badges/UpdateBytes", nil)
 	cdc.RegisterConcrete(&MsgRegisterAddresses{}, "badges/RegisterAddresses", nil)
 	// this line is used by starport scaffolding # 2
@@ -29,28 +25,22 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgNewBadge{},
+		&MsgNewCollection{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgNewSubBadge{},
+		&MsgMintBadge{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgTransferBadge{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgRequestTransferBadge{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgHandlePendingTransfer{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgSetApproval{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgRevokeBadge{},
+		&MsgUpdateDisallowedTransfers{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgFreezeAddress{},
+		&MsgUpdateManagerApprovedTransfers{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgUpdateUris{},
@@ -63,12 +53,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgRequestTransferManager{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgSelfDestructBadge{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgPruneBalances{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgUpdateBytes{},

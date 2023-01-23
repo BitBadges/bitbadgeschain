@@ -1,7 +1,6 @@
 package ante_test
 
 import (
-	"encoding/json"
 	"math/big"
 	"testing"
 	"time"
@@ -41,8 +40,6 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
-
-	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 )
 
 type AnteTestSuite struct {
@@ -82,47 +79,14 @@ func (suite *AnteTestSuite) SetupTest() {
 	simapp.FlagEnabledValue = true
 	simapp.FlagCommitValue = true
 
-	_, db, _, logger, _, err := simapp.SetupSimulation("goleveldb-app-sim", "Simulation")
-	if err != nil {
-		panic("Error constructing simapp")
-	}
-
 
 	encodingConfig := encoding.MakeConfig(bitbadgesapp.ModuleBasics)
 	// We're using TestMsg amino encoding in some tests, so register it here.
 	encodingConfig.Amino.RegisterConcrete(&testdata.TestMsg{}, "testdata.TestMsg", nil)
 
-
-	appParamsConfig := appparams.EncodingConfig{
-		Marshaler: encodingConfig.Codec,
-		TxConfig:  encodingConfig.TxConfig,
-		InterfaceRegistry: encodingConfig.InterfaceRegistry,
-		Amino: encodingConfig.Amino,
-	}
-	
-	app := bitbadgesapp.NewApp(
-		logger,
-		db,
-		nil,
-		true,
-		map[int64]bool{},
-		bitbadgesapp.DefaultNodeHome,
-		0,
-		appParamsConfig,
-		simapp.EmptyAppOptions{},
+	app := bitbadgesapp.Setup(
+		false, nil,
 	)
-
-	genesisState := bitbadgesapp.NewDefaultGenesisState(app.AppCodec())
-	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
-	if err != nil {
-		panic(err)
-	}
-
-	app.InitChain(abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		AppStateBytes:   stateBytes,
-		ConsensusParams: DefaultConsensusParams,
-	})
 
 	suite.app = app
 

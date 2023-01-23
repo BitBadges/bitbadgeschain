@@ -13,9 +13,10 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 message GenesisState {
     Params params = 1 [(gogoproto.nullable) = false];
     string port_id = 2;
-    repeated BitBadge badges = 3;
-    repeated UserBalanceInfo balances = 4;
+    repeated BadgeCollection collections = 3;
+    repeated UserBalance balances = 4;
     repeated string balance_ids = 5;
-    uint64 nextBadgeId = 6;
+    uint64 nextCollectionId = 6;
+    uint64 nextClaimId = 7;
     // this line is used by starport scaffolding # genesis/proto/state
 }

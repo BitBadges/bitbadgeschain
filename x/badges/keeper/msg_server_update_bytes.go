@@ -13,7 +13,7 @@ func (k msgServer) UpdateBytes(goCtx context.Context, msg *types.MsgUpdateBytes)
 
 	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:        msg.Creator,
-		BadgeId:        msg.BadgeId,
+		CollectionId:        msg.CollectionId,
 		MustBeManager:  true,
 		CanUpdateBytes: true,
 	})
@@ -26,9 +26,9 @@ func (k msgServer) UpdateBytes(goCtx context.Context, msg *types.MsgUpdateBytes)
 		return nil, err
 	}
 
-	badge.ArbitraryBytes = msg.NewBytes
+	badge.Bytes = msg.NewBytes
 
-	if err := k.SetBadgeInStore(ctx, badge); err != nil {
+	if err := k.SetCollectionInStore(ctx, badge); err != nil {
 		return nil, err
 	}
 
@@ -36,7 +36,7 @@ func (k msgServer) UpdateBytes(goCtx context.Context, msg *types.MsgUpdateBytes)
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeyAction, "UpdateArbitraryBytes"),
-			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
+			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.CollectionId)),
 		),
 	)
 

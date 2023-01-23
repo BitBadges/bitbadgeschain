@@ -20,7 +20,7 @@ func SimulateMsgUpdateBytes(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgUpdateBytes{
 			Creator:  simAccount.Address.String(),
-			BadgeId:  r.Uint64(),
+			CollectionId:  r.Uint64(),
 			NewBytes: simtypes.RandStringOfLength(r, r.Intn(300)),
 		}
 

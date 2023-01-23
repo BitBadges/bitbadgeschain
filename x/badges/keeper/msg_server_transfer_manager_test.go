@@ -9,17 +9,11 @@ import (
 func (suite *TestSuite) TestTransferManager() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	badgesToCreate := []BadgesToCreate{
+	collectionsToCreate := []CollectionsToCreate{
 		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-
-					InsertIdIdx: 10,
-				},
+			Collection: types.MsgNewCollection{
+				CollectionUri: "https://example.com",
+BadgeUri: "https://example.com/{id}",
 				Permissions: 127,
 			},
 			Amount:  1,
@@ -27,17 +21,17 @@ func (suite *TestSuite) TestTransferManager() {
 		},
 	}
 
-	err := CreateBadges(suite, wctx, badgesToCreate)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge")
 
-	//Create subbadge 1 with supply > 1
-	err = CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+	//Create badge 1 with supply > 1
+	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 10000,
 			Amount: 1,
 		},
-	})
-	suite.Require().Nil(err, "Error creating subbadge")
+	},)
+	suite.Require().Nil(err, "Error creating badge")
 
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
@@ -45,24 +39,18 @@ func (suite *TestSuite) TestTransferManager() {
 	err = TransferManager(suite, wctx, bob, 0, aliceAccountNum)
 	suite.Require().Nil(err, "Error transferring manager")
 
-	badge, _ := GetBadge(suite, wctx, 0)
+	badge, _ := GetCollection(suite, wctx, 0)
 	suite.Require().Equal(aliceAccountNum, badge.Manager)
 }
 
 func (suite *TestSuite) TestRequestTransferManager() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	badgesToCreate := []BadgesToCreate{
+	collectionsToCreate := []CollectionsToCreate{
 		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-
-					InsertIdIdx: 10,
-				},
+			Collection: types.MsgNewCollection{
+				CollectionUri: "https://example.com",
+BadgeUri: "https://example.com/{id}",
 				Permissions: 127,
 			},
 			Amount:  1,
@@ -70,17 +58,17 @@ func (suite *TestSuite) TestRequestTransferManager() {
 		},
 	}
 
-	err := CreateBadges(suite, wctx, badgesToCreate)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge")
 
-	//Create subbadge 1 with supply > 1
-	err = CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+	//Create badge 1 with supply > 1
+	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 10000,
 			Amount: 1,
 		},
-	})
-	suite.Require().Nil(err, "Error creating subbadge")
+	},)
+	suite.Require().Nil(err, "Error creating badge")
 
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
@@ -94,24 +82,18 @@ func (suite *TestSuite) TestRequestTransferManager() {
 	err = TransferManager(suite, wctx, bob, 0, aliceAccountNum)
 	suite.Require().Nil(err, "Error transferring manager")
 
-	badge, _ := GetBadge(suite, wctx, 0)
+	badge, _ := GetCollection(suite, wctx, 0)
 	suite.Require().Equal(aliceAccountNum, badge.Manager)
 }
 
 func (suite *TestSuite) TestRemovedRequestTransferManager() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	badgesToCreate := []BadgesToCreate{
+	collectionsToCreate := []CollectionsToCreate{
 		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-
-					InsertIdIdx: 10,
-				},
+			Collection: types.MsgNewCollection{
+				CollectionUri: "https://example.com",
+BadgeUri: "https://example.com/{id}",
 				Permissions: 127,
 			},
 			Amount:  1,
@@ -119,17 +101,17 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 		},
 	}
 
-	err := CreateBadges(suite, wctx, badgesToCreate)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge")
 
-	//Create subbadge 1 with supply > 1
-	err = CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+	//Create badge 1 with supply > 1
+	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 10000,
 			Amount: 1,
 		},
-	})
-	suite.Require().Nil(err, "Error creating subbadge")
+	},)
+	suite.Require().Nil(err, "Error creating badge")
 
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
@@ -144,35 +126,29 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	badgesToCreate := []BadgesToCreate{
+	collectionsToCreate := []CollectionsToCreate{
 		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-
-					InsertIdIdx: 10,
-				},
-				Permissions: 62,
+			Collection: types.MsgNewCollection{
+				CollectionUri: "https://example.com",
+				BadgeUri: "https://example.com/{id}",
+				Permissions: 23,
 			},
 			Amount:  1,
 			Creator: bob,
 		},
 	}
 
-	err := CreateBadges(suite, wctx, badgesToCreate)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge")
 
-	//Create subbadge 1 with supply > 1
-	err = CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+	//Create badge 1 with supply > 1
+	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 10000,
 			Amount: 1,
 		},
-	})
-	suite.Require().Nil(err, "Error creating subbadge")
+	},)
+	suite.Require().Nil(err, "Error creating badge")
 
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
@@ -181,17 +157,11 @@ func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 func (suite *TestSuite) TestManagerCantBeTransferred() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	badgesToCreate := []BadgesToCreate{
+	collectionsToCreate := []CollectionsToCreate{
 		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-
-					InsertIdIdx: 10,
-				},
+			Collection: types.MsgNewCollection{
+				CollectionUri: "https://example.com",
+				BadgeUri: "https://example.com/{id}",
 				Permissions: 0,
 			},
 			Amount:  1,
@@ -199,7 +169,7 @@ func (suite *TestSuite) TestManagerCantBeTransferred() {
 		},
 	}
 
-	err := CreateBadges(suite, wctx, badgesToCreate)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge")
 
 	err = TransferManager(suite, wctx, bob, 0, aliceAccountNum)

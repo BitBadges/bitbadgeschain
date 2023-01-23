@@ -9,17 +9,11 @@ import (
 func (suite *TestSuite) TestSetApproval() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	badgesToCreate := []BadgesToCreate{
+	collectionsToCreate := []CollectionsToCreate{
 		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-
-					InsertIdIdx: 10,
-				},
+			Collection: types.MsgNewCollection{
+				CollectionUri: "https://example.com",
+BadgeUri: "https://example.com/{id}",
 				Permissions: 62,
 			},
 			Amount:  1,
@@ -27,65 +21,74 @@ func (suite *TestSuite) TestSetApproval() {
 		},
 	}
 
-	CreateBadges(suite, wctx, badgesToCreate)
-	badge, _ := GetBadge(suite, wctx, 0)
+	CreateCollections(suite, wctx, collectionsToCreate)
+	badge, _ := GetCollection(suite, wctx, 0)
 
-	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+	//Create badge 1 with supply > 1
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 10000,
 			Amount: 1,
 		},
-	})
-	suite.Require().Nil(err, "Error creating subbadge")
-	badge, _ = GetBadge(suite, wctx, 0)
-	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
+	},)
+	suite.Require().Nil(err, "Error creating badge")
+	badge, _ = GetCollection(suite, wctx, 0)
+	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
 
-	suite.Require().Equal(uint64(1), badge.NextSubassetId)
-	suite.Require().Equal([]*types.BalanceObject{
+	suite.Require().Equal(uint64(1), badge.NextBadgeId)
+	suite.Require().Equal([]*types.Balance{
 		{
-			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+			BadgeIds: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
 			Balance:  10000,
 		},
-	}, badge.SubassetSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
+	}, badge.MaxSupplys)
+	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
 
-	err = SetApproval(suite, wctx, bob, 1000, aliceAccountNum, 0, []*types.IdRange{{Start: 0, End: 0}})
+	err = SetApproval(suite, wctx, bob, aliceAccountNum, 0, []*types.Balance{
+		{
+			Balance: 1000,
+			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+		},
+	})
 	suite.Require().Nil(err, "Error setting approval")
 
-	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
-	suite.Require().Equal(uint64(aliceAccountNum), bobBalanceInfo.Approvals[0].Address)
-	suite.Require().Equal(uint64(1000), bobBalanceInfo.Approvals[0].ApprovalAmounts[0].Balance)
+	bobbalance, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
+	suite.Require().Equal(uint64(aliceAccountNum), bobbalance.Approvals[0].Address)
+	suite.Require().Equal(uint64(1000), bobbalance.Approvals[0].Balances[0].Balance)
 
-	err = SetApproval(suite, wctx, bob, 500, charlieAccountNum, 0, []*types.IdRange{{Start: 0, End: 0}})
+	err = SetApproval(suite, wctx, bob, charlieAccountNum, 0, []*types.Balance{
+		{
+			Balance: 500,
+			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+		},
+	})
 	suite.Require().Nil(err, "Error setting approval")
 
-	err = SetApproval(suite, wctx, bob, 500, aliceAccountNum, 0, []*types.IdRange{{Start: 0, End: 0}})
+	err = SetApproval(suite, wctx, bob, aliceAccountNum, 0, []*types.Balance{
+		{
+			Balance: 500,
+			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+		},
+	})
 	suite.Require().Nil(err, "Error setting approval")
 
-	bobBalanceInfo, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
+	bobbalance, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
 
-	suite.Require().Equal(uint64(charlieAccountNum), bobBalanceInfo.Approvals[1].Address)
-	suite.Require().Equal(uint64(500), bobBalanceInfo.Approvals[1].ApprovalAmounts[0].Balance)
+	suite.Require().Equal(uint64(charlieAccountNum), bobbalance.Approvals[1].Address)
+	suite.Require().Equal(uint64(500), bobbalance.Approvals[1].Balances[0].Balance)
 
-	suite.Require().Equal(uint64(aliceAccountNum), bobBalanceInfo.Approvals[0].Address)
-	suite.Require().Equal(uint64(500), bobBalanceInfo.Approvals[0].ApprovalAmounts[0].Balance)
+	suite.Require().Equal(uint64(aliceAccountNum), bobbalance.Approvals[0].Address)
+	suite.Require().Equal(uint64(500), bobbalance.Approvals[0].Balances[0].Balance)
 }
 
 func (suite *TestSuite) TestSetApprovalNoPrevBalanceInStore() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	badgesToCreate := []BadgesToCreate{
+	collectionsToCreate := []CollectionsToCreate{
 		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-
-					InsertIdIdx: 10,
-				},
+			Collection: types.MsgNewCollection{
+				CollectionUri: "https://example.com",
+BadgeUri: "https://example.com/{id}",
 				Permissions: 62,
 			},
 			Amount:  1,
@@ -93,47 +96,46 @@ func (suite *TestSuite) TestSetApprovalNoPrevBalanceInStore() {
 		},
 	}
 
-	CreateBadges(suite, wctx, badgesToCreate)
-	badge, _ := GetBadge(suite, wctx, 0)
+	CreateCollections(suite, wctx, collectionsToCreate)
+	badge, _ := GetCollection(suite, wctx, 0)
 
-	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+	//Create badge 1 with supply > 1
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 10000,
 			Amount: 1,
 		},
 	})
-	suite.Require().Nil(err, "Error creating subbadge")
-	badge, _ = GetBadge(suite, wctx, 0)
-	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
+	suite.Require().Nil(err, "Error creating badge")
+	badge, _ = GetCollection(suite, wctx, 0)
+	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
 
-	suite.Require().Equal(uint64(1), badge.NextSubassetId)
-	suite.Require().Equal([]*types.BalanceObject{
+	suite.Require().Equal(uint64(1), badge.NextBadgeId)
+	suite.Require().Equal([]*types.Balance{
 		{
-			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+			BadgeIds: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
 			Balance:  10000,
 		},
-	}, badge.SubassetSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
+	}, badge.MaxSupplys)
+	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
 
-	err = SetApproval(suite, wctx, charlie, 1000, aliceAccountNum, 0, []*types.IdRange{{Start: 0, End: 0}})
+	err = SetApproval(suite, wctx, charlie, aliceAccountNum, 0, []*types.Balance{
+		{
+			Balance: 0,
+			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+		},
+	})
 	suite.Require().Nil(err, "Error setting approval")
 }
 
 func (suite *TestSuite) TestApproveSelf() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	badgesToCreate := []BadgesToCreate{
+	collectionsToCreate := []CollectionsToCreate{
 		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-
-					InsertIdIdx: 10,
-				},
+			Collection: types.MsgNewCollection{
+				CollectionUri: "https://example.com",
+BadgeUri: "https://example.com/{id}",
 				Permissions: 62,
 			},
 			Amount:  1,
@@ -141,29 +143,34 @@ func (suite *TestSuite) TestApproveSelf() {
 		},
 	}
 
-	CreateBadges(suite, wctx, badgesToCreate)
-	badge, _ := GetBadge(suite, wctx, 0)
+	CreateCollections(suite, wctx, collectionsToCreate)
+	badge, _ := GetCollection(suite, wctx, 0)
 
-	//Create subbadge 1 with supply > 1
-	err := CreateSubBadges(suite, wctx, bob, 0, []*types.SubassetSupplyAndAmount{
+	//Create badge 1 with supply > 1
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 10000,
 			Amount: 1,
 		},
-	})
-	suite.Require().Nil(err, "Error creating subbadge")
-	badge, _ = GetBadge(suite, wctx, 0)
-	bobBalanceInfo, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
+	},)
+	suite.Require().Nil(err, "Error creating badge")
+	badge, _ = GetCollection(suite, wctx, 0)
+	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
 
-	suite.Require().Equal(uint64(1), badge.NextSubassetId)
-	suite.Require().Equal([]*types.BalanceObject{
+	suite.Require().Equal(uint64(1), badge.NextBadgeId)
+	suite.Require().Equal([]*types.Balance{
 		{
-			IdRanges: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+			BadgeIds: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
 			Balance:  10000,
 		},
-	}, badge.SubassetSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobBalanceInfo.BalanceAmounts)[0].Balance)
+	}, badge.MaxSupplys)
+	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
 
-	err = SetApproval(suite, wctx, bob, 1000, bobAccountNum, 0, []*types.IdRange{{Start: 0, End: 0}})
+	err = SetApproval(suite, wctx, bob, bobAccountNum, 0, []*types.Balance{
+		{
+			Balance: 1000,
+			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+		},
+	})
 	suite.Require().EqualError(err, keeper.ErrAccountCanNotEqualCreator.Error())
 }

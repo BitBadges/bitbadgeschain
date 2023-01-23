@@ -9,10 +9,10 @@ const TypeMsgUpdatePermissions = "update_permissions"
 
 var _ sdk.Msg = &MsgUpdatePermissions{}
 
-func NewMsgUpdatePermissions(creator string, badgeId uint64, permissions uint64) *MsgUpdatePermissions {
+func NewMsgUpdatePermissions(creator string, collectionId uint64, permissions uint64) *MsgUpdatePermissions {
 	return &MsgUpdatePermissions{
 		Creator:     creator,
-		BadgeId:     badgeId,
+		CollectionId: collectionId,
 		Permissions: permissions,
 	}
 }

@@ -20,7 +20,7 @@ func SimulateMsgTransferManager(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgTransferManager{
 			Creator: simAccount.Address.String(),
-			BadgeId: r.Uint64(),
+			CollectionId: r.Uint64(),
 			Address: r.Uint64(),
 		}
 

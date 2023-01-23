@@ -25,15 +25,10 @@ func CmdUpdateUris() *cobra.Command {
 			}
 
 			argUri := args[1]
-			argSubassetUri := args[2]
-			_ = argSubassetUri
+			argBadgeUri := args[2]
+			_ = argBadgeUri
 
 			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			uriObject, err := GetUriObject(argUri, argSubassetUri)
 			if err != nil {
 				return err
 			}
@@ -41,7 +36,8 @@ func CmdUpdateUris() *cobra.Command {
 			msg := types.NewMsgUpdateUris(
 				clientCtx.GetFromAddress().String(),
 				argBadgeId,
-				uriObject,
+				argUri,
+				argBadgeUri,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

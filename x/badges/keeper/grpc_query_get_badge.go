@@ -10,18 +10,18 @@ import (
 )
 
 // Queries a badge by its ID and returns its contents.
-func (k Keeper) GetBadge(goCtx context.Context, req *types.QueryGetBadgeRequest) (*types.QueryGetBadgeResponse, error) {
+func (k Keeper) GetCollection(goCtx context.Context, req *types.QueryGetCollectionRequest) (*types.QueryGetCollectionResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	badge, found := k.GetBadgeFromStore(ctx, req.Id)
+	badge, found := k.GetCollectionFromStore(ctx, req.Id)
 	if !found {
-		return nil, ErrBadgeNotExists
+		return nil, ErrCollectionNotExists
 	}
 
-	return &types.QueryGetBadgeResponse{
-		Badge: &badge,
+	return &types.QueryGetCollectionResponse{
+		Collection: &badge,
 	}, nil
 }

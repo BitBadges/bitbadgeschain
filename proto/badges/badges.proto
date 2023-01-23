@@ -3,42 +3,53 @@ package bitbadges.bitbadgeschain.badges;
 
 import "google/protobuf/any.proto";
 import "badges/ranges.proto";
-import "badges/uris.proto";
+import "badges/balances.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
-// BitBadge defines a badge type. Think of this like the smart contract definition.
-message BitBadge {
-    // id defines the unique identifier of the Badge classification, similar to the contract address of ERC721
-    // starts at 0 and increments by 1 each badge
-    uint64 id = 1;
-  
-    // uri object for the badge uri and subasset uris stored off chain. Stored in a special UriObject that attemtps to save space and avoid reused plaintext storage such as http:// and duplicate text for uri and subasset uris
-    // data returned should corresponds to the Badge standard defined.
-    UriObject uri = 2;
+// BadgeCollection defines a standard collection of badges.
+message BadgeCollection {
+    // The collectionId defines the unique identifier of the Badge classification, similar to the contract address of ERC721.
+    // This is assigned by the chain itself. All ids starts at 0 and increments by 1 each created badge.
+    uint64 collectionId = 1;
 
-    // these bytes can be used to store anything on-chain about the badge. This can be updatable or not depending on the permissions set.
-    // Max 256 bytes allowed
-    string arbitraryBytes = 3;
+    // The URI where to fetch the collection's metadata. Max 100 characters.
+    string collectionUri = 2; 
+
+    // The URI where to fetch each badge's metadata. Max 100 characters.
+    // Must include {id} in the URI to be replaced by the badge's id.
+    string badgeUri = 3;
+
+    // These are arbitrary bytes can be used to store anything on-chain about the badge (often used for a permanent hash).
+    // This can be updatable or not depending on the permissions set. Max 256 bytes allowed.
+    string bytes = 4;
     
-    // manager address of the class; can have special permissions; is used as the reserve address for the assets
-    uint64 manager = 4;
+    // The manager's account number of the badge. The manager can have special permissions. \
+    uint64 manager = 5;
     
-    //Store permissions packed in a uint where the bits correspond to permissions from left to right; leading zeroes are applied and any future additions will be appended to the right. See types/permissions.go
-    uint64 permissions = 5;
+    //Store permissions packed in a uint where the bits correspond to permissions from left to right.
+    //Leading zeroes are applied. See types/permissions.go
+    uint64 permissions = 6;
 
-    //FreezeRanges defines what addresses are frozen or unfrozen. If permissions.FrozenByDefault is false, this is used for frozen addresses. If true, this is used for unfrozen addresses.
-    repeated IdRange freezeRanges = 10;
+    //This defines the address combinations that cannot be transferred. 
+    //Used to freeze addresses and prevent transfers.
+    //If all addresses are disallowed, then the badge is non-transferable.
+    repeated TransferMapping disallowedTransfers = 7;
 
-    // Starts at 0. Each subasset created will incrementally have an increasing ID #. Can't overflow.
-    uint64 nextSubassetId = 12;
+    //This defines the address combinations that the manager is approved to execute (overrides disallowedTransfers).
+    //Example use case would be to set up the manager being able to forcefully revoke or forcefully burn badges.
+    //This can be updated, but addresses can only be removed, never added.
+    repeated TransferMapping managerApprovedTransfers = 8;
 
-    //Subasset supplys are stored if the subasset supply != default. Balance => SubbadgeIdRange map  
-    repeated BalanceObject subassetSupplys = 13;
-    
-    //Default subasset supply. If == 0, we assume == 1.
-    uint64 defaultSubassetSupply = 14;
+    //Badge ids start at 0. Each badge created will increment this by 1. Can't overflow.
+    uint64 nextBadgeId = 9;
 
-    //Defines what standard this badge should implement. Must obey the rules of that standard.
-    uint64 standard = 15;
+    //This is a map of the current badge supplys. 
+    repeated Balance unmintedSupplys = 10;
+
+    //This is a map of the maximum badge supplys. 
+    repeated Balance maxSupplys = 11;
+
+    //Defines what standard this badge should implement (see /standards).
+    uint64 standard = 12;
 }

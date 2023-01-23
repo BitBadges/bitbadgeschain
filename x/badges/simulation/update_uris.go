@@ -21,19 +21,9 @@ func SimulateMsgUpdateUris(
 
 		msg := &types.MsgUpdateUris{
 			Creator: simAccount.Address.String(),
-			BadgeId: r.Uint64(),
-			Uri: &types.UriObject{
-				Uri:          simtypes.RandStringOfLength(r, r.Intn(100)),
-				Scheme:       uint64(r.Intn(10)),
-				DecodeScheme: uint64(r.Intn(10)),
-				IdxRangeToRemove: &types.IdRange{
-					Start: uint64(r.Intn(10)),
-					End:   uint64(r.Intn(10)),
-				},
-				InsertSubassetBytesIdx: uint64(r.Intn(10)),
-				BytesToInsert:          simtypes.RandStringOfLength(r, r.Intn(100)),
-				InsertIdIdx:            uint64(r.Intn(10)),
-			},
+			CollectionId: r.Uint64(),
+			CollectionUri: simtypes.RandStringOfLength(r, r.Intn(100)),
+			BadgeUri: simtypes.RandStringOfLength(r, r.Intn(100)),
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

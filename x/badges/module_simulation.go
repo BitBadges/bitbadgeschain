@@ -27,26 +27,17 @@ const (
 	opWeightMsgNewBadge          = "op_weight_msg_new_badge"
 	defaultWeightMsgNewBadge int = 1000
 
-	opWeightMsgNewSubBadge          = "op_weight_msg_new_sub_badge"
-	defaultWeightMsgNewSubBadge int = 250
+	opWeightMsgMintBadge          = "op_weight_msg_new_sub_badge"
+	defaultWeightMsgMintBadge int = 250
 
 	opWeightMsgTransferBadge          = "op_weight_msg_transfer_badge"
 	defaultWeightMsgTransferBadge int = 10000
 
-	opWeightMsgRequestTransferBadge          = "op_weight_msg_request_transfer_badge"
-	defaultWeightMsgRequestTransferBadge int = 10000
-
-	opWeightMsgHandlePendingTransfer          = "op_weight_msg_handle_pending_transfer"
-	defaultWeightMsgHandlePendingTransfer int = 10000
-
 	opWeightMsgSetApproval          = "op_weight_msg_set_approval"
 	defaultWeightMsgSetApproval int = 500
 
-	opWeightMsgRevokeBadge          = "op_weight_msg_revoke_badge"
-	defaultWeightMsgRevokeBadge int = 100
-
-	opWeightMsgFreezeAddress          = "op_weight_msg_freeze_address"
-	defaultWeightMsgFreezeAddress int = 100
+	opWeightMsgUpdateDisallowedTransfers          = "op_weight_msg_freeze_address"
+	defaultWeightMsgUpdateDisallowedTransfers int = 100
 
 	opWeightMsgUpdateUris          = "op_weight_msg_update_uris"
 	defaultWeightMsgUpdateUris int = 100
@@ -59,12 +50,6 @@ const (
 
 	opWeightMsgRequestTransferManager          = "op_weight_msg_request_transfer_manager"
 	defaultWeightMsgRequestTransferManager int = 100
-
-	opWeightMsgSelfDestructBadge          = "op_weight_msg_self_destruct_badge"
-	defaultWeightMsgSelfDestructBadge int = 100
-
-	opWeightMsgPruneBalances          = "op_weight_msg_prune_balances"
-	defaultWeightMsgPruneBalances int = 500
 
 	opWeightMsgUpdateBytes          = "op_weight_msg_update_bytes"
 	defaultWeightMsgUpdateBytes int = 100
@@ -84,9 +69,9 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	badgesGenesis := types.GenesisState{
 		Params:      types.DefaultParams(),
 		PortId:      types.PortID,
-		NextBadgeId: 0,
-		Badges:      []*types.BitBadge{},
-		Balances:    []*types.UserBalanceInfo{},
+		NextCollectionId: 0,
+		Collections:      []*types.BadgeCollection{},
+		Balances:    []*types.UserBalance{},
 		BalanceIds:  []string{},
 		// this line is used by starport scaffolding # simapp/module/genesisState
 	}
@@ -119,18 +104,18 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgNewBadge,
-		badgessimulation.SimulateMsgNewBadge(am.accountKeeper, am.bankKeeper, am.keeper),
+		badgessimulation.SimulateMsgNewCollection(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgNewSubBadge int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgNewSubBadge, &weightMsgNewSubBadge, nil,
+	var weightMsgMintBadge int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgMintBadge, &weightMsgMintBadge, nil,
 		func(_ *rand.Rand) {
-			weightMsgNewSubBadge = defaultWeightMsgNewSubBadge
+			weightMsgMintBadge = defaultWeightMsgMintBadge
 		},
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgNewSubBadge,
-		badgessimulation.SimulateMsgNewSubBadge(am.accountKeeper, am.bankKeeper, am.keeper),
+		weightMsgMintBadge,
+		badgessimulation.SimulateMsgMintBadge(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	var weightMsgTransferBadge int
@@ -144,27 +129,6 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		badgessimulation.SimulateMsgTransferBadge(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgRequestTransferBadge int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgRequestTransferBadge, &weightMsgRequestTransferBadge, nil,
-		func(_ *rand.Rand) {
-			weightMsgRequestTransferBadge = defaultWeightMsgRequestTransferBadge
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgRequestTransferBadge,
-		badgessimulation.SimulateMsgRequestTransferBadge(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgHandlePendingTransfer int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgHandlePendingTransfer, &weightMsgHandlePendingTransfer, nil,
-		func(_ *rand.Rand) {
-			weightMsgHandlePendingTransfer = defaultWeightMsgHandlePendingTransfer
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgHandlePendingTransfer,
-		badgessimulation.SimulateMsgHandlePendingTransfer(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
 
 	var weightMsgSetApproval int
 	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgSetApproval, &weightMsgSetApproval, nil,
@@ -177,26 +141,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		badgessimulation.SimulateMsgSetApproval(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgRevokeBadge int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgRevokeBadge, &weightMsgRevokeBadge, nil,
-		func(_ *rand.Rand) {
-			weightMsgRevokeBadge = defaultWeightMsgRevokeBadge
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgRevokeBadge,
-		badgessimulation.SimulateMsgRevokeBadge(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
+	
 
-	var weightMsgFreezeAddress int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgFreezeAddress, &weightMsgFreezeAddress, nil,
+	var weightMsgUpdateDisallowedTransfers int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateDisallowedTransfers, &weightMsgUpdateDisallowedTransfers, nil,
 		func(_ *rand.Rand) {
-			weightMsgFreezeAddress = defaultWeightMsgFreezeAddress
+			weightMsgUpdateDisallowedTransfers = defaultWeightMsgUpdateDisallowedTransfers
 		},
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgFreezeAddress,
-		badgessimulation.SimulateMsgFreezeAddress(am.accountKeeper, am.bankKeeper, am.keeper),
+		weightMsgUpdateDisallowedTransfers,
+		badgessimulation.SimulateMsgUpdateDisallowedTransfers(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	var weightMsgUpdateUris int
@@ -241,28 +196,6 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgRequestTransferManager,
 		badgessimulation.SimulateMsgRequestTransferManager(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgSelfDestructBadge int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgSelfDestructBadge, &weightMsgSelfDestructBadge, nil,
-		func(_ *rand.Rand) {
-			weightMsgSelfDestructBadge = defaultWeightMsgSelfDestructBadge
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgSelfDestructBadge,
-		badgessimulation.SimulateMsgSelfDestructBadge(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgPruneBalances int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgPruneBalances, &weightMsgPruneBalances, nil,
-		func(_ *rand.Rand) {
-			weightMsgPruneBalances = defaultWeightMsgPruneBalances
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgPruneBalances,
-		badgessimulation.SimulateMsgPruneBalances(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	var weightMsgUpdateBytes int

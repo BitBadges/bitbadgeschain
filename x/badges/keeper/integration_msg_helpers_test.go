@@ -8,130 +8,147 @@ import (
 
 /* Query helpers */
 
-func GetBadge(suite *TestSuite, ctx context.Context, id uint64) (types.BitBadge, error) {
-	res, err := suite.app.BadgesKeeper.GetBadge(ctx, &types.QueryGetBadgeRequest{Id: uint64(id)})
+func GetClaim(suite *TestSuite, ctx context.Context, claimId uint64) (types.Claim, error) {
+	res, err := suite.app.BadgesKeeper.GetClaim(ctx, &types.QueryGetClaimRequest{ClaimId: uint64(claimId)})
 	if err != nil {
-		return types.BitBadge{}, err
+		return types.Claim{}, err
 	}
 
-	return *res.Badge, nil
+	return *res.Claim, nil
 }
 
-func GetUserBalance(suite *TestSuite, ctx context.Context, badgeId uint64, address uint64) (types.UserBalanceInfo, error) {
+func GetCollection(suite *TestSuite, ctx context.Context, id uint64) (types.BadgeCollection, error) {
+	res, err := suite.app.BadgesKeeper.GetCollection(ctx, &types.QueryGetCollectionRequest{Id: uint64(id)})
+	if err != nil {
+		return types.BadgeCollection{}, err
+	}
+
+	return *res.Collection, nil
+}
+
+func GetUserBalance(suite *TestSuite, ctx context.Context, collectionId uint64, address uint64) (types.UserBalance, error) {
 	res, err := suite.app.BadgesKeeper.GetBalance(ctx, &types.QueryGetBalanceRequest{
-		BadgeId: uint64(badgeId),
+		BadgeId: uint64(collectionId),
 		Address: uint64(address),
 	})
 	if err != nil {
-		return types.UserBalanceInfo{}, err
+		return types.UserBalance{}, err
 	}
 
-	return *res.BalanceInfo, nil
+	return *res.Balance, nil
 }
 
 /* Msg helpers */
 
-type BadgesToCreate struct {
-	Badge   types.MsgNewBadge
+type CollectionsToCreate struct {
+	Collection   types.MsgNewCollection
 	Amount  uint64
 	Creator string
 }
 
-func CreateBadges(suite *TestSuite, ctx context.Context, badgesToCreate []BadgesToCreate) error {
-	for _, badgeToCreate := range badgesToCreate {
-		for i := 0; i < int(badgeToCreate.Amount); i++ {
-			msg := types.NewMsgNewBadge(badgeToCreate.Creator, badgeToCreate.Badge.Standard, badgeToCreate.Badge.DefaultSubassetSupply, badgeToCreate.Badge.SubassetSupplysAndAmounts, badgeToCreate.Badge.Uri, badgeToCreate.Badge.Permissions, badgeToCreate.Badge.FreezeAddressRanges, badgeToCreate.Badge.ArbitraryBytes, badgeToCreate.Badge.WhitelistedRecipients)
-			_, err := suite.msgServer.NewBadge(ctx, msg)
+func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreate []CollectionsToCreate) error {
+	for _, collectionToCreate := range collectionsToCreate {
+		for i := 0; i < int(collectionToCreate.Amount); i++ {
+			msg := types.NewMsgNewCollection(collectionToCreate.Creator, collectionToCreate.Collection.Standard, collectionToCreate.Collection.BadgeSupplys, collectionToCreate.Collection.CollectionUri, collectionToCreate.Collection.BadgeUri, collectionToCreate.Collection.Permissions, collectionToCreate.Collection.DisallowedTransfers, collectionToCreate.Collection.ManagerApprovedTransfers, collectionToCreate.Collection.Bytes, collectionToCreate.Collection.Transfers, collectionToCreate.Collection.Claims)
+			_, err := suite.msgServer.NewCollection(ctx, msg)
 			if err != nil {
 				return err
 			}
-
 		}
 	}
 	return nil
 }
 
-func CreateSubBadges(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, supplysAndAmounts []*types.SubassetSupplyAndAmount) error {
-	msg := types.NewMsgNewSubBadge(creator, badgeId, supplysAndAmounts)
-	_, err := suite.msgServer.NewSubBadge(ctx, msg)
+func CreateBadges(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, supplysAndAmounts []*types.BadgeSupplyAndAmount, transfers []*types.Transfers, claims []*types.Claim) error {
+	msg := types.NewMsgMintBadge(creator, collectionId, supplysAndAmounts, transfers, claims)
+	_, err := suite.msgServer.MintBadge(ctx, msg)
 	return err
 }
 
-func RequestTransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, amount uint64, badgeId uint64, subbadgeRange []*types.IdRange, expirationTime uint64, cantCancelBeforeTime uint64) error {
-	msg := types.NewMsgRequestTransferBadge(creator, from, amount, badgeId, subbadgeRange, expirationTime, cantCancelBeforeTime)
-	_, err := suite.msgServer.RequestTransferBadge(ctx, msg)
+//Note: Only supports Bob and Alice and only supports supplysAndAmounts[0]
+func CreateBadgesAndMintAllToCreator(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, supplysAndAmounts []*types.BadgeSupplyAndAmount) error {
+	creatorAccountNum := uint64(0)
+	if creator == bob {
+		creatorAccountNum = bobAccountNum
+	}
+	if creator == alice {
+		creatorAccountNum = aliceAccountNum
+	}
+
+	collection, err := GetCollection(suite, ctx, collectionId)
+	if err != nil {
+		return err
+	}
+
+
+	transfers := []*types.Transfers{
+		{
+			ToAddresses: []uint64{creatorAccountNum},
+			Balances:    []*types.Balance{
+				{
+					Balance: supplysAndAmounts[0].Supply,
+					BadgeIds: []*types.IdRange{
+						{
+							Start: collection.NextBadgeId,
+							End:   collection.NextBadgeId + supplysAndAmounts[0].Amount - 1,
+						},
+					},
+				},
+			},
+		},
+	}
+
+
+	msg := types.NewMsgMintBadge(creator, collectionId, supplysAndAmounts, transfers, []*types.Claim{})
+	_, err = suite.msgServer.MintBadge(ctx, msg)
 	return err
 }
 
-func RevokeBadges(suite *TestSuite, ctx context.Context, creator string, addresses []uint64, amounts []uint64, badgeId uint64, subbadgeRange []*types.IdRange) error {
-	msg := types.NewMsgRevokeBadge(creator, addresses, amounts, badgeId, subbadgeRange)
-	_, err := suite.msgServer.RevokeBadge(ctx, msg)
-	return err
-}
-
-func TransferBadge(suite *TestSuite, ctx context.Context, creator string, from uint64, to []uint64, amounts []uint64, badgeId uint64, subbadgeRange []*types.IdRange, expirationTime uint64, cantCancelBeforeTime uint64) error {
-	msg := types.NewMsgTransferBadge(creator, from, to, amounts, badgeId, subbadgeRange, expirationTime, cantCancelBeforeTime)
+func TransferBadge(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, from uint64, transfers []*types.Transfers) error {
+	msg := types.NewMsgTransferBadge(creator, collectionId, from, transfers)
 	_, err := suite.msgServer.TransferBadge(ctx, msg)
 	return err
 }
 
-func SetApproval(suite *TestSuite, ctx context.Context, creator string, amount uint64, address uint64, badgeId uint64, subbadgeRange []*types.IdRange) error {
-	msg := types.NewMsgSetApproval(creator, amount, address, badgeId, subbadgeRange)
+func SetApproval(suite *TestSuite, ctx context.Context, creator string, address uint64, collectionId uint64, balances []*types.Balance) error {
+	msg := types.NewMsgSetApproval(creator, collectionId, address, balances)
 	_, err := suite.msgServer.SetApproval(ctx, msg)
 	return err
 }
 
-func HandlePendingTransfers(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, nonceRanges []*types.IdRange, actions []uint64) error {
-	msg := types.NewMsgHandlePendingTransfer(creator, badgeId, nonceRanges, actions)
-	_, err := suite.msgServer.HandlePendingTransfer(ctx, msg)
+func UpdateDisallowedTransfers(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, disallowedTransfers []*types.TransferMapping) error {
+	msg := types.NewMsgUpdateDisallowedTransfers(creator, collectionId, disallowedTransfers)
+	_, err := suite.msgServer.UpdateDisallowedTransfers(ctx, msg)
 	return err
 }
 
-func FreezeAddresses(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, add bool, addresses []*types.IdRange) error {
-	msg := types.NewMsgFreezeAddress(creator, badgeId, add, addresses)
-	_, err := suite.msgServer.FreezeAddress(ctx, msg)
-	return err
-}
-
-func RequestTransferManager(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, add bool) error {
-	msg := types.NewMsgRequestTransferManager(creator, badgeId, add)
+func RequestTransferManager(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, add bool) error {
+	msg := types.NewMsgRequestTransferManager(creator, collectionId, add)
 	_, err := suite.msgServer.RequestTransferManager(ctx, msg)
 	return err
 }
 
-func TransferManager(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, address uint64) error {
-	msg := types.NewMsgTransferManager(creator, badgeId, address)
+func TransferManager(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, address uint64) error {
+	msg := types.NewMsgTransferManager(creator, collectionId, address)
 	_, err := suite.msgServer.TransferManager(ctx, msg)
 	return err
 }
 
-func UpdateURIs(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, uri *types.UriObject) error {
-	msg := types.NewMsgUpdateUris(creator, badgeId, uri)
+func UpdateURIs(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, collectionUri string, badgeUri string) error {
+	msg := types.NewMsgUpdateUris(creator, collectionId, collectionUri, badgeUri)
 	_, err := suite.msgServer.UpdateUris(ctx, msg)
 	return err
 }
 
-func UpdatePermissions(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, permissions uint64) error {
-	msg := types.NewMsgUpdatePermissions(creator, badgeId, permissions)
+func UpdatePermissions(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, permissions uint64) error {
+	msg := types.NewMsgUpdatePermissions(creator, collectionId, permissions)
 	_, err := suite.msgServer.UpdatePermissions(ctx, msg)
 	return err
 }
 
-func UpdateBytes(suite *TestSuite, ctx context.Context, creator string, badgeId uint64, bytes string) error {
-	msg := types.NewMsgUpdateBytes(creator, badgeId, bytes)
+func UpdateBytes(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, bytes string) error {
+	msg := types.NewMsgUpdateBytes(creator, collectionId, bytes)
 	_, err := suite.msgServer.UpdateBytes(ctx, msg)
-	return err
-}
-
-func SelfDestructBadge(suite *TestSuite, ctx context.Context, creator string, badgeId uint64) error {
-	msg := types.NewMsgSelfDestructBadge(creator, badgeId)
-	_, err := suite.msgServer.SelfDestructBadge(ctx, msg)
-	return err
-}
-
-func PruneBalances(suite *TestSuite, ctx context.Context, creator string, addresses []uint64, badgeIds []uint64) error {
-	msg := types.NewMsgPruneBalances(creator, badgeIds, addresses)
-	_, err := suite.msgServer.PruneBalances(ctx, msg)
 	return err
 }
 

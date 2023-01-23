@@ -23,45 +23,54 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// BitBadge defines a badge type. Think of this like the smart contract definition.
-type BitBadge struct {
-	// id defines the unique identifier of the Badge classification, similar to the contract address of ERC721
-	// starts at 0 and increments by 1 each badge
-	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	// uri object for the badge uri and subasset uris stored off chain. Stored in a special UriObject that attemtps to save space and avoid reused plaintext storage such as http:// and duplicate text for uri and subasset uris
-	// data returned should corresponds to the Badge standard defined.
-	Uri *UriObject `protobuf:"bytes,2,opt,name=uri,proto3" json:"uri,omitempty"`
-	// these bytes can be used to store anything on-chain about the badge. This can be updatable or not depending on the permissions set.
-	// Max 256 bytes allowed
-	ArbitraryBytes string `protobuf:"bytes,3,opt,name=arbitraryBytes,proto3" json:"arbitraryBytes,omitempty"`
-	// manager address of the class; can have special permissions; is used as the reserve address for the assets
-	Manager uint64 `protobuf:"varint,4,opt,name=manager,proto3" json:"manager,omitempty"`
-	//Store permissions packed in a uint where the bits correspond to permissions from left to right; leading zeroes are applied and any future additions will be appended to the right. See types/permissions.go
-	Permissions uint64 `protobuf:"varint,5,opt,name=permissions,proto3" json:"permissions,omitempty"`
-	//FreezeRanges defines what addresses are frozen or unfrozen. If permissions.FrozenByDefault is false, this is used for frozen addresses. If true, this is used for unfrozen addresses.
-	FreezeRanges []*IdRange `protobuf:"bytes,10,rep,name=freezeRanges,proto3" json:"freezeRanges,omitempty"`
-	// Starts at 0. Each subasset created will incrementally have an increasing ID #. Can't overflow.
-	NextSubassetId uint64 `protobuf:"varint,12,opt,name=nextSubassetId,proto3" json:"nextSubassetId,omitempty"`
-	//Subasset supplys are stored if the subasset supply != default. Balance => SubbadgeIdRange map
-	SubassetSupplys []*BalanceObject `protobuf:"bytes,13,rep,name=subassetSupplys,proto3" json:"subassetSupplys,omitempty"`
-	//Default subasset supply. If == 0, we assume == 1.
-	DefaultSubassetSupply uint64 `protobuf:"varint,14,opt,name=defaultSubassetSupply,proto3" json:"defaultSubassetSupply,omitempty"`
-	//Defines what standard this badge should implement. Must obey the rules of that standard.
-	Standard uint64 `protobuf:"varint,15,opt,name=standard,proto3" json:"standard,omitempty"`
+// BadgeCollection defines a standard collection of badges.
+type BadgeCollection struct {
+	// The collectionId defines the unique identifier of the Badge classification, similar to the contract address of ERC721.
+	// This is assigned by the chain itself. All ids starts at 0 and increments by 1 each created badge.
+	CollectionId uint64 `protobuf:"varint,1,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
+	// The URI where to fetch the collection's metadata. Max 100 characters.
+	CollectionUri string `protobuf:"bytes,2,opt,name=collectionUri,proto3" json:"collectionUri,omitempty"`
+	// The URI where to fetch each badge's metadata. Max 100 characters.
+	// Must include {id} in the URI to be replaced by the badge's id.
+	BadgeUri string `protobuf:"bytes,3,opt,name=badgeUri,proto3" json:"badgeUri,omitempty"`
+	// These are arbitrary bytes can be used to store anything on-chain about the badge (often used for a permanent hash).
+	// This can be updatable or not depending on the permissions set. Max 256 bytes allowed.
+	Bytes string `protobuf:"bytes,4,opt,name=bytes,proto3" json:"bytes,omitempty"`
+	// The manager's account number of the badge. The manager can have special permissions. \
+	Manager uint64 `protobuf:"varint,5,opt,name=manager,proto3" json:"manager,omitempty"`
+	//Store permissions packed in a uint where the bits correspond to permissions from left to right.
+	//Leading zeroes are applied. See types/permissions.go
+	Permissions uint64 `protobuf:"varint,6,opt,name=permissions,proto3" json:"permissions,omitempty"`
+	//This defines the address combinations that cannot be transferred.
+	//Used to freeze addresses and prevent transfers.
+	//If all addresses are disallowed, then the badge is non-transferable.
+	DisallowedTransfers []*TransferMapping `protobuf:"bytes,7,rep,name=disallowedTransfers,proto3" json:"disallowedTransfers,omitempty"`
+	//This defines the address combinations that the manager is approved to execute (overrides disallowedTransfers).
+	//Example use case would be to set up the manager being able to forcefully revoke or forcefully burn badges.
+	//This can be updated, but addresses can only be removed, never added.
+	ManagerApprovedTransfers []*TransferMapping `protobuf:"bytes,8,rep,name=managerApprovedTransfers,proto3" json:"managerApprovedTransfers,omitempty"`
+	//Badge ids start at 0. Each badge created will increment this by 1. Can't overflow.
+	NextBadgeId uint64 `protobuf:"varint,9,opt,name=nextBadgeId,proto3" json:"nextBadgeId,omitempty"`
+	//This is a map of the current badge supplys.
+	UnmintedSupplys []*Balance `protobuf:"bytes,10,rep,name=unmintedSupplys,proto3" json:"unmintedSupplys,omitempty"`
+	//This is a map of the maximum badge supplys.
+	MaxSupplys []*Balance `protobuf:"bytes,11,rep,name=maxSupplys,proto3" json:"maxSupplys,omitempty"`
+	//Defines what standard this badge should implement (see /standards).
+	Standard uint64 `protobuf:"varint,12,opt,name=standard,proto3" json:"standard,omitempty"`
 }
 
-func (m *BitBadge) Reset()         { *m = BitBadge{} }
-func (m *BitBadge) String() string { return proto.CompactTextString(m) }
-func (*BitBadge) ProtoMessage()    {}
-func (*BitBadge) Descriptor() ([]byte, []int) {
+func (m *BadgeCollection) Reset()         { *m = BadgeCollection{} }
+func (m *BadgeCollection) String() string { return proto.CompactTextString(m) }
+func (*BadgeCollection) ProtoMessage()    {}
+func (*BadgeCollection) Descriptor() ([]byte, []int) {
 	return fileDescriptor_71eab594b779f631, []int{0}
 }
-func (m *BitBadge) XXX_Unmarshal(b []byte) error {
+func (m *BadgeCollection) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *BitBadge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *BadgeCollection) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_BitBadge.Marshal(b, m, deterministic)
+		return xxx_messageInfo_BadgeCollection.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -71,82 +80,96 @@ func (m *BitBadge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *BitBadge) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_BitBadge.Merge(m, src)
+func (m *BadgeCollection) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BadgeCollection.Merge(m, src)
 }
-func (m *BitBadge) XXX_Size() int {
+func (m *BadgeCollection) XXX_Size() int {
 	return m.Size()
 }
-func (m *BitBadge) XXX_DiscardUnknown() {
-	xxx_messageInfo_BitBadge.DiscardUnknown(m)
+func (m *BadgeCollection) XXX_DiscardUnknown() {
+	xxx_messageInfo_BadgeCollection.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_BitBadge proto.InternalMessageInfo
+var xxx_messageInfo_BadgeCollection proto.InternalMessageInfo
 
-func (m *BitBadge) GetId() uint64 {
+func (m *BadgeCollection) GetCollectionId() uint64 {
 	if m != nil {
-		return m.Id
+		return m.CollectionId
 	}
 	return 0
 }
 
-func (m *BitBadge) GetUri() *UriObject {
+func (m *BadgeCollection) GetCollectionUri() string {
 	if m != nil {
-		return m.Uri
-	}
-	return nil
-}
-
-func (m *BitBadge) GetArbitraryBytes() string {
-	if m != nil {
-		return m.ArbitraryBytes
+		return m.CollectionUri
 	}
 	return ""
 }
 
-func (m *BitBadge) GetManager() uint64 {
+func (m *BadgeCollection) GetBadgeUri() string {
+	if m != nil {
+		return m.BadgeUri
+	}
+	return ""
+}
+
+func (m *BadgeCollection) GetBytes() string {
+	if m != nil {
+		return m.Bytes
+	}
+	return ""
+}
+
+func (m *BadgeCollection) GetManager() uint64 {
 	if m != nil {
 		return m.Manager
 	}
 	return 0
 }
 
-func (m *BitBadge) GetPermissions() uint64 {
+func (m *BadgeCollection) GetPermissions() uint64 {
 	if m != nil {
 		return m.Permissions
 	}
 	return 0
 }
 
-func (m *BitBadge) GetFreezeRanges() []*IdRange {
+func (m *BadgeCollection) GetDisallowedTransfers() []*TransferMapping {
 	if m != nil {
-		return m.FreezeRanges
+		return m.DisallowedTransfers
 	}
 	return nil
 }
 
-func (m *BitBadge) GetNextSubassetId() uint64 {
+func (m *BadgeCollection) GetManagerApprovedTransfers() []*TransferMapping {
 	if m != nil {
-		return m.NextSubassetId
-	}
-	return 0
-}
-
-func (m *BitBadge) GetSubassetSupplys() []*BalanceObject {
-	if m != nil {
-		return m.SubassetSupplys
+		return m.ManagerApprovedTransfers
 	}
 	return nil
 }
 
-func (m *BitBadge) GetDefaultSubassetSupply() uint64 {
+func (m *BadgeCollection) GetNextBadgeId() uint64 {
 	if m != nil {
-		return m.DefaultSubassetSupply
+		return m.NextBadgeId
 	}
 	return 0
 }
 
-func (m *BitBadge) GetStandard() uint64 {
+func (m *BadgeCollection) GetUnmintedSupplys() []*Balance {
+	if m != nil {
+		return m.UnmintedSupplys
+	}
+	return nil
+}
+
+func (m *BadgeCollection) GetMaxSupplys() []*Balance {
+	if m != nil {
+		return m.MaxSupplys
+	}
+	return nil
+}
+
+func (m *BadgeCollection) GetStandard() uint64 {
 	if m != nil {
 		return m.Standard
 	}
@@ -154,40 +177,42 @@ func (m *BitBadge) GetStandard() uint64 {
 }
 
 func init() {
-	proto.RegisterType((*BitBadge)(nil), "bitbadges.bitbadgeschain.badges.BitBadge")
+	proto.RegisterType((*BadgeCollection)(nil), "bitbadges.bitbadgeschain.badges.BadgeCollection")
 }
 
 func init() { proto.RegisterFile("badges/badges.proto", fileDescriptor_71eab594b779f631) }
 
 var fileDescriptor_71eab594b779f631 = []byte{
-	// 384 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x52, 0xc1, 0x6a, 0xe3, 0x30,
-	0x10, 0x8d, 0xe3, 0xec, 0x6e, 0x56, 0xc9, 0x26, 0xac, 0x96, 0x05, 0xad, 0x0f, 0x5e, 0xb3, 0x87,
-	0xc5, 0xf4, 0x60, 0x43, 0xda, 0x63, 0x4f, 0xbe, 0x05, 0x02, 0x05, 0x87, 0x42, 0xe9, 0x4d, 0xb2,
-	0x14, 0x47, 0xc5, 0x91, 0x8d, 0x24, 0x43, 0xdc, 0xaf, 0xe8, 0x67, 0xf5, 0x98, 0x63, 0x4f, 0xa5,
-	0x24, 0x3f, 0x52, 0x22, 0x3b, 0xa6, 0x09, 0x85, 0x9c, 0x3c, 0xf3, 0xde, 0xbc, 0x79, 0xcf, 0x62,
-	0xc0, 0x2f, 0x82, 0x69, 0xca, 0x54, 0x58, 0x7f, 0x82, 0x42, 0xe6, 0x3a, 0x87, 0x7f, 0x09, 0xd7,
-	0x0d, 0xd0, 0x56, 0xc9, 0x12, 0x73, 0x11, 0xd4, 0xb5, 0xf3, 0x27, 0xcd, 0xf3, 0x34, 0x63, 0xa1,
-	0x19, 0x27, 0xe5, 0x22, 0xc4, 0xa2, 0xaa, 0xb5, 0xce, 0x61, 0xa1, 0xc4, 0xa2, 0x5d, 0xe8, 0xfc,
-	0x6c, 0xc0, 0x52, 0xf2, 0x06, 0xfa, 0xf7, 0x6a, 0x83, 0x7e, 0xc4, 0x75, 0xb4, 0x27, 0xe0, 0x08,
-	0x74, 0x39, 0x45, 0x96, 0x67, 0xf9, 0xbd, 0xb8, 0xcb, 0x29, 0xbc, 0x06, 0x76, 0x29, 0x39, 0xea,
-	0x7a, 0x96, 0x3f, 0x98, 0x5c, 0x04, 0x67, 0xe2, 0x04, 0xb7, 0x92, 0xdf, 0x90, 0x07, 0x96, 0xe8,
-	0x78, 0x2f, 0x83, 0xff, 0xc1, 0x08, 0x4b, 0xc2, 0xb5, 0xc4, 0xb2, 0x8a, 0x2a, 0xcd, 0x14, 0xb2,
-	0x3d, 0xcb, 0xff, 0x1e, 0x9f, 0xa0, 0x10, 0x81, 0x6f, 0x2b, 0x2c, 0x70, 0xca, 0x24, 0xea, 0x19,
-	0xeb, 0x43, 0x0b, 0x3d, 0x30, 0x28, 0x98, 0x5c, 0x71, 0xa5, 0x78, 0x2e, 0x14, 0xfa, 0x62, 0xd8,
-	0x8f, 0x10, 0x9c, 0x81, 0xe1, 0x42, 0x32, 0xf6, 0xc8, 0x62, 0xf3, 0x9f, 0x08, 0x78, 0xb6, 0x3f,
-	0x98, 0xf8, 0x67, 0xa3, 0x4e, 0xa9, 0x11, 0xc4, 0x47, 0xea, 0x7d, 0x62, 0xc1, 0xd6, 0x7a, 0x5e,
-	0x12, 0xac, 0x14, 0xd3, 0x53, 0x8a, 0x86, 0xc6, 0xf2, 0x04, 0x85, 0x77, 0x60, 0xac, 0x9a, 0x6e,
-	0x5e, 0x16, 0x45, 0x56, 0x29, 0xf4, 0xc3, 0x18, 0x07, 0x67, 0x8d, 0x23, 0x9c, 0x61, 0x91, 0xb0,
-	0xe6, 0x9d, 0x4e, 0xd7, 0xc0, 0x2b, 0xf0, 0x9b, 0xb2, 0x05, 0x2e, 0xb3, 0xd6, 0xae, 0x66, 0xd0,
-	0xc8, 0x04, 0xf9, 0x9c, 0x84, 0x0e, 0xe8, 0x2b, 0x8d, 0x05, 0xc5, 0x92, 0xa2, 0xb1, 0x19, 0x6c,
-	0xfb, 0x68, 0xf6, 0xbc, 0x75, 0xad, 0xcd, 0xd6, 0xb5, 0xde, 0xb6, 0xae, 0xf5, 0xb4, 0x73, 0x3b,
-	0x9b, 0x9d, 0xdb, 0x79, 0xd9, 0xb9, 0x9d, 0xfb, 0x49, 0xca, 0xf5, 0xb2, 0x24, 0x41, 0x92, 0xaf,
-	0xc2, 0x36, 0x6c, 0x78, 0x1c, 0x3b, 0x5c, 0x37, 0x27, 0x19, 0xea, 0xaa, 0x60, 0x8a, 0x7c, 0x35,
-	0x57, 0x73, 0xf9, 0x1e, 0x00, 0x00, 0xff, 0xff, 0x94, 0x3c, 0x4b, 0x04, 0xb0, 0x02, 0x00, 0x00,
+	// 404 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x53, 0xbd, 0xce, 0xd3, 0x30,
+	0x14, 0x6d, 0xf8, 0xfa, 0xfd, 0xb9, 0x45, 0x95, 0x5c, 0x90, 0x4c, 0x86, 0x10, 0x55, 0x0c, 0x99,
+	0x12, 0x54, 0x9e, 0x80, 0xb2, 0x50, 0x09, 0x96, 0x00, 0x0b, 0x9b, 0x13, 0xbb, 0xa9, 0x25, 0xc7,
+	0xb6, 0x6c, 0x07, 0x9a, 0xb7, 0xe0, 0xb1, 0x18, 0x3b, 0x32, 0xa2, 0xf6, 0x21, 0x58, 0x51, 0x9c,
+	0x26, 0xa4, 0x08, 0x54, 0xc1, 0x14, 0x9f, 0x73, 0xef, 0x3d, 0xe7, 0x38, 0xb6, 0xc1, 0x3c, 0xc3,
+	0xa4, 0xa0, 0x26, 0x69, 0x3f, 0xb1, 0xd2, 0xd2, 0x4a, 0xf8, 0x34, 0x63, 0xf6, 0x44, 0xf4, 0xab,
+	0x7c, 0x8b, 0x99, 0x88, 0xdb, 0xb5, 0xff, 0xa4, 0x90, 0xb2, 0xe0, 0x34, 0x71, 0xed, 0x59, 0xb5,
+	0x49, 0xb0, 0xa8, 0xdb, 0x59, 0xbf, 0x13, 0xd4, 0x58, 0xf4, 0x82, 0xfe, 0xe3, 0xde, 0x85, 0x63,
+	0x91, 0x77, 0xf4, 0xe2, 0xc7, 0x18, 0xcc, 0x56, 0x4d, 0xe5, 0x95, 0xe4, 0x9c, 0xe6, 0x96, 0x49,
+	0x01, 0x17, 0x60, 0x9a, 0xf7, 0x68, 0x4d, 0x90, 0x17, 0x7a, 0xd1, 0x38, 0x3d, 0xe3, 0xe0, 0x33,
+	0xf0, 0xf0, 0x17, 0xfe, 0xa0, 0x19, 0x7a, 0x10, 0x7a, 0xd1, 0x7d, 0x7a, 0x4e, 0x42, 0x1f, 0xdc,
+	0x39, 0xdb, 0xa6, 0xe1, 0xca, 0x35, 0xf4, 0x18, 0x3e, 0x02, 0xd7, 0x59, 0x6d, 0xa9, 0x41, 0x63,
+	0x57, 0x68, 0x01, 0x44, 0xe0, 0xb6, 0xc4, 0x02, 0x17, 0x54, 0xa3, 0x6b, 0x67, 0xdb, 0x41, 0x18,
+	0x82, 0x89, 0xa2, 0xba, 0x64, 0xc6, 0x30, 0x29, 0x0c, 0xba, 0x71, 0xd5, 0x21, 0x05, 0x33, 0x30,
+	0x27, 0xcc, 0x60, 0xce, 0xe5, 0x67, 0x4a, 0xde, 0x6b, 0x2c, 0xcc, 0x86, 0x6a, 0x83, 0x6e, 0xc3,
+	0xab, 0x68, 0xb2, 0x7c, 0x1e, 0x5f, 0xf8, 0xa3, 0x71, 0x37, 0xf1, 0x16, 0x2b, 0xc5, 0x44, 0x91,
+	0xfe, 0x49, 0x0c, 0x72, 0x80, 0x4e, 0x81, 0x5e, 0x2a, 0xa5, 0xe5, 0xa7, 0xa1, 0xd1, 0xdd, 0x7f,
+	0x1a, 0xfd, 0x55, 0xb1, 0xd9, 0xb3, 0xa0, 0x3b, 0xeb, 0x0e, 0x68, 0x4d, 0xd0, 0x7d, 0xbb, 0xe7,
+	0x01, 0x05, 0x53, 0x30, 0xab, 0x44, 0xc9, 0x84, 0xa5, 0xe4, 0x5d, 0xa5, 0x14, 0xaf, 0x0d, 0x02,
+	0x2e, 0x46, 0x74, 0x31, 0xc6, 0xaa, 0xbd, 0x09, 0xe9, 0xef, 0x02, 0xf0, 0x35, 0x00, 0x25, 0xde,
+	0x75, 0x72, 0x93, 0x7f, 0x94, 0x1b, 0xcc, 0x36, 0xe7, 0x6f, 0x2c, 0x16, 0x04, 0x6b, 0x82, 0xa6,
+	0x2e, 0x7c, 0x8f, 0x57, 0x6f, 0xbe, 0x1e, 0x02, 0x6f, 0x7f, 0x08, 0xbc, 0xef, 0x87, 0xc0, 0xfb,
+	0x72, 0x0c, 0x46, 0xfb, 0x63, 0x30, 0xfa, 0x76, 0x0c, 0x46, 0x1f, 0x97, 0x05, 0xb3, 0xdb, 0x2a,
+	0x8b, 0x73, 0x59, 0x26, 0xbd, 0x57, 0x72, 0xee, 0x9a, 0xec, 0x4e, 0xef, 0x25, 0xb1, 0xb5, 0xa2,
+	0x26, 0xbb, 0x71, 0xd7, 0xf9, 0xc5, 0xcf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x19, 0x50, 0xab, 0xf5,
+	0x4d, 0x03, 0x00, 0x00,
 }
 
-func (m *BitBadge) Marshal() (dAtA []byte, err error) {
+func (m *BadgeCollection) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -197,12 +222,12 @@ func (m *BitBadge) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *BitBadge) MarshalTo(dAtA []byte) (int, error) {
+func (m *BadgeCollection) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *BitBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *BadgeCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -210,17 +235,12 @@ func (m *BitBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if m.Standard != 0 {
 		i = encodeVarintBadges(dAtA, i, uint64(m.Standard))
 		i--
-		dAtA[i] = 0x78
+		dAtA[i] = 0x60
 	}
-	if m.DefaultSubassetSupply != 0 {
-		i = encodeVarintBadges(dAtA, i, uint64(m.DefaultSubassetSupply))
-		i--
-		dAtA[i] = 0x70
-	}
-	if len(m.SubassetSupplys) > 0 {
-		for iNdEx := len(m.SubassetSupplys) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.MaxSupplys) > 0 {
+		for iNdEx := len(m.MaxSupplys) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.SubassetSupplys[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.MaxSupplys[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -228,18 +248,13 @@ func (m *BitBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintBadges(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x6a
+			dAtA[i] = 0x5a
 		}
 	}
-	if m.NextSubassetId != 0 {
-		i = encodeVarintBadges(dAtA, i, uint64(m.NextSubassetId))
-		i--
-		dAtA[i] = 0x60
-	}
-	if len(m.FreezeRanges) > 0 {
-		for iNdEx := len(m.FreezeRanges) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.UnmintedSupplys) > 0 {
+		for iNdEx := len(m.UnmintedSupplys) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.FreezeRanges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.UnmintedSupplys[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -250,37 +265,72 @@ func (m *BitBadge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x52
 		}
 	}
+	if m.NextBadgeId != 0 {
+		i = encodeVarintBadges(dAtA, i, uint64(m.NextBadgeId))
+		i--
+		dAtA[i] = 0x48
+	}
+	if len(m.ManagerApprovedTransfers) > 0 {
+		for iNdEx := len(m.ManagerApprovedTransfers) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ManagerApprovedTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintBadges(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x42
+		}
+	}
+	if len(m.DisallowedTransfers) > 0 {
+		for iNdEx := len(m.DisallowedTransfers) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.DisallowedTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintBadges(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
 	if m.Permissions != 0 {
 		i = encodeVarintBadges(dAtA, i, uint64(m.Permissions))
 		i--
-		dAtA[i] = 0x28
+		dAtA[i] = 0x30
 	}
 	if m.Manager != 0 {
 		i = encodeVarintBadges(dAtA, i, uint64(m.Manager))
 		i--
-		dAtA[i] = 0x20
+		dAtA[i] = 0x28
 	}
-	if len(m.ArbitraryBytes) > 0 {
-		i -= len(m.ArbitraryBytes)
-		copy(dAtA[i:], m.ArbitraryBytes)
-		i = encodeVarintBadges(dAtA, i, uint64(len(m.ArbitraryBytes)))
+	if len(m.Bytes) > 0 {
+		i -= len(m.Bytes)
+		copy(dAtA[i:], m.Bytes)
+		i = encodeVarintBadges(dAtA, i, uint64(len(m.Bytes)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.BadgeUri) > 0 {
+		i -= len(m.BadgeUri)
+		copy(dAtA[i:], m.BadgeUri)
+		i = encodeVarintBadges(dAtA, i, uint64(len(m.BadgeUri)))
 		i--
 		dAtA[i] = 0x1a
 	}
-	if m.Uri != nil {
-		{
-			size, err := m.Uri.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintBadges(dAtA, i, uint64(size))
-		}
+	if len(m.CollectionUri) > 0 {
+		i -= len(m.CollectionUri)
+		copy(dAtA[i:], m.CollectionUri)
+		i = encodeVarintBadges(dAtA, i, uint64(len(m.CollectionUri)))
 		i--
 		dAtA[i] = 0x12
 	}
-	if m.Id != 0 {
-		i = encodeVarintBadges(dAtA, i, uint64(m.Id))
+	if m.CollectionId != 0 {
+		i = encodeVarintBadges(dAtA, i, uint64(m.CollectionId))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -298,20 +348,24 @@ func encodeVarintBadges(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *BitBadge) Size() (n int) {
+func (m *BadgeCollection) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Id != 0 {
-		n += 1 + sovBadges(uint64(m.Id))
+	if m.CollectionId != 0 {
+		n += 1 + sovBadges(uint64(m.CollectionId))
 	}
-	if m.Uri != nil {
-		l = m.Uri.Size()
+	l = len(m.CollectionUri)
+	if l > 0 {
 		n += 1 + l + sovBadges(uint64(l))
 	}
-	l = len(m.ArbitraryBytes)
+	l = len(m.BadgeUri)
+	if l > 0 {
+		n += 1 + l + sovBadges(uint64(l))
+	}
+	l = len(m.Bytes)
 	if l > 0 {
 		n += 1 + l + sovBadges(uint64(l))
 	}
@@ -321,23 +375,32 @@ func (m *BitBadge) Size() (n int) {
 	if m.Permissions != 0 {
 		n += 1 + sovBadges(uint64(m.Permissions))
 	}
-	if len(m.FreezeRanges) > 0 {
-		for _, e := range m.FreezeRanges {
+	if len(m.DisallowedTransfers) > 0 {
+		for _, e := range m.DisallowedTransfers {
 			l = e.Size()
 			n += 1 + l + sovBadges(uint64(l))
 		}
 	}
-	if m.NextSubassetId != 0 {
-		n += 1 + sovBadges(uint64(m.NextSubassetId))
-	}
-	if len(m.SubassetSupplys) > 0 {
-		for _, e := range m.SubassetSupplys {
+	if len(m.ManagerApprovedTransfers) > 0 {
+		for _, e := range m.ManagerApprovedTransfers {
 			l = e.Size()
 			n += 1 + l + sovBadges(uint64(l))
 		}
 	}
-	if m.DefaultSubassetSupply != 0 {
-		n += 1 + sovBadges(uint64(m.DefaultSubassetSupply))
+	if m.NextBadgeId != 0 {
+		n += 1 + sovBadges(uint64(m.NextBadgeId))
+	}
+	if len(m.UnmintedSupplys) > 0 {
+		for _, e := range m.UnmintedSupplys {
+			l = e.Size()
+			n += 1 + l + sovBadges(uint64(l))
+		}
+	}
+	if len(m.MaxSupplys) > 0 {
+		for _, e := range m.MaxSupplys {
+			l = e.Size()
+			n += 1 + l + sovBadges(uint64(l))
+		}
 	}
 	if m.Standard != 0 {
 		n += 1 + sovBadges(uint64(m.Standard))
@@ -351,7 +414,7 @@ func sovBadges(x uint64) (n int) {
 func sozBadges(x uint64) (n int) {
 	return sovBadges(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *BitBadge) Unmarshal(dAtA []byte) error {
+func (m *BadgeCollection) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -374,17 +437,17 @@ func (m *BitBadge) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: BitBadge: wiretype end group for non-group")
+			return fmt.Errorf("proto: BadgeCollection: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: BitBadge: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: BadgeCollection: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
 			}
-			m.Id = 0
+			m.CollectionId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowBadges
@@ -394,50 +457,14 @@ func (m *BitBadge) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Id |= uint64(b&0x7F) << shift
+				m.CollectionId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowBadges
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthBadges
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthBadges
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Uri == nil {
-				m.Uri = &UriObject{}
-			}
-			if err := m.Uri.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ArbitraryBytes", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionUri", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -465,9 +492,73 @@ func (m *BitBadge) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ArbitraryBytes = string(dAtA[iNdEx:postIndex])
+			m.CollectionUri = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BadgeUri", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBadges
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthBadges
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthBadges
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.BadgeUri = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Bytes", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBadges
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthBadges
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthBadges
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Bytes = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Manager", wireType)
 			}
@@ -486,7 +577,7 @@ func (m *BitBadge) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 5:
+		case 6:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Permissions", wireType)
 			}
@@ -505,9 +596,9 @@ func (m *BitBadge) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 10:
+		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FreezeRanges", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DisallowedTransfers", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -534,84 +625,133 @@ func (m *BitBadge) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.FreezeRanges = append(m.FreezeRanges, &IdRange{})
-			if err := m.FreezeRanges[len(m.FreezeRanges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.DisallowedTransfers = append(m.DisallowedTransfers, &TransferMapping{})
+			if err := m.DisallowedTransfers[len(m.DisallowedTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ManagerApprovedTransfers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBadges
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthBadges
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthBadges
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ManagerApprovedTransfers = append(m.ManagerApprovedTransfers, &TransferMapping{})
+			if err := m.ManagerApprovedTransfers[len(m.ManagerApprovedTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NextBadgeId", wireType)
+			}
+			m.NextBadgeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBadges
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NextBadgeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UnmintedSupplys", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBadges
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthBadges
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthBadges
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UnmintedSupplys = append(m.UnmintedSupplys, &Balance{})
+			if err := m.UnmintedSupplys[len(m.UnmintedSupplys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxSupplys", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBadges
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthBadges
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthBadges
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.MaxSupplys = append(m.MaxSupplys, &Balance{})
+			if err := m.MaxSupplys[len(m.MaxSupplys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 12:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NextSubassetId", wireType)
-			}
-			m.NextSubassetId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowBadges
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.NextSubassetId |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 13:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SubassetSupplys", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowBadges
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthBadges
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthBadges
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.SubassetSupplys = append(m.SubassetSupplys, &BalanceObject{})
-			if err := m.SubassetSupplys[len(m.SubassetSupplys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 14:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DefaultSubassetSupply", wireType)
-			}
-			m.DefaultSubassetSupply = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowBadges
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.DefaultSubassetSupply |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 15:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Standard", wireType)
 			}

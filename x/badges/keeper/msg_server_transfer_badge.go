@@ -13,46 +13,62 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	accsToCheck := []uint64{msg.From}
-	accsToCheck = append(accsToCheck, msg.ToAddresses...)
+	for _, transfer := range msg.Transfers {
+		accsToCheck = append(accsToCheck, transfer.ToAddresses...)
+	}
+
+	rangesToValidate := []*types.IdRange{}
+	for _, transfer := range msg.Transfers {
+		for _, balance := range transfer.Balances {
+			for _, badgeIdRange := range balance.BadgeIds {
+				rangesToValidate = append(rangesToValidate, badgeIdRange)
+			}
+		}
+	}
 
 	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:                     msg.Creator,
-		BadgeId:                     msg.BadgeId,
-		SubbadgeRangesToValidate:    msg.SubbadgeRanges,
+		CollectionId:                     msg.CollectionId,
+		BadgeIdRangesToValidate:    	 rangesToValidate,
 		AccountsToCheckRegistration: accsToCheck,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	fromBalanceKey := ConstructBalanceKey(msg.From, msg.BadgeId)
-	fromUserBalanceInfo, found := k.Keeper.GetUserBalanceFromStore(ctx, fromBalanceKey)
+	fromBalanceKey := ConstructBalanceKey(msg.From, msg.CollectionId)
+	fromUserBalance, found := k.Keeper.GetUserBalanceFromStore(ctx, fromBalanceKey)
 	if !found {
 		return nil, ErrUserBalanceNotExists
 	}
 
-	for _, to := range msg.ToAddresses {
-		toBalanceKey := ConstructBalanceKey(to, msg.BadgeId)
-		toUserBalanceInfo, found := k.Keeper.GetUserBalanceFromStore(ctx, toBalanceKey)
-		if !found {
-			toUserBalanceInfo = types.UserBalanceInfo{}
-		}
-
-		for _, amount := range msg.Amounts {
-			for _, subbadgeRange := range msg.SubbadgeRanges {
-				fromUserBalanceInfo, toUserBalanceInfo, err = HandleTransfer(badge, subbadgeRange, fromUserBalanceInfo, toUserBalanceInfo, amount, msg.From, to, CreatorAccountNum, msg.ExpirationTime, msg.CantCancelBeforeTime)
-				if err != nil {
-					return nil, err
-				}
+	for _, transfer := range msg.Transfers {
+		for _, to := range transfer.ToAddresses {
+			toBalanceKey := ConstructBalanceKey(to, msg.CollectionId)
+			toUserBalance, found := k.Keeper.GetUserBalanceFromStore(ctx, toBalanceKey)
+			if !found {
+				toUserBalance = types.UserBalance{}
 			}
-		}
+			
+			for _, balance := range transfer.Balances {
+				amount := balance.Balance
 
-		if err := k.SetUserBalanceInStore(ctx, toBalanceKey, GetBalanceInfoToInsertToStorage(toUserBalanceInfo)); err != nil {
-			return nil, err
+				for _, badgeIdRange := range balance.BadgeIds {
+					fromUserBalance, toUserBalance, err = HandleTransfer(badge, badgeIdRange, fromUserBalance, toUserBalance, amount, msg.From, to, CreatorAccountNum)
+					if err != nil {
+						return nil, err
+					}
+				}
+				
+			}
+
+			if err := k.SetUserBalanceInStore(ctx, toBalanceKey, GetBalanceToInsertToStorage(toUserBalance)); err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	if err := k.SetUserBalanceInStore(ctx, fromBalanceKey, GetBalanceInfoToInsertToStorage(fromUserBalanceInfo)); err != nil {
+	if err := k.SetUserBalanceInStore(ctx, fromBalanceKey, GetBalanceToInsertToStorage(fromUserBalance)); err != nil {
 		return nil, err
 	}
 
@@ -60,11 +76,9 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeyAction, "TransferBadge"),
-			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.BadgeId)),
-			sdk.NewAttribute("SubbadgeRanges", fmt.Sprint(msg.SubbadgeRanges)),
-			sdk.NewAttribute("Amounts", fmt.Sprint(msg.Amounts)),
+			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.CollectionId)),
+			sdk.NewAttribute("BadgeIdRanges", fmt.Sprint(msg.Transfers)),
 			sdk.NewAttribute("From", fmt.Sprint(msg.From)),
-			sdk.NewAttribute("To", fmt.Sprint(msg.ToAddresses)),
 		),
 	)
 

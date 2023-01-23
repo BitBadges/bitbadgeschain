@@ -8,6 +8,7 @@ import "badges/params.proto";
 // this line is used by starport scaffolding # 1
 import "badges/badges.proto";
 import "badges/balances.proto";
+import "badges/claims.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
@@ -18,9 +19,14 @@ service Query {
     option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/params";
   }
   // Queries a list of GetBadge items.
-	rpc GetBadge(QueryGetBadgeRequest) returns (QueryGetBadgeResponse) {
-		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_badge/{id}";
+	rpc GetCollection(QueryGetCollectionRequest) returns (QueryGetCollectionResponse) {
+		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_collection/{id}";
 	}
+
+    rpc GetClaim(QueryGetClaimRequest) returns (QueryGetClaimResponse) {
+		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_claim/{claimId}";
+	}
+
 // Queries a list of GetBalance items.
 	rpc GetBalance(QueryGetBalanceRequest) returns (QueryGetBalanceResponse) {
 		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_balance/{badgeId}/{address}";
@@ -42,21 +48,31 @@ message QueryParamsResponse {
   Params params = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryGetBadgeRequest {
+message QueryGetCollectionRequest {
   uint64 id = 1;
 }
 
-message QueryGetBadgeResponse {
-  BitBadge badge = 1;
+message QueryGetCollectionResponse {
+  BadgeCollection collection = 1;
+}
+
+
+
+message QueryGetClaimRequest {
+    uint64 claimId = 1;
+  }
+  
+message QueryGetClaimResponse {
+    Claim claim = 1;
 }
 
 message QueryGetAddressByIdRequest {
     uint64 id = 1;
-  }
-  
-  message QueryGetAddressByIdResponse {
+}
+
+message QueryGetAddressByIdResponse {
     string address = 1;
-  }
+}
 
 message QueryGetBalanceRequest {
   uint64 badgeId = 1;
@@ -64,7 +80,7 @@ message QueryGetBalanceRequest {
 }
 
 message QueryGetBalanceResponse {
-  UserBalanceInfo balanceInfo = 1;
+  UserBalance balance = 1;
 }
 
 // this line is used by starport scaffolding # 3

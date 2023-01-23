@@ -3,27 +3,23 @@ package bitbadges.bitbadgeschain.badges;
 
 // this line is used by starport scaffolding # proto/tx/import
 import "badges/ranges.proto";
-import "badges/uris.proto";
 import "badges/balances.proto";
+import "badges/claims.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 // Msg defines the Msg service.
 service Msg {
-    rpc NewBadge(MsgNewBadge) returns (MsgNewBadgeResponse);
-    rpc NewSubBadge(MsgNewSubBadge) returns (MsgNewSubBadgeResponse);
+    rpc NewCollection(MsgNewCollection) returns (MsgNewCollectionResponse);
+    rpc MintBadge(MsgMintBadge) returns (MsgMintBadgeResponse);
     rpc TransferBadge(MsgTransferBadge) returns (MsgTransferBadgeResponse);
-    rpc RequestTransferBadge(MsgRequestTransferBadge) returns (MsgRequestTransferBadgeResponse);
-    rpc HandlePendingTransfer(MsgHandlePendingTransfer) returns (MsgHandlePendingTransferResponse);
     rpc SetApproval(MsgSetApproval) returns (MsgSetApprovalResponse);
-    rpc RevokeBadge(MsgRevokeBadge) returns (MsgRevokeBadgeResponse);
-    rpc FreezeAddress(MsgFreezeAddress) returns (MsgFreezeAddressResponse);
+    rpc UpdateDisallowedTransfers(MsgUpdateDisallowedTransfers) returns (MsgUpdateDisallowedTransfersResponse);
+    rpc UpdateManagerApprovedTransfers(MsgUpdateManagerApprovedTransfers) returns (MsgUpdateManagerApprovedTransfersResponse);
     rpc UpdateUris(MsgUpdateUris) returns (MsgUpdateUrisResponse);
     rpc UpdatePermissions(MsgUpdatePermissions) returns (MsgUpdatePermissionsResponse);
     rpc TransferManager(MsgTransferManager) returns (MsgTransferManagerResponse);
     rpc RequestTransferManager(MsgRequestTransferManager) returns (MsgRequestTransferManagerResponse);
-    rpc SelfDestructBadge(MsgSelfDestructBadge) returns (MsgSelfDestructBadgeResponse);
-    rpc PruneBalances(MsgPruneBalances) returns (MsgPruneBalancesResponse);
     rpc UpdateBytes(MsgUpdateBytes) returns (MsgUpdateBytesResponse);
     rpc RegisterAddresses(MsgRegisterAddresses) returns (MsgRegisterAddressesResponse);
     // this line is used by starport scaffolding # proto/tx/rpc
@@ -31,121 +27,100 @@ service Msg {
 
 //The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
 
-message SubassetSupplyAndAmount {
+//BadgeSupplyAndAmount is used to define the supply and amount of badges to create.
+//We create x amount of badges each with a supply of y.
+message BadgeSupplyAndAmount {
     uint64 supply = 1;
     uint64 amount = 2;
 }
 
-message MsgNewBadge {
+//Upon badge creation, the manager will first be minted these badges, and then, they will subsequently be transferred to these addresses according to permissions.ForcefulTransfers.
+//Used to only need one signature for MsgNewBadge.
+message Transfers {
+    repeated uint64 toAddresses = 1;
+    repeated Balance balances = 2;
+}
+
+message MsgNewCollection {
     // See badges.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
     string creator = 1; 
-    UriObject uri = 2;
+    string collectionUri = 2;
+    string badgeUri = 3;
+
     uint64 permissions = 4;
-    string arbitraryBytes = 5;
-    uint64 defaultSubassetSupply = 6;
-    repeated IdRange freezeAddressRanges = 9;
-    uint64 standard = 10; 
-
-    //Subasset supplys and amounts to create. For each idx, we create amounts[idx] subbadges each with a supply of supplys[idx].
+    string bytes = 5;
+    repeated TransferMapping disallowedTransfers = 6;
+    repeated TransferMapping managerApprovedTransfers = 7;
+    uint64 standard = 8; 
+    //Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
     //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
-    repeated SubassetSupplyAndAmount subassetSupplysAndAmounts = 7;
-
-    repeated WhitelistMintInfo whitelistedRecipients = 11;
+    repeated BadgeSupplyAndAmount badgeSupplys = 9;
+    repeated Transfers transfers = 10;
+    repeated Claim claims = 11;
 }
 
-message MsgNewBadgeResponse {
-    uint64 id = 1; //ID of created badge
+message MsgNewCollectionResponse {
+    uint64 collectionId = 1; //ID of created badge collection
 }
 
-message MsgNewSubBadge {
+//This handles both minting more of existing badges and creating new badges.
+message MsgMintBadge {
     string creator = 1;
-    uint64 badgeId = 2;
-
-    //Subasset supplys and amounts to create must be same length. For each idx, we create amounts[idx] subbadges each with a supply of supplys[idx].
-    //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
-    repeated SubassetSupplyAndAmount subassetSupplysAndAmounts = 7;
+    uint64 collectionId = 2;
+    repeated BadgeSupplyAndAmount badgeSupplys = 3;
+    repeated Transfers transfers = 4;
+    repeated Claim claims = 5;
 }
 
-message MsgNewSubBadgeResponse {
-    uint64 nextSubassetId = 1; //ID of next subbadgeId after creating all subbadges.
+message MsgMintBadgeResponse {
+    uint64 nextBadgeId = 1; //ID of next badgeId after creating all badges.
 }
 
-//For each amount, for each toAddress, we will attempt to transfer all the subbadgeIds for the badge with ID badgeId.
+//For each amount, for each toAddress, we will attempt to transfer all the badgeIds for the badge with ID badgeId.
 message MsgTransferBadge {
     string creator = 1;
-    uint64 from = 2;
-    repeated uint64 toAddresses = 3;
-    repeated uint64 amounts = 4;
-    uint64 badgeId = 5;
-    repeated IdRange subbadgeRanges = 6;
-    uint64 expirationTime = 7; //If 0, never expires and assumed to be the max possible time.
-    uint64 cantCancelBeforeTime = 8; //If 0, always cancellable. Must be <= expirationTime.
+    uint64 collectionId = 2;
+    uint64 from = 3;
+    repeated Transfers transfers = 4;
 }
 
 message MsgTransferBadgeResponse {}
 
-//For each amount, for each toAddress, we will request a transfer all the subbadgeIds for the badge with ID badgeId. Other party must approve / reject the transfer request.
-message MsgRequestTransferBadge {
-    string creator = 1;
-    uint64 from = 2;
-    uint64 amount = 4;
-    uint64 badgeId = 5;
-    repeated IdRange subbadgeRanges = 6;
-    uint64 expirationTime = 7; //If 0, never expires and assumed to be the max possible time.
-    uint64 cantCancelBeforeTime = 8; //If 0, always cancellable. Must be <= expirationTime.
-}
-
-message MsgRequestTransferBadgeResponse {}
-
-//For all pending transfers of the badge where ThisPendingNonce is within some nonceRange in nonceRanges, we accept or deny the pending transfer.
-message MsgHandlePendingTransfer {
-    string creator = 1;
-    repeated uint64 actions = 2; //0 = deny, 1 = approve, 2 = forceful accept; //If len == 1, we apply the action to all, else must be equal length to nonceRanges.
-    uint64 badgeId = 3;
-    repeated IdRange nonceRanges = 4;
-}
-
-
-message MsgHandlePendingTransferResponse {}
-
 //Sets an approval (no add or remove), just set it for an address.
 message MsgSetApproval {
     string creator = 1;
-    uint64 amount = 2;
-    uint64 address = 3;
-    uint64 badgeId = 4;
-    repeated IdRange subbadgeRanges = 5;
+    uint64 collectionId = 2;
+    uint64 address = 3; //The address that are approved to transfer the balances.
+    repeated Balance balances = 4; //approval balances for every badgeId
 }
 
 message MsgSetApprovalResponse {}
 
-//For each address and for each amount, revoke badge.
-message MsgRevokeBadge {
-    string creator = 1;
-    repeated uint64 addresses = 2;
-    repeated uint64 amounts = 3;
-    uint64 badgeId = 4;
-    repeated IdRange subbadgeRanges = 5;
-}
 
-message MsgRevokeBadgeResponse {}
-
-//Add or remove addreses from the freeze address range
-message MsgFreezeAddress {
+message MsgUpdateDisallowedTransfers {
   string creator = 1;
-  repeated IdRange addressRanges = 2;
-  uint64 badgeId = 3;
-  bool  add = 4;
+  uint64 collectionId = 2;
+  repeated TransferMapping disallowedTransfers = 3;
 }
 
-message MsgFreezeAddressResponse {
+message MsgUpdateDisallowedTransfersResponse {
+}
+
+message MsgUpdateManagerApprovedTransfers {
+    string creator = 1;
+    uint64 collectionId = 2;
+    repeated TransferMapping managerApprovedTransfers = 3;
+}
+  
+message MsgUpdateManagerApprovedTransfersResponse {
 }
 
 //Update badge Uris with new URI object, if permitted.
 message MsgUpdateUris {
   string creator = 1;
-  uint64 badgeId = 2;
-  UriObject uri = 3;
+  uint64 collectionId = 2;
+  string collectionUri = 3;
+  string badgeUri = 4;
 }
 
 message MsgUpdateUrisResponse {
@@ -154,7 +129,7 @@ message MsgUpdateUrisResponse {
 //Update badge permissions with new permissions, if permitted.
 message MsgUpdatePermissions {
   string creator = 1;
-  uint64 badgeId = 2;
+  uint64 collectionId = 2;
   uint64 permissions = 3;
 }
 
@@ -164,7 +139,7 @@ message MsgUpdatePermissionsResponse {
 //Transfer manager to this address. Recipient must have made a request.
 message MsgTransferManager {
   string creator = 1;
-  uint64 badgeId = 2;
+  uint64 collectionId = 2;
   uint64 address = 3;
 }
 
@@ -174,36 +149,17 @@ message MsgTransferManagerResponse {
 //Add / remove request for manager to be transferred. 
 message MsgRequestTransferManager {
   string creator = 1;
-  uint64 badgeId = 2;
-  bool add = 3;
+  uint64 collectionId = 2;
+  bool addRequest = 3;
 }
 
 message MsgRequestTransferManagerResponse {
 }
 
-//Self destructs the badge, if permitted.
-message MsgSelfDestructBadge {
-  string creator = 1;
-  uint64 badgeId = 2;
-}
-
-message MsgSelfDestructBadgeResponse {
-}
-
-//Prunes balances of self destructed badges. Can be called by anyone
-message MsgPruneBalances {
-  string creator = 1;
-  repeated uint64 badgeIds = 2;
-  repeated uint64 addresses = 3;
-}
-
-message MsgPruneBalancesResponse {
-}
-
 //Update badge bytes, if permitted
 message MsgUpdateBytes {
   string creator = 1;
-  uint64 badgeId = 2;
+  uint64 collectionId = 2;
   string newBytes = 3;
 }
 

@@ -12,16 +12,11 @@ func (suite *TestSuite) TestUpdateURIs() {
 	_, err := sdk.AccAddressFromBech32(alice)
 	suite.Require().Nil(err, "Address %s failed to parse")
 
-	badgesToCreate := []BadgesToCreate{
+	collectionsToCreate := []CollectionsToCreate{
 		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-					InsertIdIdx:            10,
-				},
+			Collection: types.MsgNewCollection{
+				BadgeUri: "https://example.com/{id}",
+				CollectionUri: "https://example.com",
 				Permissions: 62 + 128,
 			},
 			Amount:  1,
@@ -29,27 +24,14 @@ func (suite *TestSuite) TestUpdateURIs() {
 		},
 	}
 
-	err = CreateBadges(suite, wctx, badgesToCreate)
+	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	err = UpdateURIs(suite, wctx, bob, 0, &types.UriObject{
-		Uri:                    "example.com/",
-		Scheme:                 1,
-		IdxRangeToRemove:       &types.IdRange{},
-		InsertSubassetBytesIdx: 0,
-
-		InsertIdIdx: 10,
-	})
+	err = UpdateURIs(suite, wctx, bob, 0, "https://example.com", "https://example.com/{id}")
 	suite.Require().Nil(err, "Error updating uris")
-	badge, _ := GetBadge(suite, wctx, 0)
-	suite.Require().Equal(&types.UriObject{
-		Uri:                    "example.com/",
-		Scheme:                 1,
-		IdxRangeToRemove:       &types.IdRange{},
-		InsertSubassetBytesIdx: 0,
-
-		InsertIdIdx: 10,
-	}, badge.Uri)
+	badge, _ := GetCollection(suite, wctx, 0)
+	suite.Require().Equal("https://example.com", badge.CollectionUri)
+	suite.Require().Equal("https://example.com/{id}", badge.BadgeUri)
 
 	err = UpdatePermissions(suite, wctx, bob, 0, 60+128)
 	suite.Require().Nil(err, "Error updating permissions")
@@ -64,17 +46,11 @@ func (suite *TestSuite) TestCantUpdate() {
 	_, err := sdk.AccAddressFromBech32(alice)
 	suite.Require().Nil(err, "Address %s failed to parse")
 
-	badgesToCreate := []BadgesToCreate{
+	collectionsToCreate := []CollectionsToCreate{
 		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-
-					InsertIdIdx: 10,
-				},
+			Collection: types.MsgNewCollection{
+				CollectionUri: "https://example.com",
+BadgeUri: "https://example.com/{id}",
 				Permissions: 0,
 			},
 			Amount:  1,
@@ -82,17 +58,10 @@ func (suite *TestSuite) TestCantUpdate() {
 		},
 	}
 
-	err = CreateBadges(suite, wctx, badgesToCreate)
+	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	err = UpdateURIs(suite, wctx, bob, 0, &types.UriObject{
-		Uri:                    "example.com/",
-		Scheme:                 1,
-		IdxRangeToRemove:       &types.IdRange{},
-		InsertSubassetBytesIdx: 0,
-
-		InsertIdIdx: 10,
-	})
+	err = UpdateURIs(suite, wctx, bob, 0, "https://example.com", "https://example.com/{id}")
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 
 	err = UpdatePermissions(suite, wctx, bob, 0, 123)
@@ -108,17 +77,11 @@ func (suite *TestSuite) TestCantUpdateNotManager() {
 	_, err := sdk.AccAddressFromBech32(alice)
 	suite.Require().Nil(err, "Address %s failed to parse")
 
-	badgesToCreate := []BadgesToCreate{
+	collectionsToCreate := []CollectionsToCreate{
 		{
-			Badge: types.MsgNewBadge{
-				Uri: &types.UriObject{
-					Uri:                    "example.com/",
-					Scheme:                 1,
-					IdxRangeToRemove:       &types.IdRange{},
-					InsertSubassetBytesIdx: 0,
-
-					InsertIdIdx: 10,
-				},
+			Collection: types.MsgNewCollection{
+				CollectionUri: "https://example.com",
+BadgeUri: "https://example.com/{id}",
 				Permissions: 0,
 			},
 			Amount:  1,
@@ -126,17 +89,10 @@ func (suite *TestSuite) TestCantUpdateNotManager() {
 		},
 	}
 
-	err = CreateBadges(suite, wctx, badgesToCreate)
+	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	err = UpdateURIs(suite, wctx, alice, 0, &types.UriObject{
-		Uri:                    "example.com/",
-		Scheme:                 1,
-		IdxRangeToRemove:       &types.IdRange{},
-		InsertSubassetBytesIdx: 0,
-
-		InsertIdIdx: 10,
-	})
+	err = UpdateURIs(suite, wctx, alice, 0, "https://example.com", "https://example.com/{id}")
 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
 
 	err = UpdatePermissions(suite, wctx, alice, 0, 77)

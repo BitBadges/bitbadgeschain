@@ -7,13 +7,6 @@ import (
 	"github.com/spf13/cast"
 )
 
-func GetUriObject(uri string, subassetUri string) (*types.UriObject, error) {
-	//TODO: get uri object from uri and subasset uri
-	return &types.UriObject{
-		Uri: uri,
-	}, nil
-}
-
 func GetIdRange(start uint64, end uint64) *types.IdRange {
 	return &types.IdRange{
 		Start: start,
@@ -22,43 +15,44 @@ func GetIdRange(start uint64, end uint64) *types.IdRange {
 }
 
 func GetIdArrFromString(str string) ([]uint64, error) {
-	argStartingNonces := strings.Split(str, listSeparator)
+	argStartValues := strings.Split(str, listSeparator)
 
-	argStartingNoncesUint64 := []uint64{}
-	for _, nonce := range argStartingNonces {
-		nonceAsUint64, err := cast.ToUint64E(nonce)
+	argStartValuesUint64 := []uint64{}
+	for _, val := range argStartValues {
+		valAsUint64, err := cast.ToUint64E(val)
 		if err != nil {
 			return nil, err
 		}
 
-		argStartingNoncesUint64 = append(argStartingNoncesUint64, nonceAsUint64)
+		argStartValuesUint64 = append(argStartValuesUint64, valAsUint64)
 	}
 
-	return argStartingNoncesUint64, nil
+	return argStartValuesUint64, nil
 }
 
-func GetIdRanges(startStrs string, endStrs string) ([]*types.IdRange, error) {
-	argStartingNoncesUint64, err := GetIdArrFromString(startStrs)
+//Start and end strings should be comma separated list of ids
+func GetIdRanges(startStr string, endStr string) ([]*types.IdRange, error) {
+	argStartValuesUint64, err := GetIdArrFromString(startStr)
 	if err != nil {
 		return nil, err
 	}
 
-	argEndingNoncesUint64, err := GetIdArrFromString(endStrs)
+	argEndingValuesUint64, err := GetIdArrFromString(endStr)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(argStartingNoncesUint64) != len(argEndingNoncesUint64) {
+	if len(argStartValuesUint64) != len(argEndingValuesUint64) {
 		return nil, types.ErrInvalidArgumentLengths
 	}
 
-	nonceRanges := []*types.IdRange{}
-	for i := 0; i < len(argStartingNoncesUint64); i++ {
-		nonceRanges = append(nonceRanges, &types.IdRange{
-			Start: argStartingNoncesUint64[i],
-			End:   argEndingNoncesUint64[i],
+	ranges := []*types.IdRange{}
+	for i := 0; i < len(argStartValuesUint64); i++ {
+		ranges = append(ranges, &types.IdRange{
+			Start: argStartValuesUint64[i],
+			End:   argEndingValuesUint64[i],
 		})
 	}
 
-	return nonceRanges, nil
+	return ranges, nil
 }

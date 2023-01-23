@@ -6,7 +6,7 @@ package keeper
 const (
 	FixedCostPerMsg                 = 0
 	BadgeCost                       = 0
-	SubbadgeWithSupplyNotEqualToOne = 0
+	BadgeWithSupplyNotEqualToOne = 0
 	FreezeOrUnfreezeAddress         = 0
 	SimpleAdjustBalanceOrApproval   = 0
 	AddOrRemovePending              = 0
