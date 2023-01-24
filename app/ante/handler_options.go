@@ -65,7 +65,7 @@ func newCosmosAnteHandlerEip712(options HandlerOptions) sdk.AnteHandler {
 		ante.NewSetUpContextDecorator(),
 		// NOTE: extensions option decorator removed
 		// ante.NewRejectExtensionOptionsDecorator(),
-		
+
 		// ante.NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),
 		ante.NewTxTimeoutHeightDecorator(),

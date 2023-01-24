@@ -47,11 +47,10 @@ func CmdSetApproval() *cobra.Command {
 				argAddress,
 				[]*types.Balance{
 					{
-						Balance: argAmount,
+						Balance:  argAmount,
 						BadgeIds: argBadgeIdRanges,
 					},
 				},
-				
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

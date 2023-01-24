@@ -14,8 +14,8 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 
 				DisallowedTransfers: []*types.TransferMapping{
 					{
@@ -47,7 +47,7 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	// badge, _ := GetCollection(suite, wctx, 0)
 
@@ -95,8 +95,8 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri: "https://example.com/{id}",
-				Permissions: 23,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   23,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -112,7 +112,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 
@@ -153,15 +153,14 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 
 	suite.Require().Equal(uint64(5000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, alicebalance.Balances)[0].Balance)
 
-
 	err = UpdateDisallowedTransfers(suite, wctx, bob, 0, []*types.TransferMapping{
 		{
 			From: &types.Addresses{
-				AccountNums: []*types.IdRange{{Start: aliceAccountNum, End: aliceAccountNum}},
+				AccountNums:    []*types.IdRange{{Start: aliceAccountNum, End: aliceAccountNum}},
 				ManagerOptions: types.ManagerOptions_Neutral,
 			},
 			To: &types.Addresses{
-				AccountNums: []*types.IdRange{{Start: 0, End: math.MaxUint64}},
+				AccountNums:    []*types.IdRange{{Start: 0, End: math.MaxUint64}},
 				ManagerOptions: types.ManagerOptions_Neutral,
 			},
 		},
@@ -189,7 +188,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 }
 
-//TODO: 
+//TODO:
 
 // func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefault() {
 // 	wctx := sdk.WrapSDKContext(suite.ctx)

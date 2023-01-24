@@ -13,7 +13,7 @@ func (k msgServer) UpdateManagerApprovedTransfers(goCtx context.Context, msg *ty
 
 	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:       msg.Creator,
-		CollectionId:       msg.CollectionId,
+		CollectionId:  msg.CollectionId,
 		MustBeManager: true,
 	})
 	if err != nil {

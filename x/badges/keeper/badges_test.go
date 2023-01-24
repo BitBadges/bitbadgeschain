@@ -15,8 +15,8 @@ func (suite *TestSuite) TestGetCollection() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com/",
-				BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -40,9 +40,9 @@ func (suite *TestSuite) TestGetBadgeAndAssertBadges() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				BadgeUri: "https://example.com/{id}",
+				BadgeUri:      "https://example.com/{id}",
 				CollectionUri: "https://example.com",
-				Permissions:             62,
+				Permissions:   62,
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
 						Supply: 1,
@@ -89,9 +89,9 @@ func (suite *TestSuite) TestCreateBadges() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				BadgeUri: "https://example.com/{id}",
+				BadgeUri:      "https://example.com/{id}",
 				CollectionUri: "https://example.com",
-				Permissions: 62,
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -126,7 +126,6 @@ func (suite *TestSuite) TestCreateBadges() {
 		},
 	}, []*types.Claim{}, bob)
 	suite.Require().Nil(err, "Error creating subassets: %s")
-
 
 	suite.Require().Equal(badge.MaxSupplys, []*types.Balance{
 		{

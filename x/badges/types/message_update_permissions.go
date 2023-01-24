@@ -11,9 +11,9 @@ var _ sdk.Msg = &MsgUpdatePermissions{}
 
 func NewMsgUpdatePermissions(creator string, collectionId uint64, permissions uint64) *MsgUpdatePermissions {
 	return &MsgUpdatePermissions{
-		Creator:     creator,
+		Creator:      creator,
 		CollectionId: collectionId,
-		Permissions: permissions,
+		Permissions:  permissions,
 	}
 }
 

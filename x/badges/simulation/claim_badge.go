@@ -10,7 +10,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 )
 
-func SimulateMsgMintBadge(
+func SimulateMsgClaimBadge(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	k keeper.Keeper,
@@ -18,20 +18,12 @@ func SimulateMsgMintBadge(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		randomSubassets := []*types.BadgeSupplyAndAmount{}
-		for i := 0; i < r.Intn(10); i++ {
-			randomSubassets = append(randomSubassets, &types.BadgeSupplyAndAmount{
-				Supply: r.Uint64(),
-				Amount: r.Uint64(),
-			})
+		msg := &types.MsgClaimBadge{
+			Creator: simAccount.Address.String(),
 		}
 
-		msg := &types.MsgMintBadge{
-			Creator:      simAccount.Address.String(),
-			CollectionId: r.Uint64(),
-			BadgeSupplys: randomSubassets,
-		}
+		// TODO: Handling the ClaimBadge simulation
 
-		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
+		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "ClaimBadge simulation not implemented"), nil, nil
 	}
 }

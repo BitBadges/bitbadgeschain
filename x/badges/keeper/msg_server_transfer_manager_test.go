@@ -13,8 +13,8 @@ func (suite *TestSuite) TestTransferManager() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 127,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   127,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -30,7 +30,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
@@ -50,8 +50,8 @@ func (suite *TestSuite) TestRequestTransferManager() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 127,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   127,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -67,7 +67,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
@@ -93,8 +93,8 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 127,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   127,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -110,7 +110,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
@@ -130,8 +130,8 @@ func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri: "https://example.com/{id}",
-				Permissions: 23,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   23,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -147,7 +147,7 @@ func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 
 	err = RequestTransferManager(suite, wctx, alice, 0, true)
@@ -161,8 +161,8 @@ func (suite *TestSuite) TestManagerCantBeTransferred() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri: "https://example.com/{id}",
-				Permissions: 0,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   0,
 			},
 			Amount:  1,
 			Creator: bob,

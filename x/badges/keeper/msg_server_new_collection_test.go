@@ -16,9 +16,9 @@ func (suite *TestSuite) TestNewCollections() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				BadgeUri: "https://example.com/{id}",
+				BadgeUri:      "https://example.com/{id}",
 				CollectionUri: "https://example.com",
-				Permissions: 62,
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -35,8 +35,8 @@ func (suite *TestSuite) TestNewCollections() {
 
 	// Verify badge details are correct
 	suite.Require().Equal(uint64(0), badge.NextBadgeId)
-	suite.Require().Equal("https://example.com" , badge.CollectionUri)
-	suite.Require().Equal("https://example.com/{id}" , badge.BadgeUri)
+	suite.Require().Equal("https://example.com", badge.CollectionUri)
+	suite.Require().Equal("https://example.com/{id}", badge.BadgeUri)
 	suite.Require().Equal([]*types.Balance(nil), badge.MaxSupplys)
 	suite.Require().Equal(bobAccountNum, badge.Manager) //7 is the first ID it creates
 	suite.Require().Equal(perms, badge.Permissions)
@@ -54,7 +54,6 @@ func (suite *TestSuite) TestNewCollections() {
 	suite.Require().Equal(uint64(1), badge.CollectionId)
 }
 
-
 func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	perms := uint64(62)
@@ -65,7 +64,7 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				BadgeUri: "https://example.com/{id}",
+				BadgeUri:      "https://example.com/{id}",
 				CollectionUri: "https://example.com",
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
@@ -83,7 +82,7 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 								BadgeIds: []*types.IdRange{
 									{
 										Start: 0,
-										End: 4,
+										End:   4,
 									},
 								},
 							},
@@ -99,14 +98,12 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	
-
 	// Verify nextId increments correctly
 	nextId := suite.app.BadgesKeeper.GetNextCollectionId(suite.ctx)
 	suite.Require().Equal(uint64(1), nextId)
 
 	collection, _ := GetCollection(suite, wctx, 0)
-	
+
 	unmintedBalances := types.UserBalance{
 		Balances: collection.UnmintedSupplys,
 	}
@@ -115,7 +112,7 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 	suite.Require().Equal([]*types.IdRange{
 		{
 			Start: 5,
-			End: 9,
+			End:   9,
 		},
 	}, unmintedBalances.Balances[0].BadgeIds)
 
@@ -124,7 +121,7 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 	suite.Require().Equal([]*types.IdRange{
 		{
 			Start: 0,
-			End: 4,
+			End:   4,
 		},
 	}, aliceBalance.Balances[0].BadgeIds)
 
@@ -133,11 +130,10 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 	suite.Require().Equal([]*types.IdRange{
 		{
 			Start: 0,
-			End: 4,
+			End:   4,
 		},
 	}, charlieBalance.Balances[0].BadgeIds)
 }
-
 
 func (suite *TestSuite) TestNewBadgesWhitelistRecipientsOverflow() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -149,8 +145,8 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipientsOverflow() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				BadgeUri: "https://example.com/{id}",
-CollectionUri: "https://example.com",
+				BadgeUri:      "https://example.com/{id}",
+				CollectionUri: "https://example.com",
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
 						Supply: 10,
@@ -167,7 +163,7 @@ CollectionUri: "https://example.com",
 								BadgeIds: []*types.IdRange{
 									{
 										Start: 0,
-										End: 4,
+										End:   4,
 									},
 								},
 							},

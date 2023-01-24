@@ -41,9 +41,9 @@ func GetUserBalance(suite *TestSuite, ctx context.Context, collectionId uint64, 
 /* Msg helpers */
 
 type CollectionsToCreate struct {
-	Collection   types.MsgNewCollection
-	Amount  uint64
-	Creator string
+	Collection types.MsgNewCollection
+	Amount     uint64
+	Creator    string
 }
 
 func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreate []CollectionsToCreate) error {
@@ -80,11 +80,10 @@ func CreateBadgesAndMintAllToCreator(suite *TestSuite, ctx context.Context, crea
 		return err
 	}
 
-
 	transfers := []*types.Transfers{
 		{
 			ToAddresses: []uint64{creatorAccountNum},
-			Balances:    []*types.Balance{
+			Balances: []*types.Balance{
 				{
 					Balance: supplysAndAmounts[0].Supply,
 					BadgeIds: []*types.IdRange{
@@ -97,7 +96,6 @@ func CreateBadgesAndMintAllToCreator(suite *TestSuite, ctx context.Context, crea
 			},
 		},
 	}
-
 
 	msg := types.NewMsgMintBadge(creator, collectionId, supplysAndAmounts, transfers, []*types.Claim{})
 	_, err = suite.msgServer.MintBadge(ctx, msg)
@@ -155,5 +153,11 @@ func UpdateBytes(suite *TestSuite, ctx context.Context, creator string, collecti
 func RegisterAddresses(suite *TestSuite, ctx context.Context, creator string, addresses []string) error {
 	msg := types.NewMsgRegisterAddresses(creator, addresses)
 	_, err := suite.msgServer.RegisterAddresses(ctx, msg)
+	return err
+}
+
+func ClaimBadge(suite *TestSuite, ctx context.Context, creator string, claimId uint64, collectionId uint64, leaf []byte, proof *types.Proof) error {
+	msg := types.NewMsgClaimBadge(creator, claimId, collectionId,leaf, proof)
+	_, err := suite.msgServer.ClaimBadge(ctx, msg)
 	return err
 }

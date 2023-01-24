@@ -1,44 +1,30 @@
-package types_test
+package types
 
 import (
 	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 )
 
-func TestMsgUpdateBytes_ValidateBasic(t *testing.T) {
-	var arr []byte
-	for i := 0; i <= 260; i++ {
-		arr = append(arr, byte(i))
-	}
-
+func TestMsgClaimBadge_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgUpdateBytes
+		msg  MsgClaimBadge
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgUpdateBytes{
+			msg: MsgClaimBadge{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgUpdateBytes{
+			msg: MsgClaimBadge{
 				Creator: sample.AccAddress(),
 			},
-		},
-		{
-			name: "invalid bytes",
-			msg: types.MsgUpdateBytes{
-				Creator:  sample.AccAddress(),
-				NewBytes: string(arr),
-			},
-			err: types.ErrBytesGreaterThan256,
 		},
 	}
 	for _, tt := range tests {

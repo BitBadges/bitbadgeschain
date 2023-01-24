@@ -13,8 +13,8 @@ func (suite *TestSuite) TestSetApproval() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -30,7 +30,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -46,7 +46,7 @@ BadgeUri: "https://example.com/{id}",
 
 	err = SetApproval(suite, wctx, bob, aliceAccountNum, 0, []*types.Balance{
 		{
-			Balance: 1000,
+			Balance:  1000,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
 	})
@@ -58,7 +58,7 @@ BadgeUri: "https://example.com/{id}",
 
 	err = SetApproval(suite, wctx, bob, charlieAccountNum, 0, []*types.Balance{
 		{
-			Balance: 500,
+			Balance:  500,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
 	})
@@ -66,7 +66,7 @@ BadgeUri: "https://example.com/{id}",
 
 	err = SetApproval(suite, wctx, bob, aliceAccountNum, 0, []*types.Balance{
 		{
-			Balance: 500,
+			Balance:  500,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
 	})
@@ -88,8 +88,8 @@ func (suite *TestSuite) TestSetApprovalNoPrevBalanceInStore() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -121,7 +121,7 @@ BadgeUri: "https://example.com/{id}",
 
 	err = SetApproval(suite, wctx, charlie, aliceAccountNum, 0, []*types.Balance{
 		{
-			Balance: 0,
+			Balance:  0,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
 	})
@@ -135,8 +135,8 @@ func (suite *TestSuite) TestApproveSelf() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -152,7 +152,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -168,7 +168,7 @@ BadgeUri: "https://example.com/{id}",
 
 	err = SetApproval(suite, wctx, bob, bobAccountNum, 0, []*types.Balance{
 		{
-			Balance: 1000,
+			Balance:  1000,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
 	})

@@ -19,7 +19,7 @@ func TestMsgMintBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid address",
 			msg: types.MsgMintBadge{
-				Creator:         "invalid_address",
+				Creator: "invalid_address",
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
 						Supply: 10,
@@ -31,7 +31,7 @@ func TestMsgMintBadge_ValidateBasic(t *testing.T) {
 		}, {
 			name: "valid state",
 			msg: types.MsgMintBadge{
-				Creator:         sample.AccAddress(),
+				Creator: sample.AccAddress(),
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
 						Supply: 10,
@@ -42,7 +42,7 @@ func TestMsgMintBadge_ValidateBasic(t *testing.T) {
 		}, {
 			name: "invalid amount",
 			msg: types.MsgMintBadge{
-				Creator:         sample.AccAddress(),
+				Creator: sample.AccAddress(),
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
 						Supply: 10,

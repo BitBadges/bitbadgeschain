@@ -25,17 +25,16 @@ func TestMsgUpdateDisallowedTransfers_ValidateBasic(t *testing.T) {
 							AccountNums: []*types.IdRange{
 								{
 									Start: 0,
-									End: 0,
+									End:   0,
 								},
 							},
 							ManagerOptions: types.ManagerOptions_Neutral,
-						
-					},
+						},
 						To: &types.Addresses{
 							AccountNums: []*types.IdRange{
 								{
 									Start: 0,
-									End: 0,
+									End:   0,
 								},
 							},
 							ManagerOptions: types.ManagerOptions_Neutral,
@@ -51,23 +50,22 @@ func TestMsgUpdateDisallowedTransfers_ValidateBasic(t *testing.T) {
 				DisallowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.Addresses{
-								AccountNums: []*types.IdRange{
-									{
-										Start: 0,
-										End: 0,
-									},
+							AccountNums: []*types.IdRange{
+								{
+									Start: 0,
+									End:   0,
 								},
-								ManagerOptions: types.ManagerOptions_Neutral,
+							},
+							ManagerOptions: types.ManagerOptions_Neutral,
 						},
 						To: &types.Addresses{
 							AccountNums: []*types.IdRange{
 								{
 									Start: 0,
-									End: 0,
+									End:   0,
 								},
 							},
 							ManagerOptions: types.ManagerOptions_Neutral,
-						
 						},
 					},
 				},

@@ -30,16 +30,16 @@ func SimulateMsgTransferBadge(
 		}
 
 		msg := &types.MsgTransferBadge{
-			Creator:              simAccount.Address.String(),
-			From:                 r.Uint64(),
-			CollectionId:         r.Uint64(),
+			Creator:      simAccount.Address.String(),
+			From:         r.Uint64(),
+			CollectionId: r.Uint64(),
 			Transfers: []*types.Transfers{
 				{
 					ToAddresses: randomAccounts,
 					Balances: []*types.Balance{
 						{
 							Balance: r.Uint64(),
-							BadgeIds:  []*types.IdRange{
+							BadgeIds: []*types.IdRange{
 								{
 									Start: r.Uint64(),
 									End:   r.Uint64(),

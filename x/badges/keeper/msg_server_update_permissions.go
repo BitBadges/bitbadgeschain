@@ -13,7 +13,7 @@ func (k msgServer) UpdatePermissions(goCtx context.Context, msg *types.MsgUpdate
 
 	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:       msg.Creator,
-		CollectionId:       msg.CollectionId,
+		CollectionId:  msg.CollectionId,
 		MustBeManager: true,
 	})
 	if err != nil {

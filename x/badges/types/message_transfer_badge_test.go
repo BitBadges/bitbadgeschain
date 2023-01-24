@@ -19,8 +19,8 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid address",
 			msg: types.MsgTransferBadge{
-				Creator:     "invalid_address",
-				From:        1,
+				Creator: "invalid_address",
+				From:    1,
 				Transfers: []*types.Transfers{
 					{
 						ToAddresses: []uint64{0},
@@ -37,14 +37,13 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 						},
 					},
 				},
-
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid state",
 			msg: types.MsgTransferBadge{
-				Creator:     sample.AccAddress(),
-				From:        1,
+				Creator: sample.AccAddress(),
+				From:    1,
 				Transfers: []*types.Transfers{
 					{
 						ToAddresses: []uint64{0},
@@ -65,8 +64,8 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 		}, {
 			name: "invalid amounts",
 			msg: types.MsgTransferBadge{
-				Creator:     sample.AccAddress(),
-				From:        7,
+				Creator: sample.AccAddress(),
+				From:    7,
 				Transfers: []*types.Transfers{
 					{
 						ToAddresses: []uint64{0},
@@ -89,8 +88,8 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid badge range",
 			msg: types.MsgTransferBadge{
-				Creator:     sample.AccAddress(),
-				From:        7,
+				Creator: sample.AccAddress(),
+				From:    7,
 				Transfers: []*types.Transfers{
 					{
 						ToAddresses: []uint64{0},

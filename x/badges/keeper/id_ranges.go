@@ -63,24 +63,16 @@ func GetIdRangesWithOmitEmptyCaseHandled(ids []*types.IdRange) []*types.IdRange 
 	return ids
 }
 
-// Gets the number range to insert with the additional convention of storing end = 0 when end == start
+// Gets an ID range to insert
 func GetIdRangeToInsert(start uint64, end uint64) *types.IdRange {
-	if end == start {
-		end = 0
-	}
-
 	return &types.IdRange{
 		Start: start,
 		End:   end,
 	}
 }
 
-// Normalizes an existing ID range with the additional convention of storing end == 0 when end == start
+// Should just delete this function. Used to be used for normalizing end == 0.
 func NormalizeIdRange(rangeToNormalize *types.IdRange) *types.IdRange {
-	if rangeToNormalize.End == 0 {
-		rangeToNormalize.End = rangeToNormalize.Start
-	}
-
 	return &types.IdRange{
 		Start: rangeToNormalize.Start,
 		End:   rangeToNormalize.End,

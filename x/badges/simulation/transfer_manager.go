@@ -19,9 +19,9 @@ func SimulateMsgTransferManager(
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgTransferManager{
-			Creator: simAccount.Address.String(),
+			Creator:      simAccount.Address.String(),
 			CollectionId: r.Uint64(),
-			Address: r.Uint64(),
+			Address:      r.Uint64(),
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

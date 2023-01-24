@@ -22,6 +22,7 @@ service Msg {
     rpc RequestTransferManager(MsgRequestTransferManager) returns (MsgRequestTransferManagerResponse);
     rpc UpdateBytes(MsgUpdateBytes) returns (MsgUpdateBytesResponse);
     rpc RegisterAddresses(MsgRegisterAddresses) returns (MsgRegisterAddressesResponse);
+    rpc ClaimBadge(MsgClaimBadge) returns (MsgClaimBadgeResponse);
     // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -174,5 +175,24 @@ message MsgRegisterAddresses {
 message MsgRegisterAddressesResponse {
     IdRange registeredAddressNumbers = 1;
 }
+
+
+//Consistent with tendermint/crypto merkle tree
+message Proof {
+    int64          total     = 1;
+    int64          index     = 2;
+    bytes          leaf_hash = 3;
+    repeated bytes aunts     = 4;
+}
+
+message MsgClaimBadge {
+    string creator = 1;
+    uint64 claimId = 2;
+    uint64 collectionId = 3;
+    bytes leaf = 4;
+    Proof proof = 5;
+}
+  
+message MsgClaimBadgeResponse {}
 
 // this line is used by starport scaffolding # proto/tx/message

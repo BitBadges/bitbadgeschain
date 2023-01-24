@@ -35,7 +35,6 @@ func CmdNewCollection() *cobra.Command {
 				return err
 			}
 
-
 			argSupplysUInt64, err := GetIdArrFromString(args[4])
 			if err != nil {
 				return err
@@ -46,12 +45,10 @@ func CmdNewCollection() *cobra.Command {
 				return err
 			}
 
-
 			argStandard, err := cast.ToUint64E(args[6])
 			if err != nil {
 				return err
 			}
-
 
 			argBadgeSupplys := make([]*types.BadgeSupplyAndAmount, len(argSupplysUInt64))
 			for i := 0; i < len(argSupplysUInt64); i++ {

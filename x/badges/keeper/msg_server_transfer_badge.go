@@ -28,8 +28,8 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 
 	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:                     msg.Creator,
-		CollectionId:                     msg.CollectionId,
-		BadgeIdRangesToValidate:    	 rangesToValidate,
+		CollectionId:                msg.CollectionId,
+		BadgeIdRangesToValidate:     rangesToValidate,
 		AccountsToCheckRegistration: accsToCheck,
 	})
 	if err != nil {
@@ -49,7 +49,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 			if !found {
 				toUserBalance = types.UserBalance{}
 			}
-			
+
 			for _, balance := range transfer.Balances {
 				amount := balance.Balance
 
@@ -59,7 +59,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 						return nil, err
 					}
 				}
-				
+
 			}
 
 			if err := k.SetUserBalanceInStore(ctx, toBalanceKey, GetBalanceToInsertToStorage(toUserBalance)); err != nil {

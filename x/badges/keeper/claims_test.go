@@ -12,8 +12,8 @@ func (suite *TestSuite) TestSendAllToClaims() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -25,7 +25,7 @@ func (suite *TestSuite) TestSendAllToClaims() {
 
 	claimToAdd := types.Claim{
 		Balance: &types.Balance{
-			Balance: 10,
+			Balance:  10,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
 	}
@@ -35,11 +35,11 @@ func (suite *TestSuite) TestSendAllToClaims() {
 			Supply: 10,
 			Amount: 1,
 		},
-	}, 
-	[]*types.Transfers{}, 
-	[]*types.Claim{
-		&claimToAdd,
-	})
+	},
+		[]*types.Transfers{},
+		[]*types.Claim{
+			&claimToAdd,
+		})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 
@@ -51,7 +51,7 @@ func (suite *TestSuite) TestSendAllToClaims() {
 		},
 	}, badge.MaxSupplys)
 
-	claim, err := GetClaim(suite, wctx, 0);
+	claim, err := GetClaim(suite, wctx, 0)
 	suite.Require().Nil(err, "Error getting claim")
-	suite.Require().Equal(claimToAdd, claim);
+	suite.Require().Equal(claimToAdd, claim)
 }

@@ -34,7 +34,7 @@ func NewKeeper(
 	portKeeper cosmosibckeeper.PortKeeper,
 	scopedKeeper cosmosibckeeper.ScopedKeeper,
 	accountKeeper types.AccountKeeper,
-	 bankKeeper types.BankKeeper,
+	bankKeeper types.BankKeeper,
 ) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -53,8 +53,8 @@ func NewKeeper(
 		storeKey:      storeKey,
 		memKey:        memKey,
 		paramstore:    ps,
-		accountKeeper: accountKeeper, 
-		bankKeeper: bankKeeper,
+		accountKeeper: accountKeeper,
+		bankKeeper:    bankKeeper,
 	}
 }
 

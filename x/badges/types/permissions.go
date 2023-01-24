@@ -18,19 +18,19 @@ const (
 */
 
 type Permissions struct {
-	CanUpdateBytes     		bool
+	CanUpdateBytes          bool
 	CanManagerBeTransferred bool
-	CanUpdateUris      		bool
+	CanUpdateUris           bool
 	CanCreateMoreBadges     bool
 	CanUpdateDisallowed     bool
 }
 
 const (
-	CanUpdateBytesDigit     			= 5
-	CanManagerBeTransferredDigit 		= 4
-	CanUpdateUrisDigit      			= 3
-	CanCreateMoreBadgesDigit          	= 2
-	CanUpdateDisallowedDigit          	= 1
+	CanUpdateBytesDigit          = 5
+	CanManagerBeTransferredDigit = 4
+	CanUpdateUrisDigit           = 3
+	CanCreateMoreBadgesDigit     = 2
+	CanUpdateDisallowedDigit     = 1
 )
 
 //Validate permissions are validly formed., Disallows leading zeroes.

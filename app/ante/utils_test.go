@@ -79,7 +79,6 @@ func (suite *AnteTestSuite) SetupTest() {
 	simapp.FlagEnabledValue = true
 	simapp.FlagCommitValue = true
 
-
 	encodingConfig := encoding.MakeConfig(bitbadgesapp.ModuleBasics)
 	// We're using TestMsg amino encoding in some tests, so register it here.
 	encodingConfig.Amino.RegisterConcrete(&testdata.TestMsg{}, "testdata.TestMsg", nil)
@@ -90,15 +89,12 @@ func (suite *AnteTestSuite) SetupTest() {
 
 	suite.app = app
 
-
 	suite.ctx = suite.app.BaseApp.NewContext(checkTx, tmproto.Header{Height: 2, ChainID: "ethermint_9000-1", Time: time.Now().UTC()})
 	suite.ctx = suite.ctx.WithMinGasPrices(sdk.NewDecCoins(sdk.NewDecCoin(evmtypes.DefaultEVMDenom, sdk.OneInt())))
 	suite.ctx = suite.ctx.WithBlockGasMeter(sdk.NewGasMeter(1000000000000000000))
-	
+
 	infCtx := suite.ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	suite.app.AccountKeeper.SetParams(infCtx, authtypes.DefaultParams())
-
-	
 
 	suite.clientCtx = client.Context{}.WithTxConfig(encodingConfig.TxConfig)
 
@@ -172,7 +168,7 @@ func (suite *AnteTestSuite) CreateTestEIP712CosmosTxBuilder(
 	})
 	suite.Require().NoError(err)
 
-	sigHash, _,  err := apitypes.TypedDataAndHash(typedData)
+	sigHash, _, err := apitypes.TypedDataAndHash(typedData)
 	suite.Require().NoError(err)
 
 	// Sign typedData

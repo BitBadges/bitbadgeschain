@@ -11,8 +11,8 @@ var _ sdk.Msg = &MsgUpdateManagerApprovedTransfers{}
 
 func NewMsgUpdateManagerApprovedTransfers(creator string, collectionId uint64, managerApprovedTransfers []*TransferMapping) *MsgUpdateManagerApprovedTransfers {
 	return &MsgUpdateManagerApprovedTransfers{
-		Creator:       creator,
-		CollectionId: collectionId,
+		Creator:                  creator,
+		CollectionId:             collectionId,
 		ManagerApprovedTransfers: managerApprovedTransfers,
 	}
 }

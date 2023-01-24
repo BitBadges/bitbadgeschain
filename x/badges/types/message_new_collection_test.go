@@ -19,9 +19,9 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid address",
 			msg: types.MsgNewCollection{
-				Creator: "invalid_address",
-				CollectionUri: "https://example.com",
-				BadgeUri: "https://example.com/{id}",
+				Creator:             "invalid_address",
+				CollectionUri:       "https://example.com",
+				BadgeUri:            "https://example.com/{id}",
 				Permissions:         15,
 				DisallowedTransfers: []*types.TransferMapping{},
 			},
@@ -29,18 +29,18 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		}, {
 			name: "valid state",
 			msg: types.MsgNewCollection{
-				Creator: sample.AccAddress(),
-				CollectionUri: "https://example.com",
-				BadgeUri: "https://example.com/{id}",
+				Creator:             sample.AccAddress(),
+				CollectionUri:       "https://example.com",
+				BadgeUri:            "https://example.com/{id}",
 				Permissions:         15,
 				DisallowedTransfers: []*types.TransferMapping{},
 			},
 		}, {
 			name: "invalid URI",
 			msg: types.MsgNewCollection{
-				Creator: sample.AccAddress(),
-				CollectionUri: "",
-				BadgeUri: "https://example.com/{id}",
+				Creator:             sample.AccAddress(),
+				CollectionUri:       "",
+				BadgeUri:            "https://example.com/{id}",
 				Permissions:         15,
 				DisallowedTransfers: []*types.TransferMapping{},
 			},
@@ -50,9 +50,9 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid Badge URI",
 			msg: types.MsgNewCollection{
-				Creator: sample.AccAddress(),
-				CollectionUri: "https://example.com",
-				BadgeUri: "",
+				Creator:             sample.AccAddress(),
+				CollectionUri:       "https://example.com",
+				BadgeUri:            "",
 				Permissions:         15,
 				DisallowedTransfers: []*types.TransferMapping{},
 			},
@@ -61,9 +61,9 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid Permissions",
 			msg: types.MsgNewCollection{
-				Creator: sample.AccAddress(),
-				CollectionUri: "https://example.com",
-				BadgeUri: "https://example.com/{id}",
+				Creator:             sample.AccAddress(),
+				CollectionUri:       "https://example.com",
+				BadgeUri:            "https://example.com/{id}",
 				Permissions:         10000,
 				DisallowedTransfers: []*types.TransferMapping{},
 			},

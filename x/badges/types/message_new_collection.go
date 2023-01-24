@@ -13,17 +13,17 @@ var _ sdk.Msg = &MsgNewCollection{}
 
 func NewMsgNewCollection(creator string, standard uint64, collectionsToCreate []*BadgeSupplyAndAmount, collectionUri string, badgeUri string, permissions uint64, disallowedTransfers []*TransferMapping, managerApprovedTransfers []*TransferMapping, bytesToStore string, transfers []*Transfers, claims []*Claim) *MsgNewCollection {
 	return &MsgNewCollection{
-		Creator:                 	creator,
-		CollectionUri: 		 	collectionUri,
-		BadgeUri: 		 	badgeUri,
-		BadgeSupplys:				collectionsToCreate,
-		DisallowedTransfers: 		disallowedTransfers,	
-		ManagerApprovedTransfers:   managerApprovedTransfers,
-		Bytes:          			bytesToStore,
-		Permissions:             	permissions,
-		Standard:                	standard,
-		Transfers: 					transfers,
-		Claims: 					claims,
+		Creator:                  creator,
+		CollectionUri:            collectionUri,
+		BadgeUri:                 badgeUri,
+		BadgeSupplys:             collectionsToCreate,
+		DisallowedTransfers:      disallowedTransfers,
+		ManagerApprovedTransfers: managerApprovedTransfers,
+		Bytes:                    bytesToStore,
+		Permissions:              permissions,
+		Standard:                 standard,
+		Transfers:                transfers,
+		Claims:                   claims,
 	}
 }
 
@@ -74,7 +74,6 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 	if err := ValidateBytes(msg.Bytes); err != nil {
 		return err
 	}
-
 
 	amounts := make([]uint64, len(msg.BadgeSupplys))
 	supplys := make([]uint64, len(msg.BadgeSupplys))

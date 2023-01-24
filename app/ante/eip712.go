@@ -161,7 +161,7 @@ func VerifySignature(
 
 		// @contract: this code is reached only when Msg has Web3Tx extension (so this custom Ante handler flow),
 		// and the signature is SIGN_MODE_LEGACY_AMINO_JSON which is supported for EIP712 for now
-	
+
 		msgs := tx.GetMsgs()
 		if len(msgs) == 0 {
 			return sdkerrors.Wrap(sdkerrors.ErrNoSignatures, "tx doesn't contain any msgs to verify signature")
@@ -179,7 +179,7 @@ func VerifySignature(
 			msgs, tx.GetMemo(),
 			nil,
 		)
-		
+
 		signerChainID, err := ethermint.ParseChainID(signerData.ChainID)
 		if err != nil {
 			return sdkerrors.Wrapf(err, "failed to parse chainID: %s", signerData.ChainID)
@@ -214,9 +214,9 @@ func VerifySignature(
 		feeDelegation := &eip712.FeeDelegationOptions{
 			FeePayer: feePayer,
 		}
-		
+
 		firstMsg := msgs[0] //since EIP712 doesn't support multiple types in same array so all must be same message type
-		
+
 		typedData, err := eip712.WrapTxToTypedData(ethermintCodec, extOpt.TypedDataChainID, firstMsg, txBytes, feeDelegation)
 		if err != nil {
 			return sdkerrors.Wrap(err, "failed to pack tx data in EIP712 object")
@@ -228,10 +228,9 @@ func VerifySignature(
 			VerifyingContract: "cosmos",
 			Salt:              "0",
 		}
-		
-		
-		//Normalize the typedData to handle empty (0, "", false), nested objects, and arrays. 
-		//Also, add in any missing types for the EIP712 typedData specific to our badges module. 
+
+		//Normalize the typedData to handle empty (0, "", false), nested objects, and arrays.
+		//Also, add in any missing types for the EIP712 typedData specific to our badges module.
 		//Only check first message because eip712 only supports one message per tx
 		wrappedFirstMsg, ok := firstMsg.(legacytx.LegacyMsg)
 		if ok {

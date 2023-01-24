@@ -8,12 +8,13 @@ import (
 )
 
 var (
-	CollectionKey      = []byte{0x01}
-	UserBalanceKey     = []byte{0x02}
+	CollectionKey       = []byte{0x01}
+	UserBalanceKey      = []byte{0x02}
 	NextCollectionIdKey = []byte{0x03}
 	TransferManagerKey  = []byte{0x04}
-	ClaimKey 		 	= []byte{0x05}
-	NextClaimIdKey 		= []byte{0x06}
+	ClaimKey            = []byte{0x05}
+	NextClaimIdKey      = []byte{0x06}
+	UsedClaimDataKey   = []byte{0x07}
 
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}
@@ -27,8 +28,8 @@ var (
 const StoreKey = types.ModuleName
 
 type BalanceKeyDetails struct {
-	collectionId    uint64
-	accountNum uint64
+	collectionId uint64
+	accountNum   uint64
 }
 
 // Helper functions to manipulate the balance keys. These aren't prefixed. They will be after they are passed into the functions further down in this file.
@@ -38,6 +39,14 @@ func ConstructBalanceKey(accountNumber uint64, id uint64) string {
 	collection_id_str := strconv.FormatUint(id, 10)
 	account_num_str := strconv.FormatUint(accountNumber, 10)
 	return account_num_str + BalanceKeyDelimiter + collection_id_str
+}
+
+
+// Creates the used claim data key from an id and data. Note this is not prefixed yet. It is just performing a delimited string concatenation.
+func ConstructUsedClaimDataKey(collectionId uint64, claimId uint64, data string) string {
+	collection_id_str := strconv.FormatUint(collectionId, 10)
+	claim_id_str := strconv.FormatUint(claimId, 10)
+	return collection_id_str + BalanceKeyDelimiter + claim_id_str  + BalanceKeyDelimiter + data
 }
 
 // Creates the transfer manager request key from an accountNumber and collectionId. Note this is not prefixed yet. It is just performing a delimited string concatenation.
@@ -54,8 +63,8 @@ func GetDetailsFromBalanceKey(id string) BalanceKeyDetails {
 	collection_id, _ := strconv.ParseUint(result[1], 10, 64)
 
 	return BalanceKeyDetails{
-		accountNum: account_num,
-		collectionId:    collection_id,
+		accountNum:   account_num,
+		collectionId: collection_id,
 	}
 }
 
@@ -74,6 +83,14 @@ func userBalanceStoreKey(balanceKey string) []byte {
 	key := make([]byte, len(UserBalanceKey)+len(balanceKey))
 	copy(key, UserBalanceKey)
 	copy(key[len(UserBalanceKey):], []byte(balanceKey))
+	return key
+}
+
+// usedClaimDataStoreKey returns the byte representation of the used claim data store key ([]byte{0x07} + key)
+func usedClaimDataStoreKey(usedClaimDataKey string) []byte {
+	key := make([]byte, len(UsedClaimDataKey)+len(usedClaimDataKey))
+	copy(key, UsedClaimDataKey)
+	copy(key[len(UsedClaimDataKey):], []byte(usedClaimDataKey))
 	return key
 }
 
@@ -97,7 +114,6 @@ func managerTransferRequestKey(id string) []byte {
 func nextCollectionIdKey() []byte {
 	return NextCollectionIdKey
 }
-
 
 // nextClaimIdKey returns the byte representation of the next claim id key ([]byte{0x06})
 func nextClaimIdKey() []byte {

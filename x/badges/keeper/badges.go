@@ -30,7 +30,7 @@ func (k Keeper) GetCollectionAndAssertBadgeIdsAreValid(ctx sdk.Context, collecti
 	return badge, nil
 }
 
-func (k Keeper) ValidateIdRanges(collection types.BadgeCollection, ranges []*types.IdRange) (error) {
+func (k Keeper) ValidateIdRanges(collection types.BadgeCollection, ranges []*types.IdRange) error {
 	for _, badgeIdRange := range ranges {
 		badgeIdRange = NormalizeIdRange(badgeIdRange)
 
@@ -102,9 +102,9 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 	}
 
 	_, _, err = k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator: creatorAddress,
+		Creator:                     creatorAddress,
 		AccountsToCheckRegistration: accsToCheck,
-		OnlyCheckAccounts: true,
+		OnlyCheckAccounts:           true,
 	})
 	if err != nil {
 		return types.BadgeCollection{}, err
@@ -125,7 +125,6 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 		return types.BadgeCollection{}, err
 	}
 
-
 	return collection, nil
 }
 
@@ -134,7 +133,6 @@ func (k Keeper) MintViaTransfer(ctx sdk.Context, collection types.BadgeCollectio
 	unmintedBalances := types.UserBalance{
 		Balances: collection.UnmintedSupplys,
 	}
-	
 
 	err := *new(error)
 	for _, transfer := range transfers {
@@ -168,13 +166,12 @@ func (k Keeper) MintViaTransfer(ctx sdk.Context, collection types.BadgeCollectio
 	return collection, nil
 }
 
-
 func (k Keeper) MintViaClaim(ctx sdk.Context, collection types.BadgeCollection, claims []*types.Claim) (types.BadgeCollection, error) {
 	//Treat the unminted balances as another account and use our transfer function
 	unmintedBalances := types.UserBalance{
 		Balances: collection.UnmintedSupplys,
 	}
-	
+
 	err := *new(error)
 	for _, claim := range claims {
 		unmintedBalances, err = SubtractBalancesForIdRanges(unmintedBalances, claim.Balance.BadgeIds, claim.Balance.Balance)

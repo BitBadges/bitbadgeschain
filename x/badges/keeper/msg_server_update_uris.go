@@ -13,7 +13,7 @@ func (k msgServer) UpdateUris(goCtx context.Context, msg *types.MsgUpdateUris) (
 
 	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:       msg.Creator,
-		CollectionId:       msg.CollectionId,
+		CollectionId:  msg.CollectionId,
 		MustBeManager: true,
 		CanUpdateUris: true,
 	})
@@ -24,7 +24,6 @@ func (k msgServer) UpdateUris(goCtx context.Context, msg *types.MsgUpdateUris) (
 	//Already validated in ValidateBasic
 	badge.BadgeUri = msg.BadgeUri
 	badge.CollectionUri = msg.CollectionUri
-
 
 	if err := k.SetCollectionInStore(ctx, badge); err != nil {
 		return nil, err

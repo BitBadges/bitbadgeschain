@@ -20,10 +20,10 @@ func SimulateMsgUpdateUris(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 
 		msg := &types.MsgUpdateUris{
-			Creator: simAccount.Address.String(),
-			CollectionId: r.Uint64(),
+			Creator:       simAccount.Address.String(),
+			CollectionId:  r.Uint64(),
 			CollectionUri: simtypes.RandStringOfLength(r, r.Intn(100)),
-			BadgeUri: simtypes.RandStringOfLength(r, r.Intn(100)),
+			BadgeUri:      simtypes.RandStringOfLength(r, r.Intn(100)),
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

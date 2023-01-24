@@ -20,6 +20,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgRequestTransferManager{}, "badges/RequestTransferManager", nil)
 	cdc.RegisterConcrete(&MsgUpdateBytes{}, "badges/UpdateBytes", nil)
 	cdc.RegisterConcrete(&MsgRegisterAddresses{}, "badges/RegisterAddresses", nil)
+	cdc.RegisterConcrete(&MsgClaimBadge{}, "badges/ClaimBadge", nil)
 	// this line is used by starport scaffolding # 2
 }
 
@@ -60,7 +61,17 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgRegisterAddresses{},
 	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgClaimBadge{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgClaimBadge{},
+	)
 	// this line is used by starport scaffolding # 3
+
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
+
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
@@ -75,5 +86,5 @@ var (
 	Amino     = codec.NewLegacyAmino()
 	ModuleCdc = codec.NewProtoCodec(cdctypes.NewInterfaceRegistry())
 	// AminoCdc is a amino codec created to support amino JSON compatible msgs.
-	AminoCdc = codec.NewAminoCodec(Amino) 
+	AminoCdc = codec.NewAminoCodec(Amino)
 )

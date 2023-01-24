@@ -16,16 +16,16 @@ var (
 
 func duplicateInArray(arr []uint64) bool {
 	visited := make(map[uint64]bool, 0)
-	for i:=0; i<len(arr); i++{
+	for i := 0; i < len(arr); i++ {
 
-	   if visited[arr[i]] == true{
-		  return true
-	   } else {
-		  visited[arr[i]] = true
-	   }
+		if visited[arr[i]] == true {
+			return true
+		} else {
+			visited[arr[i]] = true
+		}
 	}
 	return false
- }
+}
 
 // Validate uri and subasset uri returns whether both the uri and subasset uri is valid. Max 100 characters each.
 func ValidateURI(uri string) error {

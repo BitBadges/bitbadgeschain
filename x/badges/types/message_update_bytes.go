@@ -11,9 +11,9 @@ var _ sdk.Msg = &MsgUpdateBytes{}
 
 func NewMsgUpdateBytes(creator string, collectionId uint64, newBytes string) *MsgUpdateBytes {
 	return &MsgUpdateBytes{
-		Creator:  creator,
+		Creator:      creator,
 		CollectionId: collectionId,
-		NewBytes: newBytes,
+		NewBytes:     newBytes,
 	}
 }
 

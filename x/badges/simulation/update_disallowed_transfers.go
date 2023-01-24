@@ -19,9 +19,8 @@ func SimulateMsgUpdateDisallowedTransfers(
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 
-
 		msg := &types.MsgUpdateDisallowedTransfers{
-			Creator: simAccount.Address.String(),
+			Creator:      simAccount.Address.String(),
 			CollectionId: r.Uint64(),
 			DisallowedTransfers: []*types.TransferMapping{
 				{

@@ -208,8 +208,6 @@ func (k Keeper) IncrementNextClaimId(ctx sdk.Context) {
 	k.SetNextClaimId(ctx, nextID+1) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
 }
 
-
-
 /****************************************Claims****************************************/
 // Sets a claim in the store using ClaimKey ([]byte{0x05}) as the prefix. No check if store has key already.
 func (k Keeper) SetClaimInStore(ctx sdk.Context, claimId uint64, Claim types.Claim) error {
@@ -226,7 +224,7 @@ func (k Keeper) SetClaimInStore(ctx sdk.Context, claimId uint64, Claim types.Cla
 // Gets a user balance from the store according to the balanceID.
 func (k Keeper) GetClaimFromStore(ctx sdk.Context, claimId uint64) (types.Claim, bool) {
 	store := ctx.KVStore(k.storeKey)
-	
+
 	marshaled_claim := store.Get(claimStoreKey(claimId))
 
 	var Claim types.Claim
@@ -271,4 +269,27 @@ func (k Keeper) StoreHasClaim(ctx sdk.Context, claimId uint64) bool {
 func (k Keeper) DeleteClaimFromStore(ctx sdk.Context, claimId uint64) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(claimStoreKey(claimId))
+}
+
+
+//Claim Checks
+
+
+// Sets a usedClaimData in the store using UsedClaimDataKey ([]byte{0x07}) as the prefix. No check if store has key already.
+func (k Keeper) SetUsedClaimDataInStore(ctx sdk.Context, collectionId uint64, claimId uint64, claimData string) error {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId, claimData)), []byte{0x1})
+	return nil
+}
+
+// StoreHasUsedClaimDataID determines whether the specified user balanceID exists in the store
+func (k Keeper) StoreHasUsedClaimData(ctx sdk.Context, collectionId uint64, claimId uint64, claimData string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId, claimData)))
+}
+
+// DeleteUsedClaimDataFromStore deletes a user balance from the store.
+func (k Keeper) DeleteUsedClaimDataFromStore(ctx sdk.Context, collectionId uint64, claimId uint64, claimData string) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId, claimData)))
 }

@@ -11,10 +11,10 @@ var _ sdk.Msg = &MsgSetApproval{}
 
 func NewMsgSetApproval(creator string, collectionId uint64, address uint64, balances []*Balance) *MsgSetApproval {
 	return &MsgSetApproval{
-		Creator:        creator,
-		Address:        address,
-		CollectionId:  collectionId,
-		Balances:  		balances,
+		Creator:      creator,
+		Address:      address,
+		CollectionId: collectionId,
+		Balances:     balances,
 	}
 }
 

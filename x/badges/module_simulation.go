@@ -54,8 +54,12 @@ const (
 	opWeightMsgUpdateBytes          = "op_weight_msg_update_bytes"
 	defaultWeightMsgUpdateBytes int = 100
 
-	opWeightMsgRegisterAddresses = "op_weight_msg_register_addresses"
+	opWeightMsgRegisterAddresses          = "op_weight_msg_register_addresses"
 	defaultWeightMsgRegisterAddresses int = 100
+
+	opWeightMsgClaimBadge = "op_weight_msg_claim_badge"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgClaimBadge int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const
 )
@@ -67,12 +71,12 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 		accs[i] = acc.Address.String()
 	}
 	badgesGenesis := types.GenesisState{
-		Params:      types.DefaultParams(),
-		PortId:      types.PortID,
+		Params:           types.DefaultParams(),
+		PortId:           types.PortID,
 		NextCollectionId: 0,
 		Collections:      []*types.BadgeCollection{},
-		Balances:    []*types.UserBalance{},
-		BalanceIds:  []string{},
+		Balances:         []*types.UserBalance{},
+		BalanceIds:       []string{},
 		// this line is used by starport scaffolding # simapp/module/genesisState
 	}
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&badgesGenesis)
@@ -129,7 +133,6 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		badgessimulation.SimulateMsgTransferBadge(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-
 	var weightMsgSetApproval int
 	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgSetApproval, &weightMsgSetApproval, nil,
 		func(_ *rand.Rand) {
@@ -140,8 +143,6 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		weightMsgSetApproval,
 		badgessimulation.SimulateMsgSetApproval(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
-
-	
 
 	var weightMsgUpdateDisallowedTransfers int
 	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateDisallowedTransfers, &weightMsgUpdateDisallowedTransfers, nil,
@@ -218,6 +219,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgRegisterAddresses,
 		badgessimulation.SimulateMsgRegisterAddresses(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgClaimBadge int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgClaimBadge, &weightMsgClaimBadge, nil,
+		func(_ *rand.Rand) {
+			weightMsgClaimBadge = defaultWeightMsgClaimBadge
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgClaimBadge,
+		badgessimulation.SimulateMsgClaimBadge(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

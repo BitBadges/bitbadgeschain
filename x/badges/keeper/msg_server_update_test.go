@@ -15,9 +15,9 @@ func (suite *TestSuite) TestUpdateURIs() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				BadgeUri: "https://example.com/{id}",
+				BadgeUri:      "https://example.com/{id}",
 				CollectionUri: "https://example.com",
-				Permissions: 62 + 128,
+				Permissions:   62 + 128,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -50,8 +50,8 @@ func (suite *TestSuite) TestCantUpdate() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 0,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   0,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -81,8 +81,8 @@ func (suite *TestSuite) TestCantUpdateNotManager() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 0,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   0,
 			},
 			Amount:  1,
 			Creator: bob,

@@ -24,9 +24,9 @@ func SimulateMsgRequestTransferManager(
 			randBool = true
 		}
 		msg := &types.MsgRequestTransferManager{
-			Creator: simAccount.Address.String(),
+			Creator:      simAccount.Address.String(),
 			CollectionId: r.Uint64(),
-			AddRequest:     randBool,
+			AddRequest:   randBool,
 		}
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
 	}

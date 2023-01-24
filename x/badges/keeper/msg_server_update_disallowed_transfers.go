@@ -12,9 +12,9 @@ func (k msgServer) UpdateDisallowedTransfers(goCtx context.Context, msg *types.M
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator:       msg.Creator,
-		CollectionId:       msg.CollectionId,
-		MustBeManager: true,
+		Creator:             msg.Creator,
+		CollectionId:        msg.CollectionId,
+		MustBeManager:       true,
 		CanUpdateDisallowed: true,
 	})
 	if err != nil {

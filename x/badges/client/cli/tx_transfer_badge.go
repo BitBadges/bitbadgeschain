@@ -58,7 +58,7 @@ func CmdTransferBadge() *cobra.Command {
 						ToAddresses: argToAddressesUint64,
 						Balances: []*types.Balance{
 							{
-								Balance: argAmount,
+								Balance:  argAmount,
 								BadgeIds: argBadgeIdRanges,
 							},
 						},

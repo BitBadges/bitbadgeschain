@@ -20,7 +20,7 @@ func (k msgServer) RegisterAddresses(goCtx context.Context, msg *types.MsgRegist
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s)", err)
 		}
 
-		newNum := k.Keeper.GetOrCreateAccountNumberForAccAddressBech32(ctx, convertedAddress) //This panics but is saved 
+		newNum := k.Keeper.GetOrCreateAccountNumberForAccAddressBech32(ctx, convertedAddress) //This panics but is saved
 		if i == 0 {
 			start = newNum
 		}

@@ -19,17 +19,17 @@ func TestMsgUpdateUris_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid address",
 			msg: types.MsgUpdateUris{
-				Creator: "invalid_address",
+				Creator:       "invalid_address",
 				CollectionUri: "https://facebook.com",
-				BadgeUri: "https://facebook.com",
+				BadgeUri:      "https://facebook.com",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: types.MsgUpdateUris{
-				Creator: sample.AccAddress(),
+				Creator:       sample.AccAddress(),
 				CollectionUri: "https://facebook.com",
-				BadgeUri: "https://facebook.com/{id}",
+				BadgeUri:      "https://facebook.com/{id}",
 			},
 		},
 	}

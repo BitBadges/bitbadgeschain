@@ -12,12 +12,12 @@ import (
 
 func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
-		Params:      types.DefaultParams(),
-		PortId:      types.PortID,
+		Params:           types.DefaultParams(),
+		PortId:           types.PortID,
 		NextCollectionId: 0,
 		Collections:      []*types.BadgeCollection{},
-		Balances:    []*types.UserBalance{},
-		BalanceIds:  []string{},
+		Balances:         []*types.UserBalance{},
+		BalanceIds:       []string{},
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 

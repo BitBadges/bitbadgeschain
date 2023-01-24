@@ -13,8 +13,8 @@ func (suite *TestSuite) TestNewBadges() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -30,7 +30,7 @@ func (suite *TestSuite) TestNewBadges() {
 			Supply: 10,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -50,7 +50,7 @@ func (suite *TestSuite) TestNewBadges() {
 			Supply: 1,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 
 	badge, _ = GetCollection(suite, wctx, 0)
@@ -77,7 +77,7 @@ func (suite *TestSuite) TestNewBadges() {
 			Supply: 10,
 			Amount: 2,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -107,8 +107,8 @@ func (suite *TestSuite) TestNewBadgesDirectlyUponCreatingNewBadge() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -117,8 +117,6 @@ func (suite *TestSuite) TestNewBadgesDirectlyUponCreatingNewBadge() {
 
 	CreateCollections(suite, wctx, collectionsToCreate)
 	badge, _ := GetCollection(suite, wctx, 0)
-
-	
 
 	CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
 		{
@@ -146,7 +144,7 @@ func (suite *TestSuite) TestNewBadgesDirectlyUponCreatingNewBadge() {
 			Supply: 1,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 
 	badge, _ = GetCollection(suite, wctx, 0)
@@ -172,7 +170,7 @@ func (suite *TestSuite) TestNewBadgesDirectlyUponCreatingNewBadge() {
 			Supply: 10,
 			Amount: 2,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -203,8 +201,8 @@ func (suite *TestSuite) TestNewBadgesNotManager() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -240,8 +238,8 @@ func (suite *TestSuite) TestNewBadgeCreateIsLocked() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 0,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   0,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -254,6 +252,6 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10,
 			Amount: 1,
 		},
-	}, )
+	})
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }

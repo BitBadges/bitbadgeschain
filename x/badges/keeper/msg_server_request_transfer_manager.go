@@ -12,7 +12,7 @@ func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgR
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator: msg.Creator,
+		Creator:      msg.Creator,
 		CollectionId: msg.CollectionId,
 	})
 	if err != nil {

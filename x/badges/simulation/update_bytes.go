@@ -19,9 +19,9 @@ func SimulateMsgUpdateBytes(
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgUpdateBytes{
-			Creator:  simAccount.Address.String(),
-			CollectionId:  r.Uint64(),
-			NewBytes: simtypes.RandStringOfLength(r, r.Intn(300)),
+			Creator:      simAccount.Address.String(),
+			CollectionId: r.Uint64(),
+			NewBytes:     simtypes.RandStringOfLength(r, r.Intn(300)),
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

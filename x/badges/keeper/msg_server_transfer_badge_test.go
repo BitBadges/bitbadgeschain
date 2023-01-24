@@ -15,8 +15,8 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -32,7 +32,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -62,7 +62,7 @@ BadgeUri: "https://example.com/{id}",
 			},
 		},
 	})
-	
+
 	suite.Require().Nil(err, "Error transferring badge")
 
 	bobbalance, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -221,8 +221,8 @@ func (suite *TestSuite) TestApprovalsApproved() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -238,7 +238,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -254,7 +254,7 @@ BadgeUri: "https://example.com/{id}",
 
 	err = SetApproval(suite, wctx, bob, aliceAccountNum, 0, []*types.Balance{
 		{
-			Balance: 1000000,
+			Balance:  1000000,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
 	})
@@ -292,8 +292,8 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -309,7 +309,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -325,7 +325,7 @@ BadgeUri: "https://example.com/{id}",
 
 	err = SetApproval(suite, wctx, bob, aliceAccountNum, 0, []*types.Balance{
 		{
-			Balance: 10,
+			Balance:  10,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
 	})
@@ -357,8 +357,8 @@ func (suite *TestSuite) TestApprovalsNotApprovedAtAll() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -374,7 +374,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -414,8 +414,8 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -431,7 +431,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -447,7 +447,7 @@ BadgeUri: "https://example.com/{id}",
 
 	err = SetApproval(suite, wctx, bob, charlieAccountNum, 0, []*types.Balance{
 		{
-			Balance: 10,
+			Balance:  10,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
 	})
@@ -479,8 +479,8 @@ func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -496,7 +496,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -512,7 +512,7 @@ BadgeUri: "https://example.com/{id}",
 
 	err = SetApproval(suite, wctx, bob, charlieAccountNum, 0, []*types.Balance{
 		{
-			Balance: 10,
+			Balance:  10,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
 	})
@@ -544,8 +544,8 @@ func (suite *TestSuite) TestApprovalOverflow() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri: "https://example.com/{id}",
-				Permissions: 46,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -561,7 +561,7 @@ func (suite *TestSuite) TestApprovalOverflow() {
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -577,7 +577,7 @@ func (suite *TestSuite) TestApprovalOverflow() {
 
 	err = SetApproval(suite, wctx, bob, charlieAccountNum, 0, []*types.Balance{
 		{
-			Balance: math.MaxUint64,
+			Balance:  math.MaxUint64,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
 	})
@@ -603,7 +603,7 @@ func (suite *TestSuite) TestApprovalOverflow() {
 
 	err = SetApproval(suite, wctx, bob, charlieAccountNum, 0, []*types.Balance{
 		{
-			Balance: math.MaxUint64,
+			Balance:  math.MaxUint64,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
 	})
@@ -620,8 +620,8 @@ func (suite *TestSuite) TestTransferUnderflowNotEnoughBalance() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri: "https://example.com/{id}",
-				Permissions: 46,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -637,7 +637,7 @@ func (suite *TestSuite) TestTransferUnderflowNotEnoughBalance() {
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -677,8 +677,8 @@ func (suite *TestSuite) TestPendingTransferUnderflowNotEnoughBalance() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 62,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -694,7 +694,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -734,8 +734,8 @@ func (suite *TestSuite) TestTransferInvalidBadgeIdRanges() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 46,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -751,7 +751,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 1,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
@@ -792,7 +792,7 @@ BadgeUri: "https://example.com/{id}",
 					BadgeIds: []*types.IdRange{
 						{
 							Start: 0,
-							End:  math.MaxUint64,
+							End:   math.MaxUint64,
 						},
 					},
 				},
@@ -809,8 +809,8 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 46,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -825,7 +825,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 10000,
 		},
-	}, )
+	})
 	suite.Require().Nil(err, "Error creating badges")
 
 	err = TransferBadge(suite, wctx, bob, 0, bobAccountNum, []*types.Transfers{
@@ -846,7 +846,6 @@ BadgeUri: "https://example.com/{id}",
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	
 	err = TransferBadge(suite, wctx, bob, 0, bobAccountNum, []*types.Transfers{
 		{
 			ToAddresses: []uint64{aliceAccountNum},
@@ -891,8 +890,8 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-BadgeUri: "https://example.com/{id}",
-				Permissions: 46,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -907,7 +906,7 @@ BadgeUri: "https://example.com/{id}",
 			Supply: 10000,
 			Amount: 10000,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badges")
 
 	err = TransferBadge(suite, wctx, bob, 0, bobAccountNum, []*types.Transfers{
@@ -954,8 +953,8 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri: "https://example.com/{id}",
-				Permissions: 46,
+				BadgeUri:      "https://example.com/{id}",
+				Permissions:   46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -970,7 +969,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 			Supply: 10000,
 			Amount: 10000,
 		},
-	},)
+	})
 	suite.Require().Nil(err, "Error creating badges")
 
 	err = TransferBadge(suite, wctx, bob, 0, bobAccountNum, []*types.Transfers{
@@ -1097,7 +1096,6 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 		},
 	})
 	suite.Require().Nil(err, "Error transfering badge")
-
 
 	err = TransferBadge(suite, wctx, bob, 0, bobAccountNum, []*types.Transfers{
 		{

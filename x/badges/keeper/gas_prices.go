@@ -4,15 +4,15 @@ package keeper
 //However, in some situations, we may want additional gas incentives or penalties.
 
 const (
-	FixedCostPerMsg                 = 0
-	BadgeCost                       = 0
-	BadgeWithSupplyNotEqualToOne = 0
-	FreezeOrUnfreezeAddress         = 0
-	SimpleAdjustBalanceOrApproval   = 0
-	AddOrRemovePending              = 0
-	RequestTransferManagerCost      = 0
-	TransferManagerCost             = 0
-	BadgeUpdate                     = 0
+	FixedCostPerMsg               = 0
+	BadgeCost                     = 0
+	BadgeWithSupplyNotEqualToOne  = 0
+	FreezeOrUnfreezeAddress       = 0
+	SimpleAdjustBalanceOrApproval = 0
+	AddOrRemovePending            = 0
+	RequestTransferManagerCost    = 0
+	TransferManagerCost           = 0
+	BadgeUpdate                   = 0
 
 	// Incentivize users to prune expired / self-destructed badges.
 	PruneBalanceRefundAmountPerAddress = 750

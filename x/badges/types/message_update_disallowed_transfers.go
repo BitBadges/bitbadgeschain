@@ -11,8 +11,8 @@ var _ sdk.Msg = &MsgUpdateDisallowedTransfers{}
 
 func NewMsgUpdateDisallowedTransfers(creator string, collectionId uint64, disallowedTransfers []*TransferMapping) *MsgUpdateDisallowedTransfers {
 	return &MsgUpdateDisallowedTransfers{
-		Creator:       creator,
-		CollectionId: collectionId,
+		Creator:             creator,
+		CollectionId:        collectionId,
 		DisallowedTransfers: disallowedTransfers,
 	}
 }

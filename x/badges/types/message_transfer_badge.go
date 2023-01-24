@@ -11,10 +11,10 @@ var _ sdk.Msg = &MsgTransferBadge{}
 
 func NewMsgTransferBadge(creator string, collectionId uint64, from uint64, transfers []*Transfers) *MsgTransferBadge {
 	return &MsgTransferBadge{
-		Creator:              creator,
-		CollectionId:		  collectionId,
-		From:                 from,
-		Transfers: 			  transfers,
+		Creator:      creator,
+		CollectionId: collectionId,
+		From:         from,
+		Transfers:    transfers,
 	}
 }
 
@@ -40,7 +40,6 @@ func (msg *MsgTransferBadge) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
-
 
 	if msg.Transfers == nil || len(msg.Transfers) == 0 {
 		return ErrInvalidLengthBalances

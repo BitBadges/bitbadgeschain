@@ -24,20 +24,19 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		}
 	}
 
-	
 	NextCollectionId := k.GetNextCollectionId(ctx)
 	k.IncrementNextCollectionId(ctx)
 
 	collection := types.BadgeCollection{
-		CollectionId:          NextCollectionId,
-		CollectionUri:  	   msg.CollectionUri,
-		BadgeUri:              msg.BadgeUri,
-		Manager:               CreatorAccountNum,
-		Permissions:           msg.Permissions,
-		DisallowedTransfers:   	msg.DisallowedTransfers,
+		CollectionId:             NextCollectionId,
+		CollectionUri:            msg.CollectionUri,
+		BadgeUri:                 msg.BadgeUri,
+		Manager:                  CreatorAccountNum,
+		Permissions:              msg.Permissions,
+		DisallowedTransfers:      msg.DisallowedTransfers,
 		ManagerApprovedTransfers: msg.ManagerApprovedTransfers,
-		Bytes:        			msg.Bytes,
-		Standard: 				msg.Standard,
+		Bytes:                    msg.Bytes,
+		Standard:                 msg.Standard,
 	}
 
 	if len(msg.BadgeSupplys) != 0 {

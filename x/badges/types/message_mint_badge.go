@@ -11,11 +11,11 @@ var _ sdk.Msg = &MsgMintBadge{}
 
 func NewMsgMintBadge(creator string, collectionId uint64, supplysAndAmounts []*BadgeSupplyAndAmount, transfers []*Transfers, claims []*Claim) *MsgMintBadge {
 	return &MsgMintBadge{
-		Creator:         creator,
-		CollectionId:    collectionId,
-		BadgeSupplys: 	 supplysAndAmounts,
-		Transfers: 		 transfers,
-		Claims: 		 claims,
+		Creator:      creator,
+		CollectionId: collectionId,
+		BadgeSupplys: supplysAndAmounts,
+		Transfers:    transfers,
+		Claims:       claims,
 	}
 }
 

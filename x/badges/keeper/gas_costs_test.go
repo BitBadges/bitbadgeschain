@@ -35,6 +35,7 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 	}
 
 }
+
 //TODO:
 
 // func (suite *TestSuite) TestGasCosts() {

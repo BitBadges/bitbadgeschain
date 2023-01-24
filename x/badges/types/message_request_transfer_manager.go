@@ -11,9 +11,9 @@ var _ sdk.Msg = &MsgRequestTransferManager{}
 
 func NewMsgRequestTransferManager(creator string, collectionId uint64, addRequest bool) *MsgRequestTransferManager {
 	return &MsgRequestTransferManager{
-		Creator: creator,
+		Creator:      creator,
 		CollectionId: collectionId,
-		AddRequest: addRequest,
+		AddRequest:   addRequest,
 	}
 }
 
