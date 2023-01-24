@@ -76,7 +76,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 	fetchedBalances = keeper.GetBalancesForIdRanges([]*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 	}, balances)
 
@@ -86,7 +86,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 1,
-					End:   0,
+					End:   1,
 				},
 			},
 		},
@@ -105,7 +105,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 2,
-					End:   0,
+					End:   2,
 				},
 			},
 		},
@@ -114,7 +114,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 1,
-					End:   0,
+					End:   1,
 				},
 			},
 		},
@@ -197,7 +197,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 1,
-					End:   0,
+					End:   1,
 				},
 			},
 		},
@@ -243,7 +243,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 	balances = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
 		{
 			Start: 2,
-			End:   0,
+			End:   2,
 		},
 	}, 10, balances)
 
@@ -253,7 +253,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 1,
-					End:   0,
+					End:   1,
 				},
 				{
 					Start: 3,
@@ -270,7 +270,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 				},
 				{
 					Start: 2,
-					End:   0,
+					End:   2,
 				},
 			},
 		},
@@ -282,7 +282,7 @@ func (suite *TestSuite) TestSubtractBalances() {
 	badgeIdRanges := []*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 0,
@@ -290,7 +290,7 @@ func (suite *TestSuite) TestSubtractBalances() {
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 2,
@@ -340,11 +340,11 @@ func (suite *TestSuite) TestSubtractBalances() {
 	badgeIdRangesToRemove := []*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 35,
@@ -357,10 +357,10 @@ func (suite *TestSuite) TestSubtractBalances() {
 	}
 
 	suite.Require().Equal(UserBalance.Balances[0].Balance, uint64(998))
-	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: 35, End: 0}})
+	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: 35, End: 35}})
 
 	suite.Require().Equal(UserBalance.Balances[1].Balance, uint64(999))
-	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: 1, End: 0}, {Start: 36, End: 100}})
+	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: 1, End: 1}, {Start: 36, End: 100}})
 }
 
 func (suite *TestSuite) TestAddBalancesForIdRanges() {
@@ -368,7 +368,7 @@ func (suite *TestSuite) TestAddBalancesForIdRanges() {
 	badgeIdRanges := []*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 0,
@@ -376,7 +376,7 @@ func (suite *TestSuite) TestAddBalancesForIdRanges() {
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 2,
@@ -398,16 +398,16 @@ func (suite *TestSuite) TestAddBalancesForIdRanges() {
 	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: 0, End: 34}, {Start: 36, End: 100}})
 
 	suite.Require().Equal(UserBalance.Balances[1].Balance, uint64(2000))
-	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: 35, End: 0}})
+	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: 35, End: 35}})
 
 	badgeIdRangesToAdd := []*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 35,
@@ -424,10 +424,10 @@ func (suite *TestSuite) TestAddBalancesForIdRanges() {
 	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: 0, End: 0}, {Start: 2, End: 34}})
 
 	suite.Require().Equal(UserBalance.Balances[1].Balance, uint64(1001))
-	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: 1, End: 0}, {Start: 36, End: 100}})
+	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: 1, End: 1}, {Start: 36, End: 100}})
 
 	suite.Require().Equal(UserBalance.Balances[2].Balance, uint64(2002))
-	suite.Require().Equal(UserBalance.Balances[2].BadgeIds, []*types.IdRange{{Start: 35, End: 0}})
+	suite.Require().Equal(UserBalance.Balances[2].BadgeIds, []*types.IdRange{{Start: 35, End: 35}})
 }
 
 func (suite *TestSuite) TestAddBalancesOverflow() {
@@ -435,7 +435,7 @@ func (suite *TestSuite) TestAddBalancesOverflow() {
 	badgeIdRanges := []*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 0,
@@ -443,7 +443,7 @@ func (suite *TestSuite) TestAddBalancesOverflow() {
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 2,
@@ -465,7 +465,7 @@ func (suite *TestSuite) TestAddBalancesOverflow() {
 	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: 0, End: 34}, {Start: 36, End: 100}})
 
 	suite.Require().Equal(UserBalance.Balances[1].Balance, uint64(2000))
-	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: 35, End: 0}})
+	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: 35, End: 35}})
 
 	badgeIdRangesToAdd := []*types.IdRange{
 		{
@@ -485,7 +485,7 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 	badgeIdRanges := []types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 0,
@@ -513,11 +513,11 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 	badgeIdRangesToRemove := []*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 35,

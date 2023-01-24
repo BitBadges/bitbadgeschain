@@ -1089,6 +1089,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 					BadgeIds: []*types.IdRange{
 						{
 							Start: 150,
+							End: 150,
 						},
 					},
 				},
@@ -1106,6 +1107,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 					BadgeIds: []*types.IdRange{
 						{
 							Start: 950,
+							End:  950,
 						},
 					},
 				},

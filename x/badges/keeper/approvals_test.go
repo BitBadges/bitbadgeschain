@@ -12,7 +12,7 @@ func (suite *TestSuite) TestSetApprovals() {
 	badgeIdRanges := []*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 0,
@@ -20,7 +20,7 @@ func (suite *TestSuite) TestSetApprovals() {
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 2,
@@ -54,7 +54,7 @@ func (suite *TestSuite) TestSetApprovals() {
 	badgeIdRangesToRemove := []types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 0,
@@ -62,7 +62,7 @@ func (suite *TestSuite) TestSetApprovals() {
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 35,
@@ -97,7 +97,7 @@ func (suite *TestSuite) TestRemoveApprovals() {
 	badgeIdRanges := []*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 0,
@@ -105,7 +105,7 @@ func (suite *TestSuite) TestRemoveApprovals() {
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 2,
@@ -158,11 +158,11 @@ func (suite *TestSuite) TestRemoveApprovals() {
 	badgeIdRangesToRemove := []*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 35,
@@ -177,10 +177,10 @@ func (suite *TestSuite) TestRemoveApprovals() {
 
 	suite.Require().Equal(userBalance.Approvals[0].Address, aliceAccountNum)
 	suite.Require().Equal(userBalance.Approvals[0].Balances[0].Balance, uint64(998))
-	suite.Require().Equal(userBalance.Approvals[0].Balances[0].BadgeIds, []*types.IdRange{{Start: 35, End: 0}})
+	suite.Require().Equal(userBalance.Approvals[0].Balances[0].BadgeIds, []*types.IdRange{{Start: 35, End: 35}})
 
 	suite.Require().Equal(userBalance.Approvals[0].Balances[1].Balance, uint64(999))
-	suite.Require().Equal(userBalance.Approvals[0].Balances[1].BadgeIds, []*types.IdRange{{Start: 1, End: 0}, {Start: 36, End: 100}})
+	suite.Require().Equal(userBalance.Approvals[0].Balances[1].BadgeIds, []*types.IdRange{{Start: 1, End: 1}, {Start: 36, End: 100}})
 }
 
 func (suite *TestSuite) TestAddApprovals() {
@@ -188,7 +188,7 @@ func (suite *TestSuite) TestAddApprovals() {
 	badgeIdRanges := []*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 0,
@@ -196,7 +196,7 @@ func (suite *TestSuite) TestAddApprovals() {
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 2,
@@ -220,16 +220,16 @@ func (suite *TestSuite) TestAddApprovals() {
 
 	suite.Require().Equal(userBalance.Approvals[0].Address, aliceAccountNum)
 	suite.Require().Equal(userBalance.Approvals[0].Balances[1].Balance, uint64(2000))
-	suite.Require().Equal(userBalance.Approvals[0].Balances[1].BadgeIds, []*types.IdRange{{Start: 35, End: 0}})
+	suite.Require().Equal(userBalance.Approvals[0].Balances[1].BadgeIds, []*types.IdRange{{Start: 35, End: 35}})
 
 	badgeIdRangesToRemove := []*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 35,
@@ -246,11 +246,11 @@ func (suite *TestSuite) TestAddApprovals() {
 	suite.Require().Equal(userBalance.Approvals[0].Balances[0].BadgeIds, []*types.IdRange{{Start: 0, End: 0}, {Start: 2, End: 34}})
 
 	suite.Require().Equal(userBalance.Approvals[0].Balances[1].Balance, uint64(1001))
-	suite.Require().Equal(userBalance.Approvals[0].Balances[1].BadgeIds, []*types.IdRange{{Start: 1, End: 0}, {Start: 36, End: 100}})
+	suite.Require().Equal(userBalance.Approvals[0].Balances[1].BadgeIds, []*types.IdRange{{Start: 1, End: 1}, {Start: 36, End: 100}})
 
 	suite.Require().Equal(userBalance.Approvals[0].Address, aliceAccountNum)
 	suite.Require().Equal(userBalance.Approvals[0].Balances[2].Balance, uint64(2002))
-	suite.Require().Equal(userBalance.Approvals[0].Balances[2].BadgeIds, []*types.IdRange{{Start: 35, End: 0}})
+	suite.Require().Equal(userBalance.Approvals[0].Balances[2].BadgeIds, []*types.IdRange{{Start: 35, End: 35}})
 }
 
 func (suite *TestSuite) TestAddApprovalsOverflow() {
@@ -258,7 +258,7 @@ func (suite *TestSuite) TestAddApprovalsOverflow() {
 	badgeIdRanges := []*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 0,
@@ -266,7 +266,7 @@ func (suite *TestSuite) TestAddApprovalsOverflow() {
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 2,
@@ -290,7 +290,7 @@ func (suite *TestSuite) TestAddApprovalsOverflow() {
 
 	suite.Require().Equal(userBalance.Approvals[0].Address, aliceAccountNum)
 	suite.Require().Equal(userBalance.Approvals[0].Balances[1].Balance, uint64(2000))
-	suite.Require().Equal(userBalance.Approvals[0].Balances[1].BadgeIds, []*types.IdRange{{Start: 35, End: 0}})
+	suite.Require().Equal(userBalance.Approvals[0].Balances[1].BadgeIds, []*types.IdRange{{Start: 35, End: 35}})
 
 	badgeIdRangesToAdd := []*types.IdRange{
 		{
@@ -313,7 +313,7 @@ func (suite *TestSuite) TestRemoveApprovalsUnderflow() {
 	badgeIdRanges := []*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 0,
@@ -321,7 +321,7 @@ func (suite *TestSuite) TestRemoveApprovalsUnderflow() {
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 2,
@@ -346,11 +346,11 @@ func (suite *TestSuite) TestRemoveApprovalsUnderflow() {
 	badgeIdRangesToRemove := []*types.IdRange{
 		{
 			Start: 1,
-			End:   0,
+			End:   1,
 		},
 		{
 			Start: 35,
-			End:   0,
+			End:   35,
 		},
 		{
 			Start: 35,

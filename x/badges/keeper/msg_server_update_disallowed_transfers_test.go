@@ -21,15 +21,15 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 					{
 						From: &types.Addresses{
 							AccountNums: []*types.IdRange{
-								{Start: aliceAccountNum},
+								{Start: aliceAccountNum, End: aliceAccountNum},
 							},
-							ManagerOptions: types.ManagerOptions_Neutral,
+							Options: types.AddressOptions_None,
 						},
 						To: &types.Addresses{
 							AccountNums: []*types.IdRange{
 								{Start: 0, End: math.MaxUint64},
 							},
-							ManagerOptions: types.ManagerOptions_Neutral,
+							Options: types.AddressOptions_None,
 						},
 					},
 				},
@@ -157,11 +157,11 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 		{
 			From: &types.Addresses{
 				AccountNums:    []*types.IdRange{{Start: aliceAccountNum, End: aliceAccountNum}},
-				ManagerOptions: types.ManagerOptions_Neutral,
+				Options: types.AddressOptions_None,
 			},
 			To: &types.Addresses{
 				AccountNums:    []*types.IdRange{{Start: 0, End: math.MaxUint64}},
-				ManagerOptions: types.ManagerOptions_Neutral,
+				Options: types.AddressOptions_None,
 			},
 		},
 	})
@@ -368,7 +368,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 
 // 	badge, _ = GetCollection(suite, wctx, 0)
 
-// 	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: 1, End: 0}})
+// 	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: 1, End: 1}})
 // 	suite.Require().Nil(err, "Error freezing address")
 
 // 	badge, _ = GetCollection(suite, wctx, 0)

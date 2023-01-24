@@ -850,7 +850,7 @@ paths:
 
                                   If end == 0, we assume end == start. Start
                                   must be >= end.
-                            managerOptions:
+                            Options:
                               type: string
                               enum:
                                 - Neutral
@@ -878,7 +878,7 @@ paths:
 
                                   If end == 0, we assume end == start. Start
                                   must be >= end.
-                            managerOptions:
+                            Options:
                               type: string
                               enum:
                                 - Neutral
@@ -922,7 +922,7 @@ paths:
 
                                   If end == 0, we assume end == start. Start
                                   must be >= end.
-                            managerOptions:
+                            Options:
                               type: string
                               enum:
                                 - Neutral
@@ -950,7 +950,7 @@ paths:
 
                                   If end == 0, we assume end == start. Start
                                   must be >= end.
-                            managerOptions:
+                            Options:
                               type: string
                               enum:
                                 - Neutral
@@ -46134,7 +46134,7 @@ definitions:
             badge IDs, nonces, anything. 
 
             If end == 0, we assume end == start. Start must be >= end.
-      managerOptions:
+      Options:
         type: string
         enum:
           - Neutral
@@ -46242,7 +46242,7 @@ definitions:
                       used for badge IDs, nonces, anything. 
 
                       If end == 0, we assume end == start. Start must be >= end.
-                managerOptions:
+                Options:
                   type: string
                   enum:
                     - Neutral
@@ -46268,7 +46268,7 @@ definitions:
                       used for badge IDs, nonces, anything. 
 
                       If end == 0, we assume end == start. Start must be >= end.
-                managerOptions:
+                Options:
                   type: string
                   enum:
                     - Neutral
@@ -46306,7 +46306,7 @@ definitions:
                       used for badge IDs, nonces, anything. 
 
                       If end == 0, we assume end == start. Start must be >= end.
-                managerOptions:
+                Options:
                   type: string
                   enum:
                     - Neutral
@@ -46332,7 +46332,7 @@ definitions:
                       used for badge IDs, nonces, anything. 
 
                       If end == 0, we assume end == start. Start must be >= end.
-                managerOptions:
+                Options:
                   type: string
                   enum:
                     - Neutral
@@ -46541,7 +46541,7 @@ definitions:
       IDs, nonces, anything. 
 
       If end == 0, we assume end == start. Start must be >= end.
-  bitbadges.bitbadgeschain.badges.ManagerOptions:
+  bitbadges.bitbadgeschain.badges.Options:
     type: string
     enum:
       - Neutral
@@ -46822,7 +46822,7 @@ definitions:
 
                           If end == 0, we assume end == start. Start must be >=
                           end.
-                    managerOptions:
+                    Options:
                       type: string
                       enum:
                         - Neutral
@@ -46849,7 +46849,7 @@ definitions:
 
                           If end == 0, we assume end == start. Start must be >=
                           end.
-                    managerOptions:
+                    Options:
                       type: string
                       enum:
                         - Neutral
@@ -46891,7 +46891,7 @@ definitions:
 
                           If end == 0, we assume end == start. Start must be >=
                           end.
-                    managerOptions:
+                    Options:
                       type: string
                       enum:
                         - Neutral
@@ -46918,7 +46918,7 @@ definitions:
 
                           If end == 0, we assume end == start. Start must be >=
                           end.
-                    managerOptions:
+                    Options:
                       type: string
                       enum:
                         - Neutral
@@ -47035,7 +47035,7 @@ definitions:
                 for badge IDs, nonces, anything. 
 
                 If end == 0, we assume end == start. Start must be >= end.
-          managerOptions:
+          Options:
             type: string
             enum:
               - Neutral
@@ -47061,7 +47061,7 @@ definitions:
                 for badge IDs, nonces, anything. 
 
                 If end == 0, we assume end == start. Start must be >= end.
-          managerOptions:
+          Options:
             type: string
             enum:
               - Neutral

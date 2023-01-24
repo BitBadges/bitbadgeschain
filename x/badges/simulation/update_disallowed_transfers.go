@@ -39,7 +39,7 @@ func SimulateMsgUpdateDisallowedTransfers(
 								End:   r.Uint64(),
 							},
 						},
-						ManagerOptions: types.ManagerOptions_Neutral,
+						Options: types.AddressOptions_None,
 					},
 				},
 			},

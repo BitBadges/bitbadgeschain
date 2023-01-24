@@ -28,7 +28,7 @@ func TestMsgUpdateDisallowedTransfers_ValidateBasic(t *testing.T) {
 									End:   0,
 								},
 							},
-							ManagerOptions: types.ManagerOptions_Neutral,
+							Options: types.AddressOptions_None,
 						},
 						To: &types.Addresses{
 							AccountNums: []*types.IdRange{
@@ -37,7 +37,7 @@ func TestMsgUpdateDisallowedTransfers_ValidateBasic(t *testing.T) {
 									End:   0,
 								},
 							},
-							ManagerOptions: types.ManagerOptions_Neutral,
+							Options: types.AddressOptions_None,
 						},
 					},
 				},
@@ -56,7 +56,7 @@ func TestMsgUpdateDisallowedTransfers_ValidateBasic(t *testing.T) {
 									End:   0,
 								},
 							},
-							ManagerOptions: types.ManagerOptions_Neutral,
+							Options: types.AddressOptions_None,
 						},
 						To: &types.Addresses{
 							AccountNums: []*types.IdRange{
@@ -65,7 +65,7 @@ func TestMsgUpdateDisallowedTransfers_ValidateBasic(t *testing.T) {
 									End:   0,
 								},
 							},
-							ManagerOptions: types.ManagerOptions_Neutral,
+							Options: types.AddressOptions_None,
 						},
 					},
 				},

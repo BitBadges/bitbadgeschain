@@ -59,7 +59,7 @@ func (suite *TestSuite) TestNewBadges() {
 	suite.Require().Equal(uint64(2), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 0}}, //0 to 0 range so it will be nil
+			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
 			Balance:  1,
 		},
 		{
@@ -85,7 +85,7 @@ func (suite *TestSuite) TestNewBadges() {
 	suite.Require().Equal(uint64(4), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 0}}, //0 to 0 range so it will be nil
+			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
 			Balance:  1,
 		},
 		{
@@ -153,7 +153,7 @@ func (suite *TestSuite) TestNewBadgesDirectlyUponCreatingNewBadge() {
 	suite.Require().Equal(uint64(2), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 0}}, //0 to 0 range so it will be nil
+			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
 			Balance:  1,
 		},
 		{
@@ -178,7 +178,7 @@ func (suite *TestSuite) TestNewBadgesDirectlyUponCreatingNewBadge() {
 	suite.Require().Equal(uint64(4), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 0}}, //0 to 0 range so it will be nil
+			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
 			Balance:  1,
 		},
 		{

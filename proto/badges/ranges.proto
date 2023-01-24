@@ -12,15 +12,15 @@ message IdRange {
     uint64 end = 2;
 }
 
-enum ManagerOptions {
-    Neutral = 0;
-    Include = 1;
-    Exclude = 2;
+enum AddressOptions {
+    None = 0;
+    IncludeManager = 1;
+    ExcludeManager = 2;
 }
 
 message Addresses {
     repeated IdRange accountNums = 1;
-    ManagerOptions managerOptions = 2;
+    AddressOptions options = 2;
 }
 
 //TransferMapping defines a mapping of transfers from one set of addresses to another.
