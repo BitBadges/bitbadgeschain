@@ -169,14 +169,6 @@ func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool, bool, bool) {
 			{Name: "badgeId", Type: "uint64"},
 			{Name: "add", Type: "bool"},
 		}, false, true, false, false
-	case TypeMsgUpdateManagerApprovedTransfers:
-		return []apitypes.Type{
-			//TODO:
-			{Name: "creator", Type: "string"},
-			{Name: "addressRanges", Type: "IdRange[]"},
-			{Name: "badgeId", Type: "uint64"},
-			{Name: "add", Type: "bool"},
-		}, false, true, false, false
 	case TypeMsgUpdateUris:
 		return []apitypes.Type{{Name: "creator", Type: "string"},
 			{Name: "badgeId", Type: "uint64"},

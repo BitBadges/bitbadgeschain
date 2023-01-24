@@ -13,7 +13,6 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgTransferBadge{}, "badges/TransferBadge", nil)
 	cdc.RegisterConcrete(&MsgSetApproval{}, "badges/SetApproval", nil)
 	cdc.RegisterConcrete(&MsgUpdateDisallowedTransfers{}, "badges/UpdateDisallowedTransfers", nil)
-	cdc.RegisterConcrete(&MsgUpdateManagerApprovedTransfers{}, "badges/UpdateManagerApprovedTransfers", nil)
 	cdc.RegisterConcrete(&MsgUpdateUris{}, "badges/UpdateUris", nil)
 	cdc.RegisterConcrete(&MsgUpdatePermissions{}, "badges/UpdatePermissions", nil)
 	cdc.RegisterConcrete(&MsgTransferManager{}, "badges/TransferManager", nil)
@@ -39,9 +38,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgUpdateDisallowedTransfers{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgUpdateManagerApprovedTransfers{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgUpdateUris{},

@@ -15,7 +15,6 @@ service Msg {
     rpc TransferBadge(MsgTransferBadge) returns (MsgTransferBadgeResponse);
     rpc SetApproval(MsgSetApproval) returns (MsgSetApprovalResponse);
     rpc UpdateDisallowedTransfers(MsgUpdateDisallowedTransfers) returns (MsgUpdateDisallowedTransfersResponse);
-    rpc UpdateManagerApprovedTransfers(MsgUpdateManagerApprovedTransfers) returns (MsgUpdateManagerApprovedTransfersResponse);
     rpc UpdateUris(MsgUpdateUris) returns (MsgUpdateUrisResponse);
     rpc UpdatePermissions(MsgUpdatePermissions) returns (MsgUpdatePermissionsResponse);
     rpc TransferManager(MsgTransferManager) returns (MsgTransferManagerResponse);
@@ -105,15 +104,6 @@ message MsgUpdateDisallowedTransfers {
 }
 
 message MsgUpdateDisallowedTransfersResponse {
-}
-
-message MsgUpdateManagerApprovedTransfers {
-    string creator = 1;
-    uint64 collectionId = 2;
-    repeated TransferMapping managerApprovedTransfers = 3;
-}
-  
-message MsgUpdateManagerApprovedTransfersResponse {
 }
 
 //Update badge Uris with new URI object, if permitted.

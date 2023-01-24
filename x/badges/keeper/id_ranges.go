@@ -284,3 +284,24 @@ func GetIdRangesToInsertToStorage(idRanges []*types.IdRange) []*types.IdRange {
 	}
 	return newIdRanges
 }
+
+func AddManagerAddressToRanges(collection types.BadgeCollection, ranges []*types.IdRange, options types.AddressOptions) []*types.IdRange {
+	idx, found := SearchIdRangesForId(collection.Manager, ranges)
+	if options == types.AddressOptions_IncludeManager {
+		if !found {
+			ranges = append(ranges, GetIdRangeToInsert(collection.Manager, collection.Manager))
+			ranges = SortIdRangesAndMerge(ranges)
+			return ranges
+		}
+	} else if options == types.AddressOptions_ExcludeManager {
+		if found {
+			newRanges := []*types.IdRange{}
+			newRanges = append(newRanges, ranges[:idx]...)
+			newRanges = append(newRanges, RemoveIdsFromIdRange(GetIdRangeToInsert(collection.Manager, collection.Manager), ranges[idx])...)
+			newRanges = append(newRanges, ranges[idx+1:]...)
+			ranges = newRanges
+		}
+	}
+
+	return ranges
+}

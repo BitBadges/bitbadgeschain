@@ -16,7 +16,6 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 				CollectionUri: "https://example.com",
 				BadgeUri:      "https://example.com/{id}",
 				Permissions:   62,
-
 				DisallowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.Addresses{
@@ -189,6 +188,9 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 }
 
 //TODO:
+//TODO: also test transfer mappings
+
+//TODO: also test manager approved transfers with transfer mappings
 
 // func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefault() {
 // 	wctx := sdk.WrapSDKContext(suite.ctx)

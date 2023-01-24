@@ -66,12 +66,26 @@ func DeductApprovals(UserBalance types.UserBalance, collection types.BadgeCollec
 
 // Checks if account is frozen or not.
 func IsTransferAllowed(collection types.BadgeCollection, permissions types.Permissions, fromAddress uint64, toAddress uint64, approvedBy uint64) bool {
-	//TODO: normalize ranges for manager include/exclude
-
 	if approvedBy == collection.Manager {
+		//Check if this is an approved transfer by the manager
 		for _, managerApprovedTransfer := range collection.ManagerApprovedTransfers {
-			_, fromFound := SearchIdRangesForId(fromAddress, managerApprovedTransfer.From.AccountNums)
-			_, toFound := SearchIdRangesForId(toAddress, managerApprovedTransfer.To.AccountNums)
+			fromFound := false
+			toFound := false
+			if managerApprovedTransfer.From.Options == types.AddressOptions_IncludeManager {
+				fromFound = true
+			} else if managerApprovedTransfer.From.Options == types.AddressOptions_ExcludeManager {
+				fromFound = false
+			} else {
+				_, fromFound = SearchIdRangesForId(fromAddress, managerApprovedTransfer.From.AccountNums)
+			}
+
+			if managerApprovedTransfer.To.Options == types.AddressOptions_IncludeManager {
+				toFound = true
+			} else if managerApprovedTransfer.To.Options == types.AddressOptions_ExcludeManager {
+				toFound = false
+			} else {
+				_, toFound = SearchIdRangesForId(toAddress, managerApprovedTransfer.To.AccountNums)
+			}
 
 			if fromFound && toFound {
 				return true

@@ -31,9 +31,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgUpdateDisallowedTransfers:
 			res, err := msgServer.UpdateDisallowedTransfers(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgUpdateManagerApprovedTransfers:
-			res, err := msgServer.UpdateManagerApprovedTransfers(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgUpdateUris:
 			res, err := msgServer.UpdateUris(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
