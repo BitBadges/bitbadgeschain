@@ -9,13 +9,15 @@ const TypeMsgClaimBadge = "claim_badge"
 
 var _ sdk.Msg = &MsgClaimBadge{}
 
-func NewMsgClaimBadge(creator string, claimId uint64, collectionId uint64, leaf []byte, proof *Proof) *MsgClaimBadge {
+func NewMsgClaimBadge(creator string, claimId uint64, collectionId uint64, leaf []byte, proof *Proof, uri string, timeRange *IdRange) *MsgClaimBadge {
 	return &MsgClaimBadge{
 		Creator: creator,
 		ClaimId: claimId,
 		CollectionId: collectionId,
 		Leaf: leaf,
 		Proof: proof,
+		Uri: uri,
+		TimeRange: timeRange,
 	}
 }
 
@@ -64,6 +66,16 @@ func (msg *MsgClaimBadge) ValidateBasic() error {
 		}
 	}
 	
+	if msg.Uri != "" {
+		err = ValidateURI(msg.Uri)
+		if err != nil {
+			return err
+		}
+	}
+
+	if msg.TimeRange != nil && msg.TimeRange.Start > msg.TimeRange.End {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
+	}
 
 	return nil
 }

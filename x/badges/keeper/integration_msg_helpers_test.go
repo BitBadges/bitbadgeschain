@@ -156,8 +156,8 @@ func RegisterAddresses(suite *TestSuite, ctx context.Context, creator string, ad
 	return err
 }
 
-func ClaimBadge(suite *TestSuite, ctx context.Context, creator string, claimId uint64, collectionId uint64, leaf []byte, proof *types.Proof) error {
-	msg := types.NewMsgClaimBadge(creator, claimId, collectionId,leaf, proof)
+func ClaimBadge(suite *TestSuite, ctx context.Context, creator string, claimId uint64, collectionId uint64, leaf []byte, proof *types.Proof, uri string, timeRange *types.IdRange) error {
+	msg := types.NewMsgClaimBadge(creator, claimId, collectionId,leaf, proof, uri, timeRange)
 	_, err := suite.msgServer.ClaimBadge(ctx, msg)
 	return err
 }

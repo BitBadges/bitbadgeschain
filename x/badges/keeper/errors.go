@@ -50,4 +50,5 @@ var (
 	ErrClaimAlreadyUsed 						   	= sdkerrors.Register(types.ModuleName, 43, "claim already used")
 	ErrClaimNotFound 							   	= sdkerrors.Register(types.ModuleName, 44, "claim not found")
 	ErrClaimDataInvalid 							= sdkerrors.Register(types.ModuleName, 45, "claim data invalid")
+	ErrClaimTimeInvalid 							= sdkerrors.Register(types.ModuleName, 46, "claim time invalid")
 )

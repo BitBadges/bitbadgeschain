@@ -20,6 +20,11 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		return nil, ErrClaimNotFound
 	}
 
+	//Assert claim is not expired
+	if claim.TimeRange.Start > uint64(ctx.BlockTime().Unix()) || claim.TimeRange.End < uint64(ctx.BlockTime().Unix()) {
+		return nil, ErrClaimTimeInvalid
+	}
+
 	claimData := msg.Leaf
 	if claim.Type == types.ClaimType_AccountNum {
 		//Assert claimData is either the account number or cosmos address

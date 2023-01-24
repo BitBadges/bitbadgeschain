@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"math"
+
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -39,6 +41,11 @@ func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 		AmountPerClaim: 1,
 		Data:       rootHash,
 		Type: 	 	types.ClaimType_AccountNum,
+		Uri: "",
+		TimeRange: &types.IdRange{
+			Start: 0,
+			End:   math.MaxUint64,
+		},
 	}
 
 	err = CreateBadges(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
@@ -66,7 +73,10 @@ func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 	suite.Require().Nil(err, "Error getting claim")
 	suite.Require().Equal(claimToAdd, claim)
 
-	err = ClaimBadge(suite, wctx, alice, 0, 0,  []byte(alice), (*types.Proof)(merkleProofs[0]))
+	err = ClaimBadge(suite, wctx, alice, 0, 0,  []byte(alice), (*types.Proof)(merkleProofs[0]), "", &types.IdRange{
+		Start: 0,
+		End:   math.MaxUint64,
+	})
 	suite.Require().Nil(err, "Error claiming badge")
 
 	aliceBalance, _ := GetUserBalance(suite, wctx, 0, aliceAccountNum)
@@ -138,7 +148,10 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	suite.Require().Nil(err, "Error getting claim")
 	suite.Require().Equal(claimToAdd, claim)
 
-	err = ClaimBadge(suite, wctx, alice, 0, 0, []byte("121241234"), (*types.Proof)(merkleProofs[0]))
+	err = ClaimBadge(suite, wctx, alice, 0, 0, []byte("121241234"), (*types.Proof)(merkleProofs[0]), "", &types.IdRange{
+		Start: 0,
+		End:   math.MaxUint64,
+	})
 	suite.Require().EqualError(err, keeper.ErrClaimDataInvalid.Error())
 }
 
@@ -202,7 +215,10 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 	suite.Require().Nil(err, "Error getting claim")
 	suite.Require().Equal(claimToAdd, claim)
 
-	err = ClaimBadge(suite, wctx, alice, 0, 0, []byte("121241234"), (*types.Proof)(merkleProofs[0]))
+	err = ClaimBadge(suite, wctx, alice, 0, 0, []byte("121241234"), (*types.Proof)(merkleProofs[0]), "", &types.IdRange{
+		Start: 0,
+		End:   math.MaxUint64,
+	})
 	suite.Require().Nil(err, "Error claiming badge")
 
 	aliceBalance, _ := GetUserBalance(suite, wctx, 0, aliceAccountNum)

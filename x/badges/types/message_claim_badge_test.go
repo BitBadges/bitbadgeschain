@@ -1,6 +1,7 @@
 package types
 
 import (
+	math "math"
 	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
@@ -24,6 +25,18 @@ func TestMsgClaimBadge_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: MsgClaimBadge{
 				Creator: sample.AccAddress(),
+				
+				TimeRange: &IdRange{
+					Start: 0,
+					End: math.MaxUint64,
+				},
+				Leaf: []byte("hello"),
+				Proof: &Proof{
+					LeafHash: []byte("hello"),
+					Aunts: [][]byte{[]byte("hello")},
+					Total: 1,
+					Index: 0,
+				},
 			},
 		},
 	}
