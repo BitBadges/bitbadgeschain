@@ -63,18 +63,6 @@ func GetIdxSpanForRange(rangeToCheck *types.IdRange, currRanges []*types.IdRange
 	}
 }
 
-//TODO:
-// Handle the case where it omits an empty IdRange because Start && End == 0. This is in the case where we have a non-empty balance and an empty idRanges.
-func GetIdRangesWithOmitEmptyCaseHandled(ids []*types.IdRange) []*types.IdRange {
-	if len(ids) == 0 {
-		ids = append(ids, &types.IdRange{
-			Start: 0,
-			End:   0,
-		})
-	}
-	return ids
-}
-
 // Assumes given ID is not already in a range. 
 // Gets the index to insert at. Ex. [{0-10}, {10-20}, {30-40}] and inserting 25 would return index 2
 func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) (int, error) {

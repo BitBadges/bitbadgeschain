@@ -41,8 +41,6 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*ty
 	idRanges = SortAndMergeOverlapping(idRanges)
 	idRangesNotFound := idRanges
 	for _, userBalanceObj := range currentUserBalances {
-		userBalanceObj.BadgeIds = GetIdRangesWithOmitEmptyCaseHandled(userBalanceObj.BadgeIds)
-
 		//For each specified range, search the current userBalanceObj's IdRanges to see if there is any overlap.
 		//If so, we add the overlapping range and current balance to the new []*types.Balances to be returned.
 
@@ -155,8 +153,6 @@ func SubtractBalancesForIdRanges(UserBalance types.UserBalance, ranges []*types.
 func DeleteBalanceForIdRanges(ranges []*types.IdRange, balances []*types.Balance) []*types.Balance {
 	newBalances := []*types.Balance{}
 	for _, balanceObj := range balances {
-		balanceObj.BadgeIds = GetIdRangesWithOmitEmptyCaseHandled(balanceObj.BadgeIds)
-
 		for _, rangeToDelete := range ranges {
 			currRanges := balanceObj.BadgeIds
 			idxSpan, found := GetIdxSpanForRange(rangeToDelete, currRanges)
@@ -209,7 +205,6 @@ func SetBalanceForIdRanges(ranges []*types.IdRange, amount uint64, balances []*t
 	} else {
 		//Update existing balance object
 		newBalances = balances
-		newBalances[idx].BadgeIds = GetIdRangesWithOmitEmptyCaseHandled(newBalances[idx].BadgeIds)
 		for _, rangeToAdd := range ranges {
 			newBalances[idx].BadgeIds, err = InsertRangeToIdRanges(rangeToAdd, newBalances[idx].BadgeIds)
 			if err != nil {

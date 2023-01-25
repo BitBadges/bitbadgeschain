@@ -60,8 +60,6 @@ func ValidateRangesAreValid(badgeIdRanges []*IdRange) error {
 			return ErrRangesIsNil
 		}
 
-		
-
 		if badgeIdRange.Start > badgeIdRange.End {
 			return ErrStartGreaterThanEnd
 		}
