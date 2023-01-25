@@ -10,19 +10,15 @@ import (
 )
 
 // Queries a balance for the given address and badgeId and returns its contents.
-func (k Keeper) GetClaim(goCtx context.Context, req *types.QueryGetClaimRequest) (*types.QueryGetClaimResponse, error) {
+func (k Keeper) IsClaimDataUsed(goCtx context.Context, req *types.QueryIsClaimDataUsedRequest) (*types.QueryIsClaimDataUsedResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	claim, found := k.GetClaimFromStore(ctx, req.ClaimId)
-	if !found {
-		return nil, ErrClaimNotExists
-	}
-
-	return &types.QueryGetClaimResponse{
-		Claim: &claim,
+	used := k.StoreHasUsedClaimData(ctx, req.CollectionId, req.ClaimId, req.ClaimData)
+	return &types.QueryIsClaimDataUsedResponse{
+		Used: used,
 	}, nil
 }

@@ -16,8 +16,6 @@ func NewMsgClaimBadge(creator string, claimId uint64, collectionId uint64, leaf 
 		CollectionId: collectionId,
 		Leaf: leaf,
 		Proof: proof,
-		Uri: uri,
-		TimeRange: timeRange,
 	}
 }
 
@@ -64,22 +62,6 @@ func (msg *MsgClaimBadge) ValidateBasic() error {
 		if aunt == nil || len(aunt) == 0 {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid aunt in proof")
 		}
-	}
-	
-	if msg.Uri != "" {
-		err = ValidateURI(msg.Uri)
-		if err != nil {
-			return err
-		}
-	}
-
-	if msg.TimeRange == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
-	}
-
-	err = ValidateRangesAreValid([]*IdRange{msg.TimeRange})
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
 	}
 
 	return nil

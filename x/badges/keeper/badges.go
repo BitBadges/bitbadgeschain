@@ -183,13 +183,7 @@ func (k Keeper) MintViaClaim(ctx sdk.Context, collection types.BadgeCollection, 
 			return types.BadgeCollection{}, err
 		}
 
-		nextClaimId := k.GetNextClaimId(ctx)
-		err = k.SetClaimInStore(ctx, nextClaimId, *claim)
-		if err != nil {
-			return types.BadgeCollection{}, err
-		}
-
-		k.IncrementNextClaimId(ctx)
+		collection.Claims = append(collection.Claims, claim)
 	}
 
 	collection.UnmintedSupplys = unmintedBalances.Balances

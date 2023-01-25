@@ -15,10 +15,16 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 
 	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
 
-	claim, found := k.GetClaimFromStore(ctx, msg.ClaimId)
+	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
 	if !found {
+		return nil, ErrBadgeNotExists
+	}
+
+	if uint64(len(collection.Claims)) <= msg.ClaimId {
 		return nil, ErrClaimNotFound
 	}
+
+	claim := collection.Claims[msg.ClaimId]
 
 	//Assert claim is not expired
 	if claim.TimeRange.Start > uint64(ctx.BlockTime().Unix()) || claim.TimeRange.End < uint64(ctx.BlockTime().Unix()) {
@@ -82,7 +88,10 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 
 	claim.Balance = claimUserBalance.Balances[0]
 
-	err = k.SetClaimInStore(ctx, msg.ClaimId, claim)
+	
+	collection.Claims[msg.ClaimId] = claim
+	
+	err = k.SetCollectionInStore(ctx, collection)
 	if err != nil {
 		return nil, err
 	}

@@ -63,5 +63,23 @@ func (msg *MsgMintBadge) ValidateBasic() error {
 		return err
 	}
 
+	for _, claim := range msg.Claims {
+		if claim.Uri != "" {
+			err = ValidateURI(claim.Uri)
+			if err != nil {
+				return err
+			}
+		}
+	
+		if claim.TimeRange == nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
+		}
+	
+		err = ValidateRangesAreValid([]*IdRange{claim.TimeRange})
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
+		}
+	}
+
 	return nil
 }

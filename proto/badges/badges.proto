@@ -4,6 +4,7 @@ package bitbadges.bitbadgeschain.badges;
 import "google/protobuf/any.proto";
 import "badges/ranges.proto";
 import "badges/balances.proto";
+import "badges/claims.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
@@ -50,6 +51,9 @@ message BadgeCollection {
     //This is a map of the maximum badge supplys. 
     repeated Balance maxSupplys = 11;
 
+    //This is an array of the current badge claims.
+    repeated Claim claims = 12;
+
     //Defines what standard this badge should implement (see /standards).
-    uint64 standard = 12;
+    uint64 standard = 13;
 }

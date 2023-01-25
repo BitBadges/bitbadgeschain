@@ -51,7 +51,7 @@ func (suite *TestSuite) TestSendAllToClaims() {
 		},
 	}, badge.MaxSupplys)
 
-	claim, err := GetClaim(suite, wctx, 0)
+	claim := badge.Claims[0]
 	suite.Require().Nil(err, "Error getting claim")
-	suite.Require().Equal(claimToAdd, claim)
+	suite.Require().Equal(&claimToAdd, claim)
 }

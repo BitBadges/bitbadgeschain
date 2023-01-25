@@ -69,9 +69,7 @@ func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 		},
 	}, badge.MaxSupplys)
 
-	claim, err := GetClaim(suite, wctx, 0)
-	suite.Require().Nil(err, "Error getting claim")
-	suite.Require().Equal(claimToAdd, claim)
+	claim := badge.Claims[0]
 
 	err = ClaimBadge(suite, wctx, alice, 0, 0,  []byte(alice), (*types.Proof)(merkleProofs[0]), "", &types.IdRange{
 		Start: 0,
@@ -83,8 +81,8 @@ func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 	suite.Require().Equal(uint64(1), aliceBalance.Balances[0].Balance)
 	suite.Require().Equal([]*types.IdRange{{Start: 0, End: 0}}, aliceBalance.Balances[0].BadgeIds)
 
-	claim, err = GetClaim(suite, wctx, 0)
-	suite.Require().Nil(err, "Error getting claim")
+	badge, _ = GetCollection(suite, wctx, 0)
+	claim = badge.Claims[0]
 	suite.Require().Equal(uint64(9), claim.Balance.Balance)
 	// suite.Require().Equal([]*types.IdRange{{Start: 0, End: 0}}, aliceBalance.Balances[0].BadgeIds)
 }
@@ -149,9 +147,8 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 		},
 	}, badge.MaxSupplys)
 
-	claim, err := GetClaim(suite, wctx, 0)
-	suite.Require().Nil(err, "Error getting claim")
-	suite.Require().Equal(claimToAdd, claim)
+	claim := badge.Claims[0]
+	suite.Require().Equal(&claimToAdd, claim)
 
 	err = ClaimBadge(suite, wctx, alice, 0, 0, []byte("121241234"), (*types.Proof)(merkleProofs[0]), "", &types.IdRange{
 		Start: 0,
@@ -221,9 +218,8 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 		},
 	}, badge.MaxSupplys)
 
-	claim, err := GetClaim(suite, wctx, 0)
-	suite.Require().Nil(err, "Error getting claim")
-	suite.Require().Equal(claimToAdd, claim)
+	claim := badge.Claims[0]
+	suite.Require().Equal(&claimToAdd, claim)
 
 	err = ClaimBadge(suite, wctx, alice, 0, 0, []byte("121241234"), (*types.Proof)(merkleProofs[0]), "", &types.IdRange{
 		Start: 0,
@@ -235,8 +231,8 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 	suite.Require().Equal(uint64(1), aliceBalance.Balances[0].Balance)
 	suite.Require().Equal([]*types.IdRange{{Start: 0, End: 0}}, aliceBalance.Balances[0].BadgeIds)
 
-	claim, err = GetClaim(suite, wctx, 0)
-	suite.Require().Nil(err, "Error getting claim")
+	badge, _ = GetCollection(suite, wctx, 0)
+	claim = badge.Claims[0]
 	suite.Require().Equal(uint64(9), claim.Balance.Balance)
 	// suite.Require().Equal([]*types.IdRange{{Start: 0, End: 0}}, aliceBalance.Balances[0].BadgeIds)
 }

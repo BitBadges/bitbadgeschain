@@ -8,15 +8,6 @@ import (
 
 /* Query helpers */
 
-func GetClaim(suite *TestSuite, ctx context.Context, claimId uint64) (types.Claim, error) {
-	res, err := suite.app.BadgesKeeper.GetClaim(ctx, &types.QueryGetClaimRequest{ClaimId: uint64(claimId)})
-	if err != nil {
-		return types.Claim{}, err
-	}
-
-	return *res.Claim, nil
-}
-
 func GetCollection(suite *TestSuite, ctx context.Context, id uint64) (types.BadgeCollection, error) {
 	res, err := suite.app.BadgesKeeper.GetCollection(ctx, &types.QueryGetCollectionRequest{Id: uint64(id)})
 	if err != nil {

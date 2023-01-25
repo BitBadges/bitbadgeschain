@@ -181,8 +181,6 @@ message MsgClaimBadge {
     uint64 collectionId = 3;
     bytes leaf = 4;
     Proof proof = 5;
-    string uri = 6;
-    IdRange timeRange = 7;
 }
   
 message MsgClaimBadgeResponse {}
