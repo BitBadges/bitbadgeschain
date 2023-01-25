@@ -48,11 +48,11 @@ func (msg *MsgUpdateUris) ValidateBasic() error {
 	}
 
 	//Validate well-formedness of the message entries
-	if err := ValidateURI(*&msg.BadgeUri); err != nil {
+	if err := ValidateURI(msg.BadgeUri); err != nil {
 		return err
 	}
 
-	if err := ValidateURI(*&msg.CollectionUri); err != nil {
+	if err := ValidateURI(msg.CollectionUri); err != nil {
 		return err
 	}
 

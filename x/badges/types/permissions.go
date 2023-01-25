@@ -6,23 +6,14 @@ const (
 
 /*
 	Flag bits are in the following order from left to right; leading zeroes are applied and any future additions will be appended to the right
-
-	CanUpdateBytes: can the manager update the bytes of the badge; if false, locked forever
-	CanManagerBeTransferred: can the manager transfer the managerial ownership of the badge to another account
-	CanUpdateUris: can the manager update the uris of the class and subassets; if false, locked forever
-	ForcefulTransfers: if true, one can send a badge to an account without pending approval; these badges should not by default be displayed on public profiles (can also use collections)
-	CanCreateMoreBadges: when true, manager can create more subassets of the class; once set to false, it is locked
-	CanRevoke: when true, manager can revoke subassets of the class (including null address); once set to false, it is locked
-	CanUpdateDisallowed: when true, manager can freeze addresseses from transferring; once set to false, it is locked
-	FrozenByDefault: when true, all addresses are considered frozen and must be unfrozen to transfer; when false, all addresses are considered unfrozen and must be frozen to freeze
 */
 
 type Permissions struct {
-	CanUpdateBytes          bool
-	CanManagerBeTransferred bool
-	CanUpdateUris           bool
-	CanCreateMoreBadges     bool
-	CanUpdateDisallowed     bool
+	CanUpdateBytes          bool //can the manager update the bytes of the badge; if false, locked forever
+	CanManagerBeTransferred bool //can the manager transfer the managerial ownership of the badge to another account; if false, locked forever
+	CanUpdateUris           bool //can the manager update the uris (metadata) of the collection and badges; if false, locked forever
+	CanCreateMoreBadges     bool //when true, manager can create more badges of the collection; once set to false, the number of badges in the collection is locked
+	CanUpdateDisallowed     bool //when true, manager can freeze and unfreeze addresseses from transferring; once set to false, it is locked
 }
 
 const (

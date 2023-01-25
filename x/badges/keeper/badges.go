@@ -32,8 +32,6 @@ func (k Keeper) GetCollectionAndAssertBadgeIdsAreValid(ctx sdk.Context, collecti
 
 func (k Keeper) ValidateIdRanges(collection types.BadgeCollection, ranges []*types.IdRange) error {
 	for _, badgeIdRange := range ranges {
-		badgeIdRange = NormalizeIdRange(badgeIdRange)
-
 		if badgeIdRange.Start > badgeIdRange.End {
 			return ErrInvalidBadgeRange
 		}

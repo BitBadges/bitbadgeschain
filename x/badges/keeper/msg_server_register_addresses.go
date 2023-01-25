@@ -28,6 +28,6 @@ func (k msgServer) RegisterAddresses(goCtx context.Context, msg *types.MsgRegist
 	}
 
 	return &types.MsgRegisterAddressesResponse{
-		RegisteredAddressNumbers: GetIdRangeToInsert(start, end),
+		RegisteredAddressNumbers: CreateIdRange(start, end),
 	}, nil
 }

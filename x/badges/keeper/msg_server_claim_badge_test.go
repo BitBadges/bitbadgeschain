@@ -121,6 +121,11 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 		AmountPerClaim: 1,
 		Data:       rootHash,
 		Type: 	 	types.ClaimType_AccountNum,
+		Uri: "",
+		TimeRange: &types.IdRange{
+			Start: 0,
+			End:   math.MaxUint64,
+		},
 	}
 
 	err = CreateBadges(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
@@ -188,6 +193,11 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 		AmountPerClaim: 1,
 		Data:       rootHash,
 		Type: 	 	types.ClaimType_Code,
+		Uri: "",
+		TimeRange: &types.IdRange{
+			Start: 0,
+			End:   math.MaxUint64,
+		},
 	}
 
 	err = CreateBadges(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{

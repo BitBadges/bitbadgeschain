@@ -73,7 +73,12 @@ func (msg *MsgClaimBadge) ValidateBasic() error {
 		}
 	}
 
-	if msg.TimeRange != nil && msg.TimeRange.Start > msg.TimeRange.End {
+	if msg.TimeRange == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
+	}
+
+	err = ValidateRangesAreValid([]*IdRange{msg.TimeRange})
+	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
 	}
 

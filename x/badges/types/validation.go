@@ -55,15 +55,12 @@ func ValidateBytes(bytesToCheck string) error {
 
 //Validates ranges are valid. If end == 0, we assume end == start.
 func ValidateRangesAreValid(badgeIdRanges []*IdRange) error {
-
 	for _, badgeIdRange := range badgeIdRanges {
 		if badgeIdRange == nil {
 			return ErrRangesIsNil
 		}
 
-		if badgeIdRange.End == 0 {
-			badgeIdRange.End = badgeIdRange.Start
-		}
+		
 
 		if badgeIdRange.Start > badgeIdRange.End {
 			return ErrStartGreaterThanEnd

@@ -530,3 +530,83 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 		suite.Require().EqualError(err, keeper.ErrUnderflow.Error())
 	}
 }
+
+
+//Commented because it takes +- 25 seconds to run
+
+// func (suite *TestSuite) TestBalancesFuzz() {
+// 	for i := 0; i < 25; i++ {
+// 		userBalance := types.UserBalance{}
+// 		balances := make([]uint64, 1000)
+
+// 		adds := make([]*types.IdRange, 100)
+// 		subs := make([]*types.IdRange, 100)
+// 		for i := 0; i < 100; i++ { //10000 iterations
+// 			//Get random start value
+// 			start := uint64(rand.Intn(500))
+// 			//Get random end value
+// 			end := uint64(500 + rand.Intn(500))
+
+// 			amount := uint64(rand.Intn(100))
+// 			err := *new(error)
+// 			userBalance, err = keeper.AddBalancesForIdRanges(userBalance, []*types.IdRange{
+// 				{
+// 					Start: start,
+// 					End:   end,
+// 				},
+// 			}, amount)
+// 			suite.Require().Nil(err, "error adding balance to approval")
+
+// 			adds = append(adds, &types.IdRange{
+// 				Start: start,
+// 				End:   end,
+// 			})
+// 			// println("adding", start, end, amount)
+
+// 			for j := start; j <= end; j++ {
+// 				balances[j] += amount
+// 			}
+
+// 			amount = uint64(rand.Intn(100))
+// 			start = uint64(rand.Intn(1000))
+// 			end = uint64(500 + rand.Intn(500))
+// 			userBalance, err = keeper.SubtractBalancesForIdRanges(userBalance, []*types.IdRange{
+// 				{
+// 					Start: start,
+// 					End:   end,
+// 				},
+// 			}, amount)
+			
+
+// 			if err != nil {
+// 				suite.Require().EqualError(err, keeper.ErrUnderflow.Error())
+// 			} else {
+// 				// if uint64(256) < start && uint64(256) < end {
+// 				// 	println("removing", start, end, amount)
+// 				// }
+// 				subs = append(subs, &types.IdRange{
+// 					Start: start,
+// 					End:   end,
+// 				})
+// 				for j := start; j <= end; j++ {
+// 					balances[j] -= amount
+// 				}
+// 			}
+			
+
+
+// 		}
+
+// 		for i := 0; i < 1000; i++ {
+// 			suite.Require().Equal(keeper.GetBalancesForIdRanges(
+// 				[]*types.IdRange{
+// 					{
+// 						Start: uint64(i),
+// 						End:   uint64(i),
+// 					},
+// 				},
+// 				userBalance.Balances,
+// 			)[0].Balance, balances[i], "balance mismatch at index %d", i)
+// 		}
+// 	}
+// }

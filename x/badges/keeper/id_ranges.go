@@ -4,6 +4,13 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
+func CreateIdRange(start uint64, end uint64) *types.IdRange {
+	return &types.IdRange{
+		Start: start,
+		End:   end,
+	}
+}
+
 // Search ID ranges for a specific ID. Return (idx, true) if found. And (-1, false) if not.
 func SearchIdRangesForId(id uint64, idRanges []*types.IdRange) (int, bool) {
 	//Binary search because ID ranges will be sorted
@@ -12,7 +19,7 @@ func SearchIdRangesForId(id uint64, idRanges []*types.IdRange) (int, bool) {
 	for low <= high {
 		median := int(uint(low+high) >> 1)
 
-		currRange := NormalizeIdRange(idRanges[median])
+		currRange := idRanges[median]
 
 		if currRange.Start <= id && currRange.End >= id {
 			return median, true
@@ -32,7 +39,6 @@ func GetIdxSpanForRange(targetRange *types.IdRange, targetIdRanges []*types.IdRa
 	//if not found, set to insertIdx + 0 (because we already incremented by 1)
 	//if end is found, set to that
 	//else set to insertIdx - 1 (because we already incremented by 1)
-	targetRange = NormalizeIdRange(targetRange)
 	idRanges := targetIdRanges
 
 	startIdx, startFound := SearchIdRangesForId(targetRange.Start, idRanges)
@@ -63,21 +69,6 @@ func GetIdRangesWithOmitEmptyCaseHandled(ids []*types.IdRange) []*types.IdRange 
 	return ids
 }
 
-// Gets an ID range to insert
-func GetIdRangeToInsert(start uint64, end uint64) *types.IdRange {
-	return &types.IdRange{
-		Start: start,
-		End:   end,
-	}
-}
-
-// Should just delete this function. Used to be used for normalizing end == 0.
-func NormalizeIdRange(rangeToNormalize *types.IdRange) *types.IdRange {
-	return &types.IdRange{
-		Start: rangeToNormalize.Start,
-		End:   rangeToNormalize.End,
-	}
-}
 
 // Assumes id is not already in a range. Gets the index to insert at. Ex. [10, 20, 30] and inserting 25 would return index 2
 func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) int {
@@ -98,8 +89,8 @@ func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) int {
 	median := 0
 	for low <= high {
 		median = int(uint(low+high) >> 1)
-		currRange := NormalizeIdRange(ids[median])
-		nextRange := NormalizeIdRange(ids[median+1])
+		currRange := ids[median]
+		nextRange := ids[median+1]
 
 		if currRange.Start < id && nextRange.Start > id {
 			break
@@ -110,7 +101,7 @@ func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) int {
 		}
 	}
 
-	currRange := NormalizeIdRange(ids[median])
+	currRange := ids[median]
 	insertIdx := median + 1
 	if currRange.Start <= id {
 		insertIdx = median
@@ -129,12 +120,12 @@ func MergePrevOrNextIfPossible(targetIds []*types.IdRange, insertedAtIdx int) []
 	nextEndIdx := uint64(0)
 	ids := targetIds
 
-	id := NormalizeIdRange(ids[insertedAtIdx])
+	id := ids[insertedAtIdx]
 	idStart := id.Start
 	idEnd := id.End
 
 	if insertedAtIdx > 0 {
-		prev := NormalizeIdRange(ids[insertedAtIdx-1])
+		prev := ids[insertedAtIdx-1]
 		prevStartIdx = prev.Start
 		prevEndIdx := prev.End
 
@@ -144,7 +135,7 @@ func MergePrevOrNextIfPossible(targetIds []*types.IdRange, insertedAtIdx int) []
 	}
 
 	if insertedAtIdx < len(ids)-1 {
-		next := NormalizeIdRange(ids[insertedAtIdx+1])
+		next := ids[insertedAtIdx+1]
 		nextStartIdx := next.Start
 		nextEndIdx = next.End
 
@@ -157,15 +148,15 @@ func MergePrevOrNextIfPossible(targetIds []*types.IdRange, insertedAtIdx int) []
 	// 4 Cases: Need to merge with both, just next, just prev, or neither
 	if needToMergeWithPrev && needToMergeWithNext {
 		mergedIds = append(mergedIds, ids[:insertedAtIdx-1]...)
-		mergedIds = append(mergedIds, GetIdRangeToInsert(prevStartIdx, nextEndIdx))
+		mergedIds = append(mergedIds, CreateIdRange(prevStartIdx, nextEndIdx))
 		mergedIds = append(mergedIds, ids[insertedAtIdx+2:]...)
 	} else if needToMergeWithPrev {
 		mergedIds = append(mergedIds, ids[:insertedAtIdx-1]...)
-		mergedIds = append(mergedIds, GetIdRangeToInsert(prevStartIdx, idEnd))
+		mergedIds = append(mergedIds, CreateIdRange(prevStartIdx, idEnd))
 		mergedIds = append(mergedIds, ids[insertedAtIdx+1:]...)
 	} else if needToMergeWithNext {
 		mergedIds = append(mergedIds, ids[:insertedAtIdx]...)
-		mergedIds = append(mergedIds, GetIdRangeToInsert(idStart, nextEndIdx))
+		mergedIds = append(mergedIds, CreateIdRange(idStart, nextEndIdx))
 		mergedIds = append(mergedIds, ids[insertedAtIdx+2:]...)
 	} else {
 		mergedIds = ids
@@ -179,21 +170,21 @@ func InsertRangeToIdRanges(rangeToAdd *types.IdRange, targetIds []*types.IdRange
 	ids := targetIds
 	newIds := []*types.IdRange{}
 	insertIdAtIdx := 0
-	rangeToAdd = NormalizeIdRange(rangeToAdd)
-	lastRange := NormalizeIdRange(ids[len(ids)-1])
+	rangeToAdd = rangeToAdd
+	lastRange := ids[len(ids)-1]
 
 	//Three cases: Goes at beginning, end, or somewhere in the middle
 	if ids[0].Start > rangeToAdd.End {
-		newIds = append(newIds, GetIdRangeToInsert(rangeToAdd.Start, rangeToAdd.End))
+		newIds = append(newIds, CreateIdRange(rangeToAdd.Start, rangeToAdd.End))
 		newIds = append(newIds, ids...)
 	} else if lastRange.End < rangeToAdd.Start {
 		insertIdAtIdx = len(ids)
 		newIds = append(newIds, ids...)
-		newIds = append(newIds, GetIdRangeToInsert(rangeToAdd.Start, rangeToAdd.End))
+		newIds = append(newIds, CreateIdRange(rangeToAdd.Start, rangeToAdd.End))
 	} else {
 		insertIdAtIdx = GetIdxToInsertForNewId(rangeToAdd.Start, ids) //Only lookup start since we assume the whole range isn't included already
 		newIds = append(newIds, ids[:insertIdAtIdx]...)
-		newIds = append(newIds, GetIdRangeToInsert(rangeToAdd.Start, rangeToAdd.End))
+		newIds = append(newIds, CreateIdRange(rangeToAdd.Start, rangeToAdd.End))
 		newIds = append(newIds, ids[insertIdAtIdx:]...)
 	}
 
@@ -205,25 +196,23 @@ func InsertRangeToIdRanges(rangeToAdd *types.IdRange, targetIds []*types.IdRange
 // Removes all ids within an id range from an id range. Removing can make this range be split into 0, 1, or 2 new ranges.
 func RemoveIdsFromIdRange(rangeToRemove *types.IdRange, rangeObject *types.IdRange) []*types.IdRange {
 	newRanges := []*types.IdRange{}
-	rangeToRemove = NormalizeIdRange(rangeToRemove)
-	rangeObject = NormalizeIdRange(rangeObject)
 
 	if rangeToRemove.Start > rangeObject.Start && rangeToRemove.End < rangeObject.End {
 		// Completely in the middle
-		newRanges = append(newRanges, GetIdRangeToInsert(rangeObject.Start, rangeToRemove.Start-1))
-		newRanges = append(newRanges, GetIdRangeToInsert(rangeToRemove.End+1, rangeObject.End))
+		newRanges = append(newRanges, CreateIdRange(rangeObject.Start, rangeToRemove.Start-1))
+		newRanges = append(newRanges, CreateIdRange(rangeToRemove.End+1, rangeObject.End))
 	} else if rangeToRemove.Start <= rangeObject.Start && rangeToRemove.End >= rangeObject.End {
 		// Overlaps both; remove whole thing
 		// Do nothing
 	} else if rangeToRemove.Start <= rangeObject.Start && rangeToRemove.End < rangeObject.End && rangeToRemove.End >= rangeObject.Start {
 		// Still have some at the end
-		newRanges = append(newRanges, GetIdRangeToInsert(rangeToRemove.End+1, rangeObject.End))
+		newRanges = append(newRanges, CreateIdRange(rangeToRemove.End+1, rangeObject.End))
 	} else if rangeToRemove.Start > rangeObject.Start && rangeToRemove.End >= rangeObject.End && rangeToRemove.Start <= rangeObject.End {
 		// Still have some at the start
-		newRanges = append(newRanges, GetIdRangeToInsert(rangeObject.Start, rangeToRemove.Start-1))
+		newRanges = append(newRanges, CreateIdRange(rangeObject.Start, rangeToRemove.Start-1))
 	} else {
 		// Doesn't overlap at all
-		newRanges = append(newRanges, GetIdRangeToInsert(rangeObject.Start, rangeObject.End))
+		newRanges = append(newRanges, CreateIdRange(rangeObject.Start, rangeObject.End))
 	}
 
 	return newRanges
@@ -248,11 +237,11 @@ func SortIdRangesAndMerge(ids []*types.IdRange) []*types.IdRange {
 	//Merge overlapping ranges
 	if n > 0 {
 		newIdRanges := []*types.IdRange{}
-		newIdRanges = append(newIdRanges, GetIdRangeToInsert(ids[0].Start, ids[0].End))
+		newIdRanges = append(newIdRanges, CreateIdRange(ids[0].Start, ids[0].End))
 
 		for i := 1; i < n; i++ {
-			prevInsertedRange := NormalizeIdRange(newIdRanges[len(newIdRanges)-1])
-			currRange := NormalizeIdRange(ids[i])
+			prevInsertedRange := newIdRanges[len(newIdRanges)-1]
+			currRange := ids[i]
 
 			if currRange.Start == prevInsertedRange.Start {
 				//Both have same start, so we set to currRange.End because currRange.End is greater due to our sorting
@@ -261,7 +250,7 @@ func SortIdRangesAndMerge(ids []*types.IdRange) []*types.IdRange {
 				//We have different starts and curr end is greater than prev end
 				if currRange.Start > prevInsertedRange.End+1 {
 					//We have a gap between the prev range end and curr range start, so we just append currRange
-					newIdRanges = append(newIdRanges, GetIdRangeToInsert(currRange.Start, currRange.End))
+					newIdRanges = append(newIdRanges, CreateIdRange(currRange.Start, currRange.End))
 				} else {
 					//they overlap and we can merge them
 					newIdRanges[len(newIdRanges)-1].End = currRange.End
@@ -280,7 +269,7 @@ func SortIdRangesAndMerge(ids []*types.IdRange) []*types.IdRange {
 func GetIdRangesToInsertToStorage(idRanges []*types.IdRange) []*types.IdRange {
 	newIdRanges := []*types.IdRange{}
 	for _, idRange := range idRanges {
-		newIdRanges = append(newIdRanges, GetIdRangeToInsert(idRange.Start, idRange.End))
+		newIdRanges = append(newIdRanges, CreateIdRange(idRange.Start, idRange.End))
 	}
 	return newIdRanges
 }
@@ -289,7 +278,7 @@ func AddManagerAddressToRanges(collection types.BadgeCollection, ranges []*types
 	idx, found := SearchIdRangesForId(collection.Manager, ranges)
 	if options == types.AddressOptions_IncludeManager {
 		if !found {
-			ranges = append(ranges, GetIdRangeToInsert(collection.Manager, collection.Manager))
+			ranges = append(ranges, CreateIdRange(collection.Manager, collection.Manager))
 			ranges = SortIdRangesAndMerge(ranges)
 			return ranges
 		}
@@ -297,7 +286,7 @@ func AddManagerAddressToRanges(collection types.BadgeCollection, ranges []*types
 		if found {
 			newRanges := []*types.IdRange{}
 			newRanges = append(newRanges, ranges[:idx]...)
-			newRanges = append(newRanges, RemoveIdsFromIdRange(GetIdRangeToInsert(collection.Manager, collection.Manager), ranges[idx])...)
+			newRanges = append(newRanges, RemoveIdsFromIdRange(CreateIdRange(collection.Manager, collection.Manager), ranges[idx])...)
 			newRanges = append(newRanges, ranges[idx+1:]...)
 			ranges = newRanges
 		}

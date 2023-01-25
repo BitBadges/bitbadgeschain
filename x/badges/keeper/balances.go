@@ -50,8 +50,6 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*ty
 		for _, idRange := range idRanges {
 			idxSpan, found := GetIdxSpanForRange(idRange, userBalanceObj.BadgeIds)
 			if found {
-				idxSpan = NormalizeIdRange(idxSpan)
-
 				//Set newIdRanges to the ranges where there is overlap
 				newIdRanges := userBalanceObj.BadgeIds[idxSpan.Start : idxSpan.End+1]
 
@@ -189,7 +187,7 @@ func SetBalanceForIdRanges(ranges []*types.IdRange, amount uint64, balances []*t
 		newBalances = append(newBalances, balances[:idx]...)
 		rangesToInsert := []*types.IdRange{}
 		for _, rangeToAdd := range ranges {
-			rangesToInsert = append(rangesToInsert, GetIdRangeToInsert(rangeToAdd.Start, rangeToAdd.End))
+			rangesToInsert = append(rangesToInsert, CreateIdRange(rangeToAdd.Start, rangeToAdd.End))
 		}
 		newBalances = append(newBalances, &types.Balance{
 			Balance:  amount,
