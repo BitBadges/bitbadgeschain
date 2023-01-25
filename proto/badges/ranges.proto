@@ -20,7 +20,7 @@ enum AddressOptions {
 
 message Addresses {
     repeated IdRange accountNums = 1;
-    AddressOptions options = 2;
+    uint64 options = 2;
 }
 
 //TransferMapping defines a mapping of transfers from one set of addresses to another.

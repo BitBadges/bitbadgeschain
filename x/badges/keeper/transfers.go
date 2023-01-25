@@ -71,17 +71,17 @@ func IsTransferAllowed(collection types.BadgeCollection, permissions types.Permi
 		for _, managerApprovedTransfer := range collection.ManagerApprovedTransfers {
 			fromFound := false
 			toFound := false
-			if managerApprovedTransfer.From.Options == types.AddressOptions_IncludeManager {
+			if managerApprovedTransfer.From.Options == uint64(types.AddressOptions_IncludeManager) {
 				fromFound = true
-			} else if managerApprovedTransfer.From.Options == types.AddressOptions_ExcludeManager {
+			} else if managerApprovedTransfer.From.Options == uint64(types.AddressOptions_ExcludeManager) {
 				fromFound = false
 			} else {
 				_, fromFound = SearchIdRangesForId(fromAddress, managerApprovedTransfer.From.AccountNums)
 			}
 
-			if managerApprovedTransfer.To.Options == types.AddressOptions_IncludeManager {
+			if managerApprovedTransfer.To.Options == uint64(types.AddressOptions_IncludeManager) {
 				toFound = true
-			} else if managerApprovedTransfer.To.Options == types.AddressOptions_ExcludeManager {
+			} else if managerApprovedTransfer.To.Options == uint64(types.AddressOptions_ExcludeManager) {
 				toFound = false
 			} else {
 				_, toFound = SearchIdRangesForId(toAddress, managerApprovedTransfer.To.AccountNums)

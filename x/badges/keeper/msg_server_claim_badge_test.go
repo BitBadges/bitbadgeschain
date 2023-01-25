@@ -40,7 +40,7 @@ func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 		},
 		AmountPerClaim: 1,
 		Data:       rootHash,
-		Type: 	 	types.ClaimType_AccountNum,
+		Type: 	 	uint64(types.ClaimType_AccountNum),
 		Uri: "",
 		TimeRange: &types.IdRange{
 			Start: 0,
@@ -71,7 +71,7 @@ func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 
 	claim := badge.Claims[0]
 
-	err = ClaimBadge(suite, wctx, alice, 0, 0,  []byte(alice), (*types.Proof)(merkleProofs[0]), "", &types.IdRange{
+	err = ClaimBadge(suite, wctx, alice, 0, 0,  []byte(alice), types.ConvertFromTendermintProof(merkleProofs[0]), "", &types.IdRange{
 		Start: 0,
 		End:   math.MaxUint64,
 	})
@@ -118,7 +118,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 		},
 		AmountPerClaim: 1,
 		Data:       rootHash,
-		Type: 	 	types.ClaimType_AccountNum,
+		Type: 	 	uint64(types.ClaimType_AccountNum),
 		Uri: "",
 		TimeRange: &types.IdRange{
 			Start: 0,
@@ -150,7 +150,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	claim := badge.Claims[0]
 	suite.Require().Equal(&claimToAdd, claim)
 
-	err = ClaimBadge(suite, wctx, alice, 0, 0, []byte("121241234"), (*types.Proof)(merkleProofs[0]), "", &types.IdRange{
+	err = ClaimBadge(suite, wctx, alice, 0, 0, []byte("121241234"), types.ConvertFromTendermintProof(merkleProofs[0]), "", &types.IdRange{
 		Start: 0,
 		End:   math.MaxUint64,
 	})
@@ -189,7 +189,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 		},
 		AmountPerClaim: 1,
 		Data:       rootHash,
-		Type: 	 	types.ClaimType_Code,
+		Type: 	 	uint64(types.ClaimType_Code),
 		Uri: "",
 		TimeRange: &types.IdRange{
 			Start: 0,
@@ -221,7 +221,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 	claim := badge.Claims[0]
 	suite.Require().Equal(&claimToAdd, claim)
 
-	err = ClaimBadge(suite, wctx, alice, 0, 0, []byte("121241234"), (*types.Proof)(merkleProofs[0]), "", &types.IdRange{
+	err = ClaimBadge(suite, wctx, alice, 0, 0, []byte("121241234"), types.ConvertFromTendermintProof(merkleProofs[0]), "", &types.IdRange{
 		Start: 0,
 		End:   math.MaxUint64,
 	})

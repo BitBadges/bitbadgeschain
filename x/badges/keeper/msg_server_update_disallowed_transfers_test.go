@@ -22,13 +22,13 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 							AccountNums: []*types.IdRange{
 								{Start: aliceAccountNum, End: aliceAccountNum},
 							},
-							Options: types.AddressOptions_None,
+							Options: uint64(types.AddressOptions_None),
 						},
 						To: &types.Addresses{
 							AccountNums: []*types.IdRange{
 								{Start: 0, End: math.MaxUint64},
 							},
-							Options: types.AddressOptions_None,
+							Options: uint64(types.AddressOptions_None),
 						},
 					},
 				},
@@ -161,11 +161,11 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 		{
 			From: &types.Addresses{
 				AccountNums:    []*types.IdRange{{Start: aliceAccountNum, End: aliceAccountNum}},
-				Options: types.AddressOptions_None,
+				Options: uint64(types.AddressOptions_None),
 			},
 			To: &types.Addresses{
 				AccountNums:    []*types.IdRange{{Start: 0, End: math.MaxUint64}},
-				Options: types.AddressOptions_None,
+				Options: uint64(types.AddressOptions_None),
 			},
 		},
 	})

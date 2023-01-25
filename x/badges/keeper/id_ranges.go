@@ -223,16 +223,16 @@ func SortAndMergeOverlapping(ids []*types.IdRange) []*types.IdRange {
 }
 
 
-func AddManagerAddressToRanges(collection types.BadgeCollection, ranges []*types.IdRange, options types.AddressOptions) []*types.IdRange {
+func AddManagerAddressToRanges(collection types.BadgeCollection, ranges []*types.IdRange, options uint64) []*types.IdRange {
 	idx, found := SearchIdRangesForId(collection.Manager, ranges)
 	//Add or remove the manager to the ranges if specified according to the options
-	if options == types.AddressOptions_IncludeManager {
+	if options == uint64(types.AddressOptions_IncludeManager) {
 		if !found {
 			ranges = append(ranges, CreateIdRange(collection.Manager, collection.Manager))
 			ranges = SortAndMergeOverlapping(ranges)
 			return ranges
 		}
-	} else if options == types.AddressOptions_ExcludeManager {
+	} else if options == uint64(types.AddressOptions_ExcludeManager) {
 		if found {
 			newRanges := []*types.IdRange{}
 			newRanges = append(newRanges, ranges[:idx]...)

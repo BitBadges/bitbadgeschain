@@ -38,6 +38,8 @@ func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Typ
 			mapObject[typeObj.Name] = "0"
 		} else if typeStr == "bool" && value == nil {
 			mapObject[typeObj.Name] = false
+		} else if typeStr == "AddressOptions" && value == nil {
+			mapObject[typeObj.Name] = "0"
 		} else {
 			innerMap, ok := mapObject[typeObj.Name].(map[string]interface{})
 			if ok {
@@ -54,44 +56,9 @@ func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Typ
 
 //Certain fields are omitted (when uint64 is 0, bool is false, etc) when serialized with Proto and Amino. EIP712 doesn't support optional fields, so we add the omitted empty values back in here.
 func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (apitypes.TypedData, error) {
-	actualMsgValueTypes, addUri, addIdRange, addWhitelistInfo, addSubassetSupply := GetMsgValueTypes(msgType)
-	typedData.Types["MsgValue"] = actualMsgValueTypes
-	if addUri {
-		typedData.Types["UriObject"] = []apitypes.Type{
-			{Name: "decodeScheme", Type: "uint64"},
-			{Name: "scheme", Type: "uint64"},
-			{Name: "uri", Type: "string"},
-			{Name: "idxRangeToRemove", Type: "IdRange"},
-			{Name: "insertSubassetBytesIdx", Type: "uint64"},
-			{Name: "bytesToInsert", Type: "string"},
-			{Name: "insertIdIdx", Type: "uint64"},
-		}
-	}
-
-	if addIdRange {
-		typedData.Types["IdRange"] = []apitypes.Type{
-			{Name: "start", Type: "uint64"},
-			{Name: "end", Type: "uint64"},
-		}
-	}
-
-	if addWhitelistInfo {
-		typedData.Types["WhitelistMintInfo"] = []apitypes.Type{
-			{Name: "addresses", Type: "uint64[]"},
-			{Name: "balanceAmounts", Type: "BalanceObject[]"},
-		}
-
-		typedData.Types["BalanceObject"] = []apitypes.Type{
-			{Name: "balance", Type: "uint64"},
-			{Name: "idRanges", Type: "IdRange[]"},
-		}
-	}
-
-	if addSubassetSupply {
-		typedData.Types["SubassetAmountAndSupply"] = []apitypes.Type{
-			{Name: "supply", Type: "uint64"},
-			{Name: "amount", Type: "uint64"},
-		}
+	typesMap := GetMsgValueTypes(msgType)
+	for key, value := range typesMap {
+		typedData.Types[key] = value
 	}
 
 	//Remove the types in typedData.Types that begin with the prefix Type
@@ -120,85 +87,190 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 }
 
 //first bool is if URI is needed, second is if ID Range is needed
-func GetMsgValueTypes(route string) ([]apitypes.Type, bool, bool, bool, bool) {
-	switch route {
-	case TypeMsgNewCollection:
-		//TODO:
-		return []apitypes.Type{
-			{Name: "creator", Type: "string"},
-			{Name: "uri", Type: "UriObject"},
-			{Name: "arbitraryBytes", Type: "string"},
-			{Name: "permissions", Type: "uint64"},
-			{Name: "defaultSubassetSupply", Type: "uint64"},
-			{Name: "freezeAddressRanges", Type: "IdRange[]"},
-			{Name: "standard", Type: "uint64"},
-			{Name: "BadgeSupplys", Type: "SubassetAmountAndSupply[]"},
-			{Name: "whitelistedRecipients", Type: "WhitelistMintInfo[]"},
-		}, true, true, true, true
-	case TypeMsgMintBadge:
-		//TODO:
-		return []apitypes.Type{
-			{Name: "creator", Type: "string"},
-			{Name: "badgeId", Type: "uint64"},
-			{Name: "BadgeSupplys", Type: "SubassetAmountAndSupply[]"},
-		}, false, false, false, true
-	case TypeMsgTransferBadge:
-		return []apitypes.Type{{Name: "creator", Type: "string"},
-			{Name: "from", Type: "uint64"},
-			{Name: "toAddresses", Type: "uint64[]"},
-			{Name: "amounts", Type: "uint64[]"},
-			{Name: "badgeId", Type: "uint64"},
-			{Name: "badgeIdRanges", Type: "IdRange[]"},
-			{Name: "expirationTime", Type: "uint64"},
-			{Name: "cantCancelBeforeTime", Type: "uint64"},
-		}, false, true, false, false
-	case TypeMsgSetApproval:
-		return []apitypes.Type{
-			{Name: "creator", Type: "string"},
-			{Name: "amount", Type: "uint64"},
-			{Name: "address", Type: "uint64"},
-			{Name: "badgeId", Type: "uint64"},
-			{Name: "badgeIdRanges", Type: "IdRange[]"},
-		}, false, true, false, false
+func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 
+	transferMappingTypes := []apitypes.Type{
+		{Name: "from", Type: "Addresses"},
+		{Name: "to", Type: "Addresses"},
+	}
+
+	addressesTypes := []apitypes.Type{
+		{Name: "accountNums", Type: "IdRange[]"},
+		{Name: "options", Type: "uint64"},
+	}
+
+	idRangeTypes := []apitypes.Type{
+		{Name: "start", Type: "uint64"},
+		{Name: "end", Type: "uint64"},
+	}
+
+	balanceTypes := []apitypes.Type{
+		{Name: "balance", Type: "uint64"},
+		{Name: "idRanges", Type: "IdRange[]"},
+	}
+
+	badgeSupplyAndAmountTypes := []apitypes.Type{
+		{Name: "supply", Type: "uint64"},
+		{Name: "amount", Type: "uint64"},
+	}
+
+	transfersTypes := []apitypes.Type{
+		{Name: "toAddresses", Type: "uint64[]"},
+		{Name: "balances", Type: "Balance[]"},
+	}
+
+	claimsTypes := []apitypes.Type{
+		{Name: "balance", Type: "Balance[]"},
+		{Name: "amountPerClaim", Type: "uint64"},
+		{Name: "type", Type: "uint64"},
+		{Name: "data", Type: "bytes"},
+		{Name: "uri", Type: "string"},
+		{Name: "timeRange", Type: "IdRange"},
+	}
+
+	proofTypes := []apitypes.Type{
+		{Name: "total", Type: "uint64"},
+		{Name: "index", Type: "uint64"},
+		{Name: "leafHash", Type: "bytes"},
+		{Name: "aunts", Type: "bytes[]"},
+	}
+
+	switch route {
+		
+	case TypeMsgNewCollection:
+		return map[string][]apitypes.Type{
+			"MsgValue": []apitypes.Type{
+				{Name: "creator", Type: "string"},
+				{Name: "collectionUri", Type: "string"},
+				{Name: "badgeUri", Type: "string"},
+				{Name: "bytes", Type: "string"},
+				{Name: "permissions", Type: "uint64"},
+				{Name: "disallowedTransfers", Type: "TransferMapping[]"},
+				{Name: "managerApprovedTransfers", Type: "TransferMapping[]"},
+				{Name: "standard", Type: "uint64"},
+				{Name: "badgeSupplys", Type: "BadgeSupplyAndAmount[]"},
+				{Name: "transfers", Type: "Transfers[]"},
+				{Name: "claims", Type: "Claim[]"},
+			},
+			"TransferMapping": transferMappingTypes,
+			"Addresses":       addressesTypes,
+			"IdRange":         idRangeTypes,
+			"BadgeSupplyAndAmount": badgeSupplyAndAmountTypes,
+			"Transfers": transfersTypes,
+			"Claim": claimsTypes,
+			"Balance": balanceTypes,
+		}
+	case TypeMsgMintBadge:
+		
+		return map[string][]apitypes.Type{
+			"MsgValue": []apitypes.Type{
+				{Name: "creator", Type: "string"},
+				{Name: "collectionId", Type: "uint64"},
+				{Name: "badgeSupplys", Type: "BadgeSupplyAndAmount[]"},
+				{Name: "transfers", Type: "Transfers[]"},
+				{Name: "claims", Type: "Claim[]"},
+			},
+			"BadgeSupplyAndAmount": badgeSupplyAndAmountTypes,
+			"Transfers": transfersTypes,
+			"Claim": claimsTypes,
+			"Balance": balanceTypes,
+			"IdRange": idRangeTypes,
+		}
+	case TypeMsgTransferBadge:
+		return map[string][]apitypes.Type{
+			"MsgValue": []apitypes.Type{
+				{Name: "creator", Type: "string"},
+				{Name: "from", Type: "uint64"},
+				{Name: "transfers", Type: "Transfers[]"},
+				{Name: "collectionId", Type: "uint64"},
+			}, 
+			"Transfers": transfersTypes,
+			"Balance": balanceTypes,
+			"IdRange": idRangeTypes,
+		}
+	case TypeMsgSetApproval:
+		return map[string][]apitypes.Type{
+			"MsgValue": []apitypes.Type{
+				{Name: "creator", Type: "string"},
+				{Name: "collectionId", Type: "uint64"},
+				{Name: "address", Type: "uint64"},
+				{Name: "balances", Type: "Balance[]"},
+			},
+			"Balance": balanceTypes,
+			"IdRange": idRangeTypes,
+		}
 	case TypeMsgUpdateDisallowedTransfers:
-		return []apitypes.Type{
-			//TODO:
-			{Name: "creator", Type: "string"},
-			{Name: "addressRanges", Type: "IdRange[]"},
-			{Name: "badgeId", Type: "uint64"},
-			{Name: "add", Type: "bool"},
-		}, false, true, false, false
+		return map[string][]apitypes.Type{
+			"MsgValue": []apitypes.Type{
+				{Name: "creator", Type: "string"},
+				{Name: "collectionId", Type: "IdRange[]"},
+				{Name: "disallowedTransfers", Type: "TransferMapping[]"},
+			},
+			"TransferMapping": transferMappingTypes,
+			"Addresses":       addressesTypes,
+			"IdRange":         idRangeTypes,
+		}
 	case TypeMsgUpdateUris:
-		return []apitypes.Type{{Name: "creator", Type: "string"},
-			{Name: "badgeId", Type: "uint64"},
-			{Name: "uri", Type: "UriObject"},
-		}, true, true, false, false
+		return map[string][]apitypes.Type{
+			"MsgValue": []apitypes.Type{
+				{Name: "creator", Type: "string"},
+				{Name: "collectionId", Type: "uint64"},
+				{Name: "collectionUri", Type: "string"},
+				{Name: "badgeUri", Type: "string"},
+			},
+		}
 	case TypeMsgUpdatePermissions:
-		return []apitypes.Type{{Name: "creator", Type: "string"},
-			{Name: "badgeId", Type: "uint64"},
-			{Name: "permissions", Type: "uint64"},
-		}, false, false, false, false
+		return	map[string][]apitypes.Type{
+			"MsgValue": []apitypes.Type{
+				{Name: "creator", Type: "string"},
+				{Name: "collectionId", Type: "uint64"},
+				{Name: "permissions", Type: "uint64"},
+			},
+		}
 	case TypeMsgUpdateBytes:
-		return []apitypes.Type{{Name: "creator", Type: "string"},
-			{Name: "badgeId", Type: "uint64"},
-			{Name: "newBytes", Type: "string"},
-		}, false, false, false, false
+		return map[string][]apitypes.Type{
+			"MsgValue": []apitypes.Type{
+				{Name: "creator", Type: "string"},
+				{Name: "collectionId", Type: "uint64"},
+				{Name: "newBytes", Type: "string"},
+			},
+		}
 	case TypeMsgTransferManager:
-		return []apitypes.Type{{Name: "creator", Type: "string"},
-			{Name: "badgeId", Type: "uint64"},
-			{Name: "address", Type: "uint64"},
-		}, false, false, false, false
+		return map[string][]apitypes.Type{
+			"MsgValue": []apitypes.Type{
+				{Name: "creator", Type: "string"},
+				{Name: "collectionId", Type: "uint64"},
+				{Name: "address", Type: "uint64"},
+			},
+		}
 	case TypeMsgRequestTransferManager:
-		return []apitypes.Type{{Name: "creator", Type: "string"},
-			{Name: "badgeId", Type: "uint64"},
-			{Name: "add", Type: "bool"},
-		}, false, false, false, false
+		return map[string][]apitypes.Type{
+			"MsgValue": []apitypes.Type{
+				{Name: "creator", Type: "string"},
+				{Name: "badgeId", Type: "uint64"},
+				{Name: "addRequest", Type: "bool"},
+			},
+		}
 	case TypeMsgRegisterAddresses:
-		return []apitypes.Type{{Name: "creator", Type: "string"},
-			{Name: "addressesToRegister", Type: "string[]"},
-		}, false, false, false, false
+		return map[string][]apitypes.Type{
+			"MsgValue": []apitypes.Type{
+				{Name: "creator", Type: "string"},
+				{Name: "addressesToRegister", Type: "string[]"},
+			},
+		}
+	case TypeMsgClaimBadge:
+	
+		return map[string][]apitypes.Type{
+			"MsgValue": []apitypes.Type{
+				{Name: "creator", Type: "string"},
+				{Name: "claimId", Type: "uint64"},
+				{Name: "collectionId", Type: "uint64"},
+				{Name: "leaf", Type: "bytes"},
+				{Name: "proof", Type: "Proof"},
+			},
+			"Proof": proofTypes,
+		}
 	default:
-		return []apitypes.Type{}, false, false, false, false
+		return map[string][]apitypes.Type{}
 	}
 }

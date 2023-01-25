@@ -169,10 +169,10 @@ message MsgRegisterAddressesResponse {
 
 //Consistent with tendermint/crypto merkle tree
 message Proof {
-    int64          total     = 1;
-    int64          index     = 2;
-    bytes          leaf_hash = 3;
-    repeated bytes aunts     = 4;
+    uint64          total     = 1;
+    uint64          index     = 2;
+    bytes           leafHash = 3;
+    repeated bytes  aunts     = 4;
 }
 
 message MsgClaimBadge {

@@ -32,7 +32,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	}
 
 	claimData := msg.Leaf
-	if claim.Type == types.ClaimType_AccountNum {
+	if claim.Type == uint64(types.ClaimType_AccountNum) {
 		//Assert claimData is either the account number or cosmos address
 
 		accountNumBytes := []byte(strconv.FormatUint(CreatorAccountNum, 10))
@@ -52,8 +52,8 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	rootHash := claim.Data
 	
 	proof := merkle.Proof{
-		Total:    msg.Proof.Total,
-		Index:    msg.Proof.Index,
+		Total:    int64(msg.Proof.Total),
+		Index:    int64(msg.Proof.Index),
 		LeafHash: msg.Proof.LeafHash,
 		Aunts:    msg.Proof.Aunts,
 	}
