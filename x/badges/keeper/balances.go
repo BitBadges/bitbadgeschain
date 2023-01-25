@@ -25,7 +25,7 @@ func SafeSubtract(left uint64, right uint64) (uint64, error) {
 
 // Updates the balance for a specific id from what it currently is to newAmount.
 func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount uint64, balances []*types.Balance) []*types.Balance {
-	ranges = SortIdRangesAndMerge(ranges)
+	ranges = SortAndMergeOverlapping(ranges)
 	//Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
 	balances = DeleteBalanceForIdRanges(ranges, balances)
 	balances = SetBalanceForIdRanges(ranges, newAmount, balances)
@@ -39,7 +39,7 @@ func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount uint64, balanc
 // Gets the balances for specified ID ranges. Returns a new []*types.Balance where only the specified ID ranges and their balances are included. Appends balance == 0 objects so all IDs are accounted for, even if not found.
 func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*types.Balance) []*types.Balance {
 	balancesForSpecifiedRanges := []*types.Balance{}
-	idRanges = SortIdRangesAndMerge(idRanges)
+	idRanges = SortAndMergeOverlapping(idRanges)
 	idRangesNotFound := idRanges
 	for _, userBalanceObj := range currentUserBalances {
 		userBalanceObj.BadgeIds = GetIdRangesWithOmitEmptyCaseHandled(userBalanceObj.BadgeIds)

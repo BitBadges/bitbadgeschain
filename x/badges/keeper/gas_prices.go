@@ -15,6 +15,6 @@ const (
 	BadgeUpdate                   = 0
 
 	// Incentivize users to prune expired / self-destructed badges.
-	PruneBalanceRefundAmountPerAddress = 750
-	PruneBalanceRefundAmountPerBadge   = 750
+	// PruneBalanceRefundAmountPerAddress = 750
+	// PruneBalanceRefundAmountPerBadge   = 750
 )
