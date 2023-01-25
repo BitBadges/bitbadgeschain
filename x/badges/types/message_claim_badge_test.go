@@ -24,10 +24,10 @@ func TestMsgClaimBadge_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: MsgClaimBadge{
 				Creator: sample.AccAddress(),
-				Leaf: []byte("hello"),
+				Leaf: "hello",
 				Proof: &Proof{
-					LeafHash: []byte("hello"),
-					Aunts: [][]byte{[]byte("hello")},
+					LeafHash: "hello",
+					Aunts: []string{"hello"},
 					Total: 1,
 					Index: 0,
 				},

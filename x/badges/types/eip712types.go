@@ -106,7 +106,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 
 	balanceTypes := []apitypes.Type{
 		{Name: "balance", Type: "uint64"},
-		{Name: "idRanges", Type: "IdRange[]"},
+		{Name: "badgeIds", Type: "IdRange[]"},
 	}
 
 	badgeSupplyAndAmountTypes := []apitypes.Type{
@@ -139,7 +139,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		
 	case TypeMsgNewCollection:
 		return map[string][]apitypes.Type{
-			"MsgValue": []apitypes.Type{
+			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionUri", Type: "string"},
 				{Name: "badgeUri", Type: "string"},
@@ -163,7 +163,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 	case TypeMsgMintBadge:
 		
 		return map[string][]apitypes.Type{
-			"MsgValue": []apitypes.Type{
+			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "uint64"},
 				{Name: "badgeSupplys", Type: "BadgeSupplyAndAmount[]"},
@@ -178,7 +178,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		}
 	case TypeMsgTransferBadge:
 		return map[string][]apitypes.Type{
-			"MsgValue": []apitypes.Type{
+			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "from", Type: "uint64"},
 				{Name: "transfers", Type: "Transfers[]"},
@@ -190,7 +190,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		}
 	case TypeMsgSetApproval:
 		return map[string][]apitypes.Type{
-			"MsgValue": []apitypes.Type{
+			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "uint64"},
 				{Name: "address", Type: "uint64"},
@@ -201,7 +201,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		}
 	case TypeMsgUpdateDisallowedTransfers:
 		return map[string][]apitypes.Type{
-			"MsgValue": []apitypes.Type{
+			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "IdRange[]"},
 				{Name: "disallowedTransfers", Type: "TransferMapping[]"},
@@ -212,7 +212,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		}
 	case TypeMsgUpdateUris:
 		return map[string][]apitypes.Type{
-			"MsgValue": []apitypes.Type{
+			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "uint64"},
 				{Name: "collectionUri", Type: "string"},
@@ -221,7 +221,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		}
 	case TypeMsgUpdatePermissions:
 		return	map[string][]apitypes.Type{
-			"MsgValue": []apitypes.Type{
+			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "uint64"},
 				{Name: "permissions", Type: "uint64"},
@@ -229,7 +229,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		}
 	case TypeMsgUpdateBytes:
 		return map[string][]apitypes.Type{
-			"MsgValue": []apitypes.Type{
+			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "uint64"},
 				{Name: "newBytes", Type: "string"},
@@ -237,7 +237,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		}
 	case TypeMsgTransferManager:
 		return map[string][]apitypes.Type{
-			"MsgValue": []apitypes.Type{
+			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "uint64"},
 				{Name: "address", Type: "uint64"},
@@ -245,7 +245,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		}
 	case TypeMsgRequestTransferManager:
 		return map[string][]apitypes.Type{
-			"MsgValue": []apitypes.Type{
+			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "badgeId", Type: "uint64"},
 				{Name: "addRequest", Type: "bool"},
@@ -253,7 +253,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		}
 	case TypeMsgRegisterAddresses:
 		return map[string][]apitypes.Type{
-			"MsgValue": []apitypes.Type{
+			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "addressesToRegister", Type: "string[]"},
 			},
@@ -261,7 +261,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 	case TypeMsgClaimBadge:
 	
 		return map[string][]apitypes.Type{
-			"MsgValue": []apitypes.Type{
+			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "claimId", Type: "uint64"},
 				{Name: "collectionId", Type: "uint64"},

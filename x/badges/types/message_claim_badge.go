@@ -9,7 +9,7 @@ const TypeMsgClaimBadge = "claim_badge"
 
 var _ sdk.Msg = &MsgClaimBadge{}
 
-func NewMsgClaimBadge(creator string, claimId uint64, collectionId uint64, leaf []byte, proof *Proof, uri string, timeRange *IdRange) *MsgClaimBadge {
+func NewMsgClaimBadge(creator string, claimId uint64, collectionId uint64, leaf string, proof *Proof, uri string, timeRange *IdRange) *MsgClaimBadge {
 	return &MsgClaimBadge{
 		Creator: creator,
 		ClaimId: claimId,
@@ -46,11 +46,11 @@ func (msg *MsgClaimBadge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.Leaf == nil || len(msg.Leaf) == 0 {
+	if msg.Leaf == "" || len(msg.Leaf) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid leaf")
 	}
 
-	if msg.Proof.LeafHash == nil || len(msg.Proof.LeafHash) == 0 {
+	if msg.Proof.LeafHash == "" || len(msg.Proof.LeafHash) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid leaf hash in proof")
 	}
 
@@ -59,7 +59,7 @@ func (msg *MsgClaimBadge) ValidateBasic() error {
 	}
 
 	for _, aunt := range msg.Proof.Aunts {
-		if aunt == nil || len(aunt) == 0 {
+		if aunt == "" || len(aunt) == 0 {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid aunt in proof")
 		}
 	}

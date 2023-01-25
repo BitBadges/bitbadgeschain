@@ -7,7 +7,6 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tendermint/tendermint/crypto/merkle"
 )
 
 func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (*types.MsgClaimBadgeResponse, error) {
@@ -31,7 +30,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		return nil, ErrClaimTimeInvalid
 	}
 
-	claimData := msg.Leaf
+	claimData := []byte(msg.Leaf)
 	if claim.Type == uint64(types.ClaimType_AccountNum) {
 		//Assert claimData is either the account number or cosmos address
 
@@ -48,15 +47,9 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		return nil, ErrClaimAlreadyUsed
 	}
 
-	//Convert claim.Data to bytes
-	rootHash := claim.Data
+	rootHash := []byte(claim.Data)
 	
-	proof := merkle.Proof{
-		Total:    int64(msg.Proof.Total),
-		Index:    int64(msg.Proof.Index),
-		LeafHash: msg.Proof.LeafHash,
-		Aunts:    msg.Proof.Aunts,
-	}
+	proof := types.ConvertToTendermintProof(msg.Proof)
 
 	err := proof.Verify(rootHash, claimData);
 	if err != nil {
