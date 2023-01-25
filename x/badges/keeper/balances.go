@@ -30,9 +30,6 @@ func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount uint64, balanc
 	balances = DeleteBalanceForIdRanges(ranges, balances)
 	balances = SetBalanceForIdRanges(ranges, newAmount, balances)
 
-	for _, balance := range balances {
-		balance.BadgeIds = GetIdRangesToInsertToStorage(balance.BadgeIds)
-	}
 	return balances
 }
 
@@ -98,14 +95,8 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*ty
 		})
 		updatedBalances = append(updatedBalances, balancesForSpecifiedRanges...)
 
-		for _, balance := range updatedBalances {
-			balance.BadgeIds = GetIdRangesToInsertToStorage(balance.BadgeIds)
-		}
 		return updatedBalances
 	} else {
-		for _, balance := range balancesForSpecifiedRanges {
-			balance.BadgeIds = GetIdRangesToInsertToStorage(balance.BadgeIds)
-		}
 		return balancesForSpecifiedRanges
 	}
 }
@@ -121,7 +112,7 @@ func AddBalancesForIdRanges(UserBalance types.UserBalance, ranges []*types.IdRan
 
 		UserBalance.Balances = UpdateBalancesForIdRanges(currBalanceObj.BadgeIds, newBalance, UserBalance.Balances)
 	}
-	return GetBalanceToInsertToStorage(UserBalance), nil
+	return UserBalance, nil
 }
 
 // Subtracts a balance to all ids specified in []ranges
@@ -135,7 +126,7 @@ func SubtractBalancesForIdRanges(UserBalance types.UserBalance, ranges []*types.
 
 		UserBalance.Balances = UpdateBalancesForIdRanges(currBalanceObj.BadgeIds, newBalance, UserBalance.Balances)
 	}
-	return GetBalanceToInsertToStorage(UserBalance), nil
+	return UserBalance, nil
 }
 
 // Deletes the balance for a specific id.
@@ -168,9 +159,6 @@ func DeleteBalanceForIdRanges(ranges []*types.IdRange, balances []*types.Balance
 		}
 	}
 
-	for _, balance := range newBalances {
-		balance.BadgeIds = GetIdRangesToInsertToStorage(balance.BadgeIds)
-	}
 	return newBalances
 }
 
@@ -203,9 +191,6 @@ func SetBalanceForIdRanges(ranges []*types.IdRange, amount uint64, balances []*t
 		}
 	}
 
-	for _, balance := range newBalances {
-		balance.BadgeIds = GetIdRangesToInsertToStorage(balance.BadgeIds)
-	}
 	return newBalances
 }
 
@@ -237,18 +222,4 @@ func SearchBalances(targetAmount uint64, balances []*types.Balance) (int, bool) 
 	}
 
 	return idx, hasEntryWithSameBalance
-}
-
-//Normalizes everything to save storage space. If start == end, we set end to 0 so it doens't store.
-func GetBalanceToInsertToStorage(balance types.UserBalance) types.UserBalance {
-	for _, balance := range balance.Balances {
-		balance.BadgeIds = GetIdRangesToInsertToStorage(balance.BadgeIds)
-	}
-
-	for _, approvalObject := range balance.Approvals {
-		for _, approvalAmountObject := range approvalObject.Balances {
-			approvalAmountObject.BadgeIds = GetIdRangesToInsertToStorage(approvalAmountObject.BadgeIds)
-		}
-	}
-	return balance
 }

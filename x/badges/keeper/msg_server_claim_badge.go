@@ -87,7 +87,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		return nil, err
 	}
 
-	err = k.SetUserBalanceInStore(ctx, ConstructBalanceKey(CreatorAccountNum, msg.CollectionId), GetBalanceToInsertToStorage(userBalance))
+	err = k.SetUserBalanceInStore(ctx, ConstructBalanceKey(CreatorAccountNum, msg.CollectionId), userBalance)
 	if err != nil {
 		return nil, err
 	}

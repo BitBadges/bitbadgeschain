@@ -62,13 +62,13 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 
 			}
 
-			if err := k.SetUserBalanceInStore(ctx, toBalanceKey, GetBalanceToInsertToStorage(toUserBalance)); err != nil {
+			if err := k.SetUserBalanceInStore(ctx, toBalanceKey, toUserBalance); err != nil {
 				return nil, err
 			}
 		}
 	}
 
-	if err := k.SetUserBalanceInStore(ctx, fromBalanceKey, GetBalanceToInsertToStorage(fromUserBalance)); err != nil {
+	if err := k.SetUserBalanceInStore(ctx, fromBalanceKey, fromUserBalance); err != nil {
 		return nil, err
 	}
 

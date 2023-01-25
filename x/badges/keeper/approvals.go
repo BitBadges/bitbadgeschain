@@ -41,7 +41,7 @@ func SetApproval(userBalance types.UserBalance, amount uint64, addressNum uint64
 		userBalance.Approvals = newApprovals
 	}
 
-	return GetBalanceToInsertToStorage(userBalance), nil
+	return userBalance, nil
 }
 
 //Remove a balance from the approval amount for address
@@ -79,7 +79,7 @@ func RemoveBalanceFromApproval(userBalance types.UserBalance, amountToRemove uin
 		userBalance.Approvals = append(userBalance.Approvals[:idx], userBalance.Approvals[idx+1:]...)
 	}
 
-	return GetBalanceToInsertToStorage(userBalance), nil
+	return userBalance, nil
 }
 
 //Add a balance to the approval amount
@@ -131,7 +131,7 @@ func AddBalanceToApproval(userBalance types.UserBalance, amountToAdd uint64, add
 
 	userBalance.Approvals[idx].Balances = approval.Balances
 
-	return GetBalanceToInsertToStorage(userBalance), nil
+	return userBalance, nil
 }
 
 // Approvals will be sorted, so we can binary search to get the targetIdx.

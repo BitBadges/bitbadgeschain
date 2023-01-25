@@ -153,7 +153,7 @@ func (k Keeper) MintViaTransfer(ctx sdk.Context, collection types.BadgeCollectio
 				}
 			}
 
-			if err := k.SetUserBalanceInStore(ctx, ConstructBalanceKey(address, collection.CollectionId), GetBalanceToInsertToStorage(recipientBalance)); err != nil {
+			if err := k.SetUserBalanceInStore(ctx, ConstructBalanceKey(address, collection.CollectionId), recipientBalance); err != nil {
 				return types.BadgeCollection{}, err
 			}
 		}

@@ -271,13 +271,6 @@ func SortAndMergeOverlapping(ids []*types.IdRange) []*types.IdRange {
 	}
 }
 
-func GetIdRangesToInsertToStorage(idRanges []*types.IdRange) []*types.IdRange {
-	newIdRanges := []*types.IdRange{}
-	for _, idRange := range idRanges {
-		newIdRanges = append(newIdRanges, CreateIdRange(idRange.Start, idRange.End))
-	}
-	return newIdRanges
-}
 
 func AddManagerAddressToRanges(collection types.BadgeCollection, ranges []*types.IdRange, options types.AddressOptions) []*types.IdRange {
 	idx, found := SearchIdRangesForId(collection.Manager, ranges)
