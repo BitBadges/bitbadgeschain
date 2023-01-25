@@ -51,4 +51,6 @@ var (
 	ErrClaimNotFound 							   	= sdkerrors.Register(types.ModuleName, 44, "claim not found")
 	ErrClaimDataInvalid 							= sdkerrors.Register(types.ModuleName, 45, "claim data invalid")
 	ErrClaimTimeInvalid 							= sdkerrors.Register(types.ModuleName, 46, "claim time invalid")
+	ErrIdAlreadyInRanges 							= sdkerrors.Register(types.ModuleName, 47, "id already in ranges")
+	ErrIdInRange 									= sdkerrors.Register(types.ModuleName, 48, "id in ranges")
 )

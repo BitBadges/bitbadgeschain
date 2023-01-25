@@ -44,7 +44,9 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
+	suite.Require().Nil(err)
 
 	err = TransferBadge(suite, wctx, bob, 0, bobAccountNum, []*types.Transfers{
 		{
@@ -66,153 +68,16 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 	suite.Require().Nil(err, "Error transferring badge")
 
 	bobbalance, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
-	suite.Require().Equal(uint64(5000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err = keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(5000), fetchedBalance[0].Balance)
+	suite.Require().Nil(err)
 
+	
 	alicebalance, _ := GetUserBalance(suite, wctx, 0, aliceAccountNum)
-	suite.Require().Equal(uint64(5000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, alicebalance.Balances)[0].Balance)
+	fetchedBalance, err = keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, alicebalance.Balances)
+	suite.Require().Equal(uint64(5000), fetchedBalance[0].Balance)
+	suite.Require().Nil(err)
 }
-
-// func (suite *TestSuite) TestTransferBadgePending() {
-// 	wctx := sdk.WrapSDKContext(suite.ctx)
-
-// 	collectionsToCreate := []CollectionsToCreate{
-// 		{
-// 			Badge: types.MsgNewCollection{
-// 				CollectionUri: "https://example.com",
-// 				BadgeUri: "https://example.com/{id}",
-// 				Permissions: 46,
-// 			},
-// 			Amount:  1,
-// 			Creator: bob,
-// 		},
-// 	}
-
-// 	CreateCollections(suite, wctx, collectionsToCreate)
-// 	badge, _ := GetCollection(suite, wctx, 0)
-
-// 	//Create badge 1 with supply > 1
-// 	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
-// 		{
-// 			Supply: 10000,
-// 			Amount: 1,
-// 		},
-// 	})
-// 	suite.Require().Nil(err, "Error creating badge")
-// 	badge, _ = GetCollection(suite, wctx, 0)
-// 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
-
-// 	suite.Require().Equal(uint64(1), badge.NextBadgeId)
-// 	suite.Require().Equal([]*types.Balance{
-// 		{
-// 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-// 			Balance:  10000,
-// 		},
-// 	}, badge.MaxSupplys)
-// 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
-
-// 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
-// 	suite.Require().Nil(err, "Error transferring badge")
-
-// 	bobbalance, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
-// 	suite.Require().Equal(uint64(5000), bobbalance.Pending[0].Amount)
-// 	suite.Require().Equal(uint64(1), bobbalance.PendingNonce)
-// 	suite.Require().Equal(bobAccountNum, bobbalance.Pending[0].ApprovedBy)
-// 	suite.Require().Equal(aliceAccountNum, bobbalance.Pending[0].To)
-// 	suite.Require().Equal(bobAccountNum, bobbalance.Pending[0].From)
-// 	suite.Require().Equal(uint64(0), bobbalance.Pending[0].ThisPendingNonce)
-// 	suite.Require().Equal(uint64(0), bobbalance.Pending[0].OtherPendingNonce)
-// 	suite.Require().Equal(true, bobbalance.Pending[0].Sent)
-
-// 	alicebalance, _ := GetUserBalance(suite, wctx, 0, aliceAccountNum)
-// 	suite.Require().Equal(uint64(5000), alicebalance.Pending[0].Amount)
-// 	suite.Require().Equal(uint64(1), alicebalance.PendingNonce)
-// 	suite.Require().Equal(bobAccountNum, alicebalance.Pending[0].ApprovedBy)
-// 	suite.Require().Equal(aliceAccountNum, alicebalance.Pending[0].To)
-// 	suite.Require().Equal(bobAccountNum, alicebalance.Pending[0].From)
-// 	suite.Require().Equal(uint64(0), alicebalance.Pending[0].ThisPendingNonce)
-// 	suite.Require().Equal(uint64(0), alicebalance.Pending[0].OtherPendingNonce)
-// 	suite.Require().Equal(false, alicebalance.Pending[0].Sent)
-// }
-
-// func (suite *TestSuite) TestTransferBadgeForceBurn() {
-// 	wctx := sdk.WrapSDKContext(suite.ctx)
-
-// 	collectionsToCreate := []CollectionsToCreate{
-// 		{
-// 			Badge: types.MsgNewCollection{
-// 				CollectionUri: "https://example.com",
-// BadgeUri: "https://example.com/{id}",
-// 				Permissions: 46,
-// 			},
-// 			Amount:  1,
-// 			Creator: bob,
-// 		},
-// 	}
-
-// 	CreateCollections(suite, wctx, collectionsToCreate)
-// 	badge, _ := GetCollection(suite, wctx, 0)
-
-// 	//Create badge 1 with supply > 1
-// 	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
-// 		{
-// 			Supply: 10000,
-// 			Amount: 1,
-// 		},
-// 	})
-// 	suite.Require().Nil(err, "Error creating badge")
-// 	badge, _ = GetCollection(suite, wctx, 0)
-// 	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
-
-// 	suite.Require().Equal(uint64(1), badge.NextBadgeId)
-// 	suite.Require().Equal([]*types.Balance{
-// 		{
-// 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
-// 			Balance:  10000,
-// 		},
-// 	}, badge.MaxSupplys)
-// 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
-
-// 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
-// 	suite.Require().Nil(err, "Error transferring badge")
-
-// 	bobbalance, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
-// 	suite.Require().Equal(uint64(5000), bobbalance.Pending[0].Amount)
-// 	suite.Require().Equal(uint64(1), bobbalance.PendingNonce)
-// 	suite.Require().Equal(bobAccountNum, bobbalance.Pending[0].ApprovedBy)
-// 	suite.Require().Equal(aliceAccountNum, bobbalance.Pending[0].To)
-// 	suite.Require().Equal(bobAccountNum, bobbalance.Pending[0].From)
-// 	suite.Require().Equal(uint64(0), bobbalance.Pending[0].ThisPendingNonce)
-// 	suite.Require().Equal(uint64(0), bobbalance.Pending[0].OtherPendingNonce)
-// 	suite.Require().Equal(true, bobbalance.Pending[0].Sent)
-
-// 	alicebalance, _ := GetUserBalance(suite, wctx, 0, aliceAccountNum)
-// 	suite.Require().Equal(uint64(5000), alicebalance.Pending[0].Amount)
-// 	suite.Require().Equal(uint64(1), alicebalance.PendingNonce)
-// 	suite.Require().Equal(bobAccountNum, alicebalance.Pending[0].ApprovedBy)
-// 	suite.Require().Equal(aliceAccountNum, alicebalance.Pending[0].To)
-// 	suite.Require().Equal(bobAccountNum, alicebalance.Pending[0].From)
-// 	suite.Require().Equal(uint64(0), alicebalance.Pending[0].ThisPendingNonce)
-// 	suite.Require().Equal(uint64(0), alicebalance.Pending[0].OtherPendingNonce)
-// 	suite.Require().Equal(false, alicebalance.Pending[0].Sent)
-
-// 	err = HandlePendingTransfers(suite, wctx, alice, 0, []*types.IdRange{{Start: 0, End: 0}}, []uint64{1})
-// 	suite.Require().Nil(err, "Error accepting badge")
-
-// 	bobbalance, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
-// 	suite.Require().Equal(uint64(5000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
-
-// 	alicebalance, _ = GetUserBalance(suite, wctx, 0, aliceAccountNum)
-// 	suite.Require().Equal(uint64(5000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, alicebalance.Balances)[0].Balance)
-
-// 	err = TransferBadge(suite, wctx, alice, aliceAccountNum, []uint64{bobAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
-// 	suite.Require().Nil(err, "Error transferring badge")
-
-// 	bobbalance, _ = GetUserBalance(suite, wctx, 0, bobAccountNum)
-// 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
-
-// 	alicebalance, _ = GetUserBalance(suite, wctx, 0, aliceAccountNum)
-// 	suite.Require().Equal(uint64(0), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, alicebalance.Balances)[0].Balance)
-// }
 
 func (suite *TestSuite) TestApprovalsApproved() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -250,7 +115,9 @@ func (suite *TestSuite) TestApprovalsApproved() {
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
+	suite.Require().Nil(err)
 
 	err = SetApproval(suite, wctx, bob, aliceAccountNum, 0, []*types.Balance{
 		{
@@ -321,7 +188,9 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
+	suite.Require().Nil(err)
 
 	err = SetApproval(suite, wctx, bob, aliceAccountNum, 0, []*types.Balance{
 		{
@@ -386,7 +255,9 @@ func (suite *TestSuite) TestApprovalsNotApprovedAtAll() {
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
+	suite.Require().Nil(err)
 
 	err = TransferBadge(suite, wctx, charlie, 0, bobAccountNum, []*types.Transfers{
 		{
@@ -443,7 +314,9 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
+	suite.Require().Nil(err)
 
 	err = SetApproval(suite, wctx, bob, charlieAccountNum, 0, []*types.Balance{
 		{
@@ -508,7 +381,9 @@ func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
+	suite.Require().Nil(err)
 
 	err = SetApproval(suite, wctx, bob, charlieAccountNum, 0, []*types.Balance{
 		{
@@ -573,7 +448,9 @@ func (suite *TestSuite) TestApprovalOverflow() {
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
+	suite.Require().Nil(err)
 
 	err = SetApproval(suite, wctx, bob, charlieAccountNum, 0, []*types.Balance{
 		{
@@ -649,7 +526,8 @@ func (suite *TestSuite) TestTransferUnderflowNotEnoughBalance() {
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
 
 	err = TransferBadge(suite, wctx, bob, 0, bobAccountNum, []*types.Transfers{
 		{
@@ -706,7 +584,9 @@ func (suite *TestSuite) TestPendingTransferUnderflowNotEnoughBalance() {
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
+	suite.Require().Nil(err)
 
 	err = TransferBadge(suite, wctx, bob, 0, bobAccountNum, []*types.Transfers{
 		{
@@ -763,7 +643,8 @@ func (suite *TestSuite) TestTransferInvalidBadgeIdRanges() {
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
 
 	err = TransferBadge(suite, wctx, charlie, 0, bobAccountNum, []*types.Transfers{
 		{

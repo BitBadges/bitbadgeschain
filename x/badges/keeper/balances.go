@@ -24,17 +24,19 @@ func SafeSubtract(left uint64, right uint64) (uint64, error) {
 }
 
 // Updates the balance for a specific id from what it currently is to newAmount.
-func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount uint64, balances []*types.Balance) []*types.Balance {
+func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount uint64, balances []*types.Balance) ([]*types.Balance, error) {
+	err := *new(error)
 	ranges = SortAndMergeOverlapping(ranges)
 	//Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
 	balances = DeleteBalanceForIdRanges(ranges, balances)
-	balances = SetBalanceForIdRanges(ranges, newAmount, balances)
+	balances, err = SetBalanceForIdRanges(ranges, newAmount, balances)
 
-	return balances
+	return balances, err
 }
 
 // Gets the balances for specified ID ranges. Returns a new []*types.Balance where only the specified ID ranges and their balances are included. Appends balance == 0 objects so all IDs are accounted for, even if not found.
-func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*types.Balance) []*types.Balance {
+func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*types.Balance) ([]*types.Balance, error) {
+	err := *new(error)
 	balancesForSpecifiedRanges := []*types.Balance{}
 	idRanges = SortAndMergeOverlapping(idRanges)
 	idRangesNotFound := idRanges
@@ -57,7 +59,8 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*ty
 						End:   idRange.Start - 1,
 					}
 					idRangesWithEverythingBeforeRemoved := []*types.IdRange{}
-					idRangesWithEverythingBeforeRemoved = append(idRangesWithEverythingBeforeRemoved, RemoveIdsFromIdRange(everythingBefore, newIdRanges[0])...)
+					removedRanges, _ := RemoveIdsFromIdRange(everythingBefore, newIdRanges[0])
+					idRangesWithEverythingBeforeRemoved = append(idRangesWithEverythingBeforeRemoved, removedRanges...)
 					idRangesWithEverythingBeforeRemoved = append(idRangesWithEverythingBeforeRemoved, newIdRanges[1:]...)
 					newIdRanges = idRangesWithEverythingBeforeRemoved
 				}
@@ -70,18 +73,23 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*ty
 					}
 					idRangesWithEverythingAfterRemoved := []*types.IdRange{}
 					idRangesWithEverythingAfterRemoved = append(idRangesWithEverythingAfterRemoved, newIdRanges[0:len(newIdRanges)-1]...)
-					idRangesWithEverythingAfterRemoved = append(idRangesWithEverythingAfterRemoved, RemoveIdsFromIdRange(everythingAfter, newIdRanges[len(newIdRanges)-1])...)
+					removedRanges, _ := RemoveIdsFromIdRange(everythingAfter, newIdRanges[len(newIdRanges)-1])
+					idRangesWithEverythingAfterRemoved = append(idRangesWithEverythingAfterRemoved, removedRanges...)
 					newIdRanges = idRangesWithEverythingAfterRemoved
 				}
 
 				for _, newIdRange := range newIdRanges {
 					newNotFoundRanges := []*types.IdRange{}
 					for _, idRangeNotFound := range idRangesNotFound {
-						newNotFoundRanges = append(newNotFoundRanges, RemoveIdsFromIdRange(newIdRange, idRangeNotFound)...)
+						removedRanges, _ := RemoveIdsFromIdRange(newIdRange, idRangeNotFound)
+						newNotFoundRanges = append(newNotFoundRanges, removedRanges...)
 					}
 					idRangesNotFound = newNotFoundRanges
 				}
-				balancesForSpecifiedRanges = UpdateBalancesForIdRanges(newIdRanges, userBalanceObj.Balance, balancesForSpecifiedRanges)
+				balancesForSpecifiedRanges, err = UpdateBalancesForIdRanges(newIdRanges, userBalanceObj.Balance, balancesForSpecifiedRanges)
+				if err != nil {
+					return balancesForSpecifiedRanges, err
+				}
 			}
 		}
 	}
@@ -95,36 +103,50 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*ty
 		})
 		updatedBalances = append(updatedBalances, balancesForSpecifiedRanges...)
 
-		return updatedBalances
+		return updatedBalances, nil
 	} else {
-		return balancesForSpecifiedRanges
+		return balancesForSpecifiedRanges, nil
 	}
 }
 
 // Adds a balance to all ids specified in []ranges
 func AddBalancesForIdRanges(UserBalance types.UserBalance, ranges []*types.IdRange, balanceToAdd uint64) (types.UserBalance, error) {
-	currBalances := GetBalancesForIdRanges(ranges, UserBalance.Balances)
+	currBalances, err := GetBalancesForIdRanges(ranges, UserBalance.Balances)
+	if err != nil {
+		return UserBalance, err
+	}
+
 	for _, currBalanceObj := range currBalances {
 		newBalance, err := SafeAdd(currBalanceObj.Balance, balanceToAdd)
 		if err != nil {
 			return UserBalance, err
 		}
 
-		UserBalance.Balances = UpdateBalancesForIdRanges(currBalanceObj.BadgeIds, newBalance, UserBalance.Balances)
+		UserBalance.Balances, err = UpdateBalancesForIdRanges(currBalanceObj.BadgeIds, newBalance, UserBalance.Balances)
+		if err != nil {
+			return UserBalance, err
+		}
 	}
 	return UserBalance, nil
 }
 
 // Subtracts a balance to all ids specified in []ranges
 func SubtractBalancesForIdRanges(UserBalance types.UserBalance, ranges []*types.IdRange, balanceToRemove uint64) (types.UserBalance, error) {
-	currBalances := GetBalancesForIdRanges(ranges, UserBalance.Balances)
+	currBalances, err := GetBalancesForIdRanges(ranges, UserBalance.Balances)
+	if err != nil {
+		return UserBalance, err
+	}
+
 	for _, currBalanceObj := range currBalances {
 		newBalance, err := SafeSubtract(currBalanceObj.Balance, balanceToRemove)
 		if err != nil {
 			return UserBalance, err
 		}
 
-		UserBalance.Balances = UpdateBalancesForIdRanges(currBalanceObj.BadgeIds, newBalance, UserBalance.Balances)
+		UserBalance.Balances, err = UpdateBalancesForIdRanges(currBalanceObj.BadgeIds, newBalance, UserBalance.Balances)
+		if err != nil {
+			return UserBalance, err
+		}
 	}
 	return UserBalance, nil
 }
@@ -146,7 +168,8 @@ func DeleteBalanceForIdRanges(ranges []*types.IdRange, balances []*types.Balance
 				//Remove the ids within the rangeToDelete from existing ranges
 				newIdRanges := append([]*types.IdRange{}, currRanges[:idxSpan.Start]...)
 				for i := idxSpan.Start; i <= idxSpan.End; i++ {
-					newIdRanges = append(newIdRanges, RemoveIdsFromIdRange(rangeToDelete, currRanges[i])...)
+					removedRanges, _ := RemoveIdsFromIdRange(rangeToDelete, currRanges[i])
+					newIdRanges = append(newIdRanges, removedRanges...)
 				}
 				newIdRanges = append(newIdRanges, currRanges[idxSpan.End+1:]...)
 				balanceObj.BadgeIds = newIdRanges
@@ -163,10 +186,11 @@ func DeleteBalanceForIdRanges(ranges []*types.IdRange, balances []*types.Balance
 }
 
 // Sets the balance for a specific id. Assumes balance does not exist.
-func SetBalanceForIdRanges(ranges []*types.IdRange, amount uint64, balances []*types.Balance) []*types.Balance {
+func SetBalanceForIdRanges(ranges []*types.IdRange, amount uint64, balances []*types.Balance) ([]*types.Balance, error) {
 	if amount == 0 {
-		return balances
+		return balances, nil
 	}
+	err := *new(error)
 
 	idx, found := SearchBalances(amount, balances)
 	newBalances := []*types.Balance{}
@@ -187,11 +211,14 @@ func SetBalanceForIdRanges(ranges []*types.IdRange, amount uint64, balances []*t
 		newBalances = balances
 		newBalances[idx].BadgeIds = GetIdRangesWithOmitEmptyCaseHandled(newBalances[idx].BadgeIds)
 		for _, rangeToAdd := range ranges {
-			newBalances[idx].BadgeIds = InsertRangeToIdRanges(rangeToAdd, newBalances[idx].BadgeIds)
+			newBalances[idx].BadgeIds, err = InsertRangeToIdRanges(rangeToAdd, newBalances[idx].BadgeIds)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	return newBalances
+	return newBalances, nil
 }
 
 // Balances will be sorted, so we can binary search to get the targetIdx.

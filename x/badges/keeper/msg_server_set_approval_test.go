@@ -42,7 +42,9 @@ func (suite *TestSuite) TestSetApproval() {
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
+	suite.Require().Nil(err)
 
 	err = SetApproval(suite, wctx, bob, aliceAccountNum, 0, []*types.Balance{
 		{
@@ -117,7 +119,9 @@ func (suite *TestSuite) TestSetApprovalNoPrevBalanceInStore() {
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
+	suite.Require().Nil(err)
 
 	err = SetApproval(suite, wctx, charlie, aliceAccountNum, 0, []*types.Balance{
 		{
@@ -164,7 +168,9 @@ func (suite *TestSuite) TestApproveSelf() {
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
+	suite.Require().Nil(err)
 
 	err = SetApproval(suite, wctx, bob, bobAccountNum, 0, []*types.Balance{
 		{

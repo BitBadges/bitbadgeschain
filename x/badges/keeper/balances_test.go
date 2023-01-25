@@ -34,6 +34,7 @@ func (suite *TestSuite) TestSafeSubtract() {
 }
 
 func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
+	err := *new(error)
 	balances := []*types.Balance{
 		{
 			Balance: 1,
@@ -46,19 +47,21 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		},
 	}
 
-	balances = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
+	balances, err = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
 		{
 			Start: 0,
 			End:   1,
 		},
 	}, 10, balances)
+	suite.Require().Nil(err, "Error updating balances: %s")
 
-	fetchedBalances := keeper.GetBalancesForIdRanges([]*types.IdRange{
+	fetchedBalances, err := keeper.GetBalancesForIdRanges([]*types.IdRange{
 		{
 			Start: 0,
 			End:   1,
 		},
 	}, balances)
+	suite.Require().Nil(err, "Error fetching balances: %s")
 
 	suite.Require().Equal(balances, []*types.Balance{
 		{
@@ -73,7 +76,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 	})
 	suite.Require().Equal(balances, fetchedBalances)
 
-	fetchedBalances = keeper.GetBalancesForIdRanges([]*types.IdRange{
+	fetchedBalances, err = keeper.GetBalancesForIdRanges([]*types.IdRange{
 		{
 			Start: 1,
 			End:   1,
@@ -92,7 +95,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		},
 	})
 
-	fetchedBalances = keeper.GetBalancesForIdRanges([]*types.IdRange{
+	fetchedBalances, err = keeper.GetBalancesForIdRanges([]*types.IdRange{
 		{
 			Start: 1,
 			End:   2,
@@ -120,7 +123,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		},
 	})
 
-	fetchedBalances = keeper.GetBalancesForIdRanges([]*types.IdRange{
+	fetchedBalances, err = keeper.GetBalancesForIdRanges([]*types.IdRange{
 		{
 			Start: 0,
 			End:   math.MaxUint64,
@@ -148,7 +151,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		},
 	})
 
-	fetchedBalances = keeper.GetBalancesForIdRanges([]*types.IdRange{
+	fetchedBalances, err = keeper.GetBalancesForIdRanges([]*types.IdRange{
 		{
 			Start: 3,
 			End:   math.MaxUint64,
@@ -184,7 +187,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		},
 	})
 
-	balances = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
+	balances, err = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
 		{
 			Start: 1,
 			End:   1,
@@ -212,7 +215,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		},
 	})
 
-	balances = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
+	balances, err = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
 		{
 			Start: 2,
 			End:   math.MaxUint64,
@@ -240,7 +243,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		},
 	})
 
-	balances = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
+	balances, err = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
 		{
 			Start: 2,
 			End:   2,

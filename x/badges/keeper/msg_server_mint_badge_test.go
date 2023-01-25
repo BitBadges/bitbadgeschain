@@ -42,7 +42,8 @@ func (suite *TestSuite) TestNewBadges() {
 			Balance:  10,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10), fetchedBalance[0].Balance)
 
 	//Create badge 2 with supply == 1
 	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
@@ -136,10 +137,12 @@ func (suite *TestSuite) TestNewBadgesDirectlyUponCreatingNewBadge() {
 			Balance:  10,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10), fetchedBalance[0].Balance)
+	suite.Require().Nil(err)
 
 	//Create badge 2 with supply == 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
+	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 1,
 			Amount: 1,

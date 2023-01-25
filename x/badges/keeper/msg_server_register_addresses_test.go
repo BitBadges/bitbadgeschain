@@ -42,7 +42,8 @@ func (suite *TestSuite) TestRegisterAddresses() {
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0}}, bobbalance.Balances)[0].Balance)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
 
 	// err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{1010}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
 	// suite.Require().EqualError(err, keeper.ErrAccountNotRegistered.Error())

@@ -62,23 +62,29 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 			return types.BadgeCollection{}, ErrSupplyEqualsZero
 		}
 
-		maxSupplys = UpdateBalancesForIdRanges(
+		collection.NextBadgeId, err = SafeAdd(collection.NextBadgeId, amountToCreate) //error on ID overflow
+		if err != nil {
+			return types.BadgeCollection{}, err
+		}
+
+		maxSupplys, err = UpdateBalancesForIdRanges(
 			[]*types.IdRange{
 				{Start: nextBadgeId, End: nextBadgeId + amountToCreate - 1},
 			},
 			supply,
 			maxSupplys,
 		)
+		if err != nil {
+			return types.BadgeCollection{}, err
+		}
 
-		unmintedSupplys = UpdateBalancesForIdRanges(
+		unmintedSupplys, err = UpdateBalancesForIdRanges(
 			[]*types.IdRange{
 				{Start: nextBadgeId, End: nextBadgeId + amountToCreate - 1},
 			},
 			supply,
 			unmintedSupplys,
 		)
-
-		collection.NextBadgeId, err = SafeAdd(collection.NextBadgeId, amountToCreate) //error on ID overflow
 		if err != nil {
 			return types.BadgeCollection{}, err
 		}
