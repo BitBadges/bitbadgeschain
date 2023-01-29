@@ -494,277 +494,6 @@ paths:
           format: uint64
       tags:
         - Query
-  /bitbadges/bitbadgeschain/badges/get_claim/{claimId}:
-    get:
-      operationId: BitbadgesBitbadgeschainBadgesGetClaim
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              claim:
-                type: object
-                properties:
-                  balance:
-                    type: object
-                    properties:
-                      balance:
-                        type: string
-                        format: uint64
-                      badgeIds:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            start:
-                              type: string
-                              format: uint64
-                            end:
-                              type: string
-                              format: uint64
-                          description: >-
-                            Id ranges define a range of IDs from start to end.
-                            Can be used for badge IDs, nonces, anything. 
-
-                            If end == 0, we assume end == start. Start must be
-                            >= end.
-                    description: >-
-                      Defines a balance object. The specified balance holds for
-                      all ids specified within the id ranges array.
-                  amountPerClaim:
-                    type: string
-                    format: uint64
-                    title: Amount per claim
-                  type:
-                    title: 'Type of claim (ex: addresses, codes, secret words, etc)'
-                    type: string
-                    enum:
-                      - AccountNum
-                      - Code
-                    default: AccountNum
-                  data:
-                    type: string
-                    description: >-
-                      Data for the claim. We use this for a Merkle root. Max 96
-                      chars.
-                  uri:
-                    type: string
-                    description: Optional URI for the claim. Max 100 chars.
-                  timeRange:
-                    type: object
-                    properties:
-                      start:
-                        type: string
-                        format: uint64
-                      end:
-                        type: string
-                        format: uint64
-                    description: >-
-                      Id ranges define a range of IDs from start to end. Can be
-                      used for badge IDs, nonces, anything. 
-
-                      If end == 0, we assume end == start. Start must be >= end.
-                    title: Time range when the claim is valid
-                description: >-
-                  Defines a claim object. Claims are used to transfer badges via
-                  a claiming process.
-
-                  Stored in own store. Claimed leaves are also stored in unique
-                  store.
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                      description: >-
-                        A URL/resource name that uniquely identifies the type of
-                        the serialized
-
-                        protocol buffer message. This string must contain at
-                        least
-
-                        one "/" character. The last segment of the URL's path
-                        must represent
-
-                        the fully qualified name of the type (as in
-
-                        `path/google.protobuf.Duration`). The name should be in
-                        a canonical form
-
-                        (e.g., leading "." is not accepted).
-
-
-                        In practice, teams usually precompile into the binary
-                        all types that they
-
-                        expect it to use in the context of Any. However, for
-                        URLs which use the
-
-                        scheme `http`, `https`, or no scheme, one can optionally
-                        set up a type
-
-                        server that maps type URLs to message definitions as
-                        follows:
-
-
-                        * If no scheme is provided, `https` is assumed.
-
-                        * An HTTP GET on the URL must yield a
-                        [google.protobuf.Type][]
-                          value in binary format, or produce an error.
-                        * Applications are allowed to cache lookup results based
-                        on the
-                          URL, or have them precompiled into a binary to avoid any
-                          lookup. Therefore, binary compatibility needs to be preserved
-                          on changes to types. (Use versioned type names to manage
-                          breaking changes.)
-
-                        Note: this functionality is not currently available in
-                        the official
-
-                        protobuf release, and it is not used for type URLs
-                        beginning with
-
-                        type.googleapis.com.
-
-
-                        Schemes other than `http`, `https` (or the empty scheme)
-                        might be
-
-                        used with implementation specific semantics.
-                  additionalProperties: {}
-                  description: >-
-                    `Any` contains an arbitrary serialized protocol buffer
-                    message along with a
-
-                    URL that describes the type of the serialized message.
-
-
-                    Protobuf library provides support to pack/unpack Any values
-                    in the form
-
-                    of utility functions or additional generated methods of the
-                    Any type.
-
-
-                    Example 1: Pack and unpack a message in C++.
-
-                        Foo foo = ...;
-                        Any any;
-                        any.PackFrom(foo);
-                        ...
-                        if (any.UnpackTo(&foo)) {
-                          ...
-                        }
-
-                    Example 2: Pack and unpack a message in Java.
-
-                        Foo foo = ...;
-                        Any any = Any.pack(foo);
-                        ...
-                        if (any.is(Foo.class)) {
-                          foo = any.unpack(Foo.class);
-                        }
-
-                     Example 3: Pack and unpack a message in Python.
-
-                        foo = Foo(...)
-                        any = Any()
-                        any.Pack(foo)
-                        ...
-                        if any.Is(Foo.DESCRIPTOR):
-                          any.Unpack(foo)
-                          ...
-
-                     Example 4: Pack and unpack a message in Go
-
-                         foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
-                         ...
-                         foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
-                           ...
-                         }
-
-                    The pack methods provided by protobuf library will by
-                    default use
-
-                    'type.googleapis.com/full.type.name' as the type URL and the
-                    unpack
-
-                    methods only use the fully qualified type name after the
-                    last '/'
-
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
-                    type
-
-                    name "y.z".
-
-
-
-                    JSON
-
-                    ====
-
-                    The JSON representation of an `Any` value uses the regular
-
-                    representation of the deserialized, embedded message, with
-                    an
-
-                    additional field `@type` which contains the type URL.
-                    Example:
-
-                        package google.profile;
-                        message Person {
-                          string first_name = 1;
-                          string last_name = 2;
-                        }
-
-                        {
-                          "@type": "type.googleapis.com/google.profile.Person",
-                          "firstName": <string>,
-                          "lastName": <string>
-                        }
-
-                    If the embedded message type is well-known and has a custom
-                    JSON
-
-                    representation, that representation will be embedded adding
-                    a field
-
-                    `value` which holds the custom JSON in addition to the
-                    `@type`
-
-                    field. Example (for message [google.protobuf.Duration][]):
-
-                        {
-                          "@type": "type.googleapis.com/google.protobuf.Duration",
-                          "value": "1.212s"
-                        }
-      parameters:
-        - name: claimId
-          in: path
-          required: true
-          type: string
-          format: uint64
-      tags:
-        - Query
   /bitbadges/bitbadgeschain/badges/get_collection/{id}:
     get:
       summary: Queries a list of GetBadge items.
@@ -850,13 +579,9 @@ paths:
 
                                   If end == 0, we assume end == start. Start
                                   must be >= end.
-                            Options:
+                            options:
                               type: string
-                              enum:
-                                - Neutral
-                                - Include
-                                - Exclude
-                              default: Neutral
+                              format: uint64
                         to:
                           type: object
                           properties:
@@ -878,13 +603,9 @@ paths:
 
                                   If end == 0, we assume end == start. Start
                                   must be >= end.
-                            Options:
+                            options:
                               type: string
-                              enum:
-                                - Neutral
-                                - Include
-                                - Exclude
-                              default: Neutral
+                              format: uint64
                       description: >-
                         TransferMapping defines a mapping of transfers from one
                         set of addresses to another.
@@ -922,13 +643,9 @@ paths:
 
                                   If end == 0, we assume end == start. Start
                                   must be >= end.
-                            Options:
+                            options:
                               type: string
-                              enum:
-                                - Neutral
-                                - Include
-                                - Exclude
-                              default: Neutral
+                              format: uint64
                         to:
                           type: object
                           properties:
@@ -950,13 +667,9 @@ paths:
 
                                   If end == 0, we assume end == start. Start
                                   must be >= end.
-                            Options:
+                            options:
                               type: string
-                              enum:
-                                - Neutral
-                                - Include
-                                - Exclude
-                              default: Neutral
+                              format: uint64
                       description: >-
                         TransferMapping defines a mapping of transfers from one
                         set of addresses to another.
@@ -1033,6 +746,100 @@ paths:
                         Defines a balance object. The specified balance holds
                         for all ids specified within the id ranges array.
                     description: This is a map of the maximum badge supplys.
+                  claims:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        balance:
+                          type: object
+                          properties:
+                            balance:
+                              type: string
+                              format: uint64
+                            badgeIds:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  start:
+                                    type: string
+                                    format: uint64
+                                  end:
+                                    type: string
+                                    format: uint64
+                                description: >-
+                                  Id ranges define a range of IDs from start to
+                                  end. Can be used for badge IDs, nonces,
+                                  anything. 
+
+                                  If end == 0, we assume end == start. Start
+                                  must be >= end.
+                          description: >-
+                            Defines a balance object. The specified balance
+                            holds for all ids specified within the id ranges
+                            array.
+                        type:
+                          type: string
+                          format: uint64
+                          title: >-
+                            Type of claim (ex: addresses, codes, secret words,
+                            etc)
+                        data:
+                          type: string
+                          description: Data for the root hash.
+                        amountPerClaim:
+                          type: string
+                          format: uint64
+                          title: Amount per claim
+                        badgeIds:
+                          type: object
+                          properties:
+                            start:
+                              type: string
+                              format: uint64
+                            end:
+                              type: string
+                              format: uint64
+                          description: >-
+                            Id ranges define a range of IDs from start to end.
+                            Can be used for badge IDs, nonces, anything. 
+
+                            If end == 0, we assume end == start. Start must be
+                            >= end.
+                          title: Used as a default
+                        incrementIdsBy:
+                          type: string
+                          format: uint64
+                          title: Used as a default
+                        uri:
+                          type: string
+                          title: >-
+                            Optional URI for the claim. Max 100 chars. Often
+                            used for MerkleHash
+                        timeRange:
+                          type: object
+                          properties:
+                            start:
+                              type: string
+                              format: uint64
+                            end:
+                              type: string
+                              format: uint64
+                          description: >-
+                            Id ranges define a range of IDs from start to end.
+                            Can be used for badge IDs, nonces, anything. 
+
+                            If end == 0, we assume end == start. Start must be
+                            >= end.
+                          title: Time range when the claim is valid
+                      description: >-
+                        Defines a claim object. Claims are used to transfer
+                        badges via a claiming process.
+
+                        Stored in own store. Claimed leaves are also stored in
+                        unique store.
+                    description: This is an array of the current badge claims.
                   standard:
                     type: string
                     format: uint64
@@ -1231,6 +1038,219 @@ paths:
           required: true
           type: string
           format: uint64
+      tags:
+        - Query
+  /bitbadges/bitbadgeschain/badges/is_claim_data_used/{collectionId}/{claimId}/{claimData}:
+    get:
+      operationId: BitbadgesBitbadgeschainBadgesIsClaimDataUsed
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              used:
+                type: boolean
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                      description: >-
+                        A URL/resource name that uniquely identifies the type of
+                        the serialized
+
+                        protocol buffer message. This string must contain at
+                        least
+
+                        one "/" character. The last segment of the URL's path
+                        must represent
+
+                        the fully qualified name of the type (as in
+
+                        `path/google.protobuf.Duration`). The name should be in
+                        a canonical form
+
+                        (e.g., leading "." is not accepted).
+
+
+                        In practice, teams usually precompile into the binary
+                        all types that they
+
+                        expect it to use in the context of Any. However, for
+                        URLs which use the
+
+                        scheme `http`, `https`, or no scheme, one can optionally
+                        set up a type
+
+                        server that maps type URLs to message definitions as
+                        follows:
+
+
+                        * If no scheme is provided, `https` is assumed.
+
+                        * An HTTP GET on the URL must yield a
+                        [google.protobuf.Type][]
+                          value in binary format, or produce an error.
+                        * Applications are allowed to cache lookup results based
+                        on the
+                          URL, or have them precompiled into a binary to avoid any
+                          lookup. Therefore, binary compatibility needs to be preserved
+                          on changes to types. (Use versioned type names to manage
+                          breaking changes.)
+
+                        Note: this functionality is not currently available in
+                        the official
+
+                        protobuf release, and it is not used for type URLs
+                        beginning with
+
+                        type.googleapis.com.
+
+
+                        Schemes other than `http`, `https` (or the empty scheme)
+                        might be
+
+                        used with implementation specific semantics.
+                  additionalProperties: {}
+                  description: >-
+                    `Any` contains an arbitrary serialized protocol buffer
+                    message along with a
+
+                    URL that describes the type of the serialized message.
+
+
+                    Protobuf library provides support to pack/unpack Any values
+                    in the form
+
+                    of utility functions or additional generated methods of the
+                    Any type.
+
+
+                    Example 1: Pack and unpack a message in C++.
+
+                        Foo foo = ...;
+                        Any any;
+                        any.PackFrom(foo);
+                        ...
+                        if (any.UnpackTo(&foo)) {
+                          ...
+                        }
+
+                    Example 2: Pack and unpack a message in Java.
+
+                        Foo foo = ...;
+                        Any any = Any.pack(foo);
+                        ...
+                        if (any.is(Foo.class)) {
+                          foo = any.unpack(Foo.class);
+                        }
+
+                     Example 3: Pack and unpack a message in Python.
+
+                        foo = Foo(...)
+                        any = Any()
+                        any.Pack(foo)
+                        ...
+                        if any.Is(Foo.DESCRIPTOR):
+                          any.Unpack(foo)
+                          ...
+
+                     Example 4: Pack and unpack a message in Go
+
+                         foo := &pb.Foo{...}
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
+                         ...
+                         foo := &pb.Foo{}
+                         if err := any.UnmarshalTo(foo); err != nil {
+                           ...
+                         }
+
+                    The pack methods provided by protobuf library will by
+                    default use
+
+                    'type.googleapis.com/full.type.name' as the type URL and the
+                    unpack
+
+                    methods only use the fully qualified type name after the
+                    last '/'
+
+                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    type
+
+                    name "y.z".
+
+
+
+                    JSON
+
+                    ====
+
+                    The JSON representation of an `Any` value uses the regular
+
+                    representation of the deserialized, embedded message, with
+                    an
+
+                    additional field `@type` which contains the type URL.
+                    Example:
+
+                        package google.profile;
+                        message Person {
+                          string first_name = 1;
+                          string last_name = 2;
+                        }
+
+                        {
+                          "@type": "type.googleapis.com/google.profile.Person",
+                          "firstName": <string>,
+                          "lastName": <string>
+                        }
+
+                    If the embedded message type is well-known and has a custom
+                    JSON
+
+                    representation, that representation will be embedded adding
+                    a field
+
+                    `value` which holds the custom JSON in addition to the
+                    `@type`
+
+                    field. Example (for message [google.protobuf.Duration][]):
+
+                        {
+                          "@type": "type.googleapis.com/google.protobuf.Duration",
+                          "value": "1.212s"
+                        }
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          type: string
+          format: uint64
+        - name: claimId
+          in: path
+          required: true
+          type: string
+          format: uint64
+        - name: claimData
+          in: path
+          required: true
+          type: string
       tags:
         - Query
   /bitbadges/bitbadgeschain/badges/params:
@@ -46134,13 +46154,9 @@ definitions:
             badge IDs, nonces, anything. 
 
             If end == 0, we assume end == start. Start must be >= end.
-      Options:
+      options:
         type: string
-        enum:
-          - Neutral
-          - Include
-          - Exclude
-        default: Neutral
+        format: uint64
   bitbadges.bitbadgeschain.badges.Approval:
     type: object
     properties:
@@ -46242,13 +46258,9 @@ definitions:
                       used for badge IDs, nonces, anything. 
 
                       If end == 0, we assume end == start. Start must be >= end.
-                Options:
+                options:
                   type: string
-                  enum:
-                    - Neutral
-                    - Include
-                    - Exclude
-                  default: Neutral
+                  format: uint64
             to:
               type: object
               properties:
@@ -46268,13 +46280,9 @@ definitions:
                       used for badge IDs, nonces, anything. 
 
                       If end == 0, we assume end == start. Start must be >= end.
-                Options:
+                options:
                   type: string
-                  enum:
-                    - Neutral
-                    - Include
-                    - Exclude
-                  default: Neutral
+                  format: uint64
           description: >-
             TransferMapping defines a mapping of transfers from one set of
             addresses to another.
@@ -46306,13 +46314,9 @@ definitions:
                       used for badge IDs, nonces, anything. 
 
                       If end == 0, we assume end == start. Start must be >= end.
-                Options:
+                options:
                   type: string
-                  enum:
-                    - Neutral
-                    - Include
-                    - Exclude
-                  default: Neutral
+                  format: uint64
             to:
               type: object
               properties:
@@ -46332,13 +46336,9 @@ definitions:
                       used for badge IDs, nonces, anything. 
 
                       If end == 0, we assume end == start. Start must be >= end.
-                Options:
+                options:
                   type: string
-                  enum:
-                    - Neutral
-                    - Include
-                    - Exclude
-                  default: Neutral
+                  format: uint64
           description: >-
             TransferMapping defines a mapping of transfers from one set of
             addresses to another.
@@ -46412,6 +46412,92 @@ definitions:
             Defines a balance object. The specified balance holds for all ids
             specified within the id ranges array.
         description: This is a map of the maximum badge supplys.
+      claims:
+        type: array
+        items:
+          type: object
+          properties:
+            balance:
+              type: object
+              properties:
+                balance:
+                  type: string
+                  format: uint64
+                badgeIds:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                        format: uint64
+                      end:
+                        type: string
+                        format: uint64
+                    description: >-
+                      Id ranges define a range of IDs from start to end. Can be
+                      used for badge IDs, nonces, anything. 
+
+                      If end == 0, we assume end == start. Start must be >= end.
+              description: >-
+                Defines a balance object. The specified balance holds for all
+                ids specified within the id ranges array.
+            type:
+              type: string
+              format: uint64
+              title: 'Type of claim (ex: addresses, codes, secret words, etc)'
+            data:
+              type: string
+              description: Data for the root hash.
+            amountPerClaim:
+              type: string
+              format: uint64
+              title: Amount per claim
+            badgeIds:
+              type: object
+              properties:
+                start:
+                  type: string
+                  format: uint64
+                end:
+                  type: string
+                  format: uint64
+              description: >-
+                Id ranges define a range of IDs from start to end. Can be used
+                for badge IDs, nonces, anything. 
+
+                If end == 0, we assume end == start. Start must be >= end.
+              title: Used as a default
+            incrementIdsBy:
+              type: string
+              format: uint64
+              title: Used as a default
+            uri:
+              type: string
+              title: >-
+                Optional URI for the claim. Max 100 chars. Often used for
+                MerkleHash
+            timeRange:
+              type: object
+              properties:
+                start:
+                  type: string
+                  format: uint64
+                end:
+                  type: string
+                  format: uint64
+              description: >-
+                Id ranges define a range of IDs from start to end. Can be used
+                for badge IDs, nonces, anything. 
+
+                If end == 0, we assume end == start. Start must be >= end.
+              title: Time range when the claim is valid
+          description: >-
+            Defines a claim object. Claims are used to transfer badges via a
+            claiming process.
+
+            Stored in own store. Claimed leaves are also stored in unique store.
+        description: This is an array of the current badge claims.
       standard:
         type: string
         format: uint64
@@ -46484,23 +46570,39 @@ definitions:
         description: >-
           Defines a balance object. The specified balance holds for all ids
           specified within the id ranges array.
+      type:
+        type: string
+        format: uint64
+        title: 'Type of claim (ex: addresses, codes, secret words, etc)'
+      data:
+        type: string
+        description: Data for the root hash.
       amountPerClaim:
         type: string
         format: uint64
         title: Amount per claim
-      type:
-        title: 'Type of claim (ex: addresses, codes, secret words, etc)'
+      badgeIds:
+        type: object
+        properties:
+          start:
+            type: string
+            format: uint64
+          end:
+            type: string
+            format: uint64
+        description: >-
+          Id ranges define a range of IDs from start to end. Can be used for
+          badge IDs, nonces, anything. 
+
+          If end == 0, we assume end == start. Start must be >= end.
+        title: Used as a default
+      incrementIdsBy:
         type: string
-        enum:
-          - AccountNum
-          - Code
-        default: AccountNum
-      data:
-        type: string
-        description: Data for the claim. We use this for a Merkle root. Max 96 chars.
+        format: uint64
+        title: Used as a default
       uri:
         type: string
-        description: Optional URI for the claim. Max 100 chars.
+        title: Optional URI for the claim. Max 100 chars. Often used for MerkleHash
       timeRange:
         type: object
         properties:
@@ -46521,12 +46623,6 @@ definitions:
       process.
 
       Stored in own store. Claimed leaves are also stored in unique store.
-  bitbadges.bitbadgeschain.badges.ClaimType:
-    type: string
-    enum:
-      - AccountNum
-      - Code
-    default: AccountNum
   bitbadges.bitbadgeschain.badges.IdRange:
     type: object
     properties:
@@ -46541,13 +46637,8 @@ definitions:
       IDs, nonces, anything. 
 
       If end == 0, we assume end == start. Start must be >= end.
-  bitbadges.bitbadgeschain.badges.Options:
-    type: string
-    enum:
-      - Neutral
-      - Include
-      - Exclude
-    default: Neutral
+  bitbadges.bitbadgeschain.badges.MsgClaimBadgeResponse:
+    type: object
   bitbadges.bitbadgeschain.badges.MsgMintBadgeResponse:
     type: object
     properties:
@@ -46591,8 +46682,6 @@ definitions:
     type: object
   bitbadges.bitbadgeschain.badges.MsgUpdateDisallowedTransfersResponse:
     type: object
-  bitbadges.bitbadgeschain.badges.MsgUpdateManagerApprovedTransfersResponse:
-    type: object
   bitbadges.bitbadgeschain.badges.MsgUpdatePermissionsResponse:
     type: object
   bitbadges.bitbadgeschain.badges.MsgUpdateUrisResponse:
@@ -46600,6 +46689,28 @@ definitions:
   bitbadges.bitbadgeschain.badges.Params:
     type: object
     description: Params defines the parameters for the module.
+  bitbadges.bitbadgeschain.badges.Proof:
+    type: object
+    properties:
+      leaf:
+        type: string
+      aunts:
+        type: array
+        items:
+          type: object
+          properties:
+            aunt:
+              type: string
+            onRight:
+              type: boolean
+    title: Consistent with tendermint/crypto merkle tree
+  bitbadges.bitbadgeschain.badges.ProofItem:
+    type: object
+    properties:
+      aunt:
+        type: string
+      onRight:
+        type: boolean
   bitbadges.bitbadgeschain.badges.QueryGetAddressByIdResponse:
     type: object
     properties:
@@ -46682,74 +46793,6 @@ definitions:
           Defines a user balance object for a badge w/ the user's balances,
           nonce, pending transfers, and approvals. All badge IDs for a
           collection are handled within this object.
-  bitbadges.bitbadgeschain.badges.QueryGetClaimResponse:
-    type: object
-    properties:
-      claim:
-        type: object
-        properties:
-          balance:
-            type: object
-            properties:
-              balance:
-                type: string
-                format: uint64
-              badgeIds:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    start:
-                      type: string
-                      format: uint64
-                    end:
-                      type: string
-                      format: uint64
-                  description: >-
-                    Id ranges define a range of IDs from start to end. Can be
-                    used for badge IDs, nonces, anything. 
-
-                    If end == 0, we assume end == start. Start must be >= end.
-            description: >-
-              Defines a balance object. The specified balance holds for all ids
-              specified within the id ranges array.
-          amountPerClaim:
-            type: string
-            format: uint64
-            title: Amount per claim
-          type:
-            title: 'Type of claim (ex: addresses, codes, secret words, etc)'
-            type: string
-            enum:
-              - AccountNum
-              - Code
-            default: AccountNum
-          data:
-            type: string
-            description: Data for the claim. We use this for a Merkle root. Max 96 chars.
-          uri:
-            type: string
-            description: Optional URI for the claim. Max 100 chars.
-          timeRange:
-            type: object
-            properties:
-              start:
-                type: string
-                format: uint64
-              end:
-                type: string
-                format: uint64
-            description: >-
-              Id ranges define a range of IDs from start to end. Can be used for
-              badge IDs, nonces, anything. 
-
-              If end == 0, we assume end == start. Start must be >= end.
-            title: Time range when the claim is valid
-        description: >-
-          Defines a claim object. Claims are used to transfer badges via a
-          claiming process.
-
-          Stored in own store. Claimed leaves are also stored in unique store.
   bitbadges.bitbadgeschain.badges.QueryGetCollectionResponse:
     type: object
     properties:
@@ -46822,13 +46865,9 @@ definitions:
 
                           If end == 0, we assume end == start. Start must be >=
                           end.
-                    Options:
+                    options:
                       type: string
-                      enum:
-                        - Neutral
-                        - Include
-                        - Exclude
-                      default: Neutral
+                      format: uint64
                 to:
                   type: object
                   properties:
@@ -46849,13 +46888,9 @@ definitions:
 
                           If end == 0, we assume end == start. Start must be >=
                           end.
-                    Options:
+                    options:
                       type: string
-                      enum:
-                        - Neutral
-                        - Include
-                        - Exclude
-                      default: Neutral
+                      format: uint64
               description: >-
                 TransferMapping defines a mapping of transfers from one set of
                 addresses to another.
@@ -46891,13 +46926,9 @@ definitions:
 
                           If end == 0, we assume end == start. Start must be >=
                           end.
-                    Options:
+                    options:
                       type: string
-                      enum:
-                        - Neutral
-                        - Include
-                        - Exclude
-                      default: Neutral
+                      format: uint64
                 to:
                   type: object
                   properties:
@@ -46918,13 +46949,9 @@ definitions:
 
                           If end == 0, we assume end == start. Start must be >=
                           end.
-                    Options:
+                    options:
                       type: string
-                      enum:
-                        - Neutral
-                        - Include
-                        - Exclude
-                      default: Neutral
+                      format: uint64
               description: >-
                 TransferMapping defines a mapping of transfers from one set of
                 addresses to another.
@@ -46999,6 +47026,94 @@ definitions:
                 Defines a balance object. The specified balance holds for all
                 ids specified within the id ranges array.
             description: This is a map of the maximum badge supplys.
+          claims:
+            type: array
+            items:
+              type: object
+              properties:
+                balance:
+                  type: object
+                  properties:
+                    balance:
+                      type: string
+                      format: uint64
+                    badgeIds:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          start:
+                            type: string
+                            format: uint64
+                          end:
+                            type: string
+                            format: uint64
+                        description: >-
+                          Id ranges define a range of IDs from start to end. Can
+                          be used for badge IDs, nonces, anything. 
+
+                          If end == 0, we assume end == start. Start must be >=
+                          end.
+                  description: >-
+                    Defines a balance object. The specified balance holds for
+                    all ids specified within the id ranges array.
+                type:
+                  type: string
+                  format: uint64
+                  title: 'Type of claim (ex: addresses, codes, secret words, etc)'
+                data:
+                  type: string
+                  description: Data for the root hash.
+                amountPerClaim:
+                  type: string
+                  format: uint64
+                  title: Amount per claim
+                badgeIds:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                      format: uint64
+                    end:
+                      type: string
+                      format: uint64
+                  description: >-
+                    Id ranges define a range of IDs from start to end. Can be
+                    used for badge IDs, nonces, anything. 
+
+                    If end == 0, we assume end == start. Start must be >= end.
+                  title: Used as a default
+                incrementIdsBy:
+                  type: string
+                  format: uint64
+                  title: Used as a default
+                uri:
+                  type: string
+                  title: >-
+                    Optional URI for the claim. Max 100 chars. Often used for
+                    MerkleHash
+                timeRange:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                      format: uint64
+                    end:
+                      type: string
+                      format: uint64
+                  description: >-
+                    Id ranges define a range of IDs from start to end. Can be
+                    used for badge IDs, nonces, anything. 
+
+                    If end == 0, we assume end == start. Start must be >= end.
+                  title: Time range when the claim is valid
+              description: >-
+                Defines a claim object. Claims are used to transfer badges via a
+                claiming process.
+
+                Stored in own store. Claimed leaves are also stored in unique
+                store.
+            description: This is an array of the current badge claims.
           standard:
             type: string
             format: uint64
@@ -47006,6 +47121,11 @@ definitions:
               Defines what standard this badge should implement (see
               /standards).
         description: BadgeCollection defines a standard collection of badges.
+  bitbadges.bitbadgeschain.badges.QueryIsClaimDataUsedResponse:
+    type: object
+    properties:
+      used:
+        type: boolean
   bitbadges.bitbadgeschain.badges.QueryParamsResponse:
     type: object
     properties:
@@ -47035,13 +47155,9 @@ definitions:
                 for badge IDs, nonces, anything. 
 
                 If end == 0, we assume end == start. Start must be >= end.
-          Options:
+          options:
             type: string
-            enum:
-              - Neutral
-              - Include
-              - Exclude
-            default: Neutral
+            format: uint64
       to:
         type: object
         properties:
@@ -47061,13 +47177,9 @@ definitions:
                 for badge IDs, nonces, anything. 
 
                 If end == 0, we assume end == start. Start must be >= end.
-          Options:
+          options:
             type: string
-            enum:
-              - Neutral
-              - Include
-              - Exclude
-            default: Neutral
+            format: uint64
     description: >-
       TransferMapping defines a mapping of transfers from one set of addresses
       to another.

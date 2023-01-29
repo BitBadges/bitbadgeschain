@@ -16,9 +16,14 @@ enum ClaimType {
 //Stored in own store. Claimed leaves are also stored in unique store.
 message Claim {
     Balance balance = 1; //Current balance of the claim store.
-    uint64 amountPerClaim = 2; //Amount per claim
-    uint64 type = 3; //Type of claim (ex: addresses, codes, secret words, etc)
+    uint64 type = 2; //Type of claim (ex: addresses, codes, secret words, etc)
+
     string data = 4; //Data for the root hash.
-    string uri = 5; //Optional URI for the claim. Max 100 chars. Often used for MerkleHash
-    IdRange timeRange = 6; //Time range when the claim is valid
+
+    uint64 amountPerClaim = 3; //Amount per claim
+    IdRange badgeIds = 6; //Used as a default
+    uint64 incrementIdsBy = 7; //Used as a default
+
+    string uri = 8; //Optional URI for the claim. Max 100 chars. Often used for MerkleHash
+    IdRange timeRange = 9; //Time range when the claim is valid
 }

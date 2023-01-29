@@ -1,9 +1,10 @@
-package types
+package types_test
 
 import (
 	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 )
@@ -11,25 +12,27 @@ import (
 func TestMsgClaimBadge_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgClaimBadge
+		msg  types.MsgClaimBadge
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgClaimBadge{
+			msg: types.MsgClaimBadge{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgClaimBadge{
+			msg: types.MsgClaimBadge{
 				Creator: sample.AccAddress(),
-				Leaf: "hello",
-				Proof: &Proof{
-					LeafHash: "hello",
-					Aunts: []string{"hello"},
-					Total: 1,
-					Index: 0,
+				Proof: &types.Proof{
+					Leaf: "hello",
+					Aunts: []*types.ProofItem{
+						{
+							Aunt: "hello",
+							OnRight: true,
+						},
+					},
 				},
 			},
 		},

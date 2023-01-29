@@ -229,15 +229,17 @@ func VerifySignature(
 			Salt:              "0",
 		}
 
+
 		//Normalize the typedData to handle empty (0, "", false), nested objects, and arrays.
 		//Also, add in any missing types for the EIP712 typedData specific to our badges module.
 		//Only check first message because eip712 only supports one message per tx
 		wrappedFirstMsg, ok := firstMsg.(legacytx.LegacyMsg)
 		if ok {
 			if wrappedFirstMsg.Route() == "badges" {
+
 				typedData, err = badges.NormalizeEIP712TypedData(typedData, wrappedFirstMsg.Type())
 				if err != nil {
-					return sdkerrors.Wrap(err, "failed to normalize EIP712 typed data for badges module")
+					return sdkerrors.Wrap(err, "failed to normalize EIP712 typed data for badges module %s")
 				}
 			}
 		}

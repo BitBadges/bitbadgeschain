@@ -166,21 +166,22 @@ message MsgRegisterAddressesResponse {
     IdRange registeredAddressNumbers = 1;
 }
 
+message ProofItem {
+    string aunt = 1;
+    bool onRight = 2;
+}
 
 //Consistent with tendermint/crypto merkle tree
 message Proof {
-    uint64          total     = 1;
-    uint64          index     = 2;
-    string           leafHash = 3;
-    repeated string  aunts     = 4;
+    string leaf = 1;
+    repeated ProofItem aunts = 2;
 }
 
 message MsgClaimBadge {
     string creator = 1;
     uint64 claimId = 2;
     uint64 collectionId = 3;
-    string leaf = 4;
-    Proof proof = 5;
+    Proof proof = 4;
 }
   
 message MsgClaimBadgeResponse {}

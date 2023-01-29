@@ -120,20 +120,26 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 	}
 
 	claimsTypes := []apitypes.Type{
-		{Name: "balance", Type: "Balance[]"},
+		{Name: "balance", Type: "Balance"},
 		{Name: "amountPerClaim", Type: "uint64"},
 		{Name: "type", Type: "uint64"},
-		{Name: "data", Type: "bytes"},
+		{Name: "data", Type: "string"},
+		{Name: "badgeIds", Type: "IdRange"},
+		{Name: "incrementIdsBy", Type: "uint64"},
 		{Name: "uri", Type: "string"},
 		{Name: "timeRange", Type: "IdRange"},
 	}
+	
+	proofItemTypes := []apitypes.Type{
+		{Name: "aunt", Type: "string"},
+		{Name: "onRight", Type: "bool"},
+	}
 
 	proofTypes := []apitypes.Type{
-		{Name: "total", Type: "uint64"},
-		{Name: "index", Type: "uint64"},
-		{Name: "leafHash", Type: "bytes"},
-		{Name: "aunts", Type: "bytes[]"},
+		{Name: "aunts", Type: "ProofItem[]"},
+		{Name: "leaf", Type: "string"},
 	}
+
 
 	switch route {
 		
@@ -176,6 +182,8 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 			"Balance": balanceTypes,
 			"IdRange": idRangeTypes,
 		}
+
+		
 	case TypeMsgTransferBadge:
 		return map[string][]apitypes.Type{
 			"MsgValue": {
@@ -259,16 +267,15 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 			},
 		}
 	case TypeMsgClaimBadge:
-	
 		return map[string][]apitypes.Type{
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "claimId", Type: "uint64"},
 				{Name: "collectionId", Type: "uint64"},
-				{Name: "leaf", Type: "bytes"},
 				{Name: "proof", Type: "Proof"},
 			},
 			"Proof": proofTypes,
+			"ProofItem": proofItemTypes,
 		}
 	default:
 		return map[string][]apitypes.Type{}

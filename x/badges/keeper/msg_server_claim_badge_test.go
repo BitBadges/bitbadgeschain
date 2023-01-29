@@ -1,21 +1,63 @@
 package keeper_test
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"math"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/tendermint/tendermint/crypto/merkle"
 )
 
 func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 
-	rootHash, merkleProofs := merkle.ProofsFromByteSlices([][]byte{[]byte(alice), []byte(bob), []byte(charlie)})
+	// rootHash, merkleProofs := merkle.ProofsFromByteSlices([][]byte{[]byte(alice), []byte(bob), []byte(charlie), []byte(charlie)})
 
+	aliceLeaf := "-" + alice + "-1-0-0"
+	bobLeaf := "-" + bob + "-1-0-0"
+	charlieLeaf := "-" + charlie + "-1-0-0"
+	// aliceLeaf := alice
+	// bobLeaf := bob
+	// charlieLeaf := charlie
+
+	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
+	leafHashes := make([][]byte, len(leafs))
+	for i, leaf := range leafs {
+		initialHash := sha256.Sum256(leaf)
+		leafHashes[i] = initialHash[:]
+		for j := 0; j < 32; j++ {
+			print(leafHashes[i][j])
+			print(" ")
+		}
+		println()
+
+		// println("leafHashes[i]: ", string(leafHashes[i]))
+	}
+	println()
+	
+
+	levelTwoHashes := make([][]byte, 2)
+	for i := 0; i < len(leafHashes); i += 2 {
+		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
+		levelTwoHashes[i/2] = iHash[:]
+		for j := 0; j < 32; j++ {
+			print(levelTwoHashes[i/2][j])
+			print(" ")
+		}
+		println()
+	}
+	println()
+
+	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
+	rootHash := rootHashI[:]
+
+	for j := 0; j < 32; j++ {
+		print(rootHash[j])
+		print(" ")
+	}
 	
 
 	collectionsToCreate := []CollectionsToCreate{
@@ -38,8 +80,10 @@ func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 			Balance:  10,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
+		BadgeIds: &types.IdRange{Start: 0, End: 0},
+		IncrementIdsBy: 0,
 		AmountPerClaim: 1,
-		Data:       string(rootHash),
+		Data:       hex.EncodeToString(rootHash),
 		Type: 	 	uint64(types.ClaimType_AccountNum),
 		Uri: "",
 		TimeRange: &types.IdRange{
@@ -71,10 +115,25 @@ func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 
 	claim := badge.Claims[0]
 
-	err = ClaimBadge(suite, wctx, alice, 0, 0,  alice, types.ConvertFromTendermintProof(merkleProofs[0]), "", &types.IdRange{
-		Start: 0,
-		End:   math.MaxUint64,
-	})
+	err = ClaimBadge(suite, wctx, bob, 0, 0, &types.Proof{
+			Leaf: aliceLeaf,
+			Aunts: []*types.ProofItem{
+				{
+					Aunt: hex.EncodeToString(leafHashes[1]),
+					OnRight: true,
+				},
+				{
+					Aunt: hex.EncodeToString(levelTwoHashes[1]),
+					OnRight: true,
+				},
+			},
+		},
+		"", 
+		&types.IdRange{
+			Start: 0,
+			End:   math.MaxUint64,
+		},
+	)
 	suite.Require().Nil(err, "Error claiming badge")
 
 	aliceBalance, _ := GetUserBalance(suite, wctx, 0, aliceAccountNum)
@@ -92,9 +151,29 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 
-	rootHash, merkleProofs := merkle.ProofsFromByteSlices([][]byte{[]byte("121241234"), []byte(bob), []byte(charlie)})
+	aliceLeaf := "-" + alice + "-1-0-0"
+	bobLeaf := "-" + bob + "-1-0-0"
+	charlieLeaf := "-" + charlie + "-1-0-0"
+
+	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
+	leafHashes := make([][]byte, len(leafs))
+	for i, leaf := range leafs {
+		initialHash := sha256.Sum256(leaf)
+		leafHashes[i] = initialHash[:]
+	}
 
 	
+
+	levelTwoHashes := make([][]byte, 2)
+	for i := 0; i < len(leafHashes); i += 2 {
+		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
+		levelTwoHashes[i/2] = iHash[:]
+	}
+
+	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
+	rootHash := rootHashI[:]
+	
+
 
 	collectionsToCreate := []CollectionsToCreate{
 		{
@@ -116,8 +195,10 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 			Balance:  10,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
+		BadgeIds: &types.IdRange{Start: 0, End: 0},
+		IncrementIdsBy: 0,
 		AmountPerClaim: 1,
-		Data:       string(rootHash),
+		Data:       hex.EncodeToString(rootHash),
 		Type: 	 	uint64(types.ClaimType_AccountNum),
 		Uri: "",
 		TimeRange: &types.IdRange{
@@ -150,22 +231,59 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	claim := badge.Claims[0]
 	suite.Require().Equal(&claimToAdd, claim)
 
-	err = ClaimBadge(suite, wctx, alice, 0, 0, "121241234", types.ConvertFromTendermintProof(merkleProofs[0]), "", &types.IdRange{
+	err = ClaimBadge(suite, wctx, alice, 0, 0, &types.Proof{
+		Leaf: "",
+		Aunts: []*types.ProofItem{
+			
+			{
+				Aunt: hex.EncodeToString(leafHashes[1]),
+				OnRight: true,
+			},
+			{
+				Aunt: hex.EncodeToString(levelTwoHashes[1]),
+				OnRight: true,
+			},
+		},
+	}, "", &types.IdRange{
 		Start: 0,
 		End:   math.MaxUint64,
 	})
-	suite.Require().EqualError(err, keeper.ErrClaimDataInvalid.Error())
+	suite.Require().EqualError(err, keeper.ErrRootHashInvalid.Error())
 }
-
 
 
 func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 
-	rootHash, merkleProofs := merkle.ProofsFromByteSlices([][]byte{[]byte("121241234"), []byte(bob), []byte(charlie)})
+	aliceLeaf := "-" + alice + "-1-0-0"
+	bobLeaf := "-" + bob + "-1-0-0"
+	charlieLeaf := "-" + charlie + "-1-0-0"
 
+	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
+	leafHashes := make([][]byte, len(leafs))
+	for i, leaf := range leafs {
+		initialHash := sha256.Sum256(leaf)
+		leafHashes[i] = initialHash[:]
+	}
+
+	levelTwoHashes := make([][]byte, 2)
+	for i := 0; i < len(leafHashes); i += 2 {
+		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
+		levelTwoHashes[i/2] = iHash[:]
+	}
+
+	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
+	rootHash := rootHashI[:]
 	
+
+	// output := tmhash.Sum(append([]byte{0}, []byte("hello")...))
+	// // output := tmhash.Sum([]byte("hello"))
+	// for i := 0; i < len(merkleProofs[0].LeafHash); i++ {
+	// 	println(merkleProofs[0].LeafHash[i], output[i])
+	// }
+
+	// 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
 
 	collectionsToCreate := []CollectionsToCreate{
 		{
@@ -187,8 +305,10 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 			Balance:  10,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		},
+		BadgeIds: &types.IdRange{Start: 0, End: 0},
+		IncrementIdsBy: 1,
 		AmountPerClaim: 1,
-		Data:       string(rootHash),
+		Data:       hex.EncodeToString(rootHash),
 		Type: 	 	uint64(types.ClaimType_Code),
 		Uri: "",
 		TimeRange: &types.IdRange{
@@ -221,7 +341,19 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 	claim := badge.Claims[0]
 	suite.Require().Equal(&claimToAdd, claim)
 
-	err = ClaimBadge(suite, wctx, alice, 0, 0, "121241234", types.ConvertFromTendermintProof(merkleProofs[0]), "", &types.IdRange{
+	err = ClaimBadge(suite, wctx, alice, 0, 0, &types.Proof{
+		Leaf: aliceLeaf,
+		Aunts: []*types.ProofItem{
+			{
+				Aunt: hex.EncodeToString(leafHashes[1]),
+				OnRight: true,
+			},
+			{
+				Aunt: hex.EncodeToString(levelTwoHashes[1]),
+				OnRight: true,
+			},
+		},
+	}, "", &types.IdRange{
 		Start: 0,
 		End:   math.MaxUint64,
 	})
@@ -234,5 +366,5 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 	badge, _ = GetCollection(suite, wctx, 0)
 	claim = badge.Claims[0]
 	suite.Require().Equal(uint64(9), claim.Balance.Balance)
-	// suite.Require().Equal([]*types.IdRange{{Start: 0, End: 0}}, aliceBalance.Balances[0].BadgeIds)
+	suite.Require().Equal(&types.IdRange{Start: 1, End: 1}, claim.BadgeIds)
 }

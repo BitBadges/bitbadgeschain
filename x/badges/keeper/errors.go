@@ -53,4 +53,6 @@ var (
 	ErrClaimTimeInvalid 							= sdkerrors.Register(types.ModuleName, 46, "claim time invalid")
 	ErrIdAlreadyInRanges 							= sdkerrors.Register(types.ModuleName, 47, "id already in ranges")
 	ErrIdInRange 									= sdkerrors.Register(types.ModuleName, 48, "id in ranges")
+	ErrRootHashInvalid 								= sdkerrors.Register(types.ModuleName, 49, "root hash invalid")
+	ErrInvalidAddress 								= sdkerrors.Register(types.ModuleName, 50, "invalid address")
 )
