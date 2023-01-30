@@ -120,12 +120,12 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 	}
 
 	claimsTypes := []apitypes.Type{
-		{Name: "balance", Type: "Balance"},
+		{Name: "balances", Type: "Balance[]"},
+		{Name: "badgeIds", Type: "IdRange[]"},
+		{Name: "incrementIdsBy", Type: "uint64"},
 		{Name: "amountPerClaim", Type: "uint64"},
 		{Name: "type", Type: "uint64"},
 		{Name: "data", Type: "string"},
-		{Name: "badgeIds", Type: "IdRange"},
-		{Name: "incrementIdsBy", Type: "uint64"},
 		{Name: "uri", Type: "string"},
 		{Name: "timeRange", Type: "IdRange"},
 	}
@@ -136,7 +136,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 	}
 
 	proofTypes := []apitypes.Type{
-		{Name: "aunts", Type: "ProofItem[]"},
+		{Name: "aunts", Type: "ClaimProofItem[]"},
 		{Name: "leaf", Type: "string"},
 	}
 
@@ -272,10 +272,10 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 				{Name: "creator", Type: "string"},
 				{Name: "claimId", Type: "uint64"},
 				{Name: "collectionId", Type: "uint64"},
-				{Name: "proof", Type: "Proof"},
+				{Name: "proof", Type: "ClaimProof"},
 			},
-			"Proof": proofTypes,
-			"ProofItem": proofItemTypes,
+			"ClaimProof": proofTypes,
+			"ClaimProofItem": proofItemTypes,
 		}
 	default:
 		return map[string][]apitypes.Type{}

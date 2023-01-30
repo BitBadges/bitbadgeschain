@@ -76,15 +76,17 @@ func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 	badge, _ := GetCollection(suite, wctx, 0)
 
 	claimToAdd := types.Claim{
-		Balance: &types.Balance{
-			Balance:  10,
-			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+		Balances: []*types.Balance{
+			{
+				Balance:  10,
+				BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+			},
 		},
-		BadgeIds: &types.IdRange{Start: 0, End: 0},
+		BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		IncrementIdsBy: 0,
 		AmountPerClaim: 1,
 		Data:       hex.EncodeToString(rootHash),
-		Type: 	 	uint64(types.ClaimType_AccountNum),
+		Type: 	 	uint64(types.ClaimType_MerkleTree),
 		Uri: "",
 		TimeRange: &types.IdRange{
 			Start: 0,
@@ -115,9 +117,9 @@ func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 
 	claim := badge.Claims[0]
 
-	err = ClaimBadge(suite, wctx, bob, 0, 0, &types.Proof{
+	err = ClaimBadge(suite, wctx, bob, 0, 0, &types.ClaimProof{
 			Leaf: aliceLeaf,
-			Aunts: []*types.ProofItem{
+			Aunts: []*types.ClaimProofItem{
 				{
 					Aunt: hex.EncodeToString(leafHashes[1]),
 					OnRight: true,
@@ -142,7 +144,7 @@ func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 
 	badge, _ = GetCollection(suite, wctx, 0)
 	claim = badge.Claims[0]
-	suite.Require().Equal(uint64(9), claim.Balance.Balance)
+	suite.Require().Equal(uint64(9), claim.Balances[0].Balance)
 	// suite.Require().Equal([]*types.IdRange{{Start: 0, End: 0}}, aliceBalance.Balances[0].BadgeIds)
 }
 
@@ -191,15 +193,17 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	badge, _ := GetCollection(suite, wctx, 0)
 
 	claimToAdd := types.Claim{
-		Balance: &types.Balance{
-			Balance:  10,
-			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+		Balances: []*types.Balance{
+			{
+				Balance:  10,
+				BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+			},
 		},
-		BadgeIds: &types.IdRange{Start: 0, End: 0},
+		BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		IncrementIdsBy: 0,
 		AmountPerClaim: 1,
 		Data:       hex.EncodeToString(rootHash),
-		Type: 	 	uint64(types.ClaimType_AccountNum),
+		Type: 	 	uint64(types.ClaimType_MerkleTree),
 		Uri: "",
 		TimeRange: &types.IdRange{
 			Start: 0,
@@ -231,9 +235,9 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	claim := badge.Claims[0]
 	suite.Require().Equal(&claimToAdd, claim)
 
-	err = ClaimBadge(suite, wctx, alice, 0, 0, &types.Proof{
+	err = ClaimBadge(suite, wctx, alice, 0, 0, &types.ClaimProof{
 		Leaf: "",
-		Aunts: []*types.ProofItem{
+		Aunts: []*types.ClaimProofItem{
 			
 			{
 				Aunt: hex.EncodeToString(leafHashes[1]),
@@ -301,15 +305,17 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 	badge, _ := GetCollection(suite, wctx, 0)
 
 	claimToAdd := types.Claim{
-		Balance: &types.Balance{
-			Balance:  10,
-			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+		Balances: []*types.Balance{
+			{
+				Balance:  10,
+				BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+			},
 		},
-		BadgeIds: &types.IdRange{Start: 0, End: 0},
+		BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
 		IncrementIdsBy: 1,
 		AmountPerClaim: 1,
 		Data:       hex.EncodeToString(rootHash),
-		Type: 	 	uint64(types.ClaimType_Code),
+		Type: 	 	uint64(types.ClaimType_FirstCome),
 		Uri: "",
 		TimeRange: &types.IdRange{
 			Start: 0,
@@ -341,9 +347,9 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 	claim := badge.Claims[0]
 	suite.Require().Equal(&claimToAdd, claim)
 
-	err = ClaimBadge(suite, wctx, alice, 0, 0, &types.Proof{
+	err = ClaimBadge(suite, wctx, alice, 0, 0, &types.ClaimProof{
 		Leaf: aliceLeaf,
-		Aunts: []*types.ProofItem{
+		Aunts: []*types.ClaimProofItem{
 			{
 				Aunt: hex.EncodeToString(leafHashes[1]),
 				OnRight: true,
@@ -365,6 +371,6 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 
 	badge, _ = GetCollection(suite, wctx, 0)
 	claim = badge.Claims[0]
-	suite.Require().Equal(uint64(9), claim.Balance.Balance)
-	suite.Require().Equal(&types.IdRange{Start: 1, End: 1}, claim.BadgeIds)
+	suite.Require().Equal(uint64(9), claim.Balances[0].Balance)
+	suite.Require().Equal([]*types.IdRange{{Start: 1, End: 1}}, claim.BadgeIds)
 }

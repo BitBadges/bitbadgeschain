@@ -178,9 +178,12 @@ func (k Keeper) MintViaClaim(ctx sdk.Context, collection types.BadgeCollection, 
 
 	err := *new(error)
 	for _, claim := range claims {
-		unmintedBalances, err = SubtractBalancesForIdRanges(unmintedBalances, claim.Balance.BadgeIds, claim.Balance.Balance)
-		if err != nil {
-			return types.BadgeCollection{}, err
+
+		for _, balance := range claim.Balances {
+			unmintedBalances, err = SubtractBalancesForIdRanges(unmintedBalances, balance.BadgeIds, balance.Balance)
+			if err != nil {
+				return types.BadgeCollection{}, err
+			}
 		}
 
 		collection.Claims = append(collection.Claims, claim)

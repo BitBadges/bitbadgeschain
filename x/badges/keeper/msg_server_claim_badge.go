@@ -33,7 +33,16 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	}
 
 	usedKey := msg.Creator
-	if claim.Type == uint64(types.ClaimType_AccountNum) {
+	if claim.Type == uint64(types.ClaimType_MerkleTree) {
+		if msg.Proof.Leaf == "" {
+			return nil, ErrLeafIsEmpty
+		}
+
+		if msg.Proof.Aunts == nil || len(msg.Proof.Aunts) == 0 {
+			return nil, ErrAuntsIsEmpty
+		}
+
+
 		hashedMsgLeaf := sha256.Sum256([]byte(msg.Proof.Leaf))
 		leafHash := hashedMsgLeaf[:]
 
@@ -43,7 +52,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		for _, aunt := range msg.Proof.Aunts {
 			decodedAunt, err := hex.DecodeString(aunt.Aunt)
 			if err != nil {
-				return nil, ErrRootHashInvalid
+				return nil, ErrDecodingHexString
 				// return nil, sdkerrors.Wrapf(err, "Proof is invalid %s %d", hex.EncodeToString(currHash), len(aunt.Aunt))
 			}
 
@@ -69,11 +78,13 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	}
 
 
-	
-	amountToClaim := claim.AmountPerClaim
-	badgeIds := claim.BadgeIds
+	amountToClaim := []uint64{claim.AmountPerClaim}
+	badgeIds := [][]*types.IdRange{claim.BadgeIds}
 	toAddressNum := CreatorAccountNum
-	if claim.Type == uint64(types.ClaimType_AccountNum) {
+	if claim.Type == uint64(types.ClaimType_MerkleTree) {
+		badgeIds = [][]*types.IdRange{}
+		amountToClaim = []uint64{}
+
 		//Split msg.Proof.Leaf string into 5 parts delimited by a comma
 		//The first part is the code word
 		//The second part is the address
@@ -82,7 +93,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		//The fifth part is the ending badge id
 
 		res := strings.Split(msg.Proof.Leaf, "-")
-		if len(res) != 5 {
+		if len(res) % 3 != 2 {
 			return nil, ErrClaimDataInvalid
 		}
 
@@ -96,34 +107,32 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		}
 		
 		
-		
-		//convert res[2] to uint64
-		amountToClaim, err = strconv.ParseUint(res[2], 10, 64)
-		if err != nil {
-			return nil, ErrClaimDataInvalid
-		}
+		for i := 2; i < len(res); i += 3 {
+			//convert res[i] to uint64
+			amount, err := strconv.ParseUint(res[i], 10, 64)
+			if err != nil {
+				return nil, ErrClaimDataInvalid
+			}
+			amountToClaim = append(amountToClaim, amount)
 
-		//convert res[3] to uint64
-		startingBadgeId, err := strconv.ParseUint(res[3], 10, 64)
-		if err != nil {
-			return nil, ErrClaimDataInvalid
-		}
+			//convert res[i+1] to uint64
+			startingBadgeId, err := strconv.ParseUint(res[i+1], 10, 64)
+			if err != nil {
+				return nil, ErrClaimDataInvalid
+			}
 
-		//convert res[4] to uint64
-		endingBadgeId, err := strconv.ParseUint(res[4], 10, 64)
-		if err != nil {
-			return nil, ErrClaimDataInvalid
-		}
+			//convert res[i+2] to uint64
+			endingBadgeId, err := strconv.ParseUint(res[i+2], 10, 64)
+			if err != nil {
+				return nil, ErrClaimDataInvalid
+			}
 
-		badgeIds = &types.IdRange{
-			Start: startingBadgeId,
-			End:   endingBadgeId,
+			badgeIds = append(badgeIds, []*types.IdRange{&types.IdRange{
+				Start: startingBadgeId,
+				End: endingBadgeId,
+			}})
 		}
-		
 	}
-
-
-
 
 	
 
@@ -131,40 +140,42 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	if !found {
 		userBalance = types.UserBalance{}
 	}
-	
-	userBalance, err = AddBalancesForIdRanges(userBalance, []*types.IdRange{badgeIds}, amountToClaim)
-	if err != nil {
-		return nil, err
-	}
 
 	claimUserBalance := types.UserBalance{
-		Balances: []*types.Balance{
-			claim.Balance,
-		},
+		Balances: claim.Balances,
 		Approvals: []*types.Approval{},
 	}
-
 	
-	claimUserBalance, err = SubtractBalancesForIdRanges(claimUserBalance, []*types.IdRange{badgeIds}, amountToClaim)
-	if err != nil {
-		return nil, err
-	}
-
-	claim.Balance = claimUserBalance.Balances[0]
-
-
-	if claim.IncrementIdsBy > 0 {
-		badgeIds.Start, err = SafeAdd(badgeIds.Start, claim.IncrementIdsBy)
+	for i := 0; i < len(amountToClaim); i++ {
+		userBalance, err = AddBalancesForIdRanges(userBalance, badgeIds[i], amountToClaim[i])
 		if err != nil {
 			return nil, err
 		}
 
-		badgeIds.End, err = SafeAdd(badgeIds.End, claim.IncrementIdsBy)
+		claimUserBalance, err = SubtractBalancesForIdRanges(claimUserBalance, badgeIds[i], amountToClaim[i])
 		if err != nil {
 			return nil, err
 		}
-		claim.BadgeIds = badgeIds
 	}
+
+	claim.Balances = claimUserBalance.Balances
+
+
+	if claim.IncrementIdsBy > 0 && claim.Type == uint64(types.ClaimType_FirstCome) {
+		for i := 0; i < len(badgeIds[0]); i++ {
+			badgeIds[0][i].Start, err = SafeAdd(badgeIds[0][i].Start, claim.IncrementIdsBy)
+			if err != nil {
+				return nil, err
+			}
+
+			badgeIds[0][i].End, err = SafeAdd(badgeIds[0][i].End, claim.IncrementIdsBy)
+			if err != nil {
+				return nil, err
+			}
+		}
+		claim.BadgeIds = badgeIds[0]
+	}
+
 
 	collection.Claims[msg.ClaimId] = claim
 	

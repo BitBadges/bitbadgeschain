@@ -9,7 +9,7 @@ const TypeMsgClaimBadge = "claim_badge"
 
 var _ sdk.Msg = &MsgClaimBadge{}
 
-func NewMsgClaimBadge(creator string, claimId uint64, collectionId uint64, proof *Proof, uri string, timeRange *IdRange) *MsgClaimBadge {
+func NewMsgClaimBadge(creator string, claimId uint64, collectionId uint64, proof *ClaimProof, uri string, timeRange *IdRange) *MsgClaimBadge {
 	return &MsgClaimBadge{
 		Creator: creator,
 		ClaimId: claimId,
@@ -46,18 +46,13 @@ func (msg *MsgClaimBadge) ValidateBasic() error {
 	}
 
 	if msg.Proof == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid proof")
+		for _, aunt := range msg.Proof.Aunts {
+			if aunt.Aunt == "" || len(aunt.Aunt) == 0 {
+				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid aunt in proof")
+			}
+		}	
 	}
 
-	if msg.Proof.Aunts == nil || len(msg.Proof.Aunts) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid aunts in proof")
-	}
-
-	for _, aunt := range msg.Proof.Aunts {
-		if aunt.Aunt == "" || len(aunt.Aunt) == 0 {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid aunt in proof")
-		}
-	}
-
+	
 	return nil
 }

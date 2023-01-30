@@ -751,34 +751,37 @@ paths:
                     items:
                       type: object
                       properties:
-                        balance:
-                          type: object
-                          properties:
-                            balance:
-                              type: string
-                              format: uint64
-                            badgeIds:
-                              type: array
-                              items:
-                                type: object
-                                properties:
-                                  start:
-                                    type: string
-                                    format: uint64
-                                  end:
-                                    type: string
-                                    format: uint64
-                                description: >-
-                                  Id ranges define a range of IDs from start to
-                                  end. Can be used for badge IDs, nonces,
-                                  anything. 
+                        balances:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              balance:
+                                type: string
+                                format: uint64
+                              badgeIds:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    start:
+                                      type: string
+                                      format: uint64
+                                    end:
+                                      type: string
+                                      format: uint64
+                                  description: >-
+                                    Id ranges define a range of IDs from start
+                                    to end. Can be used for badge IDs, nonces,
+                                    anything. 
 
-                                  If end == 0, we assume end == start. Start
-                                  must be >= end.
-                          description: >-
-                            Defines a balance object. The specified balance
-                            holds for all ids specified within the id ranges
-                            array.
+                                    If end == 0, we assume end == start. Start
+                                    must be >= end.
+                            description: >-
+                              Defines a balance object. The specified balance
+                              holds for all ids specified within the id ranges
+                              array.
+                          description: Current balance of the claim store.
                         type:
                           type: string
                           format: uint64
@@ -793,20 +796,22 @@ paths:
                           format: uint64
                           title: Amount per claim
                         badgeIds:
-                          type: object
-                          properties:
-                            start:
-                              type: string
-                              format: uint64
-                            end:
-                              type: string
-                              format: uint64
-                          description: >-
-                            Id ranges define a range of IDs from start to end.
-                            Can be used for badge IDs, nonces, anything. 
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              start:
+                                type: string
+                                format: uint64
+                              end:
+                                type: string
+                                format: uint64
+                            description: >-
+                              Id ranges define a range of IDs from start to end.
+                              Can be used for badge IDs, nonces, anything. 
 
-                            If end == 0, we assume end == start. Start must be
-                            >= end.
+                              If end == 0, we assume end == start. Start must be
+                              >= end.
                           title: Used as a default
                         incrementIdsBy:
                           type: string
@@ -816,7 +821,7 @@ paths:
                           type: string
                           title: >-
                             Optional URI for the claim. Max 100 chars. Often
-                            used for MerkleHash
+                            used for IPFS to Merkle Tree
                         timeRange:
                           type: object
                           properties:
@@ -46417,31 +46422,35 @@ definitions:
         items:
           type: object
           properties:
-            balance:
-              type: object
-              properties:
-                balance:
-                  type: string
-                  format: uint64
-                badgeIds:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      start:
-                        type: string
-                        format: uint64
-                      end:
-                        type: string
-                        format: uint64
-                    description: >-
-                      Id ranges define a range of IDs from start to end. Can be
-                      used for badge IDs, nonces, anything. 
+            balances:
+              type: array
+              items:
+                type: object
+                properties:
+                  balance:
+                    type: string
+                    format: uint64
+                  badgeIds:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                          format: uint64
+                        end:
+                          type: string
+                          format: uint64
+                      description: >-
+                        Id ranges define a range of IDs from start to end. Can
+                        be used for badge IDs, nonces, anything. 
 
-                      If end == 0, we assume end == start. Start must be >= end.
-              description: >-
-                Defines a balance object. The specified balance holds for all
-                ids specified within the id ranges array.
+                        If end == 0, we assume end == start. Start must be >=
+                        end.
+                description: >-
+                  Defines a balance object. The specified balance holds for all
+                  ids specified within the id ranges array.
+              description: Current balance of the claim store.
             type:
               type: string
               format: uint64
@@ -46454,19 +46463,21 @@ definitions:
               format: uint64
               title: Amount per claim
             badgeIds:
-              type: object
-              properties:
-                start:
-                  type: string
-                  format: uint64
-                end:
-                  type: string
-                  format: uint64
-              description: >-
-                Id ranges define a range of IDs from start to end. Can be used
-                for badge IDs, nonces, anything. 
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                    format: uint64
+                  end:
+                    type: string
+                    format: uint64
+                description: >-
+                  Id ranges define a range of IDs from start to end. Can be used
+                  for badge IDs, nonces, anything. 
 
-                If end == 0, we assume end == start. Start must be >= end.
+                  If end == 0, we assume end == start. Start must be >= end.
               title: Used as a default
             incrementIdsBy:
               type: string
@@ -46475,8 +46486,8 @@ definitions:
             uri:
               type: string
               title: >-
-                Optional URI for the claim. Max 100 chars. Often used for
-                MerkleHash
+                Optional URI for the claim. Max 100 chars. Often used for IPFS
+                to Merkle Tree
             timeRange:
               type: object
               properties:
@@ -46545,31 +46556,34 @@ definitions:
   bitbadges.bitbadgeschain.badges.Claim:
     type: object
     properties:
-      balance:
-        type: object
-        properties:
-          balance:
-            type: string
-            format: uint64
-          badgeIds:
-            type: array
-            items:
-              type: object
-              properties:
-                start:
-                  type: string
-                  format: uint64
-                end:
-                  type: string
-                  format: uint64
-              description: >-
-                Id ranges define a range of IDs from start to end. Can be used
-                for badge IDs, nonces, anything. 
+      balances:
+        type: array
+        items:
+          type: object
+          properties:
+            balance:
+              type: string
+              format: uint64
+            badgeIds:
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                    format: uint64
+                  end:
+                    type: string
+                    format: uint64
+                description: >-
+                  Id ranges define a range of IDs from start to end. Can be used
+                  for badge IDs, nonces, anything. 
 
-                If end == 0, we assume end == start. Start must be >= end.
-        description: >-
-          Defines a balance object. The specified balance holds for all ids
-          specified within the id ranges array.
+                  If end == 0, we assume end == start. Start must be >= end.
+          description: >-
+            Defines a balance object. The specified balance holds for all ids
+            specified within the id ranges array.
+        description: Current balance of the claim store.
       type:
         type: string
         format: uint64
@@ -46582,19 +46596,21 @@ definitions:
         format: uint64
         title: Amount per claim
       badgeIds:
-        type: object
-        properties:
-          start:
-            type: string
-            format: uint64
-          end:
-            type: string
-            format: uint64
-        description: >-
-          Id ranges define a range of IDs from start to end. Can be used for
-          badge IDs, nonces, anything. 
+        type: array
+        items:
+          type: object
+          properties:
+            start:
+              type: string
+              format: uint64
+            end:
+              type: string
+              format: uint64
+          description: >-
+            Id ranges define a range of IDs from start to end. Can be used for
+            badge IDs, nonces, anything. 
 
-          If end == 0, we assume end == start. Start must be >= end.
+            If end == 0, we assume end == start. Start must be >= end.
         title: Used as a default
       incrementIdsBy:
         type: string
@@ -46602,7 +46618,9 @@ definitions:
         title: Used as a default
       uri:
         type: string
-        title: Optional URI for the claim. Max 100 chars. Often used for MerkleHash
+        title: >-
+          Optional URI for the claim. Max 100 chars. Often used for IPFS to
+          Merkle Tree
       timeRange:
         type: object
         properties:
@@ -46623,6 +46641,31 @@ definitions:
       process.
 
       Stored in own store. Claimed leaves are also stored in unique store.
+  bitbadges.bitbadgeschain.badges.ClaimProof:
+    type: object
+    properties:
+      leaf:
+        type: string
+        description: >-
+          Formatted with
+          CODE-ADDRESS-AMOUNT-STARTID-ENDID-AMOUNT-STARTID-ENDID-...
+      aunts:
+        type: array
+        items:
+          type: object
+          properties:
+            aunt:
+              type: string
+            onRight:
+              type: boolean
+    title: Consistent with tendermint/crypto merkle tree
+  bitbadges.bitbadgeschain.badges.ClaimProofItem:
+    type: object
+    properties:
+      aunt:
+        type: string
+      onRight:
+        type: boolean
   bitbadges.bitbadgeschain.badges.IdRange:
     type: object
     properties:
@@ -46689,28 +46732,6 @@ definitions:
   bitbadges.bitbadgeschain.badges.Params:
     type: object
     description: Params defines the parameters for the module.
-  bitbadges.bitbadgeschain.badges.Proof:
-    type: object
-    properties:
-      leaf:
-        type: string
-      aunts:
-        type: array
-        items:
-          type: object
-          properties:
-            aunt:
-              type: string
-            onRight:
-              type: boolean
-    title: Consistent with tendermint/crypto merkle tree
-  bitbadges.bitbadgeschain.badges.ProofItem:
-    type: object
-    properties:
-      aunt:
-        type: string
-      onRight:
-        type: boolean
   bitbadges.bitbadgeschain.badges.QueryGetAddressByIdResponse:
     type: object
     properties:
@@ -47031,32 +47052,35 @@ definitions:
             items:
               type: object
               properties:
-                balance:
-                  type: object
-                  properties:
-                    balance:
-                      type: string
-                      format: uint64
-                    badgeIds:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          start:
-                            type: string
-                            format: uint64
-                          end:
-                            type: string
-                            format: uint64
-                        description: >-
-                          Id ranges define a range of IDs from start to end. Can
-                          be used for badge IDs, nonces, anything. 
+                balances:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      balance:
+                        type: string
+                        format: uint64
+                      badgeIds:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            start:
+                              type: string
+                              format: uint64
+                            end:
+                              type: string
+                              format: uint64
+                          description: >-
+                            Id ranges define a range of IDs from start to end.
+                            Can be used for badge IDs, nonces, anything. 
 
-                          If end == 0, we assume end == start. Start must be >=
-                          end.
-                  description: >-
-                    Defines a balance object. The specified balance holds for
-                    all ids specified within the id ranges array.
+                            If end == 0, we assume end == start. Start must be
+                            >= end.
+                    description: >-
+                      Defines a balance object. The specified balance holds for
+                      all ids specified within the id ranges array.
+                  description: Current balance of the claim store.
                 type:
                   type: string
                   format: uint64
@@ -47069,19 +47093,21 @@ definitions:
                   format: uint64
                   title: Amount per claim
                 badgeIds:
-                  type: object
-                  properties:
-                    start:
-                      type: string
-                      format: uint64
-                    end:
-                      type: string
-                      format: uint64
-                  description: >-
-                    Id ranges define a range of IDs from start to end. Can be
-                    used for badge IDs, nonces, anything. 
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                        format: uint64
+                      end:
+                        type: string
+                        format: uint64
+                    description: >-
+                      Id ranges define a range of IDs from start to end. Can be
+                      used for badge IDs, nonces, anything. 
 
-                    If end == 0, we assume end == start. Start must be >= end.
+                      If end == 0, we assume end == start. Start must be >= end.
                   title: Used as a default
                 incrementIdsBy:
                   type: string
@@ -47091,7 +47117,7 @@ definitions:
                   type: string
                   title: >-
                     Optional URI for the claim. Max 100 chars. Often used for
-                    MerkleHash
+                    IPFS to Merkle Tree
                 timeRange:
                   type: object
                   properties:

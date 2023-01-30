@@ -55,4 +55,7 @@ var (
 	ErrIdInRange 									= sdkerrors.Register(types.ModuleName, 48, "id in ranges")
 	ErrRootHashInvalid 								= sdkerrors.Register(types.ModuleName, 49, "root hash invalid")
 	ErrInvalidAddress 								= sdkerrors.Register(types.ModuleName, 50, "invalid address")
+	ErrLeafIsEmpty 									= sdkerrors.Register(types.ModuleName, 51, "leaf is empty")
+	ErrAuntsIsEmpty 								= sdkerrors.Register(types.ModuleName, 52, "aunts is empty")
+	ErrDecodingHexString 							= sdkerrors.Register(types.ModuleName, 53, "decoding hex string")
 )

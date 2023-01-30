@@ -8,22 +8,21 @@ import "badges/ranges.proto";
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 enum ClaimType {
-    AccountNum = 0;
-    Code = 1;
+    MerkleTree = 0;
+    FirstCome = 1;
 }
 
 //Defines a claim object. Claims are used to transfer badges via a claiming process.
 //Stored in own store. Claimed leaves are also stored in unique store.
 message Claim {
-    Balance balance = 1; //Current balance of the claim store.
+    repeated Balance balances = 1; //Current balance of the claim store.
     uint64 type = 2; //Type of claim (ex: addresses, codes, secret words, etc)
 
-    string data = 4; //Data for the root hash.
+    string data = 3; //Data for the root hash.
 
-    uint64 amountPerClaim = 3; //Amount per claim
-    IdRange badgeIds = 6; //Used as a default
-    uint64 incrementIdsBy = 7; //Used as a default
-
-    string uri = 8; //Optional URI for the claim. Max 100 chars. Often used for MerkleHash
-    IdRange timeRange = 9; //Time range when the claim is valid
+    uint64 amountPerClaim = 4; //Amount per claim
+    repeated IdRange badgeIds = 5; //Used as a default
+    uint64 incrementIdsBy = 6; //Used as a default
+    string uri = 7; //Optional URI for the claim. Max 100 chars. Often used for IPFS to Merkle Tree
+    IdRange timeRange = 8; //Time range when the claim is valid
 }

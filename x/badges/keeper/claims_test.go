@@ -24,10 +24,10 @@ func (suite *TestSuite) TestSendAllToClaims() {
 	badge, _ := GetCollection(suite, wctx, 0)
 
 	claimToAdd := types.Claim{
-		Balance: &types.Balance{
+		Balances: []*types.Balance{{
 			Balance:  10,
 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
-		},
+		}},
 	}
 
 	err := CreateBadges(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{

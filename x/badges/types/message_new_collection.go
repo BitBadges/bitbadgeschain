@@ -27,6 +27,8 @@ func NewMsgNewCollection(creator string, standard uint64, collectionsToCreate []
 	}
 }
 
+
+
 func (msg *MsgNewCollection) Route() string {
 	return RouterKey
 }
@@ -116,18 +118,18 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
 		}
 
-		if claim.Type == uint64(ClaimType_AccountNum) {
+		if claim.Type == uint64(ClaimType_MerkleTree) {
 			if claim.Data == "" || len(claim.Data) == 0 {
 				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid claim data")
 			}
 		}
 
-		if claim.Type == uint64(ClaimType_Code) {
+		if claim.Type == uint64(ClaimType_FirstCome) {
 			if claim.BadgeIds == nil {
 				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
 			}
 		
-			err = ValidateRangesAreValid([]*IdRange{claim.BadgeIds})
+			err = ValidateRangesAreValid(claim.BadgeIds)
 			if err != nil {
 				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
 			}

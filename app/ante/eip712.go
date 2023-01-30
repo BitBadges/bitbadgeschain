@@ -236,7 +236,6 @@ func VerifySignature(
 		wrappedFirstMsg, ok := firstMsg.(legacytx.LegacyMsg)
 		if ok {
 			if wrappedFirstMsg.Route() == "badges" {
-
 				typedData, err = badges.NormalizeEIP712TypedData(typedData, wrappedFirstMsg.Type())
 				if err != nil {
 					return sdkerrors.Wrap(err, "failed to normalize EIP712 typed data for badges module %s")
