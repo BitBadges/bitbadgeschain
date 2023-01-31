@@ -38,11 +38,6 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 			return nil, ErrLeafIsEmpty
 		}
 
-		if msg.Proof.Aunts == nil || len(msg.Proof.Aunts) == 0 {
-			return nil, ErrAuntsIsEmpty
-		}
-
-
 		hashedMsgLeaf := sha256.Sum256([]byte(msg.Proof.Leaf))
 		leafHash := hashedMsgLeaf[:]
 
@@ -67,7 +62,6 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 
 		hexCurrHash := hex.EncodeToString(currHash)
 		if hexCurrHash != claim.Data {
-			// return nil, sdkerrors.Wrapf(ErrRootHashInvalid, "Proof is invalid %s %s", hexCurrHash, claim.Data)
 			return nil, ErrRootHashInvalid
 		}
 	}
