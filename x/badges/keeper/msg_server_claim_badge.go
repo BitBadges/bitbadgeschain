@@ -87,7 +87,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		//The fifth part is the ending badge id
 
 		res := strings.Split(msg.Proof.Leaf, "-")
-		if len(res) % 3 != 2 {
+		if len(res) < 5 || (len(res) - 3) % 2 != 0 {
 			return nil, ErrClaimDataInvalid
 		}
 
