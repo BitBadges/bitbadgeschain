@@ -11,11 +11,14 @@ import (
 func (k msgServer) MintBadge(goCtx context.Context, msg *types.MsgMintBadge) (*types.MsgMintBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	checkIfCanCreateMoreBadges := msg.BadgeSupplys != nil && len(msg.BadgeSupplys) > 0
+
+
 	_, collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:             msg.Creator,
 		CollectionId:        msg.CollectionId,
 		MustBeManager:       true,
-		CanCreateMoreBadges: true,
+		CanCreateMoreBadges: checkIfCanCreateMoreBadges,
 	})
 	if err != nil {
 		return nil, err

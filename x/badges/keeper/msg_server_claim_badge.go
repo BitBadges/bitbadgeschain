@@ -98,6 +98,10 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 				return nil, ErrInvalidAddress
 			}
 			toAddressNum = k.Keeper.GetOrCreateAccountNumberForAccAddressBech32(ctx, toAddress)
+
+			if toAddressNum != CreatorAccountNum {
+				return nil, ErrMustBeClaimee
+			}
 		}
 		
 		

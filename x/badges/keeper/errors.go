@@ -58,4 +58,5 @@ var (
 	ErrLeafIsEmpty 									= sdkerrors.Register(types.ModuleName, 51, "leaf is empty")
 	ErrAuntsIsEmpty 								= sdkerrors.Register(types.ModuleName, 52, "aunts is empty")
 	ErrDecodingHexString 							= sdkerrors.Register(types.ModuleName, 53, "decoding hex string")
+	ErrMustBeClaimee 								= sdkerrors.Register(types.ModuleName, 54, "must be claimee")
 )
