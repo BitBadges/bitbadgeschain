@@ -72,12 +72,15 @@ func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId uint64) 
 }
 
 /****************************************USER BALANCES****************************************/
+
 // Sets a user balance in the store using UserBalanceKey ([]byte{0x02}) as the prefix. No check if store has key already.
 func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBalance types.UserBalance) error {
 	marshaled_badge_balance_info, err := k.cdc.Marshal(&UserBalance)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.UserBalance failed")
 	}
+
+	
 
 	store := ctx.KVStore(k.storeKey)
 	store.Set(userBalanceStoreKey(balanceKey), marshaled_badge_balance_info)
@@ -98,14 +101,19 @@ func (k Keeper) GetUserBalanceFromStore(ctx sdk.Context, balanceKey string) (typ
 }
 
 // GetUserBalancesFromStore defines a method for returning all user balances information by key.
-func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (addresses []*types.UserBalance) {
+func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.UserBalance, accNums []uint64, ids []uint64) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, UserBalanceKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var UserBalance types.UserBalance
 		k.cdc.MustUnmarshal(iterator.Value(), &UserBalance)
-		addresses = append(addresses, &UserBalance)
+		balances = append(balances, &UserBalance)
+
+		
+		balanceKeyDetails := GetDetailsFromBalanceKey(string(iterator.Key()))
+		ids = append(ids, balanceKeyDetails.collectionId)
+		accNums = append(accNums, balanceKeyDetails.accountNum)
 	}
 	return
 }
@@ -113,10 +121,11 @@ func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (addresses []*types.Us
 // GetUserBalanceIdsFromStore defines a method for returning all keys of all user balances.
 func (k Keeper) GetUserBalanceIdsFromStore(ctx sdk.Context) (ids []string) {
 	store := ctx.KVStore(k.storeKey)
+
 	iterator := sdk.KVStorePrefixIterator(store, UserBalanceKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		ids = append(ids, string(iterator.Value()))
+		ids = append(ids, string(iterator.Key()))
 	}
 	return
 }

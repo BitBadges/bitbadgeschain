@@ -18,6 +18,10 @@ func NewMsgTransferBadge(creator string, collectionId uint64, from uint64, trans
 	}
 }
 
+func (msg *MsgTransferBadge) Route() string {
+	return RouterKey
+}
+
 func (msg *MsgTransferBadge) Type() string {
 	return TypeMsgTransferBadge
 }

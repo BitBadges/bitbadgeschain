@@ -167,6 +167,8 @@ func VerifySignature(
 			return sdkerrors.Wrap(sdkerrors.ErrNoSignatures, "tx doesn't contain any msgs to verify signature")
 		}
 
+		// return sdkerrors.Wrapf(sdkerrors.ErrNoSignatures, "%s tx doesn't contain any msgs to verify signature", msgs)
+
 		txBytes := legacytx.StdSignBytes(
 			signerData.ChainID,
 			signerData.AccountNumber,

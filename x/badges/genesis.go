@@ -53,8 +53,13 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.NextClaimId = k.GetNextClaimId(ctx)
 
 	genesis.Collections = k.GetCollectionsFromStore(ctx)
-	genesis.Balances = k.GetUserBalancesFromStore(ctx)
-	genesis.BalanceIds = k.GetUserBalanceIdsFromStore(ctx)
+	accNums := []uint64{}
+	ids := []uint64{}
+	genesis.Balances, accNums, ids = k.GetUserBalancesFromStore(ctx)
+
+	for i, accNum := range accNums {
+		genesis.BalanceIds = append(genesis.BalanceIds, keeper.ConstructBalanceKey(accNum, ids[i]))
+	}
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis
