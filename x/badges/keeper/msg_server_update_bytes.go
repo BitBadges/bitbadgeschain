@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -32,11 +32,16 @@ func (k msgServer) UpdateBytes(goCtx context.Context, msg *types.MsgUpdateBytes)
 		return nil, err
 	}
 
+	collectionJson, err := json.Marshal(badge)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeyAction, "UpdateArbitraryBytes"),
-			sdk.NewAttribute("BadgeId", fmt.Sprint(msg.CollectionId)),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute("collection", string(collectionJson)),
 		),
 	)
 

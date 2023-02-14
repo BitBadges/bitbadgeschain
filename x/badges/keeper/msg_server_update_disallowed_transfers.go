@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -28,12 +28,16 @@ func (k msgServer) UpdateDisallowedTransfers(goCtx context.Context, msg *types.M
 		return nil, err
 	}
 
+	collectionJson, err := json.Marshal(badge)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeyAction, "UpdateDisallowedTransfers"),
-			sdk.NewAttribute("BadgeID", fmt.Sprint(msg.CollectionId)),
-			sdk.NewAttribute("DisallowedTransfers", fmt.Sprint(msg.DisallowedTransfers)),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute("collection", string(collectionJson)),
 		),
 	)
 

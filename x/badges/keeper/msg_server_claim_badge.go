@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -41,7 +43,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		hashedMsgLeaf := sha256.Sum256([]byte(msg.Proof.Leaf))
 		leafHash := hashedMsgLeaf[:]
 
-		usedKey = string(leafHash)
+		usedKey = hex.EncodeToString(leafHash)
 
 		currHash := leafHash
 		for _, aunt := range msg.Proof.Aunts {
@@ -192,6 +194,28 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	if err != nil {
 		return nil, err
 	}
+
+	collectionJson, err := json.Marshal(collection)
+	if err != nil {
+		return nil, err
+	}
+
+	userBalanceJson, err := json.Marshal(userBalance)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute("collection", string(collectionJson)),
+			sdk.NewAttribute("user_balance", string(userBalanceJson)),
+			sdk.NewAttribute("to", fmt.Sprint(toAddressNum)),
+			sdk.NewAttribute("claim_data", string(usedKey)),
+		),
+	)
+
 	
 	return &types.MsgClaimBadgeResponse{}, nil
 }
