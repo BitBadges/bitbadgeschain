@@ -127,7 +127,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 				return nil, ErrClaimDataInvalid
 			}
 
-			badgeIds = append(badgeIds, []*types.IdRange{&types.IdRange{
+			badgeIds = append(badgeIds, []*types.IdRange{{
 				Start: startingBadgeId,
 				End: endingBadgeId,
 			}})
@@ -205,6 +205,20 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		return nil, err
 	}
 
+	claimedBalances := []types.Balance{}
+	for i := 0; i < len(amountToClaim); i++ {
+		claimedBalances = append(claimedBalances, types.Balance{
+			Balance: amountToClaim[i],
+			BadgeIds: badgeIds[i],
+		})
+	}
+
+	claimedBalancesJson, err := json.Marshal(claimedBalances)
+	if err != nil {
+		return nil, err
+	}
+
+
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
@@ -213,6 +227,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 			sdk.NewAttribute("user_balance", string(userBalanceJson)),
 			sdk.NewAttribute("to", fmt.Sprint(toAddressNum)),
 			sdk.NewAttribute("claim_data", string(usedKey)),
+			sdk.NewAttribute("claimed_balances", string(claimedBalancesJson)),
 		),
 	)
 

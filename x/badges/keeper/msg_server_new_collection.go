@@ -37,6 +37,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		ManagerApprovedTransfers: msg.ManagerApprovedTransfers,
 		Bytes:                    msg.Bytes,
 		Standard:                 msg.Standard,
+		NextBadgeId: 			  1,
 	}
 
 	if len(msg.BadgeSupplys) != 0 {

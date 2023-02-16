@@ -12,6 +12,13 @@ import (
 //NOTE: We assume that all badges are validly formed here
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// Set if defined; default 0
+	if (genState.NextCollectionId == 0) {
+		genState.NextCollectionId = 1
+	}
+	if (genState.NextClaimId == 0) {
+		genState.NextClaimId = 1
+	}
+
 	k.SetNextCollectionId(ctx, genState.NextCollectionId)
 	// Set if defined; default 0
 	k.SetNextClaimId(ctx, genState.NextCollectionId)

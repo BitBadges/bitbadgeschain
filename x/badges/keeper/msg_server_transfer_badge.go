@@ -92,6 +92,11 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 		return nil, err
 	}
 	
+	transfersJson, err := json.Marshal(msg.Transfers)
+	if err != nil {
+		return nil, err
+	}
+
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
@@ -99,6 +104,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 			sdk.NewAttribute("collection_id", fmt.Sprint(msg.CollectionId)),
 			sdk.NewAttribute("new_balances", string(newUserBalancesJson)),
 			sdk.NewAttribute("new_balance_accounts", string(newUserBalanceAccountsJson)),
+			sdk.NewAttribute("transfers", string(transfersJson)),
 		),
 	)
 

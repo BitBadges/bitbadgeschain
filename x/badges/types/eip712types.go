@@ -255,7 +255,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		return map[string][]apitypes.Type{
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
-				{Name: "badgeId", Type: "uint64"},
+				{Name: "collectionId", Type: "uint64"},
 				{Name: "addRequest", Type: "bool"},
 			},
 		}
