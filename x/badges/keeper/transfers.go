@@ -18,22 +18,20 @@ func HandleTransfer(collection types.BadgeCollection, badgeIdRange *types.IdRang
 
 //Forceful transfers will transfer the balances and deduct from approvals directly without adding it to pending.
 func ForcefulTransfer(collection types.BadgeCollection, badgeIdRange *types.IdRange, fromUserBalance types.UserBalance, toUserBalance types.UserBalance, amount uint64, from uint64, to uint64, approvedBy uint64) (types.UserBalance, types.UserBalance, error) {
-	if amount == 0 {
-		return types.UserBalance{}, types.UserBalance{}, nil
-	}
-
 	// 1. Check if the from address is frozen
 	// 2. Remove approvals if approvedBy != from
 	// 3. Deduct from "From" balance
 	// 4. Add to "To" balance
-	err := AssertTransferAllowed(collection, from, to, approvedBy)
+	isManagerApprovedTransfer, err := AssertTransferAllowed(collection, from, to, approvedBy)
 	if err != nil {
 		return types.UserBalance{}, types.UserBalance{}, err
 	}
-
-	fromUserBalance, err = DeductApprovals(fromUserBalance, collection, collection.CollectionId, badgeIdRange, from, to, approvedBy, amount)
-	if err != nil {
-		return types.UserBalance{}, types.UserBalance{}, err
+	
+	if !isManagerApprovedTransfer {
+		fromUserBalance, err = DeductApprovals(fromUserBalance, collection, collection.CollectionId, badgeIdRange, from, to, approvedBy, amount)
+		if err != nil {
+			return types.UserBalance{}, types.UserBalance{}, err
+		}
 	}
 
 	fromUserBalance, err = SubtractBalancesForIdRanges(fromUserBalance, []*types.IdRange{badgeIdRange}, amount)
@@ -65,7 +63,7 @@ func DeductApprovals(UserBalance types.UserBalance, collection types.BadgeCollec
 }
 
 // Checks if account is frozen or not.
-func IsTransferAllowed(collection types.BadgeCollection, permissions types.Permissions, fromAddress uint64, toAddress uint64, approvedBy uint64) bool {
+func IsTransferAllowed(collection types.BadgeCollection, permissions types.Permissions, fromAddress uint64, toAddress uint64, approvedBy uint64) (bool, bool) {
 	if approvedBy == collection.Manager {
 		//Check if this is an approved transfer by the manager
 		for _, managerApprovedTransfer := range collection.ManagerApprovedTransfers {
@@ -88,7 +86,7 @@ func IsTransferAllowed(collection types.BadgeCollection, permissions types.Permi
 			}
 
 			if fromFound && toFound {
-				return true
+				return true, true
 			}
 		}
 	}
@@ -98,21 +96,21 @@ func IsTransferAllowed(collection types.BadgeCollection, permissions types.Permi
 		_, toFound := SearchIdRangesForId(toAddress, disallowedTransfer.To.AccountNums)
 
 		if fromFound && toFound {
-			return false
+			return false, false
 		}
 	}
 
-	return true
+	return true, false
 }
 
 // Returns an error if account is Frozen
-func AssertTransferAllowed(collection types.BadgeCollection, from uint64, to uint64, approvedBy uint64) error {
+func AssertTransferAllowed(collection types.BadgeCollection, from uint64, to uint64, approvedBy uint64) (bool, error) {
 	permissions := types.GetPermissions(collection.Permissions)
 
-	transferIsAllowed := IsTransferAllowed(collection, permissions, from, to, approvedBy)
+	transferIsAllowed, isManagerApprovedTransfer := IsTransferAllowed(collection, permissions, from, to, approvedBy)
 	if !transferIsAllowed {
-		return ErrAddressFrozen
+		return false, ErrAddressFrozen
 	}
 
-	return nil
+	return isManagerApprovedTransfer, nil
 }
