@@ -823,6 +823,7 @@ paths:
                             Optional URI for the claim. Max 100 chars. Often
                             used for IPFS to Merkle Tree
                         timeRange:
+                          title: Time range when the claim is valid
                           type: object
                           properties:
                             start:
@@ -837,7 +838,6 @@ paths:
 
                             If end == 0, we assume end == start. Start must be
                             >= end.
-                          title: Time range when the claim is valid
                       description: >-
                         Defines a claim object. Claims are used to transfer
                         badges via a claiming process.
@@ -46489,6 +46489,7 @@ definitions:
                 Optional URI for the claim. Max 100 chars. Often used for IPFS
                 to Merkle Tree
             timeRange:
+              title: Time range when the claim is valid
               type: object
               properties:
                 start:
@@ -46502,7 +46503,6 @@ definitions:
                 for badge IDs, nonces, anything. 
 
                 If end == 0, we assume end == start. Start must be >= end.
-              title: Time range when the claim is valid
           description: >-
             Defines a claim object. Claims are used to transfer badges via a
             claiming process.
@@ -46622,6 +46622,7 @@ definitions:
           Optional URI for the claim. Max 100 chars. Often used for IPFS to
           Merkle Tree
       timeRange:
+        title: Time range when the claim is valid
         type: object
         properties:
           start:
@@ -46635,7 +46636,6 @@ definitions:
           badge IDs, nonces, anything. 
 
           If end == 0, we assume end == start. Start must be >= end.
-        title: Time range when the claim is valid
     description: >-
       Defines a claim object. Claims are used to transfer badges via a claiming
       process.
@@ -47119,6 +47119,7 @@ definitions:
                     Optional URI for the claim. Max 100 chars. Often used for
                     IPFS to Merkle Tree
                 timeRange:
+                  title: Time range when the claim is valid
                   type: object
                   properties:
                     start:
@@ -47132,7 +47133,6 @@ definitions:
                     used for badge IDs, nonces, anything. 
 
                     If end == 0, we assume end == start. Start must be >= end.
-                  title: Time range when the claim is valid
               description: >-
                 Defines a claim object. Claims are used to transfer badges via a
                 claiming process.

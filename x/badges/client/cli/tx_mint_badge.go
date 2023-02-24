@@ -15,9 +15,9 @@ var _ = strconv.Itoa(0)
 
 func CmdMintBadge() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "new-sub-badge [id] [supplys] [amounts]",
+		Use:   "new-sub-badge [id] [supplys] [amounts] [new-collection-uri] [new-badge-uri]",
 		Short: "Creates a subasset of the badge ID. Must be executed by the manager. CLI args delimited by commas.",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argId, err := cast.ToUint64E(args[0])
 			if err != nil {
@@ -30,6 +30,16 @@ func CmdMintBadge() *cobra.Command {
 			}
 
 			argAmountsUint64, err := GetIdArrFromString(args[2])
+			if err != nil {
+				return err
+			}
+
+			argCollectionUri, err := cast.ToStringE(args[3])
+			if err != nil {
+				return err
+			}
+
+			argBadgeUri, err := cast.ToStringE(args[4])
 			if err != nil {
 				return err
 			}
@@ -53,6 +63,8 @@ func CmdMintBadge() *cobra.Command {
 				argBadgeSupplys,
 				[]*types.Transfers{}, //TODO:
 				[]*types.Claim{},
+				argCollectionUri,
+				argBadgeUri,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {

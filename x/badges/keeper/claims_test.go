@@ -39,7 +39,8 @@ func (suite *TestSuite) TestSendAllToClaims() {
 		[]*types.Transfers{},
 		[]*types.Claim{
 			&claimToAdd,
-		})
+		}, "https://example.com",
+		"https://example.com/{id}")
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 

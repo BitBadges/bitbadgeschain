@@ -175,6 +175,8 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 				{Name: "badgeSupplys", Type: "BadgeSupplyAndAmount[]"},
 				{Name: "transfers", Type: "Transfers[]"},
 				{Name: "claims", Type: "Claim[]"},
+				{Name: "collectionUri", Type: "string"},
+				{Name: "badgeUri", Type: "string"},
 			},
 			"BadgeSupplyAndAmount": badgeSupplyAndAmountTypes,
 			"Transfers": transfersTypes,
@@ -211,7 +213,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		return map[string][]apitypes.Type{
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
-				{Name: "collectionId", Type: "IdRange[]"},
+				{Name: "collectionId", Type: "uint64"},
 				{Name: "disallowedTransfers", Type: "TransferMapping[]"},
 			},
 			"TransferMapping": transferMappingTypes,

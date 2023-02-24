@@ -71,7 +71,7 @@ func (msg *MsgTransferBadge) ValidateBasic() error {
 
 		err = ValidateNoElementIsX(transfer.ToAddresses, msg.From)
 		if err != nil {
-			return err
+			return ErrSenderAndReceiverSame
 		}
 	}
 

@@ -70,6 +70,8 @@ message MsgMintBadge {
     repeated BadgeSupplyAndAmount badgeSupplys = 3;
     repeated Transfers transfers = 4;
     repeated Claim claims = 5;
+    string collectionUri = 6;
+    string badgeUri = 7;
 }
 
 message MsgMintBadgeResponse {

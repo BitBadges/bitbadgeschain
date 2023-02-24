@@ -103,7 +103,10 @@ func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 		[]*types.Transfers{},
 		[]*types.Claim{
 			&claimToAdd,
-		})
+		},
+		"https://example.com",
+		"https://example.com/{id}",
+	)
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 
@@ -220,7 +223,9 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 		[]*types.Transfers{},
 		[]*types.Claim{
 			&claimToAdd,
-		})
+		}, "https://example.com",
+		"https://example.com/{id}",
+	)
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 
@@ -332,7 +337,9 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 		[]*types.Transfers{},
 		[]*types.Claim{
 			&claimToAdd,
-		})
+		}, "https://example.com",
+		"https://example.com/{id}",
+	)
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 

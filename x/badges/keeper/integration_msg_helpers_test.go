@@ -50,8 +50,8 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 	return nil
 }
 
-func CreateBadges(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, supplysAndAmounts []*types.BadgeSupplyAndAmount, transfers []*types.Transfers, claims []*types.Claim) error {
-	msg := types.NewMsgMintBadge(creator, collectionId, supplysAndAmounts, transfers, claims)
+func CreateBadges(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, supplysAndAmounts []*types.BadgeSupplyAndAmount, transfers []*types.Transfers, claims []*types.Claim, collectionUri string, badgeUri string) error {
+	msg := types.NewMsgMintBadge(creator, collectionId, supplysAndAmounts, transfers, claims, collectionUri, badgeUri)
 	_, err := suite.msgServer.MintBadge(ctx, msg)
 	return err
 }
@@ -88,7 +88,8 @@ func CreateBadgesAndMintAllToCreator(suite *TestSuite, ctx context.Context, crea
 		},
 	}
 
-	msg := types.NewMsgMintBadge(creator, collectionId, supplysAndAmounts, transfers, []*types.Claim{})
+	msg := types.NewMsgMintBadge(creator, collectionId, supplysAndAmounts, transfers, []*types.Claim{}, "https://example.com",
+	"https://example.com/{id}")
 	_, err = suite.msgServer.MintBadge(ctx, msg)
 	return err
 }

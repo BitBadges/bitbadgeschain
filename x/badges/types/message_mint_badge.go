@@ -9,13 +9,15 @@ const TypeMsgMintBadge = "new_sub_badge"
 
 var _ sdk.Msg = &MsgMintBadge{}
 
-func NewMsgMintBadge(creator string, collectionId uint64, supplysAndAmounts []*BadgeSupplyAndAmount, transfers []*Transfers, claims []*Claim) *MsgMintBadge {
+func NewMsgMintBadge(creator string, collectionId uint64, supplysAndAmounts []*BadgeSupplyAndAmount, transfers []*Transfers, claims []*Claim, collectionUri string, badgeUri string) *MsgMintBadge {
 	return &MsgMintBadge{
 		Creator:      creator,
 		CollectionId: collectionId,
 		BadgeSupplys: supplysAndAmounts,
 		Transfers:    transfers,
 		Claims:       claims,
+		CollectionUri: collectionUri,
+		BadgeUri: badgeUri,
 	}
 }
 
@@ -61,6 +63,20 @@ func (msg *MsgMintBadge) ValidateBasic() error {
 	err = ValidateNoElementIsX(supplys, 0)
 	if err != nil {
 		return err
+	}
+
+	if msg.BadgeUri != "" {
+		err = ValidateURI(msg.BadgeUri)
+		if err != nil {
+			return err
+		}
+	}
+
+	if msg.CollectionUri != "" {
+		err = ValidateURI(msg.CollectionUri)
+		if err != nil {
+			return err
+		}
 	}
 
 	for _, claim := range msg.Claims {
