@@ -9,7 +9,7 @@ const TypeMsgMintBadge = "new_sub_badge"
 
 var _ sdk.Msg = &MsgMintBadge{}
 
-func NewMsgMintBadge(creator string, collectionId uint64, supplysAndAmounts []*BadgeSupplyAndAmount, transfers []*Transfers, claims []*Claim, collectionUri string, badgeUri string) *MsgMintBadge {
+func NewMsgMintBadge(creator string, collectionId uint64, supplysAndAmounts []*BadgeSupplyAndAmount, transfers []*Transfers, claims []*Claim, collectionUri string, badgeUris []*BadgeUri) *MsgMintBadge {
 	return &MsgMintBadge{
 		Creator:      creator,
 		CollectionId: collectionId,
@@ -17,7 +17,7 @@ func NewMsgMintBadge(creator string, collectionId uint64, supplysAndAmounts []*B
 		Transfers:    transfers,
 		Claims:       claims,
 		CollectionUri: collectionUri,
-		BadgeUri: badgeUri,
+		BadgeUris: badgeUris,
 	}
 }
 
@@ -65,10 +65,19 @@ func (msg *MsgMintBadge) ValidateBasic() error {
 		return err
 	}
 
-	if msg.BadgeUri != "" {
-		err = ValidateURI(msg.BadgeUri)
-		if err != nil {
+	if msg.BadgeUris == nil || len(msg.BadgeUris) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "badgeUris cannot be nil")
+	}
+
+	for _, badgeUri := range msg.BadgeUris {
+		//Validate well-formedness of the message entries
+		if err := ValidateURI(badgeUri.Uri); err != nil {
 			return err
+		}
+
+		err = ValidateRangesAreValid(badgeUri.BadgeIds)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid badgeIds")
 		}
 	}
 

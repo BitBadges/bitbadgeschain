@@ -14,7 +14,17 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 				DisallowedTransfers: []*types.TransferMapping{
 					{
@@ -94,7 +104,17 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   23,
 			},
 			Amount:  1,

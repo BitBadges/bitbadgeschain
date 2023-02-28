@@ -37,7 +37,7 @@ func CmdUpdateUris() *cobra.Command {
 				clientCtx.GetFromAddress().String(),
 				argBadgeId,
 				argUri,
-				argBadgeUri,
+				[]*types.BadgeUri{},
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

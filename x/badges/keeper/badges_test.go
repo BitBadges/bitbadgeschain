@@ -15,7 +15,17 @@ func (suite *TestSuite) TestGetCollection() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com/",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -40,7 +50,17 @@ func (suite *TestSuite) TestGetBadgeAndAssertBadges() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				CollectionUri: "https://example.com",
 				Permissions:   62,
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
@@ -89,7 +109,17 @@ func (suite *TestSuite) TestCreateBadges() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				CollectionUri: "https://example.com",
 				Permissions:   62,
 			},

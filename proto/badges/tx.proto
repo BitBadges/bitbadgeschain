@@ -5,6 +5,7 @@ package bitbadges.bitbadgeschain.badges;
 import "badges/ranges.proto";
 import "badges/balances.proto";
 import "badges/claims.proto";
+import "badges/badges.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
@@ -45,7 +46,7 @@ message MsgNewCollection {
     // See badges.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
     string creator = 1; 
     string collectionUri = 2;
-    string badgeUri = 3;
+    repeated BadgeUri badgeUris = 3;
 
     uint64 permissions = 4;
     string bytes = 5;
@@ -71,7 +72,7 @@ message MsgMintBadge {
     repeated Transfers transfers = 4;
     repeated Claim claims = 5;
     string collectionUri = 6;
-    string badgeUri = 7;
+    repeated BadgeUri badgeUris = 7;
 }
 
 message MsgMintBadgeResponse {
@@ -113,7 +114,7 @@ message MsgUpdateUris {
   string creator = 1;
   uint64 collectionId = 2;
   string collectionUri = 3;
-  string badgeUri = 4;
+  repeated BadgeUri badgeUris = 4;
 }
 
 message MsgUpdateUrisResponse {

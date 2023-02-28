@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"math"
+
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -16,7 +18,17 @@ func (suite *TestSuite) TestNewCollections() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				CollectionUri: "https://example.com",
 				Permissions:   62,
 			},
@@ -36,7 +48,17 @@ func (suite *TestSuite) TestNewCollections() {
 	// Verify badge details are correct
 	suite.Require().Equal(uint64(0), badge.NextBadgeId)
 	suite.Require().Equal("https://example.com", badge.CollectionUri)
-	suite.Require().Equal("https://example.com/{id}", badge.BadgeUri)
+	suite.Require().Equal([]*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				}, badge.BadgeUris)
 	suite.Require().Equal([]*types.Balance(nil), badge.MaxSupplys)
 	suite.Require().Equal(bobAccountNum, badge.Manager) //7 is the first ID it creates
 	suite.Require().Equal(perms, badge.Permissions)
@@ -64,7 +86,17 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				CollectionUri: "https://example.com",
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
@@ -145,7 +177,17 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipientsOverflow() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				CollectionUri: "https://example.com",
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{

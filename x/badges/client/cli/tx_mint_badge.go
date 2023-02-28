@@ -39,10 +39,10 @@ func CmdMintBadge() *cobra.Command {
 				return err
 			}
 
-			argBadgeUri, err := cast.ToStringE(args[4])
-			if err != nil {
-				return err
-			}
+			// argBadgeUrsi, err := cast.ToStringE(args[4])
+			// if err != nil {
+			// 	return err
+			// }
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -64,7 +64,7 @@ func CmdMintBadge() *cobra.Command {
 				[]*types.Transfers{}, //TODO:
 				[]*types.Claim{},
 				argCollectionUri,
-				argBadgeUri,
+				[]*types.BadgeUri{},
 			)
 
 			if err := msg.ValidateBasic(); err != nil {

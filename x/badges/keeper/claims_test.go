@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"math"
+
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -12,7 +14,17 @@ func (suite *TestSuite) TestSendAllToClaims() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -40,7 +52,17 @@ func (suite *TestSuite) TestSendAllToClaims() {
 		[]*types.Claim{
 			&claimToAdd,
 		}, "https://example.com",
-		"https://example.com/{id}")
+		[]*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},)
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 

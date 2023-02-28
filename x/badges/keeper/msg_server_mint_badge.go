@@ -29,7 +29,7 @@ func (k msgServer) MintBadge(goCtx context.Context, msg *types.MsgMintBadge) (*t
 		return nil, err
 	}
 
-	if (msg.CollectionUri != "" && msg.CollectionUri != collection.CollectionUri) || (msg.BadgeUri != "" && msg.BadgeUri != collection.BadgeUri) {
+	if (msg.CollectionUri != "" && msg.CollectionUri != collection.CollectionUri) || (len(msg.BadgeUris) > 0) {
 		_, _, err = k.UniversalValidate(ctx, UniversalValidationParams{
 			Creator:       msg.Creator,
 			CollectionId:  msg.CollectionId,
@@ -41,7 +41,7 @@ func (k msgServer) MintBadge(goCtx context.Context, msg *types.MsgMintBadge) (*t
 		}
 
 		//Already validated in ValidateBasic
-		collection.BadgeUri = msg.BadgeUri
+		collection.BadgeUris = msg.BadgeUris
 		collection.CollectionUri = msg.CollectionUri
 	}
 

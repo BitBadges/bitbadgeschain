@@ -30,7 +30,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 	collection := types.BadgeCollection{
 		CollectionId:             NextCollectionId,
 		CollectionUri:            msg.CollectionUri,
-		BadgeUri:                 msg.BadgeUri,
+		BadgeUris:                msg.BadgeUris,
 		Manager:                  CreatorAccountNum,
 		Permissions:              msg.Permissions,
 		DisallowedTransfers:      msg.DisallowedTransfers,

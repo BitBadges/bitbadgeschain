@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"math"
+
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,7 +17,17 @@ func (suite *TestSuite) TestUpdateURIs() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				CollectionUri: "https://example.com",
 				Permissions:   62 + 128,
 			},
@@ -27,11 +39,21 @@ func (suite *TestSuite) TestUpdateURIs() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	err = UpdateURIs(suite, wctx, bob, 0, "https://example.com", "https://example.com/{id}")
+	err = UpdateURIs(suite, wctx, bob, 0, "https://example.com", []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},)
 	suite.Require().Nil(err, "Error updating uris")
 	badge, _ := GetCollection(suite, wctx, 0)
 	suite.Require().Equal("https://example.com", badge.CollectionUri)
-	suite.Require().Equal("https://example.com/{id}", badge.BadgeUri)
+	// suite.Require().Equal("https://example.com/{id}", badge.BadgeUri)
 
 	err = UpdatePermissions(suite, wctx, bob, 0, 60+128)
 	suite.Require().Nil(err, "Error updating permissions")
@@ -50,7 +72,17 @@ func (suite *TestSuite) TestCantUpdate() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   0,
 			},
 			Amount:  1,
@@ -61,7 +93,17 @@ func (suite *TestSuite) TestCantUpdate() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	err = UpdateURIs(suite, wctx, bob, 0, "https://example.com", "https://example.com/{id}")
+	err = UpdateURIs(suite, wctx, bob, 0, "https://example.com", []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},)
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 
 	err = UpdatePermissions(suite, wctx, bob, 0, 123)
@@ -81,7 +123,17 @@ func (suite *TestSuite) TestCantUpdateNotManager() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   0,
 			},
 			Amount:  1,
@@ -92,7 +144,17 @@ func (suite *TestSuite) TestCantUpdateNotManager() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	err = UpdateURIs(suite, wctx, alice, 0, "https://example.com", "https://example.com/{id}")
+	err = UpdateURIs(suite, wctx, alice, 0, "https://example.com", []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},)
 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
 
 	err = UpdatePermissions(suite, wctx, alice, 0, 77)

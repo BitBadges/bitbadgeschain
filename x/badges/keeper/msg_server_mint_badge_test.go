@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"math"
+
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -13,7 +15,17 @@ func (suite *TestSuite) TestNewBadges() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -108,7 +120,17 @@ func (suite *TestSuite) TestNewBadgesDirectlyUponCreatingNewBadge() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -204,7 +226,17 @@ func (suite *TestSuite) TestNewBadgesNotManager() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -241,7 +273,17 @@ func (suite *TestSuite) TestNewBadgeCreateIsLocked() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   0,
 			},
 			Amount:  1,

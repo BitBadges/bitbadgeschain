@@ -15,7 +15,17 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -86,7 +96,17 @@ func (suite *TestSuite) TestApprovalsApproved() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -159,7 +179,17 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -226,7 +256,17 @@ func (suite *TestSuite) TestApprovalsNotApprovedAtAll() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -285,7 +325,17 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -352,7 +402,17 @@ func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -419,7 +479,17 @@ func (suite *TestSuite) TestApprovalOverflow() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   46,
 			},
 			Amount:  1,
@@ -497,7 +567,17 @@ func (suite *TestSuite) TestTransferUnderflowNotEnoughBalance() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   46,
 			},
 			Amount:  1,
@@ -555,7 +635,17 @@ func (suite *TestSuite) TestPendingTransferUnderflowNotEnoughBalance() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -614,7 +704,17 @@ func (suite *TestSuite) TestTransferInvalidBadgeIdRanges() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   46,
 			},
 			Amount:  1,
@@ -690,7 +790,17 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   46,
 			},
 			Amount:  1,
@@ -771,7 +881,17 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   46,
 			},
 			Amount:  1,
@@ -834,7 +954,17 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   46,
 			},
 			Amount:  1,

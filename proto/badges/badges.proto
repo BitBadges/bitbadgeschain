@@ -8,6 +8,11 @@ import "badges/claims.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
+message BadgeUri {
+    string uri = 1;
+    repeated IdRange badgeIds = 2;
+}
+
 // BadgeCollection defines a standard collection of badges.
 message BadgeCollection {
     // The collectionId defines the unique identifier of the Badge classification, similar to the contract address of ERC721.
@@ -18,8 +23,8 @@ message BadgeCollection {
     string collectionUri = 2; 
 
     // The URI where to fetch each badge's metadata. Max 100 characters.
-    // Must include {id} in the URI to be replaced by the badge's id.
-    string badgeUri = 3;
+    // Can include {id} in the URI to be replaced by the badge's id.
+    repeated BadgeUri badgeUris = 3;
 
     // These are arbitrary bytes can be used to store anything on-chain about the badge (often used for a permanent hash).
     // This can be updatable or not depending on the permissions set. Max 256 bytes allowed.

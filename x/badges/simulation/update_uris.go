@@ -23,7 +23,7 @@ func SimulateMsgUpdateUris(
 			Creator:       simAccount.Address.String(),
 			CollectionId:  r.Uint64(),
 			CollectionUri: simtypes.RandStringOfLength(r, r.Intn(100)),
-			BadgeUri:      simtypes.RandStringOfLength(r, r.Intn(100)),
+			BadgeUris:     []*types.BadgeUri{},
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

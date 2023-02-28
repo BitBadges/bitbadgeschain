@@ -64,7 +64,17 @@ func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -105,7 +115,17 @@ func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
 			&claimToAdd,
 		},
 		"https://example.com",
-		"https://example.com/{id}",
+		[]*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 	)
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
@@ -184,7 +204,17 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -224,7 +254,17 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 		[]*types.Claim{
 			&claimToAdd,
 		}, "https://example.com",
-		"https://example.com/{id}",
+		[]*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 	)
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
@@ -298,7 +338,17 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUri:      "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:   62,
 			},
 			Amount:  1,
@@ -338,7 +388,17 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
 		[]*types.Claim{
 			&claimToAdd,
 		}, "https://example.com",
-		"https://example.com/{id}",
+		[]*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 	)
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)

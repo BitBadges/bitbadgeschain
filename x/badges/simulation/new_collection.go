@@ -32,7 +32,7 @@ func SimulateMsgNewCollection(
 			Permissions:   r.Uint64(),
 			Standard:      r.Uint64(),
 			Bytes:         simtypes.RandStringOfLength(r, r.Intn(256)),
-			BadgeUri:      simtypes.RandStringOfLength(r, r.Intn(100)),
+			BadgeUris:     []*types.BadgeUri{},
 			CollectionUri: simtypes.RandStringOfLength(r, r.Intn(100)),
 		}
 

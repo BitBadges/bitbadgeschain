@@ -22,7 +22,7 @@ func (k msgServer) UpdateUris(goCtx context.Context, msg *types.MsgUpdateUris) (
 	}
 
 	//Already validated in ValidateBasic
-	badge.BadgeUri = msg.BadgeUri
+	badge.BadgeUris = msg.BadgeUris
 	badge.CollectionUri = msg.CollectionUri
 
 	if err := k.SetCollectionInStore(ctx, badge); err != nil {

@@ -63,7 +63,7 @@ func CmdNewCollection() *cobra.Command {
 				argStandard,
 				argBadgeSupplys,
 				argCollectionUri,
-				argBadgeUri,
+				[]*types.BadgeUri{}, //TODO:
 				permissions,
 				[]*types.TransferMapping{},
 				[]*types.TransferMapping{},

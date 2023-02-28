@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	math "math"
 	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
@@ -21,7 +22,17 @@ func TestMsgUpdateUris_ValidateBasic(t *testing.T) {
 			msg: types.MsgUpdateUris{
 				Creator:       "invalid_address",
 				CollectionUri: "https://facebook.com",
-				BadgeUri:      "https://facebook.com",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
@@ -29,7 +40,17 @@ func TestMsgUpdateUris_ValidateBasic(t *testing.T) {
 			msg: types.MsgUpdateUris{
 				Creator:       sample.AccAddress(),
 				CollectionUri: "https://facebook.com",
-				BadgeUri:      "https://facebook.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 			},
 		},
 	}

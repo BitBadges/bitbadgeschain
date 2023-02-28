@@ -522,13 +522,35 @@ paths:
                     description: >-
                       The URI where to fetch the collection's metadata. Max 100
                       characters.
-                  badgeUri:
-                    type: string
+                  badgeUris:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        uri:
+                          type: string
+                        badgeIds:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              start:
+                                type: string
+                                format: uint64
+                              end:
+                                type: string
+                                format: uint64
+                            description: >-
+                              Id ranges define a range of IDs from start to end.
+                              Can be used for badge IDs, nonces, anything. 
+
+                              If end == 0, we assume end == start. Start must be
+                              >= end.
                     description: >-
                       The URI where to fetch each badge's metadata. Max 100
                       characters.
 
-                      Must include {id} in the URI to be replaced by the badge's
+                      Can include {id} in the URI to be replaced by the badge's
                       id.
                   bytes:
                     type: string
@@ -46212,11 +46234,32 @@ definitions:
       collectionUri:
         type: string
         description: The URI where to fetch the collection's metadata. Max 100 characters.
-      badgeUri:
-        type: string
+      badgeUris:
+        type: array
+        items:
+          type: object
+          properties:
+            uri:
+              type: string
+            badgeIds:
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                    format: uint64
+                  end:
+                    type: string
+                    format: uint64
+                description: >-
+                  Id ranges define a range of IDs from start to end. Can be used
+                  for badge IDs, nonces, anything. 
+
+                  If end == 0, we assume end == start. Start must be >= end.
         description: |-
           The URI where to fetch each badge's metadata. Max 100 characters.
-          Must include {id} in the URI to be replaced by the badge's id.
+          Can include {id} in the URI to be replaced by the badge's id.
       bytes:
         type: string
         description: >-
@@ -46528,6 +46571,27 @@ definitions:
       create.
 
       We create x amount of badges each with a supply of y.
+  bitbadges.bitbadgeschain.badges.BadgeUri:
+    type: object
+    properties:
+      uri:
+        type: string
+      badgeIds:
+        type: array
+        items:
+          type: object
+          properties:
+            start:
+              type: string
+              format: uint64
+            end:
+              type: string
+              format: uint64
+          description: >-
+            Id ranges define a range of IDs from start to end. Can be used for
+            badge IDs, nonces, anything. 
+
+            If end == 0, we assume end == start. Start must be >= end.
   bitbadges.bitbadgeschain.badges.Balance:
     type: object
     properties:
@@ -46834,11 +46898,32 @@ definitions:
             description: >-
               The URI where to fetch the collection's metadata. Max 100
               characters.
-          badgeUri:
-            type: string
+          badgeUris:
+            type: array
+            items:
+              type: object
+              properties:
+                uri:
+                  type: string
+                badgeIds:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                        format: uint64
+                      end:
+                        type: string
+                        format: uint64
+                    description: >-
+                      Id ranges define a range of IDs from start to end. Can be
+                      used for badge IDs, nonces, anything. 
+
+                      If end == 0, we assume end == start. Start must be >= end.
             description: |-
               The URI where to fetch each badge's metadata. Max 100 characters.
-              Must include {id} in the URI to be replaced by the badge's id.
+              Can include {id} in the URI to be replaced by the badge's id.
           bytes:
             type: string
             description: >-

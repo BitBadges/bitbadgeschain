@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"context"
+	"math"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
@@ -40,7 +41,7 @@ type CollectionsToCreate struct {
 func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreate []CollectionsToCreate) error {
 	for _, collectionToCreate := range collectionsToCreate {
 		for i := 0; i < int(collectionToCreate.Amount); i++ {
-			msg := types.NewMsgNewCollection(collectionToCreate.Creator, collectionToCreate.Collection.Standard, collectionToCreate.Collection.BadgeSupplys, collectionToCreate.Collection.CollectionUri, collectionToCreate.Collection.BadgeUri, collectionToCreate.Collection.Permissions, collectionToCreate.Collection.DisallowedTransfers, collectionToCreate.Collection.ManagerApprovedTransfers, collectionToCreate.Collection.Bytes, collectionToCreate.Collection.Transfers, collectionToCreate.Collection.Claims)
+			msg := types.NewMsgNewCollection(collectionToCreate.Creator, collectionToCreate.Collection.Standard, collectionToCreate.Collection.BadgeSupplys, collectionToCreate.Collection.CollectionUri, collectionToCreate.Collection.BadgeUris, collectionToCreate.Collection.Permissions, collectionToCreate.Collection.DisallowedTransfers, collectionToCreate.Collection.ManagerApprovedTransfers, collectionToCreate.Collection.Bytes, collectionToCreate.Collection.Transfers, collectionToCreate.Collection.Claims)
 			_, err := suite.msgServer.NewCollection(ctx, msg)
 			if err != nil {
 				return err
@@ -50,8 +51,8 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 	return nil
 }
 
-func CreateBadges(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, supplysAndAmounts []*types.BadgeSupplyAndAmount, transfers []*types.Transfers, claims []*types.Claim, collectionUri string, badgeUri string) error {
-	msg := types.NewMsgMintBadge(creator, collectionId, supplysAndAmounts, transfers, claims, collectionUri, badgeUri)
+func CreateBadges(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, supplysAndAmounts []*types.BadgeSupplyAndAmount, transfers []*types.Transfers, claims []*types.Claim, collectionUri string, badgeUris []*types.BadgeUri) error {
+	msg := types.NewMsgMintBadge(creator, collectionId, supplysAndAmounts, transfers, claims, collectionUri, badgeUris)
 	_, err := suite.msgServer.MintBadge(ctx, msg)
 	return err
 }
@@ -89,7 +90,17 @@ func CreateBadgesAndMintAllToCreator(suite *TestSuite, ctx context.Context, crea
 	}
 
 	msg := types.NewMsgMintBadge(creator, collectionId, supplysAndAmounts, transfers, []*types.Claim{}, "https://example.com",
-	"https://example.com/{id}")
+	[]*types.BadgeUri{
+		{
+			Uri: "https://example.com/{id}",
+			BadgeIds: []*types.IdRange{
+				{
+					Start: 1,
+					End: math.MaxUint64,
+				},
+			},
+		},
+	})
 	_, err = suite.msgServer.MintBadge(ctx, msg)
 	return err
 }
@@ -124,8 +135,8 @@ func TransferManager(suite *TestSuite, ctx context.Context, creator string, coll
 	return err
 }
 
-func UpdateURIs(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, collectionUri string, badgeUri string) error {
-	msg := types.NewMsgUpdateUris(creator, collectionId, collectionUri, badgeUri)
+func UpdateURIs(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, collectionUri string, badgeUris []*types.BadgeUri) error {
+	msg := types.NewMsgUpdateUris(creator, collectionId, collectionUri, badgeUris)
 	_, err := suite.msgServer.UpdateUris(ctx, msg)
 	return err
 }

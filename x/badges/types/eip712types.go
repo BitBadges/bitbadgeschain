@@ -140,6 +140,11 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		{Name: "leaf", Type: "string"},
 	}
 
+	badgeUrisType := []apitypes.Type{
+		{Name: "uri", Type: "string"},
+		{Name: "badgeIds", Type: "IdRange[]"},
+	}
+
 
 	switch route {
 		
@@ -148,7 +153,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionUri", Type: "string"},
-				{Name: "badgeUri", Type: "string"},
+				{Name: "badgeUris", Type: "BadgeUri[]"},
 				{Name: "bytes", Type: "string"},
 				{Name: "permissions", Type: "uint64"},
 				{Name: "disallowedTransfers", Type: "TransferMapping[]"},
@@ -165,6 +170,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 			"Transfers": transfersTypes,
 			"Claim": claimsTypes,
 			"Balance": balanceTypes,
+			"BadgeUri": badgeUrisType,
 		}
 	case TypeMsgMintBadge:
 		
@@ -176,13 +182,14 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 				{Name: "transfers", Type: "Transfers[]"},
 				{Name: "claims", Type: "Claim[]"},
 				{Name: "collectionUri", Type: "string"},
-				{Name: "badgeUri", Type: "string"},
+				{Name: "badgeUris", Type: "BadgeUri[]"},
 			},
 			"BadgeSupplyAndAmount": badgeSupplyAndAmountTypes,
 			"Transfers": transfersTypes,
 			"Claim": claimsTypes,
 			"Balance": balanceTypes,
 			"IdRange": idRangeTypes,
+			"BadgeUri": badgeUrisType,
 		}
 
 		
@@ -226,8 +233,9 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "uint64"},
 				{Name: "collectionUri", Type: "string"},
-				{Name: "badgeUri", Type: "string"},
+				{Name: "badgeUris", Type: "BadgeUri[]"},
 			},
+			"BadgeUri": badgeUrisType,
 		}
 	case TypeMsgUpdatePermissions:
 		return	map[string][]apitypes.Type{

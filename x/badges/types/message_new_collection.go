@@ -1,8 +1,6 @@
 package types
 
 import (
-	"strings"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -11,11 +9,11 @@ const TypeMsgNewCollection = "new_collection"
 
 var _ sdk.Msg = &MsgNewCollection{}
 
-func NewMsgNewCollection(creator string, standard uint64, collectionsToCreate []*BadgeSupplyAndAmount, collectionUri string, badgeUri string, permissions uint64, disallowedTransfers []*TransferMapping, managerApprovedTransfers []*TransferMapping, bytesToStore string, transfers []*Transfers, claims []*Claim) *MsgNewCollection {
+func NewMsgNewCollection(creator string, standard uint64, collectionsToCreate []*BadgeSupplyAndAmount, collectionUri string, badgeUris []*BadgeUri, permissions uint64, disallowedTransfers []*TransferMapping, managerApprovedTransfers []*TransferMapping, bytesToStore string, transfers []*Transfers, claims []*Claim) *MsgNewCollection {
 	return &MsgNewCollection{
 		Creator:                  creator,
 		CollectionUri:            collectionUri,
-		BadgeUri:                 badgeUri,
+		BadgeUris:                badgeUris,
 		BadgeSupplys:             collectionsToCreate,
 		DisallowedTransfers:      disallowedTransfers,
 		ManagerApprovedTransfers: managerApprovedTransfers,
@@ -60,15 +58,22 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateURI(*&msg.BadgeUri); err != nil {
-		return err
+	if msg.BadgeUris == nil || len(msg.BadgeUris) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "badgeUris cannot be nil")
 	}
+	
+	for _, badgeUri := range msg.BadgeUris {
+		//Validate well-formedness of the message entries
+		if err := ValidateURI(badgeUri.Uri); err != nil {
+			return err
+		}
 
-	hasId := strings.Contains(msg.BadgeUri, "{id}")
-	if !hasId {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "badge uri must contain {id}")
+		err = ValidateRangesAreValid(badgeUri.BadgeIds)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid badgeIds")
+		}
 	}
-
+	
 	if err := ValidatePermissions(msg.Permissions); err != nil {
 		return err
 	}

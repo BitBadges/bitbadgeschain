@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	math "math"
 	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
@@ -21,7 +22,17 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgNewCollection{
 				Creator:             "invalid_address",
 				CollectionUri:       "https://example.com",
-				BadgeUri:            "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:         15,
 				DisallowedTransfers: []*types.TransferMapping{},
 			},
@@ -31,7 +42,17 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgNewCollection{
 				Creator:             sample.AccAddress(),
 				CollectionUri:       "https://example.com",
-				BadgeUri:            "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:         15,
 				DisallowedTransfers: []*types.TransferMapping{},
 			},
@@ -40,7 +61,17 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgNewCollection{
 				Creator:             sample.AccAddress(),
 				CollectionUri:       "",
-				BadgeUri:            "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:         15,
 				DisallowedTransfers: []*types.TransferMapping{},
 			},
@@ -52,7 +83,17 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgNewCollection{
 				Creator:             sample.AccAddress(),
 				CollectionUri:       "https://example.com",
-				BadgeUri:            "",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:         15,
 				DisallowedTransfers: []*types.TransferMapping{},
 			},
@@ -63,7 +104,17 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgNewCollection{
 				Creator:             sample.AccAddress(),
 				CollectionUri:       "https://example.com",
-				BadgeUri:            "https://example.com/{id}",
+				BadgeUris:            []*types.BadgeUri{
+					{
+						Uri: "https://example.com/{id}",
+						BadgeIds: []*types.IdRange{
+							{
+								Start: 1,
+								End: math.MaxUint64,
+							},
+						},
+					},
+				},
 				Permissions:         10000,
 				DisallowedTransfers: []*types.TransferMapping{},
 			},
