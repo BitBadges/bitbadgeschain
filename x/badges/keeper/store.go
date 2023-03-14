@@ -219,20 +219,68 @@ func (k Keeper) IncrementNextClaimId(ctx sdk.Context) {
 
 /****************************************Claims****************************************/
 // Sets a usedClaimData in the store using UsedClaimDataKey ([]byte{0x07}) as the prefix. No check if store has key already.
-func (k Keeper) SetUsedClaimDataInStore(ctx sdk.Context, collectionId uint64, claimId uint64, claimData string) error {
+func (k Keeper) IncrementNumUsedForClaimInStore(ctx sdk.Context, collectionId uint64, claimId uint64) (uint64, error) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId, claimData)), []byte{0x1})
-	return nil
+	currBytes := store.Get(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId)))
+	curr := uint64(0)
+	err := error(nil)
+	if currBytes != nil {
+		curr, err = strconv.ParseUint(string((currBytes)), 10, 64)
+		if err != nil {
+			panic("Failed to parse num used")
+		}
+	}
+	incrementedNum := curr + 1
+	store.Set(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId)), []byte(strconv.FormatInt(int64(curr+1), 10)))
+	return incrementedNum, nil
 }
 
-// StoreHasUsedClaimDataID determines whether the specified user balanceID exists in the store
-func (k Keeper) StoreHasUsedClaimData(ctx sdk.Context, collectionId uint64, claimId uint64, claimData string) bool {
+func (k Keeper) IncrementNumUsedForCodeInStore(ctx sdk.Context, collectionId uint64, claimId uint64, codeLeafIndex uint64) (uint64, error) {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId, claimData)))
+	currBytes := store.Get(usedClaimCodeStoreKey(ConstructUsedClaimCodeKey(collectionId, claimId, codeLeafIndex)))
+	curr := uint64(0)
+	err := error(nil)
+	if currBytes != nil {
+		curr, err = strconv.ParseUint(string((currBytes)), 10, 64)
+		if err != nil {
+			panic("Failed to parse num used")
+		}
+	}
+	incrementedNum := curr + 1
+	store.Set(usedClaimCodeStoreKey(ConstructUsedClaimCodeKey(collectionId, claimId, codeLeafIndex)), []byte(strconv.FormatInt(int64(curr+1), 10)))
+	return incrementedNum, nil
 }
 
-// DeleteUsedClaimDataFromStore deletes a user balance from the store.
-func (k Keeper) DeleteUsedClaimDataFromStore(ctx sdk.Context, collectionId uint64, claimId uint64, claimData string) {
+func (k Keeper) IncrementNumUsedForAddressInStore(ctx sdk.Context, collectionId uint64, claimId uint64, address string) (uint64, error) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId, claimData)))
+	currBytes := store.Get(usedClaimAddressStoreKey(ConstructUsedClaimAddressKey(collectionId, claimId, address)))
+	curr := uint64(0)
+	err := error(nil)
+	if currBytes != nil {
+		curr, err = strconv.ParseUint(string((currBytes)), 10, 64)
+		if err != nil {
+			panic("Failed to parse num used")
+		}
+	}
+	incrementedNum := curr + 1
+	store.Set(usedClaimAddressStoreKey(ConstructUsedClaimAddressKey(collectionId, claimId, address)), []byte(strconv.FormatInt(int64(curr+1), 10)))
+	return incrementedNum, nil
+}
+
+
+
+func (k Keeper) IncrementNumUsedForWhitelistIndexInStore(ctx sdk.Context, collectionId uint64, claimId uint64, whitelistLeafIndex uint64) (uint64, error) {
+	store := ctx.KVStore(k.storeKey)
+	currBytes := store.Get(usedWhitelistIndexStoreKey(ConstructUsedWhitelistIndexKey(collectionId, claimId, whitelistLeafIndex)))
+	curr := uint64(0)
+	err := error(nil)
+	if currBytes != nil {
+		curr, err = strconv.ParseUint(string((currBytes)), 10, 64)
+		if err != nil {
+			panic("Failed to parse num used")
+		}
+	}
+	incrementedNum := curr + 1
+	store.Set(usedWhitelistIndexStoreKey(ConstructUsedWhitelistIndexKey(collectionId, claimId, whitelistLeafIndex)), []byte(strconv.FormatInt(int64(curr+1), 10)))
+	return incrementedNum, nil
 }

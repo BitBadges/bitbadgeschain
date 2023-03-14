@@ -29,21 +29,50 @@ func (k msgServer) MintBadge(goCtx context.Context, msg *types.MsgMintBadge) (*t
 		return nil, err
 	}
 
-	if (msg.CollectionUri != "" && msg.CollectionUri != collection.CollectionUri) || (len(msg.BadgeUris) > 0) {
-		_, _, err = k.UniversalValidate(ctx, UniversalValidationParams{
-			Creator:       msg.Creator,
-			CollectionId:  msg.CollectionId,
-			MustBeManager: true,
-			CanUpdateUris: true,
-		})
-		if err != nil {
-			return nil, err
-		}
+	needToValidateUpdateUris := false
+	newCollectionUri := collection.CollectionUri
+	newBadgeUris := collection.BadgeUris
 
-		//Already validated in ValidateBasic
-		collection.BadgeUris = msg.BadgeUris
-		collection.CollectionUri = msg.CollectionUri
+	if msg.CollectionUri != "" && msg.CollectionUri != collection.CollectionUri {
+		needToValidateUpdateUris = true
+		newCollectionUri = msg.CollectionUri
 	}
+	if len(msg.BadgeUris) > 0 {
+		newBadgeUris = msg.BadgeUris
+
+		for idx, badgeUri := range collection.BadgeUris {
+			if msg.BadgeUris[idx].Uri != badgeUri.Uri {
+				needToValidateUpdateUris = true
+				break
+			}
+			if len(msg.BadgeUris[idx].BadgeIds) != len(badgeUri.BadgeIds) {
+				needToValidateUpdateUris = true
+				break
+			}
+
+			for j, badgeIdRange := range badgeUri.BadgeIds {
+				if badgeIdRange.Start != msg.BadgeUris[idx].BadgeIds[j].Start || badgeIdRange.End != msg.BadgeUris[idx].BadgeIds[j].End {
+					needToValidateUpdateUris = true
+					break
+				}
+			}
+		}
+	}
+
+
+	_, _, err = k.UniversalValidate(ctx, UniversalValidationParams{
+		Creator:       msg.Creator,
+		CollectionId:  msg.CollectionId,
+		MustBeManager: true,
+		CanUpdateUris: needToValidateUpdateUris,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	//Already validated in ValidateBasic
+	collection.BadgeUris = newBadgeUris
+	collection.CollectionUri = newCollectionUri
 
 	if err := k.SetCollectionInStore(ctx, collection); err != nil {
 		return nil, err

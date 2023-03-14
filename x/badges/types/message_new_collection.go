@@ -110,9 +110,7 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 			if err != nil {
 				return err
 			}
-		}
-
-		
+		}		
 	
 		if claim.TimeRange == nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
@@ -123,22 +121,7 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
 		}
 
-		if claim.Type == uint64(ClaimType_MerkleTree) {
-			if claim.Data == "" || len(claim.Data) == 0 {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid claim data")
-			}
-		}
-
-		if claim.Type == uint64(ClaimType_FirstCome) {
-			if claim.BadgeIds == nil {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
-			}
-		
-			err = ValidateRangesAreValid(claim.BadgeIds)
-			if err != nil {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
-			}
-		}
+		//TODO: validate balances
 	}
 
 	return nil

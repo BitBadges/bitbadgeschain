@@ -804,46 +804,13 @@ paths:
                               holds for all ids specified within the id ranges
                               array.
                           description: Current balance of the claim store.
-                        type:
+                        dataRoot:
                           type: string
-                          format: uint64
-                          title: >-
-                            Type of claim (ex: addresses, codes, secret words,
-                            etc)
-                        data:
-                          type: string
-                          description: Data for the root hash.
-                        amountPerClaim:
-                          type: string
-                          format: uint64
-                          title: Amount per claim
-                        badgeIds:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              start:
-                                type: string
-                                format: uint64
-                              end:
-                                type: string
-                                format: uint64
-                            description: >-
-                              Id ranges define a range of IDs from start to end.
-                              Can be used for badge IDs, nonces, anything. 
-
-                              If end == 0, we assume end == start. Start must be
-                              >= end.
-                          title: Used as a default
-                        incrementIdsBy:
-                          type: string
-                          format: uint64
-                          title: Used as a default
                         uri:
                           type: string
                           title: >-
-                            Optional URI for the claim. Max 100 chars. Often
-                            used for IPFS to Merkle Tree
+                            Optional URI for the claim. Max 100 chars. To be
+                            used for IPFS Merkle Tree Information
                         timeRange:
                           title: Time range when the claim is valid
                           type: object
@@ -46494,43 +46461,13 @@ definitions:
                   Defines a balance object. The specified balance holds for all
                   ids specified within the id ranges array.
               description: Current balance of the claim store.
-            type:
+            dataRoot:
               type: string
-              format: uint64
-              title: 'Type of claim (ex: addresses, codes, secret words, etc)'
-            data:
-              type: string
-              description: Data for the root hash.
-            amountPerClaim:
-              type: string
-              format: uint64
-              title: Amount per claim
-            badgeIds:
-              type: array
-              items:
-                type: object
-                properties:
-                  start:
-                    type: string
-                    format: uint64
-                  end:
-                    type: string
-                    format: uint64
-                description: >-
-                  Id ranges define a range of IDs from start to end. Can be used
-                  for badge IDs, nonces, anything. 
-
-                  If end == 0, we assume end == start. Start must be >= end.
-              title: Used as a default
-            incrementIdsBy:
-              type: string
-              format: uint64
-              title: Used as a default
             uri:
               type: string
               title: >-
-                Optional URI for the claim. Max 100 chars. Often used for IPFS
-                to Merkle Tree
+                Optional URI for the claim. Max 100 chars. To be used for IPFS
+                Merkle Tree Information
             timeRange:
               title: Time range when the claim is valid
               type: object
@@ -46648,43 +46585,13 @@ definitions:
             Defines a balance object. The specified balance holds for all ids
             specified within the id ranges array.
         description: Current balance of the claim store.
-      type:
+      dataRoot:
         type: string
-        format: uint64
-        title: 'Type of claim (ex: addresses, codes, secret words, etc)'
-      data:
-        type: string
-        description: Data for the root hash.
-      amountPerClaim:
-        type: string
-        format: uint64
-        title: Amount per claim
-      badgeIds:
-        type: array
-        items:
-          type: object
-          properties:
-            start:
-              type: string
-              format: uint64
-            end:
-              type: string
-              format: uint64
-          description: >-
-            Id ranges define a range of IDs from start to end. Can be used for
-            badge IDs, nonces, anything. 
-
-            If end == 0, we assume end == start. Start must be >= end.
-        title: Used as a default
-      incrementIdsBy:
-        type: string
-        format: uint64
-        title: Used as a default
       uri:
         type: string
         title: >-
-          Optional URI for the claim. Max 100 chars. Often used for IPFS to
-          Merkle Tree
+          Optional URI for the claim. Max 100 chars. To be used for IPFS Merkle
+          Tree Information
       timeRange:
         title: Time range when the claim is valid
         type: object
@@ -46710,9 +46617,6 @@ definitions:
     properties:
       leaf:
         type: string
-        description: >-
-          Formatted with
-          CODE-ADDRESS-AMOUNT-STARTID-ENDID-AMOUNT-STARTID-ENDID-...
       aunts:
         type: array
         items:
@@ -47166,43 +47070,13 @@ definitions:
                       Defines a balance object. The specified balance holds for
                       all ids specified within the id ranges array.
                   description: Current balance of the claim store.
-                type:
+                dataRoot:
                   type: string
-                  format: uint64
-                  title: 'Type of claim (ex: addresses, codes, secret words, etc)'
-                data:
-                  type: string
-                  description: Data for the root hash.
-                amountPerClaim:
-                  type: string
-                  format: uint64
-                  title: Amount per claim
-                badgeIds:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      start:
-                        type: string
-                        format: uint64
-                      end:
-                        type: string
-                        format: uint64
-                    description: >-
-                      Id ranges define a range of IDs from start to end. Can be
-                      used for badge IDs, nonces, anything. 
-
-                      If end == 0, we assume end == start. Start must be >= end.
-                  title: Used as a default
-                incrementIdsBy:
-                  type: string
-                  format: uint64
-                  title: Used as a default
                 uri:
                   type: string
                   title: >-
-                    Optional URI for the claim. Max 100 chars. Often used for
-                    IPFS to Merkle Tree
+                    Optional URI for the claim. Max 100 chars. To be used for
+                    IPFS Merkle Tree Information
                 timeRange:
                   title: Time range when the claim is valid
                   type: object

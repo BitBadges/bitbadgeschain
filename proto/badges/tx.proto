@@ -176,7 +176,7 @@ message ClaimProofItem {
 
 //Consistent with tendermint/crypto merkle tree
 message ClaimProof {
-    string leaf = 1; //Formatted with CODE-ADDRESS-AMOUNT-STARTID-ENDID-AMOUNT-STARTID-ENDID-...
+    string leaf = 1;
     repeated ClaimProofItem aunts = 2;
 }
 
@@ -184,7 +184,8 @@ message MsgClaimBadge {
     string creator = 1;
     uint64 claimId = 2;
     uint64 collectionId = 3;
-    ClaimProof proof = 4; //Only used for Merkle trees
+    ClaimProof whitelistProof = 4;
+    ClaimProof codeProof = 5;
 }
 
 message MsgClaimBadgeResponse {}

@@ -121,11 +121,12 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 
 	claimsTypes := []apitypes.Type{
 		{Name: "balances", Type: "Balance[]"},
-		{Name: "badgeIds", Type: "IdRange[]"},
+		{Name: "codeRoot", Type: "string"},
+		{Name: "whitelistRoot", Type: "string"},
 		{Name: "incrementIdsBy", Type: "uint64"},
-		{Name: "amountPerClaim", Type: "uint64"},
-		{Name: "type", Type: "uint64"},
-		{Name: "data", Type: "string"},
+		{Name: "amount", Type: "uint64"},
+		{Name: "badgeIds", Type: "IdRange[]"},
+		{Name: "limitPerAccount", Type: "uint64"},
 		{Name: "uri", Type: "string"},
 		{Name: "timeRange", Type: "IdRange"},
 	}
@@ -236,6 +237,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 				{Name: "badgeUris", Type: "BadgeUri[]"},
 			},
 			"BadgeUri": badgeUrisType,
+			"IdRange":  idRangeTypes,
 		}
 	case TypeMsgUpdatePermissions:
 		return	map[string][]apitypes.Type{
@@ -244,6 +246,8 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 				{Name: "collectionId", Type: "uint64"},
 				{Name: "permissions", Type: "uint64"},
 			},
+
+			
 		}
 	case TypeMsgUpdateBytes:
 		return map[string][]apitypes.Type{
@@ -282,7 +286,8 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 				{Name: "creator", Type: "string"},
 				{Name: "claimId", Type: "uint64"},
 				{Name: "collectionId", Type: "uint64"},
-				{Name: "proof", Type: "ClaimProof"},
+				{Name: "whitelistProof", Type: "ClaimProof"},
+				{Name: "codeProof", Type: "ClaimProof"},
 			},
 			"ClaimProof": proofTypes,
 			"ClaimProofItem": proofItemTypes,

@@ -25,7 +25,16 @@ func TestMsgClaimBadge_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: types.MsgClaimBadge{
 				Creator: sample.AccAddress(),
-				Proof: &types.ClaimProof{
+				CodeProof: &types.ClaimProof{
+					Leaf: "hello",
+					Aunts: []*types.ClaimProofItem{
+						{
+							Aunt: "hello",
+							OnRight: true,
+						},
+					},
+				},
+				WhitelistProof: &types.ClaimProof{
 					Leaf: "hello",
 					Aunts: []*types.ClaimProofItem{
 						{

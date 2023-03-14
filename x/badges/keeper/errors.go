@@ -59,4 +59,6 @@ var (
 	ErrAuntsIsEmpty 								= sdkerrors.Register(types.ModuleName, 52, "aunts is empty")
 	ErrDecodingHexString 							= sdkerrors.Register(types.ModuleName, 53, "decoding hex string")
 	ErrMustBeClaimee 								= sdkerrors.Register(types.ModuleName, 54, "must be claimee")
+	ErrCodeLeafInvalid 								= sdkerrors.Register(types.ModuleName, 55, "code leaf invalid")
+	ErrCodeMaxUsesExceeded 							= sdkerrors.Register(types.ModuleName, 56, "code max uses exceeded")
 )

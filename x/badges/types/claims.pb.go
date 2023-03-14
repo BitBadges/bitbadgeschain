@@ -50,14 +50,15 @@ func (ClaimType) EnumDescriptor() ([]byte, []int) {
 //Defines a claim object. Claims are used to transfer badges via a claiming process.
 //Stored in own store. Claimed leaves are also stored in unique store.
 type Claim struct {
-	Balances       []*Balance `protobuf:"bytes,1,rep,name=balances,proto3" json:"balances,omitempty"`
-	Type           uint64     `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty"`
-	Data           string     `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
-	AmountPerClaim uint64     `protobuf:"varint,4,opt,name=amountPerClaim,proto3" json:"amountPerClaim,omitempty"`
-	BadgeIds       []*IdRange `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	IncrementIdsBy uint64     `protobuf:"varint,6,opt,name=incrementIdsBy,proto3" json:"incrementIdsBy,omitempty"`
-	Uri            string     `protobuf:"bytes,7,opt,name=uri,proto3" json:"uri,omitempty"`
-	TimeRange      *IdRange   `protobuf:"bytes,8,opt,name=timeRange,proto3" json:"timeRange,omitempty"`
+	Balances        []*Balance `protobuf:"bytes,1,rep,name=balances,proto3" json:"balances,omitempty"`
+	CodeRoot        string     `protobuf:"bytes,2,opt,name=codeRoot,proto3" json:"codeRoot,omitempty"`
+	WhitelistRoot   string     `protobuf:"bytes,3,opt,name=whitelistRoot,proto3" json:"whitelistRoot,omitempty"`
+	IncrementIdsBy  uint64     `protobuf:"varint,4,opt,name=incrementIdsBy,proto3" json:"incrementIdsBy,omitempty"`
+	Amount          uint64     `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`
+	BadgeIds        []*IdRange `protobuf:"bytes,6,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	LimitPerAccount uint64     `protobuf:"varint,7,opt,name=limitPerAccount,proto3" json:"limitPerAccount,omitempty"`
+	Uri             string     `protobuf:"bytes,8,opt,name=uri,proto3" json:"uri,omitempty"`
+	TimeRange       *IdRange   `protobuf:"bytes,9,opt,name=timeRange,proto3" json:"timeRange,omitempty"`
 }
 
 func (m *Claim) Reset()         { *m = Claim{} }
@@ -100,23 +101,30 @@ func (m *Claim) GetBalances() []*Balance {
 	return nil
 }
 
-func (m *Claim) GetType() uint64 {
+func (m *Claim) GetCodeRoot() string {
 	if m != nil {
-		return m.Type
-	}
-	return 0
-}
-
-func (m *Claim) GetData() string {
-	if m != nil {
-		return m.Data
+		return m.CodeRoot
 	}
 	return ""
 }
 
-func (m *Claim) GetAmountPerClaim() uint64 {
+func (m *Claim) GetWhitelistRoot() string {
 	if m != nil {
-		return m.AmountPerClaim
+		return m.WhitelistRoot
+	}
+	return ""
+}
+
+func (m *Claim) GetIncrementIdsBy() uint64 {
+	if m != nil {
+		return m.IncrementIdsBy
+	}
+	return 0
+}
+
+func (m *Claim) GetAmount() uint64 {
+	if m != nil {
+		return m.Amount
 	}
 	return 0
 }
@@ -128,9 +136,9 @@ func (m *Claim) GetBadgeIds() []*IdRange {
 	return nil
 }
 
-func (m *Claim) GetIncrementIdsBy() uint64 {
+func (m *Claim) GetLimitPerAccount() uint64 {
 	if m != nil {
-		return m.IncrementIdsBy
+		return m.LimitPerAccount
 	}
 	return 0
 }
@@ -157,28 +165,30 @@ func init() {
 func init() { proto.RegisterFile("badges/claims.proto", fileDescriptor_5fc06cc841589c70) }
 
 var fileDescriptor_5fc06cc841589c70 = []byte{
-	// 334 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x91, 0xcf, 0x4a, 0xeb, 0x40,
-	0x18, 0xc5, 0x33, 0xfd, 0x77, 0x9b, 0xb9, 0x58, 0xca, 0x88, 0x30, 0x74, 0x11, 0x83, 0x0b, 0x09,
-	0x5d, 0x24, 0x50, 0xdf, 0xa0, 0x95, 0x42, 0x41, 0x41, 0x42, 0x57, 0xee, 0x26, 0xc9, 0x47, 0x3a,
-	0xd8, 0x4c, 0xca, 0xcc, 0x14, 0xec, 0x5b, 0xf8, 0x58, 0x2e, 0xbb, 0x74, 0x29, 0x2d, 0xbe, 0x87,
-	0xcc, 0xa4, 0x8d, 0xd4, 0x8d, 0xba, 0x3b, 0x1c, 0xf8, 0x9d, 0x73, 0xe6, 0x1b, 0x7c, 0x9e, 0xb0,
-	0x2c, 0x07, 0x15, 0xa5, 0x4b, 0xc6, 0x0b, 0x15, 0xae, 0x64, 0xa9, 0x4b, 0x72, 0x99, 0x70, 0x5d,
-	0xf9, 0x61, 0xad, 0xd2, 0x05, 0xe3, 0x22, 0xac, 0xf4, 0xe0, 0xe2, 0x40, 0x25, 0x6c, 0xc9, 0x44,
-	0x0a, 0x07, 0x6e, 0x70, 0x0c, 0x93, 0x4c, 0xe4, 0x47, 0xf3, 0xea, 0xa3, 0x81, 0xdb, 0x13, 0x93,
-	0x4e, 0x6e, 0x71, 0xf7, 0x08, 0x50, 0xe4, 0x37, 0x83, 0xff, 0xa3, 0x20, 0xfc, 0xa1, 0x29, 0x1c,
-	0x57, 0x40, 0x5c, 0x93, 0x84, 0xe0, 0x96, 0xde, 0xac, 0x80, 0x36, 0x7c, 0x14, 0xb4, 0x62, 0xab,
-	0x8d, 0x97, 0x31, 0xcd, 0x68, 0xd3, 0x47, 0x81, 0x1b, 0x5b, 0x4d, 0xae, 0x71, 0x8f, 0x15, 0xe5,
-	0x5a, 0xe8, 0x07, 0x90, 0xb6, 0x9f, 0xb6, 0x2c, 0xf1, 0xcd, 0xad, 0x56, 0x65, 0x39, 0xcc, 0x32,
-	0x45, 0xdb, 0xbf, 0x5c, 0x35, 0xcb, 0x62, 0xf3, 0xc4, 0xb8, 0x26, 0x4d, 0x1b, 0x17, 0xa9, 0x84,
-	0x02, 0x84, 0x9e, 0x65, 0x6a, 0xbc, 0xa1, 0x9d, 0xaa, 0xed, 0xd4, 0x25, 0x7d, 0xdc, 0x5c, 0x4b,
-	0x4e, 0xff, 0xd9, 0xa1, 0x46, 0x92, 0x29, 0x76, 0x35, 0x2f, 0xc0, 0x06, 0xd2, 0xae, 0x8f, 0xfe,
-	0x34, 0xe0, 0x0b, 0x1d, 0x0e, 0xb1, 0x6b, 0x1f, 0x34, 0x37, 0x07, 0xe9, 0x61, 0x7c, 0x0f, 0xf2,
-	0x69, 0x09, 0x73, 0x09, 0xd0, 0x77, 0xc8, 0x19, 0x76, 0xa7, 0x5c, 0x2a, 0x3d, 0x29, 0x0b, 0xe8,
-	0xa3, 0xf1, 0xdd, 0xeb, 0xce, 0x43, 0xdb, 0x9d, 0x87, 0xde, 0x77, 0x1e, 0x7a, 0xd9, 0x7b, 0xce,
-	0x76, 0xef, 0x39, 0x6f, 0x7b, 0xcf, 0x79, 0x1c, 0xe5, 0x5c, 0x2f, 0xd6, 0x49, 0x98, 0x96, 0x45,
-	0x54, 0x57, 0x47, 0xa7, 0x23, 0xa2, 0xe7, 0xe8, 0xe0, 0x9b, 0xe3, 0xab, 0xa4, 0x63, 0x3f, 0xfa,
-	0xe6, 0x33, 0x00, 0x00, 0xff, 0xff, 0x41, 0x5b, 0x91, 0x5e, 0x4c, 0x02, 0x00, 0x00,
+	// 366 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x92, 0xc1, 0x6a, 0xe3, 0x30,
+	0x10, 0x86, 0xad, 0x75, 0x92, 0x8d, 0xb5, 0x24, 0x1b, 0xb4, 0x6c, 0x31, 0x39, 0xb8, 0xa6, 0x94,
+	0x62, 0x72, 0xb0, 0x21, 0x7d, 0x82, 0x26, 0x25, 0x10, 0x68, 0xa1, 0x98, 0x9c, 0x7a, 0xb3, 0xe5,
+	0xc1, 0x11, 0xb5, 0xad, 0x20, 0x29, 0xb4, 0x79, 0x8b, 0x5e, 0xfb, 0x46, 0x3d, 0xe6, 0xd8, 0x63,
+	0x49, 0x5e, 0xa4, 0x44, 0x76, 0x5c, 0x92, 0x4b, 0xdb, 0xdb, 0xcc, 0xaf, 0xf9, 0xe6, 0x9f, 0x91,
+	0x84, 0xff, 0xc5, 0x51, 0x92, 0x82, 0x0c, 0x68, 0x16, 0xb1, 0x5c, 0xfa, 0x0b, 0xc1, 0x15, 0x27,
+	0xa7, 0x31, 0x53, 0xa5, 0xee, 0xd7, 0x11, 0x9d, 0x47, 0xac, 0xf0, 0xcb, 0xb8, 0xff, 0xbf, 0xa2,
+	0xe2, 0x28, 0x8b, 0x0a, 0x0a, 0x15, 0xd7, 0xdf, 0x37, 0x13, 0x51, 0x91, 0xee, 0xc5, 0xb3, 0x17,
+	0x13, 0x37, 0xc7, 0xbb, 0xee, 0xe4, 0x1a, 0xb7, 0xf7, 0x80, 0x8d, 0x5c, 0xd3, 0xfb, 0x33, 0xf4,
+	0xfc, 0x2f, 0x9c, 0xfc, 0x51, 0x09, 0x84, 0x35, 0x49, 0xfa, 0xb8, 0x4d, 0x79, 0x02, 0x21, 0xe7,
+	0xca, 0xfe, 0xe5, 0x22, 0xcf, 0x0a, 0xeb, 0x9c, 0x9c, 0xe3, 0xce, 0xe3, 0x9c, 0x29, 0xc8, 0x98,
+	0x54, 0xba, 0xc0, 0xd4, 0x05, 0x87, 0x22, 0xb9, 0xc0, 0x5d, 0x56, 0x50, 0x01, 0x39, 0x14, 0x6a,
+	0x9a, 0xc8, 0xd1, 0xca, 0x6e, 0xb8, 0xc8, 0x6b, 0x84, 0x47, 0x2a, 0x39, 0xc1, 0xad, 0x28, 0xe7,
+	0xcb, 0x42, 0xd9, 0x4d, 0x7d, 0x5e, 0x65, 0xe5, 0x1e, 0x49, 0x0a, 0xd3, 0x44, 0xda, 0xad, 0x6f,
+	0xee, 0x31, 0x4d, 0xc2, 0xdd, 0xa5, 0x84, 0x35, 0x49, 0x3c, 0xfc, 0x37, 0x63, 0x39, 0x53, 0x77,
+	0x20, 0xae, 0x28, 0xd5, 0x36, 0xbf, 0xb5, 0xcd, 0xb1, 0x4c, 0x7a, 0xd8, 0x5c, 0x0a, 0x66, 0xb7,
+	0xf5, 0x2e, 0xbb, 0x90, 0x4c, 0xb0, 0xa5, 0x58, 0x0e, 0xba, 0xa5, 0x6d, 0xb9, 0xe8, 0x47, 0x23,
+	0x7c, 0xa2, 0x83, 0x01, 0xb6, 0xf4, 0xd3, 0xcc, 0x56, 0x0b, 0x20, 0x5d, 0x8c, 0x6f, 0x41, 0x3c,
+	0x64, 0x30, 0x13, 0x00, 0x3d, 0x83, 0x74, 0xb0, 0x35, 0x61, 0x42, 0xaa, 0x31, 0xcf, 0xa1, 0x87,
+	0x46, 0x37, 0xaf, 0x1b, 0x07, 0xad, 0x37, 0x0e, 0x7a, 0xdf, 0x38, 0xe8, 0x79, 0xeb, 0x18, 0xeb,
+	0xad, 0x63, 0xbc, 0x6d, 0x1d, 0xe3, 0x7e, 0x98, 0x32, 0x35, 0x5f, 0xc6, 0x3e, 0xe5, 0x79, 0x50,
+	0x5b, 0x07, 0x87, 0x43, 0x04, 0x4f, 0x41, 0xa5, 0xab, 0xd5, 0x02, 0x64, 0xdc, 0xd2, 0x9f, 0xe3,
+	0xf2, 0x23, 0x00, 0x00, 0xff, 0xff, 0xd2, 0xda, 0xe2, 0xde, 0x80, 0x02, 0x00, 0x00,
 }
 
 func (m *Claim) Marshal() (dAtA []byte, err error) {
@@ -211,19 +221,19 @@ func (m *Claim) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintClaims(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x42
+		dAtA[i] = 0x4a
 	}
 	if len(m.Uri) > 0 {
 		i -= len(m.Uri)
 		copy(dAtA[i:], m.Uri)
 		i = encodeVarintClaims(dAtA, i, uint64(len(m.Uri)))
 		i--
-		dAtA[i] = 0x3a
+		dAtA[i] = 0x42
 	}
-	if m.IncrementIdsBy != 0 {
-		i = encodeVarintClaims(dAtA, i, uint64(m.IncrementIdsBy))
+	if m.LimitPerAccount != 0 {
+		i = encodeVarintClaims(dAtA, i, uint64(m.LimitPerAccount))
 		i--
-		dAtA[i] = 0x30
+		dAtA[i] = 0x38
 	}
 	if len(m.BadgeIds) > 0 {
 		for iNdEx := len(m.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
@@ -236,25 +246,32 @@ func (m *Claim) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintClaims(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x2a
+			dAtA[i] = 0x32
 		}
 	}
-	if m.AmountPerClaim != 0 {
-		i = encodeVarintClaims(dAtA, i, uint64(m.AmountPerClaim))
+	if m.Amount != 0 {
+		i = encodeVarintClaims(dAtA, i, uint64(m.Amount))
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.IncrementIdsBy != 0 {
+		i = encodeVarintClaims(dAtA, i, uint64(m.IncrementIdsBy))
 		i--
 		dAtA[i] = 0x20
 	}
-	if len(m.Data) > 0 {
-		i -= len(m.Data)
-		copy(dAtA[i:], m.Data)
-		i = encodeVarintClaims(dAtA, i, uint64(len(m.Data)))
+	if len(m.WhitelistRoot) > 0 {
+		i -= len(m.WhitelistRoot)
+		copy(dAtA[i:], m.WhitelistRoot)
+		i = encodeVarintClaims(dAtA, i, uint64(len(m.WhitelistRoot)))
 		i--
 		dAtA[i] = 0x1a
 	}
-	if m.Type != 0 {
-		i = encodeVarintClaims(dAtA, i, uint64(m.Type))
+	if len(m.CodeRoot) > 0 {
+		i -= len(m.CodeRoot)
+		copy(dAtA[i:], m.CodeRoot)
+		i = encodeVarintClaims(dAtA, i, uint64(len(m.CodeRoot)))
 		i--
-		dAtA[i] = 0x10
+		dAtA[i] = 0x12
 	}
 	if len(m.Balances) > 0 {
 		for iNdEx := len(m.Balances) - 1; iNdEx >= 0; iNdEx-- {
@@ -296,15 +313,19 @@ func (m *Claim) Size() (n int) {
 			n += 1 + l + sovClaims(uint64(l))
 		}
 	}
-	if m.Type != 0 {
-		n += 1 + sovClaims(uint64(m.Type))
-	}
-	l = len(m.Data)
+	l = len(m.CodeRoot)
 	if l > 0 {
 		n += 1 + l + sovClaims(uint64(l))
 	}
-	if m.AmountPerClaim != 0 {
-		n += 1 + sovClaims(uint64(m.AmountPerClaim))
+	l = len(m.WhitelistRoot)
+	if l > 0 {
+		n += 1 + l + sovClaims(uint64(l))
+	}
+	if m.IncrementIdsBy != 0 {
+		n += 1 + sovClaims(uint64(m.IncrementIdsBy))
+	}
+	if m.Amount != 0 {
+		n += 1 + sovClaims(uint64(m.Amount))
 	}
 	if len(m.BadgeIds) > 0 {
 		for _, e := range m.BadgeIds {
@@ -312,8 +333,8 @@ func (m *Claim) Size() (n int) {
 			n += 1 + l + sovClaims(uint64(l))
 		}
 	}
-	if m.IncrementIdsBy != 0 {
-		n += 1 + sovClaims(uint64(m.IncrementIdsBy))
+	if m.LimitPerAccount != 0 {
+		n += 1 + sovClaims(uint64(m.LimitPerAccount))
 	}
 	l = len(m.Uri)
 	if l > 0 {
@@ -396,27 +417,8 @@ func (m *Claim) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			}
-			m.Type = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowClaims
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Type |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CodeRoot", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -444,13 +446,13 @@ func (m *Claim) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Data = string(dAtA[iNdEx:postIndex])
+			m.CodeRoot = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AmountPerClaim", wireType)
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistRoot", wireType)
 			}
-			m.AmountPerClaim = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowClaims
@@ -460,12 +462,63 @@ func (m *Claim) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.AmountPerClaim |= uint64(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthClaims
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthClaims
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.WhitelistRoot = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IncrementIdsBy", wireType)
+			}
+			m.IncrementIdsBy = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowClaims
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.IncrementIdsBy |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			m.Amount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowClaims
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Amount |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
 			}
@@ -499,11 +552,11 @@ func (m *Claim) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 6:
+		case 7:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IncrementIdsBy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LimitPerAccount", wireType)
 			}
-			m.IncrementIdsBy = 0
+			m.LimitPerAccount = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowClaims
@@ -513,12 +566,12 @@ func (m *Claim) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.IncrementIdsBy |= uint64(b&0x7F) << shift
+				m.LimitPerAccount |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-		case 7:
+		case 8:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
 			}
@@ -550,7 +603,7 @@ func (m *Claim) Unmarshal(dAtA []byte) error {
 			}
 			m.Uri = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 8:
+		case 9:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TimeRange", wireType)
 			}

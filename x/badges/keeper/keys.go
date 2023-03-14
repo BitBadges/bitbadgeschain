@@ -14,7 +14,10 @@ var (
 	TransferManagerKey  = []byte{0x04}
 	ClaimKey            = []byte{0x05}
 	NextClaimIdKey      = []byte{0x06}
-	UsedClaimDataKey   = []byte{0x07}
+	UsedClaimDataKey   	= []byte{0x07}
+	UsedClaimCodeKey   	= []byte{0x08}
+	UsedClaimAddressKey = []byte{0x09}
+	WhitelistIndexKey   = []byte{0x0A}
 
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}
@@ -43,11 +46,32 @@ func ConstructBalanceKey(accountNumber uint64, id uint64) string {
 
 
 // Creates the used claim data key from an id and data. Note this is not prefixed yet. It is just performing a delimited string concatenation.
-func ConstructUsedClaimDataKey(collectionId uint64, claimId uint64, data string) string {
+func ConstructUsedClaimDataKey(collectionId uint64, claimId uint64) string {
 	collection_id_str := strconv.FormatUint(collectionId, 10)
 	claim_id_str := strconv.FormatUint(claimId, 10)
-	return collection_id_str + BalanceKeyDelimiter + claim_id_str  + BalanceKeyDelimiter + data
+	return collection_id_str + BalanceKeyDelimiter + claim_id_str
 }
+
+func ConstructUsedClaimCodeKey(collectionId uint64, claimId uint64, codeLeafIndex uint64) string {
+	collection_id_str := strconv.FormatUint(collectionId, 10)
+	claim_id_str := strconv.FormatUint(claimId, 10)
+	code_leaf_index_str := strconv.FormatUint(codeLeafIndex, 10)
+	return collection_id_str + BalanceKeyDelimiter + claim_id_str  + BalanceKeyDelimiter + code_leaf_index_str
+}
+
+func ConstructUsedWhitelistIndexKey(collectionId uint64, claimId uint64, whitelistLeafIndex uint64) string {
+	collection_id_str := strconv.FormatUint(collectionId, 10)
+	claim_id_str := strconv.FormatUint(claimId, 10)
+	whitelist_leaf_index_str := strconv.FormatUint(whitelistLeafIndex, 10)
+	return collection_id_str + BalanceKeyDelimiter + claim_id_str  + BalanceKeyDelimiter + whitelist_leaf_index_str
+}
+
+func ConstructUsedClaimAddressKey(collectionId uint64, claimId uint64, address string) string {
+	collection_id_str := strconv.FormatUint(collectionId, 10)
+	claim_id_str := strconv.FormatUint(claimId, 10)
+	return collection_id_str + BalanceKeyDelimiter + claim_id_str  + BalanceKeyDelimiter + address
+}
+
 
 // Creates the transfer manager request key from an accountNumber and collectionId. Note this is not prefixed yet. It is just performing a delimited string concatenation.
 func ConstructTransferManagerRequestKey(collectionId uint64, accountNumber uint64) string {
@@ -91,6 +115,27 @@ func usedClaimDataStoreKey(usedClaimDataKey string) []byte {
 	key := make([]byte, len(UsedClaimDataKey)+len(usedClaimDataKey))
 	copy(key, UsedClaimDataKey)
 	copy(key[len(UsedClaimDataKey):], []byte(usedClaimDataKey))
+	return key
+}
+
+func usedClaimCodeStoreKey(usedClaimCodeKey string) []byte {
+	key := make([]byte, len(UsedClaimCodeKey)+len(usedClaimCodeKey))
+	copy(key, UsedClaimCodeKey)
+	copy(key[len(UsedClaimCodeKey):], []byte(usedClaimCodeKey))
+	return key
+}
+
+func usedWhitelistIndexStoreKey(whitelistIndexKey string) []byte {
+	key := make([]byte, len(WhitelistIndexKey)+len(whitelistIndexKey))
+	copy(key, WhitelistIndexKey)
+	copy(key[len(WhitelistIndexKey):], []byte(whitelistIndexKey))
+	return key
+}
+
+func usedClaimAddressStoreKey(usedClaimAddressKey string) []byte {
+	key := make([]byte, len(UsedClaimAddressKey)+len(usedClaimAddressKey))
+	copy(key, UsedClaimAddressKey)
+	copy(key[len(UsedClaimAddressKey):], []byte(usedClaimAddressKey))
 	return key
 }
 
