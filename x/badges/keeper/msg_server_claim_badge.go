@@ -34,6 +34,14 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 
 	//Check if claim is valid
 	badgeIds := claim.BadgeIds
+	origBadgeIds := []*types.IdRange{}
+	for _, badgeId := range badgeIds {
+		origBadgeIds = append(origBadgeIds, &types.IdRange{
+			Start: badgeId.Start,
+			End:   badgeId.End,
+		})
+	}
+
 	codeRoot := claim.CodeRoot
 	whitelistRoot := claim.WhitelistRoot
 	amountToClaim := claim.Amount
@@ -42,6 +50,10 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	
 
 	if codeRoot != "" {
+		if len(msg.CodeProof.Aunts) != int(claim.ExpectedMerkleProofLength) {
+			return nil, ErrCodeProofLengthInvalid
+		}
+
 		codeLeafIndex := uint64(1)
 		//iterate through msg.CodeProof.Aunts backwards
 		for i := len(msg.CodeProof.Aunts) - 1; i >= 0; i-- {
@@ -95,8 +107,25 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		}
 	}
 
+
+	
+	numUsed := uint64(0)
+	if claim.LimitPerAccount == 2 { //by address
+		numUsed, err = k.IncrementNumUsedForAddressInStore(ctx, msg.CollectionId, msg.ClaimId, msg.Creator)
+		if err != nil {
+			return nil, err
+		}
+
+		if numUsed > 1 {
+			return nil, ErrAddressAlreadyUsed
+		}
+	}
+
 	if whitelistRoot != "" {
-		numUsed := uint64(0)
+		if msg.WhitelistProof.Leaf != msg.Creator {
+			return nil, ErrMustBeClaimee
+		}
+
 		if claim.LimitPerAccount == 1 { //whitelist index
 			whitelistLeafIndex := uint64(1)
 			//iterate through msg.WhitelistProof.Aunts backwards
@@ -114,17 +143,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 			if err != nil {
 				return nil, err
 			}
-		} else if claim.LimitPerAccount == 2 { //by address
-			numUsed, err = k.IncrementNumUsedForAddressInStore(ctx, msg.CollectionId, msg.ClaimId, msg.Creator)
-			if err != nil {
-				return nil, err
-			}
-		}
-
-		
-		if msg.WhitelistProof.Leaf != msg.Creator {
-			return nil, ErrMustBeClaimee
-		}
+		} 
 
 		maxUses := uint64(1)
 		if numUsed > maxUses {
@@ -220,7 +239,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	claimedBalances := []types.Balance{}
 	claimedBalances = append(claimedBalances, types.Balance{
 		Balance: amountToClaim,
-		BadgeIds: badgeIds,
+		BadgeIds: origBadgeIds,
 	})
 
 	claimedBalancesJson, err := json.Marshal(claimedBalances)
@@ -236,7 +255,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 			sdk.NewAttribute("collection", string(collectionJson)),
 			sdk.NewAttribute("user_balance", string(userBalanceJson)),
 			sdk.NewAttribute("code", string(msg.CodeProof.Leaf)),
-			sdk.NewAttribute("address", string(msg.WhitelistProof.Leaf)),
+			sdk.NewAttribute("address", msg.Creator),
 			sdk.NewAttribute("claimed_balances", string(claimedBalancesJson)),
 			sdk.NewAttribute("to", fmt.Sprint(CreatorAccountNum)),
 			sdk.NewAttribute("claim_id", fmt.Sprint(msg.ClaimId)),

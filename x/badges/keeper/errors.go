@@ -61,4 +61,6 @@ var (
 	ErrMustBeClaimee 								= sdkerrors.Register(types.ModuleName, 54, "must be claimee")
 	ErrCodeLeafInvalid 								= sdkerrors.Register(types.ModuleName, 55, "code leaf invalid")
 	ErrCodeMaxUsesExceeded 							= sdkerrors.Register(types.ModuleName, 56, "code max uses exceeded")
+	ErrAddressAlreadyUsed 							= sdkerrors.Register(types.ModuleName, 57, "address already used")
+	ErrCodeProofLengthInvalid 						= sdkerrors.Register(types.ModuleName, 58, "code proof length invalid")
 )

@@ -18,6 +18,7 @@ enum ClaimType {
 message Claim {
     repeated Balance balances = 1; //Current balance of the claim store.
     string codeRoot = 2;
+    uint64 expectedMerkleProofLength = 10;
     string whitelistRoot = 3;
     uint64 incrementIdsBy = 4;
     uint64 amount = 5;

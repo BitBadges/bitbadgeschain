@@ -37,6 +37,7 @@ func (k msgServer) MintBadge(goCtx context.Context, msg *types.MsgMintBadge) (*t
 		needToValidateUpdateUris = true
 		newCollectionUri = msg.CollectionUri
 	}
+
 	if len(msg.BadgeUris) > 0 {
 		newBadgeUris = msg.BadgeUris
 
@@ -45,6 +46,7 @@ func (k msgServer) MintBadge(goCtx context.Context, msg *types.MsgMintBadge) (*t
 				needToValidateUpdateUris = true
 				break
 			}
+
 			if len(msg.BadgeUris[idx].BadgeIds) != len(badgeUri.BadgeIds) {
 				needToValidateUpdateUris = true
 				break

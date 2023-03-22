@@ -129,6 +129,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		{Name: "limitPerAccount", Type: "uint64"},
 		{Name: "uri", Type: "string"},
 		{Name: "timeRange", Type: "IdRange"},
+		{Name: "expectedMerkleProofLength", Type: "uint64"},
 	}
 	
 	proofItemTypes := []apitypes.Type{

@@ -804,8 +804,43 @@ paths:
                               holds for all ids specified within the id ranges
                               array.
                           description: Current balance of the claim store.
-                        dataRoot:
+                        codeRoot:
                           type: string
+                        expectedMerkleProofLength:
+                          type: string
+                          format: uint64
+                        whitelistRoot:
+                          type: string
+                        incrementIdsBy:
+                          type: string
+                          format: uint64
+                        amount:
+                          type: string
+                          format: uint64
+                        badgeIds:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              start:
+                                type: string
+                                format: uint64
+                              end:
+                                type: string
+                                format: uint64
+                            description: >-
+                              Id ranges define a range of IDs from start to end.
+                              Can be used for badge IDs, nonces, anything. 
+
+                              If end == 0, we assume end == start. Start must be
+                              >= end.
+                        limitPerAccount:
+                          type: string
+                          format: uint64
+                          title: >-
+                            0 = no restrictions (can mint multiple times), 1 =
+                            whitelist leafs can only be used once, 2 = one claim
+                            per account
                         uri:
                           type: string
                           title: >-
@@ -46461,8 +46496,41 @@ definitions:
                   Defines a balance object. The specified balance holds for all
                   ids specified within the id ranges array.
               description: Current balance of the claim store.
-            dataRoot:
+            codeRoot:
               type: string
+            expectedMerkleProofLength:
+              type: string
+              format: uint64
+            whitelistRoot:
+              type: string
+            incrementIdsBy:
+              type: string
+              format: uint64
+            amount:
+              type: string
+              format: uint64
+            badgeIds:
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                    format: uint64
+                  end:
+                    type: string
+                    format: uint64
+                description: >-
+                  Id ranges define a range of IDs from start to end. Can be used
+                  for badge IDs, nonces, anything. 
+
+                  If end == 0, we assume end == start. Start must be >= end.
+            limitPerAccount:
+              type: string
+              format: uint64
+              title: >-
+                0 = no restrictions (can mint multiple times), 1 = whitelist
+                leafs can only be used once, 2 = one claim per account
             uri:
               type: string
               title: >-
@@ -46585,8 +46653,41 @@ definitions:
             Defines a balance object. The specified balance holds for all ids
             specified within the id ranges array.
         description: Current balance of the claim store.
-      dataRoot:
+      codeRoot:
         type: string
+      expectedMerkleProofLength:
+        type: string
+        format: uint64
+      whitelistRoot:
+        type: string
+      incrementIdsBy:
+        type: string
+        format: uint64
+      amount:
+        type: string
+        format: uint64
+      badgeIds:
+        type: array
+        items:
+          type: object
+          properties:
+            start:
+              type: string
+              format: uint64
+            end:
+              type: string
+              format: uint64
+          description: >-
+            Id ranges define a range of IDs from start to end. Can be used for
+            badge IDs, nonces, anything. 
+
+            If end == 0, we assume end == start. Start must be >= end.
+      limitPerAccount:
+        type: string
+        format: uint64
+        title: >-
+          0 = no restrictions (can mint multiple times), 1 = whitelist leafs can
+          only be used once, 2 = one claim per account
       uri:
         type: string
         title: >-
@@ -47070,8 +47171,41 @@ definitions:
                       Defines a balance object. The specified balance holds for
                       all ids specified within the id ranges array.
                   description: Current balance of the claim store.
-                dataRoot:
+                codeRoot:
                   type: string
+                expectedMerkleProofLength:
+                  type: string
+                  format: uint64
+                whitelistRoot:
+                  type: string
+                incrementIdsBy:
+                  type: string
+                  format: uint64
+                amount:
+                  type: string
+                  format: uint64
+                badgeIds:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                        format: uint64
+                      end:
+                        type: string
+                        format: uint64
+                    description: >-
+                      Id ranges define a range of IDs from start to end. Can be
+                      used for badge IDs, nonces, anything. 
+
+                      If end == 0, we assume end == start. Start must be >= end.
+                limitPerAccount:
+                  type: string
+                  format: uint64
+                  title: >-
+                    0 = no restrictions (can mint multiple times), 1 = whitelist
+                    leafs can only be used once, 2 = one claim per account
                 uri:
                   type: string
                   title: >-
