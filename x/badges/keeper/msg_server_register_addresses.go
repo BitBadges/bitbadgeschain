@@ -2,8 +2,6 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,8 +10,7 @@ import (
 
 func (k msgServer) RegisterAddresses(goCtx context.Context, msg *types.MsgRegisterAddresses) (*types.MsgRegisterAddressesResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
-
+	
 	start := uint64(0)
 	end := uint64(0)
 
@@ -33,17 +30,10 @@ func (k msgServer) RegisterAddresses(goCtx context.Context, msg *types.MsgRegist
 		addressNums[i] = newNum
 	}
 
-	addressesJson, err := json.Marshal(addressNums)
-	if err != nil {
-		return nil, err
-	}
-
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("addressNums", string(addressesJson)),
-			sdk.NewAttribute("creator", fmt.Sprint(CreatorAccountNum)),
 		),
 	)
 

@@ -2,8 +2,6 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -49,20 +47,10 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 		return nil, err
 	}
 
-	
-
-	userBalanceJson, err := json.Marshal(creatorbalance)
-	if err != nil {
-		return nil, err
-	}
-
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeyAction, "SetApproval"),
-			sdk.NewAttribute("collection_id", fmt.Sprint(msg.CollectionId)),
-			sdk.NewAttribute("creator", fmt.Sprint(CreatorAccountNum)),
-			sdk.NewAttribute("user_balance", string(userBalanceJson)),
 		),
 	)
 
