@@ -30,7 +30,7 @@ message BadgeCollection {
     // This can be updatable or not depending on the permissions set. Max 256 bytes allowed.
     string bytes = 4;
     
-    // The manager's account number of the badge. The manager can have special permissions. \
+    // The manager's account number of the badge. The manager can have special permissions.
     uint64 manager = 5;
     
     //Store permissions packed in a uint where the bits correspond to permissions from left to right.

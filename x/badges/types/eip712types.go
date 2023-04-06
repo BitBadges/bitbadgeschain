@@ -95,7 +95,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 	}
 
 	addressesTypes := []apitypes.Type{
-		{Name: "accountNums", Type: "IdRange[]"},
+		{Name: "accountIds", Type: "IdRange[]"},
 		{Name: "options", Type: "uint64"},
 	}
 
@@ -126,7 +126,7 @@ func GetMsgValueTypes(route string) (map[string][]apitypes.Type) {
 		{Name: "incrementIdsBy", Type: "uint64"},
 		{Name: "amount", Type: "uint64"},
 		{Name: "badgeIds", Type: "IdRange[]"},
-		{Name: "limitPerAccount", Type: "uint64"},
+		{Name: "restrictOptions", Type: "uint64"},
 		{Name: "uri", Type: "string"},
 		{Name: "timeRange", Type: "IdRange"},
 		{Name: "expectedMerkleProofLength", Type: "uint64"},

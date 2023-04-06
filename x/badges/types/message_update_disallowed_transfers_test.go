@@ -22,7 +22,7 @@ func TestMsgUpdateDisallowedTransfers_ValidateBasic(t *testing.T) {
 				DisallowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.Addresses{
-							AccountNums: []*types.IdRange{
+							AccountIds: []*types.IdRange{
 								{
 									Start: 0,
 									End:   0,
@@ -31,7 +31,7 @@ func TestMsgUpdateDisallowedTransfers_ValidateBasic(t *testing.T) {
 							Options: uint64(types.AddressOptions_None),
 						},
 						To: &types.Addresses{
-							AccountNums: []*types.IdRange{
+							AccountIds: []*types.IdRange{
 								{
 									Start: 0,
 									End:   0,
@@ -50,7 +50,7 @@ func TestMsgUpdateDisallowedTransfers_ValidateBasic(t *testing.T) {
 				DisallowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.Addresses{
-							AccountNums: []*types.IdRange{
+							AccountIds: []*types.IdRange{
 								{
 									Start: 0,
 									End:   0,
@@ -59,7 +59,7 @@ func TestMsgUpdateDisallowedTransfers_ValidateBasic(t *testing.T) {
 							Options: uint64(types.AddressOptions_None),
 						},
 						To: &types.Addresses{
-							AccountNums: []*types.IdRange{
+							AccountIds: []*types.IdRange{
 								{
 									Start: 0,
 									End:   0,

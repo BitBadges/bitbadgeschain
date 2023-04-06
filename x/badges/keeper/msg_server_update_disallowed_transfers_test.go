@@ -29,13 +29,13 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 				DisallowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.Addresses{
-							AccountNums: []*types.IdRange{
+							AccountIds: []*types.IdRange{
 								{Start: aliceAccountNum, End: aliceAccountNum},
 							},
 							Options: uint64(types.AddressOptions_None),
 						},
 						To: &types.Addresses{
-							AccountNums: []*types.IdRange{
+							AccountIds: []*types.IdRange{
 								{Start: 0, End: math.MaxUint64},
 							},
 							Options: uint64(types.AddressOptions_None),
@@ -180,11 +180,11 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 	err = UpdateDisallowedTransfers(suite, wctx, bob, 0, []*types.TransferMapping{
 		{
 			From: &types.Addresses{
-				AccountNums:    []*types.IdRange{{Start: aliceAccountNum, End: aliceAccountNum}},
+				AccountIds:    []*types.IdRange{{Start: aliceAccountNum, End: aliceAccountNum}},
 				Options: uint64(types.AddressOptions_None),
 			},
 			To: &types.Addresses{
-				AccountNums:    []*types.IdRange{{Start: 0, End: math.MaxUint64}},
+				AccountIds:    []*types.IdRange{{Start: 0, End: math.MaxUint64}},
 				Options: uint64(types.AddressOptions_None),
 			},
 		},

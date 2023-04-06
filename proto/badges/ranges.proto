@@ -19,7 +19,7 @@ enum AddressOptions {
 }
 
 message Addresses {
-    repeated IdRange accountNums = 1;
+    repeated IdRange accountIds = 1;
     uint64 options = 2;
 }
 

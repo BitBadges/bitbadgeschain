@@ -564,9 +564,9 @@ paths:
                   manager:
                     type: string
                     format: uint64
-                    title: >-
+                    description: >-
                       The manager's account number of the badge. The manager can
-                      have special permissions. \
+                      have special permissions.
                   permissions:
                     type: string
                     format: uint64
@@ -583,7 +583,7 @@ paths:
                         from:
                           type: object
                           properties:
-                            accountNums:
+                            accountIds:
                               type: array
                               items:
                                 type: object
@@ -607,7 +607,7 @@ paths:
                         to:
                           type: object
                           properties:
-                            accountNums:
+                            accountIds:
                               type: array
                               items:
                                 type: object
@@ -647,7 +647,7 @@ paths:
                         from:
                           type: object
                           properties:
-                            accountNums:
+                            accountIds:
                               type: array
                               items:
                                 type: object
@@ -671,7 +671,7 @@ paths:
                         to:
                           type: object
                           properties:
-                            accountNums:
+                            accountIds:
                               type: array
                               items:
                                 type: object
@@ -834,7 +834,7 @@ paths:
 
                               If end == 0, we assume end == start. Start must be
                               >= end.
-                        limitPerAccount:
+                        restrictOptions:
                           type: string
                           format: uint64
                           title: >-
@@ -46167,7 +46167,7 @@ definitions:
   bitbadges.bitbadgeschain.badges.Addresses:
     type: object
     properties:
-      accountNums:
+      accountIds:
         type: array
         items:
           type: object
@@ -46273,9 +46273,9 @@ definitions:
       manager:
         type: string
         format: uint64
-        title: >-
+        description: >-
           The manager's account number of the badge. The manager can have
-          special permissions. \
+          special permissions.
       permissions:
         type: string
         format: uint64
@@ -46292,7 +46292,7 @@ definitions:
             from:
               type: object
               properties:
-                accountNums:
+                accountIds:
                   type: array
                   items:
                     type: object
@@ -46314,7 +46314,7 @@ definitions:
             to:
               type: object
               properties:
-                accountNums:
+                accountIds:
                   type: array
                   items:
                     type: object
@@ -46348,7 +46348,7 @@ definitions:
             from:
               type: object
               properties:
-                accountNums:
+                accountIds:
                   type: array
                   items:
                     type: object
@@ -46370,7 +46370,7 @@ definitions:
             to:
               type: object
               properties:
-                accountNums:
+                accountIds:
                   type: array
                   items:
                     type: object
@@ -46525,7 +46525,7 @@ definitions:
                   for badge IDs, nonces, anything. 
 
                   If end == 0, we assume end == start. Start must be >= end.
-            limitPerAccount:
+            restrictOptions:
               type: string
               format: uint64
               title: >-
@@ -46682,7 +46682,7 @@ definitions:
             badge IDs, nonces, anything. 
 
             If end == 0, we assume end == start. Start must be >= end.
-      limitPerAccount:
+      restrictOptions:
         type: string
         format: uint64
         title: >-
@@ -46940,9 +46940,9 @@ definitions:
           manager:
             type: string
             format: uint64
-            title: >-
+            description: >-
               The manager's account number of the badge. The manager can have
-              special permissions. \
+              special permissions.
           permissions:
             type: string
             format: uint64
@@ -46959,7 +46959,7 @@ definitions:
                 from:
                   type: object
                   properties:
-                    accountNums:
+                    accountIds:
                       type: array
                       items:
                         type: object
@@ -46982,7 +46982,7 @@ definitions:
                 to:
                   type: object
                   properties:
-                    accountNums:
+                    accountIds:
                       type: array
                       items:
                         type: object
@@ -47020,7 +47020,7 @@ definitions:
                 from:
                   type: object
                   properties:
-                    accountNums:
+                    accountIds:
                       type: array
                       items:
                         type: object
@@ -47043,7 +47043,7 @@ definitions:
                 to:
                   type: object
                   properties:
-                    accountNums:
+                    accountIds:
                       type: array
                       items:
                         type: object
@@ -47200,7 +47200,7 @@ definitions:
                       used for badge IDs, nonces, anything. 
 
                       If end == 0, we assume end == start. Start must be >= end.
-                limitPerAccount:
+                restrictOptions:
                   type: string
                   format: uint64
                   title: >-
@@ -47258,7 +47258,7 @@ definitions:
       from:
         type: object
         properties:
-          accountNums:
+          accountIds:
             type: array
             items:
               type: object
@@ -47280,7 +47280,7 @@ definitions:
       to:
         type: object
         properties:
-          accountNums:
+          accountIds:
             type: array
             items:
               type: object

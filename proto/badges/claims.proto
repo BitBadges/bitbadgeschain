@@ -23,7 +23,7 @@ message Claim {
     uint64 incrementIdsBy = 4;
     uint64 amount = 5;
     repeated IdRange badgeIds = 6;
-    uint64 limitPerAccount = 7; //0 = no restrictions (can mint multiple times), 1 = whitelist leafs can only be used once, 2 = one claim per account
+    uint64 restrictOptions = 7; //0 = no restrictions (can mint multiple times), 1 = whitelist leafs can only be used once, 2 = one claim per account
     string uri = 8; //Optional URI for the claim. Max 100 chars. To be used for IPFS Merkle Tree Information
     IdRange timeRange = 9; //Time range when the claim is valid
 }

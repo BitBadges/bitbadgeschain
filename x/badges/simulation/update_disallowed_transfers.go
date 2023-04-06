@@ -25,7 +25,7 @@ func SimulateMsgUpdateDisallowedTransfers(
 			DisallowedTransfers: []*types.TransferMapping{
 				{
 					From: &types.Addresses{
-						AccountNums: []*types.IdRange{
+						AccountIds: []*types.IdRange{
 							{
 								Start: r.Uint64(),
 								End:   r.Uint64(),

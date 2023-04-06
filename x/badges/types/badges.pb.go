@@ -88,7 +88,7 @@ type BadgeCollection struct {
 	// These are arbitrary bytes can be used to store anything on-chain about the badge (often used for a permanent hash).
 	// This can be updatable or not depending on the permissions set. Max 256 bytes allowed.
 	Bytes string `protobuf:"bytes,4,opt,name=bytes,proto3" json:"bytes,omitempty"`
-	// The manager's account number of the badge. The manager can have special permissions. \
+	// The manager's account number of the badge. The manager can have special permissions.
 	Manager uint64 `protobuf:"varint,5,opt,name=manager,proto3" json:"manager,omitempty"`
 	//Store permissions packed in a uint where the bits correspond to permissions from left to right.
 	//Leading zeroes are applied. See types/permissions.go

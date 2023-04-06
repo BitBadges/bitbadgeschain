@@ -74,7 +74,7 @@ func IsTransferAllowed(collection types.BadgeCollection, permissions types.Permi
 			} else if managerApprovedTransfer.From.Options == uint64(types.AddressOptions_ExcludeManager) {
 				fromFound = false
 			} else {
-				_, fromFound = SearchIdRangesForId(fromAddress, managerApprovedTransfer.From.AccountNums)
+				_, fromFound = SearchIdRangesForId(fromAddress, managerApprovedTransfer.From.AccountIds)
 			}
 
 			if managerApprovedTransfer.To.Options == uint64(types.AddressOptions_IncludeManager) {
@@ -82,7 +82,7 @@ func IsTransferAllowed(collection types.BadgeCollection, permissions types.Permi
 			} else if managerApprovedTransfer.To.Options == uint64(types.AddressOptions_ExcludeManager) {
 				toFound = false
 			} else {
-				_, toFound = SearchIdRangesForId(toAddress, managerApprovedTransfer.To.AccountNums)
+				_, toFound = SearchIdRangesForId(toAddress, managerApprovedTransfer.To.AccountIds)
 			}
 
 			if fromFound && toFound {
@@ -92,8 +92,8 @@ func IsTransferAllowed(collection types.BadgeCollection, permissions types.Permi
 	}
 
 	for _, disallowedTransfer := range collection.DisallowedTransfers {
-		_, fromFound := SearchIdRangesForId(fromAddress, disallowedTransfer.From.AccountNums)
-		_, toFound := SearchIdRangesForId(toAddress, disallowedTransfer.To.AccountNums)
+		_, fromFound := SearchIdRangesForId(fromAddress, disallowedTransfer.From.AccountIds)
+		_, toFound := SearchIdRangesForId(toAddress, disallowedTransfer.To.AccountIds)
 
 		if fromFound && toFound {
 			return false, false

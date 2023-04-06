@@ -4,11 +4,10 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
-	"fmt"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (*types.MsgClaimBadgeResponse, error) {
@@ -21,11 +20,13 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		return nil, ErrBadgeNotExists
 	}
 
-	if uint64(len(collection.Claims)) <= msg.ClaimId {
+	claimId := msg.ClaimId - 1
+
+	if uint64(len(collection.Claims)) <= claimId {
 		return nil, ErrClaimNotFound
 	}
 
-	claim := collection.Claims[msg.ClaimId]
+	claim := collection.Claims[claimId]
 
 	//Assert claim is not expired
 	if claim.TimeRange.Start > uint64(ctx.BlockTime().Unix()) || claim.TimeRange.End < uint64(ctx.BlockTime().Unix()) {
@@ -67,7 +68,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 			}
 		}
 
-		numUsed, err := k.IncrementNumUsedForCodeInStore(ctx, msg.CollectionId, msg.ClaimId, codeLeafIndex)
+		numUsed, err := k.IncrementNumUsedForCodeInStore(ctx, msg.CollectionId, claimId, codeLeafIndex)
 		if err != nil {
 			return nil, err
 		}
@@ -85,6 +86,9 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		hashedMsgLeaf := sha256.Sum256([]byte(msg.CodeProof.Leaf))
 		leafHash := hashedMsgLeaf[:]
 
+		str := ""
+		str = str + msg.CodeProof.Leaf + " - " + hex.EncodeToString(leafHash)
+
 		currHash := leafHash
 		for _, aunt := range msg.CodeProof.Aunts {
 			decodedAunt, err := hex.DecodeString(aunt.Aunt)
@@ -99,19 +103,24 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 				parentHash := sha256.Sum256(append(decodedAunt, currHash...))
 				currHash = parentHash[:]
 			}
+
+			str = str + " - " + hex.EncodeToString(currHash)
 		}
 
 		hexCurrHash := hex.EncodeToString(currHash)
+
+		str = str + " - ROOT: " + codeRoot
+
 		if hexCurrHash != codeRoot {
-			return nil, ErrRootHashInvalid
+			return nil, sdkerrors.Wrapf(ErrRootHashInvalid, "Got: %s", str)
 		}
 	}
 
 
 	
 	numUsed := uint64(0)
-	if claim.LimitPerAccount == 2 { //by address
-		numUsed, err = k.IncrementNumUsedForAddressInStore(ctx, msg.CollectionId, msg.ClaimId, msg.Creator)
+	if claim.RestrictOptions == 2 { //by address
+		numUsed, err = k.IncrementNumUsedForAddressInStore(ctx, msg.CollectionId, claimId, msg.Creator)
 		if err != nil {
 			return nil, err
 		}
@@ -126,7 +135,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 			return nil, ErrMustBeClaimee
 		}
 
-		if claim.LimitPerAccount == 1 { //whitelist index
+		if claim.RestrictOptions == 1 { //whitelist index
 			whitelistLeafIndex := uint64(1)
 			//iterate through msg.WhitelistProof.Aunts backwards
 			for i := len(msg.WhitelistProof.Aunts) - 1; i >= 0; i-- {
@@ -139,7 +148,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 					whitelistLeafIndex = whitelistLeafIndex * 2 + 1
 				}
 			}
-			numUsed, err = k.IncrementNumUsedForWhitelistIndexInStore(ctx, msg.CollectionId, msg.ClaimId, whitelistLeafIndex)
+			numUsed, err = k.IncrementNumUsedForWhitelistIndexInStore(ctx, msg.CollectionId, claimId, whitelistLeafIndex)
 			if err != nil {
 				return nil, err
 			}
@@ -156,9 +165,8 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		}
 
 		hashedMsgLeaf := sha256.Sum256([]byte(msg.WhitelistProof.Leaf))
-		leafHash := hashedMsgLeaf[:]
+		currHash := hashedMsgLeaf[:]
 
-		currHash := leafHash
 		for _, aunt := range msg.WhitelistProof.Aunts {
 			decodedAunt, err := hex.DecodeString(aunt.Aunt)
 			if err != nil {
@@ -203,7 +211,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	claim.Balances = claimUserBalance.Balances
 
 	if incrementIdsBy > 0 {	
-		_, err := k.IncrementNumUsedForClaimInStore(ctx, msg.CollectionId, msg.ClaimId)
+		_, err := k.IncrementNumUsedForClaimInStore(ctx, msg.CollectionId, claimId)
 		if err != nil {
 			return nil, err
 		}
@@ -214,7 +222,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		}
 	}
 	
-	collection.Claims[msg.ClaimId] = claim
+	collection.Claims[claimId] = claim
 	
 	err = k.SetCollectionInStore(ctx, collection)
 	if err != nil {
@@ -226,39 +234,11 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		return nil, err
 	}
 
-	collectionJson, err := json.Marshal(collection)
-	if err != nil {
-		return nil, err
-	}
-
-	userBalanceJson, err := json.Marshal(userBalance)
-	if err != nil {
-		return nil, err
-	}
-
-	claimedBalances := []types.Balance{}
-	claimedBalances = append(claimedBalances, types.Balance{
-		Balance: amountToClaim,
-		BadgeIds: origBadgeIds,
-	})
-
-	claimedBalancesJson, err := json.Marshal(claimedBalances)
-	if err != nil {
-		return nil, err
-	}
-
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("collection", string(collectionJson)),
-			sdk.NewAttribute("user_balance", string(userBalanceJson)),
-			sdk.NewAttribute("code", string(msg.CodeProof.Leaf)),
-			sdk.NewAttribute("address", msg.Creator),
-			sdk.NewAttribute("claimed_balances", string(claimedBalancesJson)),
-			sdk.NewAttribute("to", fmt.Sprint(CreatorAccountNum)),
-			sdk.NewAttribute("claim_id", fmt.Sprint(msg.ClaimId)),
 		),
 	)
 
