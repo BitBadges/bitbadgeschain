@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -56,6 +57,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute("collectionId", fmt.Sprint(NextCollectionId)),
 		),
 	)
 
