@@ -15,18 +15,18 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   62,
+				Permissions: 62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -82,7 +82,6 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 	suite.Require().Equal(uint64(5000), fetchedBalance[0].Balance)
 	suite.Require().Nil(err)
 
-	
 	alicebalance, _ := GetUserBalance(suite, wctx, 0, aliceAccountNum)
 	fetchedBalance, err = keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, alicebalance.Balances)
 	suite.Require().Equal(uint64(5000), fetchedBalance[0].Balance)
@@ -96,18 +95,18 @@ func (suite *TestSuite) TestApprovalsApproved() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   62,
+				Permissions: 62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -179,18 +178,18 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   62,
+				Permissions: 62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -256,18 +255,18 @@ func (suite *TestSuite) TestApprovalsNotApprovedAtAll() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   62,
+				Permissions: 62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -325,18 +324,18 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   62,
+				Permissions: 62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -402,18 +401,18 @@ func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   62,
+				Permissions: 62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -479,18 +478,18 @@ func (suite *TestSuite) TestApprovalOverflow() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   46,
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -567,18 +566,18 @@ func (suite *TestSuite) TestTransferUnderflowNotEnoughBalance() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   46,
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -635,18 +634,18 @@ func (suite *TestSuite) TestPendingTransferUnderflowNotEnoughBalance() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   62,
+				Permissions: 62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -704,18 +703,18 @@ func (suite *TestSuite) TestTransferInvalidBadgeIdRanges() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   46,
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -790,18 +789,18 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   46,
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -881,18 +880,18 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   46,
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -954,18 +953,18 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   46,
+				Permissions: 46,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -1100,7 +1099,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 					BadgeIds: []*types.IdRange{
 						{
 							Start: 150,
-							End: 150,
+							End:   150,
 						},
 					},
 				},
@@ -1118,7 +1117,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 					BadgeIds: []*types.IdRange{
 						{
 							Start: 950,
-							End:  950,
+							End:   950,
 						},
 					},
 				},

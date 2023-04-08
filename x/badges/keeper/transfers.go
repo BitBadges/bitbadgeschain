@@ -26,7 +26,7 @@ func ForcefulTransfer(collection types.BadgeCollection, badgeIdRange *types.IdRa
 	if err != nil {
 		return types.UserBalance{}, types.UserBalance{}, err
 	}
-	
+
 	if !isManagerApprovedTransfer {
 		fromUserBalance, err = DeductApprovals(fromUserBalance, collection, collection.CollectionId, badgeIdRange, from, to, approvedBy, amount)
 		if err != nil {

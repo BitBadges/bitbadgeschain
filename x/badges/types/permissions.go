@@ -1,7 +1,7 @@
 package types
 
 const (
-	NumPermissions = 8
+	NumPermissions = 6
 )
 
 /*
@@ -14,9 +14,11 @@ type Permissions struct {
 	CanUpdateUris           bool //can the manager update the uris (metadata) of the collection and badges; if false, locked forever
 	CanCreateMoreBadges     bool //when true, manager can create more badges of the collection; once set to false, the number of badges in the collection is locked
 	CanUpdateDisallowed     bool //when true, manager can freeze and unfreeze addresseses from transferring; once set to false, it is locked
+	CanDelete               bool //when true, manager can delete the collection; once set to false, it is locked
 }
 
 const (
+	CanDeleteDigit               = 6
 	CanUpdateBytesDigit          = 5
 	CanManagerBeTransferredDigit = 4
 	CanUpdateUrisDigit           = 3
@@ -24,7 +26,7 @@ const (
 	CanUpdateDisallowedDigit     = 1
 )
 
-//Validate permissions are validly formed., Disallows leading zeroes.
+//Validate permissions are validly formed. Disallows leading zeroes.
 func ValidatePermissions(permissions uint64) error {
 	tempPermissions := permissions >> NumPermissions
 
@@ -68,6 +70,10 @@ func ValidatePermissionsUpdate(oldPermissions uint64, newPermissions uint64) err
 		return ErrInvalidPermissionsUpdateLocked
 	}
 
+	if !oldFlags.CanDelete && newFlags.CanDelete {
+		return ErrInvalidPermissionsUpdateLocked
+	}
+
 	return nil
 }
 
@@ -98,5 +104,7 @@ func SetPermissionsFlags(permission bool, digit int, flags *Permissions) {
 		flags.CanCreateMoreBadges = permission
 	} else if digit == CanUpdateDisallowedDigit {
 		flags.CanUpdateDisallowed = permission
+	} else if digit == CanDeleteDigit {
+		flags.CanDelete = permission
 	}
 }

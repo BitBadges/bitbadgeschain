@@ -37,7 +37,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		ManagerApprovedTransfers: msg.ManagerApprovedTransfers,
 		Bytes:                    msg.Bytes,
 		Standard:                 msg.Standard,
-		NextBadgeId: 			  1,
+		NextBadgeId:              1,
 	}
 
 	if len(msg.BadgeSupplys) != 0 {
@@ -51,7 +51,6 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 	if err := k.SetCollectionInStore(ctx, collection); err != nil {
 		return nil, err
 	}
-	
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,

@@ -80,8 +80,6 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 		return sdkerrors.Wrap(err, "Marshal types.UserBalance failed")
 	}
 
-	
-
 	store := ctx.KVStore(k.storeKey)
 	store.Set(userBalanceStoreKey(balanceKey), marshaled_badge_balance_info)
 	return nil
@@ -110,7 +108,6 @@ func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.Use
 		k.cdc.MustUnmarshal(iterator.Value(), &UserBalance)
 		balances = append(balances, &UserBalance)
 
-		
 		balanceKeyDetails := GetDetailsFromBalanceKey(string(iterator.Key()))
 		ids = append(ids, balanceKeyDetails.collectionId)
 		accNums = append(accNums, balanceKeyDetails.accountNum)
@@ -266,8 +263,6 @@ func (k Keeper) IncrementNumUsedForAddressInStore(ctx sdk.Context, collectionId 
 	store.Set(usedClaimAddressStoreKey(ConstructUsedClaimAddressKey(collectionId, claimId, address)), []byte(strconv.FormatInt(int64(curr+1), 10)))
 	return incrementedNum, nil
 }
-
-
 
 func (k Keeper) IncrementNumUsedForWhitelistIndexInStore(ctx sdk.Context, collectionId uint64, claimId uint64, whitelistLeafIndex uint64) (uint64, error) {
 	store := ctx.KVStore(k.storeKey)

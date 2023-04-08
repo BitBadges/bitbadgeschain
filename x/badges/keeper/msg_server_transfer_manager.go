@@ -42,6 +42,6 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		),
 	)
-	
+
 	return &types.MsgTransferManagerResponse{}, nil
 }

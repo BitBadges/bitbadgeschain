@@ -25,8 +25,6 @@ func NewMsgNewCollection(creator string, standard uint64, collectionsToCreate []
 	}
 }
 
-
-
 func (msg *MsgNewCollection) Route() string {
 	return RouterKey
 }
@@ -61,7 +59,7 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 	if msg.BadgeUris == nil || len(msg.BadgeUris) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "badgeUris cannot be nil")
 	}
-	
+
 	for _, badgeUri := range msg.BadgeUris {
 		//Validate well-formedness of the message entries
 		if err := ValidateURI(badgeUri.Uri); err != nil {
@@ -73,7 +71,7 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid badgeIds")
 		}
 	}
-	
+
 	if err := ValidatePermissions(msg.Permissions); err != nil {
 		return err
 	}
@@ -110,12 +108,12 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 			if err != nil {
 				return err
 			}
-		}		
-	
+		}
+
 		if claim.TimeRange == nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
 		}
-	
+
 		err = ValidateRangesAreValid([]*IdRange{claim.TimeRange})
 		if err != nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")

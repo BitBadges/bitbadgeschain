@@ -19,4 +19,3 @@ func (k Keeper) MustGetAccountNumberForBech32AddressString(ctx sdk.Context, addr
 	acc_address := sdk.MustAccAddressFromBech32(address)
 	return k.GetOrCreateAccountNumberForAccAddressBech32(ctx, acc_address)
 }
-

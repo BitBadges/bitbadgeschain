@@ -11,11 +11,11 @@ var _ sdk.Msg = &MsgClaimBadge{}
 
 func NewMsgClaimBadge(creator string, claimId uint64, collectionId uint64, whitelistProof *ClaimProof, codeProof *ClaimProof) *MsgClaimBadge {
 	return &MsgClaimBadge{
-		Creator: creator,
-		ClaimId: claimId,
-		CollectionId: collectionId,
+		Creator:        creator,
+		ClaimId:        claimId,
+		CollectionId:   collectionId,
 		WhitelistProof: whitelistProof,
-		CodeProof: codeProof,
+		CodeProof:      codeProof,
 	}
 }
 
@@ -46,13 +46,12 @@ func (msg *MsgClaimBadge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	
 	if msg.WhitelistProof != nil {
 		for _, aunt := range msg.WhitelistProof.Aunts {
 			if aunt.Aunt == "" || len(aunt.Aunt) == 0 {
 				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid aunt in proof")
 			}
-		}	
+		}
 	}
 
 	if msg.CodeProof != nil {
@@ -60,9 +59,8 @@ func (msg *MsgClaimBadge) ValidateBasic() error {
 			if aunt.Aunt == "" || len(aunt.Aunt) == 0 {
 				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid aunt in proof")
 			}
-		}	
+		}
 	}
 
-	
 	return nil
 }

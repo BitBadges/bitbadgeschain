@@ -42,8 +42,6 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 		return nil, ErrUserBalanceNotExists
 	}
 
-	
-
 	for _, transfer := range msg.Transfers {
 		for _, to := range transfer.ToAddresses {
 			toBalanceKey := ConstructBalanceKey(to, msg.CollectionId)
@@ -70,12 +68,9 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 		}
 	}
 
-
-
 	if err := k.SetUserBalanceInStore(ctx, fromBalanceKey, fromUserBalance); err != nil {
 		return nil, err
 	}
-
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,

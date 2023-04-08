@@ -11,13 +11,13 @@ var _ sdk.Msg = &MsgMintBadge{}
 
 func NewMsgMintBadge(creator string, collectionId uint64, supplysAndAmounts []*BadgeSupplyAndAmount, transfers []*Transfers, claims []*Claim, collectionUri string, badgeUris []*BadgeUri) *MsgMintBadge {
 	return &MsgMintBadge{
-		Creator:      creator,
-		CollectionId: collectionId,
-		BadgeSupplys: supplysAndAmounts,
-		Transfers:    transfers,
-		Claims:       claims,
+		Creator:       creator,
+		CollectionId:  collectionId,
+		BadgeSupplys:  supplysAndAmounts,
+		Transfers:     transfers,
+		Claims:        claims,
 		CollectionUri: collectionUri,
-		BadgeUris: badgeUris,
+		BadgeUris:     badgeUris,
 	}
 }
 
@@ -88,24 +88,22 @@ func (msg *MsgMintBadge) ValidateBasic() error {
 		}
 	}
 
-	
 	for _, claim := range msg.Claims {
 		if claim.Uri != "" {
 			err = ValidateURI(claim.Uri)
 			if err != nil {
 				return err
 			}
-		}		
-	
+		}
+
 		if claim.TimeRange == nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
 		}
-	
+
 		err = ValidateRangesAreValid([]*IdRange{claim.TimeRange})
 		if err != nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
 		}
-
 
 		//TODO: validate balances
 	}

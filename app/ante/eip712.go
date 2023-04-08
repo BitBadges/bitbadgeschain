@@ -231,7 +231,6 @@ func VerifySignature(
 			Salt:              "0",
 		}
 
-
 		//Normalize the typedData to handle empty (0, "", false), nested objects, and arrays.
 		//Also, add in any missing types for the EIP712 typedData specific to our badges module.
 		//Only check first message because eip712 only supports one message per tx

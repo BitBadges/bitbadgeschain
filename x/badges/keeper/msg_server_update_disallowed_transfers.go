@@ -27,7 +27,6 @@ func (k msgServer) UpdateDisallowedTransfers(goCtx context.Context, msg *types.M
 		return nil, err
 	}
 
-
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),

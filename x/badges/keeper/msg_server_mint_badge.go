@@ -12,7 +12,6 @@ func (k msgServer) MintBadge(goCtx context.Context, msg *types.MsgMintBadge) (*t
 
 	checkIfCanCreateMoreBadges := msg.BadgeSupplys != nil && len(msg.BadgeSupplys) > 0
 
-
 	_, collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:             msg.Creator,
 		CollectionId:        msg.CollectionId,
@@ -60,7 +59,6 @@ func (k msgServer) MintBadge(goCtx context.Context, msg *types.MsgMintBadge) (*t
 		}
 	}
 
-
 	_, _, err = k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:       msg.Creator,
 		CollectionId:  msg.CollectionId,
@@ -78,7 +76,7 @@ func (k msgServer) MintBadge(goCtx context.Context, msg *types.MsgMintBadge) (*t
 	if err := k.SetCollectionInStore(ctx, collection); err != nil {
 		return nil, err
 	}
-	
+
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),

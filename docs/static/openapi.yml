@@ -46751,6 +46751,8 @@ definitions:
       If end == 0, we assume end == start. Start must be >= end.
   bitbadges.bitbadgeschain.badges.MsgClaimBadgeResponse:
     type: object
+  bitbadges.bitbadgeschain.badges.MsgDeleteCollectionResponse:
+    type: object
   bitbadges.bitbadgeschain.badges.MsgMintBadgeResponse:
     type: object
     properties:

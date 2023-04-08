@@ -61,6 +61,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgClaimBadge int = 100
 
+	opWeightMsgDeleteCollection = "op_weight_msg_delete_collection"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgDeleteCollection int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -230,6 +234,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgClaimBadge,
 		badgessimulation.SimulateMsgClaimBadge(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgDeleteCollection int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgDeleteCollection, &weightMsgDeleteCollection, nil,
+		func(_ *rand.Rand) {
+			weightMsgDeleteCollection = defaultWeightMsgDeleteCollection
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgDeleteCollection,
+		badgessimulation.SimulateMsgDeleteCollection(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

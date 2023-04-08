@@ -534,7 +534,6 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 	}
 }
 
-
 //Commented because it takes +- 25 seconds to run
 
 // func (suite *TestSuite) TestBalancesFuzz() {
@@ -579,7 +578,6 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 // 					End:   end,
 // 				},
 // 			}, amount)
-			
 
 // 			if err != nil {
 // 				suite.Require().EqualError(err, keeper.ErrUnderflow.Error())
@@ -595,8 +593,6 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 // 					balances[j] -= amount
 // 				}
 // 			}
-			
-
 
 // 		}
 

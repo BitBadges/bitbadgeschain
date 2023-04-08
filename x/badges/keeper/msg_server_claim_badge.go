@@ -48,8 +48,6 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	amountToClaim := claim.Amount
 	incrementIdsBy := claim.IncrementIdsBy
 
-	
-
 	if codeRoot != "" {
 		if len(msg.CodeProof.Aunts) != int(claim.ExpectedMerkleProofLength) {
 			return nil, ErrCodeProofLengthInvalid
@@ -64,7 +62,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 			if onRight {
 				codeLeafIndex = codeLeafIndex * 2
 			} else {
-				codeLeafIndex = codeLeafIndex * 2 + 1
+				codeLeafIndex = codeLeafIndex*2 + 1
 			}
 		}
 
@@ -116,8 +114,6 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		}
 	}
 
-
-	
 	numUsed := uint64(0)
 	if claim.RestrictOptions == 2 { //by address
 		numUsed, err = k.IncrementNumUsedForAddressInStore(ctx, msg.CollectionId, claimId, msg.Creator)
@@ -145,14 +141,14 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 				if onRight {
 					whitelistLeafIndex = whitelistLeafIndex * 2
 				} else {
-					whitelistLeafIndex = whitelistLeafIndex * 2 + 1
+					whitelistLeafIndex = whitelistLeafIndex*2 + 1
 				}
 			}
 			numUsed, err = k.IncrementNumUsedForWhitelistIndexInStore(ctx, msg.CollectionId, claimId, whitelistLeafIndex)
 			if err != nil {
 				return nil, err
 			}
-		} 
+		}
 
 		maxUses := uint64(1)
 		if numUsed > maxUses {
@@ -194,7 +190,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	}
 
 	claimUserBalance := types.UserBalance{
-		Balances: claim.Balances,
+		Balances:  claim.Balances,
 		Approvals: []*types.Approval{},
 	}
 
@@ -210,7 +206,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 
 	claim.Balances = claimUserBalance.Balances
 
-	if incrementIdsBy > 0 {	
+	if incrementIdsBy > 0 {
 		_, err := k.IncrementNumUsedForClaimInStore(ctx, msg.CollectionId, claimId)
 		if err != nil {
 			return nil, err
@@ -221,9 +217,9 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 			badgeIds[i].End += incrementIdsBy
 		}
 	}
-	
+
 	collection.Claims[claimId] = claim
-	
+
 	err = k.SetCollectionInStore(ctx, collection)
 	if err != nil {
 		return nil, err
@@ -234,7 +230,6 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		return nil, err
 	}
 
-
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
@@ -242,6 +237,5 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		),
 	)
 
-	
 	return &types.MsgClaimBadgeResponse{}, nil
 }

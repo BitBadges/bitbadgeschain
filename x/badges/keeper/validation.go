@@ -20,6 +20,7 @@ type UniversalValidationParams struct {
 	CanUpdateUris                bool
 	CanUpdateBytes               bool
 	OnlyCheckAccounts            bool
+	CanDelete					 bool
 }
 
 // Validates everything about the Msg is valid and returns (creatorNum, badge, permissions, error).
@@ -92,6 +93,10 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationPar
 	}
 
 	if params.CanUpdateBytes && !permissions.CanUpdateBytes {
+		return CreatorAccountNum, types.BadgeCollection{}, ErrInvalidPermissions
+	}
+
+	if params.CanDelete && !permissions.CanDelete {
 		return CreatorAccountNum, types.BadgeCollection{}, ErrInvalidPermissions
 	}
 

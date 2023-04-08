@@ -15,18 +15,18 @@ func (suite *TestSuite) TestTransferManager() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   127,
+				Permissions: 127,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -62,18 +62,18 @@ func (suite *TestSuite) TestRequestTransferManager() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   127,
+				Permissions: 127,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -115,18 +115,18 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   127,
+				Permissions: 127,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -162,18 +162,18 @@ func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   23,
+				Permissions: 23,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -203,18 +203,18 @@ func (suite *TestSuite) TestManagerCantBeTransferred() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   0,
+				Permissions: 0,
 			},
 			Amount:  1,
 			Creator: bob,

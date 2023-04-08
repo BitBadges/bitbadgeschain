@@ -14,8 +14,8 @@ var (
 	TransferManagerKey  = []byte{0x04}
 	ClaimKey            = []byte{0x05}
 	NextClaimIdKey      = []byte{0x06}
-	UsedClaimDataKey   	= []byte{0x07}
-	UsedClaimCodeKey   	= []byte{0x08}
+	UsedClaimDataKey    = []byte{0x07}
+	UsedClaimCodeKey    = []byte{0x08}
 	UsedClaimAddressKey = []byte{0x09}
 	WhitelistIndexKey   = []byte{0x0A}
 
@@ -44,7 +44,6 @@ func ConstructBalanceKey(accountNumber uint64, id uint64) string {
 	return account_num_str + BalanceKeyDelimiter + collection_id_str
 }
 
-
 // Creates the used claim data key from an id and data. Note this is not prefixed yet. It is just performing a delimited string concatenation.
 func ConstructUsedClaimDataKey(collectionId uint64, claimId uint64) string {
 	collection_id_str := strconv.FormatUint(collectionId, 10)
@@ -56,22 +55,21 @@ func ConstructUsedClaimCodeKey(collectionId uint64, claimId uint64, codeLeafInde
 	collection_id_str := strconv.FormatUint(collectionId, 10)
 	claim_id_str := strconv.FormatUint(claimId, 10)
 	code_leaf_index_str := strconv.FormatUint(codeLeafIndex, 10)
-	return collection_id_str + BalanceKeyDelimiter + claim_id_str  + BalanceKeyDelimiter + code_leaf_index_str
+	return collection_id_str + BalanceKeyDelimiter + claim_id_str + BalanceKeyDelimiter + code_leaf_index_str
 }
 
 func ConstructUsedWhitelistIndexKey(collectionId uint64, claimId uint64, whitelistLeafIndex uint64) string {
 	collection_id_str := strconv.FormatUint(collectionId, 10)
 	claim_id_str := strconv.FormatUint(claimId, 10)
 	whitelist_leaf_index_str := strconv.FormatUint(whitelistLeafIndex, 10)
-	return collection_id_str + BalanceKeyDelimiter + claim_id_str  + BalanceKeyDelimiter + whitelist_leaf_index_str
+	return collection_id_str + BalanceKeyDelimiter + claim_id_str + BalanceKeyDelimiter + whitelist_leaf_index_str
 }
 
 func ConstructUsedClaimAddressKey(collectionId uint64, claimId uint64, address string) string {
 	collection_id_str := strconv.FormatUint(collectionId, 10)
 	claim_id_str := strconv.FormatUint(claimId, 10)
-	return collection_id_str + BalanceKeyDelimiter + claim_id_str  + BalanceKeyDelimiter + address
+	return collection_id_str + BalanceKeyDelimiter + claim_id_str + BalanceKeyDelimiter + address
 }
-
 
 // Creates the transfer manager request key from an accountNumber and collectionId. Note this is not prefixed yet. It is just performing a delimited string concatenation.
 func ConstructTransferManagerRequestKey(collectionId uint64, accountNumber uint64) string {

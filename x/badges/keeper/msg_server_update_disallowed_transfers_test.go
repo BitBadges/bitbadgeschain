@@ -14,18 +14,18 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   62,
+				Permissions: 62,
 				DisallowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.Addresses{
@@ -104,18 +104,18 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   23,
+				Permissions: 23,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -180,12 +180,12 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 	err = UpdateDisallowedTransfers(suite, wctx, bob, 0, []*types.TransferMapping{
 		{
 			From: &types.Addresses{
-				AccountIds:    []*types.IdRange{{Start: aliceAccountNum, End: aliceAccountNum}},
-				Options: uint64(types.AddressOptions_None),
+				AccountIds: []*types.IdRange{{Start: aliceAccountNum, End: aliceAccountNum}},
+				Options:    uint64(types.AddressOptions_None),
 			},
 			To: &types.Addresses{
-				AccountIds:    []*types.IdRange{{Start: 0, End: math.MaxUint64}},
-				Options: uint64(types.AddressOptions_None),
+				AccountIds: []*types.IdRange{{Start: 0, End: math.MaxUint64}},
+				Options:    uint64(types.AddressOptions_None),
 			},
 		},
 	})

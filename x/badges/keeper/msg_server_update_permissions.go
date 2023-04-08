@@ -30,7 +30,6 @@ func (k msgServer) UpdatePermissions(goCtx context.Context, msg *types.MsgUpdate
 		return nil, err
 	}
 
-
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),

@@ -10,7 +10,7 @@ import (
 
 func (k msgServer) RegisterAddresses(goCtx context.Context, msg *types.MsgRegisterAddresses) (*types.MsgRegisterAddressesResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	
+
 	start := uint64(0)
 	end := uint64(0)
 

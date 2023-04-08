@@ -14,18 +14,18 @@ func (suite *TestSuite) TestSendAllToClaims() {
 		{
 			Collection: types.MsgNewCollection{
 				CollectionUri: "https://example.com",
-				BadgeUris:            []*types.BadgeUri{
+				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 1,
-								End: math.MaxUint64,
+								End:   math.MaxUint64,
 							},
 						},
 					},
 				},
-				Permissions:   62,
+				Permissions: 62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -53,16 +53,16 @@ func (suite *TestSuite) TestSendAllToClaims() {
 			&claimToAdd,
 		}, "https://example.com",
 		[]*types.BadgeUri{
+			{
+				Uri: "https://example.com/{id}",
+				BadgeIds: []*types.IdRange{
 					{
-						Uri: "https://example.com/{id}",
-						BadgeIds: []*types.IdRange{
-							{
-								Start: 1,
-								End: math.MaxUint64,
-							},
-						},
+						Start: 1,
+						End:   math.MaxUint64,
 					},
-				},)
+				},
+			},
+		})
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 0)
 

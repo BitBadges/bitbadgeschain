@@ -15,7 +15,7 @@ func (k Keeper) IsClaimDataUsed(goCtx context.Context, req *types.QueryIsClaimDa
 	}
 
 	return nil, status.Error(codes.Unimplemented, "not implemented")
-	
+
 	//TODO:
 	// ctx := sdk.UnwrapSDKContext(goCtx)
 

@@ -31,7 +31,6 @@ func (k msgServer) UpdateBytes(goCtx context.Context, msg *types.MsgUpdateBytes)
 		return nil, err
 	}
 
-
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),

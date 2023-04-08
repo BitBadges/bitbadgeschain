@@ -11,7 +11,7 @@ func CreateIdRange(start uint64, end uint64) *types.IdRange {
 	}
 }
 
-// Search ID ranges for a specific ID. Return (idx, true) if found. And (-1, false) if not. 
+// Search ID ranges for a specific ID. Return (idx, true) if found. And (-1, false) if not.
 // Assumes ID ranges are sorted.
 func SearchIdRangesForId(id uint64, idRanges []*types.IdRange) (int, bool) {
 	//Binary search because ID ranges will be sorted
@@ -34,7 +34,7 @@ func SearchIdRangesForId(id uint64, idRanges []*types.IdRange) (int, bool) {
 	return -1, false
 }
 
-// Search a set of ranges to find what indexes a specific ID range overlaps. 
+// Search a set of ranges to find what indexes a specific ID range overlaps.
 // Return overlapping idxs as a IdRange, true if found. And empty IdRange, false if not
 func GetIdxSpanForRange(rangeToCheck *types.IdRange, currRanges []*types.IdRange) (*types.IdRange, bool) {
 	//Note GetIdxToInsertForNewId returns the index to insert at (i.e. the following idx)
@@ -50,7 +50,7 @@ func GetIdxSpanForRange(rangeToCheck *types.IdRange, currRanges []*types.IdRange
 	endIdx, endFound := SearchIdRangesForId(rangeToCheck.End, idRanges)
 	if !endFound {
 		endIdx, _ = GetIdxToInsertForNewId(rangeToCheck.End, idRanges) //ignore error because we know it's not found
-		endIdx-- //We want the idx before because we want the last overlapping range
+		endIdx--                                                       //We want the idx before because we want the last overlapping range
 	}
 
 	if startIdx <= endIdx {
@@ -63,14 +63,14 @@ func GetIdxSpanForRange(rangeToCheck *types.IdRange, currRanges []*types.IdRange
 	}
 }
 
-// Assumes given ID is not already in a range. 
+// Assumes given ID is not already in a range.
 // Gets the index to insert at. Ex. [{0-10}, {10-20}, {30-40}] and inserting 25 would return index 2
 func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) (int, error) {
-	_, found := SearchIdRangesForId(id, targetIds) 
+	_, found := SearchIdRangesForId(id, targetIds)
 	if found {
 		return -1, ErrIdInRange
 	}
-	
+
 	//Since we assume the id is not already in there, we can just compare start positions of the existing idRanges
 	ids := targetIds
 	if len(ids) == 0 {
@@ -105,7 +105,7 @@ func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) (int, error) 
 	return median + 1, nil
 }
 
-// Inserts a range into its correct position. 
+// Inserts a range into its correct position.
 // Assumes whole range is not present at all. Thus, we only search for where start fits in.
 func InsertRangeToIdRanges(rangeToAdd *types.IdRange, targetIds []*types.IdRange) ([]*types.IdRange, error) {
 	//Validation check; make sure rangeToAdd is not already in targetIds
@@ -115,7 +115,6 @@ func InsertRangeToIdRanges(rangeToAdd *types.IdRange, targetIds []*types.IdRange
 			return nil, ErrIdAlreadyInRanges
 		}
 	}
-	
 
 	ids := targetIds
 	newIds := []*types.IdRange{}
@@ -146,7 +145,7 @@ func InsertRangeToIdRanges(rangeToAdd *types.IdRange, targetIds []*types.IdRange
 	return newIds, nil
 }
 
-// Removes all ids within an id range from an id range. 
+// Removes all ids within an id range from an id range.
 // Removing can make this range be split into 0, 1, or 2 new ranges.
 // Returns if anything was removed or not
 func RemoveIdsFromIdRange(idxsToRemove *types.IdRange, rangeObject *types.IdRange) ([]*types.IdRange, bool) {
@@ -221,7 +220,6 @@ func SortAndMergeOverlapping(ids []*types.IdRange) []*types.IdRange {
 		return ids
 	}
 }
-
 
 func AddManagerAddressToRanges(collection types.BadgeCollection, ranges []*types.IdRange, options uint64) []*types.IdRange {
 	idx, found := SearchIdRangesForId(collection.Manager, ranges)

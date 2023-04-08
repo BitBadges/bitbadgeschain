@@ -23,6 +23,7 @@ service Msg {
     rpc UpdateBytes(MsgUpdateBytes) returns (MsgUpdateBytesResponse);
     rpc RegisterAddresses(MsgRegisterAddresses) returns (MsgRegisterAddressesResponse);
     rpc ClaimBadge(MsgClaimBadge) returns (MsgClaimBadgeResponse);
+    rpc DeleteCollection(MsgDeleteCollection) returns (MsgDeleteCollectionResponse);
     // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -189,5 +190,13 @@ message MsgClaimBadge {
 }
 
 message MsgClaimBadgeResponse {}
+
+message MsgDeleteCollection {
+    string creator = 1;
+    uint64 collectionId = 2;
+  }
+  
+  message MsgDeleteCollectionResponse {
+  }
 
 // this line is used by starport scaffolding # proto/tx/message

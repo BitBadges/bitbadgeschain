@@ -90,17 +90,17 @@ func CreateBadgesAndMintAllToCreator(suite *TestSuite, ctx context.Context, crea
 	}
 
 	msg := types.NewMsgMintBadge(creator, collectionId, supplysAndAmounts, transfers, []*types.Claim{}, "https://example.com",
-	[]*types.BadgeUri{
-		{
-			Uri: "https://example.com/{id}",
-			BadgeIds: []*types.IdRange{
-				{
-					Start: 1,
-					End: math.MaxUint64,
+		[]*types.BadgeUri{
+			{
+				Uri: "https://example.com/{id}",
+				BadgeIds: []*types.IdRange{
+					{
+						Start: 1,
+						End:   math.MaxUint64,
+					},
 				},
 			},
-		},
-	})
+		})
 	_, err = suite.msgServer.MintBadge(ctx, msg)
 	return err
 }
