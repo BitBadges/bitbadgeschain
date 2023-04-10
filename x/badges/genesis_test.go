@@ -14,7 +14,7 @@ func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params:           types.DefaultParams(),
 		PortId:           types.PortID,
-		NextCollectionId: 0,
+		NextCollectionId: 1,
 		Collections:      []*types.BadgeCollection{},
 		Balances:         []*types.UserBalance{},
 		BalanceIds:       []string{},

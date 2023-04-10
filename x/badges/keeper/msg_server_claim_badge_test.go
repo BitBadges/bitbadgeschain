@@ -73,16 +73,16 @@ package keeper_test
 // 	}
 
 // 	CreateCollections(suite, wctx, collectionsToCreate)
-// 	badge, _ := GetCollection(suite, wctx, 0)
+// 	badge, _ := GetCollection(suite, wctx, 1)
 
 // 	claimToAdd := types.Claim{
 // 		Balances: []*types.Balance{
 // 			{
 // 				Balance:  10,
-// 				BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+// 				BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
 // 			},
 // 		},
-// 		BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+// 		BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
 // 		IncrementIdsBy: 0,
 // 		AmountPerClaim: 1,
 // 		Data:       hex.EncodeToString(rootHash),
@@ -118,12 +118,12 @@ package keeper_test
 // 				},
 // 	)
 // 	suite.Require().Nil(err, "Error creating badge")
-// 	badge, _ = GetCollection(suite, wctx, 0)
+// 	badge, _ = GetCollection(suite, wctx, 1)
 
 // 	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
-// 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+// 			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
 // 			Balance:  10,
 // 		},
 // 	}, badge.MaxSupplys)
@@ -151,14 +151,14 @@ package keeper_test
 // 	)
 // 	suite.Require().Nil(err, "Error claiming badge")
 
-// 	aliceBalance, _ := GetUserBalance(suite, wctx, 0, aliceAccountNum)
+// 	aliceBalance, _ := GetUserBalance(suite, wctx, 1, aliceAccountNum)
 // 	suite.Require().Equal(uint64(1), aliceBalance.Balances[0].Balance)
-// 	suite.Require().Equal([]*types.IdRange{{Start: 0, End: 0}}, aliceBalance.Balances[0].BadgeIds)
+// 	suite.Require().Equal([]*types.IdRange{{Start: 1, End: 1}}, aliceBalance.Balances[0].BadgeIds)
 
-// 	badge, _ = GetCollection(suite, wctx, 0)
+// 	badge, _ = GetCollection(suite, wctx, 1)
 // 	claim = badge.Claims[0]
 // 	suite.Require().Equal(uint64(9), claim.Balances[0].Balance)
-// 	// suite.Require().Equal([]*types.IdRange{{Start: 0, End: 0}}, aliceBalance.Balances[0].BadgeIds)
+// 	// suite.Require().Equal([]*types.IdRange{{Start: 1, End: 1}}, aliceBalance.Balances[0].BadgeIds)
 // }
 
 // func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
@@ -208,16 +208,16 @@ package keeper_test
 // 	}
 
 // 	CreateCollections(suite, wctx, collectionsToCreate)
-// 	badge, _ := GetCollection(suite, wctx, 0)
+// 	badge, _ := GetCollection(suite, wctx, 1)
 
 // 	claimToAdd := types.Claim{
 // 		Balances: []*types.Balance{
 // 			{
 // 				Balance:  10,
-// 				BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+// 				BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
 // 			},
 // 		},
-// 		BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+// 		BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
 // 		IncrementIdsBy: 0,
 // 		AmountPerClaim: 1,
 // 		Data:       hex.EncodeToString(rootHash),
@@ -252,12 +252,12 @@ package keeper_test
 // 				},
 // 	)
 // 	suite.Require().Nil(err, "Error creating badge")
-// 	badge, _ = GetCollection(suite, wctx, 0)
+// 	badge, _ = GetCollection(suite, wctx, 1)
 
 // 	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
-// 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+// 			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
 // 			Balance:  10,
 // 		},
 // 	}, badge.MaxSupplys)
@@ -340,16 +340,16 @@ package keeper_test
 // 	}
 
 // 	CreateCollections(suite, wctx, collectionsToCreate)
-// 	badge, _ := GetCollection(suite, wctx, 0)
+// 	badge, _ := GetCollection(suite, wctx, 1)
 
 // 	claimToAdd := types.Claim{
 // 		Balances: []*types.Balance{
 // 			{
 // 				Balance:  10,
-// 				BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+// 				BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
 // 			},
 // 		},
-// 		BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+// 		BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
 // 		IncrementIdsBy: 1,
 // 		AmountPerClaim: 1,
 // 		Data:       hex.EncodeToString(rootHash),
@@ -384,12 +384,12 @@ package keeper_test
 // 				},
 // 	)
 // 	suite.Require().Nil(err, "Error creating badge")
-// 	badge, _ = GetCollection(suite, wctx, 0)
+// 	badge, _ = GetCollection(suite, wctx, 1)
 
 // 	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
-// 			BadgeIds: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+// 			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
 // 			Balance:  10,
 // 		},
 // 	}, badge.MaxSupplys)
@@ -415,12 +415,12 @@ package keeper_test
 // 	})
 // 	suite.Require().Nil(err, "Error claiming badge")
 
-// 	aliceBalance, _ := GetUserBalance(suite, wctx, 0, aliceAccountNum)
+// 	aliceBalance, _ := GetUserBalance(suite, wctx, 1, aliceAccountNum)
 // 	suite.Require().Equal(uint64(1), aliceBalance.Balances[0].Balance)
-// 	suite.Require().Equal([]*types.IdRange{{Start: 0, End: 0}}, aliceBalance.Balances[0].BadgeIds)
+// 	suite.Require().Equal([]*types.IdRange{{Start: 1, End: 1}}, aliceBalance.Balances[0].BadgeIds)
 
-// 	badge, _ = GetCollection(suite, wctx, 0)
+// 	badge, _ = GetCollection(suite, wctx, 1)
 // 	claim = badge.Claims[0]
 // 	suite.Require().Equal(uint64(9), claim.Balances[0].Balance)
-// 	suite.Require().Equal([]*types.IdRange{{Start: 1, End: 1}}, claim.BadgeIds)
+// 	suite.Require().Equal([]*types.IdRange{{Start: 2, End: 2}}, claim.BadgeIds)
 // }

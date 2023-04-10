@@ -34,30 +34,30 @@ func (suite *TestSuite) TestRegisterAddresses() {
 	}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
-	badge, _ := GetCollection(suite, wctx, 0)
+	badge, _ := GetCollection(suite, wctx, 1)
 
 	//Create badge 1 with supply > 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 10000,
 			Amount: 1,
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
-	badge, _ = GetCollection(suite, wctx, 0)
-	bobbalance, _ := GetUserBalance(suite, wctx, 0, bobAccountNum)
+	badge, _ = GetCollection(suite, wctx, 1)
+	bobbalance, _ := GetUserBalance(suite, wctx, 1, bobAccountNum)
 
-	suite.Require().Equal(uint64(1), badge.NextBadgeId)
+	suite.Require().Equal(uint64(2), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
 			Balance:  10000,
 		},
 	}, badge.MaxSupplys)
-	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 0, End: 0}}, bobbalance.Balances)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
 	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
 
-	// err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{1010}, []uint64{5000}, 0, []*types.IdRange{{Start: 0, End: 0}}, 0, 0)
+	// err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{1010}, []uint64{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
 	// suite.Require().EqualError(err, keeper.ErrAccountNotRegistered.Error())
 
 	registered := suite.app.AccountKeeper.HasAccount(suite.ctx, sdk.MustAccAddressFromBech32("cosmos1f6k8dr0hzafe78uhnmcg7e9qm07ejue8mmd8xq"))
@@ -66,7 +66,7 @@ func (suite *TestSuite) TestRegisterAddresses() {
 	err = RegisterAddresses(suite, wctx, bob, []string{"cosmos1f6k8dr0hzafe78uhnmcg7e9qm07ejue8mmd8xq"})
 	suite.Require().Nil(err, "Error registering addresses")
 
-	err = TransferBadge(suite, wctx, bob, 0, bobAccountNum, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bobAccountNum, []*types.Transfers{
 		{
 			ToAddresses: []uint64{1010},
 			Balances: []*types.Balance{
@@ -74,8 +74,8 @@ func (suite *TestSuite) TestRegisterAddresses() {
 					Balance: 5000,
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 0,
-							End:   0,
+							Start: 1,
+							End:   1,
 						},
 					},
 				},

@@ -33,16 +33,16 @@ func (suite *TestSuite) TestSendAllToClaims() {
 	}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
-	badge, _ := GetCollection(suite, wctx, 0)
+	badge, _ := GetCollection(suite, wctx, 1)
 
 	claimToAdd := types.Claim{
 		Balances: []*types.Balance{{
 			Balance:  10,
-			BadgeIds: []*types.IdRange{{Start: 0, End: 0}},
+			BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
 		}},
 	}
 
-	err := CreateBadges(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
+	err := CreateBadges(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 10,
 			Amount: 1,
@@ -64,12 +64,12 @@ func (suite *TestSuite) TestSendAllToClaims() {
 			},
 		})
 	suite.Require().Nil(err, "Error creating badge")
-	badge, _ = GetCollection(suite, wctx, 0)
+	badge, _ = GetCollection(suite, wctx, 1)
 
 	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 0, End: 0}}, //0 to 0 range so it will be nil
+			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
 			Balance:  10,
 		},
 	}, badge.MaxSupplys)

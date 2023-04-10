@@ -36,7 +36,7 @@ func (k msgServer) MintBadge(goCtx context.Context, msg *types.MsgMintBadge) (*t
 		newCollectionUri = msg.CollectionUri
 	}
 
-	if len(msg.BadgeUris) > 0 {
+	if msg.BadgeUris != nil && len(msg.BadgeUris) > 0 {
 		newBadgeUris = msg.BadgeUris
 
 		for idx, badgeUri := range collection.BadgeUris {

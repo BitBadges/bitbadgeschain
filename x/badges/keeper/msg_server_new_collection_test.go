@@ -39,14 +39,14 @@ func (suite *TestSuite) TestNewCollections() {
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
-	badge, _ := GetCollection(suite, wctx, 0)
+	badge, _ := GetCollection(suite, wctx, 1)
 
 	// Verify nextId increments correctly
 	nextId := suite.app.BadgesKeeper.GetNextCollectionId(suite.ctx)
-	suite.Require().Equal(uint64(1), nextId)
+	suite.Require().Equal(uint64(2), nextId)
 
 	// Verify badge details are correct
-	suite.Require().Equal(uint64(0), badge.NextBadgeId)
+	suite.Require().Equal(uint64(1), badge.NextBadgeId)
 	suite.Require().Equal("https://example.com", badge.CollectionUri)
 	suite.Require().Equal([]*types.BadgeUri{
 		{
@@ -64,16 +64,16 @@ func (suite *TestSuite) TestNewCollections() {
 	suite.Require().Equal(perms, badge.Permissions)
 	suite.Require().Equal([]*types.TransferMapping(nil), badge.DisallowedTransfers)
 	suite.Require().Equal([]*types.TransferMapping(nil), badge.ManagerApprovedTransfers)
-	suite.Require().Equal(uint64(0), badge.CollectionId)
+	suite.Require().Equal(uint64(1), badge.CollectionId)
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
 	// Verify nextId increments correctly
 	nextId = suite.app.BadgesKeeper.GetNextCollectionId(suite.ctx)
-	suite.Require().Equal(uint64(2), nextId)
-	badge, _ = GetCollection(suite, wctx, 1)
-	suite.Require().Equal(uint64(1), badge.CollectionId)
+	suite.Require().Equal(uint64(3), nextId)
+	badge, _ = GetCollection(suite, wctx, 2)
+	suite.Require().Equal(uint64(2), badge.CollectionId)
 }
 
 func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
@@ -113,8 +113,8 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 								Balance: 5,
 								BadgeIds: []*types.IdRange{
 									{
-										Start: 0,
-										End:   4,
+										Start: 1,
+										End:   5,
 									},
 								},
 							},
@@ -132,9 +132,9 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 
 	// Verify nextId increments correctly
 	nextId := suite.app.BadgesKeeper.GetNextCollectionId(suite.ctx)
-	suite.Require().Equal(uint64(1), nextId)
+	suite.Require().Equal(uint64(2), nextId)
 
-	collection, _ := GetCollection(suite, wctx, 0)
+	collection, _ := GetCollection(suite, wctx, 1)
 
 	unmintedBalances := types.UserBalance{
 		Balances: collection.UnmintedSupplys,
@@ -143,26 +143,26 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 	suite.Require().Equal(uint64(10), unmintedBalances.Balances[0].Balance)
 	suite.Require().Equal([]*types.IdRange{
 		{
-			Start: 5,
-			End:   9,
+			Start: 6,
+			End:   10,
 		},
 	}, unmintedBalances.Balances[0].BadgeIds)
 
-	aliceBalance, _ := GetUserBalance(suite, wctx, 0, aliceAccountNum)
+	aliceBalance, _ := GetUserBalance(suite, wctx, 1, aliceAccountNum)
 	suite.Require().Equal(uint64(5), aliceBalance.Balances[0].Balance)
 	suite.Require().Equal([]*types.IdRange{
 		{
-			Start: 0,
-			End:   4,
+			Start: 1,
+			End:   5,
 		},
 	}, aliceBalance.Balances[0].BadgeIds)
 
-	charlieBalance, _ := GetUserBalance(suite, wctx, 0, charlieAccountNum)
+	charlieBalance, _ := GetUserBalance(suite, wctx, 1, charlieAccountNum)
 	suite.Require().Equal(uint64(5), charlieBalance.Balances[0].Balance)
 	suite.Require().Equal([]*types.IdRange{
 		{
-			Start: 0,
-			End:   4,
+			Start: 1,
+			End:   5,
 		},
 	}, charlieBalance.Balances[0].BadgeIds)
 }

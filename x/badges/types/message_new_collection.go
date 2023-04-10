@@ -56,6 +56,10 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		return err
 	}
 
+	if err := ValidatePermissions(msg.Permissions); err != nil {
+		return err
+	}
+
 	if msg.BadgeUris == nil || len(msg.BadgeUris) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "badgeUris cannot be nil")
 	}

@@ -65,9 +65,9 @@ func (msg *MsgMintBadge) ValidateBasic() error {
 		return err
 	}
 
-	if msg.BadgeUris == nil || len(msg.BadgeUris) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "badgeUris cannot be nil")
-	}
+	// if msg.BadgeUris == nil || len(msg.BadgeUris) == 0 {
+	// 	return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "badgeUris cannot be nil")
+	// }
 
 	for _, badgeUri := range msg.BadgeUris {
 		//Validate well-formedness of the message entries

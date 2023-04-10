@@ -29,7 +29,7 @@ func (suite *TestSuite) TestUpdateURIs() {
 					},
 				},
 				CollectionUri: "https://example.com",
-				Permissions:   62 + 128,
+				Permissions:   62,
 			},
 			Amount:  1,
 			Creator: bob,
@@ -39,7 +39,7 @@ func (suite *TestSuite) TestUpdateURIs() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	err = UpdateURIs(suite, wctx, bob, 0, "https://example.com", []*types.BadgeUri{
+	err = UpdateURIs(suite, wctx, bob, 1, "https://example.com", []*types.BadgeUri{
 		{
 			Uri: "https://example.com/{id}",
 			BadgeIds: []*types.IdRange{
@@ -51,15 +51,15 @@ func (suite *TestSuite) TestUpdateURIs() {
 		},
 	})
 	suite.Require().Nil(err, "Error updating uris")
-	badge, _ := GetCollection(suite, wctx, 0)
+	badge, _ := GetCollection(suite, wctx, 1)
 	suite.Require().Equal("https://example.com", badge.CollectionUri)
 	// suite.Require().Equal("https://example.com/{id}", badge.BadgeUri)
 
-	err = UpdatePermissions(suite, wctx, bob, 0, 60+128)
+	err = UpdatePermissions(suite, wctx, bob, 1, 60-32)
 	suite.Require().Nil(err, "Error updating permissions")
 
-	err = UpdateBytes(suite, wctx, bob, 0, "example.com/")
-	suite.Require().Nil(err, "Error updating permissions")
+	err = UpdateBytes(suite, wctx, bob, 1, "example.com/")
+	suite.Require().Nil(err, "Error updating bytes")
 }
 
 func (suite *TestSuite) TestCantUpdate() {
@@ -93,7 +93,7 @@ func (suite *TestSuite) TestCantUpdate() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	err = UpdateURIs(suite, wctx, bob, 0, "https://example.com", []*types.BadgeUri{
+	err = UpdateURIs(suite, wctx, bob, 1, "https://example.com", []*types.BadgeUri{
 		{
 			Uri: "https://example.com/{id}",
 			BadgeIds: []*types.IdRange{
@@ -106,10 +106,10 @@ func (suite *TestSuite) TestCantUpdate() {
 	})
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 
-	err = UpdatePermissions(suite, wctx, bob, 0, 123)
+	err = UpdatePermissions(suite, wctx, bob, 1, 123-64)
 	suite.Require().EqualError(err, types.ErrInvalidPermissionsUpdateLocked.Error())
 
-	err = UpdateBytes(suite, wctx, bob, 0, "example.com/")
+	err = UpdateBytes(suite, wctx, bob, 1, "example.com/")
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }
 
@@ -144,7 +144,7 @@ func (suite *TestSuite) TestCantUpdateNotManager() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	err = UpdateURIs(suite, wctx, alice, 0, "https://example.com", []*types.BadgeUri{
+	err = UpdateURIs(suite, wctx, alice, 1, "https://example.com", []*types.BadgeUri{
 		{
 			Uri: "https://example.com/{id}",
 			BadgeIds: []*types.IdRange{
@@ -157,9 +157,9 @@ func (suite *TestSuite) TestCantUpdateNotManager() {
 	})
 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
 
-	err = UpdatePermissions(suite, wctx, alice, 0, 77)
+	err = UpdatePermissions(suite, wctx, alice, 1, 77)
 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
 
-	err = UpdateBytes(suite, wctx, alice, 0, "example.com/")
+	err = UpdateBytes(suite, wctx, alice, 1, "example.com/")
 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
 }

@@ -37,7 +37,7 @@ func (suite *TestSuite) TestTransferManager() {
 	suite.Require().Nil(err, "Error creating badge")
 
 	//Create badge 1 with supply > 1
-	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
+	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 10000,
 			Amount: 1,
@@ -45,13 +45,13 @@ func (suite *TestSuite) TestTransferManager() {
 	})
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = RequestTransferManager(suite, wctx, alice, 0, true)
+	err = RequestTransferManager(suite, wctx, alice, 1, true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 0, aliceAccountNum)
+	err = TransferManager(suite, wctx, bob, 1, aliceAccountNum)
 	suite.Require().Nil(err, "Error transferring manager")
 
-	badge, _ := GetCollection(suite, wctx, 0)
+	badge, _ := GetCollection(suite, wctx, 1)
 	suite.Require().Equal(aliceAccountNum, badge.Manager)
 }
 
@@ -84,7 +84,7 @@ func (suite *TestSuite) TestRequestTransferManager() {
 	suite.Require().Nil(err, "Error creating badge")
 
 	//Create badge 1 with supply > 1
-	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
+	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 10000,
 			Amount: 1,
@@ -92,19 +92,19 @@ func (suite *TestSuite) TestRequestTransferManager() {
 	})
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = RequestTransferManager(suite, wctx, alice, 0, true)
+	err = RequestTransferManager(suite, wctx, alice, 1, true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = RequestTransferManager(suite, wctx, alice, 0, false)
+	err = RequestTransferManager(suite, wctx, alice, 1, false)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = RequestTransferManager(suite, wctx, alice, 0, true)
+	err = RequestTransferManager(suite, wctx, alice, 1, true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 0, aliceAccountNum)
+	err = TransferManager(suite, wctx, bob, 1, aliceAccountNum)
 	suite.Require().Nil(err, "Error transferring manager")
 
-	badge, _ := GetCollection(suite, wctx, 0)
+	badge, _ := GetCollection(suite, wctx, 1)
 	suite.Require().Equal(aliceAccountNum, badge.Manager)
 }
 
@@ -137,7 +137,7 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 	suite.Require().Nil(err, "Error creating badge")
 
 	//Create badge 1 with supply > 1
-	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
+	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 10000,
 			Amount: 1,
@@ -145,13 +145,13 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 	})
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = RequestTransferManager(suite, wctx, alice, 0, true)
+	err = RequestTransferManager(suite, wctx, alice, 1, true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = RequestTransferManager(suite, wctx, alice, 0, false)
+	err = RequestTransferManager(suite, wctx, alice, 1, false)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 0, aliceAccountNum)
+	err = TransferManager(suite, wctx, bob, 1, aliceAccountNum)
 	suite.Require().EqualError(err, keeper.ErrAddressNeedsToOptInAndRequestManagerTransfer.Error())
 }
 
@@ -184,7 +184,7 @@ func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 	suite.Require().Nil(err, "Error creating badge")
 
 	//Create badge 1 with supply > 1
-	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 0, []*types.BadgeSupplyAndAmount{
+	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
 		{
 			Supply: 10000,
 			Amount: 1,
@@ -192,7 +192,7 @@ func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 	})
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = RequestTransferManager(suite, wctx, alice, 0, true)
+	err = RequestTransferManager(suite, wctx, alice, 1, true)
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }
 
@@ -224,6 +224,6 @@ func (suite *TestSuite) TestManagerCantBeTransferred() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = TransferManager(suite, wctx, bob, 0, aliceAccountNum)
+	err = TransferManager(suite, wctx, bob, 1, aliceAccountNum)
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }

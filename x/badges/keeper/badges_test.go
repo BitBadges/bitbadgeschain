@@ -36,11 +36,11 @@ func (suite *TestSuite) TestGetCollection() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	badge, err := suite.app.BadgesKeeper.GetCollectionE(suite.ctx, 0)
+	badge, err := suite.app.BadgesKeeper.GetCollectionE(suite.ctx, 1)
 	suite.Require().Nil(err, "Error getting badge: %s")
-	suite.Require().Equal(badge.CollectionId, uint64(0))
+	suite.Require().Equal(badge.CollectionId, uint64(1))
 
-	badge, err = suite.app.BadgesKeeper.GetCollectionE(suite.ctx, 1)
+	badge, err = suite.app.BadgesKeeper.GetCollectionE(suite.ctx, 2)
 	suite.Require().EqualError(err, keeper.ErrCollectionNotExists.Error())
 }
 
@@ -78,15 +78,15 @@ func (suite *TestSuite) TestGetBadgeAndAssertBadges() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	_, err = suite.app.BadgesKeeper.GetCollectionAndAssertBadgeIdsAreValid(suite.ctx, 0, []*types.IdRange{
+	_, err = suite.app.BadgesKeeper.GetCollectionAndAssertBadgeIdsAreValid(suite.ctx, 1, []*types.IdRange{
 		{
-			Start: 0,
-			End:   0,
+			Start: 1,
+			End:   1,
 		},
 	})
 	suite.Require().Nil(err, "Error getting badge: %s")
 
-	_, err = suite.app.BadgesKeeper.GetCollectionAndAssertBadgeIdsAreValid(suite.ctx, 0, []*types.IdRange{
+	_, err = suite.app.BadgesKeeper.GetCollectionAndAssertBadgeIdsAreValid(suite.ctx, 1, []*types.IdRange{
 		{
 			Start: 20,
 			End:   10,
@@ -94,9 +94,9 @@ func (suite *TestSuite) TestGetBadgeAndAssertBadges() {
 	})
 	suite.Require().EqualError(err, keeper.ErrInvalidBadgeRange.Error())
 
-	_, err = suite.app.BadgesKeeper.GetCollectionAndAssertBadgeIdsAreValid(suite.ctx, 0, []*types.IdRange{
+	_, err = suite.app.BadgesKeeper.GetCollectionAndAssertBadgeIdsAreValid(suite.ctx, 1, []*types.IdRange{
 		{
-			Start: 0,
+			Start: 1,
 			End:   10,
 		},
 	})
@@ -130,54 +130,9 @@ func (suite *TestSuite) TestCreateBadges() {
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
-	badge, err := GetCollection(suite, wctx, 0)
+	badge, err := GetCollection(suite, wctx, 1)
 	suite.Require().Nil(err, "Error getting badge: %s")
 	balance := types.UserBalance{}
-
-	badge, err = suite.app.BadgesKeeper.CreateBadges(suite.ctx, badge, []*types.BadgeSupplyAndAmount{
-		{
-			Supply: 1,
-			Amount: 1,
-		},
-	}, []*types.Transfers{
-		{
-			ToAddresses: []uint64{bobAccountNum},
-			Balances: []*types.Balance{
-				{
-					Balance: 1,
-					BadgeIds: []*types.IdRange{
-						{
-							Start: 0,
-							End:   0,
-						},
-					},
-				},
-			},
-		},
-	}, []*types.Claim{}, bob)
-	suite.Require().Nil(err, "Error creating subassets: %s")
-
-	suite.Require().Equal(badge.MaxSupplys, []*types.Balance{
-		{
-			Balance: 1,
-			BadgeIds: []*types.IdRange{
-				{
-					Start: 0,
-					End:   0,
-				},
-			},
-		},
-	})
-
-	balance, err = GetUserBalance(suite, wctx, 0, bobAccountNum)
-	suite.Require().Nil(err, "Error getting user balance: %s")
-	suite.Require().Equal(balance.Balances[0].Balance, uint64(1))
-	suite.Require().Equal(balance.Balances[0].BadgeIds, []*types.IdRange{
-		{
-			Start: 0,
-			End:   0,
-		},
-	})
 
 	badge, err = suite.app.BadgesKeeper.CreateBadges(suite.ctx, badge, []*types.BadgeSupplyAndAmount{
 		{
@@ -200,26 +155,26 @@ func (suite *TestSuite) TestCreateBadges() {
 			},
 		},
 	}, []*types.Claim{}, bob)
-	suite.Require().Nil(err, "Error getting user balance: %s")
-
-	balance, err = GetUserBalance(suite, wctx, 0, bobAccountNum)
-	suite.Require().Nil(err, "Error getting user balance: %s")
 	suite.Require().Nil(err, "Error creating subassets: %s")
+
 	suite.Require().Equal(badge.MaxSupplys, []*types.Balance{
 		{
 			Balance: 1,
 			BadgeIds: []*types.IdRange{
 				{
-					Start: 0,
+					Start: 1,
 					End:   1,
 				},
 			},
 		},
 	})
+
+	balance, err = GetUserBalance(suite, wctx, 1, bobAccountNum)
+	suite.Require().Nil(err, "Error getting user balance: %s")
 	suite.Require().Equal(balance.Balances[0].Balance, uint64(1))
 	suite.Require().Equal(balance.Balances[0].BadgeIds, []*types.IdRange{
 		{
-			Start: 0,
+			Start: 1,
 			End:   1,
 		},
 	})
@@ -247,7 +202,7 @@ func (suite *TestSuite) TestCreateBadges() {
 	}, []*types.Claim{}, bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
 
-	balance, err = GetUserBalance(suite, wctx, 0, bobAccountNum)
+	balance, err = GetUserBalance(suite, wctx, 1, bobAccountNum)
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	suite.Require().Nil(err, "Error creating subassets: %s")
 	suite.Require().Equal(badge.MaxSupplys, []*types.Balance{
@@ -255,7 +210,7 @@ func (suite *TestSuite) TestCreateBadges() {
 			Balance: 1,
 			BadgeIds: []*types.IdRange{
 				{
-					Start: 0,
+					Start: 1,
 					End:   2,
 				},
 			},
@@ -264,8 +219,53 @@ func (suite *TestSuite) TestCreateBadges() {
 	suite.Require().Equal(balance.Balances[0].Balance, uint64(1))
 	suite.Require().Equal(balance.Balances[0].BadgeIds, []*types.IdRange{
 		{
-			Start: 0,
+			Start: 1,
 			End:   2,
+		},
+	})
+
+	badge, err = suite.app.BadgesKeeper.CreateBadges(suite.ctx, badge, []*types.BadgeSupplyAndAmount{
+		{
+			Supply: 1,
+			Amount: 1,
+		},
+	}, []*types.Transfers{
+		{
+			ToAddresses: []uint64{bobAccountNum},
+			Balances: []*types.Balance{
+				{
+					Balance: 1,
+					BadgeIds: []*types.IdRange{
+						{
+							Start: 3,
+							End:   3,
+						},
+					},
+				},
+			},
+		},
+	}, []*types.Claim{}, bob)
+	suite.Require().Nil(err, "Error getting user balance: %s")
+
+	balance, err = GetUserBalance(suite, wctx, 1, bobAccountNum)
+	suite.Require().Nil(err, "Error getting user balance: %s")
+	suite.Require().Nil(err, "Error creating subassets: %s")
+	suite.Require().Equal(badge.MaxSupplys, []*types.Balance{
+		{
+			Balance: 1,
+			BadgeIds: []*types.IdRange{
+				{
+					Start: 1,
+					End:   3,
+				},
+			},
+		},
+	})
+	suite.Require().Equal(balance.Balances[0].Balance, uint64(1))
+	suite.Require().Equal(balance.Balances[0].BadgeIds, []*types.IdRange{
+		{
+			Start: 1,
+			End:   3,
 		},
 	})
 
@@ -282,8 +282,8 @@ func (suite *TestSuite) TestCreateBadges() {
 					Balance: 1,
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 3,
-							End:   3,
+							Start: 4,
+							End:   4,
 						},
 					},
 				},
