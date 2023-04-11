@@ -27,8 +27,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// BadgeSupplyAndAmount is used to define the supply and amount of badges to create.
-// We create x amount of badges each with a supply of y.
+//BadgeSupplyAndAmount is used to define the supply and amount of badges to create.
+//We create x amount of badges each with a supply of y.
 type BadgeSupplyAndAmount struct {
 	Supply uint64 `protobuf:"varint,1,opt,name=supply,proto3" json:"supply,omitempty"`
 	Amount uint64 `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
@@ -81,8 +81,8 @@ func (m *BadgeSupplyAndAmount) GetAmount() uint64 {
 	return 0
 }
 
-// Upon badge creation, the manager will first be minted these badges, and then, they will subsequently be transferred to these addresses according to permissions.ForcefulTransfers.
-// Used to only need one signature for MsgNewBadge.
+//Upon badge creation, the manager will first be minted these badges, and then, they will subsequently be transferred to these addresses according to permissions.ForcefulTransfers.
+//Used to only need one signature for MsgNewBadge.
 type Transfers struct {
 	ToAddresses []uint64   `protobuf:"varint,1,rep,packed,name=toAddresses,proto3" json:"toAddresses,omitempty"`
 	Balances    []*Balance `protobuf:"bytes,2,rep,name=balances,proto3" json:"balances,omitempty"`
@@ -145,8 +145,8 @@ type MsgNewCollection struct {
 	DisallowedTransfers      []*TransferMapping `protobuf:"bytes,6,rep,name=disallowedTransfers,proto3" json:"disallowedTransfers,omitempty"`
 	ManagerApprovedTransfers []*TransferMapping `protobuf:"bytes,7,rep,name=managerApprovedTransfers,proto3" json:"managerApprovedTransfers,omitempty"`
 	Standard                 uint64             `protobuf:"varint,8,opt,name=standard,proto3" json:"standard,omitempty"`
-	// Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
-	// If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
+	//Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
+	//If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
 	BadgeSupplys []*BadgeSupplyAndAmount `protobuf:"bytes,9,rep,name=badgeSupplys,proto3" json:"badgeSupplys,omitempty"`
 	Transfers    []*Transfers            `protobuf:"bytes,10,rep,name=transfers,proto3" json:"transfers,omitempty"`
 	Claims       []*Claim                `protobuf:"bytes,11,rep,name=claims,proto3" json:"claims,omitempty"`
@@ -306,7 +306,7 @@ func (m *MsgNewCollectionResponse) GetCollectionId() uint64 {
 	return 0
 }
 
-// This handles both minting more of existing badges and creating new badges.
+//This handles both minting more of existing badges and creating new badges.
 type MsgMintBadge struct {
 	Creator       string                  `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId  uint64                  `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
@@ -443,7 +443,7 @@ func (m *MsgMintBadgeResponse) GetNextBadgeId() uint64 {
 	return 0
 }
 
-// For each amount, for each toAddress, we will attempt to transfer all the badgeIds for the badge with ID badgeId.
+//For each amount, for each toAddress, we will attempt to transfer all the badgeIds for the badge with ID badgeId.
 type MsgTransferBadge struct {
 	Creator      string       `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId uint64       `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
@@ -548,7 +548,7 @@ func (m *MsgTransferBadgeResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgTransferBadgeResponse proto.InternalMessageInfo
 
-// Sets an approval (no add or remove), just set it for an address.
+//Sets an approval (no add or remove), just set it for an address.
 type MsgSetApproval struct {
 	Creator      string     `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId uint64     `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
@@ -749,7 +749,7 @@ func (m *MsgUpdateDisallowedTransfersResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateDisallowedTransfersResponse proto.InternalMessageInfo
 
-// Update badge Uris with new URI object, if permitted.
+//Update badge Uris with new URI object, if permitted.
 type MsgUpdateUris struct {
 	Creator       string      `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId  uint64      `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
@@ -854,7 +854,7 @@ func (m *MsgUpdateUrisResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateUrisResponse proto.InternalMessageInfo
 
-// Update badge permissions with new permissions, if permitted.
+//Update badge permissions with new permissions, if permitted.
 type MsgUpdatePermissions struct {
 	Creator      string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId uint64 `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
@@ -951,7 +951,7 @@ func (m *MsgUpdatePermissionsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdatePermissionsResponse proto.InternalMessageInfo
 
-// Transfer manager to this address. Recipient must have made a request.
+//Transfer manager to this address. Recipient must have made a request.
 type MsgTransferManager struct {
 	Creator      string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId uint64 `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
@@ -1048,7 +1048,7 @@ func (m *MsgTransferManagerResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgTransferManagerResponse proto.InternalMessageInfo
 
-// Add / remove request for manager to be transferred.
+//Add / remove request for manager to be transferred.
 type MsgRequestTransferManager struct {
 	Creator      string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId uint64 `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
@@ -1145,7 +1145,7 @@ func (m *MsgRequestTransferManagerResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRequestTransferManagerResponse proto.InternalMessageInfo
 
-// Update badge bytes, if permitted
+//Update badge bytes, if permitted
 type MsgUpdateBytes struct {
 	Creator      string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId uint64 `protobuf:"varint,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
@@ -1390,7 +1390,7 @@ func (m *ClaimProofItem) GetOnRight() bool {
 	return false
 }
 
-// Consistent with tendermint/crypto merkle tree
+//Consistent with tendermint/crypto merkle tree
 type ClaimProof struct {
 	Leaf  string            `protobuf:"bytes,1,opt,name=leaf,proto3" json:"leaf,omitempty"`
 	Aunts []*ClaimProofItem `protobuf:"bytes,2,rep,name=aunts,proto3" json:"aunts,omitempty"`

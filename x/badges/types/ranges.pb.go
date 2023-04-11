@@ -50,8 +50,8 @@ func (AddressOptions) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_c4071aa00cc93a07, []int{0}
 }
 
-// Id ranges define a range of IDs from start to end. Can be used for badge IDs, nonces, anything.
-// If end == 0, we assume end == start. Start must be >= end.
+//Id ranges define a range of IDs from start to end. Can be used for badge IDs, nonces, anything.
+//If end == 0, we assume end == start. Start must be >= end.
 type IdRange struct {
 	Start uint64 `protobuf:"varint,1,opt,name=start,proto3" json:"start,omitempty"`
 	End   uint64 `protobuf:"varint,2,opt,name=end,proto3" json:"end,omitempty"`
@@ -156,7 +156,7 @@ func (m *Addresses) GetOptions() uint64 {
 	return 0
 }
 
-// TransferMapping defines a mapping of transfers from one set of addresses to another.
+//TransferMapping defines a mapping of transfers from one set of addresses to another.
 type TransferMapping struct {
 	From *Addresses `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty"`
 	To   *Addresses `protobuf:"bytes,2,opt,name=to,proto3" json:"to,omitempty"`

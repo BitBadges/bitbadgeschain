@@ -23,7 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// Defines a balance object. The specified balance holds for all ids specified within the id ranges array.
+//Defines a balance object. The specified balance holds for all ids specified within the id ranges array.
 type Balance struct {
 	Balance  uint64     `protobuf:"varint,1,opt,name=balance,proto3" json:"balance,omitempty"`
 	BadgeIds []*IdRange `protobuf:"bytes,2,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
@@ -76,7 +76,7 @@ func (m *Balance) GetBadgeIds() []*IdRange {
 	return nil
 }
 
-// Defines a user balance object for a badge w/ the user's balances, nonce, pending transfers, and approvals. All badge IDs for a collection are handled within this object.
+//Defines a user balance object for a badge w/ the user's balances, nonce, pending transfers, and approvals. All badge IDs for a collection are handled within this object.
 type UserBalance struct {
 	Balances  []*Balance  `protobuf:"bytes,1,rep,name=balances,proto3" json:"balances,omitempty"`
 	Approvals []*Approval `protobuf:"bytes,2,rep,name=approvals,proto3" json:"approvals,omitempty"`
@@ -129,7 +129,7 @@ func (m *UserBalance) GetApprovals() []*Approval {
 	return nil
 }
 
-// Defines an approval object for specific addresses.
+//Defines an approval object for specific addresses.
 type Approval struct {
 	Address  uint64     `protobuf:"varint,1,opt,name=address,proto3" json:"address,omitempty"`
 	Balances []*Balance `protobuf:"bytes,2,rep,name=balances,proto3" json:"balances,omitempty"`

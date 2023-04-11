@@ -11,14 +11,14 @@ accounts:
   coins:
   - 200000000badge
 - name: bob
-  mnemonic: theory arrow blue much illness carpet arena thought clay office path museum idea text foot bacon until tragic inform stairs pitch danger spatial slight
+  address: cosmos1fulvm22smwv82cayzp226dkpvxghq3gymlgtl3
   coins:
   - 100000000badge
 - name: charlie
   coins:
   - 100000000badge
 faucet:
-  name: bob
+  name: alice
   coins:
   - 100000badge
   host: 0.0.0.0:4500
