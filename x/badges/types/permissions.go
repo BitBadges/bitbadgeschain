@@ -9,12 +9,12 @@ const (
 */
 
 type Permissions struct {
+	CanDelete               bool //when true, manager can delete the collection; once set to false, it is locked
 	CanUpdateBytes          bool //can the manager update the bytes of the badge; if false, locked forever
 	CanManagerBeTransferred bool //can the manager transfer the managerial ownership of the badge to another account; if false, locked forever
 	CanUpdateUris           bool //can the manager update the uris (metadata) of the collection and badges; if false, locked forever
 	CanCreateMoreBadges     bool //when true, manager can create more badges of the collection; once set to false, the number of badges in the collection is locked
 	CanUpdateDisallowed     bool //when true, manager can freeze and unfreeze addresseses from transferring; once set to false, it is locked
-	CanDelete               bool //when true, manager can delete the collection; once set to false, it is locked
 }
 
 const (
