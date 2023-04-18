@@ -11,7 +11,7 @@ accounts:
   coins:
   - 200000000badge
 - name: bob
-  address: cosmos1mql9aaux3453tdghk6rzkmk43stxvnvha4nv22
+  address: cosmos1kx9532ujful8vgg2dht6k544ax4k9qzszjcw04
   coins:
   - 100000000badge
 - name: charlie
