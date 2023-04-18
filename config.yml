@@ -7,6 +7,10 @@ build:
     - third_party/proto
     - proto_vendor
 accounts:
+- name: burn
+  address: cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnrql8a
+  coins:
+  - 0badge
 - name: alice
   coins:
   - 200000000badge
