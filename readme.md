@@ -13,7 +13,6 @@ We want to acknowledge the [Evmos](
 was built upon. 
 
 ## Get started
-
 ```
 ignite chain serve
 ```
