@@ -1,5 +1,16 @@
 # bitbadgeschain
-**bitbadgeschain** is a blockchain built using Cosmos SDK and Tendermint and created with [Ignite CLI](https://ignite.com/cli).
+**bitbadgeschain** is a blockchain built using Cosmos SDK and Tendermint and created with [Ignite CLI](https://ignite.com/cli). BitBadges offers an open-source, community-driven suite of tools focused on cross-chain issuance of digital tokens (badges). This blockchain is the core of the BitBadges ecosystem.
+
+See the [BitBadges documentation](https://blockin.gitbook.io/bitbadges) to learn about BitBadges and the BitBadges blockchain.
+
+See the [Cosmos SDK Docs](https://docs.cosmos.network) to learn about the Cosmos SDK and Tendermint. This repository
+follows the Cosmos SDK's [directory structure](https://docs.cosmos.network/master/building-modules/module-manager.html#directory-structure).
+
+## Acknowledgements
+We want to acknowledge the [Evmos](
+    https://github.com/evmos
+) project for maintaining and open-sourcing their software, which BitBadges 
+was built upon. 
 
 ## Get started
 
@@ -14,16 +25,7 @@ ignite chain serve
 Your blockchain in development can be configured with `config.yml`. To learn more, see the [Ignite CLI docs](https://docs.ignite.com).
 
 ### Web Frontend
-
-Ignite CLI has scaffolded a Vue.js-based web app in the `vue` directory. Run the following commands to install dependencies and start the app:
-
-```
-cd vue
-npm install
-npm run serve
-```
-
-The frontend app is built using the `@starport/vue` and `@starport/vuex` packages. For details, see the [monorepo for Ignite front-end development](https://github.com/ignite/web).
+See the [BitBadges documentation](https://blockin.gitbook.io/bitbadges) and [BitBadges website](https://bitbadges.io) for more information.
 
 ## Release
 To release a new version of your blockchain, create and push a new tag with `v` prefix. A new draft release with the configured targets will be created.
@@ -43,7 +45,7 @@ curl https://get.ignite.com/bitbadges/bitbadgeschain@latest! | sudo bash
 ```
 `bitbadges/bitbadgeschain` should match the `username` and `repo_name` of the Github repository to which the source code was pushed. Learn more about [the install process](https://github.com/allinbits/starport-installer).
 
-## Learn more
+## Learn more about Ignite CLI and Cosmos SDK
 
 - [Ignite CLI](https://ignite.com/cli)
 - [Tutorials](https://docs.ignite.com/guide)
