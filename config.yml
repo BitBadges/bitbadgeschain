@@ -7,6 +7,9 @@ build:
     - third_party/proto
     - proto_vendor
 accounts:
+- name: zero # to make everything standard, all IDs should start at 1. This account is a dummy account that should never be used.
+  coins:
+  - 1badge
 - name: burn
   address: cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnrql8a
   coins:
