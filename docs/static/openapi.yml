@@ -515,7 +515,7 @@ paths:
                       Badge classification, similar to the contract address of
                       ERC721.
 
-                      This is assigned by the chain itself. All ids starts at 0
+                      This is assigned by the chain itself. All ids starts at 1
                       and increments by 1 each created badge.
                   collectionUri:
                     type: string
@@ -547,11 +547,17 @@ paths:
                               If end == 0, we assume end == start. Start must be
                               >= end.
                     description: >-
-                      The URI where to fetch each badge's metadata. Max 100
-                      characters.
+                      An array of BadgeUri objects for where to fetch the badge
+                      metadata.
 
-                      Can include {id} in the URI to be replaced by the badge's
-                      id.
+                      Each BadgeUri object has a uri and an array of badgeId
+                      ranges (see BadgeUri type).
+
+                      The uri can include {id} in the URI which is a placeholder
+                      to be replaced by each badge's unique id.
+
+                      To fetch the metadata for a speciifc badge, the first
+                      match is always used.
                   bytes:
                     type: string
                     description: >-
@@ -565,16 +571,16 @@ paths:
                     type: string
                     format: uint64
                     description: >-
-                      The manager's account number of the badge. The manager can
-                      have special permissions.
+                      The manager's account ID. The manager can be granted
+                      special permissions.
                   permissions:
                     type: string
                     format: uint64
-                    title: >-
+                    description: >-
                       Store permissions packed in a uint where the bits
-                      correspond to permissions from left to right.
+                      correspond to certain permissions.
 
-                      Leading zeroes are applied. See types/permissions.go
+                      Leading zeroes are applied. See permissions definition.
                   disallowedTransfers:
                     type: array
                     items:
@@ -631,7 +637,7 @@ paths:
                       description: >-
                         TransferMapping defines a mapping of transfers from one
                         set of addresses to another.
-                    description: >-
+                    title: >-
                       This defines the address combinations that cannot be
                       transferred. 
 
@@ -639,6 +645,12 @@ paths:
 
                       If all addresses are disallowed, then the badge is
                       non-transferable.
+
+                      If none are disallowed, the badge is transferable.
+
+                      Ex: If an account ID is in the "to" mapping and another
+                      account ID is in the "from" mapping,
+                         the "to" account cannot transfer to the "from" account
                   managerApprovedTransfers:
                     type: array
                     items:
@@ -695,7 +707,7 @@ paths:
                       description: >-
                         TransferMapping defines a mapping of transfers from one
                         set of addresses to another.
-                    description: >-
+                    title: >-
                       This defines the address combinations that the manager is
                       approved to execute (overrides disallowedTransfers).
 
@@ -704,11 +716,15 @@ paths:
 
                       This can be updated, but addresses can only be removed,
                       never added.
+
+                      Ex: If an account ID is in the "to" mapping and another
+                      account ID is in the "from" mapping,
+                         the manager can transfer any badge from the "to" account to the "from" account
                   nextBadgeId:
                     type: string
                     format: uint64
                     description: >-
-                      Badge ids start at 0. Each badge created will increment
+                      Badge ids start at 1. Each badge created will increment
                       this by 1. Can't overflow.
                   unmintedSupplys:
                     type: array
@@ -738,7 +754,7 @@ paths:
                       description: >-
                         Defines a balance object. The specified balance holds
                         for all ids specified within the id ranges array.
-                    description: This is a map of the current badge supplys.
+                    description: This is a map of the current unminted badge supplys by ID.
                   maxSupplys:
                     type: array
                     items:
@@ -767,7 +783,7 @@ paths:
                       description: >-
                         Defines a balance object. The specified balance holds
                         for all ids specified within the id ranges array.
-                    description: This is a map of the maximum badge supplys.
+                    description: This is a map of the maximum badge supplys by ID.
                   claims:
                     type: array
                     items:
@@ -868,13 +884,13 @@ paths:
 
                         Stored in own store. Claimed leaves are also stored in
                         unique store.
-                    description: This is an array of the current badge claims.
+                    description: These represent the collection's claim objects.
                   standard:
                     type: string
                     format: uint64
                     description: >-
                       Defines what standard this badge should implement (see
-                      /standards).
+                      standards documentation).
                 description: BadgeCollection defines a standard collection of badges.
         default:
           description: An unexpected error response.
@@ -44694,7 +44710,7 @@ definitions:
           The collectionId defines the unique identifier of the Badge
           classification, similar to the contract address of ERC721.
 
-          This is assigned by the chain itself. All ids starts at 0 and
+          This is assigned by the chain itself. All ids starts at 1 and
           increments by 1 each created badge.
       collectionUri:
         type: string
@@ -44722,9 +44738,17 @@ definitions:
                   for badge IDs, nonces, anything. 
 
                   If end == 0, we assume end == start. Start must be >= end.
-        description: |-
-          The URI where to fetch each badge's metadata. Max 100 characters.
-          Can include {id} in the URI to be replaced by the badge's id.
+        description: >-
+          An array of BadgeUri objects for where to fetch the badge metadata.
+
+          Each BadgeUri object has a uri and an array of badgeId ranges (see
+          BadgeUri type).
+
+          The uri can include {id} in the URI which is a placeholder to be
+          replaced by each badge's unique id.
+
+          To fetch the metadata for a speciifc badge, the first match is always
+          used.
       bytes:
         type: string
         description: >-
@@ -44737,16 +44761,16 @@ definitions:
         type: string
         format: uint64
         description: >-
-          The manager's account number of the badge. The manager can have
-          special permissions.
+          The manager's account ID. The manager can be granted special
+          permissions.
       permissions:
         type: string
         format: uint64
-        title: >-
+        description: >-
           Store permissions packed in a uint where the bits correspond to
-          permissions from left to right.
+          certain permissions.
 
-          Leading zeroes are applied. See types/permissions.go
+          Leading zeroes are applied. See permissions definition.
       disallowedTransfers:
         type: array
         items:
@@ -44799,10 +44823,18 @@ definitions:
           description: >-
             TransferMapping defines a mapping of transfers from one set of
             addresses to another.
-        description: |-
+        title: >-
           This defines the address combinations that cannot be transferred. 
+
           Used to freeze addresses and prevent transfers.
+
           If all addresses are disallowed, then the badge is non-transferable.
+
+          If none are disallowed, the badge is transferable.
+
+          Ex: If an account ID is in the "to" mapping and another account ID is
+          in the "from" mapping,
+             the "to" account cannot transfer to the "from" account
       managerApprovedTransfers:
         type: array
         items:
@@ -44855,7 +44887,7 @@ definitions:
           description: >-
             TransferMapping defines a mapping of transfers from one set of
             addresses to another.
-        description: >-
+        title: >-
           This defines the address combinations that the manager is approved to
           execute (overrides disallowedTransfers).
 
@@ -44863,11 +44895,15 @@ definitions:
           forcefully revoke or forcefully burn badges.
 
           This can be updated, but addresses can only be removed, never added.
+
+          Ex: If an account ID is in the "to" mapping and another account ID is
+          in the "from" mapping,
+             the manager can transfer any badge from the "to" account to the "from" account
       nextBadgeId:
         type: string
         format: uint64
         description: >-
-          Badge ids start at 0. Each badge created will increment this by 1.
+          Badge ids start at 1. Each badge created will increment this by 1.
           Can't overflow.
       unmintedSupplys:
         type: array
@@ -44896,7 +44932,7 @@ definitions:
           description: >-
             Defines a balance object. The specified balance holds for all ids
             specified within the id ranges array.
-        description: This is a map of the current badge supplys.
+        description: This is a map of the current unminted badge supplys by ID.
       maxSupplys:
         type: array
         items:
@@ -44924,7 +44960,7 @@ definitions:
           description: >-
             Defines a balance object. The specified balance holds for all ids
             specified within the id ranges array.
-        description: This is a map of the maximum badge supplys.
+        description: This is a map of the maximum badge supplys by ID.
       claims:
         type: array
         items:
@@ -45019,11 +45055,13 @@ definitions:
             claiming process.
 
             Stored in own store. Claimed leaves are also stored in unique store.
-        description: This is an array of the current badge claims.
+        description: These represent the collection's claim objects.
       standard:
         type: string
         format: uint64
-        description: Defines what standard this badge should implement (see /standards).
+        description: >-
+          Defines what standard this badge should implement (see standards
+          documentation).
     description: BadgeCollection defines a standard collection of badges.
   bitbadges.bitbadgeschain.badges.BadgeSupplyAndAmount:
     type: object
@@ -45361,7 +45399,7 @@ definitions:
               The collectionId defines the unique identifier of the Badge
               classification, similar to the contract address of ERC721.
 
-              This is assigned by the chain itself. All ids starts at 0 and
+              This is assigned by the chain itself. All ids starts at 1 and
               increments by 1 each created badge.
           collectionUri:
             type: string
@@ -45391,9 +45429,18 @@ definitions:
                       used for badge IDs, nonces, anything. 
 
                       If end == 0, we assume end == start. Start must be >= end.
-            description: |-
-              The URI where to fetch each badge's metadata. Max 100 characters.
-              Can include {id} in the URI to be replaced by the badge's id.
+            description: >-
+              An array of BadgeUri objects for where to fetch the badge
+              metadata.
+
+              Each BadgeUri object has a uri and an array of badgeId ranges (see
+              BadgeUri type).
+
+              The uri can include {id} in the URI which is a placeholder to be
+              replaced by each badge's unique id.
+
+              To fetch the metadata for a speciifc badge, the first match is
+              always used.
           bytes:
             type: string
             description: >-
@@ -45406,16 +45453,16 @@ definitions:
             type: string
             format: uint64
             description: >-
-              The manager's account number of the badge. The manager can have
-              special permissions.
+              The manager's account ID. The manager can be granted special
+              permissions.
           permissions:
             type: string
             format: uint64
-            title: >-
+            description: >-
               Store permissions packed in a uint where the bits correspond to
-              permissions from left to right.
+              certain permissions.
 
-              Leading zeroes are applied. See types/permissions.go
+              Leading zeroes are applied. See permissions definition.
           disallowedTransfers:
             type: array
             items:
@@ -45470,13 +45517,19 @@ definitions:
               description: >-
                 TransferMapping defines a mapping of transfers from one set of
                 addresses to another.
-            description: >-
+            title: >-
               This defines the address combinations that cannot be transferred. 
 
               Used to freeze addresses and prevent transfers.
 
               If all addresses are disallowed, then the badge is
               non-transferable.
+
+              If none are disallowed, the badge is transferable.
+
+              Ex: If an account ID is in the "to" mapping and another account ID
+              is in the "from" mapping,
+                 the "to" account cannot transfer to the "from" account
           managerApprovedTransfers:
             type: array
             items:
@@ -45531,7 +45584,7 @@ definitions:
               description: >-
                 TransferMapping defines a mapping of transfers from one set of
                 addresses to another.
-            description: >-
+            title: >-
               This defines the address combinations that the manager is approved
               to execute (overrides disallowedTransfers).
 
@@ -45540,11 +45593,15 @@ definitions:
 
               This can be updated, but addresses can only be removed, never
               added.
+
+              Ex: If an account ID is in the "to" mapping and another account ID
+              is in the "from" mapping,
+                 the manager can transfer any badge from the "to" account to the "from" account
           nextBadgeId:
             type: string
             format: uint64
             description: >-
-              Badge ids start at 0. Each badge created will increment this by 1.
+              Badge ids start at 1. Each badge created will increment this by 1.
               Can't overflow.
           unmintedSupplys:
             type: array
@@ -45573,7 +45630,7 @@ definitions:
               description: >-
                 Defines a balance object. The specified balance holds for all
                 ids specified within the id ranges array.
-            description: This is a map of the current badge supplys.
+            description: This is a map of the current unminted badge supplys by ID.
           maxSupplys:
             type: array
             items:
@@ -45601,7 +45658,7 @@ definitions:
               description: >-
                 Defines a balance object. The specified balance holds for all
                 ids specified within the id ranges array.
-            description: This is a map of the maximum badge supplys.
+            description: This is a map of the maximum badge supplys by ID.
           claims:
             type: array
             items:
@@ -45697,13 +45754,13 @@ definitions:
 
                 Stored in own store. Claimed leaves are also stored in unique
                 store.
-            description: This is an array of the current badge claims.
+            description: These represent the collection's claim objects.
           standard:
             type: string
             format: uint64
             description: >-
-              Defines what standard this badge should implement (see
-              /standards).
+              Defines what standard this badge should implement (see standards
+              documentation).
         description: BadgeCollection defines a standard collection of badges.
   bitbadges.bitbadgeschain.badges.QueryIsClaimDataUsedResponse:
     type: object

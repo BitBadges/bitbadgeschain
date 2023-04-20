@@ -78,38 +78,45 @@ func (m *BadgeUri) GetBadgeIds() []*IdRange {
 // BadgeCollection defines a standard collection of badges.
 type BadgeCollection struct {
 	// The collectionId defines the unique identifier of the Badge classification, similar to the contract address of ERC721.
-	// This is assigned by the chain itself. All ids starts at 0 and increments by 1 each created badge.
+	// This is assigned by the chain itself. All ids starts at 1 and increments by 1 each created badge.
 	CollectionId uint64 `protobuf:"varint,1,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
 	// The URI where to fetch the collection's metadata. Max 100 characters.
 	CollectionUri string `protobuf:"bytes,2,opt,name=collectionUri,proto3" json:"collectionUri,omitempty"`
-	// The URI where to fetch each badge's metadata. Max 100 characters.
-	// Can include {id} in the URI to be replaced by the badge's id.
+	// An array of BadgeUri objects for where to fetch the badge metadata.
+	// Each BadgeUri object has a uri and an array of badgeId ranges (see BadgeUri type).
+	// The uri can include {id} in the URI which is a placeholder to be replaced by each badge's unique id.
+	// To fetch the metadata for a speciifc badge, the first match is always used.
 	BadgeUris []*BadgeUri `protobuf:"bytes,3,rep,name=badgeUris,proto3" json:"badgeUris,omitempty"`
 	// These are arbitrary bytes can be used to store anything on-chain about the badge (often used for a permanent hash).
 	// This can be updatable or not depending on the permissions set. Max 256 bytes allowed.
 	Bytes string `protobuf:"bytes,4,opt,name=bytes,proto3" json:"bytes,omitempty"`
-	// The manager's account number of the badge. The manager can have special permissions.
+	// The manager's account ID. The manager can be granted special permissions.
 	Manager uint64 `protobuf:"varint,5,opt,name=manager,proto3" json:"manager,omitempty"`
-	//Store permissions packed in a uint where the bits correspond to permissions from left to right.
-	//Leading zeroes are applied. See types/permissions.go
+	//Store permissions packed in a uint where the bits correspond to certain permissions.
+	//Leading zeroes are applied. See permissions definition.
 	Permissions uint64 `protobuf:"varint,6,opt,name=permissions,proto3" json:"permissions,omitempty"`
 	//This defines the address combinations that cannot be transferred.
 	//Used to freeze addresses and prevent transfers.
 	//If all addresses are disallowed, then the badge is non-transferable.
+	//If none are disallowed, the badge is transferable.
+	//Ex: If an account ID is in the "to" mapping and another account ID is in the "from" mapping,
+	//    the "to" account cannot transfer to the "from" account
 	DisallowedTransfers []*TransferMapping `protobuf:"bytes,7,rep,name=disallowedTransfers,proto3" json:"disallowedTransfers,omitempty"`
 	//This defines the address combinations that the manager is approved to execute (overrides disallowedTransfers).
 	//Example use case would be to set up the manager being able to forcefully revoke or forcefully burn badges.
 	//This can be updated, but addresses can only be removed, never added.
+	//Ex: If an account ID is in the "to" mapping and another account ID is in the "from" mapping,
+	//    the manager can transfer any badge from the "to" account to the "from" account
 	ManagerApprovedTransfers []*TransferMapping `protobuf:"bytes,8,rep,name=managerApprovedTransfers,proto3" json:"managerApprovedTransfers,omitempty"`
-	//Badge ids start at 0. Each badge created will increment this by 1. Can't overflow.
+	//Badge ids start at 1. Each badge created will increment this by 1. Can't overflow.
 	NextBadgeId uint64 `protobuf:"varint,9,opt,name=nextBadgeId,proto3" json:"nextBadgeId,omitempty"`
-	//This is a map of the current badge supplys.
+	//This is a map of the current unminted badge supplys by ID.
 	UnmintedSupplys []*Balance `protobuf:"bytes,10,rep,name=unmintedSupplys,proto3" json:"unmintedSupplys,omitempty"`
-	//This is a map of the maximum badge supplys.
+	//This is a map of the maximum badge supplys by ID.
 	MaxSupplys []*Balance `protobuf:"bytes,11,rep,name=maxSupplys,proto3" json:"maxSupplys,omitempty"`
-	//This is an array of the current badge claims.
+	//These represent the collection's claim objects.
 	Claims []*Claim `protobuf:"bytes,12,rep,name=claims,proto3" json:"claims,omitempty"`
-	//Defines what standard this badge should implement (see /standards).
+	//Defines what standard this badge should implement (see standards documentation).
 	Standard uint64 `protobuf:"varint,13,opt,name=standard,proto3" json:"standard,omitempty"`
 }
 
