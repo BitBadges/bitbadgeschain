@@ -15,7 +15,7 @@ var _ = strconv.Itoa(0)
 
 func CmdTransferManager() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "transfer-manager [badge-id] [address] [send]",
+		Use:   "transfer-manager [collection-id] [address]",
 		Short: "Broadcast message transferManager",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {

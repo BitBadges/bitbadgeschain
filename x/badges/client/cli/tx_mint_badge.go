@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -15,56 +16,58 @@ var _ = strconv.Itoa(0)
 
 func CmdMintBadge() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "new-sub-badge [id] [supplys] [amounts] [new-collection-uri] [new-badge-uri]",
-		Short: "Creates a subasset of the badge ID. Must be executed by the manager. CLI args delimited by commas.",
-		Args:  cobra.ExactArgs(5),
+		Use:   "mint-badge [collection-id] [supplys] [transfers] [claims] [collection-uri] [badge-uris]",
+		Short: "Broadcast message mintBadge",
+		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argId, err := cast.ToUint64E(args[0])
 			if err != nil {
 				return err
 			}
-
-			argSupplysUint64, err := GetIdArrFromString(args[1])
+			
+			var badgeSupplyAndAmount []*types.BadgeSupplyAndAmount
+			err = json.Unmarshal([]byte(args[1]), &badgeSupplyAndAmount)
 			if err != nil {
 				return err
 			}
 
-			argAmountsUint64, err := GetIdArrFromString(args[2])
+			var transfers []*types.Transfers
+			err = json.Unmarshal([]byte(args[2]), &transfers)
 			if err != nil {
 				return err
 			}
 
-			argCollectionUri, err := cast.ToStringE(args[3])
+			var claims []*types.Claim
+			err = json.Unmarshal([]byte(args[3]), &claims)
 			if err != nil {
 				return err
 			}
 
-			// argBadgeUrsi, err := cast.ToStringE(args[4])
-			// if err != nil {
-			// 	return err
-			// }
+			argCollectionUri, err := cast.ToStringE(args[4])
+			if err != nil {
+				return err
+			}
+
+			var badgeUris []*types.BadgeUri
+			err = json.Unmarshal([]byte(args[5]), &badgeUris)
+			if err != nil {
+				return err
+			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			argBadgeSupplys := make([]*types.BadgeSupplyAndAmount, len(argSupplysUint64))
-			for i := 0; i < len(argSupplysUint64); i++ {
-				argBadgeSupplys[i] = &types.BadgeSupplyAndAmount{
-					Supply: argSupplysUint64[i],
-					Amount: argAmountsUint64[i],
-				}
-			}
 
 			msg := types.NewMsgMintBadge(
 				clientCtx.GetFromAddress().String(),
 				argId,
-				argBadgeSupplys,
-				[]*types.Transfers{}, //TODO:
-				[]*types.Claim{},
+				badgeSupplyAndAmount,
+				transfers,
+				claims,
 				argCollectionUri,
-				[]*types.BadgeUri{},
+				badgeUris,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {

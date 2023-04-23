@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -13,29 +14,33 @@ import (
 
 var _ = strconv.Itoa(0)
 
+// string creator = 1;
+//     uint64 collectionId = 2;
+//     uint64 address = 3; //The address that are approved to transfer the balances.
+//     repeated Balance balances = 4; //approval balances for every badgeId
+
 func CmdSetApproval() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-approval [amount] [address] [badge-id] [badge-id-start] [badge-id-end] [expiry-time]",
+		Use:   "set-approval [collection-id] [address] [balances]",
 		Short: "Broadcast message setApproval",
-		Args:  cobra.ExactArgs(5),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argAmount, err := cast.ToUint64E(args[0])
-			if err != nil {
-				return err
-			}
-			argAddress, err := cast.ToUint64E(args[1])
-			if err != nil {
-				return err
-			}
-			argBadgeId, err := cast.ToUint64E(args[2])
-			if err != nil {
-				return err
-			}
-			argBadgeIdRanges, err := GetIdRanges(args[3], args[4])
+			argBadgeId, err := cast.ToUint64E(args[0])
 			if err != nil {
 				return err
 			}
 
+			argAddress, err := cast.ToUint64E(args[1])
+			if err != nil {
+				return err
+			}
+
+			var argBalances []*types.Balance
+			if err := json.Unmarshal([]byte(args[2]), &argBalances); err != nil {
+				return err
+			}
+
+		
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -45,12 +50,7 @@ func CmdSetApproval() *cobra.Command {
 				clientCtx.GetFromAddress().String(),
 				argBadgeId,
 				argAddress,
-				[]*types.Balance{
-					{
-						Balance:  argAmount,
-						BadgeIds: argBadgeIdRanges,
-					},
-				},
+				argBalances,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

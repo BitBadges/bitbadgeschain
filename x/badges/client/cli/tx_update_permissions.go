@@ -15,7 +15,7 @@ var _ = strconv.Itoa(0)
 
 func CmdUpdatePermissions() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-permissions [badge-id] [permissions]",
+		Use:   "update-permissions [collection-id] [permissions]",
 		Short: "Broadcast message updatePermissions",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -23,6 +23,7 @@ func CmdUpdatePermissions() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			
 			argPermissions, err := cast.ToUint64E(args[1])
 			if err != nil {
 				return err

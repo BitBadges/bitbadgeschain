@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -13,37 +14,29 @@ import (
 
 var _ = strconv.Itoa(0)
 
+
 func CmdTransferBadge() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "transfer-badge [from] [to] [amount] [collection-id] [badge-id-start] [badge-id-end] [expiry-time] [cant-cancel-before-time]",
+		Use:   "transfer-badge [collection-id] [from] [transfers]", 
 		Short: "Broadcast message transferBadge",
-		Args:  cobra.ExactArgs(8),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argFrom, err := cast.ToUint64E(args[0])
+			argCollectionId, err := cast.ToUint64E(args[0])
 			if err != nil {
 				return err
 			}
 
-			argToAddressesUint64, err := GetIdArrFromString(args[1])
+			argFrom, err := cast.ToUint64E(args[1])
 			if err != nil {
 				return err
 			}
 
-			argAmount, err := cast.ToUint64E(args[2])
+			var argTransfers []*types.Transfers
+			err = json.Unmarshal([]byte(args[2]), &argTransfers)
 			if err != nil {
 				return err
 			}
-
-			argCollectionId, err := cast.ToUint64E(args[3])
-			if err != nil {
-				return err
-			}
-
-			argBadgeIdRanges, err := GetIdRanges(args[4], args[5])
-			if err != nil {
-				return err
-			}
-
+			
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -53,17 +46,7 @@ func CmdTransferBadge() *cobra.Command {
 				clientCtx.GetFromAddress().String(),
 				argCollectionId,
 				argFrom,
-				[]*types.Transfers{
-					{
-						ToAddresses: argToAddressesUint64,
-						Balances: []*types.Balance{
-							{
-								Balance:  argAmount,
-								BadgeIds: argBadgeIdRanges,
-							},
-						},
-					},
-				},
+				argTransfers,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {

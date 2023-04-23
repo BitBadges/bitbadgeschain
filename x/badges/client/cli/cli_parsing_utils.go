@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"strings"
+	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/spf13/cast"
@@ -14,11 +14,35 @@ func GetIdRange(start uint64, end uint64) *types.IdRange {
 	}
 }
 
-func GetIdArrFromString(str string) ([]uint64, error) {
-	argStartValues := strings.Split(str, listSeparator)
+func parseJson(jsonStr string) (map[string]interface{}, error) {
+	var result map[string]interface{}
+	err := json.Unmarshal([]byte(jsonStr), &result)
+	if err != nil {
+		return nil, err
+	}
 
+	return result, nil
+}
+
+func parseJsonArr(jsonStr string) ([]interface{}, error) {
+	var result []interface{}
+	err := json.Unmarshal([]byte(jsonStr), &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func GetIdArrFromString(str string) ([]uint64, error) {
+	vals, err := parseJsonArr(str)
+	if err != nil {
+		return nil, err
+	}
+
+	//convert vals to []uint64
 	argStartValuesUint64 := []uint64{}
-	for _, val := range argStartValues {
+	for _, val := range vals {
 		valAsUint64, err := cast.ToUint64E(val)
 		if err != nil {
 			return nil, err
@@ -31,27 +55,20 @@ func GetIdArrFromString(str string) ([]uint64, error) {
 }
 
 // Start and end strings should be comma separated list of ids
-func GetIdRanges(startStr string, endStr string) ([]*types.IdRange, error) {
-	argStartValuesUint64, err := GetIdArrFromString(startStr)
+func GetIdRanges(idRangesStr string) ([]*types.IdRange, error) {
+	vals, err := parseJsonArr(idRangesStr)
 	if err != nil {
 		return nil, err
-	}
-
-	argEndingValuesUint64, err := GetIdArrFromString(endStr)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(argStartValuesUint64) != len(argEndingValuesUint64) {
-		return nil, types.ErrInvalidArgumentLengths
 	}
 
 	ranges := []*types.IdRange{}
-	for i := 0; i < len(argStartValuesUint64); i++ {
-		ranges = append(ranges, &types.IdRange{
-			Start: argStartValuesUint64[i],
-			End:   argEndingValuesUint64[i],
-		})
+	for _, val := range vals {
+		valAsMap, ok := val.(types.IdRange)
+		if !ok {
+			return nil, types.ErrInvalidIdRangeSpecified
+		}
+
+		ranges = append(ranges, &valAsMap)
 	}
 
 	return ranges, nil

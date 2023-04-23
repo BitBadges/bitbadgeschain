@@ -1,8 +1,8 @@
 package cli
 
 import (
+	"encoding/json"
 	"strconv"
-	"strings"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -19,7 +19,11 @@ func CmdRegisterAddresses() *cobra.Command {
 		Short: "Broadcast message registerAddresses",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argAddressesToRegister := strings.Split(args[0], ",")
+			var argAddressesToRegister []string
+			err = json.Unmarshal([]byte(args[0]), &argAddressesToRegister)
+			if err != nil {
+				return err
+			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {

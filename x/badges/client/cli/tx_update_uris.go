@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -15,7 +16,7 @@ var _ = strconv.Itoa(0)
 
 func CmdUpdateUris() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-uris [badge-id] [uri] [subasset-uri]",
+		Use:   "update-uris [collection-id] [uri] [badge-uris]",
 		Short: "Broadcast message updateUris",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -24,9 +25,15 @@ func CmdUpdateUris() *cobra.Command {
 				return err
 			}
 
-			argUri := args[1]
-			argBadgeUri := args[2]
-			_ = argBadgeUri
+			argUri, err := cast.ToStringE(args[1])
+			if err != nil {
+				return err
+			}
+
+			var argBadgeUris []*types.BadgeUri
+			if err := json.Unmarshal([]byte(args[2]), &argBadgeUris); err != nil {
+				return err
+			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -37,7 +44,7 @@ func CmdUpdateUris() *cobra.Command {
 				clientCtx.GetFromAddress().String(),
 				argBadgeId,
 				argUri,
-				[]*types.BadgeUri{},
+				argBadgeUris,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

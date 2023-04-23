@@ -1,43 +1,50 @@
 package cli
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 )
 
 var _ = strconv.Itoa(0)
 
-func CmdUpdateBytes() *cobra.Command {
+func CmdUpdateDisallowedTransfers() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-bytes [collection-id] [new-bytes]",
-		Short: "Broadcast message updateBytes",
+		Use:   "update-disallowed-transfers [collection-id] [disallowed-transfers]",
+		Short: "Broadcast message updateDisallowedTransfers",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argBadgeId, err := cast.ToUint64E(args[0])
+			
+			argCollectionId, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}
-			argNewBytes := args[1]
 
+			var argDisallowedTransfers []*types.TransferMapping
+			if err := json.Unmarshal([]byte(args[1]), &argDisallowedTransfers); err != nil {
+				return err
+			}
+			
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgUpdateBytes(
+			msg := types.NewMsgUpdateDisallowedTransfers(
 				clientCtx.GetFromAddress().String(),
-				argBadgeId,
-				argNewBytes,
+				argCollectionId,
+				argDisallowedTransfers,
 			)
+
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

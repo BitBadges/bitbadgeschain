@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -13,34 +14,65 @@ import (
 
 var _ = strconv.Itoa(0)
 
+
+// message MsgNewCollection {
+//     // See badges.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
+//     string creator = 1; 
+//     string collectionUri = 2;
+//     repeated BadgeUri badgeUris = 3;
+
+//     uint64 permissions = 4;
+//     string bytes = 5;
+//     repeated TransferMapping disallowedTransfers = 6;
+//     repeated TransferMapping managerApprovedTransfers = 7;
+//     uint64 standard = 8; 
+//     //Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
+//     //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
+//     repeated BadgeSupplyAndAmount badgeSupplys = 9;
+//     repeated Transfers transfers = 10;
+//     repeated Claim claims = 11;
+// }
+
 func CmdNewCollection() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "new-collection [collectionUri] [badgeUri] [permissions] [bytes-string] [subasset-supplys] [subasset-amounts] [standard]",
+		Use:   "new-collection [collectionUri] [badgeUris] [permissions] [bytes] [disallowedTransfers] [managerApprovedTransfers] [standard] [supplys] [transfers] [claims]",
 		Short: "Broadcast message newCollection",
 		Args:  cobra.ExactArgs(10),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argCollectionUri := args[0]
-			argBadgeUri := args[1]
-			_ = argBadgeUri
-
-			argBytesStr := args[3]
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-
-			permissions, err := strconv.ParseUint(args[2], 10, 64)
+			
+			argCollectionUri, err := cast.ToStringE(args[0])
 			if err != nil {
 				return err
 			}
 
-			argSupplysUInt64, err := GetIdArrFromString(args[4])
+			var argBadgeUris []*types.BadgeUri
+			err = json.Unmarshal([]byte(args[1]), &argBadgeUris)
 			if err != nil {
 				return err
 			}
 
-			argAmountsUInt64, err := GetIdArrFromString(args[5])
+			argPermissions, err := cast.ToUint64E(args[2])
+			if err != nil {
+				return err
+			}
+
+			argBytesStr, err := cast.ToStringE(args[3])
+			if err != nil {
+				return err
+			}
+
+			var argDisallowedTransfers []*types.TransferMapping
+			err = json.Unmarshal([]byte(args[4]), &argDisallowedTransfers)
+			if err != nil {
+				return err
+			}
+
+			var argManagerApprovedTransfers []*types.TransferMapping
+			err = json.Unmarshal([]byte(args[5]), &argManagerApprovedTransfers)
 			if err != nil {
 				return err
 			}
@@ -50,12 +82,22 @@ func CmdNewCollection() *cobra.Command {
 				return err
 			}
 
-			argBadgeSupplys := make([]*types.BadgeSupplyAndAmount, len(argSupplysUInt64))
-			for i := 0; i < len(argSupplysUInt64); i++ {
-				argBadgeSupplys[i] = &types.BadgeSupplyAndAmount{
-					Supply: argSupplysUInt64[i],
-					Amount: argAmountsUInt64[i],
-				}
+			var argBadgeSupplys []*types.BadgeSupplyAndAmount
+			err = json.Unmarshal([]byte(args[7]), &argBadgeSupplys)
+			if err != nil {
+				return err
+			}
+
+			var argTransfers []*types.Transfers
+			err = json.Unmarshal([]byte(args[8]), &argTransfers)
+			if err != nil {
+				return err
+			}
+
+			var argClaims []*types.Claim
+			err = json.Unmarshal([]byte(args[9]), &argClaims)
+			if err != nil {
+				return err
 			}
 
 			msg := types.NewMsgNewCollection(
@@ -63,13 +105,13 @@ func CmdNewCollection() *cobra.Command {
 				argStandard,
 				argBadgeSupplys,
 				argCollectionUri,
-				[]*types.BadgeUri{}, //TODO:
-				permissions,
-				[]*types.TransferMapping{},
-				[]*types.TransferMapping{},
+				argBadgeUris,
+				argPermissions,
+				argDisallowedTransfers,
+				argManagerApprovedTransfers,
 				argBytesStr,
-				[]*types.Transfers{}, //TODO: add whitelist capabilities to CLI
-				[]*types.Claim{},
+				argTransfers,
+				argClaims,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
