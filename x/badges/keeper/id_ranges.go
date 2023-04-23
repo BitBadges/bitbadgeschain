@@ -175,7 +175,7 @@ func RemoveIdsFromIdRange(idxsToRemove *types.IdRange, rangeObject *types.IdRang
 	return newRanges, removed
 }
 
-//Will sort the ID ranges in order and merge overlapping IDs if we can
+// Will sort the ID ranges in order and merge overlapping IDs if we can
 func SortAndMergeOverlapping(ids []*types.IdRange) []*types.IdRange {
 	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
 	var n = len(ids)

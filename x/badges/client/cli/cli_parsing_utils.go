@@ -30,7 +30,7 @@ func GetIdArrFromString(str string) ([]uint64, error) {
 	return argStartValuesUint64, nil
 }
 
-//Start and end strings should be comma separated list of ids
+// Start and end strings should be comma separated list of ids
 func GetIdRanges(startStr string, endStr string) ([]*types.IdRange, error) {
 	argStartValuesUint64, err := GetIdArrFromString(startStr)
 	if err != nil {

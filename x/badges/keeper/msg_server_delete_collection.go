@@ -14,7 +14,7 @@ func (k msgServer) DeleteCollection(goCtx context.Context, msg *types.MsgDeleteC
 		Creator:       msg.Creator,
 		CollectionId:  msg.CollectionId,
 		MustBeManager: true,
-		CanDelete: 	   true,	
+		CanDelete:     true,
 	})
 
 	k.DeleteCollectionFromStore(ctx, badge.CollectionId)

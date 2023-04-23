@@ -9,7 +9,7 @@ import (
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 
-//NOTE: We assume that all badges are validly formed here
+// NOTE: We assume that all badges are validly formed here
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// Set if defined; default 0
 	if genState.NextCollectionId == 0 {

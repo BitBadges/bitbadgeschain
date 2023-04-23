@@ -47,7 +47,7 @@ func SetApproval(userBalance types.UserBalance, amount uint64, addressNum uint64
 	return userBalance, nil
 }
 
-//Remove a balance from the approval amount for address
+// Remove a balance from the approval amount for address
 func RemoveBalanceFromApproval(userBalance types.UserBalance, amountToRemove uint64, addressNum uint64, badgeIdRanges []*types.IdRange) (types.UserBalance, error) {
 	err := *new(error)
 	if amountToRemove == 0 {
@@ -93,7 +93,7 @@ func RemoveBalanceFromApproval(userBalance types.UserBalance, amountToRemove uin
 	return userBalance, nil
 }
 
-//Add a balance to the approval amount
+// Add a balance to the approval amount
 func AddBalanceToApproval(userBalance types.UserBalance, amountToAdd uint64, addressNum uint64, badgeIdRanges []*types.IdRange) (types.UserBalance, error) {
 	err := *new(error)
 	if amountToAdd == 0 {

@@ -168,7 +168,7 @@ func (k Keeper) RemoveTransferManagerRequest(ctx sdk.Context, collectionId uint6
 
 /****************************************NEXT ASSET ID****************************************/
 
-//Gets the next badge ID.
+// Gets the next badge ID.
 func (k Keeper) GetNextCollectionId(ctx sdk.Context) uint64 {
 	store := ctx.KVStore(k.storeKey)
 	nextID, err := strconv.ParseUint(string((store.Get(nextCollectionIdKey()))), 10, 64)
@@ -192,7 +192,7 @@ func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) {
 
 /****************************************NEXT CLAIM ID****************************************/
 
-//Gets the next badge ID.
+// Gets the next badge ID.
 func (k Keeper) GetNextClaimId(ctx sdk.Context) uint64 {
 	store := ctx.KVStore(k.storeKey)
 	nextID, err := strconv.ParseUint(string((store.Get(nextClaimIdKey()))), 10, 64)

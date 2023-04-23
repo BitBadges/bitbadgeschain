@@ -27,4 +27,4 @@ message Addresses {
 message TransferMapping {
     Addresses from = 1;
     Addresses to = 2;
-}
+}   

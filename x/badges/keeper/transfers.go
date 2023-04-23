@@ -16,7 +16,7 @@ func HandleTransfer(collection types.BadgeCollection, badgeIdRange *types.IdRang
 	return fromUserBalance, toUserBalance, nil
 }
 
-//Forceful transfers will transfer the balances and deduct from approvals directly without adding it to pending.
+// Forceful transfers will transfer the balances and deduct from approvals directly without adding it to pending.
 func ForcefulTransfer(collection types.BadgeCollection, badgeIdRange *types.IdRange, fromUserBalance types.UserBalance, toUserBalance types.UserBalance, amount uint64, from uint64, to uint64, approvedBy uint64) (types.UserBalance, types.UserBalance, error) {
 	// 1. Check if the from address is frozen
 	// 2. Remove approvals if approvedBy != from

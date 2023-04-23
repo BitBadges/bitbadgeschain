@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-//Only handles from => to (pending and forceful) (not other way around)
+// Only handles from => to (pending and forceful) (not other way around)
 func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBadge) (*types.MsgTransferBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 

@@ -47,8 +47,8 @@ func (ClaimType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_5fc06cc841589c70, []int{0}
 }
 
-//Defines a claim object. Claims are used to transfer badges via a claiming process.
-//Stored in own store. Claimed leaves are also stored in unique store.
+// Defines a claim object. Claims are used to transfer badges via a claiming process.
+// Stored in own store. Claimed leaves are also stored in unique store.
 type Claim struct {
 	Balances                  []*Balance `protobuf:"bytes,1,rep,name=balances,proto3" json:"balances,omitempty"`
 	CodeRoot                  string     `protobuf:"bytes,2,opt,name=codeRoot,proto3" json:"codeRoot,omitempty"`

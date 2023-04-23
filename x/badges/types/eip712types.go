@@ -54,7 +54,7 @@ func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Typ
 	return mapObject, nil
 }
 
-//Certain fields are omitted (when uint64 is 0, bool is false, etc) when serialized with Proto and Amino. EIP712 doesn't support optional fields, so we add the omitted empty values back in here.
+// Certain fields are omitted (when uint64 is 0, bool is false, etc) when serialized with Proto and Amino. EIP712 doesn't support optional fields, so we add the omitted empty values back in here.
 func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (apitypes.TypedData, error) {
 	typesMap := GetMsgValueTypes(msgType)
 	for key, value := range typesMap {
@@ -86,7 +86,7 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 	return typedData, nil
 }
 
-//first bool is if URI is needed, second is if ID Range is needed
+// first bool is if URI is needed, second is if ID Range is needed
 func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 
 	transferMappingTypes := []apitypes.Type{

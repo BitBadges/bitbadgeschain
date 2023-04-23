@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-//Gets badge and throws error if it does not exist. Alternative to GetCollectionFromStore which returns a found bool, not an error.
+// Gets badge and throws error if it does not exist. Alternative to GetCollectionFromStore which returns a found bool, not an error.
 func (k Keeper) GetCollectionE(ctx sdk.Context, badgeId uint64) (types.BadgeCollection, error) {
 	badge, found := k.GetCollectionFromStore(ctx, badgeId)
 	if !found {
@@ -44,8 +44,8 @@ func (k Keeper) ValidateIdRanges(collection types.BadgeCollection, ranges []*typ
 	return nil
 }
 
-//For each (supply, amount) pair, we create (amount) badges with a supply of (supply). Error if IDs overflow.
-//We assume that lengths of supplys and amountsToCreate are equal before entering this function. Also amountsToCreate[i] can never be zero.
+// For each (supply, amount) pair, we create (amount) badges with a supply of (supply). Error if IDs overflow.
+// We assume that lengths of supplys and amountsToCreate are equal before entering this function. Also amountsToCreate[i] can never be zero.
 func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, supplysAndAmounts []*types.BadgeSupplyAndAmount, transfers []*types.Transfers, claims []*types.Claim, creatorAddress string) (types.BadgeCollection, error) {
 	maxSupplys := collection.MaxSupplys //get current
 	unmintedSupplys := collection.UnmintedSupplys

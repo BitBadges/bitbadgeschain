@@ -53,7 +53,7 @@ func ValidateBytes(bytesToCheck string) error {
 	return nil
 }
 
-//Validates ranges are valid. If end == 0, we assume end == start.
+// Validates ranges are valid. If end == 0, we assume end == start.
 func ValidateRangesAreValid(badgeIdRanges []*IdRange) error {
 	for _, badgeIdRange := range badgeIdRanges {
 		if badgeIdRange == nil {
@@ -87,7 +87,7 @@ func ValidateActionsAreValid(actions []uint64, rangesLength int) error {
 	return nil
 }
 
-//Validates no element is X
+// Validates no element is X
 func ValidateNoElementIsX(amounts []uint64, x uint64) error {
 	for _, amount := range amounts {
 		if amount == x {

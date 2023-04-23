@@ -26,7 +26,7 @@ const (
 	CanUpdateDisallowedDigit     = 1
 )
 
-//Validate permissions are validly formed. Disallows leading zeroes.
+// Validate permissions are validly formed. Disallows leading zeroes.
 func ValidatePermissions(permissions uint64) error {
 	tempPermissions := permissions >> NumPermissions
 
@@ -92,7 +92,7 @@ func GetPermissions(permissions uint64) Permissions {
 	return flags
 }
 
-//Sets the permission flags for a digit.
+// Sets the permission flags for a digit.
 func SetPermissionsFlags(permission bool, digit int, flags *Permissions) {
 	if digit == CanUpdateBytesDigit {
 		flags.CanUpdateBytes = permission

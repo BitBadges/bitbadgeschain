@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-//Gets the account number for the given sdk.AccAddress. If it doesn't exist, we create a new one.
+// Gets the account number for the given sdk.AccAddress. If it doesn't exist, we create a new one.
 func (k Keeper) GetOrCreateAccountNumberForAccAddressBech32(ctx sdk.Context, address sdk.AccAddress) uint64 {
 	account := k.accountKeeper.GetAccount(ctx, address)
 	if account == nil {

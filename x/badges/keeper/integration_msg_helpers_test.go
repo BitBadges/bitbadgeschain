@@ -57,7 +57,7 @@ func CreateBadges(suite *TestSuite, ctx context.Context, creator string, collect
 	return err
 }
 
-//Note: Only supports Bob and Alice and only supports supplysAndAmounts[0]
+// Note: Only supports Bob and Alice and only supports supplysAndAmounts[0]
 func CreateBadgesAndMintAllToCreator(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, supplysAndAmounts []*types.BadgeSupplyAndAmount) error {
 	creatorAccountNum := uint64(0)
 	if creator == bob {

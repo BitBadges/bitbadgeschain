@@ -55,7 +55,7 @@ type TestSuite struct {
 	msgServer   types.MsgServer
 }
 
-//Bunch of weird config stuff to setup the app. Inherited most from Cosmos SDK tutorials and existing Cosmos SDK modules.
+// Bunch of weird config stuff to setup the app. Inherited most from Cosmos SDK tutorials and existing Cosmos SDK modules.
 func (suite *TestSuite) SetupTest() {
 	app := bitbadgesapp.Setup(
 		false, nil,

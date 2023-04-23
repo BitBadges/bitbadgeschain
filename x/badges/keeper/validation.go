@@ -20,7 +20,7 @@ type UniversalValidationParams struct {
 	CanUpdateUris                bool
 	CanUpdateBytes               bool
 	OnlyCheckAccounts            bool
-	CanDelete					 bool
+	CanDelete                    bool
 }
 
 // Validates everything about the Msg is valid and returns (creatorNum, badge, permissions, error).
