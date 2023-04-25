@@ -1,6 +1,6 @@
 {
     "genesis_time": "2023-04-11T12:42:27.8237518Z",
-    "chain_id": "bitbadges_1-2",
+    "chain_id": "bitbadges_2-1",
     "initial_height": "1",
     "consensus_params": {
         "block": {

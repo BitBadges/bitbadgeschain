@@ -1,0 +1,13 @@
+syntax = "proto3";
+package bitbadges.bitbadgeschain.wasmx;
+
+import "wasmx/wasmx.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/wasmx/types";
+
+// GenesisState defines the wasmx module's genesis state.
+message GenesisState {
+  // params defines all the parameters of related to wasmx.
+  Params params = 1 [(gogoproto.nullable) = false];
+}

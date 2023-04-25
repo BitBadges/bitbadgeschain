@@ -1501,6 +1501,129 @@ paths:
                         }
       tags:
         - Query
+  /injective/wasmx/v1/module_state:
+    get:
+      summary: Retrieves the entire wasmx module's state
+      operationId: BitbadgesBitbadgeschainWasmxWasmxModuleState
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              state:
+                type: object
+                properties:
+                  params:
+                    description: params defines all the parameters of related to wasmx.
+                    type: object
+                    properties:
+                      is_execution_enabled:
+                        type: boolean
+                        description: >-
+                          Set the status to active to indicate that contracts
+                          can be executed in begin blocker.
+                      max_begin_block_total_gas:
+                        type: string
+                        format: uint64
+                        description: >-
+                          Maximum aggregate total gas to be used for the
+                          contract executions in the BeginBlocker.
+                      max_contract_gas_limit:
+                        type: string
+                        format: uint64
+                        description: >-
+                          the maximum gas limit each individual contract can
+                          consume in the BeginBlocker.
+                      min_gas_price:
+                        type: string
+                        format: uint64
+                        description: >-
+                          min_gas_price defines the minimum gas price the
+                          contracts must pay to be executed in the BeginBlocker.
+                description: GenesisState defines the wasmx module's genesis state.
+            description: >-
+              QueryModuleStateResponse is the response type for the
+              Query/WasmxModuleState RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /injective/wasmx/v1/params:
+    get:
+      summary: Retrieves wasmx params
+      operationId: BitbadgesBitbadgeschainWasmxWasmxParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                type: object
+                properties:
+                  is_execution_enabled:
+                    type: boolean
+                    description: >-
+                      Set the status to active to indicate that contracts can be
+                      executed in begin blocker.
+                  max_begin_block_total_gas:
+                    type: string
+                    format: uint64
+                    description: >-
+                      Maximum aggregate total gas to be used for the contract
+                      executions in the BeginBlocker.
+                  max_contract_gas_limit:
+                    type: string
+                    format: uint64
+                    description: >-
+                      the maximum gas limit each individual contract can consume
+                      in the BeginBlocker.
+                  min_gas_price:
+                    type: string
+                    format: uint64
+                    description: >-
+                      min_gas_price defines the minimum gas price the contracts
+                      must pay to be executed in the BeginBlocker.
+            description: >-
+              QueryWasmxParamsRequest is the response type for the
+              Query/WasmxParams RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
   /cosmos/auth/v1beta1/accounts:
     get:
       summary: Accounts returns all the existing accounts
@@ -49034,6 +49157,140 @@ definitions:
                   "@type": "type.googleapis.com/google.protobuf.Duration",
                   "value": "1.212s"
                 }
+  bitbadges.bitbadgeschain.wasmx.GenesisState:
+    type: object
+    properties:
+      params:
+        description: params defines all the parameters of related to wasmx.
+        type: object
+        properties:
+          is_execution_enabled:
+            type: boolean
+            description: >-
+              Set the status to active to indicate that contracts can be
+              executed in begin blocker.
+          max_begin_block_total_gas:
+            type: string
+            format: uint64
+            description: >-
+              Maximum aggregate total gas to be used for the contract executions
+              in the BeginBlocker.
+          max_contract_gas_limit:
+            type: string
+            format: uint64
+            description: >-
+              the maximum gas limit each individual contract can consume in the
+              BeginBlocker.
+          min_gas_price:
+            type: string
+            format: uint64
+            description: >-
+              min_gas_price defines the minimum gas price the contracts must pay
+              to be executed in the BeginBlocker.
+    description: GenesisState defines the wasmx module's genesis state.
+  bitbadges.bitbadgeschain.wasmx.MsgExecuteContractCompatResponse:
+    type: object
+    properties:
+      data:
+        type: string
+        format: byte
+        title: Data contains bytes to returned from the contract
+    description: MsgExecuteContractCompatResponse returns execution result data.
+  bitbadges.bitbadgeschain.wasmx.Params:
+    type: object
+    properties:
+      is_execution_enabled:
+        type: boolean
+        description: >-
+          Set the status to active to indicate that contracts can be executed in
+          begin blocker.
+      max_begin_block_total_gas:
+        type: string
+        format: uint64
+        description: >-
+          Maximum aggregate total gas to be used for the contract executions in
+          the BeginBlocker.
+      max_contract_gas_limit:
+        type: string
+        format: uint64
+        description: >-
+          the maximum gas limit each individual contract can consume in the
+          BeginBlocker.
+      min_gas_price:
+        type: string
+        format: uint64
+        description: >-
+          min_gas_price defines the minimum gas price the contracts must pay to
+          be executed in the BeginBlocker.
+  bitbadges.bitbadgeschain.wasmx.QueryModuleStateResponse:
+    type: object
+    properties:
+      state:
+        type: object
+        properties:
+          params:
+            description: params defines all the parameters of related to wasmx.
+            type: object
+            properties:
+              is_execution_enabled:
+                type: boolean
+                description: >-
+                  Set the status to active to indicate that contracts can be
+                  executed in begin blocker.
+              max_begin_block_total_gas:
+                type: string
+                format: uint64
+                description: >-
+                  Maximum aggregate total gas to be used for the contract
+                  executions in the BeginBlocker.
+              max_contract_gas_limit:
+                type: string
+                format: uint64
+                description: >-
+                  the maximum gas limit each individual contract can consume in
+                  the BeginBlocker.
+              min_gas_price:
+                type: string
+                format: uint64
+                description: >-
+                  min_gas_price defines the minimum gas price the contracts must
+                  pay to be executed in the BeginBlocker.
+        description: GenesisState defines the wasmx module's genesis state.
+    description: >-
+      QueryModuleStateResponse is the response type for the
+      Query/WasmxModuleState RPC method.
+  bitbadges.bitbadgeschain.wasmx.QueryWasmxParamsResponse:
+    type: object
+    properties:
+      params:
+        type: object
+        properties:
+          is_execution_enabled:
+            type: boolean
+            description: >-
+              Set the status to active to indicate that contracts can be
+              executed in begin blocker.
+          max_begin_block_total_gas:
+            type: string
+            format: uint64
+            description: >-
+              Maximum aggregate total gas to be used for the contract executions
+              in the BeginBlocker.
+          max_contract_gas_limit:
+            type: string
+            format: uint64
+            description: >-
+              the maximum gas limit each individual contract can consume in the
+              BeginBlocker.
+          min_gas_price:
+            type: string
+            format: uint64
+            description: >-
+              min_gas_price defines the minimum gas price the contracts must pay
+              to be executed in the BeginBlocker.
+    description: >-
+      QueryWasmxParamsRequest is the response type for the Query/WasmxParams RPC
+      method.
   cosmos.auth.v1beta1.AddressBytesToStringResponse:
     type: object
     properties:

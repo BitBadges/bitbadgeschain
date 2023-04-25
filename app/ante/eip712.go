@@ -191,6 +191,7 @@ func VerifySignature(
 		if !ok {
 			return sdkerrors.Wrap(sdkerrors.ErrUnknownExtensionOptions, "tx doesnt contain any extensions")
 		}
+		
 		opts := txWithExtensions.GetExtensionOptions()
 		if len(opts) != 1 {
 			return sdkerrors.Wrap(sdkerrors.ErrUnknownExtensionOptions, "tx doesnt contain expected amount of extension options")
@@ -202,7 +203,7 @@ func VerifySignature(
 		}
 
 		if extOpt.TypedDataChainID != signerChainID.Uint64() {
-			return sdkerrors.Wrap(sdkerrors.ErrInvalidChainID, "invalid chainID")
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidChainID, "invalid chainID: %s vs. %d", extOpt.TypedDataChainID, signerChainID.Uint64())
 		}
 
 		if len(extOpt.FeePayer) == 0 {
