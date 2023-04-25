@@ -20,7 +20,7 @@ func GetCollection(suite *TestSuite, ctx context.Context, id uint64) (types.Badg
 
 func GetUserBalance(suite *TestSuite, ctx context.Context, collectionId uint64, address uint64) (types.UserBalance, error) {
 	res, err := suite.app.BadgesKeeper.GetBalance(ctx, &types.QueryGetBalanceRequest{
-		BadgeId: uint64(collectionId),
+		CollectionId: uint64(collectionId),
 		Address: uint64(address),
 	})
 	if err != nil {

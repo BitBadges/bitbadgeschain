@@ -33,7 +33,7 @@ client:
   openapi:
     path: docs/static/openapi.yml
 genesis:
-  chain_id: bitbadges_2-1
+  chain_id: bitbadges_1-2
   app_state:
     staking:
       params:
