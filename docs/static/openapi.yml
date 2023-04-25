@@ -209,9 +209,11 @@ paths:
           format: uint64
       tags:
         - Query
-  /bitbadges/bitbadgeschain/badges/get_balance/{badgeId}/{address}:
+  /bitbadges/bitbadgeschain/badges/get_balance/{collectionId}/{address}:
     get:
-      summary: Queries a list of GetBalance items.
+      summary: >-
+        Queries an addresses balance for a badge collection, specified by its
+        ID.
       operationId: BitbadgesBitbadgeschainBadgesGetBalance
       responses:
         '200':
@@ -482,7 +484,7 @@ paths:
                           "value": "1.212s"
                         }
       parameters:
-        - name: badgeId
+        - name: collectionId
           in: path
           required: true
           type: string
@@ -496,7 +498,7 @@ paths:
         - Query
   /bitbadges/bitbadgeschain/badges/get_collection/{id}:
     get:
-      summary: Queries a list of GetBadge items.
+      summary: Queries a badge collection by ID.
       operationId: BitbadgesBitbadgeschainBadgesGetCollection
       responses:
         '200':
@@ -1087,6 +1089,7 @@ paths:
         - Query
   /bitbadges/bitbadgeschain/badges/is_claim_data_used/{collectionId}/{claimId}/{claimData}:
     get:
+      summary: Has a specific claim been used?
       operationId: BitbadgesBitbadgeschainBadgesIsClaimDataUsed
       responses:
         '200':
@@ -1501,7 +1504,7 @@ paths:
                         }
       tags:
         - Query
-  /injective/wasmx/v1/module_state:
+  /bitbadges/bitbadgeschain/wasmx/v1/module_state:
     get:
       summary: Retrieves the entire wasmx module's state
       operationId: BitbadgesBitbadgeschainWasmxWasmxModuleState
@@ -1565,7 +1568,7 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  /injective/wasmx/v1/params:
+  /bitbadges/bitbadgeschain/wasmx/v1/params:
     get:
       summary: Retrieves wasmx params
       operationId: BitbadgesBitbadgeschainWasmxWasmxParams

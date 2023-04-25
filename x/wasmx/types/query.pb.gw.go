@@ -206,9 +206,9 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_WasmxParams_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"injective", "wasmx", "v1", "params"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_WasmxParams_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"bitbadges", "bitbadgeschain", "wasmx", "v1", "params"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_WasmxModuleState_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"injective", "wasmx", "v1", "module_state"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_WasmxModuleState_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"bitbadges", "bitbadgeschain", "wasmx", "v1", "module_state"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

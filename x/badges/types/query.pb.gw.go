@@ -214,15 +214,15 @@ func request_Query_GetBalance_0(ctx context.Context, marshaler runtime.Marshaler
 		_   = err
 	)
 
-	val, ok = pathParams["badgeId"]
+	val, ok = pathParams["collectionId"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "badgeId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.BadgeId, err = runtime.Uint64(val)
+	protoReq.CollectionId, err = runtime.Uint64(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "badgeId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
 	}
 
 	val, ok = pathParams["address"]
@@ -252,15 +252,15 @@ func local_request_Query_GetBalance_0(ctx context.Context, marshaler runtime.Mar
 		_   = err
 	)
 
-	val, ok = pathParams["badgeId"]
+	val, ok = pathParams["collectionId"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "badgeId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.BadgeId, err = runtime.Uint64(val)
+	protoReq.CollectionId, err = runtime.Uint64(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "badgeId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
 	}
 
 	val, ok = pathParams["address"]
@@ -605,7 +605,7 @@ var (
 
 	pattern_Query_IsClaimDataUsed_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"bitbadges", "bitbadgeschain", "badges", "is_claim_data_used", "collectionId", "claimId", "claimData"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetBalance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"bitbadges", "bitbadgeschain", "badges", "get_balance", "badgeId", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetBalance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"bitbadges", "bitbadgeschain", "badges", "get_balance", "collectionId", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_GetAddressById_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"bitbadges", "bitbadgeschain", "badges", "get_address_by_id", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 )

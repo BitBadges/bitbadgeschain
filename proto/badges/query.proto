@@ -19,25 +19,26 @@ service Query {
         option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/params";
     }
 
-    // Queries a list of GetBadge items.
+    // Queries a badge collection by ID.
 	rpc GetCollection(QueryGetCollectionRequest) returns (QueryGetCollectionResponse) {
 		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_collection/{id}";
 	}
 
+    // Has a specific claim been used?
 	rpc IsClaimDataUsed(QueryIsClaimDataUsedRequest) returns (QueryIsClaimDataUsedResponse) {
 		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/is_claim_data_used/{collectionId}/{claimId}/{claimData}";
 	}
 
-    // Queries a list of GetBalance items.
+    // Queries an addresses balance for a badge collection, specified by its ID.
 	rpc GetBalance(QueryGetBalanceRequest) returns (QueryGetBalanceResponse) {
-		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_balance/{badgeId}/{address}";
+		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_balance/{collectionId}/{address}";
 	}
 
     // Queries an address by its account number.
 	rpc GetAddressById(QueryGetAddressByIdRequest) returns (QueryGetAddressByIdResponse) {
 		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_address_by_id/{id}";
 	}
-// this line is used by starport scaffolding # 2
+    // this line is used by starport scaffolding # 2
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -66,7 +67,7 @@ message QueryGetAddressByIdResponse {
 }
 
 message QueryGetBalanceRequest {
-  uint64 badgeId = 1;
+  uint64 collectionId = 1;
   uint64 address = 2;
 }
 

@@ -17,7 +17,7 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	userBalanceKey := ConstructBalanceKey(req.Address, req.BadgeId)
+	userBalanceKey := ConstructBalanceKey(req.Address, req.CollectionId)
 	UserBalance, found := k.GetUserBalanceFromStore(ctx, userBalanceKey)
 	if found {
 		return &types.QueryGetBalanceResponse{
