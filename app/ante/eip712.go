@@ -228,9 +228,33 @@ func VerifySignature(
 			Name:              "BitBadges",
 			Version:           "1.0.0",
 			ChainId:           math.NewHexOrDecimal256(int64(extOpt.TypedDataChainID)),
-			VerifyingContract: "cosmos",
-			Salt:              "0",
+			VerifyingContract: "0x1a16c87927570239fecd343ad2654fd81682725e",
+			Salt:              "0x5d1e2c0e9b8a5c395979525d5f6d5f0c595d5a5c5e5e5b5d5ecd5a5e5d2e5412",
 		}
+
+		typedData.Types["EIP712Domain"] = []apitypes.Type{
+			{
+				Name: "name",
+				Type: "string",
+			},
+			{
+				Name: "version",
+				Type: "string",
+			},
+			{
+				Name: "chainId",
+				Type: "uint256",
+			},
+			{
+				Name: "verifyingContract",
+				Type: "address",
+			},
+			{
+				Name: "salt",
+				Type: "bytes32",
+			},
+		}
+			
 
 		//Normalize the typedData to handle empty (0, "", false), nested objects, and arrays.
 		//Also, add in any missing types for the EIP712 typedData specific to our badges module.
@@ -245,11 +269,13 @@ func VerifySignature(
 			}
 		}
 
-		// return sdkerrors.Wrapf(sdkerrors.ErrInvalidChainID, "%s", typedData)
+		
 		sigHash, _, err := apitypes.TypedDataAndHash(typedData)
 		if err != nil {
 			return sdkerrors.Wrapf(err, "%s failed to compute typed data hash", typedData)
 		}
+
+		// return sdkerrors.Wrapf(sdkerrors.ErrInvalidChainID, "%s %s", typedData, sigHash)
 
 		feePayerSig := extOpt.FeePayerSig
 		if len(feePayerSig) != ethcrypto.SignatureLength {
