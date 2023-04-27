@@ -275,7 +275,7 @@ func VerifySignature(
 			return sdkerrors.Wrapf(err, "%s failed to compute typed data hash", typedData)
 		}
 
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidChainID, "%s %s", typedData, sigHash)
+		// return sdkerrors.Wrapf(sdkerrors.ErrInvalidChainID, "%s %s", typedData, sigHash)
 
 		feePayerSig := extOpt.FeePayerSig
 		if len(feePayerSig) != ethcrypto.SignatureLength {
