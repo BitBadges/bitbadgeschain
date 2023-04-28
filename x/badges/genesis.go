@@ -15,7 +15,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	if genState.NextCollectionId == 0 {
 		genState.NextCollectionId = 1
 	}
-	if genState.NextClaimId == 0 {
+	if genState.NextClaimId == 0 {khjk
 		genState.NextClaimId = 1
 	}
 
