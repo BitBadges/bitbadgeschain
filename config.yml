@@ -7,20 +7,20 @@ build:
     - third_party/proto
     - proto_vendor
 accounts:
-- name: zero # to make everything standard, all IDs should start at 1. This account is a dummy account that should never be used.
+- name: zero
   coins:
   - 1badge
 - name: burn
-  address: cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnrql8a
   coins:
   - 1badge
+  address: cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnrql8a
 - name: alice
   coins:
   - 200000000badge
 - name: bob
-  address: cosmos1kx9532ujful8vgg2dht6k544ax4k9qzszjcw04
   coins:
   - 100000000badge
+  address: cosmos1kx9532ujful8vgg2dht6k544ax4k9qzszjcw04
 - name: charlie
   coins:
   - 100000000badge
@@ -30,15 +30,16 @@ faucet:
   - 100000badge
   host: 0.0.0.0:4500
 client:
+  typescript:
+    path: ts-client
   openapi:
     path: docs/static/openapi.yml
 genesis:
-  chain_id: bitbadges_1-2
   app_state:
     staking:
       params:
-        bond_denom: "badge"
+        bond_denom: badge
+  chain_id: bitbadges_1-2
 validators:
 - name: alice
   bonded: 100000000badge
-
