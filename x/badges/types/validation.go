@@ -65,6 +65,35 @@ func ValidateBytes(bytesToCheck string) error {
 	return nil
 }
 
+
+func DoRangesOverlap(ids []*IdRange) bool {
+	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
+	var n = len(ids)
+	for i := 1; i < n; i++ {
+		j := i
+		for j > 0 {
+			if ids[j-1].Start > ids[j].Start {
+				ids[j-1], ids[j] = ids[j], ids[j-1]
+			} else if ids[j-1].Start == ids[j].Start && ids[j-1].End > ids[j].End {
+				ids[j-1], ids[j] = ids[j], ids[j-1]
+			}
+			j = j - 1
+		}
+	}
+
+	//Check if any overlap
+	for i := 1; i < n; i++ {
+		prevInsertedRange := ids[i-1]
+		currRange := ids[i]
+
+		if currRange.Start <= prevInsertedRange.End {
+			return true
+		}
+	}
+
+	return false
+}
+
 // Validates ranges are valid. If end == 0, we assume end == start.
 func ValidateRangesAreValid(badgeIdRanges []*IdRange) error {
 	for _, badgeIdRange := range badgeIdRanges {
@@ -76,6 +105,12 @@ func ValidateRangesAreValid(badgeIdRanges []*IdRange) error {
 			return ErrStartGreaterThanEnd
 		}
 	}
+
+	overlap := DoRangesOverlap(badgeIdRanges)
+	if overlap {
+		return ErrRangesOverlap
+	}
+
 	return nil
 }
 
@@ -153,6 +188,12 @@ func ValidateClaim(claim *Claim) error {
 		}
 	}
 
+	err = ValidateRangesAreValid(claim.BadgeIds)
+	if err != nil {
+		return err
+	}
+
+
 	if claim.TimeRange == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
 	}
@@ -180,7 +221,7 @@ func ValidateClaim(claim *Claim) error {
 	return nil
 }
 
-func ValidateTransfer(transfer *Transfers) error {
+func ValidateTransfer(transfer *Transfer) error {
 	err := *new(error)
 	for _, balance := range transfer.Balances {
 		if balance == nil {
@@ -209,4 +250,75 @@ func ValidateTransfer(transfer *Transfers) error {
 	}
 
 	return nil
+}
+
+func ValidateBadgeUris(badgeUris []*BadgeUri) error {
+	err := *new(error)
+	if badgeUris != nil && len(badgeUris) > 0 {
+		for _, badgeUri := range badgeUris {
+			//Validate well-formedness of the message entries
+			if err := ValidateURI(badgeUri.Uri); err != nil {
+				return err
+			}
+
+			err = ValidateRangesAreValid(badgeUri.BadgeIds)
+			if err != nil {
+				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid badgeIds")
+			}
+		}
+	}
+	return nil
+}
+
+//IMPORTANT: Note this was copied from the keeper id_range.go file. If you change this, change that as well and vice versa.
+
+// Will sort the ID ranges in order and merge overlapping IDs if we can
+func SortAndMergeOverlapping(ids []*IdRange) []*IdRange {
+	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
+	var n = len(ids)
+	for i := 1; i < n; i++ {
+		j := i
+		for j > 0 {
+			if ids[j-1].Start > ids[j].Start {
+				ids[j-1], ids[j] = ids[j], ids[j-1]
+			} else if ids[j-1].Start == ids[j].Start && ids[j-1].End > ids[j].End {
+				ids[j-1], ids[j] = ids[j], ids[j-1]
+			}
+			j = j - 1
+		}
+	}
+
+	//Merge overlapping ranges
+	if n > 0 {
+		newIdRanges := []*IdRange{ids[0]}
+		//Iterate through and compare with previously inserted range
+		for i := 1; i < n; i++ {
+			prevInsertedRange := newIdRanges[len(newIdRanges)-1]
+			currRange := ids[i]
+
+			if currRange.Start == prevInsertedRange.Start {
+				//Both have same start, so we set to currRange.End because currRange.End is greater due to our sorting
+				//Example: prevRange = [1, 5], currRange = [1, 10] -> newRange = [1, 10]
+				newIdRanges[len(newIdRanges)-1].End = currRange.End
+			} else if currRange.End > prevInsertedRange.End {
+				//We have different starts and curr end is greater than prev end
+				
+				
+				if currRange.Start > prevInsertedRange.End + 1 {
+					//We have a gap between the prev range end and curr range start, so we just append currRange
+					//Example: prevRange = [1, 5], currRange = [7, 10] -> newRange = [1, 5], [7, 10]
+					newIdRanges = append(newIdRanges, currRange)
+				} else {
+					//They overlap and we can merge them
+					//Example: prevRange = [1, 5], currRange = [2, 10] -> newRange = [1, 10]
+					newIdRanges[len(newIdRanges)-1].End = currRange.End
+				}
+			} else {
+				//Note: If currRange.End <= prevInsertedRange.End, it is already fully contained within the previous. We can just continue.
+			}
+		}
+		return newIdRanges
+	} else {
+		return ids
+	}
 }

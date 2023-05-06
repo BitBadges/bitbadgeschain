@@ -27,20 +27,19 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 	}
 
 	creatorBalanceKey := ConstructBalanceKey(msg.Creator, msg.CollectionId)
-	creatorbalance, found := k.Keeper.GetUserBalanceFromStore(ctx, creatorBalanceKey)
+	creatorBalance, found := k.Keeper.GetUserBalanceFromStore(ctx, creatorBalanceKey)
 	if !found {
-		creatorbalance = types.UserBalanceStore{}
+		creatorBalance = types.UserBalanceStore{}
 	}
 
 	for _, balance := range msg.Balances {
-		amount := balance.Amount
-		creatorbalance, err = SetApproval(creatorbalance, amount, msg.Address, balance.BadgeIds)
+		creatorBalance.Approvals, err = SetApproval(creatorBalance.Approvals, balance.Amount, msg.Address, balance.BadgeIds)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if err := k.SetUserBalanceInStore(ctx, creatorBalanceKey, creatorbalance); err != nil {
+	if err := k.SetUserBalanceInStore(ctx, creatorBalanceKey, creatorBalance); err != nil {
 		return nil, err
 	}
 

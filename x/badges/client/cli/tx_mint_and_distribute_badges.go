@@ -31,7 +31,7 @@ func CmdMintAndDistributeBadges() *cobra.Command {
 				return err
 			}
 
-			var transfers []*types.Transfers
+			var transfers []*types.Transfer
 			err = json.Unmarshal([]byte(args[2]), &transfers)
 			if err != nil {
 				return err

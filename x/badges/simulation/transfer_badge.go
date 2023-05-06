@@ -33,7 +33,7 @@ func SimulateMsgTransferBadge(
 			Creator:      simAccount.Address.String(),
 			From:         simAccount.Address.String(),
 			CollectionId: r.Uint64(),
-			Transfers: []*types.Transfers{
+			Transfers: []*types.Transfer{
 				{
 					ToAddresses: randomAccounts,
 					Balances: []*types.Balance{

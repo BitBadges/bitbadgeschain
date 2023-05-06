@@ -4,7 +4,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
-// Unnecessary but makes code more readable
+// Helper function to make code more readable
 func CreateIdRange(start uint64, end uint64) *types.IdRange {
 	return &types.IdRange{
 		Start: start,
@@ -15,6 +15,8 @@ func CreateIdRange(start uint64, end uint64) *types.IdRange {
 // Search ID ranges for a specific ID. Return (idx, true) if found. And (-1, false) if not.
 // Assumes ID ranges are sorted.
 func SearchIdRangesForId(id uint64, idRanges []*types.IdRange) (int, bool) {
+	idRanges = SortAndMergeOverlapping(idRanges) // Just in case
+
 	//Binary search because ID ranges will be sorted
 	low := 0
 	high := len(idRanges) - 1
@@ -37,6 +39,7 @@ func SearchIdRangesForId(id uint64, idRanges []*types.IdRange) (int, bool) {
 
 // Search a set of ranges to find what indexes a specific ID range overlaps.
 // Return overlapping idxs as a IdRange, true if found. And empty IdRange, false if not
+// Inclusive (aka start and end idx will both have overlaps somewhere)
 func GetIdxSpanForRange(rangeToCheck *types.IdRange, currRanges []*types.IdRange) (*types.IdRange, bool) {
 	//Note GetIdxToInsertForNewId returns the index to insert at (i.e. the following idx)
 	//For start, this is what we want because we want the first non-overlapping range
@@ -51,7 +54,7 @@ func GetIdxSpanForRange(rangeToCheck *types.IdRange, currRanges []*types.IdRange
 	endIdx, endFound := SearchIdRangesForId(rangeToCheck.End, idRanges)
 	if !endFound {
 		endIdx, _ = GetIdxToInsertForNewId(rangeToCheck.End, idRanges) //ignore error because we know it's not found
-		endIdx--                                                       //We want the idx before because we want the last overlapping range
+		endIdx--                         	
 	}
 
 	if startIdx <= endIdx {
@@ -64,9 +67,11 @@ func GetIdxSpanForRange(rangeToCheck *types.IdRange, currRanges []*types.IdRange
 	}
 }
 
-// Assumes given ID is not already in a range.
+// Assumes given ID is not already in a range. We recommend calling SearchIdRangesForId first.
 // Gets the index to insert at. Ex. [{0-10}, {10-20}, {30-40}] and inserting 25 would return index 2
 func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) (int, error) {
+	targetIds = SortAndMergeOverlapping(targetIds) // Just in case
+
 	_, found := SearchIdRangesForId(id, targetIds)
 	if found {
 		return -1, ErrIdInRange
@@ -78,11 +83,19 @@ func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) (int, error) 
 		return 0, nil
 	}
 
-	if ids[0].Start > id { //assumes not in already so we don't have to handle that case
+	// Check if id is before the first range or after the last range
+	if ids[0].Start > id {
 		return 0, nil
 	} else if ids[len(ids)-1].End < id {
 		return len(ids), nil
 	}
+
+	//If length == 1, then it should never reach here because we already checked if it's before or after
+	//and assume it's not in the range
+	if len(ids) == 1 {
+		return -1, ErrIdInRange //Should never reach here but just in case
+	}
+
 
 	//Binary search by looking at two ranges at a time [..., {curr}, {next}, ...]
 	low := 0
@@ -93,6 +106,8 @@ func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) (int, error) 
 		currRange := ids[median]
 		nextRange := ids[median+1]
 
+		//If id is in between curr and next, then we found the index to insert at
+		//Note that we assume id is not already in the range and sorted so can just check starts
 		if currRange.Start < id && nextRange.Start > id {
 			break
 		} else if currRange.Start > id {
@@ -102,7 +117,7 @@ func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) (int, error) 
 		}
 	}
 
-	//We return median + 1 to insert in between {curr} and {next}
+	//We return median + 1 because median == curr and we want to insert in between {curr} and {next}
 	return median + 1, nil
 }
 
@@ -110,8 +125,8 @@ func GetIdxToInsertForNewId(id uint64, targetIds []*types.IdRange) (int, error) 
 // Assumes whole range is not present at all. Thus, we only search for where start fits in.
 func InsertRangeToIdRanges(rangeToAdd *types.IdRange, targetIds []*types.IdRange) ([]*types.IdRange, error) {
 	//Validation check; make sure rangeToAdd is not already in targetIds
-	for _, id := range targetIds {
-		_, removed := RemoveIdsFromIdRange(id, rangeToAdd)
+	for _, idRange := range targetIds {
+		_, removed := RemoveIdsFromIdRange(idRange, rangeToAdd)
 		if removed {
 			return nil, ErrIdAlreadyInRanges
 		}
@@ -128,7 +143,6 @@ func InsertRangeToIdRanges(rangeToAdd *types.IdRange, targetIds []*types.IdRange
 		newIds = append(newIds, CreateIdRange(rangeToAdd.Start, rangeToAdd.End))
 		newIds = append(newIds, ids...)
 	} else if lastRange.End < rangeToAdd.Start {
-		insertIdAtIdx = len(ids)
 		newIds = append(newIds, ids...)
 		newIds = append(newIds, CreateIdRange(rangeToAdd.Start, rangeToAdd.End))
 	} else {
@@ -150,31 +164,40 @@ func InsertRangeToIdRanges(rangeToAdd *types.IdRange, targetIds []*types.IdRange
 // Removing can make this range be split into 0, 1, or 2 new ranges.
 // Returns if anything was removed or not
 func RemoveIdsFromIdRange(idxsToRemove *types.IdRange, rangeObject *types.IdRange) ([]*types.IdRange, bool) {
-	newRanges := []*types.IdRange{}
-	removed := true
-
-	//5 cases: Completely before, completely after, completely in the middle, overlaps both, overlaps one side
-	if idxsToRemove.Start > rangeObject.Start && idxsToRemove.End < rangeObject.End {
-		// Completely in the middle; Split into two ranges
-		newRanges = append(newRanges, CreateIdRange(rangeObject.Start, idxsToRemove.Start-1))
-		newRanges = append(newRanges, CreateIdRange(idxsToRemove.End+1, rangeObject.End))
-	} else if idxsToRemove.Start <= rangeObject.Start && idxsToRemove.End >= rangeObject.End {
-		// Overlaps both; remove whole thing
-		// Do nothing
-	} else if idxsToRemove.Start <= rangeObject.Start && idxsToRemove.End < rangeObject.End && idxsToRemove.End >= rangeObject.Start {
-		// Still have some left at the end
-		newRanges = append(newRanges, CreateIdRange(idxsToRemove.End+1, rangeObject.End))
-	} else if idxsToRemove.Start > rangeObject.Start && idxsToRemove.End >= rangeObject.End && idxsToRemove.Start <= rangeObject.End {
-		// Still have some left at the start
-		newRanges = append(newRanges, CreateIdRange(rangeObject.Start, idxsToRemove.Start-1))
-	} else {
-		// Doesn't overlap at all; keep everything
-		newRanges = append(newRanges, CreateIdRange(rangeObject.Start, rangeObject.End))
-		removed = false //Didn't remove anything
+	if idxsToRemove.End < rangeObject.Start || idxsToRemove.Start > rangeObject.End {
+		// idxsToRemove doesn't overlap with rangeObject, so nothing is removed
+		return []*types.IdRange{rangeObject}, false
 	}
 
-	return newRanges, removed
+	var newRanges []*types.IdRange
+	if idxsToRemove.Start <= rangeObject.Start && idxsToRemove.End >= rangeObject.End {
+		// idxsToRemove fully contains rangeObject, so nothing is left
+		return newRanges, true
+	}
+
+	if idxsToRemove.Start > rangeObject.Start {
+		// There's a range before idxsToRemove
+		// Underflow is not possible because idxsToRemove.Start > rangeObject.Start
+		newRanges = append(newRanges, &types.IdRange{
+			Start: rangeObject.Start,
+			End:   idxsToRemove.Start - 1,
+		})
+	}
+
+	if idxsToRemove.End < rangeObject.End {
+		// There's a range after idxsToRemove
+		// Overflow is not possible because idxsToRemove.End < rangeObject.End
+		newRanges = append(newRanges, &types.IdRange{
+			Start: idxsToRemove.End + 1,
+			End:   rangeObject.End,
+		})
+	}
+
+	return newRanges, true
 }
+
+
+//IMPORTANT: Note this function was copied to the types validation.go file. If you change this, change that as well and vice versa.
 
 // Will sort the ID ranges in order and merge overlapping IDs if we can
 func SortAndMergeOverlapping(ids []*types.IdRange) []*types.IdRange {
@@ -194,8 +217,7 @@ func SortAndMergeOverlapping(ids []*types.IdRange) []*types.IdRange {
 
 	//Merge overlapping ranges
 	if n > 0 {
-		newIdRanges := []*types.IdRange{}
-		newIdRanges = append(newIdRanges, CreateIdRange(ids[0].Start, ids[0].End))
+		newIdRanges := []*types.IdRange{CreateIdRange(ids[0].Start, ids[0].End)}
 		//Iterate through and compare with previously inserted range
 		for i := 1; i < n; i++ {
 			prevInsertedRange := newIdRanges[len(newIdRanges)-1]
@@ -203,18 +225,24 @@ func SortAndMergeOverlapping(ids []*types.IdRange) []*types.IdRange {
 
 			if currRange.Start == prevInsertedRange.Start {
 				//Both have same start, so we set to currRange.End because currRange.End is greater due to our sorting
+				//Example: prevRange = [1, 5], currRange = [1, 10] -> newRange = [1, 10]
 				newIdRanges[len(newIdRanges)-1].End = currRange.End
 			} else if currRange.End > prevInsertedRange.End {
 				//We have different starts and curr end is greater than prev end
-				if currRange.Start > prevInsertedRange.End+1 {
+				
+				
+				if currRange.Start > prevInsertedRange.End + 1 {
 					//We have a gap between the prev range end and curr range start, so we just append currRange
+					//Example: prevRange = [1, 5], currRange = [7, 10] -> newRange = [1, 5], [7, 10]
 					newIdRanges = append(newIdRanges, CreateIdRange(currRange.Start, currRange.End))
 				} else {
-					//they overlap and we can merge them
+					//They overlap and we can merge them
+					//Example: prevRange = [1, 5], currRange = [2, 10] -> newRange = [1, 10]
 					newIdRanges[len(newIdRanges)-1].End = currRange.End
 				}
+			} else {
+				//Note: If currRange.End <= prevInsertedRange.End, it is already fully contained within the previous. We can just continue.
 			}
-			///If currRange.End <= prevInsertedRange.End, it is already fully contained within the previous. We can just continue.
 		}
 		return newIdRanges
 	} else {

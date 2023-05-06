@@ -60,7 +60,7 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 	suite.Require().Nil(err, "Error creating badge")
 	// badge, _ := GetCollection(suite, wctx, 1)
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -78,7 +78,7 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 	})
 	suite.Require().Nil(err, "Error transferring badge")
 
-	err = TransferBadge(suite, wctx, alice, 1, alice, []*types.Transfers{
+	err = TransferBadge(suite, wctx, alice, 1, alice, []*types.Transfer{
 		{
 			ToAddresses: []string{bob},
 			Balances: []*types.Balance{
@@ -162,7 +162,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 	suite.Require().Nil(err)
 	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -209,7 +209,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 
 	badge, _ = GetCollection(suite, wctx, 1)
 
-	err = TransferBadge(suite, wctx, alice, 1, alice, []*types.Transfers{
+	err = TransferBadge(suite, wctx, alice, 1, alice, []*types.Transfer{
 		{
 			ToAddresses: []string{bob},
 			Balances: []*types.Balance{

@@ -63,7 +63,7 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 	return nil
 }
 
-func CreateBadges(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, supplysAndAmounts []*types.BadgeSupplyAndAmount, transfers []*types.Transfers, claims []*types.Claim, collectionUri string, badgeUris []*types.BadgeUri, balancesUri string) error {
+func CreateBadges(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, supplysAndAmounts []*types.BadgeSupplyAndAmount, transfers []*types.Transfer, claims []*types.Claim, collectionUri string, badgeUris []*types.BadgeUri, balancesUri string) error {
 	msg := types.NewMsgMintAndDistributeBadges(creator, collectionId, supplysAndAmounts, transfers, claims, collectionUri, badgeUris, balancesUri)
 	_, err := suite.msgServer.MintAndDistributeBadges(ctx, msg)
 	return err
@@ -76,7 +76,7 @@ func CreateBadgesAndMintAllToCreator(suite *TestSuite, ctx context.Context, crea
 		return err
 	}
 
-	transfers := []*types.Transfers{
+	transfers := []*types.Transfer{
 		{
 			ToAddresses: []string{creator},
 			Balances: []*types.Balance{
@@ -110,7 +110,7 @@ func CreateBadgesAndMintAllToCreator(suite *TestSuite, ctx context.Context, crea
 	return err
 }
 
-func TransferBadge(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, from string, transfers []*types.Transfers) error {
+func TransferBadge(suite *TestSuite, ctx context.Context, creator string, collectionId uint64, from string, transfers []*types.Transfer) error {
 	msg := types.NewMsgTransferBadge(creator, collectionId, from, transfers)
 	_, err := suite.msgServer.TransferBadge(ctx, msg)
 	return err

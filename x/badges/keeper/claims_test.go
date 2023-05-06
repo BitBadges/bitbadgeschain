@@ -48,7 +48,7 @@ func (suite *TestSuite) TestSendAllToClaims() {
 			Amount: 1,
 		},
 	},
-		[]*types.Transfers{},
+		[]*types.Transfer{},
 		[]*types.Claim{
 			&claimToAdd,
 		}, "https://example.com",

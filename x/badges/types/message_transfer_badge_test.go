@@ -22,7 +22,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 				Creator: "invalid_address",
 				From:   sample.AccAddress(),
 				CollectionId: 1,
-				Transfers: []*types.Transfers{
+				Transfers: []*types.Transfer{
 					{
 						ToAddresses: []string{
 							sample.AccAddress(),
@@ -47,7 +47,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgTransferBadge{
 				Creator: sample.AccAddress(),
 				From:    sample.AccAddress(),
-				Transfers: []*types.Transfers{
+				Transfers: []*types.Transfer{
 					{
 						ToAddresses: []string{
 							sample.AccAddress(),
@@ -71,7 +71,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgTransferBadge{
 				Creator: sample.AccAddress(),
 				From:    sample.AccAddress(),
-				Transfers: []*types.Transfers{
+				Transfers: []*types.Transfer{
 					{
 						ToAddresses: []string{
 							sample.AccAddress(),
@@ -97,7 +97,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgTransferBadge{
 				Creator: sample.AccAddress(),
 				From:    sample.AccAddress(),
-				Transfers: []*types.Transfers{
+				Transfers: []*types.Transfer{
 					{
 						ToAddresses: []string{sample.AccAddress()},
 						Balances: []*types.Balance{

@@ -139,7 +139,7 @@ func (suite *TestSuite) TestCreateBadges() {
 			Supply: 1,
 			Amount: 1,
 		},
-	}, []*types.Transfers{
+	}, []*types.Transfer{
 		{
 			ToAddresses: []string{bob},
 			Balances: []*types.Balance{
@@ -184,7 +184,7 @@ func (suite *TestSuite) TestCreateBadges() {
 			Supply: 1,
 			Amount: 1,
 		},
-	}, []*types.Transfers{
+	}, []*types.Transfer{
 		{
 			ToAddresses: []string{bob},
 			Balances: []*types.Balance{
@@ -229,7 +229,7 @@ func (suite *TestSuite) TestCreateBadges() {
 			Supply: 1,
 			Amount: 1,
 		},
-	}, []*types.Transfers{
+	}, []*types.Transfer{
 		{
 			ToAddresses: []string{bob},
 			Balances: []*types.Balance{
@@ -274,7 +274,7 @@ func (suite *TestSuite) TestCreateBadges() {
 			Supply: 1,
 			Amount: math.MaxUint64,
 		},
-	}, []*types.Transfers{
+	}, []*types.Transfer{
 		{
 			ToAddresses: []string{bob},
 			Balances: []*types.Balance{

@@ -15,9 +15,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 	rangesToValidate := []*types.IdRange{}
 	for _, transfer := range msg.Transfers {
 		for _, balance := range transfer.Balances {
-			for _, badgeIdRange := range balance.BadgeIds {
-				rangesToValidate = append(rangesToValidate, badgeIdRange)
-			}
+			rangesToValidate = append(rangesToValidate, balance.BadgeIds...)
 		}
 	}
 
@@ -46,14 +44,10 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 
 			for _, balance := range transfer.Balances {
 				amount := balance.Amount
-
-				for _, badgeIdRange := range balance.BadgeIds {
-					fromUserBalance, toUserBalance, err = HandleTransfer(collection, badgeIdRange, fromUserBalance, toUserBalance, amount, msg.From, to, msg.Creator)
-					if err != nil {
-						return nil, err
-					}
+				fromUserBalance, toUserBalance, err = HandleTransfer(collection, balance.BadgeIds, fromUserBalance, toUserBalance, amount, msg.From, to, msg.Creator)
+				if err != nil {
+					return nil, err
 				}
-
 			}
 
 			if err := k.SetUserBalanceInStore(ctx, toBalanceKey, toUserBalance); err != nil {

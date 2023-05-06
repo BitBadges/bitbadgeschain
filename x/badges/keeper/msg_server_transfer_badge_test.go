@@ -72,7 +72,7 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -176,7 +176,7 @@ func (suite *TestSuite) TestApprovalsApproved() {
 	bobbalance, _ = GetUserBalance(suite, wctx, 1, bob)
 	// suite.Require().Equal(uint64(1000000-5000), bobbalance.Approvals[0].Amount)
 
-	err = TransferBadge(suite, wctx, alice, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, alice, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -270,7 +270,7 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 	})
 	suite.Require().Nil(err, "Error setting approval")
 
-	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -353,7 +353,7 @@ func (suite *TestSuite) TestApprovalsNotApprovedAtAll() {
 	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -444,7 +444,7 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 	})
 	suite.Require().Nil(err, "Error setting approval")
 
-	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -535,7 +535,7 @@ func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 	})
 	suite.Require().Nil(err, "Error setting approval")
 
-	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -626,7 +626,7 @@ func (suite *TestSuite) TestApprovalOverflow() {
 	})
 	suite.Require().Nil(err, "Error setting approval")
 
-	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -719,7 +719,7 @@ func (suite *TestSuite) TestTransferUnderflowNotEnoughBalance() {
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
 	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -802,7 +802,7 @@ func (suite *TestSuite) TestPendingTransferUnderflowNotEnoughBalance() {
 	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -884,7 +884,7 @@ func (suite *TestSuite) TestTransferInvalidBadgeIdRanges() {
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
 	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
 
-	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -902,7 +902,7 @@ func (suite *TestSuite) TestTransferInvalidBadgeIdRanges() {
 	})
 	suite.Require().EqualError(err, keeper.ErrInvalidBadgeRange.Error())
 
-	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -972,7 +972,7 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 	})
 	suite.Require().Nil(err, "Error creating badges")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -990,7 +990,7 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -1008,7 +1008,7 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -1077,7 +1077,7 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 	})
 	suite.Require().Nil(err, "Error creating badges")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -1095,7 +1095,7 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -1164,7 +1164,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error creating badges")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -1182,7 +1182,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -1200,7 +1200,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -1218,7 +1218,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -1236,7 +1236,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -1254,7 +1254,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -1272,7 +1272,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
@@ -1290,7 +1290,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{

@@ -105,7 +105,7 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 					},
 				},
 				Permissions: perms,
-				Transfers: []*types.Transfers{
+				Transfers: []*types.Transfer{
 					{
 						ToAddresses: []string{alice, charlie},
 						Balances: []*types.Balance{
@@ -196,7 +196,7 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipientsOverflow() {
 					},
 				},
 				Permissions: perms,
-				Transfers: []*types.Transfers{
+				Transfers: []*types.Transfer{
 					{
 						ToAddresses: []string{alice, charlie},
 						Balances: []*types.Balance{

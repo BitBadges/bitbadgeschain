@@ -2,12 +2,9 @@ package keeper
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (*types.MsgClaimBadgeResponse, error) {
@@ -26,43 +23,36 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	}
 
 	//Assert claim is not expired
-	if claim.TimeRange.Start > uint64(ctx.BlockTime().Unix()) || claim.TimeRange.End < uint64(ctx.BlockTime().Unix()) {
+	if claim.TimeRange.Start > uint64(ctx.BlockTime().UnixMilli()) || claim.TimeRange.End < uint64(ctx.BlockTime().UnixMilli()) {
 		return nil, ErrClaimTimeInvalid
+	}
+
+	//Check if address can claim
+	numUsed := uint64(0)
+	if claim.LimitOnePerAddress {
+		numUsed, err = k.IncrementNumUsedForAddressInStore(ctx, msg.CollectionId, claimId, msg.Creator)
+		if err != nil {
+			return nil, err
+		}
+
+		if numUsed > 1 {
+			return nil, ErrAddressAlreadyUsed
+		}
 	}
 
 	//Check if claim is valid
 	badgeIds := claim.BadgeIds
-	origBadgeIds := []*types.IdRange{}
-	for _, badgeId := range badgeIds {
-		origBadgeIds = append(origBadgeIds, &types.IdRange{
-			Start: badgeId.Start,
-			End:   badgeId.End,
-		})
-	}
-
 	codeRoot := claim.CodeRoot
 	whitelistRoot := claim.WhitelistRoot
 	amountToClaim := claim.Amount
 	incrementIdsBy := claim.IncrementIdsBy
 
 	if codeRoot != "" {
-		if len(msg.CodeProof.Aunts) != int(claim.ExpectedMerkleProofLength) {
+		if len(msg.CodeProof.Aunts) != int(claim.ExpectedCodeProofLength) {
 			return nil, ErrCodeProofLengthInvalid
 		}
 
-		codeLeafIndex := uint64(1)
-		//iterate through msg.CodeProof.Aunts backwards
-		for i := len(msg.CodeProof.Aunts) - 1; i >= 0; i-- {
-			aunt := msg.CodeProof.Aunts[i]
-			onRight := aunt.OnRight
-
-			if onRight {
-				codeLeafIndex = codeLeafIndex * 2
-			} else {
-				codeLeafIndex = codeLeafIndex*2 + 1
-			}
-		}
-
+		codeLeafIndex := GetLeafIndex(msg.CodeProof.Aunts)
 		numUsed, err := k.IncrementNumUsedForCodeInStore(ctx, msg.CollectionId, claimId, codeLeafIndex)
 		if err != nil {
 			return nil, err
@@ -78,48 +68,9 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 			return nil, ErrLeafIsEmpty
 		}
 
-		hashedMsgLeaf := sha256.Sum256([]byte(msg.CodeProof.Leaf))
-		leafHash := hashedMsgLeaf[:]
-
-		str := ""
-		str = str + msg.CodeProof.Leaf + " - " + hex.EncodeToString(leafHash)
-
-		currHash := leafHash
-		for _, aunt := range msg.CodeProof.Aunts {
-			decodedAunt, err := hex.DecodeString(aunt.Aunt)
-			if err != nil {
-				return nil, ErrDecodingHexString
-			}
-
-			if aunt.OnRight {
-				parentHash := sha256.Sum256(append(currHash, decodedAunt...))
-				currHash = parentHash[:]
-			} else {
-				parentHash := sha256.Sum256(append(decodedAunt, currHash...))
-				currHash = parentHash[:]
-			}
-
-			str = str + " - " + hex.EncodeToString(currHash)
-		}
-
-		hexCurrHash := hex.EncodeToString(currHash)
-
-		str = str + " - ROOT: " + codeRoot
-
-		if hexCurrHash != codeRoot {
-			return nil, sdkerrors.Wrapf(ErrRootHashInvalid, "Got: %s", str)
-		}
-	}
-
-	numUsed := uint64(0)
-	if claim.RestrictOptions == 2 { //by address
-		numUsed, err = k.IncrementNumUsedForAddressInStore(ctx, msg.CollectionId, claimId, msg.Creator)
+		err = CheckMerklePath(msg.CodeProof.Leaf, codeRoot, msg.CodeProof.Aunts)
 		if err != nil {
 			return nil, err
-		}
-
-		if numUsed > 1 {
-			return nil, ErrAddressAlreadyUsed
 		}
 	}
 
@@ -128,23 +79,10 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 			return nil, ErrMustBeClaimee
 		}
 
-		if claim.RestrictOptions == 1 { //whitelist index
-			whitelistLeafIndex := uint64(1)
-			//iterate through msg.WhitelistProof.Aunts backwards
-			for i := len(msg.WhitelistProof.Aunts) - 1; i >= 0; i-- {
-				aunt := msg.WhitelistProof.Aunts[i]
-				onRight := aunt.OnRight
-
-				if onRight {
-					whitelistLeafIndex = whitelistLeafIndex * 2
-				} else {
-					whitelistLeafIndex = whitelistLeafIndex*2 + 1
-				}
-			}
-			numUsed, err = k.IncrementNumUsedForWhitelistIndexInStore(ctx, msg.CollectionId, claimId, whitelistLeafIndex)
-			if err != nil {
-				return nil, err
-			}
+		whitelistLeafIndex := GetLeafIndex(msg.WhitelistProof.Aunts)
+		numUsed, err = k.IncrementNumUsedForWhitelistIndexInStore(ctx, msg.CollectionId, claimId, whitelistLeafIndex)
+		if err != nil {
+			return nil, err
 		}
 
 		maxUses := uint64(1)
@@ -157,58 +95,43 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 			return nil, ErrLeafIsEmpty
 		}
 
-		hashedMsgLeaf := sha256.Sum256([]byte(msg.WhitelistProof.Leaf))
-		currHash := hashedMsgLeaf[:]
-
-		for _, aunt := range msg.WhitelistProof.Aunts {
-			decodedAunt, err := hex.DecodeString(aunt.Aunt)
-			if err != nil {
-				return nil, ErrDecodingHexString
-			}
-
-			if aunt.OnRight {
-				parentHash := sha256.Sum256(append(currHash, decodedAunt...))
-				currHash = parentHash[:]
-			} else {
-				parentHash := sha256.Sum256(append(decodedAunt, currHash...))
-				currHash = parentHash[:]
-			}
-		}
-
-		hexCurrHash := hex.EncodeToString(currHash)
-		if hexCurrHash != whitelistRoot {
-			return nil, ErrRootHashInvalid
+		err = CheckMerklePath(msg.WhitelistProof.Leaf, whitelistRoot, msg.WhitelistProof.Aunts)
+		if err != nil {
+			return nil, err
 		}
 	}
 
-	userBalance, found := k.GetUserBalanceFromStore(ctx, ConstructBalanceKey(msg.Creator, msg.CollectionId))
+	/*
+		Here, we do the following
+		1. Get msg.Creator (to) balance from store
+		2. Get claim balance. For compatibility, we set the claim balance as a UserBalanceStore
+		3. Add the balances to toBalance and subtract the balances from claimBalanceStore
+		4. Increment IDs if necessary
+		5. Set everything in store
+	*/
+
+	toBalance, found := k.GetUserBalanceFromStore(ctx, ConstructBalanceKey(msg.Creator, msg.CollectionId))
 	if !found {
-		userBalance = types.UserBalanceStore{}
+		toBalance = types.UserBalanceStore{}
 	}
 
-	claimUserBalance := types.UserBalanceStore{
+	claimBalanceStore := types.UserBalanceStore{
 		Balances:  claim.Balances,
 		Approvals: []*types.Approval{},
 	}
 
-	userBalance, err = AddBalancesForIdRanges(userBalance, badgeIds, amountToClaim)
+	toBalance.Balances, err = AddBalancesForIdRanges(toBalance.Balances, badgeIds, amountToClaim)
 	if err != nil {
 		return nil, err
 	}
 
-	claimUserBalance, err = SubtractBalancesForIdRanges(claimUserBalance, badgeIds, amountToClaim)
+	claimBalanceStore.Balances, err = SubtractBalancesForIdRanges(claimBalanceStore.Balances, badgeIds, amountToClaim)
 	if err != nil {
 		return nil, err
 	}
 
-	claim.Balances = claimUserBalance.Balances
-
+	claim.Balances = claimBalanceStore.Balances
 	if incrementIdsBy > 0 {
-		_, err := k.IncrementNumUsedForClaimInStore(ctx, msg.CollectionId, claimId)
-		if err != nil {
-			return nil, err
-		}
-
 		for i := 0; i < len(badgeIds); i++ {
 			badgeIds[i].Start += incrementIdsBy
 			badgeIds[i].End += incrementIdsBy
@@ -226,7 +149,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		return nil, err
 	}
 
-	err = k.SetUserBalanceInStore(ctx, ConstructBalanceKey(msg.Creator, msg.CollectionId), userBalance)
+	err = k.SetUserBalanceInStore(ctx, ConstructBalanceKey(msg.Creator, msg.CollectionId), toBalance)
 	if err != nil {
 		return nil, err
 	}

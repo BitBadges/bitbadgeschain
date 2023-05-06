@@ -10,6 +10,11 @@ const TypeMsgSetApproval = "set_approval"
 var _ sdk.Msg = &MsgSetApproval{}
 
 func NewMsgSetApproval(creator string, collectionId uint64, address string, balances []*Balance) *MsgSetApproval {
+
+	for _, balance := range balances {
+		balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+	}
+
 	return &MsgSetApproval{
 		Creator:      creator,
 		Address:      address,

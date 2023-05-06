@@ -100,7 +100,7 @@ package keeper_test
 // 			Amount: 1,
 // 		},
 // 	},
-// 		[]*types.Transfers{},
+// 		[]*types.Transfer{},
 // 		[]*types.Claim{
 // 			&claimToAdd,
 // 		},
@@ -235,7 +235,7 @@ package keeper_test
 // 			Amount: 1,
 // 		},
 // 	},
-// 		[]*types.Transfers{},
+// 		[]*types.Transfer{},
 // 		[]*types.Claim{
 // 			&claimToAdd,
 // 		}, "https://example.com",
@@ -367,7 +367,7 @@ package keeper_test
 // 			Amount: 1,
 // 		},
 // 	},
-// 		[]*types.Transfers{},
+// 		[]*types.Transfer{},
 // 		[]*types.Claim{
 // 			&claimToAdd,
 // 		}, "https://example.com",

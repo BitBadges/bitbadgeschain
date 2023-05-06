@@ -9,7 +9,24 @@ const TypeMsgMintAndDistributeBadges = "mint_and_distribute_badge"
 
 var _ sdk.Msg = &MsgMintAndDistributeBadges{}
 
-func NewMsgMintAndDistributeBadges(creator string, collectionId uint64, supplysAndAmounts []*BadgeSupplyAndAmount, transfers []*Transfers, claims []*Claim, collectionUri string, badgeUris []*BadgeUri, balancesUri string) *MsgMintAndDistributeBadges {
+func NewMsgMintAndDistributeBadges(creator string, collectionId uint64, supplysAndAmounts []*BadgeSupplyAndAmount, transfers []*Transfer, claims []*Claim, collectionUri string, badgeUris []*BadgeUri, balancesUri string) *MsgMintAndDistributeBadges {
+	for _, transfer := range transfers {
+		for _, balance := range transfer.Balances {
+			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+		}
+	}
+
+	for _, badgeUri := range badgeUris {
+		badgeUri.BadgeIds = SortAndMergeOverlapping(badgeUri.BadgeIds)
+	}
+
+	for _, claim := range claims {
+		claim.BadgeIds = SortAndMergeOverlapping(claim.BadgeIds)
+		for _, balance := range claim.Balances {
+			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+		}
+	}
+	
 	return &MsgMintAndDistributeBadges{
 		Creator:       creator,
 		CollectionId:  collectionId,
@@ -78,16 +95,9 @@ func (msg *MsgMintAndDistributeBadges) ValidateBasic() error {
 	}
 
 	if msg.BadgeUris != nil && len(msg.BadgeUris) > 0 {
-		for _, badgeUri := range msg.BadgeUris {
-			//Validate well-formedness of the message entries
-			if err := ValidateURI(badgeUri.Uri); err != nil {
-				return err
-			}
-
-			err = ValidateRangesAreValid(badgeUri.BadgeIds)
-			if err != nil {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid badgeIds")
-			}
+		err = ValidateBadgeUris(msg.BadgeUris)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -98,7 +108,12 @@ func (msg *MsgMintAndDistributeBadges) ValidateBasic() error {
 		}
 	}
 
-	//TODO: Validate transfers
+	for _, transfer := range msg.Transfers {
+		err = ValidateTransfer(transfer)
+		if err != nil {
+			return err
+		}
+	}
 
 
 	for _, claim := range msg.Claims {

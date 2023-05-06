@@ -7,8 +7,8 @@ import (
 )
 
 // Sets an approval amount for an address.
-func SetApproval(userBalance types.UserBalanceStore, amount uint64, address string, badgeIds []*types.IdRange) (types.UserBalanceStore, error) {
-	idx, found := SearchApprovals(address, userBalance.Approvals)
+func SetApproval(approvals []*types.Approval, amount uint64, address string, badgeIds []*types.IdRange) ([]*types.Approval, error) {
+	idx, found := SearchApprovals(address, approvals)
 	err := *new(error)
 
 	approval := &types.Approval{
@@ -17,92 +17,92 @@ func SetApproval(userBalance types.UserBalanceStore, amount uint64, address stri
 	}
 
 	if found {
-		approval = userBalance.Approvals[idx]
+		approval = approvals[idx]
 	}
 
 	approval.Balances, err = UpdateBalancesForIdRanges(badgeIds, amount, approval.Balances)
 	if err != nil {
-		return userBalance, err
+		return approvals, err
 	}
 
 	//If this is a new entry, we simply appends, otherwise we update the existing entry
 	if !found {
 		//Insert at idx
 		newApprovals := []*types.Approval{}
-		newApprovals = append(newApprovals, userBalance.Approvals[:idx]...)
+		newApprovals = append(newApprovals, approvals[:idx]...)
 		newApprovals = append(newApprovals, approval)
-		newApprovals = append(newApprovals, userBalance.Approvals[idx:]...)
-		userBalance.Approvals = newApprovals
+		newApprovals = append(newApprovals, approvals[idx:]...)
+		approvals = newApprovals
 	} else {
-		userBalance.Approvals[idx] = approval
+		approvals[idx] = approval
 
-		if len(userBalance.Approvals[idx].Balances) == 0 {
+		if len(approvals[idx].Balances) == 0 {
 			//If we end up in the event where this address does not have any more approvals after being removed, we don't have to store it anymore
-			userBalance.Approvals = append(userBalance.Approvals[:idx], userBalance.Approvals[idx+1:]...)
+			approvals = append(approvals[:idx], approvals[idx + 1:]...)
 		}
 	}
 
-	return userBalance, nil
+	return approvals, nil
 }
 
 // Remove a balance from the approval amount for address
-func RemoveBalanceFromApproval(userBalance types.UserBalanceStore, amountToRemove uint64, address string, badgeIdRanges []*types.IdRange) (types.UserBalanceStore, error) {
+func RemoveBalanceFromApproval(approvals []*types.Approval, amountToRemove uint64, address string, badgeIdRanges []*types.IdRange) ([]*types.Approval, error) {
 	err := *new(error)
 	if amountToRemove == 0 {
-		return userBalance, nil
+		return approvals, nil
 	}
 
-	idx, found := SearchApprovals(address, userBalance.Approvals)
+	idx, found := SearchApprovals(address, approvals)
 	if !found {
-		return userBalance, ErrApprovalForAddressDoesntExist
+		return approvals, ErrApprovalForAddressDoesntExist
 	}
 
-	approval := userBalance.Approvals[idx]
+	approval := approvals[idx]
 
 	//This may be a bit confusing because we have the following structure:
-	//	userBalance.Approvals is of type []Approval
+	//	approvals is of type []Approval
 	//	Approval is defined as { Address: string; Balances: []*types.Balance }
 
 	//Basic flow is we get the current approval amounts and ranges in currApprovalAmounts for all IDs in our specified badgeIdRange,
 	//and for each unique balance found (which also has its own corresponding []IdRange), we update the balances to balance - amountToRemove.
 	currApprovalAmounts, err := GetBalancesForIdRanges(badgeIdRanges, approval.Balances)
 	if err != nil {
-		return userBalance, err
+		return approvals, err
 	}
 
 	for _, currApprovalAmountObj := range currApprovalAmounts {
 		newBalance, err := SafeSubtract(currApprovalAmountObj.Amount, amountToRemove)
 		if err != nil {
-			return userBalance, err
+			return approvals, err
 		}
 
 		approval.Balances, err = UpdateBalancesForIdRanges(currApprovalAmountObj.BadgeIds, newBalance, approval.Balances)
 		if err != nil {
-			return userBalance, err
+			return approvals, err
 		}
 	}
 
-	userBalance.Approvals[idx].Balances = approval.Balances
+	approvals[idx].Balances = approval.Balances
 	
 	//If we end up in the event where this address does not have any more approvals after being removed, we don't have to store it anymore
 	if len(approval.Balances) == 0 {
-		userBalance.Approvals = append(userBalance.Approvals[:idx], userBalance.Approvals[idx+1:]...)
+		approvals = append(approvals[:idx], approvals[idx+1:]...)
 	}
 
-	return userBalance, nil
+	return approvals, nil
 }
 
 // Add a balance to the approval amount
-func AddBalanceToApproval(userBalance types.UserBalanceStore, amountToAdd uint64, address string, badgeIdRanges []*types.IdRange) (types.UserBalanceStore, error) {
+func AddBalanceToApproval(approvals []*types.Approval, amountToAdd uint64, address string, badgeIdRanges []*types.IdRange) ([]*types.Approval, error) {
 	err := *new(error)
 	if amountToAdd == 0 {
-		return userBalance, nil
+		return approvals, nil
 	}
 
-	idx, found := SearchApprovals(address, userBalance.Approvals)
+	idx, found := SearchApprovals(address, approvals)
 	if !found {
 		newApprovals := []*types.Approval{}
-		newApprovals = append(newApprovals, userBalance.Approvals[:idx]...)
+		newApprovals = append(newApprovals, approvals[:idx]...)
 		newApprovals = append(newApprovals, &types.Approval{
 			Address: address,
 			Balances: []*types.Balance{
@@ -112,21 +112,21 @@ func AddBalanceToApproval(userBalance types.UserBalanceStore, amountToAdd uint64
 				},
 			},
 		})
-		newApprovals = append(newApprovals, userBalance.Approvals[idx:]...)
-		userBalance.Approvals = newApprovals
-		return userBalance, nil
+		newApprovals = append(newApprovals, approvals[idx:]...)
+		approvals = newApprovals
+		return approvals, nil
 	}
 
 	//This may be a bit confusing because we have the following structure:
-	//	userBalance.Approvals is of type []Approval
+	//	approvals is of type []Approval
 	//	Approval is defined as { Address: uint64; Balances: []*types.Balance }
 
 	//Basic flow is we get the current approval amounts and ranges in currApprovalAmounts for all IDs in our specified badgeIdRange,
 	//and for each unique balance found (which also has its own corresponding []IdRange), we update the balances to balance + amountToAdd
-	approval := userBalance.Approvals[idx]
+	approval := approvals[idx]
 	currApprovalAmounts, err := GetBalancesForIdRanges(badgeIdRanges, approval.Balances)
 	if err != nil {
-		return userBalance, err
+		return approvals, err
 	}
 
 	for _, currApprovalAmountObj := range currApprovalAmounts {
@@ -137,13 +137,13 @@ func AddBalanceToApproval(userBalance types.UserBalanceStore, amountToAdd uint64
 
 		approval.Balances, err = UpdateBalancesForIdRanges(currApprovalAmountObj.BadgeIds, newBalance, approval.Balances)
 		if err != nil {
-			return userBalance, err
+			return approvals, err
 		}
 	}
 
-	userBalance.Approvals[idx].Balances = approval.Balances
+	approvals[idx].Balances = approval.Balances
 
-	return userBalance, nil
+	return approvals, nil
 }
 
 // Approvals will be sorted alphabetically, so we can binary search to get the targetIdx.

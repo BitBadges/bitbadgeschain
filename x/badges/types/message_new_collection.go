@@ -9,7 +9,25 @@ const TypeMsgNewCollection = "new_collection"
 
 var _ sdk.Msg = &MsgNewCollection{}
 
-func NewMsgNewCollection(creator string, standard uint64, collectionsToCreate []*BadgeSupplyAndAmount, collectionUri string, badgeUris []*BadgeUri, permissions uint64, allowedTransfers []*TransferMapping, managerApprovedTransfers []*TransferMapping, bytesToStore string, transfers []*Transfers, claims []*Claim, balancesUri string) *MsgNewCollection {
+func NewMsgNewCollection(creator string, standard uint64, collectionsToCreate []*BadgeSupplyAndAmount, collectionUri string, badgeUris []*BadgeUri, permissions uint64, allowedTransfers []*TransferMapping, managerApprovedTransfers []*TransferMapping, bytesToStore string, transfers []*Transfer, claims []*Claim, balancesUri string) *MsgNewCollection {
+	for _, transfer := range transfers {
+		for _, balance := range transfer.Balances {
+			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+		}
+	}
+
+	for _, badgeUri := range badgeUris {
+		badgeUri.BadgeIds = SortAndMergeOverlapping(badgeUri.BadgeIds)
+	}
+
+	for _, claim := range claims {
+		claim.BadgeIds = SortAndMergeOverlapping(claim.BadgeIds)
+		for _, balance := range claim.Balances {
+			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+		}
+	}
+
+	
 	return &MsgNewCollection{
 		Creator:                  creator,
 		CollectionUri:            collectionUri,
@@ -68,16 +86,8 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 	}
 
 	if msg.BadgeUris != nil {
-		for _, badgeUri := range msg.BadgeUris {
-			//Validate well-formedness of the message entries
-			if err := ValidateURI(badgeUri.Uri); err != nil {
-				return err
-			}
-
-			err = ValidateRangesAreValid(badgeUri.BadgeIds)
-			if err != nil {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid badgeIds")
-			}
+		if err := ValidateBadgeUris(msg.BadgeUris); err != nil {
+			return err
 		}
 	}
 
@@ -115,6 +125,20 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 
 	for _, transfer := range msg.Transfers {
 		err = ValidateTransfer(transfer)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, transfer := range msg.AllowedTransfers {
+		err = ValidateTransferMapping(*transfer)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, transfer := range msg.ManagerApprovedTransfers {
+		err = ValidateTransferMapping(*transfer)
 		if err != nil {
 			return err
 		}

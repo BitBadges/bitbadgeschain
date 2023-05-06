@@ -6,22 +6,23 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
-// Gets the balances for a specific ID.
-func GetBalanceForId(id uint64, balances []*types.Balance) (uint64, error) {
+// Gets the balances for a specific ID. Assumes balances are sorted
+func GetBalanceForId(id uint64, balances []*types.Balance) (uint64) {
 	for _, balance := range balances {
 		_, found := SearchIdRangesForId(id, balance.BadgeIds)
 		if found {
-			return balance.Amount, nil
+			return balance.Amount
 		}
 	}
-	return 0, nil
+	return 0
 }
 
 // Updates the balance for a specific ids from what it currently is to newAmount.
 func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount uint64, balances []*types.Balance) ([]*types.Balance, error) {
 	err := *new(error)
-	ranges = SortAndMergeOverlapping(ranges)
+
 	//Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
+	ranges = SortAndMergeOverlapping(ranges)
 	balances = DeleteBalanceForIdRanges(ranges, balances)
 	balances, err = SetBalanceForIdRanges(ranges, newAmount, balances)
 
@@ -29,27 +30,21 @@ func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount uint64, balanc
 }
 
 // Gets the balances for specified ID ranges. Returns a new []*types.Balance where only the specified ID ranges and their balances are included. Appends balance == 0 objects so all IDs are accounted for, even if not found.
-func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*types.Balance) ([]*types.Balance, error) {
-
-	// 				//Remove everything before the start of the range. Only need to remove from idx 0 since it is sorted.
-	//
-
-	// 				//Remove everything after the end of the range. Only need to remove from last idx since it is sorted.
-	//
-
+func GetBalancesForIdRanges(idRanges []*types.IdRange, balances []*types.Balance) ([]*types.Balance, error) {
 	err := *new(error)
 	fetchedBalances := []*types.Balance{}
 	idRanges = SortAndMergeOverlapping(idRanges)
-	idsWithZeroBalance := idRanges
-	for _, userBalanceObj := range currentUserBalances {
-		//For each specified range, search the current userBalanceObj's IdRanges to see if there is any overlap.
+	idsWithZeroBalance := idRanges //We use this to keep track of which IDs we have already found a balance for. Will deduct from this as we find balances
+
+	for _, balanceObj := range balances {
+		//For each specified range, search the current balanceObj's IdRanges to see if there is any overlap.
 		//If so, we add the overlapping range and current balance to the new []*types.Balances to be returned.
 
 		for _, idRange := range idRanges {
-			idxSpan, found := GetIdxSpanForRange(idRange, userBalanceObj.BadgeIds)
+			idxSpan, found := GetIdxSpanForRange(idRange, balanceObj.BadgeIds)
 			if found {
 				//Set newIdRanges to all ranges where there is overlap
-				newIdRanges := userBalanceObj.BadgeIds[idxSpan.Start : idxSpan.End+1] //+ 1 since the slice is non-inclusive
+				newIdRanges := balanceObj.BadgeIds[idxSpan.Start : idxSpan.End + 1] // + 1 since the slice is non-inclusive but idxSpan is
 
 				//Since GetIdxSpanForRange only returns the indexes of the overlapping ranges,
 				//we need to remove the non-overlapping portions of the first and last ranges.
@@ -61,8 +56,7 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*ty
 						End:   idRange.Start - 1,
 					}
 					removedRanges, _ := RemoveIdsFromIdRange(everythingBefore, newIdRanges[0])
-					newIdRanges = append([]*types.IdRange{}, removedRanges...)
-					newIdRanges = append(newIdRanges, newIdRanges[1:]...)
+					newIdRanges = append(removedRanges, newIdRanges[1:]...)
 				}
 
 				//Remove everything after the end of the range. Only need to remove from last idx since it is sorted.
@@ -73,22 +67,21 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*ty
 					}
 
 					removedRanges, _ := RemoveIdsFromIdRange(everythingAfter, newIdRanges[len(newIdRanges)-1])
-					newIdRanges = append([]*types.IdRange{}, newIdRanges[0:len(newIdRanges)-1]...)
-					newIdRanges = append(newIdRanges, removedRanges...)
+					newIdRanges = append(newIdRanges[0:len(newIdRanges)-1], removedRanges...)
 				}
 
 				//If we found any overlapping ranges, remove the IDs from the list of IDs with zero balance
-				for _, foundIdRange := range newIdRanges {
+				for _, idRange := range newIdRanges {
 					newIdsWithZeroBalance := []*types.IdRange{}
 					for _, currRangeWithZeroBalance := range idsWithZeroBalance {
-						removedRanges, _ := RemoveIdsFromIdRange(foundIdRange, currRangeWithZeroBalance)
+						removedRanges, _ := RemoveIdsFromIdRange(idRange, currRangeWithZeroBalance)
 						newIdsWithZeroBalance = append(newIdsWithZeroBalance, removedRanges...)
 					}
 					idsWithZeroBalance = newIdsWithZeroBalance
 				}
 
 				//Update the fetchedBalances with the IDs which we found
-				fetchedBalances, err = UpdateBalancesForIdRanges(newIdRanges, userBalanceObj.Amount, fetchedBalances)
+				fetchedBalances, err = UpdateBalancesForIdRanges(newIdRanges, balanceObj.Amount, fetchedBalances)
 				if err != nil {
 					return fetchedBalances, err
 				}
@@ -110,71 +103,72 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*ty
 }
 
 // Adds a balance to all ids specified in []ranges
-func AddBalancesForIdRanges(userBalance types.UserBalanceStore, ranges []*types.IdRange, balanceToAdd uint64) (types.UserBalanceStore, error) {
-	currBalances, err := GetBalancesForIdRanges(ranges, userBalance.Balances)
+func AddBalancesForIdRanges(balances []*types.Balance, ranges []*types.IdRange, balanceToAdd uint64) ([]*types.Balance, error) {
+	currBalances, err := GetBalancesForIdRanges(ranges, balances)
 	if err != nil {
-		return userBalance, err
+		return balances, err
 	}
 
 	for _, balance := range currBalances {
-		newBalance, err := SafeAdd(balance.Amount, balanceToAdd)
+		newBalanceAmount, err := SafeAdd(balance.Amount, balanceToAdd)
 		if err != nil {
-			return userBalance, err
+			return balances, err
 		}
 
-		userBalance.Balances, err = UpdateBalancesForIdRanges(balance.BadgeIds, newBalance, userBalance.Balances)
+		balances, err = UpdateBalancesForIdRanges(balance.BadgeIds, newBalanceAmount, balances)
 		if err != nil {
-			return userBalance, err
+			return balances, err
 		}
 	}
-	return userBalance, nil
+	return balances, nil
 }
 
 // Subtracts a balance to all ids specified in []ranges
-func SubtractBalancesForIdRanges(UserBalance types.UserBalanceStore, ranges []*types.IdRange, balanceToRemove uint64) (types.UserBalanceStore, error) {
-	currBalances, err := GetBalancesForIdRanges(ranges, UserBalance.Balances)
+func SubtractBalancesForIdRanges(balances []*types.Balance, ranges []*types.IdRange, balanceToRemove uint64) ( []*types.Balance, error) {
+	currBalances, err := GetBalancesForIdRanges(ranges, balances)
 	if err != nil {
-		return UserBalance, err
+		return balances, err
 	}
 
 	for _, currBalanceObj := range currBalances {
 		newBalance, err := SafeSubtract(currBalanceObj.Amount, balanceToRemove)
 		if err != nil {
-			return UserBalance, err
+			return balances, err
 		}
 
-		UserBalance.Balances, err = UpdateBalancesForIdRanges(currBalanceObj.BadgeIds, newBalance, UserBalance.Balances)
+		balances, err = UpdateBalancesForIdRanges(currBalanceObj.BadgeIds, newBalance, balances)
 		if err != nil {
-			return UserBalance, err
+			return balances, err
 		}
 	}
-	return UserBalance, nil
+	return balances, nil
 }
 
 // Deletes the balance for a specific id.
-func DeleteBalanceForIdRanges(ranges []*types.IdRange, balances []*types.Balance) []*types.Balance {
+func DeleteBalanceForIdRanges(rangesToDelete []*types.IdRange, balances []*types.Balance) []*types.Balance {
 	newBalances := []*types.Balance{}
 	for _, balanceObj := range balances {
-		for _, rangeToDelete := range ranges {
+		for _, rangeToDelete := range rangesToDelete {
 			currRanges := balanceObj.BadgeIds
+			//Remove the ids within the rangeToDelete from existing ranges
 			idxSpan, found := GetIdxSpanForRange(rangeToDelete, currRanges)
 			if found {
-				if idxSpan.End == 0 {
-					idxSpan.End = idxSpan.Start
-				}
-
-				//Remove the ids within the rangeToDelete from existing ranges
+				
 				newIdRanges := append([]*types.IdRange{}, currRanges[:idxSpan.Start]...)
+
+				//For the overlapping ranges, remove the ids within the rangeToDelete
 				for i := idxSpan.Start; i <= idxSpan.End; i++ {
 					removedRanges, _ := RemoveIdsFromIdRange(rangeToDelete, currRanges[i])
 					newIdRanges = append(newIdRanges, removedRanges...)
 				}
+
 				newIdRanges = append(newIdRanges, currRanges[idxSpan.End+1:]...)
+
 				balanceObj.BadgeIds = newIdRanges
 			}
 		}
 
-		// If we don't have any corresponding IDs, don't store this anymore
+		// If we don't have any corresponding badge IDs, remove balance from balance array
 		if len(balanceObj.BadgeIds) > 0 {
 			newBalances = append(newBalances, balanceObj)
 		}
@@ -188,20 +182,17 @@ func SetBalanceForIdRanges(ranges []*types.IdRange, amount uint64, balances []*t
 	if amount == 0 {
 		return balances, nil
 	}
-	err := *new(error)
 
+	err := *new(error)
 	idx, found := SearchBalances(amount, balances)
+
 	newBalances := []*types.Balance{}
 	if !found {
-		//We don't have an existing object with such a balance
+		//We don't have an existing object with such a balance, so we add it at idx
 		newBalances = append(newBalances, balances[:idx]...)
-		rangesToInsert := []*types.IdRange{}
-		for _, rangeToAdd := range ranges {
-			rangesToInsert = append(rangesToInsert, CreateIdRange(rangeToAdd.Start, rangeToAdd.End))
-		}
 		newBalances = append(newBalances, &types.Balance{
 			Amount:  amount,
-			BadgeIds: rangesToInsert,
+			BadgeIds: ranges,
 		})
 		newBalances = append(newBalances, balances[idx:]...)
 	} else {

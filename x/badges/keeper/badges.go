@@ -46,7 +46,7 @@ func (k Keeper) ValidateIdRanges(collection types.BadgeCollection, ranges []*typ
 
 // For each (supply, amount) pair, we create (amount) badges with a supply of (supply). Error if IDs overflow.
 // We assume that lengths of supplys and amountsToCreate are equal before entering this function. Also amountsToCreate[i] can never be zero.
-func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, supplysAndAmounts []*types.BadgeSupplyAndAmount, transfers []*types.Transfers, claims []*types.Claim, creatorAddress string) (types.BadgeCollection, error) {
+func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, supplysAndAmounts []*types.BadgeSupplyAndAmount, transfers []*types.Transfer, claims []*types.Claim, creatorAddress string) (types.BadgeCollection, error) {
 	maxSupplys := collection.MaxSupplys //get current
 	unmintedSupplys := collection.UnmintedSupplys
 
@@ -119,7 +119,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 	return collection, nil
 }
 
-func (k Keeper) MintViaTransfer(ctx sdk.Context, collection types.BadgeCollection, transfers []*types.Transfers) (types.BadgeCollection, error) {
+func (k Keeper) MintViaTransfer(ctx sdk.Context, collection types.BadgeCollection, transfers []*types.Transfer) (types.BadgeCollection, error) {
 	//Treat the unminted balances as another account for compatibility with our transfer function
 	unmintedBalances := types.UserBalanceStore{
 		Balances: collection.UnmintedSupplys,
@@ -135,12 +135,12 @@ func (k Keeper) MintViaTransfer(ctx sdk.Context, collection types.BadgeCollectio
 			}
 
 			for _, balanceObj := range transfer.Balances {
-				unmintedBalances, err = SubtractBalancesForIdRanges(unmintedBalances, balanceObj.BadgeIds, balanceObj.Amount)
+				unmintedBalances.Balances, err = SubtractBalancesForIdRanges(unmintedBalances.Balances, balanceObj.BadgeIds, balanceObj.Amount)
 				if err != nil {
 					return types.BadgeCollection{}, err
 				}
 
-				recipientBalance, err = AddBalancesForIdRanges(recipientBalance, balanceObj.BadgeIds, balanceObj.Amount)
+				recipientBalance.Balances, err = AddBalancesForIdRanges(recipientBalance.Balances, balanceObj.BadgeIds, balanceObj.Amount)
 				if err != nil {
 					return types.BadgeCollection{}, err
 				}
@@ -167,7 +167,7 @@ func (k Keeper) MintViaClaim(ctx sdk.Context, collection types.BadgeCollection, 
 	err := *new(error)
 	for _, claim := range claims {
 		for _, balance := range claim.Balances {
-			unmintedBalances, err = SubtractBalancesForIdRanges(unmintedBalances, balance.BadgeIds, balance.Amount)
+			unmintedBalances.Balances, err = SubtractBalancesForIdRanges(unmintedBalances.Balances, balance.BadgeIds, balance.Amount)
 			if err != nil {
 				return types.BadgeCollection{}, err
 			}

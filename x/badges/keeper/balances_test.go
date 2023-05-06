@@ -318,7 +318,7 @@ func (suite *TestSuite) TestSubtractBalances() {
 	}
 
 	err := *new(error)
-	UserBalance, err = keeper.AddBalancesForIdRanges(UserBalance, badgeIdRanges, 1000)
+	UserBalance.Balances, err = keeper.AddBalancesForIdRanges(UserBalance.Balances, badgeIdRanges, 1000)
 	suite.Require().NoError(err)
 
 	suite.Require().Equal(UserBalance.Balances[0].Amount, uint64(1000))
@@ -355,7 +355,7 @@ func (suite *TestSuite) TestSubtractBalances() {
 		},
 	}
 	for _, badgeIdRangeToRemove := range badgeIdRangesToRemove {
-		UserBalance, err = keeper.SubtractBalancesForIdRanges(UserBalance, []*types.IdRange{badgeIdRangeToRemove}, 1)
+		UserBalance.Balances, err = keeper.SubtractBalancesForIdRanges(UserBalance.Balances, []*types.IdRange{badgeIdRangeToRemove}, 1)
 		suite.Require().NoError(err)
 	}
 
@@ -393,7 +393,7 @@ func (suite *TestSuite) TestAddBalancesForIdRanges() {
 
 	err := *new(error)
 	for _, badgeIdRange := range badgeIdRanges {
-		UserBalance, err = keeper.AddBalancesForIdRanges(UserBalance, []*types.IdRange{badgeIdRange}, 1000)
+		UserBalance.Balances, err = keeper.AddBalancesForIdRanges(UserBalance.Balances, []*types.IdRange{badgeIdRange}, 1000)
 		suite.Require().Nil(err, "error adding balance to approval")
 	}
 
@@ -419,7 +419,7 @@ func (suite *TestSuite) TestAddBalancesForIdRanges() {
 	}
 
 	for _, badgeIdRangeToAdd := range badgeIdRangesToAdd {
-		UserBalance, _ = keeper.AddBalancesForIdRanges(UserBalance, []*types.IdRange{badgeIdRangeToAdd}, 1)
+		UserBalance.Balances, _ = keeper.AddBalancesForIdRanges(UserBalance.Balances, []*types.IdRange{badgeIdRangeToAdd}, 1)
 		suite.Require().Nil(err, "error adding balance to approval")
 	}
 
@@ -460,7 +460,7 @@ func (suite *TestSuite) TestAddBalancesOverflow() {
 
 	err := *new(error)
 	for _, badgeIdRange := range badgeIdRanges {
-		UserBalance, err = keeper.AddBalancesForIdRanges(UserBalance, []*types.IdRange{badgeIdRange}, 1000)
+		UserBalance.Balances, err = keeper.AddBalancesForIdRanges(UserBalance.Balances, []*types.IdRange{badgeIdRange}, 1000)
 		suite.Require().Nil(err, "error adding balance to approval")
 	}
 
@@ -478,7 +478,7 @@ func (suite *TestSuite) TestAddBalancesOverflow() {
 	}
 
 	for _, badgeIdRange := range badgeIdRangesToAdd {
-		UserBalance, err = keeper.AddBalancesForIdRanges(UserBalance, []*types.IdRange{badgeIdRange}, math.MaxUint64)
+		UserBalance.Balances, err = keeper.AddBalancesForIdRanges(UserBalance.Balances, []*types.IdRange{badgeIdRange}, math.MaxUint64)
 		suite.Require().EqualError(err, keeper.ErrOverflow.Error())
 	}
 }
@@ -506,7 +506,7 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 
 	err := *new(error)
 	for _, badgeIdRange := range badgeIdRanges {
-		UserBalance, err = keeper.AddBalancesForIdRanges(UserBalance, []*types.IdRange{&badgeIdRange}, 1000)
+		UserBalance.Balances, err = keeper.AddBalancesForIdRanges(UserBalance.Balances, []*types.IdRange{&badgeIdRange}, 1000)
 		suite.Require().NoError(err)
 	}
 
@@ -529,7 +529,7 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 	}
 
 	for _, badgeIdRange := range badgeIdRangesToRemove {
-		UserBalance, err = keeper.SubtractBalancesForIdRanges(UserBalance, []*types.IdRange{badgeIdRange}, math.MaxUint64)
+		UserBalance.Balances, err = keeper.SubtractBalancesForIdRanges(UserBalance.Balances, []*types.IdRange{badgeIdRange}, math.MaxUint64)
 		suite.Require().EqualError(err, keeper.ErrUnderflow.Error())
 	}
 }
@@ -551,7 +551,7 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 
 // 			amount := uint64(rand.Intn(100))
 // 			err := *new(error)
-// 			userBalance, err = keeper.AddBalancesForIdRanges(userBalance, []*types.IdRange{
+// 			userBalance.Balances, err = keeper.AddBalancesForIdRanges(userBalance.Balances, []*types.IdRange{
 // 				{
 // 					Start: start,
 // 					End:   end,
@@ -572,7 +572,7 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 // 			amount = uint64(rand.Intn(100))
 // 			start = uint64(rand.Intn(1000))
 // 			end = uint64(500 + rand.Intn(500))
-// 			userBalance, err = keeper.SubtractBalancesForIdRanges(userBalance, []*types.IdRange{
+// 			userBalance.Balances, err = keeper.SubtractBalancesForIdRanges(userBalance.Balances, []*types.IdRange{
 // 				{
 // 					Start: start,
 // 					End:   end,

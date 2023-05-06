@@ -20,51 +20,13 @@ func (k msgServer) MintAndDistributeBadges(goCtx context.Context, msg *types.Msg
 	if err != nil {
 		return nil, err
 	}
-
+	
 	collection, err = k.CreateBadges(ctx, collection, msg.BadgeSupplys, msg.Transfers, msg.Claims, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
 
-	needToValidateUpdateMetadataUris := false
-	needToValidateUpdateBalanceUri := false
-	newCollectionUri := collection.CollectionUri
-	newBadgeUris := collection.BadgeUris
-	newBalanceUri := collection.BalancesUri
-
-	if msg.CollectionUri != "" && msg.CollectionUri != collection.CollectionUri {
-		needToValidateUpdateMetadataUris = true
-		newCollectionUri = msg.CollectionUri
-	}
-
-	if msg.BalancesUri != "" && msg.BalancesUri != collection.BalancesUri {
-		needToValidateUpdateBalanceUri = true
-		newBalanceUri = msg.BalancesUri
-	}
-
-	if msg.BadgeUris != nil && len(msg.BadgeUris) > 0 {
-		newBadgeUris = msg.BadgeUris
-
-		for idx, badgeUri := range collection.BadgeUris {
-			if msg.BadgeUris[idx].Uri != badgeUri.Uri {
-				needToValidateUpdateMetadataUris = true
-				break
-			}
-
-			if len(msg.BadgeUris[idx].BadgeIds) != len(badgeUri.BadgeIds) {
-				needToValidateUpdateMetadataUris = true
-				break
-			}
-
-			for j, badgeIdRange := range badgeUri.BadgeIds {
-				if badgeIdRange.Start != msg.BadgeUris[idx].BadgeIds[j].Start || badgeIdRange.End != msg.BadgeUris[idx].BadgeIds[j].End {
-					needToValidateUpdateMetadataUris = true
-					break
-				}
-			}
-		}
-	}
-
+	newCollectionUri, newBadgeUris, newBalancesUri, needToValidateUpdateMetadataUris, needToValidateUpdateBalanceUri := GetUrisToStoreAndPermissionsToCheck(collection, msg.CollectionUri, msg.BadgeUris, msg.BalancesUri)
 	_, err = k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:       msg.Creator,
 		CollectionId:  msg.CollectionId,
@@ -76,10 +38,11 @@ func (k msgServer) MintAndDistributeBadges(goCtx context.Context, msg *types.Msg
 		return nil, err
 	}
 
+
 	//Already validated in ValidateBasic
 	collection.BadgeUris = newBadgeUris
 	collection.CollectionUri = newCollectionUri
-	collection.BalancesUri = newBalanceUri
+	collection.BalancesUri = newBalancesUri
 
 	if err := k.SetCollectionInStore(ctx, collection); err != nil {
 		return nil, err

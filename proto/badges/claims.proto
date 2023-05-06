@@ -7,18 +7,22 @@ import "badges/ranges.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
+enum RestrictOptions {
+    NO_RESTRICTIONS = 0;
+    ONE_CLAIM_PER_ADDRESS = 2;
+}
 
 //Defines a claim object. Claims are used to transfer badges via a claiming process.
 //Stored in own store. Claimed leaves are also stored in unique store.
 message Claim {
     repeated Balance balances = 1; //Current balance of the claim store.
     string codeRoot = 2;
-    uint64 expectedMerkleProofLength = 10;
+    uint64 expectedCodeProofLength = 10;
     string whitelistRoot = 3;
     uint64 incrementIdsBy = 4;
     uint64 amount = 5;
     repeated IdRange badgeIds = 6;
-    uint64 restrictOptions = 7; //enum: 0 = no restrictions (can mint multiple times), 1 = whitelist leafs can only be used once, 2 = one claim per account
+    bool limitOnePerAddress = 7; //If true, only one claim per address is allowed.
     string uri = 8; //Optional URI for the claim. Max 100 chars. To be used for IPFS Merkle Tree Information
     IdRange timeRange = 9; //Time range when the claim is valid.
 }

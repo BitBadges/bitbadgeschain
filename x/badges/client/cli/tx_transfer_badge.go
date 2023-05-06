@@ -31,7 +31,7 @@ func CmdTransferBadge() *cobra.Command {
 				return err
 			}
 
-			var argTransfers []*types.Transfers
+			var argTransfers []*types.Transfer
 			err = json.Unmarshal([]byte(args[2]), &argTransfers)
 			if err != nil {
 				return err

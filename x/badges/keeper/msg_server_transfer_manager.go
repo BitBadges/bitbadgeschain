@@ -15,7 +15,6 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 		CollectionId:                msg.CollectionId,
 		MustBeManager:               true,
 		CanManagerBeTransferred:     true,
-		// AccountsToCheckRegistration: []string{msg.Address},
 	})
 	if err != nil {
 		return nil, err

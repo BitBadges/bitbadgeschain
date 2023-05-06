@@ -37,7 +37,7 @@ message BadgeSupplyAndAmount {
 
 //Upon badge creation, the manager will first be minted these badges, and then, they will subsequently be transferred to these addresses according to permissions.ForcefulTransfers.
 //Used to only need one signature for MsgNewBadge.
-message Transfers {
+message Transfer {
     repeated string toAddresses = 1;
     repeated Balance balances = 2;
 }
@@ -57,7 +57,7 @@ message MsgNewCollection {
     //Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
     //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
     repeated BadgeSupplyAndAmount badgeSupplys = 10;
-    repeated Transfers transfers = 11;
+    repeated Transfer transfers = 11;
     repeated Claim claims = 12;
 }
 
@@ -70,7 +70,7 @@ message MsgMintAndDistributeBadges {
     string creator = 1;
     uint64 collectionId = 2;
     repeated BadgeSupplyAndAmount badgeSupplys = 3;
-    repeated Transfers transfers = 4;
+    repeated Transfer transfers = 4;
     repeated Claim claims = 5;
     string collectionUri = 6;
     repeated BadgeUri badgeUris = 7;
@@ -86,7 +86,7 @@ message MsgTransferBadge {
     string creator = 1;
     uint64 collectionId = 2;
     string from = 3;
-    repeated Transfers transfers = 4;
+    repeated Transfer transfers = 4;
 }
 
 message MsgTransferBadgeResponse {}

@@ -10,6 +10,10 @@ const TypeMsgUpdateUris = "update_uris"
 var _ sdk.Msg = &MsgUpdateUris{}
 
 func NewMsgUpdateUris(creator string, collectionId uint64, collectionUri string, badgeUris []*BadgeUri, balancesUri string) *MsgUpdateUris {
+	for _, badgeUri := range badgeUris {
+		badgeUri.BadgeIds = SortAndMergeOverlapping(badgeUri.BadgeIds)
+	}
+
 	return &MsgUpdateUris{
 		Creator:       creator,
 		CollectionId:  collectionId,
@@ -46,18 +50,8 @@ func (msg *MsgUpdateUris) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.BadgeUris != nil && len(msg.BadgeUris) > 0 {
-		for _, badgeUri := range msg.BadgeUris {
-			//Validate well-formedness of the message entries
-			if err := ValidateURI(badgeUri.Uri); err != nil {
-				return err
-			}
-
-			err = ValidateRangesAreValid(badgeUri.BadgeIds)
-			if err != nil {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid badgeIds")
-			}
-		}
+	if err := ValidateBadgeUris(msg.BadgeUris); err != nil {
+		return err
 	}
 
 	if msg.CollectionUri != "" {
