@@ -17,8 +17,10 @@ func DefaultGenesis() *GenesisState {
 		NextCollectionId: 1,
 		NextClaimId:      1,
 		Collections:      []*BadgeCollection{},
-		Balances:         []*UserBalance{},
-		BalanceIds:       []string{},
+		Balances:         []*UserBalanceStore{},
+		BalanceStoreKeys: []string{},
+		Claims: 				  []*Claim{},
+		ClaimStoreKeys:		[]string{},
 	}
 }
 

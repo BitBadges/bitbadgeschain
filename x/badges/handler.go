@@ -19,8 +19,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgNewCollection:
 			res, err := msgServer.NewCollection(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgMintBadge:
-			res, err := msgServer.MintBadge(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgMintAndDistributeBadges:
+			res, err := msgServer.MintAndDistributeBadges(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgTransferBadge:
 			res, err := msgServer.TransferBadge(sdk.WrapSDKContext(ctx), msg)
@@ -28,8 +28,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgSetApproval:
 			res, err := msgServer.SetApproval(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgUpdateDisallowedTransfers:
-			res, err := msgServer.UpdateDisallowedTransfers(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgUpdateAllowedTransfers:
+			res, err := msgServer.UpdateAllowedTransfers(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgUpdateUris:
 			res, err := msgServer.UpdateUris(sdk.WrapSDKContext(ctx), msg)
@@ -45,9 +45,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgUpdateBytes:
 			res, err := msgServer.UpdateBytes(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgRegisterAddresses:
-			res, err := msgServer.RegisterAddresses(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 			// this line is used by starport scaffolding # 1
 		default:

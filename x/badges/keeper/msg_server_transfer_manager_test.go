@@ -48,11 +48,11 @@ func (suite *TestSuite) TestTransferManager() {
 	err = RequestTransferManager(suite, wctx, alice, 1, true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 1, aliceAccountNum)
+	err = TransferManager(suite, wctx, bob, 1, alice)
 	suite.Require().Nil(err, "Error transferring manager")
 
 	badge, _ := GetCollection(suite, wctx, 1)
-	suite.Require().Equal(aliceAccountNum, badge.Manager)
+	suite.Require().Equal(alice, badge.Manager)
 }
 
 func (suite *TestSuite) TestRequestTransferManager() {
@@ -101,11 +101,11 @@ func (suite *TestSuite) TestRequestTransferManager() {
 	err = RequestTransferManager(suite, wctx, alice, 1, true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 1, aliceAccountNum)
+	err = TransferManager(suite, wctx, bob, 1, alice)
 	suite.Require().Nil(err, "Error transferring manager")
 
 	badge, _ := GetCollection(suite, wctx, 1)
-	suite.Require().Equal(aliceAccountNum, badge.Manager)
+	suite.Require().Equal(alice, badge.Manager)
 }
 
 func (suite *TestSuite) TestRemovedRequestTransferManager() {
@@ -151,7 +151,7 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 	err = RequestTransferManager(suite, wctx, alice, 1, false)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 1, aliceAccountNum)
+	err = TransferManager(suite, wctx, bob, 1, alice)
 	suite.Require().EqualError(err, keeper.ErrAddressNeedsToOptInAndRequestManagerTransfer.Error())
 }
 
@@ -224,6 +224,6 @@ func (suite *TestSuite) TestManagerCantBeTransferred() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = TransferManager(suite, wctx, bob, 1, aliceAccountNum)
+	err = TransferManager(suite, wctx, bob, 1, alice)
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }

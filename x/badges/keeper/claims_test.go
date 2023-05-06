@@ -37,7 +37,7 @@ func (suite *TestSuite) TestSendAllToClaims() {
 
 	claimToAdd := types.Claim{
 		Balances: []*types.Balance{{
-			Balance:  10,
+			Amount:  10,
 			BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
 		}},
 	}
@@ -62,7 +62,7 @@ func (suite *TestSuite) TestSendAllToClaims() {
 					},
 				},
 			},
-		})
+		}, "")
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 1)
 
@@ -70,11 +70,11 @@ func (suite *TestSuite) TestSendAllToClaims() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-			Balance:  10,
+			Amount:  10,
 		},
 	}, badge.MaxSupplys)
 
-	claim := badge.Claims[0]
+	claim, _ := GetClaim(suite, wctx, 1, 1)
 	suite.Require().Nil(err, "Error getting claim")
-	suite.Require().Equal(&claimToAdd, claim)
+	suite.Require().Equal(claimToAdd, claim)
 }

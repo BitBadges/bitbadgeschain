@@ -1,7 +1,7 @@
 package types
 
 const (
-	NumPermissions = 6
+	NumPermissions = 7
 )
 
 /*
@@ -9,21 +9,23 @@ const (
 */
 
 type Permissions struct {
+	CanUpdateBalancesUri    bool //can the manager update the balances uri of the collection; if false, locked forever
 	CanDelete               bool //when true, manager can delete the collection; once set to false, it is locked
 	CanUpdateBytes          bool //can the manager update the bytes of the badge; if false, locked forever
 	CanManagerBeTransferred bool //can the manager transfer the managerial ownership of the badge to another account; if false, locked forever
-	CanUpdateUris           bool //can the manager update the uris (metadata) of the collection and badges; if false, locked forever
+	CanUpdateMetadataUris   bool //can the manager update the uris (metadata) of the collection and badges; if false, locked forever
 	CanCreateMoreBadges     bool //when true, manager can create more badges of the collection; once set to false, the number of badges in the collection is locked
-	CanUpdateDisallowed     bool //when true, manager can freeze and unfreeze addresseses from transferring; once set to false, it is locked
+	CanUpdateAllowed     		bool //when true, manager can freeze and unfreeze addresseses from transferring; once set to false, it is locked
 }
 
 const (
+	CanUpdateBalancesUriDigit    = 7
 	CanDeleteDigit               = 6
 	CanUpdateBytesDigit          = 5
 	CanManagerBeTransferredDigit = 4
-	CanUpdateUrisDigit           = 3
+	CanUpdateMetadataUrisDigit           = 3
 	CanCreateMoreBadgesDigit     = 2
-	CanUpdateDisallowedDigit     = 1
+	CanUpdateAllowedDigit     = 1
 )
 
 // Validate permissions are validly formed. Disallows leading zeroes.
@@ -50,7 +52,7 @@ func ValidatePermissionsUpdate(oldPermissions uint64, newPermissions uint64) err
 	oldFlags := GetPermissions(oldPermissions)
 	newFlags := GetPermissions(newPermissions)
 
-	if !oldFlags.CanUpdateUris && newFlags.CanUpdateUris {
+	if !oldFlags.CanUpdateMetadataUris && newFlags.CanUpdateMetadataUris {
 		return ErrInvalidPermissionsUpdateLocked
 	}
 
@@ -62,7 +64,7 @@ func ValidatePermissionsUpdate(oldPermissions uint64, newPermissions uint64) err
 		return ErrInvalidPermissionsUpdateLocked
 	}
 
-	if !oldFlags.CanUpdateDisallowed && newFlags.CanUpdateDisallowed {
+	if !oldFlags.CanUpdateAllowed && newFlags.CanUpdateAllowed {
 		return ErrInvalidPermissionsUpdateLocked
 	}
 
@@ -71,6 +73,10 @@ func ValidatePermissionsUpdate(oldPermissions uint64, newPermissions uint64) err
 	}
 
 	if !oldFlags.CanDelete && newFlags.CanDelete {
+		return ErrInvalidPermissionsUpdateLocked
+	}
+
+	if !oldFlags.CanUpdateBalancesUri && newFlags.CanUpdateBalancesUri {
 		return ErrInvalidPermissionsUpdateLocked
 	}
 
@@ -98,13 +104,15 @@ func SetPermissionsFlags(permission bool, digit int, flags *Permissions) {
 		flags.CanUpdateBytes = permission
 	} else if digit == CanManagerBeTransferredDigit {
 		flags.CanManagerBeTransferred = permission
-	} else if digit == CanUpdateUrisDigit {
-		flags.CanUpdateUris = permission
+	} else if digit == CanUpdateMetadataUrisDigit {
+		flags.CanUpdateMetadataUris = permission
 	} else if digit == CanCreateMoreBadgesDigit {
 		flags.CanCreateMoreBadges = permission
-	} else if digit == CanUpdateDisallowedDigit {
-		flags.CanUpdateDisallowed = permission
+	} else if digit == CanUpdateAllowedDigit {
+		flags.CanUpdateAllowed = permission
 	} else if digit == CanDeleteDigit {
 		flags.CanDelete = permission
+	} else if digit == CanUpdateBalancesUriDigit {
+		flags.CanUpdateBalancesUri = permission
 	}
 }

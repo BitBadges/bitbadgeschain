@@ -5,6 +5,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+// We can clean this up in the future. A lot of errors are deprecated and can be removed.
 var (
 	ErrInvalidNFT                                   = sdkerrors.Register(types.ModuleName, 2, "invalid nft")
 	ErrCollectionExists                             = sdkerrors.Register(types.ModuleName, 3, "collection already exists")

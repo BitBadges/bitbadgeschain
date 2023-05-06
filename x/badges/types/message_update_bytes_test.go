@@ -36,7 +36,7 @@ func TestMsgUpdateBytes_ValidateBasic(t *testing.T) {
 			name: "invalid bytes",
 			msg: types.MsgUpdateBytes{
 				Creator:  sample.AccAddress(),
-				NewBytes: string(arr),
+				Bytes: string(arr),
 			},
 			err: types.ErrBytesGreaterThan256,
 		},

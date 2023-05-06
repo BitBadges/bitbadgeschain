@@ -10,12 +10,12 @@ import (
 func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransferManager) (*types.MsgTransferManagerResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
+	collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
 		MustBeManager:               true,
 		CanManagerBeTransferred:     true,
-		AccountsToCheckRegistration: []uint64{msg.Address},
+		// AccountsToCheckRegistration: []string{msg.Address},
 	})
 	if err != nil {
 		return nil, err
@@ -26,13 +26,13 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 		return nil, ErrAddressNeedsToOptInAndRequestManagerTransfer
 	}
 
-	badge.Manager = msg.Address
+	collection.Manager = msg.Address
 
 	if err := k.RemoveTransferManagerRequest(ctx, msg.CollectionId, msg.Address); err != nil {
 		return nil, err
 	}
 
-	if err := k.SetCollectionInStore(ctx, badge); err != nil {
+	if err := k.SetCollectionInStore(ctx, collection); err != nil {
 		return nil, err
 	}
 

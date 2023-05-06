@@ -26,7 +26,7 @@ func CmdTransferBadge() *cobra.Command {
 				return err
 			}
 
-			argFrom, err := cast.ToUint64E(args[1])
+			argFrom, err := cast.ToStringE(args[1])
 			if err != nil {
 				return err
 			}

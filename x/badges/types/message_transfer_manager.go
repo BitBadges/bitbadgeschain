@@ -9,7 +9,7 @@ const TypeMsgTransferManager = "transfer_manager"
 
 var _ sdk.Msg = &MsgTransferManager{}
 
-func NewMsgTransferManager(creator string, collectionId uint64, address uint64) *MsgTransferManager {
+func NewMsgTransferManager(creator string, collectionId uint64, address string) *MsgTransferManager {
 	return &MsgTransferManager{
 		Creator:      creator,
 		CollectionId: collectionId,
@@ -43,5 +43,15 @@ func (msg *MsgTransferManager) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	_, err = sdk.AccAddressFromBech32(msg.Address)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid provided address (%s)", err)
+	}
+
+	if msg.CollectionId == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
+	}
+
 	return nil
 }

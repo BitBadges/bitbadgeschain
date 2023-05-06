@@ -51,25 +51,26 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 	unmintedSupplys := collection.UnmintedSupplys
 
 	err := *new(error)
+
 	//Update supplys and mint total supply for each to manager.
 	//Subasset supplys are stored as []*types.Balance, so we can use the balance update functions
 	for _, obj := range supplysAndAmounts {
-		amountToCreate := obj.Amount
+		amount := obj.Amount
 		supply := obj.Supply
 		nextBadgeId := collection.NextBadgeId
 
-		if supply == 0 {
+		if supply == 0 || amount == 0 {
 			return types.BadgeCollection{}, ErrSupplyEqualsZero
 		}
 
-		collection.NextBadgeId, err = SafeAdd(collection.NextBadgeId, amountToCreate) //error on ID overflow
+		collection.NextBadgeId, err = SafeAdd(collection.NextBadgeId, amount) //error on ID overflow
 		if err != nil {
 			return types.BadgeCollection{}, err
 		}
 
 		maxSupplys, err = UpdateBalancesForIdRanges(
 			[]*types.IdRange{
-				{Start: nextBadgeId, End: nextBadgeId + amountToCreate - 1},
+				{Start: nextBadgeId, End: nextBadgeId + amount - 1},
 			},
 			supply,
 			maxSupplys,
@@ -80,7 +81,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 
 		unmintedSupplys, err = UpdateBalancesForIdRanges(
 			[]*types.IdRange{
-				{Start: nextBadgeId, End: nextBadgeId + amountToCreate - 1},
+				{Start: nextBadgeId, End: nextBadgeId + amount - 1},
 			},
 			supply,
 			unmintedSupplys,
@@ -93,25 +94,11 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 	collection.UnmintedSupplys = unmintedSupplys
 	collection.MaxSupplys = maxSupplys
 
-	accsToCheck := []uint64{}
-	for _, transfer := range transfers {
-		accsToCheck = append(accsToCheck, transfer.ToAddresses...)
-	}
-
 	rangesToValidate := []*types.IdRange{}
 	for _, transfer := range transfers {
 		for _, balance := range transfer.Balances {
 			rangesToValidate = append(rangesToValidate, balance.BadgeIds...)
 		}
-	}
-
-	_, _, err = k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator:                     creatorAddress,
-		AccountsToCheckRegistration: accsToCheck,
-		OnlyCheckAccounts:           true,
-	})
-	if err != nil {
-		return types.BadgeCollection{}, err
 	}
 
 	err = k.ValidateIdRanges(collection, rangesToValidate)
@@ -133,27 +120,27 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 }
 
 func (k Keeper) MintViaTransfer(ctx sdk.Context, collection types.BadgeCollection, transfers []*types.Transfers) (types.BadgeCollection, error) {
-	//Treat the unminted balances as another account and use our transfer function
-	unmintedBalances := types.UserBalance{
+	//Treat the unminted balances as another account for compatibility with our transfer function
+	unmintedBalances := types.UserBalanceStore{
 		Balances: collection.UnmintedSupplys,
 	}
 
 	err := *new(error)
 	for _, transfer := range transfers {
 		for _, address := range transfer.ToAddresses {
-			recipientBalance := types.UserBalance{}
+			recipientBalance := types.UserBalanceStore{}
 			hasBalance := k.StoreHasUserBalance(ctx, ConstructBalanceKey(address, collection.CollectionId))
 			if hasBalance {
 				recipientBalance, _ = k.GetUserBalanceFromStore(ctx, ConstructBalanceKey(address, collection.CollectionId))
 			}
 
 			for _, balanceObj := range transfer.Balances {
-				unmintedBalances, err = SubtractBalancesForIdRanges(unmintedBalances, balanceObj.BadgeIds, balanceObj.Balance)
+				unmintedBalances, err = SubtractBalancesForIdRanges(unmintedBalances, balanceObj.BadgeIds, balanceObj.Amount)
 				if err != nil {
 					return types.BadgeCollection{}, err
 				}
 
-				recipientBalance, err = AddBalancesForIdRanges(recipientBalance, balanceObj.BadgeIds, balanceObj.Balance)
+				recipientBalance, err = AddBalancesForIdRanges(recipientBalance, balanceObj.BadgeIds, balanceObj.Amount)
 				if err != nil {
 					return types.BadgeCollection{}, err
 				}
@@ -172,23 +159,32 @@ func (k Keeper) MintViaTransfer(ctx sdk.Context, collection types.BadgeCollectio
 
 func (k Keeper) MintViaClaim(ctx sdk.Context, collection types.BadgeCollection, claims []*types.Claim) (types.BadgeCollection, error) {
 	//Treat the unminted balances as another account and use our transfer function
-	unmintedBalances := types.UserBalance{
+	unmintedBalances := types.UserBalanceStore{
 		Balances: collection.UnmintedSupplys,
 	}
 
+	currClaimId := collection.NextClaimId
 	err := *new(error)
 	for _, claim := range claims {
-
 		for _, balance := range claim.Balances {
-			unmintedBalances, err = SubtractBalancesForIdRanges(unmintedBalances, balance.BadgeIds, balance.Balance)
+			unmintedBalances, err = SubtractBalancesForIdRanges(unmintedBalances, balance.BadgeIds, balance.Amount)
 			if err != nil {
 				return types.BadgeCollection{}, err
 			}
 		}
 
-		collection.Claims = append(collection.Claims, claim)
+		err = k.SetClaimInStore(ctx, collection.CollectionId, currClaimId, *claim)
+		if err != nil {
+			return types.BadgeCollection{}, err
+		}
+
+		currClaimId, err = SafeAdd(currClaimId, 1)
+		if err != nil {
+			return types.BadgeCollection{}, err
+		}
 	}
 
+	collection.NextClaimId = currClaimId
 	collection.UnmintedSupplys = unmintedBalances.Balances
 
 	return collection, nil

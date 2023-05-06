@@ -11,7 +11,7 @@ func GetBalanceForId(id uint64, currentUserBalances []*types.Balance) (uint64, e
 	for _, balance := range currentUserBalances {
 		_, found := SearchIdRangesForId(id, balance.BadgeIds)
 		if found {
-			return balance.Balance, nil
+			return balance.Amount, nil
 		}
 	}
 	return 0, nil
@@ -88,7 +88,7 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*ty
 				}
 
 				//Update the fetchedBalances with the IDs which we found
-				fetchedBalances, err = UpdateBalancesForIdRanges(newIdRanges, userBalanceObj.Balance, fetchedBalances)
+				fetchedBalances, err = UpdateBalancesForIdRanges(newIdRanges, userBalanceObj.Amount, fetchedBalances)
 				if err != nil {
 					return fetchedBalances, err
 				}
@@ -100,7 +100,7 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*ty
 	if len(idsWithZeroBalance) > 0 {
 		fetchedBalances = append([]*types.Balance{
 			{
-				Balance:  0,
+				Amount:  0,
 				BadgeIds: idsWithZeroBalance,
 			},
 		}, fetchedBalances...)
@@ -110,14 +110,14 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, currentUserBalances []*ty
 }
 
 // Adds a balance to all ids specified in []ranges
-func AddBalancesForIdRanges(userBalance types.UserBalance, ranges []*types.IdRange, balanceToAdd uint64) (types.UserBalance, error) {
+func AddBalancesForIdRanges(userBalance types.UserBalanceStore, ranges []*types.IdRange, balanceToAdd uint64) (types.UserBalanceStore, error) {
 	currBalances, err := GetBalancesForIdRanges(ranges, userBalance.Balances)
 	if err != nil {
 		return userBalance, err
 	}
 
 	for _, balance := range currBalances {
-		newBalance, err := SafeAdd(balance.Balance, balanceToAdd)
+		newBalance, err := SafeAdd(balance.Amount, balanceToAdd)
 		if err != nil {
 			return userBalance, err
 		}
@@ -131,14 +131,14 @@ func AddBalancesForIdRanges(userBalance types.UserBalance, ranges []*types.IdRan
 }
 
 // Subtracts a balance to all ids specified in []ranges
-func SubtractBalancesForIdRanges(UserBalance types.UserBalance, ranges []*types.IdRange, balanceToRemove uint64) (types.UserBalance, error) {
+func SubtractBalancesForIdRanges(UserBalance types.UserBalanceStore, ranges []*types.IdRange, balanceToRemove uint64) (types.UserBalanceStore, error) {
 	currBalances, err := GetBalancesForIdRanges(ranges, UserBalance.Balances)
 	if err != nil {
 		return UserBalance, err
 	}
 
 	for _, currBalanceObj := range currBalances {
-		newBalance, err := SafeSubtract(currBalanceObj.Balance, balanceToRemove)
+		newBalance, err := SafeSubtract(currBalanceObj.Amount, balanceToRemove)
 		if err != nil {
 			return UserBalance, err
 		}
@@ -200,7 +200,7 @@ func SetBalanceForIdRanges(ranges []*types.IdRange, amount uint64, balances []*t
 			rangesToInsert = append(rangesToInsert, CreateIdRange(rangeToAdd.Start, rangeToAdd.End))
 		}
 		newBalances = append(newBalances, &types.Balance{
-			Balance:  amount,
+			Amount:  amount,
 			BadgeIds: rangesToInsert,
 		})
 		newBalances = append(newBalances, balances[idx:]...)
@@ -228,10 +228,10 @@ func SearchBalances(targetAmount uint64, balances []*types.Balance) (int, bool) 
 	idx := 0
 	for balanceLow <= balanceHigh {
 		median = int(uint(balanceLow+balanceHigh) >> 1)
-		if balances[median].Balance == targetAmount {
+		if balances[median].Amount == targetAmount {
 			hasEntryWithSameBalance = true
 			break
-		} else if balances[median].Balance > targetAmount {
+		} else if balances[median].Amount > targetAmount {
 			balanceHigh = median - 1
 		} else {
 			balanceLow = median + 1
@@ -240,7 +240,7 @@ func SearchBalances(targetAmount uint64, balances []*types.Balance) (int, bool) 
 
 	if len(balances) != 0 {
 		idx = median + 1
-		if targetAmount <= balances[median].Balance {
+		if targetAmount <= balances[median].Amount {
 			idx = median
 		}
 	}

@@ -30,7 +30,7 @@ func CmdGetCollection() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryGetCollectionRequest{
-				Id: reqId,
+				CollectionId: reqId,
 			}
 
 			res, err := queryClient.GetCollection(cmd.Context(), params)

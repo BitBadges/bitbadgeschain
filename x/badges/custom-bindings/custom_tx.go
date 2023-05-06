@@ -23,15 +23,7 @@ func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 		}
 
-		// return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unmarshaled to value: %+v", badgeCustomMsg)
-
 		switch {
-		case badgeCustomMsg.RegisterAddresses != nil:
-				registerAddressesMsg := badgeTypes.NewMsgRegisterAddresses(
-					_sender.String(),
-					badgeCustomMsg.RegisterAddresses.AddressesToRegister,
-				)
-				return []sdk.Msg{registerAddressesMsg}, nil
 		case badgeCustomMsg.NewCollection != nil:
 				newCollectionMsg := badgeTypes.NewMsgNewCollection(
 					_sender.String(),
@@ -40,24 +32,26 @@ func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 					badgeCustomMsg.NewCollection.CollectionUri,
 					badgeCustomMsg.NewCollection.BadgeUris,
 					badgeCustomMsg.NewCollection.Permissions,
-					badgeCustomMsg.NewCollection.DisallowedTransfers,
+					badgeCustomMsg.NewCollection.AllowedTransfers,
 					badgeCustomMsg.NewCollection.ManagerApprovedTransfers,
 					badgeCustomMsg.NewCollection.Bytes,
 					badgeCustomMsg.NewCollection.Transfers,
 					badgeCustomMsg.NewCollection.Claims,
+					badgeCustomMsg.NewCollection.BalancesUri,
 				)
 				return []sdk.Msg{newCollectionMsg}, nil
-		case badgeCustomMsg.MintBadge != nil:
-				mintBadgeMsg := badgeTypes.NewMsgMintBadge(
+		case badgeCustomMsg.MintAndDistributeBadges != nil:
+				MintAndDistributeBadgesMsg := badgeTypes.NewMsgMintAndDistributeBadges(
 					_sender.String(),
-					badgeCustomMsg.MintBadge.CollectionId,
-					badgeCustomMsg.MintBadge.BadgeSupplys,
-					badgeCustomMsg.MintBadge.Transfers,
-					badgeCustomMsg.MintBadge.Claims,
-					badgeCustomMsg.MintBadge.CollectionUri,
-					badgeCustomMsg.MintBadge.BadgeUris,
+					badgeCustomMsg.MintAndDistributeBadges.CollectionId,
+					badgeCustomMsg.MintAndDistributeBadges.BadgeSupplys,
+					badgeCustomMsg.MintAndDistributeBadges.Transfers,
+					badgeCustomMsg.MintAndDistributeBadges.Claims,
+					badgeCustomMsg.MintAndDistributeBadges.CollectionUri,
+					badgeCustomMsg.MintAndDistributeBadges.BadgeUris,
+					badgeCustomMsg.MintAndDistributeBadges.BalancesUri,
 				)
-				return []sdk.Msg{mintBadgeMsg}, nil
+				return []sdk.Msg{MintAndDistributeBadgesMsg}, nil
 		case badgeCustomMsg.ClaimBadge != nil:
 				claimBadgeMsg := badgeTypes.NewMsgClaimBadge(
 					_sender.String(),
@@ -107,14 +101,14 @@ func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 				updateBytesMsg := badgeTypes.NewMsgUpdateBytes(
 					_sender.String(),
 					badgeCustomMsg.UpdateBytes.CollectionId,
-					badgeCustomMsg.UpdateBytes.NewBytes,
+					badgeCustomMsg.UpdateBytes.Bytes,
 				)
 				return []sdk.Msg{updateBytesMsg}, nil
-		case badgeCustomMsg.UpdateDisallowedTransfers != nil:
-				updateCollectionUriMsg := badgeTypes.NewMsgUpdateDisallowedTransfers(
+		case badgeCustomMsg.UpdateAllowedTransfers != nil:
+				updateCollectionUriMsg := badgeTypes.NewMsgUpdateAllowedTransfers(
 					_sender.String(),
-					badgeCustomMsg.UpdateDisallowedTransfers.CollectionId,
-					badgeCustomMsg.NewCollection.DisallowedTransfers,
+					badgeCustomMsg.UpdateAllowedTransfers.CollectionId,
+					badgeCustomMsg.NewCollection.AllowedTransfers,
 				)
 				return []sdk.Msg{updateCollectionUriMsg}, nil
 		case badgeCustomMsg.UpdatePermissions != nil:
@@ -130,6 +124,7 @@ func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 					badgeCustomMsg.UpdateUris.CollectionId,
 					badgeCustomMsg.UpdateUris.CollectionUri,
 					badgeCustomMsg.UpdateUris.BadgeUris,
+					badgeCustomMsg.UpdateUris.BalancesUri,
 				)
 				return []sdk.Msg{updateUrisMsg}, nil
 		default:
@@ -139,9 +134,8 @@ func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 }
 
 type badgeCustomMsg struct {
-	RegisterAddresses *badgeTypes.MsgRegisterAddresses `json:"registerAddressesMsg,omitempty"`
 	NewCollection    *badgeTypes.MsgNewCollection     `json:"newCollectionMsg,omitempty"`
-	MintBadge		*badgeTypes.MsgMintBadge         `json:"mintBadgeMsg,omitempty"`
+	MintAndDistributeBadges		*badgeTypes.MsgMintAndDistributeBadges         `json:"mintAndDistributeBadgesMsg,omitempty"`
 	ClaimBadge 	*badgeTypes.MsgClaimBadge        `json:"claimBadgeMsg,omitempty"`
 	DeleteCollection *badgeTypes.MsgDeleteCollection  `json:"deleteCollectionMsg,omitempty"`
 	RequestTransferManager *badgeTypes.MsgRequestTransferManager `json:"requestTransferManagerMsg,omitempty"`
@@ -149,7 +143,7 @@ type badgeCustomMsg struct {
 	TransferBadge *badgeTypes.MsgTransferBadge `json:"transferBadgeMsg,omitempty"`
 	TransferManager *badgeTypes.MsgTransferManager `json:"transferManagerMsg,omitempty"`
 	UpdateBytes *badgeTypes.MsgUpdateBytes `json:"updateBytesMsg,omitempty"`
-	UpdateDisallowedTransfers *badgeTypes.MsgUpdateDisallowedTransfers `json:"updateDisallowedTransfersMsg,omitempty"`
+	UpdateAllowedTransfers *badgeTypes.MsgUpdateAllowedTransfers `json:"updateAllowedTransfersMsg,omitempty"`
 	UpdatePermissions *badgeTypes.MsgUpdatePermissions `json:"updatePermissionsMsg,omitempty"`
 	UpdateUris *badgeTypes.MsgUpdateUris `json:"updateUrisMsg,omitempty"`
 }

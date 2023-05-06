@@ -13,10 +13,10 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdUpdateDisallowedTransfers() *cobra.Command {
+func CmdUpdateAllowedTransfers() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-disallowed-transfers [collection-id] [disallowed-transfers]",
-		Short: "Broadcast message updateDisallowedTransfers",
+		Use:   "update-allowed-transfers [collection-id] [allowed-transfers]",
+		Short: "Broadcast message updateAllowedTransfers",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			
@@ -25,8 +25,8 @@ func CmdUpdateDisallowedTransfers() *cobra.Command {
 				return err
 			}
 
-			var argDisallowedTransfers []*types.TransferMapping
-			if err := json.Unmarshal([]byte(args[1]), &argDisallowedTransfers); err != nil {
+			var argAllowedTransfers []*types.TransferMapping
+			if err := json.Unmarshal([]byte(args[1]), &argAllowedTransfers); err != nil {
 				return err
 			}
 			
@@ -35,10 +35,10 @@ func CmdUpdateDisallowedTransfers() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpdateDisallowedTransfers(
+			msg := types.NewMsgUpdateAllowedTransfers(
 				clientCtx.GetFromAddress().String(),
 				argCollectionId,
-				argDisallowedTransfers,
+				argAllowedTransfers,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {

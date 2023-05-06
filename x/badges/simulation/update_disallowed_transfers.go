@@ -10,7 +10,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 )
 
-func SimulateMsgUpdateDisallowedTransfers(
+func SimulateMsgUpdateAllowedTransfers(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	k keeper.Keeper,
@@ -19,27 +19,19 @@ func SimulateMsgUpdateDisallowedTransfers(
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 
-		msg := &types.MsgUpdateDisallowedTransfers{
+		msg := &types.MsgUpdateAllowedTransfers{
 			Creator:      simAccount.Address.String(),
 			CollectionId: r.Uint64(),
-			DisallowedTransfers: []*types.TransferMapping{
+			AllowedTransfers: []*types.TransferMapping{
 				{
-					From: &types.Addresses{
-						AccountIds: []*types.IdRange{
-							{
-								Start: r.Uint64(),
-								End:   r.Uint64(),
-							},
-							{
-								Start: r.Uint64(),
-								End:   r.Uint64(),
-							},
-							{
-								Start: r.Uint64(),
-								End:   r.Uint64(),
-							},
+					From: &types.AddressesMapping{
+						Addresses: []string{
+							simAccount.Address.String(),
+							simAccount.Address.String(),
+							simAccount.Address.String(),
 						},
-						Options: uint64(uint64(types.AddressOptions_None)),
+						IncludeOnlySpecified: r.Uint64() % 2 == 0,
+						ManagerOptions: r.Uint64(),
 					},
 				},
 			},

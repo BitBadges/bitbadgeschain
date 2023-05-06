@@ -71,13 +71,98 @@ func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId uint64) 
 	store.Delete(collectionStoreKey(collectionId))
 }
 
+/****************************************CLAIMS****************************************/
+
+// Sets a user balance in the store using ClaimKey ([]byte{0x02}) as the prefix. No check if store has key already.
+func (k Keeper) SetClaimInStore(ctx sdk.Context, collectionId uint64, claimId uint64, Claim types.Claim) error {
+	marshaled_claim_info, err := k.cdc.Marshal(&Claim)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Marshal types.Claim failed")
+	}
+
+	store := ctx.KVStore(k.storeKey)
+	claimKey := ConstructClaimKey(collectionId, claimId)
+	store.Set(claimStoreKey(claimKey), marshaled_claim_info)
+	return nil
+}
+
+// Sets a user balance in the store using ClaimKey ([]byte{0x02}) as the prefix. No check if store has key already.
+func (k Keeper) SetClaimInStoreWithKey(ctx sdk.Context, claimKey string, Claim types.Claim) error {
+	marshaled_claim_info, err := k.cdc.Marshal(&Claim)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Marshal types.Claim failed")
+	}
+
+	store := ctx.KVStore(k.storeKey)
+	store.Set(claimStoreKey(claimKey), marshaled_claim_info)
+	return nil
+}
+
+
+// Gets a user balance from the store according to the balanceID.
+func (k Keeper) GetClaimFromStore(ctx sdk.Context, collectionId uint64, claimId uint64) (types.Claim, bool) {
+	store := ctx.KVStore(k.storeKey)
+	claimKey := ConstructClaimKey(collectionId, claimId)
+	marshaled_claim_info := store.Get(claimStoreKey(claimKey))
+
+	var Claim types.Claim
+	if len(marshaled_claim_info) == 0 {
+		return Claim, false
+	}
+	k.cdc.MustUnmarshal(marshaled_claim_info, &Claim)
+	return Claim, true
+}
+
+// GetClaimsFromStore defines a method for returning all user balances information by key.
+func (k Keeper) GetClaimsFromStore(ctx sdk.Context) (claims []*types.Claim, collectionIds []uint64, claimIds []uint64) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, ClaimKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var Claim types.Claim
+		k.cdc.MustUnmarshal(iterator.Value(), &Claim)
+		claims = append(claims, &Claim)
+
+		claimKeyDetails := GetDetailsFromClaimKey(string(iterator.Key()))
+		collectionIds = append(collectionIds, claimKeyDetails.collectionId)
+		claimIds = append(claimIds, claimKeyDetails.claimId)
+	}
+	return
+}
+
+// GetClaimIdsFromStore defines a method for returning all keys of all user balances.
+func (k Keeper) GetClaimIdsFromStore(ctx sdk.Context) (ids []string) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, ClaimKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		ids = append(ids, string(iterator.Key()))
+	}
+	return
+}
+
+// StoreHasClaimID determines whether the specified user balanceID exists in the store
+func (k Keeper) StoreHasClaim(ctx sdk.Context, collectionId uint64, claimId uint64) bool {
+	store := ctx.KVStore(k.storeKey)
+	claimKey := ConstructClaimKey(collectionId, claimId)
+	return store.Has(claimStoreKey(claimKey))
+}
+
+// DeleteClaimFromStore deletes a user balance from the store.
+func (k Keeper) DeleteClaimFromStore(ctx sdk.Context, collectionId uint64, claimId uint64) {
+	store := ctx.KVStore(k.storeKey)
+	claimKey := ConstructClaimKey(collectionId, claimId)
+	store.Delete(claimStoreKey(claimKey))
+}
+
 /****************************************USER BALANCES****************************************/
 
 // Sets a user balance in the store using UserBalanceKey ([]byte{0x02}) as the prefix. No check if store has key already.
-func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBalance types.UserBalance) error {
+func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBalance types.UserBalanceStore) error {
 	marshaled_badge_balance_info, err := k.cdc.Marshal(&UserBalance)
 	if err != nil {
-		return sdkerrors.Wrap(err, "Marshal types.UserBalance failed")
+		return sdkerrors.Wrap(err, "Marshal types.UserBalanceStore failed")
 	}
 
 	store := ctx.KVStore(k.storeKey)
@@ -86,11 +171,11 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 }
 
 // Gets a user balance from the store according to the balanceID.
-func (k Keeper) GetUserBalanceFromStore(ctx sdk.Context, balanceKey string) (types.UserBalance, bool) {
+func (k Keeper) GetUserBalanceFromStore(ctx sdk.Context, balanceKey string) (types.UserBalanceStore, bool) {
 	store := ctx.KVStore(k.storeKey)
 	marshaled_badge_balance_info := store.Get(userBalanceStoreKey(balanceKey))
 
-	var UserBalance types.UserBalance
+	var UserBalance types.UserBalanceStore
 	if len(marshaled_badge_balance_info) == 0 {
 		return UserBalance, false
 	}
@@ -99,18 +184,18 @@ func (k Keeper) GetUserBalanceFromStore(ctx sdk.Context, balanceKey string) (typ
 }
 
 // GetUserBalancesFromStore defines a method for returning all user balances information by key.
-func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.UserBalance, accNums []uint64, ids []uint64) {
+func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.UserBalanceStore, addresses []string, ids []uint64) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, UserBalanceKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		var UserBalance types.UserBalance
+		var UserBalance types.UserBalanceStore
 		k.cdc.MustUnmarshal(iterator.Value(), &UserBalance)
 		balances = append(balances, &UserBalance)
 
 		balanceKeyDetails := GetDetailsFromBalanceKey(string(iterator.Key()))
 		ids = append(ids, balanceKeyDetails.collectionId)
-		accNums = append(accNums, balanceKeyDetails.accountNum)
+		addresses = append(addresses, balanceKeyDetails.address)
 	}
 	return
 }
@@ -142,14 +227,14 @@ func (k Keeper) DeleteUserBalanceFromStore(ctx sdk.Context, balanceKey string) {
 /****************************************TRANSFER MANAGER REQUESTS****************************************/
 
 // Checks if a certain address has requested a managerial transfer
-func (k Keeper) HasAddressRequestedManagerTransfer(ctx sdk.Context, collectionId uint64, address uint64) bool {
+func (k Keeper) HasAddressRequestedManagerTransfer(ctx sdk.Context, collectionId uint64, address string) bool {
 	store := ctx.KVStore(k.storeKey)
 	key := ConstructTransferManagerRequestKey(collectionId, address)
 	return store.Has(managerTransferRequestKey(key))
 }
 
 // Creates a transfer manager request for the given address and collectionId.
-func (k Keeper) CreateTransferManagerRequest(ctx sdk.Context, collectionId uint64, address uint64) error {
+func (k Keeper) CreateTransferManagerRequest(ctx sdk.Context, collectionId uint64, address string) error {
 	request := []byte{}
 	store := ctx.KVStore(k.storeKey)
 	key := ConstructTransferManagerRequestKey(collectionId, address)
@@ -158,7 +243,7 @@ func (k Keeper) CreateTransferManagerRequest(ctx sdk.Context, collectionId uint6
 }
 
 // Deletes a transfer manager request for the given address and collectionId.
-func (k Keeper) RemoveTransferManagerRequest(ctx sdk.Context, collectionId uint64, address uint64) error {
+func (k Keeper) RemoveTransferManagerRequest(ctx sdk.Context, collectionId uint64, address string) error {
 	key := ConstructTransferManagerRequestKey(collectionId, address)
 	store := ctx.KVStore(k.storeKey)
 
@@ -191,6 +276,8 @@ func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) {
 }
 
 /****************************************NEXT CLAIM ID****************************************/
+//Note these claim IDs are different than the ones within each collection. 
+//These are the IDs for the claim stores themselves, not the claim IDs for within a collection.
 
 // Gets the next badge ID.
 func (k Keeper) GetNextClaimId(ctx sdk.Context) uint64 {

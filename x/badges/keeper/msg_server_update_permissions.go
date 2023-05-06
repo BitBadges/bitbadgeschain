@@ -10,7 +10,7 @@ import (
 func (k msgServer) UpdatePermissions(goCtx context.Context, msg *types.MsgUpdatePermissions) (*types.MsgUpdatePermissionsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
+	collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:       msg.Creator,
 		CollectionId:  msg.CollectionId,
 		MustBeManager: true,
@@ -19,14 +19,13 @@ func (k msgServer) UpdatePermissions(goCtx context.Context, msg *types.MsgUpdate
 		return nil, err
 	}
 
-	err = types.ValidatePermissionsUpdate(badge.Permissions, msg.Permissions)
+	err = types.ValidatePermissionsUpdate(collection.Permissions, msg.Permissions)
 	if err != nil {
 		return nil, err
 	}
 
-	badge.Permissions = msg.Permissions
-
-	if err := k.SetCollectionInStore(ctx, badge); err != nil {
+	collection.Permissions = msg.Permissions
+	if err := k.SetCollectionInStore(ctx, collection); err != nil {
 		return nil, err
 	}
 

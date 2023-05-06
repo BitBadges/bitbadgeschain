@@ -12,16 +12,15 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 // Msg defines the Msg service.
 service Msg {
     rpc NewCollection(MsgNewCollection) returns (MsgNewCollectionResponse);
-    rpc MintBadge(MsgMintBadge) returns (MsgMintBadgeResponse);
+    rpc MintAndDistributeBadges(MsgMintAndDistributeBadges) returns (MsgMintAndDistributeBadgesResponse);
     rpc TransferBadge(MsgTransferBadge) returns (MsgTransferBadgeResponse);
     rpc SetApproval(MsgSetApproval) returns (MsgSetApprovalResponse);
-    rpc UpdateDisallowedTransfers(MsgUpdateDisallowedTransfers) returns (MsgUpdateDisallowedTransfersResponse);
+    rpc UpdateAllowedTransfers(MsgUpdateAllowedTransfers) returns (MsgUpdateAllowedTransfersResponse);
     rpc UpdateUris(MsgUpdateUris) returns (MsgUpdateUrisResponse);
     rpc UpdatePermissions(MsgUpdatePermissions) returns (MsgUpdatePermissionsResponse);
     rpc TransferManager(MsgTransferManager) returns (MsgTransferManagerResponse);
     rpc RequestTransferManager(MsgRequestTransferManager) returns (MsgRequestTransferManagerResponse);
     rpc UpdateBytes(MsgUpdateBytes) returns (MsgUpdateBytesResponse);
-    rpc RegisterAddresses(MsgRegisterAddresses) returns (MsgRegisterAddressesResponse);
     rpc ClaimBadge(MsgClaimBadge) returns (MsgClaimBadgeResponse);
     rpc DeleteCollection(MsgDeleteCollection) returns (MsgDeleteCollectionResponse);
     // this line is used by starport scaffolding # proto/tx/rpc
@@ -39,7 +38,7 @@ message BadgeSupplyAndAmount {
 //Upon badge creation, the manager will first be minted these badges, and then, they will subsequently be transferred to these addresses according to permissions.ForcefulTransfers.
 //Used to only need one signature for MsgNewBadge.
 message Transfers {
-    repeated uint64 toAddresses = 1;
+    repeated string toAddresses = 1;
     repeated Balance balances = 2;
 }
 
@@ -48,17 +47,18 @@ message MsgNewCollection {
     string creator = 1; 
     string collectionUri = 2;
     repeated BadgeUri badgeUris = 3;
+    string balancesUri = 4;
 
-    uint64 permissions = 4;
-    string bytes = 5;
-    repeated TransferMapping disallowedTransfers = 6;
-    repeated TransferMapping managerApprovedTransfers = 7;
-    uint64 standard = 8; 
+    uint64 permissions = 5;
+    string bytes = 6;
+    repeated TransferMapping allowedTransfers = 7;
+    repeated TransferMapping managerApprovedTransfers = 8;
+    uint64 standard = 9; 
     //Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
     //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
-    repeated BadgeSupplyAndAmount badgeSupplys = 9;
-    repeated Transfers transfers = 10;
-    repeated Claim claims = 11;
+    repeated BadgeSupplyAndAmount badgeSupplys = 10;
+    repeated Transfers transfers = 11;
+    repeated Claim claims = 12;
 }
 
 message MsgNewCollectionResponse {
@@ -66,7 +66,7 @@ message MsgNewCollectionResponse {
 }
 
 //This handles both minting more of existing badges and creating new badges.
-message MsgMintBadge {
+message MsgMintAndDistributeBadges {
     string creator = 1;
     uint64 collectionId = 2;
     repeated BadgeSupplyAndAmount badgeSupplys = 3;
@@ -74,9 +74,10 @@ message MsgMintBadge {
     repeated Claim claims = 5;
     string collectionUri = 6;
     repeated BadgeUri badgeUris = 7;
+    string balancesUri = 8;
 }
 
-message MsgMintBadgeResponse {
+message MsgMintAndDistributeBadgesResponse {
     uint64 nextBadgeId = 1; //ID of next badgeId after creating all badges.
 }
 
@@ -84,7 +85,7 @@ message MsgMintBadgeResponse {
 message MsgTransferBadge {
     string creator = 1;
     uint64 collectionId = 2;
-    uint64 from = 3;
+    string from = 3;
     repeated Transfers transfers = 4;
 }
 
@@ -94,20 +95,20 @@ message MsgTransferBadgeResponse {}
 message MsgSetApproval {
     string creator = 1;
     uint64 collectionId = 2;
-    uint64 address = 3; //The address that are approved to transfer the balances.
+    string address = 3; //The address that are approved to transfer the balances.
     repeated Balance balances = 4; //approval balances for every badgeId
 }
 
 message MsgSetApprovalResponse {}
 
 
-message MsgUpdateDisallowedTransfers {
+message MsgUpdateAllowedTransfers {
   string creator = 1;
   uint64 collectionId = 2;
-  repeated TransferMapping disallowedTransfers = 3;
+  repeated TransferMapping allowedTransfers = 3;
 }
 
-message MsgUpdateDisallowedTransfersResponse {
+message MsgUpdateAllowedTransfersResponse {
 }
 
 //Update badge Uris with new URI object, if permitted.
@@ -116,6 +117,7 @@ message MsgUpdateUris {
   uint64 collectionId = 2;
   string collectionUri = 3;
   repeated BadgeUri badgeUris = 4;
+  string balancesUri = 5;
 }
 
 message MsgUpdateUrisResponse {
@@ -135,7 +137,7 @@ message MsgUpdatePermissionsResponse {
 message MsgTransferManager {
   string creator = 1;
   uint64 collectionId = 2;
-  uint64 address = 3;
+  string address = 3;
 }
 
 message MsgTransferManagerResponse {
@@ -155,19 +157,10 @@ message MsgRequestTransferManagerResponse {
 message MsgUpdateBytes {
   string creator = 1;
   uint64 collectionId = 2;
-  string newBytes = 3;
+  string bytes = 3;
 }
 
 message MsgUpdateBytesResponse {
-}
-
-message MsgRegisterAddresses {
-  string creator = 1;
-  repeated string addressesToRegister = 2;
-}
-
-message MsgRegisterAddressesResponse {
-    IdRange registeredAddressNumbers = 1;
 }
 
 message ClaimProofItem {
@@ -192,11 +185,11 @@ message MsgClaimBadge {
 message MsgClaimBadgeResponse {}
 
 message MsgDeleteCollection {
-    string creator = 1;
-    uint64 collectionId = 2;
-  }
-  
-  message MsgDeleteCollectionResponse {
-  }
+  string creator = 1;
+  uint64 collectionId = 2;
+}
+
+message MsgDeleteCollectionResponse {
+}
 
 // this line is used by starport scaffolding # proto/tx/message

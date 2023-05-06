@@ -11,18 +11,18 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 //Defines a balance object. The specified balance holds for all ids specified within the id ranges array.
 message Balance {
-    uint64 balance = 1;
+    uint64 amount = 1;
     repeated IdRange badgeIds = 2;
 }
 
-//Defines a user balance object for a badge w/ the user's balances, nonce, pending transfers, and approvals. All badge IDs for a collection are handled within this object.
-message UserBalance {
+//Defines a user balance object for a badge w/ the user's balances and approvals. All badge IDs for a collection are handled within this object.
+message UserBalanceStore {
     repeated Balance balances = 1; //The user's balance for each badge ID.
     repeated Approval approvals = 2; //Approvals are sorted in order of address number.
 }
 
 //Defines an approval object for specific addresses.
 message Approval {
-    uint64 address = 1;
-    repeated Balance balances = 2; //approval balances for every badgeId
+  string address = 1;
+  repeated Balance balances = 2; //approval balances for every badgeId
 }

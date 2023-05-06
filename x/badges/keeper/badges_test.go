@@ -132,7 +132,7 @@ func (suite *TestSuite) TestCreateBadges() {
 	suite.Require().Nil(err, "Error creating badge: %s")
 	badge, err := GetCollection(suite, wctx, 1)
 	suite.Require().Nil(err, "Error getting badge: %s")
-	balance := types.UserBalance{}
+	balance := types.UserBalanceStore{}
 
 	badge, err = suite.app.BadgesKeeper.CreateBadges(suite.ctx, badge, []*types.BadgeSupplyAndAmount{
 		{
@@ -141,10 +141,10 @@ func (suite *TestSuite) TestCreateBadges() {
 		},
 	}, []*types.Transfers{
 		{
-			ToAddresses: []uint64{bobAccountNum},
+			ToAddresses: []string{bob},
 			Balances: []*types.Balance{
 				{
-					Balance: 1,
+					Amount: 1,
 					BadgeIds: []*types.IdRange{
 						{
 							Start: 1,
@@ -159,7 +159,7 @@ func (suite *TestSuite) TestCreateBadges() {
 
 	suite.Require().Equal(badge.MaxSupplys, []*types.Balance{
 		{
-			Balance: 1,
+			Amount: 1,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 1,
@@ -169,9 +169,9 @@ func (suite *TestSuite) TestCreateBadges() {
 		},
 	})
 
-	balance, err = GetUserBalance(suite, wctx, 1, bobAccountNum)
+	balance, err = GetUserBalance(suite, wctx, 1, bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
-	suite.Require().Equal(balance.Balances[0].Balance, uint64(1))
+	suite.Require().Equal(balance.Balances[0].Amount, uint64(1))
 	suite.Require().Equal(balance.Balances[0].BadgeIds, []*types.IdRange{
 		{
 			Start: 1,
@@ -186,10 +186,10 @@ func (suite *TestSuite) TestCreateBadges() {
 		},
 	}, []*types.Transfers{
 		{
-			ToAddresses: []uint64{bobAccountNum},
+			ToAddresses: []string{bob},
 			Balances: []*types.Balance{
 				{
-					Balance: 1,
+					Amount: 1,
 					BadgeIds: []*types.IdRange{
 						{
 							Start: 2,
@@ -202,12 +202,12 @@ func (suite *TestSuite) TestCreateBadges() {
 	}, []*types.Claim{}, bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
 
-	balance, err = GetUserBalance(suite, wctx, 1, bobAccountNum)
+	balance, err = GetUserBalance(suite, wctx, 1, bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	suite.Require().Nil(err, "Error creating subassets: %s")
 	suite.Require().Equal(badge.MaxSupplys, []*types.Balance{
 		{
-			Balance: 1,
+			Amount: 1,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 1,
@@ -216,7 +216,7 @@ func (suite *TestSuite) TestCreateBadges() {
 			},
 		},
 	})
-	suite.Require().Equal(balance.Balances[0].Balance, uint64(1))
+	suite.Require().Equal(balance.Balances[0].Amount, uint64(1))
 	suite.Require().Equal(balance.Balances[0].BadgeIds, []*types.IdRange{
 		{
 			Start: 1,
@@ -231,10 +231,10 @@ func (suite *TestSuite) TestCreateBadges() {
 		},
 	}, []*types.Transfers{
 		{
-			ToAddresses: []uint64{bobAccountNum},
+			ToAddresses: []string{bob},
 			Balances: []*types.Balance{
 				{
-					Balance: 1,
+					Amount: 1,
 					BadgeIds: []*types.IdRange{
 						{
 							Start: 3,
@@ -247,12 +247,12 @@ func (suite *TestSuite) TestCreateBadges() {
 	}, []*types.Claim{}, bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
 
-	balance, err = GetUserBalance(suite, wctx, 1, bobAccountNum)
+	balance, err = GetUserBalance(suite, wctx, 1, bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	suite.Require().Nil(err, "Error creating subassets: %s")
 	suite.Require().Equal(badge.MaxSupplys, []*types.Balance{
 		{
-			Balance: 1,
+			Amount: 1,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 1,
@@ -261,7 +261,7 @@ func (suite *TestSuite) TestCreateBadges() {
 			},
 		},
 	})
-	suite.Require().Equal(balance.Balances[0].Balance, uint64(1))
+	suite.Require().Equal(balance.Balances[0].Amount, uint64(1))
 	suite.Require().Equal(balance.Balances[0].BadgeIds, []*types.IdRange{
 		{
 			Start: 1,
@@ -276,10 +276,10 @@ func (suite *TestSuite) TestCreateBadges() {
 		},
 	}, []*types.Transfers{
 		{
-			ToAddresses: []uint64{bobAccountNum},
+			ToAddresses: []string{bob},
 			Balances: []*types.Balance{
 				{
-					Balance: 1,
+					Amount: 1,
 					BadgeIds: []*types.IdRange{
 						{
 							Start: 4,

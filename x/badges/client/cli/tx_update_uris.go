@@ -16,9 +16,9 @@ var _ = strconv.Itoa(0)
 
 func CmdUpdateUris() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-uris [collection-id] [uri] [badge-uris]",
+		Use:   "update-uris [collection-id] [uri] [badge-uris] [balancesUri]",
 		Short: "Broadcast message updateUris",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argBadgeId, err := cast.ToUint64E(args[0])
 			if err != nil {
@@ -35,6 +35,12 @@ func CmdUpdateUris() *cobra.Command {
 				return err
 			}
 
+			argBalancesUri, err := cast.ToStringE(args[3])
+			if err != nil {
+				return err
+			}
+
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -45,6 +51,7 @@ func CmdUpdateUris() *cobra.Command {
 				argBadgeId,
 				argUri,
 				argBadgeUris,
+				argBalancesUri,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

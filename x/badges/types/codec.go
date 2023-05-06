@@ -9,16 +9,15 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgNewCollection{}, "badges/NewCollection", nil)
-	cdc.RegisterConcrete(&MsgMintBadge{}, "badges/MintBadge", nil)
+	cdc.RegisterConcrete(&MsgMintAndDistributeBadges{}, "badges/MintAndDistributeBadges", nil)
 	cdc.RegisterConcrete(&MsgTransferBadge{}, "badges/TransferBadge", nil)
 	cdc.RegisterConcrete(&MsgSetApproval{}, "badges/SetApproval", nil)
-	cdc.RegisterConcrete(&MsgUpdateDisallowedTransfers{}, "badges/UpdateDisallowedTransfers", nil)
+	cdc.RegisterConcrete(&MsgUpdateAllowedTransfers{}, "badges/UpdateAllowedTransfers", nil)
 	cdc.RegisterConcrete(&MsgUpdateUris{}, "badges/UpdateUris", nil)
 	cdc.RegisterConcrete(&MsgUpdatePermissions{}, "badges/UpdatePermissions", nil)
 	cdc.RegisterConcrete(&MsgTransferManager{}, "badges/TransferManager", nil)
 	cdc.RegisterConcrete(&MsgRequestTransferManager{}, "badges/RequestTransferManager", nil)
 	cdc.RegisterConcrete(&MsgUpdateBytes{}, "badges/UpdateBytes", nil)
-	cdc.RegisterConcrete(&MsgRegisterAddresses{}, "badges/RegisterAddresses", nil)
 	cdc.RegisterConcrete(&MsgClaimBadge{}, "badges/ClaimBadge", nil)
 	cdc.RegisterConcrete(&MsgDeleteCollection{}, "badges/DeleteCollection", nil)
 	// this line is used by starport scaffolding # 2
@@ -29,7 +28,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgNewCollection{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgMintBadge{},
+		&MsgMintAndDistributeBadges{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgTransferBadge{},
@@ -38,7 +37,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgSetApproval{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgUpdateDisallowedTransfers{},
+		&MsgUpdateAllowedTransfers{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgUpdateUris{},
@@ -54,9 +53,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgUpdateBytes{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgRegisterAddresses{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgClaimBadge{},

@@ -10,19 +10,6 @@ import (
 
 func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollection) (*types.MsgNewCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
-
-	accsToCheck := []uint64{}
-	for _, transfer := range msg.Transfers {
-		accsToCheck = append(accsToCheck, transfer.ToAddresses...)
-	}
-
-	rangesToValidate := []*types.IdRange{}
-	for _, transfer := range msg.Transfers {
-		for _, balance := range transfer.Balances {
-			rangesToValidate = append(rangesToValidate, balance.BadgeIds...)
-		}
-	}
 
 	NextCollectionId := k.GetNextCollectionId(ctx)
 	k.IncrementNextCollectionId(ctx)
@@ -30,14 +17,16 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 	collection := types.BadgeCollection{
 		CollectionId:             NextCollectionId,
 		CollectionUri:            msg.CollectionUri,
+		BalancesUri: 							msg.BalancesUri,
 		BadgeUris:                msg.BadgeUris,
-		Manager:                  CreatorAccountNum,
+		Manager:                  msg.Creator,
 		Permissions:              msg.Permissions,
-		DisallowedTransfers:      msg.DisallowedTransfers,
+		AllowedTransfers:         msg.AllowedTransfers,
 		ManagerApprovedTransfers: msg.ManagerApprovedTransfers,
 		Bytes:                    msg.Bytes,
 		Standard:                 msg.Standard,
 		NextBadgeId:              1,
+		NextClaimId: 						  1,
 	}
 
 	if len(msg.BadgeSupplys) != 0 {

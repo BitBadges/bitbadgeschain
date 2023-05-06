@@ -7,22 +7,22 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k msgServer) UpdateDisallowedTransfers(goCtx context.Context, msg *types.MsgUpdateDisallowedTransfers) (*types.MsgUpdateDisallowedTransfersResponse, error) {
+func (k msgServer) UpdateAllowedTransfers(goCtx context.Context, msg *types.MsgUpdateAllowedTransfers) (*types.MsgUpdateAllowedTransfersResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
+	collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:             msg.Creator,
 		CollectionId:        msg.CollectionId,
 		MustBeManager:       true,
-		CanUpdateDisallowed: true,
+		CanUpdateAllowed:    true,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	badge.DisallowedTransfers = msg.DisallowedTransfers
+	collection.AllowedTransfers = msg.AllowedTransfers
 
-	err = k.SetCollectionInStore(ctx, badge)
+	err = k.SetCollectionInStore(ctx, collection)
 	if err != nil {
 		return nil, err
 	}
@@ -34,5 +34,5 @@ func (k msgServer) UpdateDisallowedTransfers(goCtx context.Context, msg *types.M
 		),
 	)
 
-	return &types.MsgUpdateDisallowedTransfersResponse{}, nil
+	return &types.MsgUpdateAllowedTransfersResponse{}, nil
 }

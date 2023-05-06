@@ -42,7 +42,13 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	}
 
 	for idx, balance := range genState.Balances {
-		if err := k.SetUserBalanceInStore(ctx, genState.BalanceIds[idx], *balance); err != nil {
+		if err := k.SetUserBalanceInStore(ctx, genState.BalanceStoreKeys[idx], *balance); err != nil {
+			panic(err)
+		}
+	}
+
+	for idx, claim := range genState.Claims {
+		if err := k.SetClaimInStoreWithKey(ctx, genState.ClaimStoreKeys[idx], *claim); err != nil {
 			panic(err)
 		}
 	}
@@ -60,13 +66,22 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.NextClaimId = k.GetNextClaimId(ctx)
 
 	genesis.Collections = k.GetCollectionsFromStore(ctx)
-	accNums := []uint64{}
+	addresses := []string{}
 	ids := []uint64{}
-	genesis.Balances, accNums, ids = k.GetUserBalancesFromStore(ctx)
+	genesis.Balances, addresses, ids = k.GetUserBalancesFromStore(ctx)
 
-	for i, accNum := range accNums {
-		genesis.BalanceIds = append(genesis.BalanceIds, keeper.ConstructBalanceKey(accNum, ids[i]))
+	for i, addresses := range addresses {
+		genesis.BalanceStoreKeys = append(genesis.BalanceStoreKeys, keeper.ConstructBalanceKey(addresses, ids[i]))
 	}
+
+	collectionIds := []uint64{}
+	claimIds := []uint64{}
+	genesis.Claims, collectionIds, claimIds = k.GetClaimsFromStore(ctx)
+
+	for i, collectionIds := range collectionIds {
+		genesis.ClaimStoreKeys = append(genesis.ClaimStoreKeys, keeper.ConstructClaimKey(collectionIds, claimIds[i]))
+	}
+
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

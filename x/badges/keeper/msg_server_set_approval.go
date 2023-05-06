@@ -16,30 +16,27 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 		rangesToValidate = append(rangesToValidate, balance.BadgeIds...)
 	}
 
-	CreatorAccountNum, _, err := k.UniversalValidate(ctx, UniversalValidationParams{
+	_, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:                      msg.Creator,
 		CollectionId:                 msg.CollectionId,
 		BadgeIdRangesToValidate:      rangesToValidate,
-		AccountsThatCantEqualCreator: []uint64{msg.Address},
-		AccountsToCheckRegistration:  []uint64{msg.Address},
+		AccountsThatCantEqualCreator: []string{msg.Address},
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	creatorBalanceKey := ConstructBalanceKey(CreatorAccountNum, msg.CollectionId)
+	creatorBalanceKey := ConstructBalanceKey(msg.Creator, msg.CollectionId)
 	creatorbalance, found := k.Keeper.GetUserBalanceFromStore(ctx, creatorBalanceKey)
 	if !found {
-		creatorbalance = types.UserBalance{}
+		creatorbalance = types.UserBalanceStore{}
 	}
 
 	for _, balance := range msg.Balances {
-		amount := balance.Balance
-		for _, badgeIdRange := range balance.BadgeIds {
-			creatorbalance, err = SetApproval(creatorbalance, amount, msg.Address, badgeIdRange)
-			if err != nil {
-				return nil, err
-			}
+		amount := balance.Amount
+		creatorbalance, err = SetApproval(creatorbalance, amount, msg.Address, balance.BadgeIds)
+		if err != nil {
+			return nil, err
 		}
 	}
 

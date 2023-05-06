@@ -9,33 +9,30 @@ import (
 type UniversalValidationParams struct {
 	Creator                      string
 	CollectionId                 uint64
-	AccountsThatCantEqualCreator []uint64
+	AccountsThatCantEqualCreator []string
 	BadgeIdRangesToValidate      []*types.IdRange
-	AccountsToCheckRegistration  []uint64
 	MustBeManager                bool
 	CanFreeze                    bool
 	CanCreateMoreBadges          bool
-	CanUpdateDisallowed          bool
+	CanUpdateAllowed          	 bool
 	CanManagerBeTransferred      bool
-	CanUpdateUris                bool
+	CanUpdateMetadataUris        bool
 	CanUpdateBytes               bool
-	OnlyCheckAccounts            bool
 	CanDelete                    bool
+	CanUpdateBalancesUri				 bool
 }
 
 // Validates everything about the Msg is valid and returns (creatorNum, badge, permissions, error).
-func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationParams) (uint64, types.BadgeCollection, error) {
-	CreatorAccountNum := k.MustGetAccountNumberForBech32AddressString(ctx, params.Creator)
-
+func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationParams) (types.BadgeCollection, error) {
+	
 	if len(params.AccountsThatCantEqualCreator) > 0 {
 		for _, account := range params.AccountsThatCantEqualCreator {
-			if account == CreatorAccountNum {
-				return CreatorAccountNum, types.BadgeCollection{}, ErrAccountCanNotEqualCreator
+			if account == params.Creator {
+				return types.BadgeCollection{}, ErrAccountCanNotEqualCreator
 			}
 		}
 	}
-
-	if len(params.AccountsToCheckRegistration) > 0 {
+	// if len(params.AccountsToCheckRegistration) > 0 {
 		// We have three options here. I currently think doing nothing is what I will go with.
 
 		// 1. Do nothing and put blame on users
@@ -48,57 +45,57 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationPar
 		// for _, accountNumber := range params.AccountsToCheckRegistration {
 		// 	//Probably a better way to do this such as only read once at beginning of block, but we check that addresses are valid and not > Next Account Number because then we would be sending to an unregistered address
 		// 	if accountNumber >= nextAccountNumber {
-		// 		return CreatorAccountNum, types.BadgeCollection{}, ErrAccountNotRegistered
+		// 		return types.BadgeCollection{}, ErrAccountNotRegistered
 		// 	}
 		// }
 
 		//Option 3
 		// for _, accountNumber := range params.AccountsToCheckRegistration {
 		// 	if !k.accountKeeper.HasAccountAddressByID(ctx, accountNumber) {
-		// 		return CreatorAccountNum, types.BadgeCollection{}, ErrAccountNotRegistered
+		// 		return types.BadgeCollection{}, ErrAccountNotRegistered
 		// 	}
 		// }
-	}
-
-	if params.OnlyCheckAccounts {
-		return CreatorAccountNum, types.BadgeCollection{}, nil
-	}
+	// }
 
 	// Assert collection and badgeId ranges exist and are well-formed
 	badge, err := k.GetCollectionAndAssertBadgeIdsAreValid(ctx, params.CollectionId, params.BadgeIdRangesToValidate)
 	if err != nil {
-		return CreatorAccountNum, types.BadgeCollection{}, err
+		return types.BadgeCollection{}, err
 	}
 
 	// Assert all permissions
-	if params.MustBeManager && badge.Manager != CreatorAccountNum {
-		return CreatorAccountNum, types.BadgeCollection{}, ErrSenderIsNotManager
+	if params.MustBeManager && badge.Manager != params.Creator {
+		return types.BadgeCollection{}, ErrSenderIsNotManager
 	}
 
 	permissions := types.GetPermissions(badge.Permissions)
-	if params.CanUpdateDisallowed && !permissions.CanUpdateDisallowed {
-		return CreatorAccountNum, types.BadgeCollection{}, ErrInvalidPermissions
+	if params.CanUpdateAllowed && !permissions.CanUpdateAllowed {
+		return types.BadgeCollection{}, ErrInvalidPermissions
 	}
 
 	if params.CanCreateMoreBadges && !permissions.CanCreateMoreBadges {
-		return CreatorAccountNum, types.BadgeCollection{}, ErrInvalidPermissions
+		return types.BadgeCollection{}, ErrInvalidPermissions
 	}
 
 	if params.CanManagerBeTransferred && !permissions.CanManagerBeTransferred {
-		return CreatorAccountNum, types.BadgeCollection{}, ErrInvalidPermissions
+		return types.BadgeCollection{}, ErrInvalidPermissions
 	}
 
-	if params.CanUpdateUris && !permissions.CanUpdateUris {
-		return CreatorAccountNum, types.BadgeCollection{}, ErrInvalidPermissions
+	if params.CanUpdateMetadataUris && !permissions.CanUpdateMetadataUris {
+		return types.BadgeCollection{}, ErrInvalidPermissions
 	}
 
 	if params.CanUpdateBytes && !permissions.CanUpdateBytes {
-		return CreatorAccountNum, types.BadgeCollection{}, ErrInvalidPermissions
+		return types.BadgeCollection{}, ErrInvalidPermissions
 	}
 
 	if params.CanDelete && !permissions.CanDelete {
-		return CreatorAccountNum, types.BadgeCollection{}, ErrInvalidPermissions
+		return types.BadgeCollection{}, ErrInvalidPermissions
 	}
 
-	return CreatorAccountNum, badge, nil
+	if params.CanUpdateBalancesUri && !permissions.CanUpdateBalancesUri {
+		return types.BadgeCollection{}, ErrInvalidPermissions
+	}
+
+	return badge, nil
 }

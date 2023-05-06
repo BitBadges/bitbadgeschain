@@ -37,7 +37,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 	err := *new(error)
 	balances := []*types.Balance{
 		{
-			Balance: 1,
+			Amount: 1,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 0,
@@ -65,7 +65,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	suite.Require().Equal(balances, []*types.Balance{
 		{
-			Balance: 10,
+			Amount: 10,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 0,
@@ -85,7 +85,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	suite.Require().Equal(fetchedBalances, []*types.Balance{
 		{
-			Balance: 10,
+			Amount: 10,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 1,
@@ -104,7 +104,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	suite.Require().Equal(fetchedBalances, []*types.Balance{
 		{
-			Balance: 0,
+			Amount: 0,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 2,
@@ -113,7 +113,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			},
 		},
 		{
-			Balance: 10,
+			Amount: 10,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 1,
@@ -132,7 +132,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	suite.Require().Equal(fetchedBalances, []*types.Balance{
 		{
-			Balance: 0,
+			Amount: 0,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 2,
@@ -141,7 +141,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			},
 		},
 		{
-			Balance: 10,
+			Amount: 10,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 0,
@@ -168,7 +168,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	suite.Require().Equal(fetchedBalances, []*types.Balance{
 		{
-			Balance: 0,
+			Amount: 0,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 2,
@@ -177,7 +177,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			},
 		},
 		{
-			Balance: 10,
+			Amount: 10,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 0,
@@ -196,7 +196,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	suite.Require().Equal(balances, []*types.Balance{
 		{
-			Balance: 5,
+			Amount: 5,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 1,
@@ -205,7 +205,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			},
 		},
 		{
-			Balance: 10,
+			Amount: 10,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 0,
@@ -224,7 +224,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	suite.Require().Equal(balances, []*types.Balance{
 		{
-			Balance: 5,
+			Amount: 5,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 1,
@@ -233,7 +233,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			},
 		},
 		{
-			Balance: 10,
+			Amount: 10,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 0,
@@ -252,7 +252,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	suite.Require().Equal(balances, []*types.Balance{
 		{
-			Balance: 5,
+			Amount: 5,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 1,
@@ -265,7 +265,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			},
 		},
 		{
-			Balance: 10,
+			Amount: 10,
 			BadgeIds: []*types.IdRange{
 				{
 					Start: 0,
@@ -281,7 +281,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 }
 
 func (suite *TestSuite) TestSubtractBalances() {
-	UserBalance := types.UserBalance{}
+	UserBalance := types.UserBalanceStore{}
 	badgeIdRanges := []*types.IdRange{
 		{
 			Start: 1,
@@ -321,7 +321,7 @@ func (suite *TestSuite) TestSubtractBalances() {
 	UserBalance, err = keeper.AddBalancesForIdRanges(UserBalance, badgeIdRanges, 1000)
 	suite.Require().NoError(err)
 
-	suite.Require().Equal(UserBalance.Balances[0].Balance, uint64(1000))
+	suite.Require().Equal(UserBalance.Balances[0].Amount, uint64(1000))
 	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{
 		{
 			Start: 0, End: 100,
@@ -359,15 +359,15 @@ func (suite *TestSuite) TestSubtractBalances() {
 		suite.Require().NoError(err)
 	}
 
-	suite.Require().Equal(UserBalance.Balances[0].Balance, uint64(998))
+	suite.Require().Equal(UserBalance.Balances[0].Amount, uint64(998))
 	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: 35, End: 35}})
 
-	suite.Require().Equal(UserBalance.Balances[1].Balance, uint64(999))
+	suite.Require().Equal(UserBalance.Balances[1].Amount, uint64(999))
 	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: 1, End: 1}, {Start: 36, End: 100}})
 }
 
 func (suite *TestSuite) TestAddBalancesForIdRanges() {
-	UserBalance := types.UserBalance{}
+	UserBalance := types.UserBalanceStore{}
 	badgeIdRanges := []*types.IdRange{
 		{
 			Start: 1,
@@ -397,10 +397,10 @@ func (suite *TestSuite) TestAddBalancesForIdRanges() {
 		suite.Require().Nil(err, "error adding balance to approval")
 	}
 
-	suite.Require().Equal(UserBalance.Balances[0].Balance, uint64(1000))
+	suite.Require().Equal(UserBalance.Balances[0].Amount, uint64(1000))
 	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: 0, End: 34}, {Start: 36, End: 100}})
 
-	suite.Require().Equal(UserBalance.Balances[1].Balance, uint64(2000))
+	suite.Require().Equal(UserBalance.Balances[1].Amount, uint64(2000))
 	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: 35, End: 35}})
 
 	badgeIdRangesToAdd := []*types.IdRange{
@@ -423,18 +423,18 @@ func (suite *TestSuite) TestAddBalancesForIdRanges() {
 		suite.Require().Nil(err, "error adding balance to approval")
 	}
 
-	suite.Require().Equal(UserBalance.Balances[0].Balance, uint64(1000))
+	suite.Require().Equal(UserBalance.Balances[0].Amount, uint64(1000))
 	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: 0, End: 0}, {Start: 2, End: 34}})
 
-	suite.Require().Equal(UserBalance.Balances[1].Balance, uint64(1001))
+	suite.Require().Equal(UserBalance.Balances[1].Amount, uint64(1001))
 	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: 1, End: 1}, {Start: 36, End: 100}})
 
-	suite.Require().Equal(UserBalance.Balances[2].Balance, uint64(2002))
+	suite.Require().Equal(UserBalance.Balances[2].Amount, uint64(2002))
 	suite.Require().Equal(UserBalance.Balances[2].BadgeIds, []*types.IdRange{{Start: 35, End: 35}})
 }
 
 func (suite *TestSuite) TestAddBalancesOverflow() {
-	UserBalance := types.UserBalance{}
+	UserBalance := types.UserBalanceStore{}
 	badgeIdRanges := []*types.IdRange{
 		{
 			Start: 1,
@@ -464,10 +464,10 @@ func (suite *TestSuite) TestAddBalancesOverflow() {
 		suite.Require().Nil(err, "error adding balance to approval")
 	}
 
-	suite.Require().Equal(UserBalance.Balances[0].Balance, uint64(1000))
+	suite.Require().Equal(UserBalance.Balances[0].Amount, uint64(1000))
 	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: 0, End: 34}, {Start: 36, End: 100}})
 
-	suite.Require().Equal(UserBalance.Balances[1].Balance, uint64(2000))
+	suite.Require().Equal(UserBalance.Balances[1].Amount, uint64(2000))
 	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: 35, End: 35}})
 
 	badgeIdRangesToAdd := []*types.IdRange{
@@ -484,7 +484,7 @@ func (suite *TestSuite) TestAddBalancesOverflow() {
 }
 
 func (suite *TestSuite) TestRemoveBalancesUnderflow() {
-	UserBalance := types.UserBalance{}
+	UserBalance := types.UserBalanceStore{}
 	badgeIdRanges := []types.IdRange{
 		{
 			Start: 1,
@@ -510,7 +510,7 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 		suite.Require().NoError(err)
 	}
 
-	suite.Require().Equal(UserBalance.Balances[0].Balance, uint64(1000))
+	suite.Require().Equal(UserBalance.Balances[0].Amount, uint64(1000))
 	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: 0, End: 100}})
 
 	badgeIdRangesToRemove := []*types.IdRange{
@@ -538,7 +538,7 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 
 // func (suite *TestSuite) TestBalancesFuzz() {
 // 	for i := 0; i < 25; i++ {
-// 		userBalance := types.UserBalance{}
+// 		userBalance := types.UserBalanceStore{}
 // 		balances := make([]uint64, 1000)
 
 // 		adds := make([]*types.IdRange, 100)
@@ -605,7 +605,7 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 // 					},
 // 				},
 // 				userBalance.Balances,
-// 			)[0].Balance, balances[i], "balance mismatch at index %d", i)
+// 			)[0].Amount, balances[i], "balance mismatch at index %d", i)
 // 		}
 // 	}
 // }

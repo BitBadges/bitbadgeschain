@@ -4,6 +4,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
+// Unnecessary but makes code more readable
 func CreateIdRange(start uint64, end uint64) *types.IdRange {
 	return &types.IdRange{
 		Start: start,
@@ -219,27 +220,4 @@ func SortAndMergeOverlapping(ids []*types.IdRange) []*types.IdRange {
 	} else {
 		return ids
 	}
-}
-
-func AddManagerAddressToRanges(collection types.BadgeCollection, ranges []*types.IdRange, options uint64) []*types.IdRange {
-	idx, found := SearchIdRangesForId(collection.Manager, ranges)
-	//Add or remove the manager to the ranges if specified according to the options
-	if options == uint64(types.AddressOptions_IncludeManager) {
-		if !found {
-			ranges = append(ranges, CreateIdRange(collection.Manager, collection.Manager))
-			ranges = SortAndMergeOverlapping(ranges)
-			return ranges
-		}
-	} else if options == uint64(types.AddressOptions_ExcludeManager) {
-		if found {
-			newRanges := []*types.IdRange{}
-			newRanges = append(newRanges, ranges[:idx]...)
-			removedRanges, _ := RemoveIdsFromIdRange(CreateIdRange(collection.Manager, collection.Manager), ranges[idx])
-			newRanges = append(newRanges, removedRanges...)
-			newRanges = append(newRanges, ranges[idx+1:]...)
-			ranges = newRanges
-		}
-	}
-
-	return ranges
 }

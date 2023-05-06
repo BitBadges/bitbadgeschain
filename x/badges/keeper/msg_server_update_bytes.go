@@ -10,7 +10,7 @@ import (
 func (k msgServer) UpdateBytes(goCtx context.Context, msg *types.MsgUpdateBytes) (*types.MsgUpdateBytesResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
+	collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:        msg.Creator,
 		CollectionId:   msg.CollectionId,
 		MustBeManager:  true,
@@ -20,14 +20,9 @@ func (k msgServer) UpdateBytes(goCtx context.Context, msg *types.MsgUpdateBytes)
 		return nil, err
 	}
 
-	err = types.ValidateBytes(msg.NewBytes)
-	if err != nil {
-		return nil, err
-	}
+	collection.Bytes = msg.Bytes
 
-	badge.Bytes = msg.NewBytes
-
-	if err := k.SetCollectionInStore(ctx, badge); err != nil {
+	if err := k.SetCollectionInStore(ctx, collection); err != nil {
 		return nil, err
 	}
 

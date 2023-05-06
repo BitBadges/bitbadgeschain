@@ -22,7 +22,7 @@ func CmdGetBalance() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			reqAddress, err := cast.ToUint64E(args[1])
+			reqAddress, err := cast.ToStringE(args[1])
 			if err != nil {
 				return err
 			}

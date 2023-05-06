@@ -13,20 +13,17 @@ import (
 func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (*types.MsgClaimBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	err := *new(error)
-	CreatorAccountNum := k.Keeper.MustGetAccountNumberForBech32AddressString(ctx, msg.Creator)
 
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
 	if !found {
 		return nil, ErrBadgeNotExists
 	}
-
-	claimId := msg.ClaimId - 1
-
-	if uint64(len(collection.Claims)) <= claimId {
+	
+	claimId := msg.ClaimId
+	claim, found := k.GetClaimFromStore(ctx, msg.CollectionId, msg.ClaimId)
+	if !found {
 		return nil, ErrClaimNotFound
 	}
-
-	claim := collection.Claims[claimId]
 
 	//Assert claim is not expired
 	if claim.TimeRange.Start > uint64(ctx.BlockTime().Unix()) || claim.TimeRange.End < uint64(ctx.BlockTime().Unix()) {
@@ -184,12 +181,12 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		}
 	}
 
-	userBalance, found := k.GetUserBalanceFromStore(ctx, ConstructBalanceKey(CreatorAccountNum, msg.CollectionId))
+	userBalance, found := k.GetUserBalanceFromStore(ctx, ConstructBalanceKey(msg.Creator, msg.CollectionId))
 	if !found {
-		userBalance = types.UserBalance{}
+		userBalance = types.UserBalanceStore{}
 	}
 
-	claimUserBalance := types.UserBalance{
+	claimUserBalance := types.UserBalanceStore{
 		Balances:  claim.Balances,
 		Approvals: []*types.Approval{},
 	}
@@ -218,14 +215,18 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		}
 	}
 
-	collection.Claims[claimId] = claim
+	err = k.SetClaimInStore(ctx, msg.CollectionId, claimId, claim)
+	if err != nil {
+		return nil, err
+	}
+
 
 	err = k.SetCollectionInStore(ctx, collection)
 	if err != nil {
 		return nil, err
 	}
 
-	err = k.SetUserBalanceInStore(ctx, ConstructBalanceKey(CreatorAccountNum, msg.CollectionId), userBalance)
+	err = k.SetUserBalanceInStore(ctx, ConstructBalanceKey(msg.Creator, msg.CollectionId), userBalance)
 	if err != nil {
 		return nil, err
 	}

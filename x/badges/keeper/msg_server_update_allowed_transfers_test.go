@@ -26,19 +26,19 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 					},
 				},
 				Permissions: 62,
-				DisallowedTransfers: []*types.TransferMapping{
+				AllowedTransfers: []*types.TransferMapping{
 					{
-						From: &types.Addresses{
-							AccountIds: []*types.IdRange{
-								{Start: aliceAccountNum, End: aliceAccountNum},
-							},
-							Options: uint64(types.AddressOptions_None),
+						From: &types.AddressesMapping{
+							Addresses: []string{							},
+							IncludeOnlySpecified: false,
+							ManagerOptions: uint64(types.AddressOptions_None),
 						},
-						To: &types.Addresses{
-							AccountIds: []*types.IdRange{
-								{Start: 0, End: math.MaxUint64},
+						To: &types.AddressesMapping{
+							Addresses: []string{
+								bob,
 							},
-							Options: uint64(types.AddressOptions_None),
+							IncludeOnlySpecified: false,
+							ManagerOptions: uint64(types.AddressOptions_None),
 						},
 					},
 				},
@@ -60,12 +60,12 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 	suite.Require().Nil(err, "Error creating badge")
 	// badge, _ := GetCollection(suite, wctx, 1)
 
-	err = TransferBadge(suite, wctx, bob, 1, bobAccountNum, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
 		{
-			ToAddresses: []uint64{aliceAccountNum},
+			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Balance: 5000,
+					Amount: 5000,
 					BadgeIds: []*types.IdRange{
 						{
 							Start: 1,
@@ -78,12 +78,12 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 	})
 	suite.Require().Nil(err, "Error transferring badge")
 
-	err = TransferBadge(suite, wctx, alice, 1, aliceAccountNum, []*types.Transfers{
+	err = TransferBadge(suite, wctx, alice, 1, alice, []*types.Transfers{
 		{
-			ToAddresses: []uint64{bobAccountNum},
+			ToAddresses: []string{bob},
 			Balances: []*types.Balance{
 				{
-					Balance: 5000,
+					Amount: 5000,
 					BadgeIds: []*types.IdRange{
 						{
 							Start: 1,
@@ -116,6 +116,20 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 					},
 				},
 				Permissions: 23,
+				AllowedTransfers: []*types.TransferMapping{
+					{
+						From: &types.AddressesMapping{
+							Addresses: []string{							},
+							IncludeOnlySpecified: false,
+							ManagerOptions: uint64(types.AddressOptions_None),
+						},
+						To: &types.AddressesMapping{
+							Addresses: []string{							},
+							IncludeOnlySpecified: false,
+							ManagerOptions: uint64(types.AddressOptions_None),
+						},
+					},
+				},			
 			},
 			Amount:  1,
 			Creator: bob,
@@ -135,25 +149,25 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 	suite.Require().Nil(err, "Error creating badge")
 	badge, _ = GetCollection(suite, wctx, 1)
 
-	bobbalance, _ := GetUserBalance(suite, wctx, 1, bobAccountNum)
+	bobbalance, _ := GetUserBalance(suite, wctx, 1, bob)
 
 	suite.Require().Equal(uint64(2), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-			Balance:  10000,
+			Amount:  10000,
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
 	suite.Require().Nil(err)
-	suite.Require().Equal(uint64(10000), fetchedBalance[0].Balance)
+	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
 
-	err = TransferBadge(suite, wctx, bob, 1, bobAccountNum, []*types.Transfers{
+	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfers{
 		{
-			ToAddresses: []uint64{aliceAccountNum},
+			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Balance: 5000,
+					Amount: 5000,
 					BadgeIds: []*types.IdRange{
 						{
 							Start: 1,
@@ -166,26 +180,28 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 	})
 	suite.Require().Nil(err, "Error transferring badge")
 
-	bobbalance, _ = GetUserBalance(suite, wctx, 1, bobAccountNum)
+	bobbalance, _ = GetUserBalance(suite, wctx, 1, bob)
 	fetchedBalance, err = keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
-	suite.Require().Equal(uint64(5000), fetchedBalance[0].Balance)
+	suite.Require().Equal(uint64(5000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	alicebalance, _ := GetUserBalance(suite, wctx, 1, aliceAccountNum)
+	alicebalance, _ := GetUserBalance(suite, wctx, 1, alice)
 
 	fetchedBalance, err = keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, alicebalance.Balances)
-	suite.Require().Equal(uint64(5000), fetchedBalance[0].Balance)
+	suite.Require().Equal(uint64(5000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = UpdateDisallowedTransfers(suite, wctx, bob, 1, []*types.TransferMapping{
+	err = UpdateAllowedTransfers(suite, wctx, bob, 1, []*types.TransferMapping{
 		{
-			From: &types.Addresses{
-				AccountIds: []*types.IdRange{{Start: aliceAccountNum, End: aliceAccountNum}},
-				Options:    uint64(types.AddressOptions_None),
+			From: &types.AddressesMapping{
+				Addresses: []string{},
+				IncludeOnlySpecified: true,
+				ManagerOptions:    uint64(types.AddressOptions_None),
 			},
-			To: &types.Addresses{
-				AccountIds: []*types.IdRange{{Start: 0, End: math.MaxUint64}},
-				Options:    uint64(types.AddressOptions_None),
+			To: &types.AddressesMapping{
+				Addresses: []string{},
+				IncludeOnlySpecified: true,
+				ManagerOptions:    uint64(types.AddressOptions_None),
 			},
 		},
 	})
@@ -193,12 +209,12 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 
 	badge, _ = GetCollection(suite, wctx, 1)
 
-	err = TransferBadge(suite, wctx, alice, 1, aliceAccountNum, []*types.Transfers{
+	err = TransferBadge(suite, wctx, alice, 1, alice, []*types.Transfers{
 		{
-			ToAddresses: []uint64{bobAccountNum},
+			ToAddresses: []string{bob},
 			Balances: []*types.Balance{
 				{
-					Balance: 5000,
+					Amount: 5000,
 					BadgeIds: []*types.IdRange{
 						{
 							Start: 1,
@@ -245,27 +261,27 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 // 	suite.Require().Nil(err, "Error creating badge")
 // 	badge, _ = GetCollection(suite, wctx, 1)
 
-// 	bobbalance, _ := GetUserBalance(suite, wctx, 1, bobAccountNum)
+// 	bobbalance, _ := GetUserBalance(suite, wctx, 1, bob)
 
 // 	suite.Require().Equal(uint64(2), badge.NextBadgeId)
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
 // 			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-// 			Balance:  10000,
+// 			Amount:  10000,
 // 		},
 // 	}, badge.MaxSupplys)
-// 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)[0].Balance)
+// 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)[0].Amount)
 
-// 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
+// 	err = TransferBadge(suite, wctx, bob, bob, []string{alice}, []string{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
 // 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 
-// 	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}})
+// 	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: bob, End: bob}})
 // 	suite.Require().Nil(err, "Error unfreezing address")
 
-// 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
+// 	err = TransferBadge(suite, wctx, bob, bob, []string{alice}, []string{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
 // 	suite.Require().Nil(err, "Error transferring after unfreeze")
 
-// 	err = TransferBadge(suite, wctx, alice, aliceAccountNum, []uint64{bobAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
+// 	err = TransferBadge(suite, wctx, alice, alice, []string{bob}, []string{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
 // 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 // }
 
@@ -297,36 +313,36 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 // 	suite.Require().Nil(err, "Error creating badge")
 // 	badge, _ = GetCollection(suite, wctx, 1)
 
-// 	bobbalance, _ := GetUserBalance(suite, wctx, 1, bobAccountNum)
+// 	bobbalance, _ := GetUserBalance(suite, wctx, 1, bob)
 
 // 	suite.Require().Equal(uint64(2), badge.NextBadgeId)
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
 // 			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-// 			Balance:  10000,
+// 			Amount:  10000,
 // 		},
 // 	}, badge.MaxSupplys)
-// 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)[0].Balance)
+// 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)[0].Amount)
 
-// 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
+// 	err = TransferBadge(suite, wctx, bob, bob, []string{alice}, []string{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
 // 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 
-// 	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}})
+// 	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: bob, End: bob}})
 // 	suite.Require().Nil(err, "Error unfreezing address")
 
-// 	err = FreezeAddresses(suite, wctx, bob, 0, false, []*types.IdRange{{Start: bobAccountNum, End: 0}})
+// 	err = FreezeAddresses(suite, wctx, bob, 0, false, []*types.IdRange{{Start: bob, End: 0}})
 // 	suite.Require().Nil(err, "Error unfreezing address")
 
-// 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
+// 	err = TransferBadge(suite, wctx, bob, bob, []string{alice}, []string{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
 // 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 
-// 	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}})
+// 	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: bob, End: bob}})
 // 	suite.Require().Nil(err, "Error unfreezing address")
 
-// 	err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
+// 	err = TransferBadge(suite, wctx, bob, bob, []string{alice}, []string{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
 // 	suite.Require().Nil(err, "Error transferring after unfreeze")
 
-// 	err = TransferBadge(suite, wctx, alice, aliceAccountNum, []uint64{bobAccountNum}, []uint64{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
+// 	err = TransferBadge(suite, wctx, alice, alice, []string{bob}, []string{5000}, 0, []*types.IdRange{{Start: 1, End: 1}}, 0, 0)
 // 	suite.Require().EqualError(err, keeper.ErrAddressFrozen.Error())
 // }
 
@@ -347,7 +363,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 
 // 	CreateCollections(suite, wctx, collectionsToCreate)
 
-// 	err := FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: bobAccountNum, End: bobAccountNum}})
+// 	err := FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: bob, End: bob}})
 // 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 // }
 
@@ -379,16 +395,16 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 // 	suite.Require().Nil(err, "Error creating badge")
 // 	badge, _ = GetCollection(suite, wctx, 1)
 
-// 	bobbalance, _ := GetUserBalance(suite, wctx, 1, bobAccountNum)
+// 	bobbalance, _ := GetUserBalance(suite, wctx, 1, bob)
 
 // 	suite.Require().Equal(uint64(2), badge.NextBadgeId)
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
 // 			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-// 			Balance:  10000,
+// 			Amount:  10000,
 // 		},
 // 	}, badge.MaxSupplys)
-// 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)[0].Balance)
+// 	suite.Require().Equal(uint64(10000), keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)[0].Amount)
 
 // 	err = FreezeAddresses(suite, wctx, bob, 0, true, []*types.IdRange{{Start: 1, End: 1}})
 // 	suite.Require().Nil(err, "Error freezing address")

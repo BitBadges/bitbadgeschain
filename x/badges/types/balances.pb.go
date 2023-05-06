@@ -25,7 +25,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Defines a balance object. The specified balance holds for all ids specified within the id ranges array.
 type Balance struct {
-	Balance  uint64     `protobuf:"varint,1,opt,name=balance,proto3" json:"balance,omitempty"`
+	Amount   uint64     `protobuf:"varint,1,opt,name=amount,proto3" json:"amount,omitempty"`
 	BadgeIds []*IdRange `protobuf:"bytes,2,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 }
 
@@ -62,9 +62,9 @@ func (m *Balance) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Balance proto.InternalMessageInfo
 
-func (m *Balance) GetBalance() uint64 {
+func (m *Balance) GetAmount() uint64 {
 	if m != nil {
-		return m.Balance
+		return m.Amount
 	}
 	return 0
 }
@@ -76,24 +76,24 @@ func (m *Balance) GetBadgeIds() []*IdRange {
 	return nil
 }
 
-// Defines a user balance object for a badge w/ the user's balances, nonce, pending transfers, and approvals. All badge IDs for a collection are handled within this object.
-type UserBalance struct {
+// Defines a user balance object for a badge w/ the user's balances and approvals. All badge IDs for a collection are handled within this object.
+type UserBalanceStore struct {
 	Balances  []*Balance  `protobuf:"bytes,1,rep,name=balances,proto3" json:"balances,omitempty"`
 	Approvals []*Approval `protobuf:"bytes,2,rep,name=approvals,proto3" json:"approvals,omitempty"`
 }
 
-func (m *UserBalance) Reset()         { *m = UserBalance{} }
-func (m *UserBalance) String() string { return proto.CompactTextString(m) }
-func (*UserBalance) ProtoMessage()    {}
-func (*UserBalance) Descriptor() ([]byte, []int) {
+func (m *UserBalanceStore) Reset()         { *m = UserBalanceStore{} }
+func (m *UserBalanceStore) String() string { return proto.CompactTextString(m) }
+func (*UserBalanceStore) ProtoMessage()    {}
+func (*UserBalanceStore) Descriptor() ([]byte, []int) {
 	return fileDescriptor_233d29a167e739f0, []int{1}
 }
-func (m *UserBalance) XXX_Unmarshal(b []byte) error {
+func (m *UserBalanceStore) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *UserBalance) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UserBalanceStore) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_UserBalance.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UserBalanceStore.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -103,26 +103,26 @@ func (m *UserBalance) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
-func (m *UserBalance) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UserBalance.Merge(m, src)
+func (m *UserBalanceStore) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserBalanceStore.Merge(m, src)
 }
-func (m *UserBalance) XXX_Size() int {
+func (m *UserBalanceStore) XXX_Size() int {
 	return m.Size()
 }
-func (m *UserBalance) XXX_DiscardUnknown() {
-	xxx_messageInfo_UserBalance.DiscardUnknown(m)
+func (m *UserBalanceStore) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserBalanceStore.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_UserBalance proto.InternalMessageInfo
+var xxx_messageInfo_UserBalanceStore proto.InternalMessageInfo
 
-func (m *UserBalance) GetBalances() []*Balance {
+func (m *UserBalanceStore) GetBalances() []*Balance {
 	if m != nil {
 		return m.Balances
 	}
 	return nil
 }
 
-func (m *UserBalance) GetApprovals() []*Approval {
+func (m *UserBalanceStore) GetApprovals() []*Approval {
 	if m != nil {
 		return m.Approvals
 	}
@@ -131,7 +131,7 @@ func (m *UserBalance) GetApprovals() []*Approval {
 
 // Defines an approval object for specific addresses.
 type Approval struct {
-	Address  uint64     `protobuf:"varint,1,opt,name=address,proto3" json:"address,omitempty"`
+	Address  string     `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 	Balances []*Balance `protobuf:"bytes,2,rep,name=balances,proto3" json:"balances,omitempty"`
 }
 
@@ -168,11 +168,11 @@ func (m *Approval) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Approval proto.InternalMessageInfo
 
-func (m *Approval) GetAddress() uint64 {
+func (m *Approval) GetAddress() string {
 	if m != nil {
 		return m.Address
 	}
-	return 0
+	return ""
 }
 
 func (m *Approval) GetBalances() []*Balance {
@@ -184,32 +184,33 @@ func (m *Approval) GetBalances() []*Balance {
 
 func init() {
 	proto.RegisterType((*Balance)(nil), "bitbadges.bitbadgeschain.badges.Balance")
-	proto.RegisterType((*UserBalance)(nil), "bitbadges.bitbadgeschain.badges.UserBalance")
+	proto.RegisterType((*UserBalanceStore)(nil), "bitbadges.bitbadgeschain.badges.UserBalanceStore")
 	proto.RegisterType((*Approval)(nil), "bitbadges.bitbadgeschain.badges.Approval")
 }
 
 func init() { proto.RegisterFile("badges/balances.proto", fileDescriptor_233d29a167e739f0) }
 
 var fileDescriptor_233d29a167e739f0 = []byte{
-	// 281 bytes of a gzipped FileDescriptorProto
+	// 295 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4d, 0x4a, 0x4c, 0x49,
 	0x4f, 0x2d, 0xd6, 0x4f, 0x4a, 0xcc, 0x49, 0xcc, 0x4b, 0x4e, 0x2d, 0xd6, 0x2b, 0x28, 0xca, 0x2f,
 	0xc9, 0x17, 0x92, 0x4f, 0xca, 0x2c, 0x81, 0xc8, 0xe8, 0xc1, 0x59, 0xc9, 0x19, 0x89, 0x99, 0x79,
 	0x7a, 0x10, 0xb6, 0x94, 0x48, 0x7a, 0x7e, 0x7a, 0x3e, 0x58, 0xad, 0x3e, 0x88, 0x05, 0xd1, 0x26,
 	0x25, 0x0c, 0x35, 0xad, 0x20, 0xb1, 0x28, 0x31, 0xb7, 0x18, 0x4d, 0xb0, 0x28, 0x31, 0x2f, 0x1d,
-	0x66, 0x81, 0x52, 0x26, 0x17, 0xbb, 0x13, 0xc4, 0x4a, 0x21, 0x09, 0x2e, 0x76, 0xa8, 0xed, 0x12,
-	0x8c, 0x0a, 0x8c, 0x1a, 0x2c, 0x41, 0x30, 0xae, 0x90, 0x0b, 0x17, 0x07, 0x58, 0xaf, 0x67, 0x4a,
-	0xb1, 0x04, 0x93, 0x02, 0xb3, 0x06, 0xb7, 0x91, 0x86, 0x1e, 0x01, 0x87, 0xe9, 0x79, 0xa6, 0x04,
-	0x81, 0xec, 0x09, 0x82, 0xeb, 0x54, 0x9a, 0xc3, 0xc8, 0xc5, 0x1d, 0x5a, 0x9c, 0x5a, 0xe4, 0x84,
-	0x6c, 0x2a, 0xc4, 0xb7, 0x12, 0x8c, 0x44, 0x9a, 0x0a, 0xd5, 0x1b, 0x04, 0xd7, 0x29, 0xe4, 0xce,
-	0xc5, 0x99, 0x58, 0x50, 0x50, 0x94, 0x5f, 0x96, 0x98, 0x03, 0x73, 0x9c, 0x26, 0x41, 0x63, 0x1c,
-	0xa1, 0x3a, 0x82, 0x10, 0x7a, 0x95, 0xb2, 0xb8, 0x38, 0x60, 0xc2, 0xa0, 0xa0, 0x48, 0x4c, 0x49,
-	0x29, 0x4a, 0x2d, 0x2e, 0x86, 0x05, 0x05, 0x94, 0x8b, 0xe2, 0x68, 0x26, 0x72, 0x1d, 0xed, 0xe4,
-	0x73, 0xe2, 0x91, 0x1c, 0xe3, 0x85, 0x47, 0x72, 0x8c, 0x0f, 0x1e, 0xc9, 0x31, 0x4e, 0x78, 0x2c,
-	0xc7, 0x70, 0xe1, 0xb1, 0x1c, 0xc3, 0x8d, 0xc7, 0x72, 0x0c, 0x51, 0x46, 0xe9, 0x99, 0x25, 0x19,
-	0xa5, 0x49, 0x7a, 0xc9, 0xf9, 0xb9, 0xfa, 0x70, 0xd3, 0xf4, 0x51, 0xcd, 0xd5, 0xaf, 0xd0, 0x87,
-	0x8a, 0x97, 0x54, 0x16, 0xa4, 0x16, 0x27, 0xb1, 0x81, 0xa3, 0xd2, 0x18, 0x10, 0x00, 0x00, 0xff,
-	0xff, 0x14, 0x37, 0x7d, 0xc9, 0x44, 0x02, 0x00, 0x00,
+	0x66, 0x81, 0x52, 0x3a, 0x17, 0xbb, 0x13, 0xc4, 0x4a, 0x21, 0x31, 0x2e, 0xb6, 0xc4, 0xdc, 0xfc,
+	0xd2, 0xbc, 0x12, 0x09, 0x46, 0x05, 0x46, 0x0d, 0x96, 0x20, 0x28, 0x4f, 0xc8, 0x85, 0x8b, 0x03,
+	0xac, 0xd3, 0x33, 0xa5, 0x58, 0x82, 0x49, 0x81, 0x59, 0x83, 0xdb, 0x48, 0x43, 0x8f, 0x80, 0xb3,
+	0xf4, 0x3c, 0x53, 0x82, 0x40, 0xb6, 0x04, 0xc1, 0x75, 0x2a, 0x2d, 0x64, 0xe4, 0x12, 0x08, 0x2d,
+	0x4e, 0x2d, 0x82, 0xda, 0x16, 0x5c, 0x92, 0x5f, 0x94, 0x0a, 0x31, 0x1a, 0xe2, 0x61, 0x09, 0x46,
+	0x22, 0x8d, 0x86, 0x1a, 0x10, 0x04, 0xd7, 0x29, 0xe4, 0xce, 0xc5, 0x99, 0x58, 0x50, 0x50, 0x94,
+	0x5f, 0x96, 0x98, 0x03, 0x73, 0xa1, 0x26, 0x41, 0x63, 0x1c, 0xa1, 0x3a, 0x82, 0x10, 0x7a, 0x95,
+	0xb2, 0xb8, 0x38, 0x60, 0xc2, 0x42, 0x12, 0x5c, 0xec, 0x89, 0x29, 0x29, 0x45, 0xa9, 0xc5, 0xc5,
+	0xe0, 0xe0, 0xe0, 0x0c, 0x82, 0x71, 0x51, 0x1c, 0xcd, 0x44, 0xae, 0xa3, 0x9d, 0x7c, 0x4e, 0x3c,
+	0x92, 0x63, 0xbc, 0xf0, 0x48, 0x8e, 0xf1, 0xc1, 0x23, 0x39, 0xc6, 0x09, 0x8f, 0xe5, 0x18, 0x2e,
+	0x3c, 0x96, 0x63, 0xb8, 0xf1, 0x58, 0x8e, 0x21, 0xca, 0x28, 0x3d, 0xb3, 0x24, 0xa3, 0x34, 0x49,
+	0x2f, 0x39, 0x3f, 0x57, 0x1f, 0x6e, 0x9a, 0x3e, 0xaa, 0xb9, 0xfa, 0x15, 0xfa, 0x50, 0xf1, 0x92,
+	0xca, 0x82, 0xd4, 0xe2, 0x24, 0x36, 0x70, 0x6c, 0x1a, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0xaf,
+	0x76, 0x0c, 0xb0, 0x47, 0x02, 0x00, 0x00,
 }
 
 func (m *Balance) Marshal() (dAtA []byte, err error) {
@@ -246,15 +247,15 @@ func (m *Balance) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x12
 		}
 	}
-	if m.Balance != 0 {
-		i = encodeVarintBalances(dAtA, i, uint64(m.Balance))
+	if m.Amount != 0 {
+		i = encodeVarintBalances(dAtA, i, uint64(m.Amount))
 		i--
 		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *UserBalance) Marshal() (dAtA []byte, err error) {
+func (m *UserBalanceStore) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -264,12 +265,12 @@ func (m *UserBalance) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *UserBalance) MarshalTo(dAtA []byte) (int, error) {
+func (m *UserBalanceStore) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *UserBalance) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UserBalanceStore) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -339,10 +340,12 @@ func (m *Approval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x12
 		}
 	}
-	if m.Address != 0 {
-		i = encodeVarintBalances(dAtA, i, uint64(m.Address))
+	if len(m.Address) > 0 {
+		i -= len(m.Address)
+		copy(dAtA[i:], m.Address)
+		i = encodeVarintBalances(dAtA, i, uint64(len(m.Address)))
 		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -364,8 +367,8 @@ func (m *Balance) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Balance != 0 {
-		n += 1 + sovBalances(uint64(m.Balance))
+	if m.Amount != 0 {
+		n += 1 + sovBalances(uint64(m.Amount))
 	}
 	if len(m.BadgeIds) > 0 {
 		for _, e := range m.BadgeIds {
@@ -376,7 +379,7 @@ func (m *Balance) Size() (n int) {
 	return n
 }
 
-func (m *UserBalance) Size() (n int) {
+func (m *UserBalanceStore) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -403,8 +406,9 @@ func (m *Approval) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Address != 0 {
-		n += 1 + sovBalances(uint64(m.Address))
+	l = len(m.Address)
+	if l > 0 {
+		n += 1 + l + sovBalances(uint64(l))
 	}
 	if len(m.Balances) > 0 {
 		for _, e := range m.Balances {
@@ -452,9 +456,9 @@ func (m *Balance) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Balance", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
 			}
-			m.Balance = 0
+			m.Amount = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowBalances
@@ -464,7 +468,7 @@ func (m *Balance) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Balance |= uint64(b&0x7F) << shift
+				m.Amount |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -524,7 +528,7 @@ func (m *Balance) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *UserBalance) Unmarshal(dAtA []byte) error {
+func (m *UserBalanceStore) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -547,10 +551,10 @@ func (m *UserBalance) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: UserBalance: wiretype end group for non-group")
+			return fmt.Errorf("proto: UserBalanceStore: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UserBalance: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UserBalanceStore: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -672,10 +676,10 @@ func (m *Approval) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
 			}
-			m.Address = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowBalances
@@ -685,11 +689,24 @@ func (m *Approval) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Address |= uint64(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthBalances
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthBalances
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Address = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Balances", wireType)

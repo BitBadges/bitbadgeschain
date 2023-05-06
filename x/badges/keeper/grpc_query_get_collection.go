@@ -16,7 +16,7 @@ func (k Keeper) GetCollection(goCtx context.Context, req *types.QueryGetCollecti
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	badge, found := k.GetCollectionFromStore(ctx, req.Id)
+	badge, found := k.GetCollectionFromStore(ctx, req.CollectionId)
 	if !found {
 		return nil, ErrCollectionNotExists
 	}

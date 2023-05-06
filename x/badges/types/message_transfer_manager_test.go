@@ -26,7 +26,16 @@ func TestMsgTransferManager_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: types.MsgTransferManager{
 				Creator: sample.AccAddress(),
+				Address: sample.AccAddress(),
 			},
+		},
+		{
+			name: "invalid address 2",
+			msg: types.MsgTransferManager{
+				Creator: sample.AccAddress(),
+				Address: "invalid_address",
+			},
+			err: sdkerrors.ErrInvalidAddress,
 		},
 	}
 	for _, tt := range tests {

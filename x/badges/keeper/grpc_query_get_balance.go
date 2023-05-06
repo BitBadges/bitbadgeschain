@@ -24,7 +24,7 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 			Balance: &UserBalance,
 		}, nil
 	} else {
-		blankUserBalance := &types.UserBalance{}
+		blankUserBalance := &types.UserBalanceStore{}
 		return &types.QueryGetBalanceResponse{
 			Balance: blankUserBalance,
 		}, nil

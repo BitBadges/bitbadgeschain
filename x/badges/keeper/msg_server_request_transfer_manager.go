@@ -10,7 +10,7 @@ import (
 func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgRequestTransferManager) (*types.MsgRequestTransferManagerResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
+	badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:      msg.Creator,
 		CollectionId: msg.CollectionId,
 	})
@@ -24,11 +24,11 @@ func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgR
 			return nil, ErrInvalidPermissions //Manager can never transfer, so we don't unnecessarily store stuff
 		}
 
-		if err := k.CreateTransferManagerRequest(ctx, msg.CollectionId, CreatorAccountNum); err != nil {
+		if err := k.CreateTransferManagerRequest(ctx, msg.CollectionId, msg.Creator); err != nil {
 			return nil, err
 		}
 	} else {
-		if err := k.RemoveTransferManagerRequest(ctx, msg.CollectionId, CreatorAccountNum); err != nil {
+		if err := k.RemoveTransferManagerRequest(ctx, msg.CollectionId, msg.Creator); err != nil {
 			return nil, err
 		}
 	}

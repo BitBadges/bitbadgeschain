@@ -6,25 +6,25 @@ package bitbadges.bitbadgeschain.badges;
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 //Id ranges define a range of IDs from start to end. Can be used for badge IDs, nonces, anything. 
-//If end == 0, we assume end == start. Start must be >= end.
 message IdRange {
     uint64 start = 1;
     uint64 end = 2;
 }
 
 enum AddressOptions {
-    None = 0;
-    IncludeManager = 1;
-    ExcludeManager = 2;
+  None = 0;
+  IncludeManager = 1;
+  ExcludeManager = 2;
 }
 
-message Addresses {
-    repeated IdRange accountIds = 1;
-    uint64 options = 2;
+message AddressesMapping {
+  repeated string addresses = 1;
+  bool includeOnlySpecified = 2;
+  uint64 managerOptions = 3;
 }
 
 //TransferMapping defines a mapping of transfers from one set of addresses to another.
 message TransferMapping {
-    Addresses from = 1;
-    Addresses to = 2;
-}   
+  AddressesMapping from = 1;
+  AddressesMapping to = 2;
+}

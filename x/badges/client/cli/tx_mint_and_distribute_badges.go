@@ -14,11 +14,11 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdMintBadge() *cobra.Command {
+func CmdMintAndDistributeBadges() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "mint-badge [collection-id] [supplys] [transfers] [claims] [collection-uri] [badge-uris]",
-		Short: "Broadcast message mintBadge",
-		Args:  cobra.ExactArgs(6),
+		Use:   "mint-badge [collection-id] [supplys] [transfers] [claims] [collection-uri] [badge-uris] [balancesUri]",
+		Short: "Broadcast message MintAndDistributeBadges",
+		Args:  cobra.ExactArgs(7),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argId, err := cast.ToUint64E(args[0])
 			if err != nil {
@@ -54,13 +54,18 @@ func CmdMintBadge() *cobra.Command {
 				return err
 			}
 
+			argBalancesUri, err := cast.ToStringE(args[6])
+			if err != nil {
+				return err
+			}
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
 
-			msg := types.NewMsgMintBadge(
+			msg := types.NewMsgMintAndDistributeBadges(
 				clientCtx.GetFromAddress().String(),
 				argId,
 				badgeSupplyAndAmount,
@@ -68,6 +73,7 @@ func CmdMintBadge() *cobra.Command {
 				claims,
 				argCollectionUri,
 				badgeUris,
+				argBalancesUri,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {

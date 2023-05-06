@@ -22,7 +22,7 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 				Creator: "invalid_address",
 				Balances: []*types.Balance{
 					{
-						Balance: 1,
+						Amount: 1,
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 0,
@@ -31,6 +31,8 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 						},
 					},
 				},
+				Address: sample.AccAddress(),
+				
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
@@ -39,7 +41,7 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 				Creator: sample.AccAddress(),
 				Balances: []*types.Balance{
 					{
-						Balance: 1,
+						Amount: 1,
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 0,
@@ -48,6 +50,7 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 						},
 					},
 				},
+				Address: sample.AccAddress(),
 			},
 		}, {
 			name: "invalid badgeId range",
@@ -55,7 +58,7 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 				Creator: sample.AccAddress(),
 				Balances: []*types.Balance{
 					{
-						Balance: 1,
+						Amount: 1,
 						BadgeIds: []*types.IdRange{
 							{
 								Start: 10,
@@ -64,6 +67,7 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 						},
 					},
 				},
+				Address: sample.AccAddress(),
 			},
 			err: types.ErrStartGreaterThanEnd,
 		},

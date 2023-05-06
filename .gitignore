@@ -8,3 +8,5 @@ release/
 x/badges/keeper/coverage*
 
 coverage*
+
+commands.txt

@@ -10,14 +10,14 @@ import (
 func (k msgServer) DeleteCollection(goCtx context.Context, msg *types.MsgDeleteCollection) (*types.MsgDeleteCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	_, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
+	collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:       msg.Creator,
 		CollectionId:  msg.CollectionId,
 		MustBeManager: true,
 		CanDelete:     true,
 	})
 
-	k.DeleteCollectionFromStore(ctx, badge.CollectionId)
+	k.DeleteCollectionFromStore(ctx, collection.CollectionId)
 	if err != nil {
 		return nil, err
 	}

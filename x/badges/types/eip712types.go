@@ -38,8 +38,6 @@ func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Typ
 			mapObject[typeObj.Name] = "0"
 		} else if typeStr == "bool" && value == nil {
 			mapObject[typeObj.Name] = false
-		} else if typeStr == "AddressOptions" && value == nil {
-			mapObject[typeObj.Name] = "0"
 		} else {
 			innerMap, ok := mapObject[typeObj.Name].(map[string]interface{})
 			if ok {
@@ -90,13 +88,14 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 
 	transferMappingTypes := []apitypes.Type{
-		{Name: "from", Type: "Addresses"},
-		{Name: "to", Type: "Addresses"},
+		{Name: "from", Type: "AddressesMapping"},
+		{Name: "to", Type: "AddressesMapping"},
 	}
 
 	addressesTypes := []apitypes.Type{
-		{Name: "accountIds", Type: "IdRange[]"},
-		{Name: "options", Type: "uint64"},
+		{Name: "addresses", Type: "string[]"},
+		{Name: "includeOnlySpecified", Type: "bool"},
+		{Name: "managerOptions", Type: "uint64"},
 	}
 
 	idRangeTypes := []apitypes.Type{
@@ -105,7 +104,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	}
 
 	balanceTypes := []apitypes.Type{
-		{Name: "balance", Type: "uint64"},
+		{Name: "amount", Type: "uint64"},
 		{Name: "badgeIds", Type: "IdRange[]"},
 	}
 
@@ -115,7 +114,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	}
 
 	transfersTypes := []apitypes.Type{
-		{Name: "toAddresses", Type: "uint64[]"},
+		{Name: "toAddresses", Type: "string[]"},
 		{Name: "balances", Type: "Balance[]"},
 	}
 
@@ -163,9 +162,10 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionUri", Type: "string"},
 				{Name: "badgeUris", Type: "BadgeUri[]"},
+				{Name: "balancesUri", Type: "string"},
 				{Name: "bytes", Type: "string"},
 				{Name: "permissions", Type: "uint64"},
-				{Name: "disallowedTransfers", Type: "TransferMapping[]"},
+				{Name: "allowedTransfers", Type: "TransferMapping[]"},
 				{Name: "managerApprovedTransfers", Type: "TransferMapping[]"},
 				{Name: "standard", Type: "uint64"},
 				{Name: "badgeSupplys", Type: "BadgeSupplyAndAmount[]"},
@@ -173,7 +173,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "claims", Type: "Claim[]"},
 			},
 			"TransferMapping":      transferMappingTypes,
-			"Addresses":            addressesTypes,
+			"AddressesMapping":     addressesTypes,
 			"IdRange":              idRangeTypes,
 			"BadgeSupplyAndAmount": badgeSupplyAndAmountTypes,
 			"Transfers":            transfersTypes,
@@ -181,7 +181,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			"Balance":              balanceTypes,
 			"BadgeUri":             badgeUrisType,
 		}
-	case TypeMsgMintBadge:
+	case TypeMsgMintAndDistributeBadges:
 
 		return map[string][]apitypes.Type{
 			"MsgValue": {
@@ -192,6 +192,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "claims", Type: "Claim[]"},
 				{Name: "collectionUri", Type: "string"},
 				{Name: "badgeUris", Type: "BadgeUri[]"},
+				{Name: "balancesUri", Type: "string"},
 			},
 			"BadgeSupplyAndAmount": badgeSupplyAndAmountTypes,
 			"Transfers":            transfersTypes,
@@ -205,7 +206,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		return map[string][]apitypes.Type{
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
-				{Name: "from", Type: "uint64"},
+				{Name: "from", Type: "string"},
 				{Name: "transfers", Type: "Transfers[]"},
 				{Name: "collectionId", Type: "uint64"},
 			},
@@ -218,18 +219,18 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "uint64"},
-				{Name: "address", Type: "uint64"},
+				{Name: "address", Type: "string"},
 				{Name: "balances", Type: "Balance[]"},
 			},
 			"Balance": balanceTypes,
 			"IdRange": idRangeTypes,
 		}
-	case TypeMsgUpdateDisallowedTransfers:
+	case TypeMsgUpdateAllowedTransfers:
 		return map[string][]apitypes.Type{
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "uint64"},
-				{Name: "disallowedTransfers", Type: "TransferMapping[]"},
+				{Name: "allowedTransfers", Type: "TransferMapping[]"},
 			},
 			"TransferMapping": transferMappingTypes,
 			"Addresses":       addressesTypes,
@@ -259,7 +260,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "uint64"},
-				{Name: "newBytes", Type: "string"},
+				{Name: "bytes", Type: "string"},
 			},
 		}
 	case TypeMsgTransferManager:
@@ -267,7 +268,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "uint64"},
-				{Name: "address", Type: "uint64"},
+				{Name: "address", Type: "string"},
 			},
 		}
 	case TypeMsgRequestTransferManager:
@@ -276,13 +277,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "uint64"},
 				{Name: "addRequest", Type: "bool"},
-			},
-		}
-	case TypeMsgRegisterAddresses:
-		return map[string][]apitypes.Type{
-			"MsgValue": {
-				{Name: "creator", Type: "string"},
-				{Name: "addressesToRegister", Type: "string[]"},
 			},
 		}
 	case TypeMsgClaimBadge:

@@ -27,6 +27,18 @@ func duplicateInArray(arr []uint64) bool {
 	return false
 }
 
+func duplicateInStringArray(arr []string) bool {
+	visited := make(map[string]bool, 0)
+	for i := 0; i < len(arr); i++ {
+		if visited[arr[i]] {
+			return true
+		} else {
+			visited[arr[i]] = true
+		}
+	}
+	return false
+}
+
 // Validate uri and subasset uri returns whether both the uri and subasset uri is valid. Max 100 characters each.
 func ValidateURI(uri string) error {
 	regexMatch := reUri.MatchString(uri)
@@ -94,5 +106,107 @@ func ValidateNoElementIsX(amounts []uint64, x uint64) error {
 			return ErrElementCantEqualThis
 		}
 	}
+	return nil
+}
+
+
+// Validates no element is X
+func ValidateNoStringElementIsX(addresses []string, x string) error {
+	for _, amount := range addresses {
+		if amount == x {
+			return ErrElementCantEqualThis
+		}
+	}
+	return nil
+}
+
+func ValidateAddressesMapping(addressesMapping AddressesMapping) error {
+	for _, address := range addressesMapping.Addresses {
+		if err := ValidateAddress(address); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+
+func ValidateTransferMapping(transferMapping TransferMapping) error {
+	if err := ValidateAddressesMapping(*transferMapping.To); err != nil {
+		return err
+	}
+
+	if err := ValidateAddressesMapping(*transferMapping.From); err != nil {
+		return err
+	}
+
+	return nil
+}	
+
+func ValidateClaim(claim *Claim) error {
+	err := *new(error)
+
+	if claim.Uri != "" {
+		err = ValidateURI(claim.Uri)
+		if err != nil {
+			return err
+		}
+	}
+
+	if claim.TimeRange == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
+	}
+
+	err = ValidateRangesAreValid([]*IdRange{claim.TimeRange})
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
+	}
+
+	for _, balance := range claim.Balances {
+		if balance == nil {
+			return ErrInvalidLengthBalances
+		}
+
+		if balance.Amount == 0 {
+			return ErrAmountEqualsZero
+		}
+
+		err = ValidateRangesAreValid(balance.BadgeIds)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func ValidateTransfer(transfer *Transfers) error {
+	err := *new(error)
+	for _, balance := range transfer.Balances {
+		if balance == nil {
+			return ErrInvalidLengthBalances
+		}
+
+		if balance.Amount == 0 {
+			return ErrAmountEqualsZero
+		}
+
+		err = ValidateRangesAreValid(balance.BadgeIds)
+		if err != nil {
+			return err
+		}
+	}
+
+	if duplicateInStringArray(transfer.ToAddresses) {
+		return ErrDuplicateAddresses
+	}
+
+	for _, address := range transfer.ToAddresses {
+		_, err = sdk.AccAddressFromBech32(address)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid to address (%s)", err)
+		}
+	}
+
 	return nil
 }

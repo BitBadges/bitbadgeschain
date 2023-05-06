@@ -60,9 +60,9 @@ func (suite *TestSuite) TestNewCollections() {
 		},
 	}, badge.BadgeUris)
 	suite.Require().Equal([]*types.Balance(nil), badge.MaxSupplys)
-	suite.Require().Equal(bobAccountNum, badge.Manager) //7 is the first ID it creates
+	suite.Require().Equal(bob, badge.Manager) //7 is the first ID it creates
 	suite.Require().Equal(perms, badge.Permissions)
-	suite.Require().Equal([]*types.TransferMapping(nil), badge.DisallowedTransfers)
+	suite.Require().Equal([]*types.TransferMapping(nil), badge.AllowedTransfers)
 	suite.Require().Equal([]*types.TransferMapping(nil), badge.ManagerApprovedTransfers)
 	suite.Require().Equal(uint64(1), badge.CollectionId)
 
@@ -107,10 +107,10 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 				Permissions: perms,
 				Transfers: []*types.Transfers{
 					{
-						ToAddresses: []uint64{aliceAccountNum, charlieAccountNum},
+						ToAddresses: []string{alice, charlie},
 						Balances: []*types.Balance{
 							{
-								Balance: 5,
+								Amount: 5,
 								BadgeIds: []*types.IdRange{
 									{
 										Start: 1,
@@ -136,11 +136,11 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 
 	collection, _ := GetCollection(suite, wctx, 1)
 
-	unmintedBalances := types.UserBalance{
+	unmintedBalances := types.UserBalanceStore{
 		Balances: collection.UnmintedSupplys,
 	}
 
-	suite.Require().Equal(uint64(10), unmintedBalances.Balances[0].Balance)
+	suite.Require().Equal(uint64(10), unmintedBalances.Balances[0].Amount)
 	suite.Require().Equal([]*types.IdRange{
 		{
 			Start: 6,
@@ -148,8 +148,8 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 		},
 	}, unmintedBalances.Balances[0].BadgeIds)
 
-	aliceBalance, _ := GetUserBalance(suite, wctx, 1, aliceAccountNum)
-	suite.Require().Equal(uint64(5), aliceBalance.Balances[0].Balance)
+	aliceBalance, _ := GetUserBalance(suite, wctx, 1, alice)
+	suite.Require().Equal(uint64(5), aliceBalance.Balances[0].Amount)
 	suite.Require().Equal([]*types.IdRange{
 		{
 			Start: 1,
@@ -157,8 +157,8 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 		},
 	}, aliceBalance.Balances[0].BadgeIds)
 
-	charlieBalance, _ := GetUserBalance(suite, wctx, 1, charlieAccountNum)
-	suite.Require().Equal(uint64(5), charlieBalance.Balances[0].Balance)
+	charlieBalance, _ := GetUserBalance(suite, wctx, 1, charlie)
+	suite.Require().Equal(uint64(5), charlieBalance.Balances[0].Amount)
 	suite.Require().Equal([]*types.IdRange{
 		{
 			Start: 1,
@@ -198,10 +198,10 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipientsOverflow() {
 				Permissions: perms,
 				Transfers: []*types.Transfers{
 					{
-						ToAddresses: []uint64{aliceAccountNum, charlieAccountNum},
+						ToAddresses: []string{alice, charlie},
 						Balances: []*types.Balance{
 							{
-								Balance: 6,
+								Amount: 6,
 								BadgeIds: []*types.IdRange{
 									{
 										Start: 0,

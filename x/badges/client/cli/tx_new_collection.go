@@ -23,7 +23,7 @@ var _ = strconv.Itoa(0)
 
 //     uint64 permissions = 4;
 //     string bytes = 5;
-//     repeated TransferMapping disallowedTransfers = 6;
+//     repeated TransferMapping allowedTransfers = 6;
 //     repeated TransferMapping managerApprovedTransfers = 7;
 //     uint64 standard = 8; 
 //     //Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
@@ -35,9 +35,9 @@ var _ = strconv.Itoa(0)
 
 func CmdNewCollection() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "new-collection [collectionUri] [badgeUris] [permissions] [bytes] [disallowedTransfers] [managerApprovedTransfers] [standard] [supplys] [transfers] [claims]",
+		Use:   "new-collection [collectionUri] [badgeUris] [permissions] [bytes] [allowedTransfers] [managerApprovedTransfers] [standard] [supplys] [transfers] [claims] [balancesUri]",
 		Short: "Broadcast message newCollection",
-		Args:  cobra.ExactArgs(10),
+		Args:  cobra.ExactArgs(11),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -65,8 +65,8 @@ func CmdNewCollection() *cobra.Command {
 				return err
 			}
 
-			var argDisallowedTransfers []*types.TransferMapping
-			err = json.Unmarshal([]byte(args[4]), &argDisallowedTransfers)
+			var argAllowedTransfers []*types.TransferMapping
+			err = json.Unmarshal([]byte(args[4]), &argAllowedTransfers)
 			if err != nil {
 				return err
 			}
@@ -100,6 +100,11 @@ func CmdNewCollection() *cobra.Command {
 				return err
 			}
 
+			argBalancesUri, err := cast.ToStringE(args[10])
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgNewCollection(
 				clientCtx.GetFromAddress().String(),
 				argStandard,
@@ -107,11 +112,12 @@ func CmdNewCollection() *cobra.Command {
 				argCollectionUri,
 				argBadgeUris,
 				argPermissions,
-				argDisallowedTransfers,
+				argAllowedTransfers,
 				argManagerApprovedTransfers,
 				argBytesStr,
 				argTransfers,
 				argClaims,
+				argBalancesUri,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

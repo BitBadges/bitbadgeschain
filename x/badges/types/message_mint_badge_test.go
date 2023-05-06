@@ -10,15 +10,15 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgMintBadge_ValidateBasic(t *testing.T) {
+func TestMsgMintAndDistributeBadges_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgMintBadge
+		msg  types.MsgMintAndDistributeBadges
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgMintBadge{
+			msg: types.MsgMintAndDistributeBadges{
 				Creator: "invalid_address",
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
@@ -30,7 +30,7 @@ func TestMsgMintBadge_ValidateBasic(t *testing.T) {
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid state",
-			msg: types.MsgMintBadge{
+			msg: types.MsgMintAndDistributeBadges{
 				Creator: sample.AccAddress(),
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
@@ -41,7 +41,7 @@ func TestMsgMintBadge_ValidateBasic(t *testing.T) {
 			},
 		}, {
 			name: "invalid amount",
-			msg: types.MsgMintBadge{
+			msg: types.MsgMintAndDistributeBadges{
 				Creator: sample.AccAddress(),
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{

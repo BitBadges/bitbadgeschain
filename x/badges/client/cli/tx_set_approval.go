@@ -30,7 +30,7 @@ func CmdSetApproval() *cobra.Command {
 				return err
 			}
 
-			argAddress, err := cast.ToUint64E(args[1])
+			argAddress, err := cast.ToStringE(args[1])
 			if err != nil {
 				return err
 			}

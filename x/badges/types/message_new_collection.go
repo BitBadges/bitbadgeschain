@@ -9,19 +9,20 @@ const TypeMsgNewCollection = "new_collection"
 
 var _ sdk.Msg = &MsgNewCollection{}
 
-func NewMsgNewCollection(creator string, standard uint64, collectionsToCreate []*BadgeSupplyAndAmount, collectionUri string, badgeUris []*BadgeUri, permissions uint64, disallowedTransfers []*TransferMapping, managerApprovedTransfers []*TransferMapping, bytesToStore string, transfers []*Transfers, claims []*Claim) *MsgNewCollection {
+func NewMsgNewCollection(creator string, standard uint64, collectionsToCreate []*BadgeSupplyAndAmount, collectionUri string, badgeUris []*BadgeUri, permissions uint64, allowedTransfers []*TransferMapping, managerApprovedTransfers []*TransferMapping, bytesToStore string, transfers []*Transfers, claims []*Claim, balancesUri string) *MsgNewCollection {
 	return &MsgNewCollection{
 		Creator:                  creator,
 		CollectionUri:            collectionUri,
 		BadgeUris:                badgeUris,
 		BadgeSupplys:             collectionsToCreate,
-		DisallowedTransfers:      disallowedTransfers,
+		AllowedTransfers:         allowedTransfers,
 		ManagerApprovedTransfers: managerApprovedTransfers,
 		Bytes:                    bytesToStore,
 		Permissions:              permissions,
 		Standard:                 standard,
 		Transfers:                transfers,
 		Claims:                   claims,
+		BalancesUri: 							balancesUri,
 	}
 }
 
@@ -56,23 +57,27 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		return err
 	}
 
+	if msg.BalancesUri != "" {
+		if err := ValidateURI(*&msg.BalancesUri); err != nil {
+			return err
+		}
+	}
+
 	if err := ValidatePermissions(msg.Permissions); err != nil {
 		return err
 	}
 
-	if msg.BadgeUris == nil || len(msg.BadgeUris) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "badgeUris cannot be nil")
-	}
+	if msg.BadgeUris != nil {
+		for _, badgeUri := range msg.BadgeUris {
+			//Validate well-formedness of the message entries
+			if err := ValidateURI(badgeUri.Uri); err != nil {
+				return err
+			}
 
-	for _, badgeUri := range msg.BadgeUris {
-		//Validate well-formedness of the message entries
-		if err := ValidateURI(badgeUri.Uri); err != nil {
-			return err
-		}
-
-		err = ValidateRangesAreValid(badgeUri.BadgeIds)
-		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid badgeIds")
+			err = ValidateRangesAreValid(badgeUri.BadgeIds)
+			if err != nil {
+				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid badgeIds")
+			}
 		}
 	}
 
@@ -101,29 +106,18 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		return err
 	}
 
-	// err = ValidateRangesAreValid(msg.FreezeAddressRanges)
-	// if err != nil {
-	// 	return err
-	// }
-
 	for _, claim := range msg.Claims {
-		if claim.Uri != "" {
-			err = ValidateURI(claim.Uri)
-			if err != nil {
-				return err
-			}
-		}
-
-		if claim.TimeRange == nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
-		}
-
-		err = ValidateRangesAreValid([]*IdRange{claim.TimeRange})
+		err = ValidateClaim(claim)
 		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
+			return err
 		}
+	}
 
-		//TODO: validate balances
+	for _, transfer := range msg.Transfers {
+		err = ValidateTransfer(transfer)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

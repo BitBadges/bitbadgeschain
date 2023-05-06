@@ -12,11 +12,6 @@ import (
 func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBadge) (*types.MsgTransferBadgeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	accsToCheck := []uint64{msg.From}
-	for _, transfer := range msg.Transfers {
-		accsToCheck = append(accsToCheck, transfer.ToAddresses...)
-	}
-
 	rangesToValidate := []*types.IdRange{}
 	for _, transfer := range msg.Transfers {
 		for _, balance := range transfer.Balances {
@@ -26,11 +21,10 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 		}
 	}
 
-	CreatorAccountNum, badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
+	collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
 		BadgeIdRangesToValidate:     rangesToValidate,
-		AccountsToCheckRegistration: accsToCheck,
 	})
 	if err != nil {
 		return nil, err
@@ -47,14 +41,14 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 			toBalanceKey := ConstructBalanceKey(to, msg.CollectionId)
 			toUserBalance, found := k.Keeper.GetUserBalanceFromStore(ctx, toBalanceKey)
 			if !found {
-				toUserBalance = types.UserBalance{}
+				toUserBalance = types.UserBalanceStore{}
 			}
 
 			for _, balance := range transfer.Balances {
-				amount := balance.Balance
+				amount := balance.Amount
 
 				for _, badgeIdRange := range balance.BadgeIds {
-					fromUserBalance, toUserBalance, err = HandleTransfer(badge, badgeIdRange, fromUserBalance, toUserBalance, amount, msg.From, to, CreatorAccountNum)
+					fromUserBalance, toUserBalance, err = HandleTransfer(collection, badgeIdRange, fromUserBalance, toUserBalance, amount, msg.From, to, msg.Creator)
 					if err != nil {
 						return nil, err
 					}

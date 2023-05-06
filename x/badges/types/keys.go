@@ -23,10 +23,6 @@ const (
 	PortID = "badges"
 )
 
-const (
-	NextAssetIdKey = "NextAssetId-value-"
-)
-
 var (
 	// PortKey defines the key to store the port ID in store
 	PortKey = KeyPrefix("badges-port-")

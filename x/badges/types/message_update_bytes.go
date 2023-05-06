@@ -9,11 +9,11 @@ const TypeMsgUpdateBytes = "update_bytes"
 
 var _ sdk.Msg = &MsgUpdateBytes{}
 
-func NewMsgUpdateBytes(creator string, collectionId uint64, newBytes string) *MsgUpdateBytes {
+func NewMsgUpdateBytes(creator string, collectionId uint64, bytes string) *MsgUpdateBytes {
 	return &MsgUpdateBytes{
 		Creator:      creator,
 		CollectionId: collectionId,
-		NewBytes:     newBytes,
+		Bytes:     		bytes,
 	}
 }
 
@@ -44,8 +44,12 @@ func (msg *MsgUpdateBytes) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if err := ValidateBytes(msg.NewBytes); err != nil {
+	if err := ValidateBytes(msg.Bytes); err != nil {
 		return err
+	}
+
+	if msg.CollectionId == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
 	}
 
 	return nil

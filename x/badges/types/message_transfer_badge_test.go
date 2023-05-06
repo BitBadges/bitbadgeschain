@@ -20,13 +20,15 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgTransferBadge{
 				Creator: "invalid_address",
-				From:    1,
+				From:   sample.AccAddress(),
 				Transfers: []*types.Transfers{
 					{
-						ToAddresses: []uint64{0},
+						ToAddresses: []string{
+							sample.AccAddress(),
+						},
 						Balances: []*types.Balance{
 							{
-								Balance: 10,
+								Amount: 10,
 								BadgeIds: []*types.IdRange{
 									{
 										Start: 0,
@@ -43,13 +45,15 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 			name: "valid state",
 			msg: types.MsgTransferBadge{
 				Creator: sample.AccAddress(),
-				From:    1,
+				From:    sample.AccAddress(),
 				Transfers: []*types.Transfers{
 					{
-						ToAddresses: []uint64{0},
+						ToAddresses: []string{
+							sample.AccAddress(),
+						},
 						Balances: []*types.Balance{
 							{
-								Balance: 10,
+								Amount: 10,
 								BadgeIds: []*types.IdRange{
 									{
 										Start: 0,
@@ -65,13 +69,15 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 			name: "invalid amounts",
 			msg: types.MsgTransferBadge{
 				Creator: sample.AccAddress(),
-				From:    7,
+				From:    sample.AccAddress(),
 				Transfers: []*types.Transfers{
 					{
-						ToAddresses: []uint64{0},
+						ToAddresses: []string{
+							sample.AccAddress(),
+						},
 						Balances: []*types.Balance{
 							{
-								Balance: 0,
+								Amount: 0,
 								BadgeIds: []*types.IdRange{
 									{
 										Start: 0,
@@ -89,13 +95,13 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 			name: "invalid badge range",
 			msg: types.MsgTransferBadge{
 				Creator: sample.AccAddress(),
-				From:    7,
+				From:    sample.AccAddress(),
 				Transfers: []*types.Transfers{
 					{
-						ToAddresses: []uint64{0},
+						ToAddresses: []string{sample.AccAddress()},
 						Balances: []*types.Balance{
 							{
-								Balance: 10,
+								Amount: 10,
 								BadgeIds: []*types.IdRange{
 									{
 										Start: 10,

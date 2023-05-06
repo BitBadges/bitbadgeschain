@@ -32,16 +32,26 @@ const StoreKey = types.ModuleName
 
 type BalanceKeyDetails struct {
 	collectionId uint64
-	accountNum   uint64
+	address   	 string
 }
 
+type ClaimKeyDetails struct {
+	collectionId uint64
+	claimId   	 uint64
+}
 // Helper functions to manipulate the balance keys. These aren't prefixed. They will be after they are passed into the functions further down in this file.
 
-// Creates the balance key from an accountNumber and collectionId. Note this is not prefixed yet. It is just performing a delimited string concatenation.
-func ConstructBalanceKey(accountNumber uint64, id uint64) string {
+// Creates the balance key from an address and collectionId. Note this is not prefixed yet. It is just performing a delimited string concatenation.
+func ConstructBalanceKey(address string, id uint64) string {
 	collection_id_str := strconv.FormatUint(id, 10)
-	account_num_str := strconv.FormatUint(accountNumber, 10)
-	return account_num_str + BalanceKeyDelimiter + collection_id_str
+	address_str := address
+	return collection_id_str + BalanceKeyDelimiter + address_str
+}
+
+func ConstructClaimKey(collectionId uint64, claimId uint64) string {
+	collection_id_str := strconv.FormatUint(collectionId, 10)
+	claim_id_str := strconv.FormatUint(claimId, 10)
+	return collection_id_str + BalanceKeyDelimiter + claim_id_str
 }
 
 // Creates the used claim data key from an id and data. Note this is not prefixed yet. It is just performing a delimited string concatenation.
@@ -71,21 +81,33 @@ func ConstructUsedClaimAddressKey(collectionId uint64, claimId uint64, address s
 	return collection_id_str + BalanceKeyDelimiter + claim_id_str + BalanceKeyDelimiter + address
 }
 
-// Creates the transfer manager request key from an accountNumber and collectionId. Note this is not prefixed yet. It is just performing a delimited string concatenation.
-func ConstructTransferManagerRequestKey(collectionId uint64, accountNumber uint64) string {
+// Creates the transfer manager request key from an address and collectionId. Note this is not prefixed yet. It is just performing a delimited string concatenation.
+func ConstructTransferManagerRequestKey(collectionId uint64, address string) string {
 	collection_id_str := strconv.FormatUint(collectionId, 10)
-	account_num_str := strconv.FormatUint(accountNumber, 10)
-	return collection_id_str + BalanceKeyDelimiter + account_num_str + BalanceKeyDelimiter
+	address_str := address
+	return collection_id_str + BalanceKeyDelimiter + address_str + BalanceKeyDelimiter
 }
 
 // Helper function to unparse a balance key and get the information from it.
 func GetDetailsFromBalanceKey(id string) BalanceKeyDetails {
 	result := strings.Split(id, BalanceKeyDelimiter)
-	account_num, _ := strconv.ParseUint(result[0], 10, 64)
-	collection_id, _ := strconv.ParseUint(result[1], 10, 64)
+	address := result[1]
+	collection_id, _ := strconv.ParseUint(result[0], 10, 64)
 
 	return BalanceKeyDetails{
-		accountNum:   account_num,
+		address:   address,
+		collectionId: collection_id,
+	}
+}
+
+func GetDetailsFromClaimKey(id string) ClaimKeyDetails {
+	result := strings.Split(id, BalanceKeyDelimiter)
+	collection_id, _ := strconv.ParseUint(result[0], 10, 64)
+	claim_id, _ := strconv.ParseUint(result[1], 10, 64)
+	
+
+	return ClaimKeyDetails{
+		claimId: claim_id,
 		collectionId: collection_id,
 	}
 }
@@ -138,10 +160,10 @@ func usedClaimAddressStoreKey(usedClaimAddressKey string) []byte {
 }
 
 // claimStoreKey returns the byte representation of the claim store key ([]byte{0x05} + claimId)
-func claimStoreKey(claimId uint64) []byte {
-	key := make([]byte, len(ClaimKey)+IDLength)
+func claimStoreKey(claimKey string) []byte {
+	key := make([]byte, len(ClaimKey)+len(claimKey))
 	copy(key, ClaimKey)
-	copy(key[len(ClaimKey):], []byte(strconv.FormatUint(claimId, 10)))
+	copy(key[len(ClaimKey):], []byte(claimKey))
 	return key
 }
 

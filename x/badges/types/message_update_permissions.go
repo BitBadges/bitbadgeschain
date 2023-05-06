@@ -43,5 +43,15 @@ func (msg *MsgUpdatePermissions) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	err = ValidatePermissions(msg.Permissions)
+	if err != nil {
+		return err
+	}
+
+	if msg.CollectionId == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
+	}
+	
 	return nil
 }

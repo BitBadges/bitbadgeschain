@@ -37,7 +37,14 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 				return nil, err
 			}
 			return json.Marshal(badgeTypes.QueryGetBalanceResponse{Balance: res.Balance})
+		case custom.QueryClaim != nil:
+			res, err := keeper.GetClaim(ctx, custom.QueryClaim)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(badgeTypes.QueryGetClaimResponse{Claim: res.Claim})
 		}
+		
 		return nil, sdkerrors.Wrap(types.ErrInvalidMsg, "Unknown Custom query variant")
 	}
 }
@@ -46,4 +53,5 @@ type badgeCustomQuery struct {
 	QueryAddressById *badgeTypes.QueryGetAddressByIdRequest `json:"queryAddressById,omitempty"`
 	QueryCollection  *badgeTypes.QueryGetCollectionRequest    `json:"queryCollection,omitempty"`
 	QueryBalance *badgeTypes.QueryGetBalanceRequest    `json:"queryBalance,omitempty"`
+	QueryClaim *badgeTypes.QueryGetClaimRequest    `json:"queryClaim,omitempty"`
 }

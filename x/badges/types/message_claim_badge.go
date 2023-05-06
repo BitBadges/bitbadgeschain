@@ -46,6 +46,14 @@ func (msg *MsgClaimBadge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
+	if msg.ClaimId == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid claim id")
+	}
+
+	if msg.CollectionId == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
+	}
+
 	if msg.WhitelistProof != nil {
 		for _, aunt := range msg.WhitelistProof.Aunts {
 			if aunt.Aunt == "" || len(aunt.Aunt) == 0 {

@@ -21,7 +21,7 @@ func SimulateMsgTransferManager(
 		msg := &types.MsgTransferManager{
 			Creator:      simAccount.Address.String(),
 			CollectionId: r.Uint64(),
-			Address:      r.Uint64(),
+			Address:      simAccount.Address.String(),
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

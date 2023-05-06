@@ -22,7 +22,7 @@ func SimulateMsgSetApproval(
 			Creator: simAccount.Address.String(),
 			Balances: []*types.Balance{
 				{
-					Balance: r.Uint64(),
+					Amount: r.Uint64(),
 					BadgeIds: []*types.IdRange{
 						{
 							Start: r.Uint64(),

@@ -78,7 +78,7 @@ package keeper_test
 // 	claimToAdd := types.Claim{
 // 		Balances: []*types.Balance{
 // 			{
-// 				Balance:  10,
+// 				Amount:  10,
 // 				BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
 // 			},
 // 		},
@@ -124,7 +124,7 @@ package keeper_test
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
 // 			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-// 			Balance:  10,
+// 			Amount:  10,
 // 		},
 // 	}, badge.MaxSupplys)
 
@@ -213,7 +213,7 @@ package keeper_test
 // 	claimToAdd := types.Claim{
 // 		Balances: []*types.Balance{
 // 			{
-// 				Balance:  10,
+// 				Amount:  10,
 // 				BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
 // 			},
 // 		},
@@ -258,7 +258,7 @@ package keeper_test
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
 // 			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-// 			Balance:  10,
+// 			Amount:  10,
 // 		},
 // 	}, badge.MaxSupplys)
 
@@ -345,7 +345,7 @@ package keeper_test
 // 	claimToAdd := types.Claim{
 // 		Balances: []*types.Balance{
 // 			{
-// 				Balance:  10,
+// 				Amount:  10,
 // 				BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
 // 			},
 // 		},
@@ -390,7 +390,7 @@ package keeper_test
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
 // 			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-// 			Balance:  10,
+// 			Amount:  10,
 // 		},
 // 	}, badge.MaxSupplys)
 

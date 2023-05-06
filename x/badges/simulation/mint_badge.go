@@ -10,7 +10,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 )
 
-func SimulateMsgMintBadge(
+func SimulateMsgMintAndDistributeBadges(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	k keeper.Keeper,
@@ -26,7 +26,7 @@ func SimulateMsgMintBadge(
 			})
 		}
 
-		msg := &types.MsgMintBadge{
+		msg := &types.MsgMintAndDistributeBadges{
 			Creator:      simAccount.Address.String(),
 			CollectionId: r.Uint64(),
 			BadgeSupplys: randomSubassets,
