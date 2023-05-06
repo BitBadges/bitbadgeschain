@@ -20,12 +20,14 @@ func TestMsgRequestTransferManager_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgRequestTransferManager{
 				Creator: "invalid_address",
+				CollectionId: 1,
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: types.MsgRequestTransferManager{
 				Creator: sample.AccAddress(),
+				CollectionId: 1,
 			},
 		},
 	}

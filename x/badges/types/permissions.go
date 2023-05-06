@@ -23,9 +23,9 @@ const (
 	CanDeleteDigit               = 6
 	CanUpdateBytesDigit          = 5
 	CanManagerBeTransferredDigit = 4
-	CanUpdateMetadataUrisDigit           = 3
+	CanUpdateMetadataUrisDigit   = 3
 	CanCreateMoreBadgesDigit     = 2
-	CanUpdateAllowedDigit     = 1
+	CanUpdateAllowedDigit        = 1
 )
 
 // Validate permissions are validly formed. Disallows leading zeroes.

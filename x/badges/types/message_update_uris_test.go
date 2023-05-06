@@ -21,6 +21,7 @@ func TestMsgUpdateUris_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgUpdateUris{
 				Creator:       "invalid_address",
+				CollectionId: 1,
 				CollectionUri: "https://facebook.com",
 				BadgeUris: []*types.BadgeUri{
 					{
@@ -40,6 +41,7 @@ func TestMsgUpdateUris_ValidateBasic(t *testing.T) {
 			msg: types.MsgUpdateUris{
 				Creator:       sample.AccAddress(),
 				CollectionUri: "https://facebook.com",
+				CollectionId: 1,
 				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",

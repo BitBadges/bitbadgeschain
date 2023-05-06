@@ -19,6 +19,7 @@ func TestMsgUpdateAllowedTransfers_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgUpdateAllowedTransfers{
 				Creator: "invalid_address",
+				CollectionId: 1,
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
@@ -43,6 +44,7 @@ func TestMsgUpdateAllowedTransfers_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: types.MsgUpdateAllowedTransfers{
 				Creator: sample.AccAddress(),
+				CollectionId: 1,
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{

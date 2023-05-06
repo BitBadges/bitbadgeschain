@@ -21,6 +21,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgTransferBadge{
 				Creator: "invalid_address",
 				From:   sample.AccAddress(),
+				CollectionId: 1,
 				Transfers: []*types.Transfers{
 					{
 						ToAddresses: []string{

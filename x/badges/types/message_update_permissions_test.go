@@ -20,12 +20,14 @@ func TestMsgUpdatePermissions_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgUpdatePermissions{
 				Creator: "invalid_address",
+				CollectionId: 1,
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: types.MsgUpdatePermissions{
 				Creator: sample.AccAddress(),
+				CollectionId: 1,
 			},
 		},
 	}

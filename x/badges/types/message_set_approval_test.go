@@ -20,6 +20,7 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgSetApproval{
 				Creator: "invalid_address",
+				CollectionId: 1,
 				Balances: []*types.Balance{
 					{
 						Amount: 1,
@@ -38,6 +39,7 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 		}, {
 			name: "valid address",
 			msg: types.MsgSetApproval{
+				CollectionId: 1,
 				Creator: sample.AccAddress(),
 				Balances: []*types.Balance{
 					{
@@ -56,6 +58,7 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 			name: "invalid badgeId range",
 			msg: types.MsgSetApproval{
 				Creator: sample.AccAddress(),
+				CollectionId: 1,
 				Balances: []*types.Balance{
 					{
 						Amount: 1,

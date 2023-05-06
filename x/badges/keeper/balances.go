@@ -7,8 +7,8 @@ import (
 )
 
 // Gets the balances for a specific ID.
-func GetBalanceForId(id uint64, currentUserBalances []*types.Balance) (uint64, error) {
-	for _, balance := range currentUserBalances {
+func GetBalanceForId(id uint64, balances []*types.Balance) (uint64, error) {
+	for _, balance := range balances {
 		_, found := SearchIdRangesForId(id, balance.BadgeIds)
 		if found {
 			return balance.Amount, nil

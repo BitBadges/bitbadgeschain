@@ -18,12 +18,14 @@ func TestMsgDeleteCollection_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: MsgDeleteCollection{
 				Creator: "invalid_address",
+				CollectionId: 1,
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: MsgDeleteCollection{
 				Creator: sample.AccAddress(),
+				CollectionId: 1,
 			},
 		},
 	}

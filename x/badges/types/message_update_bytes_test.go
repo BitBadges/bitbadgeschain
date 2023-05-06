@@ -24,12 +24,14 @@ func TestMsgUpdateBytes_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgUpdateBytes{
 				Creator: "invalid_address",
+				CollectionId: 1,
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: types.MsgUpdateBytes{
 				Creator: sample.AccAddress(),
+				CollectionId: 1,
 			},
 		},
 		{
@@ -37,6 +39,7 @@ func TestMsgUpdateBytes_ValidateBasic(t *testing.T) {
 			msg: types.MsgUpdateBytes{
 				Creator:  sample.AccAddress(),
 				Bytes: string(arr),
+				CollectionId: 1,
 			},
 			err: types.ErrBytesGreaterThan256,
 		},
