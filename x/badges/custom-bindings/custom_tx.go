@@ -57,8 +57,7 @@ func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 					_sender.String(),
 					badgeCustomMsg.ClaimBadge.ClaimId,
 					badgeCustomMsg.ClaimBadge.CollectionId,
-					badgeCustomMsg.ClaimBadge.WhitelistProof,
-					badgeCustomMsg.ClaimBadge.CodeProof,
+					badgeCustomMsg.ClaimBadge.Solutions,
 				)
 				return []sdk.Msg{claimBadgeMsg}, nil
 		case badgeCustomMsg.DeleteCollection != nil:

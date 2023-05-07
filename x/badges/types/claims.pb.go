@@ -22,51 +22,86 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type RestrictOptions int32
-
-const (
-	RestrictOptions_NO_RESTRICTIONS       RestrictOptions = 0
-	RestrictOptions_ONE_CLAIM_PER_ADDRESS RestrictOptions = 2
-)
-
-var RestrictOptions_name = map[int32]string{
-	0: "NO_RESTRICTIONS",
-	2: "ONE_CLAIM_PER_ADDRESS",
+// We will add more fields to this message later (e.g. ZKP proofs)
+type Challenge struct {
+	Root                    string `protobuf:"bytes,1,opt,name=root,proto3" json:"root,omitempty"`
+	ExpectedProofLength     uint64 `protobuf:"varint,2,opt,name=expectedProofLength,proto3" json:"expectedProofLength,omitempty"`
+	UseCreatorAddressAsLeaf bool   `protobuf:"varint,3,opt,name=useCreatorAddressAsLeaf,proto3" json:"useCreatorAddressAsLeaf,omitempty"`
 }
 
-var RestrictOptions_value = map[string]int32{
-	"NO_RESTRICTIONS":       0,
-	"ONE_CLAIM_PER_ADDRESS": 2,
-}
-
-func (x RestrictOptions) String() string {
-	return proto.EnumName(RestrictOptions_name, int32(x))
-}
-
-func (RestrictOptions) EnumDescriptor() ([]byte, []int) {
+func (m *Challenge) Reset()         { *m = Challenge{} }
+func (m *Challenge) String() string { return proto.CompactTextString(m) }
+func (*Challenge) ProtoMessage()    {}
+func (*Challenge) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5fc06cc841589c70, []int{0}
+}
+func (m *Challenge) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Challenge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Challenge.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Challenge) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Challenge.Merge(m, src)
+}
+func (m *Challenge) XXX_Size() int {
+	return m.Size()
+}
+func (m *Challenge) XXX_DiscardUnknown() {
+	xxx_messageInfo_Challenge.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Challenge proto.InternalMessageInfo
+
+func (m *Challenge) GetRoot() string {
+	if m != nil {
+		return m.Root
+	}
+	return ""
+}
+
+func (m *Challenge) GetExpectedProofLength() uint64 {
+	if m != nil {
+		return m.ExpectedProofLength
+	}
+	return 0
+}
+
+func (m *Challenge) GetUseCreatorAddressAsLeaf() bool {
+	if m != nil {
+		return m.UseCreatorAddressAsLeaf
+	}
+	return false
 }
 
 // Defines a claim object. Claims are used to transfer badges via a claiming process.
 // Stored in own store. Claimed leaves are also stored in unique store.
 type Claim struct {
-	Balances                []*Balance `protobuf:"bytes,1,rep,name=balances,proto3" json:"balances,omitempty"`
-	CodeRoot                string     `protobuf:"bytes,2,opt,name=codeRoot,proto3" json:"codeRoot,omitempty"`
-	ExpectedCodeProofLength uint64     `protobuf:"varint,10,opt,name=expectedCodeProofLength,proto3" json:"expectedCodeProofLength,omitempty"`
-	WhitelistRoot           string     `protobuf:"bytes,3,opt,name=whitelistRoot,proto3" json:"whitelistRoot,omitempty"`
-	IncrementIdsBy          uint64     `protobuf:"varint,4,opt,name=incrementIdsBy,proto3" json:"incrementIdsBy,omitempty"`
-	Amount                  uint64     `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`
-	BadgeIds                []*IdRange `protobuf:"bytes,6,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	LimitOnePerAddress      bool       `protobuf:"varint,7,opt,name=limitOnePerAddress,proto3" json:"limitOnePerAddress,omitempty"`
-	Uri                     string     `protobuf:"bytes,8,opt,name=uri,proto3" json:"uri,omitempty"`
-	TimeRange               *IdRange   `protobuf:"bytes,9,opt,name=timeRange,proto3" json:"timeRange,omitempty"`
+	UndistributedBalances []*Balance `protobuf:"bytes,1,rep,name=undistributedBalances,proto3" json:"undistributedBalances,omitempty"`
+	TimeRange             *IdRange   `protobuf:"bytes,2,opt,name=timeRange,proto3" json:"timeRange,omitempty"`
+	Uri                   string     `protobuf:"bytes,3,opt,name=uri,proto3" json:"uri,omitempty"`
+	NumClaimsPerAddress   uint64     `protobuf:"varint,4,opt,name=numClaimsPerAddress,proto3" json:"numClaimsPerAddress,omitempty"`
+	// Balances for the current claim
+	IncrementIdsBy      uint64     `protobuf:"varint,5,opt,name=incrementIdsBy,proto3" json:"incrementIdsBy,omitempty"`
+	CurrentClaimAmounts []*Balance `protobuf:"bytes,6,rep,name=currentClaimAmounts,proto3" json:"currentClaimAmounts,omitempty"`
+	// Challenges for the claim. If empty, then no challenges are required.
+	Challenges []*Challenge `protobuf:"bytes,7,rep,name=challenges,proto3" json:"challenges,omitempty"`
 }
 
 func (m *Claim) Reset()         { *m = Claim{} }
 func (m *Claim) String() string { return proto.CompactTextString(m) }
 func (*Claim) ProtoMessage()    {}
 func (*Claim) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5fc06cc841589c70, []int{0}
+	return fileDescriptor_5fc06cc841589c70, []int{1}
 }
 func (m *Claim) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -95,67 +130,11 @@ func (m *Claim) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Claim proto.InternalMessageInfo
 
-func (m *Claim) GetBalances() []*Balance {
+func (m *Claim) GetUndistributedBalances() []*Balance {
 	if m != nil {
-		return m.Balances
+		return m.UndistributedBalances
 	}
 	return nil
-}
-
-func (m *Claim) GetCodeRoot() string {
-	if m != nil {
-		return m.CodeRoot
-	}
-	return ""
-}
-
-func (m *Claim) GetExpectedCodeProofLength() uint64 {
-	if m != nil {
-		return m.ExpectedCodeProofLength
-	}
-	return 0
-}
-
-func (m *Claim) GetWhitelistRoot() string {
-	if m != nil {
-		return m.WhitelistRoot
-	}
-	return ""
-}
-
-func (m *Claim) GetIncrementIdsBy() uint64 {
-	if m != nil {
-		return m.IncrementIdsBy
-	}
-	return 0
-}
-
-func (m *Claim) GetAmount() uint64 {
-	if m != nil {
-		return m.Amount
-	}
-	return 0
-}
-
-func (m *Claim) GetBadgeIds() []*IdRange {
-	if m != nil {
-		return m.BadgeIds
-	}
-	return nil
-}
-
-func (m *Claim) GetLimitOnePerAddress() bool {
-	if m != nil {
-		return m.LimitOnePerAddress
-	}
-	return false
-}
-
-func (m *Claim) GetUri() string {
-	if m != nil {
-		return m.Uri
-	}
-	return ""
 }
 
 func (m *Claim) GetTimeRange() *IdRange {
@@ -165,42 +144,120 @@ func (m *Claim) GetTimeRange() *IdRange {
 	return nil
 }
 
+func (m *Claim) GetUri() string {
+	if m != nil {
+		return m.Uri
+	}
+	return ""
+}
+
+func (m *Claim) GetNumClaimsPerAddress() uint64 {
+	if m != nil {
+		return m.NumClaimsPerAddress
+	}
+	return 0
+}
+
+func (m *Claim) GetIncrementIdsBy() uint64 {
+	if m != nil {
+		return m.IncrementIdsBy
+	}
+	return 0
+}
+
+func (m *Claim) GetCurrentClaimAmounts() []*Balance {
+	if m != nil {
+		return m.CurrentClaimAmounts
+	}
+	return nil
+}
+
+func (m *Claim) GetChallenges() []*Challenge {
+	if m != nil {
+		return m.Challenges
+	}
+	return nil
+}
+
 func init() {
-	proto.RegisterEnum("bitbadges.bitbadgeschain.badges.RestrictOptions", RestrictOptions_name, RestrictOptions_value)
+	proto.RegisterType((*Challenge)(nil), "bitbadges.bitbadgeschain.badges.Challenge")
 	proto.RegisterType((*Claim)(nil), "bitbadges.bitbadgeschain.badges.Claim")
 }
 
 func init() { proto.RegisterFile("badges/claims.proto", fileDescriptor_5fc06cc841589c70) }
 
 var fileDescriptor_5fc06cc841589c70 = []byte{
-	// 424 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x92, 0xcf, 0x8b, 0xd3, 0x40,
-	0x14, 0xc7, 0x9b, 0xed, 0x6e, 0x6d, 0x47, 0x74, 0xcb, 0x2c, 0xab, 0x63, 0x0f, 0x31, 0x88, 0x48,
-	0xf0, 0x90, 0xc0, 0x7a, 0xf1, 0xda, 0x5f, 0x42, 0xa0, 0x36, 0x65, 0xba, 0x27, 0x2f, 0x25, 0xc9,
-	0x3c, 0xd3, 0x81, 0x66, 0xa6, 0xcc, 0xbc, 0xe2, 0xee, 0x7f, 0xe1, 0x9f, 0xe5, 0x71, 0x8f, 0x7a,
-	0x93, 0xf6, 0x1f, 0x91, 0xa6, 0x69, 0x64, 0x45, 0x51, 0x6f, 0xef, 0x7d, 0x1f, 0x9f, 0x4f, 0x5e,
-	0x1e, 0x43, 0x2e, 0xd2, 0x44, 0xe4, 0x60, 0xc3, 0x6c, 0x95, 0xc8, 0xc2, 0x06, 0x6b, 0xa3, 0x51,
-	0xd3, 0xe7, 0xa9, 0xc4, 0x43, 0x1e, 0xd4, 0x55, 0xb6, 0x4c, 0xa4, 0x0a, 0x0e, 0x75, 0xef, 0xb2,
-	0xa2, 0xd2, 0x64, 0x95, 0xa8, 0x0c, 0x2a, 0xae, 0x77, 0x94, 0x99, 0x44, 0xe5, 0xc7, 0xf0, 0xc5,
-	0xb7, 0x26, 0x39, 0x1b, 0xee, 0xed, 0x74, 0x44, 0xda, 0x47, 0x80, 0x39, 0x5e, 0xd3, 0x7f, 0x78,
-	0xe5, 0x07, 0x7f, 0xf9, 0x52, 0x30, 0x38, 0x00, 0xbc, 0x26, 0x69, 0x8f, 0xb4, 0x33, 0x2d, 0x80,
-	0x6b, 0x8d, 0xec, 0xc4, 0x73, 0xfc, 0x0e, 0xaf, 0x7b, 0xfa, 0x96, 0x3c, 0x85, 0x9b, 0x35, 0x64,
-	0x08, 0x62, 0xa8, 0x05, 0xcc, 0x8c, 0xd6, 0x1f, 0x27, 0xa0, 0x72, 0x5c, 0x32, 0xe2, 0x39, 0xfe,
-	0x29, 0xff, 0xd3, 0x98, 0xbe, 0x24, 0x8f, 0x3e, 0x2d, 0x25, 0xc2, 0x4a, 0x5a, 0x2c, 0xd5, 0xcd,
-	0x52, 0x7d, 0x3f, 0xa4, 0xaf, 0xc8, 0x63, 0xa9, 0x32, 0x03, 0x05, 0x28, 0x8c, 0x84, 0x1d, 0xdc,
-	0xb2, 0xd3, 0x52, 0xfb, 0x4b, 0x4a, 0x9f, 0x90, 0x56, 0x52, 0xe8, 0x8d, 0x42, 0x76, 0x56, 0xce,
-	0xab, 0xee, 0x70, 0x01, 0x91, 0x43, 0x24, 0x2c, 0x6b, 0xfd, 0xe3, 0x05, 0x22, 0xc1, 0xf7, 0xe7,
-	0xe4, 0x35, 0x49, 0x03, 0x42, 0x57, 0xb2, 0x90, 0x18, 0x2b, 0x98, 0x81, 0xe9, 0x0b, 0x61, 0xc0,
-	0x5a, 0xf6, 0xc0, 0x73, 0xfc, 0x36, 0xff, 0xcd, 0x84, 0x76, 0x49, 0x73, 0x63, 0x24, 0x6b, 0x97,
-	0x7f, 0xb4, 0x2f, 0xe9, 0x3b, 0xd2, 0x41, 0x59, 0x40, 0x29, 0x66, 0x1d, 0xcf, 0xf9, 0xaf, 0x45,
-	0x7e, 0xa2, 0xaf, 0xfb, 0xe4, 0x9c, 0x83, 0x45, 0x23, 0x33, 0x8c, 0xd7, 0x28, 0xb5, 0xb2, 0xf4,
-	0x82, 0x9c, 0x4f, 0xe3, 0x05, 0x1f, 0xcf, 0xaf, 0x79, 0x34, 0xbc, 0x8e, 0xe2, 0xe9, 0xbc, 0xdb,
-	0xa0, 0xcf, 0xc8, 0x65, 0x3c, 0x1d, 0x2f, 0x86, 0x93, 0x7e, 0xf4, 0x7e, 0x31, 0x1b, 0xf3, 0x45,
-	0x7f, 0x34, 0xe2, 0xe3, 0xf9, 0xbc, 0x7b, 0x32, 0x98, 0x7c, 0xd9, 0xba, 0xce, 0xdd, 0xd6, 0x75,
-	0xbe, 0x6f, 0x5d, 0xe7, 0xf3, 0xce, 0x6d, 0xdc, 0xed, 0xdc, 0xc6, 0xd7, 0x9d, 0xdb, 0xf8, 0x70,
-	0x95, 0x4b, 0x5c, 0x6e, 0xd2, 0x20, 0xd3, 0x45, 0x58, 0x6f, 0x14, 0xde, 0xdf, 0x2d, 0xbc, 0x09,
-	0xab, 0x1c, 0x6f, 0xd7, 0x60, 0xd3, 0x56, 0xf9, 0xe6, 0xde, 0xfc, 0x08, 0x00, 0x00, 0xff, 0xff,
-	0x48, 0xe8, 0x71, 0xf8, 0xd7, 0x02, 0x00, 0x00,
+	// 399 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x92, 0xcd, 0x8a, 0x13, 0x41,
+	0x14, 0x85, 0x53, 0x26, 0x33, 0x9a, 0x12, 0x44, 0x2a, 0x0c, 0x16, 0xb3, 0x68, 0xc3, 0x2c, 0xa4,
+	0x71, 0xd1, 0x2d, 0xe3, 0xc6, 0x6d, 0x12, 0x10, 0x46, 0xb2, 0x18, 0x6a, 0x39, 0x0b, 0xa1, 0xba,
+	0xea, 0x4e, 0x77, 0x41, 0x77, 0x55, 0xa8, 0x1f, 0x98, 0x79, 0x06, 0x37, 0xbe, 0x93, 0x1b, 0x97,
+	0xb3, 0x74, 0x29, 0xc9, 0x8b, 0x48, 0x57, 0xba, 0xe3, 0x0f, 0x2d, 0xd1, 0xdd, 0xe5, 0xdc, 0x7b,
+	0x3e, 0x38, 0x87, 0x8b, 0x67, 0x05, 0x97, 0x25, 0xb8, 0x5c, 0xd4, 0x5c, 0x35, 0x2e, 0xdb, 0x58,
+	0xe3, 0x0d, 0x79, 0x59, 0x28, 0xbf, 0xd7, 0xb3, 0xc3, 0x24, 0x2a, 0xae, 0x74, 0xb6, 0x9f, 0xcf,
+	0xcf, 0x3a, 0x57, 0xc1, 0x6b, 0xae, 0x05, 0x74, 0xbe, 0xf3, 0x1e, 0x66, 0xb9, 0x2e, 0x7b, 0xf1,
+	0xe2, 0x13, 0xc2, 0xd3, 0x55, 0xc5, 0xeb, 0x1a, 0x74, 0x09, 0x84, 0xe0, 0x89, 0x35, 0xc6, 0x53,
+	0x34, 0x47, 0xe9, 0x94, 0xc5, 0x99, 0xbc, 0xc1, 0x33, 0xb8, 0xdb, 0x80, 0xf0, 0x20, 0xaf, 0xad,
+	0x31, 0xb7, 0x6b, 0xd0, 0xa5, 0xaf, 0xe8, 0xa3, 0x39, 0x4a, 0x27, 0x6c, 0x68, 0x45, 0xde, 0xe1,
+	0x17, 0xc1, 0xc1, 0xca, 0x02, 0xf7, 0xc6, 0x2e, 0xa4, 0xb4, 0xe0, 0xdc, 0xc2, 0xad, 0x81, 0xdf,
+	0xd2, 0xf1, 0x1c, 0xa5, 0x4f, 0xd8, 0xdf, 0xd6, 0x17, 0x5f, 0xc6, 0xf8, 0x64, 0xd5, 0x66, 0x25,
+	0x1f, 0xf1, 0x59, 0xd0, 0x52, 0x39, 0x6f, 0x55, 0x11, 0x3c, 0xc8, 0x65, 0x97, 0x85, 0xa2, 0xf9,
+	0x38, 0x7d, 0x7a, 0x99, 0x66, 0x47, 0x4a, 0xc8, 0x3a, 0x03, 0x1b, 0xc6, 0x90, 0xf7, 0x78, 0xea,
+	0x55, 0x03, 0xac, 0xed, 0x22, 0x66, 0xf9, 0x17, 0xe6, 0x95, 0x8c, 0xf7, 0xec, 0xa7, 0x95, 0x3c,
+	0xc7, 0xe3, 0x60, 0x55, 0xcc, 0x35, 0x65, 0xed, 0xd8, 0xf6, 0xa5, 0x43, 0x13, 0x53, 0xb8, 0x6b,
+	0xe8, 0x03, 0xd2, 0xc9, 0xbe, 0xaf, 0x81, 0x15, 0x79, 0x85, 0x9f, 0x29, 0x2d, 0x2c, 0x34, 0xa0,
+	0xfd, 0x95, 0x74, 0xcb, 0x7b, 0x7a, 0x12, 0x8f, 0xff, 0x50, 0xc9, 0x0d, 0x9e, 0x89, 0x60, 0x2d,
+	0x68, 0x1f, 0x11, 0x8b, 0xc6, 0x04, 0xed, 0x1d, 0x3d, 0xfd, 0xcf, 0x46, 0x86, 0x20, 0xe4, 0x03,
+	0xc6, 0xa2, 0x7f, 0x03, 0x47, 0x1f, 0x47, 0xe4, 0xeb, 0xa3, 0xc8, 0xc3, 0xe7, 0xb0, 0x5f, 0xdc,
+	0xcb, 0xf5, 0xd7, 0x6d, 0x82, 0x1e, 0xb6, 0x09, 0xfa, 0xbe, 0x4d, 0xd0, 0xe7, 0x5d, 0x32, 0x7a,
+	0xd8, 0x25, 0xa3, 0x6f, 0xbb, 0x64, 0x74, 0x73, 0x59, 0x2a, 0x5f, 0x85, 0x22, 0x13, 0xa6, 0xc9,
+	0x0f, 0xc4, 0xfc, 0x77, 0x76, 0x7e, 0x97, 0x77, 0xba, 0xbf, 0xdf, 0x80, 0x2b, 0x4e, 0xe3, 0xa3,
+	0xbe, 0xfd, 0x11, 0x00, 0x00, 0xff, 0xff, 0x8c, 0xba, 0x72, 0xa6, 0x0c, 0x03, 0x00, 0x00,
+}
+
+func (m *Challenge) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Challenge) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Challenge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.UseCreatorAddressAsLeaf {
+		i--
+		if m.UseCreatorAddressAsLeaf {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.ExpectedProofLength != 0 {
+		i = encodeVarintClaims(dAtA, i, uint64(m.ExpectedProofLength))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Root) > 0 {
+		i -= len(m.Root)
+		copy(dAtA[i:], m.Root)
+		i = encodeVarintClaims(dAtA, i, uint64(len(m.Root)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *Claim) Marshal() (dAtA []byte, err error) {
@@ -223,10 +280,50 @@ func (m *Claim) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.ExpectedCodeProofLength != 0 {
-		i = encodeVarintClaims(dAtA, i, uint64(m.ExpectedCodeProofLength))
+	if len(m.Challenges) > 0 {
+		for iNdEx := len(m.Challenges) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Challenges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintClaims(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
+	if len(m.CurrentClaimAmounts) > 0 {
+		for iNdEx := len(m.CurrentClaimAmounts) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CurrentClaimAmounts[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintClaims(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x32
+		}
+	}
+	if m.IncrementIdsBy != 0 {
+		i = encodeVarintClaims(dAtA, i, uint64(m.IncrementIdsBy))
 		i--
-		dAtA[i] = 0x50
+		dAtA[i] = 0x28
+	}
+	if m.NumClaimsPerAddress != 0 {
+		i = encodeVarintClaims(dAtA, i, uint64(m.NumClaimsPerAddress))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.Uri) > 0 {
+		i -= len(m.Uri)
+		copy(dAtA[i:], m.Uri)
+		i = encodeVarintClaims(dAtA, i, uint64(len(m.Uri)))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if m.TimeRange != nil {
 		{
@@ -238,67 +335,12 @@ func (m *Claim) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintClaims(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x4a
-	}
-	if len(m.Uri) > 0 {
-		i -= len(m.Uri)
-		copy(dAtA[i:], m.Uri)
-		i = encodeVarintClaims(dAtA, i, uint64(len(m.Uri)))
-		i--
-		dAtA[i] = 0x42
-	}
-	if m.LimitOnePerAddress {
-		i--
-		if m.LimitOnePerAddress {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x38
-	}
-	if len(m.BadgeIds) > 0 {
-		for iNdEx := len(m.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.BadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintClaims(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x32
-		}
-	}
-	if m.Amount != 0 {
-		i = encodeVarintClaims(dAtA, i, uint64(m.Amount))
-		i--
-		dAtA[i] = 0x28
-	}
-	if m.IncrementIdsBy != 0 {
-		i = encodeVarintClaims(dAtA, i, uint64(m.IncrementIdsBy))
-		i--
-		dAtA[i] = 0x20
-	}
-	if len(m.WhitelistRoot) > 0 {
-		i -= len(m.WhitelistRoot)
-		copy(dAtA[i:], m.WhitelistRoot)
-		i = encodeVarintClaims(dAtA, i, uint64(len(m.WhitelistRoot)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.CodeRoot) > 0 {
-		i -= len(m.CodeRoot)
-		copy(dAtA[i:], m.CodeRoot)
-		i = encodeVarintClaims(dAtA, i, uint64(len(m.CodeRoot)))
-		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.Balances) > 0 {
-		for iNdEx := len(m.Balances) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.UndistributedBalances) > 0 {
+		for iNdEx := len(m.UndistributedBalances) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Balances[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.UndistributedBalances[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -323,51 +365,62 @@ func encodeVarintClaims(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *Challenge) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Root)
+	if l > 0 {
+		n += 1 + l + sovClaims(uint64(l))
+	}
+	if m.ExpectedProofLength != 0 {
+		n += 1 + sovClaims(uint64(m.ExpectedProofLength))
+	}
+	if m.UseCreatorAddressAsLeaf {
+		n += 2
+	}
+	return n
+}
+
 func (m *Claim) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.Balances) > 0 {
-		for _, e := range m.Balances {
+	if len(m.UndistributedBalances) > 0 {
+		for _, e := range m.UndistributedBalances {
 			l = e.Size()
 			n += 1 + l + sovClaims(uint64(l))
 		}
-	}
-	l = len(m.CodeRoot)
-	if l > 0 {
-		n += 1 + l + sovClaims(uint64(l))
-	}
-	l = len(m.WhitelistRoot)
-	if l > 0 {
-		n += 1 + l + sovClaims(uint64(l))
-	}
-	if m.IncrementIdsBy != 0 {
-		n += 1 + sovClaims(uint64(m.IncrementIdsBy))
-	}
-	if m.Amount != 0 {
-		n += 1 + sovClaims(uint64(m.Amount))
-	}
-	if len(m.BadgeIds) > 0 {
-		for _, e := range m.BadgeIds {
-			l = e.Size()
-			n += 1 + l + sovClaims(uint64(l))
-		}
-	}
-	if m.LimitOnePerAddress {
-		n += 2
-	}
-	l = len(m.Uri)
-	if l > 0 {
-		n += 1 + l + sovClaims(uint64(l))
 	}
 	if m.TimeRange != nil {
 		l = m.TimeRange.Size()
 		n += 1 + l + sovClaims(uint64(l))
 	}
-	if m.ExpectedCodeProofLength != 0 {
-		n += 1 + sovClaims(uint64(m.ExpectedCodeProofLength))
+	l = len(m.Uri)
+	if l > 0 {
+		n += 1 + l + sovClaims(uint64(l))
+	}
+	if m.NumClaimsPerAddress != 0 {
+		n += 1 + sovClaims(uint64(m.NumClaimsPerAddress))
+	}
+	if m.IncrementIdsBy != 0 {
+		n += 1 + sovClaims(uint64(m.IncrementIdsBy))
+	}
+	if len(m.CurrentClaimAmounts) > 0 {
+		for _, e := range m.CurrentClaimAmounts {
+			l = e.Size()
+			n += 1 + l + sovClaims(uint64(l))
+		}
+	}
+	if len(m.Challenges) > 0 {
+		for _, e := range m.Challenges {
+			l = e.Size()
+			n += 1 + l + sovClaims(uint64(l))
+		}
 	}
 	return n
 }
@@ -377,6 +430,127 @@ func sovClaims(x uint64) (n int) {
 }
 func sozClaims(x uint64) (n int) {
 	return sovClaims(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *Challenge) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowClaims
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Challenge: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Challenge: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Root", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowClaims
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthClaims
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthClaims
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Root = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ExpectedProofLength", wireType)
+			}
+			m.ExpectedProofLength = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowClaims
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ExpectedProofLength |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UseCreatorAddressAsLeaf", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowClaims
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.UseCreatorAddressAsLeaf = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipClaims(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthClaims
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *Claim) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -409,7 +583,7 @@ func (m *Claim) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Balances", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UndistributedBalances", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -436,200 +610,12 @@ func (m *Claim) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Balances = append(m.Balances, &Balance{})
-			if err := m.Balances[len(m.Balances)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.UndistributedBalances = append(m.UndistributedBalances, &Balance{})
+			if err := m.UndistributedBalances[len(m.UndistributedBalances)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CodeRoot", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowClaims
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthClaims
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthClaims
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.CodeRoot = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistRoot", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowClaims
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthClaims
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthClaims
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.WhitelistRoot = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IncrementIdsBy", wireType)
-			}
-			m.IncrementIdsBy = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowClaims
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.IncrementIdsBy |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
-			}
-			m.Amount = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowClaims
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Amount |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowClaims
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthClaims
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthClaims
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.BadgeIds = append(m.BadgeIds, &IdRange{})
-			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LimitOnePerAddress", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowClaims
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.LimitOnePerAddress = bool(v != 0)
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowClaims
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthClaims
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthClaims
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Uri = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 9:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TimeRange", wireType)
 			}
@@ -665,11 +651,11 @@ func (m *Claim) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 10:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ExpectedCodeProofLength", wireType)
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
 			}
-			m.ExpectedCodeProofLength = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowClaims
@@ -679,11 +665,130 @@ func (m *Claim) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ExpectedCodeProofLength |= uint64(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthClaims
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthClaims
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Uri = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NumClaimsPerAddress", wireType)
+			}
+			m.NumClaimsPerAddress = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowClaims
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NumClaimsPerAddress |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IncrementIdsBy", wireType)
+			}
+			m.IncrementIdsBy = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowClaims
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.IncrementIdsBy |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CurrentClaimAmounts", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowClaims
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthClaims
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthClaims
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CurrentClaimAmounts = append(m.CurrentClaimAmounts, &Balance{})
+			if err := m.CurrentClaimAmounts[len(m.CurrentClaimAmounts)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Challenges", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowClaims
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthClaims
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthClaims
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Challenges = append(m.Challenges, &Challenge{})
+			if err := m.Challenges[len(m.Challenges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipClaims(dAtA[iNdEx:])

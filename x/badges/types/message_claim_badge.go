@@ -9,13 +9,12 @@ const TypeMsgClaimBadge = "claim_badge"
 
 var _ sdk.Msg = &MsgClaimBadge{}
 
-func NewMsgClaimBadge(creator string, claimId uint64, collectionId uint64, whitelistProof *ClaimProof, codeProof *ClaimProof) *MsgClaimBadge {
+func NewMsgClaimBadge(creator string, claimId uint64, collectionId uint64, solutions []*ChallengeSolution) *MsgClaimBadge {
 	return &MsgClaimBadge{
 		Creator:        creator,
 		ClaimId:        claimId,
 		CollectionId:   collectionId,
-		WhitelistProof: whitelistProof,
-		CodeProof:      codeProof,
+		Solutions:      solutions,
 	}
 }
 
@@ -54,18 +53,12 @@ func (msg *MsgClaimBadge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
 	}
 
-	if msg.WhitelistProof != nil {
-		for _, aunt := range msg.WhitelistProof.Aunts {
-			if aunt.Aunt == "" || len(aunt.Aunt) == 0 {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid aunt in proof")
-			}
-		}
-	}
-
-	if msg.CodeProof != nil {
-		for _, aunt := range msg.CodeProof.Aunts {
-			if aunt.Aunt == "" || len(aunt.Aunt) == 0 {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid aunt in proof")
+	for _, solution := range msg.Solutions {
+		if solution.Proof != nil {
+			for _, aunt := range solution.Proof.Aunts {
+				if aunt.Aunt == "" || len(aunt.Aunt) == 0 {
+					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid aunt in proof")
+				}
 			}
 		}
 	}

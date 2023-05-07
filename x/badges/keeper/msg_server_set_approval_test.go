@@ -27,6 +27,16 @@ func (suite *TestSuite) TestSetApproval() {
 					},
 				},
 				Permissions: 62,
+				AllowedTransfers: []*types.TransferMapping{
+					{
+						From: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+						To: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+					},
+				},
 			},
 			Amount:  1,
 			Creator: bob,
@@ -114,6 +124,16 @@ func (suite *TestSuite) TestSetApprovalNoPrevBalanceInStore() {
 					},
 				},
 				Permissions: 62,
+				AllowedTransfers: []*types.TransferMapping{
+					{
+						From: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+						To: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+					},
+				},
 			},
 			Amount:  1,
 			Creator: bob,
@@ -173,6 +193,16 @@ func (suite *TestSuite) TestApproveSelf() {
 					},
 				},
 				Permissions: 62,
+				AllowedTransfers: []*types.TransferMapping{
+					{
+						From: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+						To: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+					},
+				},
 			},
 			Amount:  1,
 			Creator: bob,

@@ -27,6 +27,16 @@ func (suite *TestSuite) TestTransferManager() {
 					},
 				},
 				Permissions: 127,
+				AllowedTransfers: []*types.TransferMapping{
+					{
+						From: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+						To: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+					},
+				},
 			},
 			Amount:  1,
 			Creator: bob,
@@ -74,6 +84,16 @@ func (suite *TestSuite) TestRequestTransferManager() {
 					},
 				},
 				Permissions: 127,
+				AllowedTransfers: []*types.TransferMapping{
+					{
+						From: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+						To: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+					},
+				},
 			},
 			Amount:  1,
 			Creator: bob,
@@ -127,6 +147,16 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 					},
 				},
 				Permissions: 127,
+				AllowedTransfers: []*types.TransferMapping{
+					{
+						From: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+						To: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+					},
+				},
 			},
 			Amount:  1,
 			Creator: bob,
@@ -174,6 +204,16 @@ func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 					},
 				},
 				Permissions: 23,
+				AllowedTransfers: []*types.TransferMapping{
+					{
+						From: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+						To: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+					},
+				},
 			},
 			Amount:  1,
 			Creator: bob,

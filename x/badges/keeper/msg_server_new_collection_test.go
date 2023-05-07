@@ -105,6 +105,16 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 					},
 				},
 				Permissions: perms,
+				AllowedTransfers: []*types.TransferMapping{
+					{
+						From: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+						To: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+					},
+				},
 				Transfers: []*types.Transfer{
 					{
 						ToAddresses: []string{alice, charlie},
@@ -196,6 +206,16 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipientsOverflow() {
 					},
 				},
 				Permissions: perms,
+				AllowedTransfers: []*types.TransferMapping{
+					{
+						From: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+						To: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+					},
+				},
 				Transfers: []*types.Transfer{
 					{
 						ToAddresses: []string{alice, charlie},

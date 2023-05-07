@@ -25,18 +25,16 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 						},
 					},
 				},
-				Permissions: 62,
+				Permissions: 23,
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
-							Addresses: []string{							},
+							Addresses: []string{},
 							IncludeOnlySpecified: false,
 							ManagerOptions: uint64(types.AddressOptions_None),
 						},
 						To: &types.AddressesMapping{
-							Addresses: []string{
-								bob,
-							},
+							Addresses: []string{},
 							IncludeOnlySpecified: false,
 							ManagerOptions: uint64(types.AddressOptions_None),
 						},
@@ -77,6 +75,19 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 		},
 	})
 	suite.Require().Nil(err, "Error transferring badge")
+
+	err = UpdateAllowedTransfers(suite, wctx, bob, 1, []*types.TransferMapping{
+		{
+			From: &types.AddressesMapping{
+				IncludeOnlySpecified: false,
+			},
+			To: &types.AddressesMapping{
+				IncludeOnlySpecified: false,
+				Addresses: []string{bob},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating allowed transfers")
 
 	err = TransferBadge(suite, wctx, alice, 1, alice, []*types.Transfer{
 		{

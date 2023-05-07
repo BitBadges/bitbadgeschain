@@ -36,7 +36,7 @@ func (suite *TestSuite) TestSendAllToClaims() {
 	badge, _ := GetCollection(suite, wctx, 1)
 
 	claimToAdd := types.Claim{
-		Balances: []*types.Balance{{
+		UndistributedBalances: []*types.Balance{{
 			Amount:  10,
 			BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
 		}},

@@ -174,12 +174,15 @@ message ClaimProof {
     repeated ClaimProofItem aunts = 2;
 }
 
+message ChallengeSolution {
+  ClaimProof proof = 1;
+}
+
 message MsgClaimBadge {
-    string creator = 1;
-    uint64 claimId = 2;
-    uint64 collectionId = 3;
-    ClaimProof whitelistProof = 4;
-    ClaimProof codeProof = 5;
+  string creator = 1;
+  uint64 claimId = 2;
+  uint64 collectionId = 3;
+  repeated ChallengeSolution solutions = 4;
 }
 
 message MsgClaimBadgeResponse {}

@@ -7,22 +7,25 @@ import "badges/ranges.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
-enum RestrictOptions {
-    NO_RESTRICTIONS = 0;
-    ONE_CLAIM_PER_ADDRESS = 2;
+//We will add more fields to this message later (e.g. ZKP proofs)
+message Challenge {
+  string root = 1;
+  uint64 expectedProofLength = 2;
+  bool useCreatorAddressAsLeaf = 3;
 }
 
 //Defines a claim object. Claims are used to transfer badges via a claiming process.
 //Stored in own store. Claimed leaves are also stored in unique store.
 message Claim {
-    repeated Balance balances = 1; //Current balance of the claim store.
-    string codeRoot = 2;
-    uint64 expectedCodeProofLength = 10;
-    string whitelistRoot = 3;
-    uint64 incrementIdsBy = 4;
-    uint64 amount = 5;
-    repeated IdRange badgeIds = 6;
-    bool limitOnePerAddress = 7; //If true, only one claim per address is allowed.
-    string uri = 8; //Optional URI for the claim. Max 100 chars. To be used for IPFS Merkle Tree Information
-    IdRange timeRange = 9; //Time range when the claim is valid.
+  repeated Balance undistributedBalances = 1; //Current balance of the claim store.
+  IdRange timeRange = 2; //Time range when the claim is valid.
+  string uri = 3; //Optional URI for the claim. Max 100 chars. Often used for IPFS Merkle Tree Information for challenges
+  uint64 numClaimsPerAddress = 4; //If >0, then the claim can only be used to claim this number of leaves per address. If 0, then no limit.
+
+  //Balances for the current claim
+  uint64 incrementIdsBy = 5;
+  repeated Balance currentClaimAmounts = 6;
+
+  //Challenges for the claim. If empty, then no challenges are required.
+  repeated Challenge challenges = 7; 
 }

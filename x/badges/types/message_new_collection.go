@@ -21,8 +21,11 @@ func NewMsgNewCollection(creator string, standard uint64, collectionsToCreate []
 	}
 
 	for _, claim := range claims {
-		claim.BadgeIds = SortAndMergeOverlapping(claim.BadgeIds)
-		for _, balance := range claim.Balances {
+		for _, balance := range claim.UndistributedBalances {
+			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+		}
+		
+		for _, balance := range claim.CurrentClaimAmounts {
 			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
 		}
 	}

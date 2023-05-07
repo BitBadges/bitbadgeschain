@@ -158,8 +158,8 @@ func UpdateBytes(suite *TestSuite, ctx context.Context, creator string, collecti
 	return err
 }
 
-func ClaimBadge(suite *TestSuite, ctx context.Context, creator string, claimId uint64, collectionId uint64, whitelistProof *types.ClaimProof, codeProof *types.ClaimProof) error {
-	msg := types.NewMsgClaimBadge(creator, claimId, collectionId, whitelistProof, codeProof)
+func ClaimBadge(suite *TestSuite, ctx context.Context, creator string, claimId uint64, collectionId uint64, solutions []*types.ChallengeSolution) error {
+	msg := types.NewMsgClaimBadge(creator, claimId, collectionId, solutions)
 	_, err := suite.msgServer.ClaimBadge(ctx, msg)
 	return err
 }

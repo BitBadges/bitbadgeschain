@@ -21,8 +21,11 @@ func NewMsgMintAndDistributeBadges(creator string, collectionId uint64, supplysA
 	}
 
 	for _, claim := range claims {
-		claim.BadgeIds = SortAndMergeOverlapping(claim.BadgeIds)
-		for _, balance := range claim.Balances {
+		for _, balance := range claim.UndistributedBalances {
+			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+		}
+		
+		for _, balance := range claim.CurrentClaimAmounts {
 			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
 		}
 	}

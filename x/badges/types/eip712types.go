@@ -119,16 +119,13 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	}
 
 	claimsTypes := []apitypes.Type{
-		{Name: "balances", Type: "Balance[]"},
-		{Name: "codeRoot", Type: "string"},
-		{Name: "whitelistRoot", Type: "string"},
-		{Name: "incrementIdsBy", Type: "uint64"},
-		{Name: "amount", Type: "uint64"},
-		{Name: "badgeIds", Type: "IdRange[]"},
-		{Name: "limitOnePerAddress", Type: "bool"},
-		{Name: "uri", Type: "string"},
+		{Name: "undistributedBalances", Type: "Balance[]"},
 		{Name: "timeRange", Type: "IdRange"},
-		{Name: "expectedCodeProofLength", Type: "uint64"},
+		{Name: "uri", Type: "string"},
+		{Name: "numClaimsPerAddress", Type: "uint64"},
+		{Name: "incrementIdsBy", Type: "uint64"},
+		{Name: "currentClaimAmounts", Type: "Balance[]"},
+		{Name: "challenges", Type: "Challenge[]"},
 	}
 
 	proofItemTypes := []apitypes.Type{
@@ -144,6 +141,17 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	badgeUrisType := []apitypes.Type{
 		{Name: "uri", Type: "string"},
 		{Name: "badgeIds", Type: "IdRange[]"},
+	}
+
+	challengeType := []apitypes.Type{
+		{Name: "root", Type: "string"},
+		{Name: "expectedProofLength", Type: "uint64"},
+		{Name: "useCreatorAddressAsLeaf", Type: "bool"},
+	}
+
+
+	challengeSolutionType := []apitypes.Type{
+		{Name: "proof", Type: "ClaimProof"},
 	}
 
 	switch route {
@@ -180,6 +188,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			"Claim":                claimsTypes,
 			"Balance":              balanceTypes,
 			"BadgeUri":             badgeUrisType,
+			"Challenge":            challengeType,
 		}
 	case TypeMsgMintAndDistributeBadges:
 
@@ -200,6 +209,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			"Balance":              balanceTypes,
 			"IdRange":              idRangeTypes,
 			"BadgeUri":             badgeUrisType,
+			"Challenge":            challengeType,
 		}
 
 	case TypeMsgTransferBadge:
@@ -233,7 +243,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "allowedTransfers", Type: "TransferMapping[]"},
 			},
 			"TransferMapping": transferMappingTypes,
-			"Addresses":       addressesTypes,
+			"AddressesMapping":       addressesTypes,
 			"IdRange":         idRangeTypes,
 		}
 	case TypeMsgUpdateUris:
@@ -285,11 +295,11 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "creator", Type: "string"},
 				{Name: "claimId", Type: "uint64"},
 				{Name: "collectionId", Type: "uint64"},
-				{Name: "whitelistProof", Type: "ClaimProof"},
-				{Name: "codeProof", Type: "ClaimProof"},
+				{Name: "solutions", Type: "ChallengeSolution[]"},
 			},
 			"ClaimProof":     proofTypes,
 			"ClaimProofItem": proofItemTypes,
+			"ChallengeSolution": challengeSolutionType,
 		}
 	default:
 		return map[string][]apitypes.Type{}

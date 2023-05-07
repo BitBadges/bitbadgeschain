@@ -319,9 +319,9 @@ func (k Keeper) IncrementNumUsedForClaimInStore(ctx sdk.Context, collectionId ui
 	return incrementedNum, nil
 }
 
-func (k Keeper) IncrementNumUsedForCodeInStore(ctx sdk.Context, collectionId uint64, claimId uint64, codeLeafIndex uint64) (uint64, error) {
+func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionId uint64, claimId uint64, challengeId uint64, leafIndex uint64) (uint64, error) {
 	store := ctx.KVStore(k.storeKey)
-	currBytes := store.Get(usedClaimCodeStoreKey(ConstructUsedClaimCodeKey(collectionId, claimId, codeLeafIndex)))
+	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, claimId, challengeId, leafIndex)))
 	curr := uint64(0)
 	err := error(nil)
 	if currBytes != nil {
@@ -331,7 +331,7 @@ func (k Keeper) IncrementNumUsedForCodeInStore(ctx sdk.Context, collectionId uin
 		}
 	}
 	incrementedNum := curr + 1
-	store.Set(usedClaimCodeStoreKey(ConstructUsedClaimCodeKey(collectionId, claimId, codeLeafIndex)), []byte(strconv.FormatInt(int64(curr+1), 10)))
+	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, claimId, challengeId, leafIndex)), []byte(strconv.FormatInt(int64(curr+1), 10)))
 	return incrementedNum, nil
 }
 

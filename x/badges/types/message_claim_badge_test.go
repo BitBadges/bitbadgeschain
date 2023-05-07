@@ -27,21 +27,16 @@ func TestMsgClaimBadge_ValidateBasic(t *testing.T) {
 				Creator: sample.AccAddress(),
 				CollectionId: 1,
 				ClaimId: 1,
-				CodeProof: &types.ClaimProof{
-					Leaf: "hello",
-					Aunts: []*types.ClaimProofItem{
-						{
-							Aunt:    "hello",
-							OnRight: true,
-						},
-					},
-				},
-				WhitelistProof: &types.ClaimProof{
-					Leaf: "hello",
-					Aunts: []*types.ClaimProofItem{
-						{
-							Aunt:    "hello",
-							OnRight: true,
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof:  &types.ClaimProof{
+							Leaf: "hello",
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt:    "hello",
+									OnRight: true,
+								},
+							},
 						},
 					},
 				},

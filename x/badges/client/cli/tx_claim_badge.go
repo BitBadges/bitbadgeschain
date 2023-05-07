@@ -16,9 +16,9 @@ var _ = strconv.Itoa(0)
 func CmdClaimBadge() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:   "claim-badge [claim-id] [collection-id] [whitelist-proof] [code-proof]",
+		Use:   "claim-badge [claim-id] [collection-id] [solutions]",
 		Short: "Broadcast message claimBadge",
-		Args:  cobra.ExactArgs(4),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			
 			argClaimId, err := cast.ToUint64E(args[0])
@@ -36,32 +36,24 @@ func CmdClaimBadge() *cobra.Command {
 				return err
 			}
 
-			argWhitelistProofJson, err := parseJson(args[2])
+			argSolutionsJsonArr, err := parseJsonArr(args[2])
 			if err != nil {
 				return err
 			}
-
-			argWhitelistProof := &types.ClaimProof{
-				Leaf: argWhitelistProofJson["leaf"].(string),
-				Aunts: argWhitelistProofJson["aunts"].([]*types.ClaimProofItem),
+			
+			solutions := []*types.ChallengeSolution{}
+			for _, solutionInterface := range argSolutionsJsonArr {
+				solution := solutionInterface.(*types.ChallengeSolution)
+				solutions = append(solutions, solution)
 			}
 
-			argCodeProofJson, err := parseJson(args[3])
-			if err != nil {
-				return err
-			}
-
-			argCodeProof := &types.ClaimProof{
-				Leaf: argCodeProofJson["leaf"].(string),
-				Aunts: argCodeProofJson["aunts"].([]*types.ClaimProofItem),
-			}
+			argSolutions := solutions
 
 			msg := types.NewMsgClaimBadge(
 				clientCtx.GetFromAddress().String(),
 				argClaimId,
 				argCollectionId,
-				argWhitelistProof,
-				argCodeProof,
+				argSolutions,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {

@@ -155,8 +155,12 @@ func ValidateNoStringElementIsX(addresses []string, x string) error {
 	return nil
 }
 
-func ValidateAddressesMapping(addressesMapping AddressesMapping) error {
+func ValidateAddressesMapping(addressesMapping AddressesMapping, allowMintAddress bool) error {
 	for _, address := range addressesMapping.Addresses {
+		if allowMintAddress && address == MintAddress {
+			continue
+		}
+
 		if err := ValidateAddress(address); err != nil {
 			return err
 		}
@@ -167,11 +171,11 @@ func ValidateAddressesMapping(addressesMapping AddressesMapping) error {
 
 
 func ValidateTransferMapping(transferMapping TransferMapping) error {
-	if err := ValidateAddressesMapping(*transferMapping.To); err != nil {
+	if err := ValidateAddressesMapping(*transferMapping.To, true); err != nil {
 		return err
 	}
 
-	if err := ValidateAddressesMapping(*transferMapping.From); err != nil {
+	if err := ValidateAddressesMapping(*transferMapping.From, false); err != nil {
 		return err
 	}
 
@@ -188,9 +192,15 @@ func ValidateClaim(claim *Claim) error {
 		}
 	}
 
-	err = ValidateRangesAreValid(claim.BadgeIds)
-	if err != nil {
-		return err
+	for _, balance := range claim.CurrentClaimAmounts {
+		err = ValidateRangesAreValid(balance.BadgeIds)
+		if err != nil {
+			return err
+		}
+
+		if balance.Amount == 0 {
+			return ErrAmountEqualsZero
+		}
 	}
 
 
@@ -203,7 +213,7 @@ func ValidateClaim(claim *Claim) error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
 	}
 
-	for _, balance := range claim.Balances {
+	for _, balance := range claim.UndistributedBalances {
 		if balance == nil {
 			return ErrInvalidLengthBalances
 		}

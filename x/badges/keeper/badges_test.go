@@ -122,6 +122,16 @@ func (suite *TestSuite) TestCreateBadges() {
 				},
 				CollectionUri: "https://example.com",
 				Permissions:   62,
+				AllowedTransfers: []*types.TransferMapping{
+					{
+						From: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+						To: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+					},
+				},
 			},
 			Amount:  1,
 			Creator: bob,

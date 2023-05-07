@@ -11,15 +11,28 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	err := *new(error)
 
+	
+
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
 	if !found {
 		return nil, ErrBadgeNotExists
 	}
-	
+
+	//Check if claim is allowed
+ 	allowed, _ :=	IsTransferAllowed(collection, types.GetPermissions(collection.Permissions), "Mint", msg.Creator, "Mint")
+	if !allowed {
+		return nil, ErrMintNotAllowed
+	}
+
 	claimId := msg.ClaimId
 	claim, found := k.GetClaimFromStore(ctx, msg.CollectionId, msg.ClaimId)
 	if !found {
 		return nil, ErrClaimNotFound
+	}
+
+	//Check if solutions matches challenges length
+	if len(msg.Solutions) != len(claim.Challenges) {
+		return nil, ErrSolutionsLengthInvalid
 	}
 
 	//Assert claim is not expired
@@ -29,77 +42,61 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 
 	//Check if address can claim
 	numUsed := uint64(0)
-	if claim.LimitOnePerAddress {
+	if claim.NumClaimsPerAddress > 0 {
 		numUsed, err = k.IncrementNumUsedForAddressInStore(ctx, msg.CollectionId, claimId, msg.Creator)
 		if err != nil {
 			return nil, err
 		}
 
-		if numUsed > 1 {
-			return nil, ErrAddressAlreadyUsed
+		if numUsed > claim.NumClaimsPerAddress {
+			return nil, ErrAddressMaxUsesExceeded
+		}
+	}
+
+
+	//Check if solutions are valid
+	for idx, challenge := range claim.Challenges {
+		root := challenge.Root
+		useCreatorAddressAsLeaf := challenge.UseCreatorAddressAsLeaf
+		expectedProofLength := challenge.ExpectedProofLength
+		solution := msg.Solutions[idx]
+		challengeId := uint64(idx)
+
+		if root != "" {
+			if len(msg.Solutions[idx].Proof.Aunts) != int(expectedProofLength) {
+				return nil, ErrProofLengthInvalid
+			}
+
+			if useCreatorAddressAsLeaf {
+				solution.Proof.Leaf = msg.Creator //overwrites it
+			}
+
+			leafIndex := GetLeafIndex(solution.Proof.Aunts)
+			numUsed, err := k.IncrementNumUsedForChallengeInStore(ctx, msg.CollectionId, claimId, challengeId, leafIndex)
+			if err != nil {
+				return nil, err
+			}
+
+			maxUses := uint64(1)
+			if numUsed > maxUses {
+				return nil, ErrChallengeMaxUsesExceeded
+			}
+
+			//Check if claim is valid
+			if solution.Proof.Leaf == "" {
+				return nil, ErrLeafIsEmpty
+			}
+
+			err = CheckMerklePath(solution.Proof.Leaf, root, solution.Proof.Aunts)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
 	//Check if claim is valid
-	badgeIds := claim.BadgeIds
-	codeRoot := claim.CodeRoot
-	whitelistRoot := claim.WhitelistRoot
-	amountToClaim := claim.Amount
 	incrementIdsBy := claim.IncrementIdsBy
 
-	if codeRoot != "" {
-		if len(msg.CodeProof.Aunts) != int(claim.ExpectedCodeProofLength) {
-			return nil, ErrCodeProofLengthInvalid
-		}
-
-		codeLeafIndex := GetLeafIndex(msg.CodeProof.Aunts)
-		numUsed, err := k.IncrementNumUsedForCodeInStore(ctx, msg.CollectionId, claimId, codeLeafIndex)
-		if err != nil {
-			return nil, err
-		}
-
-		maxUses := uint64(1)
-		if numUsed > maxUses {
-			return nil, ErrCodeMaxUsesExceeded
-		}
-
-		//Check if claim is valid
-		if msg.CodeProof.Leaf == "" {
-			return nil, ErrLeafIsEmpty
-		}
-
-		err = CheckMerklePath(msg.CodeProof.Leaf, codeRoot, msg.CodeProof.Aunts)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if whitelistRoot != "" {
-		if msg.WhitelistProof.Leaf != msg.Creator {
-			return nil, ErrMustBeClaimee
-		}
-
-		whitelistLeafIndex := GetLeafIndex(msg.WhitelistProof.Aunts)
-		numUsed, err = k.IncrementNumUsedForWhitelistIndexInStore(ctx, msg.CollectionId, claimId, whitelistLeafIndex)
-		if err != nil {
-			return nil, err
-		}
-
-		maxUses := uint64(1)
-		if numUsed > maxUses {
-			return nil, ErrCodeMaxUsesExceeded
-		}
-
-		//Check if claim is valid
-		if msg.WhitelistProof.Leaf == "" {
-			return nil, ErrLeafIsEmpty
-		}
-
-		err = CheckMerklePath(msg.WhitelistProof.Leaf, whitelistRoot, msg.WhitelistProof.Aunts)
-		if err != nil {
-			return nil, err
-		}
-	}
 
 	/*
 		Here, we do the following
@@ -116,33 +113,35 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	}
 
 	claimBalanceStore := types.UserBalanceStore{
-		Balances:  claim.Balances,
+		Balances:  claim.UndistributedBalances,
 		Approvals: []*types.Approval{},
 	}
+ 
+	for _, balance := range claim.CurrentClaimAmounts {
+		toBalance.Balances, err = AddBalancesForIdRanges(toBalance.Balances, balance.BadgeIds, balance.Amount)
+		if err != nil {
+			return nil, err
+		}
 
-	toBalance.Balances, err = AddBalancesForIdRanges(toBalance.Balances, badgeIds, amountToClaim)
-	if err != nil {
-		return nil, err
-	}
+		claimBalanceStore.Balances, err = SubtractBalancesForIdRanges(claimBalanceStore.Balances, balance.BadgeIds, balance.Amount)
+		if err != nil {
+			return nil, err
+		}
 
-	claimBalanceStore.Balances, err = SubtractBalancesForIdRanges(claimBalanceStore.Balances, badgeIds, amountToClaim)
-	if err != nil {
-		return nil, err
-	}
-
-	claim.Balances = claimBalanceStore.Balances
-	if incrementIdsBy > 0 {
-		for i := 0; i < len(badgeIds); i++ {
-			badgeIds[i].Start += incrementIdsBy
-			badgeIds[i].End += incrementIdsBy
+		if incrementIdsBy > 0 {
+			for i := 0; i < len(balance.BadgeIds); i++ {
+				balance.BadgeIds[i].Start += incrementIdsBy
+				balance.BadgeIds[i].End += incrementIdsBy
+			}
 		}
 	}
+
+	claim.UndistributedBalances = claimBalanceStore.Balances
 
 	err = k.SetClaimInStore(ctx, msg.CollectionId, claimId, claim)
 	if err != nil {
 		return nil, err
 	}
-
 
 	err = k.SetCollectionInStore(ctx, collection)
 	if err != nil {

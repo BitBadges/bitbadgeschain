@@ -27,6 +27,16 @@ func (suite *TestSuite) TestNewBadges() {
 					},
 				},
 				Permissions: 62,
+				AllowedTransfers: []*types.TransferMapping{
+					{
+						From: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+						To: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+					},
+				},
 			},
 			Amount:  1,
 			Creator: bob,
@@ -132,6 +142,16 @@ func (suite *TestSuite) TestNewBadgesDirectlyUponCreatingNewBadge() {
 					},
 				},
 				Permissions: 62,
+				AllowedTransfers: []*types.TransferMapping{
+					{
+						From: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+						To: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+					},
+				},
 			},
 			Amount:  1,
 			Creator: bob,
@@ -238,6 +258,16 @@ func (suite *TestSuite) TestNewBadgesNotManager() {
 					},
 				},
 				Permissions: 62,
+				AllowedTransfers: []*types.TransferMapping{
+					{
+						From: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+						To: &types.AddressesMapping{
+							IncludeOnlySpecified: false,
+						},
+					},
+				},
 			},
 			Amount:  1,
 			Creator: bob,

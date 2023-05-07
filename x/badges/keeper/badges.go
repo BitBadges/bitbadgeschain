@@ -134,7 +134,16 @@ func (k Keeper) MintViaTransfer(ctx sdk.Context, collection types.BadgeCollectio
 				recipientBalance, _ = k.GetUserBalanceFromStore(ctx, ConstructBalanceKey(address, collection.CollectionId))
 			}
 
+			//Check if minting via transfer is allowed to this address
+			allowed, _ := IsTransferAllowed(collection, types.GetPermissions(collection.Permissions), "Mint", address, "Mint")
+			if !allowed {
+				return types.BadgeCollection{}, ErrMintNotAllowed
+			}
+
+
 			for _, balanceObj := range transfer.Balances {
+				
+
 				unmintedBalances.Balances, err = SubtractBalancesForIdRanges(unmintedBalances.Balances, balanceObj.BadgeIds, balanceObj.Amount)
 				if err != nil {
 					return types.BadgeCollection{}, err
@@ -166,7 +175,7 @@ func (k Keeper) MintViaClaim(ctx sdk.Context, collection types.BadgeCollection, 
 	currClaimId := collection.NextClaimId
 	err := *new(error)
 	for _, claim := range claims {
-		for _, balance := range claim.Balances {
+		for _, balance := range claim.UndistributedBalances {
 			unmintedBalances.Balances, err = SubtractBalancesForIdRanges(unmintedBalances.Balances, balance.BadgeIds, balance.Amount)
 			if err != nil {
 				return types.BadgeCollection{}, err
