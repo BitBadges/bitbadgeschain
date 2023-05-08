@@ -9,7 +9,7 @@ const TypeMsgUpdateAllowedTransfers = "update_allowed_transfers"
 
 var _ sdk.Msg = &MsgUpdateAllowedTransfers{}
 
-func NewMsgUpdateAllowedTransfers(creator string, collectionId uint64, allowedTransfers []*TransferMapping) *MsgUpdateAllowedTransfers {
+func NewMsgUpdateAllowedTransfers(creator string, collectionId sdk.Uint, allowedTransfers []*TransferMapping) *MsgUpdateAllowedTransfers {
 	return &MsgUpdateAllowedTransfers{
 		Creator:             creator,
 		CollectionId:        collectionId,
@@ -50,7 +50,7 @@ func (msg *MsgUpdateAllowedTransfers) ValidateBasic() error {
 		}
 	}
 
-	if msg.CollectionId == 0 {
+	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
 		return sdkerrors.Wrapf(ErrInvalidBadgeID, "collection id cannot be 0")
 	}
 

@@ -17,11 +17,8 @@ func CmdGetAddressById() *cobra.Command {
 		Short: "Query getAddressById",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			reqId, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
-
+			reqId := types.NewUintFromString(args[0])
+			
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err

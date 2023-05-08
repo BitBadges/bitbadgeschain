@@ -11,7 +11,10 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 //Defines a balance object. The specified balance holds for all ids specified within the id ranges array.
 message Balance {
-    uint64 amount = 1;
+    string amount = 1  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+    ];
     repeated IdRange badgeIds = 2;
 }
 

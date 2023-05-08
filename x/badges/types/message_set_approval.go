@@ -9,7 +9,7 @@ const TypeMsgSetApproval = "set_approval"
 
 var _ sdk.Msg = &MsgSetApproval{}
 
-func NewMsgSetApproval(creator string, collectionId uint64, address string, balances []*Balance) *MsgSetApproval {
+func NewMsgSetApproval(creator string, collectionId sdk.Uint, address string, balances []*Balance) *MsgSetApproval {
 
 	for _, balance := range balances {
 		balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
@@ -55,20 +55,14 @@ func (msg *MsgSetApproval) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid provided address (%s)", err)
 	}
 
-	if msg.CollectionId == 0 {
+	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
 	}
 
 	if msg.Balances != nil {
-		for _, balance := range msg.Balances {
-			if balance.BadgeIds == nil {
-				return ErrRangesIsNil
-			}
-
-			err = ValidateRangesAreValid(balance.BadgeIds)
-			if err != nil {
-				return err
-			}
+		err = ValidateBalances(msg.Balances)
+		if err != nil {
+			return err
 		}
 	}
 

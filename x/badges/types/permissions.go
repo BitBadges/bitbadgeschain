@@ -1,5 +1,7 @@
 package types
 
+import sdk "github.com/cosmos/cosmos-sdk/types"
+
 const (
 	NumPermissions = 7
 )
@@ -29,8 +31,12 @@ const (
 )
 
 // Validate permissions are validly formed. Disallows leading zeroes.
-func ValidatePermissions(permissions uint64) error {
-	tempPermissions := permissions >> NumPermissions
+func ValidatePermissions(permissions sdk.Uint) error {
+	if permissions.IsNil() {
+		return ErrInvalidPermissions
+	}
+
+	tempPermissions := permissions.Uint64() >> NumPermissions
 
 	if tempPermissions != 0 {
 		return ErrInvalidPermissionsLeadingZeroes
@@ -40,7 +46,7 @@ func ValidatePermissions(permissions uint64) error {
 }
 
 // Validate that the new permissions are valid and is not changing anything that they can't.
-func ValidatePermissionsUpdate(oldPermissions uint64, newPermissions uint64) error {
+func ValidatePermissionsUpdate(oldPermissions sdk.Uint, newPermissions sdk.Uint) error {
 	if err := ValidatePermissions(newPermissions); err != nil {
 		return err
 	}
@@ -84,11 +90,11 @@ func ValidatePermissionsUpdate(oldPermissions uint64, newPermissions uint64) err
 }
 
 // Get permissions from permissions number
-func GetPermissions(permissions uint64) Permissions {
+func GetPermissions(permissions sdk.Uint) Permissions {
 	var flags Permissions = Permissions{}
 	for i := 0; i <= NumPermissions; i++ {
 		mask := uint64(1) << i
-		masked_n := permissions & mask
+		masked_n := permissions.Uint64() & mask
 		bit := masked_n >> i
 		bit_as_bool := bit == 1
 

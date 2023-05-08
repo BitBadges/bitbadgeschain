@@ -9,7 +9,7 @@ const TypeMsgNewCollection = "new_collection"
 
 var _ sdk.Msg = &MsgNewCollection{}
 
-func NewMsgNewCollection(creator string, standard uint64, collectionsToCreate []*BadgeSupplyAndAmount, collectionUri string, badgeUris []*BadgeUri, permissions uint64, allowedTransfers []*TransferMapping, managerApprovedTransfers []*TransferMapping, bytesToStore string, transfers []*Transfer, claims []*Claim, balancesUri string) *MsgNewCollection {
+func NewMsgNewCollection(creator string, standard sdk.Uint, collectionsToCreate []*BadgeSupplyAndAmount, collectionUri string, badgeUris []*BadgeUri, permissions sdk.Uint, allowedTransfers []*TransferMapping, managerApprovedTransfers []*TransferMapping, bytesToStore string, transfers []*Transfer, claims []*Claim, balancesUri string) *MsgNewCollection {
 	for _, transfer := range transfers {
 		for _, balance := range transfer.Balances {
 			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
@@ -102,19 +102,23 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		return err
 	}
 
-	amounts := make([]uint64, len(msg.BadgeSupplys))
-	supplys := make([]uint64, len(msg.BadgeSupplys))
+	amounts := make([]sdk.Uint, len(msg.BadgeSupplys))
+	supplys := make([]sdk.Uint, len(msg.BadgeSupplys))
 	for i, subasset := range msg.BadgeSupplys {
+		if subasset.Amount.IsNil() || subasset.Supply.IsNil() {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid amount (%s)", subasset.Amount)
+		}
+
 		amounts[i] = subasset.Amount
 		supplys[i] = subasset.Supply
 	}
 
-	err = ValidateNoElementIsX(amounts, 0)
+	err = ValidateNoElementIsX(amounts, sdk.NewUint(0))
 	if err != nil {
 		return err
 	}
 
-	err = ValidateNoElementIsX(supplys, 0)
+	err = ValidateNoElementIsX(supplys, sdk.NewUint(0))
 	if err != nil {
 		return err
 	}
@@ -145,6 +149,10 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	if msg.Standard.IsNil() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid standard (%s)", msg.Standard)
 	}
 
 	return nil

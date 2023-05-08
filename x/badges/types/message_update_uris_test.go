@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 
@@ -21,15 +22,15 @@ func TestMsgUpdateUris_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgUpdateUris{
 				Creator:       "invalid_address",
-				CollectionId: 1,
+				CollectionId: sdk.NewUint(1),
 				CollectionUri: "https://facebook.com",
 				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
@@ -41,14 +42,14 @@ func TestMsgUpdateUris_ValidateBasic(t *testing.T) {
 			msg: types.MsgUpdateUris{
 				Creator:       sample.AccAddress(),
 				CollectionUri: "https://facebook.com",
-				CollectionId: 1,
+				CollectionId: sdk.NewUint(1),
 				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 
@@ -20,14 +21,14 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgSetApproval{
 				Creator: "invalid_address",
-				CollectionId: 1,
+				CollectionId: sdk.NewUint(1),
 				Balances: []*types.Balance{
 					{
-						Amount: 1,
+						Amount: sdk.NewUint(1),
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 0,
-								End:   0,
+								Start: sdk.NewUint(0),
+								End:   sdk.NewUint(0),
 							},
 						},
 					},
@@ -39,15 +40,15 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 		}, {
 			name: "valid address",
 			msg: types.MsgSetApproval{
-				CollectionId: 1,
+				CollectionId: sdk.NewUint(1),
 				Creator: sample.AccAddress(),
 				Balances: []*types.Balance{
 					{
-						Amount: 1,
+						Amount: sdk.NewUint(1),
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 0,
-								End:   0,
+								Start: sdk.NewUint(0),
+								End:   sdk.NewUint(0),
 							},
 						},
 					},
@@ -58,14 +59,14 @@ func TestMsgSetApproval_ValidateBasic(t *testing.T) {
 			name: "invalid badgeId range",
 			msg: types.MsgSetApproval{
 				Creator: sample.AccAddress(),
-				CollectionId: 1,
+				CollectionId: sdk.NewUint(1),
 				Balances: []*types.Balance{
 					{
-						Amount: 1,
+						Amount: sdk.NewUint(1),
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 10,
-								End:   1,
+								Start: sdk.NewUint(10),
+								End:   sdk.NewUint(1),
 							},
 						},
 					},

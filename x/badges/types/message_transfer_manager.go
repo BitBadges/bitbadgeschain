@@ -9,7 +9,7 @@ const TypeMsgTransferManager = "transfer_manager"
 
 var _ sdk.Msg = &MsgTransferManager{}
 
-func NewMsgTransferManager(creator string, collectionId uint64, address string) *MsgTransferManager {
+func NewMsgTransferManager(creator string, collectionId sdk.Uint, address string) *MsgTransferManager {
 	return &MsgTransferManager{
 		Creator:      creator,
 		CollectionId: collectionId,
@@ -49,7 +49,7 @@ func (msg *MsgTransferManager) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid provided address (%s)", err)
 	}
 
-	if msg.CollectionId == 0 {
+	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
 	}
 

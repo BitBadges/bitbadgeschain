@@ -9,7 +9,7 @@ const TypeMsgUpdatePermissions = "update_permissions"
 
 var _ sdk.Msg = &MsgUpdatePermissions{}
 
-func NewMsgUpdatePermissions(creator string, collectionId uint64, permissions uint64) *MsgUpdatePermissions {
+func NewMsgUpdatePermissions(creator string, collectionId sdk.Uint, permissions sdk.Uint) *MsgUpdatePermissions {
 	return &MsgUpdatePermissions{
 		Creator:      creator,
 		CollectionId: collectionId,
@@ -49,7 +49,7 @@ func (msg *MsgUpdatePermissions) ValidateBasic() error {
 		return err
 	}
 
-	if msg.CollectionId == 0 {
+	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
 	}
 	

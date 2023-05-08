@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 
@@ -21,19 +22,20 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgNewCollection{
 				Creator:       "invalid_address",
+				Standard: 		sdk.NewUint(0),
 				CollectionUri: "https://example.com",
 				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions:         15,
+				Permissions:         sdk.NewUint(15),
 				AllowedTransfers: []*types.TransferMapping{},
 			},
 			err: sdkerrors.ErrInvalidAddress,
@@ -41,38 +43,40 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			name: "valid state",
 			msg: types.MsgNewCollection{
 				Creator:       sample.AccAddress(),
+				Standard: 		sdk.NewUint(0),
 				CollectionUri: "https://example.com",
 				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions:         15,
+				Permissions:         sdk.NewUint(15),
 				AllowedTransfers: []*types.TransferMapping{},
 			},
 		}, {
 			name: "invalid URI",
 			msg: types.MsgNewCollection{
 				Creator:       sample.AccAddress(),
+				Standard: 		sdk.NewUint(0),
 				CollectionUri: "",
 				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions:         15,
+				Permissions:         sdk.NewUint(15),
 				AllowedTransfers: []*types.TransferMapping{},
 			},
 
@@ -82,19 +86,20 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			name: "invalid Badge URI",
 			msg: types.MsgNewCollection{
 				Creator:       sample.AccAddress(),
+				Standard: 		sdk.NewUint(0),
 				CollectionUri: "https://example.com",
 				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions:         15,
+				Permissions:         sdk.NewUint(15),
 				AllowedTransfers: []*types.TransferMapping{},
 			},
 			err: types.ErrInvalidBadgeURI,
@@ -103,20 +108,22 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			name: "invalid Permissions",
 			msg: types.MsgNewCollection{
 				Creator:       sample.AccAddress(),
+				Standard: 		sdk.NewUint(0),
 				CollectionUri: "https://example.com",
 				BadgeUris: []*types.BadgeUri{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions:         10000,
+				Permissions:         sdk.NewUint(100000),
 				AllowedTransfers: []*types.TransferMapping{},
+
 			},
 			err: types.ErrInvalidPermissionsLeadingZeroes,
 		},

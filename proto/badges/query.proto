@@ -12,6 +12,7 @@ import "badges/claims.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
+
 // Query defines the gRPC querier service.
 service Query {
   // Parameters queries the parameters of the module.
@@ -58,7 +59,10 @@ message QueryParamsResponse {
 }
 
 message QueryGetCollectionRequest {
-  uint64 collectionId = 1;
+  string collectionId = 1  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+    ];
 }
 
 message QueryGetCollectionResponse {
@@ -66,8 +70,16 @@ message QueryGetCollectionResponse {
 }
 
 message QueryGetClaimRequest {
-  uint64 collectionId = 1;
-  uint64 claimId = 2;
+  string collectionId = 1  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
+  string claimId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
 }
 
 message QueryGetClaimResponse {
@@ -75,15 +87,23 @@ message QueryGetClaimResponse {
 }
 
 message QueryGetAddressByIdRequest {
-    uint64 id = 1;
+  string id = 1  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
 }
 
 message QueryGetAddressByIdResponse {
-    string address = 1;
+  string address = 1;
 }
 
 message QueryGetBalanceRequest {
-  uint64 collectionId = 1;
+  string collectionId = 1  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
   string address = 2;
 }
 
@@ -92,8 +112,16 @@ message QueryGetBalanceResponse {
 }
 
 message QueryIsClaimDataUsedRequest {
-    uint64 collectionId = 1;
-    uint64 claimId = 2;
+    string collectionId = 1  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
+    string claimId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
     string claimData = 3;
 }
 

@@ -21,16 +21,16 @@ func SimulateMsgNewCollection(
 		randomSubassets := []*types.BadgeSupplyAndAmount{}
 		for i := 0; i < r.Intn(10); i++ {
 			randomSubassets = append(randomSubassets, &types.BadgeSupplyAndAmount{
-				Supply: r.Uint64(),
-				Amount: r.Uint64(),
+				Supply: sdk.NewUint(r.Uint64()),
+				Amount: sdk.NewUint(r.Uint64()),
 			})
 		}
 
 		msg := &types.MsgNewCollection{
 			Creator:       simAccount.Address.String(),
 			BadgeSupplys:  randomSubassets,
-			Permissions:   r.Uint64(),
-			Standard:      r.Uint64(),
+			Permissions:   sdk.NewUint(r.Uint64()),
+			Standard:      sdk.NewUint(r.Uint64()),
 			Bytes:         simtypes.RandStringOfLength(r, r.Intn(256)),
 			BadgeUris:     []*types.BadgeUri{},
 			CollectionUri: simtypes.RandStringOfLength(r, r.Intn(100)),

@@ -21,7 +21,7 @@ func SimulateMsgUpdateUris(
 
 		msg := &types.MsgUpdateUris{
 			Creator:       simAccount.Address.String(),
-			CollectionId:  r.Uint64(),
+			CollectionId:  sdk.NewUint(r.Uint64()),
 			CollectionUri: simtypes.RandStringOfLength(r, r.Intn(100)),
 			BadgeUris:     []*types.BadgeUri{},
 		}

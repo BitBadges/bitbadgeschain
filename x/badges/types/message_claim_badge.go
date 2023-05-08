@@ -9,7 +9,7 @@ const TypeMsgClaimBadge = "claim_badge"
 
 var _ sdk.Msg = &MsgClaimBadge{}
 
-func NewMsgClaimBadge(creator string, claimId uint64, collectionId uint64, solutions []*ChallengeSolution) *MsgClaimBadge {
+func NewMsgClaimBadge(creator string, claimId sdk.Uint, collectionId sdk.Uint, solutions []*ChallengeSolution) *MsgClaimBadge {
 	return &MsgClaimBadge{
 		Creator:        creator,
 		ClaimId:        claimId,
@@ -45,11 +45,11 @@ func (msg *MsgClaimBadge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.ClaimId == 0 {
+	if msg.ClaimId.IsZero() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid claim id")
 	}
 
-	if msg.CollectionId == 0 {
+	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
 	}
 

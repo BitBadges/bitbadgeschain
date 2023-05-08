@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +20,7 @@ func CmdClaimBadge() *cobra.Command {
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			
-			argClaimId, err := cast.ToUint64E(args[0])
+			argClaimId := types.NewUintFromString(args[0])
 			if err != nil {
 				return err
 			}
@@ -31,7 +30,7 @@ func CmdClaimBadge() *cobra.Command {
 				return err
 			}
 
-			argCollectionId, err := cast.ToUint64E(args[1])
+			argCollectionId := types.NewUintFromString(args[1])
 			if err != nil {
 				return err
 			}

@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +18,7 @@ func CmdUpdateBytes() *cobra.Command {
 		Short: "Broadcast message updateBytes",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argBadgeId, err := cast.ToUint64E(args[0])
+			argBadgeId := types.NewUintFromString(args[0])
 			if err != nil {
 				return err
 			}

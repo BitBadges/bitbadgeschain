@@ -20,7 +20,7 @@ func CmdMintAndDistributeBadges() *cobra.Command {
 		Short: "Broadcast message MintAndDistributeBadges",
 		Args:  cobra.ExactArgs(7),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argId, err := cast.ToUint64E(args[0])
+			argId := types.NewUintFromString(args[0])
 			if err != nil {
 				return err
 			}

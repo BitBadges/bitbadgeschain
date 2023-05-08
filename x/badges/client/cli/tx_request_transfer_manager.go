@@ -19,7 +19,7 @@ func CmdRequestTransferManager() *cobra.Command {
 		Short: "Broadcast message requestTransferManager",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argBadgeId, err := cast.ToUint64E(args[0])
+			argBadgeId := types.NewUintFromString(args[0])
 			if err != nil {
 				return err
 			}

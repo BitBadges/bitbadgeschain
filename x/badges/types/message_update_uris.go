@@ -9,7 +9,7 @@ const TypeMsgUpdateUris = "update_uris"
 
 var _ sdk.Msg = &MsgUpdateUris{}
 
-func NewMsgUpdateUris(creator string, collectionId uint64, collectionUri string, badgeUris []*BadgeUri, balancesUri string) *MsgUpdateUris {
+func NewMsgUpdateUris(creator string, collectionId sdk.Uint, collectionUri string, badgeUris []*BadgeUri, balancesUri string) *MsgUpdateUris {
 	for _, badgeUri := range badgeUris {
 		badgeUri.BadgeIds = SortAndMergeOverlapping(badgeUri.BadgeIds)
 	}
@@ -66,8 +66,8 @@ func (msg *MsgUpdateUris) ValidateBasic() error {
 		}
 	}
 
-	if msg.CollectionId == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "collectionId cannot be 0")
+	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "collectionId is 0 or nil")
 	}
 	
 	return nil

@@ -22,8 +22,8 @@ func TestGenesisState_Validate(t *testing.T) {
 			desc: "valid genesis state",
 			genState: &types.GenesisState{
 				PortId:           types.PortID,
-				NextCollectionId: 1,
-				NextClaimId:      1,
+				NextCollectionId: types.NewUint(1),
+				NextClaimId:      types.NewUint(1),
 				Collections:      []*types.BadgeCollection{},
 				Balances:         []*types.UserBalanceStore{},
 				BalanceStoreKeys: []string{},

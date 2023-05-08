@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 )
@@ -19,21 +20,21 @@ func TestMsgUpdateAllowedTransfers_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgUpdateAllowedTransfers{
 				Creator: "invalid_address",
-				CollectionId: 1,
+				CollectionId: sdk.NewUint(1),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{
 								"invalid_address",
 							},
-							ManagerOptions: uint64(types.AddressOptions_None),
+							ManagerOptions: sdk.NewUint(uint64(types.AddressOptions_None)),
 							IncludeOnlySpecified: true,
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{
 								"invalid_address",
 							},
-							ManagerOptions: uint64(types.AddressOptions_None),
+							ManagerOptions: sdk.NewUint(uint64(types.AddressOptions_None)),
 							IncludeOnlySpecified: true,
 						},
 					},
@@ -44,21 +45,21 @@ func TestMsgUpdateAllowedTransfers_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: types.MsgUpdateAllowedTransfers{
 				Creator: sample.AccAddress(),
-				CollectionId: 1,
+				CollectionId: sdk.NewUint(1),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{
 								sample.AccAddress(),
 							},
-							ManagerOptions: uint64(types.AddressOptions_None),
+							ManagerOptions: sdk.NewUint(uint64(types.AddressOptions_None)),
 							IncludeOnlySpecified: true,
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{
 								sample.AccAddress(),
 							},
-							ManagerOptions: uint64(types.AddressOptions_None),
+							ManagerOptions: sdk.NewUint(uint64(types.AddressOptions_None)),
 							IncludeOnlySpecified: true,
 						},
 					},

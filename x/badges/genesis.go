@@ -12,11 +12,11 @@ import (
 // NOTE: We assume that all badges are validly formed here
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// Set if defined; default 0
-	if genState.NextCollectionId == 0 {
-		genState.NextCollectionId = 1
+	if genState.NextCollectionId == sdk.NewUint(0) {
+		genState.NextCollectionId = sdk.NewUint(1)
 	}
-	if genState.NextClaimId == 0 {
-		genState.NextClaimId = 1
+	if genState.NextClaimId == sdk.NewUint(0) {
+		genState.NextClaimId = sdk.NewUint(1)
 	}
 
 	k.SetNextCollectionId(ctx, genState.NextCollectionId)
@@ -67,15 +67,15 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	genesis.Collections = k.GetCollectionsFromStore(ctx)
 	addresses := []string{}
-	ids := []uint64{}
+	ids := []sdk.Uint{}
 	genesis.Balances, addresses, ids = k.GetUserBalancesFromStore(ctx)
 
 	for i, addresses := range addresses {
 		genesis.BalanceStoreKeys = append(genesis.BalanceStoreKeys, keeper.ConstructBalanceKey(addresses, ids[i]))
 	}
 
-	collectionIds := []uint64{}
-	claimIds := []uint64{}
+	collectionIds := []sdk.Uint{}
+	claimIds := []sdk.Uint{}
 	genesis.Claims, collectionIds, claimIds = k.GetClaimsFromStore(ctx)
 
 	for i, collectionIds := range collectionIds {

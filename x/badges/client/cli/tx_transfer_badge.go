@@ -21,7 +21,7 @@ func CmdTransferBadge() *cobra.Command {
 		Short: "Broadcast message transferBadge",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argCollectionId, err := cast.ToUint64E(args[0])
+			argCollectionId := types.NewUintFromString(args[0])
 			if err != nil {
 				return err
 			}

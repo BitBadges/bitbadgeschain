@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +18,7 @@ func CmdDeleteCollection() *cobra.Command {
 		Short: "Broadcast message deleteCollection",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argCollectionId, err := cast.ToUint64E(args[0])
+			argCollectionId := types.NewUintFromString(args[0])
 			if err != nil {
 				return err
 			}

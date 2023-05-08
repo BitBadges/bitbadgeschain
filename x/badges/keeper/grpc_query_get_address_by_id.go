@@ -17,7 +17,7 @@ func (k Keeper) GetAddressById(goCtx context.Context, req *types.QueryGetAddress
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	address := k.accountKeeper.GetAccountAddressByID(ctx, req.Id)
+	address := k.accountKeeper.GetAccountAddressByID(ctx, req.Id.Uint64())
 	return &types.QueryGetAddressByIdResponse{
 		Address: address,
 	}, nil

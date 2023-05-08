@@ -10,7 +10,7 @@ import (
 
 func (suite *TestSuite) TestNewCollections() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
-	perms := uint64(62)
+	perms := sdk.NewUint(62)
 
 	_, err := sdk.AccAddressFromBech32(alice)
 	suite.Require().Nil(err, "Address %s failed to parse")
@@ -23,38 +23,38 @@ func (suite *TestSuite) TestNewCollections() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
 				CollectionUri: "https://example.com",
-				Permissions:   62,
+				Permissions: sdk.NewUint(62),
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
-	badge, _ := GetCollection(suite, wctx, 1)
+	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 
 	// Verify nextId increments correctly
 	nextId := suite.app.BadgesKeeper.GetNextCollectionId(suite.ctx)
-	suite.Require().Equal(uint64(2), nextId)
+	suite.Require().Equal(sdk.NewUint(2), nextId)
 
 	// Verify badge details are correct
-	suite.Require().Equal(uint64(1), badge.NextBadgeId)
+	suite.Require().Equal(sdk.NewUint(1), badge.NextBadgeId)
 	suite.Require().Equal("https://example.com", badge.CollectionUri)
 	suite.Require().Equal([]*types.BadgeUri{
 		{
 			Uri: "https://example.com/{id}",
 			BadgeIds: []*types.IdRange{
 				{
-					Start: 1,
-					End:   math.MaxUint64,
+					Start: sdk.NewUint(1),
+					End:   sdk.NewUint(math.MaxUint64),
 				},
 			},
 		},
@@ -64,21 +64,21 @@ func (suite *TestSuite) TestNewCollections() {
 	suite.Require().Equal(perms, badge.Permissions)
 	suite.Require().Equal([]*types.TransferMapping(nil), badge.AllowedTransfers)
 	suite.Require().Equal([]*types.TransferMapping(nil), badge.ManagerApprovedTransfers)
-	suite.Require().Equal(uint64(1), badge.CollectionId)
+	suite.Require().Equal(sdk.NewUint(1), badge.CollectionId)
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
 	// Verify nextId increments correctly
 	nextId = suite.app.BadgesKeeper.GetNextCollectionId(suite.ctx)
-	suite.Require().Equal(uint64(3), nextId)
-	badge, _ = GetCollection(suite, wctx, 2)
-	suite.Require().Equal(uint64(2), badge.CollectionId)
+	suite.Require().Equal(sdk.NewUint(3), nextId)
+	badge, _ = GetCollection(suite, wctx, sdk.NewUint(2))
+	suite.Require().Equal(sdk.NewUint(2), badge.CollectionId)
 }
 
 func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
-	perms := uint64(62)
+	perms := sdk.NewUint(62)
 
 	_, err := sdk.AccAddressFromBech32(alice)
 	suite.Require().Nil(err, "Address %s failed to parse")
@@ -91,8 +91,8 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
@@ -100,8 +100,8 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 				CollectionUri: "https://example.com",
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
-						Supply: 10,
-						Amount: 10,
+						Supply: sdk.NewUint(10),
+						Amount: sdk.NewUint(10),
 					},
 				},
 				Permissions: perms,
@@ -109,9 +109,11 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 					{
 						From: &types.AddressesMapping{
 							IncludeOnlySpecified: false,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							IncludeOnlySpecified: false,
+							ManagerOptions: sdk.NewUint(0),
 						},
 					},
 				},
@@ -120,11 +122,11 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 						ToAddresses: []string{alice, charlie},
 						Balances: []*types.Balance{
 							{
-								Amount: 5,
+								Amount: sdk.NewUint(5),
 								BadgeIds: []*types.IdRange{
 									{
-										Start: 1,
-										End:   5,
+										Start: sdk.NewUint(1),
+										End: sdk.NewUint(5),
 									},
 								},
 							},
@@ -132,7 +134,7 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 					},
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
@@ -142,44 +144,44 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
 
 	// Verify nextId increments correctly
 	nextId := suite.app.BadgesKeeper.GetNextCollectionId(suite.ctx)
-	suite.Require().Equal(uint64(2), nextId)
+	suite.Require().Equal(sdk.NewUint(2), nextId)
 
-	collection, _ := GetCollection(suite, wctx, 1)
+	collection, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 
 	unmintedBalances := types.UserBalanceStore{
 		Balances: collection.UnmintedSupplys,
 	}
 
-	suite.Require().Equal(uint64(10), unmintedBalances.Balances[0].Amount)
+	suite.Require().Equal(sdk.NewUint(10), unmintedBalances.Balances[0].Amount)
 	suite.Require().Equal([]*types.IdRange{
 		{
-			Start: 6,
-			End:   10,
+			Start: sdk.NewUint(6),
+			End: sdk.NewUint(10),
 		},
 	}, unmintedBalances.Balances[0].BadgeIds)
 
-	aliceBalance, _ := GetUserBalance(suite, wctx, 1, alice)
-	suite.Require().Equal(uint64(5), aliceBalance.Balances[0].Amount)
+	aliceBalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), alice)
+	suite.Require().Equal(sdk.NewUint(5), aliceBalance.Balances[0].Amount)
 	suite.Require().Equal([]*types.IdRange{
 		{
-			Start: 1,
-			End:   5,
+			Start: sdk.NewUint(1),
+			End: sdk.NewUint(5),
 		},
 	}, aliceBalance.Balances[0].BadgeIds)
 
-	charlieBalance, _ := GetUserBalance(suite, wctx, 1, charlie)
-	suite.Require().Equal(uint64(5), charlieBalance.Balances[0].Amount)
+	charlieBalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), charlie)
+	suite.Require().Equal(sdk.NewUint(5), charlieBalance.Balances[0].Amount)
 	suite.Require().Equal([]*types.IdRange{
 		{
-			Start: 1,
-			End:   5,
+			Start: sdk.NewUint(1),
+			End: sdk.NewUint(5),
 		},
 	}, charlieBalance.Balances[0].BadgeIds)
 }
 
 func (suite *TestSuite) TestNewBadgesWhitelistRecipientsOverflow() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
-	perms := uint64(62)
+	perms := sdk.NewUint(62)
 
 	_, err := sdk.AccAddressFromBech32(alice)
 	suite.Require().Nil(err, "Address %s failed to parse")
@@ -192,8 +194,8 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipientsOverflow() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
@@ -201,8 +203,8 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipientsOverflow() {
 				CollectionUri: "https://example.com",
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
-						Supply: 10,
-						Amount: 10,
+						Supply: sdk.NewUint(10),
+						Amount: sdk.NewUint(10),
 					},
 				},
 				Permissions: perms,
@@ -210,9 +212,11 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipientsOverflow() {
 					{
 						From: &types.AddressesMapping{
 							IncludeOnlySpecified: false,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							IncludeOnlySpecified: false,
+							ManagerOptions: sdk.NewUint(0),
 						},
 					},
 				},
@@ -221,11 +225,11 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipientsOverflow() {
 						ToAddresses: []string{alice, charlie},
 						Balances: []*types.Balance{
 							{
-								Amount: 6,
+								Amount: sdk.NewUint(6),
 								BadgeIds: []*types.IdRange{
 									{
-										Start: 0,
-										End:   4,
+										Start: sdk.NewUint(0),
+										End: sdk.NewUint(4),
 									},
 								},
 							},
@@ -233,7 +237,7 @@ func (suite *TestSuite) TestNewBadgesWhitelistRecipientsOverflow() {
 					},
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}

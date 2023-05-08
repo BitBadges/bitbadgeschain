@@ -6,7 +6,7 @@ import (
 )
 
 // Gets badge and throws error if it does not exist. Alternative to GetCollectionFromStore which returns a found bool, not an error.
-func (k Keeper) GetCollectionE(ctx sdk.Context, badgeId uint64) (types.BadgeCollection, error) {
+func (k Keeper) GetCollectionE(ctx sdk.Context, badgeId sdk.Uint) (types.BadgeCollection, error) {
 	badge, found := k.GetCollectionFromStore(ctx, badgeId)
 	if !found {
 		return types.BadgeCollection{}, ErrCollectionNotExists
@@ -16,13 +16,13 @@ func (k Keeper) GetCollectionE(ctx sdk.Context, badgeId uint64) (types.BadgeColl
 }
 
 // Gets the badge details from the store if it exists. Throws error if badge ranges are invalid or a badge ID does not yet exist.
-func (k Keeper) GetCollectionAndAssertBadgeIdsAreValid(ctx sdk.Context, collectionId uint64, badgeIdRanges []*types.IdRange) (types.BadgeCollection, error) {
+func (k Keeper) GetCollectionAndAssertBadgeIdsAreValid(ctx sdk.Context, collectionId sdk.Uint, badgeIdRanges []*types.IdRange) (types.BadgeCollection, error) {
 	badge, err := k.GetCollectionE(ctx, collectionId)
 	if err != nil {
 		return badge, err
 	}
 
-	err = k.ValidateIdRanges(badge, badgeIdRanges)
+	err = k.ValidateIdRanges(badge, badgeIdRanges, true)
 	if err != nil {
 		return types.BadgeCollection{}, err
 	}
@@ -30,13 +30,13 @@ func (k Keeper) GetCollectionAndAssertBadgeIdsAreValid(ctx sdk.Context, collecti
 	return badge, nil
 }
 
-func (k Keeper) ValidateIdRanges(collection types.BadgeCollection, ranges []*types.IdRange) error {
+func (k Keeper) ValidateIdRanges(collection types.BadgeCollection, ranges []*types.IdRange, checkIfLessThanNextBadgeId bool) error {
 	for _, badgeIdRange := range ranges {
-		if badgeIdRange.Start > badgeIdRange.End {
+		if badgeIdRange.Start.GT(badgeIdRange.End) {
 			return ErrInvalidBadgeRange
 		}
 
-		if badgeIdRange.End >= collection.NextBadgeId {
+		if checkIfLessThanNextBadgeId && badgeIdRange.End.GTE(collection.NextBadgeId) {
 			return ErrBadgeNotExists
 		}
 	}
@@ -59,7 +59,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 		supply := obj.Supply
 		nextBadgeId := collection.NextBadgeId
 
-		if supply == 0 || amount == 0 {
+		if supply.IsZero() || amount.IsZero() {
 			return types.BadgeCollection{}, ErrSupplyEqualsZero
 		}
 
@@ -70,7 +70,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 
 		maxSupplys, err = UpdateBalancesForIdRanges(
 			[]*types.IdRange{
-				{Start: nextBadgeId, End: nextBadgeId + amount - 1},
+				{Start: nextBadgeId, End: nextBadgeId.Add(amount).SubUint64(1)},
 			},
 			supply,
 			maxSupplys,
@@ -81,7 +81,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 
 		unmintedSupplys, err = UpdateBalancesForIdRanges(
 			[]*types.IdRange{
-				{Start: nextBadgeId, End: nextBadgeId + amount - 1},
+				{Start: nextBadgeId, End: nextBadgeId.Add(amount).SubUint64(1)},
 			},
 			supply,
 			unmintedSupplys,
@@ -101,7 +101,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 		}
 	}
 
-	err = k.ValidateIdRanges(collection, rangesToValidate)
+	err = k.ValidateIdRanges(collection, rangesToValidate, false)
 	if err != nil {
 		return types.BadgeCollection{}, err
 	}
@@ -187,7 +187,7 @@ func (k Keeper) MintViaClaim(ctx sdk.Context, collection types.BadgeCollection, 
 			return types.BadgeCollection{}, err
 		}
 
-		currClaimId, err = SafeAdd(currClaimId, 1)
+		currClaimId, err = SafeAdd(currClaimId, sdk.NewUint(1))
 		if err != nil {
 			return types.BadgeCollection{}, err
 		}

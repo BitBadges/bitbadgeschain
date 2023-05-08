@@ -2,10 +2,11 @@ package keeper
 
 import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // Handles a transfer from one address to another. If it can be a forceful transfer, it will forcefully transfer the balances and approvals. If it is a pending transfer, it will add it to the pending transfers.
-func HandleTransfer(collection types.BadgeCollection, badgeIds []*types.IdRange, fromUserBalance types.UserBalanceStore, toUserBalance types.UserBalanceStore, amount uint64, from string, to string, approvedBy string) (types.UserBalanceStore, types.UserBalanceStore, error) {
+func HandleTransfer(collection types.BadgeCollection, badgeIds []*types.IdRange, fromUserBalance types.UserBalanceStore, toUserBalance types.UserBalanceStore, amount sdk.Uint, from string, to string, approvedBy string) (types.UserBalanceStore, types.UserBalanceStore, error) {
 	err := *new(error)
 
 	fromUserBalance, toUserBalance, err = ForcefulTransfer(collection, badgeIds, fromUserBalance, toUserBalance, amount, from, to, approvedBy)
@@ -17,7 +18,7 @@ func HandleTransfer(collection types.BadgeCollection, badgeIds []*types.IdRange,
 }
 
 // Forceful transfers will transfer the balances and deduct from approvals directly without adding it to pending.
-func ForcefulTransfer(collection types.BadgeCollection, badgeIds []*types.IdRange, fromUserBalance types.UserBalanceStore, toUserBalance types.UserBalanceStore, amount uint64, from string, to string, approvedBy string) (types.UserBalanceStore, types.UserBalanceStore, error) {
+func ForcefulTransfer(collection types.BadgeCollection, badgeIds []*types.IdRange, fromUserBalance types.UserBalanceStore, toUserBalance types.UserBalanceStore, amount sdk.Uint, from string, to string, approvedBy string) (types.UserBalanceStore, types.UserBalanceStore, error) {
 	// 1. Check if the from address is frozen
 	// 2. Remove approvals if approvedBy != from and not managerApprovedTransfer
 	// 3. Deduct from "From" balance
@@ -50,7 +51,7 @@ func ForcefulTransfer(collection types.BadgeCollection, badgeIds []*types.IdRang
 }
 
 // Deduct approvals from requester if requester != from
-func DeductApprovalsIfNeeded(UserBalance types.UserBalanceStore, collection types.BadgeCollection, collectionId uint64, badgeIds []*types.IdRange, from string, to string, requester string, amount uint64) (types.UserBalanceStore, error) {
+func DeductApprovalsIfNeeded(UserBalance types.UserBalanceStore, collection types.BadgeCollection, collectionId sdk.Uint, badgeIds []*types.IdRange, from string, to string, requester string, amount sdk.Uint) (types.UserBalanceStore, error) {
 	newUserBalance := UserBalance
 
 	if from != requester {
@@ -68,9 +69,10 @@ func DeductApprovalsIfNeeded(UserBalance types.UserBalanceStore, collection type
 //from the Addresses field or do nothing.
 //This is useful because the manager address is not always a fixed address and can transfer.
 func HandleManagerOptions(addressMapping *types.AddressesMapping, managerAddress string) {
-	if addressMapping.ManagerOptions == uint64(types.AddressOptions_IncludeManager) {
+	
+	if addressMapping.ManagerOptions.Equal(sdk.NewUint(uint64(types.AddressOptions_IncludeManager))) {
 		addressMapping.Addresses = append(addressMapping.Addresses, managerAddress)
-	} else if addressMapping.ManagerOptions == uint64(types.AddressOptions_ExcludeManager) {
+	} else if addressMapping.ManagerOptions.Equal(sdk.NewUint(uint64(types.AddressOptions_ExcludeManager))) {
 		//Remove from Addresses
 		newAddresses := []string{}
 		for _, address := range addressMapping.Addresses {

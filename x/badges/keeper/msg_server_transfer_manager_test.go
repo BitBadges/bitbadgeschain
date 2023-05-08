@@ -20,13 +20,13 @@ func (suite *TestSuite) TestTransferManager() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 127,
+				Permissions: sdk.NewUint(127),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
@@ -38,7 +38,7 @@ func (suite *TestSuite) TestTransferManager() {
 					},
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
@@ -47,21 +47,21 @@ func (suite *TestSuite) TestTransferManager() {
 	suite.Require().Nil(err, "Error creating badge")
 
 	//Create badge 1 with supply > 1
-	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 1,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(1),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = RequestTransferManager(suite, wctx, alice, 1, true)
+	err = RequestTransferManager(suite, wctx, alice, sdk.NewUint(1), true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 1, alice)
+	err = TransferManager(suite, wctx, bob, sdk.NewUint(1), alice)
 	suite.Require().Nil(err, "Error transferring manager")
 
-	badge, _ := GetCollection(suite, wctx, 1)
+	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 	suite.Require().Equal(alice, badge.Manager)
 }
 
@@ -77,13 +77,13 @@ func (suite *TestSuite) TestRequestTransferManager() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 127,
+				Permissions: sdk.NewUint(127),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
@@ -95,7 +95,7 @@ func (suite *TestSuite) TestRequestTransferManager() {
 					},
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
@@ -104,27 +104,27 @@ func (suite *TestSuite) TestRequestTransferManager() {
 	suite.Require().Nil(err, "Error creating badge")
 
 	//Create badge 1 with supply > 1
-	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 1,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(1),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = RequestTransferManager(suite, wctx, alice, 1, true)
+	err = RequestTransferManager(suite, wctx, alice, sdk.NewUint(1), true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = RequestTransferManager(suite, wctx, alice, 1, false)
+	err = RequestTransferManager(suite, wctx, alice, sdk.NewUint(1), false)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = RequestTransferManager(suite, wctx, alice, 1, true)
+	err = RequestTransferManager(suite, wctx, alice, sdk.NewUint(1), true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 1, alice)
+	err = TransferManager(suite, wctx, bob, sdk.NewUint(1), alice)
 	suite.Require().Nil(err, "Error transferring manager")
 
-	badge, _ := GetCollection(suite, wctx, 1)
+	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 	suite.Require().Equal(alice, badge.Manager)
 }
 
@@ -140,13 +140,13 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 127,
+				Permissions: sdk.NewUint(127),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
@@ -158,7 +158,7 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 					},
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
@@ -167,21 +167,21 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 	suite.Require().Nil(err, "Error creating badge")
 
 	//Create badge 1 with supply > 1
-	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 1,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(1),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = RequestTransferManager(suite, wctx, alice, 1, true)
+	err = RequestTransferManager(suite, wctx, alice, sdk.NewUint(1), true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = RequestTransferManager(suite, wctx, alice, 1, false)
+	err = RequestTransferManager(suite, wctx, alice, sdk.NewUint(1), false)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, 1, alice)
+	err = TransferManager(suite, wctx, bob, sdk.NewUint(1), alice)
 	suite.Require().EqualError(err, keeper.ErrAddressNeedsToOptInAndRequestManagerTransfer.Error())
 }
 
@@ -197,13 +197,13 @@ func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 23,
+				Permissions: sdk.NewUint(23),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
@@ -215,7 +215,7 @@ func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 					},
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
@@ -224,15 +224,15 @@ func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 	suite.Require().Nil(err, "Error creating badge")
 
 	//Create badge 1 with supply > 1
-	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 1,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(1),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = RequestTransferManager(suite, wctx, alice, 1, true)
+	err = RequestTransferManager(suite, wctx, alice, sdk.NewUint(1), true)
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }
 
@@ -248,15 +248,15 @@ func (suite *TestSuite) TestManagerCantBeTransferred() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 0,
+				Permissions: sdk.NewUint(0),
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
@@ -264,6 +264,6 @@ func (suite *TestSuite) TestManagerCantBeTransferred() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = TransferManager(suite, wctx, bob, 1, alice)
+	err = TransferManager(suite, wctx, bob, sdk.NewUint(1), alice)
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }

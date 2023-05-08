@@ -21,7 +21,7 @@ func SimulateMsgUpdateAllowedTransfers(
 
 		msg := &types.MsgUpdateAllowedTransfers{
 			Creator:      simAccount.Address.String(),
-			CollectionId: r.Uint64(),
+			CollectionId: sdk.NewUint(r.Uint64()),
 			AllowedTransfers: []*types.TransferMapping{
 				{
 					From: &types.AddressesMapping{
@@ -30,8 +30,8 @@ func SimulateMsgUpdateAllowedTransfers(
 							simAccount.Address.String(),
 							simAccount.Address.String(),
 						},
-						IncludeOnlySpecified: r.Uint64() % 2 == 0,
-						ManagerOptions: r.Uint64(),
+						IncludeOnlySpecified: sdk.NewUint(r.Uint64()).Mod(sdk.NewUint(2)).IsZero(),
+						ManagerOptions: sdk.NewUint(r.Uint64()),
 					},
 				},
 			},

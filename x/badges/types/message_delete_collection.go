@@ -9,7 +9,7 @@ const TypeMsgDeleteCollection = "delete_collection"
 
 var _ sdk.Msg = &MsgDeleteCollection{}
 
-func NewMsgDeleteCollection(creator string, collectionId uint64) *MsgDeleteCollection {
+func NewMsgDeleteCollection(creator string, collectionId sdk.Uint) *MsgDeleteCollection {
 	return &MsgDeleteCollection{
 		Creator:      creator,
 		CollectionId: collectionId,
@@ -43,7 +43,7 @@ func (msg *MsgDeleteCollection) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.CollectionId == 0 {
+	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
 	}
 	

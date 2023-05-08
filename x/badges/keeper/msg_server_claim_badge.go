@@ -36,19 +36,20 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	}
 
 	//Assert claim is not expired
-	if claim.TimeRange.Start > uint64(ctx.BlockTime().UnixMilli()) || claim.TimeRange.End < uint64(ctx.BlockTime().UnixMilli()) {
+	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
+	if claim.TimeRange.Start.GT(blockTime) || claim.TimeRange.End.LT(blockTime) {
 		return nil, ErrClaimTimeInvalid
 	}
 
 	//Check if address can claim
-	numUsed := uint64(0)
-	if claim.NumClaimsPerAddress > 0 {
+	numUsed := sdk.NewUint(0)
+	if !claim.NumClaimsPerAddress.IsZero() {
 		numUsed, err = k.IncrementNumUsedForAddressInStore(ctx, msg.CollectionId, claimId, msg.Creator)
 		if err != nil {
 			return nil, err
 		}
 
-		if numUsed > claim.NumClaimsPerAddress {
+		if numUsed.GT(claim.NumClaimsPerAddress) {
 			return nil, ErrAddressMaxUsesExceeded
 		}
 	}
@@ -60,10 +61,10 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		useCreatorAddressAsLeaf := challenge.UseCreatorAddressAsLeaf
 		expectedProofLength := challenge.ExpectedProofLength
 		solution := msg.Solutions[idx]
-		challengeId := uint64(idx)
+		challengeId := sdk.NewUint(uint64(idx))
 
 		if root != "" {
-			if len(msg.Solutions[idx].Proof.Aunts) != int(expectedProofLength) {
+			if len(msg.Solutions[idx].Proof.Aunts) != int(expectedProofLength.Uint64()) {
 				return nil, ErrProofLengthInvalid
 			}
 
@@ -77,8 +78,8 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 				return nil, err
 			}
 
-			maxUses := uint64(1)
-			if numUsed > maxUses {
+			maxUses := sdk.NewUint(1)
+			if numUsed.GT(maxUses) {
 				return nil, ErrChallengeMaxUsesExceeded
 			}
 
@@ -128,10 +129,10 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 			return nil, err
 		}
 
-		if incrementIdsBy > 0 {
+		if !incrementIdsBy.IsZero() {
 			for i := 0; i < len(balance.BadgeIds); i++ {
-				balance.BadgeIds[i].Start += incrementIdsBy
-				balance.BadgeIds[i].End += incrementIdsBy
+				balance.BadgeIds[i].Start = balance.BadgeIds[i].Start.Add(incrementIdsBy)
+				balance.BadgeIds[i].End = balance.BadgeIds[i].End.Add(incrementIdsBy)
 			}
 		}
 	}

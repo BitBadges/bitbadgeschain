@@ -6,6 +6,7 @@ import "badges/ranges.proto";
 import "badges/balances.proto";
 import "badges/claims.proto";
 import "badges/badges.proto";
+import "gogoproto/gogo.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
@@ -31,8 +32,16 @@ service Msg {
 //BadgeSupplyAndAmount is used to define the supply and amount of badges to create.
 //We create x amount of badges each with a supply of y.
 message BadgeSupplyAndAmount {
-    uint64 supply = 1;
-    uint64 amount = 2;
+    string supply = 1  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];;
+    string amount = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];;
 }
 
 //Upon badge creation, the manager will first be minted these badges, and then, they will subsequently be transferred to these addresses according to permissions.ForcefulTransfers.
@@ -49,11 +58,20 @@ message MsgNewCollection {
     repeated BadgeUri badgeUris = 3;
     string balancesUri = 4;
 
-    uint64 permissions = 5;
+    string permissions = 5  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
     string bytes = 6;
     repeated TransferMapping allowedTransfers = 7;
     repeated TransferMapping managerApprovedTransfers = 8;
-    uint64 standard = 9; 
+    string standard = 9  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
+    
     //Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
     //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
     repeated BadgeSupplyAndAmount badgeSupplys = 10;
@@ -62,13 +80,21 @@ message MsgNewCollection {
 }
 
 message MsgNewCollectionResponse {
-    uint64 collectionId = 1; //ID of created badge collection
+    string collectionId = 1  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ]; //ID of created badge collection
 }
 
 //This handles both minting more of existing badges and creating new badges.
 message MsgMintAndDistributeBadges {
     string creator = 1;
-    uint64 collectionId = 2;
+    string collectionId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
     repeated BadgeSupplyAndAmount badgeSupplys = 3;
     repeated Transfer transfers = 4;
     repeated Claim claims = 5;
@@ -78,13 +104,21 @@ message MsgMintAndDistributeBadges {
 }
 
 message MsgMintAndDistributeBadgesResponse {
-    uint64 nextBadgeId = 1; //ID of next badgeId after creating all badges.
+    string nextBadgeId = 1  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ]; //ID of next badgeId after creating all badges.
 }
 
 //For each amount, for each toAddress, we will attempt to transfer all the badgeIds for the badge with ID badgeId.
 message MsgTransferBadge {
     string creator = 1;
-    uint64 collectionId = 2;
+    string collectionId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
     string from = 3;
     repeated Transfer transfers = 4;
 }
@@ -94,7 +128,11 @@ message MsgTransferBadgeResponse {}
 //Sets an approval (no add or remove), just set it for an address.
 message MsgSetApproval {
     string creator = 1;
-    uint64 collectionId = 2;
+    string collectionId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
     string address = 3; //The address that are approved to transfer the balances.
     repeated Balance balances = 4; //approval balances for every badgeId
 }
@@ -104,7 +142,11 @@ message MsgSetApprovalResponse {}
 
 message MsgUpdateAllowedTransfers {
   string creator = 1;
-  uint64 collectionId = 2;
+  string collectionId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
   repeated TransferMapping allowedTransfers = 3;
 }
 
@@ -114,7 +156,11 @@ message MsgUpdateAllowedTransfersResponse {
 //Update badge Uris with new URI object, if permitted.
 message MsgUpdateUris {
   string creator = 1;
-  uint64 collectionId = 2;
+  string collectionId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
   string collectionUri = 3;
   repeated BadgeUri badgeUris = 4;
   string balancesUri = 5;
@@ -126,8 +172,16 @@ message MsgUpdateUrisResponse {
 //Update badge permissions with new permissions, if permitted.
 message MsgUpdatePermissions {
   string creator = 1;
-  uint64 collectionId = 2;
-  uint64 permissions = 3;
+  string collectionId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
+  string permissions = 3  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
 }
 
 message MsgUpdatePermissionsResponse {
@@ -136,7 +190,11 @@ message MsgUpdatePermissionsResponse {
 //Transfer manager to this address. Recipient must have made a request.
 message MsgTransferManager {
   string creator = 1;
-  uint64 collectionId = 2;
+  string collectionId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
   string address = 3;
 }
 
@@ -146,7 +204,11 @@ message MsgTransferManagerResponse {
 //Add / remove request for manager to be transferred. 
 message MsgRequestTransferManager {
   string creator = 1;
-  uint64 collectionId = 2;
+  string collectionId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
   bool addRequest = 3;
 }
 
@@ -156,7 +218,11 @@ message MsgRequestTransferManagerResponse {
 //Update badge bytes, if permitted
 message MsgUpdateBytes {
   string creator = 1;
-  uint64 collectionId = 2;
+  string collectionId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
   string bytes = 3;
 }
 
@@ -180,8 +246,16 @@ message ChallengeSolution {
 
 message MsgClaimBadge {
   string creator = 1;
-  uint64 claimId = 2;
-  uint64 collectionId = 3;
+  string claimId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
+  string collectionId = 3  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
   repeated ChallengeSolution solutions = 4;
 }
 
@@ -189,7 +263,11 @@ message MsgClaimBadgeResponse {}
 
 message MsgDeleteCollection {
   string creator = 1;
-  uint64 collectionId = 2;
+  string collectionId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
 }
 
 message MsgDeleteCollectionResponse {

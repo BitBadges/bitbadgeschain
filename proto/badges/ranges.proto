@@ -1,14 +1,24 @@
 syntax = "proto3";
 package bitbadges.bitbadgeschain.badges;
 
+import "gogoproto/gogo.proto";
+
 // this line is used by starport scaffolding # proto/tx/import
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 //Id ranges define a range of IDs from start to end. Can be used for badge IDs, nonces, anything. 
 message IdRange {
-    uint64 start = 1;
-    uint64 end = 2;
+  string start = 1 [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
+  string end = 2 [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
 }
 
 enum AddressOptions {
@@ -20,7 +30,11 @@ enum AddressOptions {
 message AddressesMapping {
   repeated string addresses = 1;
   bool includeOnlySpecified = 2;
-  uint64 managerOptions = 3;
+  string managerOptions = 3  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
 }
 
 //TransferMapping defines a mapping of transfers from one set of addresses to another.

@@ -9,7 +9,7 @@ const TypeMsgTransferBadge = "transfer_badge"
 
 var _ sdk.Msg = &MsgTransferBadge{}
 
-func NewMsgTransferBadge(creator string, collectionId uint64, from string, transfers []*Transfer) *MsgTransferBadge {
+func NewMsgTransferBadge(creator string, collectionId sdk.Uint, from string, transfers []*Transfer) *MsgTransferBadge {
 	for _, transfer := range transfers {
 		for _, balance := range transfer.Balances {
 			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)

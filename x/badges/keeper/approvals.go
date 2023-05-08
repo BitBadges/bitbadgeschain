@@ -4,10 +4,11 @@ import (
 	"math"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // Sets an approval amount for an address.
-func SetApproval(approvals []*types.Approval, amount uint64, address string, badgeIds []*types.IdRange) ([]*types.Approval, error) {
+func SetApproval(approvals []*types.Approval, amount sdk.Uint, address string, badgeIds []*types.IdRange) ([]*types.Approval, error) {
 	idx, found := SearchApprovals(address, approvals)
 	err := *new(error)
 
@@ -46,9 +47,9 @@ func SetApproval(approvals []*types.Approval, amount uint64, address string, bad
 }
 
 // Remove a balance from the approval amount for address
-func RemoveBalanceFromApproval(approvals []*types.Approval, amountToRemove uint64, address string, badgeIdRanges []*types.IdRange) ([]*types.Approval, error) {
+func RemoveBalanceFromApproval(approvals []*types.Approval, amountToRemove sdk.Uint, address string, badgeIdRanges []*types.IdRange) ([]*types.Approval, error) {
 	err := *new(error)
-	if amountToRemove == 0 {
+	if amountToRemove.IsZero() {
 		return approvals, nil
 	}
 
@@ -93,9 +94,9 @@ func RemoveBalanceFromApproval(approvals []*types.Approval, amountToRemove uint6
 }
 
 // Add a balance to the approval amount
-func AddBalanceToApproval(approvals []*types.Approval, amountToAdd uint64, address string, badgeIdRanges []*types.IdRange) ([]*types.Approval, error) {
+func AddBalanceToApproval(approvals []*types.Approval, amountToAdd sdk.Uint, address string, badgeIdRanges []*types.IdRange) ([]*types.Approval, error) {
 	err := *new(error)
-	if amountToAdd == 0 {
+	if amountToAdd.IsZero() {
 		return approvals, nil
 	}
 
@@ -119,7 +120,7 @@ func AddBalanceToApproval(approvals []*types.Approval, amountToAdd uint64, addre
 
 	//This may be a bit confusing because we have the following structure:
 	//	approvals is of type []Approval
-	//	Approval is defined as { Address: uint64; Balances: []*types.Balance }
+	//	Approval is defined as { Address: sdk.Uint; Balances: []*types.Balance }
 
 	//Basic flow is we get the current approval amounts and ranges in currApprovalAmounts for all IDs in our specified badgeIdRange,
 	//and for each unique balance found (which also has its own corresponding []IdRange), we update the balances to balance + amountToAdd
@@ -132,7 +133,7 @@ func AddBalanceToApproval(approvals []*types.Approval, amountToAdd uint64, addre
 	for _, currApprovalAmountObj := range currApprovalAmounts {
 		newBalance, err := SafeAdd(currApprovalAmountObj.Amount, amountToAdd)
 		if err != nil {
-			newBalance = math.MaxUint64
+			newBalance = sdk.NewUint(math.MaxUint64)
 		}
 
 		approval.Balances, err = UpdateBalancesForIdRanges(currApprovalAmountObj.BadgeIds, newBalance, approval.Balances)

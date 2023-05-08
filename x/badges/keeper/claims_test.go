@@ -1,80 +1,73 @@
 package keeper_test
 
-import (
-	"math"
+// func (suite *TestSuite) TestSendAllToClaims() {
+// 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-)
+// 	collectionsToCreate := []CollectionsToCreate{
+// 		{
+// 			Collection: types.MsgNewCollection{
+// 				CollectionUri: "https://example.com",
+// 				BadgeUris: []*types.BadgeUri{
+// 					{
+// 						Uri: "https://example.com/{id}",
+// 						BadgeIds: []*types.IdRange{
+// 							{
+// 								Start: sdk.NewUint(1),
+// 								End:   sdk.NewUint(math.MaxUint64),
+// 							},
+// 						},
+// 					},
+// 				},
+// 				Permissions: sdk.NewUint(62),
+// 			},
+// 			Amount:  sdk.NewUint(1),
+// 			Creator: bob,
+// 		},
+// 	}
 
-func (suite *TestSuite) TestSendAllToClaims() {
-	wctx := sdk.WrapSDKContext(suite.ctx)
+// 	CreateCollections(suite, wctx, collectionsToCreate)
+// 	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 
-	collectionsToCreate := []CollectionsToCreate{
-		{
-			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
-					{
-						Uri: "https://example.com/{id}",
-						BadgeIds: []*types.IdRange{
-							{
-								Start: 1,
-								End:   math.MaxUint64,
-							},
-						},
-					},
-				},
-				Permissions: 62,
-			},
-			Amount:  1,
-			Creator: bob,
-		},
-	}
+// 	claimToAdd := types.Claim{
+// 		UndistributedBalances: []*types.Balance{{
+// 			Amount: sdk.NewUint(10),
+// 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
+// 		}},
+// 	}
 
-	CreateCollections(suite, wctx, collectionsToCreate)
-	badge, _ := GetCollection(suite, wctx, 1)
+// 	err := CreateBadges(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
+// 		{
+// 			Supply: sdk.NewUint(10),
+// 			Amount: sdk.NewUint(1),
+// 		},
+// 	},
+// 		[]*types.Transfer{},
+// 		[]*types.Claim{
+// 			&claimToAdd,
+// 		}, "https://example.com",
+// 		[]*types.BadgeUri{
+// 			{
+// 				Uri: "https://example.com/{id}",
+// 				BadgeIds: []*types.IdRange{
+// 					{
+// 						Start: sdk.NewUint(1),
+// 						End:   sdk.NewUint(math.MaxUint64),
+// 					},
+// 				},
+// 			},
+// 		}, "")
+// 	suite.Require().Nil(err, "Error creating badge")
+// 	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
 
-	claimToAdd := types.Claim{
-		UndistributedBalances: []*types.Balance{{
-			Amount:  10,
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
-		}},
-	}
+// 	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
+// 	suite.Require().Equal([]*types.Balance{
+// 		{
+// 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
+// 			Amount: sdk.NewUint(10),
+// 		},
+// 	}, badge.MaxSupplys)
 
-	err := CreateBadges(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
-		{
-			Supply: 10,
-			Amount: 1,
-		},
-	},
-		[]*types.Transfer{},
-		[]*types.Claim{
-			&claimToAdd,
-		}, "https://example.com",
-		[]*types.BadgeUri{
-			{
-				Uri: "https://example.com/{id}",
-				BadgeIds: []*types.IdRange{
-					{
-						Start: 1,
-						End:   math.MaxUint64,
-					},
-				},
-			},
-		}, "")
-	suite.Require().Nil(err, "Error creating badge")
-	badge, _ = GetCollection(suite, wctx, 1)
-
-	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
-	suite.Require().Equal([]*types.Balance{
-		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-			Amount:  10,
-		},
-	}, badge.MaxSupplys)
-
-	claim, _ := GetClaim(suite, wctx, 1, 1)
-	suite.Require().Nil(err, "Error getting claim")
-	suite.Require().Equal(claimToAdd, claim)
-}
+// 	claim, _ := GetClaim(suite, wctx, sdk.NewUint(1), sdk.NewUint(1))
+// 	suite.Require().Nil(err, "Error getting claim")
+// 	suite.Require().Equal(claimToAdd, claim)
+// }

@@ -1,18 +1,25 @@
 package keeper
 
-// Safe adds two uint64s and returns an error if the result overflows uint64.
-func SafeAdd(left uint64, right uint64) (uint64, error) {
-	sum := left + right
-	if sum < left {
-		return 0, ErrOverflow
-	}
-	return sum, nil
+import sdk "github.com/cosmos/cosmos-sdk/types"
+
+// Safe adds two sdk.Uints and returns an error if the result overflows sdk.Uint.
+func SafeAdd(left sdk.Uint, right sdk.Uint) (sdk.Uint, error) {
+	//try to add the two numbers and catch panic
+	defer func() (sdk.Uint, error) {
+		if r := recover(); r != nil {
+			return sdk.NewUint(0), ErrOverflow
+		}
+		return left.Add(right), nil
+	}()
+
+	return left.Add(right), nil
 }
 
-// Safe subtracts two uint64s and returns an error if the result underflows uint64.
-func SafeSubtract(left uint64, right uint64) (uint64, error) {
-	if right > left {
-		return 0, ErrUnderflow
+// Safe subtracts two sdk.Uints and returns an error if the result underflows sdk.Uint.
+func SafeSubtract(left sdk.Uint, right sdk.Uint) (sdk.Uint, error) {
+	// Cosmos SDK's Uint type does not overflow, so this check is not needed.
+	if right.GT(left) {
+		return sdk.NewUint(0), ErrUnderflow
 	}
-	return left - right, nil
+	return left.Sub(right), nil
 }

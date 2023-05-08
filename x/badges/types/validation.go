@@ -14,8 +14,8 @@ var (
 	reUri       = regexp.MustCompile(fmt.Sprintf(`^%s$`, reUriString))
 )
 
-func duplicateInArray(arr []uint64) bool {
-	visited := make(map[uint64]bool, 0)
+func duplicateInArray(arr []sdk.Uint) bool {
+	visited := make(map[sdk.Uint]bool, 0)
 	for i := 0; i < len(arr); i++ {
 
 		if visited[arr[i]] == true {
@@ -72,9 +72,9 @@ func DoRangesOverlap(ids []*IdRange) bool {
 	for i := 1; i < n; i++ {
 		j := i
 		for j > 0 {
-			if ids[j-1].Start > ids[j].Start {
+			if ids[j-1].Start.GT(ids[j].Start) {
 				ids[j-1], ids[j] = ids[j], ids[j-1]
-			} else if ids[j-1].Start == ids[j].Start && ids[j-1].End > ids[j].End {
+			} else if ids[j-1].Start.Equal(ids[j].Start) && ids[j-1].End.GT(ids[j].End) {
 				ids[j-1], ids[j] = ids[j], ids[j-1]
 			}
 			j = j - 1
@@ -86,7 +86,7 @@ func DoRangesOverlap(ids []*IdRange) bool {
 		prevInsertedRange := ids[i-1]
 		currRange := ids[i]
 
-		if currRange.Start <= prevInsertedRange.End {
+		if currRange.Start.LTE(prevInsertedRange.End) {
 			return true
 		}
 	}
@@ -94,14 +94,18 @@ func DoRangesOverlap(ids []*IdRange) bool {
 	return false
 }
 
-// Validates ranges are valid. If end == 0, we assume end == start.
+// Validates ranges are valid. If end.IsZero(), we assume end == start.
 func ValidateRangesAreValid(badgeIdRanges []*IdRange) error {
 	for _, badgeIdRange := range badgeIdRanges {
+		if badgeIdRange.Start.IsNil() || badgeIdRange.End.IsNil() {
+			return ErrUintUnititialized
+		}
+
 		if badgeIdRange == nil {
 			return ErrRangesIsNil
 		}
 
-		if badgeIdRange.Start > badgeIdRange.End {
+		if badgeIdRange.Start.GT(badgeIdRange.End) {
 			return ErrStartGreaterThanEnd
 		}
 	}
@@ -114,30 +118,10 @@ func ValidateRangesAreValid(badgeIdRanges []*IdRange) error {
 	return nil
 }
 
-func ValidateActionsAreValid(actions []uint64, rangesLength int) error {
-	for _, action := range actions {
-		if action > 2 {
-			return ErrActionOutOfRange
-		}
-	}
-
-	if len(actions) == 0 {
-		return ErrActionsEmpty
-	}
-
-	if len(actions) == 1 {
-		return nil
-	} else if len(actions) != rangesLength {
-		return ErrActionsLengthNotEqualToRangesLength
-	}
-
-	return nil
-}
-
 // Validates no element is X
-func ValidateNoElementIsX(amounts []uint64, x uint64) error {
+func ValidateNoElementIsX(amounts []sdk.Uint, x sdk.Uint) error {
 	for _, amount := range amounts {
-		if amount == x {
+		if amount.Equal(x) {
 			return ErrElementCantEqualThis
 		}
 	}
@@ -156,7 +140,14 @@ func ValidateNoStringElementIsX(addresses []string, x string) error {
 }
 
 func ValidateAddressesMapping(addressesMapping AddressesMapping, allowMintAddress bool) error {
+	if addressesMapping.ManagerOptions.IsNil() {
+		return ErrUintUnititialized
+	}
+
 	for _, address := range addressesMapping.Addresses {
+
+
+
 		if allowMintAddress && address == MintAddress {
 			continue
 		}
@@ -185,6 +176,10 @@ func ValidateTransferMapping(transferMapping TransferMapping) error {
 func ValidateClaim(claim *Claim) error {
 	err := *new(error)
 
+	if claim.NumClaimsPerAddress.IsNil() || claim.IncrementIdsBy.IsNil() {
+		return ErrUintUnititialized
+	}
+
 	if claim.Uri != "" {
 		err = ValidateURI(claim.Uri)
 		if err != nil {
@@ -192,15 +187,20 @@ func ValidateClaim(claim *Claim) error {
 		}
 	}
 
-	for _, balance := range claim.CurrentClaimAmounts {
-		err = ValidateRangesAreValid(balance.BadgeIds)
-		if err != nil {
-			return err
+	for _, challenge := range claim.Challenges {
+		if challenge.ExpectedProofLength.IsNil() {
+			return ErrUintUnititialized
 		}
+	}
 
-		if balance.Amount == 0 {
-			return ErrAmountEqualsZero
-		}
+	err = ValidateBalances(claim.UndistributedBalances)
+	if err != nil {
+		return err
+	}
+
+	err = ValidateBalances(claim.CurrentClaimAmounts)
+	if err != nil {
+		return err
 	}
 
 
@@ -213,16 +213,28 @@ func ValidateClaim(claim *Claim) error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
 	}
 
-	for _, balance := range claim.UndistributedBalances {
+
+	err = ValidateRangesAreValid([]*IdRange{claim.TimeRange})
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
+	}
+
+
+
+	return nil
+}
+
+func ValidateBalances(balances []*Balance) error {
+	for _, balance := range balances {
 		if balance == nil {
 			return ErrInvalidLengthBalances
 		}
 
-		if balance.Amount == 0 {
+		if balance.Amount.IsZero() || balance.Amount.IsNil() {
 			return ErrAmountEqualsZero
 		}
 
-		err = ValidateRangesAreValid(balance.BadgeIds)
+		err := ValidateRangesAreValid(balance.BadgeIds)
 		if err != nil {
 			return err
 		}
@@ -231,21 +243,12 @@ func ValidateClaim(claim *Claim) error {
 	return nil
 }
 
+
 func ValidateTransfer(transfer *Transfer) error {
 	err := *new(error)
-	for _, balance := range transfer.Balances {
-		if balance == nil {
-			return ErrInvalidLengthBalances
-		}
-
-		if balance.Amount == 0 {
-			return ErrAmountEqualsZero
-		}
-
-		err = ValidateRangesAreValid(balance.BadgeIds)
-		if err != nil {
-			return err
-		}
+	err = ValidateBalances(transfer.Balances)
+	if err != nil {
+		return err
 	}
 
 	if duplicateInStringArray(transfer.ToAddresses) {
@@ -289,9 +292,9 @@ func SortAndMergeOverlapping(ids []*IdRange) []*IdRange {
 	for i := 1; i < n; i++ {
 		j := i
 		for j > 0 {
-			if ids[j-1].Start > ids[j].Start {
+			if ids[j-1].Start.GT(ids[j].Start) {
 				ids[j-1], ids[j] = ids[j], ids[j-1]
-			} else if ids[j-1].Start == ids[j].Start && ids[j-1].End > ids[j].End {
+			} else if ids[j-1].Start.Equal(ids[j].Start) && ids[j-1].End.GT(ids[j].End) {
 				ids[j-1], ids[j] = ids[j], ids[j-1]
 			}
 			j = j - 1
@@ -306,15 +309,15 @@ func SortAndMergeOverlapping(ids []*IdRange) []*IdRange {
 			prevInsertedRange := newIdRanges[len(newIdRanges)-1]
 			currRange := ids[i]
 
-			if currRange.Start == prevInsertedRange.Start {
+			if currRange.Start.Equal(prevInsertedRange.Start) {
 				//Both have same start, so we set to currRange.End because currRange.End is greater due to our sorting
 				//Example: prevRange = [1, 5], currRange = [1, 10] -> newRange = [1, 10]
 				newIdRanges[len(newIdRanges)-1].End = currRange.End
-			} else if currRange.End > prevInsertedRange.End {
+			} else if currRange.End.GT(prevInsertedRange.End) {
 				//We have different starts and curr end is greater than prev end
 				
 				
-				if currRange.Start > prevInsertedRange.End + 1 {
+				if currRange.Start.GT(prevInsertedRange.End.AddUint64(1)) {
 					//We have a gap between the prev range end and curr range start, so we just append currRange
 					//Example: prevRange = [1, 5], currRange = [7, 10] -> newRange = [1, 5], [7, 10]
 					newIdRanges = append(newIdRanges, currRange)

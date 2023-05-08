@@ -5,6 +5,7 @@ import "google/protobuf/any.proto";
 import "badges/ranges.proto";
 import "badges/balances.proto";
 import "badges/claims.proto";
+import "gogoproto/gogo.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
@@ -19,7 +20,10 @@ message BadgeUri {
 message BadgeCollection {
     // The collectionId defines the unique identifier of the BadgeCollection classification, similar to the contract address of ERC721.
     // This is assigned by the chain itself. All ids start at 1 and increments by 1 each created collection.
-    uint64 collectionId = 1;
+    string collectionId = 1 [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+    ];
 
     // The URI where to fetch the collection's metadata. Max 100 characters.
     string collectionUri = 2; 
@@ -43,7 +47,8 @@ message BadgeCollection {
     
     //Store permissions packed in a uint where the bits correspond to certain permissions.
     //Leading zeroes are applied. See permissions definition.
-    uint64 permissions = 7;
+    string permissions = 7 [(gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false];
 
     //This defines the address combinations that can be transferred. 
     //Used to freeze addresses and prevent transfers.
@@ -61,7 +66,8 @@ message BadgeCollection {
     repeated TransferMapping managerApprovedTransfers = 9;
 
     //Badge ids start at 1. Each badge created will increment this by 1. Can't overflow.
-    uint64 nextBadgeId = 10;
+    string nextBadgeId = 10  [(gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false];
 
     //This is a map of the current unminted badge supplys by ID. 
     //Claimable badges are not included in this count (considered "transfered" to the claim's balances).
@@ -73,8 +79,10 @@ message BadgeCollection {
     //Keeps track of the next claim id. Claim ids start at 1. 
     //Each claim created will increment this by 1. Can't overflow.
     //Claims are stored in a separate store because they are frequently written to.
-    uint64 nextClaimId = 13;
+    string nextClaimId = 13  [(gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false];
 
     //Defines what standard this badge should implement (see standards documentation).
-    uint64 standard = 14;
+    string standard = 14  [(gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false];
 }

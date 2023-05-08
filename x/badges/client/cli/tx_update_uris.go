@@ -20,7 +20,7 @@ func CmdUpdateUris() *cobra.Command {
 		Short: "Broadcast message updateUris",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argBadgeId, err := cast.ToUint64E(args[0])
+			argBadgeId := types.NewUintFromString(args[0])
 			if err != nil {
 				return err
 			}

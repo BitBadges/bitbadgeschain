@@ -20,7 +20,7 @@ func CmdUpdateAllowedTransfers() *cobra.Command {
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			
-			argCollectionId, err := strconv.ParseUint(args[0], 10, 64)
+			argCollectionId := types.NewUintFromString(args[0])
 			if err != nil {
 				return err
 			}

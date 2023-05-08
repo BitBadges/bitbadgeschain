@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 
@@ -20,11 +21,11 @@ func TestMsgMintAndDistributeBadges_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgMintAndDistributeBadges{
 				Creator: "invalid_address",
-				CollectionId: 1,
+				CollectionId: sdk.NewUint(1),
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
-						Supply: 10,
-						Amount: 1,
+						Supply: sdk.NewUint(10),
+						Amount: sdk.NewUint(1),
 					},
 				},
 			},
@@ -33,11 +34,11 @@ func TestMsgMintAndDistributeBadges_ValidateBasic(t *testing.T) {
 			name: "valid state",
 			msg: types.MsgMintAndDistributeBadges{
 				Creator: sample.AccAddress(),
-				CollectionId: 1,
+				CollectionId: sdk.NewUint(1),
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
-						Supply: 10,
-						Amount: 1,
+						Supply: sdk.NewUint(10),
+						Amount: sdk.NewUint(1),
 					},
 				},
 			},
@@ -45,11 +46,11 @@ func TestMsgMintAndDistributeBadges_ValidateBasic(t *testing.T) {
 			name: "invalid amount",
 			msg: types.MsgMintAndDistributeBadges{
 				Creator: sample.AccAddress(),
-				CollectionId: 1,
+				CollectionId: sdk.NewUint(1),
 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
 					{
-						Supply: 10,
-						Amount: 0,
+						Supply: sdk.NewUint(10),
+						Amount: sdk.NewUint(0),
 					},
 				},
 			},

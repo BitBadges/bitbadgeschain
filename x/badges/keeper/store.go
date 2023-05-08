@@ -34,7 +34,7 @@ func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection types.BadgeColl
 }
 
 // Gets a badge from the store according to the collectionId.
-func (k Keeper) GetCollectionFromStore(ctx sdk.Context, collectionId uint64) (types.BadgeCollection, bool) {
+func (k Keeper) GetCollectionFromStore(ctx sdk.Context, collectionId sdk.Uint) (types.BadgeCollection, bool) {
 	store := ctx.KVStore(k.storeKey)
 	marshaled_collection := store.Get(collectionStoreKey(collectionId))
 
@@ -60,13 +60,13 @@ func (k Keeper) GetCollectionsFromStore(ctx sdk.Context) (collections []*types.B
 }
 
 // StoreHasCollectionID determines whether the specified collectionId exists
-func (k Keeper) StoreHasCollectionID(ctx sdk.Context, collectionId uint64) bool {
+func (k Keeper) StoreHasCollectionID(ctx sdk.Context, collectionId sdk.Uint) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(collectionStoreKey(collectionId))
 }
 
 // DeleteCollectionFromStore deletes a badge from the store.
-func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId uint64) {
+func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId sdk.Uint) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(collectionStoreKey(collectionId))
 }
@@ -74,7 +74,7 @@ func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId uint64) 
 /****************************************CLAIMS****************************************/
 
 // Sets a user balance in the store using ClaimKey ([]byte{0x02}) as the prefix. No check if store has key already.
-func (k Keeper) SetClaimInStore(ctx sdk.Context, collectionId uint64, claimId uint64, Claim types.Claim) error {
+func (k Keeper) SetClaimInStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint, Claim types.Claim) error {
 	marshaled_claim_info, err := k.cdc.Marshal(&Claim)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.Claim failed")
@@ -100,7 +100,7 @@ func (k Keeper) SetClaimInStoreWithKey(ctx sdk.Context, claimKey string, Claim t
 
 
 // Gets a user balance from the store according to the balanceID.
-func (k Keeper) GetClaimFromStore(ctx sdk.Context, collectionId uint64, claimId uint64) (types.Claim, bool) {
+func (k Keeper) GetClaimFromStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint) (types.Claim, bool) {
 	store := ctx.KVStore(k.storeKey)
 	claimKey := ConstructClaimKey(collectionId, claimId)
 	marshaled_claim_info := store.Get(claimStoreKey(claimKey))
@@ -114,7 +114,7 @@ func (k Keeper) GetClaimFromStore(ctx sdk.Context, collectionId uint64, claimId 
 }
 
 // GetClaimsFromStore defines a method for returning all user balances information by key.
-func (k Keeper) GetClaimsFromStore(ctx sdk.Context) (claims []*types.Claim, collectionIds []uint64, claimIds []uint64) {
+func (k Keeper) GetClaimsFromStore(ctx sdk.Context) (claims []*types.Claim, collectionIds []sdk.Uint, claimIds []sdk.Uint) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, ClaimKey)
 	defer iterator.Close()
@@ -143,14 +143,14 @@ func (k Keeper) GetClaimIdsFromStore(ctx sdk.Context) (ids []string) {
 }
 
 // StoreHasClaimID determines whether the specified user balanceID exists in the store
-func (k Keeper) StoreHasClaim(ctx sdk.Context, collectionId uint64, claimId uint64) bool {
+func (k Keeper) StoreHasClaim(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint) bool {
 	store := ctx.KVStore(k.storeKey)
 	claimKey := ConstructClaimKey(collectionId, claimId)
 	return store.Has(claimStoreKey(claimKey))
 }
 
 // DeleteClaimFromStore deletes a user balance from the store.
-func (k Keeper) DeleteClaimFromStore(ctx sdk.Context, collectionId uint64, claimId uint64) {
+func (k Keeper) DeleteClaimFromStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint) {
 	store := ctx.KVStore(k.storeKey)
 	claimKey := ConstructClaimKey(collectionId, claimId)
 	store.Delete(claimStoreKey(claimKey))
@@ -184,7 +184,7 @@ func (k Keeper) GetUserBalanceFromStore(ctx sdk.Context, balanceKey string) (typ
 }
 
 // GetUserBalancesFromStore defines a method for returning all user balances information by key.
-func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.UserBalanceStore, addresses []string, ids []uint64) {
+func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.UserBalanceStore, addresses []string, ids []sdk.Uint) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, UserBalanceKey)
 	defer iterator.Close()
@@ -227,14 +227,14 @@ func (k Keeper) DeleteUserBalanceFromStore(ctx sdk.Context, balanceKey string) {
 /****************************************TRANSFER MANAGER REQUESTS****************************************/
 
 // Checks if a certain address has requested a managerial transfer
-func (k Keeper) HasAddressRequestedManagerTransfer(ctx sdk.Context, collectionId uint64, address string) bool {
+func (k Keeper) HasAddressRequestedManagerTransfer(ctx sdk.Context, collectionId sdk.Uint, address string) bool {
 	store := ctx.KVStore(k.storeKey)
 	key := ConstructTransferManagerRequestKey(collectionId, address)
 	return store.Has(managerTransferRequestKey(key))
 }
 
 // Creates a transfer manager request for the given address and collectionId.
-func (k Keeper) CreateTransferManagerRequest(ctx sdk.Context, collectionId uint64, address string) error {
+func (k Keeper) CreateTransferManagerRequest(ctx sdk.Context, collectionId sdk.Uint, address string) error {
 	request := []byte{}
 	store := ctx.KVStore(k.storeKey)
 	key := ConstructTransferManagerRequestKey(collectionId, address)
@@ -243,7 +243,7 @@ func (k Keeper) CreateTransferManagerRequest(ctx sdk.Context, collectionId uint6
 }
 
 // Deletes a transfer manager request for the given address and collectionId.
-func (k Keeper) RemoveTransferManagerRequest(ctx sdk.Context, collectionId uint64, address string) error {
+func (k Keeper) RemoveTransferManagerRequest(ctx sdk.Context, collectionId sdk.Uint, address string) error {
 	key := ConstructTransferManagerRequestKey(collectionId, address)
 	store := ctx.KVStore(k.storeKey)
 
@@ -254,25 +254,22 @@ func (k Keeper) RemoveTransferManagerRequest(ctx sdk.Context, collectionId uint6
 /****************************************NEXT ASSET ID****************************************/
 
 // Gets the next badge ID.
-func (k Keeper) GetNextCollectionId(ctx sdk.Context) uint64 {
+func (k Keeper) GetNextCollectionId(ctx sdk.Context) sdk.Uint {
 	store := ctx.KVStore(k.storeKey)
-	nextID, err := strconv.ParseUint(string((store.Get(nextCollectionIdKey()))), 10, 64)
-	if err != nil {
-		panic("Failed to parse next asset ID")
-	}
+	nextID := types.NewUintFromString(string((store.Get(nextCollectionIdKey()))))
 	return nextID
 }
 
 // Sets the next asset ID. Should only be used in InitGenesis. Everything else should call IncrementNextAssetID()
-func (k Keeper) SetNextCollectionId(ctx sdk.Context, nextID uint64) {
+func (k Keeper) SetNextCollectionId(ctx sdk.Context, nextID sdk.Uint) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(nextCollectionIdKey(), []byte(strconv.FormatInt(int64(nextID), 10)))
+	store.Set(nextCollectionIdKey(), []byte(nextID.String()))
 }
 
 // Increments the next badge ID by 1.
 func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) {
 	nextID := k.GetNextCollectionId(ctx)
-	k.SetNextCollectionId(ctx, nextID+1) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
+	k.SetNextCollectionId(ctx, nextID.AddUint64(1)) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
 }
 
 /****************************************NEXT CLAIM ID****************************************/
@@ -280,89 +277,90 @@ func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) {
 //These are the IDs for the claim stores themselves, not the claim IDs for within a collection.
 
 // Gets the next badge ID.
-func (k Keeper) GetNextClaimId(ctx sdk.Context) uint64 {
+func (k Keeper) GetNextClaimId(ctx sdk.Context) sdk.Uint {
 	store := ctx.KVStore(k.storeKey)
-	nextID, err := strconv.ParseUint(string((store.Get(nextClaimIdKey()))), 10, 64)
-	if err != nil {
-		panic("Failed to parse next asset ID")
-	}
+	nextID := types.NewUintFromString(string((store.Get(nextClaimIdKey()))))
 	return nextID
 }
 
 // Sets the next asset ID. Should only be used in InitGenesis. Everything else should call IncrementNextAssetID()
-func (k Keeper) SetNextClaimId(ctx sdk.Context, nextID uint64) {
+func (k Keeper) SetNextClaimId(ctx sdk.Context, nextID sdk.Uint) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(nextClaimIdKey(), []byte(strconv.FormatInt(int64(nextID), 10)))
+	store.Set(nextClaimIdKey(), []byte(nextID.String()))
 }
 
 // Increments the next badge ID by 1.
 func (k Keeper) IncrementNextClaimId(ctx sdk.Context) {
 	nextID := k.GetNextClaimId(ctx)
-	k.SetNextClaimId(ctx, nextID+1) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
+	k.SetNextClaimId(ctx, nextID.Incr()) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
 }
 
 /****************************************Claims****************************************/
 // Sets a usedClaimData in the store using UsedClaimDataKey ([]byte{0x07}) as the prefix. No check if store has key already.
-func (k Keeper) IncrementNumUsedForClaimInStore(ctx sdk.Context, collectionId uint64, claimId uint64) (uint64, error) {
+func (k Keeper) IncrementNumUsedForClaimInStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint) (sdk.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId)))
-	curr := uint64(0)
-	err := error(nil)
+	curr := sdk.NewUint(0)
 	if currBytes != nil {
-		curr, err = strconv.ParseUint(string((currBytes)), 10, 64)
+		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
 		if err != nil {
 			panic("Failed to parse num used")
 		}
+
+		curr = sdk.NewUint(currUint)
 	}
-	incrementedNum := curr + 1
-	store.Set(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId)), []byte(strconv.FormatInt(int64(curr+1), 10)))
+	incrementedNum := curr.AddUint64(1)
+	store.Set(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId)), []byte(curr.Incr().String()))
 	return incrementedNum, nil
 }
 
-func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionId uint64, claimId uint64, challengeId uint64, leafIndex uint64) (uint64, error) {
+func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint, challengeId sdk.Uint, leafIndex sdk.Uint) (sdk.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, claimId, challengeId, leafIndex)))
-	curr := uint64(0)
-	err := error(nil)
+	curr := sdk.NewUint(0)
 	if currBytes != nil {
-		curr, err = strconv.ParseUint(string((currBytes)), 10, 64)
+		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
 		if err != nil {
 			panic("Failed to parse num used")
 		}
+
+		curr = sdk.NewUint(currUint)
 	}
-	incrementedNum := curr + 1
-	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, claimId, challengeId, leafIndex)), []byte(strconv.FormatInt(int64(curr+1), 10)))
+	incrementedNum := curr.AddUint64(1)
+	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, claimId, challengeId, leafIndex)), []byte(curr.Incr().String()))
 	return incrementedNum, nil
 }
 
-func (k Keeper) IncrementNumUsedForAddressInStore(ctx sdk.Context, collectionId uint64, claimId uint64, address string) (uint64, error) {
+func (k Keeper) IncrementNumUsedForAddressInStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint, address string) (sdk.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedClaimAddressStoreKey(ConstructUsedClaimAddressKey(collectionId, claimId, address)))
-	curr := uint64(0)
-	err := error(nil)
+	curr := sdk.NewUint(0)
 	if currBytes != nil {
-		curr, err = strconv.ParseUint(string((currBytes)), 10, 64)
+		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
 		if err != nil {
 			panic("Failed to parse num used")
 		}
+
+		curr = sdk.NewUint(currUint)
 	}
-	incrementedNum := curr + 1
-	store.Set(usedClaimAddressStoreKey(ConstructUsedClaimAddressKey(collectionId, claimId, address)), []byte(strconv.FormatInt(int64(curr+1), 10)))
+	incrementedNum := curr.AddUint64(1)
+	store.Set(usedClaimAddressStoreKey(ConstructUsedClaimAddressKey(collectionId, claimId, address)),[]byte(curr.Incr().String()))
 	return incrementedNum, nil
 }
 
-func (k Keeper) IncrementNumUsedForWhitelistIndexInStore(ctx sdk.Context, collectionId uint64, claimId uint64, whitelistLeafIndex uint64) (uint64, error) {
+func (k Keeper) IncrementNumUsedForWhitelistIndexInStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint, whitelistLeafIndex sdk.Uint) (sdk.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedWhitelistIndexStoreKey(ConstructUsedWhitelistIndexKey(collectionId, claimId, whitelistLeafIndex)))
-	curr := uint64(0)
-	err := error(nil)
+	curr := sdk.NewUint(0)
 	if currBytes != nil {
-		curr, err = strconv.ParseUint(string((currBytes)), 10, 64)
+		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
 		if err != nil {
 			panic("Failed to parse num used")
 		}
+
+		curr = sdk.NewUint(currUint)
 	}
-	incrementedNum := curr + 1
-	store.Set(usedWhitelistIndexStoreKey(ConstructUsedWhitelistIndexKey(collectionId, claimId, whitelistLeafIndex)), []byte(strconv.FormatInt(int64(curr+1), 10)))
+	incrementedNum := curr.AddUint64(1)
+	store.Set(usedWhitelistIndexStoreKey(ConstructUsedWhitelistIndexKey(collectionId, claimId, whitelistLeafIndex)), []byte(curr.Incr().String()))
 	return incrementedNum, nil
 }

@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	"github.com/spf13/cast"
 )
 
-func GetIdRange(start uint64, end uint64) *types.IdRange {
+func GetIdRange(start types.Uint, end types.Uint) *types.IdRange {
 	return &types.IdRange{
 		Start: start,
 		End:   end,
@@ -34,16 +33,16 @@ func parseJsonArr(jsonStr string) ([]interface{}, error) {
 	return result, nil
 }
 
-func GetIdArrFromString(str string) ([]uint64, error) {
+func GetIdArrFromString(str string) ([]types.Uint, error) {
 	vals, err := parseJsonArr(str)
 	if err != nil {
 		return nil, err
 	}
 
 	//convert vals to []uint64
-	argStartValuesUint64 := []uint64{}
+	argStartValuesUint64 := []types.Uint{}
 	for _, val := range vals {
-		valAsUint64, err := cast.ToUint64E(val)
+		valAsUint64 := types.NewUintFromString(val.(string))
 		if err != nil {
 			return nil, err
 		}

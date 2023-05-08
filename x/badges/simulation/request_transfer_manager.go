@@ -18,14 +18,14 @@ func SimulateMsgRequestTransferManager(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		randInt := r.Uint64()
+		randInt := sdk.NewUint(r.Uint64())
 		randBool := false
-		if randInt%2 == 0 {
+		if randInt.Mod(sdk.NewUint(2)).IsZero() {
 			randBool = true
 		}
 		msg := &types.MsgRequestTransferManager{
 			Creator:      simAccount.Address.String(),
-			CollectionId: r.Uint64(),
+			CollectionId: sdk.NewUint(r.Uint64()),
 			AddRequest:   randBool,
 		}
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

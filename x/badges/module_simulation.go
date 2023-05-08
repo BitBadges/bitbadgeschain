@@ -54,9 +54,6 @@ const (
 	opWeightMsgUpdateBytes          = "op_weight_msg_update_bytes"
 	defaultWeightMsgUpdateBytes int = 100
 
-	opWeightMsgRegisterAddresses          = "op_weight_msg_register_addresses"
-	defaultWeightMsgRegisterAddresses int = 100
-
 	opWeightMsgClaimBadge = "op_weight_msg_claim_badge"
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgClaimBadge int = 100
@@ -77,13 +74,13 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	badgesGenesis := types.GenesisState{
 		Params:           types.DefaultParams(),
 		PortId:           types.PortID,
-		NextCollectionId: 1,
+		NextCollectionId: sdk.NewUint(1),
 		Collections:      []*types.BadgeCollection{},
 		Balances:         []*types.UserBalanceStore{},
 		BalanceStoreKeys: []string{},
 		Claims: 				 	[]*types.Claim{},
 		ClaimStoreKeys:  	[]string{},
-		NextClaimId: 	 		1,
+		NextClaimId: 	 		sdk.NewUint(1),
 		// this line is used by starport scaffolding # simapp/module/genesisState
 	}
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&badgesGenesis)

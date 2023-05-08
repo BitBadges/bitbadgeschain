@@ -4,21 +4,22 @@ import (
 	"math"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // Gets the balances for a specific ID. Assumes balances are sorted
-func GetBalanceForId(id uint64, balances []*types.Balance) (uint64) {
+func GetBalanceForId(id sdk.Uint, balances []*types.Balance) (sdk.Uint) {
 	for _, balance := range balances {
 		_, found := SearchIdRangesForId(id, balance.BadgeIds)
 		if found {
 			return balance.Amount
 		}
 	}
-	return 0
+	return sdk.NewUint(0)
 }
 
 // Updates the balance for a specific ids from what it currently is to newAmount.
-func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount uint64, balances []*types.Balance) ([]*types.Balance, error) {
+func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount sdk.Uint, balances []*types.Balance) ([]*types.Balance, error) {
 	err := *new(error)
 
 	//Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
@@ -44,26 +45,26 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, balances []*types.Balance
 			idxSpan, found := GetIdxSpanForRange(idRange, balanceObj.BadgeIds)
 			if found {
 				//Set newIdRanges to all ranges where there is overlap
-				newIdRanges := balanceObj.BadgeIds[idxSpan.Start : idxSpan.End + 1] // + 1 since the slice is non-inclusive but idxSpan is
+				newIdRanges := balanceObj.BadgeIds[idxSpan.Start.Uint64() : idxSpan.End.AddUint64(1).Uint64()] // + 1 since the slice is non-inclusive but idxSpan is
 
 				//Since GetIdxSpanForRange only returns the indexes of the overlapping ranges,
 				//we need to remove the non-overlapping portions of the first and last ranges.
 
 				//Remove everything before the start of the range. Only need to remove from idx 0 since it is sorted.
-				if idRange.Start > 0 && len(newIdRanges) > 0 {
+				if !idRange.Start.IsZero() && len(newIdRanges) > 0 {
 					everythingBefore := &types.IdRange{
-						Start: 0,
-						End:   idRange.Start - 1,
+						Start: sdk.NewUint(0),
+						End:   idRange.Start.SubUint64(1),
 					}
 					removedRanges, _ := RemoveIdsFromIdRange(everythingBefore, newIdRanges[0])
 					newIdRanges = append(removedRanges, newIdRanges[1:]...)
 				}
 
 				//Remove everything after the end of the range. Only need to remove from last idx since it is sorted.
-				if idRange.End < math.MaxUint64 && len(newIdRanges) > 0 {
+				if idRange.End.LT(sdk.NewUint(math.MaxUint64)) && len(newIdRanges) > 0 {
 					everythingAfter := &types.IdRange{
-						Start: idRange.End + 1,
-						End:   math.MaxUint64,
+						Start: idRange.End.AddUint64(1),
+						End:   sdk.NewUint(math.MaxUint64),
 					}
 
 					removedRanges, _ := RemoveIdsFromIdRange(everythingAfter, newIdRanges[len(newIdRanges)-1])
@@ -93,7 +94,7 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, balances []*types.Balance
 	if len(idsWithZeroBalance) > 0 {
 		fetchedBalances = append([]*types.Balance{
 			{
-				Amount:  0,
+				Amount:  sdk.NewUint(0),
 				BadgeIds: idsWithZeroBalance,
 			},
 		}, fetchedBalances...)
@@ -103,7 +104,7 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, balances []*types.Balance
 }
 
 // Adds a balance to all ids specified in []ranges
-func AddBalancesForIdRanges(balances []*types.Balance, ranges []*types.IdRange, balanceToAdd uint64) ([]*types.Balance, error) {
+func AddBalancesForIdRanges(balances []*types.Balance, ranges []*types.IdRange, balanceToAdd sdk.Uint) ([]*types.Balance, error) {
 	currBalances, err := GetBalancesForIdRanges(ranges, balances)
 	if err != nil {
 		return balances, err
@@ -124,7 +125,7 @@ func AddBalancesForIdRanges(balances []*types.Balance, ranges []*types.IdRange, 
 }
 
 // Subtracts a balance to all ids specified in []ranges
-func SubtractBalancesForIdRanges(balances []*types.Balance, ranges []*types.IdRange, balanceToRemove uint64) ( []*types.Balance, error) {
+func SubtractBalancesForIdRanges(balances []*types.Balance, ranges []*types.IdRange, balanceToRemove sdk.Uint) ( []*types.Balance, error) {
 	currBalances, err := GetBalancesForIdRanges(ranges, balances)
 	if err != nil {
 		return balances, err
@@ -154,15 +155,15 @@ func DeleteBalanceForIdRanges(rangesToDelete []*types.IdRange, balances []*types
 			idxSpan, found := GetIdxSpanForRange(rangeToDelete, currRanges)
 			if found {
 				
-				newIdRanges := append([]*types.IdRange{}, currRanges[:idxSpan.Start]...)
+				newIdRanges := append([]*types.IdRange{}, currRanges[:idxSpan.Start.Uint64()]...)
 
 				//For the overlapping ranges, remove the ids within the rangeToDelete
-				for i := idxSpan.Start; i <= idxSpan.End; i++ {
-					removedRanges, _ := RemoveIdsFromIdRange(rangeToDelete, currRanges[i])
+				for i := idxSpan.Start; i.LTE(idxSpan.End); i = i.Incr() {
+					removedRanges, _ := RemoveIdsFromIdRange(rangeToDelete, currRanges[i.Uint64()])
 					newIdRanges = append(newIdRanges, removedRanges...)
 				}
 
-				newIdRanges = append(newIdRanges, currRanges[idxSpan.End+1:]...)
+				newIdRanges = append(newIdRanges, currRanges[idxSpan.End.Incr().Uint64():]...)
 
 				balanceObj.BadgeIds = newIdRanges
 			}
@@ -178,8 +179,8 @@ func DeleteBalanceForIdRanges(rangesToDelete []*types.IdRange, balances []*types
 }
 
 // Sets the balance for a specific id. Assumes balance does not exist.
-func SetBalanceForIdRanges(ranges []*types.IdRange, amount uint64, balances []*types.Balance) ([]*types.Balance, error) {
-	if amount == 0 {
+func SetBalanceForIdRanges(ranges []*types.IdRange, amount sdk.Uint, balances []*types.Balance) ([]*types.Balance, error) {
+	if amount.IsZero() {
 		return balances, nil
 	}
 
@@ -211,7 +212,7 @@ func SetBalanceForIdRanges(ranges []*types.IdRange, amount uint64, balances []*t
 
 // Balances will be sorted, so we can binary search to get the targetIdx.
 // If found, returns (the index it was found at, true). Else, returns (index to insert at, false).
-func SearchBalances(targetAmount uint64, balances []*types.Balance) (int, bool) {
+func SearchBalances(targetAmount sdk.Uint, balances []*types.Balance) (int, bool) {
 	balanceLow := 0
 	balanceHigh := len(balances) - 1
 	median := 0
@@ -219,10 +220,10 @@ func SearchBalances(targetAmount uint64, balances []*types.Balance) (int, bool) 
 	idx := 0
 	for balanceLow <= balanceHigh {
 		median = int(uint(balanceLow+balanceHigh) >> 1)
-		if balances[median].Amount == targetAmount {
+		if balances[median].Amount.Equal(targetAmount) {
 			hasEntryWithSameBalance = true
 			break
-		} else if balances[median].Amount > targetAmount {
+		} else if balances[median].Amount.GT(targetAmount) {
 			balanceHigh = median - 1
 		} else {
 			balanceLow = median + 1
@@ -231,7 +232,7 @@ func SearchBalances(targetAmount uint64, balances []*types.Balance) (int, bool) 
 
 	if len(balances) != 0 {
 		idx = median + 1
-		if targetAmount <= balances[median].Amount {
+		if targetAmount.LTE(balances[median].Amount) {
 			idx = median
 		}
 	}

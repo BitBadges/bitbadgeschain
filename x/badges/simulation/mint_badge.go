@@ -21,14 +21,14 @@ func SimulateMsgMintAndDistributeBadges(
 		randomSubassets := []*types.BadgeSupplyAndAmount{}
 		for i := 0; i < r.Intn(10); i++ {
 			randomSubassets = append(randomSubassets, &types.BadgeSupplyAndAmount{
-				Supply: r.Uint64(),
-				Amount: r.Uint64(),
+				Supply: sdk.NewUint(r.Uint64()),
+				Amount: sdk.NewUint(r.Uint64()),
 			})
 		}
 
 		msg := &types.MsgMintAndDistributeBadges{
 			Creator:      simAccount.Address.String(),
-			CollectionId: r.Uint64(),
+			CollectionId: sdk.NewUint(r.Uint64()),
 			BadgeSupplys: randomSubassets,
 		}
 

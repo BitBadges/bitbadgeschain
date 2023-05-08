@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.ClaimProofItem) (error) {
@@ -34,17 +35,17 @@ func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.ClaimProof
 	return nil
 }
 
-func GetLeafIndex(aunts []*types.ClaimProofItem) (uint64) {
-	leafIndex := uint64(1)
+func GetLeafIndex(aunts []*types.ClaimProofItem) (sdk.Uint) {
+	leafIndex := sdk.NewUint(1)
 	//iterate through msg.WhitelistProof.Aunts backwards
 	for i := len(aunts) - 1; i >= 0; i-- {
 		aunt := aunts[i]
 		onRight := aunt.OnRight
 
 		if onRight {
-			leafIndex = leafIndex * 2
+			leafIndex = leafIndex.Mul(sdk.NewUint(2))
 		} else {
-			leafIndex = leafIndex*2 + 1
+			leafIndex = leafIndex.Mul(sdk.NewUint(2)).Add(sdk.NewUint(1))
 		}
 	}
 	return leafIndex

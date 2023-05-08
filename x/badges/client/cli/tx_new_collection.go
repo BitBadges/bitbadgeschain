@@ -55,7 +55,7 @@ func CmdNewCollection() *cobra.Command {
 				return err
 			}
 
-			argPermissions, err := cast.ToUint64E(args[2])
+			argPermissions := types.NewUintFromString(args[2])
 			if err != nil {
 				return err
 			}
@@ -77,7 +77,7 @@ func CmdNewCollection() *cobra.Command {
 				return err
 			}
 
-			argStandard, err := cast.ToUint64E(args[6])
+			argStandard := types.NewUintFromString(args[6])
 			if err != nil {
 				return err
 			}

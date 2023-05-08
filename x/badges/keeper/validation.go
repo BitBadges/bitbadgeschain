@@ -8,7 +8,7 @@ import (
 // Determines what to validate for each Msg
 type UniversalValidationParams struct {
 	Creator                      string
-	CollectionId                 uint64
+	CollectionId                 sdk.Uint
 	AccountsThatCantEqualCreator []string
 	BadgeIdRangesToValidate      []*types.IdRange
 	MustBeManager                bool

@@ -25,8 +25,8 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		ManagerApprovedTransfers: msg.ManagerApprovedTransfers,
 		Bytes:                    msg.Bytes,
 		Standard:                 msg.Standard,
-		NextBadgeId:              1,
-		NextClaimId: 						  1,
+		NextBadgeId:              sdk.NewUint(1),
+		NextClaimId: 						  sdk.NewUint(1),
 	}
 
 	if len(msg.BadgeSupplys) != 0 {

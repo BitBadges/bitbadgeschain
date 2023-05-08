@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
@@ -31,60 +32,60 @@ var (
 const StoreKey = types.ModuleName
 
 type BalanceKeyDetails struct {
-	collectionId uint64
+	collectionId sdk.Uint
 	address   	 string
 }
 
 type ClaimKeyDetails struct {
-	collectionId uint64
-	claimId   	 uint64
+	collectionId sdk.Uint
+	claimId   	 sdk.Uint
 }
 // Helper functions to manipulate the balance keys. These aren't prefixed. They will be after they are passed into the functions further down in this file.
 
 // Creates the balance key from an address and collectionId. Note this is not prefixed yet. It is just performing a delimited string concatenation.
-func ConstructBalanceKey(address string, id uint64) string {
-	collection_id_str := strconv.FormatUint(id, 10)
+func ConstructBalanceKey(address string, id sdk.Uint) string {
+	collection_id_str := id.String()
 	address_str := address
 	return collection_id_str + BalanceKeyDelimiter + address_str
 }
 
-func ConstructClaimKey(collectionId uint64, claimId uint64) string {
-	collection_id_str := strconv.FormatUint(collectionId, 10)
-	claim_id_str := strconv.FormatUint(claimId, 10)
+func ConstructClaimKey(collectionId sdk.Uint, claimId sdk.Uint) string {
+	collection_id_str := collectionId.String()
+	claim_id_str := claimId.String()
 	return collection_id_str + BalanceKeyDelimiter + claim_id_str
 }
 
 // Creates the used claim data key from an id and data. Note this is not prefixed yet. It is just performing a delimited string concatenation.
-func ConstructUsedClaimDataKey(collectionId uint64, claimId uint64) string {
-	collection_id_str := strconv.FormatUint(collectionId, 10)
-	claim_id_str := strconv.FormatUint(claimId, 10)
+func ConstructUsedClaimDataKey(collectionId sdk.Uint, claimId sdk.Uint) string {
+	collection_id_str := collectionId.String()
+	claim_id_str := claimId.String()
 	return collection_id_str + BalanceKeyDelimiter + claim_id_str
 }
 
-func ConstructUsedClaimChallengeKey(collectionId uint64, claimId uint64, challengeId uint64, codeLeafIndex uint64) string {
-	collection_id_str := strconv.FormatUint(collectionId, 10)
-	claim_id_str := strconv.FormatUint(claimId, 10)
-	code_leaf_index_str := strconv.FormatUint(codeLeafIndex, 10)
-	challenge_id_str := strconv.FormatUint(challengeId, 10)
+func ConstructUsedClaimChallengeKey(collectionId sdk.Uint, claimId sdk.Uint, challengeId sdk.Uint, codeLeafIndex sdk.Uint) string {
+	collection_id_str := collectionId.String()
+	claim_id_str := claimId.String()
+	code_leaf_index_str := codeLeafIndex.String()
+	challenge_id_str := challengeId.String()
 	return collection_id_str + BalanceKeyDelimiter + claim_id_str + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + code_leaf_index_str
 }
 
-func ConstructUsedWhitelistIndexKey(collectionId uint64, claimId uint64, whitelistLeafIndex uint64) string {
-	collection_id_str := strconv.FormatUint(collectionId, 10)
-	claim_id_str := strconv.FormatUint(claimId, 10)
-	whitelist_leaf_index_str := strconv.FormatUint(whitelistLeafIndex, 10)
+func ConstructUsedWhitelistIndexKey(collectionId sdk.Uint, claimId sdk.Uint, whitelistLeafIndex sdk.Uint) string {
+	collection_id_str := collectionId.String()
+	claim_id_str := claimId.String()
+	whitelist_leaf_index_str := whitelistLeafIndex.String()
 	return collection_id_str + BalanceKeyDelimiter + claim_id_str + BalanceKeyDelimiter + whitelist_leaf_index_str
 }
 
-func ConstructUsedClaimAddressKey(collectionId uint64, claimId uint64, address string) string {
-	collection_id_str := strconv.FormatUint(collectionId, 10)
-	claim_id_str := strconv.FormatUint(claimId, 10)
+func ConstructUsedClaimAddressKey(collectionId sdk.Uint, claimId sdk.Uint, address string) string {
+	collection_id_str := collectionId.String()
+	claim_id_str := claimId.String()
 	return collection_id_str + BalanceKeyDelimiter + claim_id_str + BalanceKeyDelimiter + address
 }
 
 // Creates the transfer manager request key from an address and collectionId. Note this is not prefixed yet. It is just performing a delimited string concatenation.
-func ConstructTransferManagerRequestKey(collectionId uint64, address string) string {
-	collection_id_str := strconv.FormatUint(collectionId, 10)
+func ConstructTransferManagerRequestKey(collectionId sdk.Uint, address string) string {
+	collection_id_str := collectionId.String()
 	address_str := address
 	return collection_id_str + BalanceKeyDelimiter + address_str + BalanceKeyDelimiter
 }
@@ -95,9 +96,10 @@ func GetDetailsFromBalanceKey(id string) BalanceKeyDetails {
 	address := result[1]
 	collection_id, _ := strconv.ParseUint(result[0], 10, 64)
 
+
 	return BalanceKeyDetails{
 		address:   address,
-		collectionId: collection_id,
+		collectionId: sdk.NewUint(collection_id),
 	}
 }
 
@@ -108,18 +110,18 @@ func GetDetailsFromClaimKey(id string) ClaimKeyDetails {
 	
 
 	return ClaimKeyDetails{
-		claimId: claim_id,
-		collectionId: collection_id,
+		claimId:  sdk.NewUint(claim_id),
+		collectionId: sdk.NewUint(collection_id),
 	}
 }
 
 // Prefixer functions
 
 // collectionStoreKey returns the byte representation of the collection key ([]byte{0x01} + collectionId)
-func collectionStoreKey(collectionId uint64) []byte {
+func collectionStoreKey(collectionId sdk.Uint) []byte {
 	key := make([]byte, len(CollectionKey)+IDLength)
 	copy(key, CollectionKey)
-	copy(key[len(CollectionKey):], []byte(strconv.FormatUint(collectionId, 10)))
+	copy(key[len(CollectionKey):], []byte(collectionId.String()))
 	return key
 }
 

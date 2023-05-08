@@ -20,8 +20,8 @@ func SimulateMsgUpdatePermissions(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgUpdatePermissions{
 			Creator:      simAccount.Address.String(),
-			CollectionId: r.Uint64(),
-			Permissions:  r.Uint64(),
+			CollectionId: sdk.NewUint(r.Uint64()),
+			Permissions:  sdk.NewUint(r.Uint64()),
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

@@ -24,33 +24,33 @@ func SimulateMsgTransferBadge(
 			randomAccounts = append(randomAccounts, simAccount.Address.String())
 		}
 
-		randomAmounts := []uint64{}
+		randomAmounts := []sdk.Uint{}
 		for i := 0; i < r.Intn(10); i++ {
-			randomAmounts = append(randomAmounts, r.Uint64())
+			randomAmounts = append(randomAmounts, sdk.NewUint(r.Uint64()))
 		}
 
 		msg := &types.MsgTransferBadge{
 			Creator:      simAccount.Address.String(),
 			From:         simAccount.Address.String(),
-			CollectionId: r.Uint64(),
+			CollectionId: sdk.NewUint(r.Uint64()),
 			Transfers: []*types.Transfer{
 				{
 					ToAddresses: randomAccounts,
 					Balances: []*types.Balance{
 						{
-							Amount: r.Uint64(),
+							Amount: sdk.NewUint(r.Uint64()),
 							BadgeIds: []*types.IdRange{
 								{
-									Start: r.Uint64(),
-									End:   r.Uint64(),
+									Start: sdk.NewUint(r.Uint64()),
+									End:   sdk.NewUint(r.Uint64()),
 								},
 								{
-									Start: r.Uint64(),
-									End:   r.Uint64(),
+									Start: sdk.NewUint(r.Uint64()),
+									End:   sdk.NewUint(r.Uint64()),
 								},
 								{
-									Start: r.Uint64(),
-									End:   r.Uint64(),
+									Start: sdk.NewUint(r.Uint64()),
+									End:   sdk.NewUint(r.Uint64()),
 								},
 							},
 						},

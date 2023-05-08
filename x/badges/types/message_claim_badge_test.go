@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 )
@@ -25,8 +26,8 @@ func TestMsgClaimBadge_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: types.MsgClaimBadge{
 				Creator: sample.AccAddress(),
-				CollectionId: 1,
-				ClaimId: 1,
+				CollectionId: sdk.NewUint(1),
+				ClaimId: sdk.NewUint(1),
 				Solutions: []*types.ChallengeSolution{
 					{
 						Proof:  &types.ClaimProof{

@@ -19,7 +19,15 @@ message GenesisState {
     repeated string balanceStoreKeys = 5;
     repeated Claim claims = 6;
     repeated string claimStoreKeys = 7;
-    uint64 nextCollectionId = 8;
-    uint64 nextClaimId = 9;
+    string nextCollectionId = 8  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
+    string nextClaimId = 9  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+      
+    ];
     // this line is used by starport scaffolding # genesis/proto/state
 }

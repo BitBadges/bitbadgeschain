@@ -9,7 +9,7 @@ const TypeMsgUpdateBytes = "update_bytes"
 
 var _ sdk.Msg = &MsgUpdateBytes{}
 
-func NewMsgUpdateBytes(creator string, collectionId uint64, bytes string) *MsgUpdateBytes {
+func NewMsgUpdateBytes(creator string, collectionId sdk.Uint, bytes string) *MsgUpdateBytes {
 	return &MsgUpdateBytes{
 		Creator:      creator,
 		CollectionId: collectionId,
@@ -48,7 +48,7 @@ func (msg *MsgUpdateBytes) ValidateBasic() error {
 		return err
 	}
 
-	if msg.CollectionId == 0 {
+	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
 	}
 

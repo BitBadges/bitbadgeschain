@@ -9,7 +9,7 @@ const TypeMsgMintAndDistributeBadges = "mint_and_distribute_badge"
 
 var _ sdk.Msg = &MsgMintAndDistributeBadges{}
 
-func NewMsgMintAndDistributeBadges(creator string, collectionId uint64, supplysAndAmounts []*BadgeSupplyAndAmount, transfers []*Transfer, claims []*Claim, collectionUri string, badgeUris []*BadgeUri, balancesUri string) *MsgMintAndDistributeBadges {
+func NewMsgMintAndDistributeBadges(creator string, collectionId sdk.Uint, supplysAndAmounts []*BadgeSupplyAndAmount, transfers []*Transfer, claims []*Claim, collectionUri string, badgeUris []*BadgeUri, balancesUri string) *MsgMintAndDistributeBadges {
 	for _, transfer := range transfers {
 		for _, balance := range transfer.Balances {
 			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
@@ -69,23 +69,23 @@ func (msg *MsgMintAndDistributeBadges) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.CollectionId == 0 {
+	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
 	}
 
-	amounts := make([]uint64, len(msg.BadgeSupplys))
-	supplys := make([]uint64, len(msg.BadgeSupplys))
+	amounts := make([]sdk.Uint, len(msg.BadgeSupplys))
+	supplys := make([]sdk.Uint, len(msg.BadgeSupplys))
 	for i, subasset := range msg.BadgeSupplys {
 		amounts[i] = subasset.Amount
 		supplys[i] = subasset.Supply
 	}
 
-	err = ValidateNoElementIsX(amounts, 0)
+	err = ValidateNoElementIsX(amounts, sdk.NewUint(0))
 	if err != nil {
 		return err
 	}
 
-	err = ValidateNoElementIsX(supplys, 0)
+	err = ValidateNoElementIsX(supplys, sdk.NewUint(0))
 	if err != nil {
 		return err
 	}

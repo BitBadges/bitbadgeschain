@@ -9,7 +9,7 @@ const TypeMsgRequestTransferManager = "request_transfer_manager"
 
 var _ sdk.Msg = &MsgRequestTransferManager{}
 
-func NewMsgRequestTransferManager(creator string, collectionId uint64, addRequest bool) *MsgRequestTransferManager {
+func NewMsgRequestTransferManager(creator string, collectionId sdk.Uint, addRequest bool) *MsgRequestTransferManager {
 	return &MsgRequestTransferManager{
 		Creator:      creator,
 		CollectionId: collectionId,
@@ -44,7 +44,7 @@ func (msg *MsgRequestTransferManager) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.CollectionId == 0 {
+	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
 	}
 	return nil

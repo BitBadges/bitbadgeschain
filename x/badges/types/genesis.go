@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/cosmos/cosmos-sdk/types"
 	host "github.com/cosmos/ibc-go/v5/modules/core/24-host"
 	// this line is used by starport scaffolding # genesis/types/import
 )
@@ -14,8 +15,8 @@ func DefaultGenesis() *GenesisState {
 		PortId: PortID,
 		// this line is used by starport scaffolding # genesis/types/default
 		Params:           DefaultParams(),
-		NextCollectionId: 1,
-		NextClaimId:      1,
+		NextCollectionId: types.NewUint(1),
+		NextClaimId:      types.NewUint(1),
 		Collections:      []*BadgeCollection{},
 		Balances:         []*UserBalanceStore{},
 		BalanceStoreKeys: []string{},

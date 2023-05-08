@@ -20,19 +20,19 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 62,
+				Permissions: sdk.NewUint(62),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: 0,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{},
@@ -42,46 +42,46 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 					
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
-	badge, _ := GetCollection(suite, wctx, 1)
+	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 
 	//Create badge 1 with supply > 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 1,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(1),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
-	badge, _ = GetCollection(suite, wctx, 1)
-	bobbalance, _ := GetUserBalance(suite, wctx, 1, bob)
+	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+	bobbalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), bob)
 
-	suite.Require().Equal(uint64(2), badge.NextBadgeId)
+	suite.Require().Equal(sdk.NewUint(2), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-			Amount:  10000,
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
+			Amount: sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
-	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
-	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
+	suite.Require().Equal(sdk.NewUint(10000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 5000,
+					Amount: sdk.NewUint(5000),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 1,
-							End:   1,
+							Start: sdk.NewUint(1),
+							End:   sdk.NewUint(1),
 						},
 					},
 				},
@@ -91,14 +91,14 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 
 	suite.Require().Nil(err, "Error transferring badge")
 
-	bobbalance, _ = GetUserBalance(suite, wctx, 1, bob)
-	fetchedBalance, err = keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
-	suite.Require().Equal(uint64(5000), fetchedBalance[0].Amount)
+	bobbalance, _ = GetUserBalance(suite, wctx, sdk.NewUint(1), bob)
+	fetchedBalance, err = keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
+	suite.Require().Equal(sdk.NewUint(5000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	alicebalance, _ := GetUserBalance(suite, wctx, 1, alice)
-	fetchedBalance, err = keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, alicebalance.Balances)
-	suite.Require().Equal(uint64(5000), fetchedBalance[0].Amount)
+	alicebalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), alice)
+	fetchedBalance, err = keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, alicebalance.Balances)
+	suite.Require().Equal(sdk.NewUint(5000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 }
 
@@ -114,19 +114,19 @@ func (suite *TestSuite) TestApprovalsApproved() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 62,
+				Permissions: sdk.NewUint(62),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: 0,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{},
@@ -135,57 +135,57 @@ func (suite *TestSuite) TestApprovalsApproved() {
 					},
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
-	badge, _ := GetCollection(suite, wctx, 1)
+	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 
 	//Create badge 1 with supply > 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 1,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(1),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
-	badge, _ = GetCollection(suite, wctx, 1)
-	bobbalance, _ := GetUserBalance(suite, wctx, 1, bob)
+	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+	bobbalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), bob)
 
-	suite.Require().Equal(uint64(2), badge.NextBadgeId)
+	suite.Require().Equal(sdk.NewUint(2), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-			Amount:  10000,
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
+			Amount: sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
-	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
-	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
+	suite.Require().Equal(sdk.NewUint(10000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = SetApproval(suite, wctx, bob, alice, 1, []*types.Balance{
+	err = SetApproval(suite, wctx, bob, alice, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount:  1000000,
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
+			Amount:  sdk.NewUint(1000000),
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
 	suite.Require().Nil(err, "Error setting approval")
 
-	bobbalance, _ = GetUserBalance(suite, wctx, 1, bob)
-	// suite.Require().Equal(uint64(1000000-5000), bobbalance.Approvals[0].Amount)
+	bobbalance, _ = GetUserBalance(suite, wctx, sdk.NewUint(1), bob)
+	// suite.Require().Equal(sdk.NewUint(1000000-5000), bobbalance.Approvals[0].Amount)
 
-	err = TransferBadge(suite, wctx, alice, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, alice, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 5000,
+					Amount: sdk.NewUint(5000),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 1,
-							End:   1,
+							Start: sdk.NewUint(1),
+							End:   sdk.NewUint(1),
 						},
 					},
 				},
@@ -194,8 +194,8 @@ func (suite *TestSuite) TestApprovalsApproved() {
 	})
 	suite.Require().Nil(err, "Error transferring badge")
 
-	bobbalance, _ = GetUserBalance(suite, wctx, 1, bob)
-	suite.Require().Equal(uint64(1000000-5000), bobbalance.Approvals[0].Balances[0].Amount)
+	bobbalance, _ = GetUserBalance(suite, wctx, sdk.NewUint(1), bob)
+	suite.Require().Equal(sdk.NewUint(1000000-5000), bobbalance.Approvals[0].Balances[0].Amount)
 }
 
 func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
@@ -210,19 +210,19 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 62,
+				Permissions: sdk.NewUint(62),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: 0,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{},
@@ -232,54 +232,54 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 					
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
-	badge, _ := GetCollection(suite, wctx, 1)
+	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 
 	//Create badge 1 with supply > 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 1,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(1),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
-	badge, _ = GetCollection(suite, wctx, 1)
-	bobbalance, _ := GetUserBalance(suite, wctx, 1, bob)
+	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+	bobbalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), bob)
 
-	suite.Require().Equal(uint64(2), badge.NextBadgeId)
+	suite.Require().Equal(sdk.NewUint(2), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-			Amount:  10000,
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
+			Amount: sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
-	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
-	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
+	suite.Require().Equal(sdk.NewUint(10000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = SetApproval(suite, wctx, bob, alice, 1, []*types.Balance{
+	err = SetApproval(suite, wctx, bob, alice, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount:  10,
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
+			Amount: sdk.NewUint(10),
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
 	suite.Require().Nil(err, "Error setting approval")
 
-	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, charlie, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 5000,
+					Amount: sdk.NewUint(5000),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 1,
-							End:   1,
+							Start: sdk.NewUint(1),
+							End:   sdk.NewUint(1),
 						},
 					},
 				},
@@ -301,19 +301,19 @@ func (suite *TestSuite) TestApprovalsNotApprovedAtAll() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 62,
+				Permissions: sdk.NewUint(62),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: 0,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{},
@@ -323,46 +323,46 @@ func (suite *TestSuite) TestApprovalsNotApprovedAtAll() {
 					
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
-	badge, _ := GetCollection(suite, wctx, 1)
+	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 
 	//Create badge 1 with supply > 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 1,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(1),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
-	badge, _ = GetCollection(suite, wctx, 1)
-	bobbalance, _ := GetUserBalance(suite, wctx, 1, bob)
+	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+	bobbalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), bob)
 
-	suite.Require().Equal(uint64(2), badge.NextBadgeId)
+	suite.Require().Equal(sdk.NewUint(2), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-			Amount:  10000,
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
+			Amount: sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
-	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
-	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
+	suite.Require().Equal(sdk.NewUint(10000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, charlie, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 5000,
+					Amount: sdk.NewUint(5000),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 1,
-							End:   1,
+							Start: sdk.NewUint(1),
+							End:   sdk.NewUint(1),
 						},
 					},
 				},
@@ -384,19 +384,19 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 62,
+				Permissions: sdk.NewUint(62),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: 0,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{},
@@ -406,54 +406,54 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 					
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
-	badge, _ := GetCollection(suite, wctx, 1)
+	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 
 	//Create badge 1 with supply > 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 1,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(1),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
-	badge, _ = GetCollection(suite, wctx, 1)
-	bobbalance, _ := GetUserBalance(suite, wctx, 1, bob)
+	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+	bobbalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), bob)
 
-	suite.Require().Equal(uint64(2), badge.NextBadgeId)
+	suite.Require().Equal(sdk.NewUint(2), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-			Amount:  10000,
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
+			Amount: sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
-	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
-	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
+	suite.Require().Equal(sdk.NewUint(10000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = SetApproval(suite, wctx, bob, charlie, 1, []*types.Balance{
+	err = SetApproval(suite, wctx, bob, charlie, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount:  10,
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
+			Amount: sdk.NewUint(10),
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
 	suite.Require().Nil(err, "Error setting approval")
 
-	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, charlie, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 5000,
+					Amount: sdk.NewUint(5000),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 1,
-							End:   1,
+							Start: sdk.NewUint(1),
+							End:   sdk.NewUint(1),
 						},
 					},
 				},
@@ -475,19 +475,19 @@ func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 62,
+				Permissions: sdk.NewUint(62),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: 0,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{},
@@ -497,54 +497,54 @@ func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 					
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
-	badge, _ := GetCollection(suite, wctx, 1)
+	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 
 	//Create badge 1 with supply > 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 1,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(1),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
-	badge, _ = GetCollection(suite, wctx, 1)
-	bobbalance, _ := GetUserBalance(suite, wctx, 1, bob)
+	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+	bobbalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), bob)
 
-	suite.Require().Equal(uint64(2), badge.NextBadgeId)
+	suite.Require().Equal(sdk.NewUint(2), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-			Amount:  10000,
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
+			Amount: sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
-	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
-	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
+	suite.Require().Equal(sdk.NewUint(10000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = SetApproval(suite, wctx, bob, charlie, 1, []*types.Balance{
+	err = SetApproval(suite, wctx, bob, charlie, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount:  10,
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
+			Amount: sdk.NewUint(10),
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
 	suite.Require().Nil(err, "Error setting approval")
 
-	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, charlie, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 1,
-							End:   1,
+							Start: sdk.NewUint(1),
+							End:   sdk.NewUint(1),
 						},
 					},
 				},
@@ -566,19 +566,19 @@ func (suite *TestSuite) TestApprovalOverflow() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 46,
+				Permissions: sdk.NewUint(46),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: 0,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{},
@@ -588,54 +588,54 @@ func (suite *TestSuite) TestApprovalOverflow() {
 					
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
-	badge, _ := GetCollection(suite, wctx, 1)
+	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 
 	//Create badge 1 with supply > 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 1,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(1),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
-	badge, _ = GetCollection(suite, wctx, 1)
-	bobbalance, _ := GetUserBalance(suite, wctx, 1, bob)
+	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+	bobbalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), bob)
 
-	suite.Require().Equal(uint64(2), badge.NextBadgeId)
+	suite.Require().Equal(sdk.NewUint(2), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-			Amount:  10000,
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
+			Amount: sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
-	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
-	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
+	suite.Require().Equal(sdk.NewUint(10000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = SetApproval(suite, wctx, bob, charlie, 1, []*types.Balance{
+	err = SetApproval(suite, wctx, bob, charlie, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount:  math.MaxUint64,
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
+			Amount:  sdk.NewUint(math.MaxUint64),
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
 	suite.Require().Nil(err, "Error setting approval")
 
-	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, charlie, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 1,
-							End:   1,
+							Start: sdk.NewUint(1),
+							End:   sdk.NewUint(1),
 						},
 					},
 				},
@@ -644,15 +644,15 @@ func (suite *TestSuite) TestApprovalOverflow() {
 	})
 	suite.Require().Nil(err, "Error transferring valid approved")
 
-	err = SetApproval(suite, wctx, bob, charlie, 1, []*types.Balance{
+	err = SetApproval(suite, wctx, bob, charlie, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount:  math.MaxUint64,
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
+			Amount:  sdk.NewUint(math.MaxUint64),
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
 	suite.Require().Nil(err, "Error setting approval")
 
-	// err = HandlePendingTransfers(suite, wctx, bob, 0, []*types.IdRange{{Start: 1, End: 1}}, []uint64{0})
+	// err = HandlePendingTransfers(suite, wctx, bob, sdk.NewUint(0), []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, []uint64{0})
 	// suite.Require().Nil(err, "Error setting approval")
 }
 
@@ -668,19 +668,19 @@ func (suite *TestSuite) TestTransferUnderflowNotEnoughBalance() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 46,
+				Permissions: sdk.NewUint(46),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: 0,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{},
@@ -690,45 +690,45 @@ func (suite *TestSuite) TestTransferUnderflowNotEnoughBalance() {
 					
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
-	badge, _ := GetCollection(suite, wctx, 1)
+	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 
 	//Create badge 1 with supply > 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 1,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(1),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
-	badge, _ = GetCollection(suite, wctx, 1)
-	bobbalance, _ := GetUserBalance(suite, wctx, 1, bob)
+	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+	bobbalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), bob)
 
-	suite.Require().Equal(uint64(2), badge.NextBadgeId)
+	suite.Require().Equal(sdk.NewUint(2), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}},
-			Amount:  10000,
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
+			Amount: sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
-	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
-	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
+	suite.Require().Equal(sdk.NewUint(10000), fetchedBalance[0].Amount)
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: math.MaxUint64,
+					Amount: sdk.NewUint(math.MaxUint64),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 1,
-							End:   1,
+							Start: sdk.NewUint(1),
+							End:   sdk.NewUint(1),
 						},
 					},
 				},
@@ -750,19 +750,19 @@ func (suite *TestSuite) TestPendingTransferUnderflowNotEnoughBalance() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 62,
+				Permissions: sdk.NewUint(62),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: 0,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{},
@@ -772,46 +772,46 @@ func (suite *TestSuite) TestPendingTransferUnderflowNotEnoughBalance() {
 					
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
-	badge, _ := GetCollection(suite, wctx, 1)
+	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 
 	//Create badge 1 with supply > 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 1,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(1),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
-	badge, _ = GetCollection(suite, wctx, 1)
-	bobbalance, _ := GetUserBalance(suite, wctx, 1, bob)
+	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+	bobbalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), bob)
 
-	suite.Require().Equal(uint64(2), badge.NextBadgeId)
+	suite.Require().Equal(sdk.NewUint(2), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-			Amount:  10000,
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
+			Amount: sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
-	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
-	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
+	suite.Require().Equal(sdk.NewUint(10000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: math.MaxUint64,
+					Amount: sdk.NewUint(math.MaxUint64),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 1,
-							End:   1,
+							Start: sdk.NewUint(1),
+							End:   sdk.NewUint(1),
 						},
 					},
 				},
@@ -833,19 +833,19 @@ func (suite *TestSuite) TestTransferInvalidBadgeIdRanges() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 46,
+				Permissions: sdk.NewUint(46),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: 0,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{},
@@ -855,45 +855,45 @@ func (suite *TestSuite) TestTransferInvalidBadgeIdRanges() {
 					
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
-	badge, _ := GetCollection(suite, wctx, 1)
+	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 
 	//Create badge 1 with supply > 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 1,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(1),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badge")
-	badge, _ = GetCollection(suite, wctx, 1)
-	bobbalance, _ := GetUserBalance(suite, wctx, 1, bob)
+	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+	bobbalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), bob)
 
-	suite.Require().Equal(uint64(2), badge.NextBadgeId)
+	suite.Require().Equal(sdk.NewUint(2), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: 1, End: 1}}, //0 to 0 range so it will be nil
-			Amount:  10000,
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
+			Amount: sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
-	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: 1, End: 1}}, bobbalance.Balances)
-	suite.Require().Equal(uint64(10000), fetchedBalance[0].Amount)
+	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
+	suite.Require().Equal(sdk.NewUint(10000), fetchedBalance[0].Amount)
 
-	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, charlie, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 10,
-							End:   1,
+							Start: sdk.NewUint(10),
+							End:   sdk.NewUint(1),
 						},
 					},
 				},
@@ -902,16 +902,16 @@ func (suite *TestSuite) TestTransferInvalidBadgeIdRanges() {
 	})
 	suite.Require().EqualError(err, keeper.ErrInvalidBadgeRange.Error())
 
-	err = TransferBadge(suite, wctx, charlie, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, charlie, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 0,
-							End:   math.MaxUint64,
+							Start: sdk.NewUint(0),
+							End:   sdk.NewUint(math.MaxUint64),
 						},
 					},
 				},
@@ -933,19 +933,19 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 46,
+				Permissions: sdk.NewUint(46),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: 0,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{},
@@ -956,7 +956,7 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 				},
 				
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
@@ -964,24 +964,24 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 	CreateCollections(suite, wctx, collectionsToCreate)
 
 	//Create badge 1 with supply > 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 10000,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(10000),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badges")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 1,
-							End:   500,
+							Start: sdk.NewUint(1),
+							End:   sdk.NewUint(500),
 						},
 					},
 				},
@@ -990,16 +990,16 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 501,
-							End:   1000,
+							Start: sdk.NewUint(501),
+							End:   sdk.NewUint(1000),
 						},
 					},
 				},
@@ -1008,16 +1008,16 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 500,
-							End:   500,
+							Start: sdk.NewUint(500),
+							End:   sdk.NewUint(500),
 						},
 					},
 				},
@@ -1039,19 +1039,19 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 46,
+				Permissions: sdk.NewUint(46),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: 0,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{},
@@ -1061,7 +1061,7 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 					
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
@@ -1069,24 +1069,24 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 	CreateCollections(suite, wctx, collectionsToCreate)
 
 	//Create badge 1 with supply > 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 10000,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(10000),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badges")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 501,
-							End:   1000,
+							Start: sdk.NewUint(501),
+							End:   sdk.NewUint(1000),
 						},
 					},
 				},
@@ -1095,16 +1095,16 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 500,
-							End:   500,
+							Start: sdk.NewUint(500),
+							End:   sdk.NewUint(500),
 						},
 					},
 				},
@@ -1126,19 +1126,19 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
 							{
-								Start: 1,
-								End:   math.MaxUint64,
+								Start: sdk.NewUint(1),
+								End:   sdk.NewUint(math.MaxUint64),
 							},
 						},
 					},
 				},
-				Permissions: 46,
+				Permissions: sdk.NewUint(46),
 				AllowedTransfers: []*types.TransferMapping{
 					{
 						From: &types.AddressesMapping{
 							Addresses: []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: 0,
+							ManagerOptions: sdk.NewUint(0),
 						},
 						To: &types.AddressesMapping{
 							Addresses: []string{},
@@ -1148,7 +1148,7 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 					
 				},
 			},
-			Amount:  1,
+			Amount:  sdk.NewUint(1),
 			Creator: bob,
 		},
 	}
@@ -1156,24 +1156,24 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	CreateCollections(suite, wctx, collectionsToCreate)
 
 	//Create badge 1 with supply > 1
-	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, 1, []*types.BadgeSupplyAndAmount{
+	err := CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
 		{
-			Supply: 10000,
-			Amount: 10000,
+			Supply: sdk.NewUint(10000),
+			Amount: sdk.NewUint(10000),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badges")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 1,
-							End:   100,
+							Start: sdk.NewUint(1),
+							End:   sdk.NewUint(100),
 						},
 					},
 				},
@@ -1182,16 +1182,16 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 200,
-							End:   300,
+							Start: sdk.NewUint(200),
+							End:   sdk.NewUint(300),
 						},
 					},
 				},
@@ -1200,16 +1200,16 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 400,
-							End:   500,
+							Start: sdk.NewUint(400),
+							End:   sdk.NewUint(500),
 						},
 					},
 				},
@@ -1218,16 +1218,16 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 600,
-							End:   700,
+							Start: sdk.NewUint(600),
+							End:   sdk.NewUint(700),
 						},
 					},
 				},
@@ -1236,16 +1236,16 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 800,
-							End:   900,
+							Start: sdk.NewUint(800),
+							End:   sdk.NewUint(8900),
 						},
 					},
 				},
@@ -1254,16 +1254,16 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 1000,
-							End:   1100,
+							Start: sdk.NewUint(1000),
+							End:   sdk.NewUint(1100),
 						},
 					},
 				},
@@ -1272,16 +1272,16 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 150,
-							End:   150,
+							Start: sdk.NewUint(150),
+							End:   sdk.NewUint(150),
 						},
 					},
 				},
@@ -1290,16 +1290,16 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	})
 	suite.Require().Nil(err, "Error transfering badge")
 
-	err = TransferBadge(suite, wctx, bob, 1, bob, []*types.Transfer{
+	err = TransferBadge(suite, wctx, bob, sdk.NewUint(1), bob, []*types.Transfer{
 		{
 			ToAddresses: []string{alice},
 			Balances: []*types.Balance{
 				{
-					Amount: 10,
+					Amount: sdk.NewUint(10),
 					BadgeIds: []*types.IdRange{
 						{
-							Start: 950,
-							End:   950,
+							Start: sdk.NewUint(950),
+							End:   sdk.NewUint(950),
 						},
 					},
 				},

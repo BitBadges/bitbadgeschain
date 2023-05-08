@@ -206,7 +206,6 @@ paths:
           in: path
           required: true
           type: string
-          format: uint64
       tags:
         - Query
   /bitbadges/bitbadgeschain/badges/get_balance/{collectionId}/{address}:
@@ -231,7 +230,6 @@ paths:
                       properties:
                         amount:
                           type: string
-                          format: uint64
                         badgeIds:
                           type: array
                           items:
@@ -239,10 +237,8 @@ paths:
                             properties:
                               start:
                                 type: string
-                                format: uint64
                               end:
                                 type: string
-                                format: uint64
                             description: >-
                               Id ranges define a range of IDs from start to end.
                               Can be used for badge IDs, nonces, anything.
@@ -264,7 +260,6 @@ paths:
                             properties:
                               amount:
                                 type: string
-                                format: uint64
                               badgeIds:
                                 type: array
                                 items:
@@ -272,10 +267,8 @@ paths:
                                   properties:
                                     start:
                                       type: string
-                                      format: uint64
                                     end:
                                       type: string
-                                      format: uint64
                                   description: >-
                                     Id ranges define a range of IDs from start
                                     to end. Can be used for badge IDs, nonces,
@@ -481,7 +474,6 @@ paths:
           in: path
           required: true
           type: string
-          format: uint64
         - name: address
           in: path
           required: true
@@ -501,14 +493,13 @@ paths:
               claim:
                 type: object
                 properties:
-                  balances:
+                  undistributedBalances:
                     type: array
                     items:
                       type: object
                       properties:
                         amount:
                           type: string
-                          format: uint64
                         badgeIds:
                           type: array
                           items:
@@ -516,10 +507,8 @@ paths:
                             properties:
                               start:
                                 type: string
-                                format: uint64
                               end:
                                 type: string
-                                format: uint64
                             description: >-
                               Id ranges define a range of IDs from start to end.
                               Can be used for badge IDs, nonces, anything.
@@ -527,55 +516,66 @@ paths:
                         Defines a balance object. The specified balance holds
                         for all ids specified within the id ranges array.
                     description: Current balance of the claim store.
-                  codeRoot:
-                    type: string
-                  expectedMerkleProofLength:
-                    type: string
-                    format: uint64
-                  whitelistRoot:
-                    type: string
-                  incrementIdsBy:
-                    type: string
-                    format: uint64
-                  amount:
-                    type: string
-                    format: uint64
-                  badgeIds:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        start:
-                          type: string
-                          format: uint64
-                        end:
-                          type: string
-                          format: uint64
-                      description: >-
-                        Id ranges define a range of IDs from start to end. Can
-                        be used for badge IDs, nonces, anything.
-                  restrictOptions:
-                    type: string
-                    format: uint64
-                    title: >-
-                      enum: 0 = no restrictions (can mint multiple times), 1 =
-                      whitelist leafs can only be used once, 2 = one claim per
-                      account
-                  uri:
-                    type: string
-                    title: >-
-                      Optional URI for the claim. Max 100 chars. To be used for
-                      IPFS Merkle Tree Information
                   timeRange:
                     description: Time range when the claim is valid.
                     type: object
                     properties:
                       start:
                         type: string
-                        format: uint64
                       end:
                         type: string
-                        format: uint64
+                  uri:
+                    type: string
+                    title: >-
+                      Optional URI for the claim. Max 100 chars. Often used for
+                      IPFS Merkle Tree Information for challenges
+                  numClaimsPerAddress:
+                    type: string
+                    description: >-
+                      If >0, then the claim can only be used to claim this
+                      number of leaves per address. If 0, then no limit.
+                  incrementIdsBy:
+                    type: string
+                    title: Balances for the current claim
+                  currentClaimAmounts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        amount:
+                          type: string
+                        badgeIds:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              start:
+                                type: string
+                              end:
+                                type: string
+                            description: >-
+                              Id ranges define a range of IDs from start to end.
+                              Can be used for badge IDs, nonces, anything.
+                      description: >-
+                        Defines a balance object. The specified balance holds
+                        for all ids specified within the id ranges array.
+                  challenges:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        root:
+                          type: string
+                        expectedProofLength:
+                          type: string
+                        useCreatorAddressAsLeaf:
+                          type: boolean
+                      title: >-
+                        We will add more fields to this message later (e.g. ZKP
+                        proofs)
+                    description: >-
+                      Challenges for the claim. If empty, then no challenges are
+                      required.
                 description: >-
                   Defines a claim object. Claims are used to transfer badges via
                   a claiming process.
@@ -772,12 +772,10 @@ paths:
           in: path
           required: true
           type: string
-          format: uint64
         - name: claimId
           in: path
           required: true
           type: string
-          format: uint64
       tags:
         - Query
   /bitbadges/bitbadgeschain/badges/get_collection/{collectionId}:
@@ -795,7 +793,6 @@ paths:
                 properties:
                   collectionId:
                     type: string
-                    format: uint64
                     description: >-
                       The collectionId defines the unique identifier of the
                       BadgeCollection classification, similar to the contract
@@ -822,10 +819,8 @@ paths:
                             properties:
                               start:
                                 type: string
-                                format: uint64
                               end:
                                 type: string
-                                format: uint64
                             description: >-
                               Id ranges define a range of IDs from start to end.
                               Can be used for badge IDs, nonces, anything.
@@ -870,7 +865,6 @@ paths:
                       permissions.
                   permissions:
                     type: string
-                    format: uint64
                     description: >-
                       Store permissions packed in a uint where the bits
                       correspond to certain permissions.
@@ -892,7 +886,6 @@ paths:
                               type: boolean
                             managerOptions:
                               type: string
-                              format: uint64
                         to:
                           type: object
                           properties:
@@ -904,7 +897,6 @@ paths:
                               type: boolean
                             managerOptions:
                               type: string
-                              format: uint64
                       description: >-
                         TransferMapping defines a mapping of transfers from one
                         set of addresses to another.
@@ -938,7 +930,6 @@ paths:
                               type: boolean
                             managerOptions:
                               type: string
-                              format: uint64
                         to:
                           type: object
                           properties:
@@ -950,7 +941,6 @@ paths:
                               type: boolean
                             managerOptions:
                               type: string
-                              format: uint64
                       description: >-
                         TransferMapping defines a mapping of transfers from one
                         set of addresses to another.
@@ -969,7 +959,6 @@ paths:
                          the manager can transfer any badge from the "to" account to the "from" account
                   nextBadgeId:
                     type: string
-                    format: uint64
                     description: >-
                       Badge ids start at 1. Each badge created will increment
                       this by 1. Can't overflow.
@@ -980,7 +969,6 @@ paths:
                       properties:
                         amount:
                           type: string
-                          format: uint64
                         badgeIds:
                           type: array
                           items:
@@ -988,10 +976,8 @@ paths:
                             properties:
                               start:
                                 type: string
-                                format: uint64
                               end:
                                 type: string
-                                format: uint64
                             description: >-
                               Id ranges define a range of IDs from start to end.
                               Can be used for badge IDs, nonces, anything.
@@ -1011,7 +997,6 @@ paths:
                       properties:
                         amount:
                           type: string
-                          format: uint64
                         badgeIds:
                           type: array
                           items:
@@ -1019,10 +1004,8 @@ paths:
                             properties:
                               start:
                                 type: string
-                                format: uint64
                               end:
                                 type: string
-                                format: uint64
                             description: >-
                               Id ranges define a range of IDs from start to end.
                               Can be used for badge IDs, nonces, anything.
@@ -1032,7 +1015,6 @@ paths:
                     description: This is a map of the maximum badge supplys by ID.
                   nextClaimId:
                     type: string
-                    format: uint64
                     description: >-
                       Keeps track of the next claim id. Claim ids start at 1. 
 
@@ -1043,7 +1025,6 @@ paths:
                       frequently written to.
                   standard:
                     type: string
-                    format: uint64
                     description: >-
                       Defines what standard this badge should implement (see
                       standards documentation).
@@ -1238,7 +1219,6 @@ paths:
           in: path
           required: true
           type: string
-          format: uint64
       tags:
         - Query
   /bitbadges/bitbadgeschain/badges/is_claim_data_used/{collectionId}/{claimId}/{claimData}:
@@ -1443,12 +1423,10 @@ paths:
           in: path
           required: true
           type: string
-          format: uint64
         - name: claimId
           in: path
           required: true
           type: string
-          format: uint64
         - name: claimData
           in: path
           required: true
@@ -47706,7 +47684,6 @@ definitions:
         type: boolean
       managerOptions:
         type: string
-        format: uint64
   bitbadges.bitbadgeschain.badges.Approval:
     type: object
     properties:
@@ -47719,7 +47696,6 @@ definitions:
           properties:
             amount:
               type: string
-              format: uint64
             badgeIds:
               type: array
               items:
@@ -47727,10 +47703,8 @@ definitions:
                 properties:
                   start:
                     type: string
-                    format: uint64
                   end:
                     type: string
-                    format: uint64
                 description: >-
                   Id ranges define a range of IDs from start to end. Can be used
                   for badge IDs, nonces, anything.
@@ -47744,7 +47718,6 @@ definitions:
     properties:
       collectionId:
         type: string
-        format: uint64
         description: >-
           The collectionId defines the unique identifier of the BadgeCollection
           classification, similar to the contract address of ERC721.
@@ -47768,10 +47741,8 @@ definitions:
                 properties:
                   start:
                     type: string
-                    format: uint64
                   end:
                     type: string
-                    format: uint64
                 description: >-
                   Id ranges define a range of IDs from start to end. Can be used
                   for badge IDs, nonces, anything.
@@ -47810,7 +47781,6 @@ definitions:
         description: The manager's address. The manager can be granted special permissions.
       permissions:
         type: string
-        format: uint64
         description: >-
           Store permissions packed in a uint where the bits correspond to
           certain permissions.
@@ -47832,7 +47802,6 @@ definitions:
                   type: boolean
                 managerOptions:
                   type: string
-                  format: uint64
             to:
               type: object
               properties:
@@ -47844,7 +47813,6 @@ definitions:
                   type: boolean
                 managerOptions:
                   type: string
-                  format: uint64
           description: >-
             TransferMapping defines a mapping of transfers from one set of
             addresses to another.
@@ -47876,7 +47844,6 @@ definitions:
                   type: boolean
                 managerOptions:
                   type: string
-                  format: uint64
             to:
               type: object
               properties:
@@ -47888,7 +47855,6 @@ definitions:
                   type: boolean
                 managerOptions:
                   type: string
-                  format: uint64
           description: >-
             TransferMapping defines a mapping of transfers from one set of
             addresses to another.
@@ -47906,7 +47872,6 @@ definitions:
              the manager can transfer any badge from the "to" account to the "from" account
       nextBadgeId:
         type: string
-        format: uint64
         description: >-
           Badge ids start at 1. Each badge created will increment this by 1.
           Can't overflow.
@@ -47917,7 +47882,6 @@ definitions:
           properties:
             amount:
               type: string
-              format: uint64
             badgeIds:
               type: array
               items:
@@ -47925,10 +47889,8 @@ definitions:
                 properties:
                   start:
                     type: string
-                    format: uint64
                   end:
                     type: string
-                    format: uint64
                 description: >-
                   Id ranges define a range of IDs from start to end. Can be used
                   for badge IDs, nonces, anything.
@@ -47947,7 +47909,6 @@ definitions:
           properties:
             amount:
               type: string
-              format: uint64
             badgeIds:
               type: array
               items:
@@ -47955,10 +47916,8 @@ definitions:
                 properties:
                   start:
                     type: string
-                    format: uint64
                   end:
                     type: string
-                    format: uint64
                 description: >-
                   Id ranges define a range of IDs from start to end. Can be used
                   for badge IDs, nonces, anything.
@@ -47968,7 +47927,6 @@ definitions:
         description: This is a map of the maximum badge supplys by ID.
       nextClaimId:
         type: string
-        format: uint64
         description: >-
           Keeps track of the next claim id. Claim ids start at 1. 
 
@@ -47978,7 +47936,6 @@ definitions:
           written to.
       standard:
         type: string
-        format: uint64
         description: >-
           Defines what standard this badge should implement (see standards
           documentation).
@@ -47988,10 +47945,8 @@ definitions:
     properties:
       supply:
         type: string
-        format: uint64
       amount:
         type: string
-        format: uint64
     description: >-
       BadgeSupplyAndAmount is used to define the supply and amount of badges to
       create.
@@ -48009,10 +47964,8 @@ definitions:
           properties:
             start:
               type: string
-              format: uint64
             end:
               type: string
-              format: uint64
           description: >-
             Id ranges define a range of IDs from start to end. Can be used for
             badge IDs, nonces, anything.
@@ -48027,7 +47980,6 @@ definitions:
     properties:
       amount:
         type: string
-        format: uint64
       badgeIds:
         type: array
         items:
@@ -48035,27 +47987,52 @@ definitions:
           properties:
             start:
               type: string
-              format: uint64
             end:
               type: string
-              format: uint64
           description: >-
             Id ranges define a range of IDs from start to end. Can be used for
             badge IDs, nonces, anything.
     description: >-
       Defines a balance object. The specified balance holds for all ids
       specified within the id ranges array.
+  bitbadges.bitbadgeschain.badges.Challenge:
+    type: object
+    properties:
+      root:
+        type: string
+      expectedProofLength:
+        type: string
+      useCreatorAddressAsLeaf:
+        type: boolean
+    title: We will add more fields to this message later (e.g. ZKP proofs)
+  bitbadges.bitbadgeschain.badges.ChallengeSolution:
+    type: object
+    properties:
+      proof:
+        type: object
+        properties:
+          leaf:
+            type: string
+          aunts:
+            type: array
+            items:
+              type: object
+              properties:
+                aunt:
+                  type: string
+                onRight:
+                  type: boolean
+        title: Consistent with tendermint/crypto merkle tree
   bitbadges.bitbadgeschain.badges.Claim:
     type: object
     properties:
-      balances:
+      undistributedBalances:
         type: array
         items:
           type: object
           properties:
             amount:
               type: string
-              format: uint64
             badgeIds:
               type: array
               items:
@@ -48063,10 +48040,8 @@ definitions:
                 properties:
                   start:
                     type: string
-                    format: uint64
                   end:
                     type: string
-                    format: uint64
                 description: >-
                   Id ranges define a range of IDs from start to end. Can be used
                   for badge IDs, nonces, anything.
@@ -48074,54 +48049,62 @@ definitions:
             Defines a balance object. The specified balance holds for all ids
             specified within the id ranges array.
         description: Current balance of the claim store.
-      codeRoot:
-        type: string
-      expectedMerkleProofLength:
-        type: string
-        format: uint64
-      whitelistRoot:
-        type: string
-      incrementIdsBy:
-        type: string
-        format: uint64
-      amount:
-        type: string
-        format: uint64
-      badgeIds:
-        type: array
-        items:
-          type: object
-          properties:
-            start:
-              type: string
-              format: uint64
-            end:
-              type: string
-              format: uint64
-          description: >-
-            Id ranges define a range of IDs from start to end. Can be used for
-            badge IDs, nonces, anything.
-      restrictOptions:
-        type: string
-        format: uint64
-        title: >-
-          enum: 0 = no restrictions (can mint multiple times), 1 = whitelist
-          leafs can only be used once, 2 = one claim per account
-      uri:
-        type: string
-        title: >-
-          Optional URI for the claim. Max 100 chars. To be used for IPFS Merkle
-          Tree Information
       timeRange:
         description: Time range when the claim is valid.
         type: object
         properties:
           start:
             type: string
-            format: uint64
           end:
             type: string
-            format: uint64
+      uri:
+        type: string
+        title: >-
+          Optional URI for the claim. Max 100 chars. Often used for IPFS Merkle
+          Tree Information for challenges
+      numClaimsPerAddress:
+        type: string
+        description: >-
+          If >0, then the claim can only be used to claim this number of leaves
+          per address. If 0, then no limit.
+      incrementIdsBy:
+        type: string
+        title: Balances for the current claim
+      currentClaimAmounts:
+        type: array
+        items:
+          type: object
+          properties:
+            amount:
+              type: string
+            badgeIds:
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                  end:
+                    type: string
+                description: >-
+                  Id ranges define a range of IDs from start to end. Can be used
+                  for badge IDs, nonces, anything.
+          description: >-
+            Defines a balance object. The specified balance holds for all ids
+            specified within the id ranges array.
+      challenges:
+        type: array
+        items:
+          type: object
+          properties:
+            root:
+              type: string
+            expectedProofLength:
+              type: string
+            useCreatorAddressAsLeaf:
+              type: boolean
+          title: We will add more fields to this message later (e.g. ZKP proofs)
+        description: Challenges for the claim. If empty, then no challenges are required.
     description: >-
       Defines a claim object. Claims are used to transfer badges via a claiming
       process.
@@ -48154,10 +48137,8 @@ definitions:
     properties:
       start:
         type: string
-        format: uint64
       end:
         type: string
-        format: uint64
     description: >-
       Id ranges define a range of IDs from start to end. Can be used for badge
       IDs, nonces, anything.
@@ -48170,14 +48151,12 @@ definitions:
     properties:
       nextBadgeId:
         type: string
-        format: uint64
         description: ID of next badgeId after creating all badges.
   bitbadges.bitbadgeschain.badges.MsgNewCollectionResponse:
     type: object
     properties:
       collectionId:
         type: string
-        format: uint64
         title: ID of created badge collection
   bitbadges.bitbadgeschain.badges.MsgRequestTransferManagerResponse:
     type: object
@@ -48216,7 +48195,6 @@ definitions:
               properties:
                 amount:
                   type: string
-                  format: uint64
                 badgeIds:
                   type: array
                   items:
@@ -48224,10 +48202,8 @@ definitions:
                     properties:
                       start:
                         type: string
-                        format: uint64
                       end:
                         type: string
-                        format: uint64
                     description: >-
                       Id ranges define a range of IDs from start to end. Can be
                       used for badge IDs, nonces, anything.
@@ -48249,7 +48225,6 @@ definitions:
                     properties:
                       amount:
                         type: string
-                        format: uint64
                       badgeIds:
                         type: array
                         items:
@@ -48257,10 +48232,8 @@ definitions:
                           properties:
                             start:
                               type: string
-                              format: uint64
                             end:
                               type: string
-                              format: uint64
                           description: >-
                             Id ranges define a range of IDs from start to end.
                             Can be used for badge IDs, nonces, anything.
@@ -48280,14 +48253,13 @@ definitions:
       claim:
         type: object
         properties:
-          balances:
+          undistributedBalances:
             type: array
             items:
               type: object
               properties:
                 amount:
                   type: string
-                  format: uint64
                 badgeIds:
                   type: array
                   items:
@@ -48295,10 +48267,8 @@ definitions:
                     properties:
                       start:
                         type: string
-                        format: uint64
                       end:
                         type: string
-                        format: uint64
                     description: >-
                       Id ranges define a range of IDs from start to end. Can be
                       used for badge IDs, nonces, anything.
@@ -48306,54 +48276,64 @@ definitions:
                 Defines a balance object. The specified balance holds for all
                 ids specified within the id ranges array.
             description: Current balance of the claim store.
-          codeRoot:
-            type: string
-          expectedMerkleProofLength:
-            type: string
-            format: uint64
-          whitelistRoot:
-            type: string
-          incrementIdsBy:
-            type: string
-            format: uint64
-          amount:
-            type: string
-            format: uint64
-          badgeIds:
-            type: array
-            items:
-              type: object
-              properties:
-                start:
-                  type: string
-                  format: uint64
-                end:
-                  type: string
-                  format: uint64
-              description: >-
-                Id ranges define a range of IDs from start to end. Can be used
-                for badge IDs, nonces, anything.
-          restrictOptions:
-            type: string
-            format: uint64
-            title: >-
-              enum: 0 = no restrictions (can mint multiple times), 1 = whitelist
-              leafs can only be used once, 2 = one claim per account
-          uri:
-            type: string
-            title: >-
-              Optional URI for the claim. Max 100 chars. To be used for IPFS
-              Merkle Tree Information
           timeRange:
             description: Time range when the claim is valid.
             type: object
             properties:
               start:
                 type: string
-                format: uint64
               end:
                 type: string
-                format: uint64
+          uri:
+            type: string
+            title: >-
+              Optional URI for the claim. Max 100 chars. Often used for IPFS
+              Merkle Tree Information for challenges
+          numClaimsPerAddress:
+            type: string
+            description: >-
+              If >0, then the claim can only be used to claim this number of
+              leaves per address. If 0, then no limit.
+          incrementIdsBy:
+            type: string
+            title: Balances for the current claim
+          currentClaimAmounts:
+            type: array
+            items:
+              type: object
+              properties:
+                amount:
+                  type: string
+                badgeIds:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                      end:
+                        type: string
+                    description: >-
+                      Id ranges define a range of IDs from start to end. Can be
+                      used for badge IDs, nonces, anything.
+              description: >-
+                Defines a balance object. The specified balance holds for all
+                ids specified within the id ranges array.
+          challenges:
+            type: array
+            items:
+              type: object
+              properties:
+                root:
+                  type: string
+                expectedProofLength:
+                  type: string
+                useCreatorAddressAsLeaf:
+                  type: boolean
+              title: We will add more fields to this message later (e.g. ZKP proofs)
+            description: >-
+              Challenges for the claim. If empty, then no challenges are
+              required.
         description: >-
           Defines a claim object. Claims are used to transfer badges via a
           claiming process.
@@ -48367,7 +48347,6 @@ definitions:
         properties:
           collectionId:
             type: string
-            format: uint64
             description: >-
               The collectionId defines the unique identifier of the
               BadgeCollection classification, similar to the contract address of
@@ -48394,10 +48373,8 @@ definitions:
                     properties:
                       start:
                         type: string
-                        format: uint64
                       end:
                         type: string
-                        format: uint64
                     description: >-
                       Id ranges define a range of IDs from start to end. Can be
                       used for badge IDs, nonces, anything.
@@ -48441,7 +48418,6 @@ definitions:
               permissions.
           permissions:
             type: string
-            format: uint64
             description: >-
               Store permissions packed in a uint where the bits correspond to
               certain permissions.
@@ -48463,7 +48439,6 @@ definitions:
                       type: boolean
                     managerOptions:
                       type: string
-                      format: uint64
                 to:
                   type: object
                   properties:
@@ -48475,7 +48450,6 @@ definitions:
                       type: boolean
                     managerOptions:
                       type: string
-                      format: uint64
               description: >-
                 TransferMapping defines a mapping of transfers from one set of
                 addresses to another.
@@ -48508,7 +48482,6 @@ definitions:
                       type: boolean
                     managerOptions:
                       type: string
-                      format: uint64
                 to:
                   type: object
                   properties:
@@ -48520,7 +48493,6 @@ definitions:
                       type: boolean
                     managerOptions:
                       type: string
-                      format: uint64
               description: >-
                 TransferMapping defines a mapping of transfers from one set of
                 addresses to another.
@@ -48539,7 +48511,6 @@ definitions:
                  the manager can transfer any badge from the "to" account to the "from" account
           nextBadgeId:
             type: string
-            format: uint64
             description: >-
               Badge ids start at 1. Each badge created will increment this by 1.
               Can't overflow.
@@ -48550,7 +48521,6 @@ definitions:
               properties:
                 amount:
                   type: string
-                  format: uint64
                 badgeIds:
                   type: array
                   items:
@@ -48558,10 +48528,8 @@ definitions:
                     properties:
                       start:
                         type: string
-                        format: uint64
                       end:
                         type: string
-                        format: uint64
                     description: >-
                       Id ranges define a range of IDs from start to end. Can be
                       used for badge IDs, nonces, anything.
@@ -48580,7 +48548,6 @@ definitions:
               properties:
                 amount:
                   type: string
-                  format: uint64
                 badgeIds:
                   type: array
                   items:
@@ -48588,10 +48555,8 @@ definitions:
                     properties:
                       start:
                         type: string
-                        format: uint64
                       end:
                         type: string
-                        format: uint64
                     description: >-
                       Id ranges define a range of IDs from start to end. Can be
                       used for badge IDs, nonces, anything.
@@ -48601,7 +48566,6 @@ definitions:
             description: This is a map of the maximum badge supplys by ID.
           nextClaimId:
             type: string
-            format: uint64
             description: >-
               Keeps track of the next claim id. Claim ids start at 1. 
 
@@ -48611,7 +48575,6 @@ definitions:
               written to.
           standard:
             type: string
-            format: uint64
             description: >-
               Defines what standard this badge should implement (see standards
               documentation).
@@ -48628,6 +48591,41 @@ definitions:
         description: params holds all the parameters of this module.
         type: object
     description: QueryParamsResponse is response type for the Query/Params RPC method.
+  bitbadges.bitbadgeschain.badges.Transfer:
+    type: object
+    properties:
+      toAddresses:
+        type: array
+        items:
+          type: string
+      balances:
+        type: array
+        items:
+          type: object
+          properties:
+            amount:
+              type: string
+            badgeIds:
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                  end:
+                    type: string
+                description: >-
+                  Id ranges define a range of IDs from start to end. Can be used
+                  for badge IDs, nonces, anything.
+          description: >-
+            Defines a balance object. The specified balance holds for all ids
+            specified within the id ranges array.
+    description: >-
+      Upon badge creation, the manager will first be minted these badges, and
+      then, they will subsequently be transferred to these addresses according
+      to permissions.ForcefulTransfers.
+
+      Used to only need one signature for MsgNewBadge.
   bitbadges.bitbadgeschain.badges.TransferMapping:
     type: object
     properties:
@@ -48642,7 +48640,6 @@ definitions:
             type: boolean
           managerOptions:
             type: string
-            format: uint64
       to:
         type: object
         properties:
@@ -48654,48 +48651,9 @@ definitions:
             type: boolean
           managerOptions:
             type: string
-            format: uint64
     description: >-
       TransferMapping defines a mapping of transfers from one set of addresses
       to another.
-  bitbadges.bitbadgeschain.badges.Transfers:
-    type: object
-    properties:
-      toAddresses:
-        type: array
-        items:
-          type: string
-      balances:
-        type: array
-        items:
-          type: object
-          properties:
-            amount:
-              type: string
-              format: uint64
-            badgeIds:
-              type: array
-              items:
-                type: object
-                properties:
-                  start:
-                    type: string
-                    format: uint64
-                  end:
-                    type: string
-                    format: uint64
-                description: >-
-                  Id ranges define a range of IDs from start to end. Can be used
-                  for badge IDs, nonces, anything.
-          description: >-
-            Defines a balance object. The specified balance holds for all ids
-            specified within the id ranges array.
-    description: >-
-      Upon badge creation, the manager will first be minted these badges, and
-      then, they will subsequently be transferred to these addresses according
-      to permissions.ForcefulTransfers.
-
-      Used to only need one signature for MsgNewBadge.
   bitbadges.bitbadgeschain.badges.UserBalanceStore:
     type: object
     properties:
@@ -48706,7 +48664,6 @@ definitions:
           properties:
             amount:
               type: string
-              format: uint64
             badgeIds:
               type: array
               items:
@@ -48714,10 +48671,8 @@ definitions:
                 properties:
                   start:
                     type: string
-                    format: uint64
                   end:
                     type: string
-                    format: uint64
                 description: >-
                   Id ranges define a range of IDs from start to end. Can be used
                   for badge IDs, nonces, anything.
@@ -48739,7 +48694,6 @@ definitions:
                 properties:
                   amount:
                     type: string
-                    format: uint64
                   badgeIds:
                     type: array
                     items:
@@ -48747,10 +48701,8 @@ definitions:
                       properties:
                         start:
                           type: string
-                          format: uint64
                         end:
                           type: string
-                          format: uint64
                       description: >-
                         Id ranges define a range of IDs from start to end. Can
                         be used for badge IDs, nonces, anything.
