@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"math"
-
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -133,7 +131,7 @@ func AddBalanceToApproval(approvals []*types.Approval, amountToAdd sdk.Uint, add
 	for _, currApprovalAmountObj := range currApprovalAmounts {
 		newBalance, err := SafeAdd(currApprovalAmountObj.Amount, amountToAdd)
 		if err != nil {
-			newBalance = sdk.NewUint(math.MaxUint64)
+			return approvals, err
 		}
 
 		approval.Balances, err = UpdateBalancesForIdRanges(currApprovalAmountObj.BadgeIds, newBalance, approval.Balances)

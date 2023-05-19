@@ -120,7 +120,7 @@ func CheckIfInTransferMapping(transferMapping *types.TransferMapping, from strin
 
 
 // Checks if account is frozen or not.
-func IsTransferAllowed(collection types.BadgeCollection, permissions types.Permissions, fromAddress string, toAddress string, approvedBy string) (bool, bool) {
+func IsTransferAllowed(collection types.BadgeCollection, fromAddress string, toAddress string, approvedBy string) (bool, bool) {
 	if approvedBy == collection.Manager {
 		for _, managerApprovedTransfer := range collection.ManagerApprovedTransfers {
 		  fromFound, toFound := CheckIfInTransferMapping(managerApprovedTransfer, fromAddress, toAddress, collection.Manager)
@@ -147,7 +147,6 @@ func IsTransferAllowed(collection types.BadgeCollection, permissions types.Permi
 
 // Returns an error if account is Frozen
 func AssertTransferAllowed(collection types.BadgeCollection, from string, to string, approvedBy string) (bool, bool) {
-	permissions := types.GetPermissions(collection.Permissions)
-	transferIsAllowed, isManagerApprovedTransfer := IsTransferAllowed(collection, permissions, from, to, approvedBy)
+	transferIsAllowed, isManagerApprovedTransfer := IsTransferAllowed(collection, from, to, approvedBy)
 	return transferIsAllowed, isManagerApprovedTransfer
 }

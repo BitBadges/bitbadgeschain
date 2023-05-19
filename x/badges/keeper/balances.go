@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"math"
-
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -19,9 +17,7 @@ func GetBalanceForId(id sdk.Uint, balances []*types.Balance) (sdk.Uint) {
 }
 
 // Updates the balance for a specific ids from what it currently is to newAmount.
-func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount sdk.Uint, balances []*types.Balance) ([]*types.Balance, error) {
-	err := *new(error)
-
+func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount sdk.Uint, balances []*types.Balance) (newBalances []*types.Balance, err error) {
 	//Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
 	ranges = SortAndMergeOverlapping(ranges)
 	balances = DeleteBalanceForIdRanges(ranges, balances)
@@ -31,8 +27,7 @@ func UpdateBalancesForIdRanges(ranges []*types.IdRange, newAmount sdk.Uint, bala
 }
 
 // Gets the balances for specified ID ranges. Returns a new []*types.Balance where only the specified ID ranges and their balances are included. Appends balance == 0 objects so all IDs are accounted for, even if not found.
-func GetBalancesForIdRanges(idRanges []*types.IdRange, balances []*types.Balance) ([]*types.Balance, error) {
-	err := *new(error)
+func GetBalancesForIdRanges(idRanges []*types.IdRange, balances []*types.Balance) (newBalances []*types.Balance, err error) {
 	fetchedBalances := []*types.Balance{}
 	idRanges = SortAndMergeOverlapping(idRanges)
 	idsWithZeroBalance := idRanges //We use this to keep track of which IDs we have already found a balance for. Will deduct from this as we find balances
@@ -60,15 +55,21 @@ func GetBalancesForIdRanges(idRanges []*types.IdRange, balances []*types.Balance
 					newIdRanges = append(removedRanges, newIdRanges[1:]...)
 				}
 
-				//Remove everything after the end of the range. Only need to remove from last idx since it is sorted.
-				if idRange.End.LT(sdk.NewUint(math.MaxUint64)) && len(newIdRanges) > 0 {
-					everythingAfter := &types.IdRange{
-						Start: idRange.End.AddUint64(1),
-						End:   sdk.NewUint(math.MaxUint64),
-					}
 
-					removedRanges, _ := RemoveIdsFromIdRange(everythingAfter, newIdRanges[len(newIdRanges)-1])
-					newIdRanges = append(newIdRanges[0:len(newIdRanges)-1], removedRanges...)
+				
+				//Remove everything after the end of the range. Only need to remove from last idx since it is sorted.
+				if len(newIdRanges) > 0 {
+					rangeToTrim := newIdRanges[len(newIdRanges)-1]
+					if idRange.End.LT(rangeToTrim.End) {
+						
+						everythingAfter := &types.IdRange{
+							Start: idRange.End.AddUint64(1),
+							End:   rangeToTrim.End,
+						}
+
+						removedRanges, _ := RemoveIdsFromIdRange(everythingAfter, rangeToTrim)
+						newIdRanges = append(newIdRanges[0:len(newIdRanges)-1], removedRanges...)
+					}
 				}
 
 				//If we found any overlapping ranges, remove the IDs from the list of IDs with zero balance

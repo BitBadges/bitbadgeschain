@@ -19,7 +19,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	}
 
 	//Check if claim is allowed
- 	allowed, _ :=	IsTransferAllowed(collection, types.GetPermissions(collection.Permissions), "Mint", msg.Creator, "Mint")
+ 	allowed, _ :=	IsTransferAllowed(collection, "Mint", msg.Creator, "Mint")
 	if !allowed {
 		return nil, ErrMintNotAllowed
 	}
