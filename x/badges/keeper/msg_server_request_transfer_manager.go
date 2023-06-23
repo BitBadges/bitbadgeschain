@@ -7,28 +7,24 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgRequestTransferManager) (*types.MsgRequestTransferManagerResponse, error) {
+func (k msgServer) RequestUpdateManager(goCtx context.Context, msg *types.MsgRequestUpdateManager) (*types.MsgRequestUpdateManagerResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	badge, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator:      msg.Creator,
-		CollectionId: msg.CollectionId,
+	_, err := k.UniversalValidate(ctx, UniversalValidationParams{
+		Creator:                 msg.Creator,
+		CollectionId:            msg.CollectionId,
+		CanUpdateManager: msg.AddRequest,
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	if msg.AddRequest {
-		permissions := types.GetPermissions(badge.Permissions)
-		if !permissions.CanManagerBeTransferred {
-			return nil, ErrInvalidPermissions //Manager can never transfer, so we don't unnecessarily store stuff
-		}
-
-		if err := k.CreateTransferManagerRequest(ctx, msg.CollectionId, msg.Creator); err != nil {
+		if err := k.CreateUpdateManagerRequest(ctx, msg.CollectionId, msg.Creator); err != nil {
 			return nil, err
 		}
 	} else {
-		if err := k.RemoveTransferManagerRequest(ctx, msg.CollectionId, msg.Creator); err != nil {
+		if err := k.RemoveUpdateManagerRequest(ctx, msg.CollectionId, msg.Creator); err != nil {
 			return nil, err
 		}
 	}
@@ -39,5 +35,5 @@ func (k msgServer) RequestTransferManager(goCtx context.Context, msg *types.MsgR
 		),
 	)
 
-	return &types.MsgRequestTransferManagerResponse{}, nil
+	return &types.MsgRequestUpdateManagerResponse{}, nil
 }

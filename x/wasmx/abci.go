@@ -8,7 +8,7 @@ import (
 )
 
 type BlockHandler struct {
-	k       keeper.Keeper
+	k keeper.Keeper
 }
 
 func NewBlockHandler(k keeper.Keeper) *BlockHandler {

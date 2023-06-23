@@ -9,18 +9,17 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) GetClaim(goCtx context.Context, req *types.QueryGetClaimRequest) (*types.QueryGetClaimResponse, error) {
+func (k Keeper) GetClaimNumProcessed(goCtx context.Context, req *types.QueryGetClaimNumProcessedRequest) (*types.QueryGetClaimNumProcessedResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	claim, found := k.GetClaimFromStore(ctx, req.CollectionId, req.ClaimId);
-	if !found {
-		return nil, ErrClaimNotExists
-	}
+	//TODO:
 
-	return &types.QueryGetClaimResponse{
-		Claim: &claim,
+	return nil, ErrNotImplemented
+
+	return &types.QueryGetClaimNumProcessedResponse{
+		NumProcessed: sdk.NewUint(0),
 	}, nil
 }

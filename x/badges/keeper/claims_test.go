@@ -6,8 +6,8 @@ package keeper_test
 // 	collectionsToCreate := []CollectionsToCreate{
 // 		{
 // 			Collection: types.MsgNewCollection{
-// 				CollectionUri: "https://example.com",
-// 				BadgeUris: []*types.BadgeUri{
+// 				CollectionMetadata: "https://example.com",
+// 				BadgeMetadata: []*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
@@ -29,7 +29,7 @@ package keeper_test
 // 	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 
 // 	claimToAdd := types.Claim{
-// 		UndistributedBalances: []*types.Balance{{
+// 		Balances: []*types.Balance{{
 // 			Amount: sdk.NewUint(10),
 // 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 // 		}},
@@ -45,7 +45,7 @@ package keeper_test
 // 		[]*types.Claim{
 // 			&claimToAdd,
 // 		}, "https://example.com",
-// 		[]*types.BadgeUri{
+// 		[]*types.BadgeMetadata{
 // 			{
 // 				Uri: "https://example.com/{id}",
 // 				BadgeIds: []*types.IdRange{

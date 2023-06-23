@@ -12,17 +12,17 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdUpdatePermissions() *cobra.Command {
+func CmdUpdateCollectionPermissions() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-permissions [collection-id] [permissions]",
-		Short: "Broadcast message updatePermissions",
+		Short: "Broadcast message updateCollectionPermissions",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argBadgeId := types.NewUintFromString(args[0])
 			if err != nil {
 				return err
 			}
-			
+
 			argPermissions := types.NewUintFromString(args[1])
 			if err != nil {
 				return err
@@ -33,7 +33,7 @@ func CmdUpdatePermissions() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpdatePermissions(
+			msg := types.NewMsgUpdateCollectionPermissions(
 				clientCtx.GetFromAddress().String(),
 				argBadgeId,
 				argPermissions,

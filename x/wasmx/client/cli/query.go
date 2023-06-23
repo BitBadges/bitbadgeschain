@@ -7,8 +7,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 
-	cliflags "github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
+	cliflags "github.com/cosmos/cosmos-sdk/client/flags"
 )
 
 // GetQueryCmd returns the parent command for all modules/wasmx CLi query commands.

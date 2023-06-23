@@ -98,7 +98,6 @@ func (k Keeper) SetClaimInStoreWithKey(ctx sdk.Context, claimKey string, Claim t
 	return nil
 }
 
-
 // Gets a user balance from the store according to the balanceID.
 func (k Keeper) GetClaimFromStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint) (types.Claim, bool) {
 	store := ctx.KVStore(k.storeKey)
@@ -165,6 +164,11 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 		return sdkerrors.Wrap(err, "Marshal types.UserBalanceStore failed")
 	}
 
+	//Prevent accidental non-cosmos addresses from being stored
+	if err = types.ValidateAddress(GetDetailsFromBalanceKey(balanceKey).address, false); err != nil {
+		return sdkerrors.Wrap(err, "Invalid address")
+	}
+
 	store := ctx.KVStore(k.storeKey)
 	store.Set(userBalanceStoreKey(balanceKey), marshaled_badge_balance_info)
 	return nil
@@ -229,22 +233,22 @@ func (k Keeper) DeleteUserBalanceFromStore(ctx sdk.Context, balanceKey string) {
 // Checks if a certain address has requested a managerial transfer
 func (k Keeper) HasAddressRequestedManagerTransfer(ctx sdk.Context, collectionId sdk.Uint, address string) bool {
 	store := ctx.KVStore(k.storeKey)
-	key := ConstructTransferManagerRequestKey(collectionId, address)
+	key := ConstructUpdateManagerRequestKey(collectionId, address)
 	return store.Has(managerTransferRequestKey(key))
 }
 
 // Creates a transfer manager request for the given address and collectionId.
-func (k Keeper) CreateTransferManagerRequest(ctx sdk.Context, collectionId sdk.Uint, address string) error {
+func (k Keeper) CreateUpdateManagerRequest(ctx sdk.Context, collectionId sdk.Uint, address string) error {
 	request := []byte{}
 	store := ctx.KVStore(k.storeKey)
-	key := ConstructTransferManagerRequestKey(collectionId, address)
+	key := ConstructUpdateManagerRequestKey(collectionId, address)
 	store.Set(managerTransferRequestKey(key), request)
 	return nil
 }
 
 // Deletes a transfer manager request for the given address and collectionId.
-func (k Keeper) RemoveTransferManagerRequest(ctx sdk.Context, collectionId sdk.Uint, address string) error {
-	key := ConstructTransferManagerRequestKey(collectionId, address)
+func (k Keeper) RemoveUpdateManagerRequest(ctx sdk.Context, collectionId sdk.Uint, address string) error {
+	key := ConstructUpdateManagerRequestKey(collectionId, address)
 	store := ctx.KVStore(k.storeKey)
 
 	store.Delete(managerTransferRequestKey(key))
@@ -273,7 +277,7 @@ func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) {
 }
 
 /****************************************NEXT CLAIM ID****************************************/
-//Note these claim IDs are different than the ones within each collection. 
+//Note these claim IDs are different than the ones within each collection.
 //These are the IDs for the claim stores themselves, not the claim IDs for within a collection.
 
 // Gets the next badge ID.
@@ -344,7 +348,7 @@ func (k Keeper) IncrementNumUsedForAddressInStore(ctx sdk.Context, collectionId 
 		curr = sdk.NewUint(currUint)
 	}
 	incrementedNum := curr.AddUint64(1)
-	store.Set(usedClaimAddressStoreKey(ConstructUsedClaimAddressKey(collectionId, claimId, address)),[]byte(curr.Incr().String()))
+	store.Set(usedClaimAddressStoreKey(ConstructUsedClaimAddressKey(collectionId, claimId, address)), []byte(curr.Incr().String()))
 	return incrementedNum, nil
 }
 

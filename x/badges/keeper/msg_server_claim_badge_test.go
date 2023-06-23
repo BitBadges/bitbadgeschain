@@ -53,8 +53,8 @@ package keeper_test
 // 	collectionsToCreate := []CollectionsToCreate{
 // 		{
 // 			Collection: types.MsgNewCollection{
-// 				CollectionUri: "https://example.com",
-// 				BadgeUris:            []*types.BadgeUri{
+// 				CollectionMetadata: "https://example.com",
+// 				BadgeMetadata:            []*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
@@ -88,7 +88,7 @@ package keeper_test
 // 		Data:       hex.EncodeToString(rootHash),
 // 		Type: 	 	uint64(types.ClaimType_MerkleTree),
 // 		Uri: "",
-// 		TimeRange: &types.IdRange{
+// 		TimeInterval: &types.IdRange{
 // 			Start: sdk.NewUint(0),
 // 			End:   sdk.NewUint(math.MaxUint64),
 // 		},
@@ -105,7 +105,7 @@ package keeper_test
 // 			&claimToAdd,
 // 		},
 // 		"https://example.com",
-// 		[]*types.BadgeUri{
+// 		[]*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
@@ -188,8 +188,8 @@ package keeper_test
 // 	collectionsToCreate := []CollectionsToCreate{
 // 		{
 // 			Collection: types.MsgNewCollection{
-// 				CollectionUri: "https://example.com",
-// 				BadgeUris:            []*types.BadgeUri{
+// 				CollectionMetadata: "https://example.com",
+// 				BadgeMetadata:            []*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
@@ -223,7 +223,7 @@ package keeper_test
 // 		Data:       hex.EncodeToString(rootHash),
 // 		Type: 	 	uint64(types.ClaimType_MerkleTree),
 // 		Uri: "",
-// 		TimeRange: &types.IdRange{
+// 		TimeInterval: &types.IdRange{
 // 			Start: sdk.NewUint(0),
 // 			End:   sdk.NewUint(math.MaxUint64),
 // 		},
@@ -239,7 +239,7 @@ package keeper_test
 // 		[]*types.Claim{
 // 			&claimToAdd,
 // 		}, "https://example.com",
-// 		[]*types.BadgeUri{
+// 		[]*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
@@ -320,8 +320,8 @@ package keeper_test
 // 	collectionsToCreate := []CollectionsToCreate{
 // 		{
 // 			Collection: types.MsgNewCollection{
-// 				CollectionUri: "https://example.com",
-// 				BadgeUris:            []*types.BadgeUri{
+// 				CollectionMetadata: "https://example.com",
+// 				BadgeMetadata:            []*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
@@ -355,7 +355,7 @@ package keeper_test
 // 		Data:       hex.EncodeToString(rootHash),
 // 		Type: 	 	uint64(types.ClaimType_FirstCome),
 // 		Uri: "",
-// 		TimeRange: &types.IdRange{
+// 		TimeInterval: &types.IdRange{
 // 			Start: sdk.NewUint(0),
 // 			End:   sdk.NewUint(math.MaxUint64),
 // 		},
@@ -371,7 +371,7 @@ package keeper_test
 // 		[]*types.Claim{
 // 			&claimToAdd,
 // 		}, "https://example.com",
-// 		[]*types.BadgeUri{
+// 		[]*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{

@@ -19,7 +19,7 @@ func CmdClaimBadge() *cobra.Command {
 		Short: "Broadcast message claimBadge",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			
+
 			argClaimId := types.NewUintFromString(args[0])
 			if err != nil {
 				return err
@@ -39,7 +39,7 @@ func CmdClaimBadge() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
+
 			solutions := []*types.ChallengeSolution{}
 			for _, solutionInterface := range argSolutionsJsonArr {
 				solution := solutionInterface.(*types.ChallengeSolution)
@@ -58,7 +58,7 @@ func CmdClaimBadge() *cobra.Command {
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
-			
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

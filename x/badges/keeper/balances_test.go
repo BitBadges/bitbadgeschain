@@ -251,7 +251,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		},
 	}, sdk.NewUint(10), balances)
 
-	suite.Require().True(types.BalancesEqual(balances,  []*types.Balance{
+	suite.Require().True(types.BalancesEqual(balances, []*types.Balance{
 		{
 			Amount: sdk.NewUint(5),
 			BadgeIds: []*types.IdRange{
@@ -294,27 +294,27 @@ func (suite *TestSuite) TestSubtractBalances() {
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(35),
+			End:   sdk.NewUint(35),
 		},
 		{
 			Start: sdk.NewUint(2),
-			End: sdk.NewUint(34),
+			End:   sdk.NewUint(34),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 		{
 			Start: sdk.NewUint(135),
-			End: sdk.NewUint(200),
+			End:   sdk.NewUint(200),
 		},
 		{
 			Start: sdk.NewUint(235),
-			End: sdk.NewUint(300),
+			End:   sdk.NewUint(300),
 		},
 		{
 			Start: sdk.NewUint(335),
-			End: sdk.NewUint(400),
+			End:   sdk.NewUint(400),
 		},
 	}
 
@@ -329,15 +329,15 @@ func (suite *TestSuite) TestSubtractBalances() {
 		},
 		{
 			Start: sdk.NewUint(135),
-			End: sdk.NewUint(200),
+			End:   sdk.NewUint(200),
 		},
 		{
 			Start: sdk.NewUint(235),
-			End: sdk.NewUint(300),
+			End:   sdk.NewUint(300),
 		},
 		{
 			Start: sdk.NewUint(335),
-			End: sdk.NewUint(400),
+			End:   sdk.NewUint(400),
 		},
 	})
 
@@ -348,11 +348,11 @@ func (suite *TestSuite) TestSubtractBalances() {
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(35),
+			End:   sdk.NewUint(35),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 	}
 	for _, badgeIdRangeToRemove := range badgeIdRangesToRemove {
@@ -380,15 +380,15 @@ func (suite *TestSuite) TestAddBalancesForIdRanges() {
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(35),
+			End:   sdk.NewUint(35),
 		},
 		{
 			Start: sdk.NewUint(2),
-			End: sdk.NewUint(34),
+			End:   sdk.NewUint(34),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 	}
 
@@ -411,11 +411,11 @@ func (suite *TestSuite) TestAddBalancesForIdRanges() {
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(35),
+			End:   sdk.NewUint(35),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 	}
 
@@ -497,11 +497,11 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 		},
 		{
 			Start: sdk.NewUint(2),
-			End: sdk.NewUint(34),
+			End:   sdk.NewUint(34),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 	}
 
@@ -521,11 +521,11 @@ func (suite *TestSuite) TestRemoveBalancesUnderflow() {
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(35),
+			End:   sdk.NewUint(35),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 	}
 

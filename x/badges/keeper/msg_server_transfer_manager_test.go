@@ -8,14 +8,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (suite *TestSuite) TestTransferManager() {
+func (suite *TestSuite) TestUpdateManager() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -27,12 +27,12 @@ func (suite *TestSuite) TestTransferManager() {
 					},
 				},
 				Permissions: sdk.NewUint(127),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
+						From: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
-						To: &types.AddressesMapping{
+						To: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
 					},
@@ -55,24 +55,24 @@ func (suite *TestSuite) TestTransferManager() {
 	})
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = RequestTransferManager(suite, wctx, alice, sdk.NewUint(1), true)
+	err = RequestUpdateManager(suite, wctx, alice, sdk.NewUint(1), true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, sdk.NewUint(1), alice)
+	err = UpdateManager(suite, wctx, bob, sdk.NewUint(1), alice)
 	suite.Require().Nil(err, "Error transferring manager")
 
 	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 	suite.Require().Equal(alice, badge.Manager)
 }
 
-func (suite *TestSuite) TestRequestTransferManager() {
+func (suite *TestSuite) TestRequestUpdateManager() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -84,12 +84,12 @@ func (suite *TestSuite) TestRequestTransferManager() {
 					},
 				},
 				Permissions: sdk.NewUint(127),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
+						From: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
-						To: &types.AddressesMapping{
+						To: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
 					},
@@ -112,30 +112,30 @@ func (suite *TestSuite) TestRequestTransferManager() {
 	})
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = RequestTransferManager(suite, wctx, alice, sdk.NewUint(1), true)
+	err = RequestUpdateManager(suite, wctx, alice, sdk.NewUint(1), true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = RequestTransferManager(suite, wctx, alice, sdk.NewUint(1), false)
+	err = RequestUpdateManager(suite, wctx, alice, sdk.NewUint(1), false)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = RequestTransferManager(suite, wctx, alice, sdk.NewUint(1), true)
+	err = RequestUpdateManager(suite, wctx, alice, sdk.NewUint(1), true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, sdk.NewUint(1), alice)
+	err = UpdateManager(suite, wctx, bob, sdk.NewUint(1), alice)
 	suite.Require().Nil(err, "Error transferring manager")
 
 	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
 	suite.Require().Equal(alice, badge.Manager)
 }
 
-func (suite *TestSuite) TestRemovedRequestTransferManager() {
+func (suite *TestSuite) TestRemovedRequestUpdateManager() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -147,12 +147,12 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 					},
 				},
 				Permissions: sdk.NewUint(127),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
+						From: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
-						To: &types.AddressesMapping{
+						To: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
 					},
@@ -175,24 +175,24 @@ func (suite *TestSuite) TestRemovedRequestTransferManager() {
 	})
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = RequestTransferManager(suite, wctx, alice, sdk.NewUint(1), true)
+	err = RequestUpdateManager(suite, wctx, alice, sdk.NewUint(1), true)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = RequestTransferManager(suite, wctx, alice, sdk.NewUint(1), false)
+	err = RequestUpdateManager(suite, wctx, alice, sdk.NewUint(1), false)
 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-	err = TransferManager(suite, wctx, bob, sdk.NewUint(1), alice)
+	err = UpdateManager(suite, wctx, bob, sdk.NewUint(1), alice)
 	suite.Require().EqualError(err, keeper.ErrAddressNeedsToOptInAndRequestManagerTransfer.Error())
 }
 
-func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
+func (suite *TestSuite) TestRemovedRequestUpdateManagerBadPermissions() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -204,12 +204,12 @@ func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 					},
 				},
 				Permissions: sdk.NewUint(23),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
+						From: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
-						To: &types.AddressesMapping{
+						To: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
 					},
@@ -232,7 +232,7 @@ func (suite *TestSuite) TestRemovedRequestTransferManagerBadPermissions() {
 	})
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = RequestTransferManager(suite, wctx, alice, sdk.NewUint(1), true)
+	err = RequestUpdateManager(suite, wctx, alice, sdk.NewUint(1), true)
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }
 
@@ -242,8 +242,8 @@ func (suite *TestSuite) TestManagerCantBeTransferred() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -264,6 +264,6 @@ func (suite *TestSuite) TestManagerCantBeTransferred() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge")
 
-	err = TransferManager(suite, wctx, bob, sdk.NewUint(1), alice)
+	err = UpdateManager(suite, wctx, bob, sdk.NewUint(1), alice)
 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 }

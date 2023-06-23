@@ -46,6 +46,6 @@ func (msg *MsgDeleteCollection) ValidateBasic() error {
 	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
 	}
-	
+
 	return nil
 }

@@ -10,7 +10,7 @@ import (
 
 var (
 	// URI must be a valid URI. Method <= 10 characters long. Path <= 90 characters long.
-	reUriString = `\w{0,10}:(\/?\/?)[^\s]{0,90}`
+	reUriString = `\w+:(\/?\/?)[^\s]+`
 	reUri       = regexp.MustCompile(fmt.Sprintf(`^%s$`, reUriString))
 )
 
@@ -49,22 +49,17 @@ func ValidateURI(uri string) error {
 	return nil
 }
 
-func ValidateAddress(address string) error {
+func ValidateAddress(address string, allowAliases bool) error {
 	_, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
+		if allowAliases && address == "Manager" {
+			return nil
+		}
+
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s)", err)
 	}
 	return nil
 }
-
-// Validate bytes we store are valid. We don't allow users to store anything > 256 bytes in a badge.
-func ValidateBytes(bytesToCheck string) error {
-	if len(bytesToCheck) > 256 {
-		return ErrBytesGreaterThan256
-	}
-	return nil
-}
-
 
 func DoRangesOverlap(ids []*IdRange) bool {
 	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
@@ -95,14 +90,25 @@ func DoRangesOverlap(ids []*IdRange) bool {
 }
 
 // Validates ranges are valid. If end.IsZero(), we assume end == start.
-func ValidateRangesAreValid(badgeIdRanges []*IdRange) error {
-	for _, badgeIdRange := range badgeIdRanges {
-		if badgeIdRange.Start.IsNil() || badgeIdRange.End.IsNil() {
-			return ErrUintUnititialized
-		}
+func ValidateRangesAreValid(badgeIdRanges []*IdRange, errorOnEmpty bool) error {
+	if badgeIdRanges == nil {
+		return ErrRangesIsNil
+	}
 
+	if len(badgeIdRanges) == 0 {
+		if errorOnEmpty {
+			return sdkerrors.Wrapf(ErrInvalidIdRangeSpecified, "these id ranges can not be empty (length == 0)")
+		} 
+	}
+
+
+	for _, badgeIdRange := range badgeIdRanges {
 		if badgeIdRange == nil {
 			return ErrRangesIsNil
+		}
+
+		if badgeIdRange.Start.IsNil() || badgeIdRange.End.IsNil() {
+			return sdkerrors.Wrapf(ErrUintUnititialized, "id range start and/or end is uninitialized")
 		}
 
 		if badgeIdRange.Start.GT(badgeIdRange.End) {
@@ -128,7 +134,6 @@ func ValidateNoElementIsX(amounts []sdk.Uint, x sdk.Uint) error {
 	return nil
 }
 
-
 // Validates no element is X
 func ValidateNoStringElementIsX(addresses []string, x string) error {
 	for _, amount := range addresses {
@@ -139,20 +144,9 @@ func ValidateNoStringElementIsX(addresses []string, x string) error {
 	return nil
 }
 
-func ValidateAddressesMapping(addressesMapping AddressesMapping, allowMintAddress bool) error {
-	if addressesMapping.ManagerOptions.IsNil() {
-		return ErrUintUnititialized
-	}
-
-	for _, address := range addressesMapping.Addresses {
-
-
-
-		if allowMintAddress && address == MintAddress {
-			continue
-		}
-
-		if err := ValidateAddress(address); err != nil {
+func ValidateAddressMapping(addressMapping AddressMapping, allowMintAddress bool) error {
+	for _, address := range addressMapping.Addresses {
+		if err := ValidateAddress(address, true); err != nil {
 			return err
 		}
 	}
@@ -160,25 +154,95 @@ func ValidateAddressesMapping(addressesMapping AddressesMapping, allowMintAddres
 	return nil
 }
 
-
-func ValidateTransferMapping(transferMapping TransferMapping) error {
-	if err := ValidateAddressesMapping(*transferMapping.To, true); err != nil {
-		return err
+func ValidateCollectionApprovedTransfer(collectionApprovedTransfer CollectionApprovedTransfer) error {
+	
+	approvalAmountsArr := collectionApprovedTransfer.AmountRestrictions
+	if approvalAmountsArr == nil {
+		return ErrAmountRestrictionsIsNil
 	}
 
-	if err := ValidateAddressesMapping(*transferMapping.From, false); err != nil {
-		return err
+	for idx, allowedCombination := range collectionApprovedTransfer.AllowedCombinations {
+		for _, compCombination := range collectionApprovedTransfer.AllowedCombinations[idx+1:] {
+			if allowedCombination.InvertBadgeIds == compCombination.InvertBadgeIds &&
+				allowedCombination.InvertTimeIntervals == compCombination.InvertTimeIntervals &&
+				allowedCombination.InvertTo == compCombination.InvertTo &&
+				allowedCombination.InvertFrom == compCombination.InvertFrom &&
+				allowedCombination.InvertInitiatedBy == compCombination.InvertInitiatedBy {
+				return ErrInvalidCombinations
+			}
+		}
+	}
+
+	for _, approvalAmounts := range approvalAmountsArr {
+		
+		
+		if approvalAmounts != nil {
+			if err := ValidateRangesAreValid(approvalAmounts.BalancesTimes, true); err != nil {
+				return sdkerrors.Wrapf(err, "invalid balances times")
+			}
+	
+			
+			if approvalAmounts.Amount.IsNil() {
+				return sdkerrors.Wrapf(ErrUintUnititialized, "amount is uninitialized")
+			}
+
+			if approvalAmounts.MaxNumTransfers.IsNil() {
+				return sdkerrors.Wrapf(ErrUintUnititialized, "max num transfers is uninitialized")
+			}
+
+			if approvalAmounts.FromRestrictions != nil {
+				if approvalAmounts.FromRestrictions.AmountPerAddress.IsNil() {
+					return sdkerrors.Wrapf(ErrUintUnititialized, "amount per address is uninitialized")
+				}
+
+				if approvalAmounts.FromRestrictions.TransfersPerAddress.IsNil() {
+					return sdkerrors.Wrapf(ErrUintUnititialized, "transfers per address is uninitialized")
+				}
+			}
+
+			if approvalAmounts.ToRestrictions != nil {
+				if approvalAmounts.ToRestrictions.AmountPerAddress.IsNil() {
+					return sdkerrors.Wrapf(ErrUintUnititialized, "amount per address is uninitialized")
+				}
+
+				if approvalAmounts.ToRestrictions.TransfersPerAddress.IsNil() {
+					return sdkerrors.Wrapf(ErrUintUnititialized, "transfers per address is uninitialized")
+				}
+			}
+
+			if approvalAmounts.InitiatedByRestrictions != nil {
+				if approvalAmounts.InitiatedByRestrictions.AmountPerAddress.IsNil() {
+					return sdkerrors.Wrapf(ErrUintUnititialized, "amount per address is uninitialized")
+				}
+
+				if approvalAmounts.InitiatedByRestrictions.TransfersPerAddress.IsNil() {
+					return sdkerrors.Wrapf(ErrUintUnititialized, "transfers per address is uninitialized")
+				}
+			}
+		}
+	}
+
+	if err := ValidateRangesAreValid(collectionApprovedTransfer.TransferTimes, false); err != nil {
+		return sdkerrors.Wrapf(err, "invalid transfer times")
+	}
+
+	if err := ValidateRangesAreValid(collectionApprovedTransfer.BadgeIds, false); err != nil {
+		return sdkerrors.Wrapf(err, "invalid badge ids")
+	}
+
+	if err := ValidateClaim(collectionApprovedTransfer.Claim); err != nil {
+		return sdkerrors.Wrapf(err, "invalid claim")
+	}
+
+	if collectionApprovedTransfer.TransferTrackerId.IsNil() {
+		return sdkerrors.Wrapf(ErrUintUnititialized, "transfer tracker id is uninitialized")
 	}
 
 	return nil
-}	
+}
 
 func ValidateClaim(claim *Claim) error {
 	err := *new(error)
-
-	if claim.NumClaimsPerAddress.IsNil() || claim.IncrementIdsBy.IsNil() {
-		return ErrUintUnititialized
-	}
 
 	if claim.Uri != "" {
 		err = ValidateURI(claim.Uri)
@@ -187,39 +251,37 @@ func ValidateClaim(claim *Claim) error {
 		}
 	}
 
+	if claim.IncrementIdsBy.IsNil() {
+		return sdkerrors.Wrapf(ErrUintUnititialized, "increment ids by is uninitialized")
+	}
+
+	hasOrderMatters := false
 	for _, challenge := range claim.Challenges {
 		if challenge.ExpectedProofLength.IsNil() {
-			return ErrUintUnititialized
+			return sdkerrors.Wrapf(ErrUintUnititialized, "expected proof length is uninitialized")
+		}
+
+		if challenge.UseLeafIndexForDistributionOrder {
+			if hasOrderMatters {
+				return ErrCanOnlyUseLeafIndexForBadgeIdsOnce
+			}
+
+			hasOrderMatters = true
+		}
+
+		if !challenge.MaxOneUsePerLeaf && challenge.UseLeafIndexForDistributionOrder {
+			return ErrPrimaryChallengeMustBeOneUsePerLeaf
+		}
+
+		if !challenge.MaxOneUsePerLeaf && !challenge.UseCreatorAddressAsLeaf {
+			return ErrCanOnlyUseMaxOneUsePerLeafWithWhitelistTree
 		}
 	}
 
-	err = ValidateBalances(claim.UndistributedBalances)
+	err = ValidateBalances(claim.StartAmounts)
 	if err != nil {
-		return err
+		return sdkerrors.Wrapf(err, "invalid start amounts")
 	}
-
-	err = ValidateBalances(claim.CurrentClaimAmounts)
-	if err != nil {
-		return err
-	}
-
-
-	if claim.TimeRange == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
-	}
-
-	err = ValidateRangesAreValid([]*IdRange{claim.TimeRange})
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
-	}
-
-
-	err = ValidateRangesAreValid([]*IdRange{claim.TimeRange})
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid time range")
-	}
-
-
 
 	return nil
 }
@@ -227,22 +289,26 @@ func ValidateClaim(claim *Claim) error {
 func ValidateBalances(balances []*Balance) error {
 	for _, balance := range balances {
 		if balance == nil {
-			return ErrInvalidLengthBalances
+			return sdkerrors.Wrapf(ErrInvalidLengthBalances, "balances is nil")
 		}
 
 		if balance.Amount.IsZero() || balance.Amount.IsNil() {
-			return ErrAmountEqualsZero
+			return sdkerrors.Wrapf(ErrAmountEqualsZero, "amount is zero or uninitialized")
 		}
 
-		err := ValidateRangesAreValid(balance.BadgeIds)
+		err := ValidateRangesAreValid(balance.BadgeIds, true)
 		if err != nil {
-			return err
+			return sdkerrors.Wrapf(err, "invalid balance badge ids")
+		}
+
+		err = ValidateRangesAreValid(balance.Times, true)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "invalid balance times")
 		}
 	}
 
 	return nil
 }
-
 
 func ValidateTransfer(transfer *Transfer) error {
 	err := *new(error)
@@ -251,12 +317,22 @@ func ValidateTransfer(transfer *Transfer) error {
 		return err
 	}
 
+	err = ValidateNoStringElementIsX(transfer.ToAddresses, transfer.From)
+	if err != nil {
+		return ErrSenderAndReceiverSame
+	}
+
+	err = ValidateAddress(transfer.From, false)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid from address (%s)", err)
+	}
+
 	if duplicateInStringArray(transfer.ToAddresses) {
 		return ErrDuplicateAddresses
 	}
 
 	for _, address := range transfer.ToAddresses {
-		_, err = sdk.AccAddressFromBech32(address)
+		err = ValidateAddress(address, true)
 		if err != nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid to address (%s)", err)
 		}
@@ -265,73 +341,20 @@ func ValidateTransfer(transfer *Transfer) error {
 	return nil
 }
 
-func ValidateBadgeUris(badgeUris []*BadgeUri) error {
+func ValidateBadgeMetadata(badgeMetadata []*BadgeMetadata) error {
 	err := *new(error)
-	if badgeUris != nil && len(badgeUris) > 0 {
-		for _, badgeUri := range badgeUris {
+	if badgeMetadata != nil && len(badgeMetadata) > 0 {
+		for _, badgeMetadata := range badgeMetadata {
 			//Validate well-formedness of the message entries
-			if err := ValidateURI(badgeUri.Uri); err != nil {
+			if err := ValidateURI(badgeMetadata.Uri); err != nil {
 				return err
 			}
 
-			err = ValidateRangesAreValid(badgeUri.BadgeIds)
+			err = ValidateRangesAreValid(badgeMetadata.BadgeIds, true)
 			if err != nil {
 				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid badgeIds")
 			}
 		}
 	}
 	return nil
-}
-
-//IMPORTANT: Note this was copied from the keeper id_range.go file. If you change this, change that as well and vice versa.
-
-// Will sort the ID ranges in order and merge overlapping IDs if we can
-func SortAndMergeOverlapping(ids []*IdRange) []*IdRange {
-	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
-	var n = len(ids)
-	for i := 1; i < n; i++ {
-		j := i
-		for j > 0 {
-			if ids[j-1].Start.GT(ids[j].Start) {
-				ids[j-1], ids[j] = ids[j], ids[j-1]
-			} else if ids[j-1].Start.Equal(ids[j].Start) && ids[j-1].End.GT(ids[j].End) {
-				ids[j-1], ids[j] = ids[j], ids[j-1]
-			}
-			j = j - 1
-		}
-	}
-
-	//Merge overlapping ranges
-	if n > 0 {
-		newIdRanges := []*IdRange{ids[0]}
-		//Iterate through and compare with previously inserted range
-		for i := 1; i < n; i++ {
-			prevInsertedRange := newIdRanges[len(newIdRanges)-1]
-			currRange := ids[i]
-
-			if currRange.Start.Equal(prevInsertedRange.Start) {
-				//Both have same start, so we set to currRange.End because currRange.End is greater due to our sorting
-				//Example: prevRange = [1, 5], currRange = [1, 10] -> newRange = [1, 10]
-				newIdRanges[len(newIdRanges)-1].End = currRange.End
-			} else if currRange.End.GT(prevInsertedRange.End) {
-				//We have different starts and curr end is greater than prev end
-				
-				
-				if currRange.Start.GT(prevInsertedRange.End.AddUint64(1)) {
-					//We have a gap between the prev range end and curr range start, so we just append currRange
-					//Example: prevRange = [1, 5], currRange = [7, 10] -> newRange = [1, 5], [7, 10]
-					newIdRanges = append(newIdRanges, currRange)
-				} else {
-					//They overlap and we can merge them
-					//Example: prevRange = [1, 5], currRange = [2, 10] -> newRange = [1, 10]
-					newIdRanges[len(newIdRanges)-1].End = currRange.End
-				}
-			} else {
-				//Note: If currRange.End <= prevInsertedRange.End, it is already fully contained within the previous. We can just continue.
-			}
-		}
-		return newIdRanges
-	} else {
-		return ids
-	}
 }

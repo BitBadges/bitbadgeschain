@@ -12,27 +12,20 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdUpdateBytes() *cobra.Command {
+func CmdUpdateUserApprovedTransfers() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-bytes [collection-id] [new-bytes]",
-		Short: "Broadcast message updateBytes",
-		Args:  cobra.ExactArgs(2),
+		Use:   "update-user-approved-transfers",
+		Short: "Broadcast message updateUserApprovedTransfers",
+		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argBadgeId := types.NewUintFromString(args[0])
-			if err != nil {
-				return err
-			}
-			argNewBytes := args[1]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgUpdateBytes(
+			msg := types.NewMsgUpdateUserApprovedTransfers(
 				clientCtx.GetFromAddress().String(),
-				argBadgeId,
-				argNewBytes,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

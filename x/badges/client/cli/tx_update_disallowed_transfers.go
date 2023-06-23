@@ -13,32 +13,32 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdUpdateAllowedTransfers() *cobra.Command {
+func CmdUpdateCollectionApprovedTransfers() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-allowed-transfers [collection-id] [allowed-transfers]",
-		Short: "Broadcast message updateAllowedTransfers",
+		Short: "Broadcast message UpdateCollectionApprovedTransfers",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			
+
 			argCollectionId := types.NewUintFromString(args[0])
 			if err != nil {
 				return err
 			}
 
-			var argAllowedTransfers []*types.TransferMapping
-			if err := json.Unmarshal([]byte(args[1]), &argAllowedTransfers); err != nil {
+			var argApprovedTransfers []*types.CollectionApprovedTransfer
+			if err := json.Unmarshal([]byte(args[1]), &argApprovedTransfers); err != nil {
 				return err
 			}
-			
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgUpdateAllowedTransfers(
+			msg := types.NewMsgUpdateCollectionApprovedTransfers(
 				clientCtx.GetFromAddress().String(),
 				argCollectionId,
-				argAllowedTransfers,
+				argApprovedTransfers,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {

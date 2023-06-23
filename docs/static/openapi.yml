@@ -240,7 +240,7 @@ paths:
                               end:
                                 type: string
                             description: >-
-                              Id ranges define a range of IDs from start to end.
+                              ID ranges define a range of IDs from start to end.
                               Can be used for badge IDs, nonces, anything.
                       description: >-
                         Defines a balance object. The specified balance holds
@@ -251,15 +251,66 @@ paths:
                     items:
                       type: object
                       properties:
-                        address:
+                        to:
+                          title: from will always be the user's address
+                          type: object
+                          properties:
+                            addresses:
+                              type: array
+                              items:
+                                type: string
+                              description: >-
+                                Supports special alias called "Manager" which
+                                will automatically be replaced with the manager
+                                address.
+
+                                This is because the "Manager" address is
+                                variable.
+                            includeOnlySpecified:
+                              type: boolean
+                        initiatedBy:
+                          type: object
+                          properties:
+                            addresses:
+                              type: array
+                              items:
+                                type: string
+                              description: >-
+                                Supports special alias called "Manager" which
+                                will automatically be replaced with the manager
+                                address.
+
+                                This is because the "Manager" address is
+                                variable.
+                            includeOnlySpecified:
+                              type: boolean
+                        timeIntervals:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              start:
+                                type: string
+                              end:
+                                type: string
+                            description: >-
+                              ID ranges define a range of IDs from start to end.
+                              Can be used for badge IDs, nonces, anything.
+                        id:
                           type: string
+                        isAllowed:
+                          type: boolean
+                          title: Is the transfer to be allowed or disallowed?
+                        isFrozen:
+                          type: boolean
+                          description: >-
+                            If locked, this and all transfers before this cannot
+                            be edited.
                         balances:
                           type: array
                           items:
                             type: object
                             properties:
-                              amount:
-                                type: string
                               badgeIds:
                                 type: array
                                 items:
@@ -270,16 +321,114 @@ paths:
                                     end:
                                       type: string
                                   description: >-
-                                    Id ranges define a range of IDs from start
+                                    ID ranges define a range of IDs from start
                                     to end. Can be used for badge IDs, nonces,
                                     anything.
-                            description: >-
-                              Defines a balance object. The specified balance
-                              holds for all ids specified within the id ranges
-                              array.
-                          title: approval balances for every badgeId
-                      description: Defines an approval object for specific addresses.
-                    description: Approvals are sorted in order of address number.
+                              amount:
+                                type: string
+                              maxNumTransfers:
+                                type: string
+                              fromRestrictions:
+                                type: object
+                                properties:
+                                  amountPerAddress:
+                                    type: string
+                                    description: 0 means no restrictions.
+                                  transfersPerAddress:
+                                    type: string
+                                    description: 0 means no restrictions.
+                              toRestrictions:
+                                type: object
+                                properties:
+                                  amountPerAddress:
+                                    type: string
+                                    description: 0 means no restrictions.
+                                  transfersPerAddress:
+                                    type: string
+                                    description: 0 means no restrictions.
+                              initiatedByRestrictions:
+                                type: object
+                                properties:
+                                  amountPerAddress:
+                                    type: string
+                                    description: 0 means no restrictions.
+                                  transfersPerAddress:
+                                    type: string
+                                    description: 0 means no restrictions.
+                              requireToEqualsInitiatedBy:
+                                type: boolean
+                              requireFromEqualsInitiatedBy:
+                                type: boolean
+                              requireToDoesNotEqualInitiatedBy:
+                                type: boolean
+                              requireFromDoesNotEqualInitiatedBy:
+                                type: boolean
+                          description: >-
+                            If all the above match, then we attempt to transfer
+                            the badges from the user, if they meet the
+                            requirements below.
+                        claim:
+                          type: object
+                          properties:
+                            isClaim:
+                              type: boolean
+                              description: >-
+                                If true, we do not track anything. Ignore all
+                                other fields.
+                            uri:
+                              type: string
+                            customData:
+                              type: string
+                            incrementIdsBy:
+                              type: string
+                            startAmounts:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  amount:
+                                    type: string
+                                  badgeIds:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        start:
+                                          type: string
+                                        end:
+                                          type: string
+                                      description: >-
+                                        ID ranges define a range of IDs from
+                                        start to end. Can be used for badge IDs,
+                                        nonces, anything.
+                                description: >-
+                                  Defines a balance object. The specified
+                                  balance holds for all ids specified within the
+                                  id ranges array.
+                            challenges:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  root:
+                                    type: string
+                                  expectedProofLength:
+                                    type: string
+                                  isWhitelistTree:
+                                    type: boolean
+                                  maxOneUsePerLeaf:
+                                    type: boolean
+                                  useLeafIndexForBadgeIds:
+                                    type: boolean
+                                    description: >-
+                                      If true, then the order of the leaves in
+                                      the claim matters. If false, then the
+                                      order of the leaves in the claim does not
+                                      matter.
+                                title: >-
+                                  We will add more fields to this message later
+                                  (e.g. ZKP proofs)
+                    description: The user's approvals for each badge ID.
                 description: >-
                   Defines a user balance object for a badge w/ the user's
                   balances and approvals. All badge IDs for a collection are
@@ -483,105 +632,15 @@ paths:
   /bitbadges/bitbadgeschain/badges/get_claim/{collectionId}/{claimId}:
     get:
       summary: Queries a claim by collection ID and claim ID.
-      operationId: BitbadgesBitbadgeschainBadgesGetClaim
+      operationId: BitbadgesBitbadgeschainBadgesGetClaimNumProcessed
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              claim:
-                type: object
-                properties:
-                  undistributedBalances:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        amount:
-                          type: string
-                        badgeIds:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              start:
-                                type: string
-                              end:
-                                type: string
-                            description: >-
-                              Id ranges define a range of IDs from start to end.
-                              Can be used for badge IDs, nonces, anything.
-                      description: >-
-                        Defines a balance object. The specified balance holds
-                        for all ids specified within the id ranges array.
-                    description: Current balance of the claim store.
-                  timeRange:
-                    description: Time range when the claim is valid.
-                    type: object
-                    properties:
-                      start:
-                        type: string
-                      end:
-                        type: string
-                  uri:
-                    type: string
-                    title: >-
-                      Optional URI for the claim. Max 100 chars. Often used for
-                      IPFS Merkle Tree Information for challenges
-                  numClaimsPerAddress:
-                    type: string
-                    description: >-
-                      If >0, then the claim can only be used to claim this
-                      number of leaves per address. If 0, then no limit.
-                  incrementIdsBy:
-                    type: string
-                    title: Balances for the current claim
-                  currentClaimAmounts:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        amount:
-                          type: string
-                        badgeIds:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              start:
-                                type: string
-                              end:
-                                type: string
-                            description: >-
-                              Id ranges define a range of IDs from start to end.
-                              Can be used for badge IDs, nonces, anything.
-                      description: >-
-                        Defines a balance object. The specified balance holds
-                        for all ids specified within the id ranges array.
-                  challenges:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        root:
-                          type: string
-                        expectedProofLength:
-                          type: string
-                        useCreatorAddressAsLeaf:
-                          type: boolean
-                      title: >-
-                        We will add more fields to this message later (e.g. ZKP
-                        proofs)
-                    description: >-
-                      Challenges for the claim. If empty, then no challenges are
-                      required.
-                description: >-
-                  Defines a claim object. Claims are used to transfer badges via
-                  a claiming process.
-
-                  Stored in own store. Claimed leaves are also stored in unique
-                  store.
+              numProcessed:
+                type: string
         default:
           description: An unexpected error response.
           schema:
@@ -800,12 +859,26 @@ paths:
 
                       This is assigned by the chain itself. All ids start at 1
                       and increments by 1 each created collection.
-                  collectionUri:
+                  parentCollectionId:
                     type: string
+                    description: >-
+                      The parent collection id. If 0, then this is a root
+                      collection (i.e. not inherited from any parent
+                      collection).
+
+                      If not 0, then this is a subcollection of the parent
+                      collection.
+                  collectionMetadata:
                     description: >-
                       The URI where to fetch the collection's metadata. Max 100
                       characters.
-                  badgeUris:
+                    type: object
+                    properties:
+                      uri:
+                        type: string
+                      customData:
+                        type: string
+                  badgeMetadata:
                     type: array
                     items:
                       type: object
@@ -822,34 +895,53 @@ paths:
                               end:
                                 type: string
                             description: >-
-                              Id ranges define a range of IDs from start to end.
+                              ID ranges define a range of IDs from start to end.
                               Can be used for badge IDs, nonces, anything.
+                        customData:
+                          type: string
+                        isFrozen:
+                          type: boolean
                       description: >-
-                        BadgeUri defines a URI where to fetch the badge metadata
-                        for the given badge id ranges
+                        BadgeMetadataUri defines a URI where to fetch the badge
+                        metadata for the given badge id ranges
 
                         If {id} is included in the URI, it will be replaced by
                         each badge's unique id.
                     description: >-
-                      An array of BadgeUri objects for where to fetch the badge
-                      metadata.
+                      An array of BadgeMetadataUri objects for where to fetch
+                      the badge metadata.
 
-                      Each BadgeUri object has a uri and an array of badgeId
-                      ranges (see BadgeUri type).
+                      Each BadgeMetadataUri object has a uri and an array of
+                      badgeId ranges (see BadgeMetadataUri type).
 
                       The uri can include {id} in the URI which is a placeholder
                       to be replaced by each badge's unique id.
 
                       To fetch the metadata for a speciifc badge, the first
                       match is always used.
-                  balancesUri:
-                    type: string
+                  offChainBalancesMetadata:
                     description: >-
                       The URI where to fetch the collection's balances. Max 100
                       characters. 
 
                       Leave blank if balances are to be stored on-chain.
-                  bytes:
+                    type: object
+                    properties:
+                      uri:
+                        type: string
+                      customData:
+                        type: string
+                  isOffChainBalances:
+                    type: boolean
+                    description: >-
+                      Defines if the balances are stored on-chain or off-chain.
+                      If off-chain, then the offChainBalancesMetadata field will be set.
+
+                      Can't be changed after creation of the collection.
+
+                      If set, all on-chain transfer functionality will throw
+                      errors.
+                  customData:
                     type: string
                     description: >-
                       These are arbitrary bytes can be used to store anything
@@ -858,19 +950,215 @@ paths:
 
                       This can be updatable or not depending on the permissions
                       set. Max 256 bytes allowed.
+
+                      Parse this data according to the standards defined in the
+                      standards array.
+                  contractAddress:
+                    type: string
+                    description: >-
+                      The address of a contract that implements additional
+                      functionality for this collection.
+
+                      Can point to a contract on another chain or on the
+                      BitBadges chain (depending on if it needs access to edit
+                      the collection or not).
+
+                      Prefix with eth: for Ethereum. If no prefix, then it is
+                      assumed to be on the BitBadges chain.
                   manager:
                     type: string
                     description: >-
                       The manager's address. The manager can be granted special
-                      permissions.
+                      permissions below.
                   permissions:
-                    type: string
                     description: >-
                       Store permissions packed in a uint where the bits
                       correspond to certain permissions.
 
                       Leading zeroes are applied. See permissions definition.
-                  allowedTransfers:
+                    type: object
+                    properties:
+                      canArchive:
+                        type: object
+                        properties:
+                          isFrozen:
+                            type: boolean
+                          timeIntervals:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                start:
+                                  type: string
+                                end:
+                                  type: string
+                              description: >-
+                                ID ranges define a range of IDs from start to
+                                end. Can be used for badge IDs, nonces,
+                                anything.
+                      canUpdateContractAddress:
+                        type: object
+                        properties:
+                          isFrozen:
+                            type: boolean
+                          timeIntervals:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                start:
+                                  type: string
+                                end:
+                                  type: string
+                              description: >-
+                                ID ranges define a range of IDs from start to
+                                end. Can be used for badge IDs, nonces,
+                                anything.
+                      canUpdateOffChainBalancesMetadata:
+                        type: object
+                        properties:
+                          isFrozen:
+                            type: boolean
+                          timeIntervals:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                start:
+                                  type: string
+                                end:
+                                  type: string
+                              description: >-
+                                ID ranges define a range of IDs from start to
+                                end. Can be used for badge IDs, nonces,
+                                anything.
+                      canDeleteCollection:
+                        type: object
+                        properties:
+                          isFrozen:
+                            type: boolean
+                          timeIntervals:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                start:
+                                  type: string
+                                end:
+                                  type: string
+                              description: >-
+                                ID ranges define a range of IDs from start to
+                                end. Can be used for badge IDs, nonces,
+                                anything.
+                      canUpdateCustomData:
+                        type: object
+                        properties:
+                          isFrozen:
+                            type: boolean
+                          timeIntervals:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                start:
+                                  type: string
+                                end:
+                                  type: string
+                              description: >-
+                                ID ranges define a range of IDs from start to
+                                end. Can be used for badge IDs, nonces,
+                                anything.
+                      canUpdateManager:
+                        type: object
+                        properties:
+                          isFrozen:
+                            type: boolean
+                          timeIntervals:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                start:
+                                  type: string
+                                end:
+                                  type: string
+                              description: >-
+                                ID ranges define a range of IDs from start to
+                                end. Can be used for badge IDs, nonces,
+                                anything.
+                      canUpdateCollectionMetadata:
+                        type: object
+                        properties:
+                          isFrozen:
+                            type: boolean
+                          timeIntervals:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                start:
+                                  type: string
+                                end:
+                                  type: string
+                              description: >-
+                                ID ranges define a range of IDs from start to
+                                end. Can be used for badge IDs, nonces,
+                                anything.
+                      canUpdateBadgeMetadata:
+                        type: object
+                        properties:
+                          isFrozen:
+                            type: boolean
+                          timeIntervals:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                start:
+                                  type: string
+                                end:
+                                  type: string
+                              description: >-
+                                ID ranges define a range of IDs from start to
+                                end. Can be used for badge IDs, nonces,
+                                anything.
+                      canCreateMoreBadges:
+                        type: object
+                        properties:
+                          isFrozen:
+                            type: boolean
+                          timeIntervals:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                start:
+                                  type: string
+                                end:
+                                  type: string
+                              description: >-
+                                ID ranges define a range of IDs from start to
+                                end. Can be used for badge IDs, nonces,
+                                anything.
+                      canUpdateCollectionApprovedTransfers:
+                        type: object
+                        properties:
+                          isFrozen:
+                            type: boolean
+                          timeIntervals:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                start:
+                                  type: string
+                                end:
+                                  type: string
+                              description: >-
+                                ID ranges define a range of IDs from start to
+                                end. Can be used for badge IDs, nonces,
+                                anything.
+                  approvedTransfers:
                     type: array
                     items:
                       type: object
@@ -882,10 +1170,15 @@ paths:
                               type: array
                               items:
                                 type: string
+                              description: >-
+                                Supports special alias called "Manager" which
+                                will automatically be replaced with the manager
+                                address.
+
+                                This is because the "Manager" address is
+                                variable.
                             includeOnlySpecified:
                               type: boolean
-                            managerOptions:
-                              type: string
                         to:
                           type: object
                           properties:
@@ -893,70 +1186,159 @@ paths:
                               type: array
                               items:
                                 type: string
+                              description: >-
+                                Supports special alias called "Manager" which
+                                will automatically be replaced with the manager
+                                address.
+
+                                This is because the "Manager" address is
+                                variable.
                             includeOnlySpecified:
                               type: boolean
-                            managerOptions:
-                              type: string
-                      description: >-
-                        TransferMapping defines a mapping of transfers from one
-                        set of addresses to another.
-                    title: >-
-                      This defines the address combinations that can be
-                      transferred. 
-
-                      Used to freeze addresses and prevent transfers.
-
-                      If all addresses are disallowed, then the badge is
-                      non-transferable.
-
-                      If all are allowed, then the badge is transferable.
-
-                      Ex: If an account is in the "to" mapping and another
-                      account is in the "from" mapping,
-                         the "to" account can transfer to the "from" account
-                  managerApprovedTransfers:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        from:
+                        initiatedBy:
                           type: object
                           properties:
                             addresses:
                               type: array
                               items:
                                 type: string
+                              description: >-
+                                Supports special alias called "Manager" which
+                                will automatically be replaced with the manager
+                                address.
+
+                                This is because the "Manager" address is
+                                variable.
                             includeOnlySpecified:
                               type: boolean
-                            managerOptions:
-                              type: string
-                        to:
+                        timeIntervals:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              start:
+                                type: string
+                              end:
+                                type: string
+                            description: >-
+                              ID ranges define a range of IDs from start to end.
+                              Can be used for badge IDs, nonces, anything.
+                        id:
+                          type: string
+                        isAllowed:
+                          type: boolean
+                          title: Is the transfer to be allowed or disallowed?
+                        isFrozen:
+                          type: boolean
+                          description: >-
+                            If locked, this and all transfers before this cannot
+                            be edited.
+                        balances:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              amount:
+                                type: string
+                              badgeIds:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    start:
+                                      type: string
+                                    end:
+                                      type: string
+                                  description: >-
+                                    ID ranges define a range of IDs from start
+                                    to end. Can be used for badge IDs, nonces,
+                                    anything.
+                            description: >-
+                              Defines a balance object. The specified balance
+                              holds for all ids specified within the id ranges
+                              array.
+                          description: >-
+                            If all the above match, then we attempt to transfer
+                            the badges from the user, if they meet the
+                            requirements below.
+                        overridesFromApprovedTransfers:
+                          type: boolean
+                          description: >-
+                            If true, then we do not even check the approvals and
+                            allow the transfer.
+
+                            No approval will be deducted, this step is skipped.
+
+                            Required to be true for transfers because 'Mint'
+                            address does not have and will never have any
+                            approvals.
+                        claim:
                           type: object
                           properties:
-                            addresses:
+                            isClaim:
+                              type: boolean
+                              description: >-
+                                If true, we do not track anything. Ignore all
+                                other fields.
+                            uri:
+                              type: string
+                            customData:
+                              type: string
+                            incrementIdsBy:
+                              type: string
+                            startAmounts:
                               type: array
                               items:
-                                type: string
-                            includeOnlySpecified:
-                              type: boolean
-                            managerOptions:
-                              type: string
-                      description: >-
-                        TransferMapping defines a mapping of transfers from one
-                        set of addresses to another.
-                    title: >-
-                      This defines the address combinations that the manager is
-                      approved to execute (overrides allowedTransfers).
+                                type: object
+                                properties:
+                                  amount:
+                                    type: string
+                                  badgeIds:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        start:
+                                          type: string
+                                        end:
+                                          type: string
+                                      description: >-
+                                        ID ranges define a range of IDs from
+                                        start to end. Can be used for badge IDs,
+                                        nonces, anything.
+                                description: >-
+                                  Defines a balance object. The specified
+                                  balance holds for all ids specified within the
+                                  id ranges array.
+                            challenges:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  root:
+                                    type: string
+                                  expectedProofLength:
+                                    type: string
+                                  isWhitelistTree:
+                                    type: boolean
+                                  maxOneUsePerLeaf:
+                                    type: boolean
+                                  useLeafIndexForBadgeIds:
+                                    type: boolean
+                                    description: >-
+                                      If true, then the order of the leaves in
+                                      the claim matters. If false, then the
+                                      order of the leaves in the claim does not
+                                      matter.
+                                title: >-
+                                  We will add more fields to this message later
+                                  (e.g. ZKP proofs)
+                          title: Claim fields
+                    description: >-
+                      This is the most important part of the collection and
+                      defines the transferability, approvals, and claims
 
-                      Example use case would be to set up the manager being able
-                      to forcefully revoke or forcefully burn badges.
-
-                      This can be updated, but addresses can only be removed,
-                      never added.
-
-                      Ex: If an account is in the "to" mapping and another
-                      account is in the "from" mapping,
-                         the manager can transfer any badge from the "to" account to the "from" account
+                      for the collection.
                   nextBadgeId:
                     type: string
                     description: >-
@@ -979,7 +1361,7 @@ paths:
                               end:
                                 type: string
                             description: >-
-                              Id ranges define a range of IDs from start to end.
+                              ID ranges define a range of IDs from start to end.
                               Can be used for badge IDs, nonces, anything.
                       description: >-
                         Defines a balance object. The specified balance holds
@@ -1007,27 +1389,33 @@ paths:
                               end:
                                 type: string
                             description: >-
-                              Id ranges define a range of IDs from start to end.
+                              ID ranges define a range of IDs from start to end.
                               Can be used for badge IDs, nonces, anything.
                       description: >-
                         Defines a balance object. The specified balance holds
                         for all ids specified within the id ranges array.
                     description: This is a map of the maximum badge supplys by ID.
-                  nextClaimId:
+                  nextApprovedTransferId:
                     type: string
-                    description: >-
-                      Keeps track of the next claim id. Claim ids start at 1. 
-
-                      Each claim created will increment this by 1. Can't
-                      overflow.
-
-                      Claims are stored in a separate store because they are
-                      frequently written to.
+                    description: |-
+                      Keeps track of the next approved transfer id. Start at 1. 
+                      Each created will increment this by 1. Can't overflow.
                   standard:
                     type: string
                     description: >-
                       Defines what standard this badge should implement (see
                       standards documentation).
+                  isArchived:
+                    type: boolean
+                    description: >-
+                      Defines if the collection is isFrozen or not. Frozen
+                      collections can't be updated (all Msgs will fail).
+
+                      This can be useful for security reasons, archiving, or to
+                      set universal genesis conditions for subcollections.
+
+                      Subcollections will have a choice to inherit this setting
+                      or not.
                 description: BadgeCollection defines a standard collection of badges.
         default:
           description: An unexpected error response.
@@ -47673,46 +48061,74 @@ paths:
       tags:
         - Query
 definitions:
-  bitbadges.bitbadgeschain.badges.AddressesMapping:
+  bitbadges.bitbadgeschain.badges.AddressMapping:
     type: object
     properties:
       addresses:
         type: array
         items:
           type: string
+        description: >-
+          Supports special alias called "Manager" which will automatically be
+          replaced with the manager address.
+
+          This is because the "Manager" address is variable.
       includeOnlySpecified:
         type: boolean
-      managerOptions:
-        type: string
-  bitbadges.bitbadgeschain.badges.Approval:
+  bitbadges.bitbadgeschain.badges.ApprovedBalance:
     type: object
     properties:
-      address:
-        type: string
-      balances:
+      badgeIds:
         type: array
         items:
           type: object
           properties:
-            amount:
+            start:
               type: string
-            badgeIds:
-              type: array
-              items:
-                type: object
-                properties:
-                  start:
-                    type: string
-                  end:
-                    type: string
-                description: >-
-                  Id ranges define a range of IDs from start to end. Can be used
-                  for badge IDs, nonces, anything.
+            end:
+              type: string
           description: >-
-            Defines a balance object. The specified balance holds for all ids
-            specified within the id ranges array.
-        title: approval balances for every badgeId
-    description: Defines an approval object for specific addresses.
+            ID ranges define a range of IDs from start to end. Can be used for
+            badge IDs, nonces, anything.
+      amount:
+        type: string
+      maxNumTransfers:
+        type: string
+      fromRestrictions:
+        type: object
+        properties:
+          amountPerAddress:
+            type: string
+            description: 0 means no restrictions.
+          transfersPerAddress:
+            type: string
+            description: 0 means no restrictions.
+      toRestrictions:
+        type: object
+        properties:
+          amountPerAddress:
+            type: string
+            description: 0 means no restrictions.
+          transfersPerAddress:
+            type: string
+            description: 0 means no restrictions.
+      initiatedByRestrictions:
+        type: object
+        properties:
+          amountPerAddress:
+            type: string
+            description: 0 means no restrictions.
+          transfersPerAddress:
+            type: string
+            description: 0 means no restrictions.
+      requireToEqualsInitiatedBy:
+        type: boolean
+      requireFromEqualsInitiatedBy:
+        type: boolean
+      requireToDoesNotEqualInitiatedBy:
+        type: boolean
+      requireFromDoesNotEqualInitiatedBy:
+        type: boolean
   bitbadges.bitbadgeschain.badges.BadgeCollection:
     type: object
     properties:
@@ -47724,10 +48140,22 @@ definitions:
 
           This is assigned by the chain itself. All ids start at 1 and
           increments by 1 each created collection.
-      collectionUri:
+      parentCollectionId:
         type: string
-        description: The URI where to fetch the collection's metadata. Max 100 characters.
-      badgeUris:
+        description: >-
+          The parent collection id. If 0, then this is a root collection (i.e.
+          not inherited from any parent collection).
+
+          If not 0, then this is a subcollection of the parent collection.
+      collectionMetadata:
+        description: The URI where to fetch the collection's metadata. 
+        type: object
+        properties:
+          uri:
+            type: string
+          customData:
+            type: string
+      badgeMetadata:
         type: array
         items:
           type: object
@@ -47744,31 +48172,50 @@ definitions:
                   end:
                     type: string
                 description: >-
-                  Id ranges define a range of IDs from start to end. Can be used
+                  ID ranges define a range of IDs from start to end. Can be used
                   for badge IDs, nonces, anything.
+            customData:
+              type: string
+            isFrozen:
+              type: boolean
           description: >-
-            BadgeUri defines a URI where to fetch the badge metadata for the
-            given badge id ranges
+            BadgeMetadataUri defines a URI where to fetch the badge metadata for
+            the given badge id ranges
 
             If {id} is included in the URI, it will be replaced by each badge's
             unique id.
         description: >-
-          An array of BadgeUri objects for where to fetch the badge metadata.
+          An array of BadgeMetadataUri objects for where to fetch the badge
+          metadata.
 
-          Each BadgeUri object has a uri and an array of badgeId ranges (see
-          BadgeUri type).
+          Each BadgeMetadataUri object has a uri and an array of badgeId ranges
+          (see BadgeMetadataUri type).
 
           The uri can include {id} in the URI which is a placeholder to be
           replaced by each badge's unique id.
 
           To fetch the metadata for a speciifc badge, the first match is always
           used.
-      balancesUri:
-        type: string
+      offChainBalancesMetadata:
         description: |-
-          The URI where to fetch the collection's balances. Max 100 characters. 
+          The URI where to fetch the collection's balances.  
           Leave blank if balances are to be stored on-chain.
-      bytes:
+        type: object
+        properties:
+          uri:
+            type: string
+          customData:
+            type: string
+      isOffChainBalances:
+        type: boolean
+        description: >-
+          Defines if the balances are stored on-chain or off-chain. If
+          off-chain, then the offChainBalancesMetadata field will be set.
+
+          Can't be changed after creation of the collection.
+
+          If set, all on-chain transfer functionality will throw errors.
+      customData:
         type: string
         description: >-
           These are arbitrary bytes can be used to store anything on-chain about
@@ -47776,17 +48223,204 @@ definitions:
 
           This can be updatable or not depending on the permissions set. Max 256
           bytes allowed.
+
+          Parse this data according to the standards defined in the standards
+          array.
+      contractAddress:
+        type: string
+        description: >-
+          The address of a contract that implements additional functionality for
+          this collection.
+
+          Can point to a contract on another chain or on the BitBadges chain
+          (depending on if it needs access to edit the collection or not).
+
+          Prefix with eth: for Ethereum. If no prefix, then it is assumed to be
+          on the BitBadges chain.
       manager:
         type: string
-        description: The manager's address. The manager can be granted special permissions.
+        description: >-
+          The manager's address. The manager can be granted special permissions
+          below.
       permissions:
-        type: string
         description: >-
           Store permissions packed in a uint where the bits correspond to
           certain permissions.
 
           Leading zeroes are applied. See permissions definition.
-      allowedTransfers:
+        type: object
+        properties:
+          canArchive:
+            type: object
+            properties:
+              isFrozen:
+                type: boolean
+              timeIntervals:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                    end:
+                      type: string
+                  description: >-
+                    ID ranges define a range of IDs from start to end. Can be
+                    used for badge IDs, nonces, anything.
+          canUpdateContractAddress:
+            type: object
+            properties:
+              isFrozen:
+                type: boolean
+              timeIntervals:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                    end:
+                      type: string
+                  description: >-
+                    ID ranges define a range of IDs from start to end. Can be
+                    used for badge IDs, nonces, anything.
+          canUpdateOffChainBalancesMetadata:
+            type: object
+            properties:
+              isFrozen:
+                type: boolean
+              timeIntervals:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                    end:
+                      type: string
+                  description: >-
+                    ID ranges define a range of IDs from start to end. Can be
+                    used for badge IDs, nonces, anything.
+          canDeleteCollection:
+            type: object
+            properties:
+              isFrozen:
+                type: boolean
+              timeIntervals:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                    end:
+                      type: string
+                  description: >-
+                    ID ranges define a range of IDs from start to end. Can be
+                    used for badge IDs, nonces, anything.
+          canUpdateCustomData:
+            type: object
+            properties:
+              isFrozen:
+                type: boolean
+              timeIntervals:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                    end:
+                      type: string
+                  description: >-
+                    ID ranges define a range of IDs from start to end. Can be
+                    used for badge IDs, nonces, anything.
+          canUpdateManager:
+            type: object
+            properties:
+              isFrozen:
+                type: boolean
+              timeIntervals:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                    end:
+                      type: string
+                  description: >-
+                    ID ranges define a range of IDs from start to end. Can be
+                    used for badge IDs, nonces, anything.
+          canUpdateCollectionMetadata:
+            type: object
+            properties:
+              isFrozen:
+                type: boolean
+              timeIntervals:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                    end:
+                      type: string
+                  description: >-
+                    ID ranges define a range of IDs from start to end. Can be
+                    used for badge IDs, nonces, anything.
+          canUpdateBadgeMetadata:
+            type: object
+            properties:
+              isFrozen:
+                type: boolean
+              timeIntervals:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                    end:
+                      type: string
+                  description: >-
+                    ID ranges define a range of IDs from start to end. Can be
+                    used for badge IDs, nonces, anything.
+          canCreateMoreBadges:
+            type: object
+            properties:
+              isFrozen:
+                type: boolean
+              timeIntervals:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                    end:
+                      type: string
+                  description: >-
+                    ID ranges define a range of IDs from start to end. Can be
+                    used for badge IDs, nonces, anything.
+          canUpdateCollectionApprovedTransfers:
+            type: object
+            properties:
+              isFrozen:
+                type: boolean
+              timeIntervals:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                    end:
+                      type: string
+                  description: >-
+                    ID ranges define a range of IDs from start to end. Can be
+                    used for badge IDs, nonces, anything.
+      approvedTransfers:
         type: array
         items:
           type: object
@@ -47798,10 +48432,13 @@ definitions:
                   type: array
                   items:
                     type: string
+                  description: >-
+                    Supports special alias called "Manager" which will
+                    automatically be replaced with the manager address.
+
+                    This is because the "Manager" address is variable.
                 includeOnlySpecified:
                   type: boolean
-                managerOptions:
-                  type: string
             to:
               type: object
               properties:
@@ -47809,67 +48446,144 @@ definitions:
                   type: array
                   items:
                     type: string
+                  description: >-
+                    Supports special alias called "Manager" which will
+                    automatically be replaced with the manager address.
+
+                    This is because the "Manager" address is variable.
                 includeOnlySpecified:
                   type: boolean
-                managerOptions:
-                  type: string
-          description: >-
-            TransferMapping defines a mapping of transfers from one set of
-            addresses to another.
-        title: >-
-          This defines the address combinations that can be transferred. 
-
-          Used to freeze addresses and prevent transfers.
-
-          If all addresses are disallowed, then the badge is non-transferable.
-
-          If all are allowed, then the badge is transferable.
-
-          Ex: If an account is in the "to" mapping and another account is in the
-          "from" mapping,
-             the "to" account can transfer to the "from" account
-      managerApprovedTransfers:
-        type: array
-        items:
-          type: object
-          properties:
-            from:
+            initiatedBy:
               type: object
               properties:
                 addresses:
                   type: array
                   items:
                     type: string
+                  description: >-
+                    Supports special alias called "Manager" which will
+                    automatically be replaced with the manager address.
+
+                    This is because the "Manager" address is variable.
                 includeOnlySpecified:
                   type: boolean
-                managerOptions:
-                  type: string
-            to:
+            timeIntervals:
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                  end:
+                    type: string
+                description: >-
+                  ID ranges define a range of IDs from start to end. Can be used
+                  for badge IDs, nonces, anything.
+            id:
+              type: string
+            isAllowed:
+              type: boolean
+              title: Is the transfer to be allowed or disallowed?
+            isFrozen:
+              type: boolean
+              description: If locked, this and all transfers before this cannot be edited.
+            balances:
+              type: array
+              items:
+                type: object
+                properties:
+                  amount:
+                    type: string
+                  badgeIds:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                        end:
+                          type: string
+                      description: >-
+                        ID ranges define a range of IDs from start to end. Can
+                        be used for badge IDs, nonces, anything.
+                description: >-
+                  Defines a balance object. The specified balance holds for all
+                  ids specified within the id ranges array.
+              description: >-
+                If all the above match, then we attempt to transfer the badges
+                from the user, if they meet the requirements below.
+            overridesFromApprovedTransfers:
+              type: boolean
+              description: >-
+                If true, then we do not even check the approvals and allow the
+                transfer.
+
+                No approval will be deducted, this step is skipped.
+
+                Required to be true for transfers because 'Mint' address does
+                not have and will never have any approvals.
+            claim:
               type: object
               properties:
-                addresses:
+                isClaim:
+                  type: boolean
+                  description: If true, we do not track anything. Ignore all other fields.
+                uri:
+                  type: string
+                customData:
+                  type: string
+                incrementIdsBy:
+                  type: string
+                startAmounts:
                   type: array
                   items:
-                    type: string
-                includeOnlySpecified:
-                  type: boolean
-                managerOptions:
-                  type: string
-          description: >-
-            TransferMapping defines a mapping of transfers from one set of
-            addresses to another.
-        title: >-
-          This defines the address combinations that the manager is approved to
-          execute (overrides allowedTransfers).
+                    type: object
+                    properties:
+                      amount:
+                        type: string
+                      badgeIds:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            start:
+                              type: string
+                            end:
+                              type: string
+                          description: >-
+                            ID ranges define a range of IDs from start to end.
+                            Can be used for badge IDs, nonces, anything.
+                    description: >-
+                      Defines a balance object. The specified balance holds for
+                      all ids specified within the id ranges array.
+                challenges:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      root:
+                        type: string
+                      expectedProofLength:
+                        type: string
+                      isWhitelistTree:
+                        type: boolean
+                      maxOneUsePerLeaf:
+                        type: boolean
+                      useLeafIndexForBadgeIds:
+                        type: boolean
+                        description: >-
+                          If true, then the order of the leaves in the claim
+                          matters. If false, then the order of the leaves in the
+                          claim does not matter.
+                    title: >-
+                      We will add more fields to this message later (e.g. ZKP
+                      proofs)
+              title: Claim fields
+        description: >-
+          This is the most important part of the collection and defines the
+          transferability, approvals, and claims
 
-          Example use case would be to set up the manager being able to
-          forcefully revoke or forcefully burn badges.
-
-          This can be updated, but addresses can only be removed, never added.
-
-          Ex: If an account is in the "to" mapping and another account is in the
-          "from" mapping,
-             the manager can transfer any badge from the "to" account to the "from" account
+          for the collection.
       nextBadgeId:
         type: string
         description: >-
@@ -47892,7 +48606,7 @@ definitions:
                   end:
                     type: string
                 description: >-
-                  Id ranges define a range of IDs from start to end. Can be used
+                  ID ranges define a range of IDs from start to end. Can be used
                   for badge IDs, nonces, anything.
           description: >-
             Defines a balance object. The specified balance holds for all ids
@@ -47919,40 +48633,34 @@ definitions:
                   end:
                     type: string
                 description: >-
-                  Id ranges define a range of IDs from start to end. Can be used
+                  ID ranges define a range of IDs from start to end. Can be used
                   for badge IDs, nonces, anything.
           description: >-
             Defines a balance object. The specified balance holds for all ids
             specified within the id ranges array.
         description: This is a map of the maximum badge supplys by ID.
-      nextClaimId:
+      nextApprovedTransferId:
         type: string
-        description: >-
-          Keeps track of the next claim id. Claim ids start at 1. 
-
-          Each claim created will increment this by 1. Can't overflow.
-
-          Claims are stored in a separate store because they are frequently
-          written to.
+        description: |-
+          Keeps track of the next approved transfer id. Start at 1. 
+          Each created will increment this by 1. Can't overflow.
       standard:
         type: string
         description: >-
           Defines what standard this badge should implement (see standards
           documentation).
-    description: BadgeCollection defines a standard collection of badges.
-  bitbadges.bitbadgeschain.badges.BadgeSupplyAndAmount:
-    type: object
-    properties:
-      supply:
-        type: string
-      amount:
-        type: string
-    description: >-
-      BadgeSupplyAndAmount is used to define the supply and amount of badges to
-      create.
+      isArchived:
+        type: boolean
+        description: >-
+          Defines if the collection is isFrozen or not. Frozen collections can't
+          be updated (all Msgs will fail).
 
-      We create x amount of badges each with a supply of y.
-  bitbadges.bitbadgeschain.badges.BadgeUri:
+          This can be useful for security reasons, archiving, or to set
+          universal genesis conditions for subcollections.
+
+          Subcollections will have a choice to inherit this setting or not.
+    description: BadgeCollection defines a standard collection of badges.
+  bitbadges.bitbadgeschain.badges.BadgeMetadata:
     type: object
     properties:
       uri:
@@ -47967,14 +48675,30 @@ definitions:
             end:
               type: string
           description: >-
-            Id ranges define a range of IDs from start to end. Can be used for
+            ID ranges define a range of IDs from start to end. Can be used for
             badge IDs, nonces, anything.
+      customData:
+        type: string
+      isFrozen:
+        type: boolean
     description: >-
-      BadgeUri defines a URI where to fetch the badge metadata for the given
-      badge id ranges
+      BadgeMetadataUri defines a URI where to fetch the badge metadata for the
+      given badge id ranges
 
       If {id} is included in the URI, it will be replaced by each badge's unique
       id.
+  bitbadges.bitbadgeschain.badges.BadgeSupplyAndAmount:
+    type: object
+    properties:
+      supply:
+        type: string
+      amount:
+        type: string
+    description: >-
+      BadgeSupplyAndAmount is used to define the supply and amount of badges to
+      create.
+
+      We create x amount of badges each with a supply of y.
   bitbadges.bitbadgeschain.badges.Balance:
     type: object
     properties:
@@ -47990,11 +48714,18 @@ definitions:
             end:
               type: string
           description: >-
-            Id ranges define a range of IDs from start to end. Can be used for
+            ID ranges define a range of IDs from start to end. Can be used for
             badge IDs, nonces, anything.
     description: >-
       Defines a balance object. The specified balance holds for all ids
       specified within the id ranges array.
+  bitbadges.bitbadgeschain.badges.OffChainBalancesMetadata:
+    type: object
+    properties:
+      uri:
+        type: string
+      customData:
+        type: string
   bitbadges.bitbadgeschain.badges.Challenge:
     type: object
     properties:
@@ -48002,8 +48733,15 @@ definitions:
         type: string
       expectedProofLength:
         type: string
-      useCreatorAddressAsLeaf:
+      isWhitelistTree:
         type: boolean
+      maxOneUsePerLeaf:
+        type: boolean
+      useLeafIndexForBadgeIds:
+        type: boolean
+        description: >-
+          If true, then the order of the leaves in the claim matters. If false,
+          then the order of the leaves in the claim does not matter.
     title: We will add more fields to this message later (e.g. ZKP proofs)
   bitbadges.bitbadgeschain.badges.ChallengeSolution:
     type: object
@@ -48026,51 +48764,16 @@ definitions:
   bitbadges.bitbadgeschain.badges.Claim:
     type: object
     properties:
-      undistributedBalances:
-        type: array
-        items:
-          type: object
-          properties:
-            amount:
-              type: string
-            badgeIds:
-              type: array
-              items:
-                type: object
-                properties:
-                  start:
-                    type: string
-                  end:
-                    type: string
-                description: >-
-                  Id ranges define a range of IDs from start to end. Can be used
-                  for badge IDs, nonces, anything.
-          description: >-
-            Defines a balance object. The specified balance holds for all ids
-            specified within the id ranges array.
-        description: Current balance of the claim store.
-      timeRange:
-        description: Time range when the claim is valid.
-        type: object
-        properties:
-          start:
-            type: string
-          end:
-            type: string
+      isClaim:
+        type: boolean
+        description: If true, we do not track anything. Ignore all other fields.
       uri:
         type: string
-        title: >-
-          Optional URI for the claim. Max 100 chars. Often used for IPFS Merkle
-          Tree Information for challenges
-      numClaimsPerAddress:
+      customData:
         type: string
-        description: >-
-          If >0, then the claim can only be used to claim this number of leaves
-          per address. If 0, then no limit.
       incrementIdsBy:
         type: string
-        title: Balances for the current claim
-      currentClaimAmounts:
+      startAmounts:
         type: array
         items:
           type: object
@@ -48087,7 +48790,7 @@ definitions:
                   end:
                     type: string
                 description: >-
-                  Id ranges define a range of IDs from start to end. Can be used
+                  ID ranges define a range of IDs from start to end. Can be used
                   for badge IDs, nonces, anything.
           description: >-
             Defines a balance object. The specified balance holds for all ids
@@ -48101,15 +48804,17 @@ definitions:
               type: string
             expectedProofLength:
               type: string
-            useCreatorAddressAsLeaf:
+            isWhitelistTree:
               type: boolean
+            maxOneUsePerLeaf:
+              type: boolean
+            useLeafIndexForBadgeIds:
+              type: boolean
+              description: >-
+                If true, then the order of the leaves in the claim matters. If
+                false, then the order of the leaves in the claim does not
+                matter.
           title: We will add more fields to this message later (e.g. ZKP proofs)
-        description: Challenges for the claim. If empty, then no challenges are required.
-    description: >-
-      Defines a claim object. Claims are used to transfer badges via a claiming
-      process.
-
-      Stored in own store. Claimed leaves are also stored in unique store.
   bitbadges.bitbadgeschain.badges.ClaimProof:
     type: object
     properties:
@@ -48132,6 +48837,168 @@ definitions:
         type: string
       onRight:
         type: boolean
+  bitbadges.bitbadgeschain.badges.CollectionApprovedTransfer:
+    type: object
+    properties:
+      from:
+        type: object
+        properties:
+          addresses:
+            type: array
+            items:
+              type: string
+            description: >-
+              Supports special alias called "Manager" which will automatically
+              be replaced with the manager address.
+
+              This is because the "Manager" address is variable.
+          includeOnlySpecified:
+            type: boolean
+      to:
+        type: object
+        properties:
+          addresses:
+            type: array
+            items:
+              type: string
+            description: >-
+              Supports special alias called "Manager" which will automatically
+              be replaced with the manager address.
+
+              This is because the "Manager" address is variable.
+          includeOnlySpecified:
+            type: boolean
+      initiatedBy:
+        type: object
+        properties:
+          addresses:
+            type: array
+            items:
+              type: string
+            description: >-
+              Supports special alias called "Manager" which will automatically
+              be replaced with the manager address.
+
+              This is because the "Manager" address is variable.
+          includeOnlySpecified:
+            type: boolean
+      timeIntervals:
+        type: array
+        items:
+          type: object
+          properties:
+            start:
+              type: string
+            end:
+              type: string
+          description: >-
+            ID ranges define a range of IDs from start to end. Can be used for
+            badge IDs, nonces, anything.
+      id:
+        type: string
+      isAllowed:
+        type: boolean
+        title: Is the transfer to be allowed or disallowed?
+      isFrozen:
+        type: boolean
+        description: If locked, this and all transfers before this cannot be edited.
+      balances:
+        type: array
+        items:
+          type: object
+          properties:
+            amount:
+              type: string
+            badgeIds:
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                  end:
+                    type: string
+                description: >-
+                  ID ranges define a range of IDs from start to end. Can be used
+                  for badge IDs, nonces, anything.
+          description: >-
+            Defines a balance object. The specified balance holds for all ids
+            specified within the id ranges array.
+        description: >-
+          If all the above match, then we attempt to transfer the badges from
+          the user, if they meet the requirements below.
+      overridesFromApprovedTransfers:
+        type: boolean
+        description: >-
+          If true, then we do not even check the approvals and allow the
+          transfer.
+
+          No approval will be deducted, this step is skipped.
+
+          Required to be true for transfers because 'Mint' address does not have
+          and will never have any approvals.
+      claim:
+        type: object
+        properties:
+          isClaim:
+            type: boolean
+            description: If true, we do not track anything. Ignore all other fields.
+          uri:
+            type: string
+          customData:
+            type: string
+          incrementIdsBy:
+            type: string
+          startAmounts:
+            type: array
+            items:
+              type: object
+              properties:
+                amount:
+                  type: string
+                badgeIds:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                      end:
+                        type: string
+                    description: >-
+                      ID ranges define a range of IDs from start to end. Can be
+                      used for badge IDs, nonces, anything.
+              description: >-
+                Defines a balance object. The specified balance holds for all
+                ids specified within the id ranges array.
+          challenges:
+            type: array
+            items:
+              type: object
+              properties:
+                root:
+                  type: string
+                expectedProofLength:
+                  type: string
+                isWhitelistTree:
+                  type: boolean
+                maxOneUsePerLeaf:
+                  type: boolean
+                useLeafIndexForBadgeIds:
+                  type: boolean
+                  description: >-
+                    If true, then the order of the leaves in the claim matters.
+                    If false, then the order of the leaves in the claim does not
+                    matter.
+              title: We will add more fields to this message later (e.g. ZKP proofs)
+        title: Claim fields
+  bitbadges.bitbadgeschain.badges.CollectionMetadata:
+    type: object
+    properties:
+      uri:
+        type: string
+      customData:
+        type: string
   bitbadges.bitbadgeschain.badges.IdRange:
     type: object
     properties:
@@ -48140,43 +49007,233 @@ definitions:
       end:
         type: string
     description: >-
-      Id ranges define a range of IDs from start to end. Can be used for badge
+      ID ranges define a range of IDs from start to end. Can be used for badge
       IDs, nonces, anything.
-  bitbadges.bitbadgeschain.badges.MsgClaimBadgeResponse:
-    type: object
-  bitbadges.bitbadgeschain.badges.MsgDeleteCollectionResponse:
-    type: object
   bitbadges.bitbadgeschain.badges.MsgMintAndDistributeBadgesResponse:
     type: object
     properties:
       nextBadgeId:
         type: string
         description: ID of next badgeId after creating all badges.
+  bitbadges.bitbadgeschain.badges.MsgArchiveCollectionResponse:
+    type: object
+  bitbadges.bitbadgeschain.badges.MsgDeleteCollectionResponse:
+    type: object
+  bitbadges.bitbadgeschain.badges.MsgForkCollectionResponse:
+    type: object
+    properties:
+      collectionId:
+        type: string
+        title: ID of created badge collection
   bitbadges.bitbadgeschain.badges.MsgNewCollectionResponse:
     type: object
     properties:
       collectionId:
         type: string
         title: ID of created badge collection
-  bitbadges.bitbadgeschain.badges.MsgRequestTransferManagerResponse:
-    type: object
-  bitbadges.bitbadgeschain.badges.MsgSetApprovalResponse:
-    type: object
   bitbadges.bitbadgeschain.badges.MsgTransferBadgeResponse:
     type: object
-  bitbadges.bitbadgeschain.badges.MsgTransferManagerResponse:
+  bitbadges.bitbadgeschain.badges.MsgUpdateManagerResponse:
     type: object
-  bitbadges.bitbadgeschain.badges.MsgUpdateAllowedTransfersResponse:
+  bitbadges.bitbadgeschain.badges.MsgUpdateCollectionApprovedTransfersResponse:
     type: object
-  bitbadges.bitbadgeschain.badges.MsgUpdateBytesResponse:
+  bitbadges.bitbadgeschain.badges.MsgUpdateMetadataResponse:
     type: object
-  bitbadges.bitbadgeschain.badges.MsgUpdatePermissionsResponse:
-    type: object
-  bitbadges.bitbadgeschain.badges.MsgUpdateUrisResponse:
+  bitbadges.bitbadgeschain.badges.MsgUpdateCollectionPermissionsResponse:
     type: object
   bitbadges.bitbadgeschain.badges.Params:
     type: object
     description: Params defines the parameters for the module.
+  bitbadges.bitbadgeschain.badges.Permission:
+    type: object
+    properties:
+      isFrozen:
+        type: boolean
+      timeIntervals:
+        type: array
+        items:
+          type: object
+          properties:
+            start:
+              type: string
+            end:
+              type: string
+          description: >-
+            ID ranges define a range of IDs from start to end. Can be used for
+            badge IDs, nonces, anything.
+  bitbadges.bitbadgeschain.badges.Permissions:
+    type: object
+    properties:
+      canArchive:
+        type: object
+        properties:
+          isFrozen:
+            type: boolean
+          timeIntervals:
+            type: array
+            items:
+              type: object
+              properties:
+                start:
+                  type: string
+                end:
+                  type: string
+              description: >-
+                ID ranges define a range of IDs from start to end. Can be used
+                for badge IDs, nonces, anything.
+      canUpdateContractAddress:
+        type: object
+        properties:
+          isFrozen:
+            type: boolean
+          timeIntervals:
+            type: array
+            items:
+              type: object
+              properties:
+                start:
+                  type: string
+                end:
+                  type: string
+              description: >-
+                ID ranges define a range of IDs from start to end. Can be used
+                for badge IDs, nonces, anything.
+      canUpdateOffChainBalancesMetadata:
+        type: object
+        properties:
+          isFrozen:
+            type: boolean
+          timeIntervals:
+            type: array
+            items:
+              type: object
+              properties:
+                start:
+                  type: string
+                end:
+                  type: string
+              description: >-
+                ID ranges define a range of IDs from start to end. Can be used
+                for badge IDs, nonces, anything.
+      canDeleteCollection:
+        type: object
+        properties:
+          isFrozen:
+            type: boolean
+          timeIntervals:
+            type: array
+            items:
+              type: object
+              properties:
+                start:
+                  type: string
+                end:
+                  type: string
+              description: >-
+                ID ranges define a range of IDs from start to end. Can be used
+                for badge IDs, nonces, anything.
+      canUpdateCustomData:
+        type: object
+        properties:
+          isFrozen:
+            type: boolean
+          timeIntervals:
+            type: array
+            items:
+              type: object
+              properties:
+                start:
+                  type: string
+                end:
+                  type: string
+              description: >-
+                ID ranges define a range of IDs from start to end. Can be used
+                for badge IDs, nonces, anything.
+      canUpdateManager:
+        type: object
+        properties:
+          isFrozen:
+            type: boolean
+          timeIntervals:
+            type: array
+            items:
+              type: object
+              properties:
+                start:
+                  type: string
+                end:
+                  type: string
+              description: >-
+                ID ranges define a range of IDs from start to end. Can be used
+                for badge IDs, nonces, anything.
+      canUpdateCollectionMetadata:
+        type: object
+        properties:
+          isFrozen:
+            type: boolean
+          timeIntervals:
+            type: array
+            items:
+              type: object
+              properties:
+                start:
+                  type: string
+                end:
+                  type: string
+              description: >-
+                ID ranges define a range of IDs from start to end. Can be used
+                for badge IDs, nonces, anything.
+      canUpdateBadgeMetadata:
+        type: object
+        properties:
+          isFrozen:
+            type: boolean
+          timeIntervals:
+            type: array
+            items:
+              type: object
+              properties:
+                start:
+                  type: string
+                end:
+                  type: string
+              description: >-
+                ID ranges define a range of IDs from start to end. Can be used
+                for badge IDs, nonces, anything.
+      canCreateMoreBadges:
+        type: object
+        properties:
+          isFrozen:
+            type: boolean
+          timeIntervals:
+            type: array
+            items:
+              type: object
+              properties:
+                start:
+                  type: string
+                end:
+                  type: string
+              description: >-
+                ID ranges define a range of IDs from start to end. Can be used
+                for badge IDs, nonces, anything.
+      canUpdateCollectionApprovedTransfers:
+        type: object
+        properties:
+          isFrozen:
+            type: boolean
+          timeIntervals:
+            type: array
+            items:
+              type: object
+              properties:
+                start:
+                  type: string
+                end:
+                  type: string
+              description: >-
+                ID ranges define a range of IDs from start to end. Can be used
+                for badge IDs, nonces, anything.
   bitbadges.bitbadgeschain.badges.QueryGetAddressByIdResponse:
     type: object
     properties:
@@ -48205,7 +49262,7 @@ definitions:
                       end:
                         type: string
                     description: >-
-                      Id ranges define a range of IDs from start to end. Can be
+                      ID ranges define a range of IDs from start to end. Can be
                       used for badge IDs, nonces, anything.
               description: >-
                 Defines a balance object. The specified balance holds for all
@@ -48216,8 +49273,553 @@ definitions:
             items:
               type: object
               properties:
-                address:
+                to:
+                  title: from will always be the user's address
+                  type: object
+                  properties:
+                    addresses:
+                      type: array
+                      items:
+                        type: string
+                      description: >-
+                        Supports special alias called "Manager" which will
+                        automatically be replaced with the manager address.
+
+                        This is because the "Manager" address is variable.
+                    includeOnlySpecified:
+                      type: boolean
+                initiatedBy:
+                  type: object
+                  properties:
+                    addresses:
+                      type: array
+                      items:
+                        type: string
+                      description: >-
+                        Supports special alias called "Manager" which will
+                        automatically be replaced with the manager address.
+
+                        This is because the "Manager" address is variable.
+                    includeOnlySpecified:
+                      type: boolean
+                timeIntervals:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                      end:
+                        type: string
+                    description: >-
+                      ID ranges define a range of IDs from start to end. Can be
+                      used for badge IDs, nonces, anything.
+                id:
                   type: string
+                isAllowed:
+                  type: boolean
+                  title: Is the transfer to be allowed or disallowed?
+                isFrozen:
+                  type: boolean
+                  description: >-
+                    If locked, this and all transfers before this cannot be
+                    edited.
+                balances:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      badgeIds:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            start:
+                              type: string
+                            end:
+                              type: string
+                          description: >-
+                            ID ranges define a range of IDs from start to end.
+                            Can be used for badge IDs, nonces, anything.
+                      amount:
+                        type: string
+                      maxNumTransfers:
+                        type: string
+                      fromRestrictions:
+                        type: object
+                        properties:
+                          amountPerAddress:
+                            type: string
+                            description: 0 means no restrictions.
+                          transfersPerAddress:
+                            type: string
+                            description: 0 means no restrictions.
+                      toRestrictions:
+                        type: object
+                        properties:
+                          amountPerAddress:
+                            type: string
+                            description: 0 means no restrictions.
+                          transfersPerAddress:
+                            type: string
+                            description: 0 means no restrictions.
+                      initiatedByRestrictions:
+                        type: object
+                        properties:
+                          amountPerAddress:
+                            type: string
+                            description: 0 means no restrictions.
+                          transfersPerAddress:
+                            type: string
+                            description: 0 means no restrictions.
+                      requireToEqualsInitiatedBy:
+                        type: boolean
+                      requireFromEqualsInitiatedBy:
+                        type: boolean
+                      requireToDoesNotEqualInitiatedBy:
+                        type: boolean
+                      requireFromDoesNotEqualInitiatedBy:
+                        type: boolean
+                  description: >-
+                    If all the above match, then we attempt to transfer the
+                    badges from the user, if they meet the requirements below.
+                claim:
+                  type: object
+                  properties:
+                    isClaim:
+                      type: boolean
+                      description: >-
+                        If true, we do not track anything. Ignore all other
+                        fields.
+                    uri:
+                      type: string
+                    customData:
+                      type: string
+                    incrementIdsBy:
+                      type: string
+                    startAmounts:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          amount:
+                            type: string
+                          badgeIds:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                start:
+                                  type: string
+                                end:
+                                  type: string
+                              description: >-
+                                ID ranges define a range of IDs from start to
+                                end. Can be used for badge IDs, nonces,
+                                anything.
+                        description: >-
+                          Defines a balance object. The specified balance holds
+                          for all ids specified within the id ranges array.
+                    challenges:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          root:
+                            type: string
+                          expectedProofLength:
+                            type: string
+                          isWhitelistTree:
+                            type: boolean
+                          maxOneUsePerLeaf:
+                            type: boolean
+                          useLeafIndexForBadgeIds:
+                            type: boolean
+                            description: >-
+                              If true, then the order of the leaves in the claim
+                              matters. If false, then the order of the leaves in
+                              the claim does not matter.
+                        title: >-
+                          We will add more fields to this message later (e.g.
+                          ZKP proofs)
+            description: The user's approvals for each badge ID.
+        description: >-
+          Defines a user balance object for a badge w/ the user's balances and
+          approvals. All badge IDs for a collection are handled within this
+          object.
+  bitbadges.bitbadgeschain.badges.QueryGetClaimNumProcessedResponse:
+    type: object
+    properties:
+      numProcessed:
+        type: string
+  bitbadges.bitbadgeschain.badges.QueryGetCollectionResponse:
+    type: object
+    properties:
+      collection:
+        type: object
+        properties:
+          collectionId:
+            type: string
+            description: >-
+              The collectionId defines the unique identifier of the
+              BadgeCollection classification, similar to the contract address of
+              ERC721.
+
+              This is assigned by the chain itself. All ids start at 1 and
+              increments by 1 each created collection.
+          parentCollectionId:
+            type: string
+            description: >-
+              The parent collection id. If 0, then this is a root collection
+              (i.e. not inherited from any parent collection).
+
+              If not 0, then this is a subcollection of the parent collection.
+          collectionMetadata:
+            description: >-
+              The URI where to fetch the collection's metadata. Max 100
+              characters.
+            type: object
+            properties:
+              uri:
+                type: string
+              customData:
+                type: string
+          badgeMetadata:
+            type: array
+            items:
+              type: object
+              properties:
+                uri:
+                  type: string
+                badgeIds:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                      end:
+                        type: string
+                    description: >-
+                      ID ranges define a range of IDs from start to end. Can be
+                      used for badge IDs, nonces, anything.
+                customData:
+                  type: string
+                isFrozen:
+                  type: boolean
+              description: >-
+                BadgeMetadataUri defines a URI where to fetch the badge metadata
+                for the given badge id ranges
+
+                If {id} is included in the URI, it will be replaced by each
+                badge's unique id.
+            description: >-
+              An array of BadgeMetadataUri objects for where to fetch the badge
+              metadata.
+
+              Each BadgeMetadataUri object has a uri and an array of badgeId
+              ranges (see BadgeMetadataUri type).
+
+              The uri can include {id} in the URI which is a placeholder to be
+              replaced by each badge's unique id.
+
+              To fetch the metadata for a speciifc badge, the first match is
+              always used.
+          offChainBalancesMetadata:
+            description: >-
+              The URI where to fetch the collection's balances. Max 100
+              characters. 
+
+              Leave blank if balances are to be stored on-chain.
+            type: object
+            properties:
+              uri:
+                type: string
+              customData:
+                type: string
+          isOffChainBalances:
+            type: boolean
+            description: >-
+              Defines if the balances are stored on-chain or off-chain. If
+              off-chain, then the offChainBalancesMetadata field will be set.
+
+              Can't be changed after creation of the collection.
+
+              If set, all on-chain transfer functionality will throw errors.
+          customData:
+            type: string
+            description: >-
+              These are arbitrary bytes can be used to store anything on-chain
+              about the badge (often used for a permanent hash).
+
+              This can be updatable or not depending on the permissions set. Max
+              256 bytes allowed.
+
+              Parse this data according to the standards defined in the
+              standards array.
+          contractAddress:
+            type: string
+            description: >-
+              The address of a contract that implements additional functionality
+              for this collection.
+
+              Can point to a contract on another chain or on the BitBadges chain
+              (depending on if it needs access to edit the collection or not).
+
+              Prefix with eth: for Ethereum. If no prefix, then it is assumed to
+              be on the BitBadges chain.
+          manager:
+            type: string
+            description: >-
+              The manager's address. The manager can be granted special
+              permissions below.
+          permissions:
+            description: >-
+              Store permissions packed in a uint where the bits correspond to
+              certain permissions.
+
+              Leading zeroes are applied. See permissions definition.
+            type: object
+            properties:
+              canArchive:
+                type: object
+                properties:
+                  isFrozen:
+                    type: boolean
+                  timeIntervals:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                        end:
+                          type: string
+                      description: >-
+                        ID ranges define a range of IDs from start to end. Can
+                        be used for badge IDs, nonces, anything.
+              canUpdateContractAddress:
+                type: object
+                properties:
+                  isFrozen:
+                    type: boolean
+                  timeIntervals:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                        end:
+                          type: string
+                      description: >-
+                        ID ranges define a range of IDs from start to end. Can
+                        be used for badge IDs, nonces, anything.
+              canUpdateOffChainBalancesMetadata:
+                type: object
+                properties:
+                  isFrozen:
+                    type: boolean
+                  timeIntervals:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                        end:
+                          type: string
+                      description: >-
+                        ID ranges define a range of IDs from start to end. Can
+                        be used for badge IDs, nonces, anything.
+              canDeleteCollection:
+                type: object
+                properties:
+                  isFrozen:
+                    type: boolean
+                  timeIntervals:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                        end:
+                          type: string
+                      description: >-
+                        ID ranges define a range of IDs from start to end. Can
+                        be used for badge IDs, nonces, anything.
+              canUpdateCustomData:
+                type: object
+                properties:
+                  isFrozen:
+                    type: boolean
+                  timeIntervals:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                        end:
+                          type: string
+                      description: >-
+                        ID ranges define a range of IDs from start to end. Can
+                        be used for badge IDs, nonces, anything.
+              canUpdateManager:
+                type: object
+                properties:
+                  isFrozen:
+                    type: boolean
+                  timeIntervals:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                        end:
+                          type: string
+                      description: >-
+                        ID ranges define a range of IDs from start to end. Can
+                        be used for badge IDs, nonces, anything.
+              canUpdateCollectionMetadata:
+                type: object
+                properties:
+                  isFrozen:
+                    type: boolean
+                  timeIntervals:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                        end:
+                          type: string
+                      description: >-
+                        ID ranges define a range of IDs from start to end. Can
+                        be used for badge IDs, nonces, anything.
+              canUpdateBadgeMetadata:
+                type: object
+                properties:
+                  isFrozen:
+                    type: boolean
+                  timeIntervals:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                        end:
+                          type: string
+                      description: >-
+                        ID ranges define a range of IDs from start to end. Can
+                        be used for badge IDs, nonces, anything.
+              canCreateMoreBadges:
+                type: object
+                properties:
+                  isFrozen:
+                    type: boolean
+                  timeIntervals:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                        end:
+                          type: string
+                      description: >-
+                        ID ranges define a range of IDs from start to end. Can
+                        be used for badge IDs, nonces, anything.
+              canUpdateCollectionApprovedTransfers:
+                type: object
+                properties:
+                  isFrozen:
+                    type: boolean
+                  timeIntervals:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                        end:
+                          type: string
+                      description: >-
+                        ID ranges define a range of IDs from start to end. Can
+                        be used for badge IDs, nonces, anything.
+          approvedTransfers:
+            type: array
+            items:
+              type: object
+              properties:
+                from:
+                  type: object
+                  properties:
+                    addresses:
+                      type: array
+                      items:
+                        type: string
+                      description: >-
+                        Supports special alias called "Manager" which will
+                        automatically be replaced with the manager address.
+
+                        This is because the "Manager" address is variable.
+                    includeOnlySpecified:
+                      type: boolean
+                to:
+                  type: object
+                  properties:
+                    addresses:
+                      type: array
+                      items:
+                        type: string
+                      description: >-
+                        Supports special alias called "Manager" which will
+                        automatically be replaced with the manager address.
+
+                        This is because the "Manager" address is variable.
+                    includeOnlySpecified:
+                      type: boolean
+                initiatedBy:
+                  type: object
+                  properties:
+                    addresses:
+                      type: array
+                      items:
+                        type: string
+                      description: >-
+                        Supports special alias called "Manager" which will
+                        automatically be replaced with the manager address.
+
+                        This is because the "Manager" address is variable.
+                    includeOnlySpecified:
+                      type: boolean
+                timeIntervals:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                      end:
+                        type: string
+                    description: >-
+                      ID ranges define a range of IDs from start to end. Can be
+                      used for badge IDs, nonces, anything.
+                id:
+                  type: string
+                isAllowed:
+                  type: boolean
+                  title: Is the transfer to be allowed or disallowed?
+                isFrozen:
+                  type: boolean
+                  description: >-
+                    If locked, this and all transfers before this cannot be
+                    edited.
                 balances:
                   type: array
                   items:
@@ -48235,280 +49837,89 @@ definitions:
                             end:
                               type: string
                           description: >-
-                            Id ranges define a range of IDs from start to end.
+                            ID ranges define a range of IDs from start to end.
                             Can be used for badge IDs, nonces, anything.
                     description: >-
                       Defines a balance object. The specified balance holds for
                       all ids specified within the id ranges array.
-                  title: approval balances for every badgeId
-              description: Defines an approval object for specific addresses.
-            description: Approvals are sorted in order of address number.
-        description: >-
-          Defines a user balance object for a badge w/ the user's balances and
-          approvals. All badge IDs for a collection are handled within this
-          object.
-  bitbadges.bitbadgeschain.badges.QueryGetClaimResponse:
-    type: object
-    properties:
-      claim:
-        type: object
-        properties:
-          undistributedBalances:
-            type: array
-            items:
-              type: object
-              properties:
-                amount:
-                  type: string
-                badgeIds:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      start:
-                        type: string
-                      end:
-                        type: string
-                    description: >-
-                      Id ranges define a range of IDs from start to end. Can be
-                      used for badge IDs, nonces, anything.
-              description: >-
-                Defines a balance object. The specified balance holds for all
-                ids specified within the id ranges array.
-            description: Current balance of the claim store.
-          timeRange:
-            description: Time range when the claim is valid.
-            type: object
-            properties:
-              start:
-                type: string
-              end:
-                type: string
-          uri:
-            type: string
-            title: >-
-              Optional URI for the claim. Max 100 chars. Often used for IPFS
-              Merkle Tree Information for challenges
-          numClaimsPerAddress:
-            type: string
-            description: >-
-              If >0, then the claim can only be used to claim this number of
-              leaves per address. If 0, then no limit.
-          incrementIdsBy:
-            type: string
-            title: Balances for the current claim
-          currentClaimAmounts:
-            type: array
-            items:
-              type: object
-              properties:
-                amount:
-                  type: string
-                badgeIds:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      start:
-                        type: string
-                      end:
-                        type: string
-                    description: >-
-                      Id ranges define a range of IDs from start to end. Can be
-                      used for badge IDs, nonces, anything.
-              description: >-
-                Defines a balance object. The specified balance holds for all
-                ids specified within the id ranges array.
-          challenges:
-            type: array
-            items:
-              type: object
-              properties:
-                root:
-                  type: string
-                expectedProofLength:
-                  type: string
-                useCreatorAddressAsLeaf:
+                  description: >-
+                    If all the above match, then we attempt to transfer the
+                    badges from the user, if they meet the requirements below.
+                overridesFromApprovedTransfers:
                   type: boolean
-              title: We will add more fields to this message later (e.g. ZKP proofs)
-            description: >-
-              Challenges for the claim. If empty, then no challenges are
-              required.
-        description: >-
-          Defines a claim object. Claims are used to transfer badges via a
-          claiming process.
+                  description: >-
+                    If true, then we do not even check the approvals and allow
+                    the transfer.
 
-          Stored in own store. Claimed leaves are also stored in unique store.
-  bitbadges.bitbadgeschain.badges.QueryGetCollectionResponse:
-    type: object
-    properties:
-      collection:
-        type: object
-        properties:
-          collectionId:
-            type: string
-            description: >-
-              The collectionId defines the unique identifier of the
-              BadgeCollection classification, similar to the contract address of
-              ERC721.
+                    No approval will be deducted, this step is skipped.
 
-              This is assigned by the chain itself. All ids start at 1 and
-              increments by 1 each created collection.
-          collectionUri:
-            type: string
-            description: >-
-              The URI where to fetch the collection's metadata. Max 100
-              characters.
-          badgeUris:
-            type: array
-            items:
-              type: object
-              properties:
-                uri:
-                  type: string
-                badgeIds:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      start:
-                        type: string
-                      end:
-                        type: string
-                    description: >-
-                      Id ranges define a range of IDs from start to end. Can be
-                      used for badge IDs, nonces, anything.
-              description: >-
-                BadgeUri defines a URI where to fetch the badge metadata for the
-                given badge id ranges
-
-                If {id} is included in the URI, it will be replaced by each
-                badge's unique id.
-            description: >-
-              An array of BadgeUri objects for where to fetch the badge
-              metadata.
-
-              Each BadgeUri object has a uri and an array of badgeId ranges (see
-              BadgeUri type).
-
-              The uri can include {id} in the URI which is a placeholder to be
-              replaced by each badge's unique id.
-
-              To fetch the metadata for a speciifc badge, the first match is
-              always used.
-          balancesUri:
-            type: string
-            description: >-
-              The URI where to fetch the collection's balances. Max 100
-              characters. 
-
-              Leave blank if balances are to be stored on-chain.
-          bytes:
-            type: string
-            description: >-
-              These are arbitrary bytes can be used to store anything on-chain
-              about the badge (often used for a permanent hash).
-
-              This can be updatable or not depending on the permissions set. Max
-              256 bytes allowed.
-          manager:
-            type: string
-            description: >-
-              The manager's address. The manager can be granted special
-              permissions.
-          permissions:
-            type: string
-            description: >-
-              Store permissions packed in a uint where the bits correspond to
-              certain permissions.
-
-              Leading zeroes are applied. See permissions definition.
-          allowedTransfers:
-            type: array
-            items:
-              type: object
-              properties:
-                from:
+                    Required to be true for transfers because 'Mint' address
+                    does not have and will never have any approvals.
+                claim:
                   type: object
                   properties:
-                    addresses:
+                    isClaim:
+                      type: boolean
+                      description: >-
+                        If true, we do not track anything. Ignore all other
+                        fields.
+                    uri:
+                      type: string
+                    customData:
+                      type: string
+                    incrementIdsBy:
+                      type: string
+                    startAmounts:
                       type: array
                       items:
-                        type: string
-                    includeOnlySpecified:
-                      type: boolean
-                    managerOptions:
-                      type: string
-                to:
-                  type: object
-                  properties:
-                    addresses:
+                        type: object
+                        properties:
+                          amount:
+                            type: string
+                          badgeIds:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                start:
+                                  type: string
+                                end:
+                                  type: string
+                              description: >-
+                                ID ranges define a range of IDs from start to
+                                end. Can be used for badge IDs, nonces,
+                                anything.
+                        description: >-
+                          Defines a balance object. The specified balance holds
+                          for all ids specified within the id ranges array.
+                    challenges:
                       type: array
                       items:
-                        type: string
-                    includeOnlySpecified:
-                      type: boolean
-                    managerOptions:
-                      type: string
-              description: >-
-                TransferMapping defines a mapping of transfers from one set of
-                addresses to another.
-            title: >-
-              This defines the address combinations that can be transferred. 
+                        type: object
+                        properties:
+                          root:
+                            type: string
+                          expectedProofLength:
+                            type: string
+                          isWhitelistTree:
+                            type: boolean
+                          maxOneUsePerLeaf:
+                            type: boolean
+                          useLeafIndexForBadgeIds:
+                            type: boolean
+                            description: >-
+                              If true, then the order of the leaves in the claim
+                              matters. If false, then the order of the leaves in
+                              the claim does not matter.
+                        title: >-
+                          We will add more fields to this message later (e.g.
+                          ZKP proofs)
+                  title: Claim fields
+            description: >-
+              This is the most important part of the collection and defines the
+              transferability, approvals, and claims
 
-              Used to freeze addresses and prevent transfers.
-
-              If all addresses are disallowed, then the badge is
-              non-transferable.
-
-              If all are allowed, then the badge is transferable.
-
-              Ex: If an account is in the "to" mapping and another account is in
-              the "from" mapping,
-                 the "to" account can transfer to the "from" account
-          managerApprovedTransfers:
-            type: array
-            items:
-              type: object
-              properties:
-                from:
-                  type: object
-                  properties:
-                    addresses:
-                      type: array
-                      items:
-                        type: string
-                    includeOnlySpecified:
-                      type: boolean
-                    managerOptions:
-                      type: string
-                to:
-                  type: object
-                  properties:
-                    addresses:
-                      type: array
-                      items:
-                        type: string
-                    includeOnlySpecified:
-                      type: boolean
-                    managerOptions:
-                      type: string
-              description: >-
-                TransferMapping defines a mapping of transfers from one set of
-                addresses to another.
-            title: >-
-              This defines the address combinations that the manager is approved
-              to execute (overrides allowedTransfers).
-
-              Example use case would be to set up the manager being able to
-              forcefully revoke or forcefully burn badges.
-
-              This can be updated, but addresses can only be removed, never
-              added.
-
-              Ex: If an account is in the "to" mapping and another account is in
-              the "from" mapping,
-                 the manager can transfer any badge from the "to" account to the "from" account
+              for the collection.
           nextBadgeId:
             type: string
             description: >-
@@ -48531,7 +49942,7 @@ definitions:
                       end:
                         type: string
                     description: >-
-                      Id ranges define a range of IDs from start to end. Can be
+                      ID ranges define a range of IDs from start to end. Can be
                       used for badge IDs, nonces, anything.
               description: >-
                 Defines a balance object. The specified balance holds for all
@@ -48558,26 +49969,32 @@ definitions:
                       end:
                         type: string
                     description: >-
-                      Id ranges define a range of IDs from start to end. Can be
+                      ID ranges define a range of IDs from start to end. Can be
                       used for badge IDs, nonces, anything.
               description: >-
                 Defines a balance object. The specified balance holds for all
                 ids specified within the id ranges array.
             description: This is a map of the maximum badge supplys by ID.
-          nextClaimId:
+          nextApprovedTransferId:
             type: string
-            description: >-
-              Keeps track of the next claim id. Claim ids start at 1. 
-
-              Each claim created will increment this by 1. Can't overflow.
-
-              Claims are stored in a separate store because they are frequently
-              written to.
+            description: |-
+              Keeps track of the next approved transfer id. Start at 1. 
+              Each created will increment this by 1. Can't overflow.
           standard:
             type: string
             description: >-
               Defines what standard this badge should implement (see standards
               documentation).
+          isArchived:
+            type: boolean
+            description: >-
+              Defines if the collection is isFrozen or not. Frozen collections
+              can't be updated (all Msgs will fail).
+
+              This can be useful for security reasons, archiving, or to set
+              universal genesis conditions for subcollections.
+
+              Subcollections will have a choice to inherit this setting or not.
         description: BadgeCollection defines a standard collection of badges.
   bitbadges.bitbadgeschain.badges.QueryIsClaimDataUsedResponse:
     type: object
@@ -48591,9 +50008,20 @@ definitions:
         description: params holds all the parameters of this module.
         type: object
     description: QueryParamsResponse is response type for the Query/Params RPC method.
+  bitbadges.bitbadgeschain.badges.Restrictions:
+    type: object
+    properties:
+      amountPerAddress:
+        type: string
+        description: 0 means no restrictions.
+      transfersPerAddress:
+        type: string
+        description: 0 means no restrictions.
   bitbadges.bitbadgeschain.badges.Transfer:
     type: object
     properties:
+      from:
+        type: string
       toAddresses:
         type: array
         items:
@@ -48615,45 +50043,231 @@ definitions:
                   end:
                     type: string
                 description: >-
-                  Id ranges define a range of IDs from start to end. Can be used
+                  ID ranges define a range of IDs from start to end. Can be used
                   for badge IDs, nonces, anything.
           description: >-
             Defines a balance object. The specified balance holds for all ids
             specified within the id ranges array.
+      solutions:
+        type: array
+        items:
+          type: object
+          properties:
+            proof:
+              type: object
+              properties:
+                leaf:
+                  type: string
+                aunts:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      aunt:
+                        type: string
+                      onRight:
+                        type: boolean
+              title: Consistent with tendermint/crypto merkle tree
+        description: >-
+          Note here we remain optimistic that the solutions will apply to all
+          potential challenges.
+
+          It is the Tx Sender's responsibility to ensure that the solutions are
+          valid for all potential challenges.
+
+          If you are attempting to claim badges with different sets of
+          challenges, you will need to make multiple transfers.
+      userSolutions:
+        type: array
+        items:
+          type: object
+          properties:
+            proof:
+              type: object
+              properties:
+                leaf:
+                  type: string
+                aunts:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      aunt:
+                        type: string
+                      onRight:
+                        type: boolean
+              title: Consistent with tendermint/crypto merkle tree
     description: >-
       Upon badge creation, the manager will first be minted these badges, and
       then, they will subsequently be transferred to these addresses according
       to permissions.ForcefulTransfers.
 
       Used to only need one signature for MsgNewBadge.
-  bitbadges.bitbadgeschain.badges.TransferMapping:
+  bitbadges.bitbadgeschain.badges.UserApprovedTransfer:
     type: object
     properties:
-      from:
-        type: object
-        properties:
-          addresses:
-            type: array
-            items:
-              type: string
-          includeOnlySpecified:
-            type: boolean
-          managerOptions:
-            type: string
       to:
+        title: from will always be the user's address
         type: object
         properties:
           addresses:
             type: array
             items:
               type: string
+            description: >-
+              Supports special alias called "Manager" which will automatically
+              be replaced with the manager address.
+
+              This is because the "Manager" address is variable.
           includeOnlySpecified:
             type: boolean
-          managerOptions:
+      initiatedBy:
+        type: object
+        properties:
+          addresses:
+            type: array
+            items:
+              type: string
+            description: >-
+              Supports special alias called "Manager" which will automatically
+              be replaced with the manager address.
+
+              This is because the "Manager" address is variable.
+          includeOnlySpecified:
+            type: boolean
+      timeIntervals:
+        type: array
+        items:
+          type: object
+          properties:
+            start:
+              type: string
+            end:
+              type: string
+          description: >-
+            ID ranges define a range of IDs from start to end. Can be used for
+            badge IDs, nonces, anything.
+      id:
+        type: string
+      isAllowed:
+        type: boolean
+        title: Is the transfer to be allowed or disallowed?
+      isFrozen:
+        type: boolean
+        description: If locked, this and all transfers before this cannot be edited.
+      balances:
+        type: array
+        items:
+          type: object
+          properties:
+            badgeIds:
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                  end:
+                    type: string
+                description: >-
+                  ID ranges define a range of IDs from start to end. Can be used
+                  for badge IDs, nonces, anything.
+            amount:
+              type: string
+            maxNumTransfers:
+              type: string
+            fromRestrictions:
+              type: object
+              properties:
+                amountPerAddress:
+                  type: string
+                  description: 0 means no restrictions.
+                transfersPerAddress:
+                  type: string
+                  description: 0 means no restrictions.
+            toRestrictions:
+              type: object
+              properties:
+                amountPerAddress:
+                  type: string
+                  description: 0 means no restrictions.
+                transfersPerAddress:
+                  type: string
+                  description: 0 means no restrictions.
+            initiatedByRestrictions:
+              type: object
+              properties:
+                amountPerAddress:
+                  type: string
+                  description: 0 means no restrictions.
+                transfersPerAddress:
+                  type: string
+                  description: 0 means no restrictions.
+            requireToEqualsInitiatedBy:
+              type: boolean
+            requireFromEqualsInitiatedBy:
+              type: boolean
+            requireToDoesNotEqualInitiatedBy:
+              type: boolean
+            requireFromDoesNotEqualInitiatedBy:
+              type: boolean
+        description: >-
+          If all the above match, then we attempt to transfer the badges from
+          the user, if they meet the requirements below.
+      claim:
+        type: object
+        properties:
+          isClaim:
+            type: boolean
+            description: If true, we do not track anything. Ignore all other fields.
+          uri:
             type: string
-    description: >-
-      TransferMapping defines a mapping of transfers from one set of addresses
-      to another.
+          customData:
+            type: string
+          incrementIdsBy:
+            type: string
+          startAmounts:
+            type: array
+            items:
+              type: object
+              properties:
+                amount:
+                  type: string
+                badgeIds:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                      end:
+                        type: string
+                    description: >-
+                      ID ranges define a range of IDs from start to end. Can be
+                      used for badge IDs, nonces, anything.
+              description: >-
+                Defines a balance object. The specified balance holds for all
+                ids specified within the id ranges array.
+          challenges:
+            type: array
+            items:
+              type: object
+              properties:
+                root:
+                  type: string
+                expectedProofLength:
+                  type: string
+                isWhitelistTree:
+                  type: boolean
+                maxOneUsePerLeaf:
+                  type: boolean
+                useLeafIndexForBadgeIds:
+                  type: boolean
+                  description: >-
+                    If true, then the order of the leaves in the claim matters.
+                    If false, then the order of the leaves in the claim does not
+                    matter.
+              title: We will add more fields to this message later (e.g. ZKP proofs)
   bitbadges.bitbadgeschain.badges.UserBalanceStore:
     type: object
     properties:
@@ -48674,7 +50288,7 @@ definitions:
                   end:
                     type: string
                 description: >-
-                  Id ranges define a range of IDs from start to end. Can be used
+                  ID ranges define a range of IDs from start to end. Can be used
                   for badge IDs, nonces, anything.
           description: >-
             Defines a balance object. The specified balance holds for all ids
@@ -48685,15 +50299,60 @@ definitions:
         items:
           type: object
           properties:
-            address:
+            to:
+              title: from will always be the user's address
+              type: object
+              properties:
+                addresses:
+                  type: array
+                  items:
+                    type: string
+                  description: >-
+                    Supports special alias called "Manager" which will
+                    automatically be replaced with the manager address.
+
+                    This is because the "Manager" address is variable.
+                includeOnlySpecified:
+                  type: boolean
+            initiatedBy:
+              type: object
+              properties:
+                addresses:
+                  type: array
+                  items:
+                    type: string
+                  description: >-
+                    Supports special alias called "Manager" which will
+                    automatically be replaced with the manager address.
+
+                    This is because the "Manager" address is variable.
+                includeOnlySpecified:
+                  type: boolean
+            timeIntervals:
+              type: array
+              items:
+                type: object
+                properties:
+                  start:
+                    type: string
+                  end:
+                    type: string
+                description: >-
+                  ID ranges define a range of IDs from start to end. Can be used
+                  for badge IDs, nonces, anything.
+            id:
               type: string
+            isAllowed:
+              type: boolean
+              title: Is the transfer to be allowed or disallowed?
+            isFrozen:
+              type: boolean
+              description: If locked, this and all transfers before this cannot be edited.
             balances:
               type: array
               items:
                 type: object
                 properties:
-                  amount:
-                    type: string
                   badgeIds:
                     type: array
                     items:
@@ -48704,14 +50363,107 @@ definitions:
                         end:
                           type: string
                       description: >-
-                        Id ranges define a range of IDs from start to end. Can
+                        ID ranges define a range of IDs from start to end. Can
                         be used for badge IDs, nonces, anything.
-                description: >-
-                  Defines a balance object. The specified balance holds for all
-                  ids specified within the id ranges array.
-              title: approval balances for every badgeId
-          description: Defines an approval object for specific addresses.
-        description: Approvals are sorted in order of address number.
+                  amount:
+                    type: string
+                  maxNumTransfers:
+                    type: string
+                  fromRestrictions:
+                    type: object
+                    properties:
+                      amountPerAddress:
+                        type: string
+                        description: 0 means no restrictions.
+                      transfersPerAddress:
+                        type: string
+                        description: 0 means no restrictions.
+                  toRestrictions:
+                    type: object
+                    properties:
+                      amountPerAddress:
+                        type: string
+                        description: 0 means no restrictions.
+                      transfersPerAddress:
+                        type: string
+                        description: 0 means no restrictions.
+                  initiatedByRestrictions:
+                    type: object
+                    properties:
+                      amountPerAddress:
+                        type: string
+                        description: 0 means no restrictions.
+                      transfersPerAddress:
+                        type: string
+                        description: 0 means no restrictions.
+                  requireToEqualsInitiatedBy:
+                    type: boolean
+                  requireFromEqualsInitiatedBy:
+                    type: boolean
+                  requireToDoesNotEqualInitiatedBy:
+                    type: boolean
+                  requireFromDoesNotEqualInitiatedBy:
+                    type: boolean
+              description: >-
+                If all the above match, then we attempt to transfer the badges
+                from the user, if they meet the requirements below.
+            claim:
+              type: object
+              properties:
+                isClaim:
+                  type: boolean
+                  description: If true, we do not track anything. Ignore all other fields.
+                uri:
+                  type: string
+                customData:
+                  type: string
+                incrementIdsBy:
+                  type: string
+                startAmounts:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      amount:
+                        type: string
+                      badgeIds:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            start:
+                              type: string
+                            end:
+                              type: string
+                          description: >-
+                            ID ranges define a range of IDs from start to end.
+                            Can be used for badge IDs, nonces, anything.
+                    description: >-
+                      Defines a balance object. The specified balance holds for
+                      all ids specified within the id ranges array.
+                challenges:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      root:
+                        type: string
+                      expectedProofLength:
+                        type: string
+                      isWhitelistTree:
+                        type: boolean
+                      maxOneUsePerLeaf:
+                        type: boolean
+                      useLeafIndexForBadgeIds:
+                        type: boolean
+                        description: >-
+                          If true, then the order of the leaves in the claim
+                          matters. If false, then the order of the leaves in the
+                          claim does not matter.
+                    title: >-
+                      We will add more fields to this message later (e.g. ZKP
+                      proofs)
+        description: The user's approvals for each badge ID.
     description: >-
       Defines a user balance object for a badge w/ the user's balances and
       approvals. All badge IDs for a collection are handled within this object.

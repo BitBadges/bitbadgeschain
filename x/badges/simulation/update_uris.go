@@ -10,7 +10,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 )
 
-func SimulateMsgUpdateUris(
+func SimulateMsgUpdateMetadata(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	k keeper.Keeper,
@@ -19,11 +19,11 @@ func SimulateMsgUpdateUris(
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 
-		msg := &types.MsgUpdateUris{
-			Creator:       simAccount.Address.String(),
-			CollectionId:  sdk.NewUint(r.Uint64()),
-			CollectionUri: simtypes.RandStringOfLength(r, r.Intn(100)),
-			BadgeUris:     []*types.BadgeUri{},
+		msg := &types.MsgUpdateMetadata{
+			Creator:            simAccount.Address.String(),
+			CollectionId:       sdk.NewUint(r.Uint64()),
+			CollectionMetadata: simtypes.RandStringOfLength(r, r.Intn(100)),
+			BadgeMetadata:      []*types.BadgeMetadata{},
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

@@ -5,27 +5,29 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const TypeMsgUpdatePermissions = "update_permissions"
+const TypeMsgUpdateCollectionPermissions = "update_permissions"
 
-var _ sdk.Msg = &MsgUpdatePermissions{}
+var _ sdk.Msg = &MsgUpdateCollectionPermissions{}
 
-func NewMsgUpdatePermissions(creator string, collectionId sdk.Uint, permissions sdk.Uint) *MsgUpdatePermissions {
-	return &MsgUpdatePermissions{
+func NewMsgUpdateCollectionPermissions(creator string, collectionId sdk.Uint, permissions *CollectionPermissions) *MsgUpdateCollectionPermissions {
+	//TODO: permissions sort and merge overlapping
+	
+	return &MsgUpdateCollectionPermissions{
 		Creator:      creator,
 		CollectionId: collectionId,
 		Permissions:  permissions,
 	}
 }
 
-func (msg *MsgUpdatePermissions) Route() string {
+func (msg *MsgUpdateCollectionPermissions) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgUpdatePermissions) Type() string {
-	return TypeMsgUpdatePermissions
+func (msg *MsgUpdateCollectionPermissions) Type() string {
+	return TypeMsgUpdateCollectionPermissions
 }
 
-func (msg *MsgUpdatePermissions) GetSigners() []sdk.AccAddress {
+func (msg *MsgUpdateCollectionPermissions) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -33,18 +35,18 @@ func (msg *MsgUpdatePermissions) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgUpdatePermissions) GetSignBytes() []byte {
+func (msg *MsgUpdateCollectionPermissions) GetSignBytes() []byte {
 	bz := AminoCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgUpdatePermissions) ValidateBasic() error {
+func (msg *MsgUpdateCollectionPermissions) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	err = ValidatePermissions(msg.Permissions)
+	err = ValidatePermissions(msg.Permissions, true)
 	if err != nil {
 		return err
 	}
@@ -52,6 +54,6 @@ func (msg *MsgUpdatePermissions) ValidateBasic() error {
 	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
 	}
-	
+
 	return nil
 }

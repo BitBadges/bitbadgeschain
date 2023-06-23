@@ -7,14 +7,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransferManager) (*types.MsgTransferManagerResponse, error) {
+func (k msgServer) UpdateManager(goCtx context.Context, msg *types.MsgUpdateManager) (*types.MsgUpdateManagerResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator:                     msg.Creator,
-		CollectionId:                msg.CollectionId,
-		MustBeManager:               true,
-		CanManagerBeTransferred:     true,
+		Creator:                 msg.Creator,
+		CollectionId:            msg.CollectionId,
+		MustBeManager:           true,
+		CanUpdateManager: true,
 	})
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 
 	collection.Manager = msg.Address
 
-	if err := k.RemoveTransferManagerRequest(ctx, msg.CollectionId, msg.Address); err != nil {
+	if err := k.RemoveUpdateManagerRequest(ctx, msg.CollectionId, msg.Address); err != nil {
 		return nil, err
 	}
 
@@ -42,5 +42,5 @@ func (k msgServer) TransferManager(goCtx context.Context, msg *types.MsgTransfer
 		),
 	)
 
-	return &types.MsgTransferManagerResponse{}, nil
+	return &types.MsgUpdateManagerResponse{}, nil
 }

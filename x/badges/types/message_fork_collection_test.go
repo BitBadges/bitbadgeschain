@@ -1,34 +1,29 @@
-package types_test
+package types
 
 import (
 	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
-
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgRequestTransferManager_ValidateBasic(t *testing.T) {
+func TestMsgForkCollection_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgRequestTransferManager
+		msg  MsgForkCollection
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgRequestTransferManager{
+			msg: MsgForkCollection{
 				Creator: "invalid_address",
-				CollectionId: sdk.NewUint(1),
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgRequestTransferManager{
+			msg: MsgForkCollection{
 				Creator: sample.AccAddress(),
-				CollectionId: sdk.NewUint(1),
 			},
 		},
 	}

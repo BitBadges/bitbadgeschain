@@ -14,10 +14,9 @@ import (
 
 var _ = strconv.Itoa(0)
 
-
 func CmdTransferBadge() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "transfer-badge [collection-id] [from] [transfers]", 
+		Use:   "transfer-badge [collection-id] [from] [transfers]",
 		Short: "Broadcast message transferBadge",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -36,7 +35,7 @@ func CmdTransferBadge() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err

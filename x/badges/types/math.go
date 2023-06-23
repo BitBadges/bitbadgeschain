@@ -11,15 +11,15 @@ import (
 //
 // Please use the above module instead of this package.
 type (
-	Int = sdkmath.Int
+	Int  = sdkmath.Int
 	Uint = sdkmath.Uint
 )
 
 var (
-	NewInt  = sdkmath.NewInt
-	ZeroInt = sdkmath.ZeroInt
-	NewUint = sdkmath.NewUint
-	NewUintFromString = func(s string) (Uint) {
+	NewInt            = sdkmath.NewInt
+	ZeroInt           = sdkmath.ZeroInt
+	NewUint           = sdkmath.NewUint
+	NewUintFromString = func(s string) Uint {
 		if s == "" {
 			return sdkmath.NewUint(0)
 		}

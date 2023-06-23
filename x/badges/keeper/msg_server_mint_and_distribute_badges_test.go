@@ -14,8 +14,8 @@ func (suite *TestSuite) TestNewBadges() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -27,12 +27,12 @@ func (suite *TestSuite) TestNewBadges() {
 					},
 				},
 				Permissions: sdk.NewUint(62),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
+						From: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
-						To: &types.AddressesMapping{
+						To: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
 					},
@@ -61,7 +61,7 @@ func (suite *TestSuite) TestNewBadges() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10),
+			Amount:   sdk.NewUint(10),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -82,12 +82,12 @@ func (suite *TestSuite) TestNewBadges() {
 	suite.Require().Equal(sdk.NewUint(3), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(2), End: sdk.NewUint(2),}}, //0 to 0 range so it will be nil
-			Amount:  sdk.NewUint(1),
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(2), End: sdk.NewUint(2)}}, //0 to 0 range so it will be nil
+			Amount:   sdk.NewUint(1),
 		},
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10),
+			Amount:   sdk.NewUint(10),
 		},
 	}, badge.MaxSupplys)
 	bobbalance, _ = GetUserBalance(suite, wctx, sdk.NewUint(1), bob)
@@ -108,12 +108,12 @@ func (suite *TestSuite) TestNewBadges() {
 	suite.Require().Equal(sdk.NewUint(5), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(2), End: sdk.NewUint(2),}}, //0 to 0 range so it will be nil
-			Amount:  sdk.NewUint(1),
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(2), End: sdk.NewUint(2)}}, //0 to 0 range so it will be nil
+			Amount:   sdk.NewUint(1),
 		},
 		{
-			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}, {Start: sdk.NewUint(3), End: sdk.NewUint(4),}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10),
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}, {Start: sdk.NewUint(3), End: sdk.NewUint(4)}}, //0 to 0 range so it will be nil
+			Amount:   sdk.NewUint(10),
 		},
 	}, badge.MaxSupplys)
 	suite.Require().Equal(sdk.NewUint(10), bobbalance.Balances[1].Amount)
@@ -129,8 +129,8 @@ func (suite *TestSuite) TestNewBadgesDirectlyUponCreatingNewBadge() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -142,12 +142,12 @@ func (suite *TestSuite) TestNewBadgesDirectlyUponCreatingNewBadge() {
 					},
 				},
 				Permissions: sdk.NewUint(62),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
+						From: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
-						To: &types.AddressesMapping{
+						To: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
 					},
@@ -176,7 +176,7 @@ func (suite *TestSuite) TestNewBadgesDirectlyUponCreatingNewBadge() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10),
+			Amount:   sdk.NewUint(10),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -198,12 +198,12 @@ func (suite *TestSuite) TestNewBadgesDirectlyUponCreatingNewBadge() {
 	suite.Require().Equal(sdk.NewUint(3), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(2), End: sdk.NewUint(2),}}, //0 to 0 range so it will be nil
-			Amount:  sdk.NewUint(1),
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(2), End: sdk.NewUint(2)}}, //0 to 0 range so it will be nil
+			Amount:   sdk.NewUint(1),
 		},
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10),
+			Amount:   sdk.NewUint(10),
 		},
 	}, badge.MaxSupplys)
 	suite.Require().Equal(sdk.NewUint(1), bobbalance.Balances[0].Amount)
@@ -223,12 +223,12 @@ func (suite *TestSuite) TestNewBadgesDirectlyUponCreatingNewBadge() {
 	suite.Require().Equal(sdk.NewUint(5), badge.NextBadgeId)
 	suite.Require().Equal([]*types.Balance{
 		{
-			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(2), End: sdk.NewUint(2),}}, //0 to 0 range so it will be nil
-			Amount:  sdk.NewUint(1),
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(2), End: sdk.NewUint(2)}}, //0 to 0 range so it will be nil
+			Amount:   sdk.NewUint(1),
 		},
 		{
-			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}, {Start: sdk.NewUint(3), End: sdk.NewUint(4),}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10),
+			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}, {Start: sdk.NewUint(3), End: sdk.NewUint(4)}}, //0 to 0 range so it will be nil
+			Amount:   sdk.NewUint(10),
 		},
 	},
 		badge.MaxSupplys)
@@ -245,8 +245,8 @@ func (suite *TestSuite) TestNewBadgesNotManager() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -258,12 +258,12 @@ func (suite *TestSuite) TestNewBadgesNotManager() {
 					},
 				},
 				Permissions: sdk.NewUint(62),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
+						From: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
-						To: &types.AddressesMapping{
+						To: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
 					},
@@ -302,8 +302,8 @@ func (suite *TestSuite) TestNewBadgeCreateIsLocked() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{

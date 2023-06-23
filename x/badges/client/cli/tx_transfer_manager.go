@@ -13,10 +13,10 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdTransferManager() *cobra.Command {
+func CmdUpdateManager() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "transfer-manager [collection-id] [address]",
-		Short: "Broadcast message transferManager",
+		Short: "Broadcast message updateManager",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argBadgeId := types.NewUintFromString(args[0])
@@ -33,7 +33,7 @@ func CmdTransferManager() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgTransferManager(
+			msg := types.NewMsgUpdateManager(
 				clientCtx.GetFromAddress().String(),
 				argBadgeId,
 				argAddress,

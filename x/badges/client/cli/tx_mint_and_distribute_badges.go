@@ -16,7 +16,7 @@ var _ = strconv.Itoa(0)
 
 func CmdMintAndDistributeBadges() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "mint-badge [collection-id] [supplys] [transfers] [claims] [collection-uri] [badge-uris] [balancesUri]",
+		Use:   "mint-badge [collection-id] [supplys] [transfers] [claims] [collection-uri] [badge-uris] [offChainBalancesMetadata]",
 		Short: "Broadcast message MintAndDistributeBadges",
 		Args:  cobra.ExactArgs(7),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -24,7 +24,7 @@ func CmdMintAndDistributeBadges() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
+
 			var badgeSupplyAndAmount []*types.BadgeSupplyAndAmount
 			err = json.Unmarshal([]byte(args[1]), &badgeSupplyAndAmount)
 			if err != nil {
@@ -43,18 +43,18 @@ func CmdMintAndDistributeBadges() *cobra.Command {
 				return err
 			}
 
-			argCollectionUri, err := cast.ToStringE(args[4])
+			argCollectionMetadata, err := cast.ToStringE(args[4])
 			if err != nil {
 				return err
 			}
 
-			var badgeUris []*types.BadgeUri
-			err = json.Unmarshal([]byte(args[5]), &badgeUris)
+			var badgeMetadata []*types.BadgeMetadata
+			err = json.Unmarshal([]byte(args[5]), &badgeMetadata)
 			if err != nil {
 				return err
 			}
 
-			argBalancesUri, err := cast.ToStringE(args[6])
+			argOffChainBalancesMetadata, err := cast.ToStringE(args[6])
 			if err != nil {
 				return err
 			}
@@ -64,16 +64,15 @@ func CmdMintAndDistributeBadges() *cobra.Command {
 				return err
 			}
 
-
 			msg := types.NewMsgMintAndDistributeBadges(
 				clientCtx.GetFromAddress().String(),
 				argId,
 				badgeSupplyAndAmount,
 				transfers,
 				claims,
-				argCollectionUri,
-				badgeUris,
-				argBalancesUri,
+				argCollectionMetadata,
+				badgeMetadata,
+				argOffChainBalancesMetadata,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {

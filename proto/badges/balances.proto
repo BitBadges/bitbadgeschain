@@ -3,29 +3,47 @@ package bitbadges.bitbadgeschain.badges;
 
 import "gogoproto/gogo.proto";
 import "badges/params.proto";
-import "badges/ranges.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 
+//ID ranges define a range of IDs from start to end. Can be used for badge IDs, nonces, anything. 
+message IdRange {
+  string start = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false ];
+  string end = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+message BadgeSupply {
+  string amount = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated IdRange badgeIds = 2;
+}
+
 //Defines a balance object. The specified balance holds for all ids specified within the id ranges array.
 message Balance {
-    string amount = 1  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-    ];
-    repeated IdRange badgeIds = 2;
+  string amount = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated IdRange times = 2;
+  repeated IdRange badgeIds = 3;
 }
 
-//Defines a user balance object for a badge w/ the user's balances and approvals. All badge IDs for a collection are handled within this object.
-message UserBalanceStore {
-    repeated Balance balances = 1; //The user's balance for each badge ID.
-    repeated Approval approvals = 2; //Approvals are sorted in order of address number.
+//The badgeIds specified will inherit the balances of the parentBadgeIds.
+//If number of badges specified in parentBadgeIds === 1, then all badges will inherit the balances of that badge.
+//Else, number of badges specified in parentBadgeIds must === number of badges specified in badgeIds.
+//Or else, error is thrown
+message InheritedBalance {
+  repeated IdRange badgeIds = 1;
+
+  string parentCollectionId = 2;
+  repeated IdRange parentBadgeIds = 3;
 }
 
-//Defines an approval object for specific addresses.
-message Approval {
-  string address = 1;
-  repeated Balance balances = 2; //approval balances for every badgeId
+
+message MinMaxBalance {
+  repeated IdRange badgeIds = 1;
+  IdRange amount = 2;
+  string time = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string collectionId = 4 [
+    (gogoproto.customtype) = "Uint", 
+    (gogoproto.nullable) = false
+  ];
 }

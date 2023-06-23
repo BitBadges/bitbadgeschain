@@ -21,25 +21,24 @@ func (suite *TestSuite) TestSetApprovals() {
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(35),
+			End:   sdk.NewUint(35),
 		},
 		{
 			Start: sdk.NewUint(2),
-			End: sdk.NewUint(34),
+			End:   sdk.NewUint(34),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 	}
 
-	
 	err := *new(error)
 	userBalance.Approvals, err = keeper.SetApproval(userBalance.Approvals, sdk.NewUint(1000), alice, badgeIdRanges)
 	suite.Require().NoError(err)
 	userBalance.Approvals, err = keeper.SetApproval(userBalance.Approvals, sdk.NewUint(1000), charlie, badgeIdRanges)
 	suite.Require().NoError(err)
-	
+
 	suite.Require().Equal(userBalance.Approvals[0].Address, alice)
 	suite.Require().Equal(userBalance.Approvals[0].Balances[0].Amount, sdk.NewUint(1000))
 	suite.Require().Equal(userBalance.Approvals[0].Balances[0].BadgeIds, []*types.IdRange{{Start: sdk.NewUint(0), End: sdk.NewUint(100)}})
@@ -59,11 +58,11 @@ func (suite *TestSuite) TestSetApprovals() {
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(35),
+			End:   sdk.NewUint(35),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 	}
 
@@ -96,27 +95,27 @@ func (suite *TestSuite) TestRemoveApprovals() {
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(35),
+			End:   sdk.NewUint(35),
 		},
 		{
 			Start: sdk.NewUint(2),
-			End: sdk.NewUint(34),
+			End:   sdk.NewUint(34),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 		{
 			Start: sdk.NewUint(135),
-			End: sdk.NewUint(200),
+			End:   sdk.NewUint(200),
 		},
 		{
 			Start: sdk.NewUint(235),
-			End: sdk.NewUint(300),
+			End:   sdk.NewUint(300),
 		},
 		{
 			Start: sdk.NewUint(335),
-			End: sdk.NewUint(400),
+			End:   sdk.NewUint(400),
 		},
 	}
 
@@ -132,15 +131,15 @@ func (suite *TestSuite) TestRemoveApprovals() {
 		},
 		{
 			Start: sdk.NewUint(135),
-			End: sdk.NewUint(200),
+			End:   sdk.NewUint(200),
 		},
 		{
 			Start: sdk.NewUint(235),
-			End: sdk.NewUint(300),
+			End:   sdk.NewUint(300),
 		},
 		{
 			Start: sdk.NewUint(335),
-			End: sdk.NewUint(400),
+			End:   sdk.NewUint(400),
 		},
 	})
 
@@ -151,11 +150,11 @@ func (suite *TestSuite) TestRemoveApprovals() {
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(35),
+			End:   sdk.NewUint(35),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 	}
 
@@ -185,15 +184,15 @@ func (suite *TestSuite) TestAddApprovals() {
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(35),
+			End:   sdk.NewUint(35),
 		},
 		{
 			Start: sdk.NewUint(2),
-			End: sdk.NewUint(34),
+			End:   sdk.NewUint(34),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 	}
 
@@ -218,11 +217,11 @@ func (suite *TestSuite) TestAddApprovals() {
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(35),
+			End:   sdk.NewUint(35),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 	}
 
@@ -233,7 +232,7 @@ func (suite *TestSuite) TestAddApprovals() {
 
 	suite.Require().Equal(userBalance.Approvals[0].Balances[0].Amount, sdk.NewUint(1000))
 	suite.Require().True(types.IdRangeEquals(userBalance.Approvals[0].Balances[0].BadgeIds, []*types.IdRange{{Start: sdk.NewUint(0), End: sdk.NewUint(0)}, {Start: sdk.NewUint(2), End: sdk.NewUint(34)}}))
-	
+
 	suite.Require().Equal(userBalance.Approvals[0].Balances[1].Amount, sdk.NewUint(1001))
 	suite.Require().Equal(userBalance.Approvals[0].Balances[1].BadgeIds, []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}, {Start: sdk.NewUint(36), End: sdk.NewUint(100)}})
 
@@ -255,15 +254,15 @@ func (suite *TestSuite) TestAddApprovalsOverflow() {
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(35),
+			End:   sdk.NewUint(35),
 		},
 		{
 			Start: sdk.NewUint(2),
-			End: sdk.NewUint(34),
+			End:   sdk.NewUint(34),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 	}
 
@@ -284,7 +283,7 @@ func (suite *TestSuite) TestAddApprovalsOverflow() {
 	badgeIdRangesToAdd := []*types.IdRange{
 		{
 			Start: sdk.NewUint(0),
-			End: sdk.NewUint(1000),
+			End:   sdk.NewUint(1000),
 		},
 	}
 
@@ -310,15 +309,15 @@ func (suite *TestSuite) TestRemoveApprovalsUnderflow() {
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(35),
+			End:   sdk.NewUint(35),
 		},
 		{
 			Start: sdk.NewUint(2),
-			End: sdk.NewUint(34),
+			End:   sdk.NewUint(34),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 	}
 
@@ -337,11 +336,11 @@ func (suite *TestSuite) TestRemoveApprovalsUnderflow() {
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(35),
+			End:   sdk.NewUint(35),
 		},
 		{
 			Start: sdk.NewUint(35),
-			End: sdk.NewUint(100),
+			End:   sdk.NewUint(100),
 		},
 	}
 

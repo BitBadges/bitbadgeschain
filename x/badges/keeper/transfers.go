@@ -5,33 +5,21 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// Handles a transfer from one address to another. If it can be a forceful transfer, it will forcefully transfer the balances and approvals. If it is a pending transfer, it will add it to the pending transfers.
-func HandleTransfer(collection types.BadgeCollection, badgeIds []*types.IdRange, fromUserBalance types.UserBalanceStore, toUserBalance types.UserBalanceStore, amount sdk.Uint, from string, to string, approvedBy string) (types.UserBalanceStore, types.UserBalanceStore, error) {
-	err := *new(error)
-
-	fromUserBalance, toUserBalance, err = ForcefulTransfer(collection, badgeIds, fromUserBalance, toUserBalance, amount, from, to, approvedBy)
-	if err != nil {
-		return types.UserBalanceStore{}, types.UserBalanceStore{}, err
-	}
-
-	return fromUserBalance, toUserBalance, nil
-}
-
 // Forceful transfers will transfer the balances and deduct from approvals directly without adding it to pending.
-func ForcefulTransfer(collection types.BadgeCollection, badgeIds []*types.IdRange, fromUserBalance types.UserBalanceStore, toUserBalance types.UserBalanceStore, amount sdk.Uint, from string, to string, approvedBy string) (types.UserBalanceStore, types.UserBalanceStore, error) {
+func HandleTransfer(ctx sdk.Context, collection types.BadgeCollection, badgeIds []*types.IdRange, fromUserBalance types.UserBalanceStore, toUserBalance types.UserBalanceStore, amount sdk.Uint, from string, to string, initiatedBy string) (types.UserBalanceStore, types.UserBalanceStore, error) {
 	// 1. Check if the from address is frozen
-	// 2. Remove approvals if approvedBy != from and not managerApprovedTransfer
+	// 2. Remove approvals if initiatedBy != from and not managerApprovedTransfer
 	// 3. Deduct from "From" balance
 	// 4. Add to "To" balance
 	err := *new(error)
 
-	isAllowedTransfer, isManagerApprovedTransfer := AssertTransferAllowed(collection, from, to, approvedBy)
+	isAllowedTransfer, requiresApproval := IsTransferAllowed(ctx, badgeIds, collection, from, to, initiatedBy)
 	if !isAllowedTransfer {
 		return types.UserBalanceStore{}, types.UserBalanceStore{}, ErrAddressFrozen
 	}
 
-	if !isManagerApprovedTransfer {
-		fromUserBalance, err = DeductApprovalsIfNeeded(fromUserBalance, collection, collection.CollectionId, badgeIds, from, to, approvedBy, amount)
+	if requiresApproval {
+		fromUserBalance, err = DeductApprovalsIfNeeded(ctx, fromUserBalance, collection, collection.CollectionId, badgeIds, from, to, initiatedBy, amount)
 		if err != nil {
 			return types.UserBalanceStore{}, types.UserBalanceStore{}, err
 		}
@@ -51,11 +39,29 @@ func ForcefulTransfer(collection types.BadgeCollection, badgeIds []*types.IdRang
 }
 
 // Deduct approvals from requester if requester != from
-func DeductApprovalsIfNeeded(UserBalance types.UserBalanceStore, collection types.BadgeCollection, collectionId sdk.Uint, badgeIds []*types.IdRange, from string, to string, requester string, amount sdk.Uint) (types.UserBalanceStore, error) {
+func DeductApprovalsIfNeeded(ctx sdk.Context, UserBalance types.UserBalanceStore, collection types.BadgeCollection, collectionId sdk.Uint, badgeIds []*types.IdRange, from string, to string, requester string, amount sdk.Uint) (types.UserBalanceStore, error) {
 	newUserBalance := UserBalance
 
 	if from != requester {
 		err := *new(error)
+		idx, found := SearchApprovals(requester, newUserBalance.Approvals)
+		if !found {
+			return UserBalance, ErrApprovalForAddressDoesntExist
+		}
+
+		approval := newUserBalance.Approvals[idx]
+		validTime := false
+		for _, timeInterval := range approval.TimeIntervals {
+			currTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
+			if currTime.GT(timeInterval.Start) && currTime.LT(timeInterval.End) {
+				validTime = true
+			}
+		}
+
+		if !validTime {
+			return UserBalance, ErrInvalidTime
+		}
+
 		newUserBalance.Approvals, err = RemoveBalanceFromApproval(newUserBalance.Approvals, amount, requester, badgeIds)
 		if err != nil {
 			return UserBalance, err
@@ -65,88 +71,94 @@ func DeductApprovalsIfNeeded(UserBalance types.UserBalanceStore, collection type
 	return newUserBalance, nil
 }
 
-//Within each address mapping, we can specify the manager options to include/exclude the manager address
-//from the Addresses field or do nothing.
-//This is useful because the manager address is not always a fixed address and can transfer.
-func HandleManagerOptions(addressMapping *types.AddressesMapping, managerAddress string) {
-	
-	if addressMapping.ManagerOptions.Equal(sdk.NewUint(uint64(types.AddressOptions_IncludeManager))) {
-		addressMapping.Addresses = append(addressMapping.Addresses, managerAddress)
-	} else if addressMapping.ManagerOptions.Equal(sdk.NewUint(uint64(types.AddressOptions_ExcludeManager))) {
-		//Remove from Addresses
-		newAddresses := []string{}
-		for _, address := range addressMapping.Addresses {
-			if address != managerAddress {
-				newAddresses = append(newAddresses, address)
-			}
+func CheckMappingAddresses(addressMapping *types.AddressMapping, addressToCheck string, managerAddress string) bool {
+	found := false
+
+	for _, address := range addressMapping.Addresses {
+		if address == addressToCheck {
+			found = true
 		}
-		addressMapping.Addresses = newAddresses
+
+		//Support the manager alias
+		if address == "Manager" && (addressToCheck == managerAddress || addressToCheck == "Manager") {
+			found = true
+		}
 	}
+
+	if !addressMapping.IncludeOnlySpecified {
+		found = !found
+	}
+
+	return found
 }
 
-// Checks if the from and to addresses are in the transfer mapping.
+// Checks if the from and to addresses are in the transfer approvedTransfer.
 // Handles the manager options for the from and to addresses.
 // If includeOnlySpecified is true, then we check if the address is in the Addresses field.
 // If includeOnlySpecified is false, then we check if the address is NOT in the Addresses field.
-func CheckIfInTransferMapping(transferMapping *types.TransferMapping, from string, to string, managerAddress string) (bool,bool) {
-	fromFound := false
-	toFound := false
 
-	HandleManagerOptions(transferMapping.From, managerAddress)
-	HandleManagerOptions(transferMapping.To, managerAddress)
-
-	for _, address := range transferMapping.From.Addresses {
-		if address == from {
-			fromFound = true
-		}
+// Note addresses matching does not mean the transfer is allowed. It just means the addresses match.
+// All other criteria must also be met.
+func CheckIfAddressesMatch(collectionApprovedTransfer *types.CollectionApprovedTransfer, from string, to string, initiatedBy string, managerAddress string) bool {
+	if from == "Mint" && initiatedBy == "Mint" {
+		return collectionApprovedTransfer.IncludeMints && CheckMappingAddresses(collectionApprovedTransfer.To, to, managerAddress)
 	}
 
-	for _, address := range transferMapping.To.Addresses {
-		if address == to {
-			toFound = true
-		}
-	}
+	fromFound := CheckMappingAddresses(collectionApprovedTransfer.From, from, managerAddress)
+	toFound := CheckMappingAddresses(collectionApprovedTransfer.To, to, managerAddress)
+	initiatedByFound := CheckMappingAddresses(collectionApprovedTransfer.InitiatedBy, initiatedBy, managerAddress)
 
-	if !transferMapping.From.IncludeOnlySpecified {
-		fromFound = !fromFound
-	}
-
-	if !transferMapping.To.IncludeOnlySpecified {
-		toFound = !toFound
-	}
-
-	return fromFound, toFound
+	return fromFound && toFound && initiatedByFound
 }
 
-
 // Checks if account is frozen or not.
-func IsTransferAllowed(collection types.BadgeCollection, fromAddress string, toAddress string, approvedBy string) (bool, bool) {
-	if approvedBy == collection.Manager {
-		for _, managerApprovedTransfer := range collection.ManagerApprovedTransfers {
-		  fromFound, toFound := CheckIfInTransferMapping(managerApprovedTransfer, fromAddress, toAddress, collection.Manager)
-			
-			//If both are true, then this is a manager approved transfer
-			if fromFound && toFound {
-				return true, true
+func IsTransferAllowed(ctx sdk.Context, badgeIds []*types.IdRange, collection types.BadgeCollection, fromAddress string, toAddress string, initiatedBy string) (bool, bool) {
+	for _, allowedTransfer := range collection.ApprovedTransfers {
+		//Check if addresses match. Handles as a "Mint" tx, if from and initiatedBy are both "Mint"
+		addressesMatch := CheckIfAddressesMatch(allowedTransfer, fromAddress, toAddress, initiatedBy, collection.Manager)
+		if !addressesMatch {
+			continue
+		}
+
+		//Check if current time is valid
+		validTime := false
+		for _, timeInterval := range allowedTransfer.TimeIntervals {
+			time := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
+			if time.GT(timeInterval.Start) && time.LT(timeInterval.End) {
+				validTime = true
 			}
 		}
 
-		//If not, we handle it as a normal transfer
-	}
-
-	for _, allowedTransfer := range collection.AllowedTransfers {
-		fromFound, toFound := CheckIfInTransferMapping(allowedTransfer, fromAddress, toAddress, collection.Manager)
-
-		if fromFound && toFound {
-			return true, false
+		if !validTime {
+			continue
 		}
+
+		//Check if badge ids match
+		//TODO: Make this an id_ranges.go function
+		matchingBadgeIds := false
+		//Start with all badge IDs in the collection and remove as we handle them
+		startRanges := SortAndMergeOverlapping(badgeIds)
+		for _, badgeIdRange := range allowedTransfer.BadgeIds {
+			newStartRanges := []*types.IdRange{}
+			for _, idRange := range startRanges {
+				removedRanges, _ := RemoveIdsFromIdRange(badgeIdRange, idRange)
+				newStartRanges = append(newStartRanges, removedRanges...)
+			}
+			startRanges = newStartRanges
+		}
+		matchingBadgeIds = len(startRanges) == 0
+
+		if !matchingBadgeIds {
+			continue
+		}
+
+		//Lastly, return if the transfer is allowed and if it requires approval
+		allowed := allowedTransfer.IsAllowed
+		requiresApproval := !allowedTransfer.NoApprovalRequired
+
+		return allowed, requiresApproval
 	}
 
-	return false, false
-}
-
-// Returns an error if account is Frozen
-func AssertTransferAllowed(collection types.BadgeCollection, from string, to string, approvedBy string) (bool, bool) {
-	transferIsAllowed, isManagerApprovedTransfer := IsTransferAllowed(collection, from, to, approvedBy)
-	return transferIsAllowed, isManagerApprovedTransfer
+	//If not explicitly allowed
+	return false, true
 }

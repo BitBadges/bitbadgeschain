@@ -11,10 +11,10 @@ func (k msgServer) DeleteCollection(goCtx context.Context, msg *types.MsgDeleteC
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator:       msg.Creator,
-		CollectionId:  msg.CollectionId,
-		MustBeManager: true,
-		CanDelete:     true,
+		Creator:             msg.Creator,
+		CollectionId:        msg.CollectionId,
+		MustBeManager:       true,
+		CanDeleteCollection: true,
 	})
 
 	k.DeleteCollectionFromStore(ctx, collection.CollectionId)

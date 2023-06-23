@@ -1,0 +1,174 @@
+syntax = "proto3";
+package bitbadges.bitbadgeschain.badges;
+
+import "google/protobuf/any.proto";
+import "badges/balances.proto";
+import "badges/addresses.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
+
+message CollectionPermissions {
+  repeated ActionPermission canDeleteCollection = 1; 
+  repeated TimedUpdatePermission canArchive = 2;
+  repeated TimedUpdatePermission canUpdateContractAddress = 3;
+  repeated TimedUpdatePermission canUpdateOffChainBalancesMetadata = 4;
+  
+  repeated TimedUpdatePermission canUpdateCustomData = 5;
+  repeated TimedUpdatePermission canUpdateManager = 6; 
+  repeated TimedUpdatePermission canUpdateCollectionMetadata = 7;
+
+  repeated ActionWithBadgeIdsPermission canCreateMoreBadges = 8;
+
+  repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 9;
+  repeated TimedUpdateWithBadgeIdsPermission canUpdateInheritedBalances = 10;
+
+  repeated CollectionApprovedTransferPermission canUpdateApprovedTransfers = 11;
+}
+
+message UserPermissions {
+  repeated UserApprovedTransferPermission canUpdateApprovedTransfers = 1;
+}
+
+message ValueOptions {
+  bool invertDefault = 1;
+  bool allValues = 2;
+  bool noValues = 3;
+}
+
+message CollectionApprovedTransferCombination {
+  ValueOptions timelineTimesOptions = 1;
+
+  ValueOptions fromMappingIdOptions = 2;
+  ValueOptions toMappingIdOptions = 3;
+  ValueOptions initiatedByMappingIdOptions = 4;
+  ValueOptions transferTimesOptions = 5;
+  ValueOptions badgeIdsOptions = 6;
+
+  ValueOptions permittedTimesOptions = 7;
+  ValueOptions forbiddenTimesOptions = 8;
+}
+
+message CollectionApprovedTransferDefaultValues {
+  repeated IdRange timelineTimes = 1;
+
+  string fromMappingId = 2;
+  string toMappingId = 3;
+  string initiatedByMappingId = 4;
+  repeated IdRange transferTimes = 5;
+  repeated IdRange badgeIds = 6;
+
+  repeated IdRange permittedTimes = 7;
+  repeated IdRange forbiddenTimes = 8;
+}
+
+message CollectionApprovedTransferPermission {
+  CollectionApprovedTransferDefaultValues defaultValues = 1;
+  repeated CollectionApprovedTransferCombination combinations = 7;
+}
+
+message UserApprovedTransferCombination {
+  ValueOptions timelineTimesOptions = 1;
+
+  ValueOptions toMappingIdOptions = 2;
+  ValueOptions initiatedByMappingIdOptions = 3;
+  ValueOptions transferTimesOptions = 4;
+  ValueOptions badgeIdsOptions = 5;
+
+  ValueOptions permittedTimesOptions = 6;
+  ValueOptions forbiddenTimesOptions = 7;
+}
+
+message UserApprovedTransferDefaultValues {
+  repeated IdRange timelineTimes = 1;
+
+  string toMappingId = 2;
+  string initiatedByMappingId = 3;
+  repeated IdRange transferTimes = 4;
+  repeated IdRange badgeIds = 5;
+
+  repeated IdRange permittedTimes = 7;
+  repeated IdRange forbiddenTimes = 8;
+}
+
+message UserApprovedTransferPermission {
+  UserApprovedTransferDefaultValues defaultValues = 1;
+  repeated UserApprovedTransferCombination combinations = 2;
+}
+
+message ActionWithBadgeIdsCombination {
+  ValueOptions badgeIdsOptions = 1;
+
+  ValueOptions permittedTimesOptions = 2;
+  ValueOptions forbiddenTimesOptions = 3;
+}
+
+message ActionWithBadgeIdsDefaultValues {
+  repeated IdRange badgeIds = 1;
+
+  repeated IdRange permittedTimes = 2;
+  repeated IdRange forbiddenTimes = 3;
+}
+
+message ActionWithBadgeIdsPermission {
+  ActionWithBadgeIdsDefaultValues defaultValues = 1;
+  repeated ActionWithBadgeIdsCombination combinations = 2;
+}
+
+message ActionDefaultValues {
+  repeated IdRange permittedTimes = 1;
+  repeated IdRange forbiddenTimes = 2;
+}
+
+message ActionCombination {
+  
+  ValueOptions permittedTimesOptions = 1;
+  ValueOptions forbiddenTimesOptions = 2;
+}
+
+message ActionPermission {
+  ActionDefaultValues defaultValues = 1;
+  repeated ActionCombination combinations = 2;
+}
+
+message TimedUpdateCombination {
+  ValueOptions timelineTimesOptions = 1;
+
+  ValueOptions permittedTimesOptions = 2;
+  ValueOptions forbiddenTimesOptions = 3;
+}
+
+message TimedUpdateDefaultValues {
+  repeated IdRange timelineTimes = 1;
+
+  repeated IdRange permittedTimes = 2;
+  repeated IdRange forbiddenTimes = 3;
+}
+
+message TimedUpdatePermission {
+  TimedUpdateDefaultValues defaultValues = 1;
+
+  repeated TimedUpdateCombination combinations = 2;
+}
+
+message TimedUpdateWithBadgeIdsCombination {
+  ValueOptions timelineTimesOptions = 1;
+
+  ValueOptions badgeIdsOptions = 2;
+
+  ValueOptions permittedTimesOptions = 3;
+  ValueOptions forbiddenTimesOptions = 4;
+}
+
+message TimedUpdateWithBadgeIdsDefaultValues {
+  repeated IdRange badgeIds = 1;
+  repeated IdRange timelineTimes = 2;
+
+  repeated IdRange permittedTimes = 3;
+  repeated IdRange forbiddenTimes = 4;
+}
+
+message TimedUpdateWithBadgeIdsPermission {
+  TimedUpdateWithBadgeIdsDefaultValues defaultValues = 1;
+  repeated TimedUpdateWithBadgeIdsCombination combinations = 2;
+}

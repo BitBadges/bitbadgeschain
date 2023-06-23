@@ -13,8 +13,8 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -26,17 +26,17 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 					},
 				},
 				Permissions: sdk.NewUint(23),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(uint64(types.AddressOptions_None)),
+							ManagerOptions:       sdk.NewUint(uint64(types.AddressOptions_None)),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(uint64(types.AddressOptions_None)),
+							ManagerOptions:       sdk.NewUint(uint64(types.AddressOptions_None)),
 						},
 					},
 				},
@@ -76,14 +76,14 @@ func (suite *TestSuite) TestFreezeAddressesDirectlyWhenCreatingNewBadge() {
 	})
 	suite.Require().Nil(err, "Error transferring badge")
 
-	err = UpdateAllowedTransfers(suite, wctx, bob, sdk.NewUint(1), []*types.TransferMapping{
+	err = UpdateCollectionApprovedTransfers(suite, wctx, bob, sdk.NewUint(1), []*types.CollectionApprovedTransfer{
 		{
-			From: &types.AddressesMapping{
+			From: &types.AddressMapping{
 				IncludeOnlySpecified: false,
 			},
-			To: &types.AddressesMapping{
+			To: &types.AddressMapping{
 				IncludeOnlySpecified: false,
-				Addresses: []string{bob},
+				Addresses:            []string{bob},
 			},
 		},
 	})
@@ -114,8 +114,8 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -127,20 +127,20 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 					},
 				},
 				Permissions: sdk.NewUint(23),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{							},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(uint64(types.AddressOptions_None)),
+							ManagerOptions:       sdk.NewUint(uint64(types.AddressOptions_None)),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{							},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(uint64(types.AddressOptions_None)),
+							ManagerOptions:       sdk.NewUint(uint64(types.AddressOptions_None)),
 						},
 					},
-				},			
+				},
 			},
 			Amount:  sdk.NewUint(1),
 			Creator: bob,
@@ -166,7 +166,7 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10000),
+			Amount:   sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -202,17 +202,17 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 	suite.Require().Equal(sdk.NewUint(5000), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = UpdateAllowedTransfers(suite, wctx, bob, sdk.NewUint(1), []*types.TransferMapping{
+	err = UpdateCollectionApprovedTransfers(suite, wctx, bob, sdk.NewUint(1), []*types.CollectionApprovedTransfer{
 		{
-			From: &types.AddressesMapping{
-				Addresses: []string{},
+			From: &types.AddressMapping{
+				Addresses:            []string{},
 				IncludeOnlySpecified: true,
-				ManagerOptions:    sdk.NewUint(uint64(types.AddressOptions_None)),
+				ManagerOptions:       sdk.NewUint(uint64(types.AddressOptions_None)),
 			},
-			To: &types.AddressesMapping{
-				Addresses: []string{},
+			To: &types.AddressMapping{
+				Addresses:            []string{},
 				IncludeOnlySpecified: true,
-				ManagerOptions:    sdk.NewUint(uint64(types.AddressOptions_None)),
+				ManagerOptions:       sdk.NewUint(uint64(types.AddressOptions_None)),
 			},
 		},
 	})
@@ -240,9 +240,9 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 }
 
 //TODO:
-//TODO: also test transfer mappings
+//TODO: also test transfer approvedTransfers
 
-//TODO: also test manager approved transfers with transfer mappings
+//TODO: also test manager approved transfers with transfer approvedTransfers
 
 // func (suite *TestSuite) TestTransferBadgeForcefulFrozenByDefault() {
 // 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -250,8 +250,8 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 // 	collectionsToCreate := []CollectionsToCreate{
 // 		{
 // 			Badge: types.MsgNewCollection{
-// 				CollectionUri: "https://example.com",
-// BadgeUri: "https://example.com/{id}",
+// 				CollectionMetadata: "https://example.com",
+// BadgeMetadata: "https://example.com/{id}",
 // 				Permissions: 63,
 // 			},
 // 			Amount:  sdk.NewUint(1),
@@ -302,8 +302,8 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 // 	collectionsToCreate := []CollectionsToCreate{
 // 		{
 // 			Badge: types.MsgNewCollection{
-// 				CollectionUri: "https://example.com",
-// BadgeUri: "https://example.com/{id}",
+// 				CollectionMetadata: "https://example.com",
+// BadgeMetadata: "https://example.com/{id}",
 // 				Permissions: 63,
 // 			},
 // 			Amount:  sdk.NewUint(1),
@@ -363,8 +363,8 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 // 	collectionsToCreate := []CollectionsToCreate{
 // 		{
 // 			Badge: types.MsgNewCollection{
-// 				CollectionUri: "https://example.com",
-// 				BadgeUri: "https://example.com/{id}",
+// 				CollectionMetadata: "https://example.com",
+// 				BadgeMetadata: "https://example.com/{id}",
 // 				Permissions: sdk.NewUint(0),
 // 			},
 // 			Amount:  sdk.NewUint(1),
@@ -384,8 +384,8 @@ func (suite *TestSuite) TestTransferBadgeForcefulUnfrozenByDefault() {
 // 	collectionsToCreate := []CollectionsToCreate{
 // 		{
 // 			Badge: types.MsgNewCollection{
-// 				CollectionUri: "https://example.com",
-// BadgeUri: "https://example.com/{id}",
+// 				CollectionMetadata: "https://example.com",
+// BadgeMetadata: "https://example.com/{id}",
 // 				Permissions: sdk.NewUint(62),
 // 			},
 // 			Amount:  sdk.NewUint(1),

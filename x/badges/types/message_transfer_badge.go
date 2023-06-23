@@ -9,17 +9,16 @@ const TypeMsgTransferBadge = "transfer_badge"
 
 var _ sdk.Msg = &MsgTransferBadge{}
 
-func NewMsgTransferBadge(creator string, collectionId sdk.Uint, from string, transfers []*Transfer) *MsgTransferBadge {
+func NewMsgTransferBadge(creator string, collectionId sdk.Uint, transfers []*Transfer) *MsgTransferBadge {
 	for _, transfer := range transfers {
 		for _, balance := range transfer.Balances {
 			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
 		}
 	}
-	
+
 	return &MsgTransferBadge{
 		Creator:      creator,
 		CollectionId: collectionId,
-		From:         from,
 		Transfers:    transfers,
 	}
 }
@@ -51,11 +50,6 @@ func (msg *MsgTransferBadge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	_, err = sdk.AccAddressFromBech32(msg.From)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid from address (%s)", err)
-	}
-
 	if msg.Transfers == nil || len(msg.Transfers) == 0 {
 		return ErrInvalidLengthBalances
 	}
@@ -65,11 +59,7 @@ func (msg *MsgTransferBadge) ValidateBasic() error {
 		if err != nil {
 			return err
 		}
-
-		err = ValidateNoStringElementIsX(transfer.ToAddresses, msg.From)
-		if err != nil {
-			return ErrSenderAndReceiverSame
-		}
 	}
+
 	return nil
 }

@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/json"
 	"strconv"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -14,44 +13,25 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdUpdateUris() *cobra.Command {
+func CmdArchiveCollection() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-uris [collection-id] [uri] [badge-uris] [balancesUri]",
-		Short: "Broadcast message updateUris",
-		Args:  cobra.ExactArgs(4),
+		Use:   "archive-collection [collection-id]",
+		Short: "Broadcast message archiveCollection",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argBadgeId := types.NewUintFromString(args[0])
+			argCollectionId, err := cast.ToUint64E(args[0])
 			if err != nil {
 				return err
 			}
-
-			argUri, err := cast.ToStringE(args[1])
-			if err != nil {
-				return err
-			}
-
-			var argBadgeUris []*types.BadgeUri
-			if err := json.Unmarshal([]byte(args[2]), &argBadgeUris); err != nil {
-				return err
-			}
-
-			argBalancesUri, err := cast.ToStringE(args[3])
-			if err != nil {
-				return err
-			}
-
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgUpdateUris(
+			msg := types.NewMsgArchiveCollection(
 				clientCtx.GetFromAddress().String(),
-				argBadgeId,
-				argUri,
-				argBadgeUris,
-				argBalancesUri,
+				argCollectionId,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

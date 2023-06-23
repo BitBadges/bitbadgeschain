@@ -5,27 +5,27 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const TypeMsgTransferManager = "transfer_manager"
+const TypeMsgUpdateManager = "transfer_manager"
 
-var _ sdk.Msg = &MsgTransferManager{}
+var _ sdk.Msg = &MsgUpdateManager{}
 
-func NewMsgTransferManager(creator string, collectionId sdk.Uint, address string) *MsgTransferManager {
-	return &MsgTransferManager{
+func NewMsgUpdateManager(creator string, collectionId sdk.Uint, address string) *MsgUpdateManager {
+	return &MsgUpdateManager{
 		Creator:      creator,
 		CollectionId: collectionId,
 		Address:      address,
 	}
 }
 
-func (msg *MsgTransferManager) Route() string {
+func (msg *MsgUpdateManager) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgTransferManager) Type() string {
-	return TypeMsgTransferManager
+func (msg *MsgUpdateManager) Type() string {
+	return TypeMsgUpdateManager
 }
 
-func (msg *MsgTransferManager) GetSigners() []sdk.AccAddress {
+func (msg *MsgUpdateManager) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -33,12 +33,12 @@ func (msg *MsgTransferManager) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgTransferManager) GetSignBytes() []byte {
+func (msg *MsgUpdateManager) GetSignBytes() []byte {
 	bz := AminoCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgTransferManager) ValidateBasic() error {
+func (msg *MsgUpdateManager) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)

@@ -88,10 +88,10 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 type AppModule struct {
 	AppModuleBasic
 
-	keeper         wasmxkeeper.Keeper
-	accountKeeper  authkeeper.AccountKeeper
-	bankKeeper     bankkeeper.Keeper
-	blockHandler   *BlockHandler
+	keeper        wasmxkeeper.Keeper
+	accountKeeper authkeeper.AccountKeeper
+	bankKeeper    bankkeeper.Keeper
+	blockHandler  *BlockHandler
 }
 
 func (am AppModule) ConsensusVersion() uint64 {
@@ -107,10 +107,10 @@ func NewAppModule(
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 
-		keeper:         keeper,
-		accountKeeper:  accountKeeper,
-		bankKeeper:     bankKeeper,
-		blockHandler:   NewBlockHandler(keeper),
+		keeper:        keeper,
+		accountKeeper: accountKeeper,
+		bankKeeper:    bankKeeper,
+		blockHandler:  NewBlockHandler(keeper),
 	}
 }
 

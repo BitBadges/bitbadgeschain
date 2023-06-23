@@ -191,7 +191,7 @@ func VerifySignature(
 		if !ok {
 			return sdkerrors.Wrap(sdkerrors.ErrUnknownExtensionOptions, "tx doesnt contain any extensions")
 		}
-		
+
 		opts := txWithExtensions.GetExtensionOptions()
 		if len(opts) != 1 {
 			return sdkerrors.Wrap(sdkerrors.ErrUnknownExtensionOptions, "tx doesnt contain expected amount of extension options")
@@ -254,7 +254,6 @@ func VerifySignature(
 				Type: "bytes32",
 			},
 		}
-			
 
 		//Normalize the typedData to handle empty (0, "", false), nested objects, and arrays.
 		//Also, add in any missing types for the EIP712 typedData specific to our badges module.
@@ -269,7 +268,6 @@ func VerifySignature(
 			}
 		}
 
-		
 		sigHash, _, err := apitypes.TypedDataAndHash(typedData)
 		if err != nil {
 			return sdkerrors.Wrapf(err, "%s failed to compute typed data hash", typedData)

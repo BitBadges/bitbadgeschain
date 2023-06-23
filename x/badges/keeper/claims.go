@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.ClaimProofItem) (error) {
+func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.ClaimProofItem) error {
 	hashedMsgLeaf := sha256.Sum256([]byte(leaf))
 	currHash := hashedMsgLeaf[:]
 
@@ -35,7 +35,7 @@ func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.ClaimProof
 	return nil
 }
 
-func GetLeafIndex(aunts []*types.ClaimProofItem) (sdk.Uint) {
+func GetLeafIndex(aunts []*types.ClaimProofItem) sdk.Uint {
 	leafIndex := sdk.NewUint(1)
 	//iterate through msg.WhitelistProof.Aunts backwards
 	for i := len(aunts) - 1; i >= 0; i-- {

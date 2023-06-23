@@ -11,26 +11,26 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
-func TestMsgUpdatePermissions_ValidateBasic(t *testing.T) {
+func TestMsgUpdateCollectionPermissions_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgUpdatePermissions
+		msg  types.MsgUpdateCollectionPermissions
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgUpdatePermissions{
-				Creator: "invalid_address",
+			msg: types.MsgUpdateCollectionPermissions{
+				Creator:      "invalid_address",
 				CollectionId: sdk.NewUint(1),
-				Permissions: sdk.NewUint(0),
+				Permissions:  &types.CollectionPermissions{},
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgUpdatePermissions{
-				Creator: sample.AccAddress(),
+			msg: types.MsgUpdateCollectionPermissions{
+				Creator:      sample.AccAddress(),
 				CollectionId: sdk.NewUint(1),
-				Permissions: sdk.NewUint(0),
+				Permissions:  &types.CollectionPermissions{},
 			},
 		},
 	}

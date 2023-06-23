@@ -14,8 +14,8 @@ func (suite *TestSuite) TestSetApproval() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -27,12 +27,12 @@ func (suite *TestSuite) TestSetApproval() {
 					},
 				},
 				Permissions: sdk.NewUint(62),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
+						From: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
-						To: &types.AddressesMapping{
+						To: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
 					},
@@ -61,7 +61,7 @@ func (suite *TestSuite) TestSetApproval() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10000),
+			Amount:   sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -70,7 +70,7 @@ func (suite *TestSuite) TestSetApproval() {
 
 	err = SetApproval(suite, wctx, bob, alice, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount: sdk.NewUint(1000),
+			Amount:   sdk.NewUint(1000),
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
@@ -82,7 +82,7 @@ func (suite *TestSuite) TestSetApproval() {
 
 	err = SetApproval(suite, wctx, bob, charlie, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount: sdk.NewUint(500),
+			Amount:   sdk.NewUint(500),
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
@@ -90,7 +90,7 @@ func (suite *TestSuite) TestSetApproval() {
 
 	err = SetApproval(suite, wctx, bob, alice, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount: sdk.NewUint(500),
+			Amount:   sdk.NewUint(500),
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
@@ -111,8 +111,8 @@ func (suite *TestSuite) TestSetApprovalNoPrevBalanceInStore() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -124,12 +124,12 @@ func (suite *TestSuite) TestSetApprovalNoPrevBalanceInStore() {
 					},
 				},
 				Permissions: sdk.NewUint(62),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
+						From: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
-						To: &types.AddressesMapping{
+						To: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
 					},
@@ -158,7 +158,7 @@ func (suite *TestSuite) TestSetApprovalNoPrevBalanceInStore() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10000),
+			Amount:   sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -167,7 +167,7 @@ func (suite *TestSuite) TestSetApprovalNoPrevBalanceInStore() {
 
 	err = SetApproval(suite, wctx, charlie, alice, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount: sdk.NewUint(0),
+			Amount:   sdk.NewUint(0),
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
@@ -180,8 +180,8 @@ func (suite *TestSuite) TestApproveSelf() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -193,12 +193,12 @@ func (suite *TestSuite) TestApproveSelf() {
 					},
 				},
 				Permissions: sdk.NewUint(62),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
+						From: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
-						To: &types.AddressesMapping{
+						To: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
 					},
@@ -227,7 +227,7 @@ func (suite *TestSuite) TestApproveSelf() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10000),
+			Amount:   sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -236,7 +236,7 @@ func (suite *TestSuite) TestApproveSelf() {
 
 	err = SetApproval(suite, wctx, bob, bob, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount: sdk.NewUint(1000),
+			Amount:   sdk.NewUint(1000),
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})

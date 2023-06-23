@@ -14,28 +14,27 @@ import (
 
 var _ = strconv.Itoa(0)
 
-
 // message MsgNewCollection {
-//     // See badges.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
-//     string creator = 1; 
-//     string collectionUri = 2;
-//     repeated BadgeUri badgeUris = 3;
+//     // See collections.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
+//     string creator = 1;
+//     string collectionMetadata = 2;
+//     repeated BadgeMetadata badgeMetadata = 3;
 
 //     uint64 permissions = 4;
 //     string bytes = 5;
-//     repeated TransferMapping allowedTransfers = 6;
-//     repeated TransferMapping managerApprovedTransfers = 7;
-//     uint64 standard = 8; 
+//     repeated CollectionApprovedTransfer approvedTransfers = 6;
+//     repeated CollectionApprovedTransfer managerApprovedTransfers = 7;
+//     uint64 standard = 8;
 //     //Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
 //     //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
-//     repeated BadgeSupplyAndAmount badgeSupplys = 9;
+//     repeated BadgeSupplyAndAmount badgesToCreate = 9;
 //     repeated Transfers transfers = 10;
 //     repeated Claim claims = 11;
 // }
 
 func CmdNewCollection() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "new-collection [collectionUri] [badgeUris] [permissions] [bytes] [allowedTransfers] [managerApprovedTransfers] [standard] [supplys] [transfers] [claims] [balancesUri]",
+		Use:   "new-collection [collectionMetadata] [badgeMetadata] [permissions] [bytes] [approvedTransfers] [managerApprovedTransfers] [standard] [supplys] [transfers] [claims] [offChainBalancesMetadata]",
 		Short: "Broadcast message newCollection",
 		Args:  cobra.ExactArgs(11),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -43,14 +42,14 @@ func CmdNewCollection() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
-			argCollectionUri, err := cast.ToStringE(args[0])
+
+			argCollectionMetadata, err := cast.ToStringE(args[0])
 			if err != nil {
 				return err
 			}
 
-			var argBadgeUris []*types.BadgeUri
-			err = json.Unmarshal([]byte(args[1]), &argBadgeUris)
+			var argBadgeMetadata []*types.BadgeMetadata
+			err = json.Unmarshal([]byte(args[1]), &argBadgeMetadata)
 			if err != nil {
 				return err
 			}
@@ -65,13 +64,13 @@ func CmdNewCollection() *cobra.Command {
 				return err
 			}
 
-			var argAllowedTransfers []*types.TransferMapping
-			err = json.Unmarshal([]byte(args[4]), &argAllowedTransfers)
+			var argApprovedTransfers []*types.CollectionApprovedTransfer
+			err = json.Unmarshal([]byte(args[4]), &argApprovedTransfers)
 			if err != nil {
 				return err
 			}
 
-			var argManagerApprovedTransfers []*types.TransferMapping
+			var argManagerApprovedTransfers []*types.CollectionApprovedTransfer
 			err = json.Unmarshal([]byte(args[5]), &argManagerApprovedTransfers)
 			if err != nil {
 				return err
@@ -82,8 +81,8 @@ func CmdNewCollection() *cobra.Command {
 				return err
 			}
 
-			var argBadgeSupplys []*types.BadgeSupplyAndAmount
-			err = json.Unmarshal([]byte(args[7]), &argBadgeSupplys)
+			var argBadgesToCreate []*types.BadgeSupplyAndAmount
+			err = json.Unmarshal([]byte(args[7]), &argBadgesToCreate)
 			if err != nil {
 				return err
 			}
@@ -100,7 +99,7 @@ func CmdNewCollection() *cobra.Command {
 				return err
 			}
 
-			argBalancesUri, err := cast.ToStringE(args[10])
+			argOffChainBalancesMetadata, err := cast.ToStringE(args[10])
 			if err != nil {
 				return err
 			}
@@ -108,16 +107,16 @@ func CmdNewCollection() *cobra.Command {
 			msg := types.NewMsgNewCollection(
 				clientCtx.GetFromAddress().String(),
 				argStandard,
-				argBadgeSupplys,
-				argCollectionUri,
-				argBadgeUris,
+				argBadgesToCreate,
+				argCollectionMetadata,
+				argBadgeMetadata,
 				argPermissions,
-				argAllowedTransfers,
+				argApprovedTransfers,
 				argManagerApprovedTransfers,
 				argBytesStr,
 				argTransfers,
 				argClaims,
-				argBalancesUri,
+				argOffChainBalancesMetadata,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

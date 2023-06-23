@@ -1,26 +1,26 @@
 package types
 
 import (
+	"github.com/cosmos/cosmos-sdk/types/msgservice"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/msgservice"
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgNewCollection{}, "badges/NewCollection", nil)
 	cdc.RegisterConcrete(&MsgMintAndDistributeBadges{}, "badges/MintAndDistributeBadges", nil)
 	cdc.RegisterConcrete(&MsgTransferBadge{}, "badges/TransferBadge", nil)
-	cdc.RegisterConcrete(&MsgSetApproval{}, "badges/SetApproval", nil)
-	cdc.RegisterConcrete(&MsgUpdateAllowedTransfers{}, "badges/UpdateAllowedTransfers", nil)
-	cdc.RegisterConcrete(&MsgUpdateUris{}, "badges/UpdateUris", nil)
-	cdc.RegisterConcrete(&MsgUpdatePermissions{}, "badges/UpdatePermissions", nil)
-	cdc.RegisterConcrete(&MsgTransferManager{}, "badges/TransferManager", nil)
-	cdc.RegisterConcrete(&MsgRequestTransferManager{}, "badges/RequestTransferManager", nil)
-	cdc.RegisterConcrete(&MsgUpdateBytes{}, "badges/UpdateBytes", nil)
-	cdc.RegisterConcrete(&MsgClaimBadge{}, "badges/ClaimBadge", nil)
+	cdc.RegisterConcrete(&MsgUpdateCollectionApprovedTransfers{}, "badges/UpdateCollectionApprovedTransfers", nil)
+	cdc.RegisterConcrete(&MsgUpdateMetadata{}, "badges/UpdateMetadata", nil)
+	cdc.RegisterConcrete(&MsgUpdateCollectionPermissions{}, "badges/UpdateCollectionPermissions", nil)
+	cdc.RegisterConcrete(&MsgUpdateManager{}, "badges/UpdateManager", nil)
 	cdc.RegisterConcrete(&MsgDeleteCollection{}, "badges/DeleteCollection", nil)
-	// this line is used by starport scaffolding # 2
+	cdc.RegisterConcrete(&MsgArchiveCollection{}, "badges/ArchiveCollection", nil)
+	cdc.RegisterConcrete(&MsgForkCollection{}, "badges/ForkCollection", nil)
+	cdc.RegisterConcrete(&MsgUpdateUserApprovedTransfers{}, "badges/UpdateUserApprovedTransfers", nil)
+	cdc.RegisterConcrete(&MsgUpdateUserPermissions{}, "badges/UpdateUserPermissions", nil)
+// this line is used by starport scaffolding # 2
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -34,33 +34,41 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgTransferBadge{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgSetApproval{},
+		&MsgUpdateCollectionApprovedTransfers{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgUpdateAllowedTransfers{},
+		&MsgUpdateMetadata{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgUpdateUris{},
+		&MsgUpdateCollectionPermissions{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgUpdatePermissions{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgTransferManager{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgRequestTransferManager{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgUpdateBytes{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgClaimBadge{},
+		&MsgUpdateManager{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgDeleteCollection{},
 	)
-	// this line is used by starport scaffolding # 3
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgArchiveCollection{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgForkCollection{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgUpdateUserApprovedTransfers{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+	&MsgUpdateUserPermissions{},
+)
+// this line is used by starport scaffolding # 3
+
+msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
+
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
+
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
+
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 

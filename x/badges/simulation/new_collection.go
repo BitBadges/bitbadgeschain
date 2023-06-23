@@ -27,13 +27,13 @@ func SimulateMsgNewCollection(
 		}
 
 		msg := &types.MsgNewCollection{
-			Creator:       simAccount.Address.String(),
-			BadgeSupplys:  randomSubassets,
-			Permissions:   sdk.NewUint(r.Uint64()),
-			Standard:      sdk.NewUint(r.Uint64()),
-			Bytes:         simtypes.RandStringOfLength(r, r.Intn(256)),
-			BadgeUris:     []*types.BadgeUri{},
-			CollectionUri: simtypes.RandStringOfLength(r, r.Intn(100)),
+			Creator:            simAccount.Address.String(),
+			BadgesToCreate:     randomSubassets,
+			Permissions:        sdk.NewUint(r.Uint64()),
+			Standard:           sdk.NewUint(r.Uint64()),
+			Bytes:              simtypes.RandStringOfLength(r, r.Intn(256)),
+			BadgeMetadata:      []*types.BadgeMetadata{},
+			CollectionMetadata: simtypes.RandStringOfLength(r, r.Intn(100)),
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

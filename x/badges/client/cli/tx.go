@@ -33,15 +33,18 @@ func GetTxCmd() *cobra.Command {
 	cmd.AddCommand(CmdMintAndDistributeBadges())
 	cmd.AddCommand(CmdTransferBadge())
 	cmd.AddCommand(CmdSetApproval())
-	cmd.AddCommand(CmdUpdateAllowedTransfers())
-	cmd.AddCommand(CmdUpdateUris())
-	cmd.AddCommand(CmdUpdatePermissions())
-	cmd.AddCommand(CmdTransferManager())
-	cmd.AddCommand(CmdRequestTransferManager())
-	cmd.AddCommand(CmdUpdateBytes())
+	cmd.AddCommand(CmdUpdateCollectionApprovedTransfers())
+	cmd.AddCommand(CmdUpdateMetadata())
+	cmd.AddCommand(CmdUpdateCollectionPermissions())
+	cmd.AddCommand(CmdUpdateManager())
+	cmd.AddCommand(CmdRequestUpdateManager())
 	cmd.AddCommand(CmdClaimBadge())
 	cmd.AddCommand(CmdDeleteCollection())
-	// this line is used by starport scaffolding # 1
+	cmd.AddCommand(CmdArchiveCollection())
+	cmd.AddCommand(CmdForkCollection())
+	cmd.AddCommand(CmdUpdateUserApprovedTransfers())
+	cmd.AddCommand(CmdUpdateUserPermissions())
+// this line is used by starport scaffolding # 1
 
 	return cmd
 }

@@ -2,275 +2,230 @@ syntax = "proto3";
 package bitbadges.bitbadgeschain.badges;
 
 // this line is used by starport scaffolding # proto/tx/import
-import "badges/ranges.proto";
+import "badges/transfers.proto";
 import "badges/balances.proto";
-import "badges/claims.proto";
-import "badges/badges.proto";
+import "badges/permissions.proto";
+import "badges/metadata.proto";
+import "badges/collections.proto";
 import "gogoproto/gogo.proto";
+import "badges/addresses.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 // Msg defines the Msg service.
 service Msg {
-    rpc NewCollection(MsgNewCollection) returns (MsgNewCollectionResponse);
-    rpc MintAndDistributeBadges(MsgMintAndDistributeBadges) returns (MsgMintAndDistributeBadgesResponse);
-    rpc TransferBadge(MsgTransferBadge) returns (MsgTransferBadgeResponse);
-    rpc SetApproval(MsgSetApproval) returns (MsgSetApprovalResponse);
-    rpc UpdateAllowedTransfers(MsgUpdateAllowedTransfers) returns (MsgUpdateAllowedTransfersResponse);
-    rpc UpdateUris(MsgUpdateUris) returns (MsgUpdateUrisResponse);
-    rpc UpdatePermissions(MsgUpdatePermissions) returns (MsgUpdatePermissionsResponse);
-    rpc TransferManager(MsgTransferManager) returns (MsgTransferManagerResponse);
-    rpc RequestTransferManager(MsgRequestTransferManager) returns (MsgRequestTransferManagerResponse);
-    rpc UpdateBytes(MsgUpdateBytes) returns (MsgUpdateBytesResponse);
-    rpc ClaimBadge(MsgClaimBadge) returns (MsgClaimBadgeResponse);
-    rpc DeleteCollection(MsgDeleteCollection) returns (MsgDeleteCollectionResponse);
-    // this line is used by starport scaffolding # proto/tx/rpc
+  rpc NewCollection(MsgNewCollection) returns (MsgNewCollectionResponse);
+  rpc MintAndDistributeBadges(MsgMintAndDistributeBadges) returns (MsgMintAndDistributeBadgesResponse);
+  rpc TransferBadge(MsgTransferBadge) returns (MsgTransferBadgeResponse);
+  rpc UpdateCollectionApprovedTransfers(MsgUpdateCollectionApprovedTransfers) returns (MsgUpdateCollectionApprovedTransfersResponse);
+  rpc UpdateUserApprovedTransfers(MsgUpdateUserApprovedTransfers) returns (MsgUpdateUserApprovedTransfersResponse);
+  rpc UpdateMetadata(MsgUpdateMetadata) returns (MsgUpdateMetadataResponse);
+  rpc UpdateCollectionPermissions(MsgUpdateCollectionPermissions) returns (MsgUpdateCollectionPermissionsResponse);
+  rpc UpdateUserPermissions (MsgUpdateUserPermissions) returns (MsgUpdateUserPermissionsResponse);
+  rpc UpdateManager(MsgUpdateManager) returns (MsgUpdateManagerResponse);
+  rpc DeleteCollection(MsgDeleteCollection) returns (MsgDeleteCollectionResponse);
+  rpc ArchiveCollection(MsgArchiveCollection) returns (MsgArchiveCollectionResponse);
+  rpc ForkCollection(MsgForkCollection) returns (MsgForkCollectionResponse);
+  // this line is used by starport scaffolding # proto/tx/rpc
 }
 
 //The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
 
-//BadgeSupplyAndAmount is used to define the supply and amount of badges to create.
-//We create x amount of badges each with a supply of y.
-message BadgeSupplyAndAmount {
-    string supply = 1  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];;
-    string amount = 2  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];;
-}
-
 //Upon badge creation, the manager will first be minted these badges, and then, they will subsequently be transferred to these addresses according to permissions.ForcefulTransfers.
 //Used to only need one signature for MsgNewBadge.
 message Transfer {
-    repeated string toAddresses = 1;
-    repeated Balance balances = 2;
+  string from = 1;
+  repeated string toAddresses = 2;
+  repeated Balance balances = 3;
+
+  //Note here we remain optimistic that the solutions will apply to all potential challenges.
+  //It is the Tx Sender's responsibility to ensure that the solutions are valid for all potential challenges.
+  //If you are attempting to claim badges with different sets of challenges, you will need to make multiple transfers.
+  repeated ChallengeSolution solutions = 4;
+  // repeated ChallengeSolution userSolutions = 5;
 }
 
 message MsgNewCollection {
-    // See badges.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
-    string creator = 1; 
-    string collectionUri = 2;
-    repeated BadgeUri badgeUris = 3;
-    string balancesUri = 4;
+  // See collections.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
+  string creator = 1; 
+  CollectionMetadata collectionMetadata = 2;
+  repeated BadgeMetadata badgeMetadata = 3;
+  OffChainBalancesMetadata offChainBalancesMetadata = 4;
+  string customData = 5;
+  string balancesType = 6 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
+  repeated InheritedBalance inheritedBalances = 7;
+  repeated CollectionApprovedTransfer approvedTransfers = 8;
+  CollectionPermissions permissions = 9;
+  string standard = 10 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
-    string permissions = 5  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-    string bytes = 6;
-    repeated TransferMapping allowedTransfers = 7;
-    repeated TransferMapping managerApprovedTransfers = 8;
-    string standard = 9  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-    
-    //Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
-    //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
-    repeated BadgeSupplyAndAmount badgeSupplys = 10;
-    repeated Transfer transfers = 11;
-    repeated Claim claims = 12;
+  //Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
+  //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
+  repeated Balance badgesToCreate = 11;
+  repeated Transfer transfers = 12;
+  string contractAddress = 13;
+  repeated AddressMapping addressMappings = 14;
 }
 
 message MsgNewCollectionResponse {
-    string collectionId = 1  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ]; //ID of created badge collection
+  string collectionId = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false
+  ]; //ID of created badge collecon
+}
+
+message MsgForkCollection {
+  string creator = 1;
+  string parentCollectionId = 2  [(gogoproto.customtype) = "Uint", 
+    (gogoproto.nullable) = false];
+}
+
+message MsgForkCollectionResponse {
+  string collectionId = 1  [
+    (gogoproto.customtype) = "Uint", 
+    (gogoproto.nullable) = false
+  ]; //ID of created badge collection
 }
 
 //This handles both minting more of existing badges and creating new badges.
 message MsgMintAndDistributeBadges {
-    string creator = 1;
-    string collectionId = 2  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-    repeated BadgeSupplyAndAmount badgeSupplys = 3;
-    repeated Transfer transfers = 4;
-    repeated Claim claims = 5;
-    string collectionUri = 6;
-    repeated BadgeUri badgeUris = 7;
-    string balancesUri = 8;
+  string creator = 1;
+  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated Balance badgesToCreate = 3;
+
+  repeated Transfer transfers = 4;
+  repeated InheritedBalance inheritedBalances = 5;
+  CollectionMetadata collectionMetadata = 6; 
+  repeated BadgeMetadata badgeMetadata = 7;
+  OffChainBalancesMetadata offChainBalancesMetadata = 8;
+  repeated CollectionApprovedTransfer approvedTransfers = 9;
+
+  repeated AddressMapping addressMappings = 10;
 }
 
 message MsgMintAndDistributeBadgesResponse {
     string nextBadgeId = 1  [
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
-      
     ]; //ID of next badgeId after creating all badges.
 }
 
 //For each amount, for each toAddress, we will attempt to transfer all the badgeIds for the badge with ID badgeId.
 message MsgTransferBadge {
-    string creator = 1;
-    string collectionId = 2  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-    string from = 3;
-    repeated Transfer transfers = 4;
+  string creator = 1;
+  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated Transfer transfers = 3;
 }
-
 message MsgTransferBadgeResponse {}
 
-//Sets an approval (no add or remove), just set it for an address.
-message MsgSetApproval {
-    string creator = 1;
-    string collectionId = 2  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-    string address = 3; //The address that are approved to transfer the balances.
-    repeated Balance balances = 4; //approval balances for every badgeId
-}
-
-message MsgSetApprovalResponse {}
-
-
-message MsgUpdateAllowedTransfers {
+message MsgUpdateCollectionApprovedTransfers {
   string creator = 1;
   string collectionId = 2  [
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
-      
     ];
-  repeated TransferMapping allowedTransfers = 3;
+  repeated CollectionApprovedTransfer approvedTransfers = 3;
+  repeated AddressMapping addressMappings = 4;
 }
 
-message MsgUpdateAllowedTransfersResponse {
+message MsgUpdateCollectionApprovedTransfersResponse {}
+
+message MsgUpdateUserApprovedTransfers {
+  string creator = 1;
+  string collectionId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+    ];
+  repeated UserApprovedTransfer approvedTransfers = 3;
+  repeated AddressMapping addressMappings = 4;
 }
+
+message MsgUpdateUserApprovedTransfersResponse {}
 
 //Update badge Uris with new URI object, if permitted.
-message MsgUpdateUris {
+message MsgUpdateMetadata {
   string creator = 1;
   string collectionId = 2  [
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
-      
     ];
-  string collectionUri = 3;
-  repeated BadgeUri badgeUris = 4;
-  string balancesUri = 5;
+  CollectionMetadata collectionMetadata = 3; 
+  repeated BadgeMetadata badgeMetadata = 4;
+  OffChainBalancesMetadata offChainBalancesMetadata = 5;
+  string customData = 6;
+  string contractAddress = 7;
 }
 
-message MsgUpdateUrisResponse {
-}
+message MsgUpdateMetadataResponse {}
 
 //Update badge permissions with new permissions, if permitted.
-message MsgUpdatePermissions {
+message MsgUpdateCollectionPermissions {
   string creator = 1;
   string collectionId = 2  [
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
-      
     ];
-  string permissions = 3  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
+  CollectionPermissions permissions = 3;
+  repeated AddressMapping addressMappings = 4;
 }
 
-message MsgUpdatePermissionsResponse {
+message MsgUpdateCollectionPermissionsResponse {}
+
+message MsgUpdateUserPermissions {
+  string creator = 1;
+  string collectionId = 2  [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+    ];
+  UserPermissions permissions = 3;
+  repeated AddressMapping addressMappings = 4;
 }
+
+message MsgUpdateUserPermissionsResponse {}
 
 //Transfer manager to this address. Recipient must have made a request.
-message MsgTransferManager {
+message MsgUpdateManager {
   string creator = 1;
   string collectionId = 2  [
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
-      
     ];
   string address = 3;
 }
 
-message MsgTransferManagerResponse {
-}
-
-//Add / remove request for manager to be transferred. 
-message MsgRequestTransferManager {
-  string creator = 1;
-  string collectionId = 2  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-  bool addRequest = 3;
-}
-
-message MsgRequestTransferManagerResponse {
-}
-
-//Update badge bytes, if permitted
-message MsgUpdateBytes {
-  string creator = 1;
-  string collectionId = 2  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-  string bytes = 3;
-}
-
-message MsgUpdateBytesResponse {
-}
+message MsgUpdateManagerResponse {}
 
 message ClaimProofItem {
-    string aunt = 1;
-    bool onRight = 2;
+  string aunt = 1;
+  bool onRight = 2;
 }
 
 //Consistent with tendermint/crypto merkle tree
 message ClaimProof {
-    string leaf = 1;
-    repeated ClaimProofItem aunts = 2;
+  string leaf = 1;
+  repeated ClaimProofItem aunts = 2;
 }
 
 message ChallengeSolution {
   ClaimProof proof = 1;
 }
 
-message MsgClaimBadge {
-  string creator = 1;
-  string claimId = 2  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-  string collectionId = 3  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-  repeated ChallengeSolution solutions = 4;
-}
-
-message MsgClaimBadgeResponse {}
-
 message MsgDeleteCollection {
   string creator = 1;
   string collectionId = 2  [
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
-      
     ];
 }
 
-message MsgDeleteCollectionResponse {
+message MsgDeleteCollectionResponse {}
+
+message MsgArchiveCollection {
+  string creator      = 1;
+  string collectionId = 2 [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+    ];
 }
+
+message MsgArchiveCollectionResponse {}
+
 
 // this line is used by starport scaffolding # proto/tx/message

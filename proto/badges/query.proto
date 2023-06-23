@@ -6,9 +6,9 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "badges/params.proto";
 // this line is used by starport scaffolding # 1
-import "badges/badges.proto";
+import "badges/collections.proto";
 import "badges/balances.proto";
-import "badges/claims.proto";
+import "badges/transfers.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
@@ -26,7 +26,7 @@ service Query {
 	}
 
   // Queries a claim by collection ID and claim ID.
-	rpc GetClaim(QueryGetClaimRequest) returns (QueryGetClaimResponse) {
+	rpc GetClaimNumProcessed(QueryGetClaimNumProcessedRequest) returns (QueryGetClaimNumProcessedResponse) {
 		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_claim/{collectionId}/{claimId}";
 	}
 
@@ -69,7 +69,7 @@ message QueryGetCollectionResponse {
   BadgeCollection collection = 1;
 }
 
-message QueryGetClaimRequest {
+message QueryGetClaimNumProcessedRequest {
   string collectionId = 1  [
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
@@ -82,8 +82,11 @@ message QueryGetClaimRequest {
     ];
 }
 
-message QueryGetClaimResponse {
-  Claim claim = 1;
+message QueryGetClaimNumProcessedResponse {
+  string numProcessed = 1 [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+    ];
 }
 
 message QueryGetAddressByIdRequest {

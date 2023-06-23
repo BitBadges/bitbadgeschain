@@ -6,13 +6,14 @@ import (
 )
 
 // Sets an approval amount for an address.
-func SetApproval(approvals []*types.Approval, amount sdk.Uint, address string, badgeIds []*types.IdRange) ([]*types.Approval, error) {
+func SetApproval(approvals []*types.Approval, amount sdk.Uint, address string, badgeIds []*types.IdRange, timeIntervals []*types.IdRange) ([]*types.Approval, error) {
 	idx, found := SearchApprovals(address, approvals)
 	err := *new(error)
 
 	approval := &types.Approval{
-		Address: address,
-		Balances: []*types.Balance{},
+		Address:       address,
+		Balances:      []*types.Balance{},
+		TimeIntervals: []*types.IdRange{},
 	}
 
 	if found {
@@ -23,6 +24,7 @@ func SetApproval(approvals []*types.Approval, amount sdk.Uint, address string, b
 	if err != nil {
 		return approvals, err
 	}
+	approval.TimeIntervals = timeIntervals
 
 	//If this is a new entry, we simply appends, otherwise we update the existing entry
 	if !found {
@@ -37,7 +39,7 @@ func SetApproval(approvals []*types.Approval, amount sdk.Uint, address string, b
 
 		if len(approvals[idx].Balances) == 0 {
 			//If we end up in the event where this address does not have any more approvals after being removed, we don't have to store it anymore
-			approvals = append(approvals[:idx], approvals[idx + 1:]...)
+			approvals = append(approvals[:idx], approvals[idx+1:]...)
 		}
 	}
 
@@ -82,7 +84,7 @@ func RemoveBalanceFromApproval(approvals []*types.Approval, amountToRemove sdk.U
 	}
 
 	approvals[idx].Balances = approval.Balances
-	
+
 	//If we end up in the event where this address does not have any more approvals after being removed, we don't have to store it anymore
 	if len(approval.Balances) == 0 {
 		approvals = append(approvals[:idx], approvals[idx+1:]...)
@@ -92,7 +94,7 @@ func RemoveBalanceFromApproval(approvals []*types.Approval, amountToRemove sdk.U
 }
 
 // Add a balance to the approval amount
-func AddBalanceToApproval(approvals []*types.Approval, amountToAdd sdk.Uint, address string, badgeIdRanges []*types.IdRange) ([]*types.Approval, error) {
+func AddBalanceToApproval(approvals []*types.Approval, amountToAdd sdk.Uint, address string, badgeIdRanges []*types.IdRange, timeIntervals []*types.IdRange) ([]*types.Approval, error) {
 	err := *new(error)
 	if amountToAdd.IsZero() {
 		return approvals, nil
@@ -106,10 +108,11 @@ func AddBalanceToApproval(approvals []*types.Approval, amountToAdd sdk.Uint, add
 			Address: address,
 			Balances: []*types.Balance{
 				{
-					Amount:  amountToAdd,
+					Amount:   amountToAdd,
 					BadgeIds: badgeIdRanges,
 				},
 			},
+			TimeIntervals: timeIntervals,
 		})
 		newApprovals = append(newApprovals, approvals[idx:]...)
 		approvals = newApprovals

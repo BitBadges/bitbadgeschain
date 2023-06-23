@@ -13,7 +13,7 @@ import (
 // fromReflectRawMsg decodes msg.Data to an sdk.Msg using proto Any and json encoding.
 // this needs to be registered on the Encoders
 func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
-	return func(_sender sdk.AccAddress, msg json.RawMessage) ([]sdk.Msg, error) {
+	return func(sender sdk.AccAddress, msg json.RawMessage) ([]sdk.Msg, error) {
 
 		// return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unmarshaled to value: %s", msg)
 
@@ -25,107 +25,107 @@ func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 
 		switch {
 		case badgeCustomMsg.NewCollection != nil:
-				newCollectionMsg := badgeTypes.NewMsgNewCollection(
-					_sender.String(),
-					badgeCustomMsg.NewCollection.Standard,
-					badgeCustomMsg.NewCollection.BadgeSupplys,
-					badgeCustomMsg.NewCollection.CollectionUri,
-					badgeCustomMsg.NewCollection.BadgeUris,
-					badgeCustomMsg.NewCollection.Permissions,
-					badgeCustomMsg.NewCollection.AllowedTransfers,
-					badgeCustomMsg.NewCollection.ManagerApprovedTransfers,
-					badgeCustomMsg.NewCollection.Bytes,
-					badgeCustomMsg.NewCollection.Transfers,
-					badgeCustomMsg.NewCollection.Claims,
-					badgeCustomMsg.NewCollection.BalancesUri,
-				)
-				return []sdk.Msg{newCollectionMsg}, nil
+			newCollectionMsg := badgeTypes.NewMsgNewCollection(
+				sender.String(),
+				badgeCustomMsg.NewCollection.Standard,
+				badgeCustomMsg.NewCollection.BadgesToCreate,
+				badgeCustomMsg.NewCollection.CollectionMetadata,
+				badgeCustomMsg.NewCollection.BadgeMetadata,
+				badgeCustomMsg.NewCollection.Permissions,
+				badgeCustomMsg.NewCollection.ApprovedTransfers,
+				badgeCustomMsg.NewCollection.ManagerApprovedTransfers,
+				badgeCustomMsg.NewCollection.Bytes,
+				badgeCustomMsg.NewCollection.Transfers,
+				badgeCustomMsg.NewCollection.Claims,
+				badgeCustomMsg.NewCollection.OffChainBalancesMetadata,
+			)
+			return []sdk.Msg{newCollectionMsg}, nil
 		case badgeCustomMsg.MintAndDistributeBadges != nil:
-				MintAndDistributeBadgesMsg := badgeTypes.NewMsgMintAndDistributeBadges(
-					_sender.String(),
-					badgeCustomMsg.MintAndDistributeBadges.CollectionId,
-					badgeCustomMsg.MintAndDistributeBadges.BadgeSupplys,
-					badgeCustomMsg.MintAndDistributeBadges.Transfers,
-					badgeCustomMsg.MintAndDistributeBadges.Claims,
-					badgeCustomMsg.MintAndDistributeBadges.CollectionUri,
-					badgeCustomMsg.MintAndDistributeBadges.BadgeUris,
-					badgeCustomMsg.MintAndDistributeBadges.BalancesUri,
-				)
-				return []sdk.Msg{MintAndDistributeBadgesMsg}, nil
+			MintAndDistributeBadgesMsg := badgeTypes.NewMsgMintAndDistributeBadges(
+				sender.String(),
+				badgeCustomMsg.MintAndDistributeBadges.CollectionId,
+				badgeCustomMsg.MintAndDistributeBadges.BadgesToCreate,
+				badgeCustomMsg.MintAndDistributeBadges.Transfers,
+				badgeCustomMsg.MintAndDistributeBadges.Claims,
+				badgeCustomMsg.MintAndDistributeBadges.CollectionMetadata,
+				badgeCustomMsg.MintAndDistributeBadges.BadgeMetadata,
+				badgeCustomMsg.MintAndDistributeBadges.OffChainBalancesMetadata,
+			)
+			return []sdk.Msg{MintAndDistributeBadgesMsg}, nil
 		case badgeCustomMsg.ClaimBadge != nil:
-				claimBadgeMsg := badgeTypes.NewMsgClaimBadge(
-					_sender.String(),
-					badgeCustomMsg.ClaimBadge.ClaimId,
-					badgeCustomMsg.ClaimBadge.CollectionId,
-					badgeCustomMsg.ClaimBadge.Solutions,
-				)
-				return []sdk.Msg{claimBadgeMsg}, nil
+			claimBadgeMsg := badgeTypes.NewMsgClaimBadge(
+				sender.String(),
+				badgeCustomMsg.ClaimBadge.ClaimId,
+				badgeCustomMsg.ClaimBadge.CollectionId,
+				badgeCustomMsg.ClaimBadge.Solutions,
+			)
+			return []sdk.Msg{claimBadgeMsg}, nil
 		case badgeCustomMsg.DeleteCollection != nil:
-				deleteCollectionMsg := badgeTypes.NewMsgDeleteCollection(
-					_sender.String(),
-					badgeCustomMsg.DeleteCollection.CollectionId,
-				)
-				return []sdk.Msg{deleteCollectionMsg}, nil
-		case badgeCustomMsg.RequestTransferManager != nil:
-				requestTransferManagerMsg := badgeTypes.NewMsgRequestTransferManager(
-					_sender.String(),
-					badgeCustomMsg.RequestTransferManager.CollectionId,
-					badgeCustomMsg.RequestTransferManager.AddRequest,
-				)
-				return []sdk.Msg{requestTransferManagerMsg}, nil
+			deleteCollectionMsg := badgeTypes.NewMsgDeleteCollection(
+				sender.String(),
+				badgeCustomMsg.DeleteCollection.CollectionId,
+			)
+			return []sdk.Msg{deleteCollectionMsg}, nil
+		case badgeCustomMsg.RequestUpdateManager != nil:
+			requestUpdateManagerMsg := badgeTypes.NewMsgRequestUpdateManager(
+				sender.String(),
+				badgeCustomMsg.RequestUpdateManager.CollectionId,
+				badgeCustomMsg.RequestUpdateManager.AddRequest,
+			)
+			return []sdk.Msg{requestUpdateManagerMsg}, nil
 		case badgeCustomMsg.SetApproval != nil:
-				setApprovalMsg := badgeTypes.NewMsgSetApproval(
-					_sender.String(),
-					badgeCustomMsg.SetApproval.CollectionId,
-					badgeCustomMsg.SetApproval.Address,
-					badgeCustomMsg.SetApproval.Balances,
-				)
-				return []sdk.Msg{setApprovalMsg}, nil
+			setApprovalMsg := badgeTypes.NewMsgSetApproval(
+				sender.String(),
+				badgeCustomMsg.SetApproval.CollectionId,
+				badgeCustomMsg.SetApproval.Address,
+				badgeCustomMsg.SetApproval.Balances,
+			)
+			return []sdk.Msg{setApprovalMsg}, nil
 		case badgeCustomMsg.TransferBadge != nil:
-				transferBadgeMsg := badgeTypes.NewMsgTransferBadge(
-					_sender.String(),
-					badgeCustomMsg.TransferBadge.CollectionId,
-					badgeCustomMsg.TransferBadge.From,
-					badgeCustomMsg.TransferBadge.Transfers,
-				)
-				return []sdk.Msg{transferBadgeMsg}, nil
-		case badgeCustomMsg.TransferManager != nil:
-				transferManagerMsg := badgeTypes.NewMsgTransferManager(
-					_sender.String(),
-					badgeCustomMsg.TransferManager.CollectionId,
-					badgeCustomMsg.TransferManager.Address,
-				)
-				return []sdk.Msg{transferManagerMsg}, nil
-		case badgeCustomMsg.UpdateBytes != nil:
-				updateBytesMsg := badgeTypes.NewMsgUpdateBytes(
-					_sender.String(),
-					badgeCustomMsg.UpdateBytes.CollectionId,
-					badgeCustomMsg.UpdateBytes.Bytes,
-				)
-				return []sdk.Msg{updateBytesMsg}, nil
-		case badgeCustomMsg.UpdateAllowedTransfers != nil:
-				updateCollectionUriMsg := badgeTypes.NewMsgUpdateAllowedTransfers(
-					_sender.String(),
-					badgeCustomMsg.UpdateAllowedTransfers.CollectionId,
-					badgeCustomMsg.NewCollection.AllowedTransfers,
-				)
-				return []sdk.Msg{updateCollectionUriMsg}, nil
-		case badgeCustomMsg.UpdatePermissions != nil:
-				updatePermissionsMsg := badgeTypes.NewMsgUpdatePermissions(
-					_sender.String(),
-					badgeCustomMsg.UpdatePermissions.CollectionId,
-					badgeCustomMsg.UpdatePermissions.Permissions,
-				)
-				return []sdk.Msg{updatePermissionsMsg}, nil
-		case badgeCustomMsg.UpdateUris != nil:
-				updateUrisMsg := badgeTypes.NewMsgUpdateUris(
-					_sender.String(),
-					badgeCustomMsg.UpdateUris.CollectionId,
-					badgeCustomMsg.UpdateUris.CollectionUri,
-					badgeCustomMsg.UpdateUris.BadgeUris,
-					badgeCustomMsg.UpdateUris.BalancesUri,
-				)
-				return []sdk.Msg{updateUrisMsg}, nil
+			transferBadgeMsg := badgeTypes.NewMsgTransferBadge(
+				sender.String(),
+				badgeCustomMsg.TransferBadge.CollectionId,
+				badgeCustomMsg.TransferBadge.From,
+				badgeCustomMsg.TransferBadge.Transfers,
+			)
+			return []sdk.Msg{transferBadgeMsg}, nil
+		case badgeCustomMsg.UpdateManager != nil:
+			updateManagerMsg := badgeTypes.NewMsgUpdateManager(
+				sender.String(),
+				badgeCustomMsg.UpdateManager.CollectionId,
+				badgeCustomMsg.UpdateManager.Address,
+			)
+			return []sdk.Msg{updateManagerMsg}, nil
+		case badgeCustomMsg.UpdateCustomData != nil:
+			updateCustomDataMsg := badgeTypes.NewMsgUpdateCustomData(
+				sender.String(),
+				badgeCustomMsg.UpdateCustomData.CollectionId,
+				badgeCustomMsg.UpdateCustomData.Bytes,
+			)
+			return []sdk.Msg{updateCustomDataMsg}, nil
+		case badgeCustomMsg.UpdateCollectionApprovedTransfers != nil:
+			updateCollectionMetadataMsg := badgeTypes.NewMsgUpdateCollectionApprovedTransfers(
+				sender.String(),
+				badgeCustomMsg.UpdateCollectionApprovedTransfers.CollectionId,
+				badgeCustomMsg.NewCollection.ApprovedTransfers,
+			)
+			return []sdk.Msg{updateCollectionMetadataMsg}, nil
+		case badgeCustomMsg.UpdateCollectionPermissions != nil:
+			updateCollectionPermissionsMsg := badgeTypes.NewMsgUpdateCollectionPermissions(
+				sender.String(),
+				badgeCustomMsg.UpdateCollectionPermissions.CollectionId,
+				badgeCustomMsg.UpdateCollectionPermissions.Permissions,
+			)
+			return []sdk.Msg{updateCollectionPermissionsMsg}, nil
+		case badgeCustomMsg.UpdateMetadata != nil:
+			updateMetadataMsg := badgeTypes.NewMsgUpdateMetadata(
+				sender.String(),
+				badgeCustomMsg.UpdateMetadata.CollectionId,
+				badgeCustomMsg.UpdateMetadata.CollectionMetadata,
+				badgeCustomMsg.UpdateMetadata.BadgeMetadata,
+				badgeCustomMsg.UpdateMetadata.OffChainBalancesMetadata,
+			)
+			return []sdk.Msg{updateMetadataMsg}, nil
 		default:
 			return nil, sdkerrors.Wrapf(types.ErrInvalidMsg, "Unknown custom badge message variant %s", badgeCustomMsg)
 		}
@@ -133,16 +133,15 @@ func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 }
 
 type badgeCustomMsg struct {
-	NewCollection    *badgeTypes.MsgNewCollection     `json:"newCollectionMsg,omitempty"`
-	MintAndDistributeBadges		*badgeTypes.MsgMintAndDistributeBadges         `json:"mintAndDistributeBadgesMsg,omitempty"`
-	ClaimBadge 	*badgeTypes.MsgClaimBadge        `json:"claimBadgeMsg,omitempty"`
-	DeleteCollection *badgeTypes.MsgDeleteCollection  `json:"deleteCollectionMsg,omitempty"`
-	RequestTransferManager *badgeTypes.MsgRequestTransferManager `json:"requestTransferManagerMsg,omitempty"`
-	SetApproval *badgeTypes.MsgSetApproval `json:"setApprovalMsg,omitempty"`
-	TransferBadge *badgeTypes.MsgTransferBadge `json:"transferBadgeMsg,omitempty"`
-	TransferManager *badgeTypes.MsgTransferManager `json:"transferManagerMsg,omitempty"`
-	UpdateBytes *badgeTypes.MsgUpdateBytes `json:"updateBytesMsg,omitempty"`
-	UpdateAllowedTransfers *badgeTypes.MsgUpdateAllowedTransfers `json:"updateAllowedTransfersMsg,omitempty"`
-	UpdatePermissions *badgeTypes.MsgUpdatePermissions `json:"updatePermissionsMsg,omitempty"`
-	UpdateUris *badgeTypes.MsgUpdateUris `json:"updateUrisMsg,omitempty"`
+	NewCollection                     *badgeTypes.MsgNewCollection                     `json:"newCollectionMsg,omitempty"`
+	MintAndDistributeBadges                         *badgeTypes.MsgMintAndDistributeBadges                         `json:"mintAndDistributeBadgesMsg,omitempty"`
+	ClaimBadge                        *badgeTypes.MsgClaimBadge                        `json:"claimBadgeMsg,omitempty"`
+	DeleteCollection                  *badgeTypes.MsgDeleteCollection                  `json:"deleteCollectionMsg,omitempty"`
+	RequestUpdateManager            *badgeTypes.MsgRequestUpdateManager            `json:"requestUpdateManagerMsg,omitempty"`
+	SetApproval                       *badgeTypes.MsgSetApproval                       `json:"setApprovalMsg,omitempty"`
+	TransferBadge                     *badgeTypes.MsgTransferBadge                     `json:"transferBadgeMsg,omitempty"`
+	UpdateManager                   *badgeTypes.MsgUpdateManager                   `json:"updateManagerMsg,omitempty"`
+	UpdateCollectionApprovedTransfers *badgeTypes.MsgUpdateCollectionApprovedTransfers `json:"UpdateCollectionApprovedTransfersMsg,omitempty"`
+	UpdateCollectionPermissions                 *badgeTypes.MsgUpdateCollectionPermissions                 `json:"updateCollectionPermissionsMsg,omitempty"`
+	UpdateMetadata                    *badgeTypes.MsgUpdateMetadata                    `json:"updateMetadataMsg,omitempty"`
 }

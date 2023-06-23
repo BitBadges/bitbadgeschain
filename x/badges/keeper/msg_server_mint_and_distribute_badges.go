@@ -10,7 +10,7 @@ import (
 func (k msgServer) MintAndDistributeBadges(goCtx context.Context, msg *types.MsgMintAndDistributeBadges) (*types.MsgMintAndDistributeBadgesResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	checkIfCanCreateMoreBadges := msg.BadgeSupplys != nil && len(msg.BadgeSupplys) > 0
+	checkIfCanCreateMoreBadges := msg.BadgesToCreate != nil && len(msg.BadgesToCreate) > 0
 	collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:             msg.Creator,
 		CollectionId:        msg.CollectionId,
@@ -20,29 +20,47 @@ func (k msgServer) MintAndDistributeBadges(goCtx context.Context, msg *types.Msg
 	if err != nil {
 		return nil, err
 	}
-	
-	collection, err = k.CreateBadges(ctx, collection, msg.BadgeSupplys, msg.Transfers, msg.Claims, msg.Creator)
-	if err != nil {
-		return nil, err
+
+	if collection.IsOffChainBalances {
+		return nil, ErrOffChainBalances
 	}
 
-	newCollectionUri, newBadgeUris, newBalancesUri, needToValidateUpdateMetadataUris, needToValidateUpdateBalanceUri := GetUrisToStoreAndPermissionsToCheck(collection, msg.CollectionUri, msg.BadgeUris, msg.BalancesUri)
+	newCollectionMetadata, newBadgeMetadata, newOffChainBalancesMetadata, needToValidateUpdateCollectionMetadata, needToValidateUpdateBadgeMetadata, needToValidateUpdateBalanceUri := GetUrisToStoreAndPermissionsToCheck(collection, msg.CollectionMetadata, msg.BadgeMetadata, msg.OffChainBalancesMetadata)
+	newApprovedTransfers, needToValidateUpdateCollectionApprovedTransfers := GetApprovedTransfersToStore(collection, msg.ApprovedTransfers)
+
 	_, err = k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator:       msg.Creator,
-		CollectionId:  msg.CollectionId,
-		MustBeManager: true,
-		CanUpdateMetadataUris: needToValidateUpdateMetadataUris,
-		CanUpdateBalancesUri: needToValidateUpdateBalanceUri,
+		Creator:                              msg.Creator,
+		CollectionId:                         msg.CollectionId,
+		MustBeManager:                        true,
+		CanUpdateOffChainBalancesMetadata:            needToValidateUpdateBalanceUri,
+		CanUpdateBadgeMetadata:               needToValidateUpdateBadgeMetadata,
+		CanUpdateCollectionMetadata:          needToValidateUpdateCollectionMetadata,
+		CanUpdateCollectionApprovedTransfers: needToValidateUpdateCollectionApprovedTransfers,
 	})
 	if err != nil {
 		return nil, err
 	}
 
+	//Check badge metadata for isFrozen logic
+	err = AssertIsFrozenLogicIsMaintained(collection.BadgeMetadata, newBadgeMetadata)
+	if err != nil {
+		return nil, err
+	}
 
-	//Already validated in ValidateBasic
-	collection.BadgeUris = newBadgeUris
-	collection.CollectionUri = newCollectionUri
-	collection.BalancesUri = newBalancesUri
+	err = AssertIsFrozenLogicForApprovedTransfers(collection.ApprovedTransfers, newApprovedTransfers)
+	if err != nil {
+		return nil, err
+	}
+
+	collection.BadgeMetadata = newBadgeMetadata
+	collection.CollectionMetadata = newCollectionMetadata
+	collection.OffChainBalancesMetadata = newOffChainBalancesMetadata
+	collection.ApprovedTransfers = newApprovedTransfers
+
+	collection, err = k.CreateBadges(ctx, collection, msg.BadgesToCreate, msg.Transfers, msg.Claims, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := k.SetCollectionInStore(ctx, collection); err != nil {
 		return nil, err

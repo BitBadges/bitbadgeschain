@@ -14,8 +14,8 @@ func (suite *TestSuite) TestGetCollection() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com/",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com/",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -50,7 +50,7 @@ func (suite *TestSuite) TestGetBadgeAndAssertBadges() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				BadgeUris: []*types.BadgeUri{
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -61,9 +61,9 @@ func (suite *TestSuite) TestGetBadgeAndAssertBadges() {
 						},
 					},
 				},
-				CollectionUri: "https://example.com",
-				Permissions: sdk.NewUint(62),
-				BadgeSupplys: []*types.BadgeSupplyAndAmount{
+				CollectionMetadata: "https://example.com",
+				Permissions:        sdk.NewUint(62),
+				BadgesToCreate: []*types.BadgeSupplyAndAmount{
 					{
 						Supply: sdk.NewUint(1),
 						Amount: sdk.NewUint(1),
@@ -89,7 +89,7 @@ func (suite *TestSuite) TestGetBadgeAndAssertBadges() {
 	_, err = suite.app.BadgesKeeper.GetCollectionAndAssertBadgeIdsAreValid(suite.ctx, sdk.NewUint(1), []*types.IdRange{
 		{
 			Start: sdk.NewUint(20),
-			End: sdk.NewUint(10),
+			End:   sdk.NewUint(10),
 		},
 	})
 	suite.Require().EqualError(err, keeper.ErrInvalidBadgeRange.Error())
@@ -97,7 +97,7 @@ func (suite *TestSuite) TestGetBadgeAndAssertBadges() {
 	_, err = suite.app.BadgesKeeper.GetCollectionAndAssertBadgeIdsAreValid(suite.ctx, sdk.NewUint(1), []*types.IdRange{
 		{
 			Start: sdk.NewUint(1),
-			End: sdk.NewUint(10),
+			End:   sdk.NewUint(10),
 		},
 	})
 	suite.Require().EqualError(err, keeper.ErrBadgeNotExists.Error())
@@ -109,7 +109,7 @@ func (suite *TestSuite) TestCreateBadges() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				BadgeUris: []*types.BadgeUri{
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -120,14 +120,14 @@ func (suite *TestSuite) TestCreateBadges() {
 						},
 					},
 				},
-				CollectionUri: "https://example.com",
-				Permissions: sdk.NewUint(62),
-				AllowedTransfers: []*types.TransferMapping{
+				CollectionMetadata: "https://example.com",
+				Permissions:        sdk.NewUint(62),
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
+						From: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
-						To: &types.AddressesMapping{
+						To: &types.AddressMapping{
 							IncludeOnlySpecified: false,
 						},
 					},
@@ -292,8 +292,8 @@ func (suite *TestSuite) TestCreateBadges() {
 					Amount: sdk.NewUint(1),
 					BadgeIds: []*types.IdRange{
 						{
-							Start:   sdk.NewUint(4),
-							End: sdk.NewUint(4),
+							Start: sdk.NewUint(4),
+							End:   sdk.NewUint(4),
 						},
 					},
 				},

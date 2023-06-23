@@ -16,7 +16,7 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 		rangesToValidate = append(rangesToValidate, balance.BadgeIds...)
 	}
 
-	_, err := k.UniversalValidate(ctx, UniversalValidationParams{
+	collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:                      msg.Creator,
 		CollectionId:                 msg.CollectionId,
 		BadgeIdRangesToValidate:      rangesToValidate,
@@ -26,6 +26,10 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 		return nil, err
 	}
 
+	if collection.IsOffChainBalances {
+		return nil, ErrOffChainBalances
+	}
+
 	creatorBalanceKey := ConstructBalanceKey(msg.Creator, msg.CollectionId)
 	creatorBalance, found := k.Keeper.GetUserBalanceFromStore(ctx, creatorBalanceKey)
 	if !found {
@@ -33,7 +37,7 @@ func (k msgServer) SetApproval(goCtx context.Context, msg *types.MsgSetApproval)
 	}
 
 	for _, balance := range msg.Balances {
-		creatorBalance.Approvals, err = SetApproval(creatorBalance.Approvals, balance.Amount, msg.Address, balance.BadgeIds)
+		creatorBalance.Approvals, err = SetApproval(creatorBalance.Approvals, balance.Amount, msg.Address, balance.BadgeIds, msg.TimeIntervals)
 		if err != nil {
 			return nil, err
 		}

@@ -27,9 +27,9 @@ func SimulateMsgMintAndDistributeBadges(
 		}
 
 		msg := &types.MsgMintAndDistributeBadges{
-			Creator:      simAccount.Address.String(),
-			CollectionId: sdk.NewUint(r.Uint64()),
-			BadgeSupplys: randomSubassets,
+			Creator:        simAccount.Address.String(),
+			CollectionId:   sdk.NewUint(r.Uint64()),
+			BadgesToCreate: randomSubassets,
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

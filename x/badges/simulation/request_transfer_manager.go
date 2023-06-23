@@ -10,7 +10,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 )
 
-func SimulateMsgRequestTransferManager(
+func SimulateMsgRequestUpdateManager(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	k keeper.Keeper,
@@ -23,7 +23,7 @@ func SimulateMsgRequestTransferManager(
 		if randInt.Mod(sdk.NewUint(2)).IsZero() {
 			randBool = true
 		}
-		msg := &types.MsgRequestTransferManager{
+		msg := &types.MsgRequestUpdateManager{
 			Creator:      simAccount.Address.String(),
 			CollectionId: sdk.NewUint(r.Uint64()),
 			AddRequest:   randBool,

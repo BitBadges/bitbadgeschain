@@ -5,27 +5,36 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const TypeMsgUpdateAllowedTransfers = "update_allowed_transfers"
+const TypeMsgUpdateCollectionApprovedTransfers = "update_allowed_transfers"
 
-var _ sdk.Msg = &MsgUpdateAllowedTransfers{}
+var _ sdk.Msg = &MsgUpdateCollectionApprovedTransfers{}
 
-func NewMsgUpdateAllowedTransfers(creator string, collectionId sdk.Uint, allowedTransfers []*TransferMapping) *MsgUpdateAllowedTransfers {
-	return &MsgUpdateAllowedTransfers{
-		Creator:             creator,
-		CollectionId:        collectionId,
-		AllowedTransfers: 	 allowedTransfers,
+func NewMsgUpdateCollectionApprovedTransfers(creator string, collectionId sdk.Uint, approvedTransfers []*CollectionApprovedTransfer) *MsgUpdateCollectionApprovedTransfers {
+	for _, approvedTransfer := range approvedTransfers {
+		approvedTransfer.BadgeIds = SortAndMergeOverlapping(approvedTransfer.BadgeIds)
+		approvedTransfer.TransferTimes = SortAndMergeOverlapping(approvedTransfer.TransferTimes)
+
+		for _, balance := range approvedTransfer.Claim.StartAmounts {
+			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+		}
+	}
+	
+	return &MsgUpdateCollectionApprovedTransfers{
+		Creator:           creator,
+		CollectionId:      collectionId,
+		ApprovedTransfers: approvedTransfers,
 	}
 }
 
-func (msg *MsgUpdateAllowedTransfers) Route() string {
+func (msg *MsgUpdateCollectionApprovedTransfers) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgUpdateAllowedTransfers) Type() string {
-	return TypeMsgUpdateAllowedTransfers
+func (msg *MsgUpdateCollectionApprovedTransfers) Type() string {
+	return TypeMsgUpdateCollectionApprovedTransfers
 }
 
-func (msg *MsgUpdateAllowedTransfers) GetSigners() []sdk.AccAddress {
+func (msg *MsgUpdateCollectionApprovedTransfers) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -33,19 +42,20 @@ func (msg *MsgUpdateAllowedTransfers) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgUpdateAllowedTransfers) GetSignBytes() []byte {
+func (msg *MsgUpdateCollectionApprovedTransfers) GetSignBytes() []byte {
 	bz := AminoCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgUpdateAllowedTransfers) ValidateBasic() error {
+func (msg *MsgUpdateCollectionApprovedTransfers) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	for _, transferMapping := range msg.AllowedTransfers {
-		if err := ValidateTransferMapping(*transferMapping); err != nil {
+	for _, approvedTransfer := range msg.ApprovedTransfers {
+		err = ValidateCollectionApprovedTransfer(*approvedTransfer)
+		if err != nil {
 			return err
 		}
 	}

@@ -20,12 +20,16 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 	}
 
 	collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator:                     msg.Creator,
-		CollectionId:                msg.CollectionId,
-		BadgeIdRangesToValidate:     rangesToValidate,
+		Creator:                 msg.Creator,
+		CollectionId:            msg.CollectionId,
+		BadgeIdRangesToValidate: rangesToValidate,
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	if collection.IsOffChainBalances {
+		return nil, ErrOffChainBalances
 	}
 
 	fromBalanceKey := ConstructBalanceKey(msg.From, msg.CollectionId)
@@ -44,7 +48,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 
 			for _, balance := range transfer.Balances {
 				amount := balance.Amount
-				fromUserBalance, toUserBalance, err = HandleTransfer(collection, balance.BadgeIds, fromUserBalance, toUserBalance, amount, msg.From, to, msg.Creator)
+				fromUserBalance, toUserBalance, err = HandleTransfer(ctx, collection, balance.BadgeIds, fromUserBalance, toUserBalance, amount, msg.From, to, msg.Creator)
 				if err != nil {
 					return nil, err
 				}

@@ -9,16 +9,16 @@ import (
 )
 
 var (
-	CollectionKey       = []byte{0x01}
-	UserBalanceKey      = []byte{0x02}
-	NextCollectionIdKey = []byte{0x03}
-	TransferManagerKey  = []byte{0x04}
-	ClaimKey            = []byte{0x05}
-	NextClaimIdKey      = []byte{0x06}
-	UsedClaimDataKey    = []byte{0x07}
+	CollectionKey         = []byte{0x01}
+	UserBalanceKey        = []byte{0x02}
+	NextCollectionIdKey   = []byte{0x03}
+	UpdateManagerKey    = []byte{0x04}
+	ClaimKey              = []byte{0x05}
+	NextClaimIdKey        = []byte{0x06}
+	UsedClaimDataKey      = []byte{0x07}
 	UsedClaimChallengeKey = []byte{0x08}
-	UsedClaimAddressKey = []byte{0x09}
-	WhitelistIndexKey   = []byte{0x0A}
+	UsedClaimAddressKey   = []byte{0x09}
+	WhitelistIndexKey     = []byte{0x0A}
 
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}
@@ -33,13 +33,14 @@ const StoreKey = types.ModuleName
 
 type BalanceKeyDetails struct {
 	collectionId sdk.Uint
-	address   	 string
+	address      string
 }
 
 type ClaimKeyDetails struct {
 	collectionId sdk.Uint
-	claimId   	 sdk.Uint
+	claimId      sdk.Uint
 }
+
 // Helper functions to manipulate the balance keys. These aren't prefixed. They will be after they are passed into the functions further down in this file.
 
 // Creates the balance key from an address and collectionId. Note this is not prefixed yet. It is just performing a delimited string concatenation.
@@ -84,7 +85,7 @@ func ConstructUsedClaimAddressKey(collectionId sdk.Uint, claimId sdk.Uint, addre
 }
 
 // Creates the transfer manager request key from an address and collectionId. Note this is not prefixed yet. It is just performing a delimited string concatenation.
-func ConstructTransferManagerRequestKey(collectionId sdk.Uint, address string) string {
+func ConstructUpdateManagerRequestKey(collectionId sdk.Uint, address string) string {
 	collection_id_str := collectionId.String()
 	address_str := address
 	return collection_id_str + BalanceKeyDelimiter + address_str + BalanceKeyDelimiter
@@ -96,9 +97,8 @@ func GetDetailsFromBalanceKey(id string) BalanceKeyDetails {
 	address := result[1]
 	collection_id, _ := strconv.ParseUint(result[0], 10, 64)
 
-
 	return BalanceKeyDetails{
-		address:   address,
+		address:      address,
 		collectionId: sdk.NewUint(collection_id),
 	}
 }
@@ -107,10 +107,9 @@ func GetDetailsFromClaimKey(id string) ClaimKeyDetails {
 	result := strings.Split(id, BalanceKeyDelimiter)
 	collection_id, _ := strconv.ParseUint(result[0], 10, 64)
 	claim_id, _ := strconv.ParseUint(result[1], 10, 64)
-	
 
 	return ClaimKeyDetails{
-		claimId:  sdk.NewUint(claim_id),
+		claimId:      sdk.NewUint(claim_id),
 		collectionId: sdk.NewUint(collection_id),
 	}
 }
@@ -172,9 +171,9 @@ func claimStoreKey(claimKey string) []byte {
 
 // managerTransferRequestKey returns the byte representation of the manager transfer store key ([]byte{0x04} + id)
 func managerTransferRequestKey(id string) []byte {
-	key := make([]byte, len(TransferManagerKey)+len(id))
-	copy(key, TransferManagerKey)
-	copy(key[len(TransferManagerKey):], []byte(id))
+	key := make([]byte, len(UpdateManagerKey)+len(id))
+	copy(key, UpdateManagerKey)
+	copy(key[len(UpdateManagerKey):], []byte(id))
 	return key
 }
 

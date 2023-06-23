@@ -45,8 +45,8 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 	collectionsToCreate := []CollectionsToCreate{
 // 		{
 // 			Badge: types.MsgNewCollection{
-// 				CollectionUri: "https://example.com",
-// 				BadgeUri: "https://example.com/{id}",
+// 				CollectionMetadata: "https://example.com",
+// 				BadgeMetadata: "https://example.com/{id}",
 // 				Permissions: 46,
 // 			},
 // 			Amount:  sdk.NewUint(1),
@@ -57,8 +57,8 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 	collectionsToCreate2 := []CollectionsToCreate{
 // 		{
 // 			Badge: types.MsgNewCollection{
-// 				CollectionUri: "https://example.com",
-// 				BadgeUri: "https://example.com/{id}",
+// 				CollectionMetadata: "https://example.com",
+// 				BadgeMetadata: "https://example.com/{id}",
 // 				Permissions: sdk.NewUint(62),
 // 			},
 // 			Amount:  sdk.NewUint(1),
@@ -79,10 +79,10 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 	collectionsToCreateAllInOne := []CollectionsToCreate{
 // 		{
 // 			Badge: types.MsgNewCollection{
-// 				CollectionUri: "https://example.com",
-// BadgeUri: "https://example.com/{id}",
+// 				CollectionMetadata: "https://example.com",
+// BadgeMetadata: "https://example.com/{id}",
 // 				Permissions: sdk.NewUint(62),
-// 				BadgeSupplys: []*types.BadgeSupplyAndAmount{
+// 				BadgesToCreate: []*types.BadgeSupplyAndAmount{
 // 					{
 // 						Supply: 1000000,
 // 						Amount: sdk.NewUint(1),

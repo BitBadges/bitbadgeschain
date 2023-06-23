@@ -3,31 +3,32 @@ package bitbadges.bitbadgeschain.badges;
 
 import "gogoproto/gogo.proto";
 import "badges/params.proto";
-import "badges/badges.proto";
+import "badges/collections.proto";
 import "badges/balances.proto";
-import "badges/claims.proto";
+import "badges/transfers.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 // GenesisState defines the badges module's genesis state.
 message GenesisState {
-    Params params = 1 [(gogoproto.nullable) = false];
-    string port_id = 2;
-    repeated BadgeCollection collections = 3;
-    repeated UserBalanceStore balances = 4;
-    repeated string balanceStoreKeys = 5;
-    repeated Claim claims = 6;
-    repeated string claimStoreKeys = 7;
-    string nextCollectionId = 8  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-    string nextClaimId = 9  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-    // this line is used by starport scaffolding # genesis/proto/state
+  Params params = 1 [(gogoproto.nullable) = false];
+  string port_id = 2;
+  repeated BadgeCollection collections = 3;
+  repeated UserBalanceStore balances = 4;
+  repeated string balanceStoreKeys = 5;
+  repeated string claims = 6 [
+    (gogoproto.customtype) = "Uint", 
+    (gogoproto.nullable) = false
+  ];
+  repeated string claimStoreKeys = 7;
+  string nextCollectionId = 8  [
+    (gogoproto.customtype) = "Uint", 
+    (gogoproto.nullable) = false
+  ];
+  string nextClaimId = 9  [
+    (gogoproto.customtype) = "Uint", 
+    (gogoproto.nullable) = false
+  ];
+  // this line is used by starport scaffolding # genesis/proto/state
 }

@@ -87,220 +87,248 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 // first bool is if URI is needed, second is if ID Range is needed
 func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 
-	transferMappingTypes := []apitypes.Type{
-		{Name: "from", Type: "AddressesMapping"},
-		{Name: "to", Type: "AddressesMapping"},
-	}
+	// permissionType := []apitypes.Type{
+	// 	{Name: "isFrozen", Type: "bool"},
+	// 	{Name: "timeIntervals", Type: "IdRange[]"},
+	// }
 
-	addressesTypes := []apitypes.Type{
-		{Name: "addresses", Type: "string[]"},
-		{Name: "includeOnlySpecified", Type: "bool"},
-		{Name: "managerOptions", Type: "uint64"},
-	}
+	// permissionsTypes := []apitypes.Type{
+	// 	{Name: "canArchive", Type: "Permission"},
+	// 	{Name: "canUpdateContractAddress", Type: "Permission"},
+	// 	{Name: "canUpdateOffChainBalancesMetadata", Type: "Permission"},
+	// 	{Name: "canDeleteCollection", Type: "Permission"},
+	// 	{Name: "canUpdateCustomData", Type: "Permission"},
+	// 	{Name: "canUpdateManager", Type: "Permission"},
+	// 	{Name: "canUpdateCollectionMetadata", Type: "Permission"},
+	// 	{Name: "canUpdateBadgeMetadata", Type: "Permission"},
+	// 	{Name: "canCreateMoreBadges", Type: "Permission"},
+	// 	{Name: "canUpdateCollectionApprovedTransfers", Type: "Permission"},
+	// }
 
-	idRangeTypes := []apitypes.Type{
-		{Name: "start", Type: "uint64"},
-		{Name: "end", Type: "uint64"},
-	}
+	// collectionApprovedTransferTypes := []apitypes.Type{
+	// 	{Name: "from", Type: "AddressMapping"},
+	// 	{Name: "to", Type: "AddressMapping"},
+	// 	{Name: "initiatedBy", Type: "AddressMapping"},
+	// 	{Name: "includeMints", Type: "bool"},
+	// 	{Name: "isAllowed", Type: "bool"},
+	// 	{Name: "isFrozen", Type: "bool"},
+	// 	{Name: "noApprovalRequired", Type: "bool"},
+	// 	{Name: "badgeIds", Type: "IdRange[]"},
+	// 	{Name: "timeIntervals", Type: "IdRange[]"},
+	// }
 
-	balanceTypes := []apitypes.Type{
-		{Name: "amount", Type: "uint64"},
-		{Name: "badgeIds", Type: "IdRange[]"},
-	}
+	// addressesTypes := []apitypes.Type{
+	// 	{Name: "addresses", Type: "string[]"},
+	// 	{Name: "includeOnlySpecified", Type: "bool"},
+	// }
 
-	badgeSupplyAndAmountTypes := []apitypes.Type{
-		{Name: "supply", Type: "uint64"},
-		{Name: "amount", Type: "uint64"},
-	}
+	// idRangeTypes := []apitypes.Type{
+	// 	{Name: "start", Type: "uint64"},
+	// 	{Name: "end", Type: "uint64"},
+	// }
 
-	transfersTypes := []apitypes.Type{
-		{Name: "toAddresses", Type: "string[]"},
-		{Name: "balances", Type: "Balance[]"},
-	}
+	// balanceTypes := []apitypes.Type{
+	// 	{Name: "amount", Type: "uint64"},
+	// 	{Name: "badgeIds", Type: "IdRange[]"},
+	// }
 
-	claimsTypes := []apitypes.Type{
-		{Name: "undistributedBalances", Type: "Balance[]"},
-		{Name: "timeRange", Type: "IdRange"},
-		{Name: "uri", Type: "string"},
-		{Name: "numClaimsPerAddress", Type: "uint64"},
-		{Name: "incrementIdsBy", Type: "uint64"},
-		{Name: "currentClaimAmounts", Type: "Balance[]"},
-		{Name: "challenges", Type: "Challenge[]"},
-	}
+	// badgeSupplyAndAmountTypes := []apitypes.Type{
+	// 	{Name: "supply", Type: "uint64"},
+	// 	{Name: "amount", Type: "uint64"},
+	// }
 
-	proofItemTypes := []apitypes.Type{
-		{Name: "aunt", Type: "string"},
-		{Name: "onRight", Type: "bool"},
-	}
+	// transfersTypes := []apitypes.Type{
+	// 	{Name: "toAddresses", Type: "string[]"},
+	// 	{Name: "balances", Type: "Balance[]"},
+	// }
 
-	proofTypes := []apitypes.Type{
-		{Name: "aunts", Type: "ClaimProofItem[]"},
-		{Name: "leaf", Type: "string"},
-	}
+	// claimsTypes := []apitypes.Type{
+	// 	{Name: "balances", Type: "Balance[]"},
+	// 	{Name: "timeIntervals", Type: "IdRange[]"},
+	// 	{Name: "uri", Type: "string"},
+	// 	{Name: "numClaimsPerAddress", Type: "uint64"},
+	// 	{Name: "incrementIdsBy", Type: "uint64"},
+	// 	{Name: "startingClaimAmounts", Type: "Balance[]"},
+	// 	{Name: "challenges", Type: "Challenge[]"},
+	// 	{Name: "totalClaimsProcessed", Type: "uint64"},
+	// 	{Name: "isAssignable", Type: "bool"},
+	// 	{Name: "createdBy", Type: "string"},
+	// 	{Name: "isReturnable", Type: "bool"},
+	// }
 
-	badgeUrisType := []apitypes.Type{
-		{Name: "uri", Type: "string"},
-		{Name: "badgeIds", Type: "IdRange[]"},
-	}
+	// proofItemTypes := []apitypes.Type{
+	// 	{Name: "aunt", Type: "string"},
+	// 	{Name: "onRight", Type: "bool"},
+	// }
 
-	challengeType := []apitypes.Type{
-		{Name: "root", Type: "string"},
-		{Name: "expectedProofLength", Type: "uint64"},
-		{Name: "useCreatorAddressAsLeaf", Type: "bool"},
-	}
+	// proofTypes := []apitypes.Type{
+	// 	{Name: "aunts", Type: "ClaimProofItem[]"},
+	// 	{Name: "leaf", Type: "string"},
+	// }
 
+	// badgeMetadataType := []apitypes.Type{
+	// 	{Name: "uri", Type: "string"},
+	// 	{Name: "badgeIds", Type: "IdRange[]"},
+	// 	{Name: "customData", Type: "string"},
+	// 	{Name: "isFrozen", Type: "bool"},
+	// }
 
-	challengeSolutionType := []apitypes.Type{
-		{Name: "proof", Type: "ClaimProof"},
-	}
+	// collectionMetadataType := []apitypes.Type{
+	// 	{Name: "uri", Type: "string"},
+	// 	{Name: "customData", Type: "string"},
+	// }
+
+	// offChainBalancesMetadataType := []apitypes.Type{
+	// 	{Name: "uri", Type: "string"},
+	// 	{Name: "customData", Type: "string"},
+	// }
+
+	// challengeType := []apitypes.Type{
+	// 	{Name: "root", Type: "string"},
+	// 	{Name: "expectedProofLength", Type: "uint64"},
+	// 	{Name: "isWhitelistTree", Type: "bool"},
+	// 	{Name: "maxOneUsePerLeaf", Type: "bool"},
+	// 	{Name: "useLeafIndexForBadgeIds", Type: "bool"},
+	// }
+
+	// challengeSolutionType := []apitypes.Type{
+	// 	{Name: "proof", Type: "ClaimProof"},
+	// }
 
 	switch route {
 
-	case TypeMsgDeleteCollection:
-		return map[string][]apitypes.Type{
-			"MsgValue": {
-				{Name: "creator", Type: "string"},
-				{Name: "collectionId", Type: "uint64"},
-			},
-		}
+	// case TypeMsgDeleteCollection:
+	// 	return map[string][]apitypes.Type{
+	// 		"MsgValue": {
+	// 			{Name: "creator", Type: "string"},
+	// 			{Name: "collectionId", Type: "uint64"},
+	// 		},
+	// 	}
 
-	case TypeMsgNewCollection:
-		return map[string][]apitypes.Type{
-			"MsgValue": {
-				{Name: "creator", Type: "string"},
-				{Name: "collectionUri", Type: "string"},
-				{Name: "badgeUris", Type: "BadgeUri[]"},
-				{Name: "balancesUri", Type: "string"},
-				{Name: "bytes", Type: "string"},
-				{Name: "permissions", Type: "uint64"},
-				{Name: "allowedTransfers", Type: "TransferMapping[]"},
-				{Name: "managerApprovedTransfers", Type: "TransferMapping[]"},
-				{Name: "standard", Type: "uint64"},
-				{Name: "badgeSupplys", Type: "BadgeSupplyAndAmount[]"},
-				{Name: "transfers", Type: "Transfer[]"},
-				{Name: "claims", Type: "Claim[]"},
-			},
-			"TransferMapping":      transferMappingTypes,
-			"AddressesMapping":     addressesTypes,
-			"IdRange":              idRangeTypes,
-			"BadgeSupplyAndAmount": badgeSupplyAndAmountTypes,
-			"Transfer":             transfersTypes,
-			"Claim":                claimsTypes,
-			"Balance":              balanceTypes,
-			"BadgeUri":             badgeUrisType,
-			"Challenge":            challengeType,
-		}
-	case TypeMsgMintAndDistributeBadges:
+	// case TypeMsgNewCollection:
+	// 	return map[string][]apitypes.Type{
+	// 		"MsgValue": {
+	// 			{Name: "creator", Type: "string"},
+	// 			{Name: "collectionMetadata", Type: "CollectionMetadata"},
+	// 			{Name: "badgeMetadata", Type: "BadgeMetadata[]"},
+	// 			{Name: "offChainBalancesMetadata", Type: "OffChainBalancesMetadata"},
+	// 			{Name: "customData", Type: "string"},
+	// 			{Name: "permissions", Type: "Permissions"},
+	// 			{Name: "approvedTransfers", Type: "CollectionApprovedTransfer[]"},
+	// 			{Name: "standard", Type: "uint64"},
+	// 			{Name: "badgesToCreate", Type: "BadgeSupplyAndAmount[]"},
+	// 			{Name: "transfers", Type: "Transfer[]"},
+	// 			{Name: "claims", Type: "Claim[]"},
+	// 			{Name: "contractAddress", Type: "string"},
+	// 		},
+	// 		"CollectionApprovedTransfer": collectionApprovedTransferTypes,
+	// 		"AddressMapping":           addressesTypes,
+	// 		"IdRange":                    idRangeTypes,
+	// 		"BadgeSupplyAndAmount":       badgeSupplyAndAmountTypes,
+	// 		"Transfer":                   transfersTypes,
+	// 		"Claim":                      claimsTypes,
+	// 		"Balance":                    balanceTypes,
+	// 		"BadgeMetadata":              badgeMetadataType,
+	// 		"CollectionMetadata":         collectionMetadataType,
+	// 		"OffChainBalancesMetadata":           offChainBalancesMetadataType,
+	// 		"Challenge":                  challengeType,
+	// 		"Permissions":                permissionsTypes,
+	// 		"Permission":                 permissionType,
+	// 	}
+	// case TypeMsgMintAndDistributeBadges:
 
-		return map[string][]apitypes.Type{
-			"MsgValue": {
-				{Name: "creator", Type: "string"},
-				{Name: "collectionId", Type: "uint64"},
-				{Name: "badgeSupplys", Type: "BadgeSupplyAndAmount[]"},
-				{Name: "transfers", Type: "Transfer[]"},
-				{Name: "claims", Type: "Claim[]"},
-				{Name: "collectionUri", Type: "string"},
-				{Name: "badgeUris", Type: "BadgeUri[]"},
-				{Name: "balancesUri", Type: "string"},
-			},
-			"BadgeSupplyAndAmount": badgeSupplyAndAmountTypes,
-			"Transfer":             transfersTypes,
-			"Claim":                claimsTypes,
-			"Balance":              balanceTypes,
-			"IdRange":              idRangeTypes,
-			"BadgeUri":             badgeUrisType,
-			"Challenge":            challengeType,
-		}
+	// 	return map[string][]apitypes.Type{
+	// 		"MsgValue": {
+	// 			{Name: "creator", Type: "string"},
+	// 			{Name: "collectionId", Type: "uint64"},
+	// 			{Name: "badgesToCreate", Type: "BadgeSupplyAndAmount[]"},
+	// 			{Name: "transfers", Type: "Transfer[]"},
+	// 			{Name: "claims", Type: "Claim[]"},
+	// 			{Name: "collectionMetadata", Type: "CollectionMetadata"},
+	// 			{Name: "badgeMetadata", Type: "BadgeMetadata[]"},
+	// 			{Name: "offChainBalancesMetadata", Type: "OffChainBalancesMetadata"},
+	// 			{Name: "approvedTransfers", Type: "CollectionApprovedTransfer[]"},
+	// 		},
+	// 		"BadgeSupplyAndAmount":       badgeSupplyAndAmountTypes,
+	// 		"Transfer":                   transfersTypes,
+	// 		"Claim":                      claimsTypes,
+	// 		"Balance":                    balanceTypes,
+	// 		"IdRange":                    idRangeTypes,
+	// 		"BadgeMetadata":              badgeMetadataType,
+	// 		"CollectionMetadata":         collectionMetadataType,
+	// 		"OffChainBalancesMetadata":           offChainBalancesMetadataType,
+	// 		"Challenge":                  challengeType,
+	// 		"CollectionApprovedTransfer": collectionApprovedTransferTypes,
+	// 	}
 
-	case TypeMsgTransferBadge:
-		return map[string][]apitypes.Type{
-			"MsgValue": {
-				{Name: "creator", Type: "string"},
-				{Name: "from", Type: "string"},
-				{Name: "transfers", Type: "Transfer[]"},
-				{Name: "collectionId", Type: "uint64"},
-			},
-			"Transfer": transfersTypes,
-			"Balance":   balanceTypes,
-			"IdRange":   idRangeTypes,
-		}
-	case TypeMsgSetApproval:
-		return map[string][]apitypes.Type{
-			"MsgValue": {
-				{Name: "creator", Type: "string"},
-				{Name: "collectionId", Type: "uint64"},
-				{Name: "address", Type: "string"},
-				{Name: "balances", Type: "Balance[]"},
-			},
-			"Balance": balanceTypes,
-			"IdRange": idRangeTypes,
-		}
-	case TypeMsgUpdateAllowedTransfers:
-		return map[string][]apitypes.Type{
-			"MsgValue": {
-				{Name: "creator", Type: "string"},
-				{Name: "collectionId", Type: "uint64"},
-				{Name: "allowedTransfers", Type: "TransferMapping[]"},
-			},
-			"TransferMapping": transferMappingTypes,
-			"AddressesMapping":       addressesTypes,
-			"IdRange":         idRangeTypes,
-		}
-	case TypeMsgUpdateUris:
-		return map[string][]apitypes.Type{
-			"MsgValue": {
-				{Name: "creator", Type: "string"},
-				{Name: "collectionId", Type: "uint64"},
-				{Name: "collectionUri", Type: "string"},
-				{Name: "badgeUris", Type: "BadgeUri[]"},
-			},
-			"BadgeUri": badgeUrisType,
-			"IdRange":  idRangeTypes,
-		}
-	case TypeMsgUpdatePermissions:
-		return map[string][]apitypes.Type{
-			"MsgValue": {
-				{Name: "creator", Type: "string"},
-				{Name: "collectionId", Type: "uint64"},
-				{Name: "permissions", Type: "uint64"},
-			},
-		}
-	case TypeMsgUpdateBytes:
-		return map[string][]apitypes.Type{
-			"MsgValue": {
-				{Name: "creator", Type: "string"},
-				{Name: "collectionId", Type: "uint64"},
-				{Name: "bytes", Type: "string"},
-			},
-		}
-	case TypeMsgTransferManager:
-		return map[string][]apitypes.Type{
-			"MsgValue": {
-				{Name: "creator", Type: "string"},
-				{Name: "collectionId", Type: "uint64"},
-				{Name: "address", Type: "string"},
-			},
-		}
-	case TypeMsgRequestTransferManager:
-		return map[string][]apitypes.Type{
-			"MsgValue": {
-				{Name: "creator", Type: "string"},
-				{Name: "collectionId", Type: "uint64"},
-				{Name: "addRequest", Type: "bool"},
-			},
-		}
-	case TypeMsgClaimBadge:
-		return map[string][]apitypes.Type{
-			"MsgValue": {
-				{Name: "creator", Type: "string"},
-				{Name: "claimId", Type: "uint64"},
-				{Name: "collectionId", Type: "uint64"},
-				{Name: "solutions", Type: "ChallengeSolution[]"},
-			},
-			"ClaimProof":     proofTypes,
-			"ClaimProofItem": proofItemTypes,
-			"ChallengeSolution": challengeSolutionType,
-		}
+	// case TypeMsgTransferBadge:
+	// 	return map[string][]apitypes.Type{
+	// 		"MsgValue": {
+	// 			{Name: "creator", Type: "string"},
+	// 			{Name: "from", Type: "string"},
+	// 			{Name: "transfers", Type: "Transfer[]"},
+	// 			{Name: "collectionId", Type: "uint64"},
+	// 		},
+	// 		"Transfer": transfersTypes,
+	// 		"Balance":  balanceTypes,
+	// 		"IdRange":  idRangeTypes,
+	// 	}
+	// case TypeMsgUpdateUserApprovedTransfers:
+	// 	return map[string][]apitypes.Type{
+	// 		"MsgValue": {
+	// 			{Name: "creator", Type: "string"},
+	// 			{Name: "collectionId", Type: "uint64"},
+	// 			{Name: "approvedTransfers", Type: "UserApprovedTransfer[]"},
+	// 		},
+	// 		"UserApprovedTransfer": 			userApprovedTransferTypes,
+	// 		"AddressMapping":           addressesTypes,
+	// 		"IdRange":                    idRangeTypes,
+	// 	}
+	// case TypeMsgUpdateCollectionApprovedTransfers:
+	// 	return map[string][]apitypes.Type{
+	// 		"MsgValue": {
+	// 			{Name: "creator", Type: "string"},
+	// 			{Name: "collectionId", Type: "uint64"},
+	// 			{Name: "approvedTransfers", Type: "CollectionApprovedTransfer[]"},
+	// 		},
+	// 		"CollectionApprovedTransfer": collectionApprovedTransferTypes,
+	// 		"AddressMapping":           addressesTypes,
+	// 		"IdRange":                    idRangeTypes,
+	// 	}
+	// case TypeMsgUpdateMetadata:
+	// 	return map[string][]apitypes.Type{
+	// 		"MsgValue": {
+	// 			{Name: "creator", Type: "string"},
+	// 			{Name: "collectionId", Type: "uint64"},
+	// 			{Name: "collectionMetadata", Type: "CollectionMetadata"},
+	// 			{Name: "badgeMetadata", Type: "BadgeMetadata[]"},
+	// 			{Name: "offChainBalancesMetadata", Type: "OffChainBalancesMetadata"},
+	// 			{Name: "customData", Type: "string"},
+	// 			{Name: "contractAddress", Type: "string"},
+	// 		},
+	// 		"BadgeMetadata":      badgeMetadataType,
+	// 		"CollectionMetadata": collectionMetadataType,
+	// 		"OffChainBalancesMetadata":   offChainBalancesMetadataType,
+	// 		"IdRange":            idRangeTypes,
+	// 	}
+	// case TypeMsgUpdateCollectionPermissions:
+	// 	return map[string][]apitypes.Type{
+	// 		"MsgValue": {
+	// 			{Name: "creator", Type: "string"},
+	// 			{Name: "collectionId", Type: "uint64"},
+	// 			{Name: "permissions", Type: "Permissions"},
+	// 		},
+	// 		"Permissions": permissionsTypes,
+	// 		"Permission":  permissionType,
+	// 	}
+	// case TypeMsgUpdateManager:
+	// 	return map[string][]apitypes.Type{
+	// 		"MsgValue": {
+	// 			{Name: "creator", Type: "string"},
+	// 			{Name: "collectionId", Type: "uint64"},
+	// 			{Name: "address", Type: "string"},
+	// 		},
+	// 	}
 	default:
 		return map[string][]apitypes.Type{}
 	}

@@ -14,8 +14,8 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -27,19 +27,18 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 					},
 				},
 				Permissions: sdk.NewUint(62),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(0),
+							ManagerOptions:       sdk.NewUint(0),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
 						},
 					},
-					
 				},
 			},
 			Amount:  sdk.NewUint(1),
@@ -65,7 +64,7 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10000),
+			Amount:   sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -108,8 +107,8 @@ func (suite *TestSuite) TestApprovalsApproved() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -121,15 +120,15 @@ func (suite *TestSuite) TestApprovalsApproved() {
 					},
 				},
 				Permissions: sdk.NewUint(62),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(0),
+							ManagerOptions:       sdk.NewUint(0),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
 						},
 					},
@@ -158,7 +157,7 @@ func (suite *TestSuite) TestApprovalsApproved() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10000),
+			Amount:   sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -167,7 +166,7 @@ func (suite *TestSuite) TestApprovalsApproved() {
 
 	err = SetApproval(suite, wctx, bob, alice, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount:  sdk.NewUint(1000000),
+			Amount:   sdk.NewUint(1000000),
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
@@ -204,8 +203,8 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -217,19 +216,18 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 					},
 				},
 				Permissions: sdk.NewUint(62),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(0),
+							ManagerOptions:       sdk.NewUint(0),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
 						},
 					},
-					
 				},
 			},
 			Amount:  sdk.NewUint(1),
@@ -255,7 +253,7 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10000),
+			Amount:   sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -264,7 +262,7 @@ func (suite *TestSuite) TestApprovalsNotEnoughApproved() {
 
 	err = SetApproval(suite, wctx, bob, alice, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount: sdk.NewUint(10),
+			Amount:   sdk.NewUint(10),
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
@@ -295,8 +293,8 @@ func (suite *TestSuite) TestApprovalsNotApprovedAtAll() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -308,19 +306,18 @@ func (suite *TestSuite) TestApprovalsNotApprovedAtAll() {
 					},
 				},
 				Permissions: sdk.NewUint(62),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(0),
+							ManagerOptions:       sdk.NewUint(0),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
 						},
 					},
-					
 				},
 			},
 			Amount:  sdk.NewUint(1),
@@ -346,7 +343,7 @@ func (suite *TestSuite) TestApprovalsNotApprovedAtAll() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10000),
+			Amount:   sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -378,8 +375,8 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -391,19 +388,18 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 					},
 				},
 				Permissions: sdk.NewUint(62),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(0),
+							ManagerOptions:       sdk.NewUint(0),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
 						},
 					},
-					
 				},
 			},
 			Amount:  sdk.NewUint(1),
@@ -429,7 +425,7 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10000),
+			Amount:   sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -438,7 +434,7 @@ func (suite *TestSuite) TestApprovalsNotApprovedEnough() {
 
 	err = SetApproval(suite, wctx, bob, charlie, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount: sdk.NewUint(10),
+			Amount:   sdk.NewUint(10),
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
@@ -469,8 +465,8 @@ func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -482,19 +478,18 @@ func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 					},
 				},
 				Permissions: sdk.NewUint(62),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(0),
+							ManagerOptions:       sdk.NewUint(0),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
 						},
 					},
-					
 				},
 			},
 			Amount:  sdk.NewUint(1),
@@ -520,7 +515,7 @@ func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10000),
+			Amount:   sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -529,7 +524,7 @@ func (suite *TestSuite) TestApprovalsApprovedJustEnough() {
 
 	err = SetApproval(suite, wctx, bob, charlie, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount: sdk.NewUint(10),
+			Amount:   sdk.NewUint(10),
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
@@ -560,8 +555,8 @@ func (suite *TestSuite) TestApprovalOverflow() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -573,19 +568,18 @@ func (suite *TestSuite) TestApprovalOverflow() {
 					},
 				},
 				Permissions: sdk.NewUint(46),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(0),
+							ManagerOptions:       sdk.NewUint(0),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
 						},
 					},
-					
 				},
 			},
 			Amount:  sdk.NewUint(1),
@@ -611,7 +605,7 @@ func (suite *TestSuite) TestApprovalOverflow() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10000),
+			Amount:   sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -620,7 +614,7 @@ func (suite *TestSuite) TestApprovalOverflow() {
 
 	err = SetApproval(suite, wctx, bob, charlie, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount:  sdk.NewUint(math.MaxUint64),
+			Amount:   sdk.NewUint(math.MaxUint64),
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
@@ -646,7 +640,7 @@ func (suite *TestSuite) TestApprovalOverflow() {
 
 	err = SetApproval(suite, wctx, bob, charlie, sdk.NewUint(1), []*types.Balance{
 		{
-			Amount:  sdk.NewUint(math.MaxUint64),
+			Amount:   sdk.NewUint(math.MaxUint64),
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
 		},
 	})
@@ -662,8 +656,8 @@ func (suite *TestSuite) TestTransferUnderflowNotEnoughBalance() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -675,19 +669,18 @@ func (suite *TestSuite) TestTransferUnderflowNotEnoughBalance() {
 					},
 				},
 				Permissions: sdk.NewUint(46),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(0),
+							ManagerOptions:       sdk.NewUint(0),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
 						},
 					},
-					
 				},
 			},
 			Amount:  sdk.NewUint(1),
@@ -713,7 +706,7 @@ func (suite *TestSuite) TestTransferUnderflowNotEnoughBalance() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
-			Amount: sdk.NewUint(10000),
+			Amount:   sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -744,8 +737,8 @@ func (suite *TestSuite) TestPendingTransferUnderflowNotEnoughBalance() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -757,19 +750,18 @@ func (suite *TestSuite) TestPendingTransferUnderflowNotEnoughBalance() {
 					},
 				},
 				Permissions: sdk.NewUint(62),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(0),
+							ManagerOptions:       sdk.NewUint(0),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
 						},
 					},
-					
 				},
 			},
 			Amount:  sdk.NewUint(1),
@@ -795,7 +787,7 @@ func (suite *TestSuite) TestPendingTransferUnderflowNotEnoughBalance() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10000),
+			Amount:   sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -827,8 +819,8 @@ func (suite *TestSuite) TestTransferInvalidBadgeIdRanges() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -840,19 +832,18 @@ func (suite *TestSuite) TestTransferInvalidBadgeIdRanges() {
 					},
 				},
 				Permissions: sdk.NewUint(46),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(0),
+							ManagerOptions:       sdk.NewUint(0),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
 						},
 					},
-					
 				},
 			},
 			Amount:  sdk.NewUint(1),
@@ -878,7 +869,7 @@ func (suite *TestSuite) TestTransferInvalidBadgeIdRanges() {
 	suite.Require().Equal([]*types.Balance{
 		{
 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-			Amount: sdk.NewUint(10000),
+			Amount:   sdk.NewUint(10000),
 		},
 	}, badge.MaxSupplys)
 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, bobbalance.Balances)
@@ -927,8 +918,8 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -940,21 +931,19 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithNextAndPrev() {
 					},
 				},
 				Permissions: sdk.NewUint(46),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(0),
+							ManagerOptions:       sdk.NewUint(0),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
 						},
 					},
-					
 				},
-				
 			},
 			Amount:  sdk.NewUint(1),
 			Creator: bob,
@@ -1033,8 +1022,8 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -1046,19 +1035,18 @@ func (suite *TestSuite) TestTransferBadgeNeedToMergeWithJustNext() {
 					},
 				},
 				Permissions: sdk.NewUint(46),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(0),
+							ManagerOptions:       sdk.NewUint(0),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
 						},
 					},
-					
 				},
 			},
 			Amount:  sdk.NewUint(1),
@@ -1120,8 +1108,8 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 	collectionsToCreate := []CollectionsToCreate{
 		{
 			Collection: types.MsgNewCollection{
-				CollectionUri: "https://example.com",
-				BadgeUris: []*types.BadgeUri{
+				CollectionMetadata: "https://example.com",
+				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com/{id}",
 						BadgeIds: []*types.IdRange{
@@ -1133,19 +1121,18 @@ func (suite *TestSuite) TestTransferBadgeBinarySearchInsertIdx() {
 					},
 				},
 				Permissions: sdk.NewUint(46),
-				AllowedTransfers: []*types.TransferMapping{
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						From: &types.AddressesMapping{
-							Addresses: []string{},
+						From: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
-							ManagerOptions: sdk.NewUint(0),
+							ManagerOptions:       sdk.NewUint(0),
 						},
-						To: &types.AddressesMapping{
-							Addresses: []string{},
+						To: &types.AddressMapping{
+							Addresses:            []string{},
 							IncludeOnlySpecified: false,
 						},
 					},
-					
 				},
 			},
 			Amount:  sdk.NewUint(1),

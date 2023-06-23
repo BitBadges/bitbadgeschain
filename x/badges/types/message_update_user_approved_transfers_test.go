@@ -1,46 +1,29 @@
-package types_test
+package types
 
 import (
 	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 )
 
-func TestMsgClaimBadge_ValidateBasic(t *testing.T) {
+func TestMsgUpdateUserApprovedTransfers_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgClaimBadge
+		msg  MsgUpdateUserApprovedTransfers
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgClaimBadge{
+			msg: MsgUpdateUserApprovedTransfers{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgClaimBadge{
+			msg: MsgUpdateUserApprovedTransfers{
 				Creator: sample.AccAddress(),
-				CollectionId: sdk.NewUint(1),
-				ClaimId: sdk.NewUint(1),
-				Solutions: []*types.ChallengeSolution{
-					{
-						Proof:  &types.ClaimProof{
-							Leaf: "hello",
-							Aunts: []*types.ClaimProofItem{
-								{
-									Aunt:    "hello",
-									OnRight: true,
-								},
-							},
-						},
-					},
-				},
 			},
 		},
 	}

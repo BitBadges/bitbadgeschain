@@ -10,7 +10,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 )
 
-func SimulateMsgUpdateBytes(
+func SimulateMsgUpdateCustomData(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	k keeper.Keeper,
@@ -18,10 +18,10 @@ func SimulateMsgUpdateBytes(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := &types.MsgUpdateBytes{
+		msg := &types.MsgUpdateCustomData{
 			Creator:      simAccount.Address.String(),
 			CollectionId: sdk.NewUint(r.Uint64()),
-			Bytes:	      simtypes.RandStringOfLength(r, r.Intn(300)),
+			Bytes:        simtypes.RandStringOfLength(r, r.Intn(300)),
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

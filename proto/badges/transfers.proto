@@ -1,0 +1,209 @@
+syntax = "proto3";
+package bitbadges.bitbadgeschain.badges;
+
+import "gogoproto/gogo.proto";
+import "badges/permissions.proto";
+import "badges/addresses.proto";
+import "badges/balances.proto";
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
+
+//Defines a user balance object for a badge w/ the user's balances and approvals. All badge IDs for a collection are handled within this object.
+message UserBalanceStore {
+  repeated Balance balances = 1; //The user's balance for each badge ID.
+  repeated UserApprovedTransfer approvedTransfers = 2; //The user's approvals for each badge ID.
+  string nextTransferTrackerId = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  UserPermissions permissions = 4;
+}
+
+message Restrictions {
+  bool unlimitedAmountPerAddress = 1;
+  string amountPerAddress = 2 [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+    ];
+
+  bool unlimitedTransfersPerAddress = 3;
+  string transfersPerAddress = 4 [
+      (gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+    ];
+}
+
+//We will add more fields to this message later (e.g. ZKP proofs)
+message Challenge {
+  string root = 1;
+  string expectedProofLength = 2  [(gogoproto.customtype) = "Uint", 
+      (gogoproto.nullable) = false
+    ];
+  bool useCreatorAddressAsLeaf = 3;
+
+  //For codes, this should always be true. 
+  //For whitelist, you can choose to allow multiple uses per leaf. We provide this as an option for flexibility.
+  //For example, if you want to allow addresses to claim multiple times, you can set this to false.
+  bool maxOneUsePerLeaf = 4; 
+
+  //If true, then the order of the leaves in the claim matters. If false, then the order of the leaves in the claim does not matter.
+  //The leftmost leaf (2^expectedProofLength) is the first leaf and will transfer the starting amounts.
+  //The second leaf will transfer the starting amounts + incrementIdsBy.
+  //And so on.
+  bool useLeafIndexForDistributionOrder = 5; 
+}
+
+message Claim {
+  string uri = 1;
+  string customData = 2;
+
+  //To calculate the current claim amounts, we take the starting amounts and increment by the number of increments.
+  //The number of increments is determined by either a) the leaf index of a challenge (if specified) or b) the number of claims processed.
+
+  string incrementIdsBy = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string incrementTimesBy = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  repeated Balance startAmounts = 5;
+
+  repeated Challenge challenges = 6;
+}
+
+message AmountRestrictions {
+  repeated IdRange balancesTimes = 1;
+
+  bool unlimitedAmount = 2;
+  string amount = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  bool unlimitedTransfers = 4;
+  string maxNumTransfers = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  Restrictions fromRestrictions = 6;
+  Restrictions toRestrictions = 7;
+  Restrictions initiatedByRestrictions = 8;
+}
+
+message IsTransferAllowed {
+  bool invertTo = 2;
+  bool invertInitiatedBy = 3;
+  bool invertTimeIntervals = 4;
+  bool invertBadgeIds = 5;
+
+  bool isAllowed = 6;
+}
+
+message UserApprovedTransfer {
+  string toMappingId = 1;
+  string initiatedByMappingId = 2;
+  repeated IdRange transferTimes = 3;
+  repeated IdRange badgeIds = 4;
+
+  //Ensure there is no overlap between allowed and disallowed combinations.
+  repeated IsTransferAllowed allowedCombinations = 5;
+
+  //If everything above matches, we check the restrictions below
+  repeated AmountRestrictions amountRestrictions = 7;
+
+  //The transferTrackerId is used to track the number of transfers that have happened for this collection.
+  string transferTrackerId = 8 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  //Claim fields
+  // Claim claim = 8;
+
+  //The rest of the fields are for handling transfers, if it is deemed allowed and has valid badgeIDs are for handling transfers, if it is deemed allowed and has valid badgeIDs.
+  bool requireToEqualsInitiatedBy = 9;
+  bool requireToDoesNotEqualInitiatedBy = 10;
+}
+
+message IsCollectionTransferAllowed {
+  bool invertFrom = 1;
+  bool invertTo = 2;
+  bool invertInitiatedBy = 3;
+  bool invertTimeIntervals = 4;
+  bool invertBadgeIds = 5;
+
+  bool isAllowed = 6;
+}
+
+message CollectionApprovedTransfer {
+  string fromMappingId = 1;
+  string toMappingId = 2;
+  string initiatedByMappingId = 3;
+  repeated IdRange transferTimes = 4;
+  repeated IdRange badgeIds = 5;
+
+  //Ensure there is no overlap between allowed and disallowed combinations.
+  repeated IsCollectionTransferAllowed allowedCombinations = 6;
+
+  //If everything above matches, we check the restrictions below
+  repeated AmountRestrictions amountRestrictions = 8;
+
+  //The transferTrackerId is used to track the number of transfers that have happened for this collection.
+  string transferTrackerId = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  //Claim fields
+  Claim claim = 10;
+
+  //The rest of the fields are for handling transfers, if it is deemed allowed and has valid badgeIDs are for handling transfers, if it is deemed allowed and has valid badgeIDs.
+
+  //If true, then we do not even check the approvals and allow the transfer.
+  //No approval will be deducted, this step is skipped.
+  //Required to be true for transfers because 'Mint' address does not have and will never have any approvals.
+  bool overridesFromApprovedTransfers = 11;
+
+  bool requireToEqualsInitiatedBy = 12;
+  bool requireFromEqualsInitiatedBy = 13;
+
+  bool requireToDoesNotEqualInitiatedBy = 14;
+  bool requireFromDoesNotEqualInitiatedBy = 15;
+}
+
+//We have a CollectionApprovedTransfer that defines the collection-wide transfers and one that defines approvals / allowed for each user.
+//Flow: 
+//-Check collection-wide first. Deny if not explicitly allowed.
+//-If allowed, check if it requires local approval.
+//  -If local approval required, we check the local allowed transfers. 
+//    -If explicitly allowed, we allow.
+//    -If explicitly disallowed, we disallow.
+//    -If neither, if from === initiatedBy, it is allowed. Else, it is disallowed.
+//  -If local approval overriden, we allow.
+
+//To check if a transfer matches, we take the (from, to, initiatedBy, amount, badgeIds) pair.
+//If from, to, and initiatedBy are specified and is a valid time, we handle the transfer for all overlapping badge IDs (that we can).
+  //If error, does not specify claim details, goes over approvals, etc, we disallow.
+
+//For all approvals, it is the creator's responsibility to ensure that enough badges are escrowed for the desired functionality.
+//It is also the creator's responsibility to revoke approvals if they are no longer desired.
+//For example, we can't guarantee balances are escrowed for the entire claim duration or approval duration (similar to ERC-721).
+//For example, if badges are transferred at T1 but the user never cancels an approval from T2 to T3, the approval is still
+//valid if any badges get transferred back to the user at T2.5.
+
+//Direct transfers from 'Mint' will be initiated by calling address (most often 'Manager')
+//Claims will be 'Mint' initiated by calling address.
+
+//We store each allowed transfer based on an ID (not numerical).
+
+//To limit the amounts / approvals, we define the following:
+
+//Restrictions (for to/from/initiatedBy):
+//noRestrictions or defined approvedBalances
+//isApprovedBalancesPerAddress or isApprovedBalancesForAllAddresses
+//maxNumTransfersPerAddress or maxNumTransfersForAllAddresses
+
+//requireToEqualsInitiatedBy - non-assignable vs assignable
+//requireFromEqualsInitiatedBy - not sure?
+
+//Claim fields are inherited
+//uri, totalClaimsProcessed, etc
+
+//For MsgTransferBadge, we allow users to specify their transfers[], including solutions.
+//Needs to be well formatted for solutions, so we do not end up in where we have 1/2 badges in one allowed transfer w/ challenges
+//and one in another w/ challenges.
+//Get rid of MsgClaimBadge in favor of this more generic MsgTransferBadge.
+
+//Local approvals have a slightly different struct (no "from" and no localApprovalRequired)
+
+//For now, we make approvedTransfers and claims deletable but not updatable for simplicity.
+  //Questions:
+  //How do we handle claims / approval amounts being stored by ID? What if they update to not tracking status?
+    //track flags -> claims and each approval amount. track flags can never be set to false, once true.
+    //will start tracking from the moment track flag is turned on
+  //What about if claim balances are revoked in middle?

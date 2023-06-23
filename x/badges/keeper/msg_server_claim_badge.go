@@ -11,17 +11,13 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	err := *new(error)
 
-	
-
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
 	if !found {
 		return nil, ErrBadgeNotExists
 	}
 
-	//Check if claim is allowed
- 	allowed, _ :=	IsTransferAllowed(collection, "Mint", msg.Creator, "Mint")
-	if !allowed {
-		return nil, ErrMintNotAllowed
+	if collection.IsOffChainBalances {
+		return nil, ErrOffChainBalances
 	}
 
 	claimId := msg.ClaimId
@@ -35,10 +31,27 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		return nil, ErrSolutionsLengthInvalid
 	}
 
+	if !claim.IsAssignable && msg.Recipient != "" {
+		return nil, ErrClaimNotAssignable
+	}
+
+	recipient := msg.Recipient
+	if recipient == "" {
+		recipient = msg.Creator
+	}
+
 	//Assert claim is not expired
 	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-	if claim.TimeRange.Start.GT(blockTime) || claim.TimeRange.End.LT(blockTime) {
-		return nil, ErrClaimTimeInvalid
+	validTime := false
+	for _, interval := range claim.TimeIntervals {
+		if interval.Start.GT(blockTime) || interval.End.LT(blockTime) {
+			continue
+		}
+		validTime = true
+	}
+
+	if !validTime {
+		return nil, ErrInvalidTime
 	}
 
 	//Check if address can claim
@@ -54,11 +67,14 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		}
 	}
 
-
+	increment := sdk.NewUint(0)
+	if !claim.IncrementIdsBy.IsZero() {
+		increment = claim.IncrementIdsBy.Mul(claim.TotalClaimsProcessed)
+	}
 	//Check if solutions are valid
 	for idx, challenge := range claim.Challenges {
 		root := challenge.Root
-		useCreatorAddressAsLeaf := challenge.UseCreatorAddressAsLeaf
+		useCreatorAddressAsLeaf := challenge.IsWhitelistTree
 		expectedProofLength := challenge.ExpectedProofLength
 		solution := msg.Solutions[idx]
 		challengeId := sdk.NewUint(uint64(idx))
@@ -73,14 +89,26 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 			}
 
 			leafIndex := GetLeafIndex(solution.Proof.Aunts)
-			numUsed, err := k.IncrementNumUsedForChallengeInStore(ctx, msg.CollectionId, claimId, challengeId, leafIndex)
-			if err != nil {
-				return nil, err
+			if challenge.UseLeafIndexForBadgeIds {
+				//Get leftmost leaf index for layer === expectedProofLength
+				leftmostLeafIndex := sdk.NewUint(1)
+				for i := sdk.NewUint(0); i.LT(expectedProofLength); i = i.Add(sdk.NewUint(1)) {
+					leftmostLeafIndex = leftmostLeafIndex.Mul(sdk.NewUint(2))
+				}
+
+				increment = leafIndex.Sub(leftmostLeafIndex)
 			}
 
-			maxUses := sdk.NewUint(1)
-			if numUsed.GT(maxUses) {
-				return nil, ErrChallengeMaxUsesExceeded
+			if challenge.MaxOneUsePerLeaf {
+				numUsed, err := k.IncrementNumUsedForChallengeInStore(ctx, msg.CollectionId, claimId, challengeId, leafIndex)
+				if err != nil {
+					return nil, err
+				}
+
+				maxUses := sdk.NewUint(1)
+				if numUsed.GT(maxUses) {
+					return nil, ErrChallengeMaxUsesExceeded
+				}
 			}
 
 			//Check if claim is valid
@@ -95,10 +123,6 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		}
 	}
 
-	//Check if claim is valid
-	incrementIdsBy := claim.IncrementIdsBy
-
-
 	/*
 		Here, we do the following
 		1. Get msg.Creator (to) balance from store
@@ -108,17 +132,46 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		5. Set everything in store
 	*/
 
-	toBalance, found := k.GetUserBalanceFromStore(ctx, ConstructBalanceKey(msg.Creator, msg.CollectionId))
+	toBalance, found := k.GetUserBalanceFromStore(ctx, ConstructBalanceKey(recipient, msg.CollectionId))
 	if !found {
 		toBalance = types.UserBalanceStore{}
 	}
 
 	claimBalanceStore := types.UserBalanceStore{
-		Balances:  claim.UndistributedBalances,
+		Balances:  claim.Balances,
 		Approvals: []*types.Approval{},
 	}
- 
-	for _, balance := range claim.CurrentClaimAmounts {
+
+	//Get the current claim amounts
+	//We already calculated the necessary increment above
+	currentClaimAmounts := []*types.Balance{}
+	for _, balance := range claim.StartingClaimAmounts {
+		incrementedBadgeIds := []*types.IdRange{}
+		for _, idRange := range balance.BadgeIds {
+			incrementedBadgeIds = append(incrementedBadgeIds, &types.IdRange{
+				Start: idRange.Start.Add(increment),
+				End:   idRange.End.Add(increment),
+			})
+		}
+
+		currentClaimAmounts = append(currentClaimAmounts, &types.Balance{
+			Amount:   balance.Amount,
+			BadgeIds: incrementedBadgeIds,
+		})
+	}
+
+	badgeIds := []*types.IdRange{}
+	for _, balance := range currentClaimAmounts {
+		badgeIds = append(badgeIds, balance.BadgeIds...)
+	}
+
+	//Check if the claim is allowed (requiresApproval is ignored because it is a mint)
+	allowed, _ := IsTransferAllowed(ctx, badgeIds, collection, "Mint", msg.Creator, "Mint")
+	if !allowed {
+		return nil, ErrMintNotAllowed
+	}
+
+	for _, balance := range currentClaimAmounts {
 		toBalance.Balances, err = AddBalancesForIdRanges(toBalance.Balances, balance.BadgeIds, balance.Amount)
 		if err != nil {
 			return nil, err
@@ -128,16 +181,11 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		if err != nil {
 			return nil, err
 		}
-
-		if !incrementIdsBy.IsZero() {
-			for i := 0; i < len(balance.BadgeIds); i++ {
-				balance.BadgeIds[i].Start = balance.BadgeIds[i].Start.Add(incrementIdsBy)
-				balance.BadgeIds[i].End = balance.BadgeIds[i].End.Add(incrementIdsBy)
-			}
-		}
 	}
 
-	claim.UndistributedBalances = claimBalanceStore.Balances
+	claim.TotalClaimsProcessed = claim.TotalClaimsProcessed.Add(sdk.NewUint(uint64(1)))
+
+	claim.Balances = claimBalanceStore.Balances
 
 	err = k.SetClaimInStore(ctx, msg.CollectionId, claimId, claim)
 	if err != nil {
@@ -149,7 +197,7 @@ func (k msgServer) ClaimBadge(goCtx context.Context, msg *types.MsgClaimBadge) (
 		return nil, err
 	}
 
-	err = k.SetUserBalanceInStore(ctx, ConstructBalanceKey(msg.Creator, msg.CollectionId), toBalance)
+	err = k.SetUserBalanceInStore(ctx, ConstructBalanceKey(recipient, msg.CollectionId), toBalance)
 	if err != nil {
 		return nil, err
 	}
