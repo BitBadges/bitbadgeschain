@@ -12,35 +12,11 @@ type UniversalValidationParams struct {
 	AccountsThatCantEqualCreator         []string
 	BadgeIdRangesToValidate              []*types.IdRange
 	MustBeManager                        bool
-	CanArchive                           bool
-	CanUpdateContractAddress             bool
-	CanCreateMoreBadges                  bool
-	CanUpdateCollectionApprovedTransfers bool
-	CanUpdateManager              bool
-	CanUpdateBadgeMetadata               bool
-	CanUpdateCollectionMetadata          bool
-	CanUpdateCustomData                  bool
-	CanDeleteCollection                  bool
-	CanUpdateOffChainBalancesMetadata    bool
 }
 
-func CheckPermission(ctx sdk.Context, permission *types.Permission) bool {
-	if !permission.IsFrozen {
-		return true
-	}
-
-	for _, interval := range permission.TimeIntervals {
-		time := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-		if time.GT(interval.Start) && time.LT(interval.End) {
-			return true
-		}
-	}
-
-	return false
-}
-
-// Validates everything about the Msg is valid and returns (creatorNum, badge, permissions, error).
+// Validates everything about the Msg is valid and returns (creatorNum, collection, permissions, error).
 func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationParams) (types.BadgeCollection, error) {
+	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 
 	if len(params.AccountsThatCantEqualCreator) > 0 {
 		for _, account := range params.AccountsThatCantEqualCreator {
@@ -51,56 +27,34 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationPar
 	}
 
 	// Assert collection and badgeId ranges exist and are well-formed
-	badge, err := k.GetCollectionAndAssertBadgeIdsAreValid(ctx, params.CollectionId, params.BadgeIdRangesToValidate)
+	collection, err := k.GetCollectionAndAssertBadgeIdsAreValid(ctx, params.CollectionId, params.BadgeIdRangesToValidate)
 	if err != nil {
 		return types.BadgeCollection{}, err
 	}
 
-	if badge.IsArchived {
-		return types.BadgeCollection{}, ErrCollectionIsArchived
+
+	for _, timelineVal := range collection.IsArchivedTimeline {
+		idx, found := types.SearchIdRangesForId(blockTime, timelineVal.Times)
+		if found {
+			if timelineVal.IsArchived { 
+				return types.BadgeCollection{}, ErrCollectionIsArchived
+			} 
+			break
+		} 
 	}
 
 	// Assert all permissions
-	if params.MustBeManager && badge.Manager != params.Creator {
-		return types.BadgeCollection{}, ErrSenderIsNotManager
+	if params.MustBeManager {
+		for _, timelineVal := range collection.ManagerTimeline {
+			idx, found := types.SearchIdRangesForId(blockTime, timelineVal.Times)
+			if found {
+				if timelineVal.Manager != params.Creator {
+					return types.BadgeCollection{}, ErrSenderIsNotManager
+				}
+				break
+			}
+		}
 	}
 
-	permissions := badge.Permissions
-	if params.CanUpdateCollectionApprovedTransfers && !CheckPermission(ctx, permissions.CanUpdateCollectionApprovedTransfers) {
-		return types.BadgeCollection{}, ErrInvalidPermissions
-	}
-
-	if params.CanCreateMoreBadges && !CheckPermission(ctx, permissions.CanCreateMoreBadges) {
-		return types.BadgeCollection{}, ErrInvalidPermissions
-	}
-
-	if params.CanUpdateManager && !CheckPermission(ctx, permissions.CanUpdateManager) {
-		return types.BadgeCollection{}, ErrInvalidPermissions
-	}
-
-	if params.CanUpdateBadgeMetadata && !CheckPermission(ctx, permissions.CanUpdateBadgeMetadata) {
-		return types.BadgeCollection{}, ErrInvalidPermissions
-	}
-
-	if params.CanUpdateCollectionMetadata && !CheckPermission(ctx, permissions.CanUpdateCollectionMetadata) {
-		return types.BadgeCollection{}, ErrInvalidPermissions
-	}
-
-	if params.CanUpdateCustomData && !CheckPermission(ctx, permissions.CanUpdateCustomData) {
-		return types.BadgeCollection{}, ErrInvalidPermissions
-	}
-
-	if params.CanDeleteCollection && !CheckPermission(ctx, permissions.CanDeleteCollection) {
-		return types.BadgeCollection{}, ErrInvalidPermissions
-	}
-
-	if params.CanUpdateOffChainBalancesMetadata && !CheckPermission(ctx, permissions.CanUpdateOffChainBalancesMetadata) {
-		return types.BadgeCollection{}, ErrInvalidPermissions
-	}
-
-	if params.CanUpdateContractAddress && !CheckPermission(ctx, permissions.CanUpdateContractAddress) {
-		return types.BadgeCollection{}, ErrInvalidPermissions
-	}
-
-	return badge, nil
+	return collection, nil
 }

@@ -9,20 +9,20 @@ const TypeMsgUpdateCollectionApprovedTransfers = "update_allowed_transfers"
 
 var _ sdk.Msg = &MsgUpdateCollectionApprovedTransfers{}
 
-func NewMsgUpdateCollectionApprovedTransfers(creator string, collectionId sdk.Uint, approvedTransfers []*CollectionApprovedTransfer) *MsgUpdateCollectionApprovedTransfers {
-	for _, approvedTransfer := range approvedTransfers {
-		approvedTransfer.BadgeIds = SortAndMergeOverlapping(approvedTransfer.BadgeIds)
-		approvedTransfer.TransferTimes = SortAndMergeOverlapping(approvedTransfer.TransferTimes)
+func NewMsgUpdateCollectionApprovedTransfers(creator string, collectionId sdk.Uint, approvedTransfersTimeline []*CollectionApprovedTransferTimeline) *MsgUpdateCollectionApprovedTransfers {
+	// for _, approvedTransfer := range approvedTransfers {
+	// 	approvedTransfer.BadgeIds = SortAndMergeOverlapping(approvedTransfer.BadgeIds)
+	// 	approvedTransfer.TransferTimes = SortAndMergeOverlapping(approvedTransfer.TransferTimes)
 
-		for _, balance := range approvedTransfer.Claim.StartAmounts {
-			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
-		}
-	}
+	// 	for _, balance := range approvedTransfer.Claim.StartAmounts {
+	// 		balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+	// 	}
+	// }
 	
 	return &MsgUpdateCollectionApprovedTransfers{
 		Creator:           creator,
 		CollectionId:      collectionId,
-		ApprovedTransfers: approvedTransfers,
+		ApprovedTransfersTimeline: approvedTransfersTimeline,
 	}
 }
 
@@ -53,10 +53,12 @@ func (msg *MsgUpdateCollectionApprovedTransfers) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	for _, approvedTransfer := range msg.ApprovedTransfers {
-		err = ValidateCollectionApprovedTransfer(*approvedTransfer)
-		if err != nil {
-			return err
+	for _, timelineVal := range msg.ApprovedTransfersTimeline {
+		for _, approvedTransfer := range timelineVal.ApprovedTransfers {
+			err = ValidateCollectionApprovedTransfer(*approvedTransfer)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

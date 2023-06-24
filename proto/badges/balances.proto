@@ -33,7 +33,10 @@ message Balance {
 message InheritedBalance {
   repeated IdRange badgeIds = 1;
 
-  string parentCollectionId = 2;
+  string parentCollectionId = 2 [
+    (gogoproto.customtype) = "Uint", 
+    (gogoproto.nullable) = false
+  ];
   repeated IdRange parentBadgeIds = 3;
 }
 

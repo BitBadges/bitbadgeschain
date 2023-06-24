@@ -16,6 +16,7 @@ func (k Keeper) GetClaimNumProcessed(goCtx context.Context, req *types.QueryGetC
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	//TODO:
+	_ = ctx
 
 	return nil, ErrNotImplemented
 

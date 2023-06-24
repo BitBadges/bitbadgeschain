@@ -11,63 +11,66 @@ var _ sdk.Msg = &MsgNewCollection{}
 
 func NewMsgNewCollection(
 	creator string,
-	standard sdk.Uint,
+	standardTimeline []*StandardTimeline,
 	badgesToCreate []*Balance,
-	collectionMetadata *CollectionMetadata,
-	badgeMetadata []*BadgeMetadata,
+	collectionMetadataTimeline []*CollectionMetadataTimeline,
+	badgeMetadataTimeline []*BadgeMetadataTimeline,
 	permissions *CollectionPermissions,
-	approvedTransfers []*CollectionApprovedTransfer,
-	customData string,
+	approvedTransfersTimeline []*CollectionApprovedTransferTimeline,
+	customDataTimeline []*CustomDataTimeline,
 	transfers []*Transfer,
-	offChainBalancesMetadata *OffChainBalancesMetadata,
-	contractAddress string,
+	offChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline,
+	contractAddressTimeline []*ContractAddressTimeline,
 	balancesType sdk.Uint,
-	inheritedBalances []*InheritedBalance,
+	inheritedBalancesTimeline []*InheritedBalancesTimeline,
 ) *MsgNewCollection {
-	for _, transfer := range transfers {
-		for _, balance := range transfer.Balances {
-			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
-		}
-	}
+	// for _, transfer := range transfers {
+	// 	for _, balance := range transfer.Balances {
+	// 		balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+	// 	}
+	// }
 
-	for _, badgeBalanceToCreate := range badgesToCreate {
-		badgeBalanceToCreate.BadgeIds = SortAndMergeOverlapping(badgeBalanceToCreate.BadgeIds)
-	}
+	// for _, badgeBalanceToCreate := range badgesToCreate {
+	// 	badgeBalanceToCreate.BadgeIds = SortAndMergeOverlapping(badgeBalanceToCreate.BadgeIds)
+	// }
 
-	for _, badgeMetadata := range badgeMetadata {
-		badgeMetadata.BadgeIds = SortAndMergeOverlapping(badgeMetadata.BadgeIds)
-	}
+	// for _, badgeMetadata := range badgeMetadata {
+	// 	badgeMetadata.BadgeIds = SortAndMergeOverlapping(badgeMetadata.BadgeIds)
+	// }
 
-	for _, approvedTransfer := range approvedTransfers {
-		approvedTransfer.BadgeIds = SortAndMergeOverlapping(approvedTransfer.BadgeIds)
-		approvedTransfer.TransferTimes = SortAndMergeOverlapping(approvedTransfer.TransferTimes)
+	// for _, approvedTransfer := range approvedTransfers {
+	// 	approvedTransfer.BadgeIds = SortAndMergeOverlapping(approvedTransfer.BadgeIds)
+	// 	approvedTransfer.TransferTimes = SortAndMergeOverlapping(approvedTransfer.TransferTimes)
 
-		for _, balance := range approvedTransfer.Claim.StartAmounts {
-			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
-		}
-	}
+	// 	for _, balance := range approvedTransfer.Claim.StartAmounts {
+	// 		balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+	// 	}
+	// }
 
-	for _, balance := range inheritedBalances {
-		balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
-		balance.ParentBadgeIds = SortAndMergeOverlapping(balance.ParentBadgeIds)
-	}
+	// for _, balance := range inheritedBalances {
+	// 	balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+	// 	balance.ParentBadgeIds = SortAndMergeOverlapping(balance.ParentBadgeIds)
+	// }
 
 	//TODO: permissions sort and merge overlapping
 
+
+
 	return &MsgNewCollection{
 		Creator:            creator,
-		CollectionMetadata: collectionMetadata,
-		BadgeMetadata:      badgeMetadata,
+		StandardsTimeline:   standardTimeline,
 		BadgesToCreate:     badgesToCreate,
-		ApprovedTransfers:  approvedTransfers,
-		CustomData:         customData,
+		CollectionMetadataTimeline: collectionMetadataTimeline,
+		BadgeMetadataTimeline: badgeMetadataTimeline,
 		Permissions:        permissions,
-		Standard:           standard,
+
+		ApprovedTransfersTimeline: approvedTransfersTimeline,
+		CustomDataTimeline: customDataTimeline,
 		Transfers:          transfers,
-		OffChainBalancesMetadata:   offChainBalancesMetadata,
-		ContractAddress:    contractAddress,
-		BalancesType:       balancesType,
-		InheritedBalances:  inheritedBalances,
+		OffChainBalancesMetadataTimeline: offChainBalancesMetadataTimeline,
+		ContractAddressTimeline: contractAddressTimeline,
+		BalancesType: balancesType,
+		InheritedBalancesTimeline: inheritedBalancesTimeline,
 	}
 }
 
@@ -98,24 +101,30 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.OffChainBalancesMetadata != nil {
-		err = ValidateURI(msg.OffChainBalancesMetadata.Uri)
-		if err != nil {
-			return err
+	if msg.OffChainBalancesMetadataTimeline != nil {
+		for _, timelineVal := range msg.OffChainBalancesMetadataTimeline {	
+			err = ValidateURI(timelineVal.OffChainBalancesMetadata.Uri)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	if msg.BadgeMetadata != nil && len(msg.BadgeMetadata) > 0 {
-		err = ValidateBadgeMetadata(msg.BadgeMetadata)
-		if err != nil {
-			return err
+	if msg.BadgeMetadataTimeline != nil && len(msg.BadgeMetadataTimeline) > 0 {
+		for _, timelineVal := range msg.BadgeMetadataTimeline {
+			err = ValidateBadgeMetadata(timelineVal.BadgeMetadata)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	if msg.CollectionMetadata != nil {
-		err = ValidateURI(msg.CollectionMetadata.Uri)
-		if err != nil {
-			return err
+	if msg.CollectionMetadataTimeline != nil {
+		for _, timelineVal := range msg.CollectionMetadataTimeline {
+			err = ValidateURI(timelineVal.CollectionMetadata.Uri)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -123,29 +132,38 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		return err
 	}
 
-	if msg.BadgeMetadata != nil {
-		if err := ValidateBadgeMetadata(msg.BadgeMetadata); err != nil {
-			return err
-		}
-	}
-
 	if err := ValidateBalances(msg.BadgesToCreate); err != nil {
 		return err
 	}
 
-	if msg.InheritedBalances != nil {
-		if len(msg.InheritedBalances) > 0 {
-			if len(msg.Transfers) > 0 || len(msg.ApprovedTransfers) > 0 {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "balances metadata denotes off-chain balances but claims and/or transfers are set")
-			}
-		}
-	}
 
 	if !msg.BalancesType.IsZero() {
 		//We have off-chain or inherited balances
 
-		if len(msg.Transfers) > 0 || len(msg.ApprovedTransfers) > 0 {
+		if len(msg.Transfers) > 0 || len(msg.ApprovedTransfersTimeline) > 0 {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "balances metadata denotes off-chain balances but claims and/or transfers are set")
+		}
+	}
+
+
+	if msg.InheritedBalancesTimeline != nil {
+		for _, timelineVal := range msg.InheritedBalancesTimeline {
+			for _, balance := range timelineVal.InheritedBalances {
+				err = ValidateRangesAreValid(balance.BadgeIds, true)
+				if err != nil {
+					return err
+				}
+
+				err = ValidateRangesAreValid(balance.ParentBadgeIds, true)
+				if err != nil {
+					return err
+				}
+
+				if balance.ParentCollectionId.IsZero() || balance.ParentCollectionId.IsNil() {
+					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid parent collection id")
+				}
+	
+			}
 		}
 	}
 
@@ -161,16 +179,21 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		}
 	}
 
-	for _, approvedTransfer := range msg.ApprovedTransfers {
-		err = ValidateCollectionApprovedTransfer(*approvedTransfer)
-		if err != nil {
-			return err
+	for _, timelineVal := range msg.ApprovedTransfersTimeline {
+		for _, approvedTransfer := range timelineVal.ApprovedTransfers {
+			err = ValidateCollectionApprovedTransfer(*approvedTransfer)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	
+	for _, timelineVal := range msg.StandardsTimeline {
+		if timelineVal.Standard == "" {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid standard")
 		}
 	}
 
-	if msg.Standard.IsNil() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid standard (%s)", msg.Standard)
-	}
 
 	return nil
 }

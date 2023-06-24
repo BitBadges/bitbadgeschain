@@ -14,11 +14,11 @@ func NewMsgMintAndDistributeBadges(
 	collectionId sdk.Uint,
 	badgesToCreate []*Balance,
 	transfers []*Transfer,
-	collectionMetadata *CollectionMetadata,
-	badgeMetadata []*BadgeMetadata,
-	offChainBalancesMetadata *OffChainBalancesMetadata,
-	approvedTransfers []*CollectionApprovedTransfer,
-	inheritedBalances []*InheritedBalance,
+	collectionMetadataTimeline []*CollectionMetadataTimeline,
+	badgeMetadataTimeline []*BadgeMetadataTimeline,
+	offChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline,
+	approvedTransfersTimeline []*CollectionApprovedTransferTimeline,
+	inheritedBalancesTimeline []*InheritedBalancesTimeline,
 	addressMappings []*AddressMapping,
 ) *MsgMintAndDistributeBadges {
 	for _, transfer := range transfers {
@@ -26,17 +26,20 @@ func NewMsgMintAndDistributeBadges(
 			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
 		}
 	}
-
-	for _, badgeMetadata := range badgeMetadata {
-		badgeMetadata.BadgeIds = SortAndMergeOverlapping(badgeMetadata.BadgeIds)
+	for _, timelineVal := range badgeMetadataTimeline {
+		for _, badgeMetadata := range timelineVal.BadgeMetadata {
+			badgeMetadata.BadgeIds = SortAndMergeOverlapping(badgeMetadata.BadgeIds)
+		}
 	}
 
-	for _, approvedTransfer := range approvedTransfers {
-		approvedTransfer.BadgeIds = SortAndMergeOverlapping(approvedTransfer.BadgeIds)
-		approvedTransfer.TransferTimes = SortAndMergeOverlapping(approvedTransfer.TransferTimes)
+	for _, timelineVal := range approvedTransfersTimeline {
+		for _, approvedTransfer := range timelineVal.ApprovedTransfers {
+			approvedTransfer.BadgeIds = SortAndMergeOverlapping(approvedTransfer.BadgeIds)
+			approvedTransfer.TransferTimes = SortAndMergeOverlapping(approvedTransfer.TransferTimes)
 
-		for _, balance := range approvedTransfer.Claim.StartAmounts {
-			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+			for _, balance := range approvedTransfer.Claim.StartAmounts {
+				balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+			}
 		}
 	}
 
@@ -44,9 +47,11 @@ func NewMsgMintAndDistributeBadges(
 		badgeBalanceToCreate.BadgeIds = SortAndMergeOverlapping(badgeBalanceToCreate.BadgeIds)
 	}
 
-	for _, balance := range inheritedBalances {
-		balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
-		balance.ParentBadgeIds = SortAndMergeOverlapping(balance.ParentBadgeIds)
+	for _, timelineVal := range inheritedBalancesTimeline {
+		for _, balance := range timelineVal.InheritedBalances {
+			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+			balance.ParentBadgeIds = SortAndMergeOverlapping(balance.ParentBadgeIds)
+		}
 	}
 
 	return &MsgMintAndDistributeBadges{
@@ -54,11 +59,11 @@ func NewMsgMintAndDistributeBadges(
 		CollectionId:       collectionId,
 		BadgesToCreate:     badgesToCreate,
 		Transfers:          transfers,
-		CollectionMetadata: collectionMetadata,
-		BadgeMetadata:      badgeMetadata,
-		OffChainBalancesMetadata:   offChainBalancesMetadata,
-		ApprovedTransfers:  approvedTransfers,
-		InheritedBalances:  inheritedBalances,
+		CollectionMetadataTimeline: collectionMetadataTimeline,
+		BadgeMetadataTimeline:      badgeMetadataTimeline,
+		OffChainBalancesMetadataTimeline:   offChainBalancesMetadataTimeline,
+		ApprovedTransfersTimeline:  approvedTransfersTimeline,
+		InheritedBalancesTimeline:  inheritedBalancesTimeline,
 	}
 }
 
@@ -101,26 +106,33 @@ func (msg *MsgMintAndDistributeBadges) ValidateBasic() error {
 		return err
 	}
 
-	if msg.OffChainBalancesMetadata != nil {
-		err = ValidateURI(msg.OffChainBalancesMetadata.Uri)
-		if err != nil {
-			return err
+	if msg.OffChainBalancesMetadataTimeline != nil {
+		for _, timelineVal := range msg.OffChainBalancesMetadataTimeline {	
+			err = ValidateURI(timelineVal.OffChainBalancesMetadata.Uri)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	if msg.BadgeMetadata != nil && len(msg.BadgeMetadata) > 0 {
-		err = ValidateBadgeMetadata(msg.BadgeMetadata)
-		if err != nil {
-			return err
+	if msg.BadgeMetadataTimeline != nil && len(msg.BadgeMetadataTimeline) > 0 {
+		for _, timelineVal := range msg.BadgeMetadataTimeline {
+			err = ValidateBadgeMetadata(timelineVal.BadgeMetadata)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	if msg.CollectionMetadata != nil {
-		err = ValidateURI(msg.CollectionMetadata.Uri)
-		if err != nil {
-			return err
+	if msg.CollectionMetadataTimeline != nil {
+		for _, timelineVal := range msg.CollectionMetadataTimeline {
+			err = ValidateURI(timelineVal.CollectionMetadata.Uri)
+			if err != nil {
+				return err
+			}
 		}
 	}
+
 
 	for _, transfer := range msg.Transfers {
 		err = ValidateTransfer(transfer)
@@ -129,28 +141,45 @@ func (msg *MsgMintAndDistributeBadges) ValidateBasic() error {
 		}
 	}
 
-	for _, approvedTransfer := range msg.ApprovedTransfers {
-		err = ValidateCollectionApprovedTransfer(*approvedTransfer)
-		if err != nil {
-			return err
-		}
-	}
-
-	if msg.OffChainBalancesMetadata != nil {
-		if msg.OffChainBalancesMetadata.Uri != "" || msg.OffChainBalancesMetadata.CustomData != "" {
-			//We have off-chain balances
-
-			if len(msg.Transfers) > 0 || len(msg.ApprovedTransfers) > 0 {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "balances metadata denotes off-chain balances but claims and/or transfers are set")
+	if msg.ApprovedTransfersTimeline != nil {
+		for _, timelineVal := range msg.ApprovedTransfersTimeline {
+			for _, approvedTransfer := range timelineVal.ApprovedTransfers {
+				err = ValidateCollectionApprovedTransfer(*approvedTransfer)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
 
-	if msg.InheritedBalances != nil {
-		if len(msg.InheritedBalances) > 0 {
-			if len(msg.Transfers) > 0 || len(msg.ApprovedTransfers) > 0 {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "balances metadata denotes off-chain balances but claims and/or transfers are set")
+	if msg.InheritedBalancesTimeline != nil {
+		for _, timelineVal := range msg.InheritedBalancesTimeline {
+			for _, balance := range timelineVal.InheritedBalances {
+				err = ValidateRangesAreValid(balance.BadgeIds, true)
+				if err != nil {
+					return err
+				}
+
+				err = ValidateRangesAreValid(balance.ParentBadgeIds, true)
+				if err != nil {
+					return err
+				}
+
+				if balance.ParentCollectionId.IsZero() || balance.ParentCollectionId.IsNil() {
+					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid parent collection id")
+				}
+	
 			}
+		}
+	}
+
+	if len(msg.Transfers) > 0 || len(msg.ApprovedTransfersTimeline) > 0 {
+		if msg.OffChainBalancesMetadataTimeline != nil && len(msg.OffChainBalancesMetadataTimeline) > 0 {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "transfers and/or claims are set but collection has balances type = off-chain")
+		}
+
+		if msg.InheritedBalancesTimeline != nil && len(msg.InheritedBalancesTimeline) > 0 {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "transfers and/or claims are set but collection has balances type = inherited")
 		}
 	}
 

@@ -40,35 +40,39 @@ func HandleTransfer(ctx sdk.Context, collection types.BadgeCollection, badgeIds 
 
 // Deduct approvals from requester if requester != from
 func DeductApprovalsIfNeeded(ctx sdk.Context, UserBalance types.UserBalanceStore, collection types.BadgeCollection, collectionId sdk.Uint, badgeIds []*types.IdRange, from string, to string, requester string, amount sdk.Uint) (types.UserBalanceStore, error) {
-	newUserBalance := UserBalance
+	return UserBalance, ErrNotImplemented
 
-	if from != requester {
-		err := *new(error)
-		idx, found := SearchApprovals(requester, newUserBalance.Approvals)
-		if !found {
-			return UserBalance, ErrApprovalForAddressDoesntExist
-		}
+	//TODO:
+	
+	// newUserBalance := UserBalance
 
-		approval := newUserBalance.Approvals[idx]
-		validTime := false
-		for _, timeInterval := range approval.TimeIntervals {
-			currTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-			if currTime.GT(timeInterval.Start) && currTime.LT(timeInterval.End) {
-				validTime = true
-			}
-		}
+	// if from != requester {
+	// 	err := *new(error)
+	// 	idx, found := SearchApprovals(requester, newUserBalance.Approvals)
+	// 	if !found {
+	// 		return UserBalance, ErrApprovalForAddressDoesntExist
+	// 	}
 
-		if !validTime {
-			return UserBalance, ErrInvalidTime
-		}
+	// 	approval := newUserBalance.Approvals[idx]
+	// 	validTime := false
+	// 	for _, timeInterval := range approval.TimeIntervals {
+	// 		currTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
+	// 		if currTime.GT(timeInterval.Start) && currTime.LT(timeInterval.End) {
+	// 			validTime = true
+	// 		}
+	// 	}
 
-		newUserBalance.Approvals, err = RemoveBalanceFromApproval(newUserBalance.Approvals, amount, requester, badgeIds)
-		if err != nil {
-			return UserBalance, err
-		}
-	}
+	// 	if !validTime {
+	// 		return UserBalance, ErrInvalidTime
+	// 	}
 
-	return newUserBalance, nil
+	// 	newUserBalance.Approvals, err = RemoveBalanceFromApproval(newUserBalance.Approvals, amount, requester, badgeIds)
+	// 	if err != nil {
+	// 		return UserBalance, err
+	// 	}
+	// }
+
+	// return newUserBalance, nil
 }
 
 func CheckMappingAddresses(addressMapping *types.AddressMapping, addressToCheck string, managerAddress string) bool {

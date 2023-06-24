@@ -20,25 +20,25 @@ func (k msgServer) UpdateCollectionApprovedTransfers(goCtx context.Context, msg 
 		return nil, err
 	}
 
-	if collection.IsOffChainBalances {
+	if collection.BalancesType.LTE(sdk.NewUint(0)) {
 		return nil, ErrOffChainBalances
 	}
 
-	newApprovedTransfers, needToValidateUpdateCollectionApprovedTransfers := GetApprovedTransfersToStore(collection, msg.ApprovedTransfers)
+	// newApprovedTransfers, needToValidateUpdateCollectionApprovedTransfers := GetApprovedTransfersToStore(collection, msg.ApprovedTransfers)
 
-	_, err = k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator:                              msg.Creator,
-		CollectionId:                         msg.CollectionId,
-		MustBeManager:                        true,
-		CanUpdateCollectionApprovedTransfers: needToValidateUpdateCollectionApprovedTransfers,
-	})
+	// _, err = k.UniversalValidate(ctx, UniversalValidationParams{
+	// 	Creator:                              msg.Creator,
+	// 	CollectionId:                         msg.CollectionId,
+	// 	MustBeManager:                        true,
+	// 	CanUpdateCollectionApprovedTransfers: needToValidateUpdateCollectionApprovedTransfers,
+	// })
 
-	err = AssertIsFrozenLogicForApprovedTransfers(collection.ApprovedTransfers, newApprovedTransfers)
-	if err != nil {
-		return nil, err
-	}
+	// err = AssertIsFrozenLogicForApprovedTransfers(collection.ApprovedTransfers, newApprovedTransfers)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	collection.ApprovedTransfers = newApprovedTransfers
+	// collection.ApprovedTransfers = newApprovedTransfers
 
 	err = k.SetCollectionInStore(ctx, collection)
 	if err != nil {

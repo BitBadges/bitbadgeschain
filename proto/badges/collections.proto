@@ -113,10 +113,10 @@ message BadgeCollection {
 
   //This is a map of the current unminted badge supplys by ID. 
   //Consider this the balance of the 'Mint' address. Once a badge is minted, it is removed from this map.
-  repeated BadgeSupply unmintedSupplys = 13;
+  repeated Balance unmintedSupplys = 13;
 
   //This is a map of the total badge supplys in circulation by ID.
-  repeated BadgeSupply totalSupplys = 14;
+  repeated Balance totalSupplys = 14;
 
   //Defines what standard this badge should implement (see standards documentation).
   repeated StandardTimeline standardsTimeline = 15;
@@ -124,7 +124,7 @@ message BadgeCollection {
   // Defines if the collection is isFrozen or not. Frozen collections can't be updated (all Msgs will fail).
   // This can be useful for security reasons, archiving, or to set universal genesis conditions for subcollections.
   // Subcollections will have a choice to inherit this setting or not.
-  repeated IsArchivedTimeline isArchiveTimeline = 16;
+  repeated IsArchivedTimeline isArchivedTimeline = 16;
 
   string nextTransferTrackerId = 17 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 

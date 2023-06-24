@@ -126,7 +126,7 @@ func InsertRangeToIdRanges(rangeToAdd *IdRange, targetIds []*IdRange) ([]*IdRang
 	//Validation check; make sure rangeToAdd is not already in targetIds
 	for _, idRange := range targetIds {
 		_, removed := RemoveIdsFromIdRange(idRange, rangeToAdd)
-		if removed {
+		if len(removed) > 0 {
 			return nil, ErrIdAlreadyInRanges
 		}
 	}
@@ -178,16 +178,17 @@ func InvertIdRanges(idRanges []*IdRange, maxId sdk.Uint) []*IdRange {
 // Removes all ids within an id range from an id range.
 // Removing can make this range be split into 0, 1, or 2 new ranges.
 // Returns if anything was removed or not
-func RemoveIdsFromIdRange(idxsToRemove *IdRange, rangeObject *IdRange) ([]*IdRange, bool) {
+func RemoveIdsFromIdRange(idxsToRemove *IdRange, rangeObject *IdRange) ([]*IdRange, []*IdRange) {
 	if idxsToRemove.End.LT(rangeObject.Start) || idxsToRemove.Start.GT(rangeObject.End) {
 		// idxsToRemove doesn't overlap with rangeObject, so nothing is removed
-		return []*IdRange{rangeObject}, false
+		return []*IdRange{rangeObject}, []*IdRange{}
 	}
 
 	var newRanges []*IdRange
+	var removedRanges []*IdRange
 	if idxsToRemove.Start.LTE(rangeObject.Start) && idxsToRemove.End.GTE(rangeObject.End) {
 		// idxsToRemove fully contains rangeObject, so nothing is left
-		return newRanges, true
+		return newRanges, []*IdRange{rangeObject}
 	}
 
 	if idxsToRemove.Start.GT(rangeObject.Start) {
@@ -196,6 +197,11 @@ func RemoveIdsFromIdRange(idxsToRemove *IdRange, rangeObject *IdRange) ([]*IdRan
 		newRanges = append(newRanges, &IdRange{
 			Start: rangeObject.Start,
 			End:   idxsToRemove.Start.SubUint64(1),
+		})
+
+		removedRanges = append(removedRanges, &IdRange{
+			Start: idxsToRemove.Start,
+			End:   rangeObject.End,
 		})
 	}
 
@@ -206,26 +212,33 @@ func RemoveIdsFromIdRange(idxsToRemove *IdRange, rangeObject *IdRange) ([]*IdRan
 			Start: idxsToRemove.End.AddUint64(1),
 			End:   rangeObject.End,
 		})
+
+		removedRanges = append(removedRanges, &IdRange{
+			Start: rangeObject.Start,
+			End:   idxsToRemove.End,
+		})
 	}
 
-	return newRanges, true
+	return newRanges, removedRanges
 }
 
-func RemoveIdRangeFromIdRange(idsToRemove []*IdRange, rangeToRemoveFrom []*IdRange) ([]*IdRange) {
+func RemoveIdRangeFromIdRange(idsToRemove []*IdRange, rangeToRemoveFrom []*IdRange) ([]*IdRange, []*IdRange) {
 	if len(idsToRemove) == 0 {
-		return rangeToRemoveFrom
+		return rangeToRemoveFrom, []*IdRange{}
 	}
 
+	removedRanges := []*IdRange{}
 	for _, handledValue := range idsToRemove {
 		newRanges := []*IdRange{}
 		for _, oldPermittedTime := range rangeToRemoveFrom {
-			rangesAfterRemoval, _ := RemoveIdsFromIdRange(handledValue, oldPermittedTime)
+			rangesAfterRemoval, removed := RemoveIdsFromIdRange(handledValue, oldPermittedTime)
 			newRanges = append(newRanges, rangesAfterRemoval...)
+			removedRanges = append(removedRanges, removed...)
 		}
 		rangeToRemoveFrom = newRanges
 	}
 
-	return rangeToRemoveFrom
+	return rangeToRemoveFrom, SortAndMergeOverlapping(removedRanges)
 }
 
 func AssertRangeCompletelyOverlaps(rangeToCheck []*IdRange, overlappingRange []*IdRange) error {
@@ -249,7 +262,7 @@ func AssertRangeDoesNotOverlapAtAll(rangeToCheck []*IdRange, overlappingRange []
 		for _, newAllowedTime := range overlappingRange {
 			//Check that the new time completely overlaps with the old time
 			_, removed := RemoveIdsFromIdRange(newAllowedTime, oldAllowedTime)
-			if removed {
+			if len(removed) > 0 {
 				return ErrInvalidPermissionsUpdateLocked
 			}
 		}

@@ -19,39 +19,39 @@ func (k msgServer) UpdateMetadata(goCtx context.Context, msg *types.MsgUpdateMet
 		return nil, err
 	}
 
-	newCollectionMetadata, newBadgeMetadata, newOffChainBalancesMetadata, needToValidateUpdateCollectionMetadata, needToValidateUpdateBadgeMetadata, needToValidateUpdateBalanceUri := GetUrisToStoreAndPermissionsToCheck(collection, msg.CollectionMetadata, msg.BadgeMetadata, msg.OffChainBalancesMetadata)
+	// newCollectionMetadata, newBadgeMetadata, newOffChainBalancesMetadata, needToValidateUpdateCollectionMetadata, needToValidateUpdateBadgeMetadata, needToValidateUpdateBalanceUri := GetUrisToStoreAndPermissionsToCheck(collection, msg.CollectionMetadata, msg.BadgeMetadata, msg.OffChainBalancesMetadata)
 
-	_, err = k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator:                     msg.Creator,
-		CollectionId:                msg.CollectionId,
-		MustBeManager:               true,
-		CanUpdateOffChainBalancesMetadata:   needToValidateUpdateBalanceUri,
-		CanUpdateBadgeMetadata:      needToValidateUpdateBadgeMetadata,
-		CanUpdateCollectionMetadata: needToValidateUpdateCollectionMetadata,
-		CanUpdateContractAddress:    msg.ContractAddress != "" && collection.ContractAddress != msg.ContractAddress,
-		CanUpdateCustomData:         msg.CustomData != "" && collection.CustomData != msg.CustomData,
-	})
-	if err != nil {
-		return nil, err
-	}
+	// _, err = k.UniversalValidate(ctx, UniversalValidationParams{
+	// 	Creator:                     msg.Creator,
+	// 	CollectionId:                msg.CollectionId,
+	// 	MustBeManager:               true,
+	// 	CanUpdateOffChainBalancesMetadata:   needToValidateUpdateBalanceUri,
+	// 	CanUpdateBadgeMetadata:      needToValidateUpdateBadgeMetadata,
+	// 	CanUpdateCollectionMetadata: needToValidateUpdateCollectionMetadata,
+	// 	CanUpdateContractAddress:    msg.ContractAddress != "" && collection.ContractAddress != msg.ContractAddress,
+	// 	CanUpdateCustomData:         msg.CustomData != "" && collection.CustomData != msg.CustomData,
+	// })
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	//Check badge metadata for isFrozen logic
-	err = AssertIsFrozenLogicIsMaintained(collection.BadgeMetadata, newBadgeMetadata)
-	if err != nil {
-		return nil, err
-	}
+	// //Check badge metadata for isFrozen logic
+	// err = AssertIsFrozenLogicIsMaintained(collection.BadgeMetadata, newBadgeMetadata)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	collection.BadgeMetadata = newBadgeMetadata
-	collection.CollectionMetadata = newCollectionMetadata
-	collection.OffChainBalancesMetadata = newOffChainBalancesMetadata
+	// collection.BadgeMetadata = newBadgeMetadata
+	// collection.CollectionMetadata = newCollectionMetadata
+	// collection.OffChainBalancesMetadata = newOffChainBalancesMetadata
 
-	if msg.ContractAddress != "" {
-		collection.ContractAddress = msg.ContractAddress
-	}
+	// if msg.ContractAddress != "" {
+	// 	collection.ContractAddress = msg.ContractAddress
+	// }
 
-	if msg.CustomData != "" {
-		collection.CustomData = msg.CustomData
-	}
+	// if msg.CustomData != "" {
+	// 	collection.CustomData = msg.CustomData
+	// }
 
 	if err := k.SetCollectionInStore(ctx, collection); err != nil {
 		return nil, err

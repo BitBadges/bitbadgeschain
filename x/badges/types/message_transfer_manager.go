@@ -9,11 +9,11 @@ const TypeMsgUpdateManager = "transfer_manager"
 
 var _ sdk.Msg = &MsgUpdateManager{}
 
-func NewMsgUpdateManager(creator string, collectionId sdk.Uint, address string) *MsgUpdateManager {
+func NewMsgUpdateManager(creator string, collectionId sdk.Uint, managerTimeline []*ManagerTimeline) *MsgUpdateManager {
 	return &MsgUpdateManager{
 		Creator:      creator,
 		CollectionId: collectionId,
-		Address:      address,
+		ManagerTimeline: managerTimeline,	
 	}
 }
 
@@ -43,10 +43,11 @@ func (msg *MsgUpdateManager) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
-
-	_, err = sdk.AccAddressFromBech32(msg.Address)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid provided address (%s)", err)
+	for _, timelineVal := range msg.ManagerTimeline {	
+		_, err = sdk.AccAddressFromBech32(timelineVal.Manager)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid provided address (%s)", err)
+		}
 	}
 
 	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {

@@ -48,21 +48,21 @@ message Transfer {
 message MsgNewCollection {
   // See collections.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
   string creator = 1; 
-  CollectionMetadata collectionMetadata = 2;
-  repeated BadgeMetadata badgeMetadata = 3;
-  OffChainBalancesMetadata offChainBalancesMetadata = 4;
-  string customData = 5;
+  repeated CollectionMetadataTimeline collectionMetadataTimeline = 2;
+  repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
+  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 4;
+  repeated CustomDataTimeline customDataTimeline = 5;
   string balancesType = 6 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
-  repeated InheritedBalance inheritedBalances = 7;
-  repeated CollectionApprovedTransfer approvedTransfers = 8;
+  repeated InheritedBalancesTimeline inheritedBalancesTimeline = 7;
+  repeated CollectionApprovedTransferTimeline approvedTransfersTimeline = 8;
   CollectionPermissions permissions = 9;
-  string standard = 10 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated StandardTimeline standardsTimeline = 10;
 
   //Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
   //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
   repeated Balance badgesToCreate = 11;
   repeated Transfer transfers = 12;
-  string contractAddress = 13;
+  repeated ContractAddressTimeline contractAddressTimeline = 13;
   repeated AddressMapping addressMappings = 14;
 }
 
@@ -91,11 +91,11 @@ message MsgMintAndDistributeBadges {
   repeated Balance badgesToCreate = 3;
 
   repeated Transfer transfers = 4;
-  repeated InheritedBalance inheritedBalances = 5;
-  CollectionMetadata collectionMetadata = 6; 
-  repeated BadgeMetadata badgeMetadata = 7;
-  OffChainBalancesMetadata offChainBalancesMetadata = 8;
-  repeated CollectionApprovedTransfer approvedTransfers = 9;
+  repeated InheritedBalancesTimeline inheritedBalancesTimeline = 5;
+  repeated CollectionMetadataTimeline collectionMetadataTimeline = 6; 
+  repeated BadgeMetadataTimeline badgeMetadataTimeline = 7;
+  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 8;
+  repeated CollectionApprovedTransferTimeline approvedTransfersTimeline = 9;
 
   repeated AddressMapping addressMappings = 10;
 }
@@ -121,7 +121,7 @@ message MsgUpdateCollectionApprovedTransfers {
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
     ];
-  repeated CollectionApprovedTransfer approvedTransfers = 3;
+  repeated CollectionApprovedTransferTimeline approvedTransfersTimeline = 3;
   repeated AddressMapping addressMappings = 4;
 }
 
@@ -146,11 +146,12 @@ message MsgUpdateMetadata {
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
     ];
-  CollectionMetadata collectionMetadata = 3; 
-  repeated BadgeMetadata badgeMetadata = 4;
-  OffChainBalancesMetadata offChainBalancesMetadata = 5;
-  string customData = 6;
-  string contractAddress = 7;
+  repeated CollectionMetadataTimeline collectionMetadataTimeline = 3; 
+  repeated BadgeMetadataTimeline badgeMetadataTimeline = 4;
+  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 5;
+  repeated CustomDataTimeline customDataTimeline = 6;
+  repeated ContractAddressTimeline contractAddressTimeline = 7;
+  repeated StandardTimeline standardsTimeline = 8;
 }
 
 message MsgUpdateMetadataResponse {}
@@ -187,7 +188,7 @@ message MsgUpdateManager {
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
     ];
-  string address = 3;
+  repeated ManagerTimeline managerTimeline = 3;
 }
 
 message MsgUpdateManagerResponse {}

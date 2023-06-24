@@ -11,7 +11,7 @@ import (
 func (k msgServer) UpdateUserPermissions(goCtx context.Context,  msg *types.MsgUpdateUserPermissions) (*types.MsgUpdateUserPermissionsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-  collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
+  _, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:       msg.Creator,
 		CollectionId:  msg.CollectionId,
 		MustBeManager: true,
@@ -24,13 +24,18 @@ func (k msgServer) UpdateUserPermissions(goCtx context.Context,  msg *types.MsgU
 	userBalance, found := k.Keeper.GetUserBalanceFromStore(ctx, balanceKey)
 	if !found {
 		userBalance = types.UserBalanceStore{
-			Permissions: types.UserPermissions{
-				CanUpdateApprovedTransfers: {
-					DefaultValues: types.DefaultValues{
-						PermittedTimes: []types.IdRange{},
-						ForbiddenTimes: []types.IdRange{},
+			Balances : []*types.Balance{},
+			ApprovedTransfers: []*types.UserApprovedTransfer{},
+			NextTransferTrackerId: sdk.NewUint(1),
+			Permissions: &types.UserPermissions{
+				CanUpdateApprovedTransfers: []*types.UserApprovedTransferPermission{
+					{
+						DefaultValues: &types.UserApprovedTransferDefaultValues{
+							PermittedTimes: []*types.IdRange{},
+							ForbiddenTimes: []*types.IdRange{},
+						},
+						Combinations: []*types.UserApprovedTransferCombination{{}},
 					},
-					Combinations: {},
 				},
 			},
 		}
@@ -43,7 +48,7 @@ func (k msgServer) UpdateUserPermissions(goCtx context.Context,  msg *types.MsgU
 
 	//iterate through the non-nil values
 	if msg.Permissions.CanUpdateApprovedTransfers != nil {
-		collection.Permissions.CanUpdateApprovedTransfers = msg.Permissions.CanUpdateApprovedTransfers
+		userBalance.Permissions.CanUpdateApprovedTransfers = msg.Permissions.CanUpdateApprovedTransfers
 	}
 
 	userBalance.Permissions = msg.Permissions

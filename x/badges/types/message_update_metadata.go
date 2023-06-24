@@ -9,19 +9,19 @@ const TypeMsgUpdateMetadata = "update_uris"
 
 var _ sdk.Msg = &MsgUpdateMetadata{}
 
-func NewMsgUpdateMetadata(creator string, collectionId sdk.Uint, collectionMetadata *CollectionMetadata, badgeMetadata []*BadgeMetadata, offChainBalancesMetadata *OffChainBalancesMetadata, customData string, contractAddress string) *MsgUpdateMetadata {
-	for _, badgeMetadata := range badgeMetadata {
-		badgeMetadata.BadgeIds = SortAndMergeOverlapping(badgeMetadata.BadgeIds)
-	}
+func NewMsgUpdateMetadata(creator string, collectionId sdk.Uint, collectionMetadataTimeline []*CollectionMetadataTimeline, badgeMetadataTimeline []*BadgeMetadataTimeline, offChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline, customDataTimeline []*CustomDataTimeline, contractAddressTimeline []*ContractAddressTimeline) *MsgUpdateMetadata {
+	// for _, badgeMetadata := range badgeMetadata {
+	// 	badgeMetadata.BadgeIds = SortAndMergeOverlapping(badgeMetadata.BadgeIds)
+	// }
 
 	return &MsgUpdateMetadata{
 		Creator:            creator,
 		CollectionId:       collectionId,
-		CollectionMetadata: collectionMetadata,
-		BadgeMetadata:      badgeMetadata,
-		OffChainBalancesMetadata:   offChainBalancesMetadata,
-		CustomData:         customData,
-		ContractAddress:    contractAddress,
+		CollectionMetadataTimeline: collectionMetadataTimeline,
+		BadgeMetadataTimeline:      badgeMetadataTimeline,
+		OffChainBalancesMetadataTimeline:   offChainBalancesMetadataTimeline,
+		CustomDataTimeline:         customDataTimeline,
+		ContractAddressTimeline:    contractAddressTimeline,
 	}
 }
 
@@ -52,24 +52,30 @@ func (msg *MsgUpdateMetadata) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.OffChainBalancesMetadata != nil {
-		err = ValidateURI(msg.OffChainBalancesMetadata.Uri)
-		if err != nil {
-			return err
+	if msg.OffChainBalancesMetadataTimeline != nil {
+		for _, timelineVal := range msg.OffChainBalancesMetadataTimeline {	
+			err = ValidateURI(timelineVal.OffChainBalancesMetadata.Uri)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	if msg.BadgeMetadata != nil && len(msg.BadgeMetadata) > 0 {
-		err = ValidateBadgeMetadata(msg.BadgeMetadata)
-		if err != nil {
-			return err
+	if msg.BadgeMetadataTimeline != nil && len(msg.BadgeMetadataTimeline) > 0 {
+		for _, timelineVal := range msg.BadgeMetadataTimeline {
+			err = ValidateBadgeMetadata(timelineVal.BadgeMetadata)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	if msg.CollectionMetadata != nil {
-		err = ValidateURI(msg.CollectionMetadata.Uri)
-		if err != nil {
-			return err
+	if msg.CollectionMetadataTimeline != nil {
+		for _, timelineVal := range msg.CollectionMetadataTimeline {
+			err = ValidateURI(timelineVal.CollectionMetadata.Uri)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
