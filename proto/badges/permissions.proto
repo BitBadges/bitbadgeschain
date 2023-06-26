@@ -13,6 +13,7 @@ message CollectionPermissions {
   repeated TimedUpdatePermission canArchive = 2;
   repeated TimedUpdatePermission canUpdateContractAddress = 3;
   repeated TimedUpdatePermission canUpdateOffChainBalancesMetadata = 4;
+  repeated TimedUpdatePermission canUpdateStandard = 12;
   
   repeated TimedUpdatePermission canUpdateCustomData = 5;
   repeated TimedUpdatePermission canUpdateManager = 6; 

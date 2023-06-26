@@ -46,6 +46,10 @@ func (k msgServer) UpdateCollectionPermissions(goCtx context.Context, msg *types
 		collection.Permissions.CanUpdateCustomData = msg.Permissions.CanUpdateCustomData
 	}
 
+	if msg.Permissions.CanUpdateStandard != nil {
+		collection.Permissions.CanUpdateStandard = msg.Permissions.CanUpdateStandard
+	}
+
 	if msg.Permissions.CanUpdateManager != nil {
 		collection.Permissions.CanUpdateManager = msg.Permissions.CanUpdateManager
 	}

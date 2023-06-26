@@ -199,9 +199,15 @@ func RemoveIdsFromIdRange(idxsToRemove *IdRange, rangeObject *IdRange) ([]*IdRan
 			End:   idxsToRemove.Start.SubUint64(1),
 		})
 
+		//get min of idxsToRemove.End and rangeObject.End
+		minEnd := idxsToRemove.End
+		if idxsToRemove.End.GT(rangeObject.End) {
+			minEnd = rangeObject.End
+		}
+
 		removedRanges = append(removedRanges, &IdRange{
 			Start: idxsToRemove.Start,
-			End:   rangeObject.End,
+			End:   minEnd,
 		})
 	}
 
@@ -213,8 +219,13 @@ func RemoveIdsFromIdRange(idxsToRemove *IdRange, rangeObject *IdRange) ([]*IdRan
 			End:   rangeObject.End,
 		})
 
+		maxStart := idxsToRemove.Start
+		if idxsToRemove.Start.LT(rangeObject.Start) {
+			maxStart = rangeObject.Start
+		}
+
 		removedRanges = append(removedRanges, &IdRange{
-			Start: rangeObject.Start,
+			Start: maxStart,
 			End:   idxsToRemove.End,
 		})
 	}

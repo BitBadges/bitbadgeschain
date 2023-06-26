@@ -16,7 +16,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 	k.IncrementNextCollectionId(ctx)
 
 	collection := types.BadgeCollection{
-		CollectionId:       NextCollectionId,
+		CollectionId:       				NextCollectionId,
 		CollectionMetadataTimeline: msg.CollectionMetadataTimeline,
 		OffChainBalancesMetadataTimeline:   msg.OffChainBalancesMetadataTimeline,
 		BadgeMetadataTimeline:      msg.BadgeMetadataTimeline,
@@ -47,26 +47,16 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 						Start: sdk.NewUint(0),
 						End:   sdk.NewUint(math.MaxUint64),
 					},
+				},
 			},
-		},
 		},
 		UnmintedSupplys:    []*types.Balance{},
 		TotalSupplys:         []*types.Balance{},
+		InheritedBalancesTimeline: msg.InheritedBalancesTimeline,
+		NextTransferTrackerId: sdk.NewUint(1),
 	}
 
-	//Check badge metadata for isFrozen logic
-	//TODO:
-	// err := AssertIsFrozenLogicIsMaintained([]*types.BadgeMetadata{}, collection.BadgeMetadata)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// err = AssertIsFrozenLogicForApprovedTransfers([]*types.CollectionApprovedTransfer{}, collection.ApprovedTransfers)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	if len(msg.BadgesToCreate) != 0 {
+	if len(msg.BadgesToCreate) > 0 {
 		err := *new(error)
 		collection, err = k.CreateBadges(ctx, collection, msg.BadgesToCreate, msg.Transfers, msg.Creator)
 		if err != nil {
@@ -74,6 +64,16 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		}
 	}
 
+	maxBadgeId := collection.NextBadgeId.Sub(sdk.NewUint(1))
+	for _, timelineVal := range msg.InheritedBalancesTimeline {
+		for _, inheritedBalance := range timelineVal.InheritedBalances {
+			for _, badgeId := range inheritedBalance.BadgeIds {
+				if badgeId.End.GT(maxBadgeId) {
+					return nil, ErrBadgeIdTooHigh
+				}
+			}
+		}
+	}
 
 	if err := k.SetCollectionInStore(ctx, collection); err != nil {
 		return nil, err

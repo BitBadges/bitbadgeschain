@@ -3,10 +3,79 @@ package keeper
 import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"math"
 )
 
+func (k Keeper) HandleTransfers(ctx sdk.Context, collection types.BadgeCollection, transfers []*types.Transfer, initiatedBy string) (error) {
+	//If "Mint" or "Manager" 
+	unmintedBalances := types.UserBalanceStore{
+		Balances: collection.UnmintedSupplys,
+	}
+	err := *new(error)
+
+	if initiatedBy == "Manager" {
+		initiatedBy = GetCurrentManager(ctx, collection)
+	}
+
+	for _, transfer := range transfers {
+		fromBalanceKey := ConstructBalanceKey(transfer.From, collection.CollectionId)
+		fromUserBalance := unmintedBalances
+		found := true
+		if transfer.From == "Manager" {
+			transfer.From = GetCurrentManager(ctx, collection)
+		} 
+		
+		if transfer.From != "Mint" {
+			fromUserBalance, found = k.GetUserBalanceFromStore(ctx, fromBalanceKey)
+			if !found {
+				return ErrUserBalanceNotExists
+			}
+		}
+		
+		for _, to := range transfer.ToAddresses {
+			if to == "Manager" {
+				to = GetCurrentManager(ctx, collection)
+			}
+
+			toBalanceKey := ConstructBalanceKey(to, collection.CollectionId)
+			toUserBalance, found := k.GetUserBalanceFromStore(ctx, toBalanceKey)
+			if !found {
+				toUserBalance = types.UserBalanceStore{
+					Balances : []*types.Balance{},
+					ApprovedTransfersTimeline: []*types.UserApprovedTransferTimeline{},
+					NextTransferTrackerId: sdk.NewUint(1),
+					Permissions: &types.UserPermissions{
+						CanUpdateApprovedTransfers: []*types.UserApprovedTransferPermission{},
+					},
+				}
+			}
+
+			for _, balance := range transfer.Balances {
+				amount := balance.Amount
+				fromUserBalance, toUserBalance, err = HandleTransfer(ctx, collection, balance.BadgeIds, balance.Times, fromUserBalance, toUserBalance, amount, transfer.From, to, initiatedBy)
+				if err != nil {
+					return err
+				}
+			}
+			
+			//TODO: solutions
+
+			if err := k.SetUserBalanceInStore(ctx, toBalanceKey, toUserBalance); err != nil {
+				return err
+			}
+		}
+
+		if err := k.SetUserBalanceInStore(ctx, fromBalanceKey, fromUserBalance); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // Forceful transfers will transfer the balances and deduct from approvals directly without adding it to pending.
-func HandleTransfer(ctx sdk.Context, collection types.BadgeCollection, badgeIds []*types.IdRange, fromUserBalance types.UserBalanceStore, toUserBalance types.UserBalanceStore, amount sdk.Uint, from string, to string, initiatedBy string) (types.UserBalanceStore, types.UserBalanceStore, error) {
+func HandleTransfer(ctx sdk.Context, collection types.BadgeCollection, badgeIds []*types.IdRange, times []*types.IdRange, fromUserBalance types.UserBalanceStore, toUserBalance types.UserBalanceStore, amount sdk.Uint, from string, to string, initiatedBy string) (types.UserBalanceStore, types.UserBalanceStore, error) {
 	// 1. Check if the from address is frozen
 	// 2. Remove approvals if initiatedBy != from and not managerApprovedTransfer
 	// 3. Deduct from "From" balance
@@ -19,18 +88,18 @@ func HandleTransfer(ctx sdk.Context, collection types.BadgeCollection, badgeIds 
 	}
 
 	if requiresApproval {
-		fromUserBalance, err = DeductApprovalsIfNeeded(ctx, fromUserBalance, collection, collection.CollectionId, badgeIds, from, to, initiatedBy, amount)
+		fromUserBalance, err = DeductApprovalsIfNeeded(ctx, &fromUserBalance, badgeIds, times, from, to, initiatedBy, amount)
 		if err != nil {
 			return types.UserBalanceStore{}, types.UserBalanceStore{}, err
 		}
 	}
 
-	fromUserBalance.Balances, err = SubtractBalancesForIdRanges(fromUserBalance.Balances, badgeIds, amount)
+	fromUserBalance.Balances, err = SubtractBalancesForIdRanges(fromUserBalance.Balances, badgeIds, times, amount)
 	if err != nil {
 		return types.UserBalanceStore{}, types.UserBalanceStore{}, err
 	}
 
-	toUserBalance.Balances, err = AddBalancesForIdRanges(toUserBalance.Balances, badgeIds, amount)
+	toUserBalance.Balances, err = AddBalancesForIdRanges(toUserBalance.Balances, badgeIds, times, amount)
 	if err != nil {
 		return types.UserBalanceStore{}, types.UserBalanceStore{}, err
 	}
@@ -39,40 +108,118 @@ func HandleTransfer(ctx sdk.Context, collection types.BadgeCollection, badgeIds 
 }
 
 // Deduct approvals from requester if requester != from
-func DeductApprovalsIfNeeded(ctx sdk.Context, UserBalance types.UserBalanceStore, collection types.BadgeCollection, collectionId sdk.Uint, badgeIds []*types.IdRange, from string, to string, requester string, amount sdk.Uint) (types.UserBalanceStore, error) {
-	return UserBalance, ErrNotImplemented
+func DeductApprovalsIfNeeded(ctx sdk.Context, userBalance *types.UserBalanceStore, badgeIds []*types.IdRange, times []*types.IdRange, from string, to string, requester string, amount sdk.Uint) (types.UserBalanceStore, error) {
+	//check all approvals, default disallow at the end unless from === initiator	
+	newUserBalance := userBalance
+	currApprovedTransfers := GetCurrentUserApprovedTransfers(ctx, userBalance)
+	newCurrApprovedTransfers := []*types.UserApprovedTransfer{}
+	for _, approvedTransfer := range currApprovedTransfers {
+		for _, allowedCombination := range approvedTransfer.AllowedCombinations {
+			badgeIds := approvedTransfer.BadgeIds
+			if allowedCombination.InvertBadgeIds {
+				badgeIds = types.InvertIdRanges(badgeIds, sdk.NewUint(math.MaxUint64))
+			}
 
-	//TODO:
+			times := approvedTransfer.TransferTimes
+			if allowedCombination.InvertTransferTimes {
+				times = types.InvertIdRanges(times, sdk.NewUint(uint64(ctx.BlockTime().UnixMilli())))
+			}
+
+			toMappingId := approvedTransfer.ToMappingId
+			if allowedCombination.InvertTo {
+				toMappingId = "!" + toMappingId
+			}
+
+			initiatedByMappingId := approvedTransfer.InitiatedByMappingId
+			if allowedCombination.InvertInitiatedBy {
+				initiatedByMappingId = "!" + initiatedByMappingId
+			}
+
+			newCurrApprovedTransfers = append(newCurrApprovedTransfers, &types.UserApprovedTransfer{
+				ToMappingId: toMappingId,
+				InitiatedByMappingId: initiatedByMappingId,
+				TransferTimes: times,
+				BadgeIds: badgeIds,
+				AllowedCombinations: []*types.IsTransferAllowed{
+					{
+						IsAllowed: allowedCombination.IsAllowed,
+					},
+				},
+				AmountRestrictions: approvedTransfer.AmountRestrictions,
+				TransferTrackerId: approvedTransfer.TransferTrackerId,
+				RequireToEqualsInitiatedBy: approvedTransfer.RequireToEqualsInitiatedBy,
+				RequireToDoesNotEqualInitiatedBy: approvedTransfer.RequireToDoesNotEqualInitiatedBy,
+			})
+		}
+	}
+
+
+	newCurrApprovedTransfers = append(newCurrApprovedTransfers, &types.UserApprovedTransfer{
+		//TODO:
+		ToMappingId: "", //everyone
+		InitiatedByMappingId: "", //only user address
+		TransferTimes: []*types.IdRange{
+			{
+				Start: sdk.NewUint(0),
+				End: sdk.NewUint(uint64(ctx.BlockTime().UnixMilli())),
+			},
+		},
+		BadgeIds: []*types.IdRange{
+			{
+				Start: sdk.NewUint(1),
+				End: sdk.NewUint(math.MaxUint64),
+			},
+		},
+		AllowedCombinations: []*types.IsTransferAllowed{
+			{
+				IsAllowed: true,
+			},
+		},
+		AmountRestrictions: []*types.AmountRestrictions{{}},
+		TransferTrackerId: sdk.NewUint(0), //TODO: think about this
+	})
 	
-	// newUserBalance := UserBalance
+	castedApprovedTransfers := CastUserApprovedTransferToUniversalPermission(newCurrApprovedTransfers)
+	firstMatches := types.GetFirstMatchOnly(castedApprovedTransfers) //but could be duplicate mapping IDs so we need to be careful here
 
-	// if from != requester {
-	// 	err := *new(error)
-	// 	idx, found := SearchApprovals(requester, newUserBalance.Approvals)
-	// 	if !found {
-	// 		return UserBalance, ErrApprovalForAddressDoesntExist
-	// 	}
+	unhandledBadgeIds := badgeIds
+	for _, match := range firstMatches {
+		//TODO: check if the match is valid
+		//check to and initiatedBy mapping IDs
+		_, timeFound := types.SearchIdRangesForId(sdk.NewUint(uint64(ctx.BlockTime().UnixMilli())), []*types.IdRange{match.TransferTime})
+		removedBadges := []*types.IdRange{}
+		
+		if timeFound { //TODO: add mapping id checks
+			unhandledBadgeIds, removedBadges = types.RemoveIdRangeFromIdRange([]*types.IdRange{match.BadgeId}, unhandledBadgeIds)
+			if len(removedBadges) > 0 {
+				//We have a valid match for at least some badges, procees to check restrictions
+				approvedTransfer := match.ArbitraryValue.(*types.UserApprovedTransfer)
+				isAllowed := approvedTransfer.AllowedCombinations[0].IsAllowed
+				if !isAllowed {
+					return types.UserBalanceStore{}, ErrInadequateApprovals
+				}
+				
+				transferTrackerId := approvedTransfer.TransferTrackerId
+				amountRestrictions := approvedTransfer.AmountRestrictions
+				requireToEqualsInitiatedBy := approvedTransfer.RequireToEqualsInitiatedBy
+				requireToDoesNotEqualInitiatedBy := approvedTransfer.RequireToDoesNotEqualInitiatedBy
 
-	// 	approval := newUserBalance.Approvals[idx]
-	// 	validTime := false
-	// 	for _, timeInterval := range approval.TimeIntervals {
-	// 		currTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-	// 		if currTime.GT(timeInterval.Start) && currTime.LT(timeInterval.End) {
-	// 			validTime = true
-	// 		}
-	// 	}
+				if requireToEqualsInitiatedBy && to != requester {
+					return types.UserBalanceStore{}, ErrInadequateApprovals
+				}
 
-	// 	if !validTime {
-	// 		return UserBalance, ErrInvalidTime
-	// 	}
+				if requireToDoesNotEqualInitiatedBy && to == requester {
+					return types.UserBalanceStore{}, ErrInadequateApprovals
+				}
 
-	// 	newUserBalance.Approvals, err = RemoveBalanceFromApproval(newUserBalance.Approvals, amount, requester, badgeIds)
-	// 	if err != nil {
-	// 		return UserBalance, err
-	// 	}
-	// }
+				//TODO: Check amount restrictions from transfertrackerId
 
-	// return newUserBalance, nil
+				
+			}
+		}
+	}
+
+	return newUserBalance, ErrInadequateApprovals
 }
 
 func CheckMappingAddresses(addressMapping *types.AddressMapping, addressToCheck string, managerAddress string) bool {

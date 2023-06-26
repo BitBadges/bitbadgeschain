@@ -187,12 +187,6 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 			}
 		}
 	}
-	
-	for _, timelineVal := range msg.StandardsTimeline {
-		if timelineVal.Standard == "" {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid standard")
-		}
-	}
 
 
 	return nil

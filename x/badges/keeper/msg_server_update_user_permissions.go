@@ -25,18 +25,10 @@ func (k msgServer) UpdateUserPermissions(goCtx context.Context,  msg *types.MsgU
 	if !found {
 		userBalance = types.UserBalanceStore{
 			Balances : []*types.Balance{},
-			ApprovedTransfers: []*types.UserApprovedTransfer{},
+			ApprovedTransfersTimeline: []*types.UserApprovedTransferTimeline{},
 			NextTransferTrackerId: sdk.NewUint(1),
 			Permissions: &types.UserPermissions{
-				CanUpdateApprovedTransfers: []*types.UserApprovedTransferPermission{
-					{
-						DefaultValues: &types.UserApprovedTransferDefaultValues{
-							PermittedTimes: []*types.IdRange{},
-							ForbiddenTimes: []*types.IdRange{},
-						},
-						Combinations: []*types.UserApprovedTransferCombination{{}},
-					},
-				},
+				CanUpdateApprovedTransfers: []*types.UserApprovedTransferPermission{},
 			},
 		}
 	}

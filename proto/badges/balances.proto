@@ -45,8 +45,5 @@ message MinMaxBalance {
   repeated IdRange badgeIds = 1;
   IdRange amount = 2;
   string time = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string collectionId = 4 [
-    (gogoproto.customtype) = "Uint", 
-    (gogoproto.nullable) = false
-  ];
+  string collectionId = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }

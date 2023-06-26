@@ -19,39 +19,44 @@ func (k msgServer) UpdateMetadata(goCtx context.Context, msg *types.MsgUpdateMet
 		return nil, err
 	}
 
-	// newCollectionMetadata, newBadgeMetadata, newOffChainBalancesMetadata, needToValidateUpdateCollectionMetadata, needToValidateUpdateBadgeMetadata, needToValidateUpdateBalanceUri := GetUrisToStoreAndPermissionsToCheck(collection, msg.CollectionMetadata, msg.BadgeMetadata, msg.OffChainBalancesMetadata)
+	if msg.CollectionMetadataTimeline != nil && len(msg.CollectionMetadataTimeline) > 0 {
+		if err := ValidateCollectionMetadataUpdate(ctx, collection.CollectionMetadataTimeline, msg.CollectionMetadataTimeline, collection.Permissions.CanUpdateCollectionMetadata); err != nil {
+			return nil, err
+		}
+		collection.CollectionMetadataTimeline = msg.CollectionMetadataTimeline
+	}
 
-	// _, err = k.UniversalValidate(ctx, UniversalValidationParams{
-	// 	Creator:                     msg.Creator,
-	// 	CollectionId:                msg.CollectionId,
-	// 	MustBeManager:               true,
-	// 	CanUpdateOffChainBalancesMetadata:   needToValidateUpdateBalanceUri,
-	// 	CanUpdateBadgeMetadata:      needToValidateUpdateBadgeMetadata,
-	// 	CanUpdateCollectionMetadata: needToValidateUpdateCollectionMetadata,
-	// 	CanUpdateContractAddress:    msg.ContractAddress != "" && collection.ContractAddress != msg.ContractAddress,
-	// 	CanUpdateCustomData:         msg.CustomData != "" && collection.CustomData != msg.CustomData,
-	// })
-	// if err != nil {
-	// 	return nil, err
-	// }
+	if msg.OffChainBalancesMetadataTimeline != nil && len(msg.OffChainBalancesMetadataTimeline) > 0 {
+		if collection.BalancesType != sdk.NewUint(1) {
+			return nil, ErrOffChainBalances
+		}
+		
+		if err := ValidateOffChainBalancesMetadataUpdate(ctx, collection.OffChainBalancesMetadataTimeline, msg.OffChainBalancesMetadataTimeline, collection.Permissions.CanUpdateOffChainBalancesMetadata); err != nil {
+			return nil, err
+		}
+		collection.OffChainBalancesMetadataTimeline = msg.OffChainBalancesMetadataTimeline
+	}
 
-	// //Check badge metadata for isFrozen logic
-	// err = AssertIsFrozenLogicIsMaintained(collection.BadgeMetadata, newBadgeMetadata)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	if msg.ContractAddressTimeline != nil && len(msg.ContractAddressTimeline) > 0 {
+		if err := ValidateContractAddressUpdate(ctx, collection.ContractAddressTimeline, msg.ContractAddressTimeline, collection.Permissions.CanUpdateContractAddress); err != nil {
+			return nil, err
+		}
+		collection.ContractAddressTimeline = msg.ContractAddressTimeline
+	}
 
-	// collection.BadgeMetadata = newBadgeMetadata
-	// collection.CollectionMetadata = newCollectionMetadata
-	// collection.OffChainBalancesMetadata = newOffChainBalancesMetadata
+	if msg.StandardsTimeline != nil && len(msg.StandardsTimeline) > 0 {
+		if err := ValidateStandardsUpdate(ctx, collection.StandardsTimeline, msg.StandardsTimeline, collection.Permissions.CanUpdateStandard); err != nil {
+			return nil, err
+		}
+		collection.StandardsTimeline = msg.StandardsTimeline
+	}
 
-	// if msg.ContractAddress != "" {
-	// 	collection.ContractAddress = msg.ContractAddress
-	// }
-
-	// if msg.CustomData != "" {
-	// 	collection.CustomData = msg.CustomData
-	// }
+	if msg.CustomDataTimeline != nil && len(msg.CustomDataTimeline) > 0 {
+		if err := ValidateCustomDataUpdate(ctx, collection.CustomDataTimeline, msg.CustomDataTimeline, collection.Permissions.CanUpdateCustomData); err != nil {
+			return nil, err
+		}
+		collection.CustomDataTimeline = msg.CustomDataTimeline
+	}
 
 	if err := k.SetCollectionInStore(ctx, collection); err != nil {
 		return nil, err

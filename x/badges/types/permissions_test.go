@@ -1438,6 +1438,8 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 		},
 	}
 
+	println("START")
+
 	err = types.ValidateTimedUpdateWithBadgeIdsPermissionUpdate([]*types.TimedUpdateWithBadgeIdsPermission{oldActionPermission}, []*types.TimedUpdateWithBadgeIdsPermission{newActionPermission, newActionPermission2})
 	require.Error(t, err)
 
@@ -1835,7 +1837,7 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 					End:    sdk.NewUint(100),
 				},
 			},
-			ToMappingId: "",
+			ToMappingId: "x",
 			FromMappingId: "dfsaf",
 			InitiatedByMappingId: "fdsjhksad",
 				PermittedTimes: []*types.IdRange{

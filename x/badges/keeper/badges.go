@@ -52,12 +52,16 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 
 	err := *new(error)
 
-	allBadgeIds := []*types.IdRange{}
+	detailsToCheck := []*types.UniversalPermissionDetails{}
 	for _, balanceObj := range supplysAndAmounts {
-		allBadgeIds = append(allBadgeIds, balanceObj.BadgeIds...)
+		for _, badgeIdRange := range balanceObj.BadgeIds {
+			detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
+				BadgeId: badgeIdRange,
+			})
+		}
 	}
 
-	err = CheckActionWithBadgeIdsPermission(ctx, allBadgeIds, collection.Permissions.CanCreateMoreBadges)
+	err = CheckActionWithBadgeIdsPermission(ctx, detailsToCheck, collection.Permissions.CanCreateMoreBadges)
 	if err != nil {
 		return types.BadgeCollection{}, err
 	}
@@ -76,12 +80,12 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 			}
 		}
 
-		totalSupplys, err = AddBalancesForIdRanges(totalSupplys, balance.BadgeIds,	balance.Amount)
+		totalSupplys, err = AddBalancesForIdRanges(totalSupplys, balance.BadgeIds, balance.Times, balance.Amount)
 		if err != nil {
 			return types.BadgeCollection{}, err
 		}
 
-		unmintedSupplys, err = AddBalancesForIdRanges(unmintedSupplys, balance.BadgeIds, balance.Amount)
+		unmintedSupplys, err = AddBalancesForIdRanges(unmintedSupplys, balance.BadgeIds, balance.Times, balance.Amount)
 		if err != nil {
 			return types.BadgeCollection{}, err
 		}
@@ -103,62 +107,16 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 		return types.BadgeCollection{}, err
 	}
 
-	if collection.BalancesType.LTE(sdk.NewUint(0)) {
-		collection, err = k.MintViaTransfer(ctx, collection, transfers)
+	if collection.BalancesType != sdk.NewUint(0) {
+		err = k.HandleTransfers(ctx, collection, transfers, "Manager")
 		if err != nil {
 			return types.BadgeCollection{}, err
 		}
 	} else {
-		//TODO: add approvedTransfers check here?
-		if len(transfers) > 0 {
+		if len(transfers) > 0 || len(collection.ApprovedTransfersTimeline) > 0 {
 			return types.BadgeCollection{}, ErrOffChainBalances
 		}
 	}
-
-	return collection, nil
-}
-
-func (k Keeper) MintViaTransfer(ctx sdk.Context, collection types.BadgeCollection, transfers []*types.Transfer) (types.BadgeCollection, error) {
-	//Treat the unminted balances as another account for compatibility with our transfer function
-	unmintedBalances := types.UserBalanceStore{
-		Balances: collection.UnmintedSupplys,
-	}
-
-	err := *new(error)
-	for _, transfer := range transfers {
-		for _, address := range transfer.ToAddresses {
-			recipientBalance := types.UserBalanceStore{}
-			hasBalance := k.StoreHasUserBalance(ctx, ConstructBalanceKey(address, collection.CollectionId))
-			if hasBalance {
-				recipientBalance, _ = k.GetUserBalanceFromStore(ctx, ConstructBalanceKey(address, collection.CollectionId))
-			}
-
-			for _, balanceObj := range transfer.Balances {
-				//Check if minting via transfer is allowed to this address
-				//ignore requiresApproval because we are minting
-				allowed, _ := IsTransferAllowed(ctx, balanceObj.BadgeIds, collection, "Mint", address, "Manager")
-				if !allowed {
-					return types.BadgeCollection{}, ErrMintNotAllowed
-				}
-
-				unmintedBalances.Balances, err = SubtractBalancesForIdRanges(unmintedBalances.Balances, balanceObj.BadgeIds, balanceObj.Amount)
-				if err != nil {
-					return types.BadgeCollection{}, err
-				}
-
-				recipientBalance.Balances, err = AddBalancesForIdRanges(recipientBalance.Balances, balanceObj.BadgeIds, balanceObj.Amount)
-				if err != nil {
-					return types.BadgeCollection{}, err
-				}
-			}
-
-			if err := k.SetUserBalanceInStore(ctx, ConstructBalanceKey(address, collection.CollectionId), recipientBalance); err != nil {
-				return types.BadgeCollection{}, err
-			}
-		}
-	}
-
-	collection.UnmintedSupplys = unmintedBalances.Balances
 
 	return collection, nil
 }

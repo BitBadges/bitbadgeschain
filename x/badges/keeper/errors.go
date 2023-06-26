@@ -75,4 +75,6 @@ var (
 	ErrCollectionIsArchived                         = sdkerrors.Register(types.ModuleName, 67, "collection is archived")
 	ErrApprovedTransfersMustBeFrozen                = sdkerrors.Register(types.ModuleName, 68, "allowed transfers must be frozen")
 	ErrNotImplemented															 = sdkerrors.Register(types.ModuleName, 69, "not implemented")
+	ErrBadgeIdTooHigh															 = sdkerrors.Register(types.ModuleName, 70, "badge id too high. for inherited balances, all badge ids specified must be less than the collection's next badge ID - 1.")
+	ErrInadequateApprovals													 = sdkerrors.Register(types.ModuleName, 71, "inadequate approvals")
 )

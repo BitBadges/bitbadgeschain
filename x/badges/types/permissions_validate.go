@@ -319,11 +319,18 @@ func ValidatePermissions(permissions *CollectionPermissions, canBeNil bool) erro
 		return ErrPermissionsIsNil
 	}
 
-	if !canBeNil && (permissions.CanUpdateBadgeMetadata != nil || permissions.CanUpdateManager != nil || permissions.CanUpdateCustomData != nil || permissions.CanUpdateCollectionMetadata != nil || permissions.CanCreateMoreBadges != nil || permissions.CanUpdateApprovedTransfers != nil || permissions.CanDeleteCollection != nil || permissions.CanUpdateOffChainBalancesMetadata != nil || permissions.CanUpdateContractAddress != nil || permissions.CanArchive != nil || permissions.CanUpdateInheritedBalances != nil) {
+	if !canBeNil && (permissions.CanUpdateBadgeMetadata != nil || permissions.CanUpdateManager != nil || permissions.CanUpdateStandard != nil || permissions.CanUpdateCustomData != nil || permissions.CanUpdateCollectionMetadata != nil || permissions.CanCreateMoreBadges != nil || permissions.CanUpdateApprovedTransfers != nil || permissions.CanDeleteCollection != nil || permissions.CanUpdateOffChainBalancesMetadata != nil || permissions.CanUpdateContractAddress != nil || permissions.CanArchive != nil || permissions.CanUpdateInheritedBalances != nil) {
 		return ErrPermissionsIsNil
 	}
+	
 	if permissions.CanUpdateCustomData != nil {
 		if err := ValidateTimedUpdatePermission(permissions.CanUpdateCustomData); err != nil {
+			return err
+		}
+	}
+
+	if permissions.CanUpdateStandard != nil {
+		if err := ValidateTimedUpdatePermission(permissions.CanUpdateStandard); err != nil {
 			return err
 		}
 	}

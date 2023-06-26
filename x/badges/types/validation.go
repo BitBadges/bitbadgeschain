@@ -164,7 +164,7 @@ func ValidateCollectionApprovedTransfer(collectionApprovedTransfer CollectionApp
 	for idx, allowedCombination := range collectionApprovedTransfer.AllowedCombinations {
 		for _, compCombination := range collectionApprovedTransfer.AllowedCombinations[idx+1:] {
 			if allowedCombination.InvertBadgeIds == compCombination.InvertBadgeIds &&
-				allowedCombination.InvertTimeIntervals == compCombination.InvertTimeIntervals &&
+				allowedCombination.InvertTransferTimes == compCombination.InvertTransferTimes &&
 				allowedCombination.InvertTo == compCombination.InvertTo &&
 				allowedCombination.InvertFrom == compCombination.InvertFrom &&
 				allowedCombination.InvertInitiatedBy == compCombination.InvertInitiatedBy {

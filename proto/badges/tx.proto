@@ -133,7 +133,7 @@ message MsgUpdateUserApprovedTransfers {
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
     ];
-  repeated UserApprovedTransfer approvedTransfers = 3;
+  repeated UserApprovedTransferTimeline approvedTransfersTimeline = 3;
   repeated AddressMapping addressMappings = 4;
 }
 
@@ -224,6 +224,7 @@ message MsgArchiveCollection {
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
     ];
+  repeated IsArchivedTimeline isArchivedTimeline = 3;
 }
 
 message MsgArchiveCollectionResponse {}

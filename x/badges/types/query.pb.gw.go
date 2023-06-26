@@ -67,9 +67,7 @@ func request_Query_GetCollection_0(ctx context.Context, marshaler runtime.Marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
-
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -96,9 +94,7 @@ func local_request_Query_GetCollection_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
-
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -125,9 +121,7 @@ func request_Query_GetClaimNumProcessed_0(ctx context.Context, marshaler runtime
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
-
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -138,9 +132,7 @@ func request_Query_GetClaimNumProcessed_0(ctx context.Context, marshaler runtime
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "claimId")
 	}
 
-	str, err = runtime.String(val)
-	protoReq.ClaimId = NewUintFromString(str)
-
+	protoReq.ClaimId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "claimId", err)
@@ -167,9 +159,7 @@ func local_request_Query_GetClaimNumProcessed_0(ctx context.Context, marshaler r
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
-
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -180,9 +170,7 @@ func local_request_Query_GetClaimNumProcessed_0(ctx context.Context, marshaler r
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "claimId")
 	}
 
-	str, err = runtime.String(val)
-	protoReq.ClaimId = NewUintFromString(str)
-
+	protoReq.ClaimId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "claimId", err)
@@ -209,9 +197,7 @@ func request_Query_IsClaimDataUsed_0(ctx context.Context, marshaler runtime.Mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
-
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -222,9 +208,7 @@ func request_Query_IsClaimDataUsed_0(ctx context.Context, marshaler runtime.Mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "claimId")
 	}
 
-	str, err = runtime.String(val)
-	protoReq.ClaimId = NewUintFromString(str)
-
+	protoReq.ClaimId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "claimId", err)
@@ -262,9 +246,7 @@ func local_request_Query_IsClaimDataUsed_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
-
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -275,9 +257,7 @@ func local_request_Query_IsClaimDataUsed_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "claimId")
 	}
 
-	str, err = runtime.String(val)
-	protoReq.ClaimId = NewUintFromString(str)
-
+	protoReq.ClaimId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "claimId", err)
@@ -315,9 +295,7 @@ func request_Query_GetBalance_0(ctx context.Context, marshaler runtime.Marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
-
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -355,9 +333,7 @@ func local_request_Query_GetBalance_0(ctx context.Context, marshaler runtime.Mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
-
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -395,8 +371,8 @@ func request_Query_GetAddressById_0(ctx context.Context, marshaler runtime.Marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.Id = NewUintFromString(str)
+	protoReq.Id, err = runtime.String(val)
+
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
@@ -422,8 +398,8 @@ func local_request_Query_GetAddressById_0(ctx context.Context, marshaler runtime
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.Id = NewUintFromString(str)
+	protoReq.Id, err = runtime.String(val)
+
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}

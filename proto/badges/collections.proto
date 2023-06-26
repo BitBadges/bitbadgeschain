@@ -56,7 +56,7 @@ message ContractAddressTimeline {
 }
 
 message StandardTimeline {
-  string standard = 1;
+  repeated string standards = 1;
   repeated IdRange times = 2;
 }
 

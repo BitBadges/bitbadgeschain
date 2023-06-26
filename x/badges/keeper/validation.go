@@ -16,8 +16,6 @@ type UniversalValidationParams struct {
 
 // Validates everything about the Msg is valid and returns (creatorNum, collection, permissions, error).
 func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationParams) (types.BadgeCollection, error) {
-	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-
 	if len(params.AccountsThatCantEqualCreator) > 0 {
 		for _, account := range params.AccountsThatCantEqualCreator {
 			if account == params.Creator {
@@ -32,27 +30,16 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationPar
 		return types.BadgeCollection{}, err
 	}
 
-
-	for _, timelineVal := range collection.IsArchivedTimeline {
-		idx, found := types.SearchIdRangesForId(blockTime, timelineVal.Times)
-		if found {
-			if timelineVal.IsArchived { 
-				return types.BadgeCollection{}, ErrCollectionIsArchived
-			} 
-			break
-		} 
+	isArchived := GetIsArchived(ctx, collection)
+	if isArchived {
+		return types.BadgeCollection{}, ErrCollectionIsArchived
 	}
 
 	// Assert all permissions
 	if params.MustBeManager {
-		for _, timelineVal := range collection.ManagerTimeline {
-			idx, found := types.SearchIdRangesForId(blockTime, timelineVal.Times)
-			if found {
-				if timelineVal.Manager != params.Creator {
-					return types.BadgeCollection{}, ErrSenderIsNotManager
-				}
-				break
-			}
+		currManager := GetCurrentManager(ctx, collection)
+		if currManager != params.Creator {
+			return types.BadgeCollection{}, ErrSenderIsNotManager
 		}
 	}
 

@@ -16,7 +16,7 @@ import (
 // 		return nil, ErrBadgeNotExists
 // 	}
 
-// 	if collection.BalancesType.LTE(sdk.NewUint(0)) {
+// 	if collection.BalancesType != sdk.NewUint(0) {
 // 		return nil, ErrOffChainBalances
 // 	}
 

@@ -10,10 +10,15 @@ import "badges/balances.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
+message UserApprovedTransferTimeline {
+  repeated UserApprovedTransfer approvedTransfers = 1;
+  repeated IdRange times = 2;
+}
+
 //Defines a user balance object for a badge w/ the user's balances and approvals. All badge IDs for a collection are handled within this object.
 message UserBalanceStore {
   repeated Balance balances = 1; //The user's balance for each badge ID.
-  repeated UserApprovedTransfer approvedTransfers = 2; //The user's approvals for each badge ID.
+  repeated UserApprovedTransferTimeline approvedTransfersTimeline = 2; //The user's approved transfers for each badge ID.
   string nextTransferTrackerId = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   UserPermissions permissions = 4;
 }
@@ -84,7 +89,7 @@ message AmountRestrictions {
 message IsTransferAllowed {
   bool invertTo = 2;
   bool invertInitiatedBy = 3;
-  bool invertTimeIntervals = 4;
+  bool invertTransferTimes = 4;
   bool invertBadgeIds = 5;
 
   bool isAllowed = 6;
@@ -103,10 +108,10 @@ message UserApprovedTransfer {
   repeated AmountRestrictions amountRestrictions = 7;
 
   //The transferTrackerId is used to track the number of transfers that have happened for this collection.
-  string transferTrackerId = 8 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string transferTrackerId = 6 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
   //Claim fields
-  // Claim claim = 8;
+  Claim claim = 8;
 
   //The rest of the fields are for handling transfers, if it is deemed allowed and has valid badgeIDs are for handling transfers, if it is deemed allowed and has valid badgeIDs.
   bool requireToEqualsInitiatedBy = 9;
@@ -117,7 +122,7 @@ message IsCollectionTransferAllowed {
   bool invertFrom = 1;
   bool invertTo = 2;
   bool invertInitiatedBy = 3;
-  bool invertTimeIntervals = 4;
+  bool invertTransferTimes = 4;
   bool invertBadgeIds = 5;
 
   bool isAllowed = 6;
