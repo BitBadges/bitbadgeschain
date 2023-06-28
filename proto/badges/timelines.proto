@@ -1,0 +1,61 @@
+syntax = "proto3";
+package bitbadges.bitbadgeschain.badges;
+
+import "google/protobuf/any.proto";
+import "badges/transfers.proto";
+import "badges/balances.proto";
+import "badges/permissions.proto";
+import "badges/metadata.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
+
+message CollectionMetadataTimeline {
+  CollectionMetadata collectionMetadata = 1;
+  repeated IdRange times = 2;
+}
+
+message BadgeMetadataTimeline {
+  repeated BadgeMetadata badgeMetadata = 1;
+  repeated IdRange times = 2;
+}
+
+message OffChainBalancesMetadataTimeline {
+  OffChainBalancesMetadata offChainBalancesMetadata = 1;
+  repeated IdRange times = 2;
+}
+
+message InheritedBalancesTimeline {
+  repeated InheritedBalance inheritedBalances = 1;
+  repeated IdRange times = 2;
+}
+
+message CustomDataTimeline {
+  string customData = 1;
+  repeated IdRange times = 2;
+}
+
+message ManagerTimeline {
+  string manager = 1;
+  repeated IdRange times = 2;
+}
+
+message CollectionApprovedTransferTimeline {
+  repeated CollectionApprovedTransfer approvedTransfers = 1;
+  repeated IdRange times = 2;
+}
+
+message IsArchivedTimeline {
+  bool isArchived = 1;
+  repeated IdRange times = 2;
+}
+
+message ContractAddressTimeline {
+  string contractAddress = 1;
+  repeated IdRange times = 2;
+}
+
+message StandardTimeline {
+  repeated string standards = 1;
+  repeated IdRange times = 2;
+}

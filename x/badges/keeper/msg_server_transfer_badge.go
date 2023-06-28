@@ -23,7 +23,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 		return nil, ErrOffChainBalances
 	}
 
-	if err := k.Keeper.HandleTransfers(ctx, collection, msg.Transfers, "Manager"); err != nil {
+	if err := k.Keeper.HandleTransfers(ctx, collection, msg.Transfers, "Manager", msg.OnlyDeductApprovals); err != nil {
 		return nil, err
 	}
 	

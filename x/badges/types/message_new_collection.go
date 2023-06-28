@@ -23,6 +23,8 @@ func NewMsgNewCollection(
 	contractAddressTimeline []*ContractAddressTimeline,
 	balancesType sdk.Uint,
 	inheritedBalancesTimeline []*InheritedBalancesTimeline,
+	defaultApprovedOutgoingTransfersTimeline []*UserApprovedOutgoingTransferTimeline,
+	defaultApprovedIncomingTransfersTimeline []*UserApprovedIncomingTransferTimeline,
 ) *MsgNewCollection {
 	// for _, transfer := range transfers {
 	// 	for _, balance := range transfer.Balances {
@@ -71,6 +73,9 @@ func NewMsgNewCollection(
 		ContractAddressTimeline: contractAddressTimeline,
 		BalancesType: balancesType,
 		InheritedBalancesTimeline: inheritedBalancesTimeline,
+
+		DefaultApprovedOutgoingTransfersTimeline: defaultApprovedOutgoingTransfersTimeline,
+		DefaultApprovedIncomingTransfersTimeline: defaultApprovedIncomingTransfersTimeline,
 	}
 }
 

@@ -5,10 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"math"
-
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
-
 
 //Assumes that these parameters are obtained from GetPotentialUpdatesForTimelineValues
 func GetUpdateCombinationsToCheck(
@@ -90,7 +87,7 @@ func GetPotentialUpdatesForTimelineValues(times [][]*types.IdRange, values []int
 func CheckNotForbidden(ctx sdk.Context, permission *types.UniversalPermissionDetails) error {
 	//Throw if we are in a forbidden time
 	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-	_, found := types.SearchIdRangesForId(blockTime, permission.ForbiddenTimes)
+	found := types.SearchIdRangesForId(blockTime, permission.ForbiddenTimes)
 	if found {
 		return ErrInvalidPermissions
 	}
@@ -122,7 +119,6 @@ func CheckTimedUpdatePermission(ctx sdk.Context, detailsToCheck []*types.Univers
 
 func CheckActionWithBadgeIdsPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.ActionWithBadgeIdsPermission) error {
 	castedPermissions := types.CastActionWithBadgeIdsPermissionToUniversalPermission(permissions)
-
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
 
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)

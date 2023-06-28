@@ -1,8 +1,9 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"math"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -665,36 +666,36 @@ func ValidateActionPermissionUpdate(oldPermissions []*ActionPermission, newPermi
 	return nil
 }
 
-func CastUserApprovedTransferPermissionToUniversalPermission(userApprovedTransferPermission []*UserApprovedTransferPermission) []*UniversalPermission {
+func CastUserApprovedTransferPermissionToUniversalPermission(UserApprovedTransferPermission []*UserApprovedTransferPermission) []*UniversalPermission {
 	castedPermissions := []*UniversalPermission{}
-	for _, userApprovedTransferPermission := range userApprovedTransferPermission {
+	for _, UserApprovedTransferPermission := range UserApprovedTransferPermission {
 		castedCombinations := []*UniversalCombination{}
-		for _, userApprovedTransferCombination := range userApprovedTransferPermission.Combinations {
+		for _, UserApprovedOutgoingTransferCombination := range UserApprovedTransferPermission.Combinations {
 			castedCombinations = append(castedCombinations, &UniversalCombination{
-				BadgeIdsOptions: userApprovedTransferCombination.BadgeIdsOptions,
-				PermittedTimesOptions: userApprovedTransferCombination.PermittedTimesOptions,
-				ForbiddenTimesOptions: userApprovedTransferCombination.ForbiddenTimesOptions,
-				TimelineTimesOptions: userApprovedTransferCombination.TimelineTimesOptions,
-				TransferTimesOptions: userApprovedTransferCombination.TransferTimesOptions,
-				ToMappingIdOptions: userApprovedTransferCombination.ToMappingIdOptions,
-				InitiatedByMappingIdOptions: userApprovedTransferCombination.InitiatedByMappingIdOptions,
+				BadgeIdsOptions: UserApprovedOutgoingTransferCombination.BadgeIdsOptions,
+				PermittedTimesOptions: UserApprovedOutgoingTransferCombination.PermittedTimesOptions,
+				ForbiddenTimesOptions: UserApprovedOutgoingTransferCombination.ForbiddenTimesOptions,
+				TimelineTimesOptions: UserApprovedOutgoingTransferCombination.TimelineTimesOptions,
+				TransferTimesOptions: UserApprovedOutgoingTransferCombination.TransferTimesOptions,
+				ToMappingIdOptions: UserApprovedOutgoingTransferCombination.ToMappingIdOptions,
+				InitiatedByMappingIdOptions: UserApprovedOutgoingTransferCombination.InitiatedByMappingIdOptions,
 			})
 		}
 
 		castedPermissions = append(castedPermissions, &UniversalPermission{
 			DefaultValues: &UniversalDefaultValues{
-				BadgeIds: userApprovedTransferPermission.DefaultValues.BadgeIds,
-				TimelineTimes: userApprovedTransferPermission.DefaultValues.TimelineTimes,
-				TransferTimes: userApprovedTransferPermission.DefaultValues.TransferTimes,
-				ToMappingId: userApprovedTransferPermission.DefaultValues.ToMappingId,
-				InitiatedByMappingId: userApprovedTransferPermission.DefaultValues.InitiatedByMappingId,
+				BadgeIds: UserApprovedTransferPermission.DefaultValues.BadgeIds,
+				TimelineTimes: UserApprovedTransferPermission.DefaultValues.TimelineTimes,
+				TransferTimes: UserApprovedTransferPermission.DefaultValues.TransferTimes,
+				ToMappingId: UserApprovedTransferPermission.DefaultValues.ToMappingId,
+				InitiatedByMappingId: UserApprovedTransferPermission.DefaultValues.InitiatedByMappingId,
 				UsesBadgeIds: true,
 				UsesTimelineTimes: true,
 				UsesTransferTimes: true,
 				UsesToMappingId: true,
 				UsesInitiatedByMappingId: true,
-				PermittedTimes: userApprovedTransferPermission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: userApprovedTransferPermission.DefaultValues.ForbiddenTimes,
+				PermittedTimes: UserApprovedTransferPermission.DefaultValues.PermittedTimes,
+				ForbiddenTimes: UserApprovedTransferPermission.DefaultValues.ForbiddenTimes,
 			},
 			Combinations: castedCombinations,
 		})
@@ -731,8 +732,14 @@ func ValidateUserPermissionsUpdate(oldPermissions *UserPermissions, newPermissio
 		return err
 	}
 
-	if oldPermissions.CanUpdateApprovedTransfers != nil && newPermissions.CanUpdateApprovedTransfers != nil {
-		if err := ValidateUserApprovedTransferPermissionsUpdate(oldPermissions.CanUpdateApprovedTransfers, newPermissions.CanUpdateApprovedTransfers); err != nil {
+	if oldPermissions.CanUpdateApprovedIncomingTransfers != nil && newPermissions.CanUpdateApprovedIncomingTransfers != nil {
+		if err := ValidateUserApprovedTransferPermissionsUpdate(oldPermissions.CanUpdateApprovedIncomingTransfers, newPermissions.CanUpdateApprovedIncomingTransfers); err != nil {
+			return err
+		}
+	}
+
+	if oldPermissions.CanUpdateApprovedOutgoingTransfers != nil && newPermissions.CanUpdateApprovedOutgoingTransfers != nil {
+		if err := ValidateUserApprovedTransferPermissionsUpdate(oldPermissions.CanUpdateApprovedOutgoingTransfers, newPermissions.CanUpdateApprovedOutgoingTransfers); err != nil {
 			return err
 		}
 	}

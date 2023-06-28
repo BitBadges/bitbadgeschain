@@ -1,34 +1,66 @@
 package keeper
 
 import (
-	"context"
-	"fmt"
-	"math"
-
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 //TODO: Clean and DRY
 
-func GetCurrentUserApprovedTransfers(ctx sdk.Context, userBalance *types.UserBalanceStore) []*types.UserApprovedTransfer {
+// type TimelineValue struct {
+// 	Times []*types.IdRange // Ranges of IDs for the timeline value
+// 	Value interface{}     // The actual value associated with the timeline
+// }
+
+// func GetCurrentTimelineValue(ctx sdk.Context, timeline interface{}) interface{} {
+// 	timelineSlice := reflect.ValueOf(timeline)
+// 	if timelineSlice.Kind() != reflect.Slice {
+// 		return nil
+// 	}
+
+// 	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
+// 	for i := 0; i < timelineSlice.Len(); i++ {
+// 		timelineValue := timelineSlice.Index(i).Interface().(TimelineValue)
+// 		found := types.SearchIdRangesForId(blockTime, timelineValue.Times)
+// 		if found {
+// 			return timelineValue.Value
+// 		}
+// 	}
+
+// 	return nil
+// }
+
+func GetCurrentUserApprovedIncomingTransfers(ctx sdk.Context, userBalance *types.UserBalanceStore) []*types.UserApprovedIncomingTransfer {
 	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-	approvedTransfersTimeline := userBalance.ApprovedTransfersTimeline
+	approvedTransfersTimeline := userBalance.ApprovedIncomingTransfersTimeline
 	for _, approvedTransfersTimelineVal := range approvedTransfersTimeline {
-		_, found := types.SearchIdRangesForId(blockTime, approvedTransfersTimelineVal.Times)
+		found := types.SearchIdRangesForId(blockTime, approvedTransfersTimelineVal.Times)
 		if found {
-			return approvedTransfersTimelineVal.ApprovedTransfers
+			return approvedTransfersTimelineVal.ApprovedIncomingTransfers
 		}
 	}
 
-	return []*types.UserApprovedTransfer{}
+	return []*types.UserApprovedIncomingTransfer{}
+}
+
+func GetCurrentUserApprovedOutgoingTransfers(ctx sdk.Context, userBalance *types.UserBalanceStore) []*types.UserApprovedOutgoingTransfer {
+	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
+	approvedTransfersTimeline := userBalance.ApprovedOutgoingTransfersTimeline
+	for _, approvedTransfersTimelineVal := range approvedTransfersTimeline {
+		found := types.SearchIdRangesForId(blockTime, approvedTransfersTimelineVal.Times)
+		if found {
+			return approvedTransfersTimelineVal.ApprovedOutgoingTransfers
+		}
+	}
+
+	return []*types.UserApprovedOutgoingTransfer{}
 }
 
 func GetCurrentManager(ctx sdk.Context, collection types.BadgeCollection) string {
 	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	managerTimeline := collection.ManagerTimeline
 	for _, managerTimelineVal := range managerTimeline {
-		_, found := types.SearchIdRangesForId(blockTime, managerTimelineVal.Times)
+		found := types.SearchIdRangesForId(blockTime, managerTimelineVal.Times)
 		if found {
 			return managerTimelineVal.Manager
 		}
@@ -41,7 +73,7 @@ func GetIsArchived(ctx sdk.Context, collection types.BadgeCollection) bool {
 	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	isArchivedTimeline := collection.IsArchivedTimeline
 	for _, isArchivedTimelineVal := range isArchivedTimeline {
-		_, found := types.SearchIdRangesForId(blockTime, isArchivedTimelineVal.Times)
+		found := types.SearchIdRangesForId(blockTime, isArchivedTimelineVal.Times)
 		if found {
 			return isArchivedTimelineVal.IsArchived
 		}
@@ -49,6 +81,20 @@ func GetIsArchived(ctx sdk.Context, collection types.BadgeCollection) bool {
 
 	return false
 }
+
+func GetCurrentCollectionApprovedTransfers(ctx sdk.Context, collection types.BadgeCollection) []*types.CollectionApprovedTransfer {
+	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
+	approvedTransfersTimeline := collection.ApprovedTransfersTimeline
+	for _, approvedTransfersTimelineVal := range approvedTransfersTimeline {
+		found := types.SearchIdRangesForId(blockTime, approvedTransfersTimelineVal.Times)
+		if found {
+			return approvedTransfersTimelineVal.ApprovedTransfers
+		}
+	}
+
+	return []*types.CollectionApprovedTransfer{}
+}
+
 
 func GetIsArchivedTimesAndValues(isArchivedTimeline []*types.IsArchivedTimeline) ([][]*types.IdRange, []interface{}) {
 	times := [][]*types.IdRange{}
@@ -70,12 +116,22 @@ func GetCollectionApprovedTransferTimesAndValues(approvedTransfers []*types.Coll
 	return times, values
 }
 
-func GetUserApprovedTransferTimesAndValues(approvedTransfers []*types.UserApprovedTransferTimeline) ([][]*types.IdRange, []interface{}) {
+func GetUserApprovedOutgoingTransferTimesAndValues(approvedTransfers []*types.UserApprovedOutgoingTransferTimeline) ([][]*types.IdRange, []interface{}) {
 	times := [][]*types.IdRange{}
 	values := []interface{}{}
 	for _, timelineVal := range approvedTransfers {
 		times = append(times, timelineVal.Times)
-		values = append(values, timelineVal.ApprovedTransfers)
+		values = append(values, timelineVal.ApprovedOutgoingTransfers)
+	}
+	return times, values
+}
+
+func GetUserApprovedIncomingTransferTimesAndValues(approvedTransfers []*types.UserApprovedIncomingTransferTimeline) ([][]*types.IdRange, []interface{}) {
+	times := [][]*types.IdRange{}
+	values := []interface{}{}
+	for _, timelineVal := range approvedTransfers {
+		times = append(times, timelineVal.Times)
+		values = append(values, timelineVal.ApprovedIncomingTransfers)
 	}
 	return times, values
 }

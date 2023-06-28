@@ -1,10 +1,10 @@
-package keeper 
+package keeper
 
 import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
-//For TimedUpdates that involve checking additonal information (i.e. TimedUpdateWithBadgeIds, CollectionApprovedTransfers, UserApprovedTransfers, etc.)
+//For TimedUpdates that involve checking additonal information (i.e. TimedUpdateWithBadgeIds, CollectionApprovedTransfers, UserApprovedIncomingTransfers, etc.)
 //We cast the values to a UniversalPermission struct, which is compatible with the permissions.go file in types
 //This allows us to easily check overlaps and get the correct permissions
 
@@ -64,7 +64,7 @@ func CastCollectionApprovedTransferToUniversalPermission(approvedTransfers []*ty
 	return castedPermissions
 }
 
-func CastUserApprovedTransferToUniversalPermission(approvedTransfers []*types.UserApprovedTransfer) []*types.UniversalPermission {
+func CastUserApprovedOutgoingTransferToUniversalPermission(approvedTransfers []*types.UserApprovedOutgoingTransfer) []*types.UniversalPermission {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, approvedTransfer := range approvedTransfers {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
@@ -72,6 +72,29 @@ func CastUserApprovedTransferToUniversalPermission(approvedTransfers []*types.Us
 				BadgeIds: approvedTransfer.BadgeIds,
 				TransferTimes: approvedTransfer.TransferTimes,
 				ToMappingId: approvedTransfer.ToMappingId,
+				InitiatedByMappingId: approvedTransfer.InitiatedByMappingId,
+				UsesBadgeIds: true,
+				UsesTransferTimes: true,
+				UsesToMappingId: true,
+				UsesInitiatedByMappingId: true,
+				ArbitraryValue: approvedTransfer,
+			},
+			Combinations: []*types.UniversalCombination{{}},
+		})
+	}
+	return castedPermissions
+}
+
+
+
+func CastUserApprovedIncomingTransferToUniversalPermission(approvedTransfers []*types.UserApprovedIncomingTransfer) []*types.UniversalPermission {
+	castedPermissions := []*types.UniversalPermission{}
+	for _, approvedTransfer := range approvedTransfers {
+		castedPermissions = append(castedPermissions, &types.UniversalPermission{
+			DefaultValues: &types.UniversalDefaultValues{
+				BadgeIds: approvedTransfer.BadgeIds,
+				TransferTimes: approvedTransfer.TransferTimes,
+				FromMappingId: approvedTransfer.FromMappingId,
 				InitiatedByMappingId: approvedTransfer.InitiatedByMappingId,
 				UsesBadgeIds: true,
 				UsesTransferTimes: true,

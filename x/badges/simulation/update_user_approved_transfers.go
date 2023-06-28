@@ -22,8 +22,8 @@ func SimulateMsgUpdateUserApprovedTransfers(
 			Creator: simAccount.Address.String(),
 		}
 
-		// TODO: Handling the UpdateUserApprovedTransfers simulation
+		// TODO: Handling the UpdateUserApprovedOutgoingTransfers simulation
 
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "UpdateUserApprovedTransfers simulation not implemented"), nil, nil
+		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "UpdateUserApprovedOutgoingTransfers simulation not implemented"), nil, nil
 	}
 }

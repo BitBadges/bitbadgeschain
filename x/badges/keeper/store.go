@@ -71,90 +71,6 @@ func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId sdk.Uint
 	store.Delete(collectionStoreKey(collectionId))
 }
 
-/****************************************CLAIMS****************************************/
-
-// Sets a user balance in the store using ClaimKey ([]byte{0x02}) as the prefix. No check if store has key already.
-func (k Keeper) SetClaimInStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint, Claim types.Claim) error {
-	marshaled_claim_info, err := k.cdc.Marshal(&Claim)
-	if err != nil {
-		return sdkerrors.Wrap(err, "Marshal types.Claim failed")
-	}
-
-	store := ctx.KVStore(k.storeKey)
-	claimKey := ConstructClaimKey(collectionId, claimId)
-	store.Set(claimStoreKey(claimKey), marshaled_claim_info)
-	return nil
-}
-
-// Sets a user balance in the store using ClaimKey ([]byte{0x02}) as the prefix. No check if store has key already.
-func (k Keeper) SetClaimInStoreWithKey(ctx sdk.Context, claimKey string, Claim types.Claim) error {
-	marshaled_claim_info, err := k.cdc.Marshal(&Claim)
-	if err != nil {
-		return sdkerrors.Wrap(err, "Marshal types.Claim failed")
-	}
-
-	store := ctx.KVStore(k.storeKey)
-	store.Set(claimStoreKey(claimKey), marshaled_claim_info)
-	return nil
-}
-
-// Gets a user balance from the store according to the balanceID.
-func (k Keeper) GetClaimFromStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint) (types.Claim, bool) {
-	store := ctx.KVStore(k.storeKey)
-	claimKey := ConstructClaimKey(collectionId, claimId)
-	marshaled_claim_info := store.Get(claimStoreKey(claimKey))
-
-	var Claim types.Claim
-	if len(marshaled_claim_info) == 0 {
-		return Claim, false
-	}
-	k.cdc.MustUnmarshal(marshaled_claim_info, &Claim)
-	return Claim, true
-}
-
-// GetClaimsFromStore defines a method for returning all user balances information by key.
-func (k Keeper) GetClaimsFromStore(ctx sdk.Context) (claims []*types.Claim, collectionIds []sdk.Uint, claimIds []sdk.Uint) {
-	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, ClaimKey)
-	defer iterator.Close()
-	for ; iterator.Valid(); iterator.Next() {
-		var Claim types.Claim
-		k.cdc.MustUnmarshal(iterator.Value(), &Claim)
-		claims = append(claims, &Claim)
-
-		claimKeyDetails := GetDetailsFromClaimKey(string(iterator.Key()))
-		collectionIds = append(collectionIds, claimKeyDetails.collectionId)
-		claimIds = append(claimIds, claimKeyDetails.claimId)
-	}
-	return
-}
-
-// GetClaimIdsFromStore defines a method for returning all keys of all user balances.
-func (k Keeper) GetClaimIdsFromStore(ctx sdk.Context) (ids []string) {
-	store := ctx.KVStore(k.storeKey)
-
-	iterator := sdk.KVStorePrefixIterator(store, ClaimKey)
-	defer iterator.Close()
-	for ; iterator.Valid(); iterator.Next() {
-		ids = append(ids, string(iterator.Key()))
-	}
-	return
-}
-
-// StoreHasClaimID determines whether the specified user balanceID exists in the store
-func (k Keeper) StoreHasClaim(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint) bool {
-	store := ctx.KVStore(k.storeKey)
-	claimKey := ConstructClaimKey(collectionId, claimId)
-	return store.Has(claimStoreKey(claimKey))
-}
-
-// DeleteClaimFromStore deletes a user balance from the store.
-func (k Keeper) DeleteClaimFromStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint) {
-	store := ctx.KVStore(k.storeKey)
-	claimKey := ConstructClaimKey(collectionId, claimId)
-	store.Delete(claimStoreKey(claimKey))
-}
-
 /****************************************USER BALANCES****************************************/
 
 // Sets a user balance in the store using UserBalanceKey ([]byte{0x02}) as the prefix. No check if store has key already.
@@ -318,9 +234,9 @@ func (k Keeper) IncrementNumUsedForClaimInStore(ctx sdk.Context, collectionId sd
 	return incrementedNum, nil
 }
 
-func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint, challengeId sdk.Uint, leafIndex sdk.Uint) (sdk.Uint, error) {
+func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionId sdk.Uint, challengeId string, leafIndex sdk.Uint, collection bool, userOutgoing bool, userIncoming bool) (sdk.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
-	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, claimId, challengeId, leafIndex)))
+	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex, collection, userOutgoing, userIncoming)))
 	curr := sdk.NewUint(0)
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
@@ -331,7 +247,7 @@ func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionI
 		curr = sdk.NewUint(currUint)
 	}
 	incrementedNum := curr.AddUint64(1)
-	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, claimId, challengeId, leafIndex)), []byte(curr.Incr().String()))
+	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex, collection, userOutgoing, userIncoming)), []byte(curr.Incr().String()))
 	return incrementedNum, nil
 }
 
@@ -367,4 +283,99 @@ func (k Keeper) IncrementNumUsedForWhitelistIndexInStore(ctx sdk.Context, collec
 	incrementedNum := curr.AddUint64(1)
 	store.Set(usedWhitelistIndexStoreKey(ConstructUsedWhitelistIndexKey(collectionId, claimId, whitelistLeafIndex)), []byte(curr.Incr().String()))
 	return incrementedNum, nil
+}
+
+
+/****************************************ADDRESS MAPPINGS****************************************/
+
+func (k Keeper) SetAddressMappingInStore(ctx sdk.Context, addressMapping types.AddressMapping) error {
+	marshaled_address_mapping, err := k.cdc.Marshal(&addressMapping)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Marshal types.AddressMapping failed")
+	}
+
+	store := ctx.KVStore(k.storeKey)
+	store.Set(addressMappingStoreKey(addressMapping.MappingId), marshaled_address_mapping)
+	return nil
+}
+
+func (k Keeper) GetAddressMappingFromStore(ctx sdk.Context, addressMappingId string) (types.AddressMapping, bool) {
+	store := ctx.KVStore(k.storeKey)
+	marshaled_address_mapping := store.Get(addressMappingStoreKey(addressMappingId))
+
+	var addressMapping types.AddressMapping
+	if len(marshaled_address_mapping) == 0 {
+		return addressMapping, false
+	}
+	k.cdc.MustUnmarshal(marshaled_address_mapping, &addressMapping)
+	return addressMapping, true
+}
+
+func (k Keeper) GetAddressMappingsFromStore(ctx sdk.Context) (addressMappings []*types.AddressMapping) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, AddressMappingKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var addressMapping types.AddressMapping
+		k.cdc.MustUnmarshal(iterator.Value(), &addressMapping)
+		addressMappings = append(addressMappings, &addressMapping)
+	}
+	return
+}
+
+func (k Keeper) StoreHasAddressMapping(ctx sdk.Context, addressMappingId string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(addressMappingStoreKey(addressMappingId))
+}
+
+func (k Keeper) DeleteAddressMappingFromStore(ctx sdk.Context, addressMappingId string) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(addressMappingStoreKey(addressMappingId))
+}
+
+/****************************************TRANSFER TRACKERS****************************************/
+
+func (k Keeper) SetTransferTrackerInStore(ctx sdk.Context, collectionId sdk.Uint, transferTracker types.ApprovalsTracker, collection bool, userOutgoing bool, userIncoming bool, address string) error {
+	marshaled_transfer_tracker, err := k.cdc.Marshal(&transferTracker)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Marshal types.ApprovalsTracker failed")
+	}
+
+	store := ctx.KVStore(k.storeKey)
+	store.Set(transferTrackerStoreKey(ConstructTransferTrackerKey(collectionId, transferTracker.TrackerId, collection, userOutgoing, userIncoming, address)), marshaled_transfer_tracker)
+	return nil
+}
+
+func (k Keeper) GetTransferTrackerFromStore(ctx sdk.Context, collectionId sdk.Uint, trackerId string, collection bool, userOutgoing bool, userIncoming bool, address string) (types.ApprovalsTracker, bool) {
+	store := ctx.KVStore(k.storeKey)
+	marshaled_transfer_tracker := store.Get(transferTrackerStoreKey(ConstructTransferTrackerKey(collectionId, trackerId, collection, userOutgoing, userIncoming, address)))
+
+	var transferTracker types.ApprovalsTracker
+	if len(marshaled_transfer_tracker) == 0 {
+		return transferTracker, false
+	}
+	k.cdc.MustUnmarshal(marshaled_transfer_tracker, &transferTracker)
+	return transferTracker, true
+}
+
+func (k Keeper) GetTransferTrackersFromStore(ctx sdk.Context) (transferTrackers []*types.ApprovalsTracker) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, TransferTrackerKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var transferTracker types.ApprovalsTracker
+		k.cdc.MustUnmarshal(iterator.Value(), &transferTracker)
+		transferTrackers = append(transferTrackers, &transferTracker)
+	}
+	return
+}
+
+func (k Keeper) StoreHasTransferTracker(ctx sdk.Context, collectionId sdk.Uint, trackerId string, collection bool, userOutgoing bool, userIncoming bool, address string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(transferTrackerStoreKey(ConstructTransferTrackerKey(collectionId, trackerId, collection, userOutgoing, userIncoming, address)))
+}
+
+func (k Keeper) DeleteTransferTrackerFromStore(ctx sdk.Context, collectionId sdk.Uint, trackerId string, collection bool, userOutgoing bool, userIncoming bool, address string) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(transferTrackerStoreKey(ConstructTransferTrackerKey(collectionId, trackerId, collection, userOutgoing, userIncoming, address)))
 }

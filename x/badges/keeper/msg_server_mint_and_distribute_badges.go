@@ -21,6 +21,12 @@ func (k msgServer) MintAndDistributeBadges(goCtx context.Context, msg *types.Msg
 		return nil, err
 	}
 
+	for _, addressMapping := range msg.AddressMappings {
+		if err := k.CreateAddressMapping(ctx, addressMapping); err != nil {
+			return nil, err
+		}
+	}
+
 	if msg.ApprovedTransfersTimeline != nil && len(msg.ApprovedTransfersTimeline) > 0 {
 		if collection.BalancesType != sdk.NewUint(0) {
 			return nil, ErrOffChainBalances

@@ -50103,7 +50103,7 @@ definitions:
       to permissions.ForcefulTransfers.
 
       Used to only need one signature for MsgNewBadge.
-  bitbadges.bitbadgeschain.badges.UserApprovedTransfer:
+  bitbadges.bitbadgeschain.badges.UserApprovedOutgoingTransfer:
     type: object
     properties:
       to:

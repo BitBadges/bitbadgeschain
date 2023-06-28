@@ -53,7 +53,14 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		UnmintedSupplys:    []*types.Balance{},
 		TotalSupplys:         []*types.Balance{},
 		InheritedBalancesTimeline: msg.InheritedBalancesTimeline,
-		NextTransferTrackerId: sdk.NewUint(1),
+		DefaultUserApprovedOutgoingTransfersTimeline: msg.DefaultApprovedOutgoingTransfersTimeline,
+		DefaultUserApprovedIncomingTransfersTimeline: msg.DefaultApprovedIncomingTransfersTimeline,
+	}
+
+	for _, addressMapping := range msg.AddressMappings {
+		if err := k.CreateAddressMapping(ctx, addressMapping); err != nil {
+			return nil, err
+		}
 	}
 
 	if len(msg.BadgesToCreate) > 0 {

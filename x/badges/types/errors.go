@@ -52,4 +52,6 @@ var (
 	ErrCombinationsIsNil	 = sdkerrors.Register(ModuleName, 1540, "permissions is deifned but permissions.combinations is nil")
 	ErrPermissionsIsNil	 = sdkerrors.Register(ModuleName, 1542, "permissions is nil")
 	ErrInvalidCombinations	 = sdkerrors.Register(ModuleName, 1541, "invalid permission combinations. you have specified duplicate combinations and because of the first match policy, the second combination will never be used. please remove the duplicate combinations")
+	ErrOverflow = sdkerrors.Register(ModuleName, 1543, "overflow")
+	ErrUnderflow = sdkerrors.Register(ModuleName, 1544, "underflow")
 )

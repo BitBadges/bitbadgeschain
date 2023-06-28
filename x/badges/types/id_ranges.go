@@ -14,8 +14,8 @@ func CreateIdRange(start sdk.Uint, end sdk.Uint) *IdRange {
 
 // Search ID ranges for a specific ID. Return (idx, true) if found. And (-1, false) if not.
 // Assumes ID ranges are sorted.
-func SearchIdRangesForId(id sdk.Uint, idRanges []*IdRange) (int, bool) {
-	idRanges = SortAndMergeOverlapping(idRanges) // Just in case
+func SearchIdRangesForId(id sdk.Uint, idRanges []*IdRange) bool {
+	idRanges = SortAndMergeOverlapping(idRanges) 
 
 	//Binary search because ID ranges will be sorted
 	low := 0
@@ -26,7 +26,7 @@ func SearchIdRangesForId(id sdk.Uint, idRanges []*IdRange) (int, bool) {
 		currRange := idRanges[median]
 
 		if currRange.Start.LTE(id) && currRange.End.GTE(id) {
-			return median, true
+			return true
 		} else if currRange.Start.GT(id) {
 			high = median - 1
 		} else {
@@ -34,129 +34,7 @@ func SearchIdRangesForId(id sdk.Uint, idRanges []*IdRange) (int, bool) {
 		}
 	}
 
-	return -1, false
-}
-
-// Search a set of ranges to find what indexes a specific ID range overlaps.
-// Return overlapping idxs as a IdRange, true if found. And empty IdRange, false if not
-// Inclusive (aka start and end idx will both have overlaps somewhere)
-func GetIdxSpanForRange(rangeToCheck *IdRange, currRanges []*IdRange) (*IdRange, bool) {
-	//Note GetIdxToInsertForNewId returns the index to insert at (i.e. the following idx)
-	//For start, this is what we want because we want the first non-overlapping range
-	//For end, we want the idx before (i.e. idx - 1) because that is the last overlapping range
-	idRanges := currRanges
-
-	startIdx, startFound := SearchIdRangesForId(rangeToCheck.Start, idRanges)
-	if !startFound {
-		startIdx, _ = GetIdxToInsertForNewId(rangeToCheck.Start, idRanges) //ignore error because we know it's not found
-	}
-
-	endIdx, endFound := SearchIdRangesForId(rangeToCheck.End, idRanges)
-	if !endFound {
-		endIdx, _ = GetIdxToInsertForNewId(rangeToCheck.End, idRanges) //ignore error because we know it's not found
-		endIdx--
-	}
-
-	if startIdx <= endIdx {
-		return &IdRange{
-			Start: sdk.NewUint(uint64(startIdx)),
-			End:   sdk.NewUint(uint64(endIdx)),
-		}, true
-	} else {
-		return &IdRange{}, false
-	}
-}
-
-// Assumes given ID is not already in a range. We recommend calling SearchIdRangesForId first.
-// Gets the index to insert at. Ex. [{0-10}, {10-20}, {30-40}] and inserting 25 would return index 2
-func GetIdxToInsertForNewId(id sdk.Uint, targetIds []*IdRange) (int, error) {
-	targetIds = SortAndMergeOverlapping(targetIds) // Just in case
-
-	_, found := SearchIdRangesForId(id, targetIds)
-	if found {
-		return -1, ErrIdInRange
-	}
-
-	//Since we assume the id is not already in there, we can just compare start positions of the existing idRanges
-	ids := targetIds
-	if len(ids) == 0 {
-		return 0, nil
-	}
-
-	// Check if id is before the first range or after the last range
-	if ids[0].Start.GT(id) {
-		return 0, nil
-	} else if ids[len(ids)-1].End.LT(id) {
-		return len(ids), nil
-	}
-
-	//If length == 1, then it should never reach here because we already checked if it's before or after
-	//and assume it's not in the range
-	if len(ids) == 1 {
-		return -1, ErrIdInRange //Should never reach here but just in case
-	}
-
-	//Binary search by looking at two ranges at a time [..., {curr}, {next}, ...]
-	low := 0
-	high := len(ids) - 2
-	median := 0
-	for low <= high {
-		median = int(uint(low+high) >> 1)
-		currRange := ids[median]
-		nextRange := ids[median+1]
-
-		//If id is in between curr and next, then we found the index to insert at
-		//Note that we assume id is not already in the range and sorted so can just check starts
-		if currRange.Start.LT(id) && nextRange.Start.GT(id) {
-			break
-		} else if currRange.Start.GT(id) {
-			high = median - 1
-		} else {
-			low = median + 1
-		}
-	}
-
-	//We return median + 1 because median == curr and we want to insert in between {curr} and {next}
-	return median + 1, nil
-}
-
-// Inserts a range into its correct position.
-// Assumes whole range is not present at all. Thus, we only search for where start fits in.
-func InsertRangeToIdRanges(rangeToAdd *IdRange, targetIds []*IdRange) ([]*IdRange, error) {
-	//Validation check; make sure rangeToAdd is not already in targetIds
-	for _, idRange := range targetIds {
-		_, removed := RemoveIdsFromIdRange(idRange, rangeToAdd)
-		if len(removed) > 0 {
-			return nil, ErrIdAlreadyInRanges
-		}
-	}
-
-	ids := targetIds
-	newIds := []*IdRange{}
-	insertIdAtIdx := 0
-	lastRange := ids[len(ids)-1]
-
-	err := *new(error)
-	//Three cases: Goes at beginning, end, or somewhere in the middle
-	if ids[0].Start.GT(rangeToAdd.End) {
-		newIds = append(newIds, CreateIdRange(rangeToAdd.Start, rangeToAdd.End))
-		newIds = append(newIds, ids...)
-	} else if lastRange.End.LT(rangeToAdd.Start) {
-		newIds = append(newIds, ids...)
-		newIds = append(newIds, CreateIdRange(rangeToAdd.Start, rangeToAdd.End))
-	} else {
-		insertIdAtIdx, err = GetIdxToInsertForNewId(rangeToAdd.Start, ids) //Only lookup start since we assume the whole range isn't included already
-		if err != nil {
-			return nil, err
-		}
-		newIds = append(newIds, ids[:insertIdAtIdx]...)
-		newIds = append(newIds, CreateIdRange(rangeToAdd.Start, rangeToAdd.End))
-		newIds = append(newIds, ids[insertIdAtIdx:]...)
-	}
-
-	newIds = SortAndMergeOverlapping(newIds)
-
-	return newIds, nil
+	return false
 }
 
 func InvertIdRanges(idRanges []*IdRange, maxId sdk.Uint) []*IdRange {
@@ -249,7 +127,7 @@ func RemoveIdRangeFromIdRange(idsToRemove []*IdRange, rangeToRemoveFrom []*IdRan
 		rangeToRemoveFrom = newRanges
 	}
 
-	return rangeToRemoveFrom, SortAndMergeOverlapping(removedRanges)
+	return rangeToRemoveFrom, removedRanges
 }
 
 func AssertRangeCompletelyOverlaps(rangeToCheck []*IdRange, overlappingRange []*IdRange) error {
@@ -282,8 +160,6 @@ func AssertRangeDoesNotOverlapAtAll(rangeToCheck []*IdRange, overlappingRange []
 	return nil
 }
 
-
-//IMPORTANT: Note this function was copied to the types validation.go file. If you change this, change that as well and vice versa.
 
 // Will sort the ID ranges in order and merge overlapping IDs if we can
 func SortAndMergeOverlapping(ids []*IdRange) []*IdRange {

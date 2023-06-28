@@ -1,9 +1,6 @@
 package keeper
 
 import (
-	"context"
-	"fmt"
-
 	proto "github.com/gogo/protobuf/proto"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -55,8 +52,12 @@ func ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTrans
 						newVal[i].RequireFromEqualsInitiatedBy != oldVal[i].RequireFromEqualsInitiatedBy ||
 						newVal[i].RequireToDoesNotEqualInitiatedBy != oldVal[i].RequireToDoesNotEqualInitiatedBy ||
 						newVal[i].RequireFromDoesNotEqualInitiatedBy != oldVal[i].RequireFromDoesNotEqualInitiatedBy ||
-						newVal[i].OverridesFromApprovedTransfers != oldVal[i].OverridesFromApprovedTransfers ||
-						newVal[i].TransferTrackerId != oldVal[i].TransferTrackerId {
+						newVal[i].OverridesFromApprovedOutgoingTransfers != oldVal[i].OverridesFromApprovedOutgoingTransfers ||
+						newVal[i].OverridesToApprovedIncomingTransfers != oldVal[i].OverridesToApprovedIncomingTransfers ||
+						newVal[i].TrackerId != oldVal[i].TrackerId ||
+						newVal[i].Uri != oldVal[i].Uri ||
+						newVal[i].CustomData != oldVal[i].CustomData ||
+						newVal[i].MaxNumTransfers != oldVal[i].MaxNumTransfers {
 							different = true
 							break
 					}
@@ -83,17 +84,17 @@ func ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTrans
 						}
 					}
 
-					if len(newVal[i].AmountRestrictions) != len(oldVal[i].AmountRestrictions) {
+					if len(newVal[i].Challenges) != len(oldVal[i].Challenges) {
 						different = true
 						break
 					} else {
-						for j := 0; j < len(newVal[i].AmountRestrictions); j++ {
-							x, err := proto.Marshal(newVal[i].AmountRestrictions[j])
+						for j := 0; j < len(newVal[i].Challenges); j++ {
+							x, err := proto.Marshal(newVal[i].Challenges[j])
 							if err != nil {
 								panic(err)
 							}
 
-							y, err := proto.Marshal(oldVal[i].AmountRestrictions[j])
+							y, err := proto.Marshal(oldVal[i].Challenges[j])
 							if err != nil {
 								panic(err)
 							}
@@ -105,12 +106,42 @@ func ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTrans
 						}
 					}
 
-					x, err := proto.Marshal(newVal[i].Claim)
+					x, err := proto.Marshal(newVal[i].Approvals)
 					if err != nil {
 						panic(err)
 					}
 
-					y, err := proto.Marshal(oldVal[i].Claim)
+					y, err := proto.Marshal(oldVal[i].Approvals)
+					if err != nil {
+						panic(err)
+					}
+
+					if string(x) != string(y) {
+						different = true
+						break
+					}
+
+					x, err = proto.Marshal(newVal[i].PerAddressApprovals)
+					if err != nil {
+						panic(err)
+					}
+
+					y, err = proto.Marshal(oldVal[i].PerAddressApprovals)
+					if err != nil {
+						panic(err)
+					}
+
+					if string(x) != string(y) {
+						different = true
+						break
+					}
+
+					x, err = proto.Marshal(newVal[i].PerAddressMaxNumTransfers)
+					if err != nil {
+						panic(err)
+					}
+
+					y, err = proto.Marshal(oldVal[i].PerAddressMaxNumTransfers)
 					if err != nil {
 						panic(err)
 					}
@@ -147,20 +178,20 @@ func ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTrans
 }
 
 
-func ValidateUserApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTransfers []*types.UserApprovedTransferTimeline, newApprovedTransfers []*types.UserApprovedTransferTimeline, canUpdateApprovedTransfers []*types.UserApprovedTransferPermission) error {
-	oldTimes, oldValues := GetUserApprovedTransferTimesAndValues(oldApprovedTransfers)
+func ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, oldApprovedTransfers []*types.UserApprovedOutgoingTransferTimeline, newApprovedTransfers []*types.UserApprovedOutgoingTransferTimeline, canUpdateApprovedTransfers []*types.UserApprovedTransferPermission) error {
+	oldTimes, oldValues := GetUserApprovedOutgoingTransferTimesAndValues(oldApprovedTransfers)
 	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
 
-	newTimes, newValues := GetUserApprovedTransferTimesAndValues(newApprovedTransfers)
+	newTimes, newValues := GetUserApprovedOutgoingTransferTimesAndValues(newApprovedTransfers)
 	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
 
-	detailsToCheck := GetUpdateCombinationsToCheck(oldTimelineFirstMatches, newTimelineFirstMatches, []*types.UserApprovedTransfer{}, func(oldValue interface{}, newValue interface{}) []*types.UniversalPermissionDetails {
+	detailsToCheck := GetUpdateCombinationsToCheck(oldTimelineFirstMatches, newTimelineFirstMatches, []*types.UserApprovedOutgoingTransfer{}, func(oldValue interface{}, newValue interface{}) []*types.UniversalPermissionDetails {
 		//Cast to UniversalPermissionDetails for comaptibility with these overlap functions and get first matches only (i.e. first match for each badge ID)
-		oldApprovedTransfers := oldValue.([]*types.UserApprovedTransfer)
-		firstMatchesForOld := types.GetFirstMatchOnly(CastUserApprovedTransferToUniversalPermission(oldApprovedTransfers))
+		oldApprovedTransfers := oldValue.([]*types.UserApprovedOutgoingTransfer)
+		firstMatchesForOld := types.GetFirstMatchOnly(CastUserApprovedOutgoingTransferToUniversalPermission(oldApprovedTransfers))
 
-		newApprovedTransfers := newValue.([]*types.UserApprovedTransfer)
-		firstMatchesForNew := types.GetFirstMatchOnly(CastUserApprovedTransferToUniversalPermission(newApprovedTransfers))
+		newApprovedTransfers := newValue.([]*types.UserApprovedOutgoingTransfer)
+		firstMatchesForNew := types.GetFirstMatchOnly(CastUserApprovedOutgoingTransferToUniversalPermission(newApprovedTransfers))
 
 		//For every badge, we need to check if the new provided value is different in any way from the old value for each badge ID
 		//The overlapObjects from GetOverlapsAndNonOverlaps will return which badge IDs overlap
@@ -170,17 +201,20 @@ func ValidateUserApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTransfers [
 			overlap := overlapObject.Overlap
 			oldDetails := overlapObject.FirstDetails
 			newDetails := overlapObject.SecondDetails
-			oldVal := oldDetails.ArbitraryValue.([]*types.UserApprovedTransfer)
-			newVal := newDetails.ArbitraryValue.([]*types.UserApprovedTransfer)
+			oldVal := oldDetails.ArbitraryValue.([]*types.UserApprovedOutgoingTransfer)
+			newVal := newDetails.ArbitraryValue.([]*types.UserApprovedOutgoingTransfer)
 			
 			different := false
 			if len(newVal) != len(oldVal) {
 				different = true
 			} else {
 				for i := 0; i < len(newVal); i++ {
-					if newVal[i].RequireToEqualsInitiatedBy != oldVal[i].RequireToEqualsInitiatedBy ||
+					if newVal[i].RequireToEqualsInitiatedBy != oldVal[i].RequireToEqualsInitiatedBy ||	
 						newVal[i].RequireToDoesNotEqualInitiatedBy != oldVal[i].RequireToDoesNotEqualInitiatedBy ||
-						newVal[i].TransferTrackerId != oldVal[i].TransferTrackerId {
+						newVal[i].TrackerId != oldVal[i].TrackerId ||
+						newVal[i].Uri != oldVal[i].Uri ||
+						newVal[i].CustomData != oldVal[i].CustomData ||
+						newVal[i].MaxNumTransfers != oldVal[i].MaxNumTransfers {
 							different = true
 							break
 					}
@@ -207,17 +241,17 @@ func ValidateUserApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTransfers [
 						}
 					}
 
-					if len(newVal[i].AmountRestrictions) != len(oldVal[i].AmountRestrictions) {
+					if len(newVal[i].Challenges) != len(oldVal[i].Challenges) {
 						different = true
 						break
 					} else {
-						for j := 0; j < len(newVal[i].AmountRestrictions); j++ {
-							x, err := proto.Marshal(newVal[i].AmountRestrictions[j])
+						for j := 0; j < len(newVal[i].Challenges); j++ {
+							x, err := proto.Marshal(newVal[i].Challenges[j])
 							if err != nil {
 								panic(err)
 							}
 
-							y, err := proto.Marshal(oldVal[i].AmountRestrictions[j])
+							y, err := proto.Marshal(oldVal[i].Challenges[j])
 							if err != nil {
 								panic(err)
 							}
@@ -229,22 +263,202 @@ func ValidateUserApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTransfers [
 						}
 					}
 
-					// x, err := proto.Marshal(newVal[i].Claim)
-					// if err != nil {
-					// 	panic(err)
-					// }
+					x, err := proto.Marshal(newVal[i].Approvals)
+					if err != nil {
+						panic(err)
+					}
 
-					// y, err := proto.Marshal(oldVal[i].Claim)
-					// if err != nil {
-					// 	panic(err)
-					// }
+					y, err := proto.Marshal(oldVal[i].Approvals)
+					if err != nil {
+						panic(err)
+					}
 
-					// if string(x) != string(y) {
-					// 	different = true
-					// 	break
-					// }
+					if string(x) != string(y) {
+						different = true
+						break
+					}
 
+					x, err = proto.Marshal(newVal[i].PerAddressApprovals)
+					if err != nil {
+						panic(err)
+					}
 
+					y, err = proto.Marshal(oldVal[i].PerAddressApprovals)
+					if err != nil {
+						panic(err)
+					}
+
+					if string(x) != string(y) {
+						different = true
+						break
+					}
+
+					x, err = proto.Marshal(newVal[i].PerAddressMaxNumTransfers)
+					if err != nil {
+						panic(err)
+					}
+
+					y, err = proto.Marshal(oldVal[i].PerAddressMaxNumTransfers)
+					if err != nil {
+						panic(err)
+					}
+
+					if string(x) != string(y) {
+						different = true
+						break
+					}
+				}
+			}
+				
+			if different {
+				detailsToReturn = append(detailsToReturn, overlap)
+			}
+		}
+
+		//If there are combinations in old but not new, then it is considered updated. If it is in new but not old, then it is considered updated.
+		detailsToReturn = append(detailsToReturn, inOldButNotNew...)
+		detailsToReturn = append(detailsToReturn, inNewButNotOld...)
+
+		return detailsToReturn
+	})
+
+	err := CheckUserApprovedTransferPermission(ctx, detailsToCheck, canUpdateApprovedTransfers)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, oldApprovedTransfers []*types.UserApprovedIncomingTransferTimeline, newApprovedTransfers []*types.UserApprovedIncomingTransferTimeline, canUpdateApprovedTransfers []*types.UserApprovedTransferPermission) error {
+	oldTimes, oldValues := GetUserApprovedIncomingTransferTimesAndValues(oldApprovedTransfers)
+	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
+
+	newTimes, newValues := GetUserApprovedIncomingTransferTimesAndValues(newApprovedTransfers)
+	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
+
+	detailsToCheck := GetUpdateCombinationsToCheck(oldTimelineFirstMatches, newTimelineFirstMatches, []*types.UserApprovedOutgoingTransfer{}, func(oldValue interface{}, newValue interface{}) []*types.UniversalPermissionDetails {
+		//Cast to UniversalPermissionDetails for comaptibility with these overlap functions and get first matches only (i.e. first match for each badge ID)
+		oldApprovedTransfers := oldValue.([]*types.UserApprovedIncomingTransfer)
+		firstMatchesForOld := types.GetFirstMatchOnly(CastUserApprovedIncomingTransferToUniversalPermission(oldApprovedTransfers))
+
+		newApprovedTransfers := newValue.([]*types.UserApprovedIncomingTransfer)
+		firstMatchesForNew := types.GetFirstMatchOnly(CastUserApprovedIncomingTransferToUniversalPermission(newApprovedTransfers))
+
+		//For every badge, we need to check if the new provided value is different in any way from the old value for each badge ID
+		//The overlapObjects from GetOverlapsAndNonOverlaps will return which badge IDs overlap
+		detailsToReturn := []*types.UniversalPermissionDetails{}
+		overlapObjects, inOldButNotNew, inNewButNotOld := types.GetOverlapsAndNonOverlaps(firstMatchesForOld, firstMatchesForNew)
+		for _, overlapObject := range overlapObjects {
+			overlap := overlapObject.Overlap
+			oldDetails := overlapObject.FirstDetails
+			newDetails := overlapObject.SecondDetails
+			oldVal := oldDetails.ArbitraryValue.([]*types.UserApprovedIncomingTransfer)
+			newVal := newDetails.ArbitraryValue.([]*types.UserApprovedIncomingTransfer)
+			
+			different := false
+			if len(newVal) != len(oldVal) {
+				different = true
+			} else {
+				for i := 0; i < len(newVal); i++ {
+					if newVal[i].RequireFromDoesNotEqualInitiatedBy != oldVal[i].RequireFromDoesNotEqualInitiatedBy ||	
+						newVal[i].RequireFromEqualsInitiatedBy != oldVal[i].RequireFromEqualsInitiatedBy ||
+						newVal[i].TrackerId != oldVal[i].TrackerId ||
+						newVal[i].Uri != oldVal[i].Uri ||
+						newVal[i].CustomData != oldVal[i].CustomData ||
+						newVal[i].MaxNumTransfers != oldVal[i].MaxNumTransfers {
+							different = true
+							break
+					}
+
+					if len(newVal[i].AllowedCombinations) != len(oldVal[i].AllowedCombinations) {
+						different = true
+						break
+					} else {
+						for j := 0; j < len(newVal[i].AllowedCombinations); j++ {
+							x, err := proto.Marshal(newVal[i].AllowedCombinations[j])
+							if err != nil {
+								panic(err)
+							}
+
+							y, err := proto.Marshal(oldVal[i].AllowedCombinations[j])
+							if err != nil {
+								panic(err)
+							}
+
+							if string(x) != string(y) {
+								different = true
+								break
+							}
+						}
+					}
+
+					if len(newVal[i].Challenges) != len(oldVal[i].Challenges) {
+						different = true
+						break
+					} else {
+						for j := 0; j < len(newVal[i].Challenges); j++ {
+							x, err := proto.Marshal(newVal[i].Challenges[j])
+							if err != nil {
+								panic(err)
+							}
+
+							y, err := proto.Marshal(oldVal[i].Challenges[j])
+							if err != nil {
+								panic(err)
+							}
+
+							if string(x) != string(y) {
+								different = true
+								break
+							}
+						}
+					}
+
+					x, err := proto.Marshal(newVal[i].Approvals)
+					if err != nil {
+						panic(err)
+					}
+
+					y, err := proto.Marshal(oldVal[i].Approvals)
+					if err != nil {
+						panic(err)
+					}
+
+					if string(x) != string(y) {
+						different = true
+						break
+					}
+
+					x, err = proto.Marshal(newVal[i].PerAddressApprovals)
+					if err != nil {
+						panic(err)
+					}
+
+					y, err = proto.Marshal(oldVal[i].PerAddressApprovals)
+					if err != nil {
+						panic(err)
+					}
+
+					if string(x) != string(y) {
+						different = true
+						break
+					}
+
+					x, err = proto.Marshal(newVal[i].PerAddressMaxNumTransfers)
+					if err != nil {
+						panic(err)
+					}
+
+					y, err = proto.Marshal(oldVal[i].PerAddressMaxNumTransfers)
+					if err != nil {
+						panic(err)
+					}
+
+					if string(x) != string(y) {
+						different = true
+						break
+					}
 				}
 			}
 				

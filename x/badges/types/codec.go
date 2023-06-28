@@ -1,10 +1,10 @@
 package types
 
 import (
-	"github.com/cosmos/cosmos-sdk/types/msgservice"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/msgservice"
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
@@ -18,7 +18,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgDeleteCollection{}, "badges/DeleteCollection", nil)
 	cdc.RegisterConcrete(&MsgArchiveCollection{}, "badges/ArchiveCollection", nil)
 	cdc.RegisterConcrete(&MsgForkCollection{}, "badges/ForkCollection", nil)
-	cdc.RegisterConcrete(&MsgUpdateUserApprovedTransfers{}, "badges/UpdateUserApprovedTransfers", nil)
+	cdc.RegisterConcrete(&MsgUpdateUserApprovedTransfers{}, "badges/UpdateUserApprovedOutgoingTransfers", nil)
 	cdc.RegisterConcrete(&MsgUpdateUserPermissions{}, "badges/UpdateUserPermissions", nil)
 // this line is used by starport scaffolding # 2
 }

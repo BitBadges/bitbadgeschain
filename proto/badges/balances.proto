@@ -14,11 +14,6 @@ message IdRange {
   string end = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
-message BadgeSupply {
-  string amount = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  repeated IdRange badgeIds = 2;
-}
-
 //Defines a balance object. The specified balance holds for all ids specified within the id ranges array.
 message Balance {
   string amount = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
@@ -44,6 +39,5 @@ message InheritedBalance {
 message MinMaxBalance {
   repeated IdRange badgeIds = 1;
   IdRange amount = 2;
-  string time = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string collectionId = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string collectionId = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }

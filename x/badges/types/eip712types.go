@@ -278,9 +278,9 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	// 		"MsgValue": {
 	// 			{Name: "creator", Type: "string"},
 	// 			{Name: "collectionId", Type: "uint64"},
-	// 			{Name: "approvedTransfers", Type: "UserApprovedTransfer[]"},
+	// 			{Name: "approvedTransfers", Type: "UserApprovedOutgoingTransfer[]"},
 	// 		},
-	// 		"UserApprovedTransfer": 			userApprovedTransferTypes,
+	// 		"UserApprovedOutgoingTransfer": 			UserApprovedOutgoingTransferTypes,
 	// 		"AddressMapping":           addressesTypes,
 	// 		"IdRange":                    idRangeTypes,
 	// 	}

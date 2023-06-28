@@ -6,75 +6,20 @@ import "badges/transfers.proto";
 import "badges/balances.proto";
 import "badges/permissions.proto";
 import "badges/metadata.proto";
+import "badges/timelines.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
-
-message CollectionMetadataTimeline {
-  CollectionMetadata collectionMetadata = 1;
-  repeated IdRange times = 2;
-}
-
-message BadgeMetadataTimeline {
-  repeated BadgeMetadata badgeMetadata = 1;
-  repeated IdRange times = 2;
-}
-
-message OffChainBalancesMetadataTimeline {
-  OffChainBalancesMetadata offChainBalancesMetadata = 1;
-  repeated IdRange times = 2;
-}
-
-message InheritedBalancesTimeline {
-  repeated InheritedBalance inheritedBalances = 1;
-  repeated IdRange times = 2;
-}
-
-message CustomDataTimeline {
-  string customData = 1;
-  repeated IdRange times = 2;
-}
-
-message ManagerTimeline {
-  string manager = 1;
-  repeated IdRange times = 2;
-}
-
-message CollectionApprovedTransferTimeline {
-  repeated CollectionApprovedTransfer approvedTransfers = 1;
-  repeated IdRange times = 2;
-}
-
-message IsArchivedTimeline {
-  bool isArchived = 1;
-  repeated IdRange times = 2;
-}
-
-message ContractAddressTimeline {
-  string contractAddress = 1;
-  repeated IdRange times = 2;
-}
-
-message StandardTimeline {
-  repeated string standards = 1;
-  repeated IdRange times = 2;
-}
 
 // BadgeCollection defines a standard collection of badges.
 message BadgeCollection {
   // The collectionId defines the unique identifier of the BadgeCollection classification, similar to the contract address of ERC721.
   // This is assigned by the chain itself. All ids start at 1 and increments by 1 each created collection.
-  string collectionId = 1 [
-    (gogoproto.customtype) = "Uint", 
-    (gogoproto.nullable) = false
-  ];
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
   //The parent collection id. If 0, then this is a root collection (i.e. not inherited from any parent collection).
   //If not 0, then this is a subcollection of the parent collection.
-  string parentCollectionId = 2 [
-    (gogoproto.customtype) = "Uint", 
-    (gogoproto.nullable) = false
-  ];
+  string parentCollectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
   // The URI where to fetch the collection's metadata.
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 3;
@@ -126,10 +71,11 @@ message BadgeCollection {
   // Subcollections will have a choice to inherit this setting or not.
   repeated IsArchivedTimeline isArchivedTimeline = 16;
 
-  string nextTransferTrackerId = 17 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-
   // The address of a contract that implements additional functionality for this collection.
   // Can point to a contract on another chain or on the BitBadges chain (depending on if it needs access to edit the collection or not).
   // Prefix with eth: for Ethereum. If no prefix, then it is assumed to be on the BitBadges chain.
-  repeated ContractAddressTimeline contractAddressTimeline = 18;
+  repeated ContractAddressTimeline contractAddressTimeline = 17;
+
+  repeated UserApprovedOutgoingTransferTimeline defaultUserApprovedOutgoingTransfersTimeline = 18; //The user's approved transfers for each badge ID.
+  repeated UserApprovedIncomingTransferTimeline defaultUserApprovedIncomingTransfersTimeline = 19; //The user's approved incoming transfers for each badge ID.
 }

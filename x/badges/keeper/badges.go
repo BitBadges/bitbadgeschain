@@ -108,7 +108,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 	}
 
 	if collection.BalancesType != sdk.NewUint(0) {
-		err = k.HandleTransfers(ctx, collection, transfers, "Manager")
+		err = k.HandleTransfers(ctx, collection, transfers, "Manager", false)
 		if err != nil {
 			return types.BadgeCollection{}, err
 		}

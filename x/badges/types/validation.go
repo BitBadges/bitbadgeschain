@@ -156,133 +156,134 @@ func ValidateAddressMapping(addressMapping AddressMapping, allowMintAddress bool
 
 func ValidateCollectionApprovedTransfer(collectionApprovedTransfer CollectionApprovedTransfer) error {
 	
-	approvalAmountsArr := collectionApprovedTransfer.AmountRestrictions
-	if approvalAmountsArr == nil {
-		return ErrAmountRestrictionsIsNil
-	}
+// 	approvalAmountsArr := collectionApprovedTransfer.AmountRestrictions
+// 	if approvalAmountsArr == nil {
+// 		return ErrAmountRestrictionsIsNil
+// 	}
 
-	for idx, allowedCombination := range collectionApprovedTransfer.AllowedCombinations {
-		for _, compCombination := range collectionApprovedTransfer.AllowedCombinations[idx+1:] {
-			if allowedCombination.InvertBadgeIds == compCombination.InvertBadgeIds &&
-				allowedCombination.InvertTransferTimes == compCombination.InvertTransferTimes &&
-				allowedCombination.InvertTo == compCombination.InvertTo &&
-				allowedCombination.InvertFrom == compCombination.InvertFrom &&
-				allowedCombination.InvertInitiatedBy == compCombination.InvertInitiatedBy {
-				return ErrInvalidCombinations
-			}
-		}
-	}
+// 	for idx, allowedCombination := range collectionApprovedTransfer.AllowedCombinations {
+// 		for _, compCombination := range collectionApprovedTransfer.AllowedCombinations[idx+1:] {
+// 			if allowedCombination.InvertBadgeIds == compCombination.InvertBadgeIds &&
+// 				allowedCombination.InvertTransferTimes == compCombination.InvertTransferTimes &&
+// 				allowedCombination.InvertTo == compCombination.InvertTo &&
+// 				allowedCombination.InvertFrom == compCombination.InvertFrom &&
+// 				allowedCombination.InvertInitiatedBy == compCombination.InvertInitiatedBy {
+// 				return ErrInvalidCombinations
+// 			}
+// 		}
+// 	}
 
-	for _, approvalAmounts := range approvalAmountsArr {
+// 	for _, approvalAmounts := range approvalAmountsArr {
 		
 		
-		if approvalAmounts != nil {
-			if err := ValidateRangesAreValid(approvalAmounts.BalancesTimes, true); err != nil {
-				return sdkerrors.Wrapf(err, "invalid balances times")
-			}
+// 		if approvalAmounts != nil {
+// 			if err := ValidateRangesAreValid(approvalAmounts.BalancesTimes, true); err != nil {
+// 				return sdkerrors.Wrapf(err, "invalid balances times")
+// 			}
 	
 			
-			if approvalAmounts.Amount.IsNil() {
-				return sdkerrors.Wrapf(ErrUintUnititialized, "amount is uninitialized")
-			}
+// 			if approvalAmounts.Amount.IsNil() {
+// 				return sdkerrors.Wrapf(ErrUintUnititialized, "amount is uninitialized")
+// 			}
 
-			if approvalAmounts.MaxNumTransfers.IsNil() {
-				return sdkerrors.Wrapf(ErrUintUnititialized, "max num transfers is uninitialized")
-			}
+// 			if approvalAmounts.MaxNumTransfers.IsNil() {
+// 				return sdkerrors.Wrapf(ErrUintUnititialized, "max num transfers is uninitialized")
+// 			}
 
-			if approvalAmounts.FromRestrictions != nil {
-				if approvalAmounts.FromRestrictions.AmountPerAddress.IsNil() {
-					return sdkerrors.Wrapf(ErrUintUnititialized, "amount per address is uninitialized")
-				}
+// 			if approvalAmounts.FromRestrictions != nil {
+// 				if approvalAmounts.FromRestrictions.AmountPerAddress.IsNil() {
+// 					return sdkerrors.Wrapf(ErrUintUnititialized, "amount per address is uninitialized")
+// 				}
 
-				if approvalAmounts.FromRestrictions.TransfersPerAddress.IsNil() {
-					return sdkerrors.Wrapf(ErrUintUnititialized, "transfers per address is uninitialized")
-				}
-			}
+// 				if approvalAmounts.FromRestrictions.TransfersPerAddress.IsNil() {
+// 					return sdkerrors.Wrapf(ErrUintUnititialized, "transfers per address is uninitialized")
+// 				}
+// 			}
 
-			if approvalAmounts.ToRestrictions != nil {
-				if approvalAmounts.ToRestrictions.AmountPerAddress.IsNil() {
-					return sdkerrors.Wrapf(ErrUintUnititialized, "amount per address is uninitialized")
-				}
+// 			if approvalAmounts.ToRestrictions != nil {
+// 				if approvalAmounts.ToRestrictions.AmountPerAddress.IsNil() {
+// 					return sdkerrors.Wrapf(ErrUintUnititialized, "amount per address is uninitialized")
+// 				}
 
-				if approvalAmounts.ToRestrictions.TransfersPerAddress.IsNil() {
-					return sdkerrors.Wrapf(ErrUintUnititialized, "transfers per address is uninitialized")
-				}
-			}
+// 				if approvalAmounts.ToRestrictions.TransfersPerAddress.IsNil() {
+// 					return sdkerrors.Wrapf(ErrUintUnititialized, "transfers per address is uninitialized")
+// 				}
+// 			}
 
-			if approvalAmounts.InitiatedByRestrictions != nil {
-				if approvalAmounts.InitiatedByRestrictions.AmountPerAddress.IsNil() {
-					return sdkerrors.Wrapf(ErrUintUnititialized, "amount per address is uninitialized")
-				}
+// 			if approvalAmounts.InitiatedByRestrictions != nil {
+// 				if approvalAmounts.InitiatedByRestrictions.AmountPerAddress.IsNil() {
+// 					return sdkerrors.Wrapf(ErrUintUnititialized, "amount per address is uninitialized")
+// 				}
 
-				if approvalAmounts.InitiatedByRestrictions.TransfersPerAddress.IsNil() {
-					return sdkerrors.Wrapf(ErrUintUnititialized, "transfers per address is uninitialized")
-				}
-			}
-		}
-	}
+// 				if approvalAmounts.InitiatedByRestrictions.TransfersPerAddress.IsNil() {
+// 					return sdkerrors.Wrapf(ErrUintUnititialized, "transfers per address is uninitialized")
+// 				}
+// 			}
+// 		}
+// 	}
 
-	if err := ValidateRangesAreValid(collectionApprovedTransfer.TransferTimes, false); err != nil {
-		return sdkerrors.Wrapf(err, "invalid transfer times")
-	}
+// 	if err := ValidateRangesAreValid(collectionApprovedTransfer.TransferTimes, false); err != nil {
+// 		return sdkerrors.Wrapf(err, "invalid transfer times")
+// 	}
 
-	if err := ValidateRangesAreValid(collectionApprovedTransfer.BadgeIds, false); err != nil {
-		return sdkerrors.Wrapf(err, "invalid badge ids")
-	}
+// 	if err := ValidateRangesAreValid(collectionApprovedTransfer.BadgeIds, false); err != nil {
+// 		return sdkerrors.Wrapf(err, "invalid badge ids")
+// 	}
 
-	if err := ValidateClaim(collectionApprovedTransfer.Claim); err != nil {
-		return sdkerrors.Wrapf(err, "invalid claim")
-	}
+// 	if err := ValidateClaim(collectionApprovedTransfer.Claim); err != nil {
+// 		return sdkerrors.Wrapf(err, "invalid claim")
+// 	}
 
-	if collectionApprovedTransfer.TransferTrackerId.IsNil() {
-		return sdkerrors.Wrapf(ErrUintUnititialized, "transfer tracker id is uninitialized")
-	}
+// 	if collectionApprovedTransfer.TransferTrackerId.IsNil() {
+// 		return sdkerrors.Wrapf(ErrUintUnititialized, "transfer tracker id is uninitialized")
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
-func ValidateClaim(claim *Claim) error {
-	err := *new(error)
+// func ValidateClaim(claim *Claim) error {
+// 	err := *new(error)
 
-	if claim.Uri != "" {
-		err = ValidateURI(claim.Uri)
-		if err != nil {
-			return err
-		}
-	}
+// 	if claim.Uri != "" {
+// 		err = ValidateURI(claim.Uri)
+// 		if err != nil {
+// 			return err
+// 		}
+// 	}
 
-	if claim.IncrementIdsBy.IsNil() {
-		return sdkerrors.Wrapf(ErrUintUnititialized, "increment ids by is uninitialized")
-	}
+// 	if claim.IncrementIdsBy.IsNil() {
+// 		return sdkerrors.Wrapf(ErrUintUnititialized, "increment ids by is uninitialized")
+// 	}
 
-	hasOrderMatters := false
-	for _, challenge := range claim.Challenges {
-		if challenge.ExpectedProofLength.IsNil() {
-			return sdkerrors.Wrapf(ErrUintUnititialized, "expected proof length is uninitialized")
-		}
+// 	hasOrderMatters := false
+// 	for _, challenge := range claim.Challenges {
+// 		if challenge.ExpectedProofLength.IsNil() {
+// 			return sdkerrors.Wrapf(ErrUintUnititialized, "expected proof length is uninitialized")
+// 		}
 
-		if challenge.UseLeafIndexForDistributionOrder {
-			if hasOrderMatters {
-				return ErrCanOnlyUseLeafIndexForBadgeIdsOnce
-			}
+// 		if challenge.UseLeafIndexForDistributionOrder {
+// 			if hasOrderMatters {
+// 				return ErrCanOnlyUseLeafIndexForBadgeIdsOnce
+// 			}
 
-			hasOrderMatters = true
-		}
+// 			hasOrderMatters = true
+// 		}
 
-		if !challenge.MaxOneUsePerLeaf && challenge.UseLeafIndexForDistributionOrder {
-			return ErrPrimaryChallengeMustBeOneUsePerLeaf
-		}
+// 		if !challenge.MaxOneUsePerLeaf && challenge.UseLeafIndexForDistributionOrder {
+// 			return ErrPrimaryChallengeMustBeOneUsePerLeaf
+// 		}
 
-		if !challenge.MaxOneUsePerLeaf && !challenge.UseCreatorAddressAsLeaf {
-			return ErrCanOnlyUseMaxOneUsePerLeafWithWhitelistTree
-		}
-	}
+// 		if !challenge.MaxOneUsePerLeaf && !challenge.UseCreatorAddressAsLeaf {
+// 			return ErrCanOnlyUseMaxOneUsePerLeafWithWhitelistTree
+// 		}
+// 	}
 
-	err = ValidateBalances(claim.StartAmounts)
-	if err != nil {
-		return sdkerrors.Wrapf(err, "invalid start amounts")
-	}
+// 	err = ValidateBalances(claim.StartAmounts)
+// 	if err != nil {
+// 		return sdkerrors.Wrapf(err, "invalid start amounts")
+// 	}
 
+// 	return nil
 	return nil
 }
 

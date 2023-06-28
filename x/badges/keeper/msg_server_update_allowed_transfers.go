@@ -25,6 +25,12 @@ func (k msgServer) UpdateCollectionApprovedTransfers(goCtx context.Context, msg 
 		return nil, ErrOffChainBalances
 	}
 
+	for _, addressMapping := range msg.AddressMappings {
+		if err := k.CreateAddressMapping(ctx, addressMapping); err != nil {
+			return nil, err
+		}
+	}
+
 	if err := ValidateCollectionApprovedTransfersUpdate(ctx, collection.ApprovedTransfersTimeline, msg.ApprovedTransfersTimeline, collection.Permissions.CanUpdateApprovedTransfers); err != nil {
 		return nil, err
 	}

@@ -28,7 +28,8 @@ message CollectionPermissions {
 }
 
 message UserPermissions {
-  repeated UserApprovedTransferPermission canUpdateApprovedTransfers = 1;
+  repeated UserApprovedTransferPermission canUpdateApprovedOutgoingTransfers = 1;
+  repeated UserApprovedTransferPermission canUpdateApprovedIncomingTransfers = 2;
 }
 
 message ValueOptions {
@@ -68,7 +69,7 @@ message CollectionApprovedTransferPermission {
   repeated CollectionApprovedTransferCombination combinations = 7;
 }
 
-message UserApprovedTransferCombination {
+message UserApprovedOutgoingTransferCombination {
   ValueOptions timelineTimesOptions = 1;
 
   ValueOptions toMappingIdOptions = 2;
@@ -80,7 +81,7 @@ message UserApprovedTransferCombination {
   ValueOptions forbiddenTimesOptions = 7;
 }
 
-message UserApprovedTransferDefaultValues {
+message UserApprovedOutgoingTransferDefaultValues {
   repeated IdRange timelineTimes = 1;
 
   string toMappingId = 2;
@@ -93,8 +94,8 @@ message UserApprovedTransferDefaultValues {
 }
 
 message UserApprovedTransferPermission {
-  UserApprovedTransferDefaultValues defaultValues = 1;
-  repeated UserApprovedTransferCombination combinations = 2;
+  UserApprovedOutgoingTransferDefaultValues defaultValues = 1;
+  repeated UserApprovedOutgoingTransferCombination combinations = 2;
 }
 
 message ActionWithBadgeIdsCombination {

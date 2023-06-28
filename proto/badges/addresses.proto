@@ -12,17 +12,15 @@ message AddressConditions {
   repeated MinMaxBalance mustOwnBadges = 1;
   repeated MinMaxBalance mustNotOwnBadges = 2;
 
-  //Note: Must avoid circular references
   repeated string mustBeManager = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
   repeated string mustNotBeManager = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
 
-  //Note: Must avoid circular references
   repeated string mustBeInMapping = 5;
   repeated string mustNotBeInMapping = 6;
 }
 
 message AddressFilters {
-  string mustSatisfyMinX = 1;
+  string mustSatisfyMinX = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
   repeated AddressConditions conditions = 2;
 }
 

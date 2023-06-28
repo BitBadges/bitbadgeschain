@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-    "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -11,7 +11,7 @@ import (
 func (k msgServer) UpdateUserPermissions(goCtx context.Context,  msg *types.MsgUpdateUserPermissions) (*types.MsgUpdateUserPermissionsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-  _, err := k.UniversalValidate(ctx, UniversalValidationParams{
+  collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:       msg.Creator,
 		CollectionId:  msg.CollectionId,
 		MustBeManager: true,
@@ -20,15 +20,22 @@ func (k msgServer) UpdateUserPermissions(goCtx context.Context,  msg *types.MsgU
 		return nil, err
 	}
 
+	for _, addressMapping := range msg.AddressMappings {
+		if err := k.CreateAddressMapping(ctx, addressMapping); err != nil {
+			return nil, err
+		}
+	}
+
 	balanceKey := ConstructBalanceKey(msg.Creator, msg.CollectionId)
 	userBalance, found := k.Keeper.GetUserBalanceFromStore(ctx, balanceKey)
 	if !found {
 		userBalance = types.UserBalanceStore{
 			Balances : []*types.Balance{},
-			ApprovedTransfersTimeline: []*types.UserApprovedTransferTimeline{},
-			NextTransferTrackerId: sdk.NewUint(1),
+			ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
+			ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,
 			Permissions: &types.UserPermissions{
-				CanUpdateApprovedTransfers: []*types.UserApprovedTransferPermission{},
+				CanUpdateApprovedIncomingTransfers: []*types.UserApprovedTransferPermission{},
+				CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedTransferPermission{},
 			},
 		}
 	}
@@ -39,8 +46,12 @@ func (k msgServer) UpdateUserPermissions(goCtx context.Context,  msg *types.MsgU
 	}
 
 	//iterate through the non-nil values
-	if msg.Permissions.CanUpdateApprovedTransfers != nil {
-		userBalance.Permissions.CanUpdateApprovedTransfers = msg.Permissions.CanUpdateApprovedTransfers
+	if msg.Permissions.CanUpdateApprovedIncomingTransfers != nil {
+		userBalance.Permissions.CanUpdateApprovedIncomingTransfers = msg.Permissions.CanUpdateApprovedIncomingTransfers
+	}
+
+	if msg.Permissions.CanUpdateApprovedOutgoingTransfers != nil {
+		userBalance.Permissions.CanUpdateApprovedOutgoingTransfers = msg.Permissions.CanUpdateApprovedOutgoingTransfers
 	}
 
 	userBalance.Permissions = msg.Permissions

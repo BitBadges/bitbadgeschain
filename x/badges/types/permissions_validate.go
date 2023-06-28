@@ -299,12 +299,18 @@ func ValidateUserPermissions(permissions *UserPermissions, canBeNil bool) error 
 		return ErrPermissionsIsNil
 	}
 	
-	if !canBeNil && (permissions.CanUpdateApprovedTransfers == nil) {
+	if !canBeNil && (permissions.CanUpdateApprovedIncomingTransfers != nil || permissions.CanUpdateApprovedOutgoingTransfers != nil) {
 		return ErrPermissionsIsNil
 	}
 
-	if permissions.CanUpdateApprovedTransfers != nil {
-		if err := ValidateUserApprovedTransferPermissions(permissions.CanUpdateApprovedTransfers); err != nil {
+	if permissions.CanUpdateApprovedIncomingTransfers != nil {
+		if err := ValidateUserApprovedTransferPermissions(permissions.CanUpdateApprovedIncomingTransfers); err != nil {
+			return err
+		}
+	}
+
+	if permissions.CanUpdateApprovedOutgoingTransfers != nil {
+		if err := ValidateUserApprovedTransferPermissions(permissions.CanUpdateApprovedOutgoingTransfers); err != nil {
 			return err
 		}
 	}

@@ -19,6 +19,12 @@ func (k msgServer) UpdateCollectionPermissions(goCtx context.Context, msg *types
 		return nil, err
 	}
 
+	for _, addressMapping := range msg.AddressMappings {
+		if err := k.CreateAddressMapping(ctx, addressMapping); err != nil {
+			return nil, err
+		}
+	}
+
 	
 	err = types.ValidatePermissionsUpdate(collection.Permissions, msg.Permissions, true)
 	if err != nil {

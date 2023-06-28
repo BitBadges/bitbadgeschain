@@ -12,10 +12,10 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdUpdateUserApprovedTransfers() *cobra.Command {
+func CmdUpdateUserApprovedOutgoingTransfers() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-user-approved-transfers",
-		Short: "Broadcast message updateUserApprovedTransfers",
+		Short: "Broadcast message updateUserApprovedOutgoingTransfers",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 

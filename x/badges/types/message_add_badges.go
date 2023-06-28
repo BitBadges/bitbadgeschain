@@ -21,11 +21,14 @@ func NewMsgMintAndDistributeBadges(
 	inheritedBalancesTimeline []*InheritedBalancesTimeline,
 	addressMappings []*AddressMapping,
 ) *MsgMintAndDistributeBadges {
+	err := *new(error)
 	for _, transfer := range transfers {
-		for _, balance := range transfer.Balances {
-			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+		transfer.Balances, err = HandleDuplicateBadgeIds(transfer.Balances)
+		if err != nil {
+			panic(err)
 		}
 	}
+
 	for _, timelineVal := range badgeMetadataTimeline {
 		for _, badgeMetadata := range timelineVal.BadgeMetadata {
 			badgeMetadata.BadgeIds = SortAndMergeOverlapping(badgeMetadata.BadgeIds)
@@ -43,8 +46,9 @@ func NewMsgMintAndDistributeBadges(
 		}
 	}
 
-	for _, badgeBalanceToCreate := range badgesToCreate {
-		badgeBalanceToCreate.BadgeIds = SortAndMergeOverlapping(badgeBalanceToCreate.BadgeIds)
+	badgesToCreate, err = HandleDuplicateBadgeIds(badgesToCreate)
+	if err != nil {
+		panic(err)
 	}
 
 	for _, timelineVal := range inheritedBalancesTimeline {

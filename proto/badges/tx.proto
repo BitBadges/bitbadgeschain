@@ -9,6 +9,7 @@ import "badges/metadata.proto";
 import "badges/collections.proto";
 import "gogoproto/gogo.proto";
 import "badges/addresses.proto";
+import "badges/timelines.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
@@ -18,7 +19,7 @@ service Msg {
   rpc MintAndDistributeBadges(MsgMintAndDistributeBadges) returns (MsgMintAndDistributeBadgesResponse);
   rpc TransferBadge(MsgTransferBadge) returns (MsgTransferBadgeResponse);
   rpc UpdateCollectionApprovedTransfers(MsgUpdateCollectionApprovedTransfers) returns (MsgUpdateCollectionApprovedTransfersResponse);
-  rpc UpdateUserApprovedTransfers(MsgUpdateUserApprovedTransfers) returns (MsgUpdateUserApprovedTransfersResponse);
+  rpc UpdateUserApprovedOutgoingTransfers(MsgUpdateUserApprovedTransfers) returns (MsgUpdateUserApprovedTransfersResponse);
   rpc UpdateMetadata(MsgUpdateMetadata) returns (MsgUpdateMetadataResponse);
   rpc UpdateCollectionPermissions(MsgUpdateCollectionPermissions) returns (MsgUpdateCollectionPermissionsResponse);
   rpc UpdateUserPermissions (MsgUpdateUserPermissions) returns (MsgUpdateUserPermissionsResponse);
@@ -31,8 +32,7 @@ service Msg {
 
 //The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
 
-//Upon badge creation, the manager will first be minted these badges, and then, they will subsequently be transferred to these addresses according to permissions.ForcefulTransfers.
-//Used to only need one signature for MsgNewBadge.
+
 message Transfer {
   string from = 1;
   repeated string toAddresses = 2;
@@ -42,7 +42,6 @@ message Transfer {
   //It is the Tx Sender's responsibility to ensure that the solutions are valid for all potential challenges.
   //If you are attempting to claim badges with different sets of challenges, you will need to make multiple transfers.
   repeated ChallengeSolution solutions = 4;
-  // repeated ChallengeSolution userSolutions = 5;
 }
 
 message MsgNewCollection {
@@ -64,6 +63,9 @@ message MsgNewCollection {
   repeated Transfer transfers = 12;
   repeated ContractAddressTimeline contractAddressTimeline = 13;
   repeated AddressMapping addressMappings = 14;
+
+  repeated UserApprovedOutgoingTransferTimeline defaultApprovedOutgoingTransfersTimeline = 15; //The user's approved transfers for each badge ID.
+  repeated UserApprovedIncomingTransferTimeline defaultApprovedIncomingTransfersTimeline = 16; //The user's approved incoming transfers for each badge ID.
 }
 
 message MsgNewCollectionResponse {
@@ -112,6 +114,7 @@ message MsgTransferBadge {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated Transfer transfers = 3;
+  bool onlyDeductApprovals = 4; //If true, we will only deduct approvals, not actually transfer badges.
 }
 message MsgTransferBadgeResponse {}
 
@@ -133,8 +136,9 @@ message MsgUpdateUserApprovedTransfers {
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
     ];
-  repeated UserApprovedTransferTimeline approvedTransfersTimeline = 3;
-  repeated AddressMapping addressMappings = 4;
+  repeated UserApprovedOutgoingTransferTimeline approvedOutgoingTransfersTimeline = 3;
+  repeated UserApprovedIncomingTransferTimeline approvedIncomingTransfersTimeline = 4;
+  repeated AddressMapping addressMappings = 5;
 }
 
 message MsgUpdateUserApprovedTransfersResponse {}

@@ -12,13 +12,15 @@ var (
 	CollectionKey         = []byte{0x01}
 	UserBalanceKey        = []byte{0x02}
 	NextCollectionIdKey   = []byte{0x03}
-	UpdateManagerKey    = []byte{0x04}
+	UpdateManagerKey    	= []byte{0x04}
 	ClaimKey              = []byte{0x05}
 	NextClaimIdKey        = []byte{0x06}
 	UsedClaimDataKey      = []byte{0x07}
 	UsedClaimChallengeKey = []byte{0x08}
 	UsedClaimAddressKey   = []byte{0x09}
 	WhitelistIndexKey     = []byte{0x0A}
+	AddressMappingKey		 	= []byte{0x0B}
+	TransferTrackerKey    = []byte{0x0C}
 
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}
@@ -50,6 +52,19 @@ func ConstructBalanceKey(address string, id sdk.Uint) string {
 	return collection_id_str + BalanceKeyDelimiter + address_str
 }
 
+func ConstructAddressMappingKey(addressMappingId string) string {
+	return addressMappingId
+}
+
+func ConstructTransferTrackerKey(collectionId sdk.Uint, trackerId string, collection bool, userOutgoing bool, userIncoming bool, address string) string {
+	collection_id_str := collectionId.String()
+	tracker_id_str := trackerId
+	collection_str := strconv.FormatBool(collection)
+	user_outgoing_str := strconv.FormatBool(userOutgoing)
+	user_incoming_str := strconv.FormatBool(userIncoming)
+	return collection_id_str + BalanceKeyDelimiter + tracker_id_str + BalanceKeyDelimiter + collection_str + BalanceKeyDelimiter + user_outgoing_str + BalanceKeyDelimiter + user_incoming_str + BalanceKeyDelimiter + address
+}
+
 func ConstructClaimKey(collectionId sdk.Uint, claimId sdk.Uint) string {
 	collection_id_str := collectionId.String()
 	claim_id_str := claimId.String()
@@ -63,12 +78,14 @@ func ConstructUsedClaimDataKey(collectionId sdk.Uint, claimId sdk.Uint) string {
 	return collection_id_str + BalanceKeyDelimiter + claim_id_str
 }
 
-func ConstructUsedClaimChallengeKey(collectionId sdk.Uint, claimId sdk.Uint, challengeId sdk.Uint, codeLeafIndex sdk.Uint) string {
+func ConstructUsedClaimChallengeKey(collectionId sdk.Uint, challengeId string, codeLeafIndex sdk.Uint, collection bool, userOutgoing bool, userIncoming bool) string {
 	collection_id_str := collectionId.String()
-	claim_id_str := claimId.String()
 	code_leaf_index_str := codeLeafIndex.String()
-	challenge_id_str := challengeId.String()
-	return collection_id_str + BalanceKeyDelimiter + claim_id_str + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + code_leaf_index_str
+	challenge_id_str := challengeId
+	collection_str := strconv.FormatBool(collection)
+	user_outgoing_str := strconv.FormatBool(userOutgoing)
+	user_incoming_str := strconv.FormatBool(userIncoming)
+	return collection_id_str + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + code_leaf_index_str + BalanceKeyDelimiter + collection_str + BalanceKeyDelimiter + user_outgoing_str + BalanceKeyDelimiter + user_incoming_str
 }
 
 func ConstructUsedWhitelistIndexKey(collectionId sdk.Uint, claimId sdk.Uint, whitelistLeafIndex sdk.Uint) string {
@@ -113,6 +130,8 @@ func GetDetailsFromClaimKey(id string) ClaimKeyDetails {
 		collectionId: sdk.NewUint(collection_id),
 	}
 }
+
+
 
 // Prefixer functions
 
@@ -185,4 +204,18 @@ func nextCollectionIdKey() []byte {
 // nextClaimIdKey returns the byte representation of the next claim id key ([]byte{0x06})
 func nextClaimIdKey() []byte {
 	return NextClaimIdKey
+}
+
+func addressMappingStoreKey(addressMappingKey string) []byte {
+	key := make([]byte, len(AddressMappingKey)+len(addressMappingKey))
+	copy(key, AddressMappingKey)
+	copy(key[len(AddressMappingKey):], []byte(addressMappingKey))
+	return key
+}
+
+func transferTrackerStoreKey(transferTrackerKey string) []byte {
+	key := make([]byte, len(TransferTrackerKey)+len(transferTrackerKey))
+	copy(key, TransferTrackerKey)
+	copy(key[len(TransferTrackerKey):], []byte(transferTrackerKey))
+	return key
 }
