@@ -32,7 +32,7 @@ func (k msgServer) MintAndDistributeBadges(goCtx context.Context, msg *types.Msg
 			return nil, ErrOffChainBalances
 		}
 		
-		if err := ValidateCollectionApprovedTransfersUpdate(ctx, collection.ApprovedTransfersTimeline, msg.ApprovedTransfersTimeline, collection.Permissions.CanUpdateApprovedTransfers); err != nil {
+		if err := ValidateCollectionApprovedTransfersUpdate(ctx, collection.ApprovedTransfersTimeline, msg.ApprovedTransfersTimeline, collection.Permissions.CanUpdateCollectionApprovedTransfers); err != nil {
 			return nil, err
 		}
 

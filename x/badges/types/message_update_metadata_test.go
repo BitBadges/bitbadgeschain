@@ -3,12 +3,10 @@ package types_test
 import (
 	// math "math"
 	"testing"
-
 	// "github.com/bitbadges/bitbadgeschain/testutil/sample"
 	// sdk "github.com/cosmos/cosmos-sdk/types"
-	// sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	// sdkerrors "cosmossdk.io/errors"
 	// "github.com/stretchr/testify/require"
-
 	// "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
@@ -36,7 +34,7 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 	// 				},
 	// 			},
 	// 		},
-	// 		err: sdkerrors.ErrInvalidAddress,
+	// 		err: ErrInvalidAddress,
 	// 	}, {
 	// 		name: "valid address",
 	// 		msg: types.MsgUpdateMetadata{

@@ -1,8 +1,8 @@
 package types
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const TypeMsgUpdateCollectionPermissions = "update_permissions"
@@ -43,7 +43,7 @@ func (msg *MsgUpdateCollectionPermissions) GetSignBytes() []byte {
 func (msg *MsgUpdateCollectionPermissions) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	err = ValidatePermissions(msg.Permissions, true)
@@ -52,7 +52,7 @@ func (msg *MsgUpdateCollectionPermissions) ValidateBasic() error {
 	}
 
 	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
+		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
 	}
 
 	return nil

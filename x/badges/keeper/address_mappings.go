@@ -90,7 +90,7 @@ func (k Keeper) GetAddressMapping(ctx sdk.Context, addressMappingId string, mana
 		}, nil
 	}
 
-	if types.ValidateAddress(addressMappingId, false) != nil {
+	if types.ValidateAddress(addressMappingId, false) == nil {
 		return &types.AddressMapping{
 			MappingId: addressMappingId,
 			Addresses: []string{addressMappingId},
@@ -124,10 +124,10 @@ func (k Keeper) GetAddressMapping(ctx sdk.Context, addressMappingId string, mana
 			IncludeOnlySpecified: false,
 			Uri: "",
 			CustomData: "",
-			Filters: []*types.AddressFilters{
+			Filters: []*types.AddressMappingFilters{
 				{
 					MustSatisfyMinX: sdk.NewUint(1),
-					Conditions: []*types.AddressConditions{
+					Conditions: []*types.AddressMappingConditions{
 						{
 							MustOwnBadges: []*types.MinMaxBalance{
 								{
@@ -150,10 +150,6 @@ func (k Keeper) GetAddressMapping(ctx sdk.Context, addressMappingId string, mana
 			},
 		}, nil
 	}
-
-
-
-	
 
 	addressMapping, found := k.GetAddressMappingFromStore(ctx, addressMappingId)
 	if found {
@@ -187,7 +183,7 @@ func (k Keeper) CheckIfOwnsBadges(ctx sdk.Context, collectionId sdk.Uint, addres
 	}
 
 
-	balances, err := GetBalancesForIdRanges(badgeIds, []*types.IdRange{
+	balances, err := types.GetBalancesForIdRanges(badgeIds, []*types.IdRange{
 		{
 			Start: sdk.NewUint(uint64(ctx.BlockTime().UnixMilli())),
 			End: sdk.NewUint(uint64(ctx.BlockTime().UnixMilli())),

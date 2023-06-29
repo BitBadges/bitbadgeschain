@@ -72,7 +72,7 @@ message QueryGetCollectionResponse {
 message QueryGetClaimNumProcessedRequest {
   string collectionId = 1  [
       (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
+      (gogoproto.nullable) = false  
       
     ];
   string claimId = 2  [

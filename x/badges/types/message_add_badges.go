@@ -1,8 +1,8 @@
 package types
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const TypeMsgMintAndDistributeBadges = "mint_and_distribute_badge"
@@ -21,42 +21,42 @@ func NewMsgMintAndDistributeBadges(
 	inheritedBalancesTimeline []*InheritedBalancesTimeline,
 	addressMappings []*AddressMapping,
 ) *MsgMintAndDistributeBadges {
-	err := *new(error)
-	for _, transfer := range transfers {
-		transfer.Balances, err = HandleDuplicateBadgeIds(transfer.Balances)
-		if err != nil {
-			panic(err)
-		}
-	}
+	// err := *new(error)
+	// for _, transfer := range transfers {
+	// 	transfer.Balances, err = HandleDuplicateBadgeIds(transfer.Balances)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// }
 
-	for _, timelineVal := range badgeMetadataTimeline {
-		for _, badgeMetadata := range timelineVal.BadgeMetadata {
-			badgeMetadata.BadgeIds = SortAndMergeOverlapping(badgeMetadata.BadgeIds)
-		}
-	}
+	// for _, timelineVal := range badgeMetadataTimeline {
+	// 	for _, badgeMetadata := range timelineVal.BadgeMetadata {
+	// 		badgeMetadata.BadgeIds = SortAndMergeOverlapping(badgeMetadata.BadgeIds)
+	// 	}
+	// }
 
-	for _, timelineVal := range approvedTransfersTimeline {
-		for _, approvedTransfer := range timelineVal.ApprovedTransfers {
-			approvedTransfer.BadgeIds = SortAndMergeOverlapping(approvedTransfer.BadgeIds)
-			approvedTransfer.TransferTimes = SortAndMergeOverlapping(approvedTransfer.TransferTimes)
+	// for _, timelineVal := range approvedTransfersTimeline {
+	// 	for _, approvedTransfer := range timelineVal.ApprovedTransfers {
+	// 		approvedTransfer.BadgeIds = SortAndMergeOverlapping(approvedTransfer.BadgeIds)
+	// 		approvedTransfer.TransferTimes = SortAndMergeOverlapping(approvedTransfer.TransferTimes)
 
-			for _, balance := range approvedTransfer.Claim.StartAmounts {
-				balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
-			}
-		}
-	}
+	// 		for _, balance := range approvedTransfer.Claim.StartAmounts {
+	// 			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+	// 		}
+	// 	}
+	// }
 
-	badgesToCreate, err = HandleDuplicateBadgeIds(badgesToCreate)
-	if err != nil {
-		panic(err)
-	}
+	// badgesToCreate, err = HandleDuplicateBadgeIds(badgesToCreate)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	for _, timelineVal := range inheritedBalancesTimeline {
-		for _, balance := range timelineVal.InheritedBalances {
-			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
-			balance.ParentBadgeIds = SortAndMergeOverlapping(balance.ParentBadgeIds)
-		}
-	}
+	// for _, timelineVal := range inheritedBalancesTimeline {
+	// 	for _, balance := range timelineVal.InheritedBalances {
+	// 		balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+	// 		balance.ParentBadgeIds = SortAndMergeOverlapping(balance.ParentBadgeIds)
+	// 	}
+	// }
 
 	return &MsgMintAndDistributeBadges{
 		Creator:            creator,
@@ -95,15 +95,15 @@ func (msg *MsgMintAndDistributeBadges) GetSignBytes() []byte {
 func (msg *MsgMintAndDistributeBadges) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
+		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
 	}
 
 	if msg.BadgesToCreate == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid badges to create")
+		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid badges to create")
 	}
 
 	if err := ValidateBalances(msg.BadgesToCreate); err != nil {
@@ -170,7 +170,7 @@ func (msg *MsgMintAndDistributeBadges) ValidateBasic() error {
 				}
 
 				if balance.ParentCollectionId.IsZero() || balance.ParentCollectionId.IsNil() {
-					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid parent collection id")
+					return sdkerrors.Wrapf(ErrInvalidRequest, "invalid parent collection id")
 				}
 	
 			}
@@ -179,11 +179,11 @@ func (msg *MsgMintAndDistributeBadges) ValidateBasic() error {
 
 	if len(msg.Transfers) > 0 || len(msg.ApprovedTransfersTimeline) > 0 {
 		if msg.OffChainBalancesMetadataTimeline != nil && len(msg.OffChainBalancesMetadataTimeline) > 0 {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "transfers and/or claims are set but collection has balances type = off-chain")
+			return sdkerrors.Wrapf(ErrInvalidRequest, "transfers and/or claims are set but collection has balances type = off-chain")
 		}
 
 		if msg.InheritedBalancesTimeline != nil && len(msg.InheritedBalancesTimeline) > 0 {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "transfers and/or claims are set but collection has balances type = inherited")
+			return sdkerrors.Wrapf(ErrInvalidRequest, "transfers and/or claims are set but collection has balances type = inherited")
 		}
 	}
 

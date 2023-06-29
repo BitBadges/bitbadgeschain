@@ -1,7 +1,7 @@
 package types
 
 import (
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	sdkerrors "cosmossdk.io/errors"
 )
 
 func ValidatePermittedTimes(permittedTimes []*IdRange, forbiddenTimes []*IdRange) error {
@@ -325,7 +325,7 @@ func ValidatePermissions(permissions *CollectionPermissions, canBeNil bool) erro
 		return ErrPermissionsIsNil
 	}
 
-	if !canBeNil && (permissions.CanUpdateBadgeMetadata != nil || permissions.CanUpdateManager != nil || permissions.CanUpdateStandard != nil || permissions.CanUpdateCustomData != nil || permissions.CanUpdateCollectionMetadata != nil || permissions.CanCreateMoreBadges != nil || permissions.CanUpdateApprovedTransfers != nil || permissions.CanDeleteCollection != nil || permissions.CanUpdateOffChainBalancesMetadata != nil || permissions.CanUpdateContractAddress != nil || permissions.CanArchive != nil || permissions.CanUpdateInheritedBalances != nil) {
+	if !canBeNil && (permissions.CanUpdateBadgeMetadata != nil || permissions.CanUpdateManager != nil || permissions.CanUpdateStandards != nil || permissions.CanUpdateCustomData != nil || permissions.CanUpdateCollectionMetadata != nil || permissions.CanCreateMoreBadges != nil || permissions.CanUpdateCollectionApprovedTransfers != nil || permissions.CanDeleteCollection != nil || permissions.CanUpdateOffChainBalancesMetadata != nil || permissions.CanUpdateContractAddress != nil || permissions.CanArchive != nil || permissions.CanUpdateInheritedBalances != nil) {
 		return ErrPermissionsIsNil
 	}
 	
@@ -335,8 +335,8 @@ func ValidatePermissions(permissions *CollectionPermissions, canBeNil bool) erro
 		}
 	}
 
-	if permissions.CanUpdateStandard != nil {
-		if err := ValidateTimedUpdatePermission(permissions.CanUpdateStandard); err != nil {
+	if permissions.CanUpdateStandards != nil {
+		if err := ValidateTimedUpdatePermission(permissions.CanUpdateStandards); err != nil {
 			return err
 		}
 	}
@@ -365,8 +365,8 @@ func ValidatePermissions(permissions *CollectionPermissions, canBeNil bool) erro
 		}
 	}
 
-	if permissions.CanUpdateApprovedTransfers != nil {
-		if err := ValidateCollectionApprovedTransferPermissions(permissions.CanUpdateApprovedTransfers); err != nil {
+	if permissions.CanUpdateCollectionApprovedTransfers != nil {
+		if err := ValidateCollectionApprovedTransferPermissions(permissions.CanUpdateCollectionApprovedTransfers); err != nil {
 			return err
 		}
 	}

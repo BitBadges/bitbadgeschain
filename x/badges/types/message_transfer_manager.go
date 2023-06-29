@@ -1,8 +1,8 @@
 package types
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const TypeMsgUpdateManager = "transfer_manager"
@@ -41,17 +41,17 @@ func (msg *MsgUpdateManager) GetSignBytes() []byte {
 func (msg *MsgUpdateManager) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 	for _, timelineVal := range msg.ManagerTimeline {	
 		_, err = sdk.AccAddressFromBech32(timelineVal.Manager)
 		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid provided address (%s)", err)
+			return sdkerrors.Wrapf(ErrInvalidAddress, "invalid provided address (%s)", err)
 		}
 	}
 
 	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
+		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
 	}
 
 	return nil

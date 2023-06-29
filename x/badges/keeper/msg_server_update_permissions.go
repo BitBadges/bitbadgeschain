@@ -52,8 +52,8 @@ func (k msgServer) UpdateCollectionPermissions(goCtx context.Context, msg *types
 		collection.Permissions.CanUpdateCustomData = msg.Permissions.CanUpdateCustomData
 	}
 
-	if msg.Permissions.CanUpdateStandard != nil {
-		collection.Permissions.CanUpdateStandard = msg.Permissions.CanUpdateStandard
+	if msg.Permissions.CanUpdateStandards != nil {
+		collection.Permissions.CanUpdateStandards = msg.Permissions.CanUpdateStandards
 	}
 
 	if msg.Permissions.CanUpdateManager != nil {
@@ -76,8 +76,8 @@ func (k msgServer) UpdateCollectionPermissions(goCtx context.Context, msg *types
 		collection.Permissions.CanUpdateInheritedBalances = msg.Permissions.CanUpdateInheritedBalances
 	}
 
-	if msg.Permissions.CanUpdateApprovedTransfers != nil {
-		collection.Permissions.CanUpdateApprovedTransfers = msg.Permissions.CanUpdateApprovedTransfers
+	if msg.Permissions.CanUpdateCollectionApprovedTransfers != nil {
+		collection.Permissions.CanUpdateCollectionApprovedTransfers = msg.Permissions.CanUpdateCollectionApprovedTransfers
 	}
 
 	collection.Permissions = msg.Permissions

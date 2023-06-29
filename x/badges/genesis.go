@@ -47,11 +47,11 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		}
 	}
 
-	for idx, claim := range genState.Claims {
-		if err := k.SetClaimInStoreWithKey(ctx, genState.ClaimStoreKeys[idx], *claim); err != nil {
-			panic(err)
-		}
-	}
+	// for idx, claim := range genState.Claims {
+	// 	if err := k.SetClaimInStoreWithKey(ctx, genState.ClaimStoreKeys[idx], *claim); err != nil {
+	// 		panic(err)
+	// 	}
+	// }
 
 	k.SetParams(ctx, genState.Params)
 }
@@ -76,7 +76,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	collectionIds := []sdk.Uint{}
 	claimIds := []sdk.Uint{}
-	genesis.Claims, collectionIds, claimIds = k.GetClaimsFromStore(ctx)
+	// genesis.Claims, collectionIds, claimIds = k.GetClaimsFromStore(ctx)
 
 	for i, collectionIds := range collectionIds {
 		genesis.ClaimStoreKeys = append(genesis.ClaimStoreKeys, keeper.ConstructClaimKey(collectionIds, claimIds[i]))

@@ -3,8 +3,9 @@ package keeper
 import (
 	"encoding/json"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/pkg/errors"
+
+	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -55,7 +56,7 @@ func (k *Keeper) UnpinContract(
 ) (err error) {
 	contractInfo := k.wasmViewKeeper.GetContractInfo(ctx, contractAddress)
 	if contractInfo == nil {
-		return errors.Wrapf(sdkerrors.ErrNotFound, "Contract with address %v not found", contractAddress.String())
+		return errors.Wrapf(badgestypes.ErrNotFound, "Contract with address %v not found", contractAddress.String())
 	}
 	err = k.wasmContractOpsKeeper.UnpinCode(ctx, contractInfo.CodeID)
 	if err != nil {

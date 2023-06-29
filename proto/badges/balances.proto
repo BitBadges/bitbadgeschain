@@ -7,34 +7,23 @@ import "badges/params.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
-
-//ID ranges define a range of IDs from start to end. Can be used for badge IDs, nonces, anything. 
 message IdRange {
   string start = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false ];
   string end = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
-//Defines a balance object. The specified balance holds for all ids specified within the id ranges array.
 message Balance {
   string amount = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated IdRange times = 2;
   repeated IdRange badgeIds = 3;
 }
 
-//The badgeIds specified will inherit the balances of the parentBadgeIds.
-//If number of badges specified in parentBadgeIds === 1, then all badges will inherit the balances of that badge.
-//Else, number of badges specified in parentBadgeIds must === number of badges specified in badgeIds.
-//Or else, error is thrown
 message InheritedBalance {
   repeated IdRange badgeIds = 1;
 
-  string parentCollectionId = 2 [
-    (gogoproto.customtype) = "Uint", 
-    (gogoproto.nullable) = false
-  ];
+  string parentCollectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated IdRange parentBadgeIds = 3;
 }
-
 
 message MinMaxBalance {
   repeated IdRange badgeIds = 1;

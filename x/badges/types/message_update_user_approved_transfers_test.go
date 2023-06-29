@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -19,7 +18,7 @@ func TestMsgUpdateUserApprovedTransfers_ValidateBasic(t *testing.T) {
 			msg: MsgUpdateUserApprovedTransfers{
 				Creator: "invalid_address",
 			},
-			err: sdkerrors.ErrInvalidAddress,
+			err: ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: MsgUpdateUserApprovedTransfers{

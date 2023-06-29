@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	sdkerrors "cosmossdk.io/errors"
 )
 
 type UniversalCombination struct {
@@ -66,6 +66,7 @@ type Overlap struct {
 	SecondDetails *UniversalPermissionDetails
 }
 
+
 func GetOverlapsAndNonOverlaps(firstDetails []*UniversalPermissionDetails, secondDetails []*UniversalPermissionDetails) ([]*Overlap, []*UniversalPermissionDetails, []*UniversalPermissionDetails) {
 	inOldButNotNew := make([]*UniversalPermissionDetails, len(firstDetails))
 	copy(inOldButNotNew, firstDetails)
@@ -77,7 +78,6 @@ func GetOverlapsAndNonOverlaps(firstDetails []*UniversalPermissionDetails, secon
 	for _, oldPermission := range firstDetails {
 		for _, newPermission := range secondDetails {
 			_, overlaps := UniversalRemoveOverlaps(newPermission, oldPermission)
-			
 			for _, overlap := range overlaps {
 				allOverlaps = append(allOverlaps, &Overlap{
 					Overlap: overlap,
@@ -372,27 +372,28 @@ func GetPermissionString(permission *UniversalPermissionDetails) string {
 
 //IMPORTANT PRECONDITION: Must be first match only
 func ValidateUniversalPermissionUpdate(oldPermissions []*UniversalPermissionDetails, newPermissions []*UniversalPermissionDetails) error {
+
 	allOverlaps, inOldButNotNew, _ := GetOverlapsAndNonOverlaps(oldPermissions, newPermissions)  //we don't care about new not in old
 	
 	if len(inOldButNotNew) > 0 {
 		errMsg := "permission "
 		errMsg += GetPermissionString(inOldButNotNew[0])
 		errMsg += "found in old permissions but not in new permissions"
+		if len(inOldButNotNew) > 1 {
+			errMsg += " (along with " + sdk.NewUint(uint64(len(inOldButNotNew) - 1)).String() + " more)"
+		}
 
 		return sdkerrors.Wrapf(ErrInvalidPermissions, errMsg)
 	}
 	
-	//For everywhere we detected an overlap, we need to check if the new permissions are valid (i.e. they only explicitly define more times and do not remove any)
+	//For everywhere we detected an overlap, we need to check if the new permissions are valid 
+	//(i.e. they only explicitly define more permitted or forbidden times and do not remove any)
 	for _, overlapObj := range allOverlaps {
 		oldPermission := overlapObj.FirstDetails
 		newPermission := overlapObj.SecondDetails
-		oldPermittedTimes := oldPermission.PermittedTimes
-		oldForbiddenTimes := oldPermission.ForbiddenTimes
-		newPermittedTimes := newPermission.PermittedTimes
-		newForbiddenTimes := newPermission.ForbiddenTimes
 
-		leftoverPermittedTimes, _ := RemoveIdRangeFromIdRange(newPermittedTimes, oldPermittedTimes)
-		leftoverForbiddenTimes, _ := RemoveIdRangeFromIdRange(newForbiddenTimes, oldForbiddenTimes)
+		leftoverPermittedTimes, _ := RemoveIdRangeFromIdRange(newPermission.PermittedTimes, oldPermission.PermittedTimes)
+		leftoverForbiddenTimes, _ := RemoveIdRangeFromIdRange(newPermission.ForbiddenTimes, oldPermission.ForbiddenTimes)
 
 		if len(leftoverPermittedTimes) > 0 || len(leftoverForbiddenTimes) > 0 {
 			errMsg := "permission "
@@ -425,410 +426,3 @@ func ValidateUniversalPermissionUpdate(oldPermissions []*UniversalPermissionDeta
 	return nil
 }
 
-
-func CastActionWithBadgeIdsPermissionToUniversalPermission(actionWithBadgeIdsPermission []*ActionWithBadgeIdsPermission) []*UniversalPermission {
-	castedPermissions := []*UniversalPermission{}
-	for _, actionWithBadgeIdsPermission := range actionWithBadgeIdsPermission {
-		castedCombinations := []*UniversalCombination{}
-		for _, actionWithBadgeIdsCombination := range actionWithBadgeIdsPermission.Combinations {
-			castedCombinations = append(castedCombinations, &UniversalCombination{
-				BadgeIdsOptions: actionWithBadgeIdsCombination.BadgeIdsOptions,
-				PermittedTimesOptions: actionWithBadgeIdsCombination.PermittedTimesOptions,
-				ForbiddenTimesOptions: actionWithBadgeIdsCombination.ForbiddenTimesOptions,
-			})
-		}
-
-		castedPermissions = append(castedPermissions, &UniversalPermission{
-			DefaultValues: &UniversalDefaultValues{
-				BadgeIds: actionWithBadgeIdsPermission.DefaultValues.BadgeIds,
-				UsesBadgeIds: true,
-				PermittedTimes: actionWithBadgeIdsPermission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: actionWithBadgeIdsPermission.DefaultValues.ForbiddenTimes,
-			},
-			Combinations: castedCombinations,
-		})
-	}
-	return castedPermissions
-}
-
-func ValidateActionWithBadgeIdsPermissionUpdate(oldPermissions []*ActionWithBadgeIdsPermission, newPermissions []*ActionWithBadgeIdsPermission) error {
-	if err := ValidateActionWithBadgeIdsPermission(oldPermissions); err != nil {
-		return err
-	}
-
-	if err := ValidateActionWithBadgeIdsPermission(newPermissions); err != nil {
-		return err
-	}
-
-	castedOldPermissions := CastActionWithBadgeIdsPermissionToUniversalPermission(oldPermissions)
-	castedNewPermissions := CastActionWithBadgeIdsPermissionToUniversalPermission(newPermissions)
-	
-	err := ValidateUniversalPermissionUpdate(GetFirstMatchOnly(castedOldPermissions), GetFirstMatchOnly(castedNewPermissions))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func CastTimedUpdatePermissionToUniversalPermission(timedUpdatePermission []*TimedUpdatePermission) []*UniversalPermission {
-	castedPermissions := []*UniversalPermission{}
-	for _, timedUpdatePermission := range timedUpdatePermission {
-		castedCombinations := []*UniversalCombination{}
-		for _, timedUpdateCombination := range timedUpdatePermission.Combinations {
-			castedCombinations = append(castedCombinations, &UniversalCombination{
-				PermittedTimesOptions: timedUpdateCombination.PermittedTimesOptions,
-				ForbiddenTimesOptions: timedUpdateCombination.ForbiddenTimesOptions,
-				TimelineTimesOptions: timedUpdateCombination.TimelineTimesOptions,
-			})
-		}
-
-		castedPermissions = append(castedPermissions, &UniversalPermission{
-			DefaultValues: &UniversalDefaultValues{
-				TimelineTimes: timedUpdatePermission.DefaultValues.TimelineTimes,
-				UsesTimelineTimes: true,
-				PermittedTimes: timedUpdatePermission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: timedUpdatePermission.DefaultValues.ForbiddenTimes,
-			},
-			Combinations: castedCombinations,
-		})
-	}
-	return castedPermissions
-}
-
-func ValidateTimedUpdatePermissionUpdate(oldPermissions []*TimedUpdatePermission, newPermissions []*TimedUpdatePermission) error {
-	if err := ValidateTimedUpdatePermission(oldPermissions); err != nil {
-		return err
-	}
-
-	if err := ValidateTimedUpdatePermission(newPermissions); err != nil {
-		return err
-	}
-
-	castedOldPermissions := CastTimedUpdatePermissionToUniversalPermission(oldPermissions)
-	castedNewPermissions := CastTimedUpdatePermissionToUniversalPermission(newPermissions)
-
-	err := ValidateUniversalPermissionUpdate(GetFirstMatchOnly(castedOldPermissions), GetFirstMatchOnly(castedNewPermissions))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func CastTimedUpdateWithBadgeIdsPermissionToUniversalPermission(timedUpdateWithBadgeIdsPermission []*TimedUpdateWithBadgeIdsPermission) []*UniversalPermission {
-	castedPermissions := []*UniversalPermission{}
-	for _, timedUpdateWithBadgeIdsPermission := range timedUpdateWithBadgeIdsPermission {
-		castedCombinations := []*UniversalCombination{}
-		for _, timedUpdateWithBadgeIdsCombination := range timedUpdateWithBadgeIdsPermission.Combinations {
-			castedCombinations = append(castedCombinations, &UniversalCombination{
-				BadgeIdsOptions: timedUpdateWithBadgeIdsCombination.BadgeIdsOptions,
-				PermittedTimesOptions: timedUpdateWithBadgeIdsCombination.PermittedTimesOptions,
-				ForbiddenTimesOptions: timedUpdateWithBadgeIdsCombination.ForbiddenTimesOptions,
-				TimelineTimesOptions: timedUpdateWithBadgeIdsCombination.TimelineTimesOptions,
-			})
-		}
-
-		castedPermissions = append(castedPermissions, &UniversalPermission{
-			DefaultValues: &UniversalDefaultValues{
-				TimelineTimes: timedUpdateWithBadgeIdsPermission.DefaultValues.TimelineTimes,
-				BadgeIds: timedUpdateWithBadgeIdsPermission.DefaultValues.BadgeIds,
-				UsesTimelineTimes: true,
-				UsesBadgeIds: true,
-				PermittedTimes: timedUpdateWithBadgeIdsPermission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: timedUpdateWithBadgeIdsPermission.DefaultValues.ForbiddenTimes,
-			},
-			Combinations: castedCombinations,
-		})
-	}
-	return castedPermissions
-}
-
-func ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldPermissions []*TimedUpdateWithBadgeIdsPermission, newPermissions []*TimedUpdateWithBadgeIdsPermission) error {
-	if err := ValidateTimedUpdateWithBadgeIdsPermission(oldPermissions); err != nil {
-		return err
-	}
-
-	if err := ValidateTimedUpdateWithBadgeIdsPermission(newPermissions); err != nil {
-		return err
-	}
-
-	castedOldPermissions := CastTimedUpdateWithBadgeIdsPermissionToUniversalPermission(oldPermissions)
-	castedNewPermissions := CastTimedUpdateWithBadgeIdsPermissionToUniversalPermission(newPermissions)
-
-	err := ValidateUniversalPermissionUpdate(GetFirstMatchOnly(castedOldPermissions), GetFirstMatchOnly(castedNewPermissions))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func CastCollectionApprovedTransferPermissionToUniversalPermission(collectionUpdatePermission []*CollectionApprovedTransferPermission) []*UniversalPermission {
-	castedPermissions := []*UniversalPermission{}
-	for _, collectionUpdatePermission := range collectionUpdatePermission {
-		castedCombinations := []*UniversalCombination{}
-		for _, collectionUpdateCombination := range collectionUpdatePermission.Combinations {
-			castedCombinations = append(castedCombinations, &UniversalCombination{
-				PermittedTimesOptions: collectionUpdateCombination.PermittedTimesOptions,
-				ForbiddenTimesOptions: collectionUpdateCombination.ForbiddenTimesOptions,
-				TimelineTimesOptions: collectionUpdateCombination.TimelineTimesOptions,
-				TransferTimesOptions: collectionUpdateCombination.TransferTimesOptions,
-				ToMappingIdOptions: collectionUpdateCombination.ToMappingIdOptions,
-				FromMappingIdOptions: collectionUpdateCombination.FromMappingIdOptions,
-				InitiatedByMappingIdOptions: collectionUpdateCombination.InitiatedByMappingIdOptions,
-				BadgeIdsOptions: collectionUpdateCombination.BadgeIdsOptions,
-			})
-		}
-
-		castedPermissions = append(castedPermissions, &UniversalPermission{
-			DefaultValues: &UniversalDefaultValues{
-				TimelineTimes: collectionUpdatePermission.DefaultValues.TimelineTimes,
-				TransferTimes: collectionUpdatePermission.DefaultValues.TransferTimes,
-				ToMappingId: collectionUpdatePermission.DefaultValues.ToMappingId,
-				FromMappingId: collectionUpdatePermission.DefaultValues.FromMappingId,
-				InitiatedByMappingId: collectionUpdatePermission.DefaultValues.InitiatedByMappingId,
-				BadgeIds: collectionUpdatePermission.DefaultValues.BadgeIds,
-				UsesBadgeIds: true,
-				UsesTimelineTimes: true,
-				UsesTransferTimes: true,
-				UsesToMappingId: true,
-				UsesFromMappingId: true,
-				UsesInitiatedByMappingId: true,
-				PermittedTimes: collectionUpdatePermission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: collectionUpdatePermission.DefaultValues.ForbiddenTimes,
-			},
-			Combinations: castedCombinations,
-		})
-	}
-	return castedPermissions
-}
-
-func ValidateCollectionApprovedTransferPermissionsUpdate(oldPermissions []*CollectionApprovedTransferPermission, newPermissions []*CollectionApprovedTransferPermission) error {
-	if err := ValidateCollectionApprovedTransferPermissions(oldPermissions); err != nil {
-		return err
-	}
-
-	if err := ValidateCollectionApprovedTransferPermissions(newPermissions); err != nil {
-		return err
-	}
-
-	castedOldPermissions := CastCollectionApprovedTransferPermissionToUniversalPermission(oldPermissions)
-	castedNewPermissions := CastCollectionApprovedTransferPermissionToUniversalPermission(newPermissions)
-
-	err := ValidateUniversalPermissionUpdate(GetFirstMatchOnly(castedOldPermissions), GetFirstMatchOnly(castedNewPermissions))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func CastActionPermissionToUniversalPermission(actionPermission []*ActionPermission) []*UniversalPermission {
-	castedPermissions := []*UniversalPermission{}
-	for _, actionPermission := range actionPermission {
-		castedCombinations := []*UniversalCombination{}
-		for _, actionCombination := range actionPermission.Combinations {
-			castedCombinations = append(castedCombinations, &UniversalCombination{
-				PermittedTimesOptions: actionCombination.PermittedTimesOptions,
-				ForbiddenTimesOptions: actionCombination.ForbiddenTimesOptions,
-			})
-		}
-
-		castedPermissions = append(castedPermissions, &UniversalPermission{
-			DefaultValues: &UniversalDefaultValues{
-				PermittedTimes: actionPermission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: actionPermission.DefaultValues.ForbiddenTimes,
-			},
-			Combinations: castedCombinations,
-		})
-	}
-	return castedPermissions
-}
-
-func ValidateActionPermissionUpdate(oldPermissions []*ActionPermission, newPermissions []*ActionPermission) error {
-	if err := ValidateActionPermission(oldPermissions); err != nil {
-		return err
-	}
-
-	if err := ValidateActionPermission(newPermissions); err != nil {
-		return err
-	}
-
-	castedOldPermissions := CastActionPermissionToUniversalPermission(oldPermissions)
-	castedNewPermissions := CastActionPermissionToUniversalPermission(newPermissions)
-
-	err := ValidateUniversalPermissionUpdate(GetFirstMatchOnly(castedOldPermissions), GetFirstMatchOnly(castedNewPermissions))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func CastUserApprovedTransferPermissionToUniversalPermission(UserApprovedTransferPermission []*UserApprovedTransferPermission) []*UniversalPermission {
-	castedPermissions := []*UniversalPermission{}
-	for _, UserApprovedTransferPermission := range UserApprovedTransferPermission {
-		castedCombinations := []*UniversalCombination{}
-		for _, UserApprovedOutgoingTransferCombination := range UserApprovedTransferPermission.Combinations {
-			castedCombinations = append(castedCombinations, &UniversalCombination{
-				BadgeIdsOptions: UserApprovedOutgoingTransferCombination.BadgeIdsOptions,
-				PermittedTimesOptions: UserApprovedOutgoingTransferCombination.PermittedTimesOptions,
-				ForbiddenTimesOptions: UserApprovedOutgoingTransferCombination.ForbiddenTimesOptions,
-				TimelineTimesOptions: UserApprovedOutgoingTransferCombination.TimelineTimesOptions,
-				TransferTimesOptions: UserApprovedOutgoingTransferCombination.TransferTimesOptions,
-				ToMappingIdOptions: UserApprovedOutgoingTransferCombination.ToMappingIdOptions,
-				InitiatedByMappingIdOptions: UserApprovedOutgoingTransferCombination.InitiatedByMappingIdOptions,
-			})
-		}
-
-		castedPermissions = append(castedPermissions, &UniversalPermission{
-			DefaultValues: &UniversalDefaultValues{
-				BadgeIds: UserApprovedTransferPermission.DefaultValues.BadgeIds,
-				TimelineTimes: UserApprovedTransferPermission.DefaultValues.TimelineTimes,
-				TransferTimes: UserApprovedTransferPermission.DefaultValues.TransferTimes,
-				ToMappingId: UserApprovedTransferPermission.DefaultValues.ToMappingId,
-				InitiatedByMappingId: UserApprovedTransferPermission.DefaultValues.InitiatedByMappingId,
-				UsesBadgeIds: true,
-				UsesTimelineTimes: true,
-				UsesTransferTimes: true,
-				UsesToMappingId: true,
-				UsesInitiatedByMappingId: true,
-				PermittedTimes: UserApprovedTransferPermission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: UserApprovedTransferPermission.DefaultValues.ForbiddenTimes,
-			},
-			Combinations: castedCombinations,
-		})
-	}
-	return castedPermissions
-}
-
-func ValidateUserApprovedTransferPermissionsUpdate(oldPermissions []*UserApprovedTransferPermission, newPermissions []*UserApprovedTransferPermission) error {
-	if err := ValidateUserApprovedTransferPermissions(oldPermissions); err != nil {
-		return err
-	}
-
-	if err := ValidateUserApprovedTransferPermissions(newPermissions); err != nil {
-		return err
-	}
-
-	castedOldPermissions := CastUserApprovedTransferPermissionToUniversalPermission(oldPermissions)
-	castedNewPermissions := CastUserApprovedTransferPermissionToUniversalPermission(newPermissions)
-
-	err := ValidateUniversalPermissionUpdate(GetFirstMatchOnly(castedOldPermissions), GetFirstMatchOnly(castedNewPermissions))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func ValidateUserPermissionsUpdate(oldPermissions *UserPermissions, newPermissions *UserPermissions, canBeNil bool) error {
-	if err := ValidateUserPermissions(oldPermissions, canBeNil); err != nil {
-		return err
-	}
-
-	if err := ValidateUserPermissions(newPermissions, canBeNil); err != nil {
-		return err
-	}
-
-	if oldPermissions.CanUpdateApprovedIncomingTransfers != nil && newPermissions.CanUpdateApprovedIncomingTransfers != nil {
-		if err := ValidateUserApprovedTransferPermissionsUpdate(oldPermissions.CanUpdateApprovedIncomingTransfers, newPermissions.CanUpdateApprovedIncomingTransfers); err != nil {
-			return err
-		}
-	}
-
-	if oldPermissions.CanUpdateApprovedOutgoingTransfers != nil && newPermissions.CanUpdateApprovedOutgoingTransfers != nil {
-		if err := ValidateUserApprovedTransferPermissionsUpdate(oldPermissions.CanUpdateApprovedOutgoingTransfers, newPermissions.CanUpdateApprovedOutgoingTransfers); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-
-// Validate that the new permissions are valid and is not changing anything that they can't.
-func ValidatePermissionsUpdate(oldPermissions *CollectionPermissions, newPermissions *CollectionPermissions, canBeNil bool) error {
-	if err := ValidatePermissions(newPermissions, canBeNil); err != nil {
-		return err
-	}
-
-	if err := ValidatePermissions(oldPermissions, canBeNil); err != nil {
-		return err
-	}
-
-	if oldPermissions.CanDeleteCollection != nil && newPermissions.CanDeleteCollection != nil {
-		if err := ValidateActionPermissionUpdate(oldPermissions.CanDeleteCollection, newPermissions.CanDeleteCollection); err != nil {
-			return err
-		}
-	}
-
-	if oldPermissions.CanUpdateManager != nil && newPermissions.CanUpdateManager != nil {
-		if err := ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateManager, newPermissions.CanUpdateManager); err != nil {
-			return err
-		}
-	}
-
-	if oldPermissions.CanUpdateCustomData != nil && newPermissions.CanUpdateCustomData != nil {
-		if err := ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateCustomData, newPermissions.CanUpdateCustomData); err != nil {
-			return err
-		}
-	}
-	
-	if oldPermissions.CanUpdateStandard != nil && newPermissions.CanUpdateStandard != nil {
-		if err := ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateStandard, newPermissions.CanUpdateStandard); err != nil {
-			return err
-		}
-	}
-
-	if oldPermissions.CanArchive != nil && newPermissions.CanArchive != nil {
-		if err := ValidateTimedUpdatePermissionUpdate(oldPermissions.CanArchive, newPermissions.CanArchive); err != nil {
-			return err
-		}
-	}
-
-	if oldPermissions.CanUpdateOffChainBalancesMetadata != nil && newPermissions.CanUpdateOffChainBalancesMetadata != nil {
-		if err := ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateOffChainBalancesMetadata, newPermissions.CanUpdateOffChainBalancesMetadata); err != nil {
-			return err
-		}
-	}
-
-	if oldPermissions.CanUpdateCollectionMetadata != nil && newPermissions.CanUpdateCollectionMetadata != nil {
-		if err := ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateCollectionMetadata, newPermissions.CanUpdateCollectionMetadata); err != nil {
-			return err
-		}
-	}
-
-	if oldPermissions.CanUpdateContractAddress != nil && newPermissions.CanUpdateContractAddress != nil {
-		if err := ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateContractAddress, newPermissions.CanUpdateContractAddress); err != nil {
-			return err
-		}
-	}
-
-	if oldPermissions.CanCreateMoreBadges != nil && newPermissions.CanCreateMoreBadges != nil {
-		if err := ValidateActionWithBadgeIdsPermissionUpdate(oldPermissions.CanCreateMoreBadges, newPermissions.CanCreateMoreBadges); err != nil {
-			return err
-		}
-	}
-
-	if oldPermissions.CanUpdateBadgeMetadata != nil && newPermissions.CanUpdateBadgeMetadata != nil {
-		if err := ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldPermissions.CanUpdateBadgeMetadata, newPermissions.CanUpdateBadgeMetadata); err != nil {
-			return err
-		}
-	}
-
-	if oldPermissions.CanUpdateInheritedBalances != nil && newPermissions.CanUpdateInheritedBalances != nil {
-		if err := ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldPermissions.CanUpdateInheritedBalances, newPermissions.CanUpdateInheritedBalances); err != nil {
-			return err
-		}
-	}
-
-	if oldPermissions.CanUpdateApprovedTransfers != nil && newPermissions.CanUpdateApprovedTransfers != nil {
-		if err := ValidateCollectionApprovedTransferPermissionsUpdate(oldPermissions.CanUpdateApprovedTransfers, newPermissions.CanUpdateApprovedTransfers); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}

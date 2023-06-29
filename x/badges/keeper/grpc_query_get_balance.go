@@ -18,13 +18,23 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	userBalanceKey := ConstructBalanceKey(req.Address, req.CollectionId)
-	UserBalance, found := k.GetUserBalanceFromStore(ctx, userBalanceKey)
+	userBalance, found := k.GetUserBalanceFromStore(ctx, userBalanceKey)
 	if found {
 		return &types.QueryGetBalanceResponse{
-			Balance: &UserBalance,
+			Balance: &userBalance,
 		}, nil
 	} else {
-		blankUserBalance := &types.UserBalanceStore{}
+		collection, found := k.GetCollectionFromStore(ctx, req.CollectionId)
+		if !found {
+			return nil, status.Error(codes.NotFound, "collection and balances not found")
+		}
+
+		blankUserBalance := &types.UserBalanceStore{
+			Balances: []*types.Balance{},
+			ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
+			ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,
+			// UserPermissions TODO:
+		}
 		return &types.QueryGetBalanceResponse{
 			Balance: blankUserBalance,
 		}, nil

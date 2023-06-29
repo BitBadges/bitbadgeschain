@@ -80,12 +80,12 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection types.BadgeCollection, 
 			}
 		}
 
-		totalSupplys, err = AddBalancesForIdRanges(totalSupplys, balance.BadgeIds, balance.Times, balance.Amount)
+		totalSupplys, err = types.AddBalancesForIdRanges(totalSupplys, balance.BadgeIds, balance.Times, balance.Amount)
 		if err != nil {
 			return types.BadgeCollection{}, err
 		}
 
-		unmintedSupplys, err = AddBalancesForIdRanges(unmintedSupplys, balance.BadgeIds, balance.Times, balance.Amount)
+		unmintedSupplys, err = types.AddBalancesForIdRanges(unmintedSupplys, balance.BadgeIds, balance.Times, balance.Amount)
 		if err != nil {
 			return types.BadgeCollection{}, err
 		}

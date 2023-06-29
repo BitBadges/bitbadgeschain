@@ -3,12 +3,18 @@ package bitbadges.bitbadgeschain.badges;
 
 import "gogoproto/gogo.proto";
 import "badges/permissions.proto";
-import "badges/addresses.proto";
+import "badges/address_mappings.proto";
 import "badges/balances.proto";
 
-// this line is used by starport scaffolding # proto/tx/import
-
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
+
+
+message UserBalanceStore {
+  repeated Balance balances = 1;
+  repeated UserApprovedOutgoingTransferTimeline approvedOutgoingTransfersTimeline = 2;
+  repeated UserApprovedIncomingTransferTimeline approvedIncomingTransfersTimeline = 3;
+  UserPermissions permissions = 4;
+}
 
 message UserApprovedOutgoingTransferTimeline {
   repeated UserApprovedOutgoingTransfer approvedOutgoingTransfers = 1;
@@ -20,63 +26,19 @@ message UserApprovedIncomingTransferTimeline {
   repeated IdRange times = 2;
 }
 
-//Defines a user balance object for a badge w/ the user's balances and approvals. All badge IDs for a collection are handled within this object.
-message UserBalanceStore {
-  repeated Balance balances = 1; //The user's balance for each badge ID.
-  repeated UserApprovedOutgoingTransferTimeline approvedOutgoingTransfersTimeline = 2; //The user's approved transfers for each badge ID.
-  repeated UserApprovedIncomingTransferTimeline approvedIncomingTransfersTimeline = 3; //The user's approved incoming transfers for each badge ID.
-  UserPermissions permissions = 4; //The user's permissions for each badge ID.
-}
-
-//We will add more fields to this message later (e.g. ZKP proofs)
 message Challenge {
-  string challengeId = 6;
   string root = 1;
-  string expectedProofLength = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false ];
+  string expectedProofLength = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   bool useCreatorAddressAsLeaf = 3;
-
-  //For codes, this should always be true. 
-  //For whitelist, you can choose to allow multiple uses per leaf. We provide this as an option for flexibility.
-  //For example, if you want to allow addresses to claim multiple times, you can set this to false.
-  bool maxOneUsePerLeaf = 4; 
-
-  //If true, then the order of the leaves in the claim matters. If false, then the order of the leaves in the claim does not matter.
-  //The leftmost leaf (2^expectedProofLength) is the first leaf and will transfer the starting amounts.
-  //The second leaf will transfer the starting amounts + incrementIdsBy.
-  //And so on.
-  bool useLeafIndexForDistributionOrder = 5; 
+  bool maxOneUsePerLeaf = 4;
+  bool useLeafIndexForDistributionOrder = 5;
+  string challengeId = 6;
 }
 
-message OutgoingPerAddressApprovalAmounts {
-  repeated Balance approvalsPerToAddress = 1;
-  repeated Balance approvalsPerInitiatedByAddress = 2;
-}
-
-message OutgoingPerAddressMaxNumTransfers {
-  string maxNumTransfersPerToAddress = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string maxNumTransfersPerInitiatedByAddress = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-}
-
-message IncomingPerAddressApprovalAmounts {
-  repeated Balance approvalsPerFromAddress = 1;
-  repeated Balance approvalsPerInitiatedByAddress = 2;
-}
-
-message IncomingPerAddressMaxNumTransfers {
-  string maxNumTransfersPerFromAddress = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string maxNumTransfersPerInitiatedByAddress = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-}
-
-message PerAddressApprovalAmounts {
-  repeated Balance approvalsPerFromAddress = 1;
-  repeated Balance approvalsPerToAddress = 2;
-  repeated Balance approvalsPerInitiatedByAddress = 3;
-}
-
-message PerAddressMaxNumTransfers {
-  string maxNumTransfersPerFromAddress = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string maxNumTransfersPerToAddress = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string maxNumTransfersPerInitiatedByAddress = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+message PerAddressApprovals {
+  ApprovalsTracker approvalsPerFromAddress = 1;
+  ApprovalsTracker approvalsPerToAddress = 2;
+  ApprovalsTracker approvalsPerInitiatedByAddress = 3;
 }
 
 message IsUserOutgoingTransferAllowed {
@@ -84,7 +46,6 @@ message IsUserOutgoingTransferAllowed {
   bool invertInitiatedBy = 3;
   bool invertTransferTimes = 4;
   bool invertBadgeIds = 5;
-
   bool isAllowed = 6;
 }
 
@@ -93,42 +54,29 @@ message IsUserIncomingTransferAllowed {
   bool invertInitiatedBy = 3;
   bool invertTransferTimes = 4;
   bool invertBadgeIds = 5;
-
   bool isAllowed = 6;
 }
 
-message ApprovalAmounts {
-  repeated Balance startAmounts = 1;
-
-  string incrementIdsBy = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string incrementTimesBy = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-}
 
 message UserApprovedOutgoingTransfer {
   string toMappingId = 1;
   string initiatedByMappingId = 2;
   repeated IdRange transferTimes = 3;
   repeated IdRange badgeIds = 4;
+  repeated IsUserOutgoingTransferAllowed allowedCombinations = 5;
 
-  //Ensure there is no overlap between allowed and disallowed combinations.
-  repeated IsUserOutgoingTransferAllowed allowedCombinations = 5; //Determine what combinations of the (to, initiatedBy, transferTime, badgeId) tuples are allowed
+  repeated Challenge challenges = 6;
+
+  string trackerId = 7;
+
+  string incrementIdsBy = 8 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string incrementTimesBy = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  PerAddressApprovals perAddressApprovals = 10;
   
-  //If everything above matches and is allowed, we check the restrictions below
-  repeated Challenge challenges = 6; //To be approved, valid solutions must be provided for all challenges.
-  ApprovalAmounts approvals = 7; //If not nil, we dynamically calculate the approved amounts based on the rules set here.
-  OutgoingPerAddressApprovalAmounts perAddressApprovals = 8; //If not nil, we dynamically calculate the approved amounts based on the rules set here.
-
-  string maxNumTransfers = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; //If not nil, we dynamically calculate the max number of transfers based on the rules set here.
-  OutgoingPerAddressMaxNumTransfers perAddressMaxNumTransfers = 10; //If not nil, we dynamically calculate the max number of transfers based on the rules set here.
-
-  string trackerId = 11;
   string uri = 12;
   string customData = 13;
-
-  //To calculate the current claim amounts, we take the starting amounts and increment by the number of increments.
-  //The number of increments is determined by either a) the leaf index of a challenge (if specified) or b) the number of claims processed.
-
-  //The rest of the fields are for handling transfers, if it is deemed allowed and has valid badgeIDs are for handling transfers, if it is deemed allowed and has valid badgeIDs.
+  
   bool requireToEqualsInitiatedBy = 14;
   bool requireToDoesNotEqualInitiatedBy = 15;
 }
@@ -138,30 +86,20 @@ message UserApprovedIncomingTransfer {
   string initiatedByMappingId = 2;
   repeated IdRange transferTimes = 3;
   repeated IdRange badgeIds = 4;
+  repeated IsUserIncomingTransferAllowed allowedCombinations = 5;
 
-  //Ensure there is no overlap between allowed and disallowed combinations.
-  repeated IsUserIncomingTransferAllowed allowedCombinations = 5; //Determine what combinations of the (from, initiatedBy, transferTime, badgeId) tuples are allowed
-  
-  //If everything above matches and is allowed, we check the restrictions below
-  repeated Challenge challenges = 6; //To be approved, valid solutions must be provided for all challenges.
-  
-  
-  ApprovalAmounts approvals = 7; //If not nil, we dynamically calculate the approved amounts based on the rules set here.
-  
-  
-  IncomingPerAddressApprovalAmounts perAddressApprovals = 8; //If not nil, we dynamically calculate the approved amounts based on the rules set here.
+  repeated Challenge challenges = 6;
 
-  string maxNumTransfers = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; //If not nil, we dynamically calculate the max number of transfers based on the rules set here.
-  IncomingPerAddressMaxNumTransfers perAddressMaxNumTransfers = 10; //If not nil, we dynamically calculate the max number of transfers based on the rules set here.
+  string trackerId = 7;
 
-  string trackerId = 11;
+  string incrementIdsBy = 8 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string incrementTimesBy = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  PerAddressApprovals perAddressApprovals = 11;
+
   string uri = 12;
   string customData = 13;
 
-  //To calculate the current claim amounts, we take the starting amounts and increment by the number of increments.
-  //The number of increments is determined by either a) the leaf index of a challenge (if specified) or b) the number of claims processed.
-
-  //The rest of the fields are for handling transfers, if it is deemed allowed and has valid badgeIDs are for handling transfers, if it is deemed allowed and has valid badgeIDs.
   bool requireFromEqualsInitiatedBy = 14;
   bool requireFromDoesNotEqualInitiatedBy = 15;
 }
@@ -172,7 +110,6 @@ message IsCollectionTransferAllowed {
   bool invertInitiatedBy = 3;
   bool invertTransferTimes = 4;
   bool invertBadgeIds = 5;
-
   bool isAllowed = 6;
 }
 
@@ -182,43 +119,47 @@ message CollectionApprovedTransfer {
   string initiatedByMappingId = 3;
   repeated IdRange transferTimes = 4;
   repeated IdRange badgeIds = 5;
-
-  //Ensure there is no overlap between allowed and disallowed combinations.
+  
   repeated IsCollectionTransferAllowed allowedCombinations = 6;
 
-  repeated Challenge challenges = 7; //To be approved, valid solutions must be provided for all challenges.
+  repeated Challenge challenges = 7;
 
-  ApprovalAmounts approvals = 8; //If not nil, we dynamically calculate the approved amounts based on the rules set here.
-  PerAddressApprovalAmounts perAddressApprovals = 9; //If not nil, we dynamically calculate the approved amounts based on the rules set here.
+  string trackerId = 8;
 
-  string maxNumTransfers = 10 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; //If not nil, we dynamically calculate the max number of transfers based on the rules set here.
-  PerAddressMaxNumTransfers perAddressMaxNumTransfers = 11; //If not nil, we dynamically calculate the max number of transfers based on the rules set here.
+  string incrementIdsBy = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string incrementTimesBy = 10 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
-  string trackerId = 12;
-  string uri = 13;
-  string customData = 14;
+  ApprovalsTracker overallApprovals = 11;
+  PerAddressApprovals perAddressApprovals = 12;
 
   bool overridesFromApprovedOutgoingTransfers = 15;
   bool overridesToApprovedIncomingTransfers = 16;
 
   bool requireToEqualsInitiatedBy = 17;
   bool requireFromEqualsInitiatedBy = 18;
-
   bool requireToDoesNotEqualInitiatedBy = 19;
   bool requireFromDoesNotEqualInitiatedBy = 20;
+
+  string uri = 21;
+  string customData = 22;
 }
 
 message ApprovalsTracker {
   string numTransfers = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated Balance amounts = 2;
-  string trackerId = 3;
 }
 
 /*
+  We always track the primary num transfers and amounts.
+  For collection, primary = overall.
+  For outgoing, primary = from.
+  For incoming, primary = to.
+
   When you first add an approved transfer with a unique tracker ID, it starts a running tally of the number of transfers and the amounts transferred.
   For example, if you approve x20 of badge ID 1, then when valid transfers are made that match the approved transfer, the tally will increment.
   Once the tally reaches x20 of badge ID 1, the next transfer will be unapproved.
   In each approved transfer, there are more fine-grained rules such as per address approvals. The tracker does not tally if they are not set.
+  Tracker IDs are considered different tallies / counts via each level (collection is a diff count than outgoing is a diff count than incoming).
 
   When updating approved transfers, you can specify a new unique tracker ID. If you do, then the tracker will reset and start a new tally.
   If you do not update the tracker ID, then the tracker will continue to tally the transfers and amounts, according to whatever rules are set.
@@ -240,5 +181,11 @@ message ApprovalsTracker {
 */
 
 /*
-  Challenge IDs are the same way
+  Challenge IDs are the same way. If maxOneUsePerleaf is turned on, we use the challenge ID to track which leaves have been used for the challenge.
+  If you update the challenge ID, then the used leaves traceker will reset and start a new tally.
+
+  -Do not use the same challenge ID for different challenges. This can cause unexpected behavior because both challenges will use the same tally.
+  -For the same challenge, use the same challenge ID. You are allowed to use the same challenge across different approvals, but note that if they have
+   different challenge IDs, they will have different tallies. This means that any successful solution for one challenge can be replayed for the other challenge.
+  -Note that if you update the challenge ID but keep the challenge the same, your challenge is now susceptible to replay attacks using the previous successful solutions.
 */

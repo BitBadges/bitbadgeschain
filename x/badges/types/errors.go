@@ -3,7 +3,7 @@ package types
 // DONTCOVER
 
 import (
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	sdkerrors "cosmossdk.io/errors"
 )
 
 // x/badges module sentinel errors
@@ -54,4 +54,19 @@ var (
 	ErrInvalidCombinations	 = sdkerrors.Register(ModuleName, 1541, "invalid permission combinations. you have specified duplicate combinations and because of the first match policy, the second combination will never be used. please remove the duplicate combinations")
 	ErrOverflow = sdkerrors.Register(ModuleName, 1543, "overflow")
 	ErrUnderflow = sdkerrors.Register(ModuleName, 1544, "underflow")
+	ErrInvalidAddress = sdkerrors.Register(ModuleName, 1545, "invalid address")
+	ErrInvalidRequest = sdkerrors.Register(ModuleName, 1546, "invalid request")
+	ErrUnknownRequest = sdkerrors.Register(ModuleName, 1547, "unknown request")
+	ErrInvalidType = sdkerrors.Register(ModuleName, 1548, "invalid type")
+	ErrUnauthorized = sdkerrors.Register(ModuleName, 1549, "unauthorized")
+	ErrInvalidPubKey = sdkerrors.Register(ModuleName, 1550, "invalid public key")
+	ErrWrongSequence = sdkerrors.Register(ModuleName, 1551, "wrong sequence")
+	ErrNotSupported = sdkerrors.Register(ModuleName, 1552, "not supported")
+	ErrTooManySignatures = sdkerrors.Register(ModuleName, 1553, "too many signatures")
+	ErrNoSignatures = sdkerrors.Register(ModuleName, 1554, "no signatures")
+	ErrUnknownExtensionOptions = sdkerrors.Register(ModuleName, 1555, "unknown extension options")
+	ErrInvalidChainID = sdkerrors.Register(ModuleName, 1556, "invalid chain id")
+	ErrorInvalidSigner = sdkerrors.Register(ModuleName, 1557, "invalid signer")
+	ErrLogic = sdkerrors.Register(ModuleName, 1558, "logic")
+	ErrNotFound = sdkerrors.Register(ModuleName, 1559, "not found")
 )

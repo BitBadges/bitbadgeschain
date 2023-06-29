@@ -1,12 +1,11 @@
 package types_test
 
 import (
-	"testing"
 	"math"
+	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -24,7 +23,7 @@ func TestMsgUpdateManager_ValidateBasic(t *testing.T) {
 				Creator:      "invalid_address",
 				CollectionId: sdk.NewUint(1),
 			},
-			err: sdkerrors.ErrInvalidAddress,
+			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: types.MsgUpdateManager{
@@ -60,7 +59,7 @@ func TestMsgUpdateManager_ValidateBasic(t *testing.T) {
 					},
 				},
 			},
-			err: sdkerrors.ErrInvalidAddress,
+			err: types.ErrInvalidAddress,
 		},
 	}
 	for _, tt := range tests {

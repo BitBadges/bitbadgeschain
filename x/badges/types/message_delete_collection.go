@@ -1,8 +1,8 @@
 package types
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const TypeMsgDeleteCollection = "delete_collection"
@@ -40,11 +40,11 @@ func (msg *MsgDeleteCollection) GetSignBytes() []byte {
 func (msg *MsgDeleteCollection) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid collection id")
+		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
 	}
 
 	return nil

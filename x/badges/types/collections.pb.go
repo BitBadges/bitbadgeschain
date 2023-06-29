@@ -24,53 +24,23 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// BadgeCollection defines a standard collection of badges.
 type BadgeCollection struct {
-	// The collectionId defines the unique identifier of the BadgeCollection classification, similar to the contract address of ERC721.
-	// This is assigned by the chain itself. All ids start at 1 and increments by 1 each created collection.
-	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
-	//The parent collection id. If 0, then this is a root collection (i.e. not inherited from any parent collection).
-	//If not 0, then this is a subcollection of the parent collection.
-	ParentCollectionId Uint `protobuf:"bytes,2,opt,name=parentCollectionId,proto3,customtype=Uint" json:"parentCollectionId"`
-	// The URI where to fetch the collection's metadata.
-	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,3,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
-	// An array of BadgeMetadataUri objects for where to fetch the badge metadata.
-	// Each BadgeMetadataUri object has a uri and an array of badgeId ranges (see BadgeMetadataUri type).
-	// The uri can include {id} in the URI which is a placeholder to be replaced by each badge's unique id.
-	// To fetch the metadata for a speciifc badge, the first match is always used.
-	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,4,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
-	BalancesType          Uint                     `protobuf:"bytes,5,opt,name=balancesType,proto3,customtype=Uint" json:"balancesType"`
-	// The URI where to fetch the collection's balances.
-	// Leave blank if balances are to be stored on-chain.
-	OffChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline `protobuf:"bytes,6,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
-	// Defines where to fetch the balances for each badge.
-	InheritedBalancesTimeline []*InheritedBalancesTimeline `protobuf:"bytes,7,rep,name=inheritedBalancesTimeline,proto3" json:"inheritedBalancesTimeline,omitempty"`
-	// These are arbitrary bytes can be used to store anything on-chain about the badge (often used for a permanent hash).
-	// This can be updatable or not depending on the permissions set. Max 256 bytes allowed.
-	// Parse this data according to the standards defined in the standards array.
-	CustomDataTimeline []*CustomDataTimeline `protobuf:"bytes,8,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
-	ManagerTimeline    []*ManagerTimeline    `protobuf:"bytes,9,rep,name=managerTimeline,proto3" json:"managerTimeline,omitempty"`
-	//Defines the permissions for the collection.
-	Permissions *CollectionPermissions `protobuf:"bytes,10,opt,name=permissions,proto3" json:"permissions,omitempty"`
-	//This is the part of the collection that defines the transferability, approvals, and claims
-	//for the collection.
-	ApprovedTransfersTimeline []*CollectionApprovedTransferTimeline `protobuf:"bytes,11,rep,name=approvedTransfersTimeline,proto3" json:"approvedTransfersTimeline,omitempty"`
-	//Badge ids start at 1. Each badge created will increment this by 1. Can't overflow.
-	NextBadgeId Uint `protobuf:"bytes,12,opt,name=nextBadgeId,proto3,customtype=Uint" json:"nextBadgeId"`
-	//This is a map of the current unminted badge supplys by ID.
-	//Consider this the balance of the 'Mint' address. Once a badge is minted, it is removed from this map.
-	UnmintedSupplys []*Balance `protobuf:"bytes,13,rep,name=unmintedSupplys,proto3" json:"unmintedSupplys,omitempty"`
-	//This is a map of the total badge supplys in circulation by ID.
-	TotalSupplys []*Balance `protobuf:"bytes,14,rep,name=totalSupplys,proto3" json:"totalSupplys,omitempty"`
-	//Defines what standard this badge should implement (see standards documentation).
-	StandardsTimeline []*StandardTimeline `protobuf:"bytes,15,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
-	// Defines if the collection is isFrozen or not. Frozen collections can't be updated (all Msgs will fail).
-	// This can be useful for security reasons, archiving, or to set universal genesis conditions for subcollections.
-	// Subcollections will have a choice to inherit this setting or not.
-	IsArchivedTimeline []*IsArchivedTimeline `protobuf:"bytes,16,rep,name=isArchivedTimeline,proto3" json:"isArchivedTimeline,omitempty"`
-	// The address of a contract that implements additional functionality for this collection.
-	// Can point to a contract on another chain or on the BitBadges chain (depending on if it needs access to edit the collection or not).
-	// Prefix with eth: for Ethereum. If no prefix, then it is assumed to be on the BitBadges chain.
+	CollectionId                                 Uint                                    `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+	ParentCollectionId                           Uint                                    `protobuf:"bytes,2,opt,name=parentCollectionId,proto3,customtype=Uint" json:"parentCollectionId"`
+	CollectionMetadataTimeline                   []*CollectionMetadataTimeline           `protobuf:"bytes,3,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
+	BadgeMetadataTimeline                        []*BadgeMetadataTimeline                `protobuf:"bytes,4,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
+	BalancesType                                 Uint                                    `protobuf:"bytes,5,opt,name=balancesType,proto3,customtype=Uint" json:"balancesType"`
+	OffChainBalancesMetadataTimeline             []*OffChainBalancesMetadataTimeline     `protobuf:"bytes,6,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
+	InheritedBalancesTimeline                    []*InheritedBalancesTimeline            `protobuf:"bytes,7,rep,name=inheritedBalancesTimeline,proto3" json:"inheritedBalancesTimeline,omitempty"`
+	CustomDataTimeline                           []*CustomDataTimeline                   `protobuf:"bytes,8,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
+	ManagerTimeline                              []*ManagerTimeline                      `protobuf:"bytes,9,rep,name=managerTimeline,proto3" json:"managerTimeline,omitempty"`
+	Permissions                                  *CollectionPermissions                  `protobuf:"bytes,10,opt,name=permissions,proto3" json:"permissions,omitempty"`
+	ApprovedTransfersTimeline                    []*CollectionApprovedTransferTimeline   `protobuf:"bytes,11,rep,name=approvedTransfersTimeline,proto3" json:"approvedTransfersTimeline,omitempty"`
+	NextBadgeId                                  Uint                                    `protobuf:"bytes,12,opt,name=nextBadgeId,proto3,customtype=Uint" json:"nextBadgeId"`
+	UnmintedSupplys                              []*Balance                              `protobuf:"bytes,13,rep,name=unmintedSupplys,proto3" json:"unmintedSupplys,omitempty"`
+	TotalSupplys                                 []*Balance                              `protobuf:"bytes,14,rep,name=totalSupplys,proto3" json:"totalSupplys,omitempty"`
+	StandardsTimeline                            []*StandardTimeline                     `protobuf:"bytes,15,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
+	IsArchivedTimeline                           []*IsArchivedTimeline                   `protobuf:"bytes,16,rep,name=isArchivedTimeline,proto3" json:"isArchivedTimeline,omitempty"`
 	ContractAddressTimeline                      []*ContractAddressTimeline              `protobuf:"bytes,17,rep,name=contractAddressTimeline,proto3" json:"contractAddressTimeline,omitempty"`
 	DefaultUserApprovedOutgoingTransfersTimeline []*UserApprovedOutgoingTransferTimeline `protobuf:"bytes,18,rep,name=defaultUserApprovedOutgoingTransfersTimeline,proto3" json:"defaultUserApprovedOutgoingTransfersTimeline,omitempty"`
 	DefaultUserApprovedIncomingTransfersTimeline []*UserApprovedIncomingTransferTimeline `protobuf:"bytes,19,rep,name=defaultUserApprovedIncomingTransfersTimeline,proto3" json:"defaultUserApprovedIncomingTransfersTimeline,omitempty"`

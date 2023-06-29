@@ -2,11 +2,10 @@ package types_test
 
 import (
 	"testing"
-
 	// "github.com/bitbadges/bitbadgeschain/testutil/sample"
 	// "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	// sdk "github.com/cosmos/cosmos-sdk/types"
-	// sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	// sdkerrors "cosmossdk.io/errors"
 	// "github.com/stretchr/testify/require"
 )
 
@@ -40,7 +39,7 @@ func TestMsgUpdateCollectionApprovedTransfers_ValidateBasic(t *testing.T) {
 	// 				},
 	// 			},
 	// 		},
-	// 		err: sdkerrors.ErrInvalidAddress,
+	// 		err: ErrInvalidAddress,
 	// 	}, {
 	// 		name: "valid address",
 	// 		msg: types.MsgUpdateCollectionApprovedTransfers{

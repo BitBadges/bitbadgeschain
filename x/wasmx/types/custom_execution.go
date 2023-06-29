@@ -3,8 +3,10 @@ package types
 import (
 	"encoding/json"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 type InjectiveExecMsg struct {
@@ -24,7 +26,7 @@ func NewInjectiveExecMsg(origin sdk.AccAddress, data string) (*InjectiveExecMsg,
 	}
 
 	if e.Origin == "" && origin.Empty() {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "origin address is empty")
+		return nil, sdkerrors.Wrap(badgestypes.ErrInvalidAddress, "origin address is empty")
 	}
 
 	// override e.Origin for safety

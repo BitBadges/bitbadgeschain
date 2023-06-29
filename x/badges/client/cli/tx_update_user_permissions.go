@@ -1,13 +1,10 @@
 package cli
 
 import (
-    "strconv"
-	
-	"github.com/spf13/cobra"
-    "github.com/cosmos/cosmos-sdk/client"
+	"strconv"
+
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"github.com/spf13/cobra"
 )
 
 var _ = strconv.Itoa(0)
@@ -18,20 +15,21 @@ func CmdUpdateUserPermissions() *cobra.Command {
 		Short: "Broadcast message updateUserPermissions",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
+return nil
       		
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
+			// clientCtx, err := client.GetClientTxContext(cmd)
+			// if err != nil {
+			// 	return err
+			// }
 
-			msg := types.NewMsgUpdateUserPermissions(
-				clientCtx.GetFromAddress().String(),
+			// msg := types.NewMsgUpdateUserPermissions(
+			// 	clientCtx.GetFromAddress().String(),
 				
-			)
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+			// )
+			// if err := msg.ValidateBasic(); err != nil {
+			// 	return err
+			// }
+			// return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 

@@ -23,7 +23,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// ID ranges define a range of IDs from start to end. Can be used for badge IDs, nonces, anything.
 type IdRange struct {
 	Start Uint `protobuf:"bytes,1,opt,name=start,proto3,customtype=Uint" json:"start"`
 	End   Uint `protobuf:"bytes,2,opt,name=end,proto3,customtype=Uint" json:"end"`
@@ -62,7 +61,6 @@ func (m *IdRange) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_IdRange proto.InternalMessageInfo
 
-// Defines a balance object. The specified balance holds for all ids specified within the id ranges array.
 type Balance struct {
 	Amount   Uint       `protobuf:"bytes,1,opt,name=amount,proto3,customtype=Uint" json:"amount"`
 	Times    []*IdRange `protobuf:"bytes,2,rep,name=times,proto3" json:"times,omitempty"`
@@ -116,10 +114,6 @@ func (m *Balance) GetBadgeIds() []*IdRange {
 	return nil
 }
 
-// The badgeIds specified will inherit the balances of the parentBadgeIds.
-// If number of badges specified in parentBadgeIds === 1, then all badges will inherit the balances of that badge.
-// Else, number of badges specified in parentBadgeIds must === number of badges specified in badgeIds.
-// Or else, error is thrown
 type InheritedBalance struct {
 	BadgeIds           []*IdRange `protobuf:"bytes,1,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 	ParentCollectionId Uint       `protobuf:"bytes,2,opt,name=parentCollectionId,proto3,customtype=Uint" json:"parentCollectionId"`

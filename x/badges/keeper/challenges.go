@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdk.Uint,  challenges []*types.Challenge, solutions []*types.ChallengeSolution, creatorAddress string, collection bool, userOutgoing bool, userIncoming bool) (bool, sdk.Uint, error) {
+func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdk.Uint,  challenges []*types.Challenge, solutions []*types.ChallengeSolution, creatorAddress string, level string) (bool, sdk.Uint, error) {
 	numIncrements := sdk.NewUint(0)
 
 	for _, challenge := range challenges {
@@ -38,7 +38,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 				}
 
 				if challenge.MaxOneUsePerLeaf {
-					numUsed, err := k.IncrementNumUsedForChallengeInStore(ctx, collectionId, challengeId, leafIndex, collection, userOutgoing, userIncoming)
+					numUsed, err := k.IncrementNumUsedForChallengeInStore(ctx, collectionId, challengeId, leafIndex, level)
 					if err != nil {
 						continue
 					}

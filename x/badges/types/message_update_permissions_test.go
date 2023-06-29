@@ -5,7 +5,6 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -24,7 +23,7 @@ func TestMsgUpdateCollectionPermissions_ValidateBasic(t *testing.T) {
 				CollectionId: sdk.NewUint(1),
 				Permissions:  &types.CollectionPermissions{},
 			},
-			err: sdkerrors.ErrInvalidAddress,
+			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: types.MsgUpdateCollectionPermissions{

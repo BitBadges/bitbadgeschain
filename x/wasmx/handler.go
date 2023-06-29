@@ -6,11 +6,13 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	log "github.com/xlab/suplog"
 
 	"github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
+
+	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 func NewHandler(k keeper.Keeper) sdk.Handler {
@@ -26,7 +28,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			res, err := msgServer.ExecuteContractCompat(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		default:
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest,
+			return nil, sdkerrors.Wrap(badgestypes.ErrUnknownRequest,
 				fmt.Sprintf("Unrecognized wasmx Msg type: %T", msg))
 		}
 	}

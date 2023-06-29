@@ -45,7 +45,9 @@ func UpdateBalancesForIdRanges(ranges []*IdRange, newTimes []*IdRange, newAmount
 	//Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
 	// ranges = SortAndMergeOverlapping(ranges)
 	balances = DeleteBalanceForIdRanges(ranges, newTimes, balances)
-	balances, err = SetBalanceForIdRanges(ranges, newTimes,  newAmount, balances)
+	balances, err = SetBalanceForIdRanges(ranges, newTimes, newAmount, balances)
+
+
 
 	return balances, err
 }
@@ -54,49 +56,52 @@ func UpdateBalancesForIdRanges(ranges []*IdRange, newTimes []*IdRange, newAmount
 func GetBalancesForIdRanges(idRanges []*IdRange, times []*IdRange, balances []*Balance) (newBalances []*Balance, err error) {
 	fetchedBalances := []*Balance{}
 
+	currPermissionDetails := []*UniversalPermissionDetails{}
 	for _, balanceObj := range balances {
-		currPermissionDetails := []*UniversalPermissionDetails{}
 		for _, currRange := range balanceObj.BadgeIds {
 			for _, currTime := range balanceObj.Times {
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
 					BadgeId: currRange,
 					TimelineTime: currTime,
 					TransferTime: &IdRange{ Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64) }, //dummy range
+					ArbitraryValue: balanceObj.Amount,
 				})
 			}
 		}
+	}
 
-		toFetchPermissionDetails := []*UniversalPermissionDetails{}
-		for _, rangeToFetch := range idRanges {
-			for _, timeToFetch := range times {
-				toFetchPermissionDetails = append(toFetchPermissionDetails, &UniversalPermissionDetails{
-						BadgeId: rangeToFetch,
-						TimelineTime: timeToFetch,
-						TransferTime: &IdRange{ Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64) }, //dummy range
-					},
-				)
-			}
-		}
-
-		overlaps, _, inNewButNotOld := GetOverlapsAndNonOverlaps(currPermissionDetails, toFetchPermissionDetails)
-		for _, overlapObject := range overlaps {
-			overlap := overlapObject.Overlap
-
-			fetchedBalances = append(fetchedBalances, &Balance{
-				Amount:   balanceObj.Amount,
-				BadgeIds: []*IdRange{overlap.BadgeId},
-				Times: []*IdRange{overlap.TimelineTime},
-			})
-		}
-
-		for _, detail := range inNewButNotOld {
-			fetchedBalances = append(fetchedBalances, &Balance{
-				Amount:   balanceObj.Amount,
-				BadgeIds: []*IdRange{detail.BadgeId},
-				Times: []*IdRange{detail.TimelineTime},
-			})
+	toFetchPermissionDetails := []*UniversalPermissionDetails{}
+	for _, rangeToFetch := range idRanges {
+		for _, timeToFetch := range times {
+			toFetchPermissionDetails = append(toFetchPermissionDetails, &UniversalPermissionDetails{
+					BadgeId: rangeToFetch,
+					TimelineTime: timeToFetch,
+					TransferTime: &IdRange{ Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64) }, //dummy range
+				},
+			)
 		}
 	}
+
+	overlaps, _, inNewButNotOld := GetOverlapsAndNonOverlaps(currPermissionDetails, toFetchPermissionDetails)
+	for _, overlapObject := range overlaps {
+		overlap := overlapObject.Overlap
+		amount := overlapObject.FirstDetails.ArbitraryValue.(sdk.Uint)
+
+		fetchedBalances = append(fetchedBalances, &Balance{
+			Amount:  amount,
+			BadgeIds: []*IdRange{overlap.BadgeId},
+			Times: []*IdRange{overlap.TimelineTime},
+		})
+	}
+
+	for _, detail := range inNewButNotOld {
+		fetchedBalances = append(fetchedBalances, &Balance{
+			Amount:   sdk.NewUint(0),
+			BadgeIds: []*IdRange{detail.BadgeId},
+			Times: []*IdRange{detail.TimelineTime},
+		})
+	}
+	
 
 	return fetchedBalances, nil
 }
@@ -140,6 +145,7 @@ func SubtractBalancesForIdRanges(balances []*Balance, ranges []*IdRange, times [
 			return balances, err
 		}
 	}
+
 	return balances, nil
 }
 
@@ -186,23 +192,9 @@ func DeleteBalanceForIdRanges(rangesToDelete []*IdRange, timesToDelete []*IdRang
 
 // Sets the balance for a specific id. Assumes balance does not exist.
 func SetBalanceForIdRanges(ranges []*IdRange, times []*IdRange, amount sdk.Uint, balances []*Balance) ([]*Balance, error) {
-	//TODO: ?
-	// err := *new(error)
-	
-	// for _, balance := range balances {
-	// 	if balance.Amount.Equal(amount) {
-	// 		if IdRangeEquals(times, balance.Times) {
-	// 			for _, rangeToAdd := range ranges {
-	// 				balance.BadgeIds, err = InsertRangeToIdRanges(rangeToAdd, balance.BadgeIds)
-	// 				if err != nil {
-	// 					return nil, err
-	// 				}
-	// 			}
-
-	// 			return balances, nil
-	// 		}
-	// 	}
-	// }
+	if amount.IsZero() {
+		return balances, nil
+	}
 
 	balances = append(balances, &Balance{
 		Amount:   amount,

@@ -8,7 +8,7 @@ import "badges/balances.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
-message AddressConditions {
+message AddressMappingConditions {
   repeated MinMaxBalance mustOwnBadges = 1;
   repeated MinMaxBalance mustNotOwnBadges = 2;
 
@@ -19,20 +19,20 @@ message AddressConditions {
   repeated string mustNotBeInMapping = 6;
 }
 
-message AddressFilters {
+message AddressMappingFilters {
   string mustSatisfyMinX = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
-  repeated AddressConditions conditions = 2;
+  repeated AddressMappingConditions conditions = 2;
 }
 
 message AddressMapping {
   string mappingId = 1;
 
   repeated string addresses = 2;
-  bool includeOnlySpecified = 3; //If true, then we only allow the specified addresses. If false, we allow all addresses except the specified ones.
+  bool includeOnlySpecified = 3;
 
   string uri = 4;
   string customData = 5;
 
   //Must satisfy all these filters
-  repeated AddressFilters filters = 6;
+  repeated AddressMappingFilters filters = 6;
 }

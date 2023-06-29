@@ -7,12 +7,10 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
-//BadgeMetadataUri defines a URI where to fetch the badge metadata for the given badge id ranges
-//If {id} is included in the URI, it will be replaced by each badge's unique id.
 message BadgeMetadata {
   string uri = 1;
-  repeated IdRange badgeIds = 2;
-  string customData = 3;
+  string customData = 2;
+  repeated IdRange badgeIds = 3;
 }
 
 message CollectionMetadata {

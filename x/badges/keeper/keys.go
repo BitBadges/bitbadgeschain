@@ -56,13 +56,10 @@ func ConstructAddressMappingKey(addressMappingId string) string {
 	return addressMappingId
 }
 
-func ConstructTransferTrackerKey(collectionId sdk.Uint, trackerId string, collection bool, userOutgoing bool, userIncoming bool, address string) string {
+func ConstructTransferTrackerKey(collectionId sdk.Uint, trackerId string, level string, depth string, address string) string {
 	collection_id_str := collectionId.String()
 	tracker_id_str := trackerId
-	collection_str := strconv.FormatBool(collection)
-	user_outgoing_str := strconv.FormatBool(userOutgoing)
-	user_incoming_str := strconv.FormatBool(userIncoming)
-	return collection_id_str + BalanceKeyDelimiter + tracker_id_str + BalanceKeyDelimiter + collection_str + BalanceKeyDelimiter + user_outgoing_str + BalanceKeyDelimiter + user_incoming_str + BalanceKeyDelimiter + address
+	return collection_id_str + BalanceKeyDelimiter + tracker_id_str + BalanceKeyDelimiter + level + BalanceKeyDelimiter + depth + BalanceKeyDelimiter + address
 }
 
 func ConstructClaimKey(collectionId sdk.Uint, claimId sdk.Uint) string {
@@ -78,14 +75,11 @@ func ConstructUsedClaimDataKey(collectionId sdk.Uint, claimId sdk.Uint) string {
 	return collection_id_str + BalanceKeyDelimiter + claim_id_str
 }
 
-func ConstructUsedClaimChallengeKey(collectionId sdk.Uint, challengeId string, codeLeafIndex sdk.Uint, collection bool, userOutgoing bool, userIncoming bool) string {
+func ConstructUsedClaimChallengeKey(collectionId sdk.Uint, challengeId string, codeLeafIndex sdk.Uint, level string) string {
 	collection_id_str := collectionId.String()
 	code_leaf_index_str := codeLeafIndex.String()
 	challenge_id_str := challengeId
-	collection_str := strconv.FormatBool(collection)
-	user_outgoing_str := strconv.FormatBool(userOutgoing)
-	user_incoming_str := strconv.FormatBool(userIncoming)
-	return collection_id_str + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + code_leaf_index_str + BalanceKeyDelimiter + collection_str + BalanceKeyDelimiter + user_outgoing_str + BalanceKeyDelimiter + user_incoming_str
+	return collection_id_str + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + code_leaf_index_str + BalanceKeyDelimiter + level
 }
 
 func ConstructUsedWhitelistIndexKey(collectionId sdk.Uint, claimId sdk.Uint, whitelistLeafIndex sdk.Uint) string {

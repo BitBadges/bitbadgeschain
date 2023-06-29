@@ -19,9 +19,9 @@ func TestGenesis(t *testing.T) {
 		Collections:      []*types.BadgeCollection{},
 		Balances:         []*types.UserBalanceStore{},
 		BalanceStoreKeys: []string{},
-		Claims:           []*types.Claim{},
-		ClaimStoreKeys:   []string{},
-		NextClaimId:      sdk.NewUint(1),
+		// Claims:           []*types.Claim{},
+		// ClaimStoreKeys:   []string{},
+		// NextClaimId:      sdk.NewUint(1),
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 

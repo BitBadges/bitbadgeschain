@@ -15,9 +15,10 @@ var _ = strconv.Itoa(0)
 func CmdUpdateUserApprovedOutgoingTransfers() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-user-approved-transfers",
-		Short: "Broadcast message updateUserApprovedOutgoingTransfers",
+		Short: "Broadcast message UpdateUserApprovedTransfers",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
+return nil
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {

@@ -77,7 +77,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection types.BadgeCollectio
 func (k Keeper) HandleTransfer(ctx sdk.Context, collection types.BadgeCollection, badgeIds []*types.IdRange, times []*types.IdRange, fromUserBalance types.UserBalanceStore, toUserBalance types.UserBalanceStore, amount sdk.Uint, from string, to string, initiatedBy string, solutions []*types.ChallengeSolution, onlyDeductApprovals bool) (types.UserBalanceStore, types.UserBalanceStore, error) {
 	err := *new(error)
 
-	userApprovals, err := k.CheckIfApprovedOnCollectionLevelAndGetUserApprovalsToCheck(ctx,  collection, badgeIds, times,  from, to, initiatedBy, amount, solutions)
+	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx,  collection, badgeIds, times,  from, to, initiatedBy, amount, solutions)
 	if err != nil {
 		return types.UserBalanceStore{}, types.UserBalanceStore{}, err
 	}
@@ -85,12 +85,12 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection types.BadgeCollection
 	if len(userApprovals) > 0 {
 		for _, userApproval := range userApprovals {
 			if userApproval.Outgoing {
-				err = k.DeductOutgoingApprovalsIfNeeded(ctx, collection, &fromUserBalance, userApproval.BadgeIds, times, from, to, initiatedBy, amount, solutions)
+				err = k.DeductUserOutgoingApprovals(ctx, collection, &fromUserBalance, userApproval.BadgeIds, times, from, to, initiatedBy, amount, solutions)
 				if err != nil {
 					return types.UserBalanceStore{}, types.UserBalanceStore{}, err
 				}
 			} else {
-				err = k.DeductIncomingApprovalsIfNeeded(ctx, collection, &toUserBalance, userApproval.BadgeIds, times, from, to, initiatedBy, amount, solutions)
+				err = k.DeductUserIncomingApprovals(ctx, collection, &toUserBalance, userApproval.BadgeIds, times, from, to, initiatedBy, amount, solutions)
 				if err != nil {
 					return types.UserBalanceStore{}, types.UserBalanceStore{}, err
 				}
@@ -102,12 +102,12 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection types.BadgeCollection
 		return fromUserBalance, toUserBalance, nil
 	}
 
-	fromUserBalance.Balances, err = SubtractBalancesForIdRanges(fromUserBalance.Balances, badgeIds, times, amount)
+	fromUserBalance.Balances, err = types.SubtractBalancesForIdRanges(fromUserBalance.Balances, badgeIds, times, amount)
 	if err != nil {
 		return types.UserBalanceStore{}, types.UserBalanceStore{}, err
 	}
 
-	toUserBalance.Balances, err = AddBalancesForIdRanges(toUserBalance.Balances, badgeIds, times, amount)
+	toUserBalance.Balances, err = types.AddBalancesForIdRanges(toUserBalance.Balances, badgeIds, times, amount)
 	if err != nil {
 		return types.UserBalanceStore{}, types.UserBalanceStore{}, err
 	}

@@ -1,14 +1,9 @@
 package cli
 
 import (
-	"encoding/json"
 	"strconv"
 
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 )
 
@@ -25,36 +20,37 @@ func CmdSetApproval() *cobra.Command {
 		Short: "Broadcast message setApproval",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argBadgeId := types.NewUintFromString(args[0])
-			if err != nil {
-				return err
-			}
+return nil
+		// 	argBadgeId := types.NewUintFromString(args[0])
+		// 	if err != nil {
+		// 		return err
+		// 	}
 
-			argAddress, err := cast.ToStringE(args[1])
-			if err != nil {
-				return err
-			}
+		// 	argAddress, err := cast.ToStringE(args[1])
+		// 	if err != nil {
+		// 		return err
+		// 	}
 
-			var argBalances []*types.Balance
-			if err := json.Unmarshal([]byte(args[2]), &argBalances); err != nil {
-				return err
-			}
+		// 	var argBalances []*types.Balance
+		// 	if err := json.Unmarshal([]byte(args[2]), &argBalances); err != nil {
+		// 		return err
+		// 	}
 
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
+		// 	clientCtx, err := client.GetClientTxContext(cmd)
+		// 	if err != nil {
+		// 		return err
+		// 	}
 
-			msg := types.NewMsgSetApproval(
-				clientCtx.GetFromAddress().String(),
-				argBadgeId,
-				argAddress,
-				argBalances,
-			)
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		// 	msg := types.NewMsgSetApproval(
+		// 		clientCtx.GetFromAddress().String(),
+		// 		argBadgeId,
+		// 		argAddress,
+		// 		argBalances,
+		// 	)
+		// 	if err := msg.ValidateBasic(); err != nil {
+		// 		return err
+		// 	}
+		// 	return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 

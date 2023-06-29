@@ -5,7 +5,6 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -21,7 +20,7 @@ func TestMsgDeleteCollection_ValidateBasic(t *testing.T) {
 				Creator:      "invalid_address",
 				CollectionId: sdk.NewUint(1),
 			},
-			err: sdkerrors.ErrInvalidAddress,
+			err: ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: MsgDeleteCollection{

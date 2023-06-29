@@ -3,28 +3,28 @@ package bitbadges.bitbadgeschain.badges;
 
 import "google/protobuf/any.proto";
 import "badges/balances.proto";
-import "badges/addresses.proto";
+import "badges/address_mappings.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 message CollectionPermissions {
-  repeated ActionPermission canDeleteCollection = 1; 
+  repeated ActionPermission canDeleteCollection = 1;
   repeated TimedUpdatePermission canArchive = 2;
   repeated TimedUpdatePermission canUpdateContractAddress = 3;
   repeated TimedUpdatePermission canUpdateOffChainBalancesMetadata = 4;
-  repeated TimedUpdatePermission canUpdateStandard = 12;
+  repeated TimedUpdatePermission canUpdateStandards = 5;
   
-  repeated TimedUpdatePermission canUpdateCustomData = 5;
-  repeated TimedUpdatePermission canUpdateManager = 6; 
-  repeated TimedUpdatePermission canUpdateCollectionMetadata = 7;
+  repeated TimedUpdatePermission canUpdateCustomData = 6;
+  repeated TimedUpdatePermission canUpdateManager = 7;
+  repeated TimedUpdatePermission canUpdateCollectionMetadata = 8;
 
-  repeated ActionWithBadgeIdsPermission canCreateMoreBadges = 8;
+  repeated ActionWithBadgeIdsPermission canCreateMoreBadges = 9;
 
-  repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 9;
-  repeated TimedUpdateWithBadgeIdsPermission canUpdateInheritedBalances = 10;
+  repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 10;
+  repeated TimedUpdateWithBadgeIdsPermission canUpdateInheritedBalances = 11;
 
-  repeated CollectionApprovedTransferPermission canUpdateApprovedTransfers = 11;
+  repeated CollectionApprovedTransferPermission canUpdateCollectionApprovedTransfers = 12;
 }
 
 message UserPermissions {

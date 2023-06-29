@@ -3,12 +3,12 @@ package custom_bindings
 import (
 	"encoding/json"
 
+	sdkerrors "cosmossdk.io/errors"
 	wasmKeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/CosmWasm/wasmd/x/wasm/types"
 	badgeKeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	badgeTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier {
@@ -16,7 +16,7 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 		var custom badgeCustomQuery
 		err := json.Unmarshal(request, &custom)
 		if err != nil {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+			return nil, sdkerrors.Wrap(err, err.Error())
 		}
 		switch {
 		case custom.QueryAddressById != nil:
@@ -38,11 +38,11 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 			}
 			return json.Marshal(badgeTypes.QueryGetBalanceResponse{Balance: res.Balance})
 		case custom.QueryClaim != nil:
-			res, err := keeper.GetClaim(ctx, custom.QueryClaim)
+			res, err := keeper.GetClaimNumProcessed(ctx, custom.QueryClaim)
 			if err != nil {
 				return nil, err
 			}
-			return json.Marshal(badgeTypes.QueryGetClaimResponse{Claim: res.Claim})
+			return json.Marshal(badgeTypes.QueryGetClaimNumProcessedResponse{NumProcessed: res.NumProcessed})
 		}
 
 		return nil, sdkerrors.Wrap(types.ErrInvalidMsg, "Unknown Custom query variant")
@@ -53,5 +53,5 @@ type badgeCustomQuery struct {
 	QueryAddressById *badgeTypes.QueryGetAddressByIdRequest `json:"queryAddressById,omitempty"`
 	QueryCollection  *badgeTypes.QueryGetCollectionRequest  `json:"queryCollection,omitempty"`
 	QueryBalance     *badgeTypes.QueryGetBalanceRequest     `json:"queryBalance,omitempty"`
-	QueryClaim       *badgeTypes.QueryGetClaimRequest       `json:"queryClaim,omitempty"`
+	QueryClaim       *badgeTypes.QueryGetClaimNumProcessedRequest       `json:"queryClaim,omitempty"`
 }

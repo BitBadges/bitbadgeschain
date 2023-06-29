@@ -1,8 +1,8 @@
 package types
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const TypeMsgNewCollection = "new_collection"
@@ -103,7 +103,7 @@ func (msg *MsgNewCollection) GetSignBytes() []byte {
 func (msg *MsgNewCollection) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	if msg.OffChainBalancesMetadataTimeline != nil {
@@ -146,7 +146,7 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		//We have off-chain or inherited balances
 
 		if len(msg.Transfers) > 0 || len(msg.ApprovedTransfersTimeline) > 0 {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "balances metadata denotes off-chain balances but claims and/or transfers are set")
+			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but claims and/or transfers are set")
 		}
 	}
 
@@ -165,7 +165,7 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 				}
 
 				if balance.ParentCollectionId.IsZero() || balance.ParentCollectionId.IsNil() {
-					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid parent collection id")
+					return sdkerrors.Wrapf(ErrInvalidRequest, "invalid parent collection id")
 				}
 	
 			}

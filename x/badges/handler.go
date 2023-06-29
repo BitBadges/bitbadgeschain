@@ -3,10 +3,10 @@ package badges
 import (
 	"fmt"
 
+	sdkerrors "cosmossdk.io/errors"
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // NewHandler ...
@@ -25,8 +25,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgTransferBadge:
 			res, err := msgServer.TransferBadge(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgSetApproval:
-			res, err := msgServer.SetApproval(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgUpdateCollectionApprovedTransfers:
 			res, err := msgServer.UpdateCollectionApprovedTransfers(sdk.WrapSDKContext(ctx), msg)
@@ -40,16 +38,25 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgUpdateManager:
 			res, err := msgServer.UpdateManager(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgRequestUpdateManager:
-			res, err := msgServer.RequestUpdateManager(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgForkCollection:
+			res, err := msgServer.ForkCollection(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgUpdateCustomData:
-			res, err := msgServer.UpdateCustomData(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgArchiveCollection:
+			res, err := msgServer.ArchiveCollection(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgUpdateUserApprovedTransfers:
+			res, err := msgServer.UpdateUserApprovedTransfers(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgDeleteCollection:
+			res, err := msgServer.DeleteCollection(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgUpdateUserPermissions:
+			res, err := msgServer.UpdateUserPermissions(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 			// this line is used by starport scaffolding # 1
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
+			return nil, sdkerrors.Wrap(types.ErrUnknownRequest, errMsg)
 		}
 	}
 }

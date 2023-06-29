@@ -1,8 +1,9 @@
 package ante
 
 import (
+	sdkerrors "cosmossdk.io/errors"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
@@ -28,13 +29,13 @@ type HandlerOptions struct {
 
 func (options HandlerOptions) Validate() error {
 	if options.AccountKeeper == nil {
-		return sdkerrors.Wrap(sdkerrors.ErrLogic, "account keeper is required for AnteHandler")
+		return sdkerrors.Wrap(types.ErrLogic, "account keeper is required for AnteHandler")
 	}
 	if options.BankKeeper == nil {
-		return sdkerrors.Wrap(sdkerrors.ErrLogic, "bank keeper is required for AnteHandler")
+		return sdkerrors.Wrap(types.ErrLogic, "bank keeper is required for AnteHandler")
 	}
 	if options.SignModeHandler == nil {
-		return sdkerrors.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
+		return sdkerrors.Wrap(types.ErrLogic, "sign mode handler is required for ante builder")
 	}
 	return nil
 }

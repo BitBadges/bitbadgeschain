@@ -2,8 +2,7 @@ package types
 
 import (
 	"testing"
-
-	// sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	// sdkerrors "cosmossdk.io/errors"
 	// "github.com/stretchr/testify/require"
 	// "github.com/bitbadges/bitbadgeschain/testutil/sample"
 )
@@ -19,7 +18,7 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 	// 		msg: MsgUpdateUserPermissions{
 	// 			Creator: "invalid_address",
 	// 		},
-	// 		err: sdkerrors.ErrInvalidAddress,
+	// 		err: ErrInvalidAddress,
 	// 	}, {
 	// 		name: "valid address",
 	// 		msg: MsgUpdateUserPermissions{

@@ -2,12 +2,10 @@ package types_test
 
 import (
 	"testing"
-
 	// "github.com/bitbadges/bitbadgeschain/testutil/sample"
 	// sdk "github.com/cosmos/cosmos-sdk/types"
-	// sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	// sdkerrors "cosmossdk.io/errors"
 	// "github.com/stretchr/testify/require"
-
 	// "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
@@ -29,7 +27,7 @@ func TestMsgMintAndDistributeBadges_ValidateBasic(t *testing.T) {
 	// 				},
 	// 			},
 	// 		},
-	// 		err: sdkerrors.ErrInvalidAddress,
+	// 		err: ErrInvalidAddress,
 	// 	}, {
 	// 		name: "valid state",
 	// 		msg: types.MsgMintAndDistributeBadges{

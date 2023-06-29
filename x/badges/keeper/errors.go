@@ -1,8 +1,8 @@
 package keeper
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // We can clean this up in the future. A lot of errors are deprecated and can be removed.

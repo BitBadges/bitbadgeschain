@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"regexp"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 var (
@@ -56,7 +56,7 @@ func ValidateAddress(address string, allowAliases bool) error {
 			return nil
 		}
 
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s)", err)
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid address (%s)", err)
 	}
 	return nil
 }
@@ -325,7 +325,7 @@ func ValidateTransfer(transfer *Transfer) error {
 
 	err = ValidateAddress(transfer.From, false)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid from address (%s)", err)
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid from address (%s)", err)
 	}
 
 	if duplicateInStringArray(transfer.ToAddresses) {
@@ -335,7 +335,7 @@ func ValidateTransfer(transfer *Transfer) error {
 	for _, address := range transfer.ToAddresses {
 		err = ValidateAddress(address, true)
 		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid to address (%s)", err)
+			return sdkerrors.Wrapf(ErrInvalidAddress, "invalid to address (%s)", err)
 		}
 	}
 
@@ -353,7 +353,7 @@ func ValidateBadgeMetadata(badgeMetadata []*BadgeMetadata) error {
 
 			err = ValidateRangesAreValid(badgeMetadata.BadgeIds, true)
 			if err != nil {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid badgeIds")
+				return sdkerrors.Wrapf(ErrInvalidRequest, "invalid badgeIds")
 			}
 		}
 	}

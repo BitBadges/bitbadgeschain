@@ -31,7 +31,7 @@ func (k msgServer) UpdateCollectionApprovedTransfers(goCtx context.Context, msg 
 		}
 	}
 
-	if err := ValidateCollectionApprovedTransfersUpdate(ctx, collection.ApprovedTransfersTimeline, msg.ApprovedTransfersTimeline, collection.Permissions.CanUpdateApprovedTransfers); err != nil {
+	if err := ValidateCollectionApprovedTransfersUpdate(ctx, collection.ApprovedTransfersTimeline, msg.ApprovedTransfersTimeline, collection.Permissions.CanUpdateCollectionApprovedTransfers); err != nil {
 		return nil, err
 	}
 	collection.ApprovedTransfersTimeline = msg.ApprovedTransfersTimeline

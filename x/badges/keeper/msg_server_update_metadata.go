@@ -45,7 +45,7 @@ func (k msgServer) UpdateMetadata(goCtx context.Context, msg *types.MsgUpdateMet
 	}
 
 	if msg.StandardsTimeline != nil && len(msg.StandardsTimeline) > 0 {
-		if err := ValidateStandardsUpdate(ctx, collection.StandardsTimeline, msg.StandardsTimeline, collection.Permissions.CanUpdateStandard); err != nil {
+		if err := ValidateStandardsUpdate(ctx, collection.StandardsTimeline, msg.StandardsTimeline, collection.Permissions.CanUpdateStandards); err != nil {
 			return nil, err
 		}
 		collection.StandardsTimeline = msg.StandardsTimeline

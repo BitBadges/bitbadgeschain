@@ -1,8 +1,8 @@
 package types
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const TypeMsgUpdateCollectionApprovedTransfers = "update_allowed_transfers"
@@ -50,7 +50,7 @@ func (msg *MsgUpdateCollectionApprovedTransfers) GetSignBytes() []byte {
 func (msg *MsgUpdateCollectionApprovedTransfers) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	for _, timelineVal := range msg.ApprovedTransfersTimeline {

@@ -17,7 +17,7 @@ func GetCombosForStringTimelines(oldValue interface{}, newValue interface{}) []*
 	return x
 }
 
-func ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTransfers []*types.CollectionApprovedTransferTimeline, newApprovedTransfers []*types.CollectionApprovedTransferTimeline, canUpdateApprovedTransfers []*types.CollectionApprovedTransferPermission) error {
+func ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTransfers []*types.CollectionApprovedTransferTimeline, newApprovedTransfers []*types.CollectionApprovedTransferTimeline, CanUpdateCollectionApprovedTransfers []*types.CollectionApprovedTransferPermission) error {
 	oldTimes, oldValues := GetCollectionApprovedTransferTimesAndValues(oldApprovedTransfers)
 	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
 
@@ -56,8 +56,7 @@ func ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTrans
 						newVal[i].OverridesToApprovedIncomingTransfers != oldVal[i].OverridesToApprovedIncomingTransfers ||
 						newVal[i].TrackerId != oldVal[i].TrackerId ||
 						newVal[i].Uri != oldVal[i].Uri ||
-						newVal[i].CustomData != oldVal[i].CustomData ||
-						newVal[i].MaxNumTransfers != oldVal[i].MaxNumTransfers {
+						newVal[i].CustomData != oldVal[i].CustomData {
 							different = true
 							break
 					}
@@ -106,12 +105,12 @@ func ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTrans
 						}
 					}
 
-					x, err := proto.Marshal(newVal[i].Approvals)
+					x, err := proto.Marshal(newVal[i].OverallApprovals)
 					if err != nil {
 						panic(err)
 					}
 
-					y, err := proto.Marshal(oldVal[i].Approvals)
+					y, err := proto.Marshal(oldVal[i].OverallApprovals)
 					if err != nil {
 						panic(err)
 					}
@@ -135,23 +134,6 @@ func ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTrans
 						different = true
 						break
 					}
-
-					x, err = proto.Marshal(newVal[i].PerAddressMaxNumTransfers)
-					if err != nil {
-						panic(err)
-					}
-
-					y, err = proto.Marshal(oldVal[i].PerAddressMaxNumTransfers)
-					if err != nil {
-						panic(err)
-					}
-
-					if string(x) != string(y) {
-						different = true
-						break
-					}
-
-
 				}
 			}
 				
@@ -169,7 +151,7 @@ func ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTrans
 		return detailsToReturn
 	})
 
-	err := CheckCollectionApprovedTransferPermission(ctx, detailsToCheck, canUpdateApprovedTransfers)
+	err := CheckCollectionApprovedTransferPermission(ctx, detailsToCheck, CanUpdateCollectionApprovedTransfers)
 	if err != nil {
 		return err
 	}
@@ -178,7 +160,7 @@ func ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, oldApprovedTrans
 }
 
 
-func ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, oldApprovedTransfers []*types.UserApprovedOutgoingTransferTimeline, newApprovedTransfers []*types.UserApprovedOutgoingTransferTimeline, canUpdateApprovedTransfers []*types.UserApprovedTransferPermission) error {
+func ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, oldApprovedTransfers []*types.UserApprovedOutgoingTransferTimeline, newApprovedTransfers []*types.UserApprovedOutgoingTransferTimeline, CanUpdateCollectionApprovedTransfers []*types.UserApprovedTransferPermission) error {
 	oldTimes, oldValues := GetUserApprovedOutgoingTransferTimesAndValues(oldApprovedTransfers)
 	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
 
@@ -213,8 +195,7 @@ func ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, oldApprovedTra
 						newVal[i].RequireToDoesNotEqualInitiatedBy != oldVal[i].RequireToDoesNotEqualInitiatedBy ||
 						newVal[i].TrackerId != oldVal[i].TrackerId ||
 						newVal[i].Uri != oldVal[i].Uri ||
-						newVal[i].CustomData != oldVal[i].CustomData ||
-						newVal[i].MaxNumTransfers != oldVal[i].MaxNumTransfers {
+						newVal[i].CustomData != oldVal[i].CustomData {
 							different = true
 							break
 					}
@@ -263,42 +244,12 @@ func ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, oldApprovedTra
 						}
 					}
 
-					x, err := proto.Marshal(newVal[i].Approvals)
+					x, err := proto.Marshal(newVal[i].PerAddressApprovals)
 					if err != nil {
 						panic(err)
 					}
 
-					y, err := proto.Marshal(oldVal[i].Approvals)
-					if err != nil {
-						panic(err)
-					}
-
-					if string(x) != string(y) {
-						different = true
-						break
-					}
-
-					x, err = proto.Marshal(newVal[i].PerAddressApprovals)
-					if err != nil {
-						panic(err)
-					}
-
-					y, err = proto.Marshal(oldVal[i].PerAddressApprovals)
-					if err != nil {
-						panic(err)
-					}
-
-					if string(x) != string(y) {
-						different = true
-						break
-					}
-
-					x, err = proto.Marshal(newVal[i].PerAddressMaxNumTransfers)
-					if err != nil {
-						panic(err)
-					}
-
-					y, err = proto.Marshal(oldVal[i].PerAddressMaxNumTransfers)
+					y, err := proto.Marshal(oldVal[i].PerAddressApprovals)
 					if err != nil {
 						panic(err)
 					}
@@ -322,7 +273,7 @@ func ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, oldApprovedTra
 		return detailsToReturn
 	})
 
-	err := CheckUserApprovedTransferPermission(ctx, detailsToCheck, canUpdateApprovedTransfers)
+	err := CheckUserApprovedTransferPermission(ctx, detailsToCheck, CanUpdateCollectionApprovedTransfers)
 	if err != nil {
 		return err
 	}
@@ -330,7 +281,7 @@ func ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, oldApprovedTra
 	return nil
 }
 
-func ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, oldApprovedTransfers []*types.UserApprovedIncomingTransferTimeline, newApprovedTransfers []*types.UserApprovedIncomingTransferTimeline, canUpdateApprovedTransfers []*types.UserApprovedTransferPermission) error {
+func ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, oldApprovedTransfers []*types.UserApprovedIncomingTransferTimeline, newApprovedTransfers []*types.UserApprovedIncomingTransferTimeline, CanUpdateCollectionApprovedTransfers []*types.UserApprovedTransferPermission) error {
 	oldTimes, oldValues := GetUserApprovedIncomingTransferTimesAndValues(oldApprovedTransfers)
 	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
 
@@ -365,8 +316,7 @@ func ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, oldApprovedTra
 						newVal[i].RequireFromEqualsInitiatedBy != oldVal[i].RequireFromEqualsInitiatedBy ||
 						newVal[i].TrackerId != oldVal[i].TrackerId ||
 						newVal[i].Uri != oldVal[i].Uri ||
-						newVal[i].CustomData != oldVal[i].CustomData ||
-						newVal[i].MaxNumTransfers != oldVal[i].MaxNumTransfers {
+						newVal[i].CustomData != oldVal[i].CustomData {
 							different = true
 							break
 					}
@@ -415,42 +365,12 @@ func ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, oldApprovedTra
 						}
 					}
 
-					x, err := proto.Marshal(newVal[i].Approvals)
+					x, err := proto.Marshal(newVal[i].PerAddressApprovals)
 					if err != nil {
 						panic(err)
 					}
 
-					y, err := proto.Marshal(oldVal[i].Approvals)
-					if err != nil {
-						panic(err)
-					}
-
-					if string(x) != string(y) {
-						different = true
-						break
-					}
-
-					x, err = proto.Marshal(newVal[i].PerAddressApprovals)
-					if err != nil {
-						panic(err)
-					}
-
-					y, err = proto.Marshal(oldVal[i].PerAddressApprovals)
-					if err != nil {
-						panic(err)
-					}
-
-					if string(x) != string(y) {
-						different = true
-						break
-					}
-
-					x, err = proto.Marshal(newVal[i].PerAddressMaxNumTransfers)
-					if err != nil {
-						panic(err)
-					}
-
-					y, err = proto.Marshal(oldVal[i].PerAddressMaxNumTransfers)
+					y, err := proto.Marshal(oldVal[i].PerAddressApprovals)
 					if err != nil {
 						panic(err)
 					}
@@ -474,7 +394,7 @@ func ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, oldApprovedTra
 		return detailsToReturn
 	})
 
-	err := CheckUserApprovedTransferPermission(ctx, detailsToCheck, canUpdateApprovedTransfers)
+	err := CheckUserApprovedTransferPermission(ctx, detailsToCheck, CanUpdateCollectionApprovedTransfers)
 	if err != nil {
 		return err
 	}

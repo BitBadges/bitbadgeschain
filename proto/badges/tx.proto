@@ -8,7 +8,7 @@ import "badges/permissions.proto";
 import "badges/metadata.proto";
 import "badges/collections.proto";
 import "gogoproto/gogo.proto";
-import "badges/addresses.proto";
+import "badges/address_mappings.proto";
 import "badges/timelines.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
@@ -19,7 +19,7 @@ service Msg {
   rpc MintAndDistributeBadges(MsgMintAndDistributeBadges) returns (MsgMintAndDistributeBadgesResponse);
   rpc TransferBadge(MsgTransferBadge) returns (MsgTransferBadgeResponse);
   rpc UpdateCollectionApprovedTransfers(MsgUpdateCollectionApprovedTransfers) returns (MsgUpdateCollectionApprovedTransfersResponse);
-  rpc UpdateUserApprovedOutgoingTransfers(MsgUpdateUserApprovedTransfers) returns (MsgUpdateUserApprovedTransfersResponse);
+  rpc UpdateUserApprovedTransfers(MsgUpdateUserApprovedTransfers) returns (MsgUpdateUserApprovedTransfersResponse);
   rpc UpdateMetadata(MsgUpdateMetadata) returns (MsgUpdateMetadataResponse);
   rpc UpdateCollectionPermissions(MsgUpdateCollectionPermissions) returns (MsgUpdateCollectionPermissionsResponse);
   rpc UpdateUserPermissions (MsgUpdateUserPermissions) returns (MsgUpdateUserPermissionsResponse);
