@@ -2,6 +2,7 @@ package types
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -9,7 +10,7 @@ const TypeMsgDeleteCollection = "delete_collection"
 
 var _ sdk.Msg = &MsgDeleteCollection{}
 
-func NewMsgDeleteCollection(creator string, collectionId sdk.Uint) *MsgDeleteCollection {
+func NewMsgDeleteCollection(creator string, collectionId sdkmath.Uint) *MsgDeleteCollection {
 	return &MsgDeleteCollection{
 		Creator:      creator,
 		CollectionId: collectionId,

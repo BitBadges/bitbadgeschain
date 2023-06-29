@@ -1,11 +1,14 @@
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	sdkmath "cosmossdk.io/math"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
-// Safe adds two sdk.Uints and returns an error if the result overflows sdk.Uint.
-func SafeAdd(left sdk.Uint, right sdk.Uint) (sdk.Uint, error) {
+// Safe adds two sdkmath.Uints and returns an error if the result overflows sdkmath.Uint.
+func SafeAdd(left sdkmath.Uint, right sdkmath.Uint) (sdkmath.Uint, error) {
 	//try to add the two numbers and catch panic
-	defer func() (sdk.Uint, error) {
+	defer func() (sdkmath.Uint, error) {
 		if r := recover(); r != nil {
 			return sdk.NewUint(0), ErrOverflow
 		}
@@ -15,8 +18,8 @@ func SafeAdd(left sdk.Uint, right sdk.Uint) (sdk.Uint, error) {
 	return left.Add(right), nil
 }
 
-// Safe subtracts two sdk.Uints and returns an error if the result underflows sdk.Uint.
-func SafeSubtract(left sdk.Uint, right sdk.Uint) (sdk.Uint, error) {
+// Safe subtracts two sdkmath.Uints and returns an error if the result underflows sdkmath.Uint.
+func SafeSubtract(left sdkmath.Uint, right sdkmath.Uint) (sdkmath.Uint, error) {
 	// Cosmos SDK's Uint type does not overflow, so this check is not needed.
 	if right.GT(left) {
 		return sdk.NewUint(0), ErrUnderflow

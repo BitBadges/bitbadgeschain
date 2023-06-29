@@ -2,6 +2,7 @@ package types
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -9,7 +10,7 @@ const TypeMsgUpdateMetadata = "update_uris"
 
 var _ sdk.Msg = &MsgUpdateMetadata{}
 
-func NewMsgUpdateMetadata(creator string, collectionId sdk.Uint, collectionMetadataTimeline []*CollectionMetadataTimeline, badgeMetadataTimeline []*BadgeMetadataTimeline, offChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline, customDataTimeline []*CustomDataTimeline, contractAddressTimeline []*ContractAddressTimeline) *MsgUpdateMetadata {
+func NewMsgUpdateMetadata(creator string, collectionId sdkmath.Uint, collectionMetadataTimeline []*CollectionMetadataTimeline, badgeMetadataTimeline []*BadgeMetadataTimeline, offChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline, customDataTimeline []*CustomDataTimeline, contractAddressTimeline []*ContractAddressTimeline) *MsgUpdateMetadata {
 	// for _, badgeMetadata := range badgeMetadata {
 	// 	badgeMetadata.BadgeIds = SortAndMergeOverlapping(badgeMetadata.BadgeIds)
 	// }

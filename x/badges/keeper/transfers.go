@@ -3,6 +3,8 @@ package keeper
 import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	sdkmath "cosmossdk.io/math"
 )
 
 func HandleManagerAlias(address string, managerAddress string) string {
@@ -74,7 +76,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection types.BadgeCollectio
 }
 
 // Forceful transfers will transfer the balances and deduct from approvals directly without adding it to pending.
-func (k Keeper) HandleTransfer(ctx sdk.Context, collection types.BadgeCollection, badgeIds []*types.IdRange, times []*types.IdRange, fromUserBalance types.UserBalanceStore, toUserBalance types.UserBalanceStore, amount sdk.Uint, from string, to string, initiatedBy string, solutions []*types.ChallengeSolution, onlyDeductApprovals bool) (types.UserBalanceStore, types.UserBalanceStore, error) {
+func (k Keeper) HandleTransfer(ctx sdk.Context, collection types.BadgeCollection, badgeIds []*types.IdRange, times []*types.IdRange, fromUserBalance types.UserBalanceStore, toUserBalance types.UserBalanceStore, amount sdkmath.Uint, from string, to string, initiatedBy string, solutions []*types.ChallengeSolution, onlyDeductApprovals bool) (types.UserBalanceStore, types.UserBalanceStore, error) {
 	err := *new(error)
 
 	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx,  collection, badgeIds, times,  from, to, initiatedBy, amount, solutions)

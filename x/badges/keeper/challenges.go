@@ -3,9 +3,10 @@ package keeper
 import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkmath "cosmossdk.io/math"
 )
 
-func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdk.Uint,  challenges []*types.Challenge, solutions []*types.ChallengeSolution, creatorAddress string, level string) (bool, sdk.Uint, error) {
+func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint,  challenges []*types.Challenge, solutions []*types.ChallengeSolution, creatorAddress string, level string) (bool, sdkmath.Uint, error) {
 	numIncrements := sdk.NewUint(0)
 
 	for _, challenge := range challenges {

@@ -5,6 +5,7 @@ import (
 	"regexp"
 
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -14,8 +15,8 @@ var (
 	reUri       = regexp.MustCompile(fmt.Sprintf(`^%s$`, reUriString))
 )
 
-func duplicateInArray(arr []sdk.Uint) bool {
-	visited := make(map[sdk.Uint]bool, 0)
+func duplicateInArray(arr []sdkmath.Uint) bool {
+	visited := make(map[sdkmath.Uint]bool, 0)
 	for i := 0; i < len(arr); i++ {
 
 		if visited[arr[i]] == true {
@@ -125,7 +126,7 @@ func ValidateRangesAreValid(badgeIdRanges []*IdRange, errorOnEmpty bool) error {
 }
 
 // Validates no element is X
-func ValidateNoElementIsX(amounts []sdk.Uint, x sdk.Uint) error {
+func ValidateNoElementIsX(amounts []sdkmath.Uint, x sdkmath.Uint) error {
 	for _, amount := range amounts {
 		if amount.Equal(x) {
 			return ErrElementCantEqualThis

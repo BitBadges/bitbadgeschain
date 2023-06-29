@@ -2,6 +2,7 @@ package types
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -11,7 +12,7 @@ var _ sdk.Msg = &MsgMintAndDistributeBadges{}
 
 func NewMsgMintAndDistributeBadges(
 	creator string,
-	collectionId sdk.Uint,
+	collectionId sdkmath.Uint,
 	badgesToCreate []*Balance,
 	transfers []*Transfer,
 	collectionMetadataTimeline []*CollectionMetadataTimeline,

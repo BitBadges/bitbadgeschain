@@ -1,6 +1,7 @@
 package simulation
 
 // import (
+// sdkmath "cosmossdk.io/math"
 // 	"math/rand"
 
 // 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
@@ -24,7 +25,7 @@ package simulation
 // 			randomAccounts = append(randomAccounts, simAccount.Address.String())
 // 		}
 
-// 		randomAmounts := []sdk.Uint{}
+// 		randomAmounts := []sdkmath.Uint{}
 // 		for i := 0; i < r.Intn(10); i++ {
 // 			randomAmounts = append(randomAmounts, sdk.NewUint(r.Uint64()))
 // 		}

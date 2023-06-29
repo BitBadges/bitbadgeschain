@@ -2,6 +2,7 @@ package types
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -9,7 +10,7 @@ const TypeMsgArchiveCollection = "archive_collection"
 
 var _ sdk.Msg = &MsgArchiveCollection{}
 
-func NewMsgArchiveCollection(creator string, collectionId sdk.Uint) *MsgArchiveCollection {
+func NewMsgArchiveCollection(creator string, collectionId sdkmath.Uint) *MsgArchiveCollection {
 	return &MsgArchiveCollection{
 		Creator:      creator,
 		CollectionId: collectionId,

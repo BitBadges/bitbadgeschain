@@ -6,6 +6,8 @@ import (
 	sdkerrors "cosmossdk.io/errors"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	sdkmath "cosmossdk.io/math"
 )
 
 // The following methods are used for the badge store and everything associated with badges.
@@ -34,7 +36,7 @@ func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection types.BadgeColl
 }
 
 // Gets a badge from the store according to the collectionId.
-func (k Keeper) GetCollectionFromStore(ctx sdk.Context, collectionId sdk.Uint) (types.BadgeCollection, bool) {
+func (k Keeper) GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (types.BadgeCollection, bool) {
 	store := ctx.KVStore(k.storeKey)
 	marshaled_collection := store.Get(collectionStoreKey(collectionId))
 
@@ -60,13 +62,13 @@ func (k Keeper) GetCollectionsFromStore(ctx sdk.Context) (collections []*types.B
 }
 
 // StoreHasCollectionID determines whether the specified collectionId exists
-func (k Keeper) StoreHasCollectionID(ctx sdk.Context, collectionId sdk.Uint) bool {
+func (k Keeper) StoreHasCollectionID(ctx sdk.Context, collectionId sdkmath.Uint) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(collectionStoreKey(collectionId))
 }
 
 // DeleteCollectionFromStore deletes a badge from the store.
-func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId sdk.Uint) {
+func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(collectionStoreKey(collectionId))
 }
@@ -104,7 +106,7 @@ func (k Keeper) GetUserBalanceFromStore(ctx sdk.Context, balanceKey string) (typ
 }
 
 // GetUserBalancesFromStore defines a method for returning all user balances information by key.
-func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.UserBalanceStore, addresses []string, ids []sdk.Uint) {
+func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.UserBalanceStore, addresses []string, ids []sdkmath.Uint) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, UserBalanceKey)
 	defer iterator.Close()
@@ -147,14 +149,14 @@ func (k Keeper) DeleteUserBalanceFromStore(ctx sdk.Context, balanceKey string) {
 /****************************************TRANSFER MANAGER REQUESTS****************************************/
 
 // Checks if a certain address has requested a managerial transfer
-func (k Keeper) HasAddressRequestedManagerTransfer(ctx sdk.Context, collectionId sdk.Uint, address string) bool {
+func (k Keeper) HasAddressRequestedManagerTransfer(ctx sdk.Context, collectionId sdkmath.Uint, address string) bool {
 	store := ctx.KVStore(k.storeKey)
 	key := ConstructUpdateManagerRequestKey(collectionId, address)
 	return store.Has(managerTransferRequestKey(key))
 }
 
 // Creates a transfer manager request for the given address and collectionId.
-func (k Keeper) CreateUpdateManagerRequest(ctx sdk.Context, collectionId sdk.Uint, address string) error {
+func (k Keeper) CreateUpdateManagerRequest(ctx sdk.Context, collectionId sdkmath.Uint, address string) error {
 	request := []byte{}
 	store := ctx.KVStore(k.storeKey)
 	key := ConstructUpdateManagerRequestKey(collectionId, address)
@@ -163,7 +165,7 @@ func (k Keeper) CreateUpdateManagerRequest(ctx sdk.Context, collectionId sdk.Uin
 }
 
 // Deletes a transfer manager request for the given address and collectionId.
-func (k Keeper) RemoveUpdateManagerRequest(ctx sdk.Context, collectionId sdk.Uint, address string) error {
+func (k Keeper) RemoveUpdateManagerRequest(ctx sdk.Context, collectionId sdkmath.Uint, address string) error {
 	key := ConstructUpdateManagerRequestKey(collectionId, address)
 	store := ctx.KVStore(k.storeKey)
 
@@ -174,14 +176,14 @@ func (k Keeper) RemoveUpdateManagerRequest(ctx sdk.Context, collectionId sdk.Uin
 /****************************************NEXT ASSET ID****************************************/
 
 // Gets the next badge ID.
-func (k Keeper) GetNextCollectionId(ctx sdk.Context) sdk.Uint {
+func (k Keeper) GetNextCollectionId(ctx sdk.Context) sdkmath.Uint {
 	store := ctx.KVStore(k.storeKey)
 	nextID := types.NewUintFromString(string((store.Get(nextCollectionIdKey()))))
 	return nextID
 }
 
 // Sets the next asset ID. Should only be used in InitGenesis. Everything else should call IncrementNextAssetID()
-func (k Keeper) SetNextCollectionId(ctx sdk.Context, nextID sdk.Uint) {
+func (k Keeper) SetNextCollectionId(ctx sdk.Context, nextID sdkmath.Uint) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set(nextCollectionIdKey(), []byte(nextID.String()))
 }
@@ -197,14 +199,14 @@ func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) {
 //These are the IDs for the claim stores themselves, not the claim IDs for within a collection.
 
 // Gets the next badge ID.
-func (k Keeper) GetNextClaimId(ctx sdk.Context) sdk.Uint {
+func (k Keeper) GetNextClaimId(ctx sdk.Context) sdkmath.Uint {
 	store := ctx.KVStore(k.storeKey)
 	nextID := types.NewUintFromString(string((store.Get(nextClaimIdKey()))))
 	return nextID
 }
 
 // Sets the next asset ID. Should only be used in InitGenesis. Everything else should call IncrementNextAssetID()
-func (k Keeper) SetNextClaimId(ctx sdk.Context, nextID sdk.Uint) {
+func (k Keeper) SetNextClaimId(ctx sdk.Context, nextID sdkmath.Uint) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set(nextClaimIdKey(), []byte(nextID.String()))
 }
@@ -217,7 +219,7 @@ func (k Keeper) IncrementNextClaimId(ctx sdk.Context) {
 
 /****************************************Claims****************************************/
 // Sets a usedClaimData in the store using UsedClaimDataKey ([]byte{0x07}) as the prefix. No check if store has key already.
-func (k Keeper) IncrementNumUsedForClaimInStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint) (sdk.Uint, error) {
+func (k Keeper) IncrementNumUsedForClaimInStore(ctx sdk.Context, collectionId sdkmath.Uint, claimId sdkmath.Uint) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId)))
 	curr := sdk.NewUint(0)
@@ -234,7 +236,7 @@ func (k Keeper) IncrementNumUsedForClaimInStore(ctx sdk.Context, collectionId sd
 	return incrementedNum, nil
 }
 
-func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionId sdk.Uint, challengeId string, leafIndex sdk.Uint, level string) (sdk.Uint, error) {
+func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, leafIndex sdkmath.Uint, level string) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex, level)))
 	curr := sdk.NewUint(0)
@@ -251,7 +253,7 @@ func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionI
 	return incrementedNum, nil
 }
 
-func (k Keeper) IncrementNumUsedForAddressInStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint, address string) (sdk.Uint, error) {
+func (k Keeper) IncrementNumUsedForAddressInStore(ctx sdk.Context, collectionId sdkmath.Uint, claimId sdkmath.Uint, address string) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedClaimAddressStoreKey(ConstructUsedClaimAddressKey(collectionId, claimId, address)))
 	curr := sdk.NewUint(0)
@@ -268,7 +270,7 @@ func (k Keeper) IncrementNumUsedForAddressInStore(ctx sdk.Context, collectionId 
 	return incrementedNum, nil
 }
 
-func (k Keeper) IncrementNumUsedForWhitelistIndexInStore(ctx sdk.Context, collectionId sdk.Uint, claimId sdk.Uint, whitelistLeafIndex sdk.Uint) (sdk.Uint, error) {
+func (k Keeper) IncrementNumUsedForWhitelistIndexInStore(ctx sdk.Context, collectionId sdkmath.Uint, claimId sdkmath.Uint, whitelistLeafIndex sdkmath.Uint) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedWhitelistIndexStoreKey(ConstructUsedWhitelistIndexKey(collectionId, claimId, whitelistLeafIndex)))
 	curr := sdk.NewUint(0)
@@ -335,7 +337,7 @@ func (k Keeper) DeleteAddressMappingFromStore(ctx sdk.Context, addressMappingId 
 
 /****************************************TRANSFER TRACKERS****************************************/
 
-func (k Keeper) SetTransferTrackerInStore(ctx sdk.Context, collectionId sdk.Uint, trackerId string, transferTracker types.ApprovalsTracker, level string, depth string, address string) error {
+func (k Keeper) SetTransferTrackerInStore(ctx sdk.Context, collectionId sdkmath.Uint, trackerId string, transferTracker types.ApprovalsTracker, level string, depth string, address string) error {
 	marshaled_transfer_tracker, err := k.cdc.Marshal(&transferTracker)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.ApprovalsTracker failed")
@@ -346,7 +348,7 @@ func (k Keeper) SetTransferTrackerInStore(ctx sdk.Context, collectionId sdk.Uint
 	return nil
 }
 
-func (k Keeper) GetTransferTrackerFromStore(ctx sdk.Context, collectionId sdk.Uint, trackerId string, level string, depth string, address string) (types.ApprovalsTracker, bool) {
+func (k Keeper) GetTransferTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, trackerId string, level string, depth string, address string) (types.ApprovalsTracker, bool) {
 	store := ctx.KVStore(k.storeKey)
 	marshaled_transfer_tracker := store.Get(transferTrackerStoreKey(ConstructTransferTrackerKey(collectionId, trackerId, level, depth, address)))
 
@@ -370,12 +372,12 @@ func (k Keeper) GetTransferTrackersFromStore(ctx sdk.Context) (transferTrackers 
 	return
 }
 
-func (k Keeper) StoreHasTransferTracker(ctx sdk.Context, collectionId sdk.Uint, trackerId string, level string, depth string, address string) bool {
+func (k Keeper) StoreHasTransferTracker(ctx sdk.Context, collectionId sdkmath.Uint, trackerId string, level string, depth string, address string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(transferTrackerStoreKey(ConstructTransferTrackerKey(collectionId, trackerId, level, depth, address)))
 }
 
-func (k Keeper) DeleteTransferTrackerFromStore(ctx sdk.Context, collectionId sdk.Uint, trackerId string, level string, depth string, address string) {
+func (k Keeper) DeleteTransferTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, trackerId string, level string, depth string, address string) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(transferTrackerStoreKey(ConstructTransferTrackerKey(collectionId, trackerId, level, depth, address)))
 }

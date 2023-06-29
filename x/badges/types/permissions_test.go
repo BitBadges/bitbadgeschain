@@ -3,8 +3,8 @@ package types_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

@@ -2,6 +2,7 @@ package types
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -9,7 +10,7 @@ const TypeMsgUpdateManager = "transfer_manager"
 
 var _ sdk.Msg = &MsgUpdateManager{}
 
-func NewMsgUpdateManager(creator string, collectionId sdk.Uint, managerTimeline []*ManagerTimeline) *MsgUpdateManager {
+func NewMsgUpdateManager(creator string, collectionId sdkmath.Uint, managerTimeline []*ManagerTimeline) *MsgUpdateManager {
 	return &MsgUpdateManager{
 		Creator:      creator,
 		CollectionId: collectionId,

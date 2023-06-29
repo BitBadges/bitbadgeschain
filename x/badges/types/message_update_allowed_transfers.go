@@ -2,6 +2,7 @@ package types
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -9,7 +10,7 @@ const TypeMsgUpdateCollectionApprovedTransfers = "update_allowed_transfers"
 
 var _ sdk.Msg = &MsgUpdateCollectionApprovedTransfers{}
 
-func NewMsgUpdateCollectionApprovedTransfers(creator string, collectionId sdk.Uint, approvedTransfersTimeline []*CollectionApprovedTransferTimeline) *MsgUpdateCollectionApprovedTransfers {
+func NewMsgUpdateCollectionApprovedTransfers(creator string, collectionId sdkmath.Uint, approvedTransfersTimeline []*CollectionApprovedTransferTimeline) *MsgUpdateCollectionApprovedTransfers {
 	// for _, approvedTransfer := range approvedTransfers {
 	// 	approvedTransfer.BadgeIds = SortAndMergeOverlapping(approvedTransfer.BadgeIds)
 	// 	approvedTransfer.TransferTimes = SortAndMergeOverlapping(approvedTransfer.TransferTimes)

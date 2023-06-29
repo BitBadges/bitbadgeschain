@@ -4,6 +4,8 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	sdkmath "cosmossdk.io/math"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis
@@ -67,15 +69,15 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	genesis.Collections = k.GetCollectionsFromStore(ctx)
 	addresses := []string{}
-	ids := []sdk.Uint{}
+	ids := []sdkmath.Uint{}
 	genesis.Balances, addresses, ids = k.GetUserBalancesFromStore(ctx)
 
 	for i, addresses := range addresses {
 		genesis.BalanceStoreKeys = append(genesis.BalanceStoreKeys, keeper.ConstructBalanceKey(addresses, ids[i]))
 	}
 
-	collectionIds := []sdk.Uint{}
-	claimIds := []sdk.Uint{}
+	collectionIds := []sdkmath.Uint{}
+	claimIds := []sdkmath.Uint{}
 	// genesis.Claims, collectionIds, claimIds = k.GetClaimsFromStore(ctx)
 
 	for i, collectionIds := range collectionIds {

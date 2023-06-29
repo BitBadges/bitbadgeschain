@@ -1,11 +1,12 @@
 package types
 
 import (
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // Helper function to make code more readable
-func CreateIdRange(start sdk.Uint, end sdk.Uint) *IdRange {
+func CreateIdRange(start sdkmath.Uint, end sdkmath.Uint) *IdRange {
 	return &IdRange{
 		Start: start,
 		End:   end,
@@ -14,7 +15,7 @@ func CreateIdRange(start sdk.Uint, end sdk.Uint) *IdRange {
 
 // Search ID ranges for a specific ID. Return (idx, true) if found. And (-1, false) if not.
 // Assumes ID ranges are sorted.
-func SearchIdRangesForId(id sdk.Uint, idRanges []*IdRange) bool {
+func SearchIdRangesForId(id sdkmath.Uint, idRanges []*IdRange) bool {
 	idRanges = SortAndMergeOverlapping(idRanges) 
 
 	//Binary search because ID ranges will be sorted
@@ -37,7 +38,7 @@ func SearchIdRangesForId(id sdk.Uint, idRanges []*IdRange) bool {
 	return false
 }
 
-func InvertIdRanges(idRanges []*IdRange, maxId sdk.Uint) []*IdRange {
+func InvertIdRanges(idRanges []*IdRange, maxId sdkmath.Uint) []*IdRange {
 	ranges := []*IdRange{}
 	ranges = append(ranges, CreateIdRange(sdk.NewUint(0), maxId))
 

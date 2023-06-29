@@ -1,6 +1,7 @@
 package types
 
 import (
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"math"
@@ -25,7 +26,7 @@ func HandleDuplicateBadgeIds(balances []*Balance) ([]*Balance, error) {
 }
 
 // Gets the balances for a specific ID. Assumes balances are sorted
-func GetBalancesForId(id sdk.Uint, balances []*Balance) []*Balance {
+func GetBalancesForId(id sdkmath.Uint, balances []*Balance) []*Balance {
 	matchingBalances := []*Balance{}
 	for _, balance := range balances {
 		found := SearchIdRangesForId(id, balance.BadgeIds)
@@ -41,7 +42,7 @@ func GetBalancesForId(id sdk.Uint, balances []*Balance) []*Balance {
 }
 
 // Updates the balance for a specific ids from what it currently is to newAmount.
-func UpdateBalancesForIdRanges(ranges []*IdRange, newTimes []*IdRange, newAmount sdk.Uint,  balances []*Balance) (newBalances []*Balance, err error) {
+func UpdateBalancesForIdRanges(ranges []*IdRange, newTimes []*IdRange, newAmount sdkmath.Uint,  balances []*Balance) (newBalances []*Balance, err error) {
 	//Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
 	// ranges = SortAndMergeOverlapping(ranges)
 	balances = DeleteBalanceForIdRanges(ranges, newTimes, balances)
@@ -85,7 +86,7 @@ func GetBalancesForIdRanges(idRanges []*IdRange, times []*IdRange, balances []*B
 	overlaps, _, inNewButNotOld := GetOverlapsAndNonOverlaps(currPermissionDetails, toFetchPermissionDetails)
 	for _, overlapObject := range overlaps {
 		overlap := overlapObject.Overlap
-		amount := overlapObject.FirstDetails.ArbitraryValue.(sdk.Uint)
+		amount := overlapObject.FirstDetails.ArbitraryValue.(sdkmath.Uint)
 
 		fetchedBalances = append(fetchedBalances, &Balance{
 			Amount:  amount,
@@ -107,7 +108,7 @@ func GetBalancesForIdRanges(idRanges []*IdRange, times []*IdRange, balances []*B
 }
 
 // Adds a balance to all ids specified in []ranges
-func AddBalancesForIdRanges(balances []*Balance, ranges []*IdRange, times []*IdRange, balanceToAdd sdk.Uint) ([]*Balance, error) {
+func AddBalancesForIdRanges(balances []*Balance, ranges []*IdRange, times []*IdRange, balanceToAdd sdkmath.Uint) ([]*Balance, error) {
 	currBalances, err := GetBalancesForIdRanges(ranges, times, balances)
 	if err != nil {
 		return balances, err
@@ -128,7 +129,7 @@ func AddBalancesForIdRanges(balances []*Balance, ranges []*IdRange, times []*IdR
 }
 
 // Subtracts a balance to all ids specified in []ranges
-func SubtractBalancesForIdRanges(balances []*Balance, ranges []*IdRange, times []*IdRange, balanceToRemove sdk.Uint) ([]*Balance, error) {
+func SubtractBalancesForIdRanges(balances []*Balance, ranges []*IdRange, times []*IdRange, balanceToRemove sdkmath.Uint) ([]*Balance, error) {
 	currBalances, err := GetBalancesForIdRanges(ranges, times, balances)
 	if err != nil {
 		return balances, err
@@ -191,7 +192,7 @@ func DeleteBalanceForIdRanges(rangesToDelete []*IdRange, timesToDelete []*IdRang
 }
 
 // Sets the balance for a specific id. Assumes balance does not exist.
-func SetBalanceForIdRanges(ranges []*IdRange, times []*IdRange, amount sdk.Uint, balances []*Balance) ([]*Balance, error) {
+func SetBalanceForIdRanges(ranges []*IdRange, times []*IdRange, amount sdkmath.Uint, balances []*Balance) ([]*Balance, error) {
 	if amount.IsZero() {
 		return balances, nil
 	}

@@ -2,6 +2,7 @@ package types
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -9,7 +10,7 @@ const TypeMsgTransferBadge = "transfer_badge"
 
 var _ sdk.Msg = &MsgTransferBadge{}
 
-func NewMsgTransferBadge(creator string, collectionId sdk.Uint, transfers []*Transfer) *MsgTransferBadge {
+func NewMsgTransferBadge(creator string, collectionId sdkmath.Uint, transfers []*Transfer) *MsgTransferBadge {
 	for _, transfer := range transfers {
 		for _, balance := range transfer.Balances {
 			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)

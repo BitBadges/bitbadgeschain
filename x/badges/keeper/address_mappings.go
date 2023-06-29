@@ -7,6 +7,8 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	sdkmath "cosmossdk.io/math"
 )
 
 func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.AddressMapping) error {
@@ -159,7 +161,7 @@ func (k Keeper) GetAddressMapping(ctx sdk.Context, addressMappingId string, mana
 	return nil, ErrAddressMappingNotFound
 }
 
-func (k Keeper) CheckIfManager(ctx sdk.Context, collectionId sdk.Uint, address string) (bool, error) {
+func (k Keeper) CheckIfManager(ctx sdk.Context, collectionId sdkmath.Uint, address string) (bool, error) {
 	collection, found := k.GetCollectionFromStore(ctx, collectionId)
 	if !found {
 		return false, ErrCollectionNotFound
@@ -168,7 +170,7 @@ func (k Keeper) CheckIfManager(ctx sdk.Context, collectionId sdk.Uint, address s
 	return GetCurrentManager(ctx, collection) == address, nil
 }
 
-func (k Keeper) CheckIfOwnsBadges(ctx sdk.Context, collectionId sdk.Uint, address string, badgeIds []*types.IdRange, minMaxAmount *types.IdRange) (bool, error) {
+func (k Keeper) CheckIfOwnsBadges(ctx sdk.Context, collectionId sdkmath.Uint, address string, badgeIds []*types.IdRange, minMaxAmount *types.IdRange) (bool, error) {
 	collection, found := k.GetCollectionFromStore(ctx, collectionId)
 	if !found {
 		return false, ErrCollectionNotFound

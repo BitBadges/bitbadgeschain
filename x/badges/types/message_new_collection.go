@@ -2,6 +2,7 @@ package types
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -21,7 +22,7 @@ func NewMsgNewCollection(
 	transfers []*Transfer,
 	offChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline,
 	contractAddressTimeline []*ContractAddressTimeline,
-	balancesType sdk.Uint,
+	balancesType sdkmath.Uint,
 	inheritedBalancesTimeline []*InheritedBalancesTimeline,
 	defaultApprovedOutgoingTransfersTimeline []*UserApprovedOutgoingTransferTimeline,
 	defaultApprovedIncomingTransfersTimeline []*UserApprovedIncomingTransferTimeline,

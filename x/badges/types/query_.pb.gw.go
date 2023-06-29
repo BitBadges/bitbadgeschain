@@ -1,10 +1,10 @@
 package types
 
-// HACK: This file is a copy of x/badges/types/query.pb.gw.go, with support for converting to sdk.Uint
+// HACK: This file is a copy of x/badges/types/query.pb.gw.go, with support for converting to sdkmath.Uint
 
 /**
 When running ignite generate proto-go, the generated code has errors because it doesn't know how to convert from
-string to sdk.Uint. Just copy this file over the generated one and it should work.
+string to sdkmath.Uint. Just copy this file over the generated one and it should work.
 
 In the future, we should look into the root cause of this problem and fix it directly within proto or another solution.
 */
@@ -20,6 +20,7 @@ In the future, we should look into the root cause of this problem and fix it dir
 // package types
 
 // import (
+// sdkmath "cosmossdk.io/math"
 // 	"context"
 // 	"io"
 // 	"net/http"

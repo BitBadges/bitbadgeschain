@@ -3,10 +3,11 @@ package keeper
 import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkmath "cosmossdk.io/math"
 )
 
 // Gets badge and throws error if it does not exist. Alternative to GetCollectionFromStore which returns a found bool, not an error.
-func (k Keeper) GetCollectionE(ctx sdk.Context, badgeId sdk.Uint) (types.BadgeCollection, error) {
+func (k Keeper) GetCollectionE(ctx sdk.Context, badgeId sdkmath.Uint) (types.BadgeCollection, error) {
 	badge, found := k.GetCollectionFromStore(ctx, badgeId)
 	if !found {
 		return types.BadgeCollection{}, ErrCollectionNotExists
@@ -16,7 +17,7 @@ func (k Keeper) GetCollectionE(ctx sdk.Context, badgeId sdk.Uint) (types.BadgeCo
 }
 
 // Gets the badge details from the store if it exists. Throws error if badge ranges are invalid or a badge ID does not yet exist.
-func (k Keeper) GetCollectionAndAssertBadgeIdsAreValid(ctx sdk.Context, collectionId sdk.Uint, badgeIdRanges []*types.IdRange) (types.BadgeCollection, error) {
+func (k Keeper) GetCollectionAndAssertBadgeIdsAreValid(ctx sdk.Context, collectionId sdkmath.Uint, badgeIdRanges []*types.IdRange) (types.BadgeCollection, error) {
 	badge, err := k.GetCollectionE(ctx, collectionId)
 	if err != nil {
 		return badge, err

@@ -3,12 +3,14 @@ package keeper
 import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	sdkmath "cosmossdk.io/math"
 )
 
 // Determines what to validate for each Msg
 type UniversalValidationParams struct {
 	Creator                              string
-	CollectionId                         sdk.Uint
+	CollectionId                         sdkmath.Uint
 	AccountsThatCantEqualCreator         []string
 	BadgeIdRangesToValidate              []*types.IdRange
 	MustBeManager                        bool

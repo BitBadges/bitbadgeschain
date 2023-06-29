@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
+	keepertest "github.com/bitbadges/bitbadgeschain/testutil/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-    "github.com/bitbadges/bitbadgeschain/x/badges/types"
-    "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-    keepertest "github.com/bitbadges/bitbadgeschain/testutil/keeper"
 )
 
 func setupMsgServer(t testing.TB) (types.MsgServer, context.Context) {

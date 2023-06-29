@@ -2,6 +2,7 @@ package types
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -9,7 +10,7 @@ const TypeMsgUpdateCollectionPermissions = "update_permissions"
 
 var _ sdk.Msg = &MsgUpdateCollectionPermissions{}
 
-func NewMsgUpdateCollectionPermissions(creator string, collectionId sdk.Uint, permissions *CollectionPermissions) *MsgUpdateCollectionPermissions {
+func NewMsgUpdateCollectionPermissions(creator string, collectionId sdkmath.Uint, permissions *CollectionPermissions) *MsgUpdateCollectionPermissions {
 	//TODO: permissions sort and merge overlapping
 	
 	return &MsgUpdateCollectionPermissions{

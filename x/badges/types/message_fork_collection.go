@@ -2,6 +2,7 @@ package types
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -9,7 +10,7 @@ const TypeMsgForkCollection = "fork_collection"
 
 var _ sdk.Msg = &MsgForkCollection{}
 
-func NewMsgForkCollection(creator string, collectionId sdk.Uint) *MsgForkCollection {
+func NewMsgForkCollection(creator string, collectionId sdkmath.Uint) *MsgForkCollection {
 	return &MsgForkCollection{
 		Creator:            creator,
 		ParentCollectionId: collectionId,

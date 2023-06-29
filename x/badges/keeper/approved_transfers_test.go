@@ -699,4 +699,4 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 	suite.Require().Equal(0, len(x), "Error deducting outgoing approvals")
 }
 
-//TODO: Test transfer tracker ID
+//TODO: Test transfer tracker ID after update approved transfers
