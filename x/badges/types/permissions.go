@@ -3,13 +3,13 @@ package types
 import (
 	"math"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 )
 
 type UniversalCombination struct {
 	TimelineTimesOptions *ValueOptions
+	
 	FromMappingIdOptions *ValueOptions
 	ToMappingIdOptions *ValueOptions
 	InitiatedByMappingIdOptions *ValueOptions
@@ -205,7 +205,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 
 func GetIdRangesWithOptions(ranges []*IdRange, options *ValueOptions, uses bool) []*IdRange {
 	if !uses {
-		ranges = []*IdRange{&IdRange{Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64)}} //dummy range
+		ranges = []*IdRange{&IdRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}} //dummy range
 		return ranges
 	}
 	
@@ -214,11 +214,11 @@ func GetIdRangesWithOptions(ranges []*IdRange, options *ValueOptions, uses bool)
 	}
 
 	if options.AllValues {
-		ranges = []*IdRange{&IdRange{Start: sdk.NewUint(0), End: sdk.NewUint(math.MaxUint64)}}
+		ranges = []*IdRange{&IdRange{Start: sdkmath.NewUint(0), End: sdkmath.NewUint(math.MaxUint64)}}
 	}
 
 	if options.InvertDefault {
-		ranges = InvertIdRanges(ranges, sdk.NewUint(math.MaxUint64))
+		ranges = InvertIdRanges(ranges, sdkmath.NewUint(math.MaxUint64))
 	}
 
 	if options.NoValues {
@@ -340,15 +340,15 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) ([]*UniversalPermissi
 
 func GetPermissionString(permission *UniversalPermissionDetails) string {
 	str := "("
-	if permission.BadgeId.Start != sdk.NewUint(math.MaxUint64) || permission.BadgeId.End != sdk.NewUint(math.MaxUint64) {
+	if permission.BadgeId.Start.Equal(sdkmath.NewUint(math.MaxUint64)) || permission.BadgeId.End.Equal(sdkmath.NewUint(math.MaxUint64)) {
 		str += "badgeId: " + permission.BadgeId.Start.String() + " "
 	}
 
-	if permission.TimelineTime.Start != sdk.NewUint(math.MaxUint64) || permission.TimelineTime.End != sdk.NewUint(math.MaxUint64) {
+	if permission.TimelineTime.Start.Equal(sdkmath.NewUint(math.MaxUint64)) || permission.TimelineTime.End.Equal(sdkmath.NewUint(math.MaxUint64)) {
 		str += "timelineTime: " + permission.TimelineTime.Start.String() + " "
 	}
 
-	if permission.TransferTime.Start != sdk.NewUint(math.MaxUint64) || permission.TransferTime.End != sdk.NewUint(math.MaxUint64) {
+	if permission.TransferTime.Start.Equal(sdkmath.NewUint(math.MaxUint64)) || permission.TransferTime.End.Equal(sdkmath.NewUint(math.MaxUint64)) {
 		str += "transferTime: " + permission.TransferTime.Start.String() + " "
 	}
 
@@ -380,7 +380,7 @@ func ValidateUniversalPermissionUpdate(oldPermissions []*UniversalPermissionDeta
 		errMsg += GetPermissionString(inOldButNotNew[0])
 		errMsg += "found in old permissions but not in new permissions"
 		if len(inOldButNotNew) > 1 {
-			errMsg += " (along with " + sdk.NewUint(uint64(len(inOldButNotNew) - 1)).String() + " more)"
+			errMsg += " (along with " + sdkmath.NewUint(uint64(len(inOldButNotNew) - 1)).String() + " more)"
 		}
 
 		return sdkerrors.Wrapf(ErrInvalidPermissions, errMsg)

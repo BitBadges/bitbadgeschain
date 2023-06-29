@@ -21,7 +21,7 @@ package simulation
 // 		simAccount, _ := simtypes.RandomAcc(r, accs)
 // 		msg := &types.MsgUpdateCustomData{
 // 			Creator:      simAccount.Address.String(),
-// 			CollectionId: sdk.NewUint(r.Uint64()),
+// 			CollectionId: sdkmath.NewUint(r.Uint64()),
 // 			Bytes:        simtypes.RandStringOfLength(r, r.Intn(300)),
 // 		}
 

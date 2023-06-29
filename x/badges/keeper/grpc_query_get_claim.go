@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
@@ -21,6 +22,6 @@ func (k Keeper) GetClaimNumProcessed(goCtx context.Context, req *types.QueryGetC
 	return nil, ErrNotImplemented
 
 	return &types.QueryGetClaimNumProcessedResponse{
-		NumProcessed: sdk.NewUint(0),
+		NumProcessed: sdkmath.NewUint(0),
 	}, nil
 }

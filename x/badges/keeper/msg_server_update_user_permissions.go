@@ -29,7 +29,7 @@ func (k msgServer) UpdateUserPermissions(goCtx context.Context,  msg *types.MsgU
 	balanceKey := ConstructBalanceKey(msg.Creator, msg.CollectionId)
 	userBalance, found := k.Keeper.GetUserBalanceFromStore(ctx, balanceKey)
 	if !found {
-		userBalance = types.UserBalanceStore{
+		userBalance = &types.UserBalanceStore{
 			Balances : []*types.Balance{},
 			ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
 			ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,

@@ -24,8 +24,8 @@ import (
 /****************************************BADGES****************************************/
 
 // Sets a badge in the store using BadgeKey ([]byte{0x01}) as the prefix. No check if store has key already.
-func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection types.BadgeCollection) error {
-	marshaled_badge, err := k.cdc.Marshal(&collection)
+func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection *types.BadgeCollection) error {
+	marshaled_badge, err := k.cdc.Marshal(collection)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.BadgeCollection failed")
 	}
@@ -36,16 +36,16 @@ func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection types.BadgeColl
 }
 
 // Gets a badge from the store according to the collectionId.
-func (k Keeper) GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (types.BadgeCollection, bool) {
+func (k Keeper) GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*types.BadgeCollection, bool) {
 	store := ctx.KVStore(k.storeKey)
 	marshaled_collection := store.Get(collectionStoreKey(collectionId))
 
 	var collection types.BadgeCollection
 	if len(marshaled_collection) == 0 {
-		return collection, false
+		return &collection, false
 	}
 	k.cdc.MustUnmarshal(marshaled_collection, &collection)
-	return collection, true
+	return &collection, true
 }
 
 // GetCollectionsFromStore defines a method for returning all badges information by key.
@@ -76,8 +76,8 @@ func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId sdkmath.
 /****************************************USER BALANCES****************************************/
 
 // Sets a user balance in the store using UserBalanceKey ([]byte{0x02}) as the prefix. No check if store has key already.
-func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBalance types.UserBalanceStore) error {
-	marshaled_badge_balance_info, err := k.cdc.Marshal(&UserBalance)
+func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBalance *types.UserBalanceStore) error {
+	marshaled_badge_balance_info, err := k.cdc.Marshal(UserBalance)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.UserBalanceStore failed")
 	}
@@ -93,16 +93,16 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 }
 
 // Gets a user balance from the store according to the balanceID.
-func (k Keeper) GetUserBalanceFromStore(ctx sdk.Context, balanceKey string) (types.UserBalanceStore, bool) {
+func (k Keeper) GetUserBalanceFromStore(ctx sdk.Context, balanceKey string) (*types.UserBalanceStore, bool) {
 	store := ctx.KVStore(k.storeKey)
 	marshaled_badge_balance_info := store.Get(userBalanceStoreKey(balanceKey))
 
 	var UserBalance types.UserBalanceStore
 	if len(marshaled_badge_balance_info) == 0 {
-		return UserBalance, false
+		return &UserBalance, false
 	}
 	k.cdc.MustUnmarshal(marshaled_badge_balance_info, &UserBalance)
-	return UserBalance, true
+	return &UserBalance, true
 }
 
 // GetUserBalancesFromStore defines a method for returning all user balances information by key.
@@ -222,14 +222,14 @@ func (k Keeper) IncrementNextClaimId(ctx sdk.Context) {
 func (k Keeper) IncrementNumUsedForClaimInStore(ctx sdk.Context, collectionId sdkmath.Uint, claimId sdkmath.Uint) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId)))
-	curr := sdk.NewUint(0)
+	curr := sdkmath.NewUint(0)
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
 		if err != nil {
 			panic("Failed to parse num used")
 		}
 
-		curr = sdk.NewUint(currUint)
+		curr = sdkmath.NewUint(currUint)
 	}
 	incrementedNum := curr.AddUint64(1)
 	store.Set(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId)), []byte(curr.Incr().String()))
@@ -239,14 +239,14 @@ func (k Keeper) IncrementNumUsedForClaimInStore(ctx sdk.Context, collectionId sd
 func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, leafIndex sdkmath.Uint, level string) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex, level)))
-	curr := sdk.NewUint(0)
+	curr := sdkmath.NewUint(0)
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
 		if err != nil {
 			panic("Failed to parse num used")
 		}
 
-		curr = sdk.NewUint(currUint)
+		curr = sdkmath.NewUint(currUint)
 	}
 	incrementedNum := curr.AddUint64(1)
 	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex, level)), []byte(curr.Incr().String()))
@@ -256,14 +256,14 @@ func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionI
 func (k Keeper) IncrementNumUsedForAddressInStore(ctx sdk.Context, collectionId sdkmath.Uint, claimId sdkmath.Uint, address string) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedClaimAddressStoreKey(ConstructUsedClaimAddressKey(collectionId, claimId, address)))
-	curr := sdk.NewUint(0)
+	curr := sdkmath.NewUint(0)
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
 		if err != nil {
 			panic("Failed to parse num used")
 		}
 
-		curr = sdk.NewUint(currUint)
+		curr = sdkmath.NewUint(currUint)
 	}
 	incrementedNum := curr.AddUint64(1)
 	store.Set(usedClaimAddressStoreKey(ConstructUsedClaimAddressKey(collectionId, claimId, address)), []byte(curr.Incr().String()))
@@ -273,14 +273,14 @@ func (k Keeper) IncrementNumUsedForAddressInStore(ctx sdk.Context, collectionId 
 func (k Keeper) IncrementNumUsedForWhitelistIndexInStore(ctx sdk.Context, collectionId sdkmath.Uint, claimId sdkmath.Uint, whitelistLeafIndex sdkmath.Uint) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedWhitelistIndexStoreKey(ConstructUsedWhitelistIndexKey(collectionId, claimId, whitelistLeafIndex)))
-	curr := sdk.NewUint(0)
+	curr := sdkmath.NewUint(0)
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
 		if err != nil {
 			panic("Failed to parse num used")
 		}
 
-		curr = sdk.NewUint(currUint)
+		curr = sdkmath.NewUint(currUint)
 	}
 	incrementedNum := curr.AddUint64(1)
 	store.Set(usedWhitelistIndexStoreKey(ConstructUsedWhitelistIndexKey(collectionId, claimId, whitelistLeafIndex)), []byte(curr.Incr().String()))

@@ -6,7 +6,6 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
@@ -111,7 +110,7 @@ func GetDetailsFromBalanceKey(id string) BalanceKeyDetails {
 
 	return BalanceKeyDetails{
 		address:      address,
-		collectionId: sdk.NewUint(collection_id),
+		collectionId: sdkmath.NewUint(collection_id),
 	}
 }
 
@@ -121,8 +120,8 @@ func GetDetailsFromClaimKey(id string) ClaimKeyDetails {
 	claim_id, _ := strconv.ParseUint(result[1], 10, 64)
 
 	return ClaimKeyDetails{
-		claimId:      sdk.NewUint(claim_id),
-		collectionId: sdk.NewUint(collection_id),
+		claimId:      sdkmath.NewUint(claim_id),
+		collectionId: sdkmath.NewUint(collection_id),
 	}
 }
 

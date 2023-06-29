@@ -12,38 +12,53 @@ type UniversalValidationParams struct {
 	Creator                              string
 	CollectionId                         sdkmath.Uint
 	AccountsThatCantEqualCreator         []string
-	BadgeIdRangesToValidate              []*types.IdRange
 	MustBeManager                        bool
 }
 
 // Validates everything about the Msg is valid and returns (creatorNum, collection, permissions, error).
-func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationParams) (types.BadgeCollection, error) {
+func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationParams) (*types.BadgeCollection, error) {
 	if len(params.AccountsThatCantEqualCreator) > 0 {
 		for _, account := range params.AccountsThatCantEqualCreator {
 			if account == params.Creator {
-				return types.BadgeCollection{}, ErrAccountCanNotEqualCreator
+				return &types.BadgeCollection{}, ErrAccountCanNotEqualCreator
 			}
 		}
 	}
 
 	// Assert collection and badgeId ranges exist and are well-formed
-	collection, err := k.GetCollectionAndAssertBadgeIdsAreValid(ctx, params.CollectionId, params.BadgeIdRangesToValidate)
-	if err != nil {
-		return types.BadgeCollection{}, err
+	collection, found := k.GetCollectionFromStore(ctx, params.CollectionId)
+	if !found {
+		return &types.BadgeCollection{}, ErrCollectionNotExists
 	}
 
 	isArchived := GetIsArchived(ctx, collection)
 	if isArchived {
-		return types.BadgeCollection{}, ErrCollectionIsArchived
+		return &types.BadgeCollection{}, ErrCollectionIsArchived
 	}
 
 	// Assert all permissions
 	if params.MustBeManager {
 		currManager := GetCurrentManager(ctx, collection)
 		if currManager != params.Creator {
-			return types.BadgeCollection{}, ErrSenderIsNotManager
+			return &types.BadgeCollection{}, ErrSenderIsNotManager
 		}
 	}
 
 	return collection, nil
+}
+
+
+func (k Keeper) ValidateAllBadgesAreCreated(collection *types.BadgeCollection, badgeIds []*types.IdRange) error {
+	err := types.ValidateRangesAreValid(badgeIds, true)
+	if err != nil {
+		return err
+	}
+	
+	for _, badgeIdRange := range badgeIds {
+		if badgeIdRange.End.GTE(collection.NextBadgeId) {
+			return ErrBadgeNotExists
+		}
+	}
+
+	return nil
 }

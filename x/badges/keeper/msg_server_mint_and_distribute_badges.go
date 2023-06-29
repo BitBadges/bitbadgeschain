@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -28,7 +29,7 @@ func (k msgServer) MintAndDistributeBadges(goCtx context.Context, msg *types.Msg
 	}
 
 	if msg.ApprovedTransfersTimeline != nil && len(msg.ApprovedTransfersTimeline) > 0 {
-		if collection.BalancesType != sdk.NewUint(0) {
+		if collection.BalancesType != sdkmath.NewUint(0) {
 			return nil, ErrOffChainBalances
 		}
 		
@@ -48,7 +49,7 @@ func (k msgServer) MintAndDistributeBadges(goCtx context.Context, msg *types.Msg
 	}
 
 	if msg.OffChainBalancesMetadataTimeline != nil && len(msg.OffChainBalancesMetadataTimeline) > 0 {
-		if collection.BalancesType != sdk.NewUint(1) {
+		if collection.BalancesType != sdkmath.NewUint(1) {
 			return nil, ErrOffChainBalances
 		}
 		
@@ -60,18 +61,18 @@ func (k msgServer) MintAndDistributeBadges(goCtx context.Context, msg *types.Msg
 	}
 
 	if msg.BadgesToCreate != nil && len(msg.BadgesToCreate) > 0 {
-		if collection.BalancesType == sdk.NewUint(1) {
+		if collection.BalancesType == sdkmath.NewUint(1) {
 			return nil, ErrOffChainBalances
 		}
 
-		collection, err = k.CreateBadges(ctx, collection, msg.BadgesToCreate, msg.Transfers, msg.Creator)
+		collection, err = k.CreateBadges(ctx, collection, msg.BadgesToCreate, msg.Transfers)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if msg.InheritedBalancesTimeline != nil && len(msg.InheritedBalancesTimeline) > 0 {
-		if collection.BalancesType != sdk.NewUint(2) {
+		if collection.BalancesType != sdkmath.NewUint(2) {
 			return nil, ErrOffChainBalances
 		}
 		
@@ -79,8 +80,7 @@ func (k msgServer) MintAndDistributeBadges(goCtx context.Context, msg *types.Msg
 			return nil, err
 		}
 
-		maxBadgeId := collection.NextBadgeId.Sub(sdk.NewUint(1))
-
+		maxBadgeId := collection.NextBadgeId.Sub(sdkmath.NewUint(1))
 		for _, timelineVal := range msg.InheritedBalancesTimeline {
 			for _, inheritedBalance := range timelineVal.InheritedBalances {
 				for _, badgeId := range inheritedBalance.BadgeIds {

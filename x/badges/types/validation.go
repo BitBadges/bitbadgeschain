@@ -51,12 +51,12 @@ func ValidateURI(uri string) error {
 }
 
 func ValidateAddress(address string, allowAliases bool) error {
+	if allowAliases && (address == "Manager" || address == "Mint") {
+		return nil
+	}
+
 	_, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
-		if allowAliases && address == "Manager" {
-			return nil
-		}
-
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid address (%s)", err)
 	}
 	return nil

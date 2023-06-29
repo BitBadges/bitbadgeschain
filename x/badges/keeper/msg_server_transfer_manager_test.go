@@ -21,13 +21,13 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End:   sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End:   sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
-// 				Permissions: sdk.NewUint(127),
+// 				Permissions: sdkmath.NewUint(127),
 // 				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 // 					{
 // 						From: &types.AddressMapping{
@@ -39,7 +39,7 @@ package keeper_test
 // 					},
 // 				},
 // 			},
-// 			Amount:  sdk.NewUint(1),
+// 			Amount:  sdkmath.NewUint(1),
 // 			Creator: bob,
 // 		},
 // 	}
@@ -48,21 +48,21 @@ package keeper_test
 // 	suite.Require().Nil(err, "Error creating badge")
 
 // 	//Create badge 1 with supply > 1
-// 	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
+// 	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdkmath.NewUint(1), []*types.BadgeSupplyAndAmount{
 // 		{
-// 			Supply: sdk.NewUint(10000),
-// 			Amount: sdk.NewUint(1),
+// 			Supply: sdkmath.NewUint(10000),
+// 			Amount: sdkmath.NewUint(1),
 // 		},
 // 	})
 // 	suite.Require().Nil(err, "Error creating badge")
 
-// 	err = RequestUpdateManager(suite, wctx, alice, sdk.NewUint(1), true)
+// 	err = RequestUpdateManager(suite, wctx, alice, sdkmath.NewUint(1), true)
 // 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-// 	err = UpdateManager(suite, wctx, bob, sdk.NewUint(1), alice)
+// 	err = UpdateManager(suite, wctx, bob, sdkmath.NewUint(1), alice)
 // 	suite.Require().Nil(err, "Error transferring manager")
 
-// 	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
+// 	badge, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	suite.Require().Equal(alice, badge.Manager)
 // }
 
@@ -78,13 +78,13 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End:   sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End:   sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
-// 				Permissions: sdk.NewUint(127),
+// 				Permissions: sdkmath.NewUint(127),
 // 				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 // 					{
 // 						From: &types.AddressMapping{
@@ -96,7 +96,7 @@ package keeper_test
 // 					},
 // 				},
 // 			},
-// 			Amount:  sdk.NewUint(1),
+// 			Amount:  sdkmath.NewUint(1),
 // 			Creator: bob,
 // 		},
 // 	}
@@ -105,27 +105,27 @@ package keeper_test
 // 	suite.Require().Nil(err, "Error creating badge")
 
 // 	//Create badge 1 with supply > 1
-// 	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
+// 	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdkmath.NewUint(1), []*types.BadgeSupplyAndAmount{
 // 		{
-// 			Supply: sdk.NewUint(10000),
-// 			Amount: sdk.NewUint(1),
+// 			Supply: sdkmath.NewUint(10000),
+// 			Amount: sdkmath.NewUint(1),
 // 		},
 // 	})
 // 	suite.Require().Nil(err, "Error creating badge")
 
-// 	err = RequestUpdateManager(suite, wctx, alice, sdk.NewUint(1), true)
+// 	err = RequestUpdateManager(suite, wctx, alice, sdkmath.NewUint(1), true)
 // 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-// 	err = RequestUpdateManager(suite, wctx, alice, sdk.NewUint(1), false)
+// 	err = RequestUpdateManager(suite, wctx, alice, sdkmath.NewUint(1), false)
 // 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-// 	err = RequestUpdateManager(suite, wctx, alice, sdk.NewUint(1), true)
+// 	err = RequestUpdateManager(suite, wctx, alice, sdkmath.NewUint(1), true)
 // 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-// 	err = UpdateManager(suite, wctx, bob, sdk.NewUint(1), alice)
+// 	err = UpdateManager(suite, wctx, bob, sdkmath.NewUint(1), alice)
 // 	suite.Require().Nil(err, "Error transferring manager")
 
-// 	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
+// 	badge, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	suite.Require().Equal(alice, badge.Manager)
 // }
 
@@ -141,13 +141,13 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End:   sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End:   sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
-// 				Permissions: sdk.NewUint(127),
+// 				Permissions: sdkmath.NewUint(127),
 // 				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 // 					{
 // 						From: &types.AddressMapping{
@@ -159,7 +159,7 @@ package keeper_test
 // 					},
 // 				},
 // 			},
-// 			Amount:  sdk.NewUint(1),
+// 			Amount:  sdkmath.NewUint(1),
 // 			Creator: bob,
 // 		},
 // 	}
@@ -168,21 +168,21 @@ package keeper_test
 // 	suite.Require().Nil(err, "Error creating badge")
 
 // 	//Create badge 1 with supply > 1
-// 	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
+// 	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdkmath.NewUint(1), []*types.BadgeSupplyAndAmount{
 // 		{
-// 			Supply: sdk.NewUint(10000),
-// 			Amount: sdk.NewUint(1),
+// 			Supply: sdkmath.NewUint(10000),
+// 			Amount: sdkmath.NewUint(1),
 // 		},
 // 	})
 // 	suite.Require().Nil(err, "Error creating badge")
 
-// 	err = RequestUpdateManager(suite, wctx, alice, sdk.NewUint(1), true)
+// 	err = RequestUpdateManager(suite, wctx, alice, sdkmath.NewUint(1), true)
 // 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-// 	err = RequestUpdateManager(suite, wctx, alice, sdk.NewUint(1), false)
+// 	err = RequestUpdateManager(suite, wctx, alice, sdkmath.NewUint(1), false)
 // 	suite.Require().Nil(err, "Error requesting manager transfer")
 
-// 	err = UpdateManager(suite, wctx, bob, sdk.NewUint(1), alice)
+// 	err = UpdateManager(suite, wctx, bob, sdkmath.NewUint(1), alice)
 // 	suite.Require().EqualError(err, keeper.ErrAddressNeedsToOptInAndRequestManagerTransfer.Error())
 // }
 
@@ -198,13 +198,13 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End:   sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End:   sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
-// 				Permissions: sdk.NewUint(23),
+// 				Permissions: sdkmath.NewUint(23),
 // 				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 // 					{
 // 						From: &types.AddressMapping{
@@ -216,7 +216,7 @@ package keeper_test
 // 					},
 // 				},
 // 			},
-// 			Amount:  sdk.NewUint(1),
+// 			Amount:  sdkmath.NewUint(1),
 // 			Creator: bob,
 // 		},
 // 	}
@@ -225,15 +225,15 @@ package keeper_test
 // 	suite.Require().Nil(err, "Error creating badge")
 
 // 	//Create badge 1 with supply > 1
-// 	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdk.NewUint(1), []*types.BadgeSupplyAndAmount{
+// 	err = CreateBadgesAndMintAllToCreator(suite, wctx, bob, sdkmath.NewUint(1), []*types.BadgeSupplyAndAmount{
 // 		{
-// 			Supply: sdk.NewUint(10000),
-// 			Amount: sdk.NewUint(1),
+// 			Supply: sdkmath.NewUint(10000),
+// 			Amount: sdkmath.NewUint(1),
 // 		},
 // 	})
 // 	suite.Require().Nil(err, "Error creating badge")
 
-// 	err = RequestUpdateManager(suite, wctx, alice, sdk.NewUint(1), true)
+// 	err = RequestUpdateManager(suite, wctx, alice, sdkmath.NewUint(1), true)
 // 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 // }
 
@@ -249,15 +249,15 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End:   sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End:   sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
-// 				Permissions: sdk.NewUint(0),
+// 				Permissions: sdkmath.NewUint(0),
 // 			},
-// 			Amount:  sdk.NewUint(1),
+// 			Amount:  sdkmath.NewUint(1),
 // 			Creator: bob,
 // 		},
 // 	}
@@ -265,6 +265,6 @@ package keeper_test
 // 	err := CreateCollections(suite, wctx, collectionsToCreate)
 // 	suite.Require().Nil(err, "Error creating badge")
 
-// 	err = UpdateManager(suite, wctx, bob, sdk.NewUint(1), alice)
+// 	err = UpdateManager(suite, wctx, bob, sdkmath.NewUint(1), alice)
 // 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 // }

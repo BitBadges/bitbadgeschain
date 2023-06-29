@@ -23,16 +23,16 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End:   sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End:   sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
 // 				CollectionMetadata: "https://example.com",
-// 				Permissions:        sdk.NewUint(62),
+// 				Permissions:        sdkmath.NewUint(62),
 // 			},
-// 			Amount:  sdk.NewUint(1),
+// 			Amount:  sdkmath.NewUint(1),
 // 			Creator: bob,
 // 		},
 // 	}
@@ -40,26 +40,26 @@ package keeper_test
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
 // 	suite.Require().Nil(err, "Error creating badge: %s")
 
-// 	err = UpdateURIs(suite, wctx, bob, sdk.NewUint(1), "https://example.com", []*types.BadgeMetadata{
+// 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "https://example.com", []*types.BadgeMetadata{
 // 		{
 // 			Uri: "https://example.com/{id}",
 // 			BadgeIds: []*types.IdRange{
 // 				{
-// 					Start: sdk.NewUint(1),
-// 					End:   sdk.NewUint(math.MaxUint64),
+// 					Start: sdkmath.NewUint(1),
+// 					End:   sdkmath.NewUint(math.MaxUint64),
 // 				},
 // 			},
 // 		},
 // 	}, "")
 // 	suite.Require().Nil(err, "Error updating uris")
-// 	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
+// 	badge, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	suite.Require().Equal("https://example.com", badge.CollectionMetadata)
 // 	// suite.Require().Equal("https://example.com/{id}", badge.BadgeMetadata)
 
-// 	err = UpdateCollectionPermissions(suite, wctx, bob, sdk.NewUint(1), sdk.NewUint(60-32))
+// 	err = UpdateCollectionPermissions(suite, wctx, bob, sdkmath.NewUint(1), sdkmath.NewUint(60-32))
 // 	suite.Require().Nil(err, "Error updating permissions")
 
-// 	err = UpdateCustomData(suite, wctx, bob, sdk.NewUint(1), "example.com/")
+// 	err = UpdateCustomData(suite, wctx, bob, sdkmath.NewUint(1), "example.com/")
 // 	suite.Require().Nil(err, "Error updating bytes")
 // }
 
@@ -78,15 +78,15 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End:   sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End:   sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
-// 				Permissions: sdk.NewUint(0),
+// 				Permissions: sdkmath.NewUint(0),
 // 			},
-// 			Amount:  sdk.NewUint(1),
+// 			Amount:  sdkmath.NewUint(1),
 // 			Creator: bob,
 // 		},
 // 	}
@@ -94,23 +94,23 @@ package keeper_test
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
 // 	suite.Require().Nil(err, "Error creating badge: %s")
 
-// 	err = UpdateURIs(suite, wctx, bob, sdk.NewUint(1), "https://example.com/test2222", []*types.BadgeMetadata{
+// 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "https://example.com/test2222", []*types.BadgeMetadata{
 // 		{
 // 			Uri: "https://example.com/{id}/edited",
 // 			BadgeIds: []*types.IdRange{
 // 				{
-// 					Start: sdk.NewUint(1),
-// 					End:   sdk.NewUint(math.MaxUint64),
+// 					Start: sdkmath.NewUint(1),
+// 					End:   sdkmath.NewUint(math.MaxUint64),
 // 				},
 // 			},
 // 		},
 // 	}, "")
 // 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 
-// 	err = UpdateCollectionPermissions(suite, wctx, bob, sdk.NewUint(1), sdk.NewUint(123-64))
+// 	err = UpdateCollectionPermissions(suite, wctx, bob, sdkmath.NewUint(1), sdkmath.NewUint(123-64))
 // 	suite.Require().EqualError(err, types.ErrInvalidPermissionsUpdateLocked.Error())
 
-// 	err = UpdateCustomData(suite, wctx, bob, sdk.NewUint(1), "example.com/")
+// 	err = UpdateCustomData(suite, wctx, bob, sdkmath.NewUint(1), "example.com/")
 // 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 // }
 
@@ -129,15 +129,15 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End:   sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End:   sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
-// 				Permissions: sdk.NewUint(0),
+// 				Permissions: sdkmath.NewUint(0),
 // 			},
-// 			Amount:  sdk.NewUint(1),
+// 			Amount:  sdkmath.NewUint(1),
 // 			Creator: bob,
 // 		},
 // 	}
@@ -145,23 +145,23 @@ package keeper_test
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
 // 	suite.Require().Nil(err, "Error creating badge: %s")
 
-// 	err = UpdateURIs(suite, wctx, alice, sdk.NewUint(1), "https://example.com", []*types.BadgeMetadata{
+// 	err = UpdateURIs(suite, wctx, alice, sdkmath.NewUint(1), "https://example.com", []*types.BadgeMetadata{
 // 		{
 // 			Uri: "https://example.com/{id}",
 // 			BadgeIds: []*types.IdRange{
 // 				{
-// 					Start: sdk.NewUint(1),
-// 					End:   sdk.NewUint(math.MaxUint64),
+// 					Start: sdkmath.NewUint(1),
+// 					End:   sdkmath.NewUint(math.MaxUint64),
 // 				},
 // 			},
 // 		},
 // 	}, "")
 // 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
 
-// 	err = UpdateCollectionPermissions(suite, wctx, alice, sdk.NewUint(1), sdk.NewUint(77))
+// 	err = UpdateCollectionPermissions(suite, wctx, alice, sdkmath.NewUint(1), sdkmath.NewUint(77))
 // 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
 
-// 	err = UpdateCustomData(suite, wctx, alice, sdk.NewUint(1), "example.com/")
+// 	err = UpdateCustomData(suite, wctx, alice, sdkmath.NewUint(1), "example.com/")
 // 	suite.Require().EqualError(err, keeper.ErrSenderIsNotManager.Error())
 // }
 
@@ -179,16 +179,16 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End:   sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End:   sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
 // 				CollectionMetadata: "https://example.com",
-// 				Permissions:        sdk.NewUint(62 + 64),
+// 				Permissions:        sdkmath.NewUint(62 + 64),
 // 			},
-// 			Amount:  sdk.NewUint(1),
+// 			Amount:  sdkmath.NewUint(1),
 // 			Creator: bob,
 // 		},
 // 	}
@@ -196,9 +196,9 @@ package keeper_test
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
 // 	suite.Require().Nil(err, "Error creating badge: %s")
 
-// 	err = UpdateURIs(suite, wctx, bob, sdk.NewUint(1), "", []*types.BadgeMetadata{}, "https://balance.com/{id}")
+// 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "", []*types.BadgeMetadata{}, "https://balance.com/{id}")
 // 	suite.Require().Nil(err, "Error updating uris")
-// 	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
+// 	badge, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	suite.Require().Equal("https://balance.com/{id}", badge.OffChainBalancesMetadata)
 // 	// suite.Require().Equal("https://example.com/{id}", badge.BadgeMetadata)
 // }
@@ -218,15 +218,15 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End:   sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End:   sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
-// 				Permissions: sdk.NewUint(0),
+// 				Permissions: sdkmath.NewUint(0),
 // 			},
-// 			Amount:  sdk.NewUint(1),
+// 			Amount:  sdkmath.NewUint(1),
 // 			Creator: bob,
 // 		},
 // 	}
@@ -234,6 +234,6 @@ package keeper_test
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
 // 	suite.Require().Nil(err, "Error creating badge: %s")
 
-// 	err = UpdateURIs(suite, wctx, bob, sdk.NewUint(1), "", []*types.BadgeMetadata{}, "https://balance.com/{id}")
+// 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "", []*types.BadgeMetadata{}, "https://balance.com/{id}")
 // 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 // }

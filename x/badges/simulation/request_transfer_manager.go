@@ -19,14 +19,14 @@ package simulation
 // 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 // 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 // 		simAccount, _ := simtypes.RandomAcc(r, accs)
-// 		randInt := sdk.NewUint(r.Uint64())
+// 		randInt := sdkmath.NewUint(r.Uint64())
 // 		randBool := false
-// 		if randInt.Mod(sdk.NewUint(2)).IsZero() {
+// 		if randInt.Mod(sdkmath.NewUint(2)).IsZero() {
 // 			randBool = true
 // 		}
 // 		msg := &types.MsgRequestUpdateManager{
 // 			Creator:      simAccount.Address.String(),
-// 			CollectionId: sdk.NewUint(r.Uint64()),
+// 			CollectionId: sdkmath.NewUint(r.Uint64()),
 // 			AddRequest:   randBool,
 // 		}
 // 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

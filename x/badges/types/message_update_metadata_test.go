@@ -20,15 +20,15 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 	// 		name: "invalid address",
 	// 		msg: types.MsgUpdateMetadata{
 	// 			Creator:            "invalid_address",
-	// 			CollectionId:       sdk.NewUint(1),
+	// 			CollectionId:       sdkmath.NewUint(1),
 	// 			CollectionMetadata: "https://facebook.com",
 	// 			BadgeMetadata: []*types.BadgeMetadata{
 	// 				{
 	// 					Uri: "https://example.com/{id}",
 	// 					BadgeIds: []*types.IdRange{
 	// 						{
-	// 							Start: sdk.NewUint(1),
-	// 							End:   sdk.NewUint(math.MaxUint64),
+	// 							Start: sdkmath.NewUint(1),
+	// 							End:   sdkmath.NewUint(math.MaxUint64),
 	// 						},
 	// 					},
 	// 				},
@@ -40,14 +40,14 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 	// 		msg: types.MsgUpdateMetadata{
 	// 			Creator:            sample.AccAddress(),
 	// 			CollectionMetadata: "https://facebook.com",
-	// 			CollectionId:       sdk.NewUint(1),
+	// 			CollectionId:       sdkmath.NewUint(1),
 	// 			BadgeMetadata: []*types.BadgeMetadata{
 	// 				{
 	// 					Uri: "https://example.com/{id}",
 	// 					BadgeIds: []*types.IdRange{
 	// 						{
-	// 							Start: sdk.NewUint(1),
-	// 							End:   sdk.NewUint(math.MaxUint64),
+	// 							Start: sdkmath.NewUint(1),
+	// 							End:   sdkmath.NewUint(math.MaxUint64),
 	// 						},
 	// 					},
 	// 				},

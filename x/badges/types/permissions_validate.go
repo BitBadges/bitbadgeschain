@@ -185,7 +185,7 @@ func ValidateTimedUpdateWithBadgeIdsPermission(permissions []*TimedUpdateWithBad
 	return nil
 }
 
-func ValidateActionWithBadgeIdsPermission(permissions []*ActionWithBadgeIdsPermission) error {
+func ValidateActionWithBadgeIdsAndTimesPermission(permissions []*ActionWithBadgeIdsAndTimesPermission) error {
 	if permissions == nil {
 		return ErrPermissionsIsNil
 	}
@@ -204,11 +204,17 @@ func ValidateActionWithBadgeIdsPermission(permissions []*ActionWithBadgeIdsPermi
 			return err
 		}
 
+		err = ValidateRangesAreValid(permission.DefaultValues.TransferTimes, false)
+		if err != nil {
+			return err
+		}
+
 		for idx, combination := range permission.Combinations {
 			for _, combination2 := range permission.Combinations[idx+1:] {
 				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
 				combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-				combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
+				combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions &&
+				combination.TransferTimesOptions == combination2.TransferTimesOptions {
 					return ErrInvalidCombinations
 				}
 			}
@@ -360,7 +366,7 @@ func ValidatePermissions(permissions *CollectionPermissions, canBeNil bool) erro
 	}
 
 	if permissions.CanCreateMoreBadges != nil {
-		if err := ValidateActionWithBadgeIdsPermission(permissions.CanCreateMoreBadges); err != nil {
+		if err := ValidateActionWithBadgeIdsAndTimesPermission(permissions.CanCreateMoreBadges); err != nil {
 			return err
 		}
 	}

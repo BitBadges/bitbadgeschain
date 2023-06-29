@@ -3,8 +3,8 @@ package types_test
 import (
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -20,7 +20,7 @@ func TestMsgUpdateCollectionPermissions_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgUpdateCollectionPermissions{
 				Creator:      "invalid_address",
-				CollectionId: sdk.NewUint(1),
+				CollectionId: sdkmath.NewUint(1),
 				Permissions:  &types.CollectionPermissions{},
 			},
 			err: types.ErrInvalidAddress,
@@ -28,7 +28,7 @@ func TestMsgUpdateCollectionPermissions_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: types.MsgUpdateCollectionPermissions{
 				Creator:      sample.AccAddress(),
-				CollectionId: sdk.NewUint(1),
+				CollectionId: sdkmath.NewUint(1),
 				Permissions:  &types.CollectionPermissions{},
 			},
 		},

@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -19,7 +20,7 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 		return nil, err
 	}
 
-	if collection.BalancesType != sdk.NewUint(0) {
+	if collection.BalancesType != sdkmath.NewUint(0) {
 		return nil, ErrOffChainBalances
 	}
 
@@ -32,7 +33,7 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 	balanceKey := ConstructBalanceKey(msg.Creator, collection.CollectionId)
 	userBalance, found := k.GetUserBalanceFromStore(ctx, balanceKey)
 	if !found {
-		userBalance = types.UserBalanceStore{
+		userBalance = &types.UserBalanceStore{
 			Balances : []*types.Balance{},
 			ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
 			ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,

@@ -2,7 +2,6 @@ package types
 
 import (
 	sdkmath "cosmossdk.io/math"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // Helper function to make code more readable
@@ -40,7 +39,7 @@ func SearchIdRangesForId(id sdkmath.Uint, idRanges []*IdRange) bool {
 
 func InvertIdRanges(idRanges []*IdRange, maxId sdkmath.Uint) []*IdRange {
 	ranges := []*IdRange{}
-	ranges = append(ranges, CreateIdRange(sdk.NewUint(0), maxId))
+	ranges = append(ranges, CreateIdRange(sdkmath.NewUint(0), maxId))
 
 	for _, idRange := range idRanges {
 		newRanges := []*IdRange{}

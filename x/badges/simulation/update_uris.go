@@ -22,7 +22,7 @@ package simulation
 
 // 		msg := &types.MsgUpdateMetadata{
 // 			Creator:            simAccount.Address.String(),
-// 			CollectionId:       sdk.NewUint(r.Uint64()),
+// 			CollectionId:       sdkmath.NewUint(r.Uint64()),
 // 			CollectionMetadata: simtypes.RandStringOfLength(r, r.Intn(100)),
 // 			BadgeMetadata:      []*types.BadgeMetadata{},
 // 		}

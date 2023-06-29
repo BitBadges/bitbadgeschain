@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -86,7 +87,7 @@ func GetPotentialUpdatesForTimelineValues(times [][]*types.IdRange, values []int
 
 func CheckNotForbidden(ctx sdk.Context, permission *types.UniversalPermissionDetails) error {
 	//Throw if we are in a forbidden time
-	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
+	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	found := types.SearchIdRangesForId(blockTime, permission.ForbiddenTimes)
 	if found {
 		return ErrInvalidPermissions
@@ -117,8 +118,8 @@ func CheckTimedUpdatePermission(ctx sdk.Context, detailsToCheck []*types.Univers
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
 }
 
-func CheckActionWithBadgeIdsPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.ActionWithBadgeIdsPermission) error {
-	castedPermissions := types.CastActionWithBadgeIdsPermissionToUniversalPermission(permissions)
+func CheckActionWithBadgeIdsAndTimesPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.ActionWithBadgeIdsAndTimesPermission) error {
+	castedPermissions := types.CastActionWithBadgeIdsAndTimesPermissionToUniversalPermission(permissions)
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
 
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
@@ -150,15 +151,15 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 	//Apply dummy ranges to all detailsToCheck
 	for _, detailToCheck := range detailsToCheck {
 		if detailToCheck.BadgeId == nil {
-			detailToCheck.BadgeId = &types.IdRange{ Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64) } //dummy range
+			detailToCheck.BadgeId = &types.IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) } //dummy range
 		}
 
 		if detailToCheck.TimelineTime == nil {
-			detailToCheck.TimelineTime = &types.IdRange{ Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64) } //dummy range
+			detailToCheck.TimelineTime = &types.IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) } //dummy range
 		}
 
 		if detailToCheck.TransferTime == nil {
-			detailToCheck.TransferTime = &types.IdRange{ Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64) } //dummy range
+			detailToCheck.TransferTime = &types.IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) } //dummy range
 		}
 
 		//Note we are okay with the mapping IDs being ""

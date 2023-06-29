@@ -154,24 +154,27 @@ func CastTimedUpdatePermissionToUniversalPermission(timedUpdatePermission []*Tim
 }
 
 
-func CastActionWithBadgeIdsPermissionToUniversalPermission(actionWithBadgeIdsPermission []*ActionWithBadgeIdsPermission) []*UniversalPermission {
+func CastActionWithBadgeIdsAndTimesPermissionToUniversalPermission(ActionWithBadgeIdsAndTimesPermission []*ActionWithBadgeIdsAndTimesPermission) []*UniversalPermission {
 	castedPermissions := []*UniversalPermission{}
-	for _, actionWithBadgeIdsPermission := range actionWithBadgeIdsPermission {
+	for _, ActionWithBadgeIdsAndTimesPermission := range ActionWithBadgeIdsAndTimesPermission {
 		castedCombinations := []*UniversalCombination{}
-		for _, actionWithBadgeIdsCombination := range actionWithBadgeIdsPermission.Combinations {
+		for _, ActionWithBadgeIdsAndTimesCombination := range ActionWithBadgeIdsAndTimesPermission.Combinations {
 			castedCombinations = append(castedCombinations, &UniversalCombination{
-				BadgeIdsOptions: actionWithBadgeIdsCombination.BadgeIdsOptions,
-				PermittedTimesOptions: actionWithBadgeIdsCombination.PermittedTimesOptions,
-				ForbiddenTimesOptions: actionWithBadgeIdsCombination.ForbiddenTimesOptions,
+				BadgeIdsOptions: ActionWithBadgeIdsAndTimesCombination.BadgeIdsOptions,
+				TransferTimesOptions: ActionWithBadgeIdsAndTimesCombination.TransferTimesOptions,
+				PermittedTimesOptions: ActionWithBadgeIdsAndTimesCombination.PermittedTimesOptions,
+				ForbiddenTimesOptions: ActionWithBadgeIdsAndTimesCombination.ForbiddenTimesOptions,
 			})
 		}
 
 		castedPermissions = append(castedPermissions, &UniversalPermission{
 			DefaultValues: &UniversalDefaultValues{
-				BadgeIds: actionWithBadgeIdsPermission.DefaultValues.BadgeIds,
+				BadgeIds: ActionWithBadgeIdsAndTimesPermission.DefaultValues.BadgeIds,
+				TransferTimes: ActionWithBadgeIdsAndTimesPermission.DefaultValues.TransferTimes,
 				UsesBadgeIds: true,
-				PermittedTimes: actionWithBadgeIdsPermission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: actionWithBadgeIdsPermission.DefaultValues.ForbiddenTimes,
+				UsesTransferTimes: true,
+				PermittedTimes: ActionWithBadgeIdsAndTimesPermission.DefaultValues.PermittedTimes,
+				ForbiddenTimes: ActionWithBadgeIdsAndTimesPermission.DefaultValues.ForbiddenTimes,
 			},
 			Combinations: castedCombinations,
 		})

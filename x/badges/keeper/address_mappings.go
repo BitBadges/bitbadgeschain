@@ -15,7 +15,7 @@ func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.Addr
 	id := addressMapping.MappingId
 
 	//Validate ID 
-	if id == "Mint" || id == "Manager" || id == "All" || id == "None" {
+	if id == "Mint" || id == "Manager" || id == "All" || id == "None"	{
 		return ErrInvalidAddressMappingId
 	}
 	
@@ -31,7 +31,7 @@ func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.Addr
 		}
 	}
 
-	if types.ValidateAddress(addressMapping.MappingId, false) != nil {
+	if types.ValidateAddress(addressMapping.MappingId, false) == nil {
 		return ErrInvalidAddressMappingId
 	}
 
@@ -62,7 +62,7 @@ func (k Keeper) GetAddressMapping(ctx sdk.Context, addressMappingId string, mana
 	if addressMappingId == "Manager" {
 		return &types.AddressMapping{
 			MappingId: "Manager",
-			Addresses: []string{managerAddress},
+			Addresses: []string{"Manager"},
 			IncludeOnlySpecified: true,
 			Uri: "",
 			CustomData: "",
@@ -103,7 +103,7 @@ func (k Keeper) GetAddressMapping(ctx sdk.Context, addressMappingId string, mana
 		}, nil
 	}
 
-	//split by :
+
 	addressMappingIdSplit := strings.Split(addressMappingId, ":")
 	if len(addressMappingIdSplit) == 2 {
 		parsedCollectionId, err := strconv.ParseUint(addressMappingIdSplit[0], 10, 64)
@@ -111,14 +111,14 @@ func (k Keeper) GetAddressMapping(ctx sdk.Context, addressMappingId string, mana
 			return nil, ErrInvalidAddressMappingId
 		}
 
-		collectionId := sdk.NewUint(parsedCollectionId)
+		collectionId := sdkmath.NewUint(parsedCollectionId)
 
 		parsedBadgeId, err := strconv.ParseUint(addressMappingIdSplit[1], 10, 64)
 		if err != nil {
 			return nil, ErrInvalidAddressMappingId
 		}
 
-		badgeId := sdk.NewUint(parsedBadgeId)
+		badgeId := sdkmath.NewUint(parsedBadgeId)
 
 		return &types.AddressMapping{
 			MappingId: addressMappingId,
@@ -128,7 +128,7 @@ func (k Keeper) GetAddressMapping(ctx sdk.Context, addressMappingId string, mana
 			CustomData: "",
 			Filters: []*types.AddressMappingFilters{
 				{
-					MustSatisfyMinX: sdk.NewUint(1),
+					MustSatisfyMinX: sdkmath.NewUint(1),
 					Conditions: []*types.AddressMappingConditions{
 						{
 							MustOwnBadges: []*types.MinMaxBalance{
@@ -141,8 +141,8 @@ func (k Keeper) GetAddressMapping(ctx sdk.Context, addressMappingId string, mana
 										},
 									},
 									Amount: &types.IdRange{
-										Start: sdk.NewUint(1),
-										End: sdk.NewUint(math.MaxUint64),
+										Start: sdkmath.NewUint(1),
+										End: sdkmath.NewUint(math.MaxUint64),
 									},
 								},
 							},
@@ -161,6 +161,7 @@ func (k Keeper) GetAddressMapping(ctx sdk.Context, addressMappingId string, mana
 	return nil, ErrAddressMappingNotFound
 }
 
+
 func (k Keeper) CheckIfManager(ctx sdk.Context, collectionId sdkmath.Uint, address string) (bool, error) {
 	collection, found := k.GetCollectionFromStore(ctx, collectionId)
 	if !found {
@@ -176,21 +177,22 @@ func (k Keeper) CheckIfOwnsBadges(ctx sdk.Context, collectionId sdkmath.Uint, ad
 		return false, ErrCollectionNotFound
 	}
 
+	unhandledBadgeIds := make([]*types.IdRange, len(badgeIds))
+	copy(unhandledBadgeIds, badgeIds)
+
+
 	balanceKey := ConstructBalanceKey(address, collection.CollectionId)
 	userBalance, found := k.GetUserBalanceFromStore(ctx, balanceKey)
 	if !found {
-		userBalance = types.UserBalanceStore{
+		userBalance = &types.UserBalanceStore{
 			Balances : []*types.Balance{},
 		}
 	}
 
-
-	balances, err := types.GetBalancesForIdRanges(badgeIds, []*types.IdRange{
-		{
-			Start: sdk.NewUint(uint64(ctx.BlockTime().UnixMilli())),
-			End: sdk.NewUint(uint64(ctx.BlockTime().UnixMilli())),
-		},
-	}, userBalance.Balances)
+	balances, err := types.GetBalancesForIdRanges(badgeIds, []*types.IdRange{{
+			Start: sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli())),
+			End: sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli())),
+	}}, userBalance.Balances)
 	if err != nil {
 		return false, err
 	}
@@ -199,8 +201,15 @@ func (k Keeper) CheckIfOwnsBadges(ctx sdk.Context, collectionId sdkmath.Uint, ad
 		if balance.Amount.LT(minMaxAmount.Start) || balance.Amount.GT(minMaxAmount.End) {
 			return false, nil
 		}
+
+		unhandledBadgeIds, _ = types.RemoveIdRangeFromIdRange(balance.BadgeIds, unhandledBadgeIds)
 	}
 
+	//Sanity check
+	if len(unhandledBadgeIds) != 0 {
+		return false, ErrUnhandledBadgeIds
+	}
+	
 	return true, nil
 }
 
@@ -210,6 +219,8 @@ func (k Keeper) CheckMappingAddresses(ctx sdk.Context, addressMappingId string, 
 	if err != nil {
 		return false, err
 	}
+
+	
 
 	newCheckedMappingIds := make([]string, len(checkedMappingIds) + 1)
 	copy(newCheckedMappingIds, checkedMappingIds)
@@ -226,6 +237,7 @@ func (k Keeper) CheckMappingAddresses(ctx sdk.Context, addressMappingId string, 
 		if address == addressToCheck {
 			found = true
 		}
+		
 
 		//Support the manager alias
 		if address == "Manager" && (addressToCheck == managerAddress || addressToCheck == "Manager") {
@@ -237,6 +249,10 @@ func (k Keeper) CheckMappingAddresses(ctx sdk.Context, addressMappingId string, 
 		found = !found
 	}
 
+	if found && addressMapping.MappingId == "All" && addressToCheck == "Mint" {
+		return false, nil
+	}
+
 	if !found {
 		return false, nil
 	}
@@ -245,7 +261,7 @@ func (k Keeper) CheckMappingAddresses(ctx sdk.Context, addressMappingId string, 
 	for _, filter := range addressMapping.Filters {
 		mustSatisfyMinX := filter.MustSatisfyMinX
 		conditions := filter.Conditions
-		satisfyCount := sdk.NewUint(0)
+		satisfyCount := sdkmath.NewUint(0)
 
 		//TODO: support inherited balances with no circular references
 		for _, condition := range conditions {
@@ -331,7 +347,7 @@ func (k Keeper) CheckMappingAddresses(ctx sdk.Context, addressMappingId string, 
 			}
 
 			if satisfied {
-				satisfyCount = satisfyCount.Add(sdk.NewUint(1))
+				satisfyCount = satisfyCount.Add(sdkmath.NewUint(1))
 			}
 		}
 		
@@ -369,32 +385,4 @@ func (k Keeper) CheckIfAddressesMatchCollectionMappingIds(ctx sdk.Context, colle
 	}
 
 	return fromFound && toFound && initiatedByFound
-}
-
-func (k Keeper) CheckIfAddressesMatchUserOutgoingMappingIds(ctx sdk.Context, userApprovedOutgoingTransfer *types.UserApprovedOutgoingTransfer, from string, to string, initiatedBy string, managerAddress string) bool {
-	toFound, err := k.CheckMappingAddresses(ctx, userApprovedOutgoingTransfer.ToMappingId, to, managerAddress, []string{})
-	if err != nil {
-		return false
-	}
-	
-	initiatedByFound, err := k.CheckMappingAddresses(ctx, userApprovedOutgoingTransfer.InitiatedByMappingId, initiatedBy, managerAddress, []string{})
-	if err != nil {
-		return false
-	}
-
-	return toFound && initiatedByFound
-}
-
-func (k Keeper) CheckIfAddressesMatchUserIncomingMappingIds(ctx sdk.Context, userApprovedIncomingTransfer *types.UserApprovedIncomingTransfer, from string, to string, initiatedBy string, managerAddress string) bool {
-	fromFound, err := k.CheckMappingAddresses(ctx, userApprovedIncomingTransfer.FromMappingId, from, managerAddress, []string{})
-	if err != nil {
-		return false
-	}
-	
-	initiatedByFound, err := k.CheckMappingAddresses(ctx, userApprovedIncomingTransfer.InitiatedByMappingId, initiatedBy, managerAddress, []string{})
-	if err != nil {
-		return false
-	}
-
-	return fromFound && initiatedByFound
 }

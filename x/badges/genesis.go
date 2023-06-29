@@ -14,11 +14,11 @@ import (
 // NOTE: We assume that all badges are validly formed here
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// Set if defined; default 0
-	if genState.NextCollectionId == sdk.NewUint(0) {
-		genState.NextCollectionId = sdk.NewUint(1)
+	if genState.NextCollectionId.Equal(sdkmath.NewUint(0)) {
+		genState.NextCollectionId = sdkmath.NewUint(1)
 	}
-	if genState.NextClaimId == sdk.NewUint(0) {
-		genState.NextClaimId = sdk.NewUint(1)
+	if genState.NextClaimId.Equal(sdkmath.NewUint(0)) {
+		genState.NextClaimId = sdkmath.NewUint(1)
 	}
 
 	k.SetNextCollectionId(ctx, genState.NextCollectionId)
@@ -38,13 +38,13 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	}
 
 	for _, badge := range genState.Collections {
-		if err := k.SetCollectionInStore(ctx, *badge); err != nil {
+		if err := k.SetCollectionInStore(ctx, badge); err != nil {
 			panic(err)
 		}
 	}
 
 	for idx, balance := range genState.Balances {
-		if err := k.SetUserBalanceInStore(ctx, genState.BalanceStoreKeys[idx], *balance); err != nil {
+		if err := k.SetUserBalanceInStore(ctx, genState.BalanceStoreKeys[idx], balance); err != nil {
 			panic(err)
 		}
 	}

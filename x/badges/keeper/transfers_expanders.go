@@ -3,8 +3,8 @@ package keeper
 import (
 	"math"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionApprovedTransfer) []*types.CollectionApprovedTransfer {
@@ -13,12 +13,12 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 		for _, allowedCombination := range approvedTransfer.AllowedCombinations {
 			badgeIds := approvedTransfer.BadgeIds
 			if allowedCombination.InvertBadgeIds {
-				badgeIds = types.InvertIdRanges(badgeIds, sdk.NewUint(math.MaxUint64))
+				badgeIds = types.InvertIdRanges(badgeIds, sdkmath.NewUint(math.MaxUint64))
 			}
 
 			times := approvedTransfer.TransferTimes
 			if allowedCombination.InvertTransferTimes {
-				times = types.InvertIdRanges(times, sdk.NewUint(math.MaxUint64))
+				times = types.InvertIdRanges(times, sdkmath.NewUint(math.MaxUint64))
 			}
 
 			toMappingId := approvedTransfer.ToMappingId
@@ -74,14 +74,14 @@ func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomin
 		InitiatedByMappingId: userAddress,
 		TransferTimes: []*types.IdRange{
 			{
-				Start: sdk.NewUint(0),
-				End: sdk.NewUint(uint64(math.MaxUint64)),
+				Start: sdkmath.NewUint(0),
+				End: sdkmath.NewUint(uint64(math.MaxUint64)),
 			},
 		},
 		BadgeIds: []*types.IdRange{
 			{
-				Start: sdk.NewUint(1),
-				End: sdk.NewUint(math.MaxUint64),
+				Start: sdkmath.NewUint(1),
+				End: sdkmath.NewUint(math.MaxUint64),
 			},
 		},
 		AllowedCombinations: []*types.IsUserIncomingTransferAllowed{
@@ -100,14 +100,14 @@ func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoin
 		InitiatedByMappingId: userAddress,
 		TransferTimes: []*types.IdRange{
 			{
-				Start: sdk.NewUint(0),
-				End: sdk.NewUint(uint64(math.MaxUint64)),
+				Start: sdkmath.NewUint(0),
+				End: sdkmath.NewUint(uint64(math.MaxUint64)),
 			},
 		},
 		BadgeIds: []*types.IdRange{
 			{
-				Start: sdk.NewUint(1),
-				End: sdk.NewUint(math.MaxUint64),
+				Start: sdkmath.NewUint(1),
+				End: sdkmath.NewUint(math.MaxUint64),
 			},
 		},
 		AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{

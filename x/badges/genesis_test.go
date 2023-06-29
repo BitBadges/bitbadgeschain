@@ -7,21 +7,22 @@ import (
 	"github.com/bitbadges/bitbadgeschain/testutil/nullify"
 	"github.com/bitbadges/bitbadgeschain/x/badges"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
+
+	sdkmath "cosmossdk.io/math"
 )
 
 func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params:           types.DefaultParams(),
 		PortId:           types.PortID,
-		NextCollectionId: sdk.NewUint(1),
+		NextCollectionId: sdkmath.NewUint(1),
 		Collections:      []*types.BadgeCollection{},
 		Balances:         []*types.UserBalanceStore{},
 		BalanceStoreKeys: []string{},
 		// Claims:           []*types.Claim{},
 		// ClaimStoreKeys:   []string{},
-		// NextClaimId:      sdk.NewUint(1),
+		// NextClaimId:      sdkmath.NewUint(1),
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 

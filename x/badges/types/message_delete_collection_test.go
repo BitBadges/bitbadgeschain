@@ -3,8 +3,8 @@ package types
 import (
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,14 +18,14 @@ func TestMsgDeleteCollection_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: MsgDeleteCollection{
 				Creator:      "invalid_address",
-				CollectionId: sdk.NewUint(1),
+				CollectionId: sdkmath.NewUint(1),
 			},
 			err: ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: MsgDeleteCollection{
 				Creator:      sample.AccAddress(),
-				CollectionId: sdk.NewUint(1),
+				CollectionId: sdkmath.NewUint(1),
 			},
 		},
 	}

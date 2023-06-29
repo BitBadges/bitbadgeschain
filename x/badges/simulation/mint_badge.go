@@ -22,14 +22,14 @@ package simulation
 // 		randomSubassets := []*types.BadgeSupplyAndAmount{}
 // 		for i := 0; i < r.Intn(10); i++ {
 // 			randomSubassets = append(randomSubassets, &types.BadgeSupplyAndAmount{
-// 				Supply: sdk.NewUint(r.Uint64()),
-// 				Amount: sdk.NewUint(r.Uint64()),
+// 				Supply: sdkmath.NewUint(r.Uint64()),
+// 				Amount: sdkmath.NewUint(r.Uint64()),
 // 			})
 // 		}
 
 // 		msg := &types.MsgMintAndDistributeBadges{
 // 			Creator:        simAccount.Address.String(),
-// 			CollectionId:   sdk.NewUint(r.Uint64()),
+// 			CollectionId:   sdkmath.NewUint(r.Uint64()),
 // 			BadgesToCreate: randomSubassets,
 // 		}
 

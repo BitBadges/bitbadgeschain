@@ -2,7 +2,6 @@ package types
 
 import (
 	sdkmath "cosmossdk.io/math"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"math"
 )
@@ -64,7 +63,7 @@ func GetBalancesForIdRanges(idRanges []*IdRange, times []*IdRange, balances []*B
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
 					BadgeId: currRange,
 					TimelineTime: currTime,
-					TransferTime: &IdRange{ Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64) }, //dummy range
+					TransferTime: &IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
 					ArbitraryValue: balanceObj.Amount,
 				})
 			}
@@ -77,7 +76,7 @@ func GetBalancesForIdRanges(idRanges []*IdRange, times []*IdRange, balances []*B
 			toFetchPermissionDetails = append(toFetchPermissionDetails, &UniversalPermissionDetails{
 					BadgeId: rangeToFetch,
 					TimelineTime: timeToFetch,
-					TransferTime: &IdRange{ Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64) }, //dummy range
+					TransferTime: &IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
 				},
 			)
 		}
@@ -97,7 +96,7 @@ func GetBalancesForIdRanges(idRanges []*IdRange, times []*IdRange, balances []*B
 
 	for _, detail := range inNewButNotOld {
 		fetchedBalances = append(fetchedBalances, &Balance{
-			Amount:   sdk.NewUint(0),
+			Amount:   sdkmath.NewUint(0),
 			BadgeIds: []*IdRange{detail.BadgeId},
 			Times: []*IdRange{detail.TimelineTime},
 		})
@@ -161,7 +160,7 @@ func DeleteBalanceForIdRanges(rangesToDelete []*IdRange, timesToDelete []*IdRang
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
 					BadgeId: currRange,
 					TimelineTime: currTime,
-					TransferTime: &IdRange{ Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64) }, //dummy range
+					TransferTime: &IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
 				})
 			}
 		}
@@ -172,7 +171,7 @@ func DeleteBalanceForIdRanges(rangesToDelete []*IdRange, timesToDelete []*IdRang
 				toDeletePermissionDetails = append(toDeletePermissionDetails, &UniversalPermissionDetails{
 						BadgeId: rangeToDelete,
 						TimelineTime: timeToDelete,
-						TransferTime: &IdRange{ Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64) }, //dummy range
+						TransferTime: &IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
 					},
 				)
 			}

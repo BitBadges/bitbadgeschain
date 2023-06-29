@@ -19,7 +19,7 @@ message CollectionPermissions {
   repeated TimedUpdatePermission canUpdateManager = 7;
   repeated TimedUpdatePermission canUpdateCollectionMetadata = 8;
 
-  repeated ActionWithBadgeIdsPermission canCreateMoreBadges = 9;
+  repeated ActionWithBadgeIdsAndTimesPermission canCreateMoreBadges = 9;
 
   repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 10;
   repeated TimedUpdateWithBadgeIdsPermission canUpdateInheritedBalances = 11;
@@ -98,23 +98,25 @@ message UserApprovedTransferPermission {
   repeated UserApprovedOutgoingTransferCombination combinations = 2;
 }
 
-message ActionWithBadgeIdsCombination {
+message ActionWithBadgeIdsAndTimesCombination {
   ValueOptions badgeIdsOptions = 1;
+  ValueOptions transferTimesOptions = 2;
 
-  ValueOptions permittedTimesOptions = 2;
-  ValueOptions forbiddenTimesOptions = 3;
+  ValueOptions permittedTimesOptions = 3;
+  ValueOptions forbiddenTimesOptions = 4;
 }
 
-message ActionWithBadgeIdsDefaultValues {
+message ActionWithBadgeIdsAndTimesDefaultValues {
   repeated IdRange badgeIds = 1;
+  repeated IdRange transferTimes = 2;
 
-  repeated IdRange permittedTimes = 2;
-  repeated IdRange forbiddenTimes = 3;
+  repeated IdRange permittedTimes = 3;
+  repeated IdRange forbiddenTimes = 4;
 }
 
-message ActionWithBadgeIdsPermission {
-  ActionWithBadgeIdsDefaultValues defaultValues = 1;
-  repeated ActionWithBadgeIdsCombination combinations = 2;
+message ActionWithBadgeIdsAndTimesPermission {
+  ActionWithBadgeIdsAndTimesDefaultValues defaultValues = 1;
+  repeated ActionWithBadgeIdsAndTimesCombination combinations = 2;
 }
 
 message ActionDefaultValues {

@@ -27,31 +27,31 @@ package simulation
 
 // 		randomAmounts := []sdkmath.Uint{}
 // 		for i := 0; i < r.Intn(10); i++ {
-// 			randomAmounts = append(randomAmounts, sdk.NewUint(r.Uint64()))
+// 			randomAmounts = append(randomAmounts, sdkmath.NewUint(r.Uint64()))
 // 		}
 
 // 		msg := &types.MsgTransferBadge{
 // 			Creator:      simAccount.Address.String(),
 // 			From:         simAccount.Address.String(),
-// 			CollectionId: sdk.NewUint(r.Uint64()),
+// 			CollectionId: sdkmath.NewUint(r.Uint64()),
 // 			Transfers: []*types.Transfer{
 // 				{
 // 					ToAddresses: randomAccounts,
 // 					Balances: []*types.Balance{
 // 						{
-// 							Amount: sdk.NewUint(r.Uint64()),
+// 							Amount: sdkmath.NewUint(r.Uint64()),
 // 							BadgeIds: []*types.IdRange{
 // 								{
-// 									Start: sdk.NewUint(r.Uint64()),
-// 									End:   sdk.NewUint(r.Uint64()),
+// 									Start: sdkmath.NewUint(r.Uint64()),
+// 									End:   sdkmath.NewUint(r.Uint64()),
 // 								},
 // 								{
-// 									Start: sdk.NewUint(r.Uint64()),
-// 									End:   sdk.NewUint(r.Uint64()),
+// 									Start: sdkmath.NewUint(r.Uint64()),
+// 									End:   sdkmath.NewUint(r.Uint64()),
 // 								},
 // 								{
-// 									Start: sdk.NewUint(r.Uint64()),
-// 									End:   sdk.NewUint(r.Uint64()),
+// 									Start: sdkmath.NewUint(r.Uint64()),
+// 									End:   sdkmath.NewUint(r.Uint64()),
 // 								},
 // 							},
 // 						},

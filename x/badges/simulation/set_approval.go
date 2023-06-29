@@ -23,24 +23,24 @@ package simulation
 // 			Creator: simAccount.Address.String(),
 // 			Balances: []*types.Balance{
 // 				{
-// 					Amount: sdk.NewUint(r.Uint64()),
+// 					Amount: sdkmath.NewUint(r.Uint64()),
 // 					BadgeIds: []*types.IdRange{
 // 						{
-// 							Start: sdk.NewUint(r.Uint64()),
-// 							End:   sdk.NewUint(r.Uint64()),
+// 							Start: sdkmath.NewUint(r.Uint64()),
+// 							End:   sdkmath.NewUint(r.Uint64()),
 // 						},
 // 						{
-// 							Start: sdk.NewUint(r.Uint64()),
-// 							End:   sdk.NewUint(r.Uint64()),
+// 							Start: sdkmath.NewUint(r.Uint64()),
+// 							End:   sdkmath.NewUint(r.Uint64()),
 // 						},
 // 						{
-// 							Start: sdk.NewUint(r.Uint64()),
-// 							End:   sdk.NewUint(r.Uint64()),
+// 							Start: sdkmath.NewUint(r.Uint64()),
+// 							End:   sdkmath.NewUint(r.Uint64()),
 // 						},
 // 					},
 // 				},
 // 			},
-// 			CollectionId: sdk.NewUint(r.Uint64()),
+// 			CollectionId: sdkmath.NewUint(r.Uint64()),
 // 		}
 
 // 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

@@ -22,6 +22,6 @@ func (k Keeper) GetCollection(goCtx context.Context, req *types.QueryGetCollecti
 	}
 
 	return &types.QueryGetCollectionResponse{
-		Collection: &badge,
+		Collection: badge,
 	}, nil
 }

@@ -12,6 +12,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
+
+	sdkmath "cosmossdk.io/math"
 )
 
 // avoid unused import issue
@@ -90,13 +92,13 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	badgesGenesis := types.GenesisState{
 		Params:           types.DefaultParams(),
 		PortId:           types.PortID,
-		NextCollectionId: sdk.NewUint(1),
+		NextCollectionId: sdkmath.NewUint(1),
 		Collections:      []*types.BadgeCollection{},
 		Balances:         []*types.UserBalanceStore{},
 		BalanceStoreKeys: []string{},
 		// Claims:           []*types.Claim{},
 		// ClaimStoreKeys:   []string{},
-		NextClaimId:      sdk.NewUint(1),
+		NextClaimId:      sdkmath.NewUint(1),
 		// this line is used by starport scaffolding # simapp/module/genesisState
 	}
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&badgesGenesis)

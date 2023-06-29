@@ -22,7 +22,7 @@ package simulation
 
 // 		msg := &types.MsgUpdateCollectionApprovedTransfers{
 // 			Creator:      simAccount.Address.String(),
-// 			CollectionId: sdk.NewUint(r.Uint64()),
+// 			CollectionId: sdkmath.NewUint(r.Uint64()),
 // 			ApprovedTransfers: []*types.CollectionApprovedTransfer{
 // 				{
 // 					From: &types.AddressMapping{
@@ -31,8 +31,8 @@ package simulation
 // 							simAccount.Address.String(),
 // 							simAccount.Address.String(),
 // 						},
-// 						IncludeOnlySpecified: sdk.NewUint(r.Uint64()).Mod(sdk.NewUint(2)).IsZero(),
-// 						ManagerOptions:       sdk.NewUint(r.Uint64()),
+// 						IncludeOnlySpecified: sdkmath.NewUint(r.Uint64()).Mod(sdkmath.NewUint(2)).IsZero(),
+// 						ManagerOptions:       sdkmath.NewUint(r.Uint64()),
 // 					},
 // 				},
 // 			},

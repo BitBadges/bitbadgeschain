@@ -9,25 +9,25 @@ import (
 
 /* Query helpers */
 
-func GetCollection(suite *TestSuite, ctx context.Context, id sdkmath.Uint) (types.BadgeCollection, error) {
+func GetCollection(suite *TestSuite, ctx context.Context, id sdkmath.Uint) (*types.BadgeCollection, error) {
 	res, err := suite.app.BadgesKeeper.GetCollection(ctx, &types.QueryGetCollectionRequest{CollectionId: sdkmath.Uint(id)})
 	if err != nil {
-		return types.BadgeCollection{}, err
+		return &types.BadgeCollection{}, err
 	}
 
-	return *res.Collection, nil
+	return res.Collection, nil
 }
 
-func GetUserBalance(suite *TestSuite, ctx context.Context, collectionId sdkmath.Uint, address string) (types.UserBalanceStore, error) {
+func GetUserBalance(suite *TestSuite, ctx context.Context, collectionId sdkmath.Uint, address string) (*types.UserBalanceStore, error) {
 	res, err := suite.app.BadgesKeeper.GetBalance(ctx, &types.QueryGetBalanceRequest{
 		CollectionId: sdkmath.Uint(collectionId),
 		Address:      address,
 	})
 	if err != nil {
-		return types.UserBalanceStore{}, err
+		return &types.UserBalanceStore{}, err
 	}
 
-	return *res.Balance, nil
+	return res.Balance, nil
 }
 
 // func GetClaim(suite *TestSuite, ctx context.Context, collectionId sdkmath.Uint, claimId sdkmath.Uint) (types.Claim, error) {
@@ -98,8 +98,8 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 // 				Uri: "https://example.com/{id}",
 // 				BadgeIds: []*types.IdRange{
 // 					{
-// 						Start: sdk.NewUint(1),
-// 						End:   sdk.NewUint(math.MaxUint64),
+// 						Start: sdkmath.NewUint(1),
+// 						End:   sdkmath.NewUint(math.MaxUint64),
 // 					},
 // 				},
 // 			},

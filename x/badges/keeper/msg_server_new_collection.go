@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -15,7 +16,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 	NextCollectionId := k.GetNextCollectionId(ctx)
 	k.IncrementNextCollectionId(ctx)
 
-	collection := types.BadgeCollection{
+	collection := &types.BadgeCollection{
 		CollectionId:       				NextCollectionId,
 		CollectionMetadataTimeline: msg.CollectionMetadataTimeline,
 		OffChainBalancesMetadataTimeline:   msg.OffChainBalancesMetadataTimeline,
@@ -25,8 +26,8 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 				Manager: msg.Creator,
 				Times: []*types.IdRange{
 					{
-						Start: sdk.NewUint(0),
-						End:   sdk.NewUint(math.MaxUint64),
+						Start: sdkmath.NewUint(0),
+						End:   sdkmath.NewUint(math.MaxUint64),
 					},
 				},
 			},
@@ -36,16 +37,16 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		CustomDataTimeline:         msg.CustomDataTimeline,
 		ContractAddressTimeline:    msg.ContractAddressTimeline,
 		StandardsTimeline:          msg.StandardsTimeline,
-		NextBadgeId:        sdk.NewUint(1),
-		ParentCollectionId: sdk.NewUint(0),
+		NextBadgeId:        sdkmath.NewUint(1),
+		ParentCollectionId: sdkmath.NewUint(0),
 		BalancesType:       msg.BalancesType,
 		IsArchivedTimeline: []*types.IsArchivedTimeline{
 			{
 				IsArchived: false,
 				Times:      []*types.IdRange{
 					{
-						Start: sdk.NewUint(0),
-						End:   sdk.NewUint(math.MaxUint64),
+						Start: sdkmath.NewUint(0),
+						End:   sdkmath.NewUint(math.MaxUint64),
 					},
 				},
 			},
@@ -65,13 +66,13 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 
 	if len(msg.BadgesToCreate) > 0 {
 		err := *new(error)
-		collection, err = k.CreateBadges(ctx, collection, msg.BadgesToCreate, msg.Transfers, msg.Creator)
+		collection, err = k.CreateBadges(ctx, collection, msg.BadgesToCreate, msg.Transfers)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	maxBadgeId := collection.NextBadgeId.Sub(sdk.NewUint(1))
+	maxBadgeId := collection.NextBadgeId.Sub(sdkmath.NewUint(1))
 	for _, timelineVal := range msg.InheritedBalancesTimeline {
 		for _, inheritedBalance := range timelineVal.InheritedBalances {
 			for _, badgeId := range inheritedBalance.BadgeIds {

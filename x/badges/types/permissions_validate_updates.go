@@ -2,17 +2,17 @@ package types
 
 
 
-func ValidateActionWithBadgeIdsPermissionUpdate(oldPermissions []*ActionWithBadgeIdsPermission, newPermissions []*ActionWithBadgeIdsPermission) error {
-	if err := ValidateActionWithBadgeIdsPermission(oldPermissions); err != nil {
+func ValidateActionWithBadgeIdsAndTimesPermissionUpdate(oldPermissions []*ActionWithBadgeIdsAndTimesPermission, newPermissions []*ActionWithBadgeIdsAndTimesPermission) error {
+	if err := ValidateActionWithBadgeIdsAndTimesPermission(oldPermissions); err != nil {
 		return err
 	}
 
-	if err := ValidateActionWithBadgeIdsPermission(newPermissions); err != nil {
+	if err := ValidateActionWithBadgeIdsAndTimesPermission(newPermissions); err != nil {
 		return err
 	}
 
-	castedOldPermissions := CastActionWithBadgeIdsPermissionToUniversalPermission(oldPermissions)
-	castedNewPermissions := CastActionWithBadgeIdsPermissionToUniversalPermission(newPermissions)
+	castedOldPermissions := CastActionWithBadgeIdsAndTimesPermissionToUniversalPermission(oldPermissions)
+	castedNewPermissions := CastActionWithBadgeIdsAndTimesPermissionToUniversalPermission(newPermissions)
 	
 	err := ValidateUniversalPermissionUpdate(GetFirstMatchOnly(castedOldPermissions), GetFirstMatchOnly(castedNewPermissions))
 	if err != nil {
@@ -212,7 +212,7 @@ func ValidatePermissionsUpdate(oldPermissions *CollectionPermissions, newPermiss
 	}
 
 	if oldPermissions.CanCreateMoreBadges != nil && newPermissions.CanCreateMoreBadges != nil {
-		if err := ValidateActionWithBadgeIdsPermissionUpdate(oldPermissions.CanCreateMoreBadges, newPermissions.CanCreateMoreBadges); err != nil {
+		if err := ValidateActionWithBadgeIdsAndTimesPermissionUpdate(oldPermissions.CanCreateMoreBadges, newPermissions.CanCreateMoreBadges); err != nil {
 			return err
 		}
 	}

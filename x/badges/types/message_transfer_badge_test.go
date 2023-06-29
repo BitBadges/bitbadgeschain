@@ -20,7 +20,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 	// 		msg: types.MsgTransferBadge{
 	// 			Creator:      "invalid_address",
 	// 			From:         sample.AccAddress(),
-	// 			CollectionId: sdk.NewUint(1),
+	// 			CollectionId: sdkmath.NewUint(1),
 	// 			Transfers: []*types.Transfer{
 	// 				{
 	// 					ToAddresses: []string{
@@ -28,11 +28,11 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 	// 					},
 	// 					Balances: []*types.Balance{
 	// 						{
-	// 							Amount: sdk.NewUint(10),
+	// 							Amount: sdkmath.NewUint(10),
 	// 							BadgeIds: []*types.IdRange{
 	// 								{
-	// 									Start: sdk.NewUint(1),
-	// 									End:   sdk.NewUint(1),
+	// 									Start: sdkmath.NewUint(1),
+	// 									End:   sdkmath.NewUint(1),
 	// 								},
 	// 							},
 	// 						},
@@ -53,11 +53,11 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 	// 					},
 	// 					Balances: []*types.Balance{
 	// 						{
-	// 							Amount: sdk.NewUint(10),
+	// 							Amount: sdkmath.NewUint(10),
 	// 							BadgeIds: []*types.IdRange{
 	// 								{
-	// 									Start: sdk.NewUint(1),
-	// 									End:   sdk.NewUint(1),
+	// 									Start: sdkmath.NewUint(1),
+	// 									End:   sdkmath.NewUint(1),
 	// 								},
 	// 							},
 	// 						},
@@ -77,11 +77,11 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 	// 					},
 	// 					Balances: []*types.Balance{
 	// 						{
-	// 							Amount: sdk.NewUint(0),
+	// 							Amount: sdkmath.NewUint(0),
 	// 							BadgeIds: []*types.IdRange{
 	// 								{
-	// 									Start: sdk.NewUint(1),
-	// 									End:   sdk.NewUint(1),
+	// 									Start: sdkmath.NewUint(1),
+	// 									End:   sdkmath.NewUint(1),
 	// 								},
 	// 							},
 	// 						},
@@ -101,11 +101,11 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 	// 					ToAddresses: []string{sample.AccAddress()},
 	// 					Balances: []*types.Balance{
 	// 						{
-	// 							Amount: sdk.NewUint(10),
+	// 							Amount: sdkmath.NewUint(10),
 	// 							BadgeIds: []*types.IdRange{
 	// 								{
-	// 									Start: sdk.NewUint(10),
-	// 									End:   sdk.NewUint(1),
+	// 									Start: sdkmath.NewUint(10),
+	// 									End:   sdkmath.NewUint(1),
 	// 								},
 	// 							},
 	// 						},

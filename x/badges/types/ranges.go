@@ -33,6 +33,10 @@ func BalancesEqual(a, b []*Balance) bool {
 		if !IdRangeEquals(aBalance.BadgeIds, bBalance.BadgeIds) {
 			return false
 		}
+
+		if !IdRangeEquals(aBalance.Times, bBalance.Times) {
+			return false
+		}
 	}
 
 	return true

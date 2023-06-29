@@ -22,16 +22,16 @@ package simulation
 // 		randomSubassets := []*types.BadgeSupplyAndAmount{}
 // 		for i := 0; i < r.Intn(10); i++ {
 // 			randomSubassets = append(randomSubassets, &types.BadgeSupplyAndAmount{
-// 				Supply: sdk.NewUint(r.Uint64()),
-// 				Amount: sdk.NewUint(r.Uint64()),
+// 				Supply: sdkmath.NewUint(r.Uint64()),
+// 				Amount: sdkmath.NewUint(r.Uint64()),
 // 			})
 // 		}
 
 // 		msg := &types.MsgNewCollection{
 // 			Creator:            simAccount.Address.String(),
 // 			BadgesToCreate:     randomSubassets,
-// 			Permissions:        sdk.NewUint(r.Uint64()),
-// 			Standard:           sdk.NewUint(r.Uint64()),
+// 			Permissions:        sdkmath.NewUint(r.Uint64()),
+// 			Standard:           sdkmath.NewUint(r.Uint64()),
 // 			Bytes:              simtypes.RandStringOfLength(r, r.Intn(256)),
 // 			BadgeMetadata:      []*types.BadgeMetadata{},
 // 			CollectionMetadata: simtypes.RandStringOfLength(r, r.Intn(100)),

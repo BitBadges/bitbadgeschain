@@ -32,7 +32,7 @@ func AssertIsFrozenLogicIsMaintained(prevBadgeMetadata []*types.BadgeMetadata, n
 	return nil
 }
 
-// func GetUrisToStoreAndPermissionsToCheck(collection types.BadgeCollection, msgCollectionMetadata *types.CollectionMetadata, msgBadgeMetadata []*types.BadgeMetadata, msgOffChainBalancesMetadata *types.OffChainBalancesMetadata) (newCollectionMetadata *types.CollectionMetadata, newBadgeMetadata []*types.BadgeMetadata, newBalanceUri *types.OffChainBalancesMetadata, needToValidateUpdateCollectionMetadata bool, needToValidateUpdateBadgeMetadata bool, needToValidateUpdateBalanceUri bool) {
+// func GetUrisToStoreAndPermissionsToCheck(collection *types.BadgeCollection, msgCollectionMetadata *types.CollectionMetadata, msgBadgeMetadata []*types.BadgeMetadata, msgOffChainBalancesMetadata *types.OffChainBalancesMetadata) (newCollectionMetadata *types.CollectionMetadata, newBadgeMetadata []*types.BadgeMetadata, newBalanceUri *types.OffChainBalancesMetadata, needToValidateUpdateCollectionMetadata bool, needToValidateUpdateBadgeMetadata bool, needToValidateUpdateBalanceUri bool) {
 // 	needToValidateUpdateCollectionMetadata = false
 // 	needToValidateUpdateBalanceUri = false
 // 	needToValidateUpdateBadgeMetadata = false

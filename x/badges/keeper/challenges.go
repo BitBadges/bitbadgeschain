@@ -1,13 +1,13 @@
 package keeper
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkmath "cosmossdk.io/math"
 )
 
 func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint,  challenges []*types.Challenge, solutions []*types.ChallengeSolution, creatorAddress string, level string) (bool, sdkmath.Uint, error) {
-	numIncrements := sdk.NewUint(0)
+	numIncrements := sdkmath.NewUint(0)
 
 	for _, challenge := range challenges {
 		root := challenge.Root
@@ -30,9 +30,9 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 				leafIndex := GetLeafIndex(solution.Proof.Aunts)
 				if challenge.UseLeafIndexForDistributionOrder {
 					//Get leftmost leaf index for layer === expectedProofLength
-					leftmostLeafIndex := sdk.NewUint(1)
-					for i := sdk.NewUint(0); i.LT(expectedProofLength); i = i.Add(sdk.NewUint(1)) {
-						leftmostLeafIndex = leftmostLeafIndex.Mul(sdk.NewUint(2))
+					leftmostLeafIndex := sdkmath.NewUint(1)
+					for i := sdkmath.NewUint(0); i.LT(expectedProofLength); i = i.Add(sdkmath.NewUint(1)) {
+						leftmostLeafIndex = leftmostLeafIndex.Mul(sdkmath.NewUint(2))
 					}
 
 					numIncrements = leafIndex.Sub(leftmostLeafIndex)
@@ -44,7 +44,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 						continue
 					}
 
-					maxUses := sdk.NewUint(1)
+					maxUses := sdkmath.NewUint(1)
 					if numUsed.GT(maxUses) {
 						continue
 					}

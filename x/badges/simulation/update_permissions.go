@@ -21,8 +21,8 @@ package simulation
 // 		simAccount, _ := simtypes.RandomAcc(r, accs)
 // 		msg := &types.MsgUpdateCollectionPermissions{
 // 			Creator:      simAccount.Address.String(),
-// 			CollectionId: sdk.NewUint(r.Uint64()),
-// 			Permissions:  sdk.NewUint(r.Uint64()),
+// 			CollectionId: sdkmath.NewUint(r.Uint64()),
+// 			Permissions:  sdkmath.NewUint(r.Uint64()),
 // 		}
 
 // 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

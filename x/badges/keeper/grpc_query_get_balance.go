@@ -21,7 +21,7 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 	userBalance, found := k.GetUserBalanceFromStore(ctx, userBalanceKey)
 	if found {
 		return &types.QueryGetBalanceResponse{
-			Balance: &userBalance,
+			Balance: userBalance,
 		}, nil
 	} else {
 		collection, found := k.GetCollectionFromStore(ctx, req.CollectionId)

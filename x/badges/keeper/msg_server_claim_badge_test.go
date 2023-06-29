@@ -59,45 +59,45 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End: sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End: sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
-// 				Permissions: sdk.NewUint(62),
+// 				Permissions: sdkmath.NewUint(62),
 // 			},
-// 			Amount:  sdk.NewUint(1),
+// 			Amount:  sdkmath.NewUint(1),
 // 			Creator: bob,
 // 		},
 // 	}
 
 // 	CreateCollections(suite, wctx, collectionsToCreate)
-// 	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
+// 	badge, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
 // 	claimToAdd := types.Claim{
 // 		Balances: []*types.Balance{
 // 			{
-// 				Amount: sdk.NewUint(10),
-// 				BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
+// 				Amount: sdkmath.NewUint(10),
+// 				BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 			},
 // 		},
-// 		BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
+// 		BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 		IncrementIdsBy: 0,
 // 		AmountPerClaim: 1,
 // 		Data:       hex.EncodeToString(rootHash),
 // 		Type: 	 	uint64(types.ClaimType_MerkleTree),
 // 		Uri: "",
 // 		TimeInterval: &types.IdRange{
-// 			Start: sdk.NewUint(0),
-// 			End:   sdk.NewUint(math.MaxUint64),
+// 			Start: sdkmath.NewUint(0),
+// 			End:   sdkmath.NewUint(math.MaxUint64),
 // 		},
 // 	}
 
-// 	err = CreateBadges(suite, wctx, bob, sdk.NewUint(0), []*types.BadgeSupplyAndAmount{
+// 	err = CreateBadges(suite, wctx, bob, sdkmath.NewUint(0), []*types.BadgeSupplyAndAmount{
 // 		{
-// 			Supply: sdk.NewUint(10),
-// 			Amount: sdk.NewUint(1),
+// 			Supply: sdkmath.NewUint(10),
+// 			Amount: sdkmath.NewUint(1),
 // 		},
 // 	},
 // 		[]*types.Transfer{},
@@ -110,27 +110,27 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End: sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End: sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
 // 	)
 // 	suite.Require().Nil(err, "Error creating badge")
-// 	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+// 	badge, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
 
 // 	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
-// 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-// 			Amount: sdk.NewUint(10),
+// 			BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, //0 to 0 range so it will be nil
+// 			Amount: sdkmath.NewUint(10),
 // 		},
 // 	}, badge.MaxSupplys)
 
 // 	claim := badge.Claims[0]
 
-// 	err = ClaimBadge(suite, wctx, bob, sdk.NewUint(0), 0, &types.ClaimProof{
+// 	err = ClaimBadge(suite, wctx, bob, sdkmath.NewUint(0), 0, &types.ClaimProof{
 // 			Leaf: aliceLeaf,
 // 			Aunts: []*types.ClaimProofItem{
 // 				{
@@ -145,20 +145,20 @@ package keeper_test
 // 		},
 // 		"",
 // 		&types.IdRange{
-// 			Start: sdk.NewUint(0),
-// 			End:   sdk.NewUint(math.MaxUint64),
+// 			Start: sdkmath.NewUint(0),
+// 			End:   sdkmath.NewUint(math.MaxUint64),
 // 		},
 // 	)
 // 	suite.Require().Nil(err, "Error claiming badge")
 
-// 	aliceBalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), aliceAccountNum)
+// 	aliceBalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
 // 	suite.Require().Equal(uint64(1), aliceBalance.Balances[0].Balance)
-// 	suite.Require().Equal([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
+// 	suite.Require().Equal([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
 
-// 	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+// 	badge, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	claim = badge.Claims[0]
 // 	suite.Require().Equal(uint64(9), claim.Balances[0].Balance)
-// 	// suite.Require().Equal([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
+// 	// suite.Require().Equal([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
 // }
 
 // func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
@@ -194,45 +194,45 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End: sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End: sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
-// 				Permissions: sdk.NewUint(62),
+// 				Permissions: sdkmath.NewUint(62),
 // 			},
-// 			Amount:  sdk.NewUint(1),
+// 			Amount:  sdkmath.NewUint(1),
 // 			Creator: bob,
 // 		},
 // 	}
 
 // 	CreateCollections(suite, wctx, collectionsToCreate)
-// 	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
+// 	badge, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
 // 	claimToAdd := types.Claim{
 // 		Balances: []*types.Balance{
 // 			{
-// 				Amount: sdk.NewUint(10),
-// 				BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
+// 				Amount: sdkmath.NewUint(10),
+// 				BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 			},
 // 		},
-// 		BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
+// 		BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 		IncrementIdsBy: 0,
 // 		AmountPerClaim: 1,
 // 		Data:       hex.EncodeToString(rootHash),
 // 		Type: 	 	uint64(types.ClaimType_MerkleTree),
 // 		Uri: "",
 // 		TimeInterval: &types.IdRange{
-// 			Start: sdk.NewUint(0),
-// 			End:   sdk.NewUint(math.MaxUint64),
+// 			Start: sdkmath.NewUint(0),
+// 			End:   sdkmath.NewUint(math.MaxUint64),
 // 		},
 // 	}
 
-// 	err = CreateBadges(suite, wctx, bob, sdk.NewUint(0), []*types.BadgeSupplyAndAmount{
+// 	err = CreateBadges(suite, wctx, bob, sdkmath.NewUint(0), []*types.BadgeSupplyAndAmount{
 // 		{
-// 			Supply: sdk.NewUint(10),
-// 			Amount: sdk.NewUint(1),
+// 			Supply: sdkmath.NewUint(10),
+// 			Amount: sdkmath.NewUint(1),
 // 		},
 // 	},
 // 		[]*types.Transfer{},
@@ -244,28 +244,28 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End: sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End: sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
 // 	)
 // 	suite.Require().Nil(err, "Error creating badge")
-// 	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+// 	badge, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
 
 // 	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
-// 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-// 			Amount: sdk.NewUint(10),
+// 			BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, //0 to 0 range so it will be nil
+// 			Amount: sdkmath.NewUint(10),
 // 		},
 // 	}, badge.MaxSupplys)
 
 // 	claim := badge.Claims[0]
 // 	suite.Require().Equal(&claimToAdd, claim)
 
-// 	err = ClaimBadge(suite, wctx, alice, sdk.NewUint(0), 0, &types.ClaimProof{
+// 	err = ClaimBadge(suite, wctx, alice, sdkmath.NewUint(0), 0, &types.ClaimProof{
 // 		Leaf: "",
 // 		Aunts: []*types.ClaimProofItem{
 
@@ -279,8 +279,8 @@ package keeper_test
 // 			},
 // 		},
 // 	}, "", &types.IdRange{
-// 		Start: sdk.NewUint(0),
-// 		End:   sdk.NewUint(math.MaxUint64),
+// 		Start: sdkmath.NewUint(0),
+// 		End:   sdkmath.NewUint(math.MaxUint64),
 // 	})
 // 	suite.Require().EqualError(err, keeper.ErrRootHashInvalid.Error())
 // }
@@ -326,45 +326,45 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End: sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End: sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
-// 				Permissions: sdk.NewUint(62),
+// 				Permissions: sdkmath.NewUint(62),
 // 			},
-// 			Amount:  sdk.NewUint(1),
+// 			Amount:  sdkmath.NewUint(1),
 // 			Creator: bob,
 // 		},
 // 	}
 
 // 	CreateCollections(suite, wctx, collectionsToCreate)
-// 	badge, _ := GetCollection(suite, wctx, sdk.NewUint(1))
+// 	badge, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
 // 	claimToAdd := types.Claim{
 // 		Balances: []*types.Balance{
 // 			{
-// 				Amount: sdk.NewUint(10),
-// 				BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
+// 				Amount: sdkmath.NewUint(10),
+// 				BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 			},
 // 		},
-// 		BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}},
+// 		BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 		IncrementIdsBy: 1,
 // 		AmountPerClaim: 1,
 // 		Data:       hex.EncodeToString(rootHash),
 // 		Type: 	 	uint64(types.ClaimType_FirstCome),
 // 		Uri: "",
 // 		TimeInterval: &types.IdRange{
-// 			Start: sdk.NewUint(0),
-// 			End:   sdk.NewUint(math.MaxUint64),
+// 			Start: sdkmath.NewUint(0),
+// 			End:   sdkmath.NewUint(math.MaxUint64),
 // 		},
 // 	}
 
-// 	err = CreateBadges(suite, wctx, bob, sdk.NewUint(0), []*types.BadgeSupplyAndAmount{
+// 	err = CreateBadges(suite, wctx, bob, sdkmath.NewUint(0), []*types.BadgeSupplyAndAmount{
 // 		{
-// 			Supply: sdk.NewUint(10),
-// 			Amount: sdk.NewUint(1),
+// 			Supply: sdkmath.NewUint(10),
+// 			Amount: sdkmath.NewUint(1),
 // 		},
 // 	},
 // 		[]*types.Transfer{},
@@ -376,28 +376,28 @@ package keeper_test
 // 						Uri: "https://example.com/{id}",
 // 						BadgeIds: []*types.IdRange{
 // 							{
-// 								Start: sdk.NewUint(1),
-// 								End: sdk.NewUint(math.MaxUint64),
+// 								Start: sdkmath.NewUint(1),
+// 								End: sdkmath.NewUint(math.MaxUint64),
 // 							},
 // 						},
 // 					},
 // 				},
 // 	)
 // 	suite.Require().Nil(err, "Error creating badge")
-// 	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+// 	badge, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
 
 // 	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
-// 			BadgeIds: []*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, //0 to 0 range so it will be nil
-// 			Amount: sdk.NewUint(10),
+// 			BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, //0 to 0 range so it will be nil
+// 			Amount: sdkmath.NewUint(10),
 // 		},
 // 	}, badge.MaxSupplys)
 
 // 	claim := badge.Claims[0]
 // 	suite.Require().Equal(&claimToAdd, claim)
 
-// 	err = ClaimBadge(suite, wctx, alice, sdk.NewUint(0), 0, &types.ClaimProof{
+// 	err = ClaimBadge(suite, wctx, alice, sdkmath.NewUint(0), 0, &types.ClaimProof{
 // 		Leaf: aliceLeaf,
 // 		Aunts: []*types.ClaimProofItem{
 // 			{
@@ -410,17 +410,17 @@ package keeper_test
 // 			},
 // 		},
 // 	}, "", &types.IdRange{
-// 		Start: sdk.NewUint(0),
-// 		End:   sdk.NewUint(math.MaxUint64),
+// 		Start: sdkmath.NewUint(0),
+// 		End:   sdkmath.NewUint(math.MaxUint64),
 // 	})
 // 	suite.Require().Nil(err, "Error claiming badge")
 
-// 	aliceBalance, _ := GetUserBalance(suite, wctx, sdk.NewUint(1), aliceAccountNum)
+// 	aliceBalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
 // 	suite.Require().Equal(uint64(1), aliceBalance.Balances[0].Balance)
-// 	suite.Require().Equal([]*types.IdRange{{Start: sdk.NewUint(1), End: sdk.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
+// 	suite.Require().Equal([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
 
-// 	badge, _ = GetCollection(suite, wctx, sdk.NewUint(1))
+// 	badge, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	claim = badge.Claims[0]
 // 	suite.Require().Equal(uint64(9), claim.Balances[0].Balance)
-// 	suite.Require().Equal([]*types.IdRange{{Start: sdk.NewUint(2), End: sdk.NewUint(2),}}, claim.BadgeIds)
+// 	suite.Require().Equal([]*types.IdRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2),}}, claim.BadgeIds)
 // }

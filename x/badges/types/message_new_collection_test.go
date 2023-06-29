@@ -20,20 +20,20 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 	// 		name: "invalid address",
 	// 		msg: types.MsgNewCollection{
 	// 			Creator:            "invalid_address",
-	// 			Standard:           sdk.NewUint(0),
+	// 			Standard:           sdkmath.NewUint(0),
 	// 			CollectionMetadata: "https://example.com",
 	// 			BadgeMetadata: []*types.BadgeMetadata{
 	// 				{
 	// 					Uri: "https://example.com/{id}",
 	// 					BadgeIds: []*types.IdRange{
 	// 						{
-	// 							Start: sdk.NewUint(1),
-	// 							End:   sdk.NewUint(math.MaxUint64),
+	// 							Start: sdkmath.NewUint(1),
+	// 							End:   sdkmath.NewUint(math.MaxUint64),
 	// 						},
 	// 					},
 	// 				},
 	// 			},
-	// 			Permissions:       sdk.NewUint(15),
+	// 			Permissions:       sdkmath.NewUint(15),
 	// 			ApprovedTransfers: []*types.CollectionApprovedTransfer{},
 	// 		},
 	// 		err: ErrInvalidAddress,
@@ -41,40 +41,40 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 	// 		name: "valid state",
 	// 		msg: types.MsgNewCollection{
 	// 			Creator:            sample.AccAddress(),
-	// 			Standard:           sdk.NewUint(0),
+	// 			Standard:           sdkmath.NewUint(0),
 	// 			CollectionMetadata: "https://example.com",
 	// 			BadgeMetadata: []*types.BadgeMetadata{
 	// 				{
 	// 					Uri: "https://example.com/{id}",
 	// 					BadgeIds: []*types.IdRange{
 	// 						{
-	// 							Start: sdk.NewUint(1),
-	// 							End:   sdk.NewUint(math.MaxUint64),
+	// 							Start: sdkmath.NewUint(1),
+	// 							End:   sdkmath.NewUint(math.MaxUint64),
 	// 						},
 	// 					},
 	// 				},
 	// 			},
-	// 			Permissions:       sdk.NewUint(15),
+	// 			Permissions:       sdkmath.NewUint(15),
 	// 			ApprovedTransfers: []*types.CollectionApprovedTransfer{},
 	// 		},
 	// 	}, {
 	// 		name: "invalid URI",
 	// 		msg: types.MsgNewCollection{
 	// 			Creator:            sample.AccAddress(),
-	// 			Standard:           sdk.NewUint(0),
+	// 			Standard:           sdkmath.NewUint(0),
 	// 			CollectionMetadata: "",
 	// 			BadgeMetadata: []*types.BadgeMetadata{
 	// 				{
 	// 					Uri: "https://example.com/{id}",
 	// 					BadgeIds: []*types.IdRange{
 	// 						{
-	// 							Start: sdk.NewUint(1),
-	// 							End:   sdk.NewUint(math.MaxUint64),
+	// 							Start: sdkmath.NewUint(1),
+	// 							End:   sdkmath.NewUint(math.MaxUint64),
 	// 						},
 	// 					},
 	// 				},
 	// 			},
-	// 			Permissions:       sdk.NewUint(15),
+	// 			Permissions:       sdkmath.NewUint(15),
 	// 			ApprovedTransfers: []*types.CollectionApprovedTransfer{},
 	// 		},
 
@@ -84,20 +84,20 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 	// 		name: "invalid Badge URI",
 	// 		msg: types.MsgNewCollection{
 	// 			Creator:            sample.AccAddress(),
-	// 			Standard:           sdk.NewUint(0),
+	// 			Standard:           sdkmath.NewUint(0),
 	// 			CollectionMetadata: "https://example.com",
 	// 			BadgeMetadata: []*types.BadgeMetadata{
 	// 				{
 	// 					Uri: "",
 	// 					BadgeIds: []*types.IdRange{
 	// 						{
-	// 							Start: sdk.NewUint(1),
-	// 							End:   sdk.NewUint(math.MaxUint64),
+	// 							Start: sdkmath.NewUint(1),
+	// 							End:   sdkmath.NewUint(math.MaxUint64),
 	// 						},
 	// 					},
 	// 				},
 	// 			},
-	// 			Permissions:       sdk.NewUint(15),
+	// 			Permissions:       sdkmath.NewUint(15),
 	// 			ApprovedTransfers: []*types.CollectionApprovedTransfer{},
 	// 		},
 	// 		err: types.ErrInvalidBadgeURI,
@@ -106,20 +106,20 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 	// 		name: "invalid Permissions",
 	// 		msg: types.MsgNewCollection{
 	// 			Creator:            sample.AccAddress(),
-	// 			Standard:           sdk.NewUint(0),
+	// 			Standard:           sdkmath.NewUint(0),
 	// 			CollectionMetadata: "https://example.com",
 	// 			BadgeMetadata: []*types.BadgeMetadata{
 	// 				{
 	// 					Uri: "https://example.com/{id}",
 	// 					BadgeIds: []*types.IdRange{
 	// 						{
-	// 							Start: sdk.NewUint(1),
-	// 							End:   sdk.NewUint(math.MaxUint64),
+	// 							Start: sdkmath.NewUint(1),
+	// 							End:   sdkmath.NewUint(math.MaxUint64),
 	// 						},
 	// 					},
 	// 				},
 	// 			},
-	// 			Permissions:       sdk.NewUint(100000),
+	// 			Permissions:       sdkmath.NewUint(100000),
 	// 			ApprovedTransfers: []*types.CollectionApprovedTransfer{},
 	// 		},
 	// 		err: types.ErrInvalidPermissionsLeadingZeroes,

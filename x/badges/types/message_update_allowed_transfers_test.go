@@ -19,21 +19,21 @@ func TestMsgUpdateCollectionApprovedTransfers_ValidateBasic(t *testing.T) {
 	// 		name: "invalid address",
 	// 		msg: types.MsgUpdateCollectionApprovedTransfers{
 	// 			Creator:      "invalid_address",
-	// 			CollectionId: sdk.NewUint(1),
+	// 			CollectionId: sdkmath.NewUint(1),
 	// 			ApprovedTransfers: []*types.CollectionApprovedTransfer{
 	// 				{
 	// 					From: &types.AddressMapping{
 	// 						Addresses: []string{
 	// 							"invalid_address",
 	// 						},
-	// 						ManagerOptions:       sdk.NewUint(uint64(types.AddressOptions_None)),
+	// 						ManagerOptions:       sdkmath.NewUint(uint64(types.AddressOptions_None)),
 	// 						IncludeOnlySpecified: true,
 	// 					},
 	// 					To: &types.AddressMapping{
 	// 						Addresses: []string{
 	// 							"invalid_address",
 	// 						},
-	// 						ManagerOptions:       sdk.NewUint(uint64(types.AddressOptions_None)),
+	// 						ManagerOptions:       sdkmath.NewUint(uint64(types.AddressOptions_None)),
 	// 						IncludeOnlySpecified: true,
 	// 					},
 	// 				},
@@ -44,21 +44,21 @@ func TestMsgUpdateCollectionApprovedTransfers_ValidateBasic(t *testing.T) {
 	// 		name: "valid address",
 	// 		msg: types.MsgUpdateCollectionApprovedTransfers{
 	// 			Creator:      sample.AccAddress(),
-	// 			CollectionId: sdk.NewUint(1),
+	// 			CollectionId: sdkmath.NewUint(1),
 	// 			ApprovedTransfers: []*types.CollectionApprovedTransfer{
 	// 				{
 	// 					From: &types.AddressMapping{
 	// 						Addresses: []string{
 	// 							sample.AccAddress(),
 	// 						},
-	// 						ManagerOptions:       sdk.NewUint(uint64(types.AddressOptions_None)),
+	// 						ManagerOptions:       sdkmath.NewUint(uint64(types.AddressOptions_None)),
 	// 						IncludeOnlySpecified: true,
 	// 					},
 	// 					To: &types.AddressMapping{
 	// 						Addresses: []string{
 	// 							sample.AccAddress(),
 	// 						},
-	// 						ManagerOptions:       sdk.NewUint(uint64(types.AddressOptions_None)),
+	// 						ManagerOptions:       sdkmath.NewUint(uint64(types.AddressOptions_None)),
 	// 						IncludeOnlySpecified: true,
 	// 					},
 	// 				},

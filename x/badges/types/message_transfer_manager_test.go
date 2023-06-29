@@ -4,8 +4,8 @@ import (
 	"math"
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -21,20 +21,20 @@ func TestMsgUpdateManager_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgUpdateManager{
 				Creator:      "invalid_address",
-				CollectionId: sdk.NewUint(1),
+				CollectionId: sdkmath.NewUint(1),
 			},
 			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: types.MsgUpdateManager{
 				Creator:      sample.AccAddress(),
-				CollectionId: sdk.NewUint(1),
+				CollectionId: sdkmath.NewUint(1),
 				ManagerTimeline: []*types.ManagerTimeline{
 					{
 						Times: []*types.IdRange{
 							{
-								Start: sdk.NewUint(0),
-								End:   sdk.NewUint(math.MaxUint64),
+								Start: sdkmath.NewUint(0),
+								End:   sdkmath.NewUint(math.MaxUint64),
 							},
 						},
 						Manager: sample.AccAddress(),
@@ -46,13 +46,13 @@ func TestMsgUpdateManager_ValidateBasic(t *testing.T) {
 			name: "invalid address 2",
 			msg: types.MsgUpdateManager{
 				Creator:      sample.AccAddress(),
-				CollectionId: sdk.NewUint(1),
+				CollectionId: sdkmath.NewUint(1),
 				ManagerTimeline: []*types.ManagerTimeline{
 					{
 						Times: []*types.IdRange{
 							{
-								Start: sdk.NewUint(0),
-								End:   sdk.NewUint(math.MaxUint64),
+								Start: sdkmath.NewUint(0),
+								End:   sdkmath.NewUint(math.MaxUint64),
 							},
 						},
 						Manager: "invalid_address",

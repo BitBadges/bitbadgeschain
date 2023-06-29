@@ -19,11 +19,11 @@ func TestMsgMintAndDistributeBadges_ValidateBasic(t *testing.T) {
 	// 		name: "invalid address",
 	// 		msg: types.MsgMintAndDistributeBadges{
 	// 			Creator:      "invalid_address",
-	// 			CollectionId: sdk.NewUint(1),
+	// 			CollectionId: sdkmath.NewUint(1),
 	// 			BadgesToCreate: []*types.BadgeSupplyAndAmount{
 	// 				{
-	// 					Supply: sdk.NewUint(10),
-	// 					Amount: sdk.NewUint(1),
+	// 					Supply: sdkmath.NewUint(10),
+	// 					Amount: sdkmath.NewUint(1),
 	// 				},
 	// 			},
 	// 		},
@@ -32,11 +32,11 @@ func TestMsgMintAndDistributeBadges_ValidateBasic(t *testing.T) {
 	// 		name: "valid state",
 	// 		msg: types.MsgMintAndDistributeBadges{
 	// 			Creator:      sample.AccAddress(),
-	// 			CollectionId: sdk.NewUint(1),
+	// 			CollectionId: sdkmath.NewUint(1),
 	// 			BadgesToCreate: []*types.BadgeSupplyAndAmount{
 	// 				{
-	// 					Supply: sdk.NewUint(10),
-	// 					Amount: sdk.NewUint(1),
+	// 					Supply: sdkmath.NewUint(10),
+	// 					Amount: sdkmath.NewUint(1),
 	// 				},
 	// 			},
 	// 		},
@@ -44,11 +44,11 @@ func TestMsgMintAndDistributeBadges_ValidateBasic(t *testing.T) {
 	// 		name: "invalid amount",
 	// 		msg: types.MsgMintAndDistributeBadges{
 	// 			Creator:      sample.AccAddress(),
-	// 			CollectionId: sdk.NewUint(1),
+	// 			CollectionId: sdkmath.NewUint(1),
 	// 			BadgesToCreate: []*types.BadgeSupplyAndAmount{
 	// 				{
-	// 					Supply: sdk.NewUint(10),
-	// 					Amount: sdk.NewUint(0),
+	// 					Supply: sdkmath.NewUint(10),
+	// 					Amount: sdkmath.NewUint(0),
 	// 				},
 	// 			},
 	// 		},

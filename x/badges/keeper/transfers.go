@@ -15,9 +15,9 @@ func HandleManagerAlias(address string, managerAddress string) string {
 	return address
 }
 
-func (k Keeper) HandleTransfers(ctx sdk.Context, collection types.BadgeCollection, transfers []*types.Transfer, initiatedBy string, onlyDeductApprovals bool) (error) {
+func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollection, transfers []*types.Transfer, initiatedBy string, onlyDeductApprovals bool) (error) {
 	//If "Mint" or "Manager" 
-	unmintedBalances := types.UserBalanceStore{
+	unmintedBalances := &types.UserBalanceStore{
 		Balances: collection.UnmintedSupplys,
 	}
 	err := *new(error)
@@ -44,7 +44,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection types.BadgeCollectio
 			toBalanceKey := ConstructBalanceKey(to, collection.CollectionId)
 			toUserBalance, found := k.GetUserBalanceFromStore(ctx, toBalanceKey)
 			if !found {
-				toUserBalance = types.UserBalanceStore{
+				toUserBalance = &types.UserBalanceStore{
 					Balances : []*types.Balance{},
 					ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
 					ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,
@@ -67,8 +67,12 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection types.BadgeCollectio
 			}
 		}
 
-		if err := k.SetUserBalanceInStore(ctx, fromBalanceKey, fromUserBalance); err != nil {
-			return err
+		if transfer.From != "Mint" {
+			if err := k.SetUserBalanceInStore(ctx, fromBalanceKey, fromUserBalance); err != nil {
+				return err
+			}
+		} else {
+			collection.UnmintedSupplys = fromUserBalance.Balances
 		}
 	}
 
@@ -76,25 +80,25 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection types.BadgeCollectio
 }
 
 // Forceful transfers will transfer the balances and deduct from approvals directly without adding it to pending.
-func (k Keeper) HandleTransfer(ctx sdk.Context, collection types.BadgeCollection, badgeIds []*types.IdRange, times []*types.IdRange, fromUserBalance types.UserBalanceStore, toUserBalance types.UserBalanceStore, amount sdkmath.Uint, from string, to string, initiatedBy string, solutions []*types.ChallengeSolution, onlyDeductApprovals bool) (types.UserBalanceStore, types.UserBalanceStore, error) {
+func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.IdRange, times []*types.IdRange, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, amount sdkmath.Uint, from string, to string, initiatedBy string, solutions []*types.ChallengeSolution, onlyDeductApprovals bool) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
 	err := *new(error)
 
-	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx,  collection, badgeIds, times,  from, to, initiatedBy, amount, solutions)
+	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection, badgeIds, times,  from, to, initiatedBy, amount, solutions)
 	if err != nil {
-		return types.UserBalanceStore{}, types.UserBalanceStore{}, err
+		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 	}
 
 	if len(userApprovals) > 0 {
 		for _, userApproval := range userApprovals {
 			if userApproval.Outgoing {
-				err = k.DeductUserOutgoingApprovals(ctx, collection, &fromUserBalance, userApproval.BadgeIds, times, from, to, initiatedBy, amount, solutions)
+				err = k.DeductUserOutgoingApprovals(ctx, collection, fromUserBalance, userApproval.BadgeIds, times, from, to, initiatedBy, amount, solutions)
 				if err != nil {
-					return types.UserBalanceStore{}, types.UserBalanceStore{}, err
+					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 				}
 			} else {
-				err = k.DeductUserIncomingApprovals(ctx, collection, &toUserBalance, userApproval.BadgeIds, times, from, to, initiatedBy, amount, solutions)
+				err = k.DeductUserIncomingApprovals(ctx, collection, toUserBalance, userApproval.BadgeIds, times, from, to, initiatedBy, amount, solutions)
 				if err != nil {
-					return types.UserBalanceStore{}, types.UserBalanceStore{}, err
+					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 				}
 			}
 		}
@@ -106,12 +110,12 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection types.BadgeCollection
 
 	fromUserBalance.Balances, err = types.SubtractBalancesForIdRanges(fromUserBalance.Balances, badgeIds, times, amount)
 	if err != nil {
-		return types.UserBalanceStore{}, types.UserBalanceStore{}, err
+		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 	}
 
 	toUserBalance.Balances, err = types.AddBalancesForIdRanges(toUserBalance.Balances, badgeIds, times, amount)
 	if err != nil {
-		return types.UserBalanceStore{}, types.UserBalanceStore{}, err
+		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 	}
 
 	return fromUserBalance, toUserBalance, nil
