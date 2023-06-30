@@ -10,10 +10,11 @@ const TypeMsgArchiveCollection = "archive_collection"
 
 var _ sdk.Msg = &MsgArchiveCollection{}
 
-func NewMsgArchiveCollection(creator string, collectionId sdkmath.Uint) *MsgArchiveCollection {
+func NewMsgArchiveCollection(creator string, collectionId sdkmath.Uint, isArchivedTimeline []*IsArchivedTimeline) *MsgArchiveCollection {
 	return &MsgArchiveCollection{
 		Creator:      creator,
 		CollectionId: collectionId,
+		IsArchivedTimeline: 	isArchivedTimeline,
 	}
 }
 
@@ -43,5 +44,10 @@ func (msg *MsgArchiveCollection) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	if err := ValidateIsArchivedTimeline(msg.IsArchivedTimeline); err != nil {
+		return err
+	}
+
 	return nil
 }

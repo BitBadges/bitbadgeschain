@@ -41,5 +41,20 @@ func (msg *MsgUpdateUserApprovedTransfers) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	if err := ValidateUserApprovedIncomingTransferTimeline(msg.ApprovedIncomingTransfersTimeline); err != nil {
+		return err
+	}
+
+	if err := ValidateUserApprovedOutgoingTransferTimeline(msg.ApprovedOutgoingTransfersTimeline); err != nil {
+		return err
+	} 
+
+	for _, mapping := range msg.AddressMappings {
+		if err := ValidateAddressMapping(mapping); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

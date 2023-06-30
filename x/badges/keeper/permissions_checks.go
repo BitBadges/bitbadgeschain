@@ -162,7 +162,7 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 			detailToCheck.TransferTime = &types.IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) } //dummy range
 		}
 
-		//Note we are okay with the mapping IDs being ""
+		//Note we are okay with the mapping IDs being "" because they will equal each other
 	}
 	
 	

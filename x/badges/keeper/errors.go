@@ -5,7 +5,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
-// We can clean this up in the future. A lot of errors are deprecated and can be removed.
+// TODO: We can clean this up in the future. A lot of errors are deprecated and can be removed.
 var (
 	ErrInvalidNFT                                   = sdkerrors.Register(types.ModuleName, 2, "invalid nft")
 	ErrCollectionExists                             = sdkerrors.Register(types.ModuleName, 3, "collection already exists")
@@ -84,4 +84,5 @@ var (
 	ErrDisallowedTransfer 												 = sdkerrors.Register(types.ModuleName, 76, "disallowed transfer")
 	ErrNoValidSolutionForChallenge 								 = sdkerrors.Register(types.ModuleName, 77, "no valid solution for challenge")
 	ErrUnhandledBadgeIds 													 = sdkerrors.Register(types.ModuleName, 78, "unhandled badge ids")
+	ErrInheritedBalances 													 = sdkerrors.Register(types.ModuleName, 79, "inherited balances")
 )

@@ -146,33 +146,6 @@ func (k Keeper) DeleteUserBalanceFromStore(ctx sdk.Context, balanceKey string) {
 	store.Delete(userBalanceStoreKey(balanceKey))
 }
 
-/****************************************TRANSFER MANAGER REQUESTS****************************************/
-
-// Checks if a certain address has requested a managerial transfer
-func (k Keeper) HasAddressRequestedManagerTransfer(ctx sdk.Context, collectionId sdkmath.Uint, address string) bool {
-	store := ctx.KVStore(k.storeKey)
-	key := ConstructUpdateManagerRequestKey(collectionId, address)
-	return store.Has(managerTransferRequestKey(key))
-}
-
-// Creates a transfer manager request for the given address and collectionId.
-func (k Keeper) CreateUpdateManagerRequest(ctx sdk.Context, collectionId sdkmath.Uint, address string) error {
-	request := []byte{}
-	store := ctx.KVStore(k.storeKey)
-	key := ConstructUpdateManagerRequestKey(collectionId, address)
-	store.Set(managerTransferRequestKey(key), request)
-	return nil
-}
-
-// Deletes a transfer manager request for the given address and collectionId.
-func (k Keeper) RemoveUpdateManagerRequest(ctx sdk.Context, collectionId sdkmath.Uint, address string) error {
-	key := ConstructUpdateManagerRequestKey(collectionId, address)
-	store := ctx.KVStore(k.storeKey)
-
-	store.Delete(managerTransferRequestKey(key))
-	return nil
-}
-
 /****************************************NEXT ASSET ID****************************************/
 
 // Gets the next badge ID.
@@ -194,48 +167,8 @@ func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) {
 	k.SetNextCollectionId(ctx, nextID.AddUint64(1)) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
 }
 
-/****************************************NEXT CLAIM ID****************************************/
-//Note these claim IDs are different than the ones within each collection.
-//These are the IDs for the claim stores themselves, not the claim IDs for within a collection.
-
-// Gets the next badge ID.
-func (k Keeper) GetNextClaimId(ctx sdk.Context) sdkmath.Uint {
-	store := ctx.KVStore(k.storeKey)
-	nextID := types.NewUintFromString(string((store.Get(nextClaimIdKey()))))
-	return nextID
-}
-
-// Sets the next asset ID. Should only be used in InitGenesis. Everything else should call IncrementNextAssetID()
-func (k Keeper) SetNextClaimId(ctx sdk.Context, nextID sdkmath.Uint) {
-	store := ctx.KVStore(k.storeKey)
-	store.Set(nextClaimIdKey(), []byte(nextID.String()))
-}
-
-// Increments the next badge ID by 1.
-func (k Keeper) IncrementNextClaimId(ctx sdk.Context) {
-	nextID := k.GetNextClaimId(ctx)
-	k.SetNextClaimId(ctx, nextID.Incr()) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
-}
-
-/****************************************Claims****************************************/
+/********************************************************************************/
 // Sets a usedClaimData in the store using UsedClaimDataKey ([]byte{0x07}) as the prefix. No check if store has key already.
-func (k Keeper) IncrementNumUsedForClaimInStore(ctx sdk.Context, collectionId sdkmath.Uint, claimId sdkmath.Uint) (sdkmath.Uint, error) {
-	store := ctx.KVStore(k.storeKey)
-	currBytes := store.Get(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId)))
-	curr := sdkmath.NewUint(0)
-	if currBytes != nil {
-		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
-		if err != nil {
-			panic("Failed to parse num used")
-		}
-
-		curr = sdkmath.NewUint(currUint)
-	}
-	incrementedNum := curr.AddUint64(1)
-	store.Set(usedClaimDataStoreKey(ConstructUsedClaimDataKey(collectionId, claimId)), []byte(curr.Incr().String()))
-	return incrementedNum, nil
-}
-
 func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, leafIndex sdkmath.Uint, level string) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex, level)))
@@ -252,41 +185,6 @@ func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionI
 	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex, level)), []byte(curr.Incr().String()))
 	return incrementedNum, nil
 }
-
-func (k Keeper) IncrementNumUsedForAddressInStore(ctx sdk.Context, collectionId sdkmath.Uint, claimId sdkmath.Uint, address string) (sdkmath.Uint, error) {
-	store := ctx.KVStore(k.storeKey)
-	currBytes := store.Get(usedClaimAddressStoreKey(ConstructUsedClaimAddressKey(collectionId, claimId, address)))
-	curr := sdkmath.NewUint(0)
-	if currBytes != nil {
-		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
-		if err != nil {
-			panic("Failed to parse num used")
-		}
-
-		curr = sdkmath.NewUint(currUint)
-	}
-	incrementedNum := curr.AddUint64(1)
-	store.Set(usedClaimAddressStoreKey(ConstructUsedClaimAddressKey(collectionId, claimId, address)), []byte(curr.Incr().String()))
-	return incrementedNum, nil
-}
-
-func (k Keeper) IncrementNumUsedForWhitelistIndexInStore(ctx sdk.Context, collectionId sdkmath.Uint, claimId sdkmath.Uint, whitelistLeafIndex sdkmath.Uint) (sdkmath.Uint, error) {
-	store := ctx.KVStore(k.storeKey)
-	currBytes := store.Get(usedWhitelistIndexStoreKey(ConstructUsedWhitelistIndexKey(collectionId, claimId, whitelistLeafIndex)))
-	curr := sdkmath.NewUint(0)
-	if currBytes != nil {
-		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
-		if err != nil {
-			panic("Failed to parse num used")
-		}
-
-		curr = sdkmath.NewUint(currUint)
-	}
-	incrementedNum := curr.AddUint64(1)
-	store.Set(usedWhitelistIndexStoreKey(ConstructUsedWhitelistIndexKey(collectionId, claimId, whitelistLeafIndex)), []byte(curr.Incr().String()))
-	return incrementedNum, nil
-}
-
 
 /****************************************ADDRESS MAPPINGS****************************************/
 

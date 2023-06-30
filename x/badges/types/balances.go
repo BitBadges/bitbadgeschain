@@ -6,17 +6,20 @@ import (
 	"math"
 )
 
-//TODO: should really combine times and ranges and probably amount into one struct - Balance
-
-
 func HandleDuplicateBadgeIds(balances []*Balance) ([]*Balance, error) {
 	newBalances := []*Balance{}
 	err := *new(error)
 	for _, balance := range balances {
 		for _, badgeId := range balance.BadgeIds {
-			newBalances, err = AddBalancesForIdRanges(newBalances, []*IdRange{badgeId}, balance.Times, balance.Amount)
-			if err != nil {
-				return newBalances, err
+			for _, time := range balance.Times {
+				newBalances, err = AddBalance(newBalances, &Balance{
+					Amount:   balance.Amount,
+					BadgeIds: []*IdRange{badgeId},
+					Times: []*IdRange{time},
+				})
+				if err != nil {
+					return []*Balance{}, err
+				}
 			}
 		}
 	}
@@ -32,7 +35,7 @@ func GetBalancesForId(id sdkmath.Uint, balances []*Balance) []*Balance {
 		if found {
 			matchingBalances = append(matchingBalances, &Balance{
 				Amount:   balance.Amount,
-				BadgeIds: []*IdRange{&IdRange{Start: id, End: id}},
+				BadgeIds: []*IdRange{{Start: id, End: id}},
 				Times: balance.Times,
 			})
 		}
@@ -41,19 +44,25 @@ func GetBalancesForId(id sdkmath.Uint, balances []*Balance) []*Balance {
 }
 
 // Updates the balance for a specific ids from what it currently is to newAmount.
-func UpdateBalancesForIdRanges(ranges []*IdRange, newTimes []*IdRange, newAmount sdkmath.Uint,  balances []*Balance) (newBalances []*Balance, err error) {
+func UpdateBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error) {
 	//Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
 	// ranges = SortAndMergeOverlapping(ranges)
-	balances = DeleteBalanceForIdRanges(ranges, newTimes, balances)
-	balances, err = SetBalanceForIdRanges(ranges, newTimes, newAmount, balances)
+	err := *new(error)
+	balances, err = DeleteBalances(newBalance.BadgeIds, newBalance.Times, balances)
+	if err != nil {
+		return balances, err
+	}
 
+	balances, err = SetBalance(newBalance, balances)
+	if err != nil {
+		return balances, err
+	}
 
-
-	return balances, err
+	return balances, nil
 }
 
 // Gets the balances for specified ID ranges. Returns a new []*Balance where only the specified ID ranges and their balances are included. Appends balance == 0 objects so all IDs are accounted for, even if not found.
-func GetBalancesForIdRanges(idRanges []*IdRange, times []*IdRange, balances []*Balance) (newBalances []*Balance, err error) {
+func GetBalancesForIds(idRanges []*IdRange, times []*IdRange, balances []*Balance) (newBalances []*Balance, err error) {
 	fetchedBalances := []*Balance{}
 
 	currPermissionDetails := []*UniversalPermissionDetails{}
@@ -82,6 +91,7 @@ func GetBalancesForIdRanges(idRanges []*IdRange, times []*IdRange, balances []*B
 		}
 	}
 
+
 	overlaps, _, inNewButNotOld := GetOverlapsAndNonOverlaps(currPermissionDetails, toFetchPermissionDetails)
 	for _, overlapObject := range overlaps {
 		overlap := overlapObject.Overlap
@@ -107,40 +117,42 @@ func GetBalancesForIdRanges(idRanges []*IdRange, times []*IdRange, balances []*B
 }
 
 // Adds a balance to all ids specified in []ranges
-func AddBalancesForIdRanges(balances []*Balance, ranges []*IdRange, times []*IdRange, balanceToAdd sdkmath.Uint) ([]*Balance, error) {
-	currBalances, err := GetBalancesForIdRanges(ranges, times, balances)
+func AddBalance(existingBalances []*Balance, balanceToAdd *Balance) ([]*Balance, error) {
+	currBalances, err := GetBalancesForIds(balanceToAdd.BadgeIds, balanceToAdd.Times, existingBalances)
 	if err != nil {
-		return balances, err
+		return existingBalances, err
 	}
 
 	for _, balance := range currBalances {
-		newBalanceAmount, err := SafeAdd(balance.Amount, balanceToAdd)
+		balance.Amount, err = SafeAdd(balance.Amount, balanceToAdd.Amount)
 		if err != nil {
-			return balances, err
+			return existingBalances, err
 		}
 
-		balances, err = UpdateBalancesForIdRanges(balance.BadgeIds, times, newBalanceAmount, balances)
+		existingBalances, err = UpdateBalance(balance, existingBalances)
 		if err != nil {
-			return balances, err
+			return existingBalances, err
 		}
 	}
-	return balances, nil
+	
+	return existingBalances, nil
 }
 
 // Subtracts a balance to all ids specified in []ranges
-func SubtractBalancesForIdRanges(balances []*Balance, ranges []*IdRange, times []*IdRange, balanceToRemove sdkmath.Uint) ([]*Balance, error) {
-	currBalances, err := GetBalancesForIdRanges(ranges, times, balances)
+func SubtractBalance(balances []*Balance, balanceToRemove *Balance) ([]*Balance, error) {
+
+	currBalances, err := GetBalancesForIds(balanceToRemove.BadgeIds, balanceToRemove.Times, balances)
 	if err != nil {
 		return balances, err
 	}
 
 	for _, currBalanceObj := range currBalances {
-		newBalance, err := SafeSubtract(currBalanceObj.Amount, balanceToRemove)
+		currBalanceObj.Amount, err = SafeSubtract(currBalanceObj.Amount, balanceToRemove.Amount)
 		if err != nil {
 			return balances, err
 		}
 
-		balances, err = UpdateBalancesForIdRanges(currBalanceObj.BadgeIds, times, newBalance, balances)
+		balances, err = UpdateBalance(currBalanceObj, balances)
 		if err != nil {
 			return balances, err
 		}
@@ -150,7 +162,7 @@ func SubtractBalancesForIdRanges(balances []*Balance, ranges []*IdRange, times [
 }
 
 // Deletes the balance for a specific id.
-func DeleteBalanceForIdRanges(rangesToDelete []*IdRange, timesToDelete []*IdRange, balances []*Balance) []*Balance {
+func DeleteBalances(rangesToDelete []*IdRange, timesToDelete []*IdRange, balances []*Balance) ([]*Balance, error) {
 	newBalances := []*Balance{}
 
 	for _, balanceObj := range balances {
@@ -187,20 +199,16 @@ func DeleteBalanceForIdRanges(rangesToDelete []*IdRange, timesToDelete []*IdRang
 		}
 	}
 
-	return newBalances
+	return newBalances, nil
 }
 
-// Sets the balance for a specific id. Assumes balance does not exist.
-func SetBalanceForIdRanges(ranges []*IdRange, times []*IdRange, amount sdkmath.Uint, balances []*Balance) ([]*Balance, error) {
-	if amount.IsZero() {
+// Sets the balance for a specific id. Precondition: assumes balance does not exist.
+func SetBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error) {
+	if newBalance.Amount.IsZero() {
 		return balances, nil
 	}
 
-	balances = append(balances, &Balance{
-		Amount:   amount,
-		BadgeIds: ranges,
-		Times: times,
-	})
+	balances = append(balances, newBalance)
 
 	return balances, nil
 }

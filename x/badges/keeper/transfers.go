@@ -15,13 +15,13 @@ func HandleManagerAlias(address string, managerAddress string) string {
 	return address
 }
 
-func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollection, transfers []*types.Transfer, initiatedBy string, onlyDeductApprovals bool) (error) {
+func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollection, transfers []*types.Transfer, initiatedBy string) (error) {
 	//If "Mint" or "Manager" 
 	unmintedBalances := &types.UserBalanceStore{
 		Balances: collection.UnmintedSupplys,
 	}
 	err := *new(error)
-	manager := GetCurrentManager(ctx, collection)
+	manager := types.GetCurrentManager(ctx, collection)
 
 	initiatedBy = HandleManagerAlias(initiatedBy, manager)
 
@@ -56,7 +56,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 			}
 
 			for _, balance := range transfer.Balances {
-				fromUserBalance, toUserBalance, err = k.HandleTransfer(ctx, collection, balance.BadgeIds, balance.Times, fromUserBalance, toUserBalance, balance.Amount, transfer.From, to, initiatedBy, transfer.Solutions, onlyDeductApprovals)
+				fromUserBalance, toUserBalance, err = k.HandleTransfer(ctx, collection, balance.BadgeIds, balance.Times, fromUserBalance, toUserBalance, balance.Amount, transfer.From, to, initiatedBy, transfer.Solutions)
 				if err != nil {
 					return err
 				}
@@ -79,8 +79,10 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 	return nil
 }
 
-// Forceful transfers will transfer the balances and deduct from approvals directly without adding it to pending.
-func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.IdRange, times []*types.IdRange, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, amount sdkmath.Uint, from string, to string, initiatedBy string, solutions []*types.ChallengeSolution, onlyDeductApprovals bool) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
+//Step 1: Check if transfer is allowed on collection level (deducting approvals if needed)
+//Step 2: If not overriden by collection, check necessary approvals on user level (deducting approvals if needed)
+//Step 3: If all good, we can transfer the balances
+func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.IdRange, times []*types.IdRange, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, amount sdkmath.Uint, from string, to string, initiatedBy string, solutions []*types.ChallengeSolution) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
 	err := *new(error)
 
 	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection, badgeIds, times,  from, to, initiatedBy, amount, solutions)
@@ -104,16 +106,20 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollectio
 		}
 	}
 
-	if onlyDeductApprovals {
-		return fromUserBalance, toUserBalance, nil
-	}
-
-	fromUserBalance.Balances, err = types.SubtractBalancesForIdRanges(fromUserBalance.Balances, badgeIds, times, amount)
+	fromUserBalance.Balances, err = types.SubtractBalance(fromUserBalance.Balances, &types.Balance{
+		Amount: amount,
+		BadgeIds: badgeIds,
+		Times: times,
+	})
 	if err != nil {
 		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 	}
 
-	toUserBalance.Balances, err = types.AddBalancesForIdRanges(toUserBalance.Balances, badgeIds, times, amount)
+	toUserBalance.Balances, err = types.AddBalance(toUserBalance.Balances,  &types.Balance{
+		Amount: amount,
+		BadgeIds: badgeIds,
+		Times: times,
+	})
 	if err != nil {
 		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 	}

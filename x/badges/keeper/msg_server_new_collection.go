@@ -72,14 +72,9 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		}
 	}
 
-	maxBadgeId := collection.NextBadgeId.Sub(sdkmath.NewUint(1))
-	for _, timelineVal := range msg.InheritedBalancesTimeline {
-		for _, inheritedBalance := range timelineVal.InheritedBalances {
-			for _, badgeId := range inheritedBalance.BadgeIds {
-				if badgeId.End.GT(maxBadgeId) {
-					return nil, ErrBadgeIdTooHigh
-				}
-			}
+	if msg.InheritedBalancesTimeline != nil && len(msg.InheritedBalancesTimeline) > 0 {
+		if err := ValidateInheritedBalancesUpdate(ctx, collection, collection.InheritedBalancesTimeline, collection.InheritedBalancesTimeline, collection.Permissions.CanUpdateInheritedBalances); err != nil {
+			return nil, err
 		}
 	}
 

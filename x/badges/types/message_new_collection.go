@@ -27,38 +27,6 @@ func NewMsgNewCollection(
 	defaultApprovedOutgoingTransfersTimeline []*UserApprovedOutgoingTransferTimeline,
 	defaultApprovedIncomingTransfersTimeline []*UserApprovedIncomingTransferTimeline,
 ) *MsgNewCollection {
-	// for _, transfer := range transfers {
-	// 	for _, balance := range transfer.Balances {
-	// 		balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
-	// 	}
-	// }
-
-	// for _, badgeBalanceToCreate := range badgesToCreate {
-	// 	badgeBalanceToCreate.BadgeIds = SortAndMergeOverlapping(badgeBalanceToCreate.BadgeIds)
-	// }
-
-	// for _, badgeMetadata := range badgeMetadata {
-	// 	badgeMetadata.BadgeIds = SortAndMergeOverlapping(badgeMetadata.BadgeIds)
-	// }
-
-	// for _, approvedTransfer := range approvedTransfers {
-	// 	approvedTransfer.BadgeIds = SortAndMergeOverlapping(approvedTransfer.BadgeIds)
-	// 	approvedTransfer.TransferTimes = SortAndMergeOverlapping(approvedTransfer.TransferTimes)
-
-	// 	for _, balance := range approvedTransfer.Claim.StartAmounts {
-	// 		balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
-	// 	}
-	// }
-
-	// for _, balance := range inheritedBalances {
-	// 	balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
-	// 	balance.ParentBadgeIds = SortAndMergeOverlapping(balance.ParentBadgeIds)
-	// }
-
-	//TODO: permissions sort and merge overlapping
-
-
-
 	return &MsgNewCollection{
 		Creator:            creator,
 		StandardsTimeline:   standardTimeline,
@@ -107,38 +75,44 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.OffChainBalancesMetadataTimeline != nil {
-		for _, timelineVal := range msg.OffChainBalancesMetadataTimeline {	
-			err = ValidateURI(timelineVal.OffChainBalancesMetadata.Uri)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	if msg.BadgeMetadataTimeline != nil && len(msg.BadgeMetadataTimeline) > 0 {
-		for _, timelineVal := range msg.BadgeMetadataTimeline {
-			err = ValidateBadgeMetadata(timelineVal.BadgeMetadata)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	if msg.CollectionMetadataTimeline != nil {
-		for _, timelineVal := range msg.CollectionMetadataTimeline {
-			err = ValidateURI(timelineVal.CollectionMetadata.Uri)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	if err := ValidatePermissions(msg.Permissions, false); err != nil {
+	if err := ValidateOffChainBalancesMetadataTimeline(msg.OffChainBalancesMetadataTimeline); err != nil {
 		return err
 	}
 
-	if err := ValidateBalances(msg.BadgesToCreate); err != nil {
+	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline); err != nil {
+		return err
+	}
+
+	if err := ValidateCollectionMetadataTimeline(msg.CollectionMetadataTimeline); err != nil {
+		return err
+	}
+
+	if err := ValidateContractAddressTimeline(msg.ContractAddressTimeline); err != nil {
+		return err
+	}
+
+	if err := ValidateCustomDataTimeline(msg.CustomDataTimeline); err != nil {
+		return err
+	}
+
+	if err := ValidateStandardsTimeline(msg.StandardsTimeline); err != nil {
+		return err
+	}
+
+	if err := ValidatePermissions(msg.Permissions); err != nil {
+		return err
+	}
+
+	if err := ValidateUserApprovedIncomingTransferTimeline(msg.DefaultApprovedIncomingTransfersTimeline); err != nil {
+		return err
+	}
+
+	if err := ValidateUserApprovedOutgoingTransferTimeline(msg.DefaultApprovedOutgoingTransfersTimeline); err != nil {
+		return err
+	} 
+
+	msg.BadgesToCreate, err = ValidateBalances(msg.BadgesToCreate)
+	if err != nil {
 		return err
 	}
 
@@ -151,32 +125,9 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		}
 	}
 
-
-	if msg.InheritedBalancesTimeline != nil {
-		for _, timelineVal := range msg.InheritedBalancesTimeline {
-			for _, balance := range timelineVal.InheritedBalances {
-				err = ValidateRangesAreValid(balance.BadgeIds, true)
-				if err != nil {
-					return err
-				}
-
-				err = ValidateRangesAreValid(balance.ParentBadgeIds, true)
-				if err != nil {
-					return err
-				}
-
-				if balance.ParentCollectionId.IsZero() || balance.ParentCollectionId.IsNil() {
-					return sdkerrors.Wrapf(ErrInvalidRequest, "invalid parent collection id")
-				}
-	
-			}
-		}
+	if err := ValidateInheritedBalancesTimeline(msg.InheritedBalancesTimeline); err != nil {
+		return err
 	}
-
-	//TODO: Enforce irrelevant permissions to be permanently disallowed according to balances type
-	//Can't update approved transfers if not on-chain
-	//Can't update off-chain balances if not off-chain
-	//Can't update inherited balances if not inherited
 
 	for _, transfer := range msg.Transfers {
 		err = ValidateTransfer(transfer)
@@ -185,15 +136,15 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		}
 	}
 
-	for _, timelineVal := range msg.ApprovedTransfersTimeline {
-		for _, approvedTransfer := range timelineVal.ApprovedTransfers {
-			err = ValidateCollectionApprovedTransfer(*approvedTransfer)
-			if err != nil {
-				return err
-			}
-		}
+	if err := ValidateApprovedTransferTimeline(msg.ApprovedTransfersTimeline); err != nil {
+		return err
 	}
 
+	for _, mapping := range msg.AddressMappings {
+		if err := ValidateAddressMapping(mapping); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

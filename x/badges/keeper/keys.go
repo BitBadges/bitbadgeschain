@@ -12,15 +12,10 @@ var (
 	CollectionKey         = []byte{0x01}
 	UserBalanceKey        = []byte{0x02}
 	NextCollectionIdKey   = []byte{0x03}
-	UpdateManagerKey    	= []byte{0x04}
-	ClaimKey              = []byte{0x05}
-	NextClaimIdKey        = []byte{0x06}
-	UsedClaimDataKey      = []byte{0x07}
-	UsedClaimChallengeKey = []byte{0x08}
-	UsedClaimAddressKey   = []byte{0x09}
-	WhitelistIndexKey     = []byte{0x0A}
-	AddressMappingKey		 	= []byte{0x0B}
-	TransferTrackerKey    = []byte{0x0C}
+	UsedClaimChallengeKey = []byte{0x04}
+	WhitelistIndexKey     = []byte{0x05}
+	AddressMappingKey		 	= []byte{0x06}
+	TransferTrackerKey    = []byte{0x07}
 
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}
@@ -36,11 +31,6 @@ const StoreKey = types.ModuleName
 type BalanceKeyDetails struct {
 	collectionId sdkmath.Uint
 	address      string
-}
-
-type ClaimKeyDetails struct {
-	collectionId sdkmath.Uint
-	claimId      sdkmath.Uint
 }
 
 // Helper functions to manipulate the balance keys. These aren't prefixed. They will be after they are passed into the functions further down in this file.
@@ -114,19 +104,6 @@ func GetDetailsFromBalanceKey(id string) BalanceKeyDetails {
 	}
 }
 
-func GetDetailsFromClaimKey(id string) ClaimKeyDetails {
-	result := strings.Split(id, BalanceKeyDelimiter)
-	collection_id, _ := strconv.ParseUint(result[0], 10, 64)
-	claim_id, _ := strconv.ParseUint(result[1], 10, 64)
-
-	return ClaimKeyDetails{
-		claimId:      sdkmath.NewUint(claim_id),
-		collectionId: sdkmath.NewUint(collection_id),
-	}
-}
-
-
-
 // Prefixer functions
 
 // collectionStoreKey returns the byte representation of the collection key ([]byte{0x01} + collectionId)
@@ -145,14 +122,6 @@ func userBalanceStoreKey(balanceKey string) []byte {
 	return key
 }
 
-// usedClaimDataStoreKey returns the byte representation of the used claim data store key ([]byte{0x07} + key)
-func usedClaimDataStoreKey(usedClaimDataKey string) []byte {
-	key := make([]byte, len(UsedClaimDataKey)+len(usedClaimDataKey))
-	copy(key, UsedClaimDataKey)
-	copy(key[len(UsedClaimDataKey):], []byte(usedClaimDataKey))
-	return key
-}
-
 func usedClaimChallengeStoreKey(usedClaimChallengeKey string) []byte {
 	key := make([]byte, len(UsedClaimChallengeKey)+len(usedClaimChallengeKey))
 	copy(key, UsedClaimChallengeKey)
@@ -160,44 +129,9 @@ func usedClaimChallengeStoreKey(usedClaimChallengeKey string) []byte {
 	return key
 }
 
-func usedWhitelistIndexStoreKey(whitelistIndexKey string) []byte {
-	key := make([]byte, len(WhitelistIndexKey)+len(whitelistIndexKey))
-	copy(key, WhitelistIndexKey)
-	copy(key[len(WhitelistIndexKey):], []byte(whitelistIndexKey))
-	return key
-}
-
-func usedClaimAddressStoreKey(usedClaimAddressKey string) []byte {
-	key := make([]byte, len(UsedClaimAddressKey)+len(usedClaimAddressKey))
-	copy(key, UsedClaimAddressKey)
-	copy(key[len(UsedClaimAddressKey):], []byte(usedClaimAddressKey))
-	return key
-}
-
-// claimStoreKey returns the byte representation of the claim store key ([]byte{0x05} + claimId)
-func claimStoreKey(claimKey string) []byte {
-	key := make([]byte, len(ClaimKey)+len(claimKey))
-	copy(key, ClaimKey)
-	copy(key[len(ClaimKey):], []byte(claimKey))
-	return key
-}
-
-// managerTransferRequestKey returns the byte representation of the manager transfer store key ([]byte{0x04} + id)
-func managerTransferRequestKey(id string) []byte {
-	key := make([]byte, len(UpdateManagerKey)+len(id))
-	copy(key, UpdateManagerKey)
-	copy(key[len(UpdateManagerKey):], []byte(id))
-	return key
-}
-
 // nextCollectionIdKey returns the byte representation of the next asset id key ([]byte{0x03})
 func nextCollectionIdKey() []byte {
 	return NextCollectionIdKey
-}
-
-// nextClaimIdKey returns the byte representation of the next claim id key ([]byte{0x06})
-func nextClaimIdKey() []byte {
-	return NextClaimIdKey
 }
 
 func addressMappingStoreKey(addressMappingKey string) []byte {

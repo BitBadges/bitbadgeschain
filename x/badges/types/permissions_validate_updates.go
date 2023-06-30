@@ -155,11 +155,11 @@ func ValidateUserPermissionsUpdate(oldPermissions *UserPermissions, newPermissio
 
 // Validate that the new permissions are valid and is not changing anything that they can't.
 func ValidatePermissionsUpdate(oldPermissions *CollectionPermissions, newPermissions *CollectionPermissions, canBeNil bool) error {
-	if err := ValidatePermissions(newPermissions, canBeNil); err != nil {
+	if err := ValidatePermissions(newPermissions); err != nil {
 		return err
 	}
 
-	if err := ValidatePermissions(oldPermissions, canBeNil); err != nil {
+	if err := ValidatePermissions(oldPermissions); err != nil {
 		return err
 	}
 

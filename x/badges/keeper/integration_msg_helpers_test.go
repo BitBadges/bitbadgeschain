@@ -53,7 +53,12 @@ type CollectionsToCreate struct {
 func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreate []CollectionsToCreate) error {
 	for _, collectionToCreate := range collectionsToCreate {
 		for i := 0; i < int(collectionToCreate.Amount.BigInt().Int64()); i++ {
-			_, err := suite.msgServer.NewCollection(ctx, &collectionToCreate.Collection)
+			err := collectionToCreate.Collection.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			_, err = suite.msgServer.NewCollection(ctx, &collectionToCreate.Collection)
 			if err != nil {
 				return err
 			}
@@ -62,102 +67,122 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 	return nil
 }
 
-// func CreateBadges(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, supplysAndAmounts []*types.BadgeSupplyAndAmount, transfers []*types.Transfer, claims []*types.Claim, collectionMetadata *CollectionMetadata, badgeMetadata []*types.BadgeMetadata, offChainBalancesMetadata *OffChainBalancesMetadata) error {
-// 	msg := types.NewMsgMintAndDistributeBadges(creator, collectionId, supplysAndAmounts, transfers, claims, collectionMetadata, badgeMetadata, offChainBalancesMetadata)
-// 	_, err := suite.msgServer.MintAndDistributeBadges(ctx, msg)
-// 	return err
-// }
+func NewCollection(suite *TestSuite, ctx context.Context, msg *types.MsgNewCollection) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
 
-// // Note: Only supports Bob and Alice and only supports supplysAndAmounts[0]
-// func CreateBadgesAndMintAllToCreator(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, supplysAndAmounts []*types.BadgeSupplyAndAmount) error {
-// 	collection, err := GetCollection(suite, ctx, collectionId)
-// 	if err != nil {
-// 		return err
-// 	}
+	_, err = suite.msgServer.NewCollection(ctx, msg)
+	return err
+}
 
-// 	transfers := []*types.Transfer{
-// 		{
-// 			ToAddresses: []string{creator},
-// 			Balances: []*types.Balance{
-// 				{
-// 					Amount: supplysAndAmounts[0].Supply,
-// 					BadgeIds: []*types.IdRange{
-// 						{
-// 							Start: collection.NextBadgeId,
-// 							End:   collection.NextBadgeId.Add(supplysAndAmounts[0].Amount).SubUint64(1),
-// 						},
-// 					},
-// 				},
-// 			},
-// 		},
-// 	}
+func MintAndDistributeBadges(suite *TestSuite, ctx context.Context, msg *types.MsgMintAndDistributeBadges) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	
+	_, err = suite.msgServer.MintAndDistributeBadges(ctx, msg)
+	return err
+}
 
-// 	msg := types.NewMsgMintAndDistributeBadges(creator, collectionId, supplysAndAmounts, transfers, []*types.Claim{}, "https://example.com",
-// 		[]*types.BadgeMetadata{
-// 			{
-// 				Uri: "https://example.com/{id}",
-// 				BadgeIds: []*types.IdRange{
-// 					{
-// 						Start: sdkmath.NewUint(1),
-// 						End:   sdkmath.NewUint(math.MaxUint64),
-// 					},
-// 				},
-// 			},
-// 		}, "")
-// 	_, err = suite.msgServer.MintAndDistributeBadges(ctx, msg)
-// 	return err
-// }
+func ArchiveCollection(suite *TestSuite, ctx context.Context, msg *types.MsgArchiveCollection) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	
+	_, err = suite.msgServer.ArchiveCollection(ctx, msg)
+	return err
+}
 
-// func TransferBadge(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, from string, transfers []*types.Transfer) error {
-// 	msg := types.NewMsgTransferBadge(creator, collectionId, from, transfers)
-// 	_, err := suite.msgServer.TransferBadge(ctx, msg)
-// 	return err
-// }
+func DeleteCollection(suite *TestSuite, ctx context.Context, msg *types.MsgDeleteCollection) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	
+	_, err = suite.msgServer.DeleteCollection(ctx, msg)
+	return err
+}
 
-// func SetApproval(suite *TestSuite, ctx context.Context, creator string, address string, collectionId sdkmath.Uint, balances []*types.Balance) error {
-// 	msg := types.NewMsgSetApproval(creator, collectionId, address, balances)
-// 	_, err := suite.msgServer.SetApproval(ctx, msg)
-// 	return err
-// }
+func ForkCollection(suite *TestSuite, ctx context.Context, msg *types.MsgForkCollection) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	
+	_, err = suite.msgServer.ForkCollection(ctx, msg)
+	return err
+}
 
-// func UpdateCollectionApprovedTransfers(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, approvedTransfers []*types.CollectionApprovedTransfer) error {
-// 	msg := types.NewMsgUpdateCollectionApprovedTransfers(creator, collectionId, approvedTransfers)
-// 	_, err := suite.msgServer.UpdateCollectionApprovedTransfers(ctx, msg)
-// 	return err
-// }
+func TransferBadge(suite *TestSuite, ctx context.Context, msg *types.MsgTransferBadge) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	
+	_, err = suite.msgServer.TransferBadge(ctx, msg)
+	return err
+}
 
-// func RequestUpdateManager(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, add bool) error {
-// 	msg := types.NewMsgRequestUpdateManager(creator, collectionId, add)
-// 	_, err := suite.msgServer.RequestUpdateManager(ctx, msg)
-// 	return err
-// }
+func UpdateManager(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateManager) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	
+	_, err = suite.msgServer.UpdateManager(ctx, msg)
+	return err
+}
 
-// func UpdateManager(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, address string) error {
-// 	msg := types.NewMsgUpdateManager(creator, collectionId, address)
-// 	_, err := suite.msgServer.UpdateManager(ctx, msg)
-// 	return err
-// }
+func UpdateMetadata(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateMetadata) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	
+	_, err = suite.msgServer.UpdateMetadata(ctx, msg)
+	return err
+}
 
-// func UpdateURIs(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, collectionMetadata *CollectionMetadata, badgeMetadata []*types.BadgeMetadata, offChainBalancesMetadata *OffChainBalancesMetadata) error {
-// 	msg := types.NewMsgUpdateMetadata(creator, collectionId, collectionMetadata, badgeMetadata, offChainBalancesMetadata)
-// 	_, err := suite.msgServer.UpdateMetadata(ctx, msg)
-// 	return err
-// }
+func UpdateCollectionApprovedTransfers(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateCollectionApprovedTransfers) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	
+	_, err = suite.msgServer.UpdateCollectionApprovedTransfers(ctx, msg)
+	return err
+}
 
-// func UpdateCollectionPermissions(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, permissions sdkmath.Uint) error {
-// 	msg := types.NewMsgUpdateCollectionPermissions(creator, collectionId, permissions)
-// 	_, err := suite.msgServer.UpdateCollectionPermissions(ctx, msg)
-// 	return err
-// }
+func UpdateCollectionPermissions(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateCollectionPermissions) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	
+	_, err = suite.msgServer.UpdateCollectionPermissions(ctx, msg)
+	return err
+}
 
-// func UpdateCustomData(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, bytes string) error {
-// 	msg := types.NewMsgUpdateCustomData(creator, collectionId, bytes)
-// 	_, err := suite.msgServer.UpdateCustomData(ctx, msg)
-// 	return err
-// }
+func UpdateUserApprovedTransfers(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateUserApprovedTransfers) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	
+	_, err = suite.msgServer.UpdateUserApprovedTransfers(ctx, msg)
+	return err
+}
 
-// func ClaimBadge(suite *TestSuite, ctx context.Context, creator string, claimId sdkmath.Uint, collectionId sdkmath.Uint, solutions []*types.ChallengeSolution) error {
-// 	msg := types.NewMsgClaimBadge(creator, claimId, collectionId, solutions)
-// 	_, err := suite.msgServer.ClaimBadge(ctx, msg)
-// 	return err
-// }
+func UpdateUserPermissions(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateUserPermissions) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	
+	_, err = suite.msgServer.UpdateUserPermissions(ctx, msg)
+	return err
+}

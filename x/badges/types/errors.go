@@ -69,4 +69,7 @@ var (
 	ErrorInvalidSigner = sdkerrors.Register(ModuleName, 1557, "invalid signer")
 	ErrLogic = sdkerrors.Register(ModuleName, 1558, "logic")
 	ErrNotFound = sdkerrors.Register(ModuleName, 1559, "not found")
+	ErrInvalidInheritedBadgeLength = sdkerrors.Register(ModuleName, 1560, "invalid inherited badge length")
+	ErrNoTimelineTimeSpecified = sdkerrors.Register(ModuleName, 1561, "no timeline time specified")
+	ErrInvalidCollectionId = sdkerrors.Register(ModuleName, 1562, "invalid collection id")
 )

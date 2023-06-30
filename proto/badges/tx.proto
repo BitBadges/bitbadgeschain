@@ -114,7 +114,6 @@ message MsgTransferBadge {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated Transfer transfers = 3;
-  bool onlyDeductApprovals = 4; //If true, we will only deduct approvals, not actually transfer badges.
 }
 message MsgTransferBadgeResponse {}
 

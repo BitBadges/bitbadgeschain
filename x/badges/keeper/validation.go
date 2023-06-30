@@ -13,6 +13,7 @@ type UniversalValidationParams struct {
 	CollectionId                         sdkmath.Uint
 	AccountsThatCantEqualCreator         []string
 	MustBeManager                        bool
+	OverrideArchive 										 bool
 }
 
 // Validates everything about the Msg is valid and returns (creatorNum, collection, permissions, error).
@@ -31,34 +32,20 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationPar
 		return &types.BadgeCollection{}, ErrCollectionNotExists
 	}
 
-	isArchived := GetIsArchived(ctx, collection)
-	if isArchived {
-		return &types.BadgeCollection{}, ErrCollectionIsArchived
+	if !params.OverrideArchive {
+		isArchived := types.GetIsArchived(ctx, collection)
+		if isArchived {
+			return &types.BadgeCollection{}, ErrCollectionIsArchived
+		}
 	}
 
 	// Assert all permissions
 	if params.MustBeManager {
-		currManager := GetCurrentManager(ctx, collection)
+		currManager := types.GetCurrentManager(ctx, collection)
 		if currManager != params.Creator {
 			return &types.BadgeCollection{}, ErrSenderIsNotManager
 		}
 	}
 
 	return collection, nil
-}
-
-
-func (k Keeper) ValidateAllBadgesAreCreated(collection *types.BadgeCollection, badgeIds []*types.IdRange) error {
-	err := types.ValidateRangesAreValid(badgeIds, true)
-	if err != nil {
-		return err
-	}
-	
-	for _, badgeIdRange := range badgeIds {
-		if badgeIdRange.End.GTE(collection.NextBadgeId) {
-			return ErrBadgeNotExists
-		}
-	}
-
-	return nil
 }

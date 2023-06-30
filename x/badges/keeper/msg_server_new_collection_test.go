@@ -1,248 +1,99 @@
 package keeper_test
 
-// import (
-// sdkmath "cosmossdk.io/math"
-// 	"math"
+import (
+	sdkmath "cosmossdk.io/math"
 
-// 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-// 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-// 	sdk "github.com/cosmos/cosmos-sdk/types"
-// )
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
-// func (suite *TestSuite) TestNewCollections() {
-// 	wctx := sdk.WrapSDKContext(suite.ctx)
-// 	perms := sdkmath.NewUint(62)
+func (suite *TestSuite) TestNewCollection() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
 
-// 	_, err := sdk.AccAddressFromBech32(alice)
-// 	suite.Require().Nil(err, "Address %s failed to parse")
+	_, err := sdk.AccAddressFromBech32(alice)
+	suite.Require().Nil(err, "Address %s failed to parse")
 
-// 	collectionsToCreate := []CollectionsToCreate{
-// 		{
-// 			Collection: types.MsgNewCollection{
-// 				BadgeMetadata: []*types.BadgeMetadata{
-// 					{
-// 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.IdRange{
-// 							{
-// 								Start: sdkmath.NewUint(1),
-// 								End:   sdkmath.NewUint(math.MaxUint64),
-// 							},
-// 						},
-// 					},
-// 				},
-// 				CollectionMetadata: "https://example.com",
-// 				Permissions:        sdkmath.NewUint(62),
-// 			},
-// 			Amount:  sdkmath.NewUint(1),
-// 			Creator: bob,
-// 		},
-// 	}
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{}
 
-// 	err = CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "Error creating badge: %s")
-// 	badge, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating badge: %s")
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-// 	// Verify nextId increments correctly
-// 	nextId := suite.app.BadgesKeeper.GetNextCollectionId(suite.ctx)
-// 	suite.Require().Equal(sdkmath.NewUint(2), nextId)
+	// Verify nextId increments correctly
+	nextId := suite.app.BadgesKeeper.GetNextCollectionId(suite.ctx)
+	AssertUintsEqual(suite, sdkmath.NewUint(2), nextId)
 
-// 	// Verify badge details are correct
-// 	suite.Require().Equal(sdkmath.NewUint(1), badge.NextBadgeId)
-// 	suite.Require().Equal("https://example.com", badge.CollectionMetadata)
-// 	suite.Require().Equal([]*types.BadgeMetadata{
-// 		{
-// 			Uri: "https://example.com/{id}",
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(1),
-// 					End:   sdkmath.NewUint(math.MaxUint64),
-// 				},
-// 			},
-// 		},
-// 	}, badge.BadgeMetadata)
-// 	suite.Require().Equal([]*types.Balance(nil), badge.MaxSupplys)
-// 	suite.Require().Equal(bob, badge.Manager) //7 is the first ID it creates
-// 	suite.Require().Equal(perms, badge.Permissions)
-// 	suite.Require().Equal([]*types.CollectionApprovedTransfer(nil), badge.ApprovedTransfers)
-// 	suite.Require().Equal([]*types.CollectionApprovedTransfer(nil), badge.ManagerApprovedTransfers)
-// 	suite.Require().Equal(sdkmath.NewUint(1), badge.CollectionId)
+	// Verify badge details are correct
+	AssertUintsEqual(suite, sdkmath.NewUint(1), collection.NextBadgeId)
+}
 
-// 	err = CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "Error creating badge: %s")
+func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
 
-// 	// Verify nextId increments correctly
-// 	nextId = suite.app.BadgesKeeper.GetNextCollectionId(suite.ctx)
-// 	suite.Require().Equal(sdkmath.NewUint(3), nextId)
-// 	badge, _ = GetCollection(suite, wctx, sdkmath.NewUint(2))
-// 	suite.Require().Equal(sdkmath.NewUint(2), badge.CollectionId)
-// }
+	_, err := sdk.AccAddressFromBech32(alice)
+	suite.Require().Nil(err, "Address %s failed to parse")
 
-// func (suite *TestSuite) TestNewBadgesWhitelistRecipients() {
-// 	wctx := sdk.WrapSDKContext(suite.ctx)
-// 	perms := sdkmath.NewUint(62)
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{}
+	collectionsToCreate[0].Collection.BalancesType = sdkmath.NewUint(1)
+	
 
-// 	_, err := sdk.AccAddressFromBech32(alice)
-// 	suite.Require().Nil(err, "Address %s failed to parse")
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Error(err, "Error creating badge: %s")
 
-// 	collectionsToCreate := []CollectionsToCreate{
-// 		{
-// 			Collection: types.MsgNewCollection{
-// 				BadgeMetadata: []*types.BadgeMetadata{
-// 					{
-// 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.IdRange{
-// 							{
-// 								Start: sdkmath.NewUint(1),
-// 								End:   sdkmath.NewUint(math.MaxUint64),
-// 							},
-// 						},
-// 					},
-// 				},
-// 				CollectionMetadata: "https://example.com",
-// 				BadgesToCreate: []*types.BadgeSupplyAndAmount{
-// 					{
-// 						Supply: sdkmath.NewUint(10),
-// 						Amount: sdkmath.NewUint(10),
-// 					},
-// 				},
-// 				Permissions: perms,
-// 				ApprovedTransfers: []*types.CollectionApprovedTransfer{
-// 					{
-// 						From: &types.AddressMapping{
-// 							IncludeOnlySpecified: false,
-// 							ManagerOptions:       sdkmath.NewUint(0),
-// 						},
-// 						To: &types.AddressMapping{
-// 							IncludeOnlySpecified: false,
-// 							ManagerOptions:       sdkmath.NewUint(0),
-// 						},
-// 					},
-// 				},
-// 				Transfers: []*types.Transfer{
-// 					{
-// 						ToAddresses: []string{alice, charlie},
-// 						Balances: []*types.Balance{
-// 							{
-// 								Amount: sdkmath.NewUint(5),
-// 								BadgeIds: []*types.IdRange{
-// 									{
-// 										Start: sdkmath.NewUint(1),
-// 										End:   sdkmath.NewUint(5),
-// 									},
-// 								},
-// 							},
-// 						},
-// 					},
-// 				},
-// 			},
-// 			Amount:  sdkmath.NewUint(1),
-// 			Creator: bob,
-// 		},
-// 	}
+	collectionsToCreate = GetCollectionsToCreate()
+	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{}
+	collectionsToCreate[0].Collection.BalancesType = sdkmath.NewUint(1)
+	collectionsToCreate[0].Collection.ApprovedTransfersTimeline = nil
+	
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating badge: %s")
 
-// 	err = CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "Error creating badge: %s")
 
-// 	// Verify nextId increments correctly
-// 	nextId := suite.app.BadgesKeeper.GetNextCollectionId(suite.ctx)
-// 	suite.Require().Equal(sdkmath.NewUint(2), nextId)
+	collectionsToCreate = GetCollectionsToCreate()
+	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{}
+	collectionsToCreate[0].Collection.BalancesType = sdkmath.NewUint(2)
+	
 
-// 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Error(err, "Error creating badge: %s")
 
-// 	unmintedBalances := types.UserBalanceStore{
-// 		Balances: collection.UnmintedSupplys,
-// 	}
+	collectionsToCreate = GetCollectionsToCreate()
+	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{}
+	collectionsToCreate[0].Collection.BalancesType = sdkmath.NewUint(2)
+	collectionsToCreate[0].Collection.ApprovedTransfersTimeline = nil
+	
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating badge: %s")
+}
 
-// 	suite.Require().Equal(sdkmath.NewUint(10), unmintedBalances.Balances[0].Amount)
-// 	suite.Require().Equal([]*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(6),
-// 			End:   sdkmath.NewUint(10),
-// 		},
-// 	}, unmintedBalances.Balances[0].BadgeIds)
 
-// 	aliceBalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
-// 	suite.Require().Equal(sdkmath.NewUint(5), aliceBalance.Balances[0].Amount)
-// 	suite.Require().Equal([]*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(1),
-// 			End:   sdkmath.NewUint(5),
-// 		},
-// 	}, aliceBalance.Balances[0].BadgeIds)
+func (suite *TestSuite) TestNewCollectionDuplicateBadgeIds() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
 
-// 	charlieBalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), charlie)
-// 	suite.Require().Equal(sdkmath.NewUint(5), charlieBalance.Balances[0].Amount)
-// 	suite.Require().Equal([]*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(1),
-// 			End:   sdkmath.NewUint(5),
-// 		},
-// 	}, charlieBalance.Balances[0].BadgeIds)
-// }
+	_, err := sdk.AccAddressFromBech32(alice)
+	suite.Require().Nil(err, "Address %s failed to parse")
 
-// func (suite *TestSuite) TestNewBadgesWhitelistRecipientsOverflow() {
-// 	wctx := sdk.WrapSDKContext(suite.ctx)
-// 	perms := sdkmath.NewUint(62)
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].Collection.Transfers = []*types.Transfer{
+		{
+			From: "Mint",
+			ToAddresses: []string{bob},
+			Balances: []*types.Balance{
+				{
+					Amount: sdkmath.NewUint(1),
+					BadgeIds: []*types.IdRange{
+						GetOneIdRange()[0],
+						GetOneIdRange()[0],
+					},
+					Times: GetFullIdRanges(),
+				},
+			},
+		},
+	}
+	
 
-// 	_, err := sdk.AccAddressFromBech32(alice)
-// 	suite.Require().Nil(err, "Address %s failed to parse")
-
-// 	collectionsToCreate := []CollectionsToCreate{
-// 		{
-// 			Collection: types.MsgNewCollection{
-// 				BadgeMetadata: []*types.BadgeMetadata{
-// 					{
-// 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.IdRange{
-// 							{
-// 								Start: sdkmath.NewUint(1),
-// 								End:   sdkmath.NewUint(math.MaxUint64),
-// 							},
-// 						},
-// 					},
-// 				},
-// 				CollectionMetadata: "https://example.com",
-// 				BadgesToCreate: []*types.BadgeSupplyAndAmount{
-// 					{
-// 						Supply: sdkmath.NewUint(10),
-// 						Amount: sdkmath.NewUint(10),
-// 					},
-// 				},
-// 				Permissions: perms,
-// 				ApprovedTransfers: []*types.CollectionApprovedTransfer{
-// 					{
-// 						From: &types.AddressMapping{
-// 							IncludeOnlySpecified: false,
-// 							ManagerOptions:       sdkmath.NewUint(0),
-// 						},
-// 						To: &types.AddressMapping{
-// 							IncludeOnlySpecified: false,
-// 							ManagerOptions:       sdkmath.NewUint(0),
-// 						},
-// 					},
-// 				},
-// 				Transfers: []*types.Transfer{
-// 					{
-// 						ToAddresses: []string{alice, charlie},
-// 						Balances: []*types.Balance{
-// 							{
-// 								Amount: sdkmath.NewUint(6),
-// 								BadgeIds: []*types.IdRange{
-// 									{
-// 										Start: sdkmath.NewUint(0),
-// 										End:   sdkmath.NewUint(4),
-// 									},
-// 								},
-// 							},
-// 						},
-// 					},
-// 				},
-// 			},
-// 			Amount:  sdkmath.NewUint(1),
-// 			Creator: bob,
-// 		},
-// 	}
-
-// 	err = CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().EqualError(err, keeper.ErrUnderflow.Error())
-// }
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Error(err, "Error creating badge: %s")
+}

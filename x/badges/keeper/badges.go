@@ -8,6 +8,10 @@ import (
 
 //Create badges and update the unminted / total supplys for the collection
 func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, badgesToCreate []*types.Balance, transfers []*types.Transfer) (*types.BadgeCollection, error) {
+	if IsInheritedBalances(collection) {
+		return &types.BadgeCollection{}, ErrInheritedBalances
+	}
+	
 	totalSupplys := collection.TotalSupplys 
 	unmintedSupplys := collection.UnmintedSupplys
 
@@ -43,12 +47,12 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 			}
 		}
 
-		totalSupplys, err = types.AddBalancesForIdRanges(totalSupplys, balance.BadgeIds, balance.Times, balance.Amount)
+		totalSupplys, err = types.AddBalance(totalSupplys, balance)
 		if err != nil {
 			return &types.BadgeCollection{}, err
 		}
 
-		unmintedSupplys, err = types.AddBalancesForIdRanges(unmintedSupplys, balance.BadgeIds, balance.Times, balance.Amount)
+		unmintedSupplys, err = types.AddBalance(unmintedSupplys, balance)
 		if err != nil {
 			return &types.BadgeCollection{}, err
 		}
@@ -59,7 +63,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 	collection.NextBadgeId = nextBadgeId
 
 	if IsOnChainBalances(collection) {
-		err = k.HandleTransfers(ctx, collection, transfers, "Manager", false)
+		err = k.HandleTransfers(ctx, collection, transfers, "Manager")
 		if err != nil {
 			return &types.BadgeCollection{}, err
 		}

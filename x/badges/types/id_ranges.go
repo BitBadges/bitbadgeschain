@@ -12,18 +12,20 @@ func CreateIdRange(start sdkmath.Uint, end sdkmath.Uint) *IdRange {
 	}
 }
 
-// Search ID ranges for a specific ID. Return (idx, true) if found. And (-1, false) if not.
-// Assumes ID ranges are sorted.
+// Search ID ranges for a specific ID. Return (true) if found. And (false) if not.
 func SearchIdRangesForId(id sdkmath.Uint, idRanges []*IdRange) bool {
-	idRanges = SortAndMergeOverlapping(idRanges) 
+	ranges := make([]*IdRange, len(idRanges))
+	copy(ranges, idRanges)
+
+	ranges = SortAndMergeOverlapping(ranges) 
 
 	//Binary search because ID ranges will be sorted
 	low := 0
-	high := len(idRanges) - 1
+	high := len(ranges) - 1
 	for low <= high {
 		median := int(uint(low+high) >> 1)
 
-		currRange := idRanges[median]
+		currRange := ranges[median]
 
 		if currRange.Start.LTE(id) && currRange.End.GTE(id) {
 			return true
@@ -130,22 +132,8 @@ func RemoveIdRangeFromIdRange(idsToRemove []*IdRange, rangeToRemoveFrom []*IdRan
 	return rangeToRemoveFrom, removedRanges
 }
 
-func AssertRangeCompletelyOverlaps(rangeToCheck []*IdRange, overlappingRange []*IdRange) error {
-	//Check that for old times, there is 100% overlap with new times and 0% overlap with the opposite
-	for _, oldAllowedTime := range rangeToCheck {
-		for _, newAllowedTime := range overlappingRange {
-			//Check that the new time completely overlaps with the old time
-			x, _ := RemoveIdsFromIdRange(newAllowedTime, oldAllowedTime)
-			if len(x) != 0 {
-				return ErrRangeDoesNotOverlap
-			}
-		}
-	}
 
-	return nil
-}
-
-func AssertRangeDoesNotOverlapAtAll(rangeToCheck []*IdRange, overlappingRange []*IdRange) error {
+func AssertRangesDoNotOverlapAtAll(rangeToCheck []*IdRange, overlappingRange []*IdRange) error {
 	//Check that for old times, there is 100% overlap with new times and 0% overlap with the opposite
 	for _, oldAllowedTime := range rangeToCheck {
 		for _, newAllowedTime := range overlappingRange {
@@ -201,9 +189,10 @@ func SortAndMergeOverlapping(ids []*IdRange) []*IdRange {
 					//Example: prevRange = [1, 5], currRange = [2, 10] -> newRange = [1, 10]
 					newIdRanges[len(newIdRanges)-1].End = currRange.End
 				}
-			} else {
+			} 
+			// else {
 				//Note: If currRange.End <= prevInsertedRange.End, it is already fully contained within the previous. We can just continue.
-			}
+			// }
 		}
 		return newIdRanges
 	} else {

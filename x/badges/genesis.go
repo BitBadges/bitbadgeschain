@@ -22,8 +22,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	}
 
 	k.SetNextCollectionId(ctx, genState.NextCollectionId)
-	// Set if defined; default 0
-	k.SetNextClaimId(ctx, genState.NextCollectionId)
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetPort(ctx, genState.PortId)
 	// Only try to bind to port if it is not already bound, since we may already own
@@ -65,7 +63,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	genesis.PortId = k.GetPort(ctx)
 	genesis.NextCollectionId = k.GetNextCollectionId(ctx)
-	genesis.NextClaimId = k.GetNextClaimId(ctx)
 
 	genesis.Collections = k.GetCollectionsFromStore(ctx)
 	addresses := []string{}

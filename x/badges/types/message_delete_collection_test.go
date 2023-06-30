@@ -27,13 +27,28 @@ func TestMsgDeleteCollection_ValidateBasic(t *testing.T) {
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
 			},
+		}, {
+			name: "invalid collection id",
+			msg: MsgDeleteCollection{
+				Creator:      sample.AccAddress(),
+				CollectionId: sdkmath.NewUint(0),
+			},
+			err: ErrInvalidCollectionId,
 		},
+		{
+			name: "invalid collection id 2",
+			msg: MsgDeleteCollection{
+				Creator:      sample.AccAddress(),
+			},
+			err: ErrInvalidCollectionId,
+		},
+
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.msg.ValidateBasic()
 			if tt.err != nil {
-				require.ErrorIs(t, err, tt.err)
+				require.Error(t, err, tt.err)
 				return
 			}
 			require.NoError(t, err)

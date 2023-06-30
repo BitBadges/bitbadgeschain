@@ -16,7 +16,7 @@ type UserApprovalsToCheck struct {
 
 //DeductUserOutgoingApprovals will check if the current transfer is approved from the from's outgoing approvals and handle the approval tallying accordingly
 func (k Keeper) DeductUserOutgoingApprovals(ctx sdk.Context, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.IdRange, times []*types.IdRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.ChallengeSolution) (error) {
-	currApprovedTransfers := GetCurrentUserApprovedOutgoingTransfers(ctx, userBalance)
+	currApprovedTransfers := types.GetCurrentUserApprovedOutgoingTransfers(ctx, userBalance)
 	currApprovedTransfers = AppendDefaultForOutgoing(currApprovedTransfers, from)
 
 	//Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
@@ -27,7 +27,7 @@ func (k Keeper) DeductUserOutgoingApprovals(ctx sdk.Context, collection *types.B
 
 //DeductUserIncomingApprovals will check if the current transfer is approved from the to's outgoing approvals and handle the approval tallying accordingly
 func (k Keeper) DeductUserIncomingApprovals(ctx sdk.Context, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.IdRange, times []*types.IdRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.ChallengeSolution) (error) {
-	currApprovedTransfers := GetCurrentUserApprovedIncomingTransfers(ctx, userBalance)
+	currApprovedTransfers := types.GetCurrentUserApprovedIncomingTransfers(ctx, userBalance)
 	currApprovedTransfers = AppendDefaultForIncoming(currApprovedTransfers, to)
 
 	//Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
@@ -38,7 +38,7 @@ func (k Keeper) DeductUserIncomingApprovals(ctx sdk.Context, collection *types.B
 
 //DeductCollectionApprovalsAndGetUserApprovalsToCheck will check if the current transfer is allowed via the collection's approved transfers and handle any tallying accordingly
 func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.IdRange, times []*types.IdRange, fromAddress string, toAddress string, initiatedBy string, amount sdkmath.Uint, solutions []*types.ChallengeSolution) ([]*UserApprovalsToCheck, error) {
-	approvedTransfers := GetCurrentCollectionApprovedTransfers(ctx, collection)
+	approvedTransfers := types.GetCurrentCollectionApprovedTransfers(ctx, collection)
 	return k.DeductAndGetUserApprovals(approvedTransfers, ctx, collection, badgeIds, times, fromAddress, toAddress, initiatedBy, amount, solutions, "overall")
 }	
 
@@ -49,7 +49,7 @@ func (k Keeper) DeductAndGetUserApprovals(approvedTransfers []*types.CollectionA
 	castedApprovedTransfers := CastCollectionApprovedTransferToUniversalPermission(expandedApprovedTransfers)
 	firstMatches := types.GetFirstMatchOnly(castedApprovedTransfers) //Note: This filters only on the mapping ID level. We need to ensure we use first match only for each (to, from, initiatedBy) here. 
 
-	manager := GetCurrentManager(ctx, collection)
+	manager := types.GetCurrentManager(ctx, collection)
 
 	//Keep a running tally of all the badges we still have to handle
 	unhandledBadgeIds := make([]*types.IdRange, len(badgeIds))
@@ -171,7 +171,7 @@ func (k Keeper) DeductAndGetUserApprovals(approvedTransfers []*types.CollectionA
 func AddTallyAndAssertDoesntExceedThreshold(currTally []*types.Balance, toAdd *types.Balance, threshold []*types.Balance) ([]*types.Balance, error) {
 	//Add the new tally
 	err := *new(error)
-	currTally, err = types.AddBalancesForIdRanges(currTally, toAdd.BadgeIds, toAdd.Times, toAdd.Amount)
+	currTally, err = types.AddBalance(currTally, toAdd)
 	if err != nil {
 		return []*types.Balance{}, err
 	}
@@ -180,7 +180,7 @@ func AddTallyAndAssertDoesntExceedThreshold(currTally []*types.Balance, toAdd *t
 	thresholdCopy := make([]*types.Balance, len(threshold))
 	copy(thresholdCopy, threshold)
 	for _, newTalliedAmount := range currTally {
-		thresholdCopy, err = types.SubtractBalancesForIdRanges(thresholdCopy, newTalliedAmount.BadgeIds, newTalliedAmount.Times, newTalliedAmount.Amount)
+		thresholdCopy, err = types.SubtractBalance(thresholdCopy, newTalliedAmount)
 		if err != nil {
 			return []*types.Balance{}, err
 		}

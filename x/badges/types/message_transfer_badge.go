@@ -11,12 +11,6 @@ const TypeMsgTransferBadge = "transfer_badge"
 var _ sdk.Msg = &MsgTransferBadge{}
 
 func NewMsgTransferBadge(creator string, collectionId sdkmath.Uint, transfers []*Transfer) *MsgTransferBadge {
-	for _, transfer := range transfers {
-		for _, balance := range transfer.Balances {
-			balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
-		}
-	}
-
 	return &MsgTransferBadge{
 		Creator:      creator,
 		CollectionId: collectionId,

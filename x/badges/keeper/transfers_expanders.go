@@ -7,6 +7,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
+//Little hack to make AllowedCOmbinations a 1-element array so we know if disallowed/allowed for ArbitraryValue
 func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionApprovedTransfer) []*types.CollectionApprovedTransfer {
 	newCurrApprovedTransfers := []*types.CollectionApprovedTransfer{}
 	for _, approvedTransfer := range approvedTransfers {
@@ -68,6 +69,8 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 	return newCurrApprovedTransfers
 }
 
+
+//By default, we approve all transfers if to === initiatedBy
 func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomingTransfer, userAddress string) []*types.UserApprovedIncomingTransfer {
 	currApprovedTransfers = append(currApprovedTransfers, &types.UserApprovedIncomingTransfer{
 		FromMappingId: "All", //everyone
@@ -94,6 +97,7 @@ func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomin
 	return currApprovedTransfers
 }
 
+//By default, we approve all transfers if from === initiatedBy
 func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoingTransfer, userAddress string) []*types.UserApprovedOutgoingTransfer {
 	currApprovedTransfers = append(currApprovedTransfers, &types.UserApprovedOutgoingTransfer{
 		ToMappingId: "All", //everyone

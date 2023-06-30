@@ -1,27 +1,29 @@
-package types
+package types_test
 
 import (
 	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/stretchr/testify/require"
 )
 
+//TODO:
 func TestMsgUpdateUserApprovedTransfers_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgUpdateUserApprovedTransfers
+		msg  types.MsgUpdateUserApprovedTransfers
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgUpdateUserApprovedTransfers{
+			msg:types. MsgUpdateUserApprovedTransfers{
 				Creator: "invalid_address",
 			},
-			err: ErrInvalidAddress,
+			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgUpdateUserApprovedTransfers{
+			msg: types.MsgUpdateUserApprovedTransfers{
 				Creator: sample.AccAddress(),
 			},
 		},

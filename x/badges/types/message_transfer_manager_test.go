@@ -61,12 +61,25 @@ func TestMsgUpdateManager_ValidateBasic(t *testing.T) {
 			},
 			err: types.ErrInvalidAddress,
 		},
+		{
+			name: "invalid times",
+			msg: types.MsgUpdateManager{
+				Creator:      sample.AccAddress(),
+				CollectionId: sdkmath.NewUint(1),
+				ManagerTimeline: []*types.ManagerTimeline{
+					{
+						Manager: "invalid_address",
+					},
+				},
+			},
+			err: types.ErrRangeDoesNotOverlap,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.msg.ValidateBasic()
 			if tt.err != nil {
-				require.ErrorIs(t, err, tt.err)
+				require.Error(t, err, tt.err)
 				return
 			}
 			require.NoError(t, err)

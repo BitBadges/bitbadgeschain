@@ -14,6 +14,7 @@ func (k msgServer) ArchiveCollection(goCtx context.Context, msg *types.MsgArchiv
 		Creator:                 msg.Creator,
 		CollectionId:            msg.CollectionId,
 		MustBeManager:           true,
+		OverrideArchive:  			 true,
 	})
 	if err != nil {
 		return nil, err

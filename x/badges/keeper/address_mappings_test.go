@@ -70,9 +70,9 @@ func (suite *TestSuite) TestReservedIds() {
 	mapping, err := suite.app.BadgesKeeper.GetAddressMapping(suite.ctx, "1:1", alice)
 	suite.Require().Nil(err, "Error getting address mapping: %s", "1:1")
 	suite.Require().Equal(mapping.MappingId, "1:1", "Error getting address mapping: %s", "1:1")
-	suite.Require().Equal(mapping.Filters[0].Conditions[0].MustOwnBadges[0].BadgeIds[0].Start, sdkmath.NewUint(1), "Error getting address mapping: %s", "1:1")
-	suite.Require().Equal(mapping.Filters[0].Conditions[0].MustOwnBadges[0].BadgeIds[0].End, sdkmath.NewUint(1), "Error getting address mapping: %s", "1:1")
-	suite.Require().Equal(mapping.Filters[0].Conditions[0].MustOwnBadges[0].CollectionId, sdkmath.NewUint(1), "Error getting address mapping: %s", "1:1")
+	AssertUintsEqual(suite, mapping.Filters[0].Conditions[0].MustOwnBadges[0].BadgeIds[0].Start, sdkmath.NewUint(1))
+	AssertUintsEqual(suite, mapping.Filters[0].Conditions[0].MustOwnBadges[0].BadgeIds[0].End, sdkmath.NewUint(1))
+	AssertUintsEqual(suite, mapping.Filters[0].Conditions[0].MustOwnBadges[0].CollectionId, sdkmath.NewUint(1))
 }
 
 func (suite *TestSuite) TestAddressMappingsManagerOf() {

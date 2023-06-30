@@ -11,15 +11,6 @@ const TypeMsgUpdateCollectionApprovedTransfers = "update_allowed_transfers"
 var _ sdk.Msg = &MsgUpdateCollectionApprovedTransfers{}
 
 func NewMsgUpdateCollectionApprovedTransfers(creator string, collectionId sdkmath.Uint, approvedTransfersTimeline []*CollectionApprovedTransferTimeline) *MsgUpdateCollectionApprovedTransfers {
-	// for _, approvedTransfer := range approvedTransfers {
-	// 	approvedTransfer.BadgeIds = SortAndMergeOverlapping(approvedTransfer.BadgeIds)
-	// 	approvedTransfer.TransferTimes = SortAndMergeOverlapping(approvedTransfer.TransferTimes)
-
-	// 	for _, balance := range approvedTransfer.Claim.StartAmounts {
-	// 		balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
-	// 	}
-	// }
-	
 	return &MsgUpdateCollectionApprovedTransfers{
 		Creator:           creator,
 		CollectionId:      collectionId,
@@ -54,17 +45,18 @@ func (msg *MsgUpdateCollectionApprovedTransfers) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	for _, timelineVal := range msg.ApprovedTransfersTimeline {
-		for _, approvedTransfer := range timelineVal.ApprovedTransfers {
-			err = ValidateCollectionApprovedTransfer(*approvedTransfer)
-			if err != nil {
-				return err
-			}
-		}
+	if err := ValidateApprovedTransferTimeline(msg.ApprovedTransfersTimeline); err != nil {
+		return err
 	}
 
-	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
+	if msg.CollectionId.IsNil() || msg.CollectionId.IsZero() {
 		return sdkerrors.Wrapf(ErrInvalidBadgeID, "collection id cannot be 0")
+	}
+
+	for _, mapping := range msg.AddressMappings {
+		if err := ValidateAddressMapping(mapping); err != nil {
+			return err
+		}
 	}
 
 	return nil

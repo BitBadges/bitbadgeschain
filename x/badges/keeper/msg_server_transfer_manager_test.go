@@ -1,14 +1,5 @@
 package keeper_test
 
-// import (
-// sdkmath "cosmossdk.io/math"
-// 	"math"
-
-// 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-// 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-// 	sdk "github.com/cosmos/cosmos-sdk/types"
-// )
-
 // func (suite *TestSuite) TestUpdateManager() {
 // 	wctx := sdk.WrapSDKContext(suite.ctx)
 

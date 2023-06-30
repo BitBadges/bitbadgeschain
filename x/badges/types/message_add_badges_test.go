@@ -2,67 +2,56 @@ package types_test
 
 import (
 	"testing"
-	// "github.com/bitbadges/bitbadgeschain/testutil/sample"
-	// sdk "github.com/cosmos/cosmos-sdk/types"
-	// sdkerrors "cosmossdk.io/errors"
-	// "github.com/stretchr/testify/require"
-	// "github.com/bitbadges/bitbadgeschain/x/badges/types"
+
+	sdkmath "cosmossdk.io/math"
+	"github.com/bitbadges/bitbadgeschain/testutil/sample"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMsgMintAndDistributeBadges_ValidateBasic(t *testing.T) {
-	// tests := []struct {
-	// 	name string
-	// 	msg  types.MsgMintAndDistributeBadges
-	// 	err  error
-	// }{
-	// 	{
-	// 		name: "invalid address",
-	// 		msg: types.MsgMintAndDistributeBadges{
-	// 			Creator:      "invalid_address",
-	// 			CollectionId: sdkmath.NewUint(1),
-	// 			BadgesToCreate: []*types.BadgeSupplyAndAmount{
-	// 				{
-	// 					Supply: sdkmath.NewUint(10),
-	// 					Amount: sdkmath.NewUint(1),
-	// 				},
-	// 			},
-	// 		},
-	// 		err: ErrInvalidAddress,
-	// 	}, {
-	// 		name: "valid state",
-	// 		msg: types.MsgMintAndDistributeBadges{
-	// 			Creator:      sample.AccAddress(),
-	// 			CollectionId: sdkmath.NewUint(1),
-	// 			BadgesToCreate: []*types.BadgeSupplyAndAmount{
-	// 				{
-	// 					Supply: sdkmath.NewUint(10),
-	// 					Amount: sdkmath.NewUint(1),
-	// 				},
-	// 			},
-	// 		},
-	// 	}, {
-	// 		name: "invalid amount",
-	// 		msg: types.MsgMintAndDistributeBadges{
-	// 			Creator:      sample.AccAddress(),
-	// 			CollectionId: sdkmath.NewUint(1),
-	// 			BadgesToCreate: []*types.BadgeSupplyAndAmount{
-	// 				{
-	// 					Supply: sdkmath.NewUint(10),
-	// 					Amount: sdkmath.NewUint(0),
-	// 				},
-	// 			},
-	// 		},
-	// 		err: types.ErrElementCantEqualThis,
-	// 	},
-	// }
-	// for _, tt := range tests {
-	// 	t.Run(tt.name, func(t *testing.T) {
-	// 		err := tt.msg.ValidateBasic()
-	// 		if tt.err != nil {
-	// 			require.ErrorIs(t, err, tt.err)
-	// 			return
-	// 		}
-	// 		require.NoError(t, err)
-	// 	})
-	// }
+	tests := []struct {
+		name string
+		msg  types.MsgMintAndDistributeBadges
+		err  error
+	}{
+		{
+			name: "invalid address",
+			msg: types.MsgMintAndDistributeBadges{
+				Creator:      "invalid_address",
+				CollectionId: sdkmath.NewUint(1),
+			},
+			err: types.ErrInvalidAddress,
+		}, {
+			name: "valid state",
+			msg: types.MsgMintAndDistributeBadges{
+				Creator:      sample.AccAddress(),
+				CollectionId: sdkmath.NewUint(1),
+				BadgesToCreate: []*types.Balance{	},
+			},
+		}, {
+			name: "invalid amount",
+			msg: types.MsgMintAndDistributeBadges{
+				Creator:      sample.AccAddress(),
+				CollectionId: sdkmath.NewUint(1),
+				BadgesToCreate: []*types.Balance{
+					{
+						Amount: sdkmath.NewUint(0),
+
+					},
+				},
+			},
+			err: types.ErrElementCantEqualThis,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.msg.ValidateBasic()
+			if tt.err != nil {
+				require.Error(t, err, tt.err)
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
 }

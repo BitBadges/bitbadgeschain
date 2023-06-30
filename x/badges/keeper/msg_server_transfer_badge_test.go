@@ -68,7 +68,7 @@ package keeper_test
 // 			Amount:   sdkmath.NewUint(10000),
 // 		},
 // 	}, badge.MaxSupplys)
-// 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
+// 	fetchedBalance, err := keeper.GetBalancesForIds([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
 // 	suite.Require().Equal(sdkmath.NewUint(10000), fetchedBalance[0].Amount)
 // 	suite.Require().Nil(err)
 
@@ -92,12 +92,12 @@ package keeper_test
 // 	suite.Require().Nil(err, "Error transferring badge")
 
 // 	bobbalance, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
-// 	fetchedBalance, err = keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
+// 	fetchedBalance, err = keeper.GetBalancesForIds([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
 // 	suite.Require().Equal(sdkmath.NewUint(5000), fetchedBalance[0].Amount)
 // 	suite.Require().Nil(err)
 
 // 	alicebalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
-// 	fetchedBalance, err = keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, alicebalance.Balances)
+// 	fetchedBalance, err = keeper.GetBalancesForIds([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, alicebalance.Balances)
 // 	suite.Require().Equal(sdkmath.NewUint(5000), fetchedBalance[0].Amount)
 // 	suite.Require().Nil(err)
 // }
@@ -161,7 +161,7 @@ package keeper_test
 // 			Amount:   sdkmath.NewUint(10000),
 // 		},
 // 	}, badge.MaxSupplys)
-// 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
+// 	fetchedBalance, err := keeper.GetBalancesForIds([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
 // 	suite.Require().Equal(sdkmath.NewUint(10000), fetchedBalance[0].Amount)
 // 	suite.Require().Nil(err)
 
@@ -257,7 +257,7 @@ package keeper_test
 // 			Amount:   sdkmath.NewUint(10000),
 // 		},
 // 	}, badge.MaxSupplys)
-// 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
+// 	fetchedBalance, err := keeper.GetBalancesForIds([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
 // 	suite.Require().Equal(sdkmath.NewUint(10000), fetchedBalance[0].Amount)
 // 	suite.Require().Nil(err)
 
@@ -347,7 +347,7 @@ package keeper_test
 // 			Amount:   sdkmath.NewUint(10000),
 // 		},
 // 	}, badge.MaxSupplys)
-// 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
+// 	fetchedBalance, err := keeper.GetBalancesForIds([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
 // 	suite.Require().Equal(sdkmath.NewUint(10000), fetchedBalance[0].Amount)
 // 	suite.Require().Nil(err)
 
@@ -429,7 +429,7 @@ package keeper_test
 // 			Amount:   sdkmath.NewUint(10000),
 // 		},
 // 	}, badge.MaxSupplys)
-// 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
+// 	fetchedBalance, err := keeper.GetBalancesForIds([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
 // 	suite.Require().Equal(sdkmath.NewUint(10000), fetchedBalance[0].Amount)
 // 	suite.Require().Nil(err)
 
@@ -519,7 +519,7 @@ package keeper_test
 // 			Amount:   sdkmath.NewUint(10000),
 // 		},
 // 	}, badge.MaxSupplys)
-// 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
+// 	fetchedBalance, err := keeper.GetBalancesForIds([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
 // 	suite.Require().Equal(sdkmath.NewUint(10000), fetchedBalance[0].Amount)
 // 	suite.Require().Nil(err)
 
@@ -609,7 +609,7 @@ package keeper_test
 // 			Amount:   sdkmath.NewUint(10000),
 // 		},
 // 	}, badge.MaxSupplys)
-// 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
+// 	fetchedBalance, err := keeper.GetBalancesForIds([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
 // 	suite.Require().Equal(sdkmath.NewUint(10000), fetchedBalance[0].Amount)
 // 	suite.Require().Nil(err)
 
@@ -710,7 +710,7 @@ package keeper_test
 // 			Amount:   sdkmath.NewUint(10000),
 // 		},
 // 	}, badge.MaxSupplys)
-// 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
+// 	fetchedBalance, err := keeper.GetBalancesForIds([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
 // 	suite.Require().Equal(sdkmath.NewUint(10000), fetchedBalance[0].Amount)
 
 // 	err = TransferBadge(suite, wctx, bob, sdkmath.NewUint(1), bob, []*types.Transfer{
@@ -791,7 +791,7 @@ package keeper_test
 // 			Amount:   sdkmath.NewUint(10000),
 // 		},
 // 	}, badge.MaxSupplys)
-// 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
+// 	fetchedBalance, err := keeper.GetBalancesForIds([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
 // 	suite.Require().Equal(sdkmath.NewUint(10000), fetchedBalance[0].Amount)
 // 	suite.Require().Nil(err)
 
@@ -873,7 +873,7 @@ package keeper_test
 // 			Amount:   sdkmath.NewUint(10000),
 // 		},
 // 	}, badge.MaxSupplys)
-// 	fetchedBalance, err := keeper.GetBalancesForIdRanges([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
+// 	fetchedBalance, err := keeper.GetBalancesForIds([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, bobbalance.Balances)
 // 	suite.Require().Equal(sdkmath.NewUint(10000), fetchedBalance[0].Amount)
 
 // 	err = TransferBadge(suite, wctx, charlie, sdkmath.NewUint(1), bob, []*types.Transfer{

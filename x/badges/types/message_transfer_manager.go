@@ -51,8 +51,12 @@ func (msg *MsgUpdateManager) ValidateBasic() error {
 		}
 	}
 
-	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
+	if msg.CollectionId.IsNil() || msg.CollectionId.IsZero() {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
+	}
+
+	if err := ValidateManagerTimeline(msg.ManagerTimeline); err != nil {
+		return err
 	}
 
 	return nil

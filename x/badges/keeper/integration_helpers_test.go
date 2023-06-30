@@ -8,6 +8,29 @@ import (
 	sdkmath "cosmossdk.io/math"
 )
 
+func AssertUintsEqual(suite *TestSuite, expected sdkmath.Uint, actual sdkmath.Uint) {
+	suite.Require().Equal(expected.Equal(actual), true, "Uints not equal %s %s", expected.String(), actual.String())
+}
+
+func AssertIdRangesEqual(suite *TestSuite, expected []*types.IdRange, actual []*types.IdRange) {
+	remainingOne, _ := types.RemoveIdRangeFromIdRange(actual, expected)
+	remainingTwo, _ := types.RemoveIdRangeFromIdRange(expected, actual)
+	suite.Require().Equal(len(remainingOne), 0, "IdRanges not equal %s %s", expected, actual)
+	suite.Require().Equal(len(remainingTwo), 0, "IdRanges not equal %s %s", expected, actual)
+}
+
+func AssertBalancesEqual(suite *TestSuite, expected []*types.Balance, actual []*types.Balance) {
+	// suite.Require().Equal(len(expected), len(actual), "Balances length not equal %d %d", len(expected), len(actual))
+
+	err := *new(error)
+	for _, balance := range expected {
+		actual, err = types.SubtractBalance(actual, balance)
+		suite.Require().Nil(err, "Underflow error comparing balances: %s")
+	}
+
+	suite.Require().Equal(len(actual), 0, "Balances not equal %s %s", expected, actual)
+}
+
 func GetFullIdRanges() []*types.IdRange {
 	return []*types.IdRange{
 		{
@@ -169,6 +192,17 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 					},
 				},
 				Permissions: &types.CollectionPermissions{
+					CanArchive: []*types.TimedUpdatePermission{},
+					CanUpdateContractAddress: []*types.TimedUpdatePermission{},
+					CanUpdateOffChainBalancesMetadata: []*types.TimedUpdatePermission{},
+					CanUpdateStandards: []*types.TimedUpdatePermission{},
+					CanUpdateCustomData: []*types.TimedUpdatePermission{},
+					CanDeleteCollection: []*types.ActionPermission{},
+					CanUpdateManager: []*types.TimedUpdatePermission{},
+					CanUpdateCollectionMetadata: []*types.TimedUpdatePermission{},
+					CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{},
+					CanUpdateInheritedBalances: []*types.TimedUpdateWithBadgeIdsPermission{},
+					CanUpdateCollectionApprovedTransfers: []*types.CollectionApprovedTransferPermission{},
 					CanCreateMoreBadges: []*types.ActionWithBadgeIdsAndTimesPermission{
 						{
 							DefaultValues: &types.ActionWithBadgeIdsAndTimesDefaultValues{
@@ -176,9 +210,12 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 								PermittedTimes: GetFullIdRanges(),
 								ForbiddenTimes: []*types.IdRange{},
 							},
-							Combinations: []*types.ActionWithBadgeIdsAndTimesCombination{{}},
+							Combinations: []*types.ActionWithBadgeIdsAndTimesCombination{{
+
+							}},
 						},
 					},
+					
 				},
 	
 			},
@@ -190,4 +227,77 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 	return collectionsToCreate
 }
 
+func GetCollectionsToCreateAllMintedToCreator(creator string) []CollectionsToCreate {
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].Collection.Transfers = []*types.Transfer{
+		{
+			From: "Mint",
+			ToAddresses: []string{creator},
+			Balances: []*types.Balance{
+				{
+					Amount: sdkmath.NewUint(1),
+					BadgeIds: GetFullIdRanges(),
+					Times: GetFullIdRanges(),
+				},
+			},
+		},
+	}
 
+	return collectionsToCreate
+}
+
+
+
+func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []CollectionsToCreate {
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers[0].PerAddressApprovals.ApprovalsPerFromAddress.Amounts[0].Amount = sdkmath.NewUint(uint64(math.MaxUint64))
+	collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers = append([]*types.CollectionApprovedTransfer{{
+		
+				ToMappingId: "All",
+				FromMappingId: "Mint",
+				InitiatedByMappingId: "All",
+				OverridesFromApprovedOutgoingTransfers: true,
+				OverridesToApprovedIncomingTransfers: true,
+				TransferTimes: GetFullIdRanges(),
+				BadgeIds: GetFullIdRanges(),
+				AllowedCombinations: []*types.IsCollectionTransferAllowed{
+					{
+						IsAllowed: true,
+					},
+				},
+				Challenges: []*types.Challenge{},
+				TrackerId: "test",
+				IncrementIdsBy: sdkmath.NewUint(0),
+				IncrementTimesBy: sdkmath.NewUint(0),
+				PerAddressApprovals: &types.PerAddressApprovals{
+					ApprovalsPerFromAddress: &types.ApprovalsTracker{
+						Amounts: []*types.Balance{
+							{
+								Amount: sdkmath.NewUint(1),
+								Times: GetFullIdRanges(),
+								BadgeIds: GetFullIdRanges(),
+							},
+						},
+						NumTransfers: sdkmath.NewUint(1000),
+					},
+				},
+			},
+		}, collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers...
+	)
+
+	collectionsToCreate[0].Collection.Transfers = []*types.Transfer{
+		{
+			From: "Mint",
+			ToAddresses: []string{creator},
+			Balances: []*types.Balance{
+				{
+					Amount: sdkmath.NewUint(1),
+					BadgeIds: GetFullIdRanges(),
+					Times: GetFullIdRanges(),
+				},
+			},
+		},
+	}
+
+	return collectionsToCreate
+}

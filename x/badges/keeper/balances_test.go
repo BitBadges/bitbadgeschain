@@ -1,613 +1,556 @@
 package keeper_test
 
-// import (
-// sdkmath "cosmossdk.io/math"
-// 	"math"
+import (
+	"math"
+	"math/rand"
 
-// 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-// 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-// 	sdk "github.com/cosmos/cosmos-sdk/types"
-// )
+	sdkmath "cosmossdk.io/math"
 
-// func (suite *TestSuite) TestSafeAdd() {
-// 	result, err := keeper.SafeAdd(sdkmath.NewUint(0), sdkmath.NewUint(1))
-// 	suite.Require().Nil(err, "Error adding: %s")
-// 	suite.Require().Equal(result, sdkmath.NewUint(1))
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+)
 
-// 	result, err = keeper.SafeAdd(sdkmath.NewUint(math.MaxUint64), sdkmath.NewUint(0))
-// 	suite.Require().Nil(err, "Error adding: %s")
-// 	suite.Require().Equal(result, sdkmath.NewUint(math.MaxUint64))
+func (suite *TestSuite) TestSafeAdd() {
+	result, err := types.SafeAdd(sdkmath.NewUint(0), sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error adding: %s")
+	AssertUintsEqual(suite, result, sdkmath.NewUint(1))
 
-// 	_, err = keeper.SafeAdd(sdkmath.NewUint(math.MaxUint), sdkmath.NewUint(1))
-// 	// suite.Require().EqualError(err, keeper.ErrOverflow.Error()) With Cosmos SDK Uint now, this error is not returned
-// }
+	result, err = types.SafeAdd(sdkmath.NewUint(math.MaxUint64), sdkmath.NewUint(0))
+	suite.Require().Nil(err, "Error adding: %s")
+	AssertUintsEqual(suite, result, sdkmath.NewUint(math.MaxUint64))
 
-// func (suite *TestSuite) TestSafeSubtract() {
-// 	result, err := keeper.SafeSubtract(sdkmath.NewUint(1), sdkmath.NewUint(0))
-// 	suite.Require().Nil(err, "Error adding: %s")
-// 	suite.Require().Equal(result, sdkmath.NewUint(1))
+	_, err = types.SafeAdd(sdkmath.NewUint(math.MaxUint), sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error adding: %s")
+	// AssertBalancesEqualEsuite, rror(err, types.ErrOverflow.Error()) With Cosmos SDK Uint now, this error is not returned
+}
 
-// 	result, err = keeper.SafeSubtract(sdkmath.NewUint(math.MaxUint64), sdkmath.NewUint(0))
-// 	suite.Require().Nil(err, "Error adding: %s")
-// 	suite.Require().Equal(result, sdkmath.NewUint(math.MaxUint64))
+func (suite *TestSuite) TestSafeSubtract() {
+	result, err := types.SafeSubtract(sdkmath.NewUint(1), sdkmath.NewUint(0))
+	suite.Require().Nil(err, "Error adding: %s")
+	AssertUintsEqual(suite, result, sdkmath.NewUint(1))
 
-// 	_, err = keeper.SafeSubtract(sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64))
-// 	suite.Require().EqualError(err, keeper.ErrUnderflow.Error())
-// }
+	result, err = types.SafeSubtract(sdkmath.NewUint(math.MaxUint64), sdkmath.NewUint(0))
+	suite.Require().Nil(err, "Error adding: %s")
+	AssertUintsEqual(suite, result, sdkmath.NewUint(math.MaxUint64))
 
-// func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
-// 	err := *new(error)
-// 	balances := []*types.Balance{
-// 		{
-// 			Amount: sdkmath.NewUint(1),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(0),
-// 					End:   sdkmath.NewUint(1),
-// 				},
-// 			},
-// 		},
-// 	}
+	_, err = types.SafeSubtract(sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64))
+	suite.Require().Error(err, types.ErrUnderflow.Error())
+}
 
-// 	balances, err = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(0),
-// 			End:   sdkmath.NewUint(1),
-// 		},
-// 	}, sdkmath.NewUint(10), balances)
-// 	suite.Require().Nil(err, "Error updating balances: %s")
+func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
+	err := *new(error)
+	balances := []*types.Balance{
+		{
+			Amount: sdkmath.NewUint(1),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(0),
+					End:   sdkmath.NewUint(1),
+				},
+			},
+		},
+	}
 
-// 	fetchedBalances, err := keeper.GetBalancesForIdRanges([]*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(0),
-// 			End:   sdkmath.NewUint(1),
-// 		},
-// 	}, balances)
-// 	suite.Require().Nil(err, "Error fetching balances: %s")
+	balances, err = types.UpdateBalance(&types.Balance{
+		BadgeIds: []*types.IdRange{
+			{
+				Start: sdkmath.NewUint(0),
+				End:   sdkmath.NewUint(1),
+			},
+		}, 
+		Times: GetFullIdRanges(), 
+		Amount: sdkmath.NewUint(10),
+	}, balances)
+	suite.Require().Nil(err, "Error updating balances: %s")
 
-// 	suite.Require().Equal(balances, []*types.Balance{
-// 		{
-// 			Amount: sdkmath.NewUint(10),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(0),
-// 					End:   sdkmath.NewUint(1),
-// 				},
-// 			},
-// 		},
-// 	})
-// 	suite.Require().Equal(balances, fetchedBalances)
+	fetchedBalances, err := types.GetBalancesForIds([]*types.IdRange{
+		{
+			Start: sdkmath.NewUint(0),
+			End:   sdkmath.NewUint(1),
+		},
+	}, GetFullIdRanges(), balances)
+	suite.Require().Nil(err, "Error fetching balances: %s")
 
-// 	fetchedBalances, err = keeper.GetBalancesForIdRanges([]*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(1),
-// 			End:   sdkmath.NewUint(1),
-// 		},
-// 	}, balances)
+	AssertBalancesEqual(suite, balances, []*types.Balance{
+		{
+			Amount: sdkmath.NewUint(10),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(0),
+					End:   sdkmath.NewUint(1),
+				},
+			},
+		},
+	})
+	AssertBalancesEqual(suite, balances, fetchedBalances)
 
-// 	suite.Require().Equal(fetchedBalances, []*types.Balance{
-// 		{
-// 			Amount: sdkmath.NewUint(10),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(1),
-// 					End:   sdkmath.NewUint(1),
-// 				},
-// 			},
-// 		},
-// 	})
+	fetchedBalances, err = types.GetBalancesForIds([]*types.IdRange{
+		{
+			Start: sdkmath.NewUint(1),
+			End:   sdkmath.NewUint(1),
+		},
+	}, GetFullIdRanges(), balances)
+	suite.Require().Nil(err, "Error fetching balances: %s")
 
-// 	fetchedBalances, err = keeper.GetBalancesForIdRanges([]*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(1),
-// 			End:   sdkmath.NewUint(2),
-// 		},
-// 	}, balances)
+	AssertBalancesEqual(suite, fetchedBalances, []*types.Balance{
+		{
+			Amount: sdkmath.NewUint(10),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:   sdkmath.NewUint(1),
+				},
+			},
+		},
+	})
 
-// 	suite.Require().Equal(fetchedBalances, []*types.Balance{
-// 		{
-// 			Amount: sdkmath.NewUint(0),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(2),
-// 					End:   sdkmath.NewUint(2),
-// 				},
-// 			},
-// 		},
-// 		{
-// 			Amount: sdkmath.NewUint(10),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(1),
-// 					End:   sdkmath.NewUint(1),
-// 				},
-// 			},
-// 		},
-// 	})
+	fetchedBalances, err = types.GetBalancesForIds([]*types.IdRange{
+		{
+			Start: sdkmath.NewUint(1),
+			End:   sdkmath.NewUint(2),
+		},
+	}, GetFullIdRanges(), balances)
+	suite.Require().Nil(err, "Error fetching balances: %s")
 
-// 	fetchedBalances, err = keeper.GetBalancesForIdRanges([]*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(0),
-// 			End:   sdkmath.NewUint(math.MaxUint64),
-// 		},
-// 	}, balances)
+	AssertBalancesEqual(suite, fetchedBalances, []*types.Balance{
+		{
+			Amount: sdkmath.NewUint(10),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:   sdkmath.NewUint(1),
+				},
+			},
+		},
+		{
+			Amount: sdkmath.NewUint(0),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(2),
+					End:   sdkmath.NewUint(2),
+				},
+			},
+		},
+	})
 
-// 	suite.Require().Equal(fetchedBalances, []*types.Balance{
-// 		{
-// 			Amount: sdkmath.NewUint(0),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(2),
-// 					End:   sdkmath.NewUint(math.MaxUint64),
-// 				},
-// 			},
-// 		},
-// 		{
-// 			Amount: sdkmath.NewUint(10),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(0),
-// 					End:   sdkmath.NewUint(1),
-// 				},
-// 			},
-// 		},
-// 	})
+	fetchedBalances, err = types.GetBalancesForIds([]*types.IdRange{
+		{
+			Start: sdkmath.NewUint(0),
+			End:   sdkmath.NewUint(math.MaxUint64),
+		},
+	}, GetFullIdRanges(), balances)
+	suite.Require().Nil(err, "Error fetching balances: %s")
 
-// 	fetchedBalances, err = keeper.GetBalancesForIdRanges([]*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(3),
-// 			End:   sdkmath.NewUint(math.MaxUint64),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(0),
-// 			End:   sdkmath.NewUint(2),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(0),
-// 			End:   sdkmath.NewUint(1),
-// 		},
-// 	}, balances)
+	AssertBalancesEqual(suite, fetchedBalances, []*types.Balance{
+		{
+			Amount: sdkmath.NewUint(0),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(2),
+					End:   sdkmath.NewUint(math.MaxUint64),
+				},
+			},
+		},
+		{
+			Amount: sdkmath.NewUint(10),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(0),
+					End:   sdkmath.NewUint(1),
+				},
+			},
+		},
+	})
 
-// 	suite.Require().Equal(fetchedBalances, []*types.Balance{
-// 		{
-// 			Amount: sdkmath.NewUint(0),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(2),
-// 					End:   sdkmath.NewUint(math.MaxUint64),
-// 				},
-// 			},
-// 		},
-// 		{
-// 			Amount: sdkmath.NewUint(10),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(0),
-// 					End:   sdkmath.NewUint(1),
-// 				},
-// 			},
-// 		},
-// 	})
+	fetchedBalances, err = types.GetBalancesForIds([]*types.IdRange{
+		{
+			Start: sdkmath.NewUint(3),
+			End:   sdkmath.NewUint(math.MaxUint64),
+		},
+		{
+			Start: sdkmath.NewUint(0),
+			End:   sdkmath.NewUint(2),
+		},
+		// {
+		// 	Start: sdkmath.NewUint(0),
+		// 	End:   sdkmath.NewUint(1),
+		// },
+	}, GetFullIdRanges(), balances)
+	suite.Require().Nil(err, "Error fetching balances: %s")
 
-// 	balances, err = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(1),
-// 			End:   sdkmath.NewUint(1),
-// 		},
-// 	}, sdkmath.NewUint(5), balances)
+	AssertBalancesEqual(suite, fetchedBalances, []*types.Balance{
+		{
+			Amount: sdkmath.NewUint(0),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(2),
+					End:   sdkmath.NewUint(math.MaxUint64),
+				},
+			},
+		},
+		{
+			Amount: sdkmath.NewUint(10),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(0),
+					End:   sdkmath.NewUint(1),
+				},
+			},
+		},
+	})
 
-// 	suite.Require().True(types.BalancesEqual(balances, []*types.Balance{
-// 		{
-// 			Amount: sdkmath.NewUint(5),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(1),
-// 					End:   sdkmath.NewUint(1),
-// 				},
-// 			},
-// 		},
-// 		{
-// 			Amount: sdkmath.NewUint(10),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(0),
-// 					End:   sdkmath.NewUint(0),
-// 				},
-// 			},
-// 		},
-// 	}))
+	balances, err = types.UpdateBalance(&types.Balance{
+		BadgeIds: []*types.IdRange{
+		{
+			Start: sdkmath.NewUint(1),
+			End:   sdkmath.NewUint(1),
+		},
+	}, Times: GetFullIdRanges(), Amount: sdkmath.NewUint(5)}, balances)
+	suite.Require().Nil(err, "Error fetching balances: %s")
 
-// 	balances, err = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(2),
-// 			End:   sdkmath.NewUint(math.MaxUint64),
-// 		},
-// 	}, sdkmath.NewUint(5), balances)
 
-// 	suite.Require().True(types.BalancesEqual(balances, []*types.Balance{
-// 		{
-// 			Amount: sdkmath.NewUint(5),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(1),
-// 					End:   sdkmath.NewUint(math.MaxUint64),
-// 				},
-// 			},
-// 		},
-// 		{
-// 			Amount: sdkmath.NewUint(10),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(0),
-// 					End:   sdkmath.NewUint(0),
-// 				},
-// 			},
-// 		},
-// 	}))
+	AssertBalancesEqual(suite, balances, []*types.Balance{
+		{
+			Amount: sdkmath.NewUint(5),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:   sdkmath.NewUint(1),
+				},
+			},
+		},
+		{
+			Amount: sdkmath.NewUint(10),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(0),
+					End:   sdkmath.NewUint(0),
+				},
+			},
+		},
+	})
 
-// 	balances, err = keeper.UpdateBalancesForIdRanges([]*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(2),
-// 			End:   sdkmath.NewUint(2),
-// 		},
-// 	}, sdkmath.NewUint(10), balances)
+	balances, err = types.UpdateBalance(&types.Balance{
+		BadgeIds: []*types.IdRange{
+		{
+			Start: sdkmath.NewUint(2),
+			End:   sdkmath.NewUint(math.MaxUint64),
+		},
+	}, Times: GetFullIdRanges(), Amount: sdkmath.NewUint(5)}, balances)
+	suite.Require().Nil(err, "Error fetching balances: %s")
 
-// 	suite.Require().True(types.BalancesEqual(balances, []*types.Balance{
-// 		{
-// 			Amount: sdkmath.NewUint(5),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(1),
-// 					End:   sdkmath.NewUint(1),
-// 				},
-// 				{
-// 					Start: sdkmath.NewUint(3),
-// 					End:   sdkmath.NewUint(math.MaxUint64),
-// 				},
-// 			},
-// 		},
-// 		{
-// 			Amount: sdkmath.NewUint(10),
-// 			BadgeIds: []*types.IdRange{
-// 				{
-// 					Start: sdkmath.NewUint(0),
-// 					End:   sdkmath.NewUint(0),
-// 				},
-// 				{
-// 					Start: sdkmath.NewUint(2),
-// 					End:   sdkmath.NewUint(2),
-// 				},
-// 			},
-// 		},
-// 	}))
-// }
+	AssertBalancesEqual(suite, balances, []*types.Balance{
+		{
+			Amount: sdkmath.NewUint(5),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:   sdkmath.NewUint(math.MaxUint64),
+				},
+			},
+		},
+		{
+			Amount: sdkmath.NewUint(10),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(0),
+					End:   sdkmath.NewUint(0),
+				},
+			},
+		},
+	})
 
-// func (suite *TestSuite) TestSubtractBalances() {
-// 	UserBalance := types.UserBalanceStore{}
-// 	badgeIdRanges := []*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(1),
-// 			End:   sdkmath.NewUint(1),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(0),
-// 			End:   sdkmath.NewUint(0),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(35),
-// 			End:   sdkmath.NewUint(35),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(2),
-// 			End:   sdkmath.NewUint(34),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(35),
-// 			End:   sdkmath.NewUint(100),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(135),
-// 			End:   sdkmath.NewUint(200),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(235),
-// 			End:   sdkmath.NewUint(300),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(335),
-// 			End:   sdkmath.NewUint(400),
-// 		},
-// 	}
+	balances, err = types.UpdateBalance(&types.Balance{
+		BadgeIds: []*types.IdRange{
+		{
+			Start: sdkmath.NewUint(2),
+			End:   sdkmath.NewUint(2),
+		},
+	}, Times: GetFullIdRanges(), Amount: sdkmath.NewUint(10)}, balances)
+	suite.Require().Nil(err, "Error fetching balances: %s")
 
-// 	err := *new(error)
-// 	UserBalance.Balances, err = keeper.AddBalancesForIdRanges(UserBalance.Balances, badgeIdRanges, sdkmath.NewUint(1000))
-// 	suite.Require().NoError(err)
+	AssertBalancesEqual(suite, balances, []*types.Balance{
+		{
+			Amount: sdkmath.NewUint(5),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:   sdkmath.NewUint(1),
+				},
+				{
+					Start: sdkmath.NewUint(3),
+					End:   sdkmath.NewUint(math.MaxUint64),
+				},
+			},
+		},
+		{
+			Amount: sdkmath.NewUint(10),
+			Times: GetFullIdRanges(),
+			BadgeIds: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(0),
+					End:   sdkmath.NewUint(0),
+				},
+				{
+					Start: sdkmath.NewUint(2),
+					End:   sdkmath.NewUint(2),
+				},
+			},
+		},
+	})
+}
 
-// 	suite.Require().Equal(UserBalance.Balances[0].Amount, sdkmath.NewUint(1000))
-// 	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(0), End: sdkmath.NewUint(100),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(135),
-// 			End:   sdkmath.NewUint(200),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(235),
-// 			End:   sdkmath.NewUint(300),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(335),
-// 			End:   sdkmath.NewUint(400),
-// 		},
-// 	})
+//Adjust these values to test more or less
+const NUM_RUNS = 1
+const NUM_IDS = 10
+const NUM_OPERATIONS = 10
+func (suite *TestSuite) TestBalancesFuzz() {
+	for a:= 0; a< NUM_RUNS; a++ {
+		userBalance := &types.UserBalanceStore{}
+		balances := make([]sdkmath.Uint, NUM_IDS)
+		for i := 0; i < NUM_IDS; i++ {
+			balances[i] = sdkmath.NewUint(0)
+		}
 
-// 	badgeIdRangesToRemove := []*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(1),
-// 			End:   sdkmath.NewUint(1),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(35),
-// 			End:   sdkmath.NewUint(35),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(35),
-// 			End:   sdkmath.NewUint(100),
-// 		},
-// 	}
-// 	for _, badgeIdRangeToRemove := range badgeIdRangesToRemove {
-// 		UserBalance.Balances, err = keeper.SubtractBalancesForIdRanges(UserBalance.Balances, []*types.IdRange{badgeIdRangeToRemove}, sdkmath.NewUint(1))
-// 		suite.Require().NoError(err)
-// 	}
+		// adds := make([]*types.IdRange, NUM_OPERATIONS)
+		// subs := make([]*types.IdRange, NUM_OPERATIONS)
+		for i := 0; i < NUM_OPERATIONS; i++ { //NUM_OPERATIONS iterations
+			//Get random start value
+			start := (uint64(rand.Intn(NUM_IDS / 2)))
+			//Get random end value
+			end := (uint64(NUM_IDS / 2 + rand.Intn(NUM_IDS / 2)))
 
-// 	suite.Require().Equal(UserBalance.Balances[0].Amount, sdkmath.NewUint(998))
-// 	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: sdkmath.NewUint(35), End: sdkmath.NewUint(35)}})
+			amount := sdkmath.NewUint(uint64(rand.Intn(100)))
+			err := *new(error)
 
-// 	suite.Require().Equal(UserBalance.Balances[1].Amount, sdkmath.NewUint(999))
-// 	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}, {Start: sdkmath.NewUint(36), End: sdkmath.NewUint(100)}})
-// }
+			
+			userBalance.Balances, err = types.AddBalance(userBalance.Balances, &types.Balance{
+				Amount: amount,
+				BadgeIds: []*types.IdRange{
+					{
+						Start: sdkmath.NewUint(start),
+						End:   sdkmath.NewUint(end),
+					},
+				},
+				Times: GetFullIdRanges(),
+			})
+			suite.Require().Nil(err, "error adding balance to approval")
 
-// func (suite *TestSuite) TestAddBalancesForIdRanges() {
-// 	UserBalance := types.UserBalanceStore{}
-// 	badgeIdRanges := []*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(1),
-// 			End:   sdkmath.NewUint(1),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(0),
-// 			End:   sdkmath.NewUint(0),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(35),
-// 			End:   sdkmath.NewUint(35),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(2),
-// 			End:   sdkmath.NewUint(34),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(35),
-// 			End:   sdkmath.NewUint(100),
-// 		},
-// 	}
+			// adds = append(adds, &types.IdRange{
+			// 	Start: sdkmath.NewUint(start),
+			// 	End:   sdkmath.NewUint(end),
+			// })
+			// println("adding", start, end, amount.String())
 
-// 	err := *new(error)
-// 	for _, badgeIdRange := range badgeIdRanges {
-// 		UserBalance.Balances, err = keeper.AddBalancesForIdRanges(UserBalance.Balances, []*types.IdRange{badgeIdRange}, sdkmath.NewUint(1000))
-// 		suite.Require().Nil(err, "error adding balance to approval")
-// 	}
+			for j := start; j <= end; j++ {
+				balances[j] = balances[j].Add(amount)
+			}
 
-// 	suite.Require().Equal(UserBalance.Balances[0].Amount, sdkmath.NewUint(1000))
-// 	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: sdkmath.NewUint(0), End: sdkmath.NewUint(34)}, {Start: sdkmath.NewUint(36), End: sdkmath.NewUint(100)}})
+			start = (uint64(rand.Intn(NUM_IDS / 2)))
+			end = (uint64(NUM_IDS / 2 + rand.Intn(NUM_IDS / 2)))
+			amount = sdkmath.NewUint(uint64(rand.Intn(20))) //Make this substantially less than add, so we have less chance of underflow
+			// println("removing", start, end, amount.String())
 
-// 	suite.Require().Equal(UserBalance.Balances[1].Amount, sdkmath.NewUint(2000))
-// 	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: sdkmath.NewUint(35), End: sdkmath.NewUint(35)}})
+			userBalancesCopy := make([]*types.Balance, len(userBalance.Balances))
+			copy(userBalancesCopy, userBalance.Balances)
+			
+			userBalance.Balances, err = types.SubtractBalance(userBalance.Balances,  &types.Balance{
+				Amount: amount,
+				BadgeIds: []*types.IdRange{
+					{
+						Start: sdkmath.NewUint(start),
+						End:   sdkmath.NewUint(end),
+					},
+				},
+				Times: GetFullIdRanges(),
+			})
 
-// 	badgeIdRangesToAdd := []*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(1),
-// 			End:   sdkmath.NewUint(1),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(35),
-// 			End:   sdkmath.NewUint(35),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(35),
-// 			End:   sdkmath.NewUint(100),
-// 		},
-// 	}
+			if err != nil {
+				suite.Require().EqualError(err, types.ErrUnderflow.Error())
+				userBalance.Balances = userBalancesCopy //revert to previous balances
+			} else {
+				// if sdkmath.NewUint(256) < start && sdkmath.NewUint(256) < end {
+				// 	println("removing", start, end, amount)
+				// }
+				// subs = append(subs, &types.IdRange{
+				// 	Start: sdkmath.NewUint(start),
+				// 	End:   sdkmath.NewUint(end),
+				// })
 
-// 	for _, badgeIdRangeToAdd := range badgeIdRangesToAdd {
-// 		UserBalance.Balances, _ = keeper.AddBalancesForIdRanges(UserBalance.Balances, []*types.IdRange{badgeIdRangeToAdd}, sdkmath.NewUint(1))
-// 		suite.Require().Nil(err, "error adding balance to approval")
-// 	}
+				for j := start; j <= end; j++ {
+					balances[j] = balances[j].Sub(amount)
+				}
+			}
 
-// 	suite.Require().Equal(UserBalance.Balances[0].Amount, sdkmath.NewUint(1000))
-// 	suite.Require().True(types.IdRangeEquals(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: sdkmath.NewUint(0), End: sdkmath.NewUint(0)}, {Start: sdkmath.NewUint(2), End: sdkmath.NewUint(34)}}))
+		}
 
-// 	suite.Require().Equal(UserBalance.Balances[1].Amount, sdkmath.NewUint(1001))
-// 	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}, {Start: sdkmath.NewUint(36), End: sdkmath.NewUint(100)}})
+		for i := 0; i < NUM_IDS; i++ {
+			fetchedBalances, _ := types.GetBalancesForIds(
+				[]*types.IdRange{
+					{
+						Start: sdkmath.NewUint(uint64(i)),
+						End:   sdkmath.NewUint(uint64(i)),
+					},
+				},
+				GetFullIdRanges(),
+				userBalance.Balances,
+			)
+			
+			// println("fetched", i, fetchedBalances[0].Amount.String(), balances[i].String())
+			AssertUintsEqual(suite, fetchedBalances[0].Amount, balances[i])
+		}
+	}
+}
 
-// 	suite.Require().Equal(UserBalance.Balances[2].Amount, sdkmath.NewUint(2002))
-// 	suite.Require().Equal(UserBalance.Balances[2].BadgeIds, []*types.IdRange{{Start: sdkmath.NewUint(35), End: sdkmath.NewUint(35)}})
-// }
 
-// // func (suite *TestSuite) TestAddBalancesOverflow() {
-// // 	UserBalance := types.UserBalanceStore{}
-// // 	badgeIdRanges := []*types.IdRange{
-// // 		{
-// // 			Start: sdkmath.NewUint(1),
-// // 			End:   sdkmath.NewUint(1),
-// // 		},
-// // 		{
-// // 			Start: sdkmath.NewUint(0),
-// // 			End:   sdkmath.NewUint(0),
-// // 		},
-// // 		{
-// // 			Start: sdkmath.NewUint(35),
-// // 			End: sdkmath.NewUint(35),
-// // 		},
-// // 		{
-// // 			Start: sdkmath.NewUint(2),
-// // 			End: sdkmath.NewUint(34),
-// // 		},
-// // 		{
-// // 			Start: sdkmath.NewUint(35),
-// // 			End: sdkmath.NewUint(100),
-// // 		},
-// // 	}
 
-// // 	err := *new(error)
-// // 	for _, badgeIdRange := range badgeIdRanges {
-// // 		UserBalance.Balances, err = keeper.AddBalancesForIdRanges(UserBalance.Balances, []*types.IdRange{badgeIdRange}, sdkmath.NewUint(1000))
-// // 		suite.Require().Nil(err, "error adding balance to approval")
-// // 	}
+/* --------------------------------------START TESTING WITH TIMES-------------------------------------- */
+//Previously, everything was just FullIdRanges() for times
 
-// // 	suite.Require().Equal(UserBalance.Balances[0].Amount, sdkmath.NewUint(1000))
-// // 	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: sdkmath.NewUint(0), End: sdkmath.NewUint(34)}, {Start: sdkmath.NewUint(36), End: sdkmath.NewUint(100)}})
+//Adjust these values to test more or less
 
-// // 	suite.Require().Equal(UserBalance.Balances[1].Amount, sdkmath.NewUint(2000))
-// // 	suite.Require().Equal(UserBalance.Balances[1].BadgeIds, []*types.IdRange{{Start: sdkmath.NewUint(35), End: sdkmath.NewUint(35)}})
+func (suite *TestSuite) TestBalancesWithTimesFuzz() {
+	for a := 0; a < NUM_RUNS; a++ {
+		userBalance := &types.UserBalanceStore{}
+		balances := make([][]sdkmath.Uint, NUM_IDS)
+		for i := 0; i < NUM_IDS; i++ {
+			balances[i] = make([]sdkmath.Uint, NUM_IDS)
+			for j := 0; j < NUM_IDS; j++ {
+				balances[i][j] = sdkmath.NewUint(0)
+			}
+		}
 
-// // 	badgeIdRangesToAdd := []*types.IdRange{
-// // 		{
-// // 			Start: sdkmath.NewUint(0),
-// // 			End: sdkmath.NewUint(1000),
-// // 		},
-// // 	}
+		// adds := make([]*types.IdRange, NUM_OPERATIONS)
+		// subs := make([]*types.IdRange, NUM_OPERATIONS)
+		for i := 0; i < NUM_OPERATIONS; i++ { //NUM_OPERATIONS iterations
+			start := (uint64(rand.Intn(NUM_IDS / 2)))
+			end := (uint64(NUM_IDS / 2 + rand.Intn(NUM_IDS / 2)))
+			startTime := (uint64(rand.Intn(NUM_IDS / 2)))
+			endTime := (uint64(NUM_IDS / 2 + rand.Intn(NUM_IDS / 2)))
 
-// // 	for _, badgeIdRange := range badgeIdRangesToAdd {
-// // 		UserBalance.Balances, err = keeper.AddBalancesForIdRanges(UserBalance.Balances, []*types.IdRange{badgeIdRange}, sdkmath.NewUint(math.MaxUint64))
-// // 		suite.Require().EqualError(err, keeper.ErrOverflow.Error())
-// // 	}
-// // }
+			amount := sdkmath.NewUint(uint64(rand.Intn(100)))
+			err := *new(error)
 
-// func (suite *TestSuite) TestRemoveBalancesUnderflow() {
-// 	UserBalance := types.UserBalanceStore{}
-// 	badgeIdRanges := []types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(1),
-// 			End:   sdkmath.NewUint(1),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(0),
-// 			End:   sdkmath.NewUint(0),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(2),
-// 			End:   sdkmath.NewUint(34),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(35),
-// 			End:   sdkmath.NewUint(100),
-// 		},
-// 	}
+			
+			userBalance.Balances, err = types.AddBalance(userBalance.Balances,  &types.Balance{
+				Amount: amount,
+				BadgeIds: []*types.IdRange{
+					{
+						Start: sdkmath.NewUint(start),
+						End:   sdkmath.NewUint(end),
+					},
+				},
+				Times: []*types.IdRange{
+					{
+						Start: sdkmath.NewUint(startTime),
+						End:   sdkmath.NewUint(endTime),
+					},
+				},
+			})
+			suite.Require().Nil(err, "error adding balance to approval")
 
-// 	err := *new(error)
-// 	for _, badgeIdRange := range badgeIdRanges {
-// 		UserBalance.Balances, err = keeper.AddBalancesForIdRanges(UserBalance.Balances, []*types.IdRange{&badgeIdRange}, sdkmath.NewUint(1000))
-// 		suite.Require().NoError(err)
-// 	}
+			
 
-// 	suite.Require().Equal(UserBalance.Balances[0].Amount, sdkmath.NewUint(1000))
-// 	suite.Require().Equal(UserBalance.Balances[0].BadgeIds, []*types.IdRange{{Start: sdkmath.NewUint(0), End: sdkmath.NewUint(100)}})
+			// adds = append(adds, &types.IdRange{
+			// 	Start: sdkmath.NewUint(start),
+			// 	End:   sdkmath.NewUint(end),
+			// })
+			// println("adding", start, end, startTime, endTime, amount.String())
 
-// 	badgeIdRangesToRemove := []*types.IdRange{
-// 		{
-// 			Start: sdkmath.NewUint(1),
-// 			End:   sdkmath.NewUint(1),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(35),
-// 			End:   sdkmath.NewUint(35),
-// 		},
-// 		{
-// 			Start: sdkmath.NewUint(35),
-// 			End:   sdkmath.NewUint(100),
-// 		},
-// 	}
+			for j := start; j <= end; j++ {
+				for k := startTime; k <= endTime; k++ {
+					balances[j][k] = balances[j][k].Add(amount)
+				}
+			}
 
-// 	for _, badgeIdRange := range badgeIdRangesToRemove {
-// 		UserBalance.Balances, err = keeper.SubtractBalancesForIdRanges(UserBalance.Balances, []*types.IdRange{badgeIdRange}, sdkmath.NewUint(math.MaxUint64))
-// 		suite.Require().EqualError(err, keeper.ErrUnderflow.Error())
-// 	}
-// }
+			start = (uint64(rand.Intn(NUM_IDS / 2)))
+			end = (uint64(NUM_IDS / 2 + rand.Intn(NUM_IDS / 2)))
+			amount = sdkmath.NewUint(uint64(rand.Intn(20))) //Make this substantially less than add, so we have less chance of underflow
+			startTime = (uint64(rand.Intn(NUM_IDS / 2)))
+			endTime = (uint64(NUM_IDS / 2 + rand.Intn(NUM_IDS / 2)))
+			// println("removing", start, end, startTime, endTime, amount.String())
 
-// //Commented because it takes +- 25 seconds to run
+			userBalancesCopy := make([]*types.Balance, len(userBalance.Balances))
+			copy(userBalancesCopy, userBalance.Balances)
 
-// // func (suite *TestSuite) TestBalancesFuzz() {
-// // 	for i := 0; i < 25; i++ {
-// // 		userBalance := types.UserBalanceStore{}
-// // 		balances := make([]uint64, sdkmath.NewUint(1000))
+			//removing 18 from IDs 1-7 Times 1-6
+			
+			userBalance.Balances, err = types.SubtractBalance(userBalance.Balances,  &types.Balance{
+				Amount: amount,
+				BadgeIds: []*types.IdRange{
+					{
+						Start: sdkmath.NewUint(start),
+						End:   sdkmath.NewUint(end),
+					},
+				},
+				Times: []*types.IdRange{
+					{
+						Start: sdkmath.NewUint(startTime),
+						End:   sdkmath.NewUint(endTime),
+					},
+				},
+			})
 
-// // 		adds := make([]*types.IdRange, 100)
-// // 		subs := make([]*types.IdRange, 100)
-// // 		for i := 0; i < 100; i++ { //10000 iterations
-// // 			//Get random start value
-// // 			start := sdkmath.NewUint(rand.Intn(500))
-// // 			//Get random end value
-// // 			end := sdkmath.NewUint(500 + rand.Intn(500))
+			if err != nil {
+				suite.Require().EqualError(err, types.ErrUnderflow.Error())
+				userBalance.Balances = userBalancesCopy //revert to previous balances
+				// println("reverted")
+			} else {
+				// if sdkmath.NewUint(256) < start && sdkmath.NewUint(256) < end {
+				// 	println("removing", start, end, amount)
+				// }
+				// subs = append(subs, &types.IdRange{
+				// 	Start: sdkmath.NewUint(start),
+				// 	End:   sdkmath.NewUint(end),
+				// })
 
-// // 			amount := sdkmath.NewUint(rand.Intn(100))
-// // 			err := *new(error)
-// // 			userBalance.Balances, err = keeper.AddBalancesForIdRanges(userBalance.Balances, []*types.IdRange{
-// // 				{
-// // 					Start: start,
-// // 					End:   end,
-// // 				},
-// // 			}, amount)
-// // 			suite.Require().Nil(err, "error adding balance to approval")
+				for j := start; j <= end; j++ {
+					for k := startTime; k <= endTime; k++ {
+						balances[j][k] = balances[j][k].Sub(amount)
+					}
+				}
+			}
+		}
 
-// // 			adds = append(adds, &types.IdRange{
-// // 				Start: start,
-// // 				End:   end,
-// // 			})
-// // 			// println("adding", start, end, amount)
-
-// // 			for j := start; j <= end; j++ {
-// // 				balances[j] += amount
-// // 			}
-
-// // 			amount = sdkmath.NewUint(rand.Intn(100))
-// // 			start = sdkmath.NewUint(rand.Intn(1000))
-// // 			end = sdkmath.NewUint(500 + rand.Intn(500))
-// // 			userBalance.Balances, err = keeper.SubtractBalancesForIdRanges(userBalance.Balances, []*types.IdRange{
-// // 				{
-// // 					Start: start,
-// // 					End:   end,
-// // 				},
-// // 			}, amount)
-
-// // 			if err != nil {
-// // 				suite.Require().EqualError(err, keeper.ErrUnderflow.Error())
-// // 			} else {
-// // 				// if sdkmath.NewUint(256) < start && sdkmath.NewUint(256) < end {
-// // 				// 	println("removing", start, end, amount)
-// // 				// }
-// // 				subs = append(subs, &types.IdRange{
-// // 					Start: start,
-// // 					End:   end,
-// // 				})
-// // 				for j := start; j <= end; j++ {
-// // 					balances[j] -= amount
-// // 				}
-// // 			}
-
-// // 		}
-
-// // 		for i := 0; i < 1000; i++ {
-// // 			suite.Require().Equal(keeper.GetBalancesForIdRanges(
-// // 				[]*types.IdRange{
-// // 					{
-// // 						Start: sdkmath.NewUint(i),
-// // 						End:   sdkmath.NewUint(i),
-// // 					},
-// // 				},
-// // 				userBalance.Balances,
-// // 			)[0].Amount, balances[i], "balance mismatch at index %d", i)
-// // 		}
-// // 	}
-// // }
+		for i := 0; i < NUM_IDS; i++ {
+			for j := 0; j < NUM_IDS; j++ {
+				fetchedBalances, _ := types.GetBalancesForIds(
+					[]*types.IdRange{
+						{
+							Start: sdkmath.NewUint(uint64(i)),
+							End:   sdkmath.NewUint(uint64(i)),
+						},
+					},
+					[]*types.IdRange{
+						{
+							Start: sdkmath.NewUint(uint64(j)),
+							End:   sdkmath.NewUint(uint64(j)),
+						},
+					},
+					userBalance.Balances,
+				)
+				
+				//1 1 12 13
+				// add 31
+				// remove 13
+				// remove 18
+				// remove 5
+				// println("fetched", i, j, fetchedBalances[0].Amount.String(), balances[i][j].String())
+				AssertUintsEqual(suite, fetchedBalances[0].Amount, balances[i][j])
+			}
+		}
+	}
+}

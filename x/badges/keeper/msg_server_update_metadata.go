@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 
-	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -28,11 +27,7 @@ func (k msgServer) UpdateMetadata(goCtx context.Context, msg *types.MsgUpdateMet
 	}
 
 	if msg.OffChainBalancesMetadataTimeline != nil && len(msg.OffChainBalancesMetadataTimeline) > 0 {
-		if collection.BalancesType != sdkmath.NewUint(1) {
-			return nil, ErrOffChainBalances
-		}
-		
-		if err := ValidateOffChainBalancesMetadataUpdate(ctx, collection.OffChainBalancesMetadataTimeline, msg.OffChainBalancesMetadataTimeline, collection.Permissions.CanUpdateOffChainBalancesMetadata); err != nil {
+		if err := ValidateOffChainBalancesMetadataUpdate(ctx, collection, collection.OffChainBalancesMetadataTimeline, msg.OffChainBalancesMetadataTimeline, collection.Permissions.CanUpdateOffChainBalancesMetadata); err != nil {
 			return nil, err
 		}
 		collection.OffChainBalancesMetadataTimeline = msg.OffChainBalancesMetadataTimeline

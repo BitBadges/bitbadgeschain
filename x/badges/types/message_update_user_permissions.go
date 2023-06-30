@@ -11,9 +11,6 @@ const TypeMsgUpdateUserPermissions = "update_user_permissions"
 var _ sdk.Msg = &MsgUpdateUserPermissions{}
 
 func NewMsgUpdateUserPermissions(creator string, collectionId sdkmath.Uint, permissions *UserPermissions) *MsgUpdateUserPermissions {
-  
-	//TODO: permissions sort and merge overlapping
-
 	return &MsgUpdateUserPermissions{
 		Creator: creator,
 		CollectionId: collectionId,
@@ -61,6 +58,11 @@ func (msg *MsgUpdateUserPermissions) ValidateBasic() error {
 		return err
 	}
 
+	for _, mapping := range msg.AddressMappings {
+		if err := ValidateAddressMapping(mapping); err != nil {
+			return err
+		}
+	}
 
   return nil
 }

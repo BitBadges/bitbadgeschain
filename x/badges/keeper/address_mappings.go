@@ -168,7 +168,7 @@ func (k Keeper) CheckIfManager(ctx sdk.Context, collectionId sdkmath.Uint, addre
 		return false, ErrCollectionNotFound
 	}
 
-	return GetCurrentManager(ctx, collection) == address, nil
+	return types.GetCurrentManager(ctx, collection) == address, nil
 }
 
 func (k Keeper) CheckIfOwnsBadges(ctx sdk.Context, collectionId sdkmath.Uint, address string, badgeIds []*types.IdRange, minMaxAmount *types.IdRange) (bool, error) {
@@ -189,7 +189,7 @@ func (k Keeper) CheckIfOwnsBadges(ctx sdk.Context, collectionId sdkmath.Uint, ad
 		}
 	}
 
-	balances, err := types.GetBalancesForIdRanges(badgeIds, []*types.IdRange{{
+	balances, err := types.GetBalancesForIds(badgeIds, []*types.IdRange{{
 			Start: sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli())),
 			End: sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli())),
 	}}, userBalance.Balances)

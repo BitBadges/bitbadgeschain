@@ -11,8 +11,6 @@ const TypeMsgUpdateCollectionPermissions = "update_permissions"
 var _ sdk.Msg = &MsgUpdateCollectionPermissions{}
 
 func NewMsgUpdateCollectionPermissions(creator string, collectionId sdkmath.Uint, permissions *CollectionPermissions) *MsgUpdateCollectionPermissions {
-	//TODO: permissions sort and merge overlapping
-	
 	return &MsgUpdateCollectionPermissions{
 		Creator:      creator,
 		CollectionId: collectionId,
@@ -47,13 +45,19 @@ func (msg *MsgUpdateCollectionPermissions) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	err = ValidatePermissions(msg.Permissions, true)
+	err = ValidatePermissions(msg.Permissions)
 	if err != nil {
 		return err
 	}
 
-	if msg.CollectionId.IsZero() || msg.CollectionId.IsNil() {
+	if msg.CollectionId.IsNil() || msg.CollectionId.IsZero() {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
+	}
+
+	for _, mapping := range msg.AddressMappings {
+		if err := ValidateAddressMapping(mapping); err != nil {
+			return err
+		}
 	}
 
 	return nil
