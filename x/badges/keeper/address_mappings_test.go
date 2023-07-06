@@ -83,7 +83,7 @@ func (suite *TestSuite) TestReservedIds() {
 // 	err = suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 // 		MappingId: "test",
 // 		Addresses: []string{},
-// 		IncludeOnlySpecified: false,
+// 		OnlySpecifiedAddresses: false,
 // 		Filters: []*types.AddressMappingFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -108,7 +108,7 @@ func (suite *TestSuite) TestReservedIds() {
 // 	err = suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 // 		MappingId: "test",
 // 		Addresses: []string{},
-// 		IncludeOnlySpecified: false,
+// 		OnlySpecifiedAddresses: false,
 // 		Filters: []*types.AddressMappingFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -141,7 +141,7 @@ func (suite *TestSuite) TestReservedIds() {
 // 	err = suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 // 		MappingId: "test",
 // 		Addresses: []string{},
-// 		IncludeOnlySpecified: false,
+// 		OnlySpecifiedAddresses: false,
 // 		Filters: []*types.AddressMappingFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -158,7 +158,7 @@ func (suite *TestSuite) TestReservedIds() {
 // 	err = suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 // 		MappingId: "test2",
 // 		Addresses: []string{},
-// 		IncludeOnlySpecified: false,
+// 		OnlySpecifiedAddresses: false,
 // 		Filters: []*types.AddressMappingFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -175,7 +175,7 @@ func (suite *TestSuite) TestReservedIds() {
 // 	err = suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 // 		MappingId: "test3",
 // 		Addresses: []string{},
-// 		IncludeOnlySpecified: false,
+// 		OnlySpecifiedAddresses: false,
 // 		Filters: []*types.AddressMappingFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -207,7 +207,7 @@ func (suite *TestSuite) TestReservedIds() {
 // 	err = suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 // 		MappingId: "test",
 // 		Addresses: []string{},
-// 		IncludeOnlySpecified: false,
+// 		OnlySpecifiedAddresses: false,
 // 		Filters: []*types.AddressMappingFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -224,7 +224,7 @@ func (suite *TestSuite) TestReservedIds() {
 // 	err = suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 // 		MappingId: "test2",
 // 		Addresses: []string{},
-// 		IncludeOnlySpecified: false,
+// 		OnlySpecifiedAddresses: false,
 // 		Filters: []*types.AddressMappingFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -241,7 +241,7 @@ func (suite *TestSuite) TestReservedIds() {
 // 	err = suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 // 		MappingId: "test3",
 // 		Addresses: []string{},
-// 		IncludeOnlySpecified: false,
+// 		OnlySpecifiedAddresses: false,
 // 		Filters: []*types.AddressMappingFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -273,14 +273,14 @@ func (suite *TestSuite) TestReservedIds() {
 // 	err = suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 // 		MappingId: "test",
 // 		Addresses: []string{alice},
-// 		IncludeOnlySpecified: true,
+// 		OnlySpecifiedAddresses: true,
 // 	})
 // 	suite.Require().Nil(err, "Error creating address mapping: %s", "test")
 
 // 	err = suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 // 		MappingId: "test3",
 // 		Addresses: []string{},
-// 		IncludeOnlySpecified: false,
+// 		OnlySpecifiedAddresses: false,
 // 		Filters: []*types.AddressMappingFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -297,7 +297,7 @@ func (suite *TestSuite) TestReservedIds() {
 // 	err = suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 // 		MappingId: "mustnot",
 // 		Addresses: []string{},
-// 		IncludeOnlySpecified: false,
+// 		OnlySpecifiedAddresses: false,
 // 		Filters: []*types.AddressMappingFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -338,14 +338,14 @@ func (suite *TestSuite) TestReservedIds() {
 // 	err = suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 // 		MappingId: "test",
 // 		Addresses: []string{alice},
-// 		IncludeOnlySpecified: true,
+// 		OnlySpecifiedAddresses: true,
 // 	})
 // 	suite.Require().Nil(err, "Error creating address mapping: %s", "test")
 
 // 	err = suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 // 		MappingId: "test3",
 // 		Addresses: []string{},
-// 		IncludeOnlySpecified: false,
+// 		OnlySpecifiedAddresses: false,
 // 		Filters: []*types.AddressMappingFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -371,7 +371,7 @@ func (suite *TestSuite) TestReservedIds() {
 // 	err = suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 // 		MappingId: "test3",
 // 		Addresses: []string{},
-// 		IncludeOnlySpecified: false,
+// 		OnlySpecifiedAddresses: false,
 // 		Filters: []*types.AddressMappingFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),

@@ -12,51 +12,51 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 message CollectionMetadataTimeline {
   CollectionMetadata collectionMetadata = 1;
-  repeated IdRange timelineTimes = 2;
+  repeated UintRange timelineTimes = 2;
 }
 
 message BadgeMetadataTimeline {
   repeated BadgeMetadata badgeMetadata = 1;
-  repeated IdRange timelineTimes = 2;
+  repeated UintRange timelineTimes = 2;
 }
 
 message OffChainBalancesMetadataTimeline {
   OffChainBalancesMetadata offChainBalancesMetadata = 1;
-  repeated IdRange timelineTimes = 2;
+  repeated UintRange timelineTimes = 2;
 }
 
 message InheritedBalancesTimeline {
   repeated InheritedBalance inheritedBalances = 1;
-  repeated IdRange timelineTimes = 2;
+  repeated UintRange timelineTimes = 2;
 }
 
 message CustomDataTimeline {
   string customData = 1;
-  repeated IdRange timelineTimes = 2;
+  repeated UintRange timelineTimes = 2;
 }
 
 message ManagerTimeline {
   string manager = 1;
-  repeated IdRange timelineTimes = 2;
+  repeated UintRange timelineTimes = 2;
 }
 
 message CollectionApprovedTransferTimeline {
   repeated CollectionApprovedTransfer approvedTransfers = 1;
-  repeated IdRange timelineTimes = 2;
+  repeated UintRange timelineTimes = 2;
 }
 
 message IsArchivedTimeline {
   bool isArchived = 1;
-  repeated IdRange timelineTimes = 2;
+  repeated UintRange timelineTimes = 2;
 }
 
 message ContractAddressTimeline {
   string contractAddress = 1;
-  repeated IdRange timelineTimes = 2;
+  repeated UintRange timelineTimes = 2;
 }
 
 message StandardsTimeline {
   repeated string standards = 1;
-  repeated IdRange timelineTimes = 2;
+  repeated UintRange timelineTimes = 2;
 }
 

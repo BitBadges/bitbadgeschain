@@ -17,212 +17,212 @@ const (
 
 func TestRemoveOverlaps(t *testing.T) {
 	remaining, _ := types.UniversalRemoveOverlaps(&types.UniversalPermissionDetails{
-		BadgeId: &types.IdRange{
+		BadgeId: &types.UintRange{
 			Start: sdkmath.NewUint(5),
 			End:   sdkmath.NewUint(5),
 		},
-		TimelineTime: &types.IdRange{
+		TimelineTime: &types.UintRange{
 			Start: sdkmath.NewUint(5),
 			End:   sdkmath.NewUint(5),
 		},
-		TransferTime: &types.IdRange{
+		TransferTime: &types.UintRange{
 			Start: sdkmath.NewUint(5),
 			End:  sdkmath.NewUint(5),
 		},
 		ToMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 		},
 		FromMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 		},
 		InitiatedByMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 		},
 	}, &types.UniversalPermissionDetails{
-		BadgeId: &types.IdRange{
+		BadgeId: &types.UintRange{
 			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(10),
 		},
-		TimelineTime: &types.IdRange{
+		TimelineTime: &types.UintRange{
 			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(10),
 		},
-		TransferTime: &types.IdRange{
+		TransferTime: &types.UintRange{
 			Start: sdkmath.NewUint(1),
 			End:  sdkmath.NewUint(10),
 		},
 		ToMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 		},
 		FromMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 		},
 		InitiatedByMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 		},
 	})
 	expected :=  []*types.UniversalPermissionDetails{
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(4),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:  sdkmath.NewUint(10),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(6),
 				End:   sdkmath.NewUint(10),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:  sdkmath.NewUint(10),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(4),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:  sdkmath.NewUint(10),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(6),
 				End:   sdkmath.NewUint(10),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:  sdkmath.NewUint(10),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:  sdkmath.NewUint(4),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(6),
 				End:  sdkmath.NewUint(10),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 	}
@@ -256,9 +256,9 @@ func TestRemoveOverlaps(t *testing.T) {
 			require.Contains(t, x.InitiatedByMapping.Addresses, addr)
 		}
 
-		require.Equal(t, r.ToMapping.IncludeOnlySpecified, x.ToMapping.IncludeOnlySpecified)
-		require.Equal(t, r.FromMapping.IncludeOnlySpecified, x.FromMapping.IncludeOnlySpecified)
-		require.Equal(t, r.InitiatedByMapping.IncludeOnlySpecified, x.InitiatedByMapping.IncludeOnlySpecified)
+		require.Equal(t, r.ToMapping.OnlySpecifiedAddresses, x.ToMapping.OnlySpecifiedAddresses)
+		require.Equal(t, r.FromMapping.OnlySpecifiedAddresses, x.FromMapping.OnlySpecifiedAddresses)
+		require.Equal(t, r.InitiatedByMapping.OnlySpecifiedAddresses, x.InitiatedByMapping.OnlySpecifiedAddresses)
 	}
 
 	require.Equal(t, expected, remaining)
@@ -267,290 +267,290 @@ func TestRemoveOverlaps(t *testing.T) {
 
 func TestRemoveAddresses(t *testing.T) {
 	remaining, _ := types.UniversalRemoveOverlaps(&types.UniversalPermissionDetails{
-		BadgeId: &types.IdRange{
+		BadgeId: &types.UintRange{
 			Start: sdkmath.NewUint(5),
 			End:   sdkmath.NewUint(5),
 		},
-		TimelineTime: &types.IdRange{
+		TimelineTime: &types.UintRange{
 			Start: sdkmath.NewUint(5),
 			End:   sdkmath.NewUint(5),
 		},
-		TransferTime: &types.IdRange{
+		TransferTime: &types.UintRange{
 			Start: sdkmath.NewUint(5),
 			End:  sdkmath.NewUint(5),
 		},
 		ToMapping: &types.AddressMapping{
 			Addresses: []string{alice},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 		},
 		FromMapping: &types.AddressMapping{
 			Addresses: []string{alice},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 		},
 		InitiatedByMapping: &types.AddressMapping{
 			Addresses: []string{alice},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 		},
 	}, &types.UniversalPermissionDetails{
-		BadgeId: &types.IdRange{
+		BadgeId: &types.UintRange{
 			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(10),
 		},
-		TimelineTime: &types.IdRange{
+		TimelineTime: &types.UintRange{
 			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(10),
 		},
-		TransferTime: &types.IdRange{
+		TransferTime: &types.UintRange{
 			Start: sdkmath.NewUint(1),
 			End:  sdkmath.NewUint(10),
 		},
 		ToMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 		},
 		FromMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 		},
 		InitiatedByMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 		},
 	})
 	expected :=  []*types.UniversalPermissionDetails{
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(4),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:  sdkmath.NewUint(10),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(6),
 				End:   sdkmath.NewUint(10),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:  sdkmath.NewUint(10),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(4),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:  sdkmath.NewUint(10),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(6),
 				End:   sdkmath.NewUint(10),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:  sdkmath.NewUint(10),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:  sdkmath.NewUint(4),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(6),
 				End:  sdkmath.NewUint(10),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:  sdkmath.NewUint(5),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:  sdkmath.NewUint(5),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 		{
-			TimelineTime: &types.IdRange{
+			TimelineTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.IdRange{
+			BadgeId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			TransferTime: &types.IdRange{
+			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:  sdkmath.NewUint(5),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{bob, charlie},
-				IncludeOnlySpecified: true,
+				OnlySpecifiedAddresses: true,
 			},
 		},
 	}
@@ -586,9 +586,9 @@ func TestRemoveAddresses(t *testing.T) {
 			require.Contains(t, x.InitiatedByMapping.Addresses, addr)
 		}
 
-		require.Equal(t, r.ToMapping.IncludeOnlySpecified, x.ToMapping.IncludeOnlySpecified)
-		require.Equal(t, r.FromMapping.IncludeOnlySpecified, x.FromMapping.IncludeOnlySpecified)
-		require.Equal(t, r.InitiatedByMapping.IncludeOnlySpecified, x.InitiatedByMapping.IncludeOnlySpecified)
+		require.Equal(t, r.ToMapping.OnlySpecifiedAddresses, x.ToMapping.OnlySpecifiedAddresses)
+		require.Equal(t, r.FromMapping.OnlySpecifiedAddresses, x.FromMapping.OnlySpecifiedAddresses)
+		require.Equal(t, r.InitiatedByMapping.OnlySpecifiedAddresses, x.InitiatedByMapping.OnlySpecifiedAddresses)
 	}
 
 	require.Equal(t, expected, remaining)

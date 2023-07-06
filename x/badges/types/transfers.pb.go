@@ -107,7 +107,7 @@ func (m *UserBalanceStore) GetPermissions() *UserPermissions {
 
 type UserApprovedOutgoingTransferTimeline struct {
 	ApprovedOutgoingTransfers []*UserApprovedOutgoingTransfer `protobuf:"bytes,1,rep,name=approvedOutgoingTransfers,proto3" json:"approvedOutgoingTransfers,omitempty"`
-	TimelineTimes             []*IdRange                      `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes             []*UintRange                      `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *UserApprovedOutgoingTransferTimeline) Reset()         { *m = UserApprovedOutgoingTransferTimeline{} }
@@ -150,7 +150,7 @@ func (m *UserApprovedOutgoingTransferTimeline) GetApprovedOutgoingTransfers() []
 	return nil
 }
 
-func (m *UserApprovedOutgoingTransferTimeline) GetTimelineTimes() []*IdRange {
+func (m *UserApprovedOutgoingTransferTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -159,7 +159,7 @@ func (m *UserApprovedOutgoingTransferTimeline) GetTimelineTimes() []*IdRange {
 
 type UserApprovedIncomingTransferTimeline struct {
 	ApprovedIncomingTransfers []*UserApprovedIncomingTransfer `protobuf:"bytes,1,rep,name=approvedIncomingTransfers,proto3" json:"approvedIncomingTransfers,omitempty"`
-	TimelineTimes             []*IdRange                      `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes             []*UintRange                      `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *UserApprovedIncomingTransferTimeline) Reset()         { *m = UserApprovedIncomingTransferTimeline{} }
@@ -202,7 +202,7 @@ func (m *UserApprovedIncomingTransferTimeline) GetApprovedIncomingTransfers() []
 	return nil
 }
 
-func (m *UserApprovedIncomingTransferTimeline) GetTimelineTimes() []*IdRange {
+func (m *UserApprovedIncomingTransferTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -521,8 +521,8 @@ func (m *IsUserIncomingTransferAllowed) GetIsAllowed() bool {
 type UserApprovedOutgoingTransfer struct {
 	ToMappingId                      string                           `protobuf:"bytes,1,opt,name=toMappingId,proto3" json:"toMappingId,omitempty"`
 	InitiatedByMappingId             string                           `protobuf:"bytes,2,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
-	TransferTimes                    []*IdRange                       `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	BadgeIds                         []*IdRange                       `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TransferTimes                    []*UintRange                       `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
+	BadgeIds                         []*UintRange                       `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 	AllowedCombinations              []*IsUserOutgoingTransferAllowed `protobuf:"bytes,5,rep,name=allowedCombinations,proto3" json:"allowedCombinations,omitempty"`
 	Challenges                       []*Challenge                     `protobuf:"bytes,6,rep,name=challenges,proto3" json:"challenges,omitempty"`
 	TrackerId                        string                           `protobuf:"bytes,7,opt,name=trackerId,proto3" json:"trackerId,omitempty"`
@@ -582,14 +582,14 @@ func (m *UserApprovedOutgoingTransfer) GetInitiatedByMappingId() string {
 	return ""
 }
 
-func (m *UserApprovedOutgoingTransfer) GetTransferTimes() []*IdRange {
+func (m *UserApprovedOutgoingTransfer) GetTransferTimes() []*UintRange {
 	if m != nil {
 		return m.TransferTimes
 	}
 	return nil
 }
 
-func (m *UserApprovedOutgoingTransfer) GetBadgeIds() []*IdRange {
+func (m *UserApprovedOutgoingTransfer) GetBadgeIds() []*UintRange {
 	if m != nil {
 		return m.BadgeIds
 	}
@@ -657,8 +657,8 @@ func (m *UserApprovedOutgoingTransfer) GetRequireToDoesNotEqualInitiatedBy() boo
 type UserApprovedIncomingTransfer struct {
 	FromMappingId                      string                           `protobuf:"bytes,1,opt,name=fromMappingId,proto3" json:"fromMappingId,omitempty"`
 	InitiatedByMappingId               string                           `protobuf:"bytes,2,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
-	TransferTimes                      []*IdRange                       `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	BadgeIds                           []*IdRange                       `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TransferTimes                      []*UintRange                       `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
+	BadgeIds                           []*UintRange                       `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 	AllowedCombinations                []*IsUserIncomingTransferAllowed `protobuf:"bytes,5,rep,name=allowedCombinations,proto3" json:"allowedCombinations,omitempty"`
 	Challenges                         []*Challenge                     `protobuf:"bytes,6,rep,name=challenges,proto3" json:"challenges,omitempty"`
 	TrackerId                          string                           `protobuf:"bytes,7,opt,name=trackerId,proto3" json:"trackerId,omitempty"`
@@ -718,14 +718,14 @@ func (m *UserApprovedIncomingTransfer) GetInitiatedByMappingId() string {
 	return ""
 }
 
-func (m *UserApprovedIncomingTransfer) GetTransferTimes() []*IdRange {
+func (m *UserApprovedIncomingTransfer) GetTransferTimes() []*UintRange {
 	if m != nil {
 		return m.TransferTimes
 	}
 	return nil
 }
 
-func (m *UserApprovedIncomingTransfer) GetBadgeIds() []*IdRange {
+func (m *UserApprovedIncomingTransfer) GetBadgeIds() []*UintRange {
 	if m != nil {
 		return m.BadgeIds
 	}
@@ -876,8 +876,8 @@ type CollectionApprovedTransfer struct {
 	FromMappingId                          string                         `protobuf:"bytes,1,opt,name=fromMappingId,proto3" json:"fromMappingId,omitempty"`
 	ToMappingId                            string                         `protobuf:"bytes,2,opt,name=toMappingId,proto3" json:"toMappingId,omitempty"`
 	InitiatedByMappingId                   string                         `protobuf:"bytes,3,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
-	TransferTimes                          []*IdRange                     `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	BadgeIds                               []*IdRange                     `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TransferTimes                          []*UintRange                     `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
+	BadgeIds                               []*UintRange                     `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 	AllowedCombinations                    []*IsCollectionTransferAllowed `protobuf:"bytes,6,rep,name=allowedCombinations,proto3" json:"allowedCombinations,omitempty"`
 	Challenges                             []*Challenge                   `protobuf:"bytes,7,rep,name=challenges,proto3" json:"challenges,omitempty"`
 	TrackerId                              string                         `protobuf:"bytes,8,opt,name=trackerId,proto3" json:"trackerId,omitempty"`
@@ -949,14 +949,14 @@ func (m *CollectionApprovedTransfer) GetInitiatedByMappingId() string {
 	return ""
 }
 
-func (m *CollectionApprovedTransfer) GetTransferTimes() []*IdRange {
+func (m *CollectionApprovedTransfer) GetTransferTimes() []*UintRange {
 	if m != nil {
 		return m.TransferTimes
 	}
 	return nil
 }
 
-func (m *CollectionApprovedTransfer) GetBadgeIds() []*IdRange {
+func (m *CollectionApprovedTransfer) GetBadgeIds() []*UintRange {
 	if m != nil {
 		return m.BadgeIds
 	}
@@ -3093,7 +3093,7 @@ func (m *UserApprovedOutgoingTransferTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -3211,7 +3211,7 @@ func (m *UserApprovedIncomingTransferTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -4025,7 +4025,7 @@ func (m *UserApprovedOutgoingTransfer) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TransferTimes = append(m.TransferTimes, &IdRange{})
+			m.TransferTimes = append(m.TransferTimes, &UintRange{})
 			if err := m.TransferTimes[len(m.TransferTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -4059,7 +4059,7 @@ func (m *UserApprovedOutgoingTransfer) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &IdRange{})
+			m.BadgeIds = append(m.BadgeIds, &UintRange{})
 			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -4515,7 +4515,7 @@ func (m *UserApprovedIncomingTransfer) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TransferTimes = append(m.TransferTimes, &IdRange{})
+			m.TransferTimes = append(m.TransferTimes, &UintRange{})
 			if err := m.TransferTimes[len(m.TransferTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -4549,7 +4549,7 @@ func (m *UserApprovedIncomingTransfer) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &IdRange{})
+			m.BadgeIds = append(m.BadgeIds, &UintRange{})
 			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -5207,7 +5207,7 @@ func (m *CollectionApprovedTransfer) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TransferTimes = append(m.TransferTimes, &IdRange{})
+			m.TransferTimes = append(m.TransferTimes, &UintRange{})
 			if err := m.TransferTimes[len(m.TransferTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -5241,7 +5241,7 @@ func (m *CollectionApprovedTransfer) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &IdRange{})
+			m.BadgeIds = append(m.BadgeIds, &UintRange{})
 			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}

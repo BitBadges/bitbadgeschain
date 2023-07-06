@@ -19,7 +19,7 @@ var (
 	ErrStartGreaterThanEnd                         = sdkerrors.Register(ModuleName, 1507, "start greater than end")
 	ErrRangesIsNil                                 = sdkerrors.Register(ModuleName, 1508, "ranges is nil")
 	ErrElementCantEqualThis                        = sdkerrors.Register(ModuleName, 1509, "element cant equal this")
-	ErrInvalidIdRangeSpecified                     = sdkerrors.Register(ModuleName, 1510, "invalid id range specified")
+	ErrInvalidUintRangeSpecified                     = sdkerrors.Register(ModuleName, 1510, "invalid id range specified")
 	ErrInvalidTypedData                            = sdkerrors.Register(ModuleName, 1511, "invalid typed data")
 	ErrNotImplemented                              = sdkerrors.Register(ModuleName, 1512, "not implemented")
 	ErrRangesOverlap                               = sdkerrors.Register(ModuleName, 1513, "id ranges overlap. for example, { Start: sdkmath.NewUint(1), end: 5 } and { Start: sdkmath.NewUint(4), End: sdkmath.NewUint(10) } overlap")

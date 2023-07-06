@@ -83,7 +83,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 //Step 1: Check if transfer is allowed on collection level (deducting approvals if needed)
 //Step 2: If not overriden by collection, check necessary approvals on user level (deducting approvals if needed)
 //Step 3: If all good, we can transfer the balances
-func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.IdRange, times []*types.IdRange, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, amount sdkmath.Uint, from string, to string, initiatedBy string, solutions []*types.ChallengeSolution) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
+func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, amount sdkmath.Uint, from string, to string, initiatedBy string, solutions []*types.ChallengeSolution) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
 	err := *new(error)
 
 	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection, badgeIds, times,  from, to, initiatedBy, amount, solutions)

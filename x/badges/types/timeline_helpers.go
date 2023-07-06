@@ -9,7 +9,7 @@ func GetCurrentUserApprovedIncomingTransfers(ctx sdk.Context, userBalance *UserB
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	approvedTransfersTimeline := userBalance.ApprovedIncomingTransfersTimeline
 	for _, approvedTransfersTimelineVal := range approvedTransfersTimeline {
-		found := SearchIdRangesForId(blockTime, approvedTransfersTimelineVal.TimelineTimes)
+		found := SearchUintRangesForId(blockTime, approvedTransfersTimelineVal.TimelineTimes)
 		if found {
 			return approvedTransfersTimelineVal.ApprovedIncomingTransfers
 		}
@@ -22,7 +22,7 @@ func GetCurrentUserApprovedOutgoingTransfers(ctx sdk.Context, userBalance *UserB
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	approvedTransfersTimeline := userBalance.ApprovedOutgoingTransfersTimeline
 	for _, approvedTransfersTimelineVal := range approvedTransfersTimeline {
-		found := SearchIdRangesForId(blockTime, approvedTransfersTimelineVal.TimelineTimes)
+		found := SearchUintRangesForId(blockTime, approvedTransfersTimelineVal.TimelineTimes)
 		if found {
 			return approvedTransfersTimelineVal.ApprovedOutgoingTransfers
 		}
@@ -35,7 +35,7 @@ func GetCurrentManager(ctx sdk.Context, collection *BadgeCollection) string {
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	managerTimeline := collection.ManagerTimeline
 	for _, managerTimelineVal := range managerTimeline {
-		found := SearchIdRangesForId(blockTime, managerTimelineVal.TimelineTimes)
+		found := SearchUintRangesForId(blockTime, managerTimelineVal.TimelineTimes)
 		if found {
 			return managerTimelineVal.Manager
 		}
@@ -48,7 +48,7 @@ func GetCurrentInheritedBalances(ctx sdk.Context, collection *BadgeCollection) [
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	inheritedBalancesTimeline := collection.InheritedBalancesTimeline
 	for _, inheritedBalancesTimelineVal := range inheritedBalancesTimeline {
-		found := SearchIdRangesForId(blockTime, inheritedBalancesTimelineVal.TimelineTimes)
+		found := SearchUintRangesForId(blockTime, inheritedBalancesTimelineVal.TimelineTimes)
 		if found {
 			return inheritedBalancesTimelineVal.InheritedBalances
 		}
@@ -61,7 +61,7 @@ func GetIsArchived(ctx sdk.Context, collection *BadgeCollection) bool {
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	isArchivedTimeline := collection.IsArchivedTimeline
 	for _, isArchivedTimelineVal := range isArchivedTimeline {
-		found := SearchIdRangesForId(blockTime, isArchivedTimelineVal.TimelineTimes)
+		found := SearchUintRangesForId(blockTime, isArchivedTimelineVal.TimelineTimes)
 		if found {
 			return isArchivedTimelineVal.IsArchived
 		}
@@ -74,7 +74,7 @@ func GetCurrentCollectionApprovedTransfers(ctx sdk.Context, collection *BadgeCol
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	approvedTransfersTimeline := collection.CollectionApprovedTransfersTimeline
 	for _, approvedTransfersTimelineVal := range approvedTransfersTimeline {
-		found := SearchIdRangesForId(blockTime, approvedTransfersTimelineVal.TimelineTimes)
+		found := SearchUintRangesForId(blockTime, approvedTransfersTimelineVal.TimelineTimes)
 		if found {
 			return approvedTransfersTimelineVal.ApprovedTransfers
 		}
@@ -84,8 +84,8 @@ func GetCurrentCollectionApprovedTransfers(ctx sdk.Context, collection *BadgeCol
 }
 
 
-func GetIsArchivedTimesAndValues(isArchivedTimeline []*IsArchivedTimeline) ([][]*IdRange, []interface{}) {
-	times := [][]*IdRange{}
+func GetIsArchivedTimesAndValues(isArchivedTimeline []*IsArchivedTimeline) ([][]*UintRange, []interface{}) {
+	times := [][]*UintRange{}
 	values := []interface{}{}
 	for _, timelineVal := range isArchivedTimeline {
 		times = append(times, timelineVal.TimelineTimes)
@@ -94,8 +94,8 @@ func GetIsArchivedTimesAndValues(isArchivedTimeline []*IsArchivedTimeline) ([][]
 	return times, values
 }
 
-func GetCollectionApprovedTransferTimesAndValues(approvedTransfers []*CollectionApprovedTransferTimeline) ([][]*IdRange, []interface{}) {
-	times := [][]*IdRange{}
+func GetCollectionApprovedTransferTimesAndValues(approvedTransfers []*CollectionApprovedTransferTimeline) ([][]*UintRange, []interface{}) {
+	times := [][]*UintRange{}
 	values := []interface{}{}
 	for _, timelineVal := range approvedTransfers {
 		times = append(times, timelineVal.TimelineTimes)
@@ -104,8 +104,8 @@ func GetCollectionApprovedTransferTimesAndValues(approvedTransfers []*Collection
 	return times, values
 }
 
-func GetUserApprovedOutgoingTransferTimesAndValues(approvedTransfers []*UserApprovedOutgoingTransferTimeline) ([][]*IdRange, []interface{}) {
-	times := [][]*IdRange{}
+func GetUserApprovedOutgoingTransferTimesAndValues(approvedTransfers []*UserApprovedOutgoingTransferTimeline) ([][]*UintRange, []interface{}) {
+	times := [][]*UintRange{}
 	values := []interface{}{}
 	for _, timelineVal := range approvedTransfers {
 		times = append(times, timelineVal.TimelineTimes)
@@ -114,8 +114,8 @@ func GetUserApprovedOutgoingTransferTimesAndValues(approvedTransfers []*UserAppr
 	return times, values
 }
 
-func GetUserApprovedIncomingTransferTimesAndValues(approvedTransfers []*UserApprovedIncomingTransferTimeline) ([][]*IdRange, []interface{}) {
-	times := [][]*IdRange{}
+func GetUserApprovedIncomingTransferTimesAndValues(approvedTransfers []*UserApprovedIncomingTransferTimeline) ([][]*UintRange, []interface{}) {
+	times := [][]*UintRange{}
 	values := []interface{}{}
 	for _, timelineVal := range approvedTransfers {
 		times = append(times, timelineVal.TimelineTimes)
@@ -125,8 +125,8 @@ func GetUserApprovedIncomingTransferTimesAndValues(approvedTransfers []*UserAppr
 }
 
 
-func GetInheritedBalancesTimesAndValues(inheritedBalances []*InheritedBalancesTimeline) ([][]*IdRange, []interface{}) {
-	times := [][]*IdRange{}
+func GetInheritedBalancesTimesAndValues(inheritedBalances []*InheritedBalancesTimeline) ([][]*UintRange, []interface{}) {
+	times := [][]*UintRange{}
 	values := []interface{}{}
 	for _, timelineVal := range inheritedBalances {
 		times = append(times, timelineVal.TimelineTimes)
@@ -136,8 +136,8 @@ func GetInheritedBalancesTimesAndValues(inheritedBalances []*InheritedBalancesTi
 	return times, values
 }
 
-func GetOffChainBalancesMetadataTimesAndValues(inheritedBalancesMetadata []*OffChainBalancesMetadataTimeline) ([][]*IdRange, []interface{}) {
-	times := [][]*IdRange{}
+func GetOffChainBalancesMetadataTimesAndValues(inheritedBalancesMetadata []*OffChainBalancesMetadataTimeline) ([][]*UintRange, []interface{}) {
+	times := [][]*UintRange{}
 	values := []interface{}{}
 	for _, timelineVal := range inheritedBalancesMetadata {
 		times = append(times, timelineVal.TimelineTimes)
@@ -146,8 +146,8 @@ func GetOffChainBalancesMetadataTimesAndValues(inheritedBalancesMetadata []*OffC
 	return times, values
 }
 
-func GetCollectionMetadataTimesAndValues(timeline []*CollectionMetadataTimeline) ([][]*IdRange, []interface{}) {
-	times := [][]*IdRange{}
+func GetCollectionMetadataTimesAndValues(timeline []*CollectionMetadataTimeline) ([][]*UintRange, []interface{}) {
+	times := [][]*UintRange{}
 	values := []interface{}{}
 	for _, timelineVal := range timeline {
 		times = append(times, timelineVal.TimelineTimes)
@@ -156,8 +156,8 @@ func GetCollectionMetadataTimesAndValues(timeline []*CollectionMetadataTimeline)
 	return times, values
 }
 
-func GetBadgeMetadataTimesAndValues(timeline []*BadgeMetadataTimeline) ([][]*IdRange, []interface{}) {
-	times := [][]*IdRange{}
+func GetBadgeMetadataTimesAndValues(timeline []*BadgeMetadataTimeline) ([][]*UintRange, []interface{}) {
+	times := [][]*UintRange{}
 	values := []interface{}{}
 	for _, timelineVal := range timeline {
 		times = append(times, timelineVal.TimelineTimes)
@@ -166,8 +166,8 @@ func GetBadgeMetadataTimesAndValues(timeline []*BadgeMetadataTimeline) ([][]*IdR
 	return times, values
 }
 
-func GetManagerTimesAndValues(managerTimeline []*ManagerTimeline) ([][]*IdRange, []interface{}) {
-	times := [][]*IdRange{}
+func GetManagerTimesAndValues(managerTimeline []*ManagerTimeline) ([][]*UintRange, []interface{}) {
+	times := [][]*UintRange{}
 	values := []interface{}{}
 	for _, timelineVal := range managerTimeline {
 		times = append(times, timelineVal.TimelineTimes)
@@ -176,8 +176,8 @@ func GetManagerTimesAndValues(managerTimeline []*ManagerTimeline) ([][]*IdRange,
 	return times, values
 }
 
-func GetContractAddressTimesAndValues(contractAddressTimeline []*ContractAddressTimeline) ([][]*IdRange, []interface{}) {
-	times := [][]*IdRange{}
+func GetContractAddressTimesAndValues(contractAddressTimeline []*ContractAddressTimeline) ([][]*UintRange, []interface{}) {
+	times := [][]*UintRange{}
 	values := []interface{}{}
 	for _, timelineVal := range contractAddressTimeline {
 		times = append(times, timelineVal.TimelineTimes)
@@ -186,8 +186,8 @@ func GetContractAddressTimesAndValues(contractAddressTimeline []*ContractAddress
 	return times, values
 }
 
-func GetCustomDataTimesAndValues(customDataTimeline []*CustomDataTimeline) ([][]*IdRange, []interface{}) {
-	times := [][]*IdRange{}
+func GetCustomDataTimesAndValues(customDataTimeline []*CustomDataTimeline) ([][]*UintRange, []interface{}) {
+	times := [][]*UintRange{}
 	values := []interface{}{}
 	for _, timelineVal := range customDataTimeline {
 		times = append(times, timelineVal.TimelineTimes)
@@ -196,8 +196,8 @@ func GetCustomDataTimesAndValues(customDataTimeline []*CustomDataTimeline) ([][]
 	return times, values
 }
 
-func GetStandardsTimesAndValues(standardsTimeline []*StandardsTimeline) ([][]*IdRange, []interface{}) {
-	times := [][]*IdRange{}
+func GetStandardsTimesAndValues(standardsTimeline []*StandardsTimeline) ([][]*UintRange, []interface{}) {
+	times := [][]*UintRange{}
 	values := []interface{}{}
 	for _, timelineVal := range standardsTimeline {
 		times = append(times, timelineVal.TimelineTimes)

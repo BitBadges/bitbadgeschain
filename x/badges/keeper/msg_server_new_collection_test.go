@@ -83,11 +83,11 @@ func (suite *TestSuite) TestNewCollectionDuplicateBadgeIds() {
 			Balances: []*types.Balance{
 				{
 					Amount: sdkmath.NewUint(1),
-					BadgeIds: []*types.IdRange{
-						GetOneIdRange()[0],
-						GetOneIdRange()[0],
+					BadgeIds: []*types.UintRange{
+						GetOneUintRange()[0],
+						GetOneUintRange()[0],
 					},
-					OwnershipTimes: GetFullIdRanges(),
+					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
 		},

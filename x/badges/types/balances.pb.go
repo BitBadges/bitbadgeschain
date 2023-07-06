@@ -23,27 +23,27 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// IDRange is a range of IDs from some start to some end (inclusive).
+// uintRange is a range of IDs from some start to some end (inclusive).
 //
-// IDRanges are one of the core types used in the BitBadgesChain module.
+// uintRanges are one of the core types used in the BitBadgesChain module.
 // They are used for evrything from badge IDs to time ranges to min / max balance amounts.
-type IdRange struct {
+type UintRange struct {
 	Start Uint `protobuf:"bytes,1,opt,name=start,proto3,customtype=Uint" json:"start"`
 	End   Uint `protobuf:"bytes,2,opt,name=end,proto3,customtype=Uint" json:"end"`
 }
 
-func (m *IdRange) Reset()         { *m = IdRange{} }
-func (m *IdRange) String() string { return proto.CompactTextString(m) }
-func (*IdRange) ProtoMessage()    {}
-func (*IdRange) Descriptor() ([]byte, []int) {
+func (m *UintRange) Reset()         { *m = UintRange{} }
+func (m *UintRange) String() string { return proto.CompactTextString(m) }
+func (*UintRange) ProtoMessage()    {}
+func (*UintRange) Descriptor() ([]byte, []int) {
 	return fileDescriptor_233d29a167e739f0, []int{0}
 }
-func (m *IdRange) XXX_Unmarshal(b []byte) error {
+func (m *UintRange) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *IdRange) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UintRange) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_IdRange.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UintRange.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -53,17 +53,17 @@ func (m *IdRange) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *IdRange) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_IdRange.Merge(m, src)
+func (m *UintRange) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UintRange.Merge(m, src)
 }
-func (m *IdRange) XXX_Size() int {
+func (m *UintRange) XXX_Size() int {
 	return m.Size()
 }
-func (m *IdRange) XXX_DiscardUnknown() {
-	xxx_messageInfo_IdRange.DiscardUnknown(m)
+func (m *UintRange) XXX_DiscardUnknown() {
+	xxx_messageInfo_UintRange.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_IdRange proto.InternalMessageInfo
+var xxx_messageInfo_UintRange proto.InternalMessageInfo
 
 // Balance represents the balance of a badge for a specific user.
 // The user amounts xAmount of a badge for the badgeID specified for the time ranges specified.
@@ -73,8 +73,8 @@ var xxx_messageInfo_IdRange proto.InternalMessageInfo
 // If times or badgeIDs have len > 1, then the user owns all badge IDs specified for all time ranges specified.
 type Balance struct {
 	Amount         Uint       `protobuf:"bytes,1,opt,name=amount,proto3,customtype=Uint" json:"amount"`
-	OwnershipTimes []*IdRange `protobuf:"bytes,2,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
-	BadgeIds       []*IdRange `protobuf:"bytes,3,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	OwnershipTimes []*UintRange `protobuf:"bytes,2,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
+	BadgeIds       []*UintRange `protobuf:"bytes,3,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 }
 
 func (m *Balance) Reset()         { *m = Balance{} }
@@ -110,14 +110,14 @@ func (m *Balance) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Balance proto.InternalMessageInfo
 
-func (m *Balance) GetOwnershipTimes() []*IdRange {
+func (m *Balance) GetOwnershipTimes() []*UintRange {
 	if m != nil {
 		return m.OwnershipTimes
 	}
 	return nil
 }
 
-func (m *Balance) GetBadgeIds() []*IdRange {
+func (m *Balance) GetBadgeIds() []*UintRange {
 	if m != nil {
 		return m.BadgeIds
 	}
@@ -131,11 +131,11 @@ func (m *Balance) GetBadgeIds() []*IdRange {
 // The badgeIds specified will inherit the balances from the parent collection and badges specified.
 // If the total number of parent badges == 1, then all the badgeIds will inherit the balance from that parent badge.
 // Otherwise, the total number of parent badges must equal the total number of badgeIds specified.
-// By total number, we mean the sum of the number of badgeIds in each IdRange.
+// By total number, we mean the sum of the number of badgeIds in each UintRange.
 type InheritedBalance struct {
-	BadgeIds           []*IdRange `protobuf:"bytes,1,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	BadgeIds           []*UintRange `protobuf:"bytes,1,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 	ParentCollectionId Uint       `protobuf:"bytes,2,opt,name=parentCollectionId,proto3,customtype=Uint" json:"parentCollectionId"`
-	ParentBadgeIds     []*IdRange `protobuf:"bytes,3,rep,name=parentBadgeIds,proto3" json:"parentBadgeIds,omitempty"`
+	ParentBadgeIds     []*UintRange `protobuf:"bytes,3,rep,name=parentBadgeIds,proto3" json:"parentBadgeIds,omitempty"`
 }
 
 func (m *InheritedBalance) Reset()         { *m = InheritedBalance{} }
@@ -171,14 +171,14 @@ func (m *InheritedBalance) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_InheritedBalance proto.InternalMessageInfo
 
-func (m *InheritedBalance) GetBadgeIds() []*IdRange {
+func (m *InheritedBalance) GetBadgeIds() []*UintRange {
 	if m != nil {
 		return m.BadgeIds
 	}
 	return nil
 }
 
-func (m *InheritedBalance) GetParentBadgeIds() []*IdRange {
+func (m *InheritedBalance) GetParentBadgeIds() []*UintRange {
 	if m != nil {
 		return m.ParentBadgeIds
 	}
@@ -186,7 +186,7 @@ func (m *InheritedBalance) GetParentBadgeIds() []*IdRange {
 }
 
 func init() {
-	proto.RegisterType((*IdRange)(nil), "bitbadges.bitbadgeschain.badges.IdRange")
+	proto.RegisterType((*UintRange)(nil), "bitbadges.bitbadgeschain.badges.UintRange")
 	proto.RegisterType((*Balance)(nil), "bitbadges.bitbadgeschain.badges.Balance")
 	proto.RegisterType((*InheritedBalance)(nil), "bitbadges.bitbadgeschain.badges.InheritedBalance")
 }
@@ -218,7 +218,7 @@ var fileDescriptor_233d29a167e739f0 = []byte{
 	0x01, 0x00, 0x00, 0xff, 0xff, 0x67, 0xf0, 0xca, 0x22, 0xbd, 0x02, 0x00, 0x00,
 }
 
-func (m *IdRange) Marshal() (dAtA []byte, err error) {
+func (m *UintRange) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -228,12 +228,12 @@ func (m *IdRange) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *IdRange) MarshalTo(dAtA []byte) (int, error) {
+func (m *UintRange) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *IdRange) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UintRange) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -394,7 +394,7 @@ func encodeVarintBalances(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *IdRange) Size() (n int) {
+func (m *UintRange) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -459,7 +459,7 @@ func sovBalances(x uint64) (n int) {
 func sozBalances(x uint64) (n int) {
 	return sovBalances(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *IdRange) Unmarshal(dAtA []byte) error {
+func (m *UintRange) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -482,10 +482,10 @@ func (m *IdRange) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: IdRange: wiretype end group for non-group")
+			return fmt.Errorf("proto: UintRange: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: IdRange: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UintRange: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -669,7 +669,7 @@ func (m *Balance) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.OwnershipTimes = append(m.OwnershipTimes, &IdRange{})
+			m.OwnershipTimes = append(m.OwnershipTimes, &UintRange{})
 			if err := m.OwnershipTimes[len(m.OwnershipTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -703,7 +703,7 @@ func (m *Balance) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &IdRange{})
+			m.BadgeIds = append(m.BadgeIds, &UintRange{})
 			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -787,7 +787,7 @@ func (m *InheritedBalance) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &IdRange{})
+			m.BadgeIds = append(m.BadgeIds, &UintRange{})
 			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -855,7 +855,7 @@ func (m *InheritedBalance) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ParentBadgeIds = append(m.ParentBadgeIds, &IdRange{})
+			m.ParentBadgeIds = append(m.ParentBadgeIds, &UintRange{})
 			if err := m.ParentBadgeIds[len(m.ParentBadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}

@@ -12,11 +12,11 @@ func AssertUintsEqual(suite *TestSuite, expected sdkmath.Uint, actual sdkmath.Ui
 	suite.Require().Equal(expected.Equal(actual), true, "Uints not equal %s %s", expected.String(), actual.String())
 }
 
-func AssertIdRangesEqual(suite *TestSuite, expected []*types.IdRange, actual []*types.IdRange) {
-	remainingOne, _ := types.RemoveIdRangeFromIdRange(actual, expected)
-	remainingTwo, _ := types.RemoveIdRangeFromIdRange(expected, actual)
-	suite.Require().Equal(len(remainingOne), 0, "IdRanges not equal %s %s", expected, actual)
-	suite.Require().Equal(len(remainingTwo), 0, "IdRanges not equal %s %s", expected, actual)
+func AssertUintRangesEqual(suite *TestSuite, expected []*types.UintRange, actual []*types.UintRange) {
+	remainingOne, _ := types.RemoveUintRangeFromUintRange(actual, expected)
+	remainingTwo, _ := types.RemoveUintRangeFromUintRange(expected, actual)
+	suite.Require().Equal(len(remainingOne), 0, "UintRanges not equal %s %s", expected, actual)
+	suite.Require().Equal(len(remainingTwo), 0, "UintRanges not equal %s %s", expected, actual)
 }
 
 func AssertBalancesEqual(suite *TestSuite, expected []*types.Balance, actual []*types.Balance) {
@@ -31,8 +31,8 @@ func AssertBalancesEqual(suite *TestSuite, expected []*types.Balance, actual []*
 	suite.Require().Equal(len(actual), 0, "Balances not equal %s %s", expected, actual)
 }
 
-func GetFullIdRanges() []*types.IdRange {
-	return []*types.IdRange{
+func GetFullUintRanges() []*types.UintRange {
+	return []*types.UintRange{
 		{
 			Start: sdkmath.NewUint(1),
 			End:  sdkmath.NewUint(math.MaxUint64),
@@ -40,8 +40,8 @@ func GetFullIdRanges() []*types.IdRange {
 	}
 }
 
-func GetBottomHalfIdRanges() []*types.IdRange {
-	return []*types.IdRange{
+func GetBottomHalfUintRanges() []*types.UintRange {
+	return []*types.UintRange{
 		{
 			Start: sdkmath.NewUint(1),
 			End:  sdkmath.NewUint(math.MaxUint32),
@@ -49,8 +49,8 @@ func GetBottomHalfIdRanges() []*types.IdRange {
 	}
 }
 
-func GetTopHalfIdRanges() []*types.IdRange {
-	return []*types.IdRange{
+func GetTopHalfUintRanges() []*types.UintRange {
+	return []*types.UintRange{
 		{
 			Start: sdkmath.NewUint(math.MaxUint32 + 1),
 			End:  sdkmath.NewUint(math.MaxUint64),
@@ -58,8 +58,8 @@ func GetTopHalfIdRanges() []*types.IdRange {
 	}
 }
 
-func GetOneIdRange() []*types.IdRange {
-	return []*types.IdRange{
+func GetOneUintRange() []*types.UintRange {
+	return []*types.UintRange{
 		{
 			Start: sdkmath.NewUint(1),
 			End:  sdkmath.NewUint(1),
@@ -67,8 +67,8 @@ func GetOneIdRange() []*types.IdRange {
 	}
 }
 
-func GetTwoIdRanges() []*types.IdRange {
-	return []*types.IdRange{
+func GetTwoUintRanges() []*types.UintRange {
+	return []*types.UintRange{
 		{
 			Start: sdkmath.NewUint(2),
 			End:  sdkmath.NewUint(2),
@@ -84,14 +84,14 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 				BalancesType: sdkmath.NewUint(0),
 				CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
 					{
-						TimelineTimes: GetFullIdRanges(),
+						TimelineTimes: GetFullUintRanges(),
 						ApprovedTransfers: []*types.CollectionApprovedTransfer{
 						{
 							ToMappingId: "All",
 							FromMappingId: "All",
 							InitiatedByMappingId: "All",
-							TransferTimes: GetFullIdRanges(),
-							BadgeIds: GetFullIdRanges(),
+							TransferTimes: GetFullUintRanges(),
+							BadgeIds: GetFullUintRanges(),
 							AllowedCombinations: []*types.IsCollectionTransferAllowed{
 								{
 									IsAllowed: true,
@@ -106,8 +106,8 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 									Amounts: []*types.Balance{
 										{
 											Amount: sdkmath.NewUint(1),
-											OwnershipTimes: GetFullIdRanges(),
-											BadgeIds: GetFullIdRanges(),
+											OwnershipTimes: GetFullUintRanges(),
+											BadgeIds: GetFullUintRanges(),
 										},
 									},
 									NumTransfers: sdkmath.NewUint(1000),
@@ -122,8 +122,8 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 							{
 								FromMappingId: "All",
 								InitiatedByMappingId: "All",
-								TransferTimes: GetFullIdRanges(),
-								BadgeIds: GetFullIdRanges(),
+								TransferTimes: GetFullUintRanges(),
+								BadgeIds: GetFullUintRanges(),
 								AllowedCombinations: []*types.IsUserIncomingTransferAllowed{
 									{
 										IsAllowed: true,
@@ -138,8 +138,8 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 										Amounts: []*types.Balance{
 											{
 												Amount: sdkmath.NewUint(1),
-												OwnershipTimes: GetFullIdRanges(),
-												BadgeIds: GetFullIdRanges(),
+												OwnershipTimes: GetFullUintRanges(),
+												BadgeIds: GetFullUintRanges(),
 											},
 										},
 										NumTransfers: sdkmath.NewUint(1000),
@@ -147,7 +147,7 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 								},
 							},
 						},
-						TimelineTimes: GetFullIdRanges(),
+						TimelineTimes: GetFullUintRanges(),
 					},
 				},
 				DefaultApprovedOutgoingTransfersTimeline: []*types.UserApprovedOutgoingTransferTimeline{
@@ -156,8 +156,8 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 							{
 								ToMappingId: "All",
 								InitiatedByMappingId: "All",
-								TransferTimes: GetFullIdRanges(),
-								BadgeIds: GetFullIdRanges(),
+								TransferTimes: GetFullUintRanges(),
+								BadgeIds: GetFullUintRanges(),
 								AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
 									{
 										IsAllowed: true,
@@ -172,8 +172,8 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 										Amounts: []*types.Balance{
 											{
 												Amount: sdkmath.NewUint(1),
-												OwnershipTimes: GetFullIdRanges(),
-												BadgeIds: GetFullIdRanges(),
+												OwnershipTimes: GetFullUintRanges(),
+												BadgeIds: GetFullUintRanges(),
 											},
 										},
 										NumTransfers: sdkmath.NewUint(1000),
@@ -181,14 +181,14 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 								},
 							},
 						},
-						TimelineTimes: GetFullIdRanges(),
+						TimelineTimes: GetFullUintRanges(),
 					},
 				},
 				BadgesToCreate: []*types.Balance{
 					{
 						Amount: sdkmath.NewUint(1),
-						BadgeIds: GetFullIdRanges(),
-						OwnershipTimes: GetFullIdRanges(),
+						BadgeIds: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				Permissions: &types.CollectionPermissions{
@@ -206,9 +206,9 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 					CanCreateMoreBadges: []*types.BalancesActionPermission{
 						{
 							DefaultValues: &types.BalancesActionDefaultValues{
-								BadgeIds: GetFullIdRanges(),
-								PermittedTimes: GetFullIdRanges(),
-								ForbiddenTimes: []*types.IdRange{},
+								BadgeIds: GetFullUintRanges(),
+								PermittedTimes: GetFullUintRanges(),
+								ForbiddenTimes: []*types.UintRange{},
 							},
 							Combinations: []*types.BalancesActionCombination{{
 
@@ -238,8 +238,8 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []Colle
 				InitiatedByMappingId: "All",
 				OverridesFromApprovedOutgoingTransfers: true,
 				OverridesToApprovedIncomingTransfers: true,
-				TransferTimes: GetFullIdRanges(),
-				BadgeIds: GetFullIdRanges(),
+				TransferTimes: GetFullUintRanges(),
+				BadgeIds: GetFullUintRanges(),
 				AllowedCombinations: []*types.IsCollectionTransferAllowed{
 					{
 						IsAllowed: true,
@@ -254,8 +254,8 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []Colle
 						Amounts: []*types.Balance{
 							{
 								Amount: sdkmath.NewUint(1000),
-								OwnershipTimes: GetFullIdRanges(),
-								BadgeIds: GetFullIdRanges(),
+								OwnershipTimes: GetFullUintRanges(),
+								BadgeIds: GetFullUintRanges(),
 							},
 						},
 						NumTransfers: sdkmath.NewUint(1000),
@@ -272,8 +272,8 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []Colle
 			Balances: []*types.Balance{
 				{
 					Amount: sdkmath.NewUint(1),
-					BadgeIds: GetFullIdRanges(),
-					OwnershipTimes: GetFullIdRanges(),
+					BadgeIds: GetFullUintRanges(),
+					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
 		},

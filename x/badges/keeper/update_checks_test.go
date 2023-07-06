@@ -21,8 +21,8 @@ func (suite *TestSuite) TestCheckTimedUpdatePermission() {
 			CanUpdateContractAddress: []*types.TimedUpdatePermission{
 				{
 					DefaultValues: &types.TimedUpdateDefaultValues{
-						PermittedTimes: GetFullIdRanges(),
-						TimelineTimes: GetFullIdRanges(),
+						PermittedTimes: GetFullUintRanges(),
+						TimelineTimes: GetFullUintRanges(),
 					},
 					Combinations: []*types.TimedUpdateCombination{
 						{
@@ -40,7 +40,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermission() {
 		CollectionId: sdkmath.NewUint(1),
 		ContractAddressTimeline: []*types.ContractAddressTimeline{
 			{
-				TimelineTimes: GetFullIdRanges(),
+				TimelineTimes: GetFullUintRanges(),
 				ContractAddress: "0x123",
 			},
 		},
@@ -70,7 +70,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionDefaultAllowed() {
 		CollectionId: sdkmath.NewUint(1),
 		ContractAddressTimeline: []*types.ContractAddressTimeline{
 			{
-				TimelineTimes: GetFullIdRanges(),
+				TimelineTimes: GetFullUintRanges(),
 				ContractAddress: "0x123",
 			},
 		},
@@ -93,8 +93,8 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 			CanUpdateContractAddress: []*types.TimedUpdatePermission{
 				{
 					DefaultValues: &types.TimedUpdateDefaultValues{
-						PermittedTimes: GetFullIdRanges(),
-						TimelineTimes: GetOneIdRange(),
+						PermittedTimes: GetFullUintRanges(),
+						TimelineTimes: GetOneUintRange(),
 					},
 					Combinations: []*types.TimedUpdateCombination{
 						{
@@ -104,8 +104,8 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 				},
 				{
 					DefaultValues: &types.TimedUpdateDefaultValues{
-						ForbiddenTimes: GetFullIdRanges(),
-						TimelineTimes: GetTwoIdRanges(),
+						ForbiddenTimes: GetFullUintRanges(),
+						TimelineTimes: GetTwoUintRanges(),
 					},
 					Combinations: []*types.TimedUpdateCombination{
 						{
@@ -123,7 +123,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 		CollectionId: sdkmath.NewUint(1),
 		ContractAddressTimeline: []*types.ContractAddressTimeline{
 			{
-				TimelineTimes: GetFullIdRanges(),
+				TimelineTimes: GetFullUintRanges(),
 				ContractAddress: "0x123",
 			},
 		},
@@ -135,7 +135,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 		CollectionId: sdkmath.NewUint(1),
 		ContractAddressTimeline: []*types.ContractAddressTimeline{
 			{
-				TimelineTimes: GetOneIdRange(),
+				TimelineTimes: GetOneUintRange(),
 				ContractAddress: "0x123",
 			},
 		},
@@ -158,9 +158,9 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermission() {
 			CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{
 				{
 					DefaultValues: &types.TimedUpdateWithBadgeIdsDefaultValues{
-						PermittedTimes: GetFullIdRanges(),
-						TimelineTimes: GetFullIdRanges(),
-						BadgeIds: GetFullIdRanges(),
+						PermittedTimes: GetFullUintRanges(),
+						TimelineTimes: GetFullUintRanges(),
+						BadgeIds: GetFullUintRanges(),
 					},
 					Combinations: []*types.TimedUpdateWithBadgeIdsCombination{
 						{
@@ -178,11 +178,11 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermission() {
 		CollectionId: sdkmath.NewUint(1),
 		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
 			{
-				TimelineTimes: GetFullIdRanges(),
+				TimelineTimes: GetFullUintRanges(),
 				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com",
-						BadgeIds: GetFullIdRanges(),
+						BadgeIds: GetFullUintRanges(),
 					},
 				},
 			},
@@ -213,11 +213,11 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionDefaultAllowed
 		CollectionId: sdkmath.NewUint(1),
 		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
 			{
-				TimelineTimes: GetFullIdRanges(),
+				TimelineTimes: GetFullUintRanges(),
 				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com",
-						BadgeIds: GetFullIdRanges(),
+						BadgeIds: GetFullUintRanges(),
 					},
 				},
 			},
@@ -241,9 +241,9 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionInvalidTimes()
 			CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{
 				{
 					DefaultValues: &types.TimedUpdateWithBadgeIdsDefaultValues{
-						PermittedTimes: GetFullIdRanges(),
-						TimelineTimes: GetOneIdRange(),
-						BadgeIds: GetFullIdRanges(),
+						PermittedTimes: GetFullUintRanges(),
+						TimelineTimes: GetOneUintRange(),
+						BadgeIds: GetFullUintRanges(),
 					},
 					Combinations: []*types.TimedUpdateWithBadgeIdsCombination{
 						{
@@ -253,9 +253,9 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionInvalidTimes()
 				},
 				{
 					DefaultValues: &types.TimedUpdateWithBadgeIdsDefaultValues{
-						ForbiddenTimes: GetFullIdRanges(),
-						TimelineTimes: GetTwoIdRanges(),
-						BadgeIds: GetFullIdRanges(),
+						ForbiddenTimes: GetFullUintRanges(),
+						TimelineTimes: GetTwoUintRanges(),
+						BadgeIds: GetFullUintRanges(),
 					},
 					Combinations: []*types.TimedUpdateWithBadgeIdsCombination{
 						{
@@ -273,11 +273,11 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionInvalidTimes()
 		CollectionId: sdkmath.NewUint(1),
 		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
 			{
-				TimelineTimes: GetFullIdRanges(),
+				TimelineTimes: GetFullUintRanges(),
 				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com",
-						BadgeIds: GetFullIdRanges(),
+						BadgeIds: GetFullUintRanges(),
 					},
 				},
 			},
@@ -290,11 +290,11 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionInvalidTimes()
 		CollectionId: sdkmath.NewUint(1),
 		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
 			{
-				TimelineTimes: GetOneIdRange(),
+				TimelineTimes: GetOneUintRange(),
 				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com",
-						BadgeIds: GetFullIdRanges(),
+						BadgeIds: GetFullUintRanges(),
 					},
 				},
 			},

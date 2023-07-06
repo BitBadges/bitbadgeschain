@@ -78,7 +78,7 @@ func GetUpdateCombinationsToCheck(
 }
 
 //Returns all combinations of timeline times and values
-func GetPotentialUpdatesForTimelineValues(times [][]*types.IdRange, values []interface{}) []*types.UniversalPermissionDetails {
+func GetPotentialUpdatesForTimelineValues(times [][]*types.UintRange, values []interface{}) []*types.UniversalPermissionDetails {
 	castedPermissions := []*types.UniversalPermission{}
 	for idx, time := range times {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
@@ -99,7 +99,7 @@ func GetPotentialUpdatesForTimelineValues(times [][]*types.IdRange, values []int
 func CheckNotForbidden(ctx sdk.Context, permission *types.UniversalPermissionDetails) error {
 	//Throw if we are in a forbidden time
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-	found := types.SearchIdRangesForId(blockTime, permission.ForbiddenTimes)
+	found := types.SearchUintRangesForId(blockTime, permission.ForbiddenTimes)
 	if found {
 		return ErrForbiddenTime
 	}
@@ -197,27 +197,27 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 	//Apply dummy ranges to all detailsToCheck
 	for _, detailToCheck := range detailsToCheck {
 		if detailToCheck.BadgeId == nil {
-			detailToCheck.BadgeId = &types.IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) } //dummy range
+			detailToCheck.BadgeId = &types.UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) } //dummy range
 		}
 
 		if detailToCheck.TimelineTime == nil {
-			detailToCheck.TimelineTime = &types.IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) } //dummy range
+			detailToCheck.TimelineTime = &types.UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) } //dummy range
 		}
 
 		if detailToCheck.TransferTime == nil {
-			detailToCheck.TransferTime = &types.IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) } //dummy range
+			detailToCheck.TransferTime = &types.UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) } //dummy range
 		}
 
 		if detailToCheck.ToMapping == nil {
-			detailToCheck.ToMapping = &types.AddressMapping{Addresses: []string{}, IncludeOnlySpecified: false}
+			detailToCheck.ToMapping = &types.AddressMapping{Addresses: []string{}, OnlySpecifiedAddresses: false}
 		}
 
 		if detailToCheck.FromMapping == nil {
-			detailToCheck.FromMapping = &types.AddressMapping{Addresses: []string{}, IncludeOnlySpecified: false}
+			detailToCheck.FromMapping = &types.AddressMapping{Addresses: []string{}, OnlySpecifiedAddresses: false}
 		}
 
 		if detailToCheck.InitiatedByMapping == nil {
-			detailToCheck.InitiatedByMapping = &types.AddressMapping{Addresses: []string{}, IncludeOnlySpecified: false}
+			detailToCheck.InitiatedByMapping = &types.AddressMapping{Addresses: []string{}, OnlySpecifiedAddresses: false}
 		}
 	}
 	

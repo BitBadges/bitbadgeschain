@@ -31,7 +31,7 @@ package simulation
 // 							simAccount.Address.String(),
 // 							simAccount.Address.String(),
 // 						},
-// 						IncludeOnlySpecified: sdkmath.NewUint(r.Uint64()).Mod(sdkmath.NewUint(2)).IsZero(),
+// 						OnlySpecifiedAddresses: sdkmath.NewUint(r.Uint64()).Mod(sdkmath.NewUint(2)).IsZero(),
 // 						ManagerOptions:       sdkmath.NewUint(r.Uint64()),
 // 					},
 // 				},

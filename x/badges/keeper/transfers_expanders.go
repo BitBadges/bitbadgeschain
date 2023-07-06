@@ -14,12 +14,12 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 		for _, allowedCombination := range approvedTransfer.AllowedCombinations {
 			badgeIds := approvedTransfer.BadgeIds
 			if allowedCombination.InvertBadgeIds {
-				badgeIds = types.InvertIdRanges(badgeIds, sdkmath.NewUint(math.MaxUint64))
+				badgeIds = types.InvertUintRanges(badgeIds, sdkmath.NewUint(math.MaxUint64))
 			}
 
 			times := approvedTransfer.TransferTimes
 			if allowedCombination.InvertTransferTimes {
-				times = types.InvertIdRanges(times, sdkmath.NewUint(math.MaxUint64))
+				times = types.InvertUintRanges(times, sdkmath.NewUint(math.MaxUint64))
 			}
 
 			toMappingId := approvedTransfer.ToMappingId
@@ -75,13 +75,13 @@ func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomin
 	currApprovedTransfers = append(currApprovedTransfers, &types.UserApprovedIncomingTransfer{
 		FromMappingId: "All", //everyone
 		InitiatedByMappingId: userAddress,
-		TransferTimes: []*types.IdRange{
+		TransferTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(0),
 				End: sdkmath.NewUint(uint64(math.MaxUint64)),
 			},
 		},
-		BadgeIds: []*types.IdRange{
+		BadgeIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End: sdkmath.NewUint(math.MaxUint64),
@@ -102,13 +102,13 @@ func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoin
 	currApprovedTransfers = append(currApprovedTransfers, &types.UserApprovedOutgoingTransfer{
 		ToMappingId: "All", //everyone
 		InitiatedByMappingId: userAddress,
-		TransferTimes: []*types.IdRange{
+		TransferTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(0),
 				End: sdkmath.NewUint(uint64(math.MaxUint64)),
 			},
 		},
-		BadgeIds: []*types.IdRange{
+		BadgeIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End: sdkmath.NewUint(math.MaxUint64),

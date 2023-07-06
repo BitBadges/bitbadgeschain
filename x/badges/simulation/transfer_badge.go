@@ -40,7 +40,7 @@ package simulation
 // 					Balances: []*types.Balance{
 // 						{
 // 							Amount: sdkmath.NewUint(r.Uint64()),
-// 							BadgeIds: []*types.IdRange{
+// 							BadgeIds: []*types.UintRange{
 // 								{
 // 									Start: sdkmath.NewUint(r.Uint64()),
 // 									End:   sdkmath.NewUint(r.Uint64()),

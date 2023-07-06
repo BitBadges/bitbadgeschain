@@ -16,8 +16,8 @@ func (suite *TestSuite) TestCreateBadges() {
 	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{
 		{
 			Amount: sdkmath.NewUint(1),
-			BadgeIds: GetOneIdRange(),
-			OwnershipTimes: GetFullIdRanges(),
+			BadgeIds: GetOneUintRange(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	}
 	collectionsToCreate[0].Collection.Transfers = []*types.Transfer{
@@ -27,8 +27,8 @@ func (suite *TestSuite) TestCreateBadges() {
 			Balances: []*types.Balance{
 				{
 					Amount: sdkmath.NewUint(1),
-					BadgeIds: GetOneIdRange(),
-					OwnershipTimes: GetFullIdRanges(),
+					BadgeIds: GetOneUintRange(),
+					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
 		},
@@ -48,15 +48,15 @@ func (suite *TestSuite) TestCreateBadges() {
 	AssertBalancesEqual(suite, collection.TotalSupplys, []*types.Balance{
 		{
 			Amount: sdkmath.NewUint(1),
-			BadgeIds: GetOneIdRange(),
-			OwnershipTimes: GetFullIdRanges(),
+			BadgeIds: GetOneUintRange(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	})
 
 	balance, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	AssertUintsEqual(suite, balance.Balances[0].Amount, sdkmath.NewUint(1))
-	AssertIdRangesEqual(suite, balance.Balances[0].BadgeIds, []*types.IdRange{
+	AssertUintRangesEqual(suite, balance.Balances[0].BadgeIds, []*types.UintRange{
 		{
 			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(1),
@@ -66,8 +66,8 @@ func (suite *TestSuite) TestCreateBadges() {
 	collection, err = suite.app.BadgesKeeper.CreateBadges(suite.ctx, collection, []*types.Balance{
 		{
 			Amount: sdkmath.NewUint(1),
-			BadgeIds: GetTwoIdRanges(),
-			OwnershipTimes: GetFullIdRanges(),
+			BadgeIds: GetTwoUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	}, []*types.Transfer{
 		{
@@ -76,8 +76,8 @@ func (suite *TestSuite) TestCreateBadges() {
 			Balances: []*types.Balance{
 				{
 					Amount: sdkmath.NewUint(1),
-					BadgeIds: GetTwoIdRanges(),
-					OwnershipTimes: GetFullIdRanges(),
+					BadgeIds: GetTwoUintRanges(),
+					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
 		},
@@ -88,22 +88,22 @@ func (suite *TestSuite) TestCreateBadges() {
 	suite.Require().Nil(err, "Error getting user balance: %s")
 
 	_, err = types.SubtractBalance(balance.Balances, &types.Balance{ 
-		BadgeIds: []*types.IdRange{
-			GetOneIdRange()[0],
-			GetTwoIdRanges()[0],
+		BadgeIds: []*types.UintRange{
+			GetOneUintRange()[0],
+			GetTwoUintRanges()[0],
 		}, 
-		OwnershipTimes: GetFullIdRanges(), 
+		OwnershipTimes: GetFullUintRanges(), 
 		Amount: sdkmath.NewUint(1),
 	})
 	suite.Require().Nil(err, "Error subtracting balances: %s")
 
 
 	_, err = types.SubtractBalance(collection.TotalSupplys, &types.Balance{ 
-		BadgeIds: []*types.IdRange{
-		GetOneIdRange()[0],
-		GetTwoIdRanges()[0],
+		BadgeIds: []*types.UintRange{
+		GetOneUintRange()[0],
+		GetTwoUintRanges()[0],
 		}, 
-		OwnershipTimes: GetFullIdRanges(), 
+		OwnershipTimes: GetFullUintRanges(), 
 		Amount: sdkmath.NewUint(1),
 	})
 	suite.Require().Nil(err, "Error subtracting balances: %s")
@@ -113,35 +113,35 @@ func (suite *TestSuite) TestCreateBadges() {
 	collection, err = suite.app.BadgesKeeper.CreateBadges(suite.ctx, collection, []*types.Balance{
 		{
 			Amount: sdkmath.NewUint(1),
-			BadgeIds: GetTwoIdRanges(),
-			OwnershipTimes: GetFullIdRanges(),
+			BadgeIds: GetTwoUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	}, []*types.Transfer{})
 	suite.Require().Nil(err, "Error creating badges: %s")
 
 	_, err = types.SubtractBalance(collection.TotalSupplys, &types.Balance{ 
-		BadgeIds: []*types.IdRange{
-			GetTwoIdRanges()[0],
+		BadgeIds: []*types.UintRange{
+			GetTwoUintRanges()[0],
 		}, 
-		OwnershipTimes: GetFullIdRanges(), 
+		OwnershipTimes: GetFullUintRanges(), 
 		Amount: sdkmath.NewUint(2),
 	})
 	suite.Require().Nil(err, "Error subtracting balances: %s")
 
 	_, err = types.SubtractBalance(collection.UnmintedSupplys, &types.Balance{ 
-		BadgeIds: []*types.IdRange{
-			GetTwoIdRanges()[0],
+		BadgeIds: []*types.UintRange{
+			GetTwoUintRanges()[0],
 		}, 
-		OwnershipTimes: GetFullIdRanges(), 
+		OwnershipTimes: GetFullUintRanges(), 
 		Amount: sdkmath.NewUint(2),
 	})
 	suite.Require().Error(err, "Error subtracting balances: %s")
 
 	_, err = types.SubtractBalance(collection.UnmintedSupplys, &types.Balance{ 
-		BadgeIds: []*types.IdRange{
-		GetTwoIdRanges()[0],
+		BadgeIds: []*types.UintRange{
+		GetTwoUintRanges()[0],
 		}, 
-		OwnershipTimes: GetFullIdRanges(), 
+		OwnershipTimes: GetFullUintRanges(), 
 		Amount: sdkmath.NewUint(1),
 	})
 	suite.Require().Nil(err, "Error subtracting balances: %s")
@@ -150,18 +150,18 @@ func (suite *TestSuite) TestCreateBadges() {
 	collection, err = suite.app.BadgesKeeper.CreateBadges(suite.ctx, collection, []*types.Balance{
 		{
 			Amount: types.NewUintFromString("1000000000000000000000000000000000000000000000000000000000000"),
-			BadgeIds: GetTopHalfIdRanges(),
-			OwnershipTimes: GetFullIdRanges(),
+			BadgeIds: GetTopHalfUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	}, []*types.Transfer{})
 	suite.Require().Nil(err, "Error creating badges: %s")
 	AssertUintsEqual(suite, collection.NextBadgeId, sdkmath.NewUint(uint64(math.MaxUint64)).Add(sdkmath.NewUint(1)))
 
 	_, err = types.SubtractBalance(collection.UnmintedSupplys, &types.Balance{ 
-		BadgeIds: []*types.IdRange{
-			GetTopHalfIdRanges()[0],
+		BadgeIds: []*types.UintRange{
+			GetTopHalfUintRanges()[0],
 		}, 
-		OwnershipTimes: GetFullIdRanges(), 
+		OwnershipTimes: GetFullUintRanges(), 
 		Amount: types.NewUintFromString("1000000000000000000000000000000000000000000000000000000000000"),
 	})
 	suite.Require().Nil(err, "Error subtracting balances: %s")
@@ -170,8 +170,8 @@ func (suite *TestSuite) TestCreateBadges() {
 	_, err = suite.app.BadgesKeeper.CreateBadges(suite.ctx, collection, []*types.Balance{
 		{
 			Amount: sdkmath.NewUint(1),
-			BadgeIds: GetTwoIdRanges(),
-			OwnershipTimes: GetFullIdRanges(),
+			BadgeIds: GetTwoUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	}, []*types.Transfer{
 		{
@@ -180,8 +180,8 @@ func (suite *TestSuite) TestCreateBadges() {
 			Balances: []*types.Balance{
 				{
 					Amount: sdkmath.NewUint(1),
-					BadgeIds: GetTwoIdRanges(),
-					OwnershipTimes: GetFullIdRanges(),
+					BadgeIds: GetTwoUintRanges(),
+					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
 		},

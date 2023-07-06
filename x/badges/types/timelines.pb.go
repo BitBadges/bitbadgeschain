@@ -26,7 +26,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type CollectionMetadataTimeline struct {
 	CollectionMetadata *CollectionMetadata `protobuf:"bytes,1,opt,name=collectionMetadata,proto3" json:"collectionMetadata,omitempty"`
-	TimelineTimes      []*IdRange          `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes      []*UintRange          `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *CollectionMetadataTimeline) Reset()         { *m = CollectionMetadataTimeline{} }
@@ -69,7 +69,7 @@ func (m *CollectionMetadataTimeline) GetCollectionMetadata() *CollectionMetadata
 	return nil
 }
 
-func (m *CollectionMetadataTimeline) GetTimelineTimes() []*IdRange {
+func (m *CollectionMetadataTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -78,7 +78,7 @@ func (m *CollectionMetadataTimeline) GetTimelineTimes() []*IdRange {
 
 type BadgeMetadataTimeline struct {
 	BadgeMetadata []*BadgeMetadata `protobuf:"bytes,1,rep,name=badgeMetadata,proto3" json:"badgeMetadata,omitempty"`
-	TimelineTimes []*IdRange       `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes []*UintRange       `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *BadgeMetadataTimeline) Reset()         { *m = BadgeMetadataTimeline{} }
@@ -121,7 +121,7 @@ func (m *BadgeMetadataTimeline) GetBadgeMetadata() []*BadgeMetadata {
 	return nil
 }
 
-func (m *BadgeMetadataTimeline) GetTimelineTimes() []*IdRange {
+func (m *BadgeMetadataTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -130,7 +130,7 @@ func (m *BadgeMetadataTimeline) GetTimelineTimes() []*IdRange {
 
 type OffChainBalancesMetadataTimeline struct {
 	OffChainBalancesMetadata *OffChainBalancesMetadata `protobuf:"bytes,1,opt,name=offChainBalancesMetadata,proto3" json:"offChainBalancesMetadata,omitempty"`
-	TimelineTimes            []*IdRange                `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes            []*UintRange                `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *OffChainBalancesMetadataTimeline) Reset()         { *m = OffChainBalancesMetadataTimeline{} }
@@ -173,7 +173,7 @@ func (m *OffChainBalancesMetadataTimeline) GetOffChainBalancesMetadata() *OffCha
 	return nil
 }
 
-func (m *OffChainBalancesMetadataTimeline) GetTimelineTimes() []*IdRange {
+func (m *OffChainBalancesMetadataTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -182,7 +182,7 @@ func (m *OffChainBalancesMetadataTimeline) GetTimelineTimes() []*IdRange {
 
 type InheritedBalancesTimeline struct {
 	InheritedBalances []*InheritedBalance `protobuf:"bytes,1,rep,name=inheritedBalances,proto3" json:"inheritedBalances,omitempty"`
-	TimelineTimes     []*IdRange          `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes     []*UintRange          `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *InheritedBalancesTimeline) Reset()         { *m = InheritedBalancesTimeline{} }
@@ -225,7 +225,7 @@ func (m *InheritedBalancesTimeline) GetInheritedBalances() []*InheritedBalance {
 	return nil
 }
 
-func (m *InheritedBalancesTimeline) GetTimelineTimes() []*IdRange {
+func (m *InheritedBalancesTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -234,7 +234,7 @@ func (m *InheritedBalancesTimeline) GetTimelineTimes() []*IdRange {
 
 type CustomDataTimeline struct {
 	CustomData    string     `protobuf:"bytes,1,opt,name=customData,proto3" json:"customData,omitempty"`
-	TimelineTimes []*IdRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *CustomDataTimeline) Reset()         { *m = CustomDataTimeline{} }
@@ -277,7 +277,7 @@ func (m *CustomDataTimeline) GetCustomData() string {
 	return ""
 }
 
-func (m *CustomDataTimeline) GetTimelineTimes() []*IdRange {
+func (m *CustomDataTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -286,7 +286,7 @@ func (m *CustomDataTimeline) GetTimelineTimes() []*IdRange {
 
 type ManagerTimeline struct {
 	Manager       string     `protobuf:"bytes,1,opt,name=manager,proto3" json:"manager,omitempty"`
-	TimelineTimes []*IdRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *ManagerTimeline) Reset()         { *m = ManagerTimeline{} }
@@ -329,7 +329,7 @@ func (m *ManagerTimeline) GetManager() string {
 	return ""
 }
 
-func (m *ManagerTimeline) GetTimelineTimes() []*IdRange {
+func (m *ManagerTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -338,7 +338,7 @@ func (m *ManagerTimeline) GetTimelineTimes() []*IdRange {
 
 type CollectionApprovedTransferTimeline struct {
 	ApprovedTransfers []*CollectionApprovedTransfer `protobuf:"bytes,1,rep,name=approvedTransfers,proto3" json:"approvedTransfers,omitempty"`
-	TimelineTimes     []*IdRange                    `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes     []*UintRange                    `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *CollectionApprovedTransferTimeline) Reset()         { *m = CollectionApprovedTransferTimeline{} }
@@ -381,7 +381,7 @@ func (m *CollectionApprovedTransferTimeline) GetApprovedTransfers() []*Collectio
 	return nil
 }
 
-func (m *CollectionApprovedTransferTimeline) GetTimelineTimes() []*IdRange {
+func (m *CollectionApprovedTransferTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -390,7 +390,7 @@ func (m *CollectionApprovedTransferTimeline) GetTimelineTimes() []*IdRange {
 
 type IsArchivedTimeline struct {
 	IsArchived    bool       `protobuf:"varint,1,opt,name=isArchived,proto3" json:"isArchived,omitempty"`
-	TimelineTimes []*IdRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *IsArchivedTimeline) Reset()         { *m = IsArchivedTimeline{} }
@@ -433,7 +433,7 @@ func (m *IsArchivedTimeline) GetIsArchived() bool {
 	return false
 }
 
-func (m *IsArchivedTimeline) GetTimelineTimes() []*IdRange {
+func (m *IsArchivedTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -442,7 +442,7 @@ func (m *IsArchivedTimeline) GetTimelineTimes() []*IdRange {
 
 type ContractAddressTimeline struct {
 	ContractAddress string     `protobuf:"bytes,1,opt,name=contractAddress,proto3" json:"contractAddress,omitempty"`
-	TimelineTimes   []*IdRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes   []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *ContractAddressTimeline) Reset()         { *m = ContractAddressTimeline{} }
@@ -485,7 +485,7 @@ func (m *ContractAddressTimeline) GetContractAddress() string {
 	return ""
 }
 
-func (m *ContractAddressTimeline) GetTimelineTimes() []*IdRange {
+func (m *ContractAddressTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -494,7 +494,7 @@ func (m *ContractAddressTimeline) GetTimelineTimes() []*IdRange {
 
 type StandardsTimeline struct {
 	Standards     []string   `protobuf:"bytes,1,rep,name=standards,proto3" json:"standards,omitempty"`
-	TimelineTimes []*IdRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *StandardsTimeline) Reset()         { *m = StandardsTimeline{} }
@@ -537,7 +537,7 @@ func (m *StandardsTimeline) GetStandards() []string {
 	return nil
 }
 
-func (m *StandardsTimeline) GetTimelineTimes() []*IdRange {
+func (m *StandardsTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -1381,7 +1381,7 @@ func (m *CollectionMetadataTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1499,7 +1499,7 @@ func (m *BadgeMetadataTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1619,7 +1619,7 @@ func (m *OffChainBalancesMetadataTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1737,7 +1737,7 @@ func (m *InheritedBalancesTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1853,7 +1853,7 @@ func (m *CustomDataTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1969,7 +1969,7 @@ func (m *ManagerTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2087,7 +2087,7 @@ func (m *CollectionApprovedTransferTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2191,7 +2191,7 @@ func (m *IsArchivedTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2307,7 +2307,7 @@ func (m *ContractAddressTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2423,7 +2423,7 @@ func (m *StandardsTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}

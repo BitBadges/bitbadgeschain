@@ -39,7 +39,7 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 						BadgeMetadata: []*types.BadgeMetadata{
 							{
 								Uri: "https://example.com/{id}",
-								BadgeIds: []*types.IdRange{
+								BadgeIds: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 
@@ -62,7 +62,7 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 						CollectionMetadata: &types.CollectionMetadata{
 							Uri: "https://example.com/{id}",
 						},
-						TimelineTimes: []*types.IdRange{
+						TimelineTimes: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(1),
 								End:  sdkmath.NewUint(math.MaxUint64),
@@ -75,7 +75,7 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 						BadgeMetadata: []*types.BadgeMetadata{
 							{
 								Uri: "https://example.com/{id}",
-								BadgeIds: []*types.IdRange{
+								BadgeIds: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 
@@ -84,7 +84,7 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 								},
 							},
 						},
-						TimelineTimes: []*types.IdRange{
+						TimelineTimes: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(1),
 								End:  sdkmath.NewUint(math.MaxUint64),

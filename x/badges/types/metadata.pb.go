@@ -29,7 +29,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 type BadgeMetadata struct {
 	Uri        string     `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
 	CustomData string     `protobuf:"bytes,2,opt,name=customData,proto3" json:"customData,omitempty"`
-	BadgeIds   []*IdRange `protobuf:"bytes,3,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	BadgeIds   []*UintRange `protobuf:"bytes,3,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 }
 
 func (m *BadgeMetadata) Reset()         { *m = BadgeMetadata{} }
@@ -79,7 +79,7 @@ func (m *BadgeMetadata) GetCustomData() string {
 	return ""
 }
 
-func (m *BadgeMetadata) GetBadgeIds() []*IdRange {
+func (m *BadgeMetadata) GetBadgeIds() []*UintRange {
 	if m != nil {
 		return m.BadgeIds
 	}
@@ -545,7 +545,7 @@ func (m *BadgeMetadata) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &IdRange{})
+			m.BadgeIds = append(m.BadgeIds, &UintRange{})
 			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}

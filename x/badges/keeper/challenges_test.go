@@ -17,7 +17,7 @@ func (suite *TestSuite) TestNoChallengesWorking() {
 	CreateCollections(suite, wctx, collectionsToCreate) 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection,	GetTopHalfIdRanges(), GetFullIdRanges(),	bob,	alice,	alice,	sdkmath.NewUint(1),	[]*types.ChallengeSolution{},)
+	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection,	GetTopHalfUintRanges(), GetFullUintRanges(),	bob,	alice,	alice,	sdkmath.NewUint(1),	[]*types.ChallengeSolution{},)
 	suite.Require().Error(err, "Error getting user balance: %s")
 }
 
@@ -35,10 +35,10 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection,	GetTopHalfIdRanges(), GetFullIdRanges(),	bob,	alice,	alice,	sdkmath.NewUint(1),	[]*types.ChallengeSolution{},)
+	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection,	GetTopHalfUintRanges(), GetFullUintRanges(),	bob,	alice,	alice,	sdkmath.NewUint(1),	[]*types.ChallengeSolution{},)
 	suite.Require().Error(err, "Error getting user balance: %s")
 
-	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection,	GetTopHalfIdRanges(), GetFullIdRanges(),	bob,	alice,	alice,	sdkmath.NewUint(1),	[]*types.ChallengeSolution{
+	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection,	GetTopHalfUintRanges(), GetFullUintRanges(),	bob,	alice,	alice,	sdkmath.NewUint(1),	[]*types.ChallengeSolution{
 		{
 			Proof: &types.ClaimProof{
 				Aunts: []*types.ClaimProofItem{},
@@ -114,7 +114,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 				BadgeMetadata:            []*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.IdRange{
+// 						BadgeIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End: sdkmath.NewUint(math.MaxUint64),
@@ -136,16 +136,16 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 		Balances: []*types.Balance{
 // 			{
 // 				Amount: sdkmath.NewUint(10),
-// 				BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+// 				BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 			},
 // 		},
-// 		BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+// 		BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 		IncrementBadgeIdsBy: 0,
 // 		AmountPerClaim: 1,
 // 		Data:       hex.EncodeToString(rootHash),
 // 		Type: 	 	uint64(types.ClaimType_MerkleTree),
 // 		Uri: "",
-// 		TimeInterval: &types.IdRange{
+// 		TimeInterval: &types.UintRange{
 // 			Start: sdkmath.NewUint(0),
 // 			End:   sdkmath.NewUint(math.MaxUint64),
 // 		},
@@ -165,7 +165,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 		[]*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.IdRange{
+// 						BadgeIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End: sdkmath.NewUint(math.MaxUint64),
@@ -180,7 +180,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
-// 			BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, //0 to 0 range so it will be nil
+// 			BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, //0 to 0 range so it will be nil
 // 			Amount: sdkmath.NewUint(10),
 // 		},
 // 	}, badge.MaxSupplys)
@@ -201,7 +201,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 			},
 // 		},
 // 		"",
-// 		&types.IdRange{
+// 		&types.UintRange{
 // 			Start: sdkmath.NewUint(0),
 // 			End:   sdkmath.NewUint(math.MaxUint64),
 // 		},
@@ -210,12 +210,12 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 
 // 	aliceBalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
 // 	suite.Require().Equal(uint64(1), aliceBalance.Balances[0].Balance)
-// 	suite.Require().Equal([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
+// 	suite.Require().Equal([]*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
 
 // 	badge, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	claim = badge.Claims[0]
 // 	suite.Require().Equal(uint64(9), claim.Balances[0].Balance)
-// 	// suite.Require().Equal([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
+// 	// suite.Require().Equal([]*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
 // }
 
 // func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
@@ -249,7 +249,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 				BadgeMetadata:            []*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.IdRange{
+// 						BadgeIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End: sdkmath.NewUint(math.MaxUint64),
@@ -271,16 +271,16 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 		Balances: []*types.Balance{
 // 			{
 // 				Amount: sdkmath.NewUint(10),
-// 				BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+// 				BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 			},
 // 		},
-// 		BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+// 		BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 		IncrementBadgeIdsBy: 0,
 // 		AmountPerClaim: 1,
 // 		Data:       hex.EncodeToString(rootHash),
 // 		Type: 	 	uint64(types.ClaimType_MerkleTree),
 // 		Uri: "",
-// 		TimeInterval: &types.IdRange{
+// 		TimeInterval: &types.UintRange{
 // 			Start: sdkmath.NewUint(0),
 // 			End:   sdkmath.NewUint(math.MaxUint64),
 // 		},
@@ -299,7 +299,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 		[]*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.IdRange{
+// 						BadgeIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End: sdkmath.NewUint(math.MaxUint64),
@@ -314,7 +314,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
-// 			BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, //0 to 0 range so it will be nil
+// 			BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, //0 to 0 range so it will be nil
 // 			Amount: sdkmath.NewUint(10),
 // 		},
 // 	}, badge.MaxSupplys)
@@ -335,7 +335,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 				OnRight: true,
 // 			},
 // 		},
-// 	}, "", &types.IdRange{
+// 	}, "", &types.UintRange{
 // 		Start: sdkmath.NewUint(0),
 // 		End:   sdkmath.NewUint(math.MaxUint64),
 // 	})
@@ -381,7 +381,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 				BadgeMetadata:            []*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.IdRange{
+// 						BadgeIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End: sdkmath.NewUint(math.MaxUint64),
@@ -403,16 +403,16 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 		Balances: []*types.Balance{
 // 			{
 // 				Amount: sdkmath.NewUint(10),
-// 				BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+// 				BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 			},
 // 		},
-// 		BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+// 		BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 		IncrementBadgeIdsBy: 1,
 // 		AmountPerClaim: 1,
 // 		Data:       hex.EncodeToString(rootHash),
 // 		Type: 	 	uint64(types.ClaimType_FirstCome),
 // 		Uri: "",
-// 		TimeInterval: &types.IdRange{
+// 		TimeInterval: &types.UintRange{
 // 			Start: sdkmath.NewUint(0),
 // 			End:   sdkmath.NewUint(math.MaxUint64),
 // 		},
@@ -431,7 +431,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 		[]*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.IdRange{
+// 						BadgeIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End: sdkmath.NewUint(math.MaxUint64),
@@ -446,7 +446,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
 // 	suite.Require().Equal([]*types.Balance{
 // 		{
-// 			BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, //0 to 0 range so it will be nil
+// 			BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, //0 to 0 range so it will be nil
 // 			Amount: sdkmath.NewUint(10),
 // 		},
 // 	}, badge.MaxSupplys)
@@ -466,7 +466,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 				OnRight: true,
 // 			},
 // 		},
-// 	}, "", &types.IdRange{
+// 	}, "", &types.UintRange{
 // 		Start: sdkmath.NewUint(0),
 // 		End:   sdkmath.NewUint(math.MaxUint64),
 // 	})
@@ -474,10 +474,10 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 
 // 	aliceBalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
 // 	suite.Require().Equal(uint64(1), aliceBalance.Balances[0].Balance)
-// 	suite.Require().Equal([]*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
+// 	suite.Require().Equal([]*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
 
 // 	badge, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	claim = badge.Claims[0]
 // 	suite.Require().Equal(uint64(9), claim.Balances[0].Balance)
-// 	suite.Require().Equal([]*types.IdRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2),}}, claim.BadgeIds)
+// 	suite.Require().Equal([]*types.UintRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2),}}, claim.BadgeIds)
 // }

@@ -14,8 +14,8 @@ func HandleDuplicateBadgeIds(balances []*Balance) ([]*Balance, error) {
 			for _, time := range balance.OwnershipTimes {
 				newBalances, err = AddBalance(newBalances, &Balance{
 					Amount:   balance.Amount,
-					BadgeIds: []*IdRange{badgeId},
-					OwnershipTimes: []*IdRange{time},
+					BadgeIds: []*UintRange{badgeId},
+					OwnershipTimes: []*UintRange{time},
 				})
 				if err != nil {
 					return []*Balance{}, err
@@ -31,11 +31,11 @@ func HandleDuplicateBadgeIds(balances []*Balance) ([]*Balance, error) {
 func GetBalancesForId(id sdkmath.Uint, balances []*Balance) []*Balance {
 	matchingBalances := []*Balance{}
 	for _, balance := range balances {
-		found := SearchIdRangesForId(id, balance.BadgeIds)
+		found := SearchUintRangesForId(id, balance.BadgeIds)
 		if found {
 			matchingBalances = append(matchingBalances, &Balance{
 				Amount:   balance.Amount,
-				BadgeIds: []*IdRange{{Start: id, End: id}},
+				BadgeIds: []*UintRange{{Start: id, End: id}},
 				OwnershipTimes: balance.OwnershipTimes,
 			})
 		}
@@ -62,7 +62,7 @@ func UpdateBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error)
 }
 
 // Gets the balances for specified ID ranges. Returns a new []*Balance where only the specified ID ranges and their balances are included. Appends balance == 0 objects so all IDs are accounted for, even if not found.
-func GetBalancesForIds(idRanges []*IdRange, times []*IdRange, balances []*Balance) (newBalances []*Balance, err error) {
+func GetBalancesForIds(uintRanges []*UintRange, times []*UintRange, balances []*Balance) (newBalances []*Balance, err error) {
 	fetchedBalances := []*Balance{}
 
 	currPermissionDetails := []*UniversalPermissionDetails{}
@@ -72,10 +72,10 @@ func GetBalancesForIds(idRanges []*IdRange, times []*IdRange, balances []*Balanc
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
 					BadgeId: currRange,
 					TimelineTime: currTime,
-					TransferTime: &IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
-					ToMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
-					FromMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
-					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
+					TransferTime: &UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
+					ToMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
+					FromMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
+					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
 					ArbitraryValue: balanceObj.Amount,
 				})
 			}
@@ -83,15 +83,15 @@ func GetBalancesForIds(idRanges []*IdRange, times []*IdRange, balances []*Balanc
 	}
 
 	toFetchPermissionDetails := []*UniversalPermissionDetails{}
-	for _, rangeToFetch := range idRanges {
+	for _, rangeToFetch := range uintRanges {
 		for _, timeToFetch := range times {
 			toFetchPermissionDetails = append(toFetchPermissionDetails, &UniversalPermissionDetails{
 					BadgeId: rangeToFetch,
 					TimelineTime: timeToFetch,
-					TransferTime: &IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
-					ToMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
-					FromMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
-					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
+					TransferTime: &UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
+					ToMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
+					FromMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
+					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
 				},
 			)
 		}
@@ -105,16 +105,16 @@ func GetBalancesForIds(idRanges []*IdRange, times []*IdRange, balances []*Balanc
 
 		fetchedBalances = append(fetchedBalances, &Balance{
 			Amount:  amount,
-			BadgeIds: []*IdRange{overlap.BadgeId},
-			OwnershipTimes: []*IdRange{overlap.TimelineTime},
+			BadgeIds: []*UintRange{overlap.BadgeId},
+			OwnershipTimes: []*UintRange{overlap.TimelineTime},
 		})
 	}
 
 	for _, detail := range inNewButNotOld {
 		fetchedBalances = append(fetchedBalances, &Balance{
 			Amount:   sdkmath.NewUint(0),
-			BadgeIds: []*IdRange{detail.BadgeId},
-			OwnershipTimes: []*IdRange{detail.TimelineTime},
+			BadgeIds: []*UintRange{detail.BadgeId},
+			OwnershipTimes: []*UintRange{detail.TimelineTime},
 		})
 	}
 	
@@ -168,7 +168,7 @@ func SubtractBalance(balances []*Balance, balanceToRemove *Balance) ([]*Balance,
 }
 
 // Deletes the balance for a specific id.
-func DeleteBalances(rangesToDelete []*IdRange, timesToDelete []*IdRange, balances []*Balance) ([]*Balance, error) {
+func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, balances []*Balance) ([]*Balance, error) {
 	newBalances := []*Balance{}
 
 	for _, balanceObj := range balances {
@@ -178,10 +178,10 @@ func DeleteBalances(rangesToDelete []*IdRange, timesToDelete []*IdRange, balance
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
 					BadgeId: currRange,
 					TimelineTime: currTime,
-					TransferTime: &IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
-					ToMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
-					FromMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
-					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
+					TransferTime: &UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
+					ToMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
+					FromMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
+					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
 				})
 			}
 		}
@@ -192,10 +192,10 @@ func DeleteBalances(rangesToDelete []*IdRange, timesToDelete []*IdRange, balance
 				toDeletePermissionDetails = append(toDeletePermissionDetails, &UniversalPermissionDetails{
 						BadgeId: rangeToDelete,
 						TimelineTime: timeToDelete,
-						TransferTime: &IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
-						ToMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
-						FromMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
-						InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
+						TransferTime: &UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
+						ToMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
+						FromMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
+						InitiatedByMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
 					},
 				)
 			}
@@ -205,8 +205,8 @@ func DeleteBalances(rangesToDelete []*IdRange, timesToDelete []*IdRange, balance
 		for _, remainingBalance := range inOldButNotNew {
 			newBalances = append(newBalances, &Balance{
 				Amount:   balanceObj.Amount,
-				BadgeIds: []*IdRange{remainingBalance.BadgeId},
-				OwnershipTimes: []*IdRange{remainingBalance.TimelineTime},
+				BadgeIds: []*UintRange{remainingBalance.BadgeId},
+				OwnershipTimes: []*UintRange{remainingBalance.TimelineTime},
 			})
 		}
 	}

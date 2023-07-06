@@ -6,8 +6,8 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
-func GetIdRange(start types.Uint, end types.Uint) *types.IdRange {
-	return &types.IdRange{
+func GetUintRange(start types.Uint, end types.Uint) *types.UintRange {
+	return &types.UintRange{
 		Start: start,
 		End:   end,
 	}
@@ -54,17 +54,17 @@ func GetIdArrFromString(str string) ([]types.Uint, error) {
 }
 
 // Start and end strings should be comma separated list of ids
-func GetIdRanges(idRangesStr string) ([]*types.IdRange, error) {
-	vals, err := parseJsonArr(idRangesStr)
+func GetUintRanges(uintRangesStr string) ([]*types.UintRange, error) {
+	vals, err := parseJsonArr(uintRangesStr)
 	if err != nil {
 		return nil, err
 	}
 
-	ranges := []*types.IdRange{}
+	ranges := []*types.UintRange{}
 	for _, val := range vals {
-		valAsMap, ok := val.(types.IdRange)
+		valAsMap, ok := val.(types.UintRange)
 		if !ok {
-			return nil, types.ErrInvalidIdRangeSpecified
+			return nil, types.ErrInvalidUintRangeSpecified
 		}
 
 		ranges = append(ranges, &valAsMap)

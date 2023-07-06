@@ -404,14 +404,14 @@ func (m *CollectionApprovedTransferCombination) GetForbiddenTimesOptions() *Valu
 }
 
 type CollectionApprovedTransferDefaultValues struct {
-	TimelineTimes        []*IdRange `protobuf:"bytes,1,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes        []*UintRange `protobuf:"bytes,1,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 	FromMappingId        string     `protobuf:"bytes,2,opt,name=fromMappingId,proto3" json:"fromMappingId,omitempty"`
 	ToMappingId          string     `protobuf:"bytes,3,opt,name=toMappingId,proto3" json:"toMappingId,omitempty"`
 	InitiatedByMappingId string     `protobuf:"bytes,4,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
-	TransferTimes        []*IdRange `protobuf:"bytes,5,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	BadgeIds             []*IdRange `protobuf:"bytes,6,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	PermittedTimes       []*IdRange `protobuf:"bytes,7,rep,name=permittedTimes,proto3" json:"permittedTimes,omitempty"`
-	ForbiddenTimes       []*IdRange `protobuf:"bytes,8,rep,name=forbiddenTimes,proto3" json:"forbiddenTimes,omitempty"`
+	TransferTimes        []*UintRange `protobuf:"bytes,5,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
+	BadgeIds             []*UintRange `protobuf:"bytes,6,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	PermittedTimes       []*UintRange `protobuf:"bytes,7,rep,name=permittedTimes,proto3" json:"permittedTimes,omitempty"`
+	ForbiddenTimes       []*UintRange `protobuf:"bytes,8,rep,name=forbiddenTimes,proto3" json:"forbiddenTimes,omitempty"`
 }
 
 func (m *CollectionApprovedTransferDefaultValues) Reset() {
@@ -449,7 +449,7 @@ func (m *CollectionApprovedTransferDefaultValues) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CollectionApprovedTransferDefaultValues proto.InternalMessageInfo
 
-func (m *CollectionApprovedTransferDefaultValues) GetTimelineTimes() []*IdRange {
+func (m *CollectionApprovedTransferDefaultValues) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -477,28 +477,28 @@ func (m *CollectionApprovedTransferDefaultValues) GetInitiatedByMappingId() stri
 	return ""
 }
 
-func (m *CollectionApprovedTransferDefaultValues) GetTransferTimes() []*IdRange {
+func (m *CollectionApprovedTransferDefaultValues) GetTransferTimes() []*UintRange {
 	if m != nil {
 		return m.TransferTimes
 	}
 	return nil
 }
 
-func (m *CollectionApprovedTransferDefaultValues) GetBadgeIds() []*IdRange {
+func (m *CollectionApprovedTransferDefaultValues) GetBadgeIds() []*UintRange {
 	if m != nil {
 		return m.BadgeIds
 	}
 	return nil
 }
 
-func (m *CollectionApprovedTransferDefaultValues) GetPermittedTimes() []*IdRange {
+func (m *CollectionApprovedTransferDefaultValues) GetPermittedTimes() []*UintRange {
 	if m != nil {
 		return m.PermittedTimes
 	}
 	return nil
 }
 
-func (m *CollectionApprovedTransferDefaultValues) GetForbiddenTimes() []*IdRange {
+func (m *CollectionApprovedTransferDefaultValues) GetForbiddenTimes() []*UintRange {
 	if m != nil {
 		return m.ForbiddenTimes
 	}
@@ -668,13 +668,13 @@ func (m *UserApprovedOutgoingTransferCombination) GetForbiddenTimesOptions() *Va
 }
 
 type UserApprovedOutgoingTransferDefaultValues struct {
-	TimelineTimes        []*IdRange `protobuf:"bytes,1,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes        []*UintRange `protobuf:"bytes,1,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 	ToMappingId          string     `protobuf:"bytes,2,opt,name=toMappingId,proto3" json:"toMappingId,omitempty"`
 	InitiatedByMappingId string     `protobuf:"bytes,3,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
-	TransferTimes        []*IdRange `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	BadgeIds             []*IdRange `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	PermittedTimes       []*IdRange `protobuf:"bytes,7,rep,name=permittedTimes,proto3" json:"permittedTimes,omitempty"`
-	ForbiddenTimes       []*IdRange `protobuf:"bytes,8,rep,name=forbiddenTimes,proto3" json:"forbiddenTimes,omitempty"`
+	TransferTimes        []*UintRange `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
+	BadgeIds             []*UintRange `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	PermittedTimes       []*UintRange `protobuf:"bytes,7,rep,name=permittedTimes,proto3" json:"permittedTimes,omitempty"`
+	ForbiddenTimes       []*UintRange `protobuf:"bytes,8,rep,name=forbiddenTimes,proto3" json:"forbiddenTimes,omitempty"`
 }
 
 func (m *UserApprovedOutgoingTransferDefaultValues) Reset() {
@@ -714,7 +714,7 @@ func (m *UserApprovedOutgoingTransferDefaultValues) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_UserApprovedOutgoingTransferDefaultValues proto.InternalMessageInfo
 
-func (m *UserApprovedOutgoingTransferDefaultValues) GetTimelineTimes() []*IdRange {
+func (m *UserApprovedOutgoingTransferDefaultValues) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -735,28 +735,28 @@ func (m *UserApprovedOutgoingTransferDefaultValues) GetInitiatedByMappingId() st
 	return ""
 }
 
-func (m *UserApprovedOutgoingTransferDefaultValues) GetTransferTimes() []*IdRange {
+func (m *UserApprovedOutgoingTransferDefaultValues) GetTransferTimes() []*UintRange {
 	if m != nil {
 		return m.TransferTimes
 	}
 	return nil
 }
 
-func (m *UserApprovedOutgoingTransferDefaultValues) GetBadgeIds() []*IdRange {
+func (m *UserApprovedOutgoingTransferDefaultValues) GetBadgeIds() []*UintRange {
 	if m != nil {
 		return m.BadgeIds
 	}
 	return nil
 }
 
-func (m *UserApprovedOutgoingTransferDefaultValues) GetPermittedTimes() []*IdRange {
+func (m *UserApprovedOutgoingTransferDefaultValues) GetPermittedTimes() []*UintRange {
 	if m != nil {
 		return m.PermittedTimes
 	}
 	return nil
 }
 
-func (m *UserApprovedOutgoingTransferDefaultValues) GetForbiddenTimes() []*IdRange {
+func (m *UserApprovedOutgoingTransferDefaultValues) GetForbiddenTimes() []*UintRange {
 	if m != nil {
 		return m.ForbiddenTimes
 	}
@@ -914,13 +914,13 @@ func (m *UserApprovedIncomingTransferCombination) GetForbiddenTimesOptions() *Va
 }
 
 type UserApprovedIncomingTransferDefaultValues struct {
-	TimelineTimes        []*IdRange `protobuf:"bytes,1,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	TimelineTimes        []*UintRange `protobuf:"bytes,1,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 	FromMappingId        string     `protobuf:"bytes,2,opt,name=fromMappingId,proto3" json:"fromMappingId,omitempty"`
 	InitiatedByMappingId string     `protobuf:"bytes,3,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
-	TransferTimes        []*IdRange `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	BadgeIds             []*IdRange `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	PermittedTimes       []*IdRange `protobuf:"bytes,7,rep,name=permittedTimes,proto3" json:"permittedTimes,omitempty"`
-	ForbiddenTimes       []*IdRange `protobuf:"bytes,8,rep,name=forbiddenTimes,proto3" json:"forbiddenTimes,omitempty"`
+	TransferTimes        []*UintRange `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
+	BadgeIds             []*UintRange `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	PermittedTimes       []*UintRange `protobuf:"bytes,7,rep,name=permittedTimes,proto3" json:"permittedTimes,omitempty"`
+	ForbiddenTimes       []*UintRange `protobuf:"bytes,8,rep,name=forbiddenTimes,proto3" json:"forbiddenTimes,omitempty"`
 }
 
 func (m *UserApprovedIncomingTransferDefaultValues) Reset() {
@@ -960,7 +960,7 @@ func (m *UserApprovedIncomingTransferDefaultValues) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_UserApprovedIncomingTransferDefaultValues proto.InternalMessageInfo
 
-func (m *UserApprovedIncomingTransferDefaultValues) GetTimelineTimes() []*IdRange {
+func (m *UserApprovedIncomingTransferDefaultValues) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -981,28 +981,28 @@ func (m *UserApprovedIncomingTransferDefaultValues) GetInitiatedByMappingId() st
 	return ""
 }
 
-func (m *UserApprovedIncomingTransferDefaultValues) GetTransferTimes() []*IdRange {
+func (m *UserApprovedIncomingTransferDefaultValues) GetTransferTimes() []*UintRange {
 	if m != nil {
 		return m.TransferTimes
 	}
 	return nil
 }
 
-func (m *UserApprovedIncomingTransferDefaultValues) GetBadgeIds() []*IdRange {
+func (m *UserApprovedIncomingTransferDefaultValues) GetBadgeIds() []*UintRange {
 	if m != nil {
 		return m.BadgeIds
 	}
 	return nil
 }
 
-func (m *UserApprovedIncomingTransferDefaultValues) GetPermittedTimes() []*IdRange {
+func (m *UserApprovedIncomingTransferDefaultValues) GetPermittedTimes() []*UintRange {
 	if m != nil {
 		return m.PermittedTimes
 	}
 	return nil
 }
 
-func (m *UserApprovedIncomingTransferDefaultValues) GetForbiddenTimes() []*IdRange {
+func (m *UserApprovedIncomingTransferDefaultValues) GetForbiddenTimes() []*UintRange {
 	if m != nil {
 		return m.ForbiddenTimes
 	}
@@ -1134,10 +1134,10 @@ func (m *BalancesActionCombination) GetForbiddenTimesOptions() *ValueOptions {
 }
 
 type BalancesActionDefaultValues struct {
-	BadgeIds       []*IdRange `protobuf:"bytes,1,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	OwnershipTimes []*IdRange `protobuf:"bytes,2,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
-	PermittedTimes []*IdRange `protobuf:"bytes,3,rep,name=permittedTimes,proto3" json:"permittedTimes,omitempty"`
-	ForbiddenTimes []*IdRange `protobuf:"bytes,4,rep,name=forbiddenTimes,proto3" json:"forbiddenTimes,omitempty"`
+	BadgeIds       []*UintRange `protobuf:"bytes,1,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	OwnershipTimes []*UintRange `protobuf:"bytes,2,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
+	PermittedTimes []*UintRange `protobuf:"bytes,3,rep,name=permittedTimes,proto3" json:"permittedTimes,omitempty"`
+	ForbiddenTimes []*UintRange `protobuf:"bytes,4,rep,name=forbiddenTimes,proto3" json:"forbiddenTimes,omitempty"`
 }
 
 func (m *BalancesActionDefaultValues) Reset()         { *m = BalancesActionDefaultValues{} }
@@ -1173,28 +1173,28 @@ func (m *BalancesActionDefaultValues) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_BalancesActionDefaultValues proto.InternalMessageInfo
 
-func (m *BalancesActionDefaultValues) GetBadgeIds() []*IdRange {
+func (m *BalancesActionDefaultValues) GetBadgeIds() []*UintRange {
 	if m != nil {
 		return m.BadgeIds
 	}
 	return nil
 }
 
-func (m *BalancesActionDefaultValues) GetOwnershipTimes() []*IdRange {
+func (m *BalancesActionDefaultValues) GetOwnershipTimes() []*UintRange {
 	if m != nil {
 		return m.OwnershipTimes
 	}
 	return nil
 }
 
-func (m *BalancesActionDefaultValues) GetPermittedTimes() []*IdRange {
+func (m *BalancesActionDefaultValues) GetPermittedTimes() []*UintRange {
 	if m != nil {
 		return m.PermittedTimes
 	}
 	return nil
 }
 
-func (m *BalancesActionDefaultValues) GetForbiddenTimes() []*IdRange {
+func (m *BalancesActionDefaultValues) GetForbiddenTimes() []*UintRange {
 	if m != nil {
 		return m.ForbiddenTimes
 	}
@@ -1259,8 +1259,8 @@ func (m *BalancesActionPermission) GetCombinations() []*BalancesActionCombinatio
 }
 
 type ActionDefaultValues struct {
-	PermittedTimes []*IdRange `protobuf:"bytes,1,rep,name=permittedTimes,proto3" json:"permittedTimes,omitempty"`
-	ForbiddenTimes []*IdRange `protobuf:"bytes,2,rep,name=forbiddenTimes,proto3" json:"forbiddenTimes,omitempty"`
+	PermittedTimes []*UintRange `protobuf:"bytes,1,rep,name=permittedTimes,proto3" json:"permittedTimes,omitempty"`
+	ForbiddenTimes []*UintRange `protobuf:"bytes,2,rep,name=forbiddenTimes,proto3" json:"forbiddenTimes,omitempty"`
 }
 
 func (m *ActionDefaultValues) Reset()         { *m = ActionDefaultValues{} }
@@ -1296,14 +1296,14 @@ func (m *ActionDefaultValues) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ActionDefaultValues proto.InternalMessageInfo
 
-func (m *ActionDefaultValues) GetPermittedTimes() []*IdRange {
+func (m *ActionDefaultValues) GetPermittedTimes() []*UintRange {
 	if m != nil {
 		return m.PermittedTimes
 	}
 	return nil
 }
 
-func (m *ActionDefaultValues) GetForbiddenTimes() []*IdRange {
+func (m *ActionDefaultValues) GetForbiddenTimes() []*UintRange {
 	if m != nil {
 		return m.ForbiddenTimes
 	}
@@ -1478,9 +1478,9 @@ func (m *TimedUpdateCombination) GetForbiddenTimesOptions() *ValueOptions {
 }
 
 type TimedUpdateDefaultValues struct {
-	TimelineTimes  []*IdRange `protobuf:"bytes,1,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
-	PermittedTimes []*IdRange `protobuf:"bytes,2,rep,name=permittedTimes,proto3" json:"permittedTimes,omitempty"`
-	ForbiddenTimes []*IdRange `protobuf:"bytes,3,rep,name=forbiddenTimes,proto3" json:"forbiddenTimes,omitempty"`
+	TimelineTimes  []*UintRange `protobuf:"bytes,1,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	PermittedTimes []*UintRange `protobuf:"bytes,2,rep,name=permittedTimes,proto3" json:"permittedTimes,omitempty"`
+	ForbiddenTimes []*UintRange `protobuf:"bytes,3,rep,name=forbiddenTimes,proto3" json:"forbiddenTimes,omitempty"`
 }
 
 func (m *TimedUpdateDefaultValues) Reset()         { *m = TimedUpdateDefaultValues{} }
@@ -1516,21 +1516,21 @@ func (m *TimedUpdateDefaultValues) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_TimedUpdateDefaultValues proto.InternalMessageInfo
 
-func (m *TimedUpdateDefaultValues) GetTimelineTimes() []*IdRange {
+func (m *TimedUpdateDefaultValues) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
 	return nil
 }
 
-func (m *TimedUpdateDefaultValues) GetPermittedTimes() []*IdRange {
+func (m *TimedUpdateDefaultValues) GetPermittedTimes() []*UintRange {
 	if m != nil {
 		return m.PermittedTimes
 	}
 	return nil
 }
 
-func (m *TimedUpdateDefaultValues) GetForbiddenTimes() []*IdRange {
+func (m *TimedUpdateDefaultValues) GetForbiddenTimes() []*UintRange {
 	if m != nil {
 		return m.ForbiddenTimes
 	}
@@ -1662,10 +1662,10 @@ func (m *TimedUpdateWithBadgeIdsCombination) GetForbiddenTimesOptions() *ValueOp
 }
 
 type TimedUpdateWithBadgeIdsDefaultValues struct {
-	BadgeIds       []*IdRange `protobuf:"bytes,1,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	TimelineTimes  []*IdRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
-	PermittedTimes []*IdRange `protobuf:"bytes,3,rep,name=permittedTimes,proto3" json:"permittedTimes,omitempty"`
-	ForbiddenTimes []*IdRange `protobuf:"bytes,4,rep,name=forbiddenTimes,proto3" json:"forbiddenTimes,omitempty"`
+	BadgeIds       []*UintRange `protobuf:"bytes,1,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TimelineTimes  []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	PermittedTimes []*UintRange `protobuf:"bytes,3,rep,name=permittedTimes,proto3" json:"permittedTimes,omitempty"`
+	ForbiddenTimes []*UintRange `protobuf:"bytes,4,rep,name=forbiddenTimes,proto3" json:"forbiddenTimes,omitempty"`
 }
 
 func (m *TimedUpdateWithBadgeIdsDefaultValues) Reset()         { *m = TimedUpdateWithBadgeIdsDefaultValues{} }
@@ -1701,28 +1701,28 @@ func (m *TimedUpdateWithBadgeIdsDefaultValues) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_TimedUpdateWithBadgeIdsDefaultValues proto.InternalMessageInfo
 
-func (m *TimedUpdateWithBadgeIdsDefaultValues) GetBadgeIds() []*IdRange {
+func (m *TimedUpdateWithBadgeIdsDefaultValues) GetBadgeIds() []*UintRange {
 	if m != nil {
 		return m.BadgeIds
 	}
 	return nil
 }
 
-func (m *TimedUpdateWithBadgeIdsDefaultValues) GetTimelineTimes() []*IdRange {
+func (m *TimedUpdateWithBadgeIdsDefaultValues) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
 	return nil
 }
 
-func (m *TimedUpdateWithBadgeIdsDefaultValues) GetPermittedTimes() []*IdRange {
+func (m *TimedUpdateWithBadgeIdsDefaultValues) GetPermittedTimes() []*UintRange {
 	if m != nil {
 		return m.PermittedTimes
 	}
 	return nil
 }
 
-func (m *TimedUpdateWithBadgeIdsDefaultValues) GetForbiddenTimes() []*IdRange {
+func (m *TimedUpdateWithBadgeIdsDefaultValues) GetForbiddenTimes() []*UintRange {
 	if m != nil {
 		return m.ForbiddenTimes
 	}
@@ -5541,7 +5541,7 @@ func (m *CollectionApprovedTransferDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -5671,7 +5671,7 @@ func (m *CollectionApprovedTransferDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TransferTimes = append(m.TransferTimes, &IdRange{})
+			m.TransferTimes = append(m.TransferTimes, &UintRange{})
 			if err := m.TransferTimes[len(m.TransferTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -5705,7 +5705,7 @@ func (m *CollectionApprovedTransferDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &IdRange{})
+			m.BadgeIds = append(m.BadgeIds, &UintRange{})
 			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -5739,7 +5739,7 @@ func (m *CollectionApprovedTransferDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PermittedTimes = append(m.PermittedTimes, &IdRange{})
+			m.PermittedTimes = append(m.PermittedTimes, &UintRange{})
 			if err := m.PermittedTimes[len(m.PermittedTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -5773,7 +5773,7 @@ func (m *CollectionApprovedTransferDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ForbiddenTimes = append(m.ForbiddenTimes, &IdRange{})
+			m.ForbiddenTimes = append(m.ForbiddenTimes, &UintRange{})
 			if err := m.ForbiddenTimes[len(m.ForbiddenTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -6279,7 +6279,7 @@ func (m *UserApprovedOutgoingTransferDefaultValues) Unmarshal(dAtA []byte) error
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -6377,7 +6377,7 @@ func (m *UserApprovedOutgoingTransferDefaultValues) Unmarshal(dAtA []byte) error
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TransferTimes = append(m.TransferTimes, &IdRange{})
+			m.TransferTimes = append(m.TransferTimes, &UintRange{})
 			if err := m.TransferTimes[len(m.TransferTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -6411,7 +6411,7 @@ func (m *UserApprovedOutgoingTransferDefaultValues) Unmarshal(dAtA []byte) error
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &IdRange{})
+			m.BadgeIds = append(m.BadgeIds, &UintRange{})
 			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -6445,7 +6445,7 @@ func (m *UserApprovedOutgoingTransferDefaultValues) Unmarshal(dAtA []byte) error
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PermittedTimes = append(m.PermittedTimes, &IdRange{})
+			m.PermittedTimes = append(m.PermittedTimes, &UintRange{})
 			if err := m.PermittedTimes[len(m.PermittedTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -6479,7 +6479,7 @@ func (m *UserApprovedOutgoingTransferDefaultValues) Unmarshal(dAtA []byte) error
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ForbiddenTimes = append(m.ForbiddenTimes, &IdRange{})
+			m.ForbiddenTimes = append(m.ForbiddenTimes, &UintRange{})
 			if err := m.ForbiddenTimes[len(m.ForbiddenTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -6985,7 +6985,7 @@ func (m *UserApprovedIncomingTransferDefaultValues) Unmarshal(dAtA []byte) error
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -7083,7 +7083,7 @@ func (m *UserApprovedIncomingTransferDefaultValues) Unmarshal(dAtA []byte) error
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TransferTimes = append(m.TransferTimes, &IdRange{})
+			m.TransferTimes = append(m.TransferTimes, &UintRange{})
 			if err := m.TransferTimes[len(m.TransferTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -7117,7 +7117,7 @@ func (m *UserApprovedIncomingTransferDefaultValues) Unmarshal(dAtA []byte) error
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &IdRange{})
+			m.BadgeIds = append(m.BadgeIds, &UintRange{})
 			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -7151,7 +7151,7 @@ func (m *UserApprovedIncomingTransferDefaultValues) Unmarshal(dAtA []byte) error
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PermittedTimes = append(m.PermittedTimes, &IdRange{})
+			m.PermittedTimes = append(m.PermittedTimes, &UintRange{})
 			if err := m.PermittedTimes[len(m.PermittedTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -7185,7 +7185,7 @@ func (m *UserApprovedIncomingTransferDefaultValues) Unmarshal(dAtA []byte) error
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ForbiddenTimes = append(m.ForbiddenTimes, &IdRange{})
+			m.ForbiddenTimes = append(m.ForbiddenTimes, &UintRange{})
 			if err := m.ForbiddenTimes[len(m.ForbiddenTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -7583,7 +7583,7 @@ func (m *BalancesActionDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &IdRange{})
+			m.BadgeIds = append(m.BadgeIds, &UintRange{})
 			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -7617,7 +7617,7 @@ func (m *BalancesActionDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.OwnershipTimes = append(m.OwnershipTimes, &IdRange{})
+			m.OwnershipTimes = append(m.OwnershipTimes, &UintRange{})
 			if err := m.OwnershipTimes[len(m.OwnershipTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -7651,7 +7651,7 @@ func (m *BalancesActionDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PermittedTimes = append(m.PermittedTimes, &IdRange{})
+			m.PermittedTimes = append(m.PermittedTimes, &UintRange{})
 			if err := m.PermittedTimes[len(m.PermittedTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -7685,7 +7685,7 @@ func (m *BalancesActionDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ForbiddenTimes = append(m.ForbiddenTimes, &IdRange{})
+			m.ForbiddenTimes = append(m.ForbiddenTimes, &UintRange{})
 			if err := m.ForbiddenTimes[len(m.ForbiddenTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -7889,7 +7889,7 @@ func (m *ActionDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PermittedTimes = append(m.PermittedTimes, &IdRange{})
+			m.PermittedTimes = append(m.PermittedTimes, &UintRange{})
 			if err := m.PermittedTimes[len(m.PermittedTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -7923,7 +7923,7 @@ func (m *ActionDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ForbiddenTimes = append(m.ForbiddenTimes, &IdRange{})
+			m.ForbiddenTimes = append(m.ForbiddenTimes, &UintRange{})
 			if err := m.ForbiddenTimes[len(m.ForbiddenTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -8407,7 +8407,7 @@ func (m *TimedUpdateDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -8441,7 +8441,7 @@ func (m *TimedUpdateDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PermittedTimes = append(m.PermittedTimes, &IdRange{})
+			m.PermittedTimes = append(m.PermittedTimes, &UintRange{})
 			if err := m.PermittedTimes[len(m.PermittedTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -8475,7 +8475,7 @@ func (m *TimedUpdateDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ForbiddenTimes = append(m.ForbiddenTimes, &IdRange{})
+			m.ForbiddenTimes = append(m.ForbiddenTimes, &UintRange{})
 			if err := m.ForbiddenTimes[len(m.ForbiddenTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -8873,7 +8873,7 @@ func (m *TimedUpdateWithBadgeIdsDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &IdRange{})
+			m.BadgeIds = append(m.BadgeIds, &UintRange{})
 			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -8907,7 +8907,7 @@ func (m *TimedUpdateWithBadgeIdsDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
 			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -8941,7 +8941,7 @@ func (m *TimedUpdateWithBadgeIdsDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PermittedTimes = append(m.PermittedTimes, &IdRange{})
+			m.PermittedTimes = append(m.PermittedTimes, &UintRange{})
 			if err := m.PermittedTimes[len(m.PermittedTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -8975,7 +8975,7 @@ func (m *TimedUpdateWithBadgeIdsDefaultValues) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ForbiddenTimes = append(m.ForbiddenTimes, &IdRange{})
+			m.ForbiddenTimes = append(m.ForbiddenTimes, &UintRange{})
 			if err := m.ForbiddenTimes[len(m.ForbiddenTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}

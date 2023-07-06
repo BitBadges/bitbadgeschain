@@ -11,12 +11,12 @@ import (
 //The UserApprovalsToCheck struct is used to keep track of which incoming / outgoing approvals for which addresses we need to check.
 type UserApprovalsToCheck struct {
 	Address string
-	BadgeIds []*types.IdRange
+	BadgeIds []*types.UintRange
 	Outgoing bool
 }
 
 //DeductUserOutgoingApprovals will check if the current transfer is approved from the from's outgoing approvals and handle the approval tallying accordingly
-func (k Keeper) DeductUserOutgoingApprovals(ctx sdk.Context, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.IdRange, times []*types.IdRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.ChallengeSolution) (error) {
+func (k Keeper) DeductUserOutgoingApprovals(ctx sdk.Context, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.ChallengeSolution) (error) {
 	currApprovedTransfers := types.GetCurrentUserApprovedOutgoingTransfers(ctx, userBalance)
 	currApprovedTransfers = AppendDefaultForOutgoing(currApprovedTransfers, from)
 
@@ -27,7 +27,7 @@ func (k Keeper) DeductUserOutgoingApprovals(ctx sdk.Context, collection *types.B
 }
 
 //DeductUserIncomingApprovals will check if the current transfer is approved from the to's outgoing approvals and handle the approval tallying accordingly
-func (k Keeper) DeductUserIncomingApprovals(ctx sdk.Context, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.IdRange, times []*types.IdRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.ChallengeSolution) (error) {
+func (k Keeper) DeductUserIncomingApprovals(ctx sdk.Context, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.ChallengeSolution) (error) {
 	currApprovedTransfers := types.GetCurrentUserApprovedIncomingTransfers(ctx, userBalance)
 	currApprovedTransfers = AppendDefaultForIncoming(currApprovedTransfers, to)
 
@@ -38,12 +38,12 @@ func (k Keeper) DeductUserIncomingApprovals(ctx sdk.Context, collection *types.B
 }
 
 //DeductCollectionApprovalsAndGetUserApprovalsToCheck will check if the current transfer is allowed via the collection's approved transfers and handle any tallying accordingly
-func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.IdRange, times []*types.IdRange, fromAddress string, toAddress string, initiatedBy string, amount sdkmath.Uint, solutions []*types.ChallengeSolution) ([]*UserApprovalsToCheck, error) {
+func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, fromAddress string, toAddress string, initiatedBy string, amount sdkmath.Uint, solutions []*types.ChallengeSolution) ([]*UserApprovalsToCheck, error) {
 	approvedTransfers := types.GetCurrentCollectionApprovedTransfers(ctx, collection)
 	return k.DeductAndGetUserApprovals(approvedTransfers, ctx, collection, badgeIds, times, fromAddress, toAddress, initiatedBy, amount, solutions, "overall")
 }	
 
-func (k Keeper) DeductAndGetUserApprovals(approvedTransfers []*types.CollectionApprovedTransfer, ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.IdRange, times []*types.IdRange, fromAddress string, toAddress string, initiatedBy string, amount sdkmath.Uint, solutions []*types.ChallengeSolution, timelineType string) ([]*UserApprovalsToCheck, error) {
+func (k Keeper) DeductAndGetUserApprovals(approvedTransfers []*types.CollectionApprovedTransfer, ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, fromAddress string, toAddress string, initiatedBy string, amount sdkmath.Uint, solutions []*types.ChallengeSolution, timelineType string) ([]*UserApprovalsToCheck, error) {
 	//HACK: We first expand all transfers to have just a len == 1 AllowedCombination[] so that we can easily check IsAllowed later
 	//		  This is because GetFirstMatchOnly will break down the transfers into smaller parts and without expansion, fetching if a certain transfer is allowed is impossible. 
 	expandedApprovedTransfers := ExpandCollectionApprovedTransfers(approvedTransfers) 
@@ -57,7 +57,7 @@ func (k Keeper) DeductAndGetUserApprovals(approvedTransfers []*types.CollectionA
 	manager := types.GetCurrentManager(ctx, collection)
 
 	//Keep a running tally of all the badges we still have to handle
-	unhandledBadgeIds := make([]*types.IdRange, len(badgeIds))
+	unhandledBadgeIds := make([]*types.UintRange, len(badgeIds))
 	copy(unhandledBadgeIds, badgeIds)
 
 	//We will need to return a list of all the user incoming/outgoing approvals we need to check
@@ -70,12 +70,12 @@ func (k Keeper) DeductAndGetUserApprovals(approvedTransfers []*types.CollectionA
 			continue
 		}
 
-		currTimeFound := types.SearchIdRangesForId(sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli())), []*types.IdRange{match.TransferTime})
+		currTimeFound := types.SearchUintRangesForId(sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli())), []*types.UintRange{match.TransferTime})
 		if !currTimeFound {
 			continue
 		}
 
-		remaining, overlaps := types.RemoveIdRangeFromIdRange([]*types.IdRange{match.BadgeId}, unhandledBadgeIds)
+		remaining, overlaps := types.RemoveUintRangeFromUintRange([]*types.UintRange{match.BadgeId}, unhandledBadgeIds)
 		unhandledBadgeIds = remaining
 		if len(overlaps) > 0 {
 			//For the overlapping badges, we have a match.

@@ -1,7 +1,7 @@
 package types
 
-func ValidateTimelineTimesDoNotOverlap(times [][]*IdRange) error {
-	handledBadgeIds := []*IdRange{}
+func ValidateTimelineTimesDoNotOverlap(times [][]*UintRange) error {
+	handledBadgeIds := []*UintRange{}
 	for _, time := range times {
 		if len(time) == 0 {
 			return ErrNoTimelineTimeSpecified	

@@ -4,7 +4,7 @@ import (
 	sdkerrors "cosmossdk.io/errors"
 )
 
-func ValidatePermittedTimes(permittedTimes []*IdRange, forbiddenTimes []*IdRange) error {
+func ValidatePermittedTimes(permittedTimes []*UintRange, forbiddenTimes []*UintRange) error {
 	//Check if any overlap between permittedTimes and forbiddenTimes
 	err := ValidateRangesAreValid(permittedTimes, false)
 	if err != nil {

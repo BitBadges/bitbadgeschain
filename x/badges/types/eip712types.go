@@ -89,7 +89,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 
 	// permissionType := []apitypes.Type{
 	// 	{Name: "isFrozen", Type: "bool"},
-	// 	{Name: "timeIntervals", Type: "IdRange[]"},
+	// 	{Name: "timeIntervals", Type: "UintRange[]"},
 	// }
 
 	// permissionsTypes := []apitypes.Type{
@@ -113,23 +113,23 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	// 	{Name: "isAllowed", Type: "bool"},
 	// 	{Name: "isFrozen", Type: "bool"},
 	// 	{Name: "noApprovalRequired", Type: "bool"},
-	// 	{Name: "badgeIds", Type: "IdRange[]"},
-	// 	{Name: "timeIntervals", Type: "IdRange[]"},
+	// 	{Name: "badgeIds", Type: "UintRange[]"},
+	// 	{Name: "timeIntervals", Type: "UintRange[]"},
 	// }
 
 	// addressesTypes := []apitypes.Type{
 	// 	{Name: "addresses", Type: "string[]"},
-	// 	{Name: "includeOnlySpecified", Type: "bool"},
+	// 	{Name: "onlySpecifiedAddresses", Type: "bool"},
 	// }
 
-	// idRangeTypes := []apitypes.Type{
+	// uintRangeTypes := []apitypes.Type{
 	// 	{Name: "start", Type: "uint64"},
 	// 	{Name: "end", Type: "uint64"},
 	// }
 
 	// balanceTypes := []apitypes.Type{
 	// 	{Name: "amount", Type: "uint64"},
-	// 	{Name: "badgeIds", Type: "IdRange[]"},
+	// 	{Name: "badgeIds", Type: "UintRange[]"},
 	// }
 
 	// badgeSupplyAndAmountTypes := []apitypes.Type{
@@ -144,7 +144,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 
 	// claimsTypes := []apitypes.Type{
 	// 	{Name: "balances", Type: "Balance[]"},
-	// 	{Name: "timeIntervals", Type: "IdRange[]"},
+	// 	{Name: "timeIntervals", Type: "UintRange[]"},
 	// 	{Name: "uri", Type: "string"},
 	// 	{Name: "numClaimsPerAddress", Type: "uint64"},
 	// 	{Name: "IncrementBadgeIdsBy", Type: "uint64"},
@@ -168,7 +168,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 
 	// badgeMetadataType := []apitypes.Type{
 	// 	{Name: "uri", Type: "string"},
-	// 	{Name: "badgeIds", Type: "IdRange[]"},
+	// 	{Name: "badgeIds", Type: "UintRange[]"},
 	// 	{Name: "customData", Type: "string"},
 	// 	{Name: "isFrozen", Type: "bool"},
 	// }
@@ -223,7 +223,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	// 		},
 	// 		"CollectionApprovedTransfer": collectionApprovedTransferTypes,
 	// 		"AddressMapping":           addressesTypes,
-	// 		"IdRange":                    idRangeTypes,
+	// 		"UintRange":                    uintRangeTypes,
 	// 		"BadgeSupplyAndAmount":       badgeSupplyAndAmountTypes,
 	// 		"Transfer":                   transfersTypes,
 	// 		"Claim":                      claimsTypes,
@@ -253,7 +253,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	// 		"Transfer":                   transfersTypes,
 	// 		"Claim":                      claimsTypes,
 	// 		"Balance":                    balanceTypes,
-	// 		"IdRange":                    idRangeTypes,
+	// 		"UintRange":                    uintRangeTypes,
 	// 		"BadgeMetadata":              badgeMetadataType,
 	// 		"CollectionMetadata":         collectionMetadataType,
 	// 		"OffChainBalancesMetadata":           offChainBalancesMetadataType,
@@ -271,7 +271,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	// 		},
 	// 		"Transfer": transfersTypes,
 	// 		"Balance":  balanceTypes,
-	// 		"IdRange":  idRangeTypes,
+	// 		"UintRange":  uintRangeTypes,
 	// 	}
 	// case TypeMsgUpdateUserApprovedTransfers:
 	// 	return map[string][]apitypes.Type{
@@ -282,7 +282,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	// 		},
 	// 		"UserApprovedOutgoingTransfer": 			UserApprovedOutgoingTransferTypes,
 	// 		"AddressMapping":           addressesTypes,
-	// 		"IdRange":                    idRangeTypes,
+	// 		"UintRange":                    uintRangeTypes,
 	// 	}
 	// case TypeMsgUpdateCollectionApprovedTransfers:
 	// 	return map[string][]apitypes.Type{
@@ -293,7 +293,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	// 		},
 	// 		"CollectionApprovedTransfer": collectionApprovedTransferTypes,
 	// 		"AddressMapping":           addressesTypes,
-	// 		"IdRange":                    idRangeTypes,
+	// 		"UintRange":                    uintRangeTypes,
 	// 	}
 	// case TypeMsgUpdateMetadata:
 	// 	return map[string][]apitypes.Type{
@@ -309,7 +309,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	// 		"BadgeMetadata":      badgeMetadataType,
 	// 		"CollectionMetadata": collectionMetadataType,
 	// 		"OffChainBalancesMetadata":   offChainBalancesMetadataType,
-	// 		"IdRange":            idRangeTypes,
+	// 		"UintRange":            uintRangeTypes,
 	// 	}
 	// case TypeMsgUpdateCollectionPermissions:
 	// 	return map[string][]apitypes.Type{

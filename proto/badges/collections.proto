@@ -45,7 +45,7 @@ message BadgeCollection {
   // The manager is the address of the manager of this collection.
   repeated ManagerTimeline managerTimeline = 9;
   
-  // The permissions define what the manager and owners of the collection can do or not do.
+  // The permissions define what the manager of the collection can do or not do.
   CollectionPermissions permissions = 10;
   
   // The approved transfers timeline defines the transferability of the collection for collections with standard balances.

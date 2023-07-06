@@ -12,7 +12,7 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 message BadgeMetadata {
   string uri = 1;
   string customData = 2;
-  repeated IdRange badgeIds = 3;
+  repeated UintRange badgeIds = 3;
 }
 
 // This defines the metadata for the collection.

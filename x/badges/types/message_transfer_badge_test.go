@@ -30,7 +30,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 						Balances: []*types.Balance{
 							{
 								Amount: sdkmath.NewUint(10),
-								BadgeIds: []*types.IdRange{
+								BadgeIds: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 										End:   sdkmath.NewUint(1),
@@ -57,13 +57,13 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 						Balances: []*types.Balance{
 							{
 								Amount: sdkmath.NewUint(10),
-								BadgeIds: []*types.IdRange{
+								BadgeIds: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 										End:   sdkmath.NewUint(1),
 									},
 								},
-								OwnershipTimes:  []*types.IdRange{
+								OwnershipTimes:  []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 										End:   sdkmath.NewUint(1),
@@ -87,13 +87,13 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 						},
 						Balances: []*types.Balance{
 							{
-								BadgeIds: []*types.IdRange{
+								BadgeIds: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 										End:   sdkmath.NewUint(1),
 									},
 								},
-								OwnershipTimes:  []*types.IdRange{
+								OwnershipTimes:  []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 										End:   sdkmath.NewUint(1),
@@ -118,13 +118,13 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 						Balances: []*types.Balance{
 							{
 								Amount: sdkmath.NewUint(10),
-								BadgeIds: []*types.IdRange{
+								BadgeIds: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(10),
 										End:   sdkmath.NewUint(1),
 									},
 								},
-								OwnershipTimes:  []*types.IdRange{
+								OwnershipTimes:  []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 										End:   sdkmath.NewUint(1),
@@ -150,7 +150,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 						Balances: []*types.Balance{
 							{
 								Amount: sdkmath.NewUint(10),
-								BadgeIds: []*types.IdRange{
+								BadgeIds: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(10),
 										End:   sdkmath.NewUint(1),
@@ -177,13 +177,13 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 						Balances: []*types.Balance{
 							{
 								Amount: sdkmath.NewUint(10),
-								OwnershipTimes: []*types.IdRange{
+								OwnershipTimes: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(10),
 										End:   sdkmath.NewUint(1),
 									},
 								},
-								BadgeIds: []*types.IdRange{
+								BadgeIds: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 										End:   sdkmath.NewUint(1),

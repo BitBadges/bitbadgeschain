@@ -21,7 +21,7 @@ package keeper_test
 // 				BadgeMetadata: []*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.IdRange{
+// 						BadgeIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End:   sdkmath.NewUint(math.MaxUint64),
@@ -43,7 +43,7 @@ package keeper_test
 // 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "https://example.com", []*types.BadgeMetadata{
 // 		{
 // 			Uri: "https://example.com/{id}",
-// 			BadgeIds: []*types.IdRange{
+// 			BadgeIds: []*types.UintRange{
 // 				{
 // 					Start: sdkmath.NewUint(1),
 // 					End:   sdkmath.NewUint(math.MaxUint64),
@@ -76,7 +76,7 @@ package keeper_test
 // 				BadgeMetadata: []*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.IdRange{
+// 						BadgeIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End:   sdkmath.NewUint(math.MaxUint64),
@@ -97,7 +97,7 @@ package keeper_test
 // 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "https://example.com/test2222", []*types.BadgeMetadata{
 // 		{
 // 			Uri: "https://example.com/{id}/edited",
-// 			BadgeIds: []*types.IdRange{
+// 			BadgeIds: []*types.UintRange{
 // 				{
 // 					Start: sdkmath.NewUint(1),
 // 					End:   sdkmath.NewUint(math.MaxUint64),
@@ -127,7 +127,7 @@ package keeper_test
 // 				BadgeMetadata: []*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.IdRange{
+// 						BadgeIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End:   sdkmath.NewUint(math.MaxUint64),
@@ -148,7 +148,7 @@ package keeper_test
 // 	err = UpdateURIs(suite, wctx, alice, sdkmath.NewUint(1), "https://example.com", []*types.BadgeMetadata{
 // 		{
 // 			Uri: "https://example.com/{id}",
-// 			BadgeIds: []*types.IdRange{
+// 			BadgeIds: []*types.UintRange{
 // 				{
 // 					Start: sdkmath.NewUint(1),
 // 					End:   sdkmath.NewUint(math.MaxUint64),
@@ -177,7 +177,7 @@ package keeper_test
 // 				BadgeMetadata: []*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.IdRange{
+// 						BadgeIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End:   sdkmath.NewUint(math.MaxUint64),
@@ -216,7 +216,7 @@ package keeper_test
 // 				BadgeMetadata: []*types.BadgeMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.IdRange{
+// 						BadgeIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End:   sdkmath.NewUint(math.MaxUint64),

@@ -48,7 +48,7 @@ func (k Keeper) GetAddressMappingFromStore(ctx sdk.Context, addressMappingId str
 		return &types.AddressMapping{
 			MappingId: "Mint",
 			Addresses: []string{"Mint"},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 			Uri: "",
 			CustomData: "",
 		}, nil
@@ -58,7 +58,7 @@ func (k Keeper) GetAddressMappingFromStore(ctx sdk.Context, addressMappingId str
 		return &types.AddressMapping{
 			MappingId: "Manager",
 			Addresses: []string{"Manager"},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 			Uri: "",
 			CustomData: "",
 		}, nil
@@ -68,7 +68,7 @@ func (k Keeper) GetAddressMappingFromStore(ctx sdk.Context, addressMappingId str
 		return &types.AddressMapping{
 			MappingId: "All",
 			Addresses: []string{},
-			IncludeOnlySpecified: false,
+			OnlySpecifiedAddresses: false,
 			Uri: "",
 			CustomData: "",
 		}, nil
@@ -78,7 +78,7 @@ func (k Keeper) GetAddressMappingFromStore(ctx sdk.Context, addressMappingId str
 		return &types.AddressMapping{
 			MappingId: "None",
 			Addresses: []string{},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 			Uri: "",
 			CustomData: "",
 		}, nil
@@ -88,7 +88,7 @@ func (k Keeper) GetAddressMappingFromStore(ctx sdk.Context, addressMappingId str
 		return &types.AddressMapping{
 			MappingId: addressMappingId,
 			Addresses: []string{addressMappingId},
-			IncludeOnlySpecified: true,
+			OnlySpecifiedAddresses: true,
 			Uri: "",
 			CustomData: "",
 		}, nil
@@ -133,7 +133,7 @@ func (k Keeper) CheckMappingAddresses(ctx sdk.Context, addressMappingId string, 
 		}
 	}
 
-	if !addressMapping.IncludeOnlySpecified {
+	if !addressMapping.OnlySpecifiedAddresses {
 		found = !found
 	}
 
@@ -152,8 +152,8 @@ func (k Keeper) CheckMappingAddresses(ctx sdk.Context, addressMappingId string, 
 
 // Checks if the from and to addresses are in the transfer approvedTransfer.
 // Handles the manager options for the from and to addresses.
-// If includeOnlySpecified is true, then we check if the address is in the Addresses field.
-// If includeOnlySpecified is false, then we check if the address is NOT in the Addresses field.
+// If onlySpecifiedAddresses is true, then we check if the address is in the Addresses field.
+// If onlySpecifiedAddresses is false, then we check if the address is NOT in the Addresses field.
 
 // Note addresses matching does not mean the transfer is allowed. It just means the addresses match.
 // All other criteria must also be met.

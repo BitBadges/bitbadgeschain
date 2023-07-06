@@ -25,7 +25,7 @@ func SimulateMsgMintAndDistributeBadges(
 			start := sdkmath.NewUint(r.Uint64())
 			randomSubassets = append(randomSubassets, &types.Balance{
 				Amount: sdkmath.NewUint(r.Uint64()),
-				BadgeIds: []*types.IdRange{
+				BadgeIds: []*types.UintRange{
 					{
 						Start: start,
 						End:   start.Add(sdkmath.NewUint(r.Uint64())),

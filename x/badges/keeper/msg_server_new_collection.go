@@ -24,7 +24,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		ManagerTimeline:            []*types.ManagerTimeline{
 			{
 				Manager: msg.Creator,
-				TimelineTimes: []*types.IdRange{
+				TimelineTimes: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(0),
 						End:   sdkmath.NewUint(math.MaxUint64),
@@ -42,7 +42,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		IsArchivedTimeline: []*types.IsArchivedTimeline{
 			{
 				IsArchived: false,
-				TimelineTimes:      []*types.IdRange{
+				TimelineTimes:      []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(0),
 						End:   sdkmath.NewUint(math.MaxUint64),

@@ -18,10 +18,10 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 	err := *new(error)
 	detailsToCheck := []*types.UniversalPermissionDetails{}
 	for _, balanceObj := range badgesToCreate {
-		for _, badgeIdRange := range balanceObj.BadgeIds {
+		for _, badgeUintRange := range balanceObj.BadgeIds {
 			for _, time := range balanceObj.OwnershipTimes {
 				detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
-					BadgeId: badgeIdRange,
+					BadgeId: badgeUintRange,
 					TransferTime: time,
 				})
 			}
@@ -41,9 +41,9 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 			return &types.BadgeCollection{}, ErrSupplyEqualsZero
 		}
 
-		for _, badgeIdRange := range balance.BadgeIds {
-			if badgeIdRange.End.GTE(nextBadgeId) {
-				nextBadgeId = badgeIdRange.End.Add(sdkmath.NewUint(1))
+		for _, badgeUintRange := range balance.BadgeIds {
+			if badgeUintRange.End.GTE(nextBadgeId) {
+				nextBadgeId = badgeUintRange.End.Add(sdkmath.NewUint(1))
 			}
 		}
 

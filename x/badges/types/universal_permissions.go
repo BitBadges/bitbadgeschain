@@ -27,15 +27,15 @@ type UniversalPermission struct {
 }
 
 type UniversalDefaultValues struct {
-	BadgeIds []*IdRange
-	TimelineTimes []*IdRange
-	TransferTimes []*IdRange
+	BadgeIds []*UintRange
+	TimelineTimes []*UintRange
+	TransferTimes []*UintRange
 	ToMapping *AddressMapping
 	FromMapping *AddressMapping
 	InitiatedByMapping *AddressMapping
 
-	PermittedTimes []*IdRange
-	ForbiddenTimes []*IdRange
+	PermittedTimes []*UintRange
+	ForbiddenTimes []*UintRange
 
 	UsesBadgeIds bool
 	UsesTimelineTimes bool
@@ -48,17 +48,17 @@ type UniversalDefaultValues struct {
 }
 
 type UniversalPermissionDetails struct {
-	BadgeId *IdRange
-	TimelineTime *IdRange
-	TransferTime *IdRange
+	BadgeId *UintRange
+	TimelineTime *UintRange
+	TransferTime *UintRange
 	ToMapping *AddressMapping
 	FromMapping *AddressMapping
 	InitiatedByMapping *AddressMapping
 
 	//These fields are not actually used in the overlapping logic. 
 	//They are just along for the ride and used later for lookups
-	PermittedTimes []*IdRange
-	ForbiddenTimes []*IdRange
+	PermittedTimes []*UintRange
+	ForbiddenTimes []*UintRange
 
 	ArbitraryValue interface{}
 }
@@ -107,13 +107,13 @@ func UniversalRemoveOverlapFromValues(handled *UniversalPermissionDetails, value
 }
 
 func IsAddressMappingEmpty(mapping *AddressMapping) bool {
-	return len(mapping.Addresses) == 0 && mapping.IncludeOnlySpecified
+	return len(mapping.Addresses) == 0 && mapping.OnlySpecifiedAddresses
 }
 
 func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
-	timelineTimesAfterRemoval, removedTimelineTimes := RemoveIdsFromIdRange(handled.TimelineTime, valueToCheck.TimelineTime)
-	badgesAfterRemoval, removedBadges := RemoveIdsFromIdRange(handled.BadgeId, valueToCheck.BadgeId)
-	transferTimesAfterRemoval, removedTransferTimes := RemoveIdsFromIdRange(handled.TransferTime, valueToCheck.TransferTime)
+	timelineTimesAfterRemoval, removedTimelineTimes := RemoveIdsFromUintRange(handled.TimelineTime, valueToCheck.TimelineTime)
+	badgesAfterRemoval, removedBadges := RemoveIdsFromUintRange(handled.BadgeId, valueToCheck.BadgeId)
+	transferTimesAfterRemoval, removedTransferTimes := RemoveIdsFromUintRange(handled.TransferTime, valueToCheck.TransferTime)
 
 	
 	toMappingAfterRemoval, removedToMapping := RemoveAddressMappingFromAddressMapping(handled.ToMapping, valueToCheck.ToMapping)
@@ -240,9 +240,9 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 	return remaining, removedDetails
 }
 
-func GetIdRangesWithOptions(ranges []*IdRange, options *ValueOptions, uses bool) []*IdRange {
+func GetUintRangesWithOptions(ranges []*UintRange, options *ValueOptions, uses bool) []*UintRange {
 	if !uses {
-		ranges = []*IdRange{{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}} //dummy range
+		ranges = []*UintRange{{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}} //dummy range
 		return ranges
 	}
 	
@@ -251,15 +251,15 @@ func GetIdRangesWithOptions(ranges []*IdRange, options *ValueOptions, uses bool)
 	}
 
 	if options.AllValues {
-		ranges = []*IdRange{{Start: sdkmath.NewUint(0), End: sdkmath.NewUint(math.MaxUint64)}}
+		ranges = []*UintRange{{Start: sdkmath.NewUint(0), End: sdkmath.NewUint(math.MaxUint64)}}
 	}
 
 	if options.InvertDefault {
-		ranges = InvertIdRanges(ranges, sdkmath.NewUint(math.MaxUint64))
+		ranges = InvertUintRanges(ranges, sdkmath.NewUint(math.MaxUint64))
 	}
 
 	if options.NoValues {
-		ranges = []*IdRange{}
+		ranges = []*UintRange{}
 	}
 
 	return ranges
@@ -267,7 +267,7 @@ func GetIdRangesWithOptions(ranges []*IdRange, options *ValueOptions, uses bool)
 
 func GetMappingWithOptions(mapping *AddressMapping, options *ValueOptions, uses bool) *AddressMapping {
 	if !uses {
-		mapping = &AddressMapping{Addresses: []string{}, IncludeOnlySpecified: false} //All addresses
+		mapping = &AddressMapping{Addresses: []string{}, OnlySpecifiedAddresses: false} //All addresses
 	}
 	
 	if options == nil {
@@ -275,15 +275,15 @@ func GetMappingWithOptions(mapping *AddressMapping, options *ValueOptions, uses 
 	}
 
 	if options.AllValues {
-		mapping = &AddressMapping{Addresses: []string{}, IncludeOnlySpecified: false} //All addresses
+		mapping = &AddressMapping{Addresses: []string{}, OnlySpecifiedAddresses: false} //All addresses
 	}
 
 	if options.InvertDefault {
-		mapping = &AddressMapping{Addresses: mapping.Addresses, IncludeOnlySpecified: !mapping.IncludeOnlySpecified} //Invert
+		mapping = &AddressMapping{Addresses: mapping.Addresses, OnlySpecifiedAddresses: !mapping.OnlySpecifiedAddresses} //Invert
 	}
 
 	if options.NoValues {
-		mapping = &AddressMapping{Addresses: []string{}, IncludeOnlySpecified: true} //No addresses
+		mapping = &AddressMapping{Addresses: []string{}, OnlySpecifiedAddresses: true} //No addresses
 	}
 
 	return mapping
@@ -293,11 +293,11 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) ([]*UniversalPermissi
 	handled := []*UniversalPermissionDetails{}
 	for _, permission := range permissions {
 		for _, combination := range permission.Combinations {
-			badgeIds := GetIdRangesWithOptions(permission.DefaultValues.BadgeIds, combination.BadgeIdsOptions, permission.DefaultValues.UsesBadgeIds)
-			timelineTimes := GetIdRangesWithOptions(permission.DefaultValues.TimelineTimes, combination.TimelineTimesOptions, permission.DefaultValues.UsesTimelineTimes)
-			transferTimes := GetIdRangesWithOptions(permission.DefaultValues.TransferTimes, combination.TransferTimesOptions, permission.DefaultValues.UsesTransferTimes)
-			permittedTimes := GetIdRangesWithOptions(permission.DefaultValues.PermittedTimes, combination.PermittedTimesOptions, true)
-			forbiddenTimes := GetIdRangesWithOptions(permission.DefaultValues.ForbiddenTimes, combination.ForbiddenTimesOptions, true)
+			badgeIds := GetUintRangesWithOptions(permission.DefaultValues.BadgeIds, combination.BadgeIdsOptions, permission.DefaultValues.UsesBadgeIds)
+			timelineTimes := GetUintRangesWithOptions(permission.DefaultValues.TimelineTimes, combination.TimelineTimesOptions, permission.DefaultValues.UsesTimelineTimes)
+			transferTimes := GetUintRangesWithOptions(permission.DefaultValues.TransferTimes, combination.TransferTimesOptions, permission.DefaultValues.UsesTransferTimes)
+			permittedTimes := GetUintRangesWithOptions(permission.DefaultValues.PermittedTimes, combination.PermittedTimesOptions, true)
+			forbiddenTimes := GetUintRangesWithOptions(permission.DefaultValues.ForbiddenTimes, combination.ForbiddenTimesOptions, true)
 			arbitraryValue := permission.DefaultValues.ArbitraryValue
 
 			toMapping := GetMappingWithOptions(permission.DefaultValues.ToMapping, combination.ToMappingOptions, permission.DefaultValues.UsesToMapping)
@@ -359,7 +359,7 @@ func GetPermissionString(permission *UniversalPermissionDetails) string {
 
 	if permission.ToMapping != nil {
 		str += "toMapping: "
-		if !permission.ToMapping.IncludeOnlySpecified {
+		if !permission.ToMapping.OnlySpecifiedAddresses {
 			str += fmt.Sprint(len(permission.ToMapping.Addresses)) + " addresses "
 		} else {
 			str += "all except " + fmt.Sprint(len(permission.ToMapping.Addresses)) + " addresses "
@@ -378,7 +378,7 @@ func GetPermissionString(permission *UniversalPermissionDetails) string {
 
 	if permission.FromMapping != nil {
 		str += "fromMapping: "
-		if !permission.FromMapping.IncludeOnlySpecified {
+		if !permission.FromMapping.OnlySpecifiedAddresses {
 			str += fmt.Sprint(len(permission.FromMapping.Addresses)) + " addresses "
 		} else {
 			str += "all except " + fmt.Sprint(len(permission.FromMapping.Addresses)) + " addresses "
@@ -395,7 +395,7 @@ func GetPermissionString(permission *UniversalPermissionDetails) string {
 
 	if permission.InitiatedByMapping != nil {
 		str += "initiatedByMapping: "
-		if !permission.InitiatedByMapping.IncludeOnlySpecified {
+		if !permission.InitiatedByMapping.OnlySpecifiedAddresses {
 			str += fmt.Sprint(len(permission.InitiatedByMapping.Addresses)) + " addresses "
 		} else {
 			str += "all except " + fmt.Sprint(len(permission.InitiatedByMapping.Addresses)) + " addresses "
@@ -437,8 +437,8 @@ func ValidateUniversalPermissionUpdate(oldPermissions []*UniversalPermissionDeta
 		oldPermission := overlapObj.FirstDetails
 		newPermission := overlapObj.SecondDetails
 
-		leftoverPermittedTimes, _ := RemoveIdRangeFromIdRange(newPermission.PermittedTimes, oldPermission.PermittedTimes)
-		leftoverForbiddenTimes, _ := RemoveIdRangeFromIdRange(newPermission.ForbiddenTimes, oldPermission.ForbiddenTimes)
+		leftoverPermittedTimes, _ := RemoveUintRangeFromUintRange(newPermission.PermittedTimes, oldPermission.PermittedTimes)
+		leftoverForbiddenTimes, _ := RemoveUintRangeFromUintRange(newPermission.ForbiddenTimes, oldPermission.ForbiddenTimes)
 
 		if len(leftoverPermittedTimes) > 0 || len(leftoverForbiddenTimes) > 0 {
 			errMsg := "permission "

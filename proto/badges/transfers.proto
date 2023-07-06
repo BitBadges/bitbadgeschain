@@ -31,12 +31,12 @@ message UserBalanceStore {
 
 message UserApprovedOutgoingTransferTimeline {
   repeated UserApprovedOutgoingTransfer approvedOutgoingTransfers = 1;
-  repeated IdRange timelineTimes = 2;
+  repeated UintRange timelineTimes = 2;
 }
 
 message UserApprovedIncomingTransferTimeline {
   repeated UserApprovedIncomingTransfer approvedIncomingTransfers = 1;
-  repeated IdRange timelineTimes = 2;
+  repeated UintRange timelineTimes = 2;
 }
 
 // Challenges define the rules for the approval.
@@ -93,8 +93,8 @@ message IsUserIncomingTransferAllowed {
 message UserApprovedOutgoingTransfer {
   string toMappingId = 1;
   string initiatedByMappingId = 2;
-  repeated IdRange transferTimes = 3;
-  repeated IdRange badgeIds = 4;
+  repeated UintRange transferTimes = 3;
+  repeated UintRange badgeIds = 4;
   repeated IsUserOutgoingTransferAllowed allowedCombinations = 5;
 
   repeated Challenge challenges = 6;
@@ -118,8 +118,8 @@ message UserApprovedOutgoingTransfer {
 message UserApprovedIncomingTransfer {
   string fromMappingId = 1;
   string initiatedByMappingId = 2;
-  repeated IdRange transferTimes = 3;
-  repeated IdRange badgeIds = 4;
+  repeated UintRange transferTimes = 3;
+  repeated UintRange badgeIds = 4;
   repeated IsUserIncomingTransferAllowed allowedCombinations = 5;
 
   repeated Challenge challenges = 6;
@@ -188,8 +188,8 @@ message CollectionApprovedTransfer {
   string fromMappingId = 1;
   string toMappingId = 2;
   string initiatedByMappingId = 3;
-  repeated IdRange transferTimes = 4;
-  repeated IdRange badgeIds = 5;
+  repeated UintRange transferTimes = 4;
+  repeated UintRange badgeIds = 5;
   
   repeated IsCollectionTransferAllowed allowedCombinations = 6;
 

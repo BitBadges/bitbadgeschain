@@ -5,17 +5,17 @@ import (
 )
 
 // Helper function to make code more readable
-func CreateIdRange(start sdkmath.Uint, end sdkmath.Uint) *IdRange {
-	return &IdRange{
+func CreateUintRange(start sdkmath.Uint, end sdkmath.Uint) *UintRange {
+	return &UintRange{
 		Start: start,
 		End:   end,
 	}
 }
 
 // Search ID ranges for a specific ID. Return (true) if found. And (false) if not.
-func SearchIdRangesForId(id sdkmath.Uint, idRanges []*IdRange) bool {
-	ranges := make([]*IdRange, len(idRanges))
-	copy(ranges, idRanges)
+func SearchUintRangesForId(id sdkmath.Uint, uintRanges []*UintRange) bool {
+	ranges := make([]*UintRange, len(uintRanges))
+	copy(ranges, uintRanges)
 
 	ranges = SortAndMergeOverlapping(ranges) 
 
@@ -39,14 +39,14 @@ func SearchIdRangesForId(id sdkmath.Uint, idRanges []*IdRange) bool {
 	return false
 }
 
-func InvertIdRanges(idRanges []*IdRange, maxId sdkmath.Uint) []*IdRange {
-	ranges := []*IdRange{}
-	ranges = append(ranges, CreateIdRange(sdkmath.NewUint(0), maxId))
+func InvertUintRanges(uintRanges []*UintRange, maxId sdkmath.Uint) []*UintRange {
+	ranges := []*UintRange{}
+	ranges = append(ranges, CreateUintRange(sdkmath.NewUint(0), maxId))
 
-	for _, idRange := range idRanges {
-		newRanges := []*IdRange{}
+	for _, uintRange := range uintRanges {
+		newRanges := []*UintRange{}
 		for _, rangeObject := range ranges {
-			rangesAfterRemoval, _ := RemoveIdsFromIdRange(idRange, rangeObject)
+			rangesAfterRemoval, _ := RemoveIdsFromUintRange(uintRange, rangeObject)
 			newRanges = append(newRanges, rangesAfterRemoval...)
 		}
 		ranges = newRanges
@@ -58,23 +58,23 @@ func InvertIdRanges(idRanges []*IdRange, maxId sdkmath.Uint) []*IdRange {
 // Removes all ids within an id range from an id range.
 // Removing can make this range be split into 0, 1, or 2 new ranges.
 // Returns if anything was removed or not
-func RemoveIdsFromIdRange(idxsToRemove *IdRange, rangeObject *IdRange) ([]*IdRange, []*IdRange) {
+func RemoveIdsFromUintRange(idxsToRemove *UintRange, rangeObject *UintRange) ([]*UintRange, []*UintRange) {
 	if idxsToRemove.End.LT(rangeObject.Start) || idxsToRemove.Start.GT(rangeObject.End) {
 		// idxsToRemove doesn't overlap with rangeObject, so nothing is removed
-		return []*IdRange{rangeObject}, []*IdRange{}
+		return []*UintRange{rangeObject}, []*UintRange{}
 	}
 
-	var newRanges []*IdRange
-	var removedRanges []*IdRange
+	var newRanges []*UintRange
+	var removedRanges []*UintRange
 	if idxsToRemove.Start.LTE(rangeObject.Start) && idxsToRemove.End.GTE(rangeObject.End) {
 		// idxsToRemove fully contains rangeObject, so nothing is left
-		return newRanges, []*IdRange{rangeObject}
+		return newRanges, []*UintRange{rangeObject}
 	}
 
 	if idxsToRemove.Start.GT(rangeObject.Start) {
 		// There's a range before idxsToRemove
 		// Underflow is not possible because idxsToRemove.Start.GT(rangeObject.Start
-		newRanges = append(newRanges, &IdRange{
+		newRanges = append(newRanges, &UintRange{
 			Start: rangeObject.Start,
 			End:   idxsToRemove.Start.SubUint64(1),
 		})
@@ -85,7 +85,7 @@ func RemoveIdsFromIdRange(idxsToRemove *IdRange, rangeObject *IdRange) ([]*IdRan
 			minEnd = rangeObject.End
 		}
 
-		removedRanges = append(removedRanges, &IdRange{
+		removedRanges = append(removedRanges, &UintRange{
 			Start: idxsToRemove.Start,
 			End:   minEnd,
 		})
@@ -94,7 +94,7 @@ func RemoveIdsFromIdRange(idxsToRemove *IdRange, rangeObject *IdRange) ([]*IdRan
 	if idxsToRemove.End.LT(rangeObject.End) {
 		// There's a range after idxsToRemove
 		// Overflow is not possible because idxsToRemove.End.LT(rangeObject.End
-		newRanges = append(newRanges, &IdRange{
+		newRanges = append(newRanges, &UintRange{
 			Start: idxsToRemove.End.AddUint64(1),
 			End:   rangeObject.End,
 		})
@@ -104,7 +104,7 @@ func RemoveIdsFromIdRange(idxsToRemove *IdRange, rangeObject *IdRange) ([]*IdRan
 			maxStart = rangeObject.Start
 		}
 
-		removedRanges = append(removedRanges, &IdRange{
+		removedRanges = append(removedRanges, &UintRange{
 			Start: maxStart,
 			End:   idxsToRemove.End,
 		})
@@ -113,16 +113,16 @@ func RemoveIdsFromIdRange(idxsToRemove *IdRange, rangeObject *IdRange) ([]*IdRan
 	return newRanges, removedRanges
 }
 
-func RemoveIdRangeFromIdRange(idsToRemove []*IdRange, rangeToRemoveFrom []*IdRange) ([]*IdRange, []*IdRange) {
+func RemoveUintRangeFromUintRange(idsToRemove []*UintRange, rangeToRemoveFrom []*UintRange) ([]*UintRange, []*UintRange) {
 	if len(idsToRemove) == 0 {
-		return rangeToRemoveFrom, []*IdRange{}
+		return rangeToRemoveFrom, []*UintRange{}
 	}
 
-	removedRanges := []*IdRange{}
+	removedRanges := []*UintRange{}
 	for _, handledValue := range idsToRemove {
-		newRanges := []*IdRange{}
+		newRanges := []*UintRange{}
 		for _, oldPermittedTime := range rangeToRemoveFrom {
-			rangesAfterRemoval, removed := RemoveIdsFromIdRange(handledValue, oldPermittedTime)
+			rangesAfterRemoval, removed := RemoveIdsFromUintRange(handledValue, oldPermittedTime)
 			newRanges = append(newRanges, rangesAfterRemoval...)
 			removedRanges = append(removedRanges, removed...)
 		}
@@ -133,12 +133,12 @@ func RemoveIdRangeFromIdRange(idsToRemove []*IdRange, rangeToRemoveFrom []*IdRan
 }
 
 
-func AssertRangesDoNotOverlapAtAll(rangeToCheck []*IdRange, overlappingRange []*IdRange) error {
+func AssertRangesDoNotOverlapAtAll(rangeToCheck []*UintRange, overlappingRange []*UintRange) error {
 	//Check that for old times, there is 100% overlap with new times and 0% overlap with the opposite
 	for _, oldAllowedTime := range rangeToCheck {
 		for _, newAllowedTime := range overlappingRange {
 			//Check that the new time completely overlaps with the old time
-			_, removed := RemoveIdsFromIdRange(newAllowedTime, oldAllowedTime)
+			_, removed := RemoveIdsFromUintRange(newAllowedTime, oldAllowedTime)
 			if len(removed) > 0 {
 				return ErrRangesOverlap
 			}
@@ -150,7 +150,7 @@ func AssertRangesDoNotOverlapAtAll(rangeToCheck []*IdRange, overlappingRange []*
 
 
 // Will sort the ID ranges in order and merge overlapping IDs if we can
-func SortAndMergeOverlapping(ids []*IdRange) []*IdRange {
+func SortAndMergeOverlapping(ids []*UintRange) []*UintRange {
 	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
 	var n = len(ids)
 	for i := 1; i < n; i++ {
@@ -167,34 +167,34 @@ func SortAndMergeOverlapping(ids []*IdRange) []*IdRange {
 
 	//Merge overlapping ranges
 	if n > 0 {
-		newIdRanges := []*IdRange{CreateIdRange(ids[0].Start, ids[0].End)}
+		newUintRanges := []*UintRange{CreateUintRange(ids[0].Start, ids[0].End)}
 		//Iterate through and compare with previously inserted range
 		for i := 1; i < n; i++ {
-			prevInsertedRange := newIdRanges[len(newIdRanges)-1]
+			prevInsertedRange := newUintRanges[len(newUintRanges)-1]
 			currRange := ids[i]
 
 			if currRange.Start.Equal(prevInsertedRange.Start) {
 				//Both have same start, so we set to currRange.End because currRange.End is greater due to our sorting
 				//Example: prevRange = [1, 5], currRange = [1, 10] -> newRange = [1, 10]
-				newIdRanges[len(newIdRanges)-1].End = currRange.End
+				newUintRanges[len(newUintRanges)-1].End = currRange.End
 			} else if currRange.End.GT(prevInsertedRange.End) {
 				//We have different starts and curr end is greater than prev end
 
 				if currRange.Start.GT(prevInsertedRange.End.AddUint64(1)) {
 					//We have a gap between the prev range end and curr range start, so we just append currRange
 					//Example: prevRange = [1, 5], currRange = [7, 10] -> newRange = [1, 5], [7, 10]
-					newIdRanges = append(newIdRanges, CreateIdRange(currRange.Start, currRange.End))
+					newUintRanges = append(newUintRanges, CreateUintRange(currRange.Start, currRange.End))
 				} else {
 					//They overlap and we can merge them
 					//Example: prevRange = [1, 5], currRange = [2, 10] -> newRange = [1, 10]
-					newIdRanges[len(newIdRanges)-1].End = currRange.End
+					newUintRanges[len(newUintRanges)-1].End = currRange.End
 				}
 			} 
 			// else {
 				//Note: If currRange.End <= prevInsertedRange.End, it is already fully contained within the previous. We can just continue.
 			// }
 		}
-		return newIdRanges
+		return newUintRanges
 	} else {
 		return ids
 	}

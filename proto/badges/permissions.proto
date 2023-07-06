@@ -20,7 +20,7 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 // CollectionApprovedTransferPermission: defines when the manager can update the transferability of the collection and what transfers can be updated vs locked
 //
 // Note there are a few different times here which could get confusing:
-// - TimelineTimes: the times when a timeline-based field is a specific value
+// - timelineTimes: the times when a timeline-based field is a specific value
 // - permitted/forbiddenTimes - the times that a permission can be performed
 // - transferTimes - the times that a transfer occurs
 // - ownershipTimes - the times when a badge is owned by a user
@@ -87,16 +87,16 @@ message CollectionApprovedTransferCombination {
 }
 
 message CollectionApprovedTransferDefaultValues {
-  repeated IdRange timelineTimes = 1;
+  repeated UintRange timelineTimes = 1;
 
   string fromMappingId = 2;
   string toMappingId = 3;
   string initiatedByMappingId = 4;
-  repeated IdRange transferTimes = 5;
-  repeated IdRange badgeIds = 6;
+  repeated UintRange transferTimes = 5;
+  repeated UintRange badgeIds = 6;
 
-  repeated IdRange permittedTimes = 7;
-  repeated IdRange forbiddenTimes = 8;
+  repeated UintRange permittedTimes = 7;
+  repeated UintRange forbiddenTimes = 8;
 }
 
 // CollectionApprovedTransferPermission defines what collection approved transfers can be updated vs are locked.
@@ -133,15 +133,15 @@ message UserApprovedOutgoingTransferCombination {
 }
 
 message UserApprovedOutgoingTransferDefaultValues {
-  repeated IdRange timelineTimes = 1;
+  repeated UintRange timelineTimes = 1;
 
   string toMappingId = 2;
   string initiatedByMappingId = 3;
-  repeated IdRange transferTimes = 4;
-  repeated IdRange badgeIds = 5;
+  repeated UintRange transferTimes = 4;
+  repeated UintRange badgeIds = 5;
 
-  repeated IdRange permittedTimes = 7;
-  repeated IdRange forbiddenTimes = 8;
+  repeated UintRange permittedTimes = 7;
+  repeated UintRange forbiddenTimes = 8;
 }
 
 // UserApprovedOutgoingTransferPermission defines the permissions for updating the user's approved outgoing transfers.
@@ -164,15 +164,15 @@ message UserApprovedIncomingTransferCombination {
 }
 
 message UserApprovedIncomingTransferDefaultValues {
-  repeated IdRange timelineTimes = 1;
+  repeated UintRange timelineTimes = 1;
 
   string fromMappingId = 2;
   string initiatedByMappingId = 3;
-  repeated IdRange transferTimes = 4;
-  repeated IdRange badgeIds = 5;
+  repeated UintRange transferTimes = 4;
+  repeated UintRange badgeIds = 5;
 
-  repeated IdRange permittedTimes = 7;
-  repeated IdRange forbiddenTimes = 8;
+  repeated UintRange permittedTimes = 7;
+  repeated UintRange forbiddenTimes = 8;
 }
 
 // UserApprovedIncomingTransferPermission defines the permissions for updating the user's approved incoming transfers.
@@ -191,11 +191,11 @@ message BalancesActionCombination {
 }
 
 message BalancesActionDefaultValues {
-  repeated IdRange badgeIds = 1;
-  repeated IdRange ownershipTimes = 2;
+  repeated UintRange badgeIds = 1;
+  repeated UintRange ownershipTimes = 2;
 
-  repeated IdRange permittedTimes = 3;
-  repeated IdRange forbiddenTimes = 4;
+  repeated UintRange permittedTimes = 3;
+  repeated UintRange forbiddenTimes = 4;
 }
 
 // BalancesActionPermission defines the permissions for updating a timeline-based field for specific badges and specific badge ownership times.
@@ -209,8 +209,8 @@ message BalancesActionPermission {
 }
 
 message ActionDefaultValues {
-  repeated IdRange permittedTimes = 1;
-  repeated IdRange forbiddenTimes = 2;
+  repeated UintRange permittedTimes = 1;
+  repeated UintRange forbiddenTimes = 2;
 }
 
 message ActionCombination {
@@ -234,10 +234,10 @@ message TimedUpdateCombination {
 }
 
 message TimedUpdateDefaultValues {
-  repeated IdRange timelineTimes = 1;
+  repeated UintRange timelineTimes = 1;
 
-  repeated IdRange permittedTimes = 2;
-  repeated IdRange forbiddenTimes = 3;
+  repeated UintRange permittedTimes = 2;
+  repeated UintRange forbiddenTimes = 3;
 }
 
 // TimedUpdatePermission defines the permissions for updating a timeline-based field.
@@ -260,11 +260,11 @@ message TimedUpdateWithBadgeIdsCombination {
 }
 
 message TimedUpdateWithBadgeIdsDefaultValues {
-  repeated IdRange badgeIds = 1;
-  repeated IdRange timelineTimes = 2;
+  repeated UintRange badgeIds = 1;
+  repeated UintRange timelineTimes = 2;
 
-  repeated IdRange permittedTimes = 3;
-  repeated IdRange forbiddenTimes = 4;
+  repeated UintRange permittedTimes = 3;
+  repeated UintRange forbiddenTimes = 4;
 }
 
 // TimedUpdateWithBadgeIdsPermission defines the permissions for updating a timeline-based field for specific badges.
