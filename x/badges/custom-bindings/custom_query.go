@@ -21,12 +21,6 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 			return nil, sdkerrors.Wrap(err, err.Error())
 		}
 		switch {
-		case custom.QueryAddressById != nil:
-			res, err := keeper.GetAddressById(ctx, custom.QueryAddressById)
-			if err != nil {
-				return nil, err
-			}
-			return json.Marshal(badgeTypes.QueryGetAddressByIdResponse{Address: res.Address})
 		case custom.QueryCollection != nil:
 			res, err := keeper.GetCollection(ctx, custom.QueryCollection)
 			if err != nil {
@@ -46,7 +40,6 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 }
 
 type badgeCustomQuery struct {
-	QueryAddressById *badgeTypes.QueryGetAddressByIdRequest `json:"queryAddressById,omitempty"`
 	QueryCollection  *badgeTypes.QueryGetCollectionRequest  `json:"queryCollection,omitempty"`
 	QueryBalance     *badgeTypes.QueryGetBalanceRequest     `json:"queryBalance,omitempty"`
 }

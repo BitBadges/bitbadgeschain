@@ -17,8 +17,6 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	
-
 	userBalanceKey := ConstructBalanceKey(req.Address, req.CollectionId)
 	userBalance, found := k.GetUserBalanceFromStore(ctx, userBalanceKey)
 	if found {
@@ -40,7 +38,7 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 			Balances: []*types.Balance{},
 			ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
 			ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,
-			// UserPermissions TODO:
+			Permissions: &types.UserPermissions{},
 		}
 		return &types.QueryGetBalanceResponse{
 			Balance: blankUserBalance,

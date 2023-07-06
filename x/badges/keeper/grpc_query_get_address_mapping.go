@@ -21,7 +21,7 @@ func (k Keeper) GetAddressMapping(goCtx context.Context, req *types.QueryGetAddr
 		return nil, status.Error(codes.InvalidArgument, "invalid request. this query does not support the manager mapping")
 	}
 
-	addressMapping, err := k.GetAddressMappingFromStore(ctx, req.MappingId, "")
+	addressMapping, err := k.GetAddressMappingById(ctx, req.MappingId, "")
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}

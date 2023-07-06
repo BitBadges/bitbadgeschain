@@ -54,7 +54,7 @@ type BadgeCollection struct {
 	CustomDataTimeline []*CustomDataTimeline `protobuf:"bytes,8,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
 	// The manager is the address of the manager of this collection.
 	ManagerTimeline []*ManagerTimeline `protobuf:"bytes,9,rep,name=managerTimeline,proto3" json:"managerTimeline,omitempty"`
-	// The permissions define what the manager and owners of the collection can do or not do.
+	// The permissions define what the manager of the collection can do or not do.
 	Permissions *CollectionPermissions `protobuf:"bytes,10,opt,name=permissions,proto3" json:"permissions,omitempty"`
 	// The approved transfers timeline defines the transferability of the collection for collections with standard balances.
 	// This defines it on a collection-level. All transfers must be explicitly allowed on the collection-level, or else, they will fail.

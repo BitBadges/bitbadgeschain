@@ -36,7 +36,7 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 
 }
 
-//TODO:
+//TODO: Create a test suite that measures a benchmark of gas costs and look to optimize it
 
 // func (suite *TestSuite) TestGasCosts() {
 // 	wctx := sdk.WrapSDKContext(suite.ctx)

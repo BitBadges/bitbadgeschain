@@ -13,11 +13,11 @@ import (
 func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollection) (*types.MsgNewCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	NextCollectionId := k.GetNextCollectionId(ctx)
+	nextCollectionId := k.GetNextCollectionId(ctx)
 	k.IncrementNextCollectionId(ctx)
 
 	collection := &types.BadgeCollection{
-		CollectionId:       				NextCollectionId,
+		CollectionId:       				nextCollectionId,
 		CollectionMetadataTimeline: msg.CollectionMetadataTimeline,
 		OffChainBalancesMetadataTimeline:   msg.OffChainBalancesMetadataTimeline,
 		BadgeMetadataTimeline:      msg.BadgeMetadataTimeline,
@@ -26,7 +26,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 				Manager: msg.Creator,
 				TimelineTimes: []*types.UintRange{
 					{
-						Start: sdkmath.NewUint(0),
+						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(math.MaxUint64),
 					},
 				},
@@ -44,7 +44,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 				IsArchived: false,
 				TimelineTimes:      []*types.UintRange{
 					{
-						Start: sdkmath.NewUint(0),
+						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(math.MaxUint64),
 					},
 				},
@@ -63,7 +63,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		}
 	}
 
-	if len(msg.BadgesToCreate) > 0 {
+	if msg.BadgesToCreate != nil {
 		err := *new(error)
 		collection, err = k.CreateBadges(ctx, collection, msg.BadgesToCreate, msg.Transfers)
 		if err != nil {
@@ -71,7 +71,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		}
 	}
 
-	if msg.InheritedBalancesTimeline != nil && len(msg.InheritedBalancesTimeline) > 0 {
+	if msg.InheritedBalancesTimeline != nil {
 		if err := k.ValidateInheritedBalancesUpdate(ctx, collection, collection.InheritedBalancesTimeline, collection.InheritedBalancesTimeline, collection.Permissions.CanUpdateInheritedBalances); err != nil {
 			return nil, err
 		}
@@ -85,11 +85,11 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("collectionId", fmt.Sprint(NextCollectionId)),
+			sdk.NewAttribute("collectionId", fmt.Sprint(nextCollectionId)),
 		),
 	)
 
 	return &types.MsgNewCollectionResponse{
-		CollectionId: NextCollectionId,
+		CollectionId: nextCollectionId,
 	}, nil
 }

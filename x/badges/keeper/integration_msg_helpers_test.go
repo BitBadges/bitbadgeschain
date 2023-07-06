@@ -30,17 +30,7 @@ func GetUserBalance(suite *TestSuite, ctx context.Context, collectionId sdkmath.
 	return res.Balance, nil
 }
 
-// func GetClaim(suite *TestSuite, ctx context.Context, collectionId sdkmath.Uint, claimId sdkmath.Uint) (types.Claim, error) {
-// 	res, err := suite.app.BadgesKeeper.GetClaim(ctx, &types.QueryGetClaimRequest{
-// 		CollectionId: sdkmath.Uint(collectionId),
-// 		ClaimId:      sdkmath.Uint(claimId),
-// 	})
-// 	if err != nil {
-// 		return types.Claim{}, err
-// 	}
-
-// 	return *res.Claim, nil
-// }
+//TODO: Queries
 
 // /* Msg helpers */
 

@@ -9,19 +9,17 @@ import (
 //Create badges and update the unminted / total supplys for the collection
 func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, badgesToCreate []*types.Balance, transfers []*types.Transfer) (*types.BadgeCollection, error) {
 	if IsInheritedBalances(collection) {
-		return &types.BadgeCollection{}, ErrInheritedBalances
+		return &types.BadgeCollection{}, ErrWrongBalancesType
 	}
-	
-	totalSupplys := collection.TotalSupplys 
-	unmintedSupplys := collection.UnmintedSupplys
 
+	//Check if we are allowed to create these badges
 	err := *new(error)
 	detailsToCheck := []*types.UniversalPermissionDetails{}
 	for _, balanceObj := range badgesToCreate {
-		for _, badgeUintRange := range balanceObj.BadgeIds {
+		for _, badgeIdRange := range balanceObj.BadgeIds {
 			for _, time := range balanceObj.OwnershipTimes {
 				detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
-					BadgeId: badgeUintRange,
+					BadgeId: badgeIdRange,
 					TransferTime: time,
 				})
 			}
@@ -32,42 +30,41 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 	if err != nil {
 		return &types.BadgeCollection{}, err
 	}
-	nextBadgeId := collection.NextBadgeId
 
-	//Update supplys and mint total supply for each to manager.
-	//Subasset supplys are stored as []*types.Balance, so we can use the balance update functions
+
+	//Create the badges and add newly created balances to unminted supplys
 	for _, balance := range badgesToCreate {
 		if balance.Amount.IsZero() {
 			return &types.BadgeCollection{}, ErrSupplyEqualsZero
 		}
 
-		for _, badgeUintRange := range balance.BadgeIds {
-			if badgeUintRange.End.GTE(nextBadgeId) {
-				nextBadgeId = badgeUintRange.End.Add(sdkmath.NewUint(1))
+		//Update nextBadgeId to be max badgeId + 1
+		for _, badgeIdRange := range balance.BadgeIds {
+			if badgeIdRange.End.GTE(collection.NextBadgeId) {
+				collection.NextBadgeId = badgeIdRange.End.Add(sdkmath.NewUint(1))
 			}
 		}
 
-		totalSupplys, err = types.AddBalance(totalSupplys, balance)
+		collection.TotalSupplys, err = types.AddBalance(collection.TotalSupplys, balance)
 		if err != nil {
 			return &types.BadgeCollection{}, err
 		}
 
-		unmintedSupplys, err = types.AddBalance(unmintedSupplys, balance)
+		collection.UnmintedSupplys, err = types.AddBalance(collection.UnmintedSupplys, balance)
 		if err != nil {
 			return &types.BadgeCollection{}, err
 		}
 	}
 
-	collection.UnmintedSupplys = unmintedSupplys
-	collection.TotalSupplys = totalSupplys
-	collection.NextBadgeId = nextBadgeId
-
+	
 	if IsStandardBalances(collection) {
+		//Handle any transfers defined in the Msg
 		err = k.HandleTransfers(ctx, collection, transfers, "Manager")
 		if err != nil {
 			return &types.BadgeCollection{}, err
 		}
 	} else {
+		//For readability, we do not allow transfers to happen on-chain, if not defined in the collection
 		if len(transfers) > 0 || len(collection.CollectionApprovedTransfersTimeline) > 0 {
 			return &types.BadgeCollection{}, ErrWrongBalancesType
 		}

@@ -43,10 +43,6 @@ service Query {
 		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_balance/{collectionId}/{address}";
 	}
 
-  // Queries an address by its account number.
-	rpc GetAddressById(QueryGetAddressByIdRequest) returns (QueryGetAddressByIdResponse) {
-		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_address_by_id/{id}";
-	}
   // this line is used by starport scaffolding # 2
 }
 
@@ -68,18 +64,6 @@ message QueryGetCollectionRequest {
 
 message QueryGetCollectionResponse {
   BadgeCollection collection = 1;
-}
-
-message QueryGetAddressByIdRequest {
-  string id = 1  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-}
-
-message QueryGetAddressByIdResponse {
-  string address = 1;
 }
 
 message QueryGetBalanceRequest {

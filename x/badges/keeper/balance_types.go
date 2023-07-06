@@ -6,13 +6,13 @@ import (
 )
 
 func IsStandardBalances(collection *types.BadgeCollection) bool {
-	return collection.BalancesType.Equal(sdkmath.NewUint(0))
-}
-
-func IsOffChainBalances(collection *types.BadgeCollection) bool {
 	return collection.BalancesType.Equal(sdkmath.NewUint(1))
 }
 
-func IsInheritedBalances(collection *types.BadgeCollection) bool {
+func IsOffChainBalances(collection *types.BadgeCollection) bool {
 	return collection.BalancesType.Equal(sdkmath.NewUint(2))
+}
+
+func IsInheritedBalances(collection *types.BadgeCollection) bool {
+	return collection.BalancesType.Equal(sdkmath.NewUint(3))
 }

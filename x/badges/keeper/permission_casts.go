@@ -21,12 +21,12 @@ func (k Keeper) CastUserApprovedIncomingTransferPermissionToUniversalPermission(
 			})
 		}
 
-		fromMapping, err := k.GetAddressMappingFromStore(ctx, permission.DefaultValues.FromMappingId, managerAddress)
+		fromMapping, err := k.GetAddressMappingById(ctx, permission.DefaultValues.FromMappingId, managerAddress)
 		if err != nil {
 			return nil, err
 		}
 
-		initiatedByMapping, err := k.GetAddressMappingFromStore(ctx, permission.DefaultValues.InitiatedByMappingId, managerAddress)
+		initiatedByMapping, err := k.GetAddressMappingById(ctx, permission.DefaultValues.InitiatedByMappingId, managerAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -70,12 +70,12 @@ func (k Keeper) CastUserApprovedOutgoingTransferPermissionToUniversalPermission(
 			})
 		}
 
-		initiatedByMapping, err := k.GetAddressMappingFromStore(ctx, permission.DefaultValues.InitiatedByMappingId, managerAddress)
+		initiatedByMapping, err := k.GetAddressMappingById(ctx, permission.DefaultValues.InitiatedByMappingId, managerAddress)
 		if err != nil {
 			return nil, err
 		}
 
-		toMapping, err := k.GetAddressMappingFromStore(ctx, permission.DefaultValues.ToMappingId, managerAddress)
+		toMapping, err := k.GetAddressMappingById(ctx, permission.DefaultValues.ToMappingId, managerAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -142,17 +142,17 @@ func (k Keeper) CastCollectionApprovedTransferPermissionToUniversalPermission(ct
 			})
 		}
 
-		fromMapping, err := k.GetAddressMappingFromStore(ctx, collectionUpdatePermission.DefaultValues.FromMappingId, managerAddress)
+		fromMapping, err := k.GetAddressMappingById(ctx, collectionUpdatePermission.DefaultValues.FromMappingId, managerAddress)
 		if err != nil {
 			return nil, err
 		}
 
-		initiatedByMapping, err := k.GetAddressMappingFromStore(ctx, collectionUpdatePermission.DefaultValues.InitiatedByMappingId, managerAddress)
+		initiatedByMapping, err := k.GetAddressMappingById(ctx, collectionUpdatePermission.DefaultValues.InitiatedByMappingId, managerAddress)
 		if err != nil {
 			return nil, err
 		}
 
-		toMapping, err := k.GetAddressMappingFromStore(ctx, collectionUpdatePermission.DefaultValues.ToMappingId, managerAddress)
+		toMapping, err := k.GetAddressMappingById(ctx, collectionUpdatePermission.DefaultValues.ToMappingId, managerAddress)
 		if err != nil {
 			return nil, err
 		}

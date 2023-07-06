@@ -66,9 +66,9 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	genesis.NumUsedForChallenges, genesis.NumUsedForChallengesStoreKeys = k.GetNumUsedForChallengesFromStore(ctx)
 
-	genesis.AddressMappings = k.GetAddressMappingFromStoresFromStore(ctx)
+	genesis.AddressMappings = k.GetAddressMappingsFromStore(ctx)
 
-	genesis.ApprovalsTrackers, genesis.ApprovalsTrackerStoreKeys = k.GetTransferTrackersFromStore(ctx)
+	genesis.ApprovalsTrackers, genesis.ApprovalsTrackerStoreKeys = k.GetApprovalsTrackersFromStore(ctx)
 
 	// this line is used by starport scaffolding # genesis/module/export
 

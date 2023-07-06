@@ -31,7 +31,7 @@ func HandleDuplicateBadgeIds(balances []*Balance) ([]*Balance, error) {
 func GetBalancesForId(id sdkmath.Uint, balances []*Balance) []*Balance {
 	matchingBalances := []*Balance{}
 	for _, balance := range balances {
-		found := SearchUintRangesForId(id, balance.BadgeIds)
+		found := SearchUintRangesForUint(id, balance.BadgeIds)
 		if found {
 			matchingBalances = append(matchingBalances, &Balance{
 				Amount:   balance.Amount,

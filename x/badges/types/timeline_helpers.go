@@ -9,7 +9,7 @@ func GetCurrentUserApprovedIncomingTransfers(ctx sdk.Context, userBalance *UserB
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	approvedTransfersTimeline := userBalance.ApprovedIncomingTransfersTimeline
 	for _, approvedTransfersTimelineVal := range approvedTransfersTimeline {
-		found := SearchUintRangesForId(blockTime, approvedTransfersTimelineVal.TimelineTimes)
+		found := SearchUintRangesForUint(blockTime, approvedTransfersTimelineVal.TimelineTimes)
 		if found {
 			return approvedTransfersTimelineVal.ApprovedIncomingTransfers
 		}
@@ -22,7 +22,7 @@ func GetCurrentUserApprovedOutgoingTransfers(ctx sdk.Context, userBalance *UserB
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	approvedTransfersTimeline := userBalance.ApprovedOutgoingTransfersTimeline
 	for _, approvedTransfersTimelineVal := range approvedTransfersTimeline {
-		found := SearchUintRangesForId(blockTime, approvedTransfersTimelineVal.TimelineTimes)
+		found := SearchUintRangesForUint(blockTime, approvedTransfersTimelineVal.TimelineTimes)
 		if found {
 			return approvedTransfersTimelineVal.ApprovedOutgoingTransfers
 		}
@@ -35,7 +35,7 @@ func GetCurrentManager(ctx sdk.Context, collection *BadgeCollection) string {
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	managerTimeline := collection.ManagerTimeline
 	for _, managerTimelineVal := range managerTimeline {
-		found := SearchUintRangesForId(blockTime, managerTimelineVal.TimelineTimes)
+		found := SearchUintRangesForUint(blockTime, managerTimelineVal.TimelineTimes)
 		if found {
 			return managerTimelineVal.Manager
 		}
@@ -48,7 +48,7 @@ func GetCurrentInheritedBalances(ctx sdk.Context, collection *BadgeCollection) [
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	inheritedBalancesTimeline := collection.InheritedBalancesTimeline
 	for _, inheritedBalancesTimelineVal := range inheritedBalancesTimeline {
-		found := SearchUintRangesForId(blockTime, inheritedBalancesTimelineVal.TimelineTimes)
+		found := SearchUintRangesForUint(blockTime, inheritedBalancesTimelineVal.TimelineTimes)
 		if found {
 			return inheritedBalancesTimelineVal.InheritedBalances
 		}
@@ -61,7 +61,7 @@ func GetIsArchived(ctx sdk.Context, collection *BadgeCollection) bool {
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	isArchivedTimeline := collection.IsArchivedTimeline
 	for _, isArchivedTimelineVal := range isArchivedTimeline {
-		found := SearchUintRangesForId(blockTime, isArchivedTimelineVal.TimelineTimes)
+		found := SearchUintRangesForUint(blockTime, isArchivedTimelineVal.TimelineTimes)
 		if found {
 			return isArchivedTimelineVal.IsArchived
 		}
@@ -74,7 +74,7 @@ func GetCurrentCollectionApprovedTransfers(ctx sdk.Context, collection *BadgeCol
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	approvedTransfersTimeline := collection.CollectionApprovedTransfersTimeline
 	for _, approvedTransfersTimelineVal := range approvedTransfersTimeline {
-		found := SearchUintRangesForId(blockTime, approvedTransfersTimelineVal.TimelineTimes)
+		found := SearchUintRangesForUint(blockTime, approvedTransfersTimelineVal.TimelineTimes)
 		if found {
 			return approvedTransfersTimelineVal.ApprovedTransfers
 		}

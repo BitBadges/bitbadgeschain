@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -99,9 +100,9 @@ func GetPotentialUpdatesForTimelineValues(times [][]*types.UintRange, values []i
 func CheckNotForbidden(ctx sdk.Context, permission *types.UniversalPermissionDetails) error {
 	//Throw if we are in a forbidden time
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-	found := types.SearchUintRangesForId(blockTime, permission.ForbiddenTimes)
+	found := types.SearchUintRangesForUint(blockTime, permission.ForbiddenTimes)
 	if found {
-		return ErrForbiddenTime
+		return sdkerrors.Wrapf(ErrForbiddenTime, "current time %s is forbidden", blockTime.String())
 	}
 
 	return nil

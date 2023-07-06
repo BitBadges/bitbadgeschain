@@ -13,7 +13,7 @@ func CreateUintRange(start sdkmath.Uint, end sdkmath.Uint) *UintRange {
 }
 
 // Search ID ranges for a specific ID. Return (true) if found. And (false) if not.
-func SearchUintRangesForId(id sdkmath.Uint, uintRanges []*UintRange) bool {
+func SearchUintRangesForUint(id sdkmath.Uint, uintRanges []*UintRange) bool {
 	ranges := make([]*UintRange, len(uintRanges))
 	copy(ranges, uintRanges)
 

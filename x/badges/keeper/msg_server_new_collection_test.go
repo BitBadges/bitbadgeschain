@@ -36,7 +36,7 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{}
-	collectionsToCreate[0].Collection.BalancesType = sdkmath.NewUint(1)
+	collectionsToCreate[0].Collection.BalancesType = sdkmath.NewUint(2)
 	
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -44,7 +44,7 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 
 	collectionsToCreate = GetCollectionsToCreate()
 	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{}
-	collectionsToCreate[0].Collection.BalancesType = sdkmath.NewUint(1)
+	collectionsToCreate[0].Collection.BalancesType = sdkmath.NewUint(2)
 	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline = nil
 	
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -53,7 +53,7 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 
 	collectionsToCreate = GetCollectionsToCreate()
 	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{}
-	collectionsToCreate[0].Collection.BalancesType = sdkmath.NewUint(2)
+	collectionsToCreate[0].Collection.BalancesType = sdkmath.NewUint(3)
 	
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -61,7 +61,7 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 
 	collectionsToCreate = GetCollectionsToCreate()
 	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{}
-	collectionsToCreate[0].Collection.BalancesType = sdkmath.NewUint(2)
+	collectionsToCreate[0].Collection.BalancesType = sdkmath.NewUint(3)
 	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline = nil
 	
 	err = CreateCollections(suite, wctx, collectionsToCreate)

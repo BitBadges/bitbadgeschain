@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// Queries a balance for the given address and badgeId and returns its contents.
+// Queries how many times a leaf has been used for a challenge
 func (k Keeper) GetNumUsedForChallenge(goCtx context.Context, req *types.QueryGetNumUsedForChallengeRequest) (*types.QueryGetNumUsedForChallengeResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

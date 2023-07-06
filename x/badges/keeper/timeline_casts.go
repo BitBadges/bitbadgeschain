@@ -45,17 +45,17 @@ func (k Keeper) CastBadgeMetadataToUniversalPermission(badgeMetadata []*types.Ba
 func (k Keeper) CastCollectionApprovedTransferToUniversalPermission(ctx sdk.Context, approvedTransfers []*types.CollectionApprovedTransfer, managerAddress string) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, approvedTransfer := range approvedTransfers {
-		fromMapping, err := k.GetAddressMappingFromStore(ctx, approvedTransfer.FromMappingId, managerAddress)
+		fromMapping, err := k.GetAddressMappingById(ctx, approvedTransfer.FromMappingId, managerAddress)
 		if err != nil {
 			return nil, err
 		}
 
-		initiatedByMapping, err := k.GetAddressMappingFromStore(ctx, approvedTransfer.InitiatedByMappingId, managerAddress)
+		initiatedByMapping, err := k.GetAddressMappingById(ctx, approvedTransfer.InitiatedByMappingId, managerAddress)
 		if err != nil {
 			return nil, err
 		}
 
-		toMapping, err := k.GetAddressMappingFromStore(ctx, approvedTransfer.ToMappingId, managerAddress)
+		toMapping, err := k.GetAddressMappingById(ctx, approvedTransfer.ToMappingId, managerAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -83,12 +83,12 @@ func (k Keeper) CastCollectionApprovedTransferToUniversalPermission(ctx sdk.Cont
 func (k Keeper) CastUserApprovedOutgoingTransferToUniversalPermission(ctx sdk.Context, approvedTransfers []*types.UserApprovedOutgoingTransfer, managerAddress string) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, approvedTransfer := range approvedTransfers {
-		initiatedByMapping, err := k.GetAddressMappingFromStore(ctx, approvedTransfer.InitiatedByMappingId, managerAddress)
+		initiatedByMapping, err := k.GetAddressMappingById(ctx, approvedTransfer.InitiatedByMappingId, managerAddress)
 		if err != nil {
 			return nil, err
 		}
 
-		toMapping, err := k.GetAddressMappingFromStore(ctx, approvedTransfer.ToMappingId, managerAddress)
+		toMapping, err := k.GetAddressMappingById(ctx, approvedTransfer.ToMappingId, managerAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -117,12 +117,12 @@ func (k Keeper) CastUserApprovedIncomingTransferToUniversalPermission(ctx sdk.Co
 	castedPermissions := []*types.UniversalPermission{}
 	for _, approvedTransfer := range approvedTransfers {
 		
-		fromMapping, err := k.GetAddressMappingFromStore(ctx, approvedTransfer.FromMappingId, managerAddress)
+		fromMapping, err := k.GetAddressMappingById(ctx, approvedTransfer.FromMappingId, managerAddress)
 		if err != nil {
 			return nil, err
 		}
 
-		initiatedByMapping, err := k.GetAddressMappingFromStore(ctx, approvedTransfer.InitiatedByMappingId, managerAddress)
+		initiatedByMapping, err := k.GetAddressMappingById(ctx, approvedTransfer.InitiatedByMappingId, managerAddress)
 		if err != nil {
 			return nil, err
 		}

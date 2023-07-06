@@ -15,7 +15,7 @@ var (
 	UsedClaimChallengeKey = []byte{0x04}
 	WhitelistIndexKey     = []byte{0x05}
 	AddressMappingKey		 	= []byte{0x06}
-	TransferTrackerKey    = []byte{0x07}
+	ApprovalsTrackerKey    = []byte{0x07}
 
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}
@@ -46,16 +46,10 @@ func ConstructAddressMappingKey(addressMappingId string) string {
 	return addressMappingId
 }
 
-func ConstructTransferTrackerKey(collectionId sdkmath.Uint, trackerId string, level string, depth string, address string) string {
+func ConstructApprovalsTrackerKey(collectionId sdkmath.Uint, trackerId string, level string, depth string, address string) string {
 	collection_id_str := collectionId.String()
 	tracker_id_str := trackerId
 	return collection_id_str + BalanceKeyDelimiter + tracker_id_str + BalanceKeyDelimiter + level + BalanceKeyDelimiter + depth + BalanceKeyDelimiter + address
-}
-
-func ConstructClaimKey(collectionId sdkmath.Uint, claimId sdkmath.Uint) string {
-	collection_id_str := collectionId.String()
-	claim_id_str := claimId.String()
-	return collection_id_str + BalanceKeyDelimiter + claim_id_str
 }
 
 // Creates the used claim data key from an id and data. Note this is not prefixed yet. It is just performing a delimited string concatenation.
@@ -70,26 +64,6 @@ func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, challengeId strin
 	code_leaf_index_str := codeLeafIndex.String()
 	challenge_id_str := challengeId
 	return collection_id_str + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + code_leaf_index_str + BalanceKeyDelimiter + level
-}
-
-func ConstructUsedWhitelistIndexKey(collectionId sdkmath.Uint, claimId sdkmath.Uint, whitelistLeafIndex sdkmath.Uint) string {
-	collection_id_str := collectionId.String()
-	claim_id_str := claimId.String()
-	whitelist_leaf_index_str := whitelistLeafIndex.String()
-	return collection_id_str + BalanceKeyDelimiter + claim_id_str + BalanceKeyDelimiter + whitelist_leaf_index_str
-}
-
-func ConstructUsedClaimAddressKey(collectionId sdkmath.Uint, claimId sdkmath.Uint, address string) string {
-	collection_id_str := collectionId.String()
-	claim_id_str := claimId.String()
-	return collection_id_str + BalanceKeyDelimiter + claim_id_str + BalanceKeyDelimiter + address
-}
-
-// Creates the transfer manager request key from an address and collectionId. Note this is not prefixed yet. It is just performing a delimited string concatenation.
-func ConstructUpdateManagerRequestKey(collectionId sdkmath.Uint, address string) string {
-	collection_id_str := collectionId.String()
-	address_str := address
-	return collection_id_str + BalanceKeyDelimiter + address_str + BalanceKeyDelimiter
 }
 
 // Helper function to unparse a balance key and get the information from it.
@@ -141,9 +115,9 @@ func addressMappingStoreKey(addressMappingKey string) []byte {
 	return key
 }
 
-func transferTrackerStoreKey(transferTrackerKey string) []byte {
-	key := make([]byte, len(TransferTrackerKey)+len(transferTrackerKey))
-	copy(key, TransferTrackerKey)
-	copy(key[len(TransferTrackerKey):], []byte(transferTrackerKey))
+func approvalsTrackerStoreKey(approvalsTrackerKey string) []byte {
+	key := make([]byte, len(ApprovalsTrackerKey)+len(approvalsTrackerKey))
+	copy(key, ApprovalsTrackerKey)
+	copy(key[len(ApprovalsTrackerKey):], []byte(approvalsTrackerKey))
 	return key
 }

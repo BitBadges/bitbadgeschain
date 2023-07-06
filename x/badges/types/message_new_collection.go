@@ -116,11 +116,11 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		return err
 	}
 
-	if msg.BalancesType.IsNil() {
-		return sdkerrors.Wrapf(ErrInvalidRequest, "balances type cannot be nil")
+	if msg.BalancesType.IsNil() || msg.BalancesType.IsZero() {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "balances type cannot be nil or zero")
 	}
 
-	if !msg.BalancesType.IsZero() {
+	if msg.BalancesType.GT(sdkmath.NewUintFromString("1")) {
 		//We have off-chain or inherited balances
 
 		if len(msg.Transfers) > 0 || len(msg.CollectionApprovedTransfersTimeline) > 0 {

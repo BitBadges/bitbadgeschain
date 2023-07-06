@@ -81,7 +81,7 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 		{
 			Collection: types.MsgNewCollection{
 				Creator: bob,
-				BalancesType: sdkmath.NewUint(0),
+				BalancesType: sdkmath.NewUint(1),
 				CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
 					{
 						TimelineTimes: GetFullUintRanges(),
