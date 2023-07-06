@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//TODO:
 func TestMsgUpdateUserApprovedTransfers_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string

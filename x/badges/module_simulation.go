@@ -68,10 +68,6 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgArchiveCollection int = 100
 
-	opWeightMsgForkCollection = "op_weight_msg_fork_collection"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgForkCollection int = 100
-
 	opWeightMsgUpdateUserApprovedTransfers = "op_weight_msg_update_user_approved_transfers"
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgUpdateUserApprovedTransfers int = 100
@@ -257,17 +253,6 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	// operations = append(operations, simulation.NewWeightedOperation(
 	// 	weightMsgArchiveCollection,
 	// 	badgessimulation.SimulateMsgArchiveCollection(am.accountKeeper, am.bankKeeper, am.keeper),
-	// ))
-
-	// var weightMsgForkCollection int
-	// simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgForkCollection, &weightMsgForkCollection, nil,
-	// 	func(_ *rand.Rand) {
-	// 		weightMsgForkCollection = defaultWeightMsgForkCollection
-	// 	},
-	// )
-	// operations = append(operations, simulation.NewWeightedOperation(
-	// 	weightMsgForkCollection,
-	// 	badgessimulation.SimulateMsgForkCollection(am.accountKeeper, am.bankKeeper, am.keeper),
 	// ))
 
 	// var weightMsgUpdateUserApprovedTransfers int

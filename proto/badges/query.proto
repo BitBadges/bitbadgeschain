@@ -9,6 +9,7 @@ import "badges/params.proto";
 import "badges/collections.proto";
 import "badges/balances.proto";
 import "badges/transfers.proto";
+import "badges/address_mappings.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
@@ -25,15 +26,17 @@ service Query {
 		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_collection/{collectionId}";
 	}
 
-  // Queries a claim by collection ID and claim ID.
-	rpc GetClaimNumProcessed(QueryGetClaimNumProcessedRequest) returns (QueryGetClaimNumProcessedResponse) {
-		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_claim/{collectionId}/{claimId}";
-	}
+  rpc GetAddressMapping(QueryGetAddressMappingRequest) returns (QueryGetAddressMappingResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_address_mapping/{mappingId}";
+  }
 
-  // Has a specific claim been used?
-	rpc IsClaimDataUsed(QueryIsClaimDataUsedRequest) returns (QueryIsClaimDataUsedResponse) {
-		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/is_claim_data_used/{collectionId}/{claimId}/{claimData}";
-	}
+  rpc GetApprovalsTracker(QueryGetApprovalsTrackerRequest) returns (QueryGetApprovalsTrackerResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_approvals_tracker/{trackerId}/{level}";
+  }
+
+  rpc GetNumUsedForChallenge(QueryGetNumUsedForChallengeRequest) returns (QueryGetNumUsedForChallengeResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{challengeId}/{level}/{leafIndex}";
+  }
 
   // Queries an addresses balance for a badge collection, specified by its ID.
 	rpc GetBalance(QueryGetBalanceRequest) returns (QueryGetBalanceResponse) {
@@ -44,8 +47,6 @@ service Query {
 	rpc GetAddressById(QueryGetAddressByIdRequest) returns (QueryGetAddressByIdResponse) {
 		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_address_by_id/{id}";
 	}
-
-
   // this line is used by starport scaffolding # 2
 }
 
@@ -67,26 +68,6 @@ message QueryGetCollectionRequest {
 
 message QueryGetCollectionResponse {
   BadgeCollection collection = 1;
-}
-
-message QueryGetClaimNumProcessedRequest {
-  string collectionId = 1  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false  
-      
-    ];
-  string claimId = 2  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-}
-
-message QueryGetClaimNumProcessedResponse {
-  string numProcessed = 1 [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-    ];
 }
 
 message QueryGetAddressByIdRequest {
@@ -114,21 +95,34 @@ message QueryGetBalanceResponse {
   UserBalanceStore balance = 1;
 }
 
-message QueryIsClaimDataUsedRequest {
-    string collectionId = 1  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-    string claimId = 2  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
-    string claimData = 3;
+message QueryGetAddressMappingRequest {
+  string mappingId = 1 ;
 }
 
-message QueryIsClaimDataUsedResponse {
-    bool used = 1;
+message QueryGetAddressMappingResponse {
+  AddressMapping mapping = 1;
+}
+
+message QueryGetApprovalsTrackerRequest {
+  string trackerId = 1;
+  string level = 2;
+  string depth = 3;
+  string address = 4;
+  string collectionId = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+message QueryGetApprovalsTrackerResponse {
+  ApprovalsTracker tracker = 1;
+}
+
+message QueryGetNumUsedForChallengeRequest {
+  string challengeId = 1;
+  string level = 2;
+  string leafIndex = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string collectionId = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+message QueryGetNumUsedForChallengeResponse {
+  string numUsed = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 // this line is used by starport scaffolding # 3

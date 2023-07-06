@@ -26,7 +26,6 @@ service Msg {
   rpc UpdateManager(MsgUpdateManager) returns (MsgUpdateManagerResponse);
   rpc DeleteCollection(MsgDeleteCollection) returns (MsgDeleteCollectionResponse);
   rpc ArchiveCollection(MsgArchiveCollection) returns (MsgArchiveCollectionResponse);
-  rpc ForkCollection(MsgForkCollection) returns (MsgForkCollectionResponse);
   // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -73,18 +72,18 @@ message MsgNewCollectionResponse {
   ]; //ID of created badge collecon
 }
 
-message MsgForkCollection {
-  string creator = 1;
-  string parentCollectionId = 2  [(gogoproto.customtype) = "Uint", 
-    (gogoproto.nullable) = false];
-}
+// message MsgForkCollection {
+//   string creator = 1;
+//   string parentCollectionId = 2  [(gogoproto.customtype) = "Uint", 
+//     (gogoproto.nullable) = false];
+// }
 
-message MsgForkCollectionResponse {
-  string collectionId = 1  [
-    (gogoproto.customtype) = "Uint", 
-    (gogoproto.nullable) = false
-  ]; //ID of created badge collection
-}
+// message MsgForkCollectionResponse {
+//   string collectionId = 1  [
+//     (gogoproto.customtype) = "Uint", 
+//     (gogoproto.nullable) = false
+//   ]; //ID of created badge collection
+// }
 
 //This handles both minting more of existing badges and creating new badges.
 message MsgMintAndDistributeBadges {

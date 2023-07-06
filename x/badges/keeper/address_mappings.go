@@ -39,7 +39,7 @@ func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.Addr
 	return nil
 }
 
-func (k Keeper) GetAddressMapping(ctx sdk.Context, addressMappingId string, managerAddress string) (*types.AddressMapping, error) {
+func (k Keeper) GetAddressMappingFromStore(ctx sdk.Context, addressMappingId string, managerAddress string) (*types.AddressMapping, error) {
 	if addressMappingId[0] == '!' {
 		return nil, ErrInvalidAddressMappingId
 	}
@@ -94,7 +94,7 @@ func (k Keeper) GetAddressMapping(ctx sdk.Context, addressMappingId string, mana
 		}, nil
 	}
 
-	addressMapping, found := k.GetAddressMappingFromStore(ctx, addressMappingId)
+	addressMapping, found := k.GetAddressMappingFromStoreFromStore(ctx, addressMappingId)
 	if found {
 		return &addressMapping, nil
 	}
@@ -105,7 +105,7 @@ func (k Keeper) GetAddressMapping(ctx sdk.Context, addressMappingId string, mana
 
 //Avoid circular dependencies through the checkedMappingIds
 func (k Keeper) CheckMappingAddresses(ctx sdk.Context, addressMappingId string, addressToCheck string, managerAddress string, checkedMappingIds []string) (bool, error) {
-	addressMapping, err := k.GetAddressMapping(ctx, addressMappingId, managerAddress)
+	addressMapping, err := k.GetAddressMappingFromStore(ctx, addressMappingId, managerAddress)
 	if err != nil {
 		return false, err
 	}

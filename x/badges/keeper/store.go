@@ -181,6 +181,21 @@ func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionI
 	return incrementedNum, nil
 }
 
+func (k Keeper) GetNumUsedForChallengeFromStore(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, leafIndex sdkmath.Uint, level string) (sdkmath.Uint, error) {
+	store := ctx.KVStore(k.storeKey)
+	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex, level)))
+	curr := sdkmath.NewUint(0)
+	if currBytes != nil {
+		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
+		if err != nil {
+			panic("Failed to parse num used")
+		}
+
+		curr = sdkmath.NewUint(currUint)
+	}
+	return curr, nil
+}
+
 func (k Keeper) GetNumUsedForChallengesFromStore(ctx sdk.Context) (numUsed []sdkmath.Uint, ids []string) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, UsedClaimChallengeKey)
@@ -209,7 +224,7 @@ func (k Keeper) SetAddressMappingInStore(ctx sdk.Context, addressMapping types.A
 	return nil
 }
 
-func (k Keeper) GetAddressMappingFromStore(ctx sdk.Context, addressMappingId string) (types.AddressMapping, bool) {
+func (k Keeper) GetAddressMappingFromStoreFromStore(ctx sdk.Context, addressMappingId string) (types.AddressMapping, bool) {
 	store := ctx.KVStore(k.storeKey)
 	marshaled_address_mapping := store.Get(addressMappingStoreKey(addressMappingId))
 
@@ -221,7 +236,7 @@ func (k Keeper) GetAddressMappingFromStore(ctx sdk.Context, addressMappingId str
 	return addressMapping, true
 }
 
-func (k Keeper) GetAddressMappingsFromStore(ctx sdk.Context) (addressMappings []*types.AddressMapping) {
+func (k Keeper) GetAddressMappingFromStoresFromStore(ctx sdk.Context) (addressMappings []*types.AddressMapping) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, AddressMappingKey)
 	defer iterator.Close()

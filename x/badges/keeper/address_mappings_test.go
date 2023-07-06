@@ -27,7 +27,7 @@ func (suite *TestSuite) TestReservedIds() {
 		})	
 		suite.Require().Error(err, "Error creating address mapping: %s", check)
 
-		mapping, err := suite.app.BadgesKeeper.GetAddressMapping(suite.ctx, check, alice)
+		mapping, err := suite.app.BadgesKeeper.GetAddressMappingFromStore(suite.ctx, check, alice)
 		suite.Require().Nil(err, "Error getting address mapping: %s", check)
 		suite.Require().NotNil(mapping, "Error getting address mapping: %s", check)
 	}
@@ -65,7 +65,7 @@ func (suite *TestSuite) TestReservedIds() {
 	suite.Require().False(found, "Error checking mapping addresses: %s", "None")
 	suite.Require().Nil(err, "Error checking mapping addresses: %s", "None")
 
-	// mapping, err := suite.app.BadgesKeeper.GetAddressMapping(suite.ctx, "1:1", alice)
+	// mapping, err := suite.app.BadgesKeeper.GetAddressMappingFromStore(suite.ctx, "1:1", alice)
 	// suite.Require().Nil(err, "Error getting address mapping: %s", "1:1")
 	// suite.Require().Equal(mapping.MappingId, "1:1", "Error getting address mapping: %s", "1:1")
 	// AssertUintsEqual(suite, mapping.Filters[0].Conditions[0].MustOwnBadges[0].BadgeIds[0].Start, sdkmath.NewUint(1))

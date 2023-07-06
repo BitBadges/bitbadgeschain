@@ -107,15 +107,6 @@ func DeleteCollection(suite *TestSuite, ctx context.Context, msg *types.MsgDelet
 	return err
 }
 
-func ForkCollection(suite *TestSuite, ctx context.Context, msg *types.MsgForkCollection) error {
-	err := msg.ValidateBasic()
-	if err != nil {
-		return err
-	}
-	
-	_, err = suite.msgServer.ForkCollection(ctx, msg)
-	return err
-}
 
 func TransferBadge(suite *TestSuite, ctx context.Context, msg *types.MsgTransferBadge) error {
 	err := msg.ValidateBasic()
