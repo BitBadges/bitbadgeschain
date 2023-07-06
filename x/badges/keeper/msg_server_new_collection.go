@@ -51,7 +51,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 			},
 		},
 		UnmintedSupplys:    []*types.Balance{},
-		TotalSupplys:         []*types.Balance{},
+		TotalSupplys:       []*types.Balance{},
 		InheritedBalancesTimeline: msg.InheritedBalancesTimeline,
 		DefaultUserApprovedOutgoingTransfersTimeline: msg.DefaultApprovedOutgoingTransfersTimeline,
 		DefaultUserApprovedIncomingTransfersTimeline: msg.DefaultApprovedIncomingTransfersTimeline,
@@ -63,7 +63,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		}
 	}
 
-	if msg.BadgesToCreate != nil {
+	if msg.BadgesToCreate != nil && len(msg.BadgesToCreate) > 0 {
 		err := *new(error)
 		collection, err = k.CreateBadges(ctx, collection, msg.BadgesToCreate, msg.Transfers)
 		if err != nil {
@@ -71,7 +71,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		}
 	}
 
-	if msg.InheritedBalancesTimeline != nil {
+	if msg.InheritedBalancesTimeline != nil && len(msg.InheritedBalancesTimeline) > 0 {
 		if err := k.ValidateInheritedBalancesUpdate(ctx, collection, collection.InheritedBalancesTimeline, collection.InheritedBalancesTimeline, collection.Permissions.CanUpdateInheritedBalances); err != nil {
 			return nil, err
 		}

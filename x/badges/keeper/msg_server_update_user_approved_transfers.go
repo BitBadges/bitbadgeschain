@@ -43,9 +43,6 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 	}
 
 	manager := types.GetCurrentManager(ctx, collection)
-
-
-
 	if msg.ApprovedOutgoingTransfersTimeline != nil {
 		if err := k.ValidateUserApprovedOutgoingTransfersUpdate(ctx, userBalance.ApprovedOutgoingTransfersTimeline, msg.ApprovedOutgoingTransfersTimeline, userBalance.Permissions.CanUpdateApprovedOutgoingTransfers, manager); err != nil {
 			return nil, err
