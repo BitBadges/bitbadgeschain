@@ -20,7 +20,7 @@ func (suite *TestSuite) TestUpdateManager() {
 		ManagerTimeline: []*types.ManagerTimeline{
 			{
 				Manager: alice,
-				Times: GetFullIdRanges(),
+				TimelineTimes: GetFullIdRanges(),
 			},
 		},
 	})

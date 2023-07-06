@@ -33,7 +33,7 @@ func (suite *TestSuite) TestDeleteCollection() {
 		IsArchivedTimeline: []*types.IsArchivedTimeline{
 			{
 				IsArchived: true,
-				Times: GetFullIdRanges(),
+				TimelineTimes: GetFullIdRanges(),
 			},
 		},
 	})

@@ -40,7 +40,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermission() {
 		CollectionId: sdkmath.NewUint(1),
 		ContractAddressTimeline: []*types.ContractAddressTimeline{
 			{
-				Times: GetFullIdRanges(),
+				TimelineTimes: GetFullIdRanges(),
 				ContractAddress: "0x123",
 			},
 		},
@@ -70,7 +70,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionDefaultAllowed() {
 		CollectionId: sdkmath.NewUint(1),
 		ContractAddressTimeline: []*types.ContractAddressTimeline{
 			{
-				Times: GetFullIdRanges(),
+				TimelineTimes: GetFullIdRanges(),
 				ContractAddress: "0x123",
 			},
 		},
@@ -123,7 +123,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 		CollectionId: sdkmath.NewUint(1),
 		ContractAddressTimeline: []*types.ContractAddressTimeline{
 			{
-				Times: GetFullIdRanges(),
+				TimelineTimes: GetFullIdRanges(),
 				ContractAddress: "0x123",
 			},
 		},
@@ -135,7 +135,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 		CollectionId: sdkmath.NewUint(1),
 		ContractAddressTimeline: []*types.ContractAddressTimeline{
 			{
-				Times: GetOneIdRange(),
+				TimelineTimes: GetOneIdRange(),
 				ContractAddress: "0x123",
 			},
 		},
@@ -178,7 +178,7 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermission() {
 		CollectionId: sdkmath.NewUint(1),
 		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
 			{
-				Times: GetFullIdRanges(),
+				TimelineTimes: GetFullIdRanges(),
 				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com",
@@ -213,7 +213,7 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionDefaultAllowed
 		CollectionId: sdkmath.NewUint(1),
 		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
 			{
-				Times: GetFullIdRanges(),
+				TimelineTimes: GetFullIdRanges(),
 				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com",
@@ -273,7 +273,7 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionInvalidTimes()
 		CollectionId: sdkmath.NewUint(1),
 		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
 			{
-				Times: GetFullIdRanges(),
+				TimelineTimes: GetFullIdRanges(),
 				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com",
@@ -290,7 +290,7 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionInvalidTimes()
 		CollectionId: sdkmath.NewUint(1),
 		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
 			{
-				Times: GetOneIdRange(),
+				TimelineTimes: GetOneIdRange(),
 				BadgeMetadata: []*types.BadgeMetadata{
 					{
 						Uri: "https://example.com",

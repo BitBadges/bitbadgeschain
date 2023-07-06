@@ -96,6 +96,10 @@ func ValidateRangesAreValid(badgeIdRanges []*IdRange, errorOnEmpty bool) error {
 			return sdkerrors.Wrapf(ErrUintUnititialized, "id range start and/or end is nil")
 		}
 
+		if badgeIdRange.Start.IsZero() || badgeIdRange.End.IsZero() {
+			return sdkerrors.Wrapf(ErrUintUnititialized, "id range start and/or end is zero")
+		}
+
 		if badgeIdRange.Start.GT(badgeIdRange.End) {
 			return ErrStartGreaterThanEnd
 		}
@@ -266,11 +270,11 @@ func ValidateCollectionApprovedTransfer(collectionApprovedTransfer *CollectionAp
 		}
 	}
 
-	if collectionApprovedTransfer.IncrementIdsBy.IsNil() {
+	if collectionApprovedTransfer.IncrementBadgeIdsBy.IsNil() {
 		return sdkerrors.Wrapf(ErrUintUnititialized, "increment ids by is uninitialized")
 	}
 
-	if collectionApprovedTransfer.IncrementTimesBy.IsNil() {
+	if collectionApprovedTransfer.IncrementOwnershipTimesBy.IsNil() {
 		return sdkerrors.Wrapf(ErrUintUnititialized, "max num transfers is uninitialized")
 	}
 
@@ -326,7 +330,7 @@ func ValidateBalances(balances []*Balance) ([]*Balance, error) {
 			return balances, sdkerrors.Wrapf(err, "invalid balance badge ids")
 		}
 
-		err = ValidateRangesAreValid(balance.Times, true)
+		err = ValidateRangesAreValid(balance.OwnershipTimes, true)
 		if err != nil {
 			return balances, sdkerrors.Wrapf(err, "invalid balance times")
 		}

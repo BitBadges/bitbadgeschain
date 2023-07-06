@@ -21,7 +21,7 @@ service Query {
       option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/params";
   }
 
-    // Queries a badge collection by ID.
+  // Queries a badge collection by ID.
 	rpc GetCollection(QueryGetCollectionRequest) returns (QueryGetCollectionResponse) {
 		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_collection/{collectionId}";
 	}

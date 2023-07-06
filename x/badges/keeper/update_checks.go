@@ -137,8 +137,8 @@ func (k Keeper) CheckTimedUpdatePermission(ctx sdk.Context, detailsToCheck []*ty
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
 }
 
-func (k Keeper) CheckActionWithBadgeIdsAndTimesPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.ActionWithBadgeIdsAndTimesPermission) error {
-	castedPermissions, err := k.CastActionWithBadgeIdsAndTimesPermissionToUniversalPermission(permissions)
+func (k Keeper) CheckBalancesActionPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.BalancesActionPermission) error {
+	castedPermissions, err := k.CastBalancesActionPermissionToUniversalPermission(permissions)
 	if err != nil {
 		return err
 	}

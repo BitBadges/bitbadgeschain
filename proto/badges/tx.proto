@@ -52,9 +52,9 @@ message MsgNewCollection {
   repeated CustomDataTimeline customDataTimeline = 5;
   string balancesType = 6 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
   repeated InheritedBalancesTimeline inheritedBalancesTimeline = 7;
-  repeated CollectionApprovedTransferTimeline approvedTransfersTimeline = 8;
+  repeated CollectionApprovedTransferTimeline collectionApprovedTransfersTimeline = 8;
   CollectionPermissions permissions = 9;
-  repeated StandardTimeline standardsTimeline = 10;
+  repeated StandardsTimeline standardsTimeline = 10;
 
   //Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
   //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
@@ -96,7 +96,7 @@ message MsgMintAndDistributeBadges {
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 6; 
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 7;
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 8;
-  repeated CollectionApprovedTransferTimeline approvedTransfersTimeline = 9;
+  repeated CollectionApprovedTransferTimeline collectionApprovedTransfersTimeline = 9;
 
   repeated AddressMapping addressMappings = 10;
 }
@@ -122,7 +122,7 @@ message MsgUpdateCollectionApprovedTransfers {
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
     ];
-  repeated CollectionApprovedTransferTimeline approvedTransfersTimeline = 3;
+  repeated CollectionApprovedTransferTimeline collectionApprovedTransfersTimeline = 3;
   repeated AddressMapping addressMappings = 4;
 }
 
@@ -153,7 +153,7 @@ message MsgUpdateMetadata {
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 5;
   repeated CustomDataTimeline customDataTimeline = 6;
   repeated ContractAddressTimeline contractAddressTimeline = 7;
-  repeated StandardTimeline standardsTimeline = 8;
+  repeated StandardsTimeline standardsTimeline = 8;
 }
 
 message MsgUpdateMetadataResponse {}

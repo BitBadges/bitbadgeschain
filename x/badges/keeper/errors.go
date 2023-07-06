@@ -14,7 +14,7 @@ var (
 	ErrAccountCanNotEqualCreator                    = sdkerrors.Register(types.ModuleName, 35, "account can not equal creator")
 	ErrRootHashInvalid                              = sdkerrors.Register(types.ModuleName, 49, "root hash invalid")
 	ErrDecodingHexString                            = sdkerrors.Register(types.ModuleName, 53, "couldn't decode hex string")
-	ErrWrongBalancesType                             = sdkerrors.Register(types.ModuleName, 64, "wrong balances type (off-chain balances vs inherited balances vs on-chain balances) ")
+	ErrWrongBalancesType                             = sdkerrors.Register(types.ModuleName, 64, "wrong balances type (off-chain balances vs inherited balances vs standard balances) ")
 	ErrCollectionIsArchived                         = sdkerrors.Register(types.ModuleName, 67, "collection is currently archived (read-only)")
 	ErrNotImplemented															  = sdkerrors.Register(types.ModuleName, 69, "not implemented")
 	ErrInadequateApprovals													= sdkerrors.Register(types.ModuleName, 71, "inadequate approvals")

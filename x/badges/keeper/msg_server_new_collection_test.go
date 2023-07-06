@@ -45,7 +45,7 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 	collectionsToCreate = GetCollectionsToCreate()
 	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{}
 	collectionsToCreate[0].Collection.BalancesType = sdkmath.NewUint(1)
-	collectionsToCreate[0].Collection.ApprovedTransfersTimeline = nil
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline = nil
 	
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
@@ -62,7 +62,7 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 	collectionsToCreate = GetCollectionsToCreate()
 	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{}
 	collectionsToCreate[0].Collection.BalancesType = sdkmath.NewUint(2)
-	collectionsToCreate[0].Collection.ApprovedTransfersTimeline = nil
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline = nil
 	
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
@@ -87,7 +87,7 @@ func (suite *TestSuite) TestNewCollectionDuplicateBadgeIds() {
 						GetOneIdRange()[0],
 						GetOneIdRange()[0],
 					},
-					Times: GetFullIdRanges(),
+					OwnershipTimes: GetFullIdRanges(),
 				},
 			},
 		},

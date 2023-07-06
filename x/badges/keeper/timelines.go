@@ -21,8 +21,8 @@ func GetCombosForStringTimelines(ctx sdk.Context, oldValue interface{}, newValue
 }
 
 func (k Keeper) ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldApprovedTransfers []*types.CollectionApprovedTransferTimeline, newApprovedTransfers []*types.CollectionApprovedTransferTimeline, CanUpdateCollectionApprovedTransfers []*types.CollectionApprovedTransferPermission, managerAddress string) error {
-	if !IsOnChainBalances(collection) {
-		return sdkerrors.Wrapf(ErrWrongBalancesType, "collection %s does not have on-chain balances", collection.CollectionId)
+	if !IsStandardBalances(collection) {
+		return sdkerrors.Wrapf(ErrWrongBalancesType, "collection %s does not have standard balances", collection.CollectionId)
 	}
 	
 	oldTimes, oldValues := types.GetCollectionApprovedTransferTimesAndValues(oldApprovedTransfers)
@@ -707,7 +707,7 @@ func (k Keeper) ValidateCustomDataUpdate(ctx sdk.Context, oldCustomData []*types
 	return nil
 }
 
-func (k Keeper) ValidateStandardsUpdate(ctx sdk.Context, oldStandards []*types.StandardTimeline, newStandards []*types.StandardTimeline, canUpdateStandards []*types.TimedUpdatePermission) error {
+func (k Keeper) ValidateStandardsUpdate(ctx sdk.Context, oldStandards []*types.StandardsTimeline, newStandards []*types.StandardsTimeline, canUpdateStandards []*types.TimedUpdatePermission) error {
 	oldTimes, oldValues := types.GetStandardsTimesAndValues(oldStandards)
 	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
 

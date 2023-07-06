@@ -110,7 +110,7 @@ func (k Keeper) DeductAndGetUserApprovals(approvedTransfers []*types.CollectionA
 				return  []*UserApprovalsToCheck{}, ErrDisallowedTransfer
 			}
 
-			transferBalance := &types.Balance{ Amount: amount,	Times: times,	BadgeIds: overlaps }
+			transferBalance := &types.Balance{ Amount: amount,	OwnershipTimes: times,	BadgeIds: overlaps }
 
 
 			if transferVal.TrackerId == "" && (transferVal.OverallApprovals != nil || transferVal.PerAddressApprovals != nil) {
@@ -118,7 +118,7 @@ func (k Keeper) DeductAndGetUserApprovals(approvedTransfers []*types.CollectionA
 			}
 
 			if transferVal.OverallApprovals != nil {
-				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, transferVal.OverallApprovals.Amounts, transferVal.OverallApprovals.NumTransfers, transferBalance, transferVal.TrackerId, transferVal.IncrementIdsBy, transferVal.IncrementTimesBy,	useLeafIndexForNumIncrements, numIncrements, timelineType, "overall", "")
+				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, transferVal.OverallApprovals.Amounts, transferVal.OverallApprovals.NumTransfers, transferBalance, transferVal.TrackerId, transferVal.IncrementBadgeIdsBy, transferVal.IncrementOwnershipTimesBy,	useLeafIndexForNumIncrements, numIncrements, timelineType, "overall", "")
 				if err != nil {
 					return []*UserApprovalsToCheck{}, err
 				}
@@ -126,21 +126,21 @@ func (k Keeper) DeductAndGetUserApprovals(approvedTransfers []*types.CollectionA
 
 			if transferVal.PerAddressApprovals != nil {
 				if transferVal.PerAddressApprovals.ApprovalsPerToAddress != nil {
-					err := k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, transferVal.PerAddressApprovals.ApprovalsPerToAddress.Amounts, transferVal.PerAddressApprovals.ApprovalsPerFromAddress.NumTransfers, transferBalance, transferVal.TrackerId, transferVal.IncrementIdsBy, transferVal.IncrementTimesBy,	useLeafIndexForNumIncrements, numIncrements, timelineType, "per-to", toAddress)
+					err := k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, transferVal.PerAddressApprovals.ApprovalsPerToAddress.Amounts, transferVal.PerAddressApprovals.ApprovalsPerFromAddress.NumTransfers, transferBalance, transferVal.TrackerId, transferVal.IncrementBadgeIdsBy, transferVal.IncrementOwnershipTimesBy,	useLeafIndexForNumIncrements, numIncrements, timelineType, "per-to", toAddress)
 					if err != nil {
 						return []*UserApprovalsToCheck{}, err
 					}
 				}
 
 				if transferVal.PerAddressApprovals.ApprovalsPerFromAddress != nil {
-					err := k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, transferVal.PerAddressApprovals.ApprovalsPerFromAddress.Amounts, transferVal.PerAddressApprovals.ApprovalsPerFromAddress.NumTransfers, transferBalance, transferVal.TrackerId, transferVal.IncrementIdsBy, transferVal.IncrementTimesBy,	useLeafIndexForNumIncrements, numIncrements, timelineType, "per-from", fromAddress)
+					err := k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, transferVal.PerAddressApprovals.ApprovalsPerFromAddress.Amounts, transferVal.PerAddressApprovals.ApprovalsPerFromAddress.NumTransfers, transferBalance, transferVal.TrackerId, transferVal.IncrementBadgeIdsBy, transferVal.IncrementOwnershipTimesBy,	useLeafIndexForNumIncrements, numIncrements, timelineType, "per-from", fromAddress)
 					if err != nil {
 						return []*UserApprovalsToCheck{}, err
 					}
 				}
 
 				if transferVal.PerAddressApprovals.ApprovalsPerInitiatedByAddress != nil {
-					err := k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, transferVal.PerAddressApprovals.ApprovalsPerInitiatedByAddress.Amounts, transferVal.PerAddressApprovals.ApprovalsPerInitiatedByAddress.NumTransfers, transferBalance, transferVal.TrackerId, transferVal.IncrementIdsBy, transferVal.IncrementTimesBy,	useLeafIndexForNumIncrements, numIncrements, timelineType, "per-initiated-by", initiatedBy)
+					err := k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, transferVal.PerAddressApprovals.ApprovalsPerInitiatedByAddress.Amounts, transferVal.PerAddressApprovals.ApprovalsPerInitiatedByAddress.NumTransfers, transferBalance, transferVal.TrackerId, transferVal.IncrementBadgeIdsBy, transferVal.IncrementOwnershipTimesBy,	useLeafIndexForNumIncrements, numIncrements, timelineType, "per-initiated-by", initiatedBy)
 					if err != nil {
 						return []*UserApprovalsToCheck{}, err
 					}
@@ -202,8 +202,8 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	maxNumTransfers sdkmath.Uint,
 	transferAmounts *types.Balance, 
 	trackerId string, 
-	incrementIdsBy sdkmath.Uint,
-	incrementTimesBy sdkmath.Uint,
+	IncrementBadgeIdsBy sdkmath.Uint,
+	IncrementOwnershipTimesBy sdkmath.Uint,
 	precalculatedNumIncrements bool, 
 	numIncrements sdkmath.Uint,
 	timelineType string,
@@ -217,7 +217,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	if approvals == nil {
 		approvals = []*types.Balance{{
 			Amount: transferAmounts.Amount,
-			Times: transferAmounts.Times,
+			OwnershipTimes: transferAmounts.OwnershipTimes,
 			BadgeIds: transferAmounts.BadgeIds,
 		}}
 	}
@@ -239,14 +239,14 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	copy(allApprovals, approvals)
 	
 	for _, startAmount := range allApprovals {
-		for _, time := range startAmount.Times {
-			time.Start = time.Start.Add(numIncrements.Mul(incrementTimesBy))
-			time.End = time.End.Add(numIncrements.Mul(incrementTimesBy))
+		for _, time := range startAmount.OwnershipTimes {
+			time.Start = time.Start.Add(numIncrements.Mul(IncrementOwnershipTimesBy))
+			time.End = time.End.Add(numIncrements.Mul(IncrementOwnershipTimesBy))
 		}
 
 		for _, badgeId := range startAmount.BadgeIds {
-			badgeId.Start = badgeId.Start.Add(numIncrements.Mul(incrementIdsBy))
-			badgeId.End = badgeId.End.Add(numIncrements.Mul(incrementIdsBy))
+			badgeId.Start = badgeId.Start.Add(numIncrements.Mul(IncrementBadgeIdsBy))
+			badgeId.End = badgeId.End.Add(numIncrements.Mul(IncrementBadgeIdsBy))
 		}
 	}
 	

@@ -108,10 +108,10 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].IncrementIdsBy = sdkmath.NewUint(math.MaxUint64)
-	collectionsToCreate[0].Collection.DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].IncrementTimesBy = sdkmath.NewUint(math.MaxUint64)
-	collectionsToCreate[0].Collection.DefaultApprovedIncomingTransfersTimeline[0].ApprovedIncomingTransfers[0].IncrementIdsBy = sdkmath.NewUint(math.MaxUint64)
-	collectionsToCreate[0].Collection.DefaultApprovedIncomingTransfersTimeline[0].ApprovedIncomingTransfers[0].IncrementTimesBy = sdkmath.NewUint(math.MaxUint64)
+	collectionsToCreate[0].Collection.DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].IncrementBadgeIdsBy = sdkmath.NewUint(math.MaxUint64)
+	collectionsToCreate[0].Collection.DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].IncrementOwnershipTimesBy = sdkmath.NewUint(math.MaxUint64)
+	collectionsToCreate[0].Collection.DefaultApprovedIncomingTransfersTimeline[0].ApprovedIncomingTransfers[0].IncrementBadgeIdsBy = sdkmath.NewUint(math.MaxUint64)
+	collectionsToCreate[0].Collection.DefaultApprovedIncomingTransfersTimeline[0].ApprovedIncomingTransfers[0].IncrementOwnershipTimesBy = sdkmath.NewUint(math.MaxUint64)
 	
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 suite.Require().Nil(err, "error creating badges")
@@ -234,14 +234,14 @@ func (suite *TestSuite) TestFirstMatchOnly() {
 					},
 					Challenges: []*types.Challenge{},
 					TrackerId: "test",
-					IncrementIdsBy: sdkmath.NewUint(0),
-					IncrementTimesBy: sdkmath.NewUint(0),
+					IncrementBadgeIdsBy: sdkmath.NewUint(0),
+					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					PerAddressApprovals: &types.PerAddressApprovals{
 						ApprovalsPerFromAddress: &types.ApprovalsTracker{
 							Amounts: []*types.Balance{
 								{
 									Amount: sdkmath.NewUint(1),
-									Times: GetFullIdRanges(),
+									OwnershipTimes: GetFullIdRanges(),
 									BadgeIds: GetFullIdRanges(),
 								},
 							},
@@ -251,7 +251,7 @@ func (suite *TestSuite) TestFirstMatchOnly() {
 				},
 				collectionsToCreate[0].Collection.DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0],
 			},
-			Times: GetFullIdRanges(),
+			TimelineTimes: GetFullIdRanges(),
 		},
 	}
 	collectionsToCreate[0].Collection.DefaultApprovedOutgoingTransfersTimeline = newOutgoingTimeline
@@ -289,14 +289,14 @@ func (suite *TestSuite) TestFirstMatchOnlyWrongTime() {
 					},
 					Challenges: []*types.Challenge{},
 					TrackerId: "test",
-					IncrementIdsBy: sdkmath.NewUint(0),
-					IncrementTimesBy: sdkmath.NewUint(0),
+					IncrementBadgeIdsBy: sdkmath.NewUint(0),
+					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					PerAddressApprovals: &types.PerAddressApprovals{
 						ApprovalsPerFromAddress: &types.ApprovalsTracker{
 							Amounts: []*types.Balance{
 								{
 									Amount: sdkmath.NewUint(1),
-									Times: GetFullIdRanges(),
+									OwnershipTimes: GetFullIdRanges(),
 									BadgeIds: GetFullIdRanges(),
 								},
 							},
@@ -306,7 +306,7 @@ func (suite *TestSuite) TestFirstMatchOnlyWrongTime() {
 				},
 				collectionsToCreate[0].Collection.DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0],
 			},
-			Times: GetFullIdRanges(),
+			TimelineTimes: GetFullIdRanges(),
 		},
 	}
 	collectionsToCreate[0].Collection.DefaultApprovedOutgoingTransfersTimeline = newOutgoingTimeline
@@ -345,14 +345,14 @@ func (suite *TestSuite) TestCombinations() {
 					},
 					Challenges: []*types.Challenge{},
 					TrackerId: "test",
-					IncrementIdsBy: sdkmath.NewUint(0),
-					IncrementTimesBy: sdkmath.NewUint(0),
+					IncrementBadgeIdsBy: sdkmath.NewUint(0),
+					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					PerAddressApprovals: &types.PerAddressApprovals{
 						ApprovalsPerFromAddress: &types.ApprovalsTracker{
 							Amounts: []*types.Balance{
 								{
 									Amount: sdkmath.NewUint(1),
-									Times: GetFullIdRanges(),
+									OwnershipTimes: GetFullIdRanges(),
 									BadgeIds: GetFullIdRanges(),
 								},
 							},
@@ -361,7 +361,7 @@ func (suite *TestSuite) TestCombinations() {
 					},
 				},
 			},
-			Times: GetFullIdRanges(),
+			TimelineTimes: GetFullIdRanges(),
 		},
 	}
 	collectionsToCreate[0].Collection.DefaultApprovedOutgoingTransfersTimeline = newOutgoingTimeline
@@ -404,14 +404,14 @@ func (suite *TestSuite) TestCombinationsOrder() {
 					},
 					Challenges: []*types.Challenge{},
 					TrackerId: "test",
-					IncrementIdsBy: sdkmath.NewUint(0),
-					IncrementTimesBy: sdkmath.NewUint(0),
+					IncrementBadgeIdsBy: sdkmath.NewUint(0),
+					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					PerAddressApprovals: &types.PerAddressApprovals{
 						ApprovalsPerFromAddress: &types.ApprovalsTracker{
 							Amounts: []*types.Balance{
 								{
 									Amount: sdkmath.NewUint(1),
-									Times: GetFullIdRanges(),
+									OwnershipTimes: GetFullIdRanges(),
 									BadgeIds: GetFullIdRanges(),
 								},
 							},
@@ -420,7 +420,7 @@ func (suite *TestSuite) TestCombinationsOrder() {
 					},
 				},
 			},
-			Times: GetFullIdRanges(),
+			TimelineTimes: GetFullIdRanges(),
 		},
 	}
 	collectionsToCreate[0].Collection.DefaultApprovedOutgoingTransfersTimeline = newOutgoingTimeline
@@ -455,14 +455,14 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 					},
 					Challenges: []*types.Challenge{},
 					TrackerId: "test",
-					IncrementIdsBy: sdkmath.NewUint(0),
-					IncrementTimesBy: sdkmath.NewUint(0),
+					IncrementBadgeIdsBy: sdkmath.NewUint(0),
+					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					PerAddressApprovals: &types.PerAddressApprovals{
 						ApprovalsPerFromAddress: &types.ApprovalsTracker{
 							Amounts: []*types.Balance{
 								{
 									Amount: sdkmath.NewUint(1),
-									Times: GetFullIdRanges(),
+									OwnershipTimes: GetFullIdRanges(),
 									BadgeIds: GetFullIdRanges(),
 								},
 							},
@@ -471,7 +471,7 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 					},
 				},
 			},
-			Times: GetFullIdRanges(),
+			TimelineTimes: GetFullIdRanges(),
 		},
 	}
 	collectionsToCreate[0].Collection.DefaultApprovedOutgoingTransfersTimeline = newOutgoingTimeline
@@ -491,7 +491,7 @@ func (suite *TestSuite) TestUserApprovalsReturned() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	
 	collectionsToCreate := GetCollectionsToCreate()
-	// collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
+	// collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 suite.Require().Nil(err, "error creating badges")
@@ -509,7 +509,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesOutgoing() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -527,7 +527,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesIncoming() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 suite.Require().Nil(err, "error creating badges")
@@ -545,8 +545,8 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 suite.Require().Nil(err, "error creating badges")

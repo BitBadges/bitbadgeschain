@@ -24,7 +24,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		ManagerTimeline:            []*types.ManagerTimeline{
 			{
 				Manager: msg.Creator,
-				Times: []*types.IdRange{
+				TimelineTimes: []*types.IdRange{
 					{
 						Start: sdkmath.NewUint(0),
 						End:   sdkmath.NewUint(math.MaxUint64),
@@ -33,17 +33,16 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 			},
 		},
 		Permissions:        msg.Permissions,
-		ApprovedTransfersTimeline:  msg.ApprovedTransfersTimeline,
+		CollectionApprovedTransfersTimeline:  msg.CollectionApprovedTransfersTimeline,
 		CustomDataTimeline:         msg.CustomDataTimeline,
 		ContractAddressTimeline:    msg.ContractAddressTimeline,
 		StandardsTimeline:          msg.StandardsTimeline,
 		NextBadgeId:        sdkmath.NewUint(1),
-		ParentCollectionId: sdkmath.NewUint(0),
 		BalancesType:       msg.BalancesType,
 		IsArchivedTimeline: []*types.IsArchivedTimeline{
 			{
 				IsArchived: false,
-				Times:      []*types.IdRange{
+				TimelineTimes:      []*types.IdRange{
 					{
 						Start: sdkmath.NewUint(0),
 						End:   sdkmath.NewUint(math.MaxUint64),

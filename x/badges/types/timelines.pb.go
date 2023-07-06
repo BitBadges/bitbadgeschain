@@ -26,7 +26,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type CollectionMetadataTimeline struct {
 	CollectionMetadata *CollectionMetadata `protobuf:"bytes,1,opt,name=collectionMetadata,proto3" json:"collectionMetadata,omitempty"`
-	Times              []*IdRange          `protobuf:"bytes,2,rep,name=times,proto3" json:"times,omitempty"`
+	TimelineTimes      []*IdRange          `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *CollectionMetadataTimeline) Reset()         { *m = CollectionMetadataTimeline{} }
@@ -69,16 +69,16 @@ func (m *CollectionMetadataTimeline) GetCollectionMetadata() *CollectionMetadata
 	return nil
 }
 
-func (m *CollectionMetadataTimeline) GetTimes() []*IdRange {
+func (m *CollectionMetadataTimeline) GetTimelineTimes() []*IdRange {
 	if m != nil {
-		return m.Times
+		return m.TimelineTimes
 	}
 	return nil
 }
 
 type BadgeMetadataTimeline struct {
 	BadgeMetadata []*BadgeMetadata `protobuf:"bytes,1,rep,name=badgeMetadata,proto3" json:"badgeMetadata,omitempty"`
-	Times         []*IdRange       `protobuf:"bytes,2,rep,name=times,proto3" json:"times,omitempty"`
+	TimelineTimes []*IdRange       `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *BadgeMetadataTimeline) Reset()         { *m = BadgeMetadataTimeline{} }
@@ -121,16 +121,16 @@ func (m *BadgeMetadataTimeline) GetBadgeMetadata() []*BadgeMetadata {
 	return nil
 }
 
-func (m *BadgeMetadataTimeline) GetTimes() []*IdRange {
+func (m *BadgeMetadataTimeline) GetTimelineTimes() []*IdRange {
 	if m != nil {
-		return m.Times
+		return m.TimelineTimes
 	}
 	return nil
 }
 
 type OffChainBalancesMetadataTimeline struct {
 	OffChainBalancesMetadata *OffChainBalancesMetadata `protobuf:"bytes,1,opt,name=offChainBalancesMetadata,proto3" json:"offChainBalancesMetadata,omitempty"`
-	Times                    []*IdRange                `protobuf:"bytes,2,rep,name=times,proto3" json:"times,omitempty"`
+	TimelineTimes            []*IdRange                `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *OffChainBalancesMetadataTimeline) Reset()         { *m = OffChainBalancesMetadataTimeline{} }
@@ -173,16 +173,16 @@ func (m *OffChainBalancesMetadataTimeline) GetOffChainBalancesMetadata() *OffCha
 	return nil
 }
 
-func (m *OffChainBalancesMetadataTimeline) GetTimes() []*IdRange {
+func (m *OffChainBalancesMetadataTimeline) GetTimelineTimes() []*IdRange {
 	if m != nil {
-		return m.Times
+		return m.TimelineTimes
 	}
 	return nil
 }
 
 type InheritedBalancesTimeline struct {
 	InheritedBalances []*InheritedBalance `protobuf:"bytes,1,rep,name=inheritedBalances,proto3" json:"inheritedBalances,omitempty"`
-	Times             []*IdRange          `protobuf:"bytes,2,rep,name=times,proto3" json:"times,omitempty"`
+	TimelineTimes     []*IdRange          `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *InheritedBalancesTimeline) Reset()         { *m = InheritedBalancesTimeline{} }
@@ -225,16 +225,16 @@ func (m *InheritedBalancesTimeline) GetInheritedBalances() []*InheritedBalance {
 	return nil
 }
 
-func (m *InheritedBalancesTimeline) GetTimes() []*IdRange {
+func (m *InheritedBalancesTimeline) GetTimelineTimes() []*IdRange {
 	if m != nil {
-		return m.Times
+		return m.TimelineTimes
 	}
 	return nil
 }
 
 type CustomDataTimeline struct {
-	CustomData string     `protobuf:"bytes,1,opt,name=customData,proto3" json:"customData,omitempty"`
-	Times      []*IdRange `protobuf:"bytes,2,rep,name=times,proto3" json:"times,omitempty"`
+	CustomData    string     `protobuf:"bytes,1,opt,name=customData,proto3" json:"customData,omitempty"`
+	TimelineTimes []*IdRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *CustomDataTimeline) Reset()         { *m = CustomDataTimeline{} }
@@ -277,16 +277,16 @@ func (m *CustomDataTimeline) GetCustomData() string {
 	return ""
 }
 
-func (m *CustomDataTimeline) GetTimes() []*IdRange {
+func (m *CustomDataTimeline) GetTimelineTimes() []*IdRange {
 	if m != nil {
-		return m.Times
+		return m.TimelineTimes
 	}
 	return nil
 }
 
 type ManagerTimeline struct {
-	Manager string     `protobuf:"bytes,1,opt,name=manager,proto3" json:"manager,omitempty"`
-	Times   []*IdRange `protobuf:"bytes,2,rep,name=times,proto3" json:"times,omitempty"`
+	Manager       string     `protobuf:"bytes,1,opt,name=manager,proto3" json:"manager,omitempty"`
+	TimelineTimes []*IdRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *ManagerTimeline) Reset()         { *m = ManagerTimeline{} }
@@ -329,16 +329,16 @@ func (m *ManagerTimeline) GetManager() string {
 	return ""
 }
 
-func (m *ManagerTimeline) GetTimes() []*IdRange {
+func (m *ManagerTimeline) GetTimelineTimes() []*IdRange {
 	if m != nil {
-		return m.Times
+		return m.TimelineTimes
 	}
 	return nil
 }
 
 type CollectionApprovedTransferTimeline struct {
 	ApprovedTransfers []*CollectionApprovedTransfer `protobuf:"bytes,1,rep,name=approvedTransfers,proto3" json:"approvedTransfers,omitempty"`
-	Times             []*IdRange                    `protobuf:"bytes,2,rep,name=times,proto3" json:"times,omitempty"`
+	TimelineTimes     []*IdRange                    `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *CollectionApprovedTransferTimeline) Reset()         { *m = CollectionApprovedTransferTimeline{} }
@@ -381,16 +381,16 @@ func (m *CollectionApprovedTransferTimeline) GetApprovedTransfers() []*Collectio
 	return nil
 }
 
-func (m *CollectionApprovedTransferTimeline) GetTimes() []*IdRange {
+func (m *CollectionApprovedTransferTimeline) GetTimelineTimes() []*IdRange {
 	if m != nil {
-		return m.Times
+		return m.TimelineTimes
 	}
 	return nil
 }
 
 type IsArchivedTimeline struct {
-	IsArchived bool       `protobuf:"varint,1,opt,name=isArchived,proto3" json:"isArchived,omitempty"`
-	Times      []*IdRange `protobuf:"bytes,2,rep,name=times,proto3" json:"times,omitempty"`
+	IsArchived    bool       `protobuf:"varint,1,opt,name=isArchived,proto3" json:"isArchived,omitempty"`
+	TimelineTimes []*IdRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *IsArchivedTimeline) Reset()         { *m = IsArchivedTimeline{} }
@@ -433,16 +433,16 @@ func (m *IsArchivedTimeline) GetIsArchived() bool {
 	return false
 }
 
-func (m *IsArchivedTimeline) GetTimes() []*IdRange {
+func (m *IsArchivedTimeline) GetTimelineTimes() []*IdRange {
 	if m != nil {
-		return m.Times
+		return m.TimelineTimes
 	}
 	return nil
 }
 
 type ContractAddressTimeline struct {
 	ContractAddress string     `protobuf:"bytes,1,opt,name=contractAddress,proto3" json:"contractAddress,omitempty"`
-	Times           []*IdRange `protobuf:"bytes,2,rep,name=times,proto3" json:"times,omitempty"`
+	TimelineTimes   []*IdRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *ContractAddressTimeline) Reset()         { *m = ContractAddressTimeline{} }
@@ -485,30 +485,30 @@ func (m *ContractAddressTimeline) GetContractAddress() string {
 	return ""
 }
 
-func (m *ContractAddressTimeline) GetTimes() []*IdRange {
+func (m *ContractAddressTimeline) GetTimelineTimes() []*IdRange {
 	if m != nil {
-		return m.Times
+		return m.TimelineTimes
 	}
 	return nil
 }
 
-type StandardTimeline struct {
-	Standards []string   `protobuf:"bytes,1,rep,name=standards,proto3" json:"standards,omitempty"`
-	Times     []*IdRange `protobuf:"bytes,2,rep,name=times,proto3" json:"times,omitempty"`
+type StandardsTimeline struct {
+	Standards     []string   `protobuf:"bytes,1,rep,name=standards,proto3" json:"standards,omitempty"`
+	TimelineTimes []*IdRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
-func (m *StandardTimeline) Reset()         { *m = StandardTimeline{} }
-func (m *StandardTimeline) String() string { return proto.CompactTextString(m) }
-func (*StandardTimeline) ProtoMessage()    {}
-func (*StandardTimeline) Descriptor() ([]byte, []int) {
+func (m *StandardsTimeline) Reset()         { *m = StandardsTimeline{} }
+func (m *StandardsTimeline) String() string { return proto.CompactTextString(m) }
+func (*StandardsTimeline) ProtoMessage()    {}
+func (*StandardsTimeline) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6acaeede2b65317a, []int{9}
 }
-func (m *StandardTimeline) XXX_Unmarshal(b []byte) error {
+func (m *StandardsTimeline) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *StandardTimeline) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *StandardsTimeline) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_StandardTimeline.Marshal(b, m, deterministic)
+		return xxx_messageInfo_StandardsTimeline.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -518,28 +518,28 @@ func (m *StandardTimeline) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (m *StandardTimeline) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_StandardTimeline.Merge(m, src)
+func (m *StandardsTimeline) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_StandardsTimeline.Merge(m, src)
 }
-func (m *StandardTimeline) XXX_Size() int {
+func (m *StandardsTimeline) XXX_Size() int {
 	return m.Size()
 }
-func (m *StandardTimeline) XXX_DiscardUnknown() {
-	xxx_messageInfo_StandardTimeline.DiscardUnknown(m)
+func (m *StandardsTimeline) XXX_DiscardUnknown() {
+	xxx_messageInfo_StandardsTimeline.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_StandardTimeline proto.InternalMessageInfo
+var xxx_messageInfo_StandardsTimeline proto.InternalMessageInfo
 
-func (m *StandardTimeline) GetStandards() []string {
+func (m *StandardsTimeline) GetStandards() []string {
 	if m != nil {
 		return m.Standards
 	}
 	return nil
 }
 
-func (m *StandardTimeline) GetTimes() []*IdRange {
+func (m *StandardsTimeline) GetTimelineTimes() []*IdRange {
 	if m != nil {
-		return m.Times
+		return m.TimelineTimes
 	}
 	return nil
 }
@@ -554,47 +554,47 @@ func init() {
 	proto.RegisterType((*CollectionApprovedTransferTimeline)(nil), "bitbadges.bitbadgeschain.badges.CollectionApprovedTransferTimeline")
 	proto.RegisterType((*IsArchivedTimeline)(nil), "bitbadges.bitbadgeschain.badges.IsArchivedTimeline")
 	proto.RegisterType((*ContractAddressTimeline)(nil), "bitbadges.bitbadgeschain.badges.ContractAddressTimeline")
-	proto.RegisterType((*StandardTimeline)(nil), "bitbadges.bitbadgeschain.badges.StandardTimeline")
+	proto.RegisterType((*StandardsTimeline)(nil), "bitbadges.bitbadgeschain.badges.StandardsTimeline")
 }
 
 func init() { proto.RegisterFile("badges/timelines.proto", fileDescriptor_6acaeede2b65317a) }
 
 var fileDescriptor_6acaeede2b65317a = []byte{
-	// 535 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0xcd, 0x8e, 0xd3, 0x30,
-	0x10, 0x5e, 0x83, 0xf8, 0xe9, 0xac, 0xd0, 0xb2, 0x15, 0x0b, 0xd9, 0x0a, 0x85, 0xaa, 0xa7, 0x9e,
-	0x12, 0xd1, 0x3d, 0x21, 0x24, 0xa4, 0xb6, 0x5c, 0x2a, 0xb1, 0x42, 0x32, 0x3d, 0x71, 0x41, 0x8e,
-	0xe3, 0xa6, 0x16, 0x8d, 0x1d, 0xd9, 0x2e, 0x62, 0xcf, 0xbc, 0x00, 0x2f, 0xc2, 0x1b, 0x70, 0xe1,
-	0xc6, 0x8d, 0x3d, 0xc2, 0x0d, 0xb5, 0x2f, 0x82, 0x9a, 0xb8, 0x69, 0x9a, 0x50, 0x45, 0x28, 0xdc,
-	0xa6, 0xdf, 0x78, 0xbe, 0x6f, 0x66, 0xbe, 0x3a, 0x86, 0x87, 0x01, 0x09, 0x23, 0xa6, 0x7d, 0xc3,
-	0x63, 0xb6, 0xe0, 0x82, 0x69, 0x2f, 0x51, 0xd2, 0xc8, 0xf6, 0x93, 0x80, 0x9b, 0x2c, 0xe5, 0xe5,
-	0x11, 0x9d, 0x13, 0x2e, 0xbc, 0x2c, 0xee, 0x9c, 0x47, 0x52, 0x46, 0x0b, 0xe6, 0xa7, 0xc7, 0x83,
-	0xe5, 0xcc, 0x27, 0xe2, 0x2a, 0xab, 0xed, 0xe4, 0x9c, 0x8a, 0x08, 0x3d, 0x63, 0xca, 0x72, 0x76,
-	0xce, 0x2c, 0x1e, 0x90, 0x05, 0x11, 0x74, 0x2b, 0xd5, 0x71, 0x2c, 0x9c, 0x30, 0x15, 0x73, 0xad,
-	0xb9, 0x14, 0xe5, 0x82, 0x98, 0x19, 0x12, 0x12, 0x43, 0x2c, 0xfc, 0x20, 0x92, 0x91, 0x4c, 0x43,
-	0x7f, 0x13, 0x65, 0x68, 0xef, 0x1b, 0x82, 0xce, 0x58, 0x2e, 0x16, 0x8c, 0x1a, 0x2e, 0xc5, 0xa5,
-	0x2d, 0x99, 0xda, 0xb9, 0xda, 0x14, 0xda, 0xb4, 0x92, 0x75, 0x50, 0x17, 0xf5, 0x8f, 0x07, 0x17,
-	0x5e, 0xcd, 0xb4, 0x5e, 0x95, 0x18, 0xff, 0x85, 0xae, 0xfd, 0x02, 0x6e, 0x6d, 0x16, 0xa9, 0x9d,
-	0x1b, 0xdd, 0x9b, 0xfd, 0xe3, 0x41, 0xbf, 0x96, 0x77, 0x12, 0x62, 0x22, 0x22, 0x86, 0xb3, 0xb2,
-	0xde, 0x17, 0x04, 0x67, 0xa3, 0x4d, 0xa6, 0xd2, 0xfe, 0x14, 0xee, 0x05, 0xc5, 0x84, 0x83, 0x52,
-	0x05, 0xaf, 0x56, 0x61, 0x8f, 0x0e, 0xef, 0x93, 0x34, 0xee, 0xf7, 0x17, 0x82, 0xee, 0xeb, 0xd9,
-	0x6c, 0xbc, 0x39, 0x32, 0xb2, 0xae, 0x56, 0x5a, 0x5f, 0x82, 0x23, 0x0f, 0x9c, 0xb1, 0xfb, 0x7f,
-	0x56, 0xab, 0x7b, 0x48, 0x04, 0x1f, 0xa4, 0x6e, 0x3c, 0xdb, 0x57, 0x04, 0xe7, 0x13, 0x31, 0x67,
-	0x8a, 0x1b, 0x16, 0x6e, 0xd9, 0xf3, 0xa1, 0xde, 0xc1, 0x29, 0x2f, 0x27, 0xad, 0x27, 0x4f, 0xeb,
-	0x95, 0x4a, 0x95, 0xb8, 0xca, 0xd5, 0xb8, 0x7d, 0x03, 0xed, 0xf1, 0x52, 0x1b, 0x19, 0xbf, 0x2c,
-	0x7a, 0xe1, 0x02, 0xd0, 0x1c, 0x4d, 0xb7, 0xdf, 0xc2, 0x05, 0xa4, 0xb1, 0xea, 0x7b, 0x38, 0xb9,
-	0x24, 0x82, 0x44, 0x4c, 0xe5, 0x92, 0x0e, 0xdc, 0x89, 0x33, 0xc8, 0xea, 0x6d, 0x7f, 0x36, 0x16,
-	0xfb, 0x81, 0xa0, 0xb7, 0xbb, 0x98, 0xc3, 0x24, 0x51, 0xf2, 0x03, 0x0b, 0xa7, 0xf6, 0xab, 0x93,
-	0x37, 0xc0, 0xe1, 0x94, 0x94, 0x72, 0x5b, 0xab, 0x9e, 0xff, 0xc3, 0xc5, 0x2f, 0xf3, 0xe3, 0x2a,
-	0xeb, 0xff, 0x30, 0x6d, 0xa2, 0x87, 0x8a, 0xce, 0xf9, 0x86, 0xb6, 0x60, 0x1a, 0xcf, 0xd1, 0x74,
-	0x89, 0x77, 0x71, 0x01, 0x69, 0xac, 0xfa, 0x09, 0xc1, 0xa3, 0xb1, 0x14, 0x46, 0x11, 0x6a, 0x86,
-	0x61, 0xa8, 0x98, 0xde, 0xfd, 0xcf, 0xfb, 0x70, 0x42, 0xf7, 0x53, 0xd6, 0xc5, 0x32, 0xdc, 0xb8,
-	0x8b, 0x04, 0xee, 0xbf, 0x31, 0x44, 0x84, 0x44, 0xed, 0x26, 0x7f, 0x0c, 0x2d, 0x6d, 0xb1, 0xcc,
-	0xb2, 0x16, 0xde, 0x01, 0x4d, 0x15, 0x47, 0xaf, 0xbe, 0xaf, 0x5c, 0x74, 0xbd, 0x72, 0xd1, 0xef,
-	0x95, 0x8b, 0x3e, 0xaf, 0xdd, 0xa3, 0xeb, 0xb5, 0x7b, 0xf4, 0x73, 0xed, 0x1e, 0xbd, 0x1d, 0x44,
-	0xdc, 0xcc, 0x97, 0x81, 0x47, 0x65, 0xec, 0xe7, 0x54, 0xfe, 0x3e, 0xa9, 0xff, 0xd1, 0xdf, 0xbe,
-	0x73, 0x57, 0x09, 0xd3, 0xc1, 0xed, 0xf4, 0x19, 0xba, 0xf8, 0x13, 0x00, 0x00, 0xff, 0xff, 0x1a,
-	0x70, 0x4d, 0xaf, 0x52, 0x07, 0x00, 0x00,
+	// 544 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x55, 0x41, 0xab, 0xd3, 0x4c,
+	0x14, 0xed, 0x7c, 0x1f, 0xa8, 0xbd, 0x8f, 0xc7, 0xa3, 0xc5, 0xa7, 0x79, 0x45, 0x62, 0xe9, 0xaa,
+	0xab, 0x04, 0xfb, 0x56, 0xe2, 0xaa, 0xad, 0x9b, 0x82, 0x4f, 0x61, 0xec, 0xca, 0x8d, 0x4c, 0x26,
+	0xd3, 0x74, 0xa0, 0x99, 0x29, 0x33, 0x53, 0xf1, 0xe1, 0x4a, 0xf0, 0x07, 0x08, 0xfe, 0x1e, 0xf7,
+	0x2e, 0x5c, 0x3c, 0x77, 0xee, 0x94, 0x76, 0xe5, 0xbf, 0x90, 0xa6, 0x93, 0xb4, 0x49, 0x2c, 0x41,
+	0x88, 0xbb, 0xc9, 0xb9, 0xf7, 0x9e, 0x73, 0x6e, 0x0e, 0xc9, 0xc0, 0xbd, 0x80, 0x84, 0x11, 0xd3,
+	0xbe, 0xe1, 0x31, 0x5b, 0x70, 0xc1, 0xb4, 0xb7, 0x54, 0xd2, 0xc8, 0xf6, 0xc3, 0x80, 0x9b, 0x5d,
+	0xc9, 0xcb, 0x4e, 0x74, 0x4e, 0xb8, 0xf0, 0x76, 0xe7, 0xce, 0x45, 0x24, 0x65, 0xb4, 0x60, 0x7e,
+	0xd2, 0x1e, 0xac, 0x66, 0x3e, 0x11, 0xd7, 0xbb, 0xd9, 0x4e, 0xc6, 0xa9, 0x88, 0xd0, 0x33, 0xa6,
+	0x2c, 0x67, 0xe7, 0xdc, 0xe2, 0x01, 0x59, 0x10, 0x41, 0x53, 0xa9, 0x8e, 0x63, 0xe1, 0x25, 0x53,
+	0x31, 0xd7, 0x9a, 0x4b, 0x51, 0x1c, 0x88, 0x99, 0x21, 0x21, 0x31, 0xc4, 0xc2, 0x77, 0x23, 0x19,
+	0xc9, 0xe4, 0xe8, 0x6f, 0x4f, 0x3b, 0xb4, 0xf7, 0x0d, 0x41, 0x67, 0x2c, 0x17, 0x0b, 0x46, 0x0d,
+	0x97, 0xe2, 0xca, 0x8e, 0x4c, 0xed, 0x5e, 0x6d, 0x0a, 0x6d, 0x5a, 0xaa, 0x3a, 0xa8, 0x8b, 0xfa,
+	0x27, 0x83, 0x4b, 0xaf, 0x62, 0x5b, 0xaf, 0x4c, 0x8c, 0xff, 0x40, 0xd7, 0x7e, 0x0e, 0xa7, 0xe9,
+	0x8b, 0xdc, 0x0a, 0x6b, 0xe7, 0xbf, 0xee, 0xff, 0xfd, 0x93, 0x41, 0xbf, 0x92, 0x7f, 0x12, 0x62,
+	0x22, 0x22, 0x86, 0xf3, 0xe3, 0xbd, 0xcf, 0x08, 0xce, 0x47, 0xdb, 0x8e, 0xd2, 0x3a, 0x53, 0x38,
+	0x0d, 0x0e, 0x0b, 0x0e, 0x4a, 0x94, 0xbc, 0x4a, 0xa5, 0x1c, 0x1d, 0xce, 0x93, 0xd4, 0xee, 0xff,
+	0x17, 0x82, 0xee, 0x8b, 0xd9, 0x6c, 0xbc, 0x6d, 0x1d, 0xd9, 0xd4, 0x4b, 0xab, 0xac, 0xc0, 0x91,
+	0x47, 0x7a, 0x6c, 0x3e, 0x8f, 0x2b, 0xf5, 0x8f, 0x89, 0xe0, 0xa3, 0xd4, 0xb5, 0xef, 0xfa, 0x15,
+	0xc1, 0xc5, 0x44, 0xcc, 0x99, 0xe2, 0x86, 0x85, 0xa9, 0x5a, 0xb6, 0xe4, 0x6b, 0x68, 0xf1, 0x62,
+	0xd1, 0x66, 0xf6, 0xa8, 0x5a, 0xb1, 0x30, 0x89, 0xcb, 0x5c, 0xb5, 0xaf, 0xf3, 0x01, 0x41, 0x7b,
+	0xbc, 0xd2, 0x46, 0xc6, 0x4f, 0x0f, 0xc3, 0x72, 0x01, 0x68, 0x86, 0x26, 0xf1, 0x34, 0xf1, 0x01,
+	0x52, 0xbb, 0x8d, 0x77, 0x70, 0x76, 0x45, 0x04, 0x89, 0x98, 0xca, 0x2c, 0x38, 0x70, 0x3b, 0xde,
+	0x41, 0x56, 0x3f, 0x7d, 0xac, 0x5d, 0xfc, 0x07, 0x82, 0xde, 0xfe, 0xcb, 0x1f, 0x2e, 0x97, 0x4a,
+	0xbe, 0x61, 0xe1, 0xd4, 0xfe, 0xd6, 0x32, 0x43, 0x1c, 0x5a, 0xa4, 0x50, 0x4b, 0xb3, 0x7d, 0xf2,
+	0x17, 0x7f, 0x96, 0x22, 0x3f, 0x2e, 0xb3, 0xfe, 0x93, 0x94, 0x27, 0x7a, 0xa8, 0xe8, 0x9c, 0x6f,
+	0x75, 0x0e, 0x52, 0xe6, 0x19, 0x9a, 0xbc, 0xe5, 0x3b, 0xf8, 0x00, 0xa9, 0xdd, 0xc6, 0x27, 0x04,
+	0xf7, 0xc7, 0x52, 0x18, 0x45, 0xa8, 0x19, 0x86, 0xa1, 0x62, 0x7a, 0xff, 0xe5, 0xf4, 0xe1, 0x8c,
+	0xe6, 0x4b, 0x36, 0xf6, 0x22, 0x5c, 0xbb, 0xab, 0xf7, 0x08, 0x5a, 0x2f, 0x0d, 0x11, 0x21, 0x51,
+	0xe1, 0xde, 0xcf, 0x03, 0x68, 0xea, 0x14, 0x4c, 0x52, 0x6e, 0xe2, 0x3d, 0x50, 0xb7, 0x87, 0xd1,
+	0xb3, 0x2f, 0x6b, 0x17, 0xdd, 0xac, 0x5d, 0xf4, 0x73, 0xed, 0xa2, 0x8f, 0x1b, 0xb7, 0x71, 0xb3,
+	0x71, 0x1b, 0xdf, 0x37, 0x6e, 0xe3, 0xd5, 0x20, 0xe2, 0x66, 0xbe, 0x0a, 0x3c, 0x2a, 0x63, 0x3f,
+	0xa3, 0xf4, 0xf3, 0xe4, 0xfe, 0x5b, 0x3f, 0xbd, 0x8b, 0xaf, 0x97, 0x4c, 0x07, 0xb7, 0x92, 0xab,
+	0xf2, 0xf2, 0x77, 0x00, 0x00, 0x00, 0xff, 0xff, 0x75, 0x09, 0xa8, 0x8c, 0xf6, 0x07, 0x00, 0x00,
 }
 
 func (m *CollectionMetadataTimeline) Marshal() (dAtA []byte, err error) {
@@ -617,10 +617,10 @@ func (m *CollectionMetadataTimeline) MarshalToSizedBuffer(dAtA []byte) (int, err
 	_ = i
 	var l int
 	_ = l
-	if len(m.Times) > 0 {
-		for iNdEx := len(m.Times) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TimelineTimes) > 0 {
+		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Times[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -666,10 +666,10 @@ func (m *BadgeMetadataTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Times) > 0 {
-		for iNdEx := len(m.Times) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TimelineTimes) > 0 {
+		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Times[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -717,10 +717,10 @@ func (m *OffChainBalancesMetadataTimeline) MarshalToSizedBuffer(dAtA []byte) (in
 	_ = i
 	var l int
 	_ = l
-	if len(m.Times) > 0 {
-		for iNdEx := len(m.Times) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TimelineTimes) > 0 {
+		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Times[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -766,10 +766,10 @@ func (m *InheritedBalancesTimeline) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	_ = i
 	var l int
 	_ = l
-	if len(m.Times) > 0 {
-		for iNdEx := len(m.Times) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TimelineTimes) > 0 {
+		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Times[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -817,10 +817,10 @@ func (m *CustomDataTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Times) > 0 {
-		for iNdEx := len(m.Times) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TimelineTimes) > 0 {
+		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Times[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -861,10 +861,10 @@ func (m *ManagerTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Times) > 0 {
-		for iNdEx := len(m.Times) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TimelineTimes) > 0 {
+		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Times[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -905,10 +905,10 @@ func (m *CollectionApprovedTransferTimeline) MarshalToSizedBuffer(dAtA []byte) (
 	_ = i
 	var l int
 	_ = l
-	if len(m.Times) > 0 {
-		for iNdEx := len(m.Times) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TimelineTimes) > 0 {
+		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Times[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -956,10 +956,10 @@ func (m *IsArchivedTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Times) > 0 {
-		for iNdEx := len(m.Times) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TimelineTimes) > 0 {
+		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Times[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1003,10 +1003,10 @@ func (m *ContractAddressTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Times) > 0 {
-		for iNdEx := len(m.Times) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TimelineTimes) > 0 {
+		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Times[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1027,7 +1027,7 @@ func (m *ContractAddressTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
-func (m *StandardTimeline) Marshal() (dAtA []byte, err error) {
+func (m *StandardsTimeline) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1037,20 +1037,20 @@ func (m *StandardTimeline) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *StandardTimeline) MarshalTo(dAtA []byte) (int, error) {
+func (m *StandardsTimeline) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *StandardTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *StandardsTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Times) > 0 {
-		for iNdEx := len(m.Times) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TimelineTimes) > 0 {
+		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Times[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1094,8 +1094,8 @@ func (m *CollectionMetadataTimeline) Size() (n int) {
 		l = m.CollectionMetadata.Size()
 		n += 1 + l + sovTimelines(uint64(l))
 	}
-	if len(m.Times) > 0 {
-		for _, e := range m.Times {
+	if len(m.TimelineTimes) > 0 {
+		for _, e := range m.TimelineTimes {
 			l = e.Size()
 			n += 1 + l + sovTimelines(uint64(l))
 		}
@@ -1115,8 +1115,8 @@ func (m *BadgeMetadataTimeline) Size() (n int) {
 			n += 1 + l + sovTimelines(uint64(l))
 		}
 	}
-	if len(m.Times) > 0 {
-		for _, e := range m.Times {
+	if len(m.TimelineTimes) > 0 {
+		for _, e := range m.TimelineTimes {
 			l = e.Size()
 			n += 1 + l + sovTimelines(uint64(l))
 		}
@@ -1134,8 +1134,8 @@ func (m *OffChainBalancesMetadataTimeline) Size() (n int) {
 		l = m.OffChainBalancesMetadata.Size()
 		n += 1 + l + sovTimelines(uint64(l))
 	}
-	if len(m.Times) > 0 {
-		for _, e := range m.Times {
+	if len(m.TimelineTimes) > 0 {
+		for _, e := range m.TimelineTimes {
 			l = e.Size()
 			n += 1 + l + sovTimelines(uint64(l))
 		}
@@ -1155,8 +1155,8 @@ func (m *InheritedBalancesTimeline) Size() (n int) {
 			n += 1 + l + sovTimelines(uint64(l))
 		}
 	}
-	if len(m.Times) > 0 {
-		for _, e := range m.Times {
+	if len(m.TimelineTimes) > 0 {
+		for _, e := range m.TimelineTimes {
 			l = e.Size()
 			n += 1 + l + sovTimelines(uint64(l))
 		}
@@ -1174,8 +1174,8 @@ func (m *CustomDataTimeline) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTimelines(uint64(l))
 	}
-	if len(m.Times) > 0 {
-		for _, e := range m.Times {
+	if len(m.TimelineTimes) > 0 {
+		for _, e := range m.TimelineTimes {
 			l = e.Size()
 			n += 1 + l + sovTimelines(uint64(l))
 		}
@@ -1193,8 +1193,8 @@ func (m *ManagerTimeline) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTimelines(uint64(l))
 	}
-	if len(m.Times) > 0 {
-		for _, e := range m.Times {
+	if len(m.TimelineTimes) > 0 {
+		for _, e := range m.TimelineTimes {
 			l = e.Size()
 			n += 1 + l + sovTimelines(uint64(l))
 		}
@@ -1214,8 +1214,8 @@ func (m *CollectionApprovedTransferTimeline) Size() (n int) {
 			n += 1 + l + sovTimelines(uint64(l))
 		}
 	}
-	if len(m.Times) > 0 {
-		for _, e := range m.Times {
+	if len(m.TimelineTimes) > 0 {
+		for _, e := range m.TimelineTimes {
 			l = e.Size()
 			n += 1 + l + sovTimelines(uint64(l))
 		}
@@ -1232,8 +1232,8 @@ func (m *IsArchivedTimeline) Size() (n int) {
 	if m.IsArchived {
 		n += 2
 	}
-	if len(m.Times) > 0 {
-		for _, e := range m.Times {
+	if len(m.TimelineTimes) > 0 {
+		for _, e := range m.TimelineTimes {
 			l = e.Size()
 			n += 1 + l + sovTimelines(uint64(l))
 		}
@@ -1251,8 +1251,8 @@ func (m *ContractAddressTimeline) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTimelines(uint64(l))
 	}
-	if len(m.Times) > 0 {
-		for _, e := range m.Times {
+	if len(m.TimelineTimes) > 0 {
+		for _, e := range m.TimelineTimes {
 			l = e.Size()
 			n += 1 + l + sovTimelines(uint64(l))
 		}
@@ -1260,7 +1260,7 @@ func (m *ContractAddressTimeline) Size() (n int) {
 	return n
 }
 
-func (m *StandardTimeline) Size() (n int) {
+func (m *StandardsTimeline) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1272,8 +1272,8 @@ func (m *StandardTimeline) Size() (n int) {
 			n += 1 + l + sovTimelines(uint64(l))
 		}
 	}
-	if len(m.Times) > 0 {
-		for _, e := range m.Times {
+	if len(m.TimelineTimes) > 0 {
+		for _, e := range m.TimelineTimes {
 			l = e.Size()
 			n += 1 + l + sovTimelines(uint64(l))
 		}
@@ -1354,7 +1354,7 @@ func (m *CollectionMetadataTimeline) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Times", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1381,8 +1381,8 @@ func (m *CollectionMetadataTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Times = append(m.Times, &IdRange{})
-			if err := m.Times[len(m.Times)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1472,7 +1472,7 @@ func (m *BadgeMetadataTimeline) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Times", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1499,8 +1499,8 @@ func (m *BadgeMetadataTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Times = append(m.Times, &IdRange{})
-			if err := m.Times[len(m.Times)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1592,7 +1592,7 @@ func (m *OffChainBalancesMetadataTimeline) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Times", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1619,8 +1619,8 @@ func (m *OffChainBalancesMetadataTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Times = append(m.Times, &IdRange{})
-			if err := m.Times[len(m.Times)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1710,7 +1710,7 @@ func (m *InheritedBalancesTimeline) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Times", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1737,8 +1737,8 @@ func (m *InheritedBalancesTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Times = append(m.Times, &IdRange{})
-			if err := m.Times[len(m.Times)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1826,7 +1826,7 @@ func (m *CustomDataTimeline) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Times", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1853,8 +1853,8 @@ func (m *CustomDataTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Times = append(m.Times, &IdRange{})
-			if err := m.Times[len(m.Times)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1942,7 +1942,7 @@ func (m *ManagerTimeline) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Times", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1969,8 +1969,8 @@ func (m *ManagerTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Times = append(m.Times, &IdRange{})
-			if err := m.Times[len(m.Times)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2060,7 +2060,7 @@ func (m *CollectionApprovedTransferTimeline) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Times", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2087,8 +2087,8 @@ func (m *CollectionApprovedTransferTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Times = append(m.Times, &IdRange{})
-			if err := m.Times[len(m.Times)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2164,7 +2164,7 @@ func (m *IsArchivedTimeline) Unmarshal(dAtA []byte) error {
 			m.IsArchived = bool(v != 0)
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Times", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2191,8 +2191,8 @@ func (m *IsArchivedTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Times = append(m.Times, &IdRange{})
-			if err := m.Times[len(m.Times)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2280,7 +2280,7 @@ func (m *ContractAddressTimeline) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Times", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2307,8 +2307,8 @@ func (m *ContractAddressTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Times = append(m.Times, &IdRange{})
-			if err := m.Times[len(m.Times)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2333,7 +2333,7 @@ func (m *ContractAddressTimeline) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *StandardTimeline) Unmarshal(dAtA []byte) error {
+func (m *StandardsTimeline) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2356,10 +2356,10 @@ func (m *StandardTimeline) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: StandardTimeline: wiretype end group for non-group")
+			return fmt.Errorf("proto: StandardsTimeline: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: StandardTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: StandardsTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2396,7 +2396,7 @@ func (m *StandardTimeline) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Times", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2423,8 +2423,8 @@ func (m *StandardTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Times = append(m.Times, &IdRange{})
-			if err := m.Times[len(m.Times)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TimelineTimes = append(m.TimelineTimes, &IdRange{})
+			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

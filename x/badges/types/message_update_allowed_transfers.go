@@ -14,7 +14,7 @@ func NewMsgUpdateCollectionApprovedTransfers(creator string, collectionId sdkmat
 	return &MsgUpdateCollectionApprovedTransfers{
 		Creator:           creator,
 		CollectionId:      collectionId,
-		ApprovedTransfersTimeline: approvedTransfersTimeline,
+		CollectionApprovedTransfersTimeline: approvedTransfersTimeline,
 	}
 }
 
@@ -45,7 +45,7 @@ func (msg *MsgUpdateCollectionApprovedTransfers) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if err := ValidateApprovedTransferTimeline(msg.ApprovedTransfersTimeline); err != nil {
+	if err := ValidateApprovedTransferTimeline(msg.CollectionApprovedTransfersTimeline); err != nil {
 		return err
 	}
 

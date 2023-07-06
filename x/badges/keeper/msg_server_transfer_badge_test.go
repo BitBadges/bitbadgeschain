@@ -32,7 +32,7 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 					{
 						Amount: sdkmath.NewUint(1),
 						BadgeIds: GetOneIdRange(),
-						Times: GetFullIdRanges(),
+						OwnershipTimes: GetFullIdRanges(),
 					},
 				},
 			},
@@ -80,7 +80,7 @@ func (suite *TestSuite) TestTransferBadgeHandleDuplicateIDs() {
 							GetOneIdRange()[0],
 							GetOneIdRange()[0],
 						},
-						Times: GetFullIdRanges(),
+						OwnershipTimes: GetFullIdRanges(),
 					},
 				},
 			},
@@ -107,10 +107,10 @@ func (suite *TestSuite) TestTransferBadgeNotApprovedCollectionLevel() {
 	err = UpdateCollectionApprovedTransfers(suite, wctx, &types.MsgUpdateCollectionApprovedTransfers{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		ApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
+		CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
 			{
 				ApprovedTransfers: []*types.CollectionApprovedTransfer{},
-				Times: GetFullIdRanges(),
+				TimelineTimes: GetFullIdRanges(),
 			},
 		},
 	})
@@ -127,7 +127,7 @@ func (suite *TestSuite) TestTransferBadgeNotApprovedCollectionLevel() {
 					{
 						Amount: sdkmath.NewUint(1),
 						BadgeIds: GetOneIdRange(),
-						Times: GetFullIdRanges(),
+						OwnershipTimes: GetFullIdRanges(),
 					},
 				},
 			},
@@ -157,7 +157,7 @@ func (suite *TestSuite) TestTransferBadgeNotApprovedIncoming() {
 		ApprovedIncomingTransfersTimeline: []*types.UserApprovedIncomingTransferTimeline{
 			{
 				// ApprovedIncomingTransfers: []*types.CollectionApprovedTransfer{},
-				Times: GetFullIdRanges(),
+				TimelineTimes: GetFullIdRanges(),
 			},
 		},
 	})
@@ -174,7 +174,7 @@ func (suite *TestSuite) TestTransferBadgeNotApprovedIncoming() {
 					{
 						Amount: sdkmath.NewUint(1),
 						BadgeIds: GetOneIdRange(),
-						Times: GetFullIdRanges(),
+						OwnershipTimes: GetFullIdRanges(),
 					},
 				},
 			},
@@ -207,7 +207,7 @@ func (suite *TestSuite) TestTransferBadgeFromMintAddress() {
 			{
 				Amount: sdkmath.NewUint(1),
 				BadgeIds: GetOneIdRange(),
-				Times: GetFullIdRanges(),
+				OwnershipTimes: GetFullIdRanges(),
 			},
 		},
 	})
@@ -224,7 +224,7 @@ func (suite *TestSuite) TestTransferBadgeFromMintAddress() {
 					{
 						Amount: sdkmath.NewUint(1),
 						BadgeIds: GetOneIdRange(),
-						Times: GetFullIdRanges(),
+						OwnershipTimes: GetFullIdRanges(),
 					},
 				},
 			},
@@ -245,7 +245,7 @@ func (suite *TestSuite) TestTransferBadgeFromMintAddress() {
 					{
 						Amount: sdkmath.NewUint(1),
 						BadgeIds: GetOneIdRange(),
-						Times: GetFullIdRanges(),
+						OwnershipTimes: GetFullIdRanges(),
 					},
 				},
 			},

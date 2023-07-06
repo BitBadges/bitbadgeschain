@@ -8,7 +8,20 @@ import "badges/balances.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
-
+// UserBalanceStore is the store for the user balances
+// It consists of a list of balances, a list of approved outgoing transfers, and a list of approved incoming transfers,
+// and the permissions for updating the approved incoming/outgoing transfers.
+//
+// The default approved outgoing / incoming transfers are defined by the collection.
+//
+// The outgoing transfers can be used to allow / disallow transfers which are sent from this user.
+// If a transfer has no match, then it is disallowed by default, unless from == initiatedBy (i.e. initiated by this user).
+//
+// The incoming transfers can be used to allow / disallow transfers which are sent to this user.
+// If a transfer has no match, then it is disallowed by default, unless to == initiatedBy (i.e. initiated by this user).
+//
+// Note that the user approved transfers are only checked if the collection approved transfers do not specify to override
+// the user approved transfers.
 message UserBalanceStore {
   repeated Balance balances = 1;
   repeated UserApprovedOutgoingTransferTimeline approvedOutgoingTransfersTimeline = 2;
@@ -18,14 +31,31 @@ message UserBalanceStore {
 
 message UserApprovedOutgoingTransferTimeline {
   repeated UserApprovedOutgoingTransfer approvedOutgoingTransfers = 1;
-  repeated IdRange times = 2;
+  repeated IdRange timelineTimes = 2;
 }
 
 message UserApprovedIncomingTransferTimeline {
   repeated UserApprovedIncomingTransfer approvedIncomingTransfers = 1;
-  repeated IdRange times = 2;
+  repeated IdRange timelineTimes = 2;
 }
 
+// Challenges define the rules for the approval.
+// If all challenge are not met with valid solutions, then the transfer is not approved.
+//
+// Currently, we only support Merkle tree challenges where the Merkle path must be to the provided root
+// and be the expected length.
+//
+// We also support the following options:
+// -useCreatorAddressAsLeaf: If true, then the leaf will be set to the creator address. Used for whitelist trees.
+// -maxOneUsePerLeaf: If true, then each leaf can only be used once. If false, then the leaf can be used multiple times.
+// This is very important to be set to true if you want to prevent replay attacks.
+// -useLeafIndexForDistributionOrder: If true, we will use the leafIndex to determine the order of the distribution of badges.
+// leafIndex 0 will be the leftmost leaf of the expectedProofLength layer
+//
+// IMPORTANT: We track the number of uses per leaf according to a challenge ID.
+// Please use unique challenge IDs for different challenges of the same timeline.
+// If you update the challenge ID, then the used leaves tracker will reset and start a new tally.
+// It is highly recommended to avoid updating a challenge without resetting the tally via a new challenge ID.
 message Challenge {
   string root = 1;
   string expectedProofLength = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
@@ -35,6 +65,7 @@ message Challenge {
   string challengeId = 6;
 }
 
+//PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address.
 message PerAddressApprovals {
   ApprovalsTracker approvalsPerFromAddress = 1;
   ApprovalsTracker approvalsPerToAddress = 2;
@@ -57,7 +88,8 @@ message IsUserIncomingTransferAllowed {
   bool isAllowed = 6;
 }
 
-
+// UserApprovedOutgoingTransfer defines the rules for the approval of an outgoing transfer from a user.
+// See CollectionApprovedTransfer for more details. This is the same minus a few fields.
 message UserApprovedOutgoingTransfer {
   string toMappingId = 1;
   string initiatedByMappingId = 2;
@@ -69,8 +101,8 @@ message UserApprovedOutgoingTransfer {
 
   string trackerId = 7;
 
-  string incrementIdsBy = 8 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string incrementTimesBy = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string incrementBadgeIdsBy = 8 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string incrementOwnershipTimesBy = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
   PerAddressApprovals perAddressApprovals = 10;
   
@@ -81,6 +113,8 @@ message UserApprovedOutgoingTransfer {
   bool requireToDoesNotEqualInitiatedBy = 15;
 }
 
+// UserApprovedIncomingTransfer defines the rules for the approval of an incoming transfer to a user.
+// See CollectionApprovedTransfer for more details. This is the same minus a few fields.
 message UserApprovedIncomingTransfer {
   string fromMappingId = 1;
   string initiatedByMappingId = 2;
@@ -92,8 +126,8 @@ message UserApprovedIncomingTransfer {
 
   string trackerId = 7;
 
-  string incrementIdsBy = 8 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string incrementTimesBy = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string incrementBadgeIdsBy = 8 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string incrementOwnershipTimesBy = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
   PerAddressApprovals perAddressApprovals = 11;
 
@@ -113,6 +147,43 @@ message IsCollectionTransferAllowed {
   bool isAllowed = 6;
 }
 
+// CollectionApprovedTransfer defines the rules for the approval of a transfer.
+// Each transfer can be broken down into a (from, to, initiatedBy, transferTime, badgeId) tuple.
+// We check the approvedTransfers for first match of this tuple, using the allowedCombinations. Subsequent matches are ignored.
+//
+// If the first match is disallowed, the transfer is disallowed.
+// If the first match is allowed, then we check the rest of the restrictions. If any restrictions fail, then the transfer is disallowed. 
+// We do not proceed to the next match.
+//
+// Challenges defines the challenges that must be met with valid solutions for the transfer to be approved.
+//
+// requireTo/From(DoesNot)EqualsInitiatedBy defines whether the to/from address must equal the initiatedBy address or not. If it doesn't, then the transfer is disallowed.
+//  
+// overallApprovals defines the overall approvals for the transfer (i.e. the running tally of the number of transfers and amounts transferred by all addresses).
+// perAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address.
+// If any of these are nil, we assume unlimited approvals.
+//
+// IMPORTANT: We track the number of transfers and amounts transferred according to a tracker ID. This is a running tally that increments over time.
+// Whenever a transfer is processed that maps to a specific tracker ID, we increment the number of transfers and amounts transferred.
+// If the number of transfers or amounts transferred exceeds the corresponding overall or per address approvals, then the transfer is disallowed.
+// Note we only track if overallApprovals or to/from/intiiatedByApprovals is not nil.
+// If you want to reset the tracker tally, update the tracker ID to a new unique tracker ID.
+// Tracker IDs are unique to their timelines. A tracker ID "abc" can be used for the collection, outgoing, and incoming timelines without overlap or overwriting one another.
+//
+// Ex: If overallApprovals maxNumTransfers = 20 and trackerID = "abc", then the first 20 transfers that map to trackerID = "abc" will be approved. The 21st transfer will be disallowed.
+//
+// IMPORTANT: Be very careful when updating an approved transfer but keeping the same tracker ID. 
+// For example, if you change the corresponding badge IDs and the old badge IDs overlap, then the overlapping badge IDs will already have existing tallies.
+//    
+// Another common area of confusion is what is actually being tallied. The tally is based on the approved transfer rules that are set.
+// For example, if you don't have per address rules set and you update the approved transfer rules to include per address rules, 
+// then the tally doesn't retroactively apply the per address rules to the previous transfers. It starts at that time.
+//
+// Lastly, we have overridesFromApprovedOutgoingTransfers and overridesToApprovedIncomingTransfers.
+// If these are set to true, we ignore the from / to user's approved outgoing / incoming transfers, respectively.
+// This is useful, for example, for forcefully revoking badges.
+// If these are set to false, the transfer must also be approved by the from /to user's approved outgoing / incoming transfers, respectively.
+
 message CollectionApprovedTransfer {
   string fromMappingId = 1;
   string toMappingId = 2;
@@ -126,8 +197,8 @@ message CollectionApprovedTransfer {
 
   string trackerId = 8;
 
-  string incrementIdsBy = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string incrementTimesBy = 10 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string incrementBadgeIdsBy = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string incrementOwnershipTimesBy = 10 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
   ApprovalsTracker overallApprovals = 11;
   PerAddressApprovals perAddressApprovals = 12;
@@ -148,44 +219,3 @@ message ApprovalsTracker {
   string numTransfers = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated Balance amounts = 2;
 }
-
-/*
-  We always track the primary num transfers and amounts.
-  For collection, primary = overall.
-  For outgoing, primary = from.
-  For incoming, primary = to.
-
-  When you first add an approved transfer with a unique tracker ID, it starts a running tally of the number of transfers and the amounts transferred.
-  For example, if you approve x20 of badge ID 1, then when valid transfers are made that match the approved transfer, the tally will increment.
-  Once the tally reaches x20 of badge ID 1, the next transfer will be unapproved.
-  In each approved transfer, there are more fine-grained rules such as per address approvals. The tracker does not tally if they are not set.
-  Tracker IDs are considered different tallies / counts via each level (collection is a diff count than outgoing is a diff count than incoming).
-
-  When updating approved transfers, you can specify a new unique tracker ID. If you do, then the tracker will reset and start a new tally.
-  If you do not update the tracker ID, then the tracker will continue to tally the transfers and amounts, according to whatever rules are set.
-  You can query the current tracker status anytime with the query endpoints.
-  
-  There are three cases when updating the approved transfers:
-  -1) No update needed. Leave the existing approved transfer as is w/ tracker ID, and it will continue to tally as before.
-  -2) Update and reset state. Remove the existing approved transfer and replace it with a new one with a new tracker ID, thus resetting the tally.
-      For most use cases, this should be the approach you take. It is the simplest and most straightforward.
-  -3) If you need to update and keep the current tally, then you can update the approved transfer rules without updating the tracker ID.
-      This is a more advanced use case and can cause confusion. You should BE VERY CAREFUL when using this approach and know what you are changing.
-      For example, if you change the corresponding badge IDs and the old badge IDs overlap, then the overlapping badge IDs will already have existing tallies.
-      
-      Another common area of confusion is what is actually being tallied. The tally is based on the approved transfer rules that are set.
-      For example, if you don't have per address rules set and you update the approved transfer rules to include per address rules, 
-      then the tally doesn't retroactively apply the per address rules to the previous transfers. It starts at that time.
-   
-  Note when updating approved transfers, order matters (we take the first match ONLY).
-*/
-
-/*
-  Challenge IDs are the same way. If maxOneUsePerleaf is turned on, we use the challenge ID to track which leaves have been used for the challenge.
-  If you update the challenge ID, then the used leaves traceker will reset and start a new tally.
-
-  -Do not use the same challenge ID for different challenges. This can cause unexpected behavior because both challenges will use the same tally.
-  -For the same challenge, use the same challenge ID. You are allowed to use the same challenge across different approvals, but note that if they have
-   different challenge IDs, they will have different tallies. This means that any successful solution for one challenge can be replayed for the other challenge.
-  -Note that if you update the challenge ID but keep the challenge the same, your challenge is now susceptible to replay attacks using the previous successful solutions.
-*/

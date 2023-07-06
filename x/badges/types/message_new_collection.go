@@ -12,7 +12,7 @@ var _ sdk.Msg = &MsgNewCollection{}
 
 func NewMsgNewCollection(
 	creator string,
-	standardTimeline []*StandardTimeline,
+	standardsTimeline []*StandardsTimeline,
 	badgesToCreate []*Balance,
 	collectionMetadataTimeline []*CollectionMetadataTimeline,
 	badgeMetadataTimeline []*BadgeMetadataTimeline,
@@ -29,13 +29,13 @@ func NewMsgNewCollection(
 ) *MsgNewCollection {
 	return &MsgNewCollection{
 		Creator:            creator,
-		StandardsTimeline:   standardTimeline,
+		StandardsTimeline:   standardsTimeline,
 		BadgesToCreate:     badgesToCreate,
 		CollectionMetadataTimeline: collectionMetadataTimeline,
 		BadgeMetadataTimeline: badgeMetadataTimeline,
 		Permissions:        permissions,
 
-		ApprovedTransfersTimeline: approvedTransfersTimeline,
+		CollectionApprovedTransfersTimeline: approvedTransfersTimeline,
 		CustomDataTimeline: customDataTimeline,
 		Transfers:          transfers,
 		OffChainBalancesMetadataTimeline: offChainBalancesMetadataTimeline,
@@ -123,7 +123,7 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 	if !msg.BalancesType.IsZero() {
 		//We have off-chain or inherited balances
 
-		if len(msg.Transfers) > 0 || len(msg.ApprovedTransfersTimeline) > 0 {
+		if len(msg.Transfers) > 0 || len(msg.CollectionApprovedTransfersTimeline) > 0 {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but claims and/or transfers are set")
 		}
 	}
@@ -139,7 +139,7 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		}
 	}
 
-	if err := ValidateApprovedTransferTimeline(msg.ApprovedTransfersTimeline); err != nil {
+	if err := ValidateApprovedTransferTimeline(msg.CollectionApprovedTransfersTimeline); err != nil {
 		return err
 	}
 

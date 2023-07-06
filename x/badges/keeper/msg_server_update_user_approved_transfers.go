@@ -18,7 +18,7 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 		return nil, err
 	}
 
-	if !IsOnChainBalances(collection) {
+	if !IsStandardBalances(collection) {
 		return nil, ErrWrongBalancesType
 	}
 

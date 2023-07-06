@@ -19,7 +19,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 	detailsToCheck := []*types.UniversalPermissionDetails{}
 	for _, balanceObj := range badgesToCreate {
 		for _, badgeIdRange := range balanceObj.BadgeIds {
-			for _, time := range balanceObj.Times {
+			for _, time := range balanceObj.OwnershipTimes {
 				detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
 					BadgeId: badgeIdRange,
 					TransferTime: time,
@@ -28,7 +28,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		}
 	}
 
-	err = k.CheckActionWithBadgeIdsAndTimesPermission(ctx, detailsToCheck, collection.Permissions.CanCreateMoreBadges)
+	err = k.CheckBalancesActionPermission(ctx, detailsToCheck, collection.Permissions.CanCreateMoreBadges)
 	if err != nil {
 		return &types.BadgeCollection{}, err
 	}
@@ -62,13 +62,13 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 	collection.TotalSupplys = totalSupplys
 	collection.NextBadgeId = nextBadgeId
 
-	if IsOnChainBalances(collection) {
+	if IsStandardBalances(collection) {
 		err = k.HandleTransfers(ctx, collection, transfers, "Manager")
 		if err != nil {
 			return &types.BadgeCollection{}, err
 		}
 	} else {
-		if len(transfers) > 0 || len(collection.ApprovedTransfersTimeline) > 0 {
+		if len(transfers) > 0 || len(collection.CollectionApprovedTransfersTimeline) > 0 {
 			return &types.BadgeCollection{}, ErrWrongBalancesType
 		}
 	}

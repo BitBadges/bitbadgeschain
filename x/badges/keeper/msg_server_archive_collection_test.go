@@ -23,7 +23,7 @@ func (suite *TestSuite) TestArchiveCollection() {
 		IsArchivedTimeline: []*types.IsArchivedTimeline{
 			{
 				IsArchived: true,
-				Times: GetFullIdRanges(),
+				TimelineTimes: GetFullIdRanges(),
 			},
 		},
 	})
@@ -39,7 +39,7 @@ func (suite *TestSuite) TestArchiveCollection() {
 		ManagerTimeline:       []*types.ManagerTimeline{
 			{
 				Manager: alice,
-				Times: GetFullIdRanges(),
+				TimelineTimes: GetFullIdRanges(),
 			},
 		},
 	})
@@ -51,7 +51,7 @@ func (suite *TestSuite) TestArchiveCollection() {
 		IsArchivedTimeline: []*types.IsArchivedTimeline{
 			{
 				IsArchived: false,
-				Times: GetFullIdRanges(),
+				TimelineTimes: GetFullIdRanges(),
 			},
 		},
 	})
@@ -63,7 +63,7 @@ func (suite *TestSuite) TestArchiveCollection() {
 		ManagerTimeline:       []*types.ManagerTimeline{
 			{
 				Manager: alice,
-				Times: GetFullIdRanges(),
+				TimelineTimes: GetFullIdRanges(),
 			},
 		},
 	})

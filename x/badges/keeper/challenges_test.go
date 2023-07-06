@@ -10,9 +10,9 @@ func (suite *TestSuite) TestNoChallengesWorking() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
-	collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers[0].Challenges = []*types.Challenge{{}}
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].Challenges = []*types.Challenge{{}}
 
 	CreateCollections(suite, wctx, collectionsToCreate) 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
@@ -25,9 +25,9 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
-	collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers[0].Challenges = []*types.Challenge{{
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].Challenges = []*types.Challenge{{
 		Root: "sample",
 	}}
 
@@ -140,7 +140,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 			},
 // 		},
 // 		BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-// 		IncrementIdsBy: 0,
+// 		IncrementBadgeIdsBy: 0,
 // 		AmountPerClaim: 1,
 // 		Data:       hex.EncodeToString(rootHash),
 // 		Type: 	 	uint64(types.ClaimType_MerkleTree),
@@ -275,7 +275,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 			},
 // 		},
 // 		BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-// 		IncrementIdsBy: 0,
+// 		IncrementBadgeIdsBy: 0,
 // 		AmountPerClaim: 1,
 // 		Data:       hex.EncodeToString(rootHash),
 // 		Type: 	 	uint64(types.ClaimType_MerkleTree),
@@ -407,7 +407,7 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 // 			},
 // 		},
 // 		BadgeIds: []*types.IdRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-// 		IncrementIdsBy: 1,
+// 		IncrementBadgeIdsBy: 1,
 // 		AmountPerClaim: 1,
 // 		Data:       hex.EncodeToString(rootHash),
 // 		Type: 	 	uint64(types.ClaimType_FirstCome),

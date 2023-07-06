@@ -27,7 +27,7 @@ func GetValidCollectionMetadataTimeline() []*types.CollectionMetadataTimeline {
 			CollectionMetadata: &types.CollectionMetadata{
 				Uri: "https://example.com/{id}",
 			},
-			Times: []*types.IdRange{
+			TimelineTimes: []*types.IdRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:  sdkmath.NewUint(math.MaxUint64),
@@ -52,7 +52,7 @@ func GetValidBadgeMetadataTimeline() []*types.BadgeMetadataTimeline {
 					},
 				},
 			},
-			Times: []*types.IdRange{
+			TimelineTimes: []*types.IdRange{
 				{
 					Start: sdkmath.NewUint(0),
 					End:  sdkmath.NewUint(math.MaxUint64),

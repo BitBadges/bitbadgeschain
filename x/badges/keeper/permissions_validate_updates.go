@@ -5,21 +5,21 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) ValidateActionWithBadgeIdsAndTimesPermissionUpdate(oldPermissions []*types.ActionWithBadgeIdsAndTimesPermission, newPermissions []*types.ActionWithBadgeIdsAndTimesPermission) error {
-	if err := types.ValidateActionWithBadgeIdsAndTimesPermission(oldPermissions); err != nil {
+func (k Keeper) ValidateBalancesActionPermissionUpdate(oldPermissions []*types.BalancesActionPermission, newPermissions []*types.BalancesActionPermission) error {
+	if err := types.ValidateBalancesActionPermission(oldPermissions); err != nil {
 		return err
 	}
 
-	if err := types.ValidateActionWithBadgeIdsAndTimesPermission(newPermissions); err != nil {
+	if err := types.ValidateBalancesActionPermission(newPermissions); err != nil {
 		return err
 	}
 
-	castedOldPermissions, err := k.CastActionWithBadgeIdsAndTimesPermissionToUniversalPermission(oldPermissions)
+	castedOldPermissions, err := k.CastBalancesActionPermissionToUniversalPermission(oldPermissions)
 	if err != nil {
 		return err
 	}
 	
-	castedNewPermissions, err := k.CastActionWithBadgeIdsAndTimesPermissionToUniversalPermission(newPermissions)
+	castedNewPermissions, err := k.CastBalancesActionPermissionToUniversalPermission(newPermissions)
 	if err != nil {
 		return err 
 	}
@@ -289,7 +289,7 @@ func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types
 	}
 
 	if oldPermissions.CanCreateMoreBadges != nil && newPermissions.CanCreateMoreBadges != nil {
-		if err := k.ValidateActionWithBadgeIdsAndTimesPermissionUpdate(oldPermissions.CanCreateMoreBadges, newPermissions.CanCreateMoreBadges); err != nil {
+		if err := k.ValidateBalancesActionPermissionUpdate(oldPermissions.CanCreateMoreBadges, newPermissions.CanCreateMoreBadges); err != nil {
 			return err
 		}
 	}

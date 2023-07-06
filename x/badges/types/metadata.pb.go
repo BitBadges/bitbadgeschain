@@ -24,6 +24,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// This defines the metadata for specific badge IDs.
+// This should be interpreted according to the collection standard.
 type BadgeMetadata struct {
 	Uri        string     `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
 	CustomData string     `protobuf:"bytes,2,opt,name=customData,proto3" json:"customData,omitempty"`
@@ -84,6 +86,8 @@ func (m *BadgeMetadata) GetBadgeIds() []*IdRange {
 	return nil
 }
 
+// This defines the metadata for the collection.
+// This should be interpreted according to the collection standard.
 type CollectionMetadata struct {
 	Uri        string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
 	CustomData string `protobuf:"bytes,2,opt,name=customData,proto3" json:"customData,omitempty"`
@@ -136,6 +140,8 @@ func (m *CollectionMetadata) GetCustomData() string {
 	return ""
 }
 
+// This defines the metadata for the off-chain balances (if using this balances type).
+// This should be interpreted according to the collection standard.
 type OffChainBalancesMetadata struct {
 	Uri        string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
 	CustomData string `protobuf:"bytes,2,opt,name=customData,proto3" json:"customData,omitempty"`

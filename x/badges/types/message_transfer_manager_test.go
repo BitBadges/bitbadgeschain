@@ -31,7 +31,7 @@ func TestMsgUpdateManager_ValidateBasic(t *testing.T) {
 				CollectionId: sdkmath.NewUint(1),
 				ManagerTimeline: []*types.ManagerTimeline{
 					{
-						Times: []*types.IdRange{
+						TimelineTimes: []*types.IdRange{
 							{
 								Start: sdkmath.NewUint(0),
 								End:   sdkmath.NewUint(math.MaxUint64),
@@ -49,7 +49,7 @@ func TestMsgUpdateManager_ValidateBasic(t *testing.T) {
 				CollectionId: sdkmath.NewUint(1),
 				ManagerTimeline: []*types.ManagerTimeline{
 					{
-						Times: []*types.IdRange{
+						TimelineTimes: []*types.IdRange{
 							{
 								Start: sdkmath.NewUint(0),
 								End:   sdkmath.NewUint(math.MaxUint64),

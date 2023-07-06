@@ -10,7 +10,7 @@ const TypeMsgUpdateMetadata = "update_uris"
 
 var _ sdk.Msg = &MsgUpdateMetadata{}
 
-func NewMsgUpdateMetadata(creator string, collectionId sdkmath.Uint, collectionMetadataTimeline []*CollectionMetadataTimeline, badgeMetadataTimeline []*BadgeMetadataTimeline, offChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline, customDataTimeline []*CustomDataTimeline, contractAddressTimeline []*ContractAddressTimeline, standardsTimeline []*StandardTimeline) *MsgUpdateMetadata {
+func NewMsgUpdateMetadata(creator string, collectionId sdkmath.Uint, collectionMetadataTimeline []*CollectionMetadataTimeline, badgeMetadataTimeline []*BadgeMetadataTimeline, offChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline, customDataTimeline []*CustomDataTimeline, contractAddressTimeline []*ContractAddressTimeline, standardsTimeline []*StandardsTimeline) *MsgUpdateMetadata {
 	return &MsgUpdateMetadata{
 		Creator:            creator,
 		CollectionId:       collectionId,

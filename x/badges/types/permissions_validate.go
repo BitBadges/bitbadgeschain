@@ -263,7 +263,7 @@ func ValidateTimedUpdateWithBadgeIdsPermission(permissions []*TimedUpdateWithBad
 	return nil
 }
 
-func ValidateActionWithBadgeIdsAndTimesPermission(permissions []*ActionWithBadgeIdsAndTimesPermission) error {
+func ValidateBalancesActionPermission(permissions []*BalancesActionPermission) error {
 	if permissions == nil {
 		return ErrPermissionsIsNil
 	}
@@ -282,12 +282,12 @@ func ValidateActionWithBadgeIdsAndTimesPermission(permissions []*ActionWithBadge
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TransferTimes, false)
+		err = ValidateRangesAreValid(permission.DefaultValues.OwnershipTimes, false)
 		if err != nil {
 			return err
 		}
 
-		permission.DefaultValues.TransferTimes = SortAndMergeOverlapping(permission.DefaultValues.TransferTimes)
+		permission.DefaultValues.OwnershipTimes = SortAndMergeOverlapping(permission.DefaultValues.OwnershipTimes)
 		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
 
 
@@ -456,7 +456,7 @@ func ValidatePermissions(permissions *CollectionPermissions) error {
 	}
 
 	if permissions.CanCreateMoreBadges != nil {
-		if err := ValidateActionWithBadgeIdsAndTimesPermission(permissions.CanCreateMoreBadges); err != nil {
+		if err := ValidateBalancesActionPermission(permissions.CanCreateMoreBadges); err != nil {
 			return err
 		}
 	}

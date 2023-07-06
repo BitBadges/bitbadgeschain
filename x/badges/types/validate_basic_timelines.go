@@ -105,7 +105,7 @@ func ValidateInheritedBalancesTimeline(timeline []*InheritedBalancesTimeline) er
 	return nil
 }
 
-func ValidateStandardsTimeline(timeline []*StandardTimeline) error {
+func ValidateStandardsTimeline(timeline []*StandardsTimeline) error {
 	times, _ := GetStandardsTimesAndValues(timeline)
 	err := ValidateTimelineTimesDoNotOverlap(times)
 	if err != nil {

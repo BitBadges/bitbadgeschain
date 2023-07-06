@@ -8,6 +8,35 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
+// CollectionPermissions defines the permissions for the collection (i.e. what the manager can and cannot do).
+//
+// There are five types of permissions for a collection: ActionPermission, TimedUpdatePermission, TimedUpdateWithBadgeIdsPermission, BalancesActionPermission, and CollectionApprovedTransferPermission.
+//
+// The permission type allows fine-grained access control for each action.
+// ActionPermission: defines when the manager can perform an action.
+// TimedUpdatePermission: defines when the manager can update a timeline-based field and what times of the timeline can be updated.
+// TimedUpdateWithBadgeIdsPermission: defines when the manager can update a timeline-based field for specific badges and what times of the timeline can be updated.
+// BalancesActionPermission: defines when the manager can perform an action for specific badges and specific badge ownership times.
+// CollectionApprovedTransferPermission: defines when the manager can update the transferability of the collection and what transfers can be updated vs locked
+//
+// Note there are a few different times here which could get confusing:
+// - TimelineTimes: the times when a timeline-based field is a specific value
+// - permitted/forbiddenTimes - the times that a permission can be performed
+// - transferTimes - the times that a transfer occurs
+// - ownershipTimes - the times when a badge is owned by a user
+//
+// The permitted/forbiddenTimes are used to determine when a permission can be executed.
+// Once a time is set to be permitted or forbidden, it is PERMANENT and cannot be changed.
+// If a time is not set to be permitted or forbidden, it is considered NEUTRAL and can be updated but is ALLOWED by default.
+//
+// Each permission type has a defaultValues field and a combinations field.
+// The defaultValues field defines the default values for the permission which can be manipulated by the combinations field (to avoid unnecessary repetition).
+// Ex: We can have default value badgeIds = [1,2] and combinations = [{invertDefault: true, isAllowed: false}, {isAllowed: true}].
+// This would mean that badgeIds [1,2] are allowed but everything else is not allowed.
+//
+// IMPORTANT: For all permissions, we ONLY take the first combination that matches. Any subsequent combinations are ignored. 
+// Ex: If we have defaultValues = {badgeIds: [1,2]} and combinations = [{isAllowed: true}, {isAllowed: false}].
+// This would mean that badgeIds [1,2] are allowed and the second combination is ignored.
 message CollectionPermissions {
   repeated ActionPermission canDeleteCollection = 1;
   repeated TimedUpdatePermission canArchive = 2;
@@ -19,7 +48,7 @@ message CollectionPermissions {
   repeated TimedUpdatePermission canUpdateManager = 7;
   repeated TimedUpdatePermission canUpdateCollectionMetadata = 8;
 
-  repeated ActionWithBadgeIdsAndTimesPermission canCreateMoreBadges = 9;
+  repeated BalancesActionPermission canCreateMoreBadges = 9;
 
   repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 10;
   repeated TimedUpdateWithBadgeIdsPermission canUpdateInheritedBalances = 11;
@@ -27,15 +56,21 @@ message CollectionPermissions {
   repeated CollectionApprovedTransferPermission canUpdateCollectionApprovedTransfers = 12;
 }
 
+// UserPermissions defines the permissions for the user (i.e. what the user can and cannot do).
+//
+// See CollectionPermissions for more details on the different types of permissions.
+// The UserApprovedOutgoing and UserApprovedIncoming permissions are the same as the CollectionApprovedTransferPermission,
+// but certain fields are removed because they are not relevant to the user.
 message UserPermissions {
   repeated UserApprovedOutgoingTransferPermission canUpdateApprovedOutgoingTransfers = 1;
   repeated UserApprovedIncomingTransferPermission canUpdateApprovedIncomingTransfers = 2;
 }
 
+// ValueOptions defines how we manipulate the default values.
 message ValueOptions {
   bool invertDefault = 1;
-  bool allValues = 2;
-  bool noValues = 3;
+  bool allValues = 2; //Override default values with all possible values
+  bool noValues = 3; //Override default values with no values
 }
 
 message CollectionApprovedTransferCombination {
@@ -64,6 +99,22 @@ message CollectionApprovedTransferDefaultValues {
   repeated IdRange forbiddenTimes = 8;
 }
 
+// CollectionApprovedTransferPermission defines what collection approved transfers can be updated vs are locked.
+//
+// Each transfer is broken down to a (from, to, initiatedBy, transferTime, badgeId) tuple.
+// For a transfer to match, we need to match ALL of the fields in the combination. 
+// These are detemined by the fromMappingId, toMappingId, initiatedByMappingId, transferTimes, badgeIds fields.
+// AddressMappings are used for (from, to, initiatedBy) which are a permanent list of addresses identified by an ID (see AddressMappings). 
+// 
+// TimelineTimes: which timeline times of the collection's approvedTransfersTimeline field can be updated or not?
+// permitted/forbidden TimelineTimes: when can the manager execute this permission?
+//
+// Ex: Let's say we are updating the transferability for timelineTime 1 and the transfer tuple ("All", "All", "All", 10, 1000).
+// We would check to find the FIRST CollectionApprovedTransferPermission that matches this combination.
+// If we find a match, we would check the permitted/forbidden times to see if we can execute this permission (default is ALLOWED).
+//
+// Ex: So if you wanted to freeze the transferability to enforce that badge ID 1 will always be transferable, you could set
+// the combination ("All", "All", "All", "All Transfer Times", 1) to always be forbidden at all timelineTimes.
 message CollectionApprovedTransferPermission {
   CollectionApprovedTransferDefaultValues defaultValues = 1;
   repeated CollectionApprovedTransferCombination combinations = 7;
@@ -93,6 +144,8 @@ message UserApprovedOutgoingTransferDefaultValues {
   repeated IdRange forbiddenTimes = 8;
 }
 
+// UserApprovedOutgoingTransferPermission defines the permissions for updating the user's approved outgoing transfers.
+// See CollectionApprovedTransferPermission for more details. This is equivalent without the fromMappingId field because that is always the user.
 message UserApprovedOutgoingTransferPermission {
   UserApprovedOutgoingTransferDefaultValues defaultValues = 1;
   repeated UserApprovedOutgoingTransferCombination combinations = 2;
@@ -122,12 +175,14 @@ message UserApprovedIncomingTransferDefaultValues {
   repeated IdRange forbiddenTimes = 8;
 }
 
+// UserApprovedIncomingTransferPermission defines the permissions for updating the user's approved incoming transfers.
+// See CollectionApprovedTransferPermission for more details. This is equivalent without the toMappingId field because that is always the user.
 message UserApprovedIncomingTransferPermission {
   UserApprovedIncomingTransferDefaultValues defaultValues = 1;
   repeated UserApprovedIncomingTransferCombination combinations = 2;
 }
 
-message ActionWithBadgeIdsAndTimesCombination {
+message BalancesActionCombination {
   ValueOptions badgeIdsOptions = 1;
   ValueOptions transferTimesOptions = 2;
 
@@ -135,17 +190,22 @@ message ActionWithBadgeIdsAndTimesCombination {
   ValueOptions forbiddenTimesOptions = 4;
 }
 
-message ActionWithBadgeIdsAndTimesDefaultValues {
+message BalancesActionDefaultValues {
   repeated IdRange badgeIds = 1;
-  repeated IdRange transferTimes = 2;
+  repeated IdRange ownershipTimes = 2;
 
   repeated IdRange permittedTimes = 3;
   repeated IdRange forbiddenTimes = 4;
 }
 
-message ActionWithBadgeIdsAndTimesPermission {
-  ActionWithBadgeIdsAndTimesDefaultValues defaultValues = 1;
-  repeated ActionWithBadgeIdsAndTimesCombination combinations = 2;
+// BalancesActionPermission defines the permissions for updating a timeline-based field for specific badges and specific badge ownership times.
+// Currently, this is only used for creating new badges.
+//
+// Ex: If you want to lock the ability to create new badges for badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021, 
+// you could set the combination (badgeIds: [1,2], ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
+message BalancesActionPermission {
+  BalancesActionDefaultValues defaultValues = 1;
+  repeated BalancesActionCombination combinations = 2;
 }
 
 message ActionDefaultValues {
@@ -154,11 +214,13 @@ message ActionDefaultValues {
 }
 
 message ActionCombination {
-  
   ValueOptions permittedTimesOptions = 1;
   ValueOptions forbiddenTimesOptions = 2;
 }
 
+// ActionPermission defines the permissions for performing an action.
+// 
+// This is simple and straightforward as the only thing we need to check is the permitted/forbidden times.
 message ActionPermission {
   ActionDefaultValues defaultValues = 1;
   repeated ActionCombination combinations = 2;
@@ -178,6 +240,10 @@ message TimedUpdateDefaultValues {
   repeated IdRange forbiddenTimes = 3;
 }
 
+// TimedUpdatePermission defines the permissions for updating a timeline-based field.
+//
+// Ex: If you want to lock the ability to update the collection's metadata for timelineTimes 1/1/2020 - 1/1/2021,
+// you could set the combination (TimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
 message TimedUpdatePermission {
   TimedUpdateDefaultValues defaultValues = 1;
 
@@ -201,6 +267,10 @@ message TimedUpdateWithBadgeIdsDefaultValues {
   repeated IdRange forbiddenTimes = 4;
 }
 
+// TimedUpdateWithBadgeIdsPermission defines the permissions for updating a timeline-based field for specific badges.
+// 
+// Ex: If you want to lock the ability to update the metadata for badgeIds [1,2] for timelineTimes 1/1/2020 - 1/1/2021,
+// you could set the combination (badgeIds: [1,2], TimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
 message TimedUpdateWithBadgeIdsPermission {
   TimedUpdateWithBadgeIdsDefaultValues defaultValues = 1;
   repeated TimedUpdateWithBadgeIdsCombination combinations = 2;

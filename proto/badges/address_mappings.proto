@@ -8,22 +8,11 @@ import "badges/balances.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
-// message AddressMappingConditions {
-//   repeated MinMaxBalance mustOwnBadges = 1;
-//   repeated MinMaxBalance mustNotOwnBadges = 2;
-
-//   repeated string mustBeManager = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
-//   repeated string mustNotBeManager = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
-
-//   repeated string mustBeInMapping = 5;
-//   repeated string mustNotBeInMapping = 6;
-// }
-
-// message AddressMappingFilters {
-//   string mustSatisfyMinX = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
-//   repeated AddressMappingConditions conditions = 2;
-// }
-
+// An AddressMapping is a permanent list of addresses that are referenced by a mapping ID.
+// The mapping may include only the specified addresses, or it may include all addresses but
+// the specified addresses (depending on if includeOnlySpecified is true or false).
+//
+// AddressMappings are used for things like whitelists, blacklists, approvals, etc.
 message AddressMapping {
   string mappingId = 1;
 
@@ -32,7 +21,4 @@ message AddressMapping {
 
   string uri = 4;
   string customData = 5;
-
-  //Must satisfy all these filters
-  // repeated AddressMappingFilters filters = 6;
 }

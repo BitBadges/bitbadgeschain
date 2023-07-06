@@ -11,24 +11,76 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
+// A BadgeCollection is the top level object for a collection of badges. 
+// It defines everything about the collection, such as the manager, metadata, etc.
+//
+// All collections are identified by a collectionId assigned by the blockchain, which is a uint64 that increments (i.e. first collection has ID 1).
+//
+// All collections also have a manager who is responsible for managing the collection. 
+// They can be granted certain permissions, such as the ability to mint new badges.
+//
+// Certain fields are timeline-based, which means they may have different values at different block heights. 
+// We fetch the value according to the current time.
+// For example, we may set the manager to be Alice from Time1 to Time2, and then set the manager to be Bob from Time2 to Time3.
+//
+// Collections may have different balance types: standard vs off-chain vs inherited. See documentation for differences.
 message BadgeCollection {
+  // The collectionId is the unique identifier for this collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string parentCollectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The collection metadata is the metadata for the collection itself.
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 3;
+  // The badge metadata is the metadata for each badge in the collection.
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 4;
+  
+  // The balancesType is the type of balances this collection uses (standard, off-chain, or inherited).
   string balancesType = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The off-chain balances metadata defines where to fetch the balances for collections with off-chain balances.
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 6;
+  // The inherited balances metadata defines the parent balances for collections with inherited balances.
   repeated InheritedBalancesTimeline inheritedBalancesTimeline = 7;
+
+  // The custom data field is an arbitrary field that can be used to store any data.
   repeated CustomDataTimeline customDataTimeline = 8;
+  // The manager is the address of the manager of this collection.
   repeated ManagerTimeline managerTimeline = 9;
+  
+  // The permissions define what the manager and owners of the collection can do or not do.
   CollectionPermissions permissions = 10;
-  repeated CollectionApprovedTransferTimeline approvedTransfersTimeline = 11;
+  
+  // The approved transfers timeline defines the transferability of the collection for collections with standard balances.
+  // This defines it on a collection-level. All transfers must be explicitly allowed on the collection-level, or else, they will fail.
+  // 
+  // Collection approved transfers can optionally specify to override the user approvals for a transfer (e.g. forcefully revoke a badge).
+  // If user approvals are not overriden, then a transfer must also satisfy the From user's approved outgoing transfers and the To user's approved incoming transfers.
+  repeated CollectionApprovedTransferTimeline collectionApprovedTransfersTimeline = 11;
+
+  // The nextBadgeId is the next badgeId to be minted. A collection will always have (nextBadgeId - 1) badges created. 
   string nextBadgeId = 12 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The unmintedSupplys is the created but unminted balances (i.e. the 'Mint' address balances)
   repeated Balance unmintedSupplys = 13;
+
+  // The totalSupplys is the total created supplys of each badge in the collection.
   repeated Balance totalSupplys = 14;
-  repeated StandardTimeline standardsTimeline = 15;
+
+  // Standards allow us to define a standard for the collection. This lets others know how to interpret the fields of the collection.
+  repeated StandardsTimeline standardsTimeline = 15;
+
+  // The isArchivedTimeline defines whether the collection is archived or not. 
+  // When a collection is archived, it is read-only and no transactions can be processed.
   repeated IsArchivedTimeline isArchivedTimeline = 16;
+
+  // The contractAddressTimeline defines the contract address for the collection (if it has a corresponding contract).
   repeated ContractAddressTimeline contractAddressTimeline = 17;
+
+  // The defaultUserApprovedOutgoingTransfersTimeline defines the default user approved outgoing transfers for an uninitialized user balance. 
+  // The user can change this value at any time.
   repeated UserApprovedOutgoingTransferTimeline defaultUserApprovedOutgoingTransfersTimeline = 18;
+
+  // The defaultUserApprovedIncomingTransfersTimeline defines the default user approved incoming transfers for an uninitialized user balance.
+  // The user can change this value at any time.
+  //
+  // Ex: Set this to disallow all incoming transfers by default, making the user have to opt-in to receiving the badge.
   repeated UserApprovedIncomingTransferTimeline defaultUserApprovedIncomingTransfersTimeline = 19;
 }

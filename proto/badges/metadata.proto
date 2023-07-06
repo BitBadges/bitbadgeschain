@@ -7,17 +7,23 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
+// This defines the metadata for specific badge IDs.
+// This should be interpreted according to the collection standard.
 message BadgeMetadata {
   string uri = 1;
   string customData = 2;
   repeated IdRange badgeIds = 3;
 }
 
+// This defines the metadata for the collection.
+// This should be interpreted according to the collection standard.
 message CollectionMetadata {
   string uri = 1;
   string customData = 2;
 }
 
+// This defines the metadata for the off-chain balances (if using this balances type).
+// This should be interpreted according to the collection standard.
 message OffChainBalancesMetadata {
   string uri = 1;
   string customData = 2;

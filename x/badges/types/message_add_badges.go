@@ -30,7 +30,7 @@ func NewMsgMintAndDistributeBadges(
 		CollectionMetadataTimeline: collectionMetadataTimeline,
 		BadgeMetadataTimeline:      badgeMetadataTimeline,
 		OffChainBalancesMetadataTimeline:   offChainBalancesMetadataTimeline,
-		ApprovedTransfersTimeline:  approvedTransfersTimeline,
+		CollectionApprovedTransfersTimeline:  approvedTransfersTimeline,
 		InheritedBalancesTimeline:  inheritedBalancesTimeline,
 	}
 }
@@ -95,7 +95,7 @@ func (msg *MsgMintAndDistributeBadges) ValidateBasic() error {
 		}
 	}
 
-	if err := ValidateApprovedTransferTimeline(msg.ApprovedTransfersTimeline); err != nil {
+	if err := ValidateApprovedTransferTimeline(msg.CollectionApprovedTransfersTimeline); err != nil {
 		return err
 	}
 	
@@ -103,7 +103,7 @@ func (msg *MsgMintAndDistributeBadges) ValidateBasic() error {
 		return err
 	}
 
-	if len(msg.Transfers) > 0 || len(msg.ApprovedTransfersTimeline) > 0 {
+	if len(msg.Transfers) > 0 || len(msg.CollectionApprovedTransfersTimeline) > 0 {
 		if msg.OffChainBalancesMetadataTimeline != nil && len(msg.OffChainBalancesMetadataTimeline) > 0 {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "transfers and/or claims are set but collection has balances type = off-chain")
 		}

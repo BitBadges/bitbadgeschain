@@ -23,7 +23,7 @@ func (suite *TestSuite) TestNewBadges() {
 			{
 				Amount: sdkmath.NewUint(1),
 				BadgeIds: GetOneIdRange(),
-				Times: GetFullIdRanges(),
+				OwnershipTimes: GetFullIdRanges(),
 			},
 		},
 		Transfers: []*types.Transfer{
@@ -34,7 +34,7 @@ func (suite *TestSuite) TestNewBadges() {
 					{
 						Amount: sdkmath.NewUint(1),
 						BadgeIds: GetOneIdRange(),
-						Times: GetOneIdRange(),
+						OwnershipTimes: GetOneIdRange(),
 					},
 				},
 			},
@@ -58,7 +58,7 @@ func (suite *TestSuite) TestNewBadgesNotManager() {
 			{
 				Amount: sdkmath.NewUint(1),
 				BadgeIds: GetOneIdRange(),
-				Times: GetFullIdRanges(),
+				OwnershipTimes: GetFullIdRanges(),
 			},
 		},
 		Transfers: []*types.Transfer{
@@ -69,7 +69,7 @@ func (suite *TestSuite) TestNewBadgesNotManager() {
 					{
 						Amount: sdkmath.NewUint(1),
 						BadgeIds: GetOneIdRange(),
-						Times: GetOneIdRange(),
+						OwnershipTimes: GetOneIdRange(),
 					},
 				},
 			},
@@ -93,7 +93,7 @@ func (suite *TestSuite) TestNewBadgeBadgeNotExists() {
 			{
 				Amount: sdkmath.NewUint(1),
 				BadgeIds: GetOneIdRange(),
-				Times: GetFullIdRanges(),
+				OwnershipTimes: GetFullIdRanges(),
 			},
 		},
 		Transfers: []*types.Transfer{
@@ -109,7 +109,7 @@ func (suite *TestSuite) TestNewBadgeBadgeNotExists() {
 								End: sdkmath.NewUint(math.MaxUint64).Add(sdkmath.NewUint(1)),
 							},
 						},
-						Times: GetOneIdRange(),
+						OwnershipTimes: GetOneIdRange(),
 					},
 				},
 			},
@@ -130,14 +130,14 @@ func (suite *TestSuite) TestNewBadgesNotAllowed() {
 		Creator: bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanCreateMoreBadges: []*types.ActionWithBadgeIdsAndTimesPermission{
+			CanCreateMoreBadges: []*types.BalancesActionPermission{
 				{
-					DefaultValues: &types.ActionWithBadgeIdsAndTimesDefaultValues{
+					DefaultValues: &types.BalancesActionDefaultValues{
 						ForbiddenTimes: GetFullIdRanges(),
 						BadgeIds: GetFullIdRanges(),
-						TransferTimes: GetFullIdRanges(),
+						OwnershipTimes: GetFullIdRanges(),
 					},
-					Combinations: []*types.ActionWithBadgeIdsAndTimesCombination{{
+					Combinations: []*types.BalancesActionCombination{{
 					}},
 				},
 			},
@@ -152,7 +152,7 @@ func (suite *TestSuite) TestNewBadgesNotAllowed() {
 			{
 				Amount: sdkmath.NewUint(1),
 				BadgeIds: GetOneIdRange(),
-				Times: GetFullIdRanges(),
+				OwnershipTimes: GetFullIdRanges(),
 			},
 		},
 		Transfers: []*types.Transfer{
@@ -163,7 +163,7 @@ func (suite *TestSuite) TestNewBadgesNotAllowed() {
 					{
 						Amount: sdkmath.NewUint(1),
 						BadgeIds: GetOneIdRange(),
-						Times: GetOneIdRange(),
+						OwnershipTimes: GetOneIdRange(),
 					},
 				},
 			},
@@ -184,24 +184,24 @@ func (suite *TestSuite) TestNewBadgesPermissionIsAllowed() {
 		Creator: bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanCreateMoreBadges: []*types.ActionWithBadgeIdsAndTimesPermission{
+			CanCreateMoreBadges: []*types.BalancesActionPermission{
 				{
-					DefaultValues: &types.ActionWithBadgeIdsAndTimesDefaultValues{
+					DefaultValues: &types.BalancesActionDefaultValues{
 						PermittedTimes: GetFullIdRanges(),
 						BadgeIds: GetOneIdRange(),
-						TransferTimes: GetOneIdRange(),
+						OwnershipTimes: GetOneIdRange(),
 					},
-					Combinations: []*types.ActionWithBadgeIdsAndTimesCombination{{
+					Combinations: []*types.BalancesActionCombination{{
 
 					}},
 				},
 				{
-					DefaultValues: &types.ActionWithBadgeIdsAndTimesDefaultValues{
+					DefaultValues: &types.BalancesActionDefaultValues{
 						ForbiddenTimes: GetFullIdRanges(),
 						BadgeIds: GetFullIdRanges(),
-						TransferTimes: GetFullIdRanges(),
+						OwnershipTimes: GetFullIdRanges(),
 					},
-					Combinations: []*types.ActionWithBadgeIdsAndTimesCombination{{
+					Combinations: []*types.BalancesActionCombination{{
 						
 					}},
 				},
@@ -217,7 +217,7 @@ func (suite *TestSuite) TestNewBadgesPermissionIsAllowed() {
 			{
 				Amount: sdkmath.NewUint(1),
 				BadgeIds: GetOneIdRange(),
-				Times: GetFullIdRanges(),
+				OwnershipTimes: GetFullIdRanges(),
 			},
 		},
 	})
@@ -230,7 +230,7 @@ func (suite *TestSuite) TestNewBadgesPermissionIsAllowed() {
 			{
 				Amount: sdkmath.NewUint(1),
 				BadgeIds: GetFullIdRanges(),
-				Times: GetOneIdRange(),
+				OwnershipTimes: GetOneIdRange(),
 			},
 		},
 	})
@@ -243,7 +243,7 @@ func (suite *TestSuite) TestNewBadgesPermissionIsAllowed() {
 			{
 				Amount: sdkmath.NewUint(1),
 				BadgeIds: GetOneIdRange(),
-				Times: GetOneIdRange(),
+				OwnershipTimes: GetOneIdRange(),
 			},
 		},
 	})

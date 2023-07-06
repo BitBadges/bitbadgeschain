@@ -147,7 +147,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	// 	{Name: "timeIntervals", Type: "IdRange[]"},
 	// 	{Name: "uri", Type: "string"},
 	// 	{Name: "numClaimsPerAddress", Type: "uint64"},
-	// 	{Name: "incrementIdsBy", Type: "uint64"},
+	// 	{Name: "IncrementBadgeIdsBy", Type: "uint64"},
 	// 	{Name: "startingClaimAmounts", Type: "Balance[]"},
 	// 	{Name: "challenges", Type: "Challenge[]"},
 	// 	{Name: "totalClaimsProcessed", Type: "uint64"},

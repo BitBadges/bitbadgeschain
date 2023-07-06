@@ -57,7 +57,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 			}
 
 			for _, balance := range transfer.Balances {
-				fromUserBalance, toUserBalance, err = k.HandleTransfer(ctx, collection, balance.BadgeIds, balance.Times, fromUserBalance, toUserBalance, balance.Amount, transfer.From, to, initiatedBy, transfer.Solutions)
+				fromUserBalance, toUserBalance, err = k.HandleTransfer(ctx, collection, balance.BadgeIds, balance.OwnershipTimes, fromUserBalance, toUserBalance, balance.Amount, transfer.From, to, initiatedBy, transfer.Solutions)
 				if err != nil {
 					return err
 				}
@@ -110,7 +110,7 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollectio
 	fromUserBalance.Balances, err = types.SubtractBalance(fromUserBalance.Balances, &types.Balance{
 		Amount: amount,
 		BadgeIds: badgeIds,
-		Times: times,
+		OwnershipTimes: times,
 	})
 	if err != nil {
 		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
@@ -119,7 +119,7 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollectio
 	toUserBalance.Balances, err = types.AddBalance(toUserBalance.Balances,  &types.Balance{
 		Amount: amount,
 		BadgeIds: badgeIds,
-		Times: times,
+		OwnershipTimes: times,
 	})
 	if err != nil {
 		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err

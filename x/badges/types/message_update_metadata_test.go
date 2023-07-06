@@ -62,7 +62,7 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 						CollectionMetadata: &types.CollectionMetadata{
 							Uri: "https://example.com/{id}",
 						},
-						Times: []*types.IdRange{
+						TimelineTimes: []*types.IdRange{
 							{
 								Start: sdkmath.NewUint(1),
 								End:  sdkmath.NewUint(math.MaxUint64),
@@ -84,7 +84,7 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 								},
 							},
 						},
-						Times: []*types.IdRange{
+						TimelineTimes: []*types.IdRange{
 							{
 								Start: sdkmath.NewUint(1),
 								End:  sdkmath.NewUint(math.MaxUint64),

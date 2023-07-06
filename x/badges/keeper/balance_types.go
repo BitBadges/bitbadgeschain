@@ -5,7 +5,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
-func IsOnChainBalances(collection *types.BadgeCollection) bool {
+func IsStandardBalances(collection *types.BadgeCollection) bool {
 	return collection.BalancesType.Equal(sdkmath.NewUint(0))
 }
 

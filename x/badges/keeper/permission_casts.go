@@ -235,27 +235,27 @@ func (k Keeper) CastTimedUpdatePermissionToUniversalPermission(timedUpdatePermis
 }
 
 
-func (k Keeper) CastActionWithBadgeIdsAndTimesPermissionToUniversalPermission(ActionWithBadgeIdsAndTimesPermission []*types.ActionWithBadgeIdsAndTimesPermission) ([]*types.UniversalPermission, error) {
+func (k Keeper) CastBalancesActionPermissionToUniversalPermission(BalancesActionPermission []*types.BalancesActionPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
-	for _, ActionWithBadgeIdsAndTimesPermission := range ActionWithBadgeIdsAndTimesPermission {
+	for _, BalancesActionPermission := range BalancesActionPermission {
 		castedCombinations := []*types.UniversalCombination{}
-		for _, ActionWithBadgeIdsAndTimesCombination := range ActionWithBadgeIdsAndTimesPermission.Combinations {
+		for _, BalancesActionCombination := range BalancesActionPermission.Combinations {
 			castedCombinations = append(castedCombinations, &types.UniversalCombination{
-				BadgeIdsOptions: ActionWithBadgeIdsAndTimesCombination.BadgeIdsOptions,
-				TransferTimesOptions: ActionWithBadgeIdsAndTimesCombination.TransferTimesOptions,
-				PermittedTimesOptions: ActionWithBadgeIdsAndTimesCombination.PermittedTimesOptions,
-				ForbiddenTimesOptions: ActionWithBadgeIdsAndTimesCombination.ForbiddenTimesOptions,
+				BadgeIdsOptions: BalancesActionCombination.BadgeIdsOptions,
+				TransferTimesOptions: BalancesActionCombination.TransferTimesOptions,
+				PermittedTimesOptions: BalancesActionCombination.PermittedTimesOptions,
+				ForbiddenTimesOptions: BalancesActionCombination.ForbiddenTimesOptions,
 			})
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
-				BadgeIds: ActionWithBadgeIdsAndTimesPermission.DefaultValues.BadgeIds,
-				TransferTimes: ActionWithBadgeIdsAndTimesPermission.DefaultValues.TransferTimes,
+				BadgeIds: BalancesActionPermission.DefaultValues.BadgeIds,
+				TransferTimes: BalancesActionPermission.DefaultValues.OwnershipTimes,
 				UsesBadgeIds: true,
 				UsesTransferTimes: true,
-				PermittedTimes: ActionWithBadgeIdsAndTimesPermission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: ActionWithBadgeIdsAndTimesPermission.DefaultValues.ForbiddenTimes,
+				PermittedTimes: BalancesActionPermission.DefaultValues.PermittedTimes,
+				ForbiddenTimes: BalancesActionPermission.DefaultValues.ForbiddenTimes,
 			},
 			Combinations: castedCombinations,
 		})

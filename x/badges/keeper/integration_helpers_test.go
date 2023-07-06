@@ -82,9 +82,9 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 			Collection: types.MsgNewCollection{
 				Creator: bob,
 				BalancesType: sdkmath.NewUint(0),
-				ApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
+				CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
 					{
-						Times: GetFullIdRanges(),
+						TimelineTimes: GetFullIdRanges(),
 						ApprovedTransfers: []*types.CollectionApprovedTransfer{
 						{
 							ToMappingId: "All",
@@ -99,14 +99,14 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 							},
 							Challenges: []*types.Challenge{},
 							TrackerId: "test",
-							IncrementIdsBy: sdkmath.NewUint(0),
-							IncrementTimesBy: sdkmath.NewUint(0),
+							IncrementBadgeIdsBy: sdkmath.NewUint(0),
+							IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 							PerAddressApprovals: &types.PerAddressApprovals{
 								ApprovalsPerFromAddress: &types.ApprovalsTracker{
 									Amounts: []*types.Balance{
 										{
 											Amount: sdkmath.NewUint(1),
-											Times: GetFullIdRanges(),
+											OwnershipTimes: GetFullIdRanges(),
 											BadgeIds: GetFullIdRanges(),
 										},
 									},
@@ -131,14 +131,14 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 								},
 								Challenges: []*types.Challenge{},
 								TrackerId: "test",
-								IncrementIdsBy: sdkmath.NewUint(0),
-								IncrementTimesBy: sdkmath.NewUint(0),
+								IncrementBadgeIdsBy: sdkmath.NewUint(0),
+								IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 								PerAddressApprovals: &types.PerAddressApprovals{
 									ApprovalsPerFromAddress: &types.ApprovalsTracker{
 										Amounts: []*types.Balance{
 											{
 												Amount: sdkmath.NewUint(1),
-												Times: GetFullIdRanges(),
+												OwnershipTimes: GetFullIdRanges(),
 												BadgeIds: GetFullIdRanges(),
 											},
 										},
@@ -147,7 +147,7 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 								},
 							},
 						},
-						Times: GetFullIdRanges(),
+						TimelineTimes: GetFullIdRanges(),
 					},
 				},
 				DefaultApprovedOutgoingTransfersTimeline: []*types.UserApprovedOutgoingTransferTimeline{
@@ -165,14 +165,14 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 								},
 								Challenges: []*types.Challenge{},
 								TrackerId: "test",
-								IncrementIdsBy: sdkmath.NewUint(0),
-								IncrementTimesBy: sdkmath.NewUint(0),
+								IncrementBadgeIdsBy: sdkmath.NewUint(0),
+								IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 								PerAddressApprovals: &types.PerAddressApprovals{
 									ApprovalsPerFromAddress: &types.ApprovalsTracker{
 										Amounts: []*types.Balance{
 											{
 												Amount: sdkmath.NewUint(1),
-												Times: GetFullIdRanges(),
+												OwnershipTimes: GetFullIdRanges(),
 												BadgeIds: GetFullIdRanges(),
 											},
 										},
@@ -181,14 +181,14 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 								},
 							},
 						},
-						Times: GetFullIdRanges(),
+						TimelineTimes: GetFullIdRanges(),
 					},
 				},
 				BadgesToCreate: []*types.Balance{
 					{
 						Amount: sdkmath.NewUint(1),
 						BadgeIds: GetFullIdRanges(),
-						Times: GetFullIdRanges(),
+						OwnershipTimes: GetFullIdRanges(),
 					},
 				},
 				Permissions: &types.CollectionPermissions{
@@ -203,14 +203,14 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 					CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{},
 					CanUpdateInheritedBalances: []*types.TimedUpdateWithBadgeIdsPermission{},
 					CanUpdateCollectionApprovedTransfers: []*types.CollectionApprovedTransferPermission{},
-					CanCreateMoreBadges: []*types.ActionWithBadgeIdsAndTimesPermission{
+					CanCreateMoreBadges: []*types.BalancesActionPermission{
 						{
-							DefaultValues: &types.ActionWithBadgeIdsAndTimesDefaultValues{
+							DefaultValues: &types.BalancesActionDefaultValues{
 								BadgeIds: GetFullIdRanges(),
 								PermittedTimes: GetFullIdRanges(),
 								ForbiddenTimes: []*types.IdRange{},
 							},
-							Combinations: []*types.ActionWithBadgeIdsAndTimesCombination{{
+							Combinations: []*types.BalancesActionCombination{{
 
 							}},
 						},
@@ -230,8 +230,8 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 
 func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []CollectionsToCreate {
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers[0].PerAddressApprovals.ApprovalsPerFromAddress.Amounts[0].Amount = sdkmath.NewUint(uint64(math.MaxUint64))
-	collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers = append([]*types.CollectionApprovedTransfer{{
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].PerAddressApprovals.ApprovalsPerFromAddress.Amounts[0].Amount = sdkmath.NewUint(uint64(math.MaxUint64))
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append([]*types.CollectionApprovedTransfer{{
 		
 				ToMappingId: "All",
 				FromMappingId: "Mint",
@@ -247,14 +247,14 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []Colle
 				},
 				Challenges: []*types.Challenge{},
 				TrackerId: "test",
-				IncrementIdsBy: sdkmath.NewUint(0),
-				IncrementTimesBy: sdkmath.NewUint(0),
+				IncrementBadgeIdsBy: sdkmath.NewUint(0),
+				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				PerAddressApprovals: &types.PerAddressApprovals{
 					ApprovalsPerFromAddress: &types.ApprovalsTracker{
 						Amounts: []*types.Balance{
 							{
 								Amount: sdkmath.NewUint(1000),
-								Times: GetFullIdRanges(),
+								OwnershipTimes: GetFullIdRanges(),
 								BadgeIds: GetFullIdRanges(),
 							},
 						},
@@ -262,7 +262,7 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []Colle
 					},
 				},
 			},
-		}, collectionsToCreate[0].Collection.ApprovedTransfersTimeline[0].ApprovedTransfers...
+		}, collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers...
 	)
 
 	collectionsToCreate[0].Collection.Transfers = []*types.Transfer{
@@ -273,7 +273,7 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []Colle
 				{
 					Amount: sdkmath.NewUint(1),
 					BadgeIds: GetFullIdRanges(),
-					Times: GetFullIdRanges(),
+					OwnershipTimes: GetFullIdRanges(),
 				},
 			},
 		},

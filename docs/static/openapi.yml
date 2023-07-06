@@ -379,7 +379,7 @@ paths:
                               type: string
                             customData:
                               type: string
-                            incrementIdsBy:
+                            IncrementBadgeIdsBy:
                               type: string
                             startAmounts:
                               type: array
@@ -1284,7 +1284,7 @@ paths:
                               type: string
                             customData:
                               type: string
-                            incrementIdsBy:
+                            IncrementBadgeIdsBy:
                               type: string
                             startAmounts:
                               type: array
@@ -48532,7 +48532,7 @@ definitions:
                   type: string
                 customData:
                   type: string
-                incrementIdsBy:
+                IncrementBadgeIdsBy:
                   type: string
                 startAmounts:
                   type: array
@@ -48771,7 +48771,7 @@ definitions:
         type: string
       customData:
         type: string
-      incrementIdsBy:
+      IncrementBadgeIdsBy:
         type: string
       startAmounts:
         type: array
@@ -48947,7 +48947,7 @@ definitions:
             type: string
           customData:
             type: string
-          incrementIdsBy:
+          IncrementBadgeIdsBy:
             type: string
           startAmounts:
             type: array
@@ -49395,7 +49395,7 @@ definitions:
                       type: string
                     customData:
                       type: string
-                    incrementIdsBy:
+                    IncrementBadgeIdsBy:
                       type: string
                     startAmounts:
                       type: array
@@ -49867,7 +49867,7 @@ definitions:
                       type: string
                     customData:
                       type: string
-                    incrementIdsBy:
+                    IncrementBadgeIdsBy:
                       type: string
                     startAmounts:
                       type: array
@@ -50224,7 +50224,7 @@ definitions:
             type: string
           customData:
             type: string
-          incrementIdsBy:
+          IncrementBadgeIdsBy:
             type: string
           startAmounts:
             type: array
@@ -50417,7 +50417,7 @@ definitions:
                   type: string
                 customData:
                   type: string
-                incrementIdsBy:
+                IncrementBadgeIdsBy:
                   type: string
                 startAmounts:
                   type: array

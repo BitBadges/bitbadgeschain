@@ -19,7 +19,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 		return nil, err
 	}
 
-	if !IsOnChainBalances(collection) {
+	if !IsStandardBalances(collection) {
 		return nil, ErrWrongBalancesType
 	}
 
