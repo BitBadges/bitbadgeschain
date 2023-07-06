@@ -58,29 +58,23 @@ message BadgeCollection {
   // The nextBadgeId is the next badgeId to be minted. A collection will always have (nextBadgeId - 1) badges created. 
   string nextBadgeId = 12 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
-  // The unmintedSupplys is the created but unminted balances (i.e. the 'Mint' address balances)
-  repeated Balance unmintedSupplys = 13;
-
-  // The totalSupplys is the total created supplys of each badge in the collection.
-  repeated Balance totalSupplys = 14;
-
   // Standards allow us to define a standard for the collection. This lets others know how to interpret the fields of the collection.
-  repeated StandardsTimeline standardsTimeline = 15;
+  repeated StandardsTimeline standardsTimeline = 13;
 
   // The isArchivedTimeline defines whether the collection is archived or not. 
   // When a collection is archived, it is read-only and no transactions can be processed.
-  repeated IsArchivedTimeline isArchivedTimeline = 16;
+  repeated IsArchivedTimeline isArchivedTimeline = 14;
 
   // The contractAddressTimeline defines the contract address for the collection (if it has a corresponding contract).
-  repeated ContractAddressTimeline contractAddressTimeline = 17;
+  repeated ContractAddressTimeline contractAddressTimeline = 15;
 
   // The defaultUserApprovedOutgoingTransfersTimeline defines the default user approved outgoing transfers for an uninitialized user balance. 
   // The user can change this value at any time.
-  repeated UserApprovedOutgoingTransferTimeline defaultUserApprovedOutgoingTransfersTimeline = 18;
+  repeated UserApprovedOutgoingTransferTimeline defaultUserApprovedOutgoingTransfersTimeline = 16;
 
   // The defaultUserApprovedIncomingTransfersTimeline defines the default user approved incoming transfers for an uninitialized user balance.
   // The user can change this value at any time.
   //
   // Ex: Set this to disallow all incoming transfers by default, making the user have to opt-in to receiving the badge.
-  repeated UserApprovedIncomingTransferTimeline defaultUserApprovedIncomingTransfersTimeline = 19;
+  repeated UserApprovedIncomingTransferTimeline defaultUserApprovedIncomingTransfersTimeline = 17;
 }

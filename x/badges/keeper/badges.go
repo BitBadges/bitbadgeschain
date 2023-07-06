@@ -31,6 +31,15 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		return &types.BadgeCollection{}, err
 	}
 
+	unmintedSupplys, found := k.GetUserBalanceFromStore(ctx, ConstructBalanceKey("Mint", collection.CollectionId))
+	if !found {
+		unmintedSupplys = &types.UserBalanceStore{} //permissions and timelines do not matter because these are special addresses
+	}
+
+	totalSupplys, found := k.GetUserBalanceFromStore(ctx, ConstructBalanceKey("Total", collection.CollectionId))
+	if !found {
+		totalSupplys = &types.UserBalanceStore{} //permissions and timelines do not matter because these are special addresses
+	}
 
 	//Create the badges and add newly created balances to unminted supplys
 	for _, balance := range badgesToCreate {
@@ -45,18 +54,27 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 			}
 		}
 
-		collection.TotalSupplys, err = types.AddBalance(collection.TotalSupplys, balance)
+		totalSupplys.Balances, err = types.AddBalance(totalSupplys.Balances, balance)
 		if err != nil {
 			return &types.BadgeCollection{}, err
 		}
 
-		collection.UnmintedSupplys, err = types.AddBalance(collection.UnmintedSupplys, balance)
+		unmintedSupplys.Balances, err = types.AddBalance(unmintedSupplys.Balances, balance)
 		if err != nil {
 			return &types.BadgeCollection{}, err
 		}
 	}
 
-	
+	err = k.SetUserBalanceInStore(ctx, ConstructBalanceKey("Mint", collection.CollectionId), unmintedSupplys)
+	if err != nil {
+		return &types.BadgeCollection{}, err
+	}
+
+	err = k.SetUserBalanceInStore(ctx, ConstructBalanceKey("Total", collection.CollectionId), totalSupplys)
+	if err != nil {
+		return &types.BadgeCollection{}, err
+	}
+
 	if IsStandardBalances(collection) {
 		//Handle any transfers defined in the Msg
 		err = k.HandleTransfers(ctx, collection, transfers, "Manager")

@@ -17,10 +17,6 @@ func HandleManagerAlias(address string, managerAddress string) string {
 }
 
 func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollection, transfers []*types.Transfer, initiatedBy string) (error) {
-	//If "Mint" or "Manager" 
-	unmintedBalances := &types.UserBalanceStore{
-		Balances: collection.UnmintedSupplys,
-	}
 	err := *new(error)
 	manager := types.GetCurrentManager(ctx, collection)
 
@@ -28,17 +24,13 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 
 	for _, transfer := range transfers {
 		fromBalanceKey := ConstructBalanceKey(transfer.From, collection.CollectionId)
-		fromUserBalance := unmintedBalances
-		found := true
 		transfer.From = HandleManagerAlias(transfer.From, manager)
 		
-		if transfer.From != "Mint" {
-			fromUserBalance, found = k.GetUserBalanceFromStore(ctx, fromBalanceKey)
-			if !found {
-				return sdkerrors.Wrapf(ErrUserBalanceNotExists, "from user balance for %s does not exist", transfer.From)
-			}
+		fromUserBalance, found := k.GetUserBalanceFromStore(ctx, fromBalanceKey)
+		if !found {
+			return sdkerrors.Wrapf(ErrUserBalanceNotExists, "from user balance for %s does not exist", transfer.From)
 		}
-		
+
 		for _, to := range transfer.ToAddresses {
 			to = HandleManagerAlias(to, manager)
 
@@ -68,12 +60,8 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 			}
 		}
 
-		if transfer.From != "Mint" {
-			if err := k.SetUserBalanceInStore(ctx, fromBalanceKey, fromUserBalance); err != nil {
-				return err
-			}
-		} else {
-			collection.UnmintedSupplys = fromUserBalance.Balances
+		if err := k.SetUserBalanceInStore(ctx, fromBalanceKey, fromUserBalance); err != nil {
+			return err
 		}
 	}
 

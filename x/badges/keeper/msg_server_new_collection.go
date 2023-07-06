@@ -50,8 +50,6 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 				},
 			},
 		},
-		UnmintedSupplys:    []*types.Balance{},
-		TotalSupplys:       []*types.Balance{},
 		InheritedBalancesTimeline: msg.InheritedBalancesTimeline,
 		DefaultUserApprovedOutgoingTransfersTimeline: msg.DefaultApprovedOutgoingTransfersTimeline,
 		DefaultUserApprovedIncomingTransfersTimeline: msg.DefaultApprovedIncomingTransfersTimeline,

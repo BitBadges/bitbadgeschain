@@ -25,7 +25,7 @@ import (
 
 //TODO: DRY and clean this file up; a lot of repeated code; also work on naming conventions
 
-func GetCombosForStringTimelines(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error) {
+func GetUpdatedStringCombinations(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error) {
 	x := []*types.UniversalPermissionDetails{}
 	if (oldValue == nil && newValue != nil) || (oldValue != nil && newValue == nil) {
 		x = append(x, &types.UniversalPermissionDetails{})
@@ -691,7 +691,7 @@ func (k Keeper) ValidateManagerUpdate(ctx sdk.Context, oldManager []*types.Manag
 	newTimes, newValues := types.GetManagerTimesAndValues(newManager)
 	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
 
-	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, "", "", GetCombosForStringTimelines)
+	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, "", "", GetUpdatedStringCombinations)
 	if err != nil {
 		return err
 	}
@@ -710,7 +710,7 @@ func (k Keeper) ValidateCustomDataUpdate(ctx sdk.Context, oldCustomData []*types
 	newTimes, newValues := types.GetCustomDataTimesAndValues(newCustomData)
 	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
 
-	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, "", "", GetCombosForStringTimelines)
+	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, "", "", GetUpdatedStringCombinations)
 	if err != nil {
 		return err
 	}
@@ -771,7 +771,7 @@ func (k Keeper) ValidateContractAddressUpdate(ctx sdk.Context, oldContractAddres
 	newTimes, newValues := types.GetContractAddressTimesAndValues(newContractAddress)
 	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
 
-	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, "", "", GetCombosForStringTimelines)
+	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, "", "", GetUpdatedStringCombinations)
 	if err != nil {
 		return err
 	}

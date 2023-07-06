@@ -78,8 +78,10 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 	}
 
 	//Prevent accidental non-cosmos addresses from being stored
-	if err = types.ValidateAddress(GetDetailsFromBalanceKey(balanceKey).address, false); err != nil {
-		return sdkerrors.Wrap(err, "Invalid address")
+	if GetDetailsFromBalanceKey(balanceKey).address != "Mint" && GetDetailsFromBalanceKey(balanceKey).address != "Total" {
+		if err = types.ValidateAddress(GetDetailsFromBalanceKey(balanceKey).address, false); err != nil {
+			return sdkerrors.Wrap(err, "Invalid address")
+		}
 	}
 
 	store := ctx.KVStore(k.storeKey)

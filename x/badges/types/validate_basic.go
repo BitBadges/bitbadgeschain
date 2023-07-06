@@ -39,7 +39,7 @@ func ValidateURI(uri string) error {
 }
 
 func ValidateAddress(address string, allowAliases bool) error {
-	if allowAliases && (address == "Manager" || address == "Mint") {
+	if allowAliases && (address == "Mint") {
 		return nil
 	}
 
@@ -79,33 +79,33 @@ func DoRangesOverlap(ids []*UintRange) bool {
 }
 
 // Validates ranges are valid. If end.IsZero(), we assume end == start.
-func ValidateRangesAreValid(badgeIdRanges []*UintRange, errorOnEmpty bool) error {
-	if len(badgeIdRanges) == 0 {
+func ValidateRangesAreValid(badgeUintRanges []*UintRange, errorOnEmpty bool) error {
+	if len(badgeUintRanges) == 0 {
 		if errorOnEmpty {
 			return sdkerrors.Wrapf(ErrInvalidUintRangeSpecified, "these id ranges can not be empty (length == 0)")
 		} 
 	}
 
 
-	for _, badgeIdRange := range badgeIdRanges {
-		if badgeIdRange == nil {
+	for _, badgeUintRange := range badgeUintRanges {
+		if badgeUintRange == nil {
 			return ErrRangesIsNil
 		}
 
-		if badgeIdRange.Start.IsNil() || badgeIdRange.End.IsNil() {
+		if badgeUintRange.Start.IsNil() || badgeUintRange.End.IsNil() {
 			return sdkerrors.Wrapf(ErrUintUnititialized, "id range start and/or end is nil")
 		}
 
-		if badgeIdRange.Start.IsZero() || badgeIdRange.End.IsZero() {
+		if badgeUintRange.Start.IsZero() || badgeUintRange.End.IsZero() {
 			return sdkerrors.Wrapf(ErrUintUnititialized, "id range start and/or end is zero")
 		}
 
-		if badgeIdRange.Start.GT(badgeIdRange.End) {
+		if badgeUintRange.Start.GT(badgeUintRange.End) {
 			return ErrStartGreaterThanEnd
 		}
 	}
 
-	overlap := DoRangesOverlap(badgeIdRanges)
+	overlap := DoRangesOverlap(badgeUintRanges)
 	if overlap {
 		return ErrRangesOverlap
 	}
@@ -367,7 +367,7 @@ func ValidateTransfer(transfer *Transfer) error {
 	}
 
 	for _, address := range transfer.ToAddresses {
-		err = ValidateAddress(address, true)
+		err = ValidateAddress(address, false)
 		if err != nil {
 			return sdkerrors.Wrapf(ErrInvalidAddress, "invalid to address (%s)", err)
 		}
@@ -438,13 +438,13 @@ func ValidateInheritedBalances(inheritedBalances []*InheritedBalance) error {
 			}
 
 			totalBadgeLength := sdk.NewUint(0)
-			for _, badgeIdRange := range inheritedBalance.BadgeIds {
-				totalBadgeLength = totalBadgeLength.Add(badgeIdRange.End.Sub(badgeIdRange.Start).AddUint64(1))
+			for _, badgeUintRange := range inheritedBalance.BadgeIds {
+				totalBadgeLength = totalBadgeLength.Add(badgeUintRange.End.Sub(badgeUintRange.Start).AddUint64(1))
 			}
 
 			totalParentBadgeLength := sdk.NewUint(0)
-			for _, badgeIdRange := range inheritedBalance.ParentBadgeIds {
-				totalParentBadgeLength = totalParentBadgeLength.Add(badgeIdRange.End.Sub(badgeIdRange.Start).AddUint64(1))
+			for _, badgeUintRange := range inheritedBalance.ParentBadgeIds {
+				totalParentBadgeLength = totalParentBadgeLength.Add(badgeUintRange.End.Sub(badgeUintRange.Start).AddUint64(1))
 			}
 
 			if !totalParentBadgeLength.Equal(sdk.NewUint(1)) {

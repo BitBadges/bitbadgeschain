@@ -27,18 +27,6 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 	if err := k.Keeper.HandleTransfers(ctx, collection, msg.Transfers, "Manager"); err != nil {
 		return nil, err
 	}
-
-	//The "mint" balances are stored via the collection's unminted supplys. 
-	//We only need to update the collection if there is a mint transfer
-	for _, transfer := range msg.Transfers {
-		if transfer.From == "Mint" {
-			if err := k.SetCollectionInStore(ctx, collection); err != nil {
-				return nil, err
-			}
-			break
-		}
-	}
-
 	
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,

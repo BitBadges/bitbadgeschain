@@ -192,13 +192,14 @@ func (suite *TestSuite) TestTransferBadgeFromMintAddress() {
 	suite.Require().Nil(err, "Error creating collections")
 
 	bobbalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
-	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
 	fetchedBalance, err := types.GetBalancesForIds(GetOneUintRange(), GetOneUintRange(), bobbalance.Balances)
 	suite.Require().Equal(sdkmath.NewUint(1), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	AssertBalancesEqual(suite, []*types.Balance{}, collection.UnmintedSupplys)
+	unmintedSupplys, err := GetUserBalance(suite, wctx, sdk.NewUint(1), "Mint")
+	suite.Require().Nil(err, "Error getting user balance: %s")
+	AssertBalancesEqual(suite, []*types.Balance{}, unmintedSupplys.Balances)
 
 	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
 		Creator:      bob,
@@ -232,7 +233,9 @@ func (suite *TestSuite) TestTransferBadgeFromMintAddress() {
 	})
 	suite.Require().Nil(err, "Error transferring badge")
 
-	AssertBalancesEqual(suite, []*types.Balance{}, collection.UnmintedSupplys)
+	unmintedSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Mint")
+	suite.Require().Nil(err, "Error getting user balance: %s")
+	AssertBalancesEqual(suite, []*types.Balance{}, unmintedSupplys.Balances)
 
 	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
 		Creator:      bob,
