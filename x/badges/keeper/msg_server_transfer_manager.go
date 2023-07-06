@@ -19,7 +19,7 @@ func (k msgServer) UpdateManager(goCtx context.Context, msg *types.MsgUpdateMana
 		return nil, err
 	}
 
-	if err := ValidateManagerUpdate(ctx, collection.ManagerTimeline, msg.ManagerTimeline, collection.Permissions.CanUpdateManager); err != nil {
+	if err := k.ValidateManagerUpdate(ctx, collection.ManagerTimeline, msg.ManagerTimeline, collection.Permissions.CanUpdateManager); err != nil {
 		return nil, err
 	}
 	collection.ManagerTimeline = msg.ManagerTimeline

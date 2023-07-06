@@ -156,10 +156,10 @@ func ValidateIsArchivedTimeline(timeline []*IsArchivedTimeline) error {
 }
 
 
-func ValidateUserApprovedOutgoingTransferTimeline(timeline []*UserApprovedOutgoingTransferTimeline) error {
+func ValidateUserApprovedOutgoingTransferTimeline(timeline []*UserApprovedOutgoingTransferTimeline, address string) error {
 	for _, timelineVal := range timeline {
 		for _, approvedTransfer := range timelineVal.ApprovedOutgoingTransfers {
-			err := ValidateUserApprovedOutgoingTransfer(approvedTransfer)
+			err := ValidateUserApprovedOutgoingTransfer(approvedTransfer, address)
 			if err != nil {
 				return err
 			}
@@ -175,10 +175,10 @@ func ValidateUserApprovedOutgoingTransferTimeline(timeline []*UserApprovedOutgoi
 	return nil
 }
 
-func ValidateUserApprovedIncomingTransferTimeline(timeline []*UserApprovedIncomingTransferTimeline) error {
+func ValidateUserApprovedIncomingTransferTimeline(timeline []*UserApprovedIncomingTransferTimeline, address string) error {
 	for _, timelineVal := range timeline {
 		for _, approvedTransfer := range timelineVal.ApprovedIncomingTransfers {
-			err := ValidateUserApprovedIncomingTransfer(approvedTransfer)
+			err := ValidateUserApprovedIncomingTransfer(approvedTransfer, address)
 			if err != nil {
 				return err
 			}

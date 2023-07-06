@@ -2,13 +2,14 @@ package keeper
 
 import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 //For TimedUpdates that involve checking additonal information (i.e. TimedUpdateWithBadgeIds, CollectionApprovedTransfers, UserApprovedIncomingTransfers, etc.)
 //We cast the values to a UniversalPermission struct, which is compatible with the permissions.go file in types
 //This allows us to easily check overlaps and get the correct permissions
 
-func CastInheritedBalancesToUniversalPermission(inheritedBalances []*types.InheritedBalance) []*types.UniversalPermission {
+func (k Keeper) CastInheritedBalancesToUniversalPermission(inheritedBalances []*types.InheritedBalance) []*types.UniversalPermission {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, inheritedBalance := range inheritedBalances {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
@@ -24,7 +25,7 @@ func CastInheritedBalancesToUniversalPermission(inheritedBalances []*types.Inher
 	return castedPermissions
 }
 
-func CastBadgeMetadataToUniversalPermission(badgeMetadata []*types.BadgeMetadata) []*types.UniversalPermission {
+func (k Keeper) CastBadgeMetadataToUniversalPermission(badgeMetadata []*types.BadgeMetadata) []*types.UniversalPermission {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, badgeMetadata := range badgeMetadata {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
@@ -41,69 +42,105 @@ func CastBadgeMetadataToUniversalPermission(badgeMetadata []*types.BadgeMetadata
 
 
 
-func CastCollectionApprovedTransferToUniversalPermission(approvedTransfers []*types.CollectionApprovedTransfer) []*types.UniversalPermission {
+func (k Keeper) CastCollectionApprovedTransferToUniversalPermission(ctx sdk.Context, approvedTransfers []*types.CollectionApprovedTransfer, managerAddress string) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, approvedTransfer := range approvedTransfers {
+		fromMapping, err := k.GetAddressMapping(ctx, approvedTransfer.FromMappingId, managerAddress)
+		if err != nil {
+			return nil, err
+		}
+
+		initiatedByMapping, err := k.GetAddressMapping(ctx, approvedTransfer.InitiatedByMappingId, managerAddress)
+		if err != nil {
+			return nil, err
+		}
+
+		toMapping, err := k.GetAddressMapping(ctx, approvedTransfer.ToMappingId, managerAddress)
+		if err != nil {
+			return nil, err
+		}
+
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
 				BadgeIds: approvedTransfer.BadgeIds,
 				TransferTimes: approvedTransfer.TransferTimes,
-				ToMappingId: approvedTransfer.ToMappingId,
-				FromMappingId: approvedTransfer.FromMappingId,
-				InitiatedByMappingId: approvedTransfer.InitiatedByMappingId,
+				FromMapping: fromMapping,
+				ToMapping: toMapping,
+				InitiatedByMapping: initiatedByMapping,
 				UsesBadgeIds: true,
 				UsesTransferTimes: true,
-				UsesToMappingId: true,
-				UsesFromMappingId: true,
-				UsesInitiatedByMappingId: true,
+				UsesToMapping: true,
+				UsesFromMapping: true,
+				UsesInitiatedByMapping: true,
 				ArbitraryValue: approvedTransfer,
 			},
 			Combinations: []*types.UniversalCombination{{}},
 		})
 	}
-	return castedPermissions
+	return castedPermissions, nil
 }
 
-func CastUserApprovedOutgoingTransferToUniversalPermission(approvedTransfers []*types.UserApprovedOutgoingTransfer) []*types.UniversalPermission {
+func (k Keeper) CastUserApprovedOutgoingTransferToUniversalPermission(ctx sdk.Context, approvedTransfers []*types.UserApprovedOutgoingTransfer, managerAddress string) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, approvedTransfer := range approvedTransfers {
+		initiatedByMapping, err := k.GetAddressMapping(ctx, approvedTransfer.InitiatedByMappingId, managerAddress)
+		if err != nil {
+			return nil, err
+		}
+
+		toMapping, err := k.GetAddressMapping(ctx, approvedTransfer.ToMappingId, managerAddress)
+		if err != nil {
+			return nil, err
+		}
+
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
 				BadgeIds: approvedTransfer.BadgeIds,
 				TransferTimes: approvedTransfer.TransferTimes,
-				ToMappingId: approvedTransfer.ToMappingId,
-				InitiatedByMappingId: approvedTransfer.InitiatedByMappingId,
+				ToMapping: toMapping,
+				InitiatedByMapping: initiatedByMapping,
 				UsesBadgeIds: true,
 				UsesTransferTimes: true,
-				UsesToMappingId: true,
-				UsesInitiatedByMappingId: true,
+				UsesToMapping: true,
+				UsesInitiatedByMapping: true,
 				ArbitraryValue: approvedTransfer,
 			},
 			Combinations: []*types.UniversalCombination{{}},
 		})
 	}
-	return castedPermissions
+	return castedPermissions, nil
 }
 
 
 
-func CastUserApprovedIncomingTransferToUniversalPermission(approvedTransfers []*types.UserApprovedIncomingTransfer) []*types.UniversalPermission {
+func (k Keeper) CastUserApprovedIncomingTransferToUniversalPermission(ctx sdk.Context, approvedTransfers []*types.UserApprovedIncomingTransfer, managerAddress string) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, approvedTransfer := range approvedTransfers {
+		
+		fromMapping, err := k.GetAddressMapping(ctx, approvedTransfer.FromMappingId, managerAddress)
+		if err != nil {
+			return nil, err
+		}
+
+		initiatedByMapping, err := k.GetAddressMapping(ctx, approvedTransfer.InitiatedByMappingId, managerAddress)
+		if err != nil {
+			return nil, err
+		}
+		
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
 				BadgeIds: approvedTransfer.BadgeIds,
 				TransferTimes: approvedTransfer.TransferTimes,
-				FromMappingId: approvedTransfer.FromMappingId,
-				InitiatedByMappingId: approvedTransfer.InitiatedByMappingId,
+				FromMapping: fromMapping,
+				InitiatedByMapping: initiatedByMapping,
 				UsesBadgeIds: true,
 				UsesTransferTimes: true,
-				UsesToMappingId: true,
-				UsesInitiatedByMappingId: true,
+				UsesToMapping: true,
+				UsesInitiatedByMapping: true,
 				ArbitraryValue: approvedTransfer,
 			},
 			Combinations: []*types.UniversalCombination{{}},
 		})
 	}
-	return castedPermissions
+	return castedPermissions, nil
 }

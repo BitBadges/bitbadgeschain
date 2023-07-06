@@ -73,6 +73,9 @@ func GetBalancesForIds(idRanges []*IdRange, times []*IdRange, balances []*Balanc
 					BadgeId: currRange,
 					TimelineTime: currTime,
 					TransferTime: &IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
+					ToMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
+					FromMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
+					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
 					ArbitraryValue: balanceObj.Amount,
 				})
 			}
@@ -86,6 +89,9 @@ func GetBalancesForIds(idRanges []*IdRange, times []*IdRange, balances []*Balanc
 					BadgeId: rangeToFetch,
 					TimelineTime: timeToFetch,
 					TransferTime: &IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
+					ToMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
+					FromMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
+					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
 				},
 			)
 		}
@@ -173,6 +179,9 @@ func DeleteBalances(rangesToDelete []*IdRange, timesToDelete []*IdRange, balance
 					BadgeId: currRange,
 					TimelineTime: currTime,
 					TransferTime: &IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
+					ToMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
+					FromMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
+					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
 				})
 			}
 		}
@@ -184,6 +193,9 @@ func DeleteBalances(rangesToDelete []*IdRange, timesToDelete []*IdRange, balance
 						BadgeId: rangeToDelete,
 						TimelineTime: timeToDelete,
 						TransferTime: &IdRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
+						ToMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
+						FromMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
+						InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeOnlySpecified: false },
 					},
 				)
 			}

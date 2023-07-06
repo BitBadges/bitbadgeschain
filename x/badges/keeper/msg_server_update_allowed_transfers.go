@@ -27,10 +27,12 @@ func (k msgServer) UpdateCollectionApprovedTransfers(goCtx context.Context, msg 
 		}
 	}
 
-	if err := ValidateCollectionApprovedTransfersUpdate(ctx, collection, collection.ApprovedTransfersTimeline, msg.ApprovedTransfersTimeline, collection.Permissions.CanUpdateCollectionApprovedTransfers); err != nil {
-		return nil, err
+	if msg.ApprovedTransfersTimeline != nil && len(msg.ApprovedTransfersTimeline) > 0 {
+		if err := k.ValidateCollectionApprovedTransfersUpdate(ctx, collection, collection.ApprovedTransfersTimeline, msg.ApprovedTransfersTimeline, collection.Permissions.CanUpdateCollectionApprovedTransfers, msg.Creator); err != nil {
+			return nil, err
+		}
+		collection.ApprovedTransfersTimeline = msg.ApprovedTransfersTimeline
 	}
-	collection.ApprovedTransfersTimeline = msg.ApprovedTransfersTimeline
 
 	err = k.SetCollectionInStore(ctx, collection)
 	if err != nil {

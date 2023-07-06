@@ -42,11 +42,11 @@ func (msg *MsgUpdateUserApprovedTransfers) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if err := ValidateUserApprovedIncomingTransferTimeline(msg.ApprovedIncomingTransfersTimeline); err != nil {
+	if err := ValidateUserApprovedIncomingTransferTimeline(msg.ApprovedIncomingTransfersTimeline, msg.Creator); err != nil {
 		return err
 	}
 
-	if err := ValidateUserApprovedOutgoingTransferTimeline(msg.ApprovedOutgoingTransfersTimeline); err != nil {
+	if err := ValidateUserApprovedOutgoingTransferTimeline(msg.ApprovedOutgoingTransfersTimeline, msg.Creator); err != nil {
 		return err
 	} 
 

@@ -28,7 +28,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		}
 	}
 
-	err = CheckActionWithBadgeIdsAndTimesPermission(ctx, detailsToCheck, collection.Permissions.CanCreateMoreBadges)
+	err = k.CheckActionWithBadgeIdsAndTimesPermission(ctx, detailsToCheck, collection.Permissions.CanCreateMoreBadges)
 	if err != nil {
 		return &types.BadgeCollection{}, err
 	}

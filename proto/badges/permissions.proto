@@ -28,8 +28,8 @@ message CollectionPermissions {
 }
 
 message UserPermissions {
-  repeated UserApprovedTransferPermission canUpdateApprovedOutgoingTransfers = 1;
-  repeated UserApprovedTransferPermission canUpdateApprovedIncomingTransfers = 2;
+  repeated UserApprovedOutgoingTransferPermission canUpdateApprovedOutgoingTransfers = 1;
+  repeated UserApprovedIncomingTransferPermission canUpdateApprovedIncomingTransfers = 2;
 }
 
 message ValueOptions {
@@ -41,9 +41,9 @@ message ValueOptions {
 message CollectionApprovedTransferCombination {
   ValueOptions timelineTimesOptions = 1;
 
-  ValueOptions fromMappingIdOptions = 2;
-  ValueOptions toMappingIdOptions = 3;
-  ValueOptions initiatedByMappingIdOptions = 4;
+  ValueOptions fromMappingOptions = 2;
+  ValueOptions toMappingOptions = 3;
+  ValueOptions initiatedByMappingOptions = 4;
   ValueOptions transferTimesOptions = 5;
   ValueOptions badgeIdsOptions = 6;
 
@@ -72,8 +72,8 @@ message CollectionApprovedTransferPermission {
 message UserApprovedOutgoingTransferCombination {
   ValueOptions timelineTimesOptions = 1;
 
-  ValueOptions toMappingIdOptions = 2;
-  ValueOptions initiatedByMappingIdOptions = 3;
+  ValueOptions toMappingOptions = 2;
+  ValueOptions initiatedByMappingOptions = 3;
   ValueOptions transferTimesOptions = 4;
   ValueOptions badgeIdsOptions = 5;
 
@@ -93,9 +93,38 @@ message UserApprovedOutgoingTransferDefaultValues {
   repeated IdRange forbiddenTimes = 8;
 }
 
-message UserApprovedTransferPermission {
+message UserApprovedOutgoingTransferPermission {
   UserApprovedOutgoingTransferDefaultValues defaultValues = 1;
   repeated UserApprovedOutgoingTransferCombination combinations = 2;
+}
+
+message UserApprovedIncomingTransferCombination {
+  ValueOptions timelineTimesOptions = 1;
+
+  ValueOptions fromMappingOptions = 2;
+  ValueOptions initiatedByMappingOptions = 3;
+  ValueOptions transferTimesOptions = 4;
+  ValueOptions badgeIdsOptions = 5;
+
+  ValueOptions permittedTimesOptions = 6;
+  ValueOptions forbiddenTimesOptions = 7;
+}
+
+message UserApprovedIncomingTransferDefaultValues {
+  repeated IdRange timelineTimes = 1;
+
+  string fromMappingId = 2;
+  string initiatedByMappingId = 3;
+  repeated IdRange transferTimes = 4;
+  repeated IdRange badgeIds = 5;
+
+  repeated IdRange permittedTimes = 7;
+  repeated IdRange forbiddenTimes = 8;
+}
+
+message UserApprovedIncomingTransferPermission {
+  UserApprovedIncomingTransferDefaultValues defaultValues = 1;
+  repeated UserApprovedIncomingTransferCombination combinations = 2;
 }
 
 message ActionWithBadgeIdsAndTimesCombination {

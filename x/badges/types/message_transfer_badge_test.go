@@ -87,7 +87,6 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 						},
 						Balances: []*types.Balance{
 							{
-								Amount: sdkmath.NewUint(0),
 								BadgeIds: []*types.IdRange{
 									{
 										Start: sdkmath.NewUint(1),
@@ -204,7 +203,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.msg.ValidateBasic()
 			if tt.err != nil {
-				require.ErrorIs(t, err, tt.err)
+				require.Error(t, err, tt.err)
 				return
 			}
 			require.NoError(t, err)

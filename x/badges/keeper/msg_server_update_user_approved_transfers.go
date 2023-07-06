@@ -13,7 +13,6 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 	collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:                              msg.Creator,
 		CollectionId:                         msg.CollectionId,
-		MustBeManager:                        true,
 	})
 	if err != nil {
 		return nil, err
@@ -37,23 +36,25 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 			ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
 			ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,
 			Permissions: &types.UserPermissions{
-				CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedTransferPermission{},
-				CanUpdateApprovedIncomingTransfers: []*types.UserApprovedTransferPermission{},
+				CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransferPermission{},
+				CanUpdateApprovedIncomingTransfers: []*types.UserApprovedIncomingTransferPermission{},
 			},
 		}
 	}
 
+	manager := types.GetCurrentManager(ctx, collection)
+
 
 
 	if msg.ApprovedOutgoingTransfersTimeline != nil {
-		if err := ValidateUserApprovedOutgoingTransfersUpdate(ctx, userBalance.ApprovedOutgoingTransfersTimeline, msg.ApprovedOutgoingTransfersTimeline, userBalance.Permissions.CanUpdateApprovedOutgoingTransfers); err != nil {
+		if err := k.ValidateUserApprovedOutgoingTransfersUpdate(ctx, userBalance.ApprovedOutgoingTransfersTimeline, msg.ApprovedOutgoingTransfersTimeline, userBalance.Permissions.CanUpdateApprovedOutgoingTransfers, manager); err != nil {
 			return nil, err
 		}
 		userBalance.ApprovedOutgoingTransfersTimeline = msg.ApprovedOutgoingTransfersTimeline
 	}
 
 	if msg.ApprovedIncomingTransfersTimeline != nil {
-		if err := ValidateUserApprovedIncomingTransfersUpdate(ctx, userBalance.ApprovedIncomingTransfersTimeline, msg.ApprovedIncomingTransfersTimeline, userBalance.Permissions.CanUpdateApprovedIncomingTransfers); err != nil {
+		if err := k.ValidateUserApprovedIncomingTransfersUpdate(ctx, userBalance.ApprovedIncomingTransfersTimeline, msg.ApprovedIncomingTransfersTimeline, userBalance.Permissions.CanUpdateApprovedIncomingTransfers, manager); err != nil {
 			return nil, err
 		}
 		userBalance.ApprovedIncomingTransfersTimeline = msg.ApprovedIncomingTransfersTimeline

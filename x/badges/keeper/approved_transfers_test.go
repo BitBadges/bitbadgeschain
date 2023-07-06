@@ -398,6 +398,7 @@ func (suite *TestSuite) TestCombinationsOrder() {
 							IsAllowed: false,
 						},
 						{
+							InvertInitiatedBy: true,
 							IsAllowed: true,
 						},
 					},
@@ -425,7 +426,7 @@ func (suite *TestSuite) TestCombinationsOrder() {
 	collectionsToCreate[0].Collection.DefaultApprovedOutgoingTransfersTimeline = newOutgoingTimeline
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating badges")
 
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))

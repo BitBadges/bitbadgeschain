@@ -45,7 +45,7 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 				Creator: sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
 				Permissions: &types.UserPermissions{
-					CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedTransferPermission{
+					CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransferPermission{
 						{
 							DefaultValues: &types.UserApprovedOutgoingTransferDefaultValues{
 								PermittedTimes: []*types.IdRange{ { Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2) } },

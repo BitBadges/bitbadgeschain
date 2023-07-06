@@ -227,26 +227,6 @@ func GetCollectionsToCreate() []CollectionsToCreate {
 	return collectionsToCreate
 }
 
-func GetCollectionsToCreateAllMintedToCreator(creator string) []CollectionsToCreate {
-	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.Transfers = []*types.Transfer{
-		{
-			From: "Mint",
-			ToAddresses: []string{creator},
-			Balances: []*types.Balance{
-				{
-					Amount: sdkmath.NewUint(1),
-					BadgeIds: GetFullIdRanges(),
-					Times: GetFullIdRanges(),
-				},
-			},
-		},
-	}
-
-	return collectionsToCreate
-}
-
-
 
 func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []CollectionsToCreate {
 	collectionsToCreate := GetCollectionsToCreate()
@@ -273,7 +253,7 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []Colle
 					ApprovalsPerFromAddress: &types.ApprovalsTracker{
 						Amounts: []*types.Balance{
 							{
-								Amount: sdkmath.NewUint(1),
+								Amount: sdkmath.NewUint(1000),
 								Times: GetFullIdRanges(),
 								BadgeIds: GetFullIdRanges(),
 							},

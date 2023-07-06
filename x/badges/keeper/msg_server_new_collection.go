@@ -73,7 +73,7 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 	}
 
 	if msg.InheritedBalancesTimeline != nil && len(msg.InheritedBalancesTimeline) > 0 {
-		if err := ValidateInheritedBalancesUpdate(ctx, collection, collection.InheritedBalancesTimeline, collection.InheritedBalancesTimeline, collection.Permissions.CanUpdateInheritedBalances); err != nil {
+		if err := k.ValidateInheritedBalancesUpdate(ctx, collection, collection.InheritedBalancesTimeline, collection.InheritedBalancesTimeline, collection.Permissions.CanUpdateInheritedBalances); err != nil {
 			return nil, err
 		}
 	}

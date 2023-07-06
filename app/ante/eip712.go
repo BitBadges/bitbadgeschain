@@ -204,7 +204,7 @@ func VerifySignature(
 		}
 
 		if extOpt.TypedDataChainID != signerChainID.Uint64() {
-			return sdkerrors.Wrapf(types.ErrInvalidChainID, "invalid chainID: %s vs. %d", extOpt.TypedDataChainID, signerChainID.Uint64())
+			return sdkerrors.Wrapf(types.ErrInvalidChainID, "invalid chainID: %d vs. %d", extOpt.TypedDataChainID, signerChainID.Uint64())
 		}
 
 		if len(extOpt.FeePayer) == 0 {
@@ -271,7 +271,7 @@ func VerifySignature(
 
 		sigHash, _, err := apitypes.TypedDataAndHash(typedData)
 		if err != nil {
-			return sdkerrors.Wrapf(err, "%s failed to compute typed data hash", typedData)
+			return sdkerrors.Wrapf(err, "%v failed to compute typed data hash", typedData)
 		}
 
 		// return sdkerrors.Wrapf(types.ErrInvalidChainID, "%s %s", typedData, sigHash)

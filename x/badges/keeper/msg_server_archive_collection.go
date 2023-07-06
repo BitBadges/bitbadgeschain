@@ -20,7 +20,7 @@ func (k msgServer) ArchiveCollection(goCtx context.Context, msg *types.MsgArchiv
 		return nil, err
 	}
 
-	if err := ValidateIsArchivedUpdate(ctx, collection.IsArchivedTimeline, msg.IsArchivedTimeline, collection.Permissions.CanArchive); err != nil {
+	if err := k.ValidateIsArchivedUpdate(ctx, collection.IsArchivedTimeline, msg.IsArchivedTimeline, collection.Permissions.CanArchive); err != nil {
 		return nil, err
 	}
 	collection.IsArchivedTimeline = msg.IsArchivedTimeline

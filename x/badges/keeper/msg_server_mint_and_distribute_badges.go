@@ -33,35 +33,35 @@ func (k msgServer) MintAndDistributeBadges(goCtx context.Context, msg *types.Msg
 	}
 
 	if msg.ApprovedTransfersTimeline != nil && len(msg.ApprovedTransfersTimeline) > 0 {		
-		if err := ValidateCollectionApprovedTransfersUpdate(ctx, collection, collection.ApprovedTransfersTimeline, msg.ApprovedTransfersTimeline, collection.Permissions.CanUpdateCollectionApprovedTransfers); err != nil {
+		if err := k.ValidateCollectionApprovedTransfersUpdate(ctx, collection, collection.ApprovedTransfersTimeline, msg.ApprovedTransfersTimeline, collection.Permissions.CanUpdateCollectionApprovedTransfers, msg.Creator); err != nil {
 			return nil, err
 		}
 		collection.ApprovedTransfersTimeline = msg.ApprovedTransfersTimeline
 	}
 	
 	if msg.CollectionMetadataTimeline != nil && len(msg.CollectionMetadataTimeline) > 0 {
-		if err := ValidateCollectionMetadataUpdate(ctx, collection.CollectionMetadataTimeline, msg.CollectionMetadataTimeline, collection.Permissions.CanUpdateCollectionMetadata); err != nil {
+		if err := k.ValidateCollectionMetadataUpdate(ctx, collection.CollectionMetadataTimeline, msg.CollectionMetadataTimeline, collection.Permissions.CanUpdateCollectionMetadata); err != nil {
 			return nil, err
 		}
 		collection.CollectionMetadataTimeline = msg.CollectionMetadataTimeline
 	}
 
 	if msg.OffChainBalancesMetadataTimeline != nil && len(msg.OffChainBalancesMetadataTimeline) > 0 {
-		if err := ValidateOffChainBalancesMetadataUpdate(ctx, collection, collection.OffChainBalancesMetadataTimeline, msg.OffChainBalancesMetadataTimeline, collection.Permissions.CanUpdateOffChainBalancesMetadata); err != nil {
+		if err := k.ValidateOffChainBalancesMetadataUpdate(ctx, collection, collection.OffChainBalancesMetadataTimeline, msg.OffChainBalancesMetadataTimeline, collection.Permissions.CanUpdateOffChainBalancesMetadata); err != nil {
 			return nil, err
 		}
 		collection.OffChainBalancesMetadataTimeline = msg.OffChainBalancesMetadataTimeline
 	}
 
 	if msg.InheritedBalancesTimeline != nil && len(msg.InheritedBalancesTimeline) > 0 {		
-		if err := ValidateInheritedBalancesUpdate(ctx, collection, collection.InheritedBalancesTimeline, msg.InheritedBalancesTimeline, collection.Permissions.CanUpdateInheritedBalances); err != nil {
+		if err := k.ValidateInheritedBalancesUpdate(ctx, collection, collection.InheritedBalancesTimeline, msg.InheritedBalancesTimeline, collection.Permissions.CanUpdateInheritedBalances); err != nil {
 			return nil, err
 		}
 		collection.InheritedBalancesTimeline = msg.InheritedBalancesTimeline
 	}
 
 	if msg.BadgeMetadataTimeline != nil && len(msg.BadgeMetadataTimeline) > 0 {
-		if err := ValidateBadgeMetadataUpdate(ctx, collection.BadgeMetadataTimeline, msg.BadgeMetadataTimeline, collection.Permissions.CanUpdateBadgeMetadata); err != nil {
+		if err := k.ValidateBadgeMetadataUpdate(ctx, collection.BadgeMetadataTimeline, msg.BadgeMetadataTimeline, collection.Permissions.CanUpdateBadgeMetadata); err != nil {
 			return nil, err
 		}
 		collection.BadgeMetadataTimeline = msg.BadgeMetadataTimeline

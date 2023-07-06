@@ -9,7 +9,7 @@ import (
 
 func GetValidUserPermissions() *types.UserPermissions {
 	return &types.UserPermissions{
-		CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedTransferPermission{
+		CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransferPermission{
 			{
 				DefaultValues: &types.UserApprovedOutgoingTransferDefaultValues{
 					PermittedTimes: []*types.IdRange{ { Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2) } },
@@ -50,6 +50,12 @@ func GetValidBadgeMetadataTimeline() []*types.BadgeMetadataTimeline {
 							End:   sdkmath.NewUint(math.MaxUint64),
 						},
 					},
+				},
+			},
+			Times: []*types.IdRange{
+				{
+					Start: sdkmath.NewUint(0),
+					End:  sdkmath.NewUint(math.MaxUint64),
 				},
 			},
 		},

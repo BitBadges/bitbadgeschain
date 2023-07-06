@@ -103,11 +103,11 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateUserApprovedIncomingTransferTimeline(msg.DefaultApprovedIncomingTransfersTimeline); err != nil {
+	if err := ValidateUserApprovedIncomingTransferTimeline(msg.DefaultApprovedIncomingTransfersTimeline, msg.Creator); err != nil {
 		return err
 	}
 
-	if err := ValidateUserApprovedOutgoingTransferTimeline(msg.DefaultApprovedOutgoingTransfersTimeline); err != nil {
+	if err := ValidateUserApprovedOutgoingTransferTimeline(msg.DefaultApprovedOutgoingTransfersTimeline, msg.Creator); err != nil {
 		return err
 	} 
 
@@ -116,6 +116,9 @@ func (msg *MsgNewCollection) ValidateBasic() error {
 		return err
 	}
 
+	if msg.BalancesType.IsNil() {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "balances type cannot be nil")
+	}
 
 	if !msg.BalancesType.IsZero() {
 		//We have off-chain or inherited balances

@@ -14,7 +14,6 @@ func (k msgServer) UpdateUserPermissions(goCtx context.Context,  msg *types.MsgU
   collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
 		Creator:       msg.Creator,
 		CollectionId:  msg.CollectionId,
-		MustBeManager: true,
 	})
 	if err != nil {
 		return nil, err
@@ -34,13 +33,15 @@ func (k msgServer) UpdateUserPermissions(goCtx context.Context,  msg *types.MsgU
 			ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
 			ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,
 			Permissions: &types.UserPermissions{
-				CanUpdateApprovedIncomingTransfers: []*types.UserApprovedTransferPermission{},
-				CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedTransferPermission{},
+				CanUpdateApprovedIncomingTransfers: []*types.UserApprovedIncomingTransferPermission{},
+				CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransferPermission{},
 			},
 		}
 	}
 
-	err = types.ValidateUserPermissionsUpdate(userBalance.Permissions, msg.Permissions, true)
+	manager := types.GetCurrentManager(ctx, collection)
+
+	err = k.ValidateUserPermissionsUpdate(ctx, userBalance.Permissions, msg.Permissions, true, manager)
 	if err != nil {
 		return nil, err
 	}

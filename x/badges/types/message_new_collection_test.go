@@ -26,6 +26,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: types.MsgNewCollection{
 				Creator:            "invalid_address",
+				BalancesType: sdkmath.NewUint(0),
 				CollectionMetadataTimeline: GetValidCollectionMetadataTimeline(),
 				BadgeMetadataTimeline: GetValidBadgeMetadataTimeline(),
 				Permissions: &types.CollectionPermissions{},
@@ -35,6 +36,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			name: "valid state",
 			msg: types.MsgNewCollection{
 				Creator:            sample.AccAddress(),
+				BalancesType: sdkmath.NewUint(0),
 				CollectionMetadataTimeline: GetValidCollectionMetadataTimeline(),
 				BadgeMetadataTimeline: GetValidBadgeMetadataTimeline(),
 				Permissions: &types.CollectionPermissions{},
@@ -43,6 +45,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			name: "invalid URI",
 			msg: types.MsgNewCollection{
 				Creator:            sample.AccAddress(),
+				BalancesType: sdkmath.NewUint(0),
 				CollectionMetadataTimeline: []*types.CollectionMetadataTimeline{
 					{
 						CollectionMetadata: &types.CollectionMetadata{
@@ -66,6 +69,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			name: "invalid Badge URI",
 			msg: types.MsgNewCollection{
 				Creator:            sample.AccAddress(),
+				BalancesType: sdkmath.NewUint(0),
 				CollectionMetadataTimeline: GetValidCollectionMetadataTimeline(),
 				BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
 					{
@@ -96,6 +100,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			name: "invalid Permissions",
 			msg: types.MsgNewCollection{
 				Creator:            sample.AccAddress(),
+				BalancesType: sdkmath.NewUint(0),
 				CollectionMetadataTimeline: GetValidCollectionMetadataTimeline(),
 				BadgeMetadataTimeline: GetValidBadgeMetadataTimeline(),
 			},

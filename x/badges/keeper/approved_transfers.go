@@ -46,7 +46,11 @@ func (k Keeper) DeductAndGetUserApprovals(approvedTransfers []*types.CollectionA
 	//HACK: We first expand all transfers to have just a len == 1 AllowedCombination[] so that we can easily check IsAllowed later
 	//		  This is because GetFirstMatchOnly will break down the transfers into smaller parts and without expansion, fetching if a certain transfer is allowed is impossible. 
 	expandedApprovedTransfers := ExpandCollectionApprovedTransfers(approvedTransfers) 
-	castedApprovedTransfers := CastCollectionApprovedTransferToUniversalPermission(expandedApprovedTransfers)
+	castedApprovedTransfers, err := k.CastCollectionApprovedTransferToUniversalPermission(ctx, expandedApprovedTransfers, types.GetCurrentManager(ctx, collection))
+	if err != nil {
+		return []*UserApprovalsToCheck{}, err
+	}
+	
 	firstMatches := types.GetFirstMatchOnly(castedApprovedTransfers) //Note: This filters only on the mapping ID level. We need to ensure we use first match only for each (to, from, initiatedBy) here. 
 
 	manager := types.GetCurrentManager(ctx, collection)

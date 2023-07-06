@@ -4,12 +4,8 @@ import (
 	sdkmath "cosmossdk.io/math"
 )
 
-// Type aliases to the SDK's math sub-module
-//
-// Deprecated: Functionality of this package has been moved to it's own module:
-// cosmossdk.io/math
-//
-// Please use the above module instead of this package.
+//Needed for custom gogoproto types
+
 type (
 	Int  = sdkmath.Int
 	Uint = sdkmath.Uint
@@ -28,10 +24,6 @@ var (
 		return val
 	}
 )
-
-// func (ip IntProto) String() string {
-// 	return ip.Int.String()
-// }
 
 type (
 	Dec = sdkmath.LegacyDec
