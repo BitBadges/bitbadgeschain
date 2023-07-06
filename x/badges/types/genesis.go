@@ -1,7 +1,6 @@
 package types
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/types"
 	host "github.com/cosmos/ibc-go/v5/modules/core/24-host"
 	// this line is used by starport scaffolding # genesis/types/import
@@ -17,12 +16,6 @@ func DefaultGenesis() *GenesisState {
 		// this line is used by starport scaffolding # genesis/types/default
 		Params:           DefaultParams(),
 		NextCollectionId: types.NewUint(1),
-		NextClaimId:      types.NewUint(1),
-		Collections:      []*BadgeCollection{},
-		Balances:         []*UserBalanceStore{},
-		BalanceStoreKeys: []string{},
-		Claims:           []sdkmath.Uint{},
-		ClaimStoreKeys:   []string{},
 	}
 }
 

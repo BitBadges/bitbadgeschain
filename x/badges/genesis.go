@@ -17,9 +17,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	if genState.NextCollectionId.Equal(sdkmath.NewUint(0)) {
 		genState.NextCollectionId = sdkmath.NewUint(1)
 	}
-	if genState.NextClaimId.Equal(sdkmath.NewUint(0)) {
-		genState.NextClaimId = sdkmath.NewUint(1)
-	}
 
 	k.SetNextCollectionId(ctx, genState.NextCollectionId)
 	// this line is used by starport scaffolding # genesis/module/init
@@ -47,12 +44,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		}
 	}
 
-	// for idx, claim := range genState.Claims {
-	// 	if err := k.SetClaimInStoreWithKey(ctx, genState.ClaimStoreKeys[idx], *claim); err != nil {
-	// 		panic(err)
-	// 	}
-	// }
-
 	k.SetParams(ctx, genState.Params)
 }
 
@@ -66,20 +57,18 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	genesis.Collections = k.GetCollectionsFromStore(ctx)
 	addresses := []string{}
-	ids := []sdkmath.Uint{}
-	genesis.Balances, addresses, ids = k.GetUserBalancesFromStore(ctx)
+	balanceIds := []sdkmath.Uint{}
+	genesis.Balances, addresses, balanceIds = k.GetUserBalancesFromStore(ctx)
 
 	for i, addresses := range addresses {
-		genesis.BalanceStoreKeys = append(genesis.BalanceStoreKeys, keeper.ConstructBalanceKey(addresses, ids[i]))
+		genesis.BalanceStoreKeys = append(genesis.BalanceStoreKeys, keeper.ConstructBalanceKey(addresses, balanceIds[i]))
 	}
 
-	collectionIds := []sdkmath.Uint{}
-	claimIds := []sdkmath.Uint{}
-	// genesis.Claims, collectionIds, claimIds = k.GetClaimsFromStore(ctx)
+	genesis.NumUsedForChallenges, genesis.NumUsedForChallengesStoreKeys = k.GetNumUsedForChallengesFromStore(ctx)
 
-	for i, collectionIds := range collectionIds {
-		genesis.ClaimStoreKeys = append(genesis.ClaimStoreKeys, keeper.ConstructClaimKey(collectionIds, claimIds[i]))
-	}
+	genesis.AddressMappings = k.GetAddressMappingsFromStore(ctx)
+
+	genesis.ApprovalsTrackers, genesis.ApprovalsTrackerStoreKeys = k.GetTransferTrackersFromStore(ctx)
 
 	// this line is used by starport scaffolding # genesis/module/export
 

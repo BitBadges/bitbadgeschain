@@ -4,6 +4,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 )
 
@@ -34,7 +35,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 		if transfer.From != "Mint" {
 			fromUserBalance, found = k.GetUserBalanceFromStore(ctx, fromBalanceKey)
 			if !found {
-				return ErrUserBalanceNotExists
+				return sdkerrors.Wrapf(ErrUserBalanceNotExists, "from user balance for %s does not exist", transfer.From)
 			}
 		}
 		

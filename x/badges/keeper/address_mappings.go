@@ -3,6 +3,8 @@ package keeper
 import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	sdkerrors "cosmossdk.io/errors"
 )
 
 func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.AddressMapping) error {
@@ -10,23 +12,23 @@ func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.Addr
 
 	//Validate ID 
 	if id == "Mint" || id == "Manager" || id == "All" || id == "None"	{
-		return ErrInvalidAddressMappingId
+		return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot be %s", id)
 	}
 	
 	//if starts with !
 	if id[0] == '!' {
-		return ErrInvalidAddressMappingId
+		return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot start with !")
 	}
 
 	//if any char is a :
 	for _, char := range id {
 		if char == ':' {
-			return ErrInvalidAddressMappingId
+			return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot contain :")
 		}
 	}
 
 	if types.ValidateAddress(addressMapping.MappingId, false) == nil {
-		return ErrInvalidAddressMappingId
+		return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot be a valid address")
 	}
 
 	err := k.SetAddressMappingInStore(ctx, *addressMapping)

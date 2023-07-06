@@ -33,14 +33,14 @@ func TestMsgDeleteCollection_ValidateBasic(t *testing.T) {
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(0),
 			},
-			err: ErrInvalidCollectionId,
+			err: ErrInvalidCollectionID,
 		},
 		{
 			name: "invalid collection id 2",
 			msg: MsgDeleteCollection{
 				Creator:      sample.AccAddress(),
 			},
-			err: ErrInvalidCollectionId,
+			err: ErrInvalidCollectionID,
 		},
 
 	}

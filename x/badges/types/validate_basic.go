@@ -32,7 +32,7 @@ func duplicateInStringArray(arr []string) bool {
 func ValidateURI(uri string) error {
 	regexMatch := reUri.MatchString(uri)
 	if !regexMatch {
-		return sdkerrors.Wrapf(ErrInvalidBadgeURI, "invalid uri: %s", uri)
+		return sdkerrors.Wrapf(ErrInvalidURI, "invalid uri: %s", uri)
 	}
 
 	return nil
@@ -93,7 +93,7 @@ func ValidateRangesAreValid(badgeIdRanges []*IdRange, errorOnEmpty bool) error {
 		}
 
 		if badgeIdRange.Start.IsNil() || badgeIdRange.End.IsNil() {
-			return sdkerrors.Wrapf(ErrUintUnititialized, "id range start and/or end is uninitialized")
+			return sdkerrors.Wrapf(ErrUintUnititialized, "id range start and/or end is nil")
 		}
 
 		if badgeIdRange.Start.GT(badgeIdRange.End) {
@@ -113,7 +113,7 @@ func ValidateRangesAreValid(badgeIdRanges []*IdRange, errorOnEmpty bool) error {
 func ValidateNoElementIsX(amounts []sdkmath.Uint, x sdkmath.Uint) error {
 	for _, amount := range amounts {
 		if amount.Equal(x) {
-			return ErrElementCantEqualThis
+			return sdkerrors.Wrapf(ErrElementCantEqualThis, "amount can not equal %s", x.String())
 		}
 	}
 	return nil
@@ -123,7 +123,7 @@ func ValidateNoElementIsX(amounts []sdkmath.Uint, x sdkmath.Uint) error {
 func ValidateNoStringElementIsX(addresses []string, x string) error {
 	for _, amount := range addresses {
 		if amount == x {
-			return ErrElementCantEqualThis
+			return sdkerrors.Wrapf(ErrElementCantEqualThis, "address can not equal %s", x)
 		}
 	}
 	return nil

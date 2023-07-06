@@ -6,6 +6,7 @@ import "badges/params.proto";
 import "badges/collections.proto";
 import "badges/balances.proto";
 import "badges/transfers.proto";
+import "badges/address_mappings.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
@@ -15,20 +16,13 @@ message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
   string port_id = 2;
   repeated BadgeCollection collections = 3;
-  repeated UserBalanceStore balances = 4;
-  repeated string balanceStoreKeys = 5;
-  repeated string claims = 6 [
-    (gogoproto.customtype) = "Uint", 
-    (gogoproto.nullable) = false
-  ];
-  repeated string claimStoreKeys = 7;
-  string nextCollectionId = 8  [
-    (gogoproto.customtype) = "Uint", 
-    (gogoproto.nullable) = false
-  ];
-  string nextClaimId = 9  [
-    (gogoproto.customtype) = "Uint", 
-    (gogoproto.nullable) = false
-  ];
+  string nextCollectionId = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated UserBalanceStore balances = 5;
+  repeated string balanceStoreKeys = 6;
+  repeated string numUsedForChallenges = 7 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated string numUsedForChallengesStoreKeys = 8;
+  repeated AddressMapping addressMappings = 9;
+  repeated ApprovalsTracker approvalsTrackers = 10;
+  repeated string approvalsTrackerStoreKeys = 11;
   // this line is used by starport scaffolding # genesis/proto/state
 }

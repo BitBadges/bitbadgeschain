@@ -46,7 +46,7 @@ func (msg *MsgTransferBadge) ValidateBasic() error {
 	}
 
 	if msg.Transfers == nil || len(msg.Transfers) == 0 {
-		return ErrInvalidLengthBalances
+		return sdkerrors.Wrapf(ErrInvalidTransfers, "transfers cannot be empty")
 	}
 
 	for _, transfer := range msg.Transfers {

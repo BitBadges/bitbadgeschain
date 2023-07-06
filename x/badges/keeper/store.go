@@ -11,17 +11,12 @@ import (
 )
 
 // The following methods are used for the badge store and everything associated with badges.
-// All permissions and checks must be handled before these functions are called.
-// This file handles:
-// - Storing badges in the store
-// - Storing balances in the store
-// - Storing transfer manager requests in the store
-// - Storing the next asset ID in the store
-// - Claims
+// All preconditions and checks must be handled before these functions are called.
+// This file handles storing collections, balances, approvals, used challenges, next collection ID, etc.
 
 // All the following CRUD operations must obey the key prefixes defined in keys.go.
 
-/****************************************BADGES****************************************/
+/****************************************COLLECTIONS****************************************/
 
 // Sets a badge in the store using BadgeKey ([]byte{0x01}) as the prefix. No check if store has key already.
 func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection *types.BadgeCollection) error {
@@ -146,9 +141,9 @@ func (k Keeper) DeleteUserBalanceFromStore(ctx sdk.Context, balanceKey string) {
 	store.Delete(userBalanceStoreKey(balanceKey))
 }
 
-/****************************************NEXT ASSET ID****************************************/
+/****************************************NEXT COLLECTION ID****************************************/
 
-// Gets the next badge ID.
+// Gets the next collection ID.
 func (k Keeper) GetNextCollectionId(ctx sdk.Context) sdkmath.Uint {
 	store := ctx.KVStore(k.storeKey)
 	nextID := types.NewUintFromString(string((store.Get(nextCollectionIdKey()))))
@@ -161,7 +156,7 @@ func (k Keeper) SetNextCollectionId(ctx sdk.Context, nextID sdkmath.Uint) {
 	store.Set(nextCollectionIdKey(), []byte(nextID.String()))
 }
 
-// Increments the next badge ID by 1.
+// Increments the next collection ID by 1.
 func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) {
 	nextID := k.GetNextCollectionId(ctx)
 	k.SetNextCollectionId(ctx, nextID.AddUint64(1)) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
@@ -184,6 +179,21 @@ func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionI
 	incrementedNum := curr.AddUint64(1)
 	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex, level)), []byte(curr.Incr().String()))
 	return incrementedNum, nil
+}
+
+func (k Keeper) GetNumUsedForChallengesFromStore(ctx sdk.Context) (numUsed []sdkmath.Uint, ids []string) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, UsedClaimChallengeKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		curr, err := strconv.ParseUint(string((iterator.Value())), 10, 64)
+		if err != nil {
+			panic("Failed to parse num used")
+		}
+		numUsed = append(numUsed, sdkmath.NewUint(curr))
+		ids = append(ids, string(iterator.Key()))
+	}
+	return
 }
 
 /****************************************ADDRESS MAPPINGS****************************************/
@@ -258,7 +268,7 @@ func (k Keeper) GetTransferTrackerFromStore(ctx sdk.Context, collectionId sdkmat
 	return transferTracker, true
 }
 
-func (k Keeper) GetTransferTrackersFromStore(ctx sdk.Context) (transferTrackers []*types.ApprovalsTracker) {
+func (k Keeper) GetTransferTrackersFromStore(ctx sdk.Context) (transferTrackers []*types.ApprovalsTracker, ids []string) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, TransferTrackerKey)
 	defer iterator.Close()
@@ -266,6 +276,8 @@ func (k Keeper) GetTransferTrackersFromStore(ctx sdk.Context) (transferTrackers 
 		var transferTracker types.ApprovalsTracker
 		k.cdc.MustUnmarshal(iterator.Value(), &transferTracker)
 		transferTrackers = append(transferTrackers, &transferTracker)
+
+		ids = append(ids, string(iterator.Key()))
 	}
 	return
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 )
 
@@ -16,7 +17,7 @@ func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.ClaimProof
 	for _, aunt := range aunts {
 		decodedAunt, err := hex.DecodeString(aunt.Aunt)
 		if err != nil {
-			return ErrDecodingHexString
+			return sdkerrors.Wrapf(ErrDecodingHexString, "error decoding aunt %s", aunt.Aunt)
 		}
 
 		if aunt.OnRight {
@@ -30,7 +31,7 @@ func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.ClaimProof
 
 	hexCurrHash := hex.EncodeToString(currHash)
 	if hexCurrHash != expectedRoot {
-		return ErrRootHashInvalid
+		return sdkerrors.Wrapf(ErrRootHashInvalid, "expected root %s, got %s", expectedRoot, hexCurrHash)
 	}
 
 	return nil

@@ -4,6 +4,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 )
 
@@ -256,12 +257,12 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 
 	approvalTrackerDetails.NumTransfers = approvalTrackerDetails.NumTransfers.Add(sdkmath.NewUint(1))
 	if approvalTrackerDetails.NumTransfers.GT(maxNumTransfers) {
-		return ErrDisallowedTransfer
+		return sdkerrors.Wrapf(ErrDisallowedTransfer, "exceeded max num transfers - %s", maxNumTransfers.String())
 	}
 
 	err = k.SetTransferTrackerInStore(ctx, collection.CollectionId, trackerId, approvalTrackerDetails, timelineType, depth, address)
 	if err != nil {
-		return ErrDisallowedTransfer
+		return err
 	}
 
 	return nil

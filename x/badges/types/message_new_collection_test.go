@@ -63,7 +63,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 				Permissions: &types.CollectionPermissions{},
 			},
 
-			err: types.ErrInvalidBadgeURI,
+			err: types.ErrInvalidURI,
 		},
 		{
 			name: "invalid Badge URI",
@@ -94,7 +94,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 				},
 				Permissions: &types.CollectionPermissions{},
 			},
-			err: types.ErrInvalidBadgeURI,
+			err: types.ErrInvalidURI,
 		},
 		{
 			name: "invalid Permissions",
@@ -104,7 +104,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 				CollectionMetadataTimeline: GetValidCollectionMetadataTimeline(),
 				BadgeMetadataTimeline: GetValidBadgeMetadataTimeline(),
 			},
-			err: types.ErrInvalidPermissionsLeadingZeroes,
+			err: types.ErrPermissionsIsNil,
 		},
 	}
 	for _, tt := range tests {

@@ -69,7 +69,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		}
 	} else {
 		if len(transfers) > 0 || len(collection.ApprovedTransfersTimeline) > 0 {
-			return &types.BadgeCollection{}, ErrOffChainBalances
+			return &types.BadgeCollection{}, ErrWrongBalancesType
 		}
 	}
 

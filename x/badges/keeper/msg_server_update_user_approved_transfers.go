@@ -19,7 +19,7 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 	}
 
 	if !IsOnChainBalances(collection) {
-		return nil, ErrOffChainBalances
+		return nil, ErrWrongBalancesType
 	}
 
 	for _, addressMapping := range msg.AddressMappings {

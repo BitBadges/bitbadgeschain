@@ -101,7 +101,7 @@ func CheckNotForbidden(ctx sdk.Context, permission *types.UniversalPermissionDet
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	found := types.SearchIdRangesForId(blockTime, permission.ForbiddenTimes)
 	if found {
-		return ErrInvalidPermissions
+		return ErrForbiddenTime
 	}
 
 	return nil

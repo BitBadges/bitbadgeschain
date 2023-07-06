@@ -25,7 +25,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgTransferBadge:
 			res, err := msgServer.TransferBadge(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgUpdateCollectionApprovedTransfers:
 			res, err := msgServer.UpdateCollectionApprovedTransfers(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)

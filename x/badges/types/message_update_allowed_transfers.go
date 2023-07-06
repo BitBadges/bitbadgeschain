@@ -50,7 +50,7 @@ func (msg *MsgUpdateCollectionApprovedTransfers) ValidateBasic() error {
 	}
 
 	if msg.CollectionId.IsNil() || msg.CollectionId.IsZero() {
-		return sdkerrors.Wrapf(ErrInvalidBadgeID, "collection id cannot be 0")
+		return sdkerrors.Wrapf(ErrInvalidCollectionID, "collection id cannot be 0")
 	}
 
 	for _, mapping := range msg.AddressMappings {

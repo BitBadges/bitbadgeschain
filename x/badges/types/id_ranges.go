@@ -140,7 +140,7 @@ func AssertRangesDoNotOverlapAtAll(rangeToCheck []*IdRange, overlappingRange []*
 			//Check that the new time completely overlaps with the old time
 			_, removed := RemoveIdsFromIdRange(newAllowedTime, oldAllowedTime)
 			if len(removed) > 0 {
-				return ErrInvalidPermissionsUpdateLocked
+				return ErrRangesOverlap
 			}
 		}
 	}

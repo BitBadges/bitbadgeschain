@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	proto "github.com/gogo/protobuf/proto"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -21,7 +22,7 @@ func GetCombosForStringTimelines(ctx sdk.Context, oldValue interface{}, newValue
 
 func (k Keeper) ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldApprovedTransfers []*types.CollectionApprovedTransferTimeline, newApprovedTransfers []*types.CollectionApprovedTransferTimeline, CanUpdateCollectionApprovedTransfers []*types.CollectionApprovedTransferPermission, managerAddress string) error {
 	if !IsOnChainBalances(collection) {
-		return ErrOffChainBalances
+		return sdkerrors.Wrapf(ErrWrongBalancesType, "collection %s does not have on-chain balances", collection.CollectionId)
 	}
 	
 	oldTimes, oldValues := types.GetCollectionApprovedTransferTimesAndValues(oldApprovedTransfers)
@@ -539,7 +540,7 @@ func (k Keeper) ValidateCollectionMetadataUpdate(ctx sdk.Context, oldCollectionM
 
 func (k Keeper) ValidateOffChainBalancesMetadataUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldOffChainBalancesMetadata []*types.OffChainBalancesMetadataTimeline, newOffChainBalancesMetadata []*types.OffChainBalancesMetadataTimeline, canUpdateOffChainBalancesMetadata []*types.TimedUpdatePermission) error {
 	if !IsOffChainBalances(collection) {
-		return ErrOffChainBalances
+		return sdkerrors.Wrapf(ErrWrongBalancesType, "off-chain balances metadata is being set but collection %s does not have off-chain balances", collection.CollectionId)
 	}
 	
 	oldTimes, oldValues := types.GetOffChainBalancesMetadataTimesAndValues(oldOffChainBalancesMetadata)
@@ -577,7 +578,7 @@ func (k Keeper) ValidateOffChainBalancesMetadataUpdate(ctx sdk.Context, collecti
 
 func (k Keeper) ValidateInheritedBalancesUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldInheritedBalances []*types.InheritedBalancesTimeline, newInheritedBalances []*types.InheritedBalancesTimeline, canUpdateInheritedBalances []*types.TimedUpdateWithBadgeIdsPermission) error {
 	if !IsInheritedBalances(collection) {
-		return ErrOffChainBalances
+		return sdkerrors.Wrapf(ErrWrongBalancesType, "inherited balances are being set but collection %s does not have inherited balances", collection.CollectionId)
 	}
 	
 	//Set collection next badge ID
