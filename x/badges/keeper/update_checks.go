@@ -9,6 +9,10 @@ import (
 	"math"
 )
 
+//See top of update_checks_helpers.go for documentations
+
+
+
 //Assumes that these parameters are obtained from GetPotentialUpdatesForTimelineValues
 func GetUpdateCombinationsToCheck(
 	ctx sdk.Context,

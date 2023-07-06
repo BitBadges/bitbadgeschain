@@ -25,7 +25,7 @@ func (k msgServer) UpdateCollectionPermissions(goCtx context.Context, msg *types
 		}
 	}
 	
-	err = k.ValidatePermissionsUpdate(ctx, collection.Permissions, msg.Permissions, true, msg.Creator)
+	err = k.ValidatePermissionsUpdate(ctx, collection.Permissions, msg.Permissions, msg.Creator)
 	if err != nil {
 		return nil, err
 	}

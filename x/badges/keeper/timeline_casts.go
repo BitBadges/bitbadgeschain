@@ -9,6 +9,9 @@ import (
 //We cast the values to a UniversalPermission struct, which is compatible with the permissions.go file in types
 //This allows us to easily check overlaps and get the correct permissions
 
+//HACK: We use the ArbitraryValue field to store the original value, so we can cast it back later
+//HACK: We cast to a UniversalPermission for reusable code.
+
 func (k Keeper) CastInheritedBalancesToUniversalPermission(inheritedBalances []*types.InheritedBalance) []*types.UniversalPermission {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, inheritedBalance := range inheritedBalances {

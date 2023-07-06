@@ -5,6 +5,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+//HACK: We cast the permissions to their UniversalPermission equivalents, so we can reuse the UniversalPermission functions
+
 func (k Keeper) CastUserApprovedIncomingTransferPermissionToUniversalPermission(ctx sdk.Context, managerAddress string, permissions []*types.UserApprovedIncomingTransferPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, permission := range permissions {
@@ -30,8 +32,6 @@ func (k Keeper) CastUserApprovedIncomingTransferPermissionToUniversalPermission(
 		if err != nil {
 			return nil, err
 		}
-
-		
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{

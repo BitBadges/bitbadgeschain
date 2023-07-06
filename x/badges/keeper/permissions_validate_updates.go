@@ -5,6 +5,15 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+//This file checks that we are able to update some permission from A to B according to the rules:
+//-First match only (subsequent matches are ignored)
+//-If we have previously defined a permitted time or forbidden time, we cannot remove or switch it. If it was previously undefined, we can set it
+//-Forbidden and permitted times cannot overlap
+//-Other permission-specific validation checks
+//-Duplicate combinations are disallowed because they are redundant
+
+//HACK: For resuable code, we cast the permissions to their UniversalPermission equivalents, so we can reuse the UniversalPermission functions
+
 func (k Keeper) ValidateBalancesActionPermissionUpdate(oldPermissions []*types.BalancesActionPermission, newPermissions []*types.BalancesActionPermission) error {
 	if err := types.ValidateBalancesActionPermission(oldPermissions); err != nil {
 		return err
@@ -48,9 +57,9 @@ func (k Keeper) ValidateTimedUpdatePermissionUpdate(oldPermissions []*types.Time
 	}
 	
 	castedNewPermissions, err := k.CastTimedUpdatePermissionToUniversalPermission(newPermissions)
-if err != nil {
-	return err 
-}
+	if err != nil {
+		return err 
+	}
 
 
 	err = types.ValidateUniversalPermissionUpdate(types.GetFirstMatchOnly(castedOldPermissions), types.GetFirstMatchOnly(castedNewPermissions))
@@ -231,7 +240,7 @@ func (k Keeper) ValidateUserPermissionsUpdate(ctx sdk.Context, oldPermissions *t
 
 
 // Validate that the new permissions are valid and is not changing anything that they can't.
-func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types.CollectionPermissions, newPermissions *types.CollectionPermissions, canBeNil bool, managerAddress string) error {
+func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types.CollectionPermissions, newPermissions *types.CollectionPermissions, managerAddress string) error {
 	if err := types.ValidatePermissions(newPermissions); err != nil {
 		return err
 	}

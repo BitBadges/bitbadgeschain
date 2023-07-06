@@ -7,7 +7,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
-//Little hack to make AllowedCOmbinations a 1-element array so we know if disallowed/allowed for ArbitraryValue
+//Little hack to make AllowedCombinations a 1-element array so we know if disallowed/allowed for ArbitraryValue
 func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionApprovedTransfer) []*types.CollectionApprovedTransfer {
 	newCurrApprovedTransfers := []*types.CollectionApprovedTransfer{}
 	for _, approvedTransfer := range approvedTransfers {

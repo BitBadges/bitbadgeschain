@@ -8,6 +8,21 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+//This file is responsible for verifying that if we go from Value A to Value B for a timeline, that the update is valid
+//So here, we check the following:
+//-Assert the collection has the correct balances type, if we are updating a balance type-specific field
+//-For all updates, check that we are able to update according to the permissions.
+// This means we have to verify that the current permissions do not forbid the update.
+//
+//To do this, we have to do the following:
+//-1) Get all the first matches for the old and new timelines
+//-2) Get the combination of values which are "updated". Note this depends on the field, so this is kept generic through a function (GetUpdateCombinationsToCheck)
+//-3) For all the values that are considered "updated", we check if we are allowed to update them, according to the permissions.
+//		To do this, we abstract all the updates to a (timelineTime, badgeIds, transferTimes, toMapping, fromMapping, initiatedByMapping) tuple, adding dummy values where needed.
+//		We then check if this tuple overlaps any of the permission's (timelineTime, badgeIds, transferTimes, toMapping, fromMapping, initiatedByMapping) tuples, again adding dummy values where needed.
+//		For all overlaps, we check that the current block time is NOT forbidden.
+//		If there are no forbidden updates, it is a valid update.
+
 //TODO: DRY and clean this file up; a lot of repeated code; also work on naming conventions
 
 func GetCombosForStringTimelines(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error) {

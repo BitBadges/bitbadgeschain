@@ -48,6 +48,8 @@ type UniversalDefaultValues struct {
 }
 
 type UniversalPermissionDetails struct {
+
+	
 	BadgeId *UintRange
 	TimelineTime *UintRange
 	TransferTime *UintRange

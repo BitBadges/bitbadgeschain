@@ -40,66 +40,83 @@ func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.Addr
 }
 
 func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string, managerAddress string) (*types.AddressMapping, error) {
+	inverted := false
+	handled := false
+	addressMapping := &types.AddressMapping{}
 	if addressMappingId[0] == '!' {
-		return nil, sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping with id %s", addressMappingId)
+		inverted = true
+		addressMappingId = addressMappingId[1:]
 	}
 	
 	if addressMappingId == "Mint" {
-		return &types.AddressMapping{
+		addressMapping = &types.AddressMapping{
 			MappingId: "Mint",
 			Addresses: []string{"Mint"},
 			OnlySpecifiedAddresses: true,
 			Uri: "",
 			CustomData: "",
-		}, nil
+		}
+		handled = true
 	}
 
 	if addressMappingId == "Manager" {
-		return &types.AddressMapping{
+		addressMapping = &types.AddressMapping{
 			MappingId: "Manager",
 			Addresses: []string{managerAddress},
 			OnlySpecifiedAddresses: true,
 			Uri: "",
 			CustomData: "",
-		}, nil
+		}
+		handled = true
 	}
 
 	if addressMappingId == "All" {
-		return &types.AddressMapping{
+		addressMapping = &types.AddressMapping{
 			MappingId: "All",
 			Addresses: []string{},
 			OnlySpecifiedAddresses: false,
 			Uri: "",
 			CustomData: "",
-		}, nil
+		}
+		handled = true
 	}
 
 	if addressMappingId == "None" {
-		return &types.AddressMapping{
+		addressMapping = &types.AddressMapping{
 			MappingId: "None",
 			Addresses: []string{},
 			OnlySpecifiedAddresses: true,
 			Uri: "",
 			CustomData: "",
-		}, nil
+		}
+		handled = true
 	}
 
 	if types.ValidateAddress(addressMappingId, false) == nil {
-		return &types.AddressMapping{
+		addressMapping = &types.AddressMapping{
 			MappingId: addressMappingId,
 			Addresses: []string{addressMappingId},
 			OnlySpecifiedAddresses: true,
 			Uri: "",
 			CustomData: "",
-		}, nil
+		}
+		handled = true
 	}
 
-	addressMapping, found := k.GetAddressMappingFromStore(ctx, addressMappingId)
-	if found {
-		return &addressMapping, nil
+	if !handled {
+		addressMappingFetched, found := k.GetAddressMappingFromStore(ctx, addressMappingId)
+		if found {
+			addressMapping = &addressMappingFetched
+		} else {
+			return nil, sdkerrors.Wrapf(ErrAddressMappingNotFound, "address mapping with id %s not found", addressMappingId)
+		}
 	}
 
-	return nil, sdkerrors.Wrapf(ErrAddressMappingNotFound, "address mapping with id %s not found", addressMappingId)
+	if inverted {
+		addressMapping.OnlySpecifiedAddresses = !addressMapping.OnlySpecifiedAddresses
+	}
+
+	return addressMapping, nil
 }
 
 func (k Keeper) CheckMappingAddresses(ctx sdk.Context, addressMappingId string, addressToCheck string, managerAddress string) (bool, error) {
