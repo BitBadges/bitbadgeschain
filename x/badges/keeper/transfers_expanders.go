@@ -77,7 +77,7 @@ func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomin
 		InitiatedByMappingId: userAddress,
 		TransferTimes: []*types.UintRange{
 			{
-				Start: sdkmath.NewUint(0),
+				Start: sdkmath.NewUint(1),
 				End: sdkmath.NewUint(uint64(math.MaxUint64)),
 			},
 		},
@@ -104,7 +104,7 @@ func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoin
 		InitiatedByMappingId: userAddress,
 		TransferTimes: []*types.UintRange{
 			{
-				Start: sdkmath.NewUint(0),
+				Start: sdkmath.NewUint(1),
 				End: sdkmath.NewUint(uint64(math.MaxUint64)),
 			},
 		},

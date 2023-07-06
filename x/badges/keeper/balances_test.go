@@ -44,7 +44,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
-					Start: sdkmath.NewUint(0),
+					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(1),
 				},
 			},
@@ -54,7 +54,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 	balances, err = types.UpdateBalance(&types.Balance{
 		BadgeIds: []*types.UintRange{
 			{
-				Start: sdkmath.NewUint(0),
+				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(1),
 			},
 		}, 
@@ -65,7 +65,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	fetchedBalances, err := types.GetBalancesForIds([]*types.UintRange{
 		{
-			Start: sdkmath.NewUint(0),
+			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(1),
 		},
 	}, GetFullUintRanges(), balances)
@@ -77,7 +77,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
-					Start: sdkmath.NewUint(0),
+					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(1),
 				},
 			},
@@ -139,7 +139,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	fetchedBalances, err = types.GetBalancesForIds([]*types.UintRange{
 		{
-			Start: sdkmath.NewUint(0),
+			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(math.MaxUint64),
 		},
 	}, GetFullUintRanges(), balances)
@@ -161,7 +161,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
-					Start: sdkmath.NewUint(0),
+					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(1),
 				},
 			},
@@ -174,11 +174,11 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			End:   sdkmath.NewUint(math.MaxUint64),
 		},
 		{
-			Start: sdkmath.NewUint(0),
+			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(2),
 		},
 		// {
-		// 	Start: sdkmath.NewUint(0),
+		// 	Start: sdkmath.NewUint(1),
 		// 	End:   sdkmath.NewUint(1),
 		// },
 	}, GetFullUintRanges(), balances)
@@ -200,7 +200,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
-					Start: sdkmath.NewUint(0),
+					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(1),
 				},
 			},
@@ -228,16 +228,16 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 				},
 			},
 		},
-		{
-			Amount: sdkmath.NewUint(10),
-			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(0),
-					End:   sdkmath.NewUint(0),
-				},
-			},
-		},
+		// {
+		// 	Amount: sdkmath.NewUint(10),
+		// 	OwnershipTimes: GetFullUintRanges(),
+		// 	BadgeIds: []*types.UintRange{
+		// 		{
+		// 			Start: sdkmath.NewUint(1),
+		// 			End:   sdkmath.NewUint(1),
+		// 		},
+		// 	},
+		// },
 	})
 
 	balances, err = types.UpdateBalance(&types.Balance{
@@ -260,16 +260,16 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 				},
 			},
 		},
-		{
-			Amount: sdkmath.NewUint(10),
-			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(0),
-					End:   sdkmath.NewUint(0),
-				},
-			},
-		},
+		// {
+		// 	Amount: sdkmath.NewUint(10),
+		// 	OwnershipTimes: GetFullUintRanges(),
+		// 	BadgeIds: []*types.UintRange{
+		// 		{
+		// 			Start: sdkmath.NewUint(1),
+		// 			End:   sdkmath.NewUint(1),
+		// 		},
+		// 	},
+		// },
 	})
 
 	balances, err = types.UpdateBalance(&types.Balance{
@@ -300,10 +300,10 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			Amount: sdkmath.NewUint(10),
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(0),
-					End:   sdkmath.NewUint(0),
-				},
+				// {
+				// 	Start: sdkmath.NewUint(1),
+				// 	End:   sdkmath.NewUint(1),
+				// },
 				{
 					Start: sdkmath.NewUint(2),
 					End:   sdkmath.NewUint(2),
