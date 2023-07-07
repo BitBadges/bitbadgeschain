@@ -20,8 +20,8 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 			msg: types.MsgUpdateUserApprovedTransfers{
 				Creator:      "invalid_address",
 				CollectionId: sdkmath.NewUint(1),
-				Permissions:  &types.UserPermissions{},
-				UpdateApprovedTransfersUserPermissions: true,
+				UserPermissions:  &types.UserPermissions{},
+				UpdateUserPermissions: true,
 			},
 			err: types.ErrInvalidAddress,
 		}, {
@@ -29,8 +29,8 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 			msg: types.MsgUpdateUserApprovedTransfers{
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
-				Permissions:  &types.UserPermissions{},
-				UpdateApprovedTransfersUserPermissions: true,
+				UserPermissions:  &types.UserPermissions{},
+				UpdateUserPermissions: true,
 			},
 		},
 		// {
@@ -38,7 +38,7 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 		// 	msg: types.MsgUpdateUserApprovedTransfers{
 		// 		Creator:      sample.AccAddress(),
 		// 		CollectionId: sdkmath.NewUint(1),
-		// 		UpdateApprovedTransfersUserPermissions: true,
+		// 		UpdateUserPermissions: true,
 		// 	},
 		// 	err: types.ErrPermissionsIsNil,
 		// },
@@ -47,8 +47,8 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 			msg: types.MsgUpdateUserApprovedTransfers{
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
-				UpdateApprovedTransfersUserPermissions: true,
-				Permissions: &types.UserPermissions{
+				UpdateUserPermissions: true,
+				UserPermissions: &types.UserPermissions{
 					CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransferPermission{
 						{
 							DefaultValues: &types.UserApprovedOutgoingTransferDefaultValues{
@@ -67,8 +67,8 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 			msg: types.MsgUpdateUserApprovedTransfers{
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
-				Permissions:  GetValidUserPermissions(),
-				UpdateApprovedTransfersUserPermissions: true,
+				UserPermissions:  GetValidUserPermissions(),
+				UpdateUserPermissions: true,
 			},
 		},
 	}

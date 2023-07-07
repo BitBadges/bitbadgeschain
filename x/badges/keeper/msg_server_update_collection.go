@@ -20,7 +20,7 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 
 		collection = &types.BadgeCollection{
 			CollectionId:                     nextCollectionId,
-			Permissions:                      &types.CollectionPermissions{},
+			CollectionPermissions:                      &types.CollectionPermissions{},
 			BalancesType:                     msg.BalancesType,
 			DefaultUserApprovedOutgoingTransfersTimeline: msg.DefaultApprovedOutgoingTransfersTimeline,
 			DefaultUserApprovedIncomingTransfersTimeline: msg.DefaultApprovedIncomingTransfersTimeline,
@@ -55,7 +55,7 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 
 	previouslyArchived := types.GetIsArchived(ctx, collection)
 	if msg.UpdateIsArchivedTimeline {
-		if err := k.ValidateIsArchivedUpdate(ctx, collection.IsArchivedTimeline, msg.IsArchivedTimeline, collection.Permissions.CanArchive); err != nil {
+		if err := k.ValidateIsArchivedUpdate(ctx, collection.IsArchivedTimeline, msg.IsArchivedTimeline, collection.CollectionPermissions.CanArchive); err != nil {
 			return nil, err
 		}
 		collection.IsArchivedTimeline = msg.IsArchivedTimeline
@@ -72,63 +72,63 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 
 
 	if msg.UpdateCollectionApprovedTransfersTimeline {
-		if err := k.ValidateCollectionApprovedTransfersUpdate(ctx, collection, collection.CollectionApprovedTransfersTimeline, msg.CollectionApprovedTransfersTimeline, collection.Permissions.CanUpdateCollectionApprovedTransfers, msg.Creator); err != nil {
+		if err := k.ValidateCollectionApprovedTransfersUpdate(ctx, collection, collection.CollectionApprovedTransfersTimeline, msg.CollectionApprovedTransfersTimeline, collection.CollectionPermissions.CanUpdateCollectionApprovedTransfers, msg.Creator); err != nil {
 			return nil, err
 		}
 		collection.CollectionApprovedTransfersTimeline = msg.CollectionApprovedTransfersTimeline
 	}
 
 	if msg.UpdateCollectionMetadataTimeline {
-		if err := k.ValidateCollectionMetadataUpdate(ctx, collection.CollectionMetadataTimeline, msg.CollectionMetadataTimeline, collection.Permissions.CanUpdateCollectionMetadata); err != nil {
+		if err := k.ValidateCollectionMetadataUpdate(ctx, collection.CollectionMetadataTimeline, msg.CollectionMetadataTimeline, collection.CollectionPermissions.CanUpdateCollectionMetadata); err != nil {
 			return nil, err
 		}
 		collection.CollectionMetadataTimeline = msg.CollectionMetadataTimeline
 	}
 
 	if msg.UpdateOffChainBalancesMetadataTimeline {
-		if err := k.ValidateOffChainBalancesMetadataUpdate(ctx, collection, collection.OffChainBalancesMetadataTimeline, msg.OffChainBalancesMetadataTimeline, collection.Permissions.CanUpdateOffChainBalancesMetadata); err != nil {
+		if err := k.ValidateOffChainBalancesMetadataUpdate(ctx, collection, collection.OffChainBalancesMetadataTimeline, msg.OffChainBalancesMetadataTimeline, collection.CollectionPermissions.CanUpdateOffChainBalancesMetadata); err != nil {
 			return nil, err
 		}
 		collection.OffChainBalancesMetadataTimeline = msg.OffChainBalancesMetadataTimeline
 	}
 
 	if msg.UpdateInheritedBalancesTimeline {
-		if err := k.ValidateInheritedBalancesUpdate(ctx, collection, collection.InheritedBalancesTimeline, msg.InheritedBalancesTimeline, collection.Permissions.CanUpdateInheritedBalances); err != nil {
+		if err := k.ValidateInheritedBalancesUpdate(ctx, collection, collection.InheritedBalancesTimeline, msg.InheritedBalancesTimeline, collection.CollectionPermissions.CanUpdateInheritedBalances); err != nil {
 			return nil, err
 		}
 		collection.InheritedBalancesTimeline = msg.InheritedBalancesTimeline
 	}
 
 	if msg.UpdateBadgeMetadataTimeline {
-		if err := k.ValidateBadgeMetadataUpdate(ctx, collection.BadgeMetadataTimeline, msg.BadgeMetadataTimeline, collection.Permissions.CanUpdateBadgeMetadata); err != nil {
+		if err := k.ValidateBadgeMetadataUpdate(ctx, collection.BadgeMetadataTimeline, msg.BadgeMetadataTimeline, collection.CollectionPermissions.CanUpdateBadgeMetadata); err != nil {
 			return nil, err
 		}
 		collection.BadgeMetadataTimeline = msg.BadgeMetadataTimeline
 	}
 
 	if msg.UpdateManagerTimeline {
-		if err := k.ValidateManagerUpdate(ctx, collection.ManagerTimeline, msg.ManagerTimeline, collection.Permissions.CanUpdateManager); err != nil {
+		if err := k.ValidateManagerUpdate(ctx, collection.ManagerTimeline, msg.ManagerTimeline, collection.CollectionPermissions.CanUpdateManager); err != nil {
 			return nil, err
 		}
 		collection.ManagerTimeline = msg.ManagerTimeline
 	}
 
 	if msg.UpdateContractAddressTimeline {
-		if err := k.ValidateContractAddressUpdate(ctx, collection.ContractAddressTimeline, msg.ContractAddressTimeline, collection.Permissions.CanUpdateContractAddress); err != nil {
+		if err := k.ValidateContractAddressUpdate(ctx, collection.ContractAddressTimeline, msg.ContractAddressTimeline, collection.CollectionPermissions.CanUpdateContractAddress); err != nil {
 			return nil, err
 		}
 		collection.ContractAddressTimeline = msg.ContractAddressTimeline
 	}
 
 	if msg.UpdateStandardsTimeline {
-		if err := k.ValidateStandardsUpdate(ctx, collection.StandardsTimeline, msg.StandardsTimeline, collection.Permissions.CanUpdateStandards); err != nil {
+		if err := k.ValidateStandardsUpdate(ctx, collection.StandardsTimeline, msg.StandardsTimeline, collection.CollectionPermissions.CanUpdateStandards); err != nil {
 			return nil, err
 		}
 		collection.StandardsTimeline = msg.StandardsTimeline
 	}
 
 	if msg.UpdateCustomDataTimeline {
-		if err := k.ValidateCustomDataUpdate(ctx, collection.CustomDataTimeline, msg.CustomDataTimeline, collection.Permissions.CanUpdateCustomData); err != nil {
+		if err := k.ValidateCustomDataUpdate(ctx, collection.CustomDataTimeline, msg.CustomDataTimeline, collection.CollectionPermissions.CanUpdateCustomData); err != nil {
 			return nil, err
 		}
 		collection.CustomDataTimeline = msg.CustomDataTimeline
@@ -140,61 +140,61 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 	}
 
 	if msg.UpdateCollectionPermissions {
-		err = k.ValidatePermissionsUpdate(ctx, collection.Permissions, msg.CollectionPermissions, msg.Creator)
+		err = k.ValidatePermissionsUpdate(ctx, collection.CollectionPermissions, msg.CollectionPermissions, msg.Creator)
 		if err != nil {
 			return nil, err
 		}
 
 		//iterate through the non-nil values
 		if msg.CollectionPermissions.CanDeleteCollection != nil {
-			collection.Permissions.CanDeleteCollection = msg.CollectionPermissions.CanDeleteCollection
+			collection.CollectionPermissions.CanDeleteCollection = msg.CollectionPermissions.CanDeleteCollection
 		}
 
 		if msg.CollectionPermissions.CanArchive != nil {
-			collection.Permissions.CanArchive = msg.CollectionPermissions.CanArchive
+			collection.CollectionPermissions.CanArchive = msg.CollectionPermissions.CanArchive
 		}
 
 		if msg.CollectionPermissions.CanUpdateContractAddress != nil {
-			collection.Permissions.CanUpdateContractAddress = msg.CollectionPermissions.CanUpdateContractAddress
+			collection.CollectionPermissions.CanUpdateContractAddress = msg.CollectionPermissions.CanUpdateContractAddress
 		}
 
 		if msg.CollectionPermissions.CanUpdateOffChainBalancesMetadata != nil {
-			collection.Permissions.CanUpdateOffChainBalancesMetadata = msg.CollectionPermissions.CanUpdateOffChainBalancesMetadata
+			collection.CollectionPermissions.CanUpdateOffChainBalancesMetadata = msg.CollectionPermissions.CanUpdateOffChainBalancesMetadata
 		}
 
 		if msg.CollectionPermissions.CanUpdateCustomData != nil {
-			collection.Permissions.CanUpdateCustomData = msg.CollectionPermissions.CanUpdateCustomData
+			collection.CollectionPermissions.CanUpdateCustomData = msg.CollectionPermissions.CanUpdateCustomData
 		}
 
 		if msg.CollectionPermissions.CanUpdateStandards != nil {
-			collection.Permissions.CanUpdateStandards = msg.CollectionPermissions.CanUpdateStandards
+			collection.CollectionPermissions.CanUpdateStandards = msg.CollectionPermissions.CanUpdateStandards
 		}
 
 		if msg.CollectionPermissions.CanUpdateManager != nil {
-			collection.Permissions.CanUpdateManager = msg.CollectionPermissions.CanUpdateManager
+			collection.CollectionPermissions.CanUpdateManager = msg.CollectionPermissions.CanUpdateManager
 		}
 
 		if msg.CollectionPermissions.CanUpdateCollectionMetadata != nil {
-			collection.Permissions.CanUpdateCollectionMetadata = msg.CollectionPermissions.CanUpdateCollectionMetadata
+			collection.CollectionPermissions.CanUpdateCollectionMetadata = msg.CollectionPermissions.CanUpdateCollectionMetadata
 		}
 
 		if msg.CollectionPermissions.CanCreateMoreBadges != nil {
-			collection.Permissions.CanCreateMoreBadges = msg.CollectionPermissions.CanCreateMoreBadges
+			collection.CollectionPermissions.CanCreateMoreBadges = msg.CollectionPermissions.CanCreateMoreBadges
 		}
 
 		if msg.CollectionPermissions.CanUpdateBadgeMetadata != nil {
-			collection.Permissions.CanUpdateBadgeMetadata = msg.CollectionPermissions.CanUpdateBadgeMetadata
+			collection.CollectionPermissions.CanUpdateBadgeMetadata = msg.CollectionPermissions.CanUpdateBadgeMetadata
 		}
 
 		if msg.CollectionPermissions.CanUpdateInheritedBalances != nil {
-			collection.Permissions.CanUpdateInheritedBalances = msg.CollectionPermissions.CanUpdateInheritedBalances
+			collection.CollectionPermissions.CanUpdateInheritedBalances = msg.CollectionPermissions.CanUpdateInheritedBalances
 		}
 
 		if msg.CollectionPermissions.CanUpdateCollectionApprovedTransfers != nil {
-			collection.Permissions.CanUpdateCollectionApprovedTransfers = msg.CollectionPermissions.CanUpdateCollectionApprovedTransfers
+			collection.CollectionPermissions.CanUpdateCollectionApprovedTransfers = msg.CollectionPermissions.CanUpdateCollectionApprovedTransfers
 		}
 
-		collection.Permissions = msg.CollectionPermissions
+		collection.CollectionPermissions = msg.CollectionPermissions
 	}
 
 	if err := k.SetCollectionInStore(ctx, collection); err != nil {

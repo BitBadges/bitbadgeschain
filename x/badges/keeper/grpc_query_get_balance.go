@@ -38,7 +38,7 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 			Balances:                          []*types.Balance{},
 			ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
 			ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,
-			Permissions:                       &types.UserPermissions{},
+			UserPermissions:                       &types.UserPermissions{},
 		}
 		return &types.QueryGetBalanceResponse{
 			Balance: blankUserBalance,

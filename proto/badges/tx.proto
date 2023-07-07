@@ -109,8 +109,8 @@ message MsgUpdateUserApprovedTransfers {
   bool updateApprovedIncomingTransfersTimeline = 5;
   repeated UserApprovedIncomingTransferTimeline approvedIncomingTransfersTimeline = 6;
   
-  bool updateApprovedTransfersUserPermissions = 7;
-  UserPermissions permissions = 8;
+  bool updateUserPermissions = 7;
+  UserPermissions userPermissions = 8;
 }
 
 message MsgUpdateUserApprovedTransfersResponse {}

@@ -203,12 +203,12 @@ func (k Keeper) ValidateUserApprovedOutgoingTransferPermissionsUpdate(ctx sdk.Co
 	return nil
 }
 
-func (k Keeper) ValidateUserPermissionsUpdate(ctx sdk.Context, oldPermissions *types.UserPermissions, newPermissions *types.UserPermissions, canBeNil bool, managerAddress string) error {
-	if err := types.ValidateUserPermissions(oldPermissions, canBeNil); err != nil {
+func (k Keeper) ValidateUserPermissionsUpdate(ctx sdk.Context, oldPermissions *types.UserPermissions, newPermissions *types.UserPermissions, managerAddress string) error {
+	if err := types.ValidateUserPermissions(oldPermissions); err != nil {
 		return err
 	}
 
-	if err := types.ValidateUserPermissions(newPermissions, canBeNil); err != nil {
+	if err := types.ValidateUserPermissions(newPermissions); err != nil {
 		return err
 	}
 

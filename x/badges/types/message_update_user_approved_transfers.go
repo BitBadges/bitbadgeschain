@@ -50,11 +50,11 @@ func (msg *MsgUpdateUserApprovedTransfers) ValidateBasic() error {
 		return err
 	}
 
-	if msg.Permissions == nil {
-		msg.Permissions = &UserPermissions{}
+	if msg.UserPermissions == nil {
+		msg.UserPermissions = &UserPermissions{}
 	}
 
-	err = ValidateUserPermissions(msg.Permissions, true)
+	err = ValidateUserPermissions(msg.UserPermissions)
 	if err != nil {
 		return err
 	}

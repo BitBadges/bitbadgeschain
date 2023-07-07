@@ -26,7 +26,7 @@ message UserBalanceStore {
   repeated Balance balances = 1;
   repeated UserApprovedOutgoingTransferTimeline approvedOutgoingTransfersTimeline = 2;
   repeated UserApprovedIncomingTransferTimeline approvedIncomingTransfersTimeline = 3;
-  UserPermissions permissions = 4;
+  UserPermissions userPermissions = 4;
 }
 
 message UserApprovedOutgoingTransferTimeline {

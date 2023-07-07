@@ -26,7 +26,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 					Balances:                          []*types.Balance{},
 					ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
 					ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,
-					Permissions: &types.UserPermissions{
+					UserPermissions: &types.UserPermissions{
 						CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransferPermission{},
 						CanUpdateApprovedIncomingTransfers: []*types.UserApprovedIncomingTransferPermission{},
 					},

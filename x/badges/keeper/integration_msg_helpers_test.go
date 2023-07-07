@@ -296,8 +296,8 @@ func UpdateUserPermissions(suite *TestSuite, ctx context.Context, msg *types.Msg
 	_, err := suite.msgServer.UpdateUserApprovedTransfers(ctx, &types.MsgUpdateUserApprovedTransfers{
 		Creator: bob,
 		CollectionId: msg.CollectionId,
-		Permissions: msg.Permissions,
-		UpdateApprovedTransfersUserPermissions: true,
+		UserPermissions: msg.Permissions,
+		UpdateUserPermissions: true,
 	})
 	return err
 }

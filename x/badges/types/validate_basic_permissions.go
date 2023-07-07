@@ -356,11 +356,7 @@ func ValidateActionPermission(permissions []*ActionPermission) error {
 	return nil
 }
 
-func ValidateUserPermissions(permissions *UserPermissions, canBeNil bool) error {
-	if !canBeNil && (permissions.CanUpdateApprovedIncomingTransfers != nil || permissions.CanUpdateApprovedOutgoingTransfers != nil) {
-		return ErrPermissionsIsNil
-	}
-
+func ValidateUserPermissions(permissions *UserPermissions) error {
 	if permissions.CanUpdateApprovedIncomingTransfers != nil {
 		if err := ValidateUserApprovedIncomingTransferPermissions(permissions.CanUpdateApprovedIncomingTransfers); err != nil {
 			return err
