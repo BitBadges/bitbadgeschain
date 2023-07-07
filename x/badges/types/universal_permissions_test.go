@@ -31,15 +31,15 @@ func TestRemoveOverlaps(t *testing.T) {
 		},
 		ToMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 		},
 		FromMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 		},
 		InitiatedByMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 		},
 	}, &types.UniversalPermissionDetails{
 		BadgeId: &types.UintRange{
@@ -56,15 +56,15 @@ func TestRemoveOverlaps(t *testing.T) {
 		},
 		ToMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 		},
 		FromMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 		},
 		InitiatedByMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 		},
 	})
 	expected :=  []*types.UniversalPermissionDetails{
@@ -83,15 +83,15 @@ func TestRemoveOverlaps(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 		{
@@ -109,15 +109,15 @@ func TestRemoveOverlaps(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 		{
@@ -135,15 +135,15 @@ func TestRemoveOverlaps(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 		{
@@ -161,15 +161,15 @@ func TestRemoveOverlaps(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 		{
@@ -187,15 +187,15 @@ func TestRemoveOverlaps(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 
@@ -214,15 +214,15 @@ func TestRemoveOverlaps(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 	}
@@ -256,9 +256,9 @@ func TestRemoveOverlaps(t *testing.T) {
 			require.Contains(t, x.InitiatedByMapping.Addresses, addr)
 		}
 
-		require.Equal(t, r.ToMapping.OnlySpecifiedAddresses, x.ToMapping.OnlySpecifiedAddresses)
-		require.Equal(t, r.FromMapping.OnlySpecifiedAddresses, x.FromMapping.OnlySpecifiedAddresses)
-		require.Equal(t, r.InitiatedByMapping.OnlySpecifiedAddresses, x.InitiatedByMapping.OnlySpecifiedAddresses)
+		require.Equal(t, r.ToMapping.IncludeAddresses, x.ToMapping.IncludeAddresses)
+		require.Equal(t, r.FromMapping.IncludeAddresses, x.FromMapping.IncludeAddresses)
+		require.Equal(t, r.InitiatedByMapping.IncludeAddresses, x.InitiatedByMapping.IncludeAddresses)
 	}
 
 	require.Equal(t, expected, remaining)
@@ -281,15 +281,15 @@ func TestRemoveAddresses(t *testing.T) {
 		},
 		ToMapping: &types.AddressMapping{
 			Addresses: []string{alice},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 		},
 		FromMapping: &types.AddressMapping{
 			Addresses: []string{alice},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 		},
 		InitiatedByMapping: &types.AddressMapping{
 			Addresses: []string{alice},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 		},
 	}, &types.UniversalPermissionDetails{
 		BadgeId: &types.UintRange{
@@ -306,15 +306,15 @@ func TestRemoveAddresses(t *testing.T) {
 		},
 		ToMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 		},
 		FromMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 		},
 		InitiatedByMapping: &types.AddressMapping{
 			Addresses: []string{alice, bob, charlie},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 		},
 	})
 	expected :=  []*types.UniversalPermissionDetails{
@@ -333,15 +333,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 		{
@@ -359,15 +359,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 		{
@@ -385,15 +385,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 		{
@@ -411,15 +411,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 		{
@@ -437,15 +437,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 
@@ -464,15 +464,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 		{
@@ -490,15 +490,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 		{
@@ -516,15 +516,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{alice, bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 		{
@@ -542,15 +542,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses: []string{bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
 				Addresses: []string{bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{
 				Addresses: []string{bob, charlie},
-				OnlySpecifiedAddresses: true,
+				IncludeAddresses: true,
 			},
 		},
 	}
@@ -586,9 +586,9 @@ func TestRemoveAddresses(t *testing.T) {
 			require.Contains(t, x.InitiatedByMapping.Addresses, addr)
 		}
 
-		require.Equal(t, r.ToMapping.OnlySpecifiedAddresses, x.ToMapping.OnlySpecifiedAddresses)
-		require.Equal(t, r.FromMapping.OnlySpecifiedAddresses, x.FromMapping.OnlySpecifiedAddresses)
-		require.Equal(t, r.InitiatedByMapping.OnlySpecifiedAddresses, x.InitiatedByMapping.OnlySpecifiedAddresses)
+		require.Equal(t, r.ToMapping.IncludeAddresses, x.ToMapping.IncludeAddresses)
+		require.Equal(t, r.FromMapping.IncludeAddresses, x.FromMapping.IncludeAddresses)
+		require.Equal(t, r.InitiatedByMapping.IncludeAddresses, x.InitiatedByMapping.IncludeAddresses)
 	}
 
 	require.Equal(t, expected, remaining)

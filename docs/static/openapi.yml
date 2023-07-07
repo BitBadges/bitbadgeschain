@@ -266,7 +266,7 @@ paths:
 
                                 This is because the "Manager" address is
                                 variable.
-                            onlySpecifiedAddresses:
+                            includeAddresses:
                               type: boolean
                         initiatedBy:
                           type: object
@@ -282,7 +282,7 @@ paths:
 
                                 This is because the "Manager" address is
                                 variable.
-                            onlySpecifiedAddresses:
+                            includeAddresses:
                               type: boolean
                         timeIntervals:
                           type: array
@@ -1177,7 +1177,7 @@ paths:
 
                                 This is because the "Manager" address is
                                 variable.
-                            onlySpecifiedAddresses:
+                            includeAddresses:
                               type: boolean
                         to:
                           type: object
@@ -1193,7 +1193,7 @@ paths:
 
                                 This is because the "Manager" address is
                                 variable.
-                            onlySpecifiedAddresses:
+                            includeAddresses:
                               type: boolean
                         initiatedBy:
                           type: object
@@ -1209,7 +1209,7 @@ paths:
 
                                 This is because the "Manager" address is
                                 variable.
-                            onlySpecifiedAddresses:
+                            includeAddresses:
                               type: boolean
                         timeIntervals:
                           type: array
@@ -48073,7 +48073,7 @@ definitions:
           replaced with the manager address.
 
           This is because the "Manager" address is variable.
-      onlySpecifiedAddresses:
+      includeAddresses:
         type: boolean
   bitbadges.bitbadgeschain.badges.ApprovedBalance:
     type: object
@@ -48437,7 +48437,7 @@ definitions:
                     automatically be replaced with the manager address.
 
                     This is because the "Manager" address is variable.
-                onlySpecifiedAddresses:
+                includeAddresses:
                   type: boolean
             to:
               type: object
@@ -48451,7 +48451,7 @@ definitions:
                     automatically be replaced with the manager address.
 
                     This is because the "Manager" address is variable.
-                onlySpecifiedAddresses:
+                includeAddresses:
                   type: boolean
             initiatedBy:
               type: object
@@ -48465,7 +48465,7 @@ definitions:
                     automatically be replaced with the manager address.
 
                     This is because the "Manager" address is variable.
-                onlySpecifiedAddresses:
+                includeAddresses:
                   type: boolean
             timeIntervals:
               type: array
@@ -48852,7 +48852,7 @@ definitions:
               be replaced with the manager address.
 
               This is because the "Manager" address is variable.
-          onlySpecifiedAddresses:
+          includeAddresses:
             type: boolean
       to:
         type: object
@@ -48866,7 +48866,7 @@ definitions:
               be replaced with the manager address.
 
               This is because the "Manager" address is variable.
-          onlySpecifiedAddresses:
+          includeAddresses:
             type: boolean
       initiatedBy:
         type: object
@@ -48880,7 +48880,7 @@ definitions:
               be replaced with the manager address.
 
               This is because the "Manager" address is variable.
-          onlySpecifiedAddresses:
+          includeAddresses:
             type: boolean
       timeIntervals:
         type: array
@@ -49286,7 +49286,7 @@ definitions:
                         automatically be replaced with the manager address.
 
                         This is because the "Manager" address is variable.
-                    onlySpecifiedAddresses:
+                    includeAddresses:
                       type: boolean
                 initiatedBy:
                   type: object
@@ -49300,7 +49300,7 @@ definitions:
                         automatically be replaced with the manager address.
 
                         This is because the "Manager" address is variable.
-                    onlySpecifiedAddresses:
+                    includeAddresses:
                       type: boolean
                 timeIntervals:
                   type: array
@@ -49768,7 +49768,7 @@ definitions:
                         automatically be replaced with the manager address.
 
                         This is because the "Manager" address is variable.
-                    onlySpecifiedAddresses:
+                    includeAddresses:
                       type: boolean
                 to:
                   type: object
@@ -49782,7 +49782,7 @@ definitions:
                         automatically be replaced with the manager address.
 
                         This is because the "Manager" address is variable.
-                    onlySpecifiedAddresses:
+                    includeAddresses:
                       type: boolean
                 initiatedBy:
                   type: object
@@ -49796,7 +49796,7 @@ definitions:
                         automatically be replaced with the manager address.
 
                         This is because the "Manager" address is variable.
-                    onlySpecifiedAddresses:
+                    includeAddresses:
                       type: boolean
                 timeIntervals:
                   type: array
@@ -50119,7 +50119,7 @@ definitions:
               be replaced with the manager address.
 
               This is because the "Manager" address is variable.
-          onlySpecifiedAddresses:
+          includeAddresses:
             type: boolean
       initiatedBy:
         type: object
@@ -50133,7 +50133,7 @@ definitions:
               be replaced with the manager address.
 
               This is because the "Manager" address is variable.
-          onlySpecifiedAddresses:
+          includeAddresses:
             type: boolean
       timeIntervals:
         type: array
@@ -50312,7 +50312,7 @@ definitions:
                     automatically be replaced with the manager address.
 
                     This is because the "Manager" address is variable.
-                onlySpecifiedAddresses:
+                includeAddresses:
                   type: boolean
             initiatedBy:
               type: object
@@ -50326,7 +50326,7 @@ definitions:
                     automatically be replaced with the manager address.
 
                     This is because the "Manager" address is variable.
-                onlySpecifiedAddresses:
+                includeAddresses:
                   type: boolean
             timeIntervals:
               type: array

@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -48,17 +49,26 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		totalSupplys = &types.UserBalanceStore{} //permissions and timelines do not matter because these are special addresses
 	}
 
+	allBadgeIds := []*types.UintRange{}
+	for _, balance := range totalSupplys.Balances {
+		allBadgeIds = append(allBadgeIds, balance.BadgeIds...)
+	}
+
+	for _, balance := range badgesToCreate {
+		allBadgeIds = append(allBadgeIds, balance.BadgeIds...)
+	}
+
+
+	allBadgeIds = types.SortAndMergeOverlapping(allBadgeIds)
+	if len(allBadgeIds) > 1 || (len(allBadgeIds) == 1 && !allBadgeIds[0].Start.Equal(sdkmath.NewUint(1))) {
+		return &types.BadgeCollection{}, sdkerrors.Wrapf(types.ErrNotSupported, "BadgeIds must be sequential starting from 1")
+	}
+
+
 	//Create the badges and add newly created balances to unminted supplys
 	for _, balance := range badgesToCreate {
 		if balance.Amount.IsZero() {
 			return &types.BadgeCollection{}, ErrSupplyEqualsZero
-		}
-
-		//Update nextBadgeId to be max badgeId + 1
-		for _, badgeIdRange := range balance.BadgeIds {
-			if badgeIdRange.End.GTE(collection.NextBadgeId) {
-				collection.NextBadgeId = badgeIdRange.End.Add(sdkmath.NewUint(1))
-			}
 		}
 
 		totalSupplys.Balances, err = types.AddBalance(totalSupplys.Balances, balance)

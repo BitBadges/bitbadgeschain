@@ -3,8 +3,6 @@ package simulation
 import (
 	"math/rand"
 
-	sdkmath "cosmossdk.io/math"
-
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -20,23 +18,30 @@ func SimulateMsgNewCollection(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		randomSubassets := []*types.Balance{}
-		for i := 0; i < r.Intn(10); i++ {
-			start := sdkmath.NewUint(r.Uint64())
-			randomSubassets = append(randomSubassets, &types.Balance{
-				Amount: sdkmath.NewUint(r.Uint64()),
-				BadgeIds: []*types.UintRange{
-					{
-						Start: start,
-						End:   start.Add(sdkmath.NewUint(r.Uint64())),
-					},
-				},
-			})
-		}
 
 		msg := &types.MsgNewCollection{
 			Creator:            simAccount.Address.String(),
-			BadgesToCreate:     randomSubassets,
+			BadgesToCreate:     GetRandomBalances(r, 3),
+			Transfers:          GetRandomTransfers(r, 3, accs),
+			CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
+				{
+					ApprovedTransfers: []*types.CollectionApprovedTransfer{
+						{
+							FromMappingId: GetRandomAddresses(r, 1, accs)[0],
+							ToMappingId:   GetRandomAddresses(r, 1, accs)[0],
+							InitiatedByMappingId: GetRandomAddresses(r, 1, accs)[0],
+							TransferTimes: GetTimelineTimes(r, 100),
+							BadgeIds: GetTimelineTimes(r, 3),
+							AllowedCombinations: []*types.IsCollectionTransferAllowed{
+								{
+									IsAllowed: r.Int63n(2) == 0,
+								},
+							},
+						},
+					},
+					TimelineTimes: 	 GetTimelineTimes(r, 100),
+				},
+			},
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

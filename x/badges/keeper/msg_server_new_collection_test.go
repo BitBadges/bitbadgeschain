@@ -18,14 +18,14 @@ func (suite *TestSuite) TestNewCollection() {
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
-	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
 	// Verify nextId increments correctly
 	nextId := suite.app.BadgesKeeper.GetNextCollectionId(suite.ctx)
 	AssertUintsEqual(suite, sdkmath.NewUint(2), nextId)
 
 	// Verify badge details are correct
-	AssertUintsEqual(suite, sdkmath.NewUint(1), collection.NextBadgeId)
+	// AssertUintsEqual(suite, sdkmath.NewUint(1), collection.NextBadgeId)
 }
 
 func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {

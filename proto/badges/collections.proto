@@ -29,52 +29,49 @@ message BadgeCollection {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
   // The collection metadata is the metadata for the collection itself.
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 3;
+  repeated CollectionMetadataTimeline collectionMetadataTimeline = 2;
   // The badge metadata is the metadata for each badge in the collection.
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 4;
+  repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
   
   // The balancesType is the type of balances this collection uses (standard, off-chain, or inherited).
-  string balancesType = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string balancesType = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // The off-chain balances metadata defines where to fetch the balances for collections with off-chain balances.
-  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 6;
+  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 5;
   // The inherited balances metadata defines the parent balances for collections with inherited balances.
-  repeated InheritedBalancesTimeline inheritedBalancesTimeline = 7;
+  repeated InheritedBalancesTimeline inheritedBalancesTimeline = 6;
 
   // The custom data field is an arbitrary field that can be used to store any data.
-  repeated CustomDataTimeline customDataTimeline = 8;
+  repeated CustomDataTimeline customDataTimeline = 7;
   // The manager is the address of the manager of this collection.
-  repeated ManagerTimeline managerTimeline = 9;
+  repeated ManagerTimeline managerTimeline = 8;
   
   // The permissions define what the manager of the collection can do or not do.
-  CollectionPermissions permissions = 10;
+  CollectionPermissions permissions = 9;
   
   // The approved transfers timeline defines the transferability of the collection for collections with standard balances.
   // This defines it on a collection-level. All transfers must be explicitly allowed on the collection-level, or else, they will fail.
   // 
   // Collection approved transfers can optionally specify to override the user approvals for a transfer (e.g. forcefully revoke a badge).
   // If user approvals are not overriden, then a transfer must also satisfy the From user's approved outgoing transfers and the To user's approved incoming transfers.
-  repeated CollectionApprovedTransferTimeline collectionApprovedTransfersTimeline = 11;
-
-  // The nextBadgeId is the next badgeId to be minted. A collection will always have (nextBadgeId - 1) badges created. 
-  string nextBadgeId = 12 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated CollectionApprovedTransferTimeline collectionApprovedTransfersTimeline = 10;
   
   // Standards allow us to define a standard for the collection. This lets others know how to interpret the fields of the collection.
-  repeated StandardsTimeline standardsTimeline = 13;
+  repeated StandardsTimeline standardsTimeline = 11;
 
   // The isArchivedTimeline defines whether the collection is archived or not. 
   // When a collection is archived, it is read-only and no transactions can be processed.
-  repeated IsArchivedTimeline isArchivedTimeline = 14;
+  repeated IsArchivedTimeline isArchivedTimeline = 12;
 
   // The contractAddressTimeline defines the contract address for the collection (if it has a corresponding contract).
-  repeated ContractAddressTimeline contractAddressTimeline = 15;
+  repeated ContractAddressTimeline contractAddressTimeline = 13;
 
   // The defaultUserApprovedOutgoingTransfersTimeline defines the default user approved outgoing transfers for an uninitialized user balance. 
   // The user can change this value at any time.
-  repeated UserApprovedOutgoingTransferTimeline defaultUserApprovedOutgoingTransfersTimeline = 16;
+  repeated UserApprovedOutgoingTransferTimeline defaultUserApprovedOutgoingTransfersTimeline = 14;
 
   // The defaultUserApprovedIncomingTransfersTimeline defines the default user approved incoming transfers for an uninitialized user balance.
   // The user can change this value at any time.
   //
   // Ex: Set this to disallow all incoming transfers by default, making the user have to opt-in to receiving the badge.
-  repeated UserApprovedIncomingTransferTimeline defaultUserApprovedIncomingTransfersTimeline = 17;
+  repeated UserApprovedIncomingTransferTimeline defaultUserApprovedIncomingTransfersTimeline = 15;
 }

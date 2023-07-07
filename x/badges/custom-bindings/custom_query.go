@@ -11,8 +11,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-//TODO: Add all queries here
-
 func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier {
 	return func(ctx sdk.Context, request json.RawMessage) ([]byte, error) {
 		var custom badgeCustomQuery

@@ -12,7 +12,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 )
 
-func SimulateMsgMintAndDistributeBadges(
+func SimulateMsgUpdateMetadata(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	k keeper.Keeper,
@@ -20,13 +20,9 @@ func SimulateMsgMintAndDistributeBadges(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		
-		msg := &types.MsgMintAndDistributeBadges{
-			Creator:        simAccount.Address.String(),
-			CollectionId:   sdkmath.NewUint(r.Uint64()),
-			BadgesToCreate: GetRandomBalances(r, 3),
-			Transfers: 			GetRandomTransfers(r, 3, accs),
-			//TODO: timelines
+		msg := &types.MsgUpdateMetadata{
+			Creator:      simAccount.Address.String(),
+			CollectionId: sdkmath.NewUint(uint64(r.Int63n(100))),
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

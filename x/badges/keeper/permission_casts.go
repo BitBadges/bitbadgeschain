@@ -242,7 +242,7 @@ func (k Keeper) CastBalancesActionPermissionToUniversalPermission(BalancesAction
 		for _, BalancesActionCombination := range BalancesActionPermission.Combinations {
 			castedCombinations = append(castedCombinations, &types.UniversalCombination{
 				BadgeIdsOptions: BalancesActionCombination.BadgeIdsOptions,
-				TransferTimesOptions: BalancesActionCombination.TransferTimesOptions,
+				TransferTimesOptions: BalancesActionCombination.OwnershipTimesOptions, //we just use transferTimes for ownershipTimes
 				PermittedTimesOptions: BalancesActionCombination.PermittedTimesOptions,
 				ForbiddenTimesOptions: BalancesActionCombination.ForbiddenTimesOptions,
 			})

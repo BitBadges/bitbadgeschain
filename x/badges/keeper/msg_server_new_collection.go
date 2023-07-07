@@ -37,7 +37,6 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		CustomDataTimeline:         msg.CustomDataTimeline,
 		ContractAddressTimeline:    msg.ContractAddressTimeline,
 		StandardsTimeline:          msg.StandardsTimeline,
-		NextBadgeId:        sdkmath.NewUint(1),
 		BalancesType:       msg.BalancesType,
 		IsArchivedTimeline: []*types.IsArchivedTimeline{
 			{

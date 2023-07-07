@@ -76,9 +76,9 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 					BadgeId: currRange,
 					TimelineTime: currTime,
 					TransferTime: &UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
-					ToMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
-					FromMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
-					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
+					ToMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
+					FromMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
+					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
 					ArbitraryValue: balanceObj.Amount,
 				})
 			}
@@ -92,9 +92,9 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 					BadgeId: rangeToFetch,
 					TimelineTime: timeToFetch,
 					TransferTime: &UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
-					ToMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
-					FromMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
-					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
+					ToMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
+					FromMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
+					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
 				},
 			)
 		}
@@ -184,9 +184,9 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 					BadgeId: currRange,
 					TimelineTime: currTime,
 					TransferTime: &UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
-					ToMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
-					FromMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
-					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
+					ToMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
+					FromMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
+					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
 				})
 			}
 		}
@@ -198,9 +198,9 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 						BadgeId: rangeToDelete,
 						TimelineTime: timeToDelete,
 						TransferTime: &UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
-						ToMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
-						FromMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
-						InitiatedByMapping: &AddressMapping{ Addresses: []string{}, OnlySpecifiedAddresses: false },
+						ToMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
+						FromMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
+						InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
 					},
 				)
 			}

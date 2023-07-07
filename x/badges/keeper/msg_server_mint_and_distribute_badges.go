@@ -71,7 +71,5 @@ func (k msgServer) MintAndDistributeBadges(goCtx context.Context, msg *types.Msg
 		),
 	)
 
-	return &types.MsgMintAndDistributeBadgesResponse{
-		NextBadgeId: collection.NextBadgeId,
-	}, nil
+	return &types.MsgMintAndDistributeBadgesResponse{}, nil
 }

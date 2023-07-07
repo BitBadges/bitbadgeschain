@@ -52,7 +52,7 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string, 
 		addressMapping = &types.AddressMapping{
 			MappingId: "Mint",
 			Addresses: []string{"Mint"},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 			Uri: "",
 			CustomData: "",
 		}
@@ -63,7 +63,7 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string, 
 		addressMapping = &types.AddressMapping{
 			MappingId: "Manager",
 			Addresses: []string{managerAddress},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 			Uri: "",
 			CustomData: "",
 		}
@@ -74,7 +74,7 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string, 
 		addressMapping = &types.AddressMapping{
 			MappingId: "All",
 			Addresses: []string{"Mint"},
-			OnlySpecifiedAddresses: false,
+			IncludeAddresses: false,
 			Uri: "",
 			CustomData: "",
 		}
@@ -85,7 +85,7 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string, 
 		addressMapping = &types.AddressMapping{
 			MappingId: "None",
 			Addresses: []string{},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 			Uri: "",
 			CustomData: "",
 		}
@@ -96,7 +96,7 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string, 
 		addressMapping = &types.AddressMapping{
 			MappingId: addressMappingId,
 			Addresses: []string{addressMappingId},
-			OnlySpecifiedAddresses: true,
+			IncludeAddresses: true,
 			Uri: "",
 			CustomData: "",
 		}
@@ -113,7 +113,7 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string, 
 	}
 
 	if inverted {
-		addressMapping.OnlySpecifiedAddresses = !addressMapping.OnlySpecifiedAddresses
+		addressMapping.IncludeAddresses = !addressMapping.IncludeAddresses
 	}
 
 	return addressMapping, nil
@@ -132,7 +132,7 @@ func (k Keeper) CheckMappingAddresses(ctx sdk.Context, addressMappingId string, 
 		}
 	}
 
-	if !addressMapping.OnlySpecifiedAddresses {
+	if !addressMapping.IncludeAddresses {
 		found = !found
 	}
 
@@ -146,8 +146,8 @@ func (k Keeper) CheckMappingAddresses(ctx sdk.Context, addressMappingId string, 
 
 
 // Checks if the addresses are in their respective mapping.
-// If onlySpecifiedAddresses is true, then we check if the address is in the Addresses field.
-// If onlySpecifiedAddresses is false, then we check if the address is NOT in the Addresses field.
+// If includeAddresses is true, then we check if the address is in the Addresses field.
+// If includeAddresses is false, then we check if the address is NOT in the Addresses field.
 
 // Note addresses matching does not mean the transfer is allowed. It just means the addresses match.
 // All other criteria must also be met.

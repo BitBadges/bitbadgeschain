@@ -1,43 +1,44 @@
 package simulation
 
-// import (
-// sdkmath "cosmossdk.io/math"
-// 	"math/rand"
+import (
+	"math/rand"
 
-// 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-// 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-// 	"github.com/cosmos/cosmos-sdk/baseapp"
-// 	sdk "github.com/cosmos/cosmos-sdk/types"
-// 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-// )
+	sdkmath "cosmossdk.io/math"
 
-// func SimulateMsgUpdateCollectionApprovedTransfers(
-// 	ak types.AccountKeeper,
-// 	bk types.BankKeeper,
-// 	k keeper.Keeper,
-// ) simtypes.Operation {
-// 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
-// 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-// 		simAccount, _ := simtypes.RandomAcc(r, accs)
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"github.com/cosmos/cosmos-sdk/baseapp"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+)
 
-// 		msg := &types.MsgUpdateCollectionApprovedTransfers{
-// 			Creator:      simAccount.Address.String(),
-// 			CollectionId: sdkmath.NewUint(r.Uint64()),
-// 			ApprovedTransfers: []*types.CollectionApprovedTransfer{
-// 				{
-// 					From: &types.AddressMapping{
-// 						Addresses: []string{
-// 							simAccount.Address.String(),
-// 							simAccount.Address.String(),
-// 							simAccount.Address.String(),
-// 						},
-// 						OnlySpecifiedAddresses: sdkmath.NewUint(r.Uint64()).Mod(sdkmath.NewUint(2)).IsZero(),
-// 						ManagerOptions:       sdkmath.NewUint(r.Uint64()),
-// 					},
-// 				},
-// 			},
-// 		}
+func SimulateMsgUpdateCollectionApprovedTransfers(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
+	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
+	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
+		simAccount, _ := simtypes.RandomAcc(r, accs)
 
-// 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
-// 	}
-// }
+		msg := &types.MsgUpdateCollectionApprovedTransfers{
+			Creator:      simAccount.Address.String(),
+			CollectionId: sdkmath.NewUint(uint64(r.Int63n(100))),
+			// CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
+			// 	{
+			// 		From: &types.AddressMapping{
+			// 			Addresses: []string{
+			// 				simAccount.Address.String(),
+			// 				simAccount.Address.String(),
+			// 				simAccount.Address.String(),
+			// 			},
+			// 			IncludeAddresses: sdkmath.NewUint(r.Uint64()).Mod(sdkmath.NewUint(2)).IsZero(),
+			// 			ManagerOptions:       sdkmath.NewUint(r.Uint64()),
+			// 		},
+			// 	},
+			// },
+		}
+
+		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
+	}
+}

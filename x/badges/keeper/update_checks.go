@@ -203,15 +203,15 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 		}
 
 		if detailToCheck.ToMapping == nil {
-			detailToCheck.ToMapping = &types.AddressMapping{Addresses: []string{}, OnlySpecifiedAddresses: false}
+			detailToCheck.ToMapping = &types.AddressMapping{Addresses: []string{}, IncludeAddresses: false}
 		}
 
 		if detailToCheck.FromMapping == nil {
-			detailToCheck.FromMapping = &types.AddressMapping{Addresses: []string{}, OnlySpecifiedAddresses: false}
+			detailToCheck.FromMapping = &types.AddressMapping{Addresses: []string{}, IncludeAddresses: false}
 		}
 
 		if detailToCheck.InitiatedByMapping == nil {
-			detailToCheck.InitiatedByMapping = &types.AddressMapping{Addresses: []string{}, OnlySpecifiedAddresses: false}
+			detailToCheck.InitiatedByMapping = &types.AddressMapping{Addresses: []string{}, IncludeAddresses: false}
 		}
 	}
 	

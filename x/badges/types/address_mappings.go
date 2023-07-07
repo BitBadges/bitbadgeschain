@@ -3,8 +3,8 @@ package types
 
 
 func RemoveAddressMappingFromAddressMapping(mappingToRemove *AddressMapping, addressMapping *AddressMapping) (*AddressMapping, *AddressMapping) {
-	//Each address mapping has a list of addresses and a boolean onlySpecifiedAddresses.
-	//Four cases (toRemove.OnlySpecifiedAddresses, addressMapping.OnlySpecifiedAddresses):
+	//Each address mapping has a list of addresses and a boolean includeAddresses.
+	//Four cases (toRemove.IncludeAddresses, addressMapping.IncludeAddresses):
 	// 1) (true, true) - Remove ABC from BCD
 	//    Removed - duplicates from toRemove.Addresses and addressMapping.Addresses (BC)
 	//    Remaining - non-duplicates from addressMapping.Addresses (D)
@@ -59,37 +59,37 @@ func RemoveAddressMappingFromAddressMapping(mappingToRemove *AddressMapping, add
 	remaining := &AddressMapping{}
 
 	
-	if mappingToRemove.OnlySpecifiedAddresses && addressMapping.OnlySpecifiedAddresses {
+	if mappingToRemove.IncludeAddresses && addressMapping.IncludeAddresses {
 		//Case 1
-		removed.OnlySpecifiedAddresses = true
+		removed.IncludeAddresses = true
 		removed.Addresses = duplicates
 
-		remaining.OnlySpecifiedAddresses = true
+		remaining.IncludeAddresses = true
 		remaining.Addresses = inMappingButNotToRemove
-	} else if !mappingToRemove.OnlySpecifiedAddresses && addressMapping.OnlySpecifiedAddresses {
+	} else if !mappingToRemove.IncludeAddresses && addressMapping.IncludeAddresses {
 		//Case 2
-		removed.OnlySpecifiedAddresses = true
+		removed.IncludeAddresses = true
 		removed.Addresses = inMappingButNotToRemove
 
-		remaining.OnlySpecifiedAddresses = true
+		remaining.IncludeAddresses = true
 		remaining.Addresses = duplicates
-	} else if mappingToRemove.OnlySpecifiedAddresses && !addressMapping.OnlySpecifiedAddresses {
+	} else if mappingToRemove.IncludeAddresses && !addressMapping.IncludeAddresses {
 		//Case 3
-		removed.OnlySpecifiedAddresses = true
+		removed.IncludeAddresses = true
 		removed.Addresses = inToRemoveButNotMapping
 
-		remaining.OnlySpecifiedAddresses = false
+		remaining.IncludeAddresses = false
 		remaining.Addresses = append(remaining.Addresses, inMappingButNotToRemove...)
 		remaining.Addresses = append(remaining.Addresses, inToRemoveButNotMapping...)
 		remaining.Addresses = append(remaining.Addresses, duplicates...)
-	} else if !mappingToRemove.OnlySpecifiedAddresses && !addressMapping.OnlySpecifiedAddresses {
+	} else if !mappingToRemove.IncludeAddresses && !addressMapping.IncludeAddresses {
 		//Case 4
-		removed.OnlySpecifiedAddresses = false
+		removed.IncludeAddresses = false
 		removed.Addresses = append(removed.Addresses, inMappingButNotToRemove...)
 		removed.Addresses = append(removed.Addresses, inToRemoveButNotMapping...)
 		removed.Addresses = append(removed.Addresses, duplicates...)
 
-		remaining.OnlySpecifiedAddresses = true
+		remaining.IncludeAddresses = true
 		remaining.Addresses = inToRemoveButNotMapping
 	}
 

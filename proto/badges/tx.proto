@@ -101,12 +101,7 @@ message MsgMintAndDistributeBadges {
   repeated AddressMapping addressMappings = 10;
 }
 
-message MsgMintAndDistributeBadgesResponse {
-    string nextBadgeId = 1  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-    ]; //ID of next badgeId after creating all badges.
-}
+message MsgMintAndDistributeBadgesResponse {}
 
 //For each amount, for each toAddress, we will attempt to transfer all the badgeIds for the badge with ID badgeId.
 message MsgTransferBadge {

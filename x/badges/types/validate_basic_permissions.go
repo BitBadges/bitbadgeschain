@@ -276,7 +276,7 @@ func ValidateBalancesActionPermission(permissions []*BalancesActionPermission) e
 				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
 				combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
 				combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions &&
-				combination.TransferTimesOptions == combination2.TransferTimesOptions {
+				combination.OwnershipTimesOptions == combination2.OwnershipTimesOptions {
 					return ErrInvalidCombinations
 				}
 			}

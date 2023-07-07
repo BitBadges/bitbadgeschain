@@ -3,6 +3,7 @@ package simulation
 import (
 	"math/rand"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -20,10 +21,15 @@ func SimulateMsgArchiveCollection(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgArchiveCollection{
 			Creator: simAccount.Address.String(),
+			CollectionId: sdkmath.NewUint(uint64(r.Int63n(100))),
+			IsArchivedTimeline: []*types.IsArchivedTimeline{
+				{
+					IsArchived: r.Int63n(2) == 0,
+					TimelineTimes: GetTimelineTimes(r, 3),
+				},
+			},	
 		}
 
-		// TODO: Handling the ArchiveCollection simulation
-
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "ArchiveCollection simulation not implemented"), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
 	}
 }

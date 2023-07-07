@@ -119,7 +119,7 @@ func UniversalRemoveOverlapFromValues(handled *UniversalPermissionDetails, value
 }
 
 func IsAddressMappingEmpty(mapping *AddressMapping) bool {
-	return len(mapping.Addresses) == 0 && mapping.OnlySpecifiedAddresses
+	return len(mapping.Addresses) == 0 && mapping.IncludeAddresses
 }
 
 func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
@@ -279,7 +279,7 @@ func GetUintRangesWithOptions(ranges []*UintRange, options *ValueOptions, uses b
 
 func GetMappingWithOptions(mapping *AddressMapping, options *ValueOptions, uses bool) *AddressMapping {
 	if !uses {
-		mapping = &AddressMapping{Addresses: []string{}, OnlySpecifiedAddresses: false} //All addresses
+		mapping = &AddressMapping{Addresses: []string{}, IncludeAddresses: false} //All addresses
 	}
 	
 	if options == nil {
@@ -287,15 +287,15 @@ func GetMappingWithOptions(mapping *AddressMapping, options *ValueOptions, uses 
 	}
 
 	if options.AllValues {
-		mapping = &AddressMapping{Addresses: []string{}, OnlySpecifiedAddresses: false} //All addresses
+		mapping = &AddressMapping{Addresses: []string{}, IncludeAddresses: false} //All addresses
 	}
 
 	if options.InvertDefault {
-		mapping = &AddressMapping{Addresses: mapping.Addresses, OnlySpecifiedAddresses: !mapping.OnlySpecifiedAddresses} //Invert
+		mapping = &AddressMapping{Addresses: mapping.Addresses, IncludeAddresses: !mapping.IncludeAddresses} //Invert
 	}
 
 	if options.NoValues {
-		mapping = &AddressMapping{Addresses: []string{}, OnlySpecifiedAddresses: true} //No addresses
+		mapping = &AddressMapping{Addresses: []string{}, IncludeAddresses: true} //No addresses
 	}
 
 	return mapping
@@ -371,7 +371,7 @@ func GetPermissionString(permission *UniversalPermissionDetails) string {
 
 	if permission.ToMapping != nil {
 		str += "toMapping: "
-		if !permission.ToMapping.OnlySpecifiedAddresses {
+		if !permission.ToMapping.IncludeAddresses {
 			str += fmt.Sprint(len(permission.ToMapping.Addresses)) + " addresses "
 		} else {
 			str += "all except " + fmt.Sprint(len(permission.ToMapping.Addresses)) + " addresses "
@@ -390,7 +390,7 @@ func GetPermissionString(permission *UniversalPermissionDetails) string {
 
 	if permission.FromMapping != nil {
 		str += "fromMapping: "
-		if !permission.FromMapping.OnlySpecifiedAddresses {
+		if !permission.FromMapping.IncludeAddresses {
 			str += fmt.Sprint(len(permission.FromMapping.Addresses)) + " addresses "
 		} else {
 			str += "all except " + fmt.Sprint(len(permission.FromMapping.Addresses)) + " addresses "
@@ -407,7 +407,7 @@ func GetPermissionString(permission *UniversalPermissionDetails) string {
 
 	if permission.InitiatedByMapping != nil {
 		str += "initiatedByMapping: "
-		if !permission.InitiatedByMapping.OnlySpecifiedAddresses {
+		if !permission.InitiatedByMapping.IncludeAddresses {
 			str += fmt.Sprint(len(permission.InitiatedByMapping.Addresses)) + " addresses "
 		} else {
 			str += "all except " + fmt.Sprint(len(permission.InitiatedByMapping.Addresses)) + " addresses "

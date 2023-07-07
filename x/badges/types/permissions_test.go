@@ -2080,21 +2080,21 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate3(t *testing.T) {
 	err := keeper.CreateAddressMapping(ctx, &types.AddressMapping{
 		MappingId: "ABC",
 		Addresses: []string{bob, alice, charlie},
-		OnlySpecifiedAddresses: true,
+		IncludeAddresses: true,
 	})
 	require.NoError(t, err)
 
 	err = keeper.CreateAddressMapping(ctx, &types.AddressMapping{
 		MappingId: "Alice",
 		Addresses: []string{alice},
-		OnlySpecifiedAddresses: true,
+		IncludeAddresses: true,
 	})
 	require.NoError(t, err)
 
 	err = keeper.CreateAddressMapping(ctx, &types.AddressMapping{
 		MappingId: "BobCharlie",
 		Addresses: []string{bob, charlie},
-		OnlySpecifiedAddresses: true,
+		IncludeAddresses: true,
 	})
 	require.NoError(t, err)
 
@@ -2197,21 +2197,21 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate4Invalid(t *testing.
 	err := keeper.CreateAddressMapping(ctx, &types.AddressMapping{
 		MappingId: "ABC",
 		Addresses: []string{bob, alice, charlie},
-		OnlySpecifiedAddresses: true,
+		IncludeAddresses: true,
 	})
 	require.NoError(t, err)
 
 	err = keeper.CreateAddressMapping(ctx, &types.AddressMapping{
 		MappingId: "Alice",
 		Addresses: []string{alice},
-		OnlySpecifiedAddresses: true,
+		IncludeAddresses: true,
 	})
 	require.NoError(t, err)
 
 	err = keeper.CreateAddressMapping(ctx, &types.AddressMapping{
 		MappingId: "BobCharlie",
 		Addresses: []string{bob, charlie},
-		OnlySpecifiedAddresses: true,
+		IncludeAddresses: true,
 	})
 	require.NoError(t, err)
 	

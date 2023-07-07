@@ -2,6 +2,7 @@ package keeper
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	proto "github.com/gogo/protobuf/proto"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -138,16 +139,12 @@ func (k Keeper) ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, colle
 
 					if proto.MarshalTextString(newVal.PerAddressApprovals) != proto.MarshalTextString(oldVal.PerAddressApprovals) {
 						different = true
-					
 					}
 
 					if proto.MarshalTextString(newVal.OverallApprovals) != proto.MarshalTextString(oldVal.OverallApprovals) {
-						different = true
-					
+						different = true	
 					}
 				}
-				
-				
 			}
 				
 			if different {
@@ -510,18 +507,25 @@ func (k Keeper) ValidateInheritedBalancesUpdate(ctx sdk.Context, collection *typ
 		}
 		return nil
 	}
+
+
+	//TODO: Should we actually have them mint / create badges to "Mint" and "Total" and then assert inherited balances doesn't exceed minted?
+	//			Would be weird with amounts bc they would be overidden by inherited amounts
+	//			But then, we could always 
 	
-	//Set collection next badge ID
+	//Enforce that badge IDs are sequential starting from 1
 	for _, timelineVal := range newInheritedBalances {
+		allBadgeIds := []*types.UintRange{}
 		for _, inheritedBalance := range timelineVal.InheritedBalances {
-			for _, badgeId := range inheritedBalance.BadgeIds {
-				if badgeId.End.GT(collection.NextBadgeId) {
-					collection.NextBadgeId = badgeId.End
-				}
-			}
+			allBadgeIds = append(allBadgeIds, inheritedBalance.BadgeIds...)
+		}
+
+		allBadgeIds = types.SortAndMergeOverlapping(allBadgeIds)
+		if len(allBadgeIds) > 1 || (len(allBadgeIds) == 1 && !allBadgeIds[0].Start.Equal(sdkmath.NewUint(1))) {
+			return sdkerrors.Wrapf(types.ErrNotSupported, "BadgeIds must be sequential starting from 1")
 		}
 	}
-	
+
 	oldTimes, oldValues := types.GetInheritedBalancesTimesAndValues(oldInheritedBalances)
 	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
 

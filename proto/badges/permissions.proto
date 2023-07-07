@@ -184,7 +184,7 @@ message UserApprovedIncomingTransferPermission {
 
 message BalancesActionCombination {
   ValueOptions badgeIdsOptions = 1;
-  ValueOptions transferTimesOptions = 2;
+  ValueOptions ownershipTimesOptions = 2;
 
   ValueOptions permittedTimesOptions = 3;
   ValueOptions forbiddenTimesOptions = 4;

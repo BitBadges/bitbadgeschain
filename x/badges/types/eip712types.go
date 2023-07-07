@@ -119,7 +119,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 
 	// addressesTypes := []apitypes.Type{
 	// 	{Name: "addresses", Type: "string[]"},
-	// 	{Name: "onlySpecifiedAddresses", Type: "bool"},
+	// 	{Name: "includeAddresses", Type: "bool"},
 	// }
 
 	// uintRangeTypes := []apitypes.Type{
