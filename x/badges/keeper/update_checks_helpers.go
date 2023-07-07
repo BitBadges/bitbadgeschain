@@ -509,10 +509,6 @@ func (k Keeper) ValidateInheritedBalancesUpdate(ctx sdk.Context, collection *typ
 	}
 
 
-	//TODO: Should we actually have them mint / create badges to "Mint" and "Total" and then assert inherited balances doesn't exceed minted?
-	//			Would be weird with amounts bc they would be overidden by inherited amounts
-	//			But then, we could always 
-	
 	//Enforce that badge IDs are sequential starting from 1
 	for _, timelineVal := range newInheritedBalances {
 		allBadgeIds := []*types.UintRange{}

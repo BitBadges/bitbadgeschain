@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"math"
+
 	sdkmath "cosmossdk.io/math"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -212,4 +214,42 @@ func (suite *TestSuite) TestCreateBadges() {
 		},
 	}, bob)
 	suite.Require().Error(err, "Error creating badges: %s")
+}
+
+
+func (suite *TestSuite) TestCreateBadgesIdGreaterThanMax() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{
+		{
+			Amount: sdkmath.NewUint(1),
+			BadgeIds: GetOneUintRange(),
+			OwnershipTimes: GetFullUintRanges(),
+		},
+	}
+	collectionsToCreate[0].Collection.Transfers = []*types.Transfer{
+		{
+			From: "Mint",
+			ToAddresses: []string{bob},
+			Balances: []*types.Balance{
+				{
+					Amount: sdkmath.NewUint(1),
+					BadgeIds: []*types.UintRange{
+						{
+							Start: sdkmath.NewUint(1),
+							End:   sdkmath.NewUint(math.MaxUint64).Add(sdkmath.NewUint(1)),
+						},
+					},
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+		},
+	}
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].FromMappingId = "Mint"
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Error(err, "Error creating badge: %s")
 }

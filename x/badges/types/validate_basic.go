@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"math"
 	"regexp"
 	"strings"
 
@@ -102,6 +103,10 @@ func ValidateRangesAreValid(badgeUintRanges []*UintRange, errorOnEmpty bool) err
 
 		if badgeUintRange.Start.GT(badgeUintRange.End) {
 			return ErrStartGreaterThanEnd
+		}
+
+		if badgeUintRange.Start.GT(sdkmath.NewUint(math.MaxUint64)) || badgeUintRange.End.GT(sdkmath.NewUint(math.MaxUint64)) {
+			return ErrUintGreaterThanMax
 		}
 	}
 

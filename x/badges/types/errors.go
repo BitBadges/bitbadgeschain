@@ -54,4 +54,6 @@ var (
 	ErrNoTimelineTimeSpecified                  = sdkerrors.Register(ModuleName, 1542, "no timeline times specified (len 0 for Times)")
 	ErrSenderAndReceiverSame                    = sdkerrors.Register(ModuleName, 1543, "sender and receiver cannot be the same")
 	ErrInvalidTransfers												  = sdkerrors.Register(ModuleName, 1544, "invalid transfers")
+	ErrUintGreaterThanMax                   		= sdkerrors.Register(ModuleName, 1545, "uint greater than max uint")
+	
 )
