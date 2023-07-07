@@ -138,7 +138,7 @@ func (k Keeper) CastUserApprovedIncomingTransferToUniversalPermission(ctx sdk.Co
 				InitiatedByMapping: initiatedByMapping,
 				UsesBadgeIds: true,
 				UsesTransferTimes: true,
-				UsesToMapping: true,
+				UsesFromMapping: true,
 				UsesInitiatedByMapping: true,
 				ArbitraryValue: approvedTransfer,
 			},

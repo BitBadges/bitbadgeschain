@@ -61,18 +61,14 @@ func (k msgServer) NewCollection(goCtx context.Context, msg *types.MsgNewCollect
 		}
 	}
 
-	if msg.BadgesToCreate != nil && len(msg.BadgesToCreate) > 0 {
-		err := *new(error)
-		collection, err = k.CreateBadges(ctx, collection, msg.BadgesToCreate, msg.Transfers)
-		if err != nil {
-			return nil, err
-		}
+	err := *new(error)
+	collection, err = k.CreateBadges(ctx, collection, msg.BadgesToCreate, msg.Transfers, msg.Creator)
+	if err != nil {
+		return nil, err
 	}
 
-	if msg.InheritedBalancesTimeline != nil && len(msg.InheritedBalancesTimeline) > 0 {
-		if err := k.ValidateInheritedBalancesUpdate(ctx, collection, collection.InheritedBalancesTimeline, collection.InheritedBalancesTimeline, collection.Permissions.CanUpdateInheritedBalances); err != nil {
-			return nil, err
-		}
+	if err := k.ValidateInheritedBalancesUpdate(ctx, collection, collection.InheritedBalancesTimeline, collection.InheritedBalancesTimeline, collection.Permissions.CanUpdateInheritedBalances); err != nil {
+		return nil, err
 	}
 
 	if err := k.SetCollectionInStore(ctx, collection); err != nil {

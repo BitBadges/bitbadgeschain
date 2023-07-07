@@ -11,21 +11,12 @@ import (
 type UniversalValidationParams struct {
 	Creator                              string
 	CollectionId                         sdkmath.Uint
-	AccountsThatCantEqualCreator         []string
 	MustBeManager                        bool
 	OverrideArchive 										 bool
 }
 
 // Validates everything about the Msg is valid and returns (creatorNum, collection, permissions, error).
 func (k Keeper) UniversalValidate(ctx sdk.Context, params UniversalValidationParams) (*types.BadgeCollection, error) {
-	if len(params.AccountsThatCantEqualCreator) > 0 {
-		for _, account := range params.AccountsThatCantEqualCreator {
-			if account == params.Creator {
-				return &types.BadgeCollection{}, ErrAccountCanNotEqualCreator
-			}
-		}
-	}
-
 	// Assert collection and badgeId ranges exist and are well-formed
 	collection, found := k.GetCollectionFromStore(ctx, params.CollectionId)
 	if !found {

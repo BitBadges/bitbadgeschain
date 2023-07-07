@@ -25,10 +25,6 @@ func ValidatePermittedTimes(permittedTimes []*UintRange, forbiddenTimes []*UintR
 }
 
 func ValidateCollectionApprovedTransferPermissions(permissions []*CollectionApprovedTransferPermission) error {
-	if permissions == nil {
-		return ErrPermissionsIsNil
-	}
-	
 	for _, permission := range permissions {
 		if permission.DefaultValues == nil {
 			return ErrPermissionsValueIsNil
@@ -87,10 +83,6 @@ func ValidateCollectionApprovedTransferPermissions(permissions []*CollectionAppr
 
 
 func ValidateUserApprovedOutgoingTransferPermissions(permissions []*UserApprovedOutgoingTransferPermission) error {
-	if permissions == nil {
-		return ErrPermissionsIsNil
-	}
-	
 	for _, permission := range permissions {
 		if permission.DefaultValues == nil {
 			return ErrPermissionsValueIsNil
@@ -147,10 +139,6 @@ func ValidateUserApprovedOutgoingTransferPermissions(permissions []*UserApproved
 
 
 func ValidateUserApprovedIncomingTransferPermissions(permissions []*UserApprovedIncomingTransferPermission) error {
-	if permissions == nil {
-		return ErrPermissionsIsNil
-	}
-	
 	for _, permission := range permissions {
 		if permission.DefaultValues == nil {
 			return ErrPermissionsValueIsNil
@@ -208,10 +196,6 @@ func ValidateUserApprovedIncomingTransferPermissions(permissions []*UserApproved
 
 
 func ValidateTimedUpdateWithBadgeIdsPermission(permissions []*TimedUpdateWithBadgeIdsPermission) error {
-	if permissions == nil {
-		return ErrPermissionsIsNil
-	}
-	
 	for _, permission := range permissions {
 		if permission.DefaultValues == nil {
 			return ErrPermissionsValueIsNil
@@ -264,10 +248,6 @@ func ValidateTimedUpdateWithBadgeIdsPermission(permissions []*TimedUpdateWithBad
 }
 
 func ValidateBalancesActionPermission(permissions []*BalancesActionPermission) error {
-	if permissions == nil {
-		return ErrPermissionsIsNil
-	}
-
 	for _, permission := range permissions {
 		if permission.DefaultValues == nil {
 			return ErrPermissionsValueIsNil
@@ -315,10 +295,6 @@ func ValidateBalancesActionPermission(permissions []*BalancesActionPermission) e
 }
 
 func ValidateTimedUpdatePermission(permissions []*TimedUpdatePermission) error {
-	if permissions == nil {
-		return ErrPermissionsIsNil
-	}
-
 	for _, permission := range permissions {
 		if permission.DefaultValues == nil {
 			return ErrPermissionsValueIsNil
@@ -359,10 +335,6 @@ func ValidateTimedUpdatePermission(permissions []*TimedUpdatePermission) error {
 }
 
 func ValidateActionPermission(permissions []*ActionPermission) error {
-	if permissions == nil {
-		return ErrPermissionsIsNil
-	}
-
 	if len(permissions) > 1 {
 		return sdkerrors.Wrap(ErrInvalidCombinations, "only one action permission allowed")
 	}
@@ -395,10 +367,6 @@ func ValidateActionPermission(permissions []*ActionPermission) error {
 
 
 func ValidateUserPermissions(permissions *UserPermissions, canBeNil bool) error {
-	if permissions == nil {
-		return ErrPermissionsIsNil
-	}
-	
 	if !canBeNil && (permissions.CanUpdateApprovedIncomingTransfers != nil || permissions.CanUpdateApprovedOutgoingTransfers != nil) {
 		return ErrPermissionsIsNil
 	}
@@ -425,76 +393,53 @@ func ValidatePermissions(permissions *CollectionPermissions) error {
 		return ErrPermissionsIsNil
 	}
 	
-	if permissions.CanUpdateCustomData != nil {
-		if err := ValidateTimedUpdatePermission(permissions.CanUpdateCustomData); err != nil {
-			return err
-		}
+	if err := ValidateTimedUpdatePermission(permissions.CanUpdateCustomData); err != nil {
+		return err
 	}
 
-	if permissions.CanUpdateStandards != nil {
-		if err := ValidateTimedUpdatePermission(permissions.CanUpdateStandards); err != nil {
-			return err
-		}
+	if err := ValidateTimedUpdatePermission(permissions.CanUpdateStandards); err != nil {
+		return err
+	}
+	
+	if err := ValidateTimedUpdatePermission(permissions.CanUpdateManager); err != nil {
+		return err
 	}
 
-	if permissions.CanUpdateManager != nil {
-		if err := ValidateTimedUpdatePermission(permissions.CanUpdateManager); err != nil {
-			return err
-		}
+	if err := ValidateTimedUpdateWithBadgeIdsPermission(permissions.CanUpdateBadgeMetadata); err != nil {
+		return err
 	}
 
-	if permissions.CanUpdateBadgeMetadata != nil {
-		if err := ValidateTimedUpdateWithBadgeIdsPermission(permissions.CanUpdateBadgeMetadata); err != nil {
-			return err
-		}
+	if err := ValidateTimedUpdatePermission(permissions.CanUpdateCollectionMetadata); err != nil {
+		return err
 	}
 
-	if permissions.CanUpdateCollectionMetadata != nil {
-		if err := ValidateTimedUpdatePermission(permissions.CanUpdateCollectionMetadata); err != nil {
-			return err
-		}
+	if err := ValidateBalancesActionPermission(permissions.CanCreateMoreBadges); err != nil {
+		return err
 	}
 
-	if permissions.CanCreateMoreBadges != nil {
-		if err := ValidateBalancesActionPermission(permissions.CanCreateMoreBadges); err != nil {
-			return err
-		}
+	if err := ValidateCollectionApprovedTransferPermissions(permissions.CanUpdateCollectionApprovedTransfers); err != nil {
+		return err
 	}
 
-	if permissions.CanUpdateCollectionApprovedTransfers != nil {
-		if err := ValidateCollectionApprovedTransferPermissions(permissions.CanUpdateCollectionApprovedTransfers); err != nil {
-			return err
-		}
+
+	if err := ValidateActionPermission(permissions.CanDeleteCollection); err != nil {
+		return err
+	}
+	
+	if err := ValidateTimedUpdatePermission(permissions.CanUpdateOffChainBalancesMetadata); err != nil {
+		return err
 	}
 
-	if permissions.CanDeleteCollection != nil {
-		if err := ValidateActionPermission(permissions.CanDeleteCollection); err != nil {
-			return err
-		}
+	if err := ValidateTimedUpdatePermission(permissions.CanUpdateContractAddress); err != nil {
+		return err
 	}
 
-	if permissions.CanUpdateOffChainBalancesMetadata != nil {
-		if err := ValidateTimedUpdatePermission(permissions.CanUpdateOffChainBalancesMetadata); err != nil {
-			return err
-		}
+	if err := ValidateTimedUpdatePermission(permissions.CanArchive); err != nil {
+		return err
 	}
 
-	if permissions.CanUpdateContractAddress != nil {
-		if err := ValidateTimedUpdatePermission(permissions.CanUpdateContractAddress); err != nil {
-			return err
-		}
-	}
-
-	if permissions.CanArchive != nil {
-		if err := ValidateTimedUpdatePermission(permissions.CanArchive); err != nil {
-			return err
-		}
-	}
-
-	if permissions.CanUpdateInheritedBalances != nil {
-		if err := ValidateTimedUpdateWithBadgeIdsPermission(permissions.CanUpdateInheritedBalances); err != nil {
-			return err
-		}
+	if err := ValidateTimedUpdateWithBadgeIdsPermission(permissions.CanUpdateInheritedBalances); err != nil {
+		return err
 	}
 
 	return nil

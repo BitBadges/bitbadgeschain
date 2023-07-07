@@ -84,6 +84,18 @@ func GetCurrentCollectionApprovedTransfers(ctx sdk.Context, collection *BadgeCol
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 func GetIsArchivedTimesAndValues(isArchivedTimeline []*IsArchivedTimeline) ([][]*UintRange, []interface{}) {
 	times := [][]*UintRange{}
 	values := []interface{}{}

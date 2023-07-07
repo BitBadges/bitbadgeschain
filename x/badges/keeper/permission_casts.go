@@ -43,7 +43,7 @@ func (k Keeper) CastUserApprovedIncomingTransferPermissionToUniversalPermission(
 				UsesBadgeIds: true,
 				UsesTimelineTimes: true,
 				UsesTransferTimes: true,
-				UsesToMapping: true,
+				UsesFromMapping: true,
 				UsesInitiatedByMapping: true,
 				PermittedTimes: permission.DefaultValues.PermittedTimes,
 				ForbiddenTimes: permission.DefaultValues.ForbiddenTimes,

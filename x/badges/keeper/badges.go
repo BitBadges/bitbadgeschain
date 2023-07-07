@@ -7,9 +7,16 @@ import (
 )
 
 //Create badges and update the unminted / total supplys for the collection
-func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, badgesToCreate []*types.Balance, transfers []*types.Transfer) (*types.BadgeCollection, error) {
+func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, badgesToCreate []*types.Balance, transfers []*types.Transfer, managerAddress string) (*types.BadgeCollection, error) {
+	if !IsStandardBalances(collection) {
+		//For readability, we do not allow transfers to happen on-chain, if not defined in the collection
+		if len(transfers) > 0 || len(collection.CollectionApprovedTransfersTimeline) > 0 {
+			return &types.BadgeCollection{}, ErrWrongBalancesType
+		}
+	}
+
 	if IsInheritedBalances(collection) {
-		return &types.BadgeCollection{}, ErrWrongBalancesType
+		return collection, nil
 	}
 
 	//Check if we are allowed to create these badges
@@ -77,14 +84,9 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 
 	if IsStandardBalances(collection) {
 		//Handle any transfers defined in the Msg
-		err = k.HandleTransfers(ctx, collection, transfers, "Manager")
+		err = k.HandleTransfers(ctx, collection, transfers, managerAddress)
 		if err != nil {
 			return &types.BadgeCollection{}, err
-		}
-	} else {
-		//For readability, we do not allow transfers to happen on-chain, if not defined in the collection
-		if len(transfers) > 0 || len(collection.CollectionApprovedTransfersTimeline) > 0 {
-			return &types.BadgeCollection{}, ErrWrongBalancesType
 		}
 	}
 

@@ -193,6 +193,8 @@ func (suite *TestSuite) TestTransferBadgeFromMintAddress() {
 
 	bobbalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
 	fetchedBalance, err := types.GetBalancesForIds(GetOneUintRange(), GetOneUintRange(), bobbalance.Balances)
 	suite.Require().Equal(sdkmath.NewUint(1), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
@@ -211,6 +213,11 @@ func (suite *TestSuite) TestTransferBadgeFromMintAddress() {
 				OwnershipTimes: GetFullUintRanges(),
 			},
 		},
+		CollectionApprovedTransfersTimeline: collection.CollectionApprovedTransfersTimeline,
+		InheritedBalancesTimeline: collection.InheritedBalancesTimeline,
+		CollectionMetadataTimeline: collection.CollectionMetadataTimeline,
+		BadgeMetadataTimeline: collection.BadgeMetadataTimeline,
+		OffChainBalancesMetadataTimeline: collection.OffChainBalancesMetadataTimeline,
 	})
 	suite.Require().Nil(err, "Error transferring badge")
 

@@ -228,11 +228,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	//Note we filter any excess badge IDs later and apply num increments as well
 	err := *new(error)
 	if approvals == nil {
-		approvals = []*types.Balance{{
-			Amount: transferAmounts.Amount,
-			OwnershipTimes: transferAmounts.OwnershipTimes,
-			BadgeIds: transferAmounts.BadgeIds,
-		}}
+		return sdkerrors.Wrapf(ErrDisallowedTransfer, "transfer disallowed because no approval amounts were found")
 	}
 
 	approvalTrackerDetails, found := k.GetApprovalsTrackerFromStore(ctx, collection.CollectionId, trackerId, timelineType, depth, address)

@@ -20,6 +20,7 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 		if err != nil {
 			return nil, sdkerrors.Wrap(err, err.Error())
 		}
+
 		switch {
 		case custom.QueryCollection != nil:
 			res, err := keeper.GetCollection(ctx, custom.QueryCollection)
@@ -33,13 +34,34 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 				return nil, err
 			}
 			return json.Marshal(badgeTypes.QueryGetBalanceResponse{Balance: res.Balance})
-		}
 		
+		case custom.QueryAddressMapping != nil:
+			res, err := keeper.GetAddressMapping(ctx, custom.QueryAddressMapping)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(badgeTypes.QueryGetAddressMappingResponse{Mapping: res.Mapping})
+		case custom.QueryApprovalsTracker != nil:
+			res, err := keeper.GetApprovalsTracker(ctx, custom.QueryApprovalsTracker)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(badgeTypes.QueryGetApprovalsTrackerResponse{Tracker: res.Tracker})
+		case custom.QueryGetNumUsedForChallenge != nil:
+			res, err := keeper.GetNumUsedForChallenge(ctx, custom.QueryGetNumUsedForChallenge)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(badgeTypes.QueryGetNumUsedForChallengeResponse{NumUsed: res.NumUsed})
+		}
 		return nil, sdkerrors.Wrap(types.ErrInvalidMsg, "Unknown Custom query variant")
 	}
 }
 
 type badgeCustomQuery struct {
-	QueryCollection  *badgeTypes.QueryGetCollectionRequest  `json:"queryCollection,omitempty"`
-	QueryBalance     *badgeTypes.QueryGetBalanceRequest     `json:"queryBalance,omitempty"`
+	QueryCollection  							*badgeTypes.QueryGetCollectionRequest  `json:"queryCollection,omitempty"`
+	QueryBalance     							*badgeTypes.QueryGetBalanceRequest     `json:"queryBalance,omitempty"`
+	QueryAddressMapping 	 				*badgeTypes.QueryGetAddressMappingRequest     `json:"queryAddressMapping,omitempty"`
+	QueryApprovalsTracker 	 			*badgeTypes.QueryGetApprovalsTrackerRequest     `json:"queryApprovalsTracker,omitempty"`
+	QueryGetNumUsedForChallenge 	*badgeTypes.QueryGetNumUsedForChallengeRequest     `json:"queryGetNumUsedForChallenge,omitempty"`
 }

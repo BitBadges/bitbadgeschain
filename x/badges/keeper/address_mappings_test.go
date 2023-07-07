@@ -65,6 +65,26 @@ func (suite *TestSuite) TestReservedIds() {
 	// AssertUintsEqual(suite, mapping.Filters[0].Conditions[0].MustOwnBadges[0].CollectionId, sdkmath.NewUint(1))
 }
 
+func (suite *TestSuite) TestStoreAddressMappings() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].Collection.AddressMappings = []*types.AddressMapping{
+		{
+			MappingId: "test1asdasfda",
+			Addresses: []string{alice},
+		},
+	}
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating badge: %s")
+
+	mapping, err := GetAddressMapping(suite, suite.ctx, "test1asdasfda")
+	suite.Require().Nil(err, "Error getting address mapping: %s", "test1asdasfda")
+	suite.Require().NotNil(mapping, "Error getting address mapping: %s", "test1asdasfda")
+	suite.Require().Equal(mapping.MappingId, "test1asdasfda", "Error getting address mapping: %s", "test1asdasfda")
+}
+
 // func (suite *TestSuite) TestAddressMappingsManagerOf() {
 // 	wctx := sdk.WrapSDKContext(suite.ctx)
 

@@ -1,5 +1,7 @@
 package keeper_test
 
+//We have some tests in update_checks_test that call MsgUpdateMetadata
+
 // import (
 // sdkmath "cosmossdk.io/math"
 // 	"math"

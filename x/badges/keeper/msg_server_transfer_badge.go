@@ -24,7 +24,7 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 	}
 
 	
-	if err := k.Keeper.HandleTransfers(ctx, collection, msg.Transfers, "Manager"); err != nil {
+	if err := k.Keeper.HandleTransfers(ctx, collection, msg.Transfers, msg.Creator); err != nil {
 		return nil, err
 	}
 	

@@ -8,32 +8,17 @@ import (
 	sdkmath "cosmossdk.io/math"
 )
 
-func HandleManagerAlias(address string, managerAddress string) string {
-	if address == "Manager" {
-		return managerAddress
-	}
-
-	return address
-}
-
 func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollection, transfers []*types.Transfer, initiatedBy string) (error) {
 	err := *new(error)
-	manager := types.GetCurrentManager(ctx, collection)
-
-	initiatedBy = HandleManagerAlias(initiatedBy, manager)
 
 	for _, transfer := range transfers {
 		fromBalanceKey := ConstructBalanceKey(transfer.From, collection.CollectionId)
-		transfer.From = HandleManagerAlias(transfer.From, manager)
-		
 		fromUserBalance, found := k.GetUserBalanceFromStore(ctx, fromBalanceKey)
 		if !found {
 			return sdkerrors.Wrapf(ErrUserBalanceNotExists, "from user balance for %s does not exist", transfer.From)
 		}
 
 		for _, to := range transfer.ToAddresses {
-			to = HandleManagerAlias(to, manager)
-
 			toBalanceKey := ConstructBalanceKey(to, collection.CollectionId)
 			toUserBalance, found := k.GetUserBalanceFromStore(ctx, toBalanceKey)
 			if !found {

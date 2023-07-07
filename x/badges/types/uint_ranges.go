@@ -46,7 +46,7 @@ func InvertUintRanges(uintRanges []*UintRange, maxId sdkmath.Uint) []*UintRange 
 	for _, uintRange := range uintRanges {
 		newRanges := []*UintRange{}
 		for _, rangeObject := range ranges {
-			rangesAfterRemoval, _ := RemoveIdsFromUintRange(uintRange, rangeObject)
+			rangesAfterRemoval, _ := RemoveUintsFromUintRange(uintRange, rangeObject)
 			newRanges = append(newRanges, rangesAfterRemoval...)
 		}
 		ranges = newRanges
@@ -58,7 +58,7 @@ func InvertUintRanges(uintRanges []*UintRange, maxId sdkmath.Uint) []*UintRange 
 // Removes all ids within an id range from an id range.
 // Removing can make this range be split into 0, 1, or 2 new ranges.
 // Returns if anything was removed or not
-func RemoveIdsFromUintRange(idxsToRemove *UintRange, rangeObject *UintRange) ([]*UintRange, []*UintRange) {
+func RemoveUintsFromUintRange(idxsToRemove *UintRange, rangeObject *UintRange) ([]*UintRange, []*UintRange) {
 	if idxsToRemove.End.LT(rangeObject.Start) || idxsToRemove.Start.GT(rangeObject.End) {
 		// idxsToRemove doesn't overlap with rangeObject, so nothing is removed
 		return []*UintRange{rangeObject}, []*UintRange{}
@@ -122,7 +122,7 @@ func RemoveUintRangeFromUintRange(idsToRemove []*UintRange, rangeToRemoveFrom []
 	for _, handledValue := range idsToRemove {
 		newRanges := []*UintRange{}
 		for _, oldPermittedTime := range rangeToRemoveFrom {
-			rangesAfterRemoval, removed := RemoveIdsFromUintRange(handledValue, oldPermittedTime)
+			rangesAfterRemoval, removed := RemoveUintsFromUintRange(handledValue, oldPermittedTime)
 			newRanges = append(newRanges, rangesAfterRemoval...)
 			removedRanges = append(removedRanges, removed...)
 		}
@@ -138,7 +138,7 @@ func AssertRangesDoNotOverlapAtAll(rangeToCheck []*UintRange, overlappingRange [
 	for _, oldAllowedTime := range rangeToCheck {
 		for _, newAllowedTime := range overlappingRange {
 			//Check that the new time completely overlaps with the old time
-			_, removed := RemoveIdsFromUintRange(newAllowedTime, oldAllowedTime)
+			_, removed := RemoveUintsFromUintRange(newAllowedTime, oldAllowedTime)
 			if len(removed) > 0 {
 				return ErrRangesOverlap
 			}

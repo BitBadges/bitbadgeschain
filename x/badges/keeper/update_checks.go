@@ -9,11 +9,14 @@ import (
 	"math"
 )
 
-//See top of update_checks_helpers.go for documentations
+//See top of update_checks_helpers.go for documentation
 
-
-
-//Assumes that these parameters are obtained from GetPotentialUpdatesForTimelineValues
+//Precondition: Assumes that all passed-in matches have .ArbitraryValue set
+//	We do this by getting from GetPotentialUpdatesForTimelineValues
+//This is a generic function that is used to get the "updated" field combinations
+//Ex: If we go from [badgeIDs 1 to 10 -> www.example.com] to [badgeIDs 1 to 2 -> www.example2.com, badgeIDs 3 to 10 -> www.example.com]
+//		This will return a UniversalPermissionDetails with badgeIDs 1 to 2 because they are the only ones that changed
+//Note that updates are field-specific, so the comparison logic is handled via a custom passed-in function - compareAndGetUpdateCombosToCheck
 func GetUpdateCombinationsToCheck(
 	ctx sdk.Context,
 	firstMatchesForOld []*types.UniversalPermissionDetails, 
@@ -25,6 +28,8 @@ func GetUpdateCombinationsToCheck(
 	detailsToCheck := []*types.UniversalPermissionDetails{}
 
 	overlapObjects, inOldButNotNew, inNewButNotOld := types.GetOverlapsAndNonOverlaps(firstMatchesForOld, firstMatchesForNew)
+	
+	//Handle all old combinations that are not in the new (by comparing to empty value)
 	for _, detail := range inOldButNotNew {
 		detailsToAdd, err := compareAndGetUpdateCombosToCheck(ctx, detail.ArbitraryValue, emptyValue, managerAddress)
 		if err != nil {
@@ -42,6 +47,7 @@ func GetUpdateCombinationsToCheck(
 		}
 	}
 
+	//Handle all new combinations that are not in the old (by comparing to empty value)
 	for _, detail := range inNewButNotOld {
 		detailsToAdd, err := compareAndGetUpdateCombosToCheck(ctx, detail.ArbitraryValue, emptyValue, managerAddress)
 		if err != nil {
@@ -59,6 +65,7 @@ func GetUpdateCombinationsToCheck(
 		}
 	}
 
+	//Handle all overlaps (by comparing old and new values directly)
 	for _, overlapObj := range overlapObjects {
 		overlap := overlapObj.Overlap
 		oldDetails := overlapObj.FirstDetails
@@ -82,27 +89,9 @@ func GetUpdateCombinationsToCheck(
 	return detailsToCheck, nil
 }
 
-//Returns all combinations of timeline times and values
-func GetPotentialUpdatesForTimelineValues(times [][]*types.UintRange, values []interface{}) []*types.UniversalPermissionDetails {
-	castedPermissions := []*types.UniversalPermission{}
-	for idx, time := range times {
-		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			DefaultValues: &types.UniversalDefaultValues{
-				TimelineTimes: time, 
-				ArbitraryValue: values[idx],
-				UsesTimelineTimes: true,
-			},
-			Combinations: []*types.UniversalCombination{{}},
-		})
-	}
-
-	firstMatches := types.GetFirstMatchOnly(castedPermissions)
-	
-	return firstMatches
-}
 
 func CheckNotForbidden(ctx sdk.Context, permission *types.UniversalPermissionDetails) error {
-	//Throw if we are in a forbidden time
+	//Throw if current block time is a forbidden time
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	found := types.SearchUintRangesForUint(blockTime, permission.ForbiddenTimes)
 	if found {
@@ -199,7 +188,7 @@ func (k Keeper) CheckUserApprovedIncomingTransferPermission(ctx sdk.Context, det
 }
 
 func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types.UniversalPermissionDetails, detailsToCheck []*types.UniversalPermissionDetails) error {
-	//Apply dummy ranges to all detailsToCheck
+	//Apply dummy ranges to all detailsToCheck 
 	for _, detailToCheck := range detailsToCheck {
 		if detailToCheck.BadgeId == nil {
 			detailToCheck.BadgeId = &types.UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) } //dummy range
@@ -234,7 +223,7 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 		for _, detailToCheck := range detailsToCheck {
 			_, overlap := types.UniversalRemoveOverlaps(permissionDetail, detailToCheck)
 			if len(overlap) > 0 {
-				err := CheckNotForbidden(ctx, permissionDetail)
+				err := CheckNotForbidden(ctx, permissionDetail) //forbiddenTimes and permittedTimes are stored in here
 				if err != nil {
 					return err
 				}

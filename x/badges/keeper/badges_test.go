@@ -83,7 +83,7 @@ func (suite *TestSuite) TestCreateBadges() {
 				},
 			},
 		},
-	})
+	}, bob)
 	suite.Require().Nil(err, "Error creating badges: %s")
 
 	balance, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
@@ -122,7 +122,7 @@ func (suite *TestSuite) TestCreateBadges() {
 			BadgeIds: GetTwoUintRanges(),
 			OwnershipTimes: GetFullUintRanges(),
 		},
-	}, []*types.Transfer{})
+	}, []*types.Transfer{}, bob)
 	suite.Require().Nil(err, "Error creating badges: %s")
 
 	totalSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Total")
@@ -165,7 +165,7 @@ func (suite *TestSuite) TestCreateBadges() {
 			BadgeIds: GetTopHalfUintRanges(),
 			OwnershipTimes: GetFullUintRanges(),
 		},
-	}, []*types.Transfer{})
+	}, []*types.Transfer{}, bob)
 	suite.Require().Nil(err, "Error creating badges: %s")
 	AssertUintsEqual(suite, collection.NextBadgeId, sdkmath.NewUint(uint64(math.MaxUint64)).Add(sdkmath.NewUint(1)))
 
@@ -199,6 +199,6 @@ func (suite *TestSuite) TestCreateBadges() {
 				},
 			},
 		},
-	})
+	}, bob)
 	suite.Require().Error(err, "Error creating badges: %s")
 }

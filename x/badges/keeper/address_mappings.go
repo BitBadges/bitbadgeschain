@@ -73,7 +73,7 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string, 
 	if addressMappingId == "All" {
 		addressMapping = &types.AddressMapping{
 			MappingId: "All",
-			Addresses: []string{},
+			Addresses: []string{"Mint"},
 			OnlySpecifiedAddresses: false,
 			Uri: "",
 			CustomData: "",
@@ -134,10 +134,6 @@ func (k Keeper) CheckMappingAddresses(ctx sdk.Context, addressMappingId string, 
 
 	if !addressMapping.OnlySpecifiedAddresses {
 		found = !found
-	}
-
-	if found && addressMapping.MappingId == "All" && addressToCheck == "Mint" {
-		return false, nil
 	}
 
 	if !found {

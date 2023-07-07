@@ -12,6 +12,7 @@ import (
 
 func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint,  challenges []*types.Challenge, solutions []*types.ChallengeSolution, creatorAddress string, level string) (bool, sdkmath.Uint, error) {
 	numIncrements := sdkmath.NewUint(0)
+	useLeafIndexForDistributionOrder := false
 
 	for _, challenge := range challenges {
 		root := challenge.Root
@@ -34,6 +35,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 
 				leafIndex := GetLeafIndex(solution.Proof.Aunts)
 				if challenge.UseLeafIndexForDistributionOrder {
+					useLeafIndexForDistributionOrder = true
 
 					//Get leftmost leaf index for layer === challenge.ExpectedProofLength
 					leftmostLeafIndex := sdkmath.NewUint(1)
@@ -70,7 +72,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 		}
 	}
 
-	return true, numIncrements, nil
+	return useLeafIndexForDistributionOrder, numIncrements, nil
 }
 
 

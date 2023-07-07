@@ -8,6 +8,16 @@ import (
 	sdkmath "cosmossdk.io/math"
 )
 
+//TODO: This file should probably be refactored a lot, but it currently works.
+//			It is also not user-facing or dev-facing, so I am okay with how it is now
+
+//For permissions, we have many types of permissions that are all very similar to each other
+//Here, we abstract all those permissions to a UniversalPermission struct in order to reuse code.
+//When casting to a UniversalPermission, we use fake dummy values for the unused values to avoid messing up the logic
+//
+//This file implements certain logic using UniversalPermissions such as overlaps and getting first match only
+//This is used in many places around the codebase
+
 type UniversalCombination struct {
 	TimelineTimesOptions *ValueOptions
 	
@@ -113,9 +123,9 @@ func IsAddressMappingEmpty(mapping *AddressMapping) bool {
 }
 
 func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
-	timelineTimesAfterRemoval, removedTimelineTimes := RemoveIdsFromUintRange(handled.TimelineTime, valueToCheck.TimelineTime)
-	badgesAfterRemoval, removedBadges := RemoveIdsFromUintRange(handled.BadgeId, valueToCheck.BadgeId)
-	transferTimesAfterRemoval, removedTransferTimes := RemoveIdsFromUintRange(handled.TransferTime, valueToCheck.TransferTime)
+	timelineTimesAfterRemoval, removedTimelineTimes := RemoveUintsFromUintRange(handled.TimelineTime, valueToCheck.TimelineTime)
+	badgesAfterRemoval, removedBadges := RemoveUintsFromUintRange(handled.BadgeId, valueToCheck.BadgeId)
+	transferTimesAfterRemoval, removedTransferTimes := RemoveUintsFromUintRange(handled.TransferTime, valueToCheck.TransferTime)
 
 	
 	toMappingAfterRemoval, removedToMapping := RemoveAddressMappingFromAddressMapping(handled.ToMapping, valueToCheck.ToMapping)

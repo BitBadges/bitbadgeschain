@@ -30,7 +30,45 @@ func GetUserBalance(suite *TestSuite, ctx context.Context, collectionId sdkmath.
 	return res.Balance, nil
 }
 
-//TODO: Queries
+func GetAddressMapping(suite *TestSuite, ctx context.Context, mappingId string) (*types.AddressMapping, error) {
+	res, err := suite.app.BadgesKeeper.GetAddressMapping(ctx, &types.QueryGetAddressMappingRequest{
+		MappingId: mappingId,
+	})
+	if err != nil {
+		return &types.AddressMapping{}, err
+	}
+
+	return res.Mapping, nil
+}
+
+func GetNumUsedForChallenge(suite *TestSuite, ctx context.Context, challengeId string, level string, leafIndex sdkmath.Uint, collectionId sdkmath.Uint) (sdkmath.Uint, error) {
+	res, err := suite.app.BadgesKeeper.GetNumUsedForChallenge(ctx, &types.QueryGetNumUsedForChallengeRequest{
+		ChallengeId: challengeId,
+		Level: level,
+		LeafIndex: leafIndex,
+		CollectionId: collectionId,
+	})
+	if err != nil {
+		return sdkmath.Uint{}, err
+	}
+
+	return res.NumUsed, nil
+}
+
+func GetApprovalsTracker(suite *TestSuite, ctx context.Context, collectionId sdkmath.Uint, address string, trackerId string, level string, depth string) (*types.ApprovalsTracker, error) {
+	res, err := suite.app.BadgesKeeper.GetApprovalsTracker(ctx, &types.QueryGetApprovalsTrackerRequest{
+		CollectionId: sdkmath.Uint(collectionId),
+		Address:      address,
+		TrackerId: trackerId,
+		Level: level,
+		Depth: depth,
+	})
+	if err != nil {
+		return &types.ApprovalsTracker{}, err
+	}
+
+	return res.Tracker, nil
+}
 
 // /* Msg helpers */
 

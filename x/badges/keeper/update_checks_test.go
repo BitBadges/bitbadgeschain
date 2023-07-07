@@ -304,4 +304,229 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionInvalidTimes()
 }
 
 
-//TODO: Collection/UserApprovedTransfer Updates check
+
+func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {	
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating collections")
+
+	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUpdateCollectionPermissions{
+		Creator: bob,
+		CollectionId: sdkmath.NewUint(1),
+		Permissions: &types.CollectionPermissions{
+			CanUpdateCollectionApprovedTransfers: []*types.CollectionApprovedTransferPermission{
+				{
+					DefaultValues: &types.CollectionApprovedTransferDefaultValues{
+						FromMappingId: alice,
+						ToMappingId: "All",
+						ForbiddenTimes: GetFullUintRanges(),
+						TimelineTimes: GetFullUintRanges(),
+						InitiatedByMappingId: "All",
+						BadgeIds: GetFullUintRanges(),
+						TransferTimes: GetFullUintRanges(),
+					},
+					Combinations: []*types.CollectionApprovedTransferCombination{
+						{
+							
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection permissions")
+
+	
+	err = UpdateCollectionApprovedTransfers(suite, wctx, &types.MsgUpdateCollectionApprovedTransfers{
+		Creator: bob,
+		CollectionId: sdkmath.NewUint(1),
+		CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
+			{
+				TimelineTimes: GetFullUintRanges(),
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
+					{
+						FromMappingId: alice,
+						ToMappingId: "All",
+						InitiatedByMappingId: "All",
+						BadgeIds: GetFullUintRanges(),
+						TransferTimes: GetFullUintRanges(),
+						OverridesFromApprovedOutgoingTransfers: true,
+						RequireToEqualsInitiatedBy: true,
+						TrackerId: "test",
+						IncrementBadgeIdsBy: sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error updating collection approved transfers")
+
+	err = UpdateCollectionApprovedTransfers(suite, wctx, &types.MsgUpdateCollectionApprovedTransfers{
+		Creator: bob,
+		CollectionId: sdkmath.NewUint(1),
+		CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
+			{
+				TimelineTimes: GetFullUintRanges(),
+				ApprovedTransfers: []*types.CollectionApprovedTransfer{
+					{
+						FromMappingId: bob,
+						ToMappingId: "All",
+						InitiatedByMappingId: "All",
+						BadgeIds: GetFullUintRanges(),
+						TransferTimes: GetFullUintRanges(),
+						OverridesFromApprovedOutgoingTransfers: true,
+						RequireToEqualsInitiatedBy: true,
+						TrackerId: "test",
+						IncrementBadgeIdsBy: sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection approved transfers")
+}
+
+
+func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {	
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].Collection.DefaultApprovedIncomingTransfersTimeline = []*types.UserApprovedIncomingTransferTimeline{}
+	collectionsToCreate[0].Collection.DefaultApprovedOutgoingTransfersTimeline = []*types.UserApprovedOutgoingTransferTimeline{}
+
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating collections")
+
+	err = UpdateUserPermissions(suite, wctx, &types.MsgUpdateUserPermissions{
+		Creator: bob,
+		CollectionId: sdkmath.NewUint(1),
+		Permissions: &types.UserPermissions{
+			CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransferPermission{
+				{
+					DefaultValues: &types.UserApprovedOutgoingTransferDefaultValues{
+						ToMappingId: alice,
+						ForbiddenTimes: GetFullUintRanges(),
+						TimelineTimes: GetFullUintRanges(),
+						InitiatedByMappingId: "All",
+						BadgeIds: GetFullUintRanges(),
+						TransferTimes: GetFullUintRanges(),
+					},
+					Combinations: []*types.UserApprovedOutgoingTransferCombination{
+						{
+							
+						},
+					},
+				},
+			},
+			CanUpdateApprovedIncomingTransfers: []*types.UserApprovedIncomingTransferPermission{
+				{
+					DefaultValues: &types.UserApprovedIncomingTransferDefaultValues{
+						FromMappingId: alice,
+						ForbiddenTimes: GetFullUintRanges(),
+						TimelineTimes: GetFullUintRanges(),
+						InitiatedByMappingId: "All",
+						BadgeIds: GetFullUintRanges(),
+						TransferTimes: GetFullUintRanges(),
+					},
+					Combinations: []*types.UserApprovedIncomingTransferCombination{
+						{
+							
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection permissions")
+
+	
+	err = UpdateUserApprovedTransfers(suite, wctx, &types.MsgUpdateUserApprovedTransfers{
+		Creator: bob,
+		CollectionId: sdkmath.NewUint(1),
+		
+		ApprovedOutgoingTransfersTimeline: []*types.UserApprovedOutgoingTransferTimeline{
+			{
+				TimelineTimes: GetFullUintRanges(),
+				ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
+					{
+						ToMappingId: alice,
+						InitiatedByMappingId: "All",
+						BadgeIds: GetFullUintRanges(),
+						TransferTimes: GetFullUintRanges(),
+						RequireToEqualsInitiatedBy: true,
+						TrackerId: "test",
+						IncrementBadgeIdsBy: sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+		ApprovedIncomingTransfersTimeline: []*types.UserApprovedIncomingTransferTimeline{
+			{
+				TimelineTimes: GetFullUintRanges(),
+				ApprovedIncomingTransfers: []*types.UserApprovedIncomingTransfer{
+					{
+						FromMappingId: alice,
+						InitiatedByMappingId: "All",
+						BadgeIds: GetFullUintRanges(),
+						TransferTimes: GetFullUintRanges(),
+						
+						TrackerId: "test",
+						IncrementBadgeIdsBy: sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error updating collection approved transfers")
+
+	err = UpdateUserApprovedTransfers(suite, wctx, &types.MsgUpdateUserApprovedTransfers{
+		Creator: bob,
+		CollectionId: sdkmath.NewUint(1),
+		ApprovedOutgoingTransfersTimeline: []*types.UserApprovedOutgoingTransferTimeline{
+			{
+				TimelineTimes: GetFullUintRanges(),
+				ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
+					{
+						ToMappingId: bob,
+						InitiatedByMappingId: "All",
+						BadgeIds: GetFullUintRanges(),
+						TransferTimes: GetFullUintRanges(),
+						RequireToEqualsInitiatedBy: true,
+						TrackerId: "test",
+						IncrementBadgeIdsBy: sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+		ApprovedIncomingTransfersTimeline: []*types.UserApprovedIncomingTransferTimeline{
+			{
+				TimelineTimes: GetFullUintRanges(),
+				ApprovedIncomingTransfers: []*types.UserApprovedIncomingTransfer{
+					{
+						FromMappingId: bob,
+						InitiatedByMappingId: "All",
+						BadgeIds: GetFullUintRanges(),
+						TransferTimes: GetFullUintRanges(),
+						RequireFromEqualsInitiatedBy: true,
+						
+						TrackerId: "test",
+						IncrementBadgeIdsBy: sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection approved transfers")
+}
+
+//TODO: Equality checks

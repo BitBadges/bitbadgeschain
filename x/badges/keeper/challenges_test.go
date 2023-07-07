@@ -1,6 +1,9 @@
 package keeper_test
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -48,436 +51,538 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 	})
 	suite.Require().Error(err, "Error getting user balance: %s")
 }
+func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
 
-//TODO: Test a working challenge, expectedProofLength, increments, useLeaf, etc. valid solution to one but not the other, more solutiosn than challenges
-//string expectedProofLength = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-// bool useCreatorAddressAsLeaf = 3;
-// bool maxOneUsePerLeaf = 4;
-// bool useLeafIndexForDistributionOrder = 5;
-// string challengeId = 6;
+	aliceLeaf := "-" + alice + "-1-0-0"
+	bobLeaf := "-" + bob + "-1-0-0"
+	charlieLeaf := "-" + charlie + "-1-0-0"
+
+	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
+	leafHashes := make([][]byte, len(leafs))
+	for i, leaf := range leafs {
+		initialHash := sha256.Sum256(leaf)
+		leafHashes[i] = initialHash[:]
+	}
+
+	levelTwoHashes := make([][]byte, 2)
+	for i := 0; i < len(leafHashes); i += 2 {
+		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
+		levelTwoHashes[i/2] = iHash[:]
+	}
+
+	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
+	rootHash := rootHashI[:]
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
+		OverallApprovals: &types.ApprovalsTracker{
+			Amounts: []*types.Balance{
+				{
+					Amount: sdkmath.NewUint(10),
+					BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+			NumTransfers: sdk.NewUint(10),
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsAllowed: true,
+		}},
+		Uri: "",
+		Challenges: []*types.Challenge{
+			{
+				Root: hex.EncodeToString(rootHash),
+				ExpectedProofLength: sdk.NewUint(2),
+				MaxOneUsePerLeaf: true,
+				ChallengeId: "hello",
+			},
+		},
+		TrackerId: "testing232",
+		TransferTimes: GetFullUintRanges(),
+		BadgeIds: GetOneUintRange(),
+		FromMappingId: "Mint",
+		ToMappingId: "All",
+		InitiatedByMappingId: "All",
+
+		OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers: true,
+		IncrementBadgeIdsBy: sdk.NewUint(0),
+		IncrementOwnershipTimesBy: sdk.NewUint(0),
+	})
+	
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
+		Creator: bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From: "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount: sdkmath.NewUint(10),
+						BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: "",
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt: hex.EncodeToString(leafHashes[1]),
+									OnRight: true,
+								},
+								{
+									Aunt: hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+
+	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
+		Creator: bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From: "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount: sdkmath.NewUint(1),
+						BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt: hex.EncodeToString(leafHashes[1]),
+									OnRight: true,
+								},
+								{
+									Aunt: hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge: %s")
+
+	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
+		Creator: bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From: "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount: sdkmath.NewUint(1),
+						BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt: hex.EncodeToString(leafHashes[1]),
+									OnRight: true,
+								},
+								{
+									Aunt: hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+}
+
+func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	aliceLeaf := "-" + alice + "-1-0-0"
+	bobLeaf := "-" + bob + "-1-0-0"
+	charlieLeaf := "-" + charlie + "-1-0-0"
+
+	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
+	leafHashes := make([][]byte, len(leafs))
+	for i, leaf := range leafs {
+		initialHash := sha256.Sum256(leaf)
+		leafHashes[i] = initialHash[:]
+	}
+
+	levelTwoHashes := make([][]byte, 2)
+	for i := 0; i < len(leafHashes); i += 2 {
+		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
+		levelTwoHashes[i/2] = iHash[:]
+	}
+
+	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
+	rootHash := rootHashI[:]
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
+		OverallApprovals: &types.ApprovalsTracker{
+			Amounts: []*types.Balance{
+				{
+					Amount: sdkmath.NewUint(10),
+					BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+			NumTransfers: sdk.NewUint(10),
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsAllowed: true,
+		}},
+		Uri: "",
+		Challenges: []*types.Challenge{
+			{
+				Root: hex.EncodeToString(rootHash),
+				ExpectedProofLength: sdk.NewUint(2),
+				MaxOneUsePerLeaf: true,
+				UseCreatorAddressAsLeaf: true,
+				ChallengeId: "hello",
+			},
+		},
+		TrackerId: "testing232",
+		TransferTimes: GetFullUintRanges(),
+		BadgeIds: GetOneUintRange(),
+		FromMappingId: "Mint",
+		ToMappingId: "All",
+		InitiatedByMappingId: "All",
+
+		OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers: true,
+		IncrementBadgeIdsBy: sdk.NewUint(0),
+		IncrementOwnershipTimesBy: sdk.NewUint(0),
+	})
+	
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
+		Creator: bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From: "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount: sdkmath.NewUint(1),
+						BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt: hex.EncodeToString(leafHashes[1]),
+									OnRight: true,
+								},
+								{
+									Aunt: hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+}
 
 
 
+func (suite *TestSuite) TestWrongExpectedProofLength() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
 
-// func (suite *TestSuite) TestSendAllToClaimsAndClaim() {
-// 	wctx := sdk.WrapSDKContext(suite.ctx)
-// 	err := *new(error)
+	aliceLeaf := "-" + alice + "-1-0-0"
+	bobLeaf := "-" + bob + "-1-0-0"
+	charlieLeaf := "-" + charlie + "-1-0-0"
 
-// 	// rootHash, merkleProofs := merkle.ProofsFromByteSlices([][]byte{[]byte(alice), []byte(bob), []byte(charlie), []byte(charlie)})
+	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
+	leafHashes := make([][]byte, len(leafs))
+	for i, leaf := range leafs {
+		initialHash := sha256.Sum256(leaf)
+		leafHashes[i] = initialHash[:]
+	}
 
-// 	aliceLeaf := "-" + alice + "-1-0-0"
-// 	bobLeaf := "-" + bob + "-1-0-0"
-// 	charlieLeaf := "-" + charlie + "-1-0-0"
-// 	// aliceLeaf := alice
-// 	// bobLeaf := bob
-// 	// charlieLeaf := charlie
+	levelTwoHashes := make([][]byte, 2)
+	for i := 0; i < len(leafHashes); i += 2 {
+		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
+		levelTwoHashes[i/2] = iHash[:]
+	}
 
-// 	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
-// 	leafHashes := make([][]byte, len(leafs))
-// 	for i, leaf := range leafs {
-// 		initialHash := sha256.Sum256(leaf)
-// 		leafHashes[i] = initialHash[:]
-// 		for j := 0; j < 32; j++ {
-// 			print(leafHashes[i][j])
-// 			print(" ")
-// 		}
-// 		println()
+	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
+	rootHash := rootHashI[:]
 
-// 		// println("leafHashes[i]: ", string(leafHashes[i]))
-// 	}
-// 	println()
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
+		OverallApprovals: &types.ApprovalsTracker{
+			Amounts: []*types.Balance{
+				{
+					Amount: sdkmath.NewUint(10),
+					BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+			NumTransfers: sdk.NewUint(10),
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsAllowed: true,
+		}},
+		Uri: "",
+		Challenges: []*types.Challenge{
+			{
+				Root: hex.EncodeToString(rootHash),
+				ExpectedProofLength: sdk.NewUint(5),
+				MaxOneUsePerLeaf: true,
+				ChallengeId: "hello",
+			},
+		},
+		TrackerId: "testing232",
+		TransferTimes: GetFullUintRanges(),
+		BadgeIds: GetOneUintRange(),
+		FromMappingId: "Mint",
+		ToMappingId: "All",
+		InitiatedByMappingId: "All",
 
-// 	levelTwoHashes := make([][]byte, 2)
-// 	for i := 0; i < len(leafHashes); i += 2 {
-// 		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
-// 		levelTwoHashes[i/2] = iHash[:]
-// 		for j := 0; j < 32; j++ {
-// 			print(levelTwoHashes[i/2][j])
-// 			print(" ")
-// 		}
-// 		println()
-// 	}
-// 	println()
+		OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers: true,
+		IncrementBadgeIdsBy: sdk.NewUint(0),
+		IncrementOwnershipTimesBy: sdk.NewUint(0),
+	})
+	
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-// 	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
-// 	rootHash := rootHashI[:]
+	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
+		Creator: bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From: "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount: sdkmath.NewUint(1),
+						BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+							},
+						},
+					},
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+							},
+						},
+					},
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt: hex.EncodeToString(leafHashes[1]),
+									OnRight: true,
+								},
+								{
+									Aunt: hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+}
 
-// 	for j := 0; j < 32; j++ {
-// 		print(rootHash[j])
-// 		print(" ")
-// 	}
+func (suite *TestSuite) TestIncrements() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
 
-// 	collectionsToCreate := []CollectionsToCreate{
-// 		{
-// 			Collection: types.MsgNewCollection{
-// 				CollectionMetadata: "https://example.com",
-// 				BadgeMetadata:            []*types.BadgeMetadata{
-// 					{
-// 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.UintRange{
-// 							{
-// 								Start: sdkmath.NewUint(1),
-// 								End: sdkmath.NewUint(math.MaxUint64),
-// 							},
-// 						},
-// 					},
-// 				},
-// 				Permissions: sdkmath.NewUint(62),
-// 			},
-// 			Amount:  sdkmath.NewUint(1),
-// 			Creator: bob,
-// 		},
-// 	}
+	aliceLeaf := "-" + alice + "-1-0-0"
+	bobLeaf := "-" + bob + "-1-0-0"
+	charlieLeaf := "-" + charlie + "-1-0-0"
 
-// 	CreateCollections(suite, wctx, collectionsToCreate)
-// 	badge, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
+	leafHashes := make([][]byte, len(leafs))
+	for i, leaf := range leafs {
+		initialHash := sha256.Sum256(leaf)
+		leafHashes[i] = initialHash[:]
+	}
 
-// 	claimToAdd := types.Claim{
-// 		Balances: []*types.Balance{
-// 			{
-// 				Amount: sdkmath.NewUint(10),
-// 				BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-// 			},
-// 		},
-// 		BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-// 		IncrementBadgeIdsBy: 0,
-// 		AmountPerClaim: 1,
-// 		Data:       hex.EncodeToString(rootHash),
-// 		Type: 	 	uint64(types.ClaimType_MerkleTree),
-// 		Uri: "",
-// 		TimeInterval: &types.UintRange{
-// 			Start: sdkmath.NewUint(0),
-// 			End:   sdkmath.NewUint(math.MaxUint64),
-// 		},
-// 	}
+	levelTwoHashes := make([][]byte, 2)
+	for i := 0; i < len(leafHashes); i += 2 {
+		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
+		levelTwoHashes[i/2] = iHash[:]
+	}
 
-// 	err = CreateBadges(suite, wctx, bob, sdkmath.NewUint(0), []*types.BadgeSupplyAndAmount{
-// 		{
-// 			Supply: sdkmath.NewUint(10),
-// 			Amount: sdkmath.NewUint(1),
-// 		},
-// 	},
-// 		[]*types.Transfer{},
-// 		[]*types.Claim{
-// 			&claimToAdd,
-// 		},
-// 		"https://example.com",
-// 		[]*types.BadgeMetadata{
-// 					{
-// 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.UintRange{
-// 							{
-// 								Start: sdkmath.NewUint(1),
-// 								End: sdkmath.NewUint(math.MaxUint64),
-// 							},
-// 						},
-// 					},
-// 				},
-// 	)
-// 	suite.Require().Nil(err, "Error creating badge")
-// 	badge, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
+	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
+	rootHash := rootHashI[:]
 
-// 	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
-// 	suite.Require().Equal([]*types.Balance{
-// 		{
-// 			BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, //0 to 0 range so it will be nil
-// 			Amount: sdkmath.NewUint(10),
-// 		},
-// 	}, badge.MaxSupplys)
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
+		OverallApprovals: &types.ApprovalsTracker{
+			Amounts: []*types.Balance{
+				{
+					Amount: sdkmath.NewUint(10),
+					BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+			NumTransfers: sdk.NewUint(10),
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsAllowed: true,
+		}},
+		Uri: "",
+		Challenges: []*types.Challenge{
+			{
+				Root: hex.EncodeToString(rootHash),
+				ExpectedProofLength: sdk.NewUint(2),
+				MaxOneUsePerLeaf: true,
+				UseLeafIndexForDistributionOrder: true,
+				ChallengeId: "hello",
+			},
+		},
+		TrackerId: "testing232",
+		TransferTimes: GetFullUintRanges(),
+		BadgeIds: GetOneUintRange(),
+		FromMappingId: "Mint",
+		ToMappingId: "All",
+		InitiatedByMappingId: "All",
 
-// 	claim := badge.Claims[0]
+		OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers: true,
+		IncrementBadgeIdsBy: sdk.NewUint(1),
+		IncrementOwnershipTimesBy: sdk.NewUint(0),
+	})
+	
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-// 	err = ClaimBadge(suite, wctx, bob, sdkmath.NewUint(0), 0, &types.ClaimProof{
-// 			Leaf: aliceLeaf,
-// 			Aunts: []*types.ClaimProofItem{
-// 				{
-// 					Aunt: hex.EncodeToString(leafHashes[1]),
-// 					OnRight: true,
-// 				},
-// 				{
-// 					Aunt: hex.EncodeToString(levelTwoHashes[1]),
-// 					OnRight: true,
-// 				},
-// 			},
-// 		},
-// 		"",
-// 		&types.UintRange{
-// 			Start: sdkmath.NewUint(0),
-// 			End:   sdkmath.NewUint(math.MaxUint64),
-// 		},
-// 	)
-// 	suite.Require().Nil(err, "Error claiming badge")
+	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
+		Creator: bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From: "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount: sdkmath.NewUint(1),
+						BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: bobLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt: hex.EncodeToString(leafHashes[0]),
+									OnRight: false,
+								},
+								{
+									Aunt: hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
 
-// 	aliceBalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
-// 	suite.Require().Equal(uint64(1), aliceBalance.Balances[0].Balance)
-// 	suite.Require().Equal([]*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
+	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
+		Creator: bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From: "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount: sdkmath.NewUint(1),
+						BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt: hex.EncodeToString(leafHashes[1]),
+									OnRight: true,
+								},
+								{
+									Aunt: hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge: %s")
+}
 
-// 	badge, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
-// 	claim = badge.Claims[0]
-// 	suite.Require().Equal(uint64(9), claim.Balances[0].Balance)
-// 	// suite.Require().Equal([]*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
-// }
 
-// func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
-// 	wctx := sdk.WrapSDKContext(suite.ctx)
-// 	err := *new(error)
-
-// 	aliceLeaf := "-" + alice + "-1-0-0"
-// 	bobLeaf := "-" + bob + "-1-0-0"
-// 	charlieLeaf := "-" + charlie + "-1-0-0"
-
-// 	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
-// 	leafHashes := make([][]byte, len(leafs))
-// 	for i, leaf := range leafs {
-// 		initialHash := sha256.Sum256(leaf)
-// 		leafHashes[i] = initialHash[:]
-// 	}
-
-// 	levelTwoHashes := make([][]byte, 2)
-// 	for i := 0; i < len(leafHashes); i += 2 {
-// 		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
-// 		levelTwoHashes[i/2] = iHash[:]
-// 	}
-
-// 	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
-// 	rootHash := rootHashI[:]
-
-// 	collectionsToCreate := []CollectionsToCreate{
-// 		{
-// 			Collection: types.MsgNewCollection{
-// 				CollectionMetadata: "https://example.com",
-// 				BadgeMetadata:            []*types.BadgeMetadata{
-// 					{
-// 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.UintRange{
-// 							{
-// 								Start: sdkmath.NewUint(1),
-// 								End: sdkmath.NewUint(math.MaxUint64),
-// 							},
-// 						},
-// 					},
-// 				},
-// 				Permissions: sdkmath.NewUint(62),
-// 			},
-// 			Amount:  sdkmath.NewUint(1),
-// 			Creator: bob,
-// 		},
-// 	}
-
-// 	CreateCollections(suite, wctx, collectionsToCreate)
-// 	badge, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
-
-// 	claimToAdd := types.Claim{
-// 		Balances: []*types.Balance{
-// 			{
-// 				Amount: sdkmath.NewUint(10),
-// 				BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-// 			},
-// 		},
-// 		BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-// 		IncrementBadgeIdsBy: 0,
-// 		AmountPerClaim: 1,
-// 		Data:       hex.EncodeToString(rootHash),
-// 		Type: 	 	uint64(types.ClaimType_MerkleTree),
-// 		Uri: "",
-// 		TimeInterval: &types.UintRange{
-// 			Start: sdkmath.NewUint(0),
-// 			End:   sdkmath.NewUint(math.MaxUint64),
-// 		},
-// 	}
-
-// 	err = CreateBadges(suite, wctx, bob, sdkmath.NewUint(0), []*types.BadgeSupplyAndAmount{
-// 		{
-// 			Supply: sdkmath.NewUint(10),
-// 			Amount: sdkmath.NewUint(1),
-// 		},
-// 	},
-// 		[]*types.Transfer{},
-// 		[]*types.Claim{
-// 			&claimToAdd,
-// 		}, "https://example.com",
-// 		[]*types.BadgeMetadata{
-// 					{
-// 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.UintRange{
-// 							{
-// 								Start: sdkmath.NewUint(1),
-// 								End: sdkmath.NewUint(math.MaxUint64),
-// 							},
-// 						},
-// 					},
-// 				},
-// 	)
-// 	suite.Require().Nil(err, "Error creating badge")
-// 	badge, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
-
-// 	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
-// 	suite.Require().Equal([]*types.Balance{
-// 		{
-// 			BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, //0 to 0 range so it will be nil
-// 			Amount: sdkmath.NewUint(10),
-// 		},
-// 	}, badge.MaxSupplys)
-
-// 	claim := badge.Claims[0]
-// 	suite.Require().Equal(&claimToAdd, claim)
-
-// 	err = ClaimBadge(suite, wctx, alice, sdkmath.NewUint(0), 0, &types.ClaimProof{
-// 		Leaf: "",
-// 		Aunts: []*types.ClaimProofItem{
-
-// 			{
-// 				Aunt: hex.EncodeToString(leafHashes[1]),
-// 				OnRight: true,
-// 			},
-// 			{
-// 				Aunt: hex.EncodeToString(levelTwoHashes[1]),
-// 				OnRight: true,
-// 			},
-// 		},
-// 	}, "", &types.UintRange{
-// 		Start: sdkmath.NewUint(0),
-// 		End:   sdkmath.NewUint(math.MaxUint64),
-// 	})
-// 	suite.Require().EqualError(err, keeper.ErrRootHashInvalid.Error())
-// }
-
-// func (suite *TestSuite) TestSendAllToClaimsAccountTypeCodes() {
-// 	wctx := sdk.WrapSDKContext(suite.ctx)
-// 	err := *new(error)
-
-// 	aliceLeaf := "-" + alice + "-1-0-0"
-// 	bobLeaf := "-" + bob + "-1-0-0"
-// 	charlieLeaf := "-" + charlie + "-1-0-0"
-
-// 	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
-// 	leafHashes := make([][]byte, len(leafs))
-// 	for i, leaf := range leafs {
-// 		initialHash := sha256.Sum256(leaf)
-// 		leafHashes[i] = initialHash[:]
-// 	}
-
-// 	levelTwoHashes := make([][]byte, 2)
-// 	for i := 0; i < len(leafHashes); i += 2 {
-// 		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
-// 		levelTwoHashes[i/2] = iHash[:]
-// 	}
-
-// 	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
-// 	rootHash := rootHashI[:]
-
-// 	// output := tmhash.Sum(append([]byte{0}, []byte("hello")...))
-// 	// // output := tmhash.Sum([]byte("hello"))
-// 	// for i := 0; i < len(merkleProofs[0].LeafHash); i++ {
-// 	// 	println(merkleProofs[0].LeafHash[i], output[i])
-// 	// }
-
-// 	// 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
-
-// 	collectionsToCreate := []CollectionsToCreate{
-// 		{
-// 			Collection: types.MsgNewCollection{
-// 				CollectionMetadata: "https://example.com",
-// 				BadgeMetadata:            []*types.BadgeMetadata{
-// 					{
-// 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.UintRange{
-// 							{
-// 								Start: sdkmath.NewUint(1),
-// 								End: sdkmath.NewUint(math.MaxUint64),
-// 							},
-// 						},
-// 					},
-// 				},
-// 				Permissions: sdkmath.NewUint(62),
-// 			},
-// 			Amount:  sdkmath.NewUint(1),
-// 			Creator: bob,
-// 		},
-// 	}
-
-// 	CreateCollections(suite, wctx, collectionsToCreate)
-// 	badge, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
-
-// 	claimToAdd := types.Claim{
-// 		Balances: []*types.Balance{
-// 			{
-// 				Amount: sdkmath.NewUint(10),
-// 				BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-// 			},
-// 		},
-// 		BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-// 		IncrementBadgeIdsBy: 1,
-// 		AmountPerClaim: 1,
-// 		Data:       hex.EncodeToString(rootHash),
-// 		Type: 	 	uint64(types.ClaimType_FirstCome),
-// 		Uri: "",
-// 		TimeInterval: &types.UintRange{
-// 			Start: sdkmath.NewUint(0),
-// 			End:   sdkmath.NewUint(math.MaxUint64),
-// 		},
-// 	}
-
-// 	err = CreateBadges(suite, wctx, bob, sdkmath.NewUint(0), []*types.BadgeSupplyAndAmount{
-// 		{
-// 			Supply: sdkmath.NewUint(10),
-// 			Amount: sdkmath.NewUint(1),
-// 		},
-// 	},
-// 		[]*types.Transfer{},
-// 		[]*types.Claim{
-// 			&claimToAdd,
-// 		}, "https://example.com",
-// 		[]*types.BadgeMetadata{
-// 					{
-// 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.UintRange{
-// 							{
-// 								Start: sdkmath.NewUint(1),
-// 								End: sdkmath.NewUint(math.MaxUint64),
-// 							},
-// 						},
-// 					},
-// 				},
-// 	)
-// 	suite.Require().Nil(err, "Error creating badge")
-// 	badge, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
-
-// 	suite.Require().Equal([]*types.Balance(nil), badge.UnmintedSupplys)
-// 	suite.Require().Equal([]*types.Balance{
-// 		{
-// 			BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, //0 to 0 range so it will be nil
-// 			Amount: sdkmath.NewUint(10),
-// 		},
-// 	}, badge.MaxSupplys)
-
-// 	claim := badge.Claims[0]
-// 	suite.Require().Equal(&claimToAdd, claim)
-
-// 	err = ClaimBadge(suite, wctx, alice, sdkmath.NewUint(0), 0, &types.ClaimProof{
-// 		Leaf: aliceLeaf,
-// 		Aunts: []*types.ClaimProofItem{
-// 			{
-// 				Aunt: hex.EncodeToString(leafHashes[1]),
-// 				OnRight: true,
-// 			},
-// 			{
-// 				Aunt: hex.EncodeToString(levelTwoHashes[1]),
-// 				OnRight: true,
-// 			},
-// 		},
-// 	}, "", &types.UintRange{
-// 		Start: sdkmath.NewUint(0),
-// 		End:   sdkmath.NewUint(math.MaxUint64),
-// 	})
-// 	suite.Require().Nil(err, "Error claiming badge")
-
-// 	aliceBalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
-// 	suite.Require().Equal(uint64(1), aliceBalance.Balances[0].Balance)
-// 	suite.Require().Equal([]*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, aliceBalance.Balances[0].BadgeIds)
-
-// 	badge, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
-// 	claim = badge.Claims[0]
-// 	suite.Require().Equal(uint64(9), claim.Balances[0].Balance)
-// 	suite.Require().Equal([]*types.UintRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2),}}, claim.BadgeIds)
-// }

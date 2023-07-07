@@ -15,24 +15,43 @@ import (
 // This means we have to verify that the current permissions do not forbid the update.
 //
 //To do this, we have to do the following:
-//-1) Get all the first matches for the old and new timelines
-//-2) Get the combination of values which are "updated". Note this depends on the field, so this is kept generic through a function (GetUpdateCombinationsToCheck)
-//-3) For all the values that are considered "updated", we check if we are allowed to update them, according to the permissions.
-//		To do this, we abstract all the updates to a (timelineTime, badgeIds, transferTimes, toMapping, fromMapping, initiatedByMapping) tuple, adding dummy values where needed.
-//		We then check if this tuple overlaps any of the permission's (timelineTime, badgeIds, transferTimes, toMapping, fromMapping, initiatedByMapping) tuples, again adding dummy values where needed.
-//		For all overlaps, we check that the current block time is NOT forbidden.
-//		If there are no forbidden updates, it is a valid update.
+//-1) Get the combination of values which are "updated". Note this depends on the field, so this is kept generic through a function (GetUpdateCombinationsToCheck)
+//		We are also dealing with timelines, so "updated" depends on the respective times, as well as the field value.
+//		We do this in a multi step-process:
+//		-First, we cast the timeline to UniversalPermission using only the TimelineTimes. We store the timeline VALUE in the ArbitraryValue field.
+//		-Second, we get the overlaps and non-overlaps between the (old, new) timeline times.
+//		 Note we also have to handle edge cases (in one but not the other). We add empty values where needed.
+//		 This then leaves us with a list of all the (timeA-timeB, valueX) - (timeA-timeB, valueY) pairs we need to check.
+//		-Third, we compare all valueX and valueY values to see if the actual value was updated.
+//		 If the value was not updated, then for timeA-timeB, we do not need to check the permissions.
+//		 If it was updated, we need to check the permissions for timeA-timeB.
+//		-Lastly, if it was updated, in addition to just simply checking timeA-timeB, we may also have to be more specific with what that we need to check.
+//		 Ex: If we go from [badgeIDs 1 to 10 -> www.example.com] to [badgeIDs 1 to 2 -> www.example2.com, badgeIDs 3 to 10 -> www.example.com],
+//				 we only need to check badgeIDs 1 to 2 from timeA-timeB
+//		 We eventually end with a (timeA-timeB, badgeIds, transferTimes, toMapping, fromMapping, initiatedByMapping) tuples array[] that we need to check, adding dummy values where needed.
+//		 This step and the third step is field-specific, so that is why we do it via a generic custom function (GetUpdatedStringCombinations, GetUpdatedBoolCombinations, etc...)
+//-2) For all the values that are considered "updated", we check if we are allowed to update them, according to the permissions.
+//		This is done by fetching wherever the returned tuples from above overlaps any of the permission's (timelineTime, badgeIds, transferTimes, toMapping, fromMapping, initiatedByMapping) tuples, again adding dummy values where needed.
+//		For all overlaps, we then assert that the current block time is NOT forbidden (permitted or undefined both correspond to allowed)
+//		If all are not forbidden, it is a valid update.
 
-//TODO: DRY and clean this file up; a lot of repeated code; also work on naming conventions
-
-func GetUpdatedStringCombinations(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error) {
-	x := []*types.UniversalPermissionDetails{}
-	if (oldValue == nil && newValue != nil) || (oldValue != nil && newValue == nil) {
-		x = append(x, &types.UniversalPermissionDetails{})
-	} else if oldValue.(string) != newValue.(string) {
-		x = append(x, &types.UniversalPermissionDetails{})
+//To make it easier, we first
+func GetPotentialUpdatesForTimelineValues(times [][]*types.UintRange, values []interface{}) []*types.UniversalPermissionDetails {
+	castedPermissions := []*types.UniversalPermission{}
+	for idx, time := range times {
+		castedPermissions = append(castedPermissions, &types.UniversalPermission{
+			DefaultValues: &types.UniversalDefaultValues{
+				TimelineTimes: time, 
+				ArbitraryValue: values[idx],
+				UsesTimelineTimes: true,
+			},
+			Combinations: []*types.UniversalCombination{{}},
+		})
 	}
-	return x, nil
+
+	firstMatches := types.GetFirstMatchOnly(castedPermissions) //I think this is unnecessary because we already disallow duplicate timeline times in ValidateBasic
+	
+	return firstMatches
 }
 
 func (k Keeper) ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldApprovedTransfers []*types.CollectionApprovedTransferTimeline, newApprovedTransfers []*types.CollectionApprovedTransferTimeline, CanUpdateCollectionApprovedTransfers []*types.CollectionApprovedTransferPermission, managerAddress string) error {
@@ -72,102 +91,63 @@ func (k Keeper) ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, colle
 			if (oldDetails.ArbitraryValue == nil && newDetails.ArbitraryValue != nil) || (oldDetails.ArbitraryValue != nil && newDetails.ArbitraryValue == nil) {
 				different = true
 			} else {
-				oldVal := oldDetails.ArbitraryValue.([]*types.CollectionApprovedTransfer)
-				newVal := newDetails.ArbitraryValue.([]*types.CollectionApprovedTransfer)
-			
+				oldVal := oldDetails.ArbitraryValue.(*types.CollectionApprovedTransfer)
+				newVal := newDetails.ArbitraryValue.(*types.CollectionApprovedTransfer)
 				
-				if len(newVal) != len(oldVal) {
+				
+				if newVal.RequireToEqualsInitiatedBy != oldVal.RequireToEqualsInitiatedBy ||	
+					newVal.RequireFromEqualsInitiatedBy != oldVal.RequireFromEqualsInitiatedBy ||
+					newVal.RequireToDoesNotEqualInitiatedBy != oldVal.RequireToDoesNotEqualInitiatedBy ||
+					newVal.RequireFromDoesNotEqualInitiatedBy != oldVal.RequireFromDoesNotEqualInitiatedBy ||
+					newVal.OverridesFromApprovedOutgoingTransfers != oldVal.OverridesFromApprovedOutgoingTransfers ||
+					newVal.OverridesToApprovedIncomingTransfers != oldVal.OverridesToApprovedIncomingTransfers ||
+					newVal.TrackerId != oldVal.TrackerId ||
+					newVal.Uri != oldVal.Uri ||
+					newVal.CustomData != oldVal.CustomData {
+						different = true
+					
+				}
+
+				if len(newVal.AllowedCombinations) != len(oldVal.AllowedCombinations) {
 					different = true
+				
 				} else {
-					for i := 0; i < len(newVal); i++ {
-						if newVal[i].RequireToEqualsInitiatedBy != oldVal[i].RequireToEqualsInitiatedBy ||	
-							newVal[i].RequireFromEqualsInitiatedBy != oldVal[i].RequireFromEqualsInitiatedBy ||
-							newVal[i].RequireToDoesNotEqualInitiatedBy != oldVal[i].RequireToDoesNotEqualInitiatedBy ||
-							newVal[i].RequireFromDoesNotEqualInitiatedBy != oldVal[i].RequireFromDoesNotEqualInitiatedBy ||
-							newVal[i].OverridesFromApprovedOutgoingTransfers != oldVal[i].OverridesFromApprovedOutgoingTransfers ||
-							newVal[i].OverridesToApprovedIncomingTransfers != oldVal[i].OverridesToApprovedIncomingTransfers ||
-							newVal[i].TrackerId != oldVal[i].TrackerId ||
-							newVal[i].Uri != oldVal[i].Uri ||
-							newVal[i].CustomData != oldVal[i].CustomData {
+					if len(newVal.AllowedCombinations) != len(oldVal.AllowedCombinations) {
+						different = true
+					
+					} else {
+						for j := 0; j < len(newVal.AllowedCombinations); j++ {
+							if proto.MarshalTextString(newVal.AllowedCombinations[j]) != proto.MarshalTextString(oldVal.AllowedCombinations[j]) {
 								different = true
-								break
-						}
-
-						if len(newVal[i].AllowedCombinations) != len(oldVal[i].AllowedCombinations) {
-							different = true
-							break
-						} else {
-							for j := 0; j < len(newVal[i].AllowedCombinations); j++ {
-								x, err := proto.Marshal(newVal[i].AllowedCombinations[j])
-								if err != nil {
-									panic(err)
-								}
-
-								y, err := proto.Marshal(oldVal[i].AllowedCombinations[j])
-								if err != nil {
-									panic(err)
-								}
-
-								if string(x) != string(y) {
-									different = true
-									break
-								}
+							
 							}
-						}
-
-						if len(newVal[i].Challenges) != len(oldVal[i].Challenges) {
-							different = true
-							break
-						} else {
-							for j := 0; j < len(newVal[i].Challenges); j++ {
-								x, err := proto.Marshal(newVal[i].Challenges[j])
-								if err != nil {
-									panic(err)
-								}
-
-								y, err := proto.Marshal(oldVal[i].Challenges[j])
-								if err != nil {
-									panic(err)
-								}
-
-								if string(x) != string(y) {
-									different = true
-									break
-								}
-							}
-						}
-
-						x, err := proto.Marshal(newVal[i].OverallApprovals)
-						if err != nil {
-							panic(err)
-						}
-
-						y, err := proto.Marshal(oldVal[i].OverallApprovals)
-						if err != nil {
-							panic(err)
-						}
-
-						if string(x) != string(y) {
-							different = true
-							break
-						}
-
-						x, err = proto.Marshal(newVal[i].PerAddressApprovals)
-						if err != nil {
-							panic(err)
-						}
-
-						y, err = proto.Marshal(oldVal[i].PerAddressApprovals)
-						if err != nil {
-							panic(err)
-						}
-
-						if string(x) != string(y) {
-							different = true
-							break
 						}
 					}
+
+					if len(newVal.Challenges) != len(oldVal.Challenges) {
+						different = true
+					
+					} else {
+						for j := 0; j < len(newVal.Challenges); j++ {
+							if proto.MarshalTextString(newVal.Challenges[j]) != proto.MarshalTextString(oldVal.Challenges[j]) {
+								different = true
+							
+							}
+						}
+					}
+
+					if proto.MarshalTextString(newVal.PerAddressApprovals) != proto.MarshalTextString(oldVal.PerAddressApprovals) {
+						different = true
+					
+					}
+
+					if proto.MarshalTextString(newVal.OverallApprovals) != proto.MarshalTextString(oldVal.OverallApprovals) {
+						different = true
+					
+					}
 				}
+				
+				
 			}
 				
 			if different {
@@ -196,11 +176,11 @@ func (k Keeper) ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, colle
 }
 
 
-func (k Keeper) ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, oldApprovedTransfers []*types.UserApprovedOutgoingTransferTimeline, newApprovedTransfers []*types.UserApprovedOutgoingTransferTimeline, CanUpdateCollectionApprovedTransfers []*types.UserApprovedOutgoingTransferPermission, managerAddress string) error {
-	oldTimes, oldValues := types.GetUserApprovedOutgoingTransferTimesAndValues(oldApprovedTransfers)
+func (k Keeper) ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, _oldApprovedTransfers []*types.UserApprovedOutgoingTransferTimeline, _newApprovedTransfers []*types.UserApprovedOutgoingTransferTimeline, CanUpdateCollectionApprovedTransfers []*types.UserApprovedOutgoingTransferPermission, managerAddress string) error {
+	oldTimes, oldValues := types.GetUserApprovedOutgoingTransferTimesAndValues(_oldApprovedTransfers)
 	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
 
-	newTimes, newValues := types.GetUserApprovedOutgoingTransferTimesAndValues(newApprovedTransfers)
+	newTimes, newValues := types.GetUserApprovedOutgoingTransferTimesAndValues(_newApprovedTransfers)
 	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
 
 	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []*types.UserApprovedOutgoingTransfer{}, managerAddress, func(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error) {
@@ -229,81 +209,46 @@ func (k Keeper) ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, old
 			if (oldDetails.ArbitraryValue == nil && newDetails.ArbitraryValue != nil) || (oldDetails.ArbitraryValue != nil && newDetails.ArbitraryValue == nil) {
 				different = true
 			} else {
-				oldVal := oldDetails.ArbitraryValue.([]*types.UserApprovedOutgoingTransfer)
-				newVal := newDetails.ArbitraryValue.([]*types.UserApprovedOutgoingTransfer)
+				oldVal := oldDetails.ArbitraryValue.(*types.UserApprovedOutgoingTransfer)
+				newVal := newDetails.ArbitraryValue.(*types.UserApprovedOutgoingTransfer)
 				
-				if len(newVal) != len(oldVal) {
+				
+				if newVal.RequireToEqualsInitiatedBy != oldVal.RequireToEqualsInitiatedBy ||	
+					newVal.RequireToDoesNotEqualInitiatedBy != oldVal.RequireToDoesNotEqualInitiatedBy ||
+					newVal.TrackerId != oldVal.TrackerId ||
+					newVal.Uri != oldVal.Uri ||
+					newVal.CustomData != oldVal.CustomData {
+						different = true
+					
+				}
+
+				if len(newVal.AllowedCombinations) != len(oldVal.AllowedCombinations) {
 					different = true
+				
 				} else {
-					for i := 0; i < len(newVal); i++ {
-						if newVal[i].RequireToEqualsInitiatedBy != oldVal[i].RequireToEqualsInitiatedBy ||	
-							newVal[i].RequireToDoesNotEqualInitiatedBy != oldVal[i].RequireToDoesNotEqualInitiatedBy ||
-							newVal[i].TrackerId != oldVal[i].TrackerId ||
-							newVal[i].Uri != oldVal[i].Uri ||
-							newVal[i].CustomData != oldVal[i].CustomData {
-								different = true
-								break
-						}
-
-						if len(newVal[i].AllowedCombinations) != len(oldVal[i].AllowedCombinations) {
+					for j := 0; j < len(newVal.AllowedCombinations); j++ {
+						if proto.MarshalTextString(newVal.AllowedCombinations[j]) != proto.MarshalTextString(oldVal.AllowedCombinations[j]) {
 							different = true
-							break
-						} else {
-							for j := 0; j < len(newVal[i].AllowedCombinations); j++ {
-								x, err := proto.Marshal(newVal[i].AllowedCombinations[j])
-								if err != nil {
-									panic(err)
-								}
-
-								y, err := proto.Marshal(oldVal[i].AllowedCombinations[j])
-								if err != nil {
-									panic(err)
-								}
-
-								if string(x) != string(y) {
-									different = true
-									break
-								}
-							}
-						}
-
-						if len(newVal[i].Challenges) != len(oldVal[i].Challenges) {
-							different = true
-							break
-						} else {
-							for j := 0; j < len(newVal[i].Challenges); j++ {
-								x, err := proto.Marshal(newVal[i].Challenges[j])
-								if err != nil {
-									panic(err)
-								}
-
-								y, err := proto.Marshal(oldVal[i].Challenges[j])
-								if err != nil {
-									panic(err)
-								}
-
-								if string(x) != string(y) {
-									different = true
-									break
-								}
-							}
-						}
-
-						x, err := proto.Marshal(newVal[i].PerAddressApprovals)
-						if err != nil {
-							panic(err)
-						}
-
-						y, err := proto.Marshal(oldVal[i].PerAddressApprovals)
-						if err != nil {
-							panic(err)
-						}
-
-						if string(x) != string(y) {
-							different = true
-							break
+						
 						}
 					}
+				}
+
+				if len(newVal.Challenges) != len(oldVal.Challenges) {
+					different = true
+				
+				} else {
+					for j := 0; j < len(newVal.Challenges); j++ {
+						if proto.MarshalTextString(newVal.Challenges[j]) != proto.MarshalTextString(oldVal.Challenges[j]) {
+							different = true
+						
+						}
+					}
+				}
+
+				if proto.MarshalTextString(newVal.PerAddressApprovals) != proto.MarshalTextString(oldVal.PerAddressApprovals) {
+					different = true
+				
 				}
 			}
 				
@@ -330,14 +275,14 @@ func (k Keeper) ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, old
 	return nil
 }
 
-func (k Keeper) ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, oldApprovedTransfers []*types.UserApprovedIncomingTransferTimeline, newApprovedTransfers []*types.UserApprovedIncomingTransferTimeline, CanUpdateCollectionApprovedTransfers []*types.UserApprovedIncomingTransferPermission, managerAddress string) error {
-	oldTimes, oldValues := types.GetUserApprovedIncomingTransferTimesAndValues(oldApprovedTransfers)
+func (k Keeper) ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, _oldApprovedTransfers []*types.UserApprovedIncomingTransferTimeline, _newApprovedTransfers []*types.UserApprovedIncomingTransferTimeline, CanUpdateCollectionApprovedTransfers []*types.UserApprovedIncomingTransferPermission, managerAddress string) error {
+	oldTimes, oldValues := types.GetUserApprovedIncomingTransferTimesAndValues(_oldApprovedTransfers)
 	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
 
-	newTimes, newValues := types.GetUserApprovedIncomingTransferTimesAndValues(newApprovedTransfers)
+	newTimes, newValues := types.GetUserApprovedIncomingTransferTimesAndValues(_newApprovedTransfers)
 	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
 
-	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []*types.UserApprovedOutgoingTransfer{}, managerAddress, func(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error) {
+	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []*types.UserApprovedIncomingTransfer{}, managerAddress, func(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error) {
 		//Cast to UniversalPermissionDetails for comaptibility with these overlap functions and get first matches only (i.e. first match for each badge ID)
 		oldApprovedTransfers, err := k.CastUserApprovedIncomingTransferToUniversalPermission(ctx, oldValue.([]*types.UserApprovedIncomingTransfer), managerAddress)
 		if err != nil {
@@ -364,85 +309,48 @@ func (k Keeper) ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, old
 				different = true
 			} else {
 
-				oldVal := oldDetails.ArbitraryValue.([]*types.UserApprovedIncomingTransfer)
-				newVal := newDetails.ArbitraryValue.([]*types.UserApprovedIncomingTransfer)
+				oldVal := oldDetails.ArbitraryValue.(*types.UserApprovedIncomingTransfer)
+				newVal := newDetails.ArbitraryValue.(*types.UserApprovedIncomingTransfer)
 				
-				
-				if len(newVal) != len(oldVal) {
+				if newVal.RequireFromDoesNotEqualInitiatedBy != oldVal.RequireFromDoesNotEqualInitiatedBy ||	
+					newVal.RequireFromEqualsInitiatedBy != oldVal.RequireFromEqualsInitiatedBy ||
+					newVal.TrackerId != oldVal.TrackerId ||
+					newVal.Uri != oldVal.Uri ||
+					newVal.CustomData != oldVal.CustomData {
+						different = true
+					
+				}
+
+				if len(newVal.AllowedCombinations) != len(oldVal.AllowedCombinations) {
 					different = true
+				
 				} else {
-					for i := 0; i < len(newVal); i++ {
-						if newVal[i].RequireFromDoesNotEqualInitiatedBy != oldVal[i].RequireFromDoesNotEqualInitiatedBy ||	
-							newVal[i].RequireFromEqualsInitiatedBy != oldVal[i].RequireFromEqualsInitiatedBy ||
-							newVal[i].TrackerId != oldVal[i].TrackerId ||
-							newVal[i].Uri != oldVal[i].Uri ||
-							newVal[i].CustomData != oldVal[i].CustomData {
-								different = true
-								break
-						}
-
-						if len(newVal[i].AllowedCombinations) != len(oldVal[i].AllowedCombinations) {
+					for j := 0; j < len(newVal.AllowedCombinations); j++ {
+						if proto.MarshalTextString(newVal.AllowedCombinations[j]) != proto.MarshalTextString(oldVal.AllowedCombinations[j]) {
 							different = true
-							break
-						} else {
-							for j := 0; j < len(newVal[i].AllowedCombinations); j++ {
-								x, err := proto.Marshal(newVal[i].AllowedCombinations[j])
-								if err != nil {
-									panic(err)
-								}
-
-								y, err := proto.Marshal(oldVal[i].AllowedCombinations[j])
-								if err != nil {
-									panic(err)
-								}
-
-								if string(x) != string(y) {
-									different = true
-									break
-								}
-							}
-						}
-
-						if len(newVal[i].Challenges) != len(oldVal[i].Challenges) {
-							different = true
-							break
-						} else {
-							for j := 0; j < len(newVal[i].Challenges); j++ {
-								x, err := proto.Marshal(newVal[i].Challenges[j])
-								if err != nil {
-									panic(err)
-								}
-
-								y, err := proto.Marshal(oldVal[i].Challenges[j])
-								if err != nil {
-									panic(err)
-								}
-
-								if string(x) != string(y) {
-									different = true
-									break
-								}
-							}
-						}
-
-						x, err := proto.Marshal(newVal[i].PerAddressApprovals)
-						if err != nil {
-							panic(err)
-						}
-
-						y, err := proto.Marshal(oldVal[i].PerAddressApprovals)
-						if err != nil {
-							panic(err)
-						}
-
-						if string(x) != string(y) {
-							different = true
-							break
+						
 						}
 					}
 				}
-			}
+
+				if len(newVal.Challenges) != len(oldVal.Challenges) {
+					different = true
 				
+				} else {
+					for j := 0; j < len(newVal.Challenges); j++ {
+						if proto.MarshalTextString(newVal.Challenges[j]) != proto.MarshalTextString(oldVal.Challenges[j]) {
+							different = true
+						
+						}
+					}
+				}
+
+				if proto.MarshalTextString(newVal.PerAddressApprovals) != proto.MarshalTextString(oldVal.PerAddressApprovals) {
+					different = true
+				
+				}
+			}
+		
 			if different {
 				detailsToReturn = append(detailsToReturn, overlap)
 			}
@@ -489,6 +397,7 @@ func (k Keeper) ValidateBadgeMetadataUpdate(ctx sdk.Context, oldBadgeMetadata []
 			overlap := overlapObject.Overlap
 			oldDetails := overlapObject.FirstDetails
 			newDetails := overlapObject.SecondDetails
+			//HACK: We set it to a string beforehand
 			if (oldDetails.ArbitraryValue == nil && newDetails.ArbitraryValue != nil) || (oldDetails.ArbitraryValue != nil && newDetails.ArbitraryValue == nil) {
 				detailsToReturn = append(detailsToReturn, overlap)
 			} else {
@@ -555,7 +464,10 @@ func (k Keeper) ValidateCollectionMetadataUpdate(ctx sdk.Context, oldCollectionM
 
 func (k Keeper) ValidateOffChainBalancesMetadataUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldOffChainBalancesMetadata []*types.OffChainBalancesMetadataTimeline, newOffChainBalancesMetadata []*types.OffChainBalancesMetadataTimeline, canUpdateOffChainBalancesMetadata []*types.TimedUpdatePermission) error {
 	if !IsOffChainBalances(collection) {
-		return sdkerrors.Wrapf(ErrWrongBalancesType, "off-chain balances metadata is being set but collection %s does not have off-chain balances", collection.CollectionId)
+		if len(oldOffChainBalancesMetadata) > 0 || len(newOffChainBalancesMetadata) > 0 {
+			return sdkerrors.Wrapf(ErrWrongBalancesType, "off chain balances are being set but collection %s does not have off chain balances", collection.CollectionId)
+		}
+		return nil
 	}
 	
 	oldTimes, oldValues := types.GetOffChainBalancesMetadataTimesAndValues(oldOffChainBalancesMetadata)
@@ -593,7 +505,10 @@ func (k Keeper) ValidateOffChainBalancesMetadataUpdate(ctx sdk.Context, collecti
 
 func (k Keeper) ValidateInheritedBalancesUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldInheritedBalances []*types.InheritedBalancesTimeline, newInheritedBalances []*types.InheritedBalancesTimeline, canUpdateInheritedBalances []*types.TimedUpdateWithBadgeIdsPermission) error {
 	if !IsInheritedBalances(collection) {
-		return sdkerrors.Wrapf(ErrWrongBalancesType, "inherited balances are being set but collection %s does not have inherited balances", collection.CollectionId)
+		if len(oldInheritedBalances) > 0 || len(newInheritedBalances) > 0 {
+			return sdkerrors.Wrapf(ErrWrongBalancesType, "inherited balances are being set but collection %s does not have inherited balances", collection.CollectionId)
+		}
+		return nil
 	}
 	
 	//Set collection next badge ID
@@ -634,30 +549,13 @@ func (k Keeper) ValidateInheritedBalancesUpdate(ctx sdk.Context, collection *typ
 			if (oldDetails.ArbitraryValue == nil && newDetails.ArbitraryValue != nil) || (oldDetails.ArbitraryValue != nil && newDetails.ArbitraryValue == nil) {
 				different = true
 			} else {
+				oldVal := oldDetails.ArbitraryValue.(*types.InheritedBalance)
+				newVal := newDetails.ArbitraryValue.(*types.InheritedBalance)
 
-				oldVal := oldDetails.ArbitraryValue.([]*types.InheritedBalance)
-				newVal := newDetails.ArbitraryValue.([]*types.InheritedBalance)
-
-				
-				if len(newVal) != len(oldVal) {
+			
+				if proto.MarshalTextString(newVal) != proto.MarshalTextString(oldVal) {
 					different = true
-				} else {
-					for i := 0; i < len(newVal); i++ {
-						x, err := proto.Marshal(newVal[i])
-						if err != nil {
-							panic(err)
-						}
-
-						y, err := proto.Marshal(oldVal[i])
-						if err != nil {
-							panic(err)
-						}
-
-						if string(x) != string(y) {
-							different = true
-							break
-						}
-					}
+				
 				}
 			}
 
@@ -683,6 +581,34 @@ func (k Keeper) ValidateInheritedBalancesUpdate(ctx sdk.Context, collection *typ
 
 	return nil
 }
+
+/** Everything below here is pretty standard because all we need to compare is primitive types **/
+
+func GetUpdatedStringCombinations(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error) {
+	x := []*types.UniversalPermissionDetails{}
+	if (oldValue == nil && newValue != nil) || (oldValue != nil && newValue == nil) {
+		x = append(x, &types.UniversalPermissionDetails{})
+	} else if oldValue.(string) != newValue.(string) {
+		x = append(x, &types.UniversalPermissionDetails{})
+	}
+	return x, nil
+}
+
+func GetUpdatedBoolCombinations(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error) {
+	if (oldValue == nil && newValue != nil) || (oldValue != nil && newValue == nil) {
+		return []*types.UniversalPermissionDetails{{}}, nil
+	}
+
+	oldVal := oldValue.(bool)
+	newVal := newValue.(bool)
+	if oldVal != newVal {
+		return []*types.UniversalPermissionDetails{
+			{},
+		}, nil
+	}
+	return []*types.UniversalPermissionDetails{}, nil
+}
+
 
 func (k Keeper) ValidateManagerUpdate(ctx sdk.Context, oldManager []*types.ManagerTimeline, newManager []*types.ManagerTimeline, canUpdateManager []*types.TimedUpdatePermission) error {
 	oldTimes, oldValues := types.GetManagerTimesAndValues(oldManager)
@@ -737,15 +663,11 @@ func (k Keeper) ValidateStandardsUpdate(ctx sdk.Context, oldStandards []*types.S
 			newVal := newValue.([]string)
 			
 			if len(oldVal) != len(newVal) {
-				return []*types.UniversalPermissionDetails{
-					{},
-				}, nil
+				return []*types.UniversalPermissionDetails{{}}, nil
 			} else {
 				for i := 0; i < len(oldVal); i++ {
 					if oldVal[i] != newVal[i] {
-						return []*types.UniversalPermissionDetails{
-							{},
-						}, nil
+						return []*types.UniversalPermissionDetails{{}}, nil
 					}
 				}
 			}
@@ -790,20 +712,7 @@ func (k Keeper) ValidateIsArchivedUpdate(ctx sdk.Context, oldIsArchived []*types
 	newTimes, newValues := types.GetIsArchivedTimesAndValues(newIsArchived)
 	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
 
-	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, false, "", func(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error) {
-		if (oldValue == nil && newValue != nil) || (oldValue != nil && newValue == nil) {
-			return []*types.UniversalPermissionDetails{{}}, nil
-		}
-
-		oldVal := oldValue.(bool)
-		newVal := newValue.(bool)
-		if oldVal != newVal {
-			return []*types.UniversalPermissionDetails{
-				{},
-			}, nil
-		}
-		return []*types.UniversalPermissionDetails{}, nil
-	})
+	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, false, "", GetUpdatedBoolCombinations)
 	if err != nil {
 		return err 
 	}

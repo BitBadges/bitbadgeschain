@@ -6,6 +6,9 @@ import (
 	"math"
 )
 
+//We handle the following cases:
+//1) {amount: 1, badgeIds: [1 to 10, 5 to 20]} -> {amount: 1, badgeIds: [1 to 4, 11 to 20]}, {amount: 2: badgeIds: [5 to 10]}
+//2) {amount: 1, badgeIds: [5 to 10]}, {amount: 2: badgeIds: [5 to 10]} -> {amount: 3: badgeIds: [5 to 10]}
 func HandleDuplicateBadgeIds(balances []*Balance) ([]*Balance, error) {
 	newBalances := []*Balance{}
 	err := *new(error)
@@ -27,23 +30,23 @@ func HandleDuplicateBadgeIds(balances []*Balance) ([]*Balance, error) {
 	return newBalances, nil
 }
 
-// Gets the balances for a specific ID. Assumes balances are sorted
-func GetBalancesForId(id sdkmath.Uint, balances []*Balance) []*Balance {
-	matchingBalances := []*Balance{}
-	for _, balance := range balances {
-		found := SearchUintRangesForUint(id, balance.BadgeIds)
-		if found {
-			matchingBalances = append(matchingBalances, &Balance{
-				Amount:   balance.Amount,
-				BadgeIds: []*UintRange{{Start: id, End: id}},
-				OwnershipTimes: balance.OwnershipTimes,
-			})
-		}
-	}
-	return matchingBalances
-}
+// // Gets the balances for a specific ID
+// func GetBalancesForId(id sdkmath.Uint, balances []*Balance) []*Balance {
+// 	matchingBalances := []*Balance{}
+// 	for _, balance := range balances {
+// 		found := SearchUintRangesForUint(id, balance.BadgeIds)
+// 		if found {
+// 			matchingBalances = append(matchingBalances, &Balance{
+// 				Amount:   balance.Amount,
+// 				BadgeIds: []*UintRange{{Start: id, End: id}},
+// 				OwnershipTimes: balance.OwnershipTimes,
+// 			})
+// 		}
+// 	}
+// 	return matchingBalances
+// }
 
-// Updates the balance for a specific ids from what it currently is to newAmount.
+// Updates the balance for a specific ids from what it currently is to newAmount. No add/subtract logic. Just set it.
 func UpdateBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error) {
 	//Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
 	// ranges = SortAndMergeOverlapping(ranges)
@@ -62,7 +65,7 @@ func UpdateBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error)
 }
 
 // Gets the balances for specified ID ranges. Returns a new []*Balance where only the specified ID ranges and their balances are included. Appends balance == 0 objects so all IDs are accounted for, even if not found.
-func GetBalancesForIds(uintRanges []*UintRange, times []*UintRange, balances []*Balance) (newBalances []*Balance, err error) {
+func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Balance) (newBalances []*Balance, err error) {
 	fetchedBalances := []*Balance{}
 
 	currPermissionDetails := []*UniversalPermissionDetails{}
@@ -83,7 +86,7 @@ func GetBalancesForIds(uintRanges []*UintRange, times []*UintRange, balances []*
 	}
 
 	toFetchPermissionDetails := []*UniversalPermissionDetails{}
-	for _, rangeToFetch := range uintRanges {
+	for _, rangeToFetch := range idRanges {
 		for _, timeToFetch := range times {
 			toFetchPermissionDetails = append(toFetchPermissionDetails, &UniversalPermissionDetails{
 					BadgeId: rangeToFetch,
@@ -99,6 +102,7 @@ func GetBalancesForIds(uintRanges []*UintRange, times []*UintRange, balances []*
 
 
 	overlaps, _, inNewButNotOld := GetOverlapsAndNonOverlaps(currPermissionDetails, toFetchPermissionDetails)
+	//For all overlaps, we simply return the amount
 	for _, overlapObject := range overlaps {
 		overlap := overlapObject.Overlap
 		amount := overlapObject.FirstDetails.ArbitraryValue.(sdkmath.Uint)
@@ -110,6 +114,7 @@ func GetBalancesForIds(uintRanges []*UintRange, times []*UintRange, balances []*
 		})
 	}
 
+	//For those that were in toFetch but not currBalances, we return amount == 0
 	for _, detail := range inNewButNotOld {
 		fetchedBalances = append(fetchedBalances, &Balance{
 			Amount:   sdkmath.NewUint(0),

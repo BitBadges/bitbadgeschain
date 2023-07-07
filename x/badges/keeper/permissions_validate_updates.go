@@ -223,13 +223,13 @@ func (k Keeper) ValidateUserPermissionsUpdate(ctx sdk.Context, oldPermissions *t
 		return err
 	}
 
-	if oldPermissions.CanUpdateApprovedIncomingTransfers != nil && newPermissions.CanUpdateApprovedIncomingTransfers != nil {
+	if newPermissions.CanUpdateApprovedIncomingTransfers != nil {
 		if err := k.ValidateUserApprovedIncomingTransferPermissionsUpdate(ctx, oldPermissions.CanUpdateApprovedIncomingTransfers, newPermissions.CanUpdateApprovedIncomingTransfers, managerAddress); err != nil {
 			return err
 		}
 	}
 
-	if oldPermissions.CanUpdateApprovedOutgoingTransfers != nil && newPermissions.CanUpdateApprovedOutgoingTransfers != nil {
+	if newPermissions.CanUpdateApprovedOutgoingTransfers != nil {
 		if err := k.ValidateUserApprovedOutgoingTransferPermissionsUpdate(ctx, oldPermissions.CanUpdateApprovedOutgoingTransfers, newPermissions.CanUpdateApprovedOutgoingTransfers, managerAddress); err != nil {
 			return err
 		}
@@ -249,73 +249,73 @@ func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types
 		return err
 	}
 
-	if oldPermissions.CanDeleteCollection != nil && newPermissions.CanDeleteCollection != nil {
+	if newPermissions.CanDeleteCollection != nil {
 		if err := k.ValidateActionPermissionUpdate(oldPermissions.CanDeleteCollection, newPermissions.CanDeleteCollection); err != nil {
 			return err
 		}
 	}
 
-	if oldPermissions.CanUpdateManager != nil && newPermissions.CanUpdateManager != nil {
+	if newPermissions.CanUpdateManager != nil {
 		if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateManager, newPermissions.CanUpdateManager); err != nil {
 			return err
 		}
 	}
 
-	if oldPermissions.CanUpdateCustomData != nil && newPermissions.CanUpdateCustomData != nil {
+	if newPermissions.CanUpdateCustomData != nil {
 		if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateCustomData, newPermissions.CanUpdateCustomData); err != nil {
 			return err
 		}
 	}
 	
-	if oldPermissions.CanUpdateStandards != nil && newPermissions.CanUpdateStandards != nil {
+	if newPermissions.CanUpdateStandards != nil {
 		if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateStandards, newPermissions.CanUpdateStandards); err != nil {
 			return err
 		}
 	}
 
-	if oldPermissions.CanArchive != nil && newPermissions.CanArchive != nil {
+	if newPermissions.CanArchive != nil {
 		if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanArchive, newPermissions.CanArchive); err != nil {
 			return err
 		}
 	}
 
-	if oldPermissions.CanUpdateOffChainBalancesMetadata != nil && newPermissions.CanUpdateOffChainBalancesMetadata != nil {
+	if newPermissions.CanUpdateOffChainBalancesMetadata != nil {
 		if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateOffChainBalancesMetadata, newPermissions.CanUpdateOffChainBalancesMetadata); err != nil {
 			return err
 		}
 	}
 
-	if oldPermissions.CanUpdateCollectionMetadata != nil && newPermissions.CanUpdateCollectionMetadata != nil {
+	if newPermissions.CanUpdateCollectionMetadata != nil {
 		if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateCollectionMetadata, newPermissions.CanUpdateCollectionMetadata); err != nil {
 			return err
 		}
 	}
 
-	if oldPermissions.CanUpdateContractAddress != nil && newPermissions.CanUpdateContractAddress != nil {
+	if newPermissions.CanUpdateContractAddress != nil {
 		if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateContractAddress, newPermissions.CanUpdateContractAddress); err != nil {
 			return err
 		}
 	}
 
-	if oldPermissions.CanCreateMoreBadges != nil && newPermissions.CanCreateMoreBadges != nil {
+	if newPermissions.CanCreateMoreBadges != nil {
 		if err := k.ValidateBalancesActionPermissionUpdate(oldPermissions.CanCreateMoreBadges, newPermissions.CanCreateMoreBadges); err != nil {
 			return err
 		}
 	}
 
-	if oldPermissions.CanUpdateBadgeMetadata != nil && newPermissions.CanUpdateBadgeMetadata != nil {
+	if newPermissions.CanUpdateBadgeMetadata != nil {
 		if err := k.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldPermissions.CanUpdateBadgeMetadata, newPermissions.CanUpdateBadgeMetadata); err != nil {
 			return err
 		}
 	}
 
-	if oldPermissions.CanUpdateInheritedBalances != nil && newPermissions.CanUpdateInheritedBalances != nil {
+	if newPermissions.CanUpdateInheritedBalances != nil {
 		if err := k.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldPermissions.CanUpdateInheritedBalances, newPermissions.CanUpdateInheritedBalances); err != nil {
 			return err
 		}
 	}
 
-	if oldPermissions.CanUpdateCollectionApprovedTransfers != nil && newPermissions.CanUpdateCollectionApprovedTransfers != nil {
+	if newPermissions.CanUpdateCollectionApprovedTransfers != nil {
 		if err := k.ValidateCollectionApprovedTransferPermissionsUpdate(ctx, oldPermissions.CanUpdateCollectionApprovedTransfers, newPermissions.CanUpdateCollectionApprovedTransfers, managerAddress); err != nil {
 			return err
 		}

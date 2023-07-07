@@ -222,7 +222,7 @@ func ValidateCollectionApprovedTransfer(collectionApprovedTransfer *CollectionAp
 	}
 
 	if collectionApprovedTransfer.TrackerId == "" &&
-	 (collectionApprovedTransfer.OverallApprovals == nil && collectionApprovedTransfer.PerAddressApprovals == nil) {
+	 (collectionApprovedTransfer.OverallApprovals == nil || collectionApprovedTransfer.PerAddressApprovals == nil) {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "tracker id is uninitialized")
 	}
 
