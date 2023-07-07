@@ -9,7 +9,7 @@ func (suite *TestSuite) TestDeleteCollection() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{}
+	collectionsToCreate[0].BadgesToCreate = []*types.Balance{}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
@@ -18,8 +18,8 @@ func (suite *TestSuite) TestDeleteCollection() {
 	suite.Require().Nil(err, "Error getting badge: %s")
 
 	err = DeleteCollection(suite, wctx, &types.MsgDeleteCollection{
-		Creator:       bob,
-		CollectionId:  sdk.NewUint(1),
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
 	})
 	suite.Require().Nil(err, "Error archiving collection: %s")
 
@@ -28,11 +28,11 @@ func (suite *TestSuite) TestDeleteCollection() {
 	suite.Require().Error(err, "Error getting badge: %s")
 
 	err = ArchiveCollection(suite, wctx, &types.MsgArchiveCollection{
-		Creator:       bob,
-		CollectionId:  sdk.NewUint(1),
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
 		IsArchivedTimeline: []*types.IsArchivedTimeline{
 			{
-				IsArchived: true,
+				IsArchived:    true,
 				TimelineTimes: GetFullUintRanges(),
 			},
 		},

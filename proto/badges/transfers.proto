@@ -219,3 +219,29 @@ message ApprovalsTracker {
   string numTransfers = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated Balance amounts = 2;
 }
+
+message Transfer {
+  string from = 1;
+  repeated string toAddresses = 2;
+  repeated Balance balances = 3;
+
+  //Note here we remain optimistic that the solutions will apply to all potential challenges.
+  //It is the Tx Sender's responsibility to ensure that the solutions are valid for all potential challenges.
+  //If you are attempting to claim badges with different sets of challenges, you will need to make multiple transfers.
+  repeated ChallengeSolution solutions = 4;
+}
+
+message ClaimProofItem {
+  string aunt = 1;
+  bool onRight = 2;
+}
+
+//Consistent with tendermint/crypto merkle tree
+message ClaimProof {
+  string leaf = 1;
+  repeated ClaimProofItem aunts = 2;
+}
+
+message ChallengeSolution {
+  ClaimProof proof = 1;
+}

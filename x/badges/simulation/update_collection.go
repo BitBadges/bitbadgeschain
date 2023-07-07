@@ -1,0 +1,76 @@
+package simulation
+
+import (
+	"math/rand"
+
+	sdkmath "cosmossdk.io/math"
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"github.com/cosmos/cosmos-sdk/baseapp"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+)
+
+func SimulateMsgUpdateCollection(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
+	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
+	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
+		simAccount, _ := simtypes.RandomAcc(r, accs)
+		msg := &types.MsgUpdateCollection{
+			Creator: simAccount.Address.String(),
+			UpdateCollectionPermissions: r.Int63n(2) == 0,
+			UpdateIsArchivedTimeline:    r.Int63n(2) == 0,
+			UpdateManagerTimeline: 		 r.Int63n(2) == 0,
+			UpdateCollectionMetadataTimeline: r.Int63n(2) == 0,
+			UpdateBadgeMetadataTimeline: r.Int63n(2) == 0,
+			UpdateOffChainBalancesMetadataTimeline: r.Int63n(2) == 0,
+			UpdateCustomDataTimeline: r.Int63n(2) == 0,
+			UpdateInheritedBalancesTimeline: r.Int63n(2) == 0,
+			UpdateCollectionApprovedTransfersTimeline: r.Int63n(2) == 0,
+			UpdateStandardsTimeline: r.Int63n(2) == 0,
+			UpdateContractAddressTimeline: r.Int63n(2) == 0,
+
+			CollectionId: sdkmath.NewUint(uint64(r.Int63n(5))),
+			IsArchivedTimeline: []*types.IsArchivedTimeline{
+				{
+					IsArchived:    r.Int63n(2) == 0,
+					TimelineTimes: GetTimelineTimes(r, 3),
+				},
+			},
+			BadgesToCreate: GetRandomBalances(r, 3),
+			CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
+				{
+					ApprovedTransfers: []*types.CollectionApprovedTransfer{
+						{
+							FromMappingId:        GetRandomAddresses(r, 1, accs)[0],
+							ToMappingId:          GetRandomAddresses(r, 1, accs)[0],
+							InitiatedByMappingId: GetRandomAddresses(r, 1, accs)[0],
+							TransferTimes:        GetTimelineTimes(r, 100),
+							BadgeIds:             GetTimelineTimes(r, 3),
+							AllowedCombinations: []*types.IsCollectionTransferAllowed{
+								{
+									IsAllowed: r.Int63n(2) == 0,
+								},
+							},
+						},
+					},
+					TimelineTimes: GetTimelineTimes(r, 100),
+				},
+			},
+			ManagerTimeline: []*types.ManagerTimeline{
+				{
+					Manager:       simAccount.Address.String(),
+					TimelineTimes: GetTimelineTimes(r, 3),
+				},
+			},
+			CollectionPermissions:  GetRandomCollectionPermissions(r, accs),
+		}
+
+		// TODO: Handling the UpdateCollection simulation
+
+		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "UpdateCollection simulation not implemented"), nil, nil
+	}
+}

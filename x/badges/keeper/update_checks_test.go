@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (suite *TestSuite) TestCheckTimedUpdatePermission() {	
+func (suite *TestSuite) TestCheckTimedUpdatePermission() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -15,19 +15,17 @@ func (suite *TestSuite) TestCheckTimedUpdatePermission() {
 	suite.Require().Nil(err, "Error creating collections")
 
 	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUpdateCollectionPermissions{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
 			CanUpdateContractAddress: []*types.TimedUpdatePermission{
 				{
 					DefaultValues: &types.TimedUpdateDefaultValues{
 						PermittedTimes: GetFullUintRanges(),
-						TimelineTimes: GetFullUintRanges(),
+						TimelineTimes:  GetFullUintRanges(),
 					},
 					Combinations: []*types.TimedUpdateCombination{
-						{
-							
-						},
+						{},
 					},
 				},
 			},
@@ -36,11 +34,11 @@ func (suite *TestSuite) TestCheckTimedUpdatePermission() {
 	suite.Require().Nil(err, "Error updating collection permissions")
 
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		ContractAddressTimeline: []*types.ContractAddressTimeline{
 			{
-				TimelineTimes: GetFullUintRanges(),
+				TimelineTimes:   GetFullUintRanges(),
 				ContractAddress: "0x123",
 			},
 		},
@@ -48,7 +46,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermission() {
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-func (suite *TestSuite) TestCheckTimedUpdatePermissionDefaultAllowed() {	
+func (suite *TestSuite) TestCheckTimedUpdatePermissionDefaultAllowed() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -57,7 +55,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionDefaultAllowed() {
 	suite.Require().Nil(err, "Error creating collections")
 
 	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUpdateCollectionPermissions{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
 			CanUpdateContractAddress: []*types.TimedUpdatePermission{},
@@ -66,11 +64,11 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionDefaultAllowed() {
 	suite.Require().Nil(err, "Error updating collection permissions")
 
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		ContractAddressTimeline: []*types.ContractAddressTimeline{
 			{
-				TimelineTimes: GetFullUintRanges(),
+				TimelineTimes:   GetFullUintRanges(),
 				ContractAddress: "0x123",
 			},
 		},
@@ -78,7 +76,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionDefaultAllowed() {
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {	
+func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -87,30 +85,26 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 	suite.Require().Nil(err, "Error creating collections")
 
 	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUpdateCollectionPermissions{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
 			CanUpdateContractAddress: []*types.TimedUpdatePermission{
 				{
 					DefaultValues: &types.TimedUpdateDefaultValues{
 						PermittedTimes: GetFullUintRanges(),
-						TimelineTimes: GetOneUintRange(),
+						TimelineTimes:  GetOneUintRange(),
 					},
 					Combinations: []*types.TimedUpdateCombination{
-						{
-							
-						},
+						{},
 					},
 				},
 				{
 					DefaultValues: &types.TimedUpdateDefaultValues{
 						ForbiddenTimes: GetFullUintRanges(),
-						TimelineTimes: GetTwoUintRanges(),
+						TimelineTimes:  GetTwoUintRanges(),
 					},
 					Combinations: []*types.TimedUpdateCombination{
-						{
-							
-						},
+						{},
 					},
 				},
 			},
@@ -119,11 +113,11 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 	suite.Require().Nil(err, "Error updating collection permissions")
 
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		ContractAddressTimeline: []*types.ContractAddressTimeline{
 			{
-				TimelineTimes: GetFullUintRanges(),
+				TimelineTimes:   GetFullUintRanges(),
 				ContractAddress: "0x123",
 			},
 		},
@@ -131,11 +125,11 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 	suite.Require().Error(err, "Error updating metadata")
 
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		ContractAddressTimeline: []*types.ContractAddressTimeline{
 			{
-				TimelineTimes: GetOneUintRange(),
+				TimelineTimes:   GetOneUintRange(),
 				ContractAddress: "0x123",
 			},
 		},
@@ -143,7 +137,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermission() {	
+func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermission() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -152,20 +146,18 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermission() {
 	suite.Require().Nil(err, "Error creating collections")
 
 	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUpdateCollectionPermissions{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
 			CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{
 				{
 					DefaultValues: &types.TimedUpdateWithBadgeIdsDefaultValues{
 						PermittedTimes: GetFullUintRanges(),
-						TimelineTimes: GetFullUintRanges(),
-						BadgeIds: GetFullUintRanges(),
+						TimelineTimes:  GetFullUintRanges(),
+						BadgeIds:       GetFullUintRanges(),
 					},
 					Combinations: []*types.TimedUpdateWithBadgeIdsCombination{
-						{
-							
-						},
+						{},
 					},
 				},
 			},
@@ -174,14 +166,14 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermission() {
 	suite.Require().Nil(err, "Error updating collection permissions")
 
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
 			{
 				TimelineTimes: GetFullUintRanges(),
 				BadgeMetadata: []*types.BadgeMetadata{
 					{
-						Uri: "https://example.com",
+						Uri:      "https://example.com",
 						BadgeIds: GetFullUintRanges(),
 					},
 				},
@@ -191,7 +183,7 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermission() {
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionDefaultAllowed() {	
+func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionDefaultAllowed() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -200,7 +192,7 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionDefaultAllowed
 	suite.Require().Nil(err, "Error creating collections")
 
 	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUpdateCollectionPermissions{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
 			CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{},
@@ -209,14 +201,14 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionDefaultAllowed
 	suite.Require().Nil(err, "Error updating collection permissions")
 
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
 			{
 				TimelineTimes: GetFullUintRanges(),
 				BadgeMetadata: []*types.BadgeMetadata{
 					{
-						Uri: "https://example.com",
+						Uri:      "https://example.com",
 						BadgeIds: GetFullUintRanges(),
 					},
 				},
@@ -226,7 +218,7 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionDefaultAllowed
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionInvalidTimes() {	
+func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionInvalidTimes() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -235,32 +227,28 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionInvalidTimes()
 	suite.Require().Nil(err, "Error creating collections")
 
 	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUpdateCollectionPermissions{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
 			CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{
 				{
 					DefaultValues: &types.TimedUpdateWithBadgeIdsDefaultValues{
 						PermittedTimes: GetFullUintRanges(),
-						TimelineTimes: GetOneUintRange(),
-						BadgeIds: GetFullUintRanges(),
+						TimelineTimes:  GetOneUintRange(),
+						BadgeIds:       GetFullUintRanges(),
 					},
 					Combinations: []*types.TimedUpdateWithBadgeIdsCombination{
-						{
-							
-						},
+						{},
 					},
 				},
 				{
 					DefaultValues: &types.TimedUpdateWithBadgeIdsDefaultValues{
 						ForbiddenTimes: GetFullUintRanges(),
-						TimelineTimes: GetTwoUintRanges(),
-						BadgeIds: GetFullUintRanges(),
+						TimelineTimes:  GetTwoUintRanges(),
+						BadgeIds:       GetFullUintRanges(),
 					},
 					Combinations: []*types.TimedUpdateWithBadgeIdsCombination{
-						{
-							
-						},
+						{},
 					},
 				},
 			},
@@ -269,14 +257,14 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionInvalidTimes()
 	suite.Require().Nil(err, "Error updating collection permissions")
 
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
 			{
 				TimelineTimes: GetFullUintRanges(),
 				BadgeMetadata: []*types.BadgeMetadata{
 					{
-						Uri: "https://example.com",
+						Uri:      "https://example.com",
 						BadgeIds: GetFullUintRanges(),
 					},
 				},
@@ -286,14 +274,14 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionInvalidTimes()
 	suite.Require().Error(err, "Error updating metadata")
 
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
 			{
 				TimelineTimes: GetOneUintRange(),
 				BadgeMetadata: []*types.BadgeMetadata{
 					{
-						Uri: "https://example.com",
+						Uri:      "https://example.com",
 						BadgeIds: GetFullUintRanges(),
 					},
 				},
@@ -303,9 +291,7 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionInvalidTimes()
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-
-
-func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {	
+func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -314,24 +300,22 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 	suite.Require().Nil(err, "Error creating collections")
 
 	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUpdateCollectionPermissions{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
 			CanUpdateCollectionApprovedTransfers: []*types.CollectionApprovedTransferPermission{
 				{
 					DefaultValues: &types.CollectionApprovedTransferDefaultValues{
-						FromMappingId: alice,
-						ToMappingId: "All",
-						ForbiddenTimes: GetFullUintRanges(),
-						TimelineTimes: GetFullUintRanges(),
+						FromMappingId:        alice,
+						ToMappingId:          "All",
+						ForbiddenTimes:       GetFullUintRanges(),
+						TimelineTimes:        GetFullUintRanges(),
 						InitiatedByMappingId: "All",
-						BadgeIds: GetFullUintRanges(),
-						TransferTimes: GetFullUintRanges(),
+						BadgeIds:             GetFullUintRanges(),
+						TransferTimes:        GetFullUintRanges(),
 					},
 					Combinations: []*types.CollectionApprovedTransferCombination{
-						{
-							
-						},
+						{},
 					},
 				},
 			},
@@ -339,25 +323,24 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 	})
 	suite.Require().Nil(err, "Error updating collection permissions")
 
-	
 	err = UpdateCollectionApprovedTransfers(suite, wctx, &types.MsgUpdateCollectionApprovedTransfers{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
 			{
 				TimelineTimes: GetFullUintRanges(),
 				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						FromMappingId: alice,
-						ToMappingId: "All",
-						InitiatedByMappingId: "All",
-						BadgeIds: GetFullUintRanges(),
-						TransferTimes: GetFullUintRanges(),
+						FromMappingId:                          alice,
+						ToMappingId:                            "All",
+						InitiatedByMappingId:                   "All",
+						BadgeIds:                               GetFullUintRanges(),
+						TransferTimes:                          GetFullUintRanges(),
 						OverridesFromApprovedOutgoingTransfers: true,
-						RequireToEqualsInitiatedBy: true,
-						TrackerId: "test",
-						IncrementBadgeIdsBy: sdkmath.NewUint(0),
-						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+						RequireToEqualsInitiatedBy:             true,
+						TrackerId:                              "test",
+						IncrementBadgeIdsBy:                    sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy:              sdkmath.NewUint(0),
 					},
 				},
 			},
@@ -366,23 +349,23 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 	suite.Require().Error(err, "Error updating collection approved transfers")
 
 	err = UpdateCollectionApprovedTransfers(suite, wctx, &types.MsgUpdateCollectionApprovedTransfers{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
 			{
 				TimelineTimes: GetFullUintRanges(),
 				ApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
-						FromMappingId: bob,
-						ToMappingId: "All",
-						InitiatedByMappingId: "All",
-						BadgeIds: GetFullUintRanges(),
-						TransferTimes: GetFullUintRanges(),
+						FromMappingId:                          bob,
+						ToMappingId:                            "All",
+						InitiatedByMappingId:                   "All",
+						BadgeIds:                               GetFullUintRanges(),
+						TransferTimes:                          GetFullUintRanges(),
 						OverridesFromApprovedOutgoingTransfers: true,
-						RequireToEqualsInitiatedBy: true,
-						TrackerId: "test",
-						IncrementBadgeIdsBy: sdkmath.NewUint(0),
-						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+						RequireToEqualsInitiatedBy:             true,
+						TrackerId:                              "test",
+						IncrementBadgeIdsBy:                    sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy:              sdkmath.NewUint(0),
 					},
 				},
 			},
@@ -391,53 +374,47 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 	suite.Require().Nil(err, "Error updating collection approved transfers")
 }
 
-
-func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {	
+func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].Collection.DefaultApprovedIncomingTransfersTimeline = []*types.UserApprovedIncomingTransferTimeline{}
-	collectionsToCreate[0].Collection.DefaultApprovedOutgoingTransfersTimeline = []*types.UserApprovedOutgoingTransferTimeline{}
-
+	collectionsToCreate[0].DefaultApprovedIncomingTransfersTimeline = []*types.UserApprovedIncomingTransferTimeline{}
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline = []*types.UserApprovedOutgoingTransferTimeline{}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating collections")
 
 	err = UpdateUserPermissions(suite, wctx, &types.MsgUpdateUserPermissions{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.UserPermissions{
 			CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransferPermission{
 				{
 					DefaultValues: &types.UserApprovedOutgoingTransferDefaultValues{
-						ToMappingId: alice,
-						ForbiddenTimes: GetFullUintRanges(),
-						TimelineTimes: GetFullUintRanges(),
+						ToMappingId:          alice,
+						ForbiddenTimes:       GetFullUintRanges(),
+						TimelineTimes:        GetFullUintRanges(),
 						InitiatedByMappingId: "All",
-						BadgeIds: GetFullUintRanges(),
-						TransferTimes: GetFullUintRanges(),
+						BadgeIds:             GetFullUintRanges(),
+						TransferTimes:        GetFullUintRanges(),
 					},
 					Combinations: []*types.UserApprovedOutgoingTransferCombination{
-						{
-							
-						},
+						{},
 					},
 				},
 			},
 			CanUpdateApprovedIncomingTransfers: []*types.UserApprovedIncomingTransferPermission{
 				{
 					DefaultValues: &types.UserApprovedIncomingTransferDefaultValues{
-						FromMappingId: alice,
-						ForbiddenTimes: GetFullUintRanges(),
-						TimelineTimes: GetFullUintRanges(),
+						FromMappingId:        alice,
+						ForbiddenTimes:       GetFullUintRanges(),
+						TimelineTimes:        GetFullUintRanges(),
 						InitiatedByMappingId: "All",
-						BadgeIds: GetFullUintRanges(),
-						TransferTimes: GetFullUintRanges(),
+						BadgeIds:             GetFullUintRanges(),
+						TransferTimes:        GetFullUintRanges(),
 					},
 					Combinations: []*types.UserApprovedIncomingTransferCombination{
-						{
-							
-						},
+						{},
 					},
 				},
 			},
@@ -445,24 +422,24 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 	})
 	suite.Require().Nil(err, "Error updating collection permissions")
 
-	
 	err = UpdateUserApprovedTransfers(suite, wctx, &types.MsgUpdateUserApprovedTransfers{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		
+		UpdateApprovedOutgoingTransfersTimeline: true,
+		UpdateApprovedIncomingTransfersTimeline: true,
 		ApprovedOutgoingTransfersTimeline: []*types.UserApprovedOutgoingTransferTimeline{
 			{
 				TimelineTimes: GetFullUintRanges(),
 				ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
 					{
-						ToMappingId: alice,
-						InitiatedByMappingId: "All",
-						BadgeIds: GetFullUintRanges(),
-						TransferTimes: GetFullUintRanges(),
+						ToMappingId:                alice,
+						InitiatedByMappingId:       "All",
+						BadgeIds:                   GetFullUintRanges(),
+						TransferTimes:              GetFullUintRanges(),
 						RequireToEqualsInitiatedBy: true,
-						TrackerId: "test",
-						IncrementBadgeIdsBy: sdkmath.NewUint(0),
-						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+						TrackerId:                  "test",
+						IncrementBadgeIdsBy:        sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy:  sdkmath.NewUint(0),
 					},
 				},
 			},
@@ -472,13 +449,13 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 				TimelineTimes: GetFullUintRanges(),
 				ApprovedIncomingTransfers: []*types.UserApprovedIncomingTransfer{
 					{
-						FromMappingId: alice,
+						FromMappingId:        alice,
 						InitiatedByMappingId: "All",
-						BadgeIds: GetFullUintRanges(),
-						TransferTimes: GetFullUintRanges(),
-						
-						TrackerId: "test",
-						IncrementBadgeIdsBy: sdkmath.NewUint(0),
+						BadgeIds:             GetFullUintRanges(),
+						TransferTimes:        GetFullUintRanges(),
+
+						TrackerId:                 "test",
+						IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					},
 				},
@@ -488,21 +465,23 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 	suite.Require().Error(err, "Error updating collection approved transfers")
 
 	err = UpdateUserApprovedTransfers(suite, wctx, &types.MsgUpdateUserApprovedTransfers{
-		Creator: bob,
+		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
+		UpdateApprovedOutgoingTransfersTimeline: true,
+		UpdateApprovedIncomingTransfersTimeline: true,
 		ApprovedOutgoingTransfersTimeline: []*types.UserApprovedOutgoingTransferTimeline{
 			{
 				TimelineTimes: GetFullUintRanges(),
 				ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
 					{
-						ToMappingId: bob,
-						InitiatedByMappingId: "All",
-						BadgeIds: GetFullUintRanges(),
-						TransferTimes: GetFullUintRanges(),
+						ToMappingId:                bob,
+						InitiatedByMappingId:       "All",
+						BadgeIds:                   GetFullUintRanges(),
+						TransferTimes:              GetFullUintRanges(),
 						RequireToEqualsInitiatedBy: true,
-						TrackerId: "test",
-						IncrementBadgeIdsBy: sdkmath.NewUint(0),
-						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+						TrackerId:                  "test",
+						IncrementBadgeIdsBy:        sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy:  sdkmath.NewUint(0),
 					},
 				},
 			},
@@ -512,14 +491,14 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 				TimelineTimes: GetFullUintRanges(),
 				ApprovedIncomingTransfers: []*types.UserApprovedIncomingTransfer{
 					{
-						FromMappingId: bob,
-						InitiatedByMappingId: "All",
-						BadgeIds: GetFullUintRanges(),
-						TransferTimes: GetFullUintRanges(),
+						FromMappingId:                bob,
+						InitiatedByMappingId:         "All",
+						BadgeIds:                     GetFullUintRanges(),
+						TransferTimes:                GetFullUintRanges(),
 						RequireFromEqualsInitiatedBy: true,
-						
-						TrackerId: "test",
-						IncrementBadgeIdsBy: sdkmath.NewUint(0),
+
+						TrackerId:                 "test",
+						IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					},
 				},

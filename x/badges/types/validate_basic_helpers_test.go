@@ -12,8 +12,8 @@ func GetValidUserPermissions() *types.UserPermissions {
 		CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransferPermission{
 			{
 				DefaultValues: &types.UserApprovedOutgoingTransferDefaultValues{
-					PermittedTimes: []*types.UintRange{ { Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2) } },
-					ForbiddenTimes: []*types.UintRange{ { Start: sdkmath.NewUint(6), End: sdkmath.NewUint(8) } },
+					PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+					ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(6), End: sdkmath.NewUint(8)}},
 				},
 				Combinations: []*types.UserApprovedOutgoingTransferCombination{{}},
 			},
@@ -30,7 +30,7 @@ func GetValidCollectionMetadataTimeline() []*types.CollectionMetadataTimeline {
 			TimelineTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
-					End:  sdkmath.NewUint(math.MaxUint64),
+					End:   sdkmath.NewUint(math.MaxUint64),
 				},
 			},
 		},
@@ -47,7 +47,7 @@ func GetValidBadgeMetadataTimeline() []*types.BadgeMetadataTimeline {
 						{
 							Start: sdkmath.NewUint(1),
 
-							End:   sdkmath.NewUint(math.MaxUint64),
+							End: sdkmath.NewUint(math.MaxUint64),
 						},
 					},
 				},
@@ -55,10 +55,9 @@ func GetValidBadgeMetadataTimeline() []*types.BadgeMetadataTimeline {
 			TimelineTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(0),
-					End:  sdkmath.NewUint(math.MaxUint64),
+					End:   sdkmath.NewUint(math.MaxUint64),
 				},
 			},
 		},
 	}
 }
-

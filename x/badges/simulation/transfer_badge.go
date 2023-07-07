@@ -12,7 +12,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 )
 
-func SimulateMsgTransferBadge(
+func SimulateMsgTransferBadges(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	k keeper.Keeper,
@@ -21,11 +21,10 @@ func SimulateMsgTransferBadge(
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 
-		
-		msg := &types.MsgTransferBadge{
+		msg := &types.MsgTransferBadges{
 			Creator:      simAccount.Address.String(),
 			CollectionId: sdkmath.NewUint(uint64(r.Int63n(100))),
-			Transfers:  GetRandomTransfers(r, 3, accs),
+			Transfers:    GetRandomTransfers(r, 3, accs),
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

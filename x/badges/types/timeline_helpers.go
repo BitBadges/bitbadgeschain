@@ -83,19 +83,6 @@ func GetCurrentCollectionApprovedTransfers(ctx sdk.Context, collection *BadgeCol
 	return []*CollectionApprovedTransfer{}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 func GetIsArchivedTimesAndValues(isArchivedTimeline []*IsArchivedTimeline) ([][]*UintRange, []interface{}) {
 	times := [][]*UintRange{}
 	values := []interface{}{}
@@ -135,7 +122,6 @@ func GetUserApprovedIncomingTransferTimesAndValues(approvedTransfers []*UserAppr
 	}
 	return times, values
 }
-
 
 func GetInheritedBalancesTimesAndValues(inheritedBalances []*InheritedBalancesTimeline) ([][]*UintRange, []interface{}) {
 	times := [][]*UintRange{}
@@ -217,4 +203,3 @@ func GetStandardsTimesAndValues(standardsTimeline []*StandardsTimeline) ([][]*Ui
 	}
 	return times, values
 }
-

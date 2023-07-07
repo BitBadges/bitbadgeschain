@@ -16,7 +16,7 @@ func CmdClaimBadge() *cobra.Command {
 		Short: "Broadcast message claimBadge",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-return nil
+			return nil
 
 			// argClaimId := types.NewUintFromString(args[0])
 			// if err != nil {

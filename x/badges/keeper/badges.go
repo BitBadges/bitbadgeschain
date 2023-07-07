@@ -7,11 +7,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-//Create badges and update the unminted / total supplys for the collection
-func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, badgesToCreate []*types.Balance, transfers []*types.Transfer, managerAddress string) (*types.BadgeCollection, error) {
+// Create badges and update the unminted / total supplys for the collection
+func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, badgesToCreate []*types.Balance) (*types.BadgeCollection, error) {
 	if !IsStandardBalances(collection) {
 		//For readability, we do not allow transfers to happen on-chain, if not defined in the collection
-		if len(transfers) > 0 || len(collection.CollectionApprovedTransfersTimeline) > 0 {
+		if len(collection.CollectionApprovedTransfersTimeline) > 0 {
 			return &types.BadgeCollection{}, ErrWrongBalancesType
 		}
 	}
@@ -27,7 +27,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		for _, badgeIdRange := range balanceObj.BadgeIds {
 			for _, time := range balanceObj.OwnershipTimes {
 				detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
-					BadgeId: badgeIdRange,
+					BadgeId:      badgeIdRange,
 					TransferTime: time,
 				})
 			}
@@ -58,12 +58,10 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		allBadgeIds = append(allBadgeIds, balance.BadgeIds...)
 	}
 
-
 	allBadgeIds = types.SortAndMergeOverlapping(allBadgeIds)
 	if len(allBadgeIds) > 1 || (len(allBadgeIds) == 1 && !allBadgeIds[0].Start.Equal(sdkmath.NewUint(1))) {
 		return &types.BadgeCollection{}, sdkerrors.Wrapf(types.ErrNotSupported, "BadgeIds must be sequential starting from 1")
 	}
-
 
 	//Create the badges and add newly created balances to unminted supplys
 	for _, balance := range badgesToCreate {
@@ -90,14 +88,6 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 	err = k.SetUserBalanceInStore(ctx, ConstructBalanceKey("Total", collection.CollectionId), totalSupplys)
 	if err != nil {
 		return &types.BadgeCollection{}, err
-	}
-
-	if IsStandardBalances(collection) {
-		//Handle any transfers defined in the Msg
-		err = k.HandleTransfers(ctx, collection, transfers, managerAddress)
-		if err != nil {
-			return &types.BadgeCollection{}, err
-		}
 	}
 
 	return collection, nil

@@ -6,27 +6,27 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const TypeMsgTransferBadge = "transfer_badge"
+const TypeMsgTransferBadges = "transfer_badge"
 
-var _ sdk.Msg = &MsgTransferBadge{}
+var _ sdk.Msg = &MsgTransferBadges{}
 
-func NewMsgTransferBadge(creator string, collectionId sdkmath.Uint, transfers []*Transfer) *MsgTransferBadge {
-	return &MsgTransferBadge{
+func NewMsgTransferBadges(creator string, collectionId sdkmath.Uint, transfers []*Transfer) *MsgTransferBadges {
+	return &MsgTransferBadges{
 		Creator:      creator,
 		CollectionId: collectionId,
 		Transfers:    transfers,
 	}
 }
 
-func (msg *MsgTransferBadge) Route() string {
+func (msg *MsgTransferBadges) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgTransferBadge) Type() string {
-	return TypeMsgTransferBadge
+func (msg *MsgTransferBadges) Type() string {
+	return TypeMsgTransferBadges
 }
 
-func (msg *MsgTransferBadge) GetSigners() []sdk.AccAddress {
+func (msg *MsgTransferBadges) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -34,12 +34,12 @@ func (msg *MsgTransferBadge) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgTransferBadge) GetSignBytes() []byte {
+func (msg *MsgTransferBadges) GetSignBytes() []byte {
 	bz := AminoCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgTransferBadge) ValidateBasic() error {
+func (msg *MsgTransferBadges) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)

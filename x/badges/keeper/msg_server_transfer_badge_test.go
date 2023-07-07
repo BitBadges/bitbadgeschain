@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (suite *TestSuite) TestTransferBadgeForceful() {
+func (suite *TestSuite) TestTransferBadgesForceful() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -21,17 +21,17 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 	suite.Require().Equal(sdkmath.NewUint(1), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From:         bob,
+				From:        bob,
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
-						Amount: sdkmath.NewUint(1),
-						BadgeIds: GetOneUintRange(),
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetOneUintRange(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -51,8 +51,7 @@ func (suite *TestSuite) TestTransferBadgeForceful() {
 	suite.Require().Nil(err)
 }
 
-
-func (suite *TestSuite) TestTransferBadgeHandleDuplicateIDs() {
+func (suite *TestSuite) TestTransferBadgesHandleDuplicateIDs() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -66,12 +65,12 @@ func (suite *TestSuite) TestTransferBadgeHandleDuplicateIDs() {
 	suite.Require().Equal(sdkmath.NewUint(1), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From:         bob,
+				From:        bob,
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
@@ -90,7 +89,7 @@ func (suite *TestSuite) TestTransferBadgeHandleDuplicateIDs() {
 
 }
 
-func (suite *TestSuite) TestTransferBadgeNotApprovedCollectionLevel() {
+func (suite *TestSuite) TestTransferBadgesNotApprovedCollectionLevel() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -110,23 +109,23 @@ func (suite *TestSuite) TestTransferBadgeNotApprovedCollectionLevel() {
 		CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
 			{
 				ApprovedTransfers: []*types.CollectionApprovedTransfer{},
-				TimelineTimes: GetFullUintRanges(),
+				TimelineTimes:     GetFullUintRanges(),
 			},
 		},
 	})
 	suite.Require().Nil(err, "Error updating approved transfers")
 
-	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From:         bob,
+				From:        bob,
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
-						Amount: sdkmath.NewUint(1),
-						BadgeIds: GetOneUintRange(),
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetOneUintRange(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -136,8 +135,7 @@ func (suite *TestSuite) TestTransferBadgeNotApprovedCollectionLevel() {
 	suite.Require().Error(err, "Error transferring badge")
 }
 
-
-func (suite *TestSuite) TestTransferBadgeNotApprovedIncoming() {
+func (suite *TestSuite) TestTransferBadgesNotApprovedIncoming() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -154,6 +152,7 @@ func (suite *TestSuite) TestTransferBadgeNotApprovedIncoming() {
 	err = UpdateUserApprovedTransfers(suite, wctx, &types.MsgUpdateUserApprovedTransfers{
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
+		UpdateApprovedIncomingTransfersTimeline: true,
 		ApprovedIncomingTransfersTimeline: []*types.UserApprovedIncomingTransferTimeline{
 			{
 				// ApprovedIncomingTransfers: []*types.CollectionApprovedTransfer{},
@@ -163,17 +162,17 @@ func (suite *TestSuite) TestTransferBadgeNotApprovedIncoming() {
 	})
 	suite.Require().Nil(err, "Error updating approved transfers")
 
-	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From:         bob,
+				From:        bob,
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
-						Amount: sdkmath.NewUint(1),
-						BadgeIds: GetOneUintRange(),
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetOneUintRange(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -183,7 +182,7 @@ func (suite *TestSuite) TestTransferBadgeNotApprovedIncoming() {
 	suite.Require().Error(err, "Error transferring badge")
 }
 
-func (suite *TestSuite) TestTransferBadgeFromMintAddress() {
+func (suite *TestSuite) TestTransferBadgesFromMintAddress() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -208,30 +207,30 @@ func (suite *TestSuite) TestTransferBadgeFromMintAddress() {
 		CollectionId: sdkmath.NewUint(1),
 		BadgesToCreate: []*types.Balance{
 			{
-				Amount: sdkmath.NewUint(1),
-				BadgeIds: GetOneUintRange(),
+				Amount:         sdkmath.NewUint(1),
+				BadgeIds:       GetOneUintRange(),
 				OwnershipTimes: GetFullUintRanges(),
 			},
 		},
 		CollectionApprovedTransfersTimeline: collection.CollectionApprovedTransfersTimeline,
-		InheritedBalancesTimeline: collection.InheritedBalancesTimeline,
-		CollectionMetadataTimeline: collection.CollectionMetadataTimeline,
-		BadgeMetadataTimeline: collection.BadgeMetadataTimeline,
-		OffChainBalancesMetadataTimeline: collection.OffChainBalancesMetadataTimeline,
+		InheritedBalancesTimeline:           collection.InheritedBalancesTimeline,
+		CollectionMetadataTimeline:          collection.CollectionMetadataTimeline,
+		BadgeMetadataTimeline:               collection.BadgeMetadataTimeline,
+		OffChainBalancesMetadataTimeline:    collection.OffChainBalancesMetadataTimeline,
 	})
 	suite.Require().Nil(err, "Error transferring badge")
 
-	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From:         "Mint",
+				From:        "Mint",
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
-						Amount: sdkmath.NewUint(1),
-						BadgeIds: GetOneUintRange(),
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetOneUintRange(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -244,17 +243,17 @@ func (suite *TestSuite) TestTransferBadgeFromMintAddress() {
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	AssertBalancesEqual(suite, []*types.Balance{}, unmintedSupplys.Balances)
 
-	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From:         "Mint",
+				From:        "Mint",
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
-						Amount: sdkmath.NewUint(1),
-						BadgeIds: GetOneUintRange(),
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetOneUintRange(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},

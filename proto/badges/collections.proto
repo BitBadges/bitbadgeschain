@@ -34,7 +34,7 @@ message BadgeCollection {
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
   
   // The balancesType is the type of balances this collection uses (standard, off-chain, or inherited).
-  string balancesType = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string balancesType = 4;
   // The off-chain balances metadata defines where to fetch the balances for collections with off-chain balances.
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 5;
   // The inherited balances metadata defines the parent balances for collections with inherited balances.

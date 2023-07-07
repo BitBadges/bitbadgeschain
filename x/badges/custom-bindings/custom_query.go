@@ -32,7 +32,7 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 				return nil, err
 			}
 			return json.Marshal(badgeTypes.QueryGetBalanceResponse{Balance: res.Balance})
-		
+
 		case custom.QueryAddressMapping != nil:
 			res, err := keeper.GetAddressMapping(ctx, custom.QueryAddressMapping)
 			if err != nil {
@@ -57,9 +57,9 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 }
 
 type badgeCustomQuery struct {
-	QueryCollection  							*badgeTypes.QueryGetCollectionRequest  `json:"queryCollection,omitempty"`
-	QueryBalance     							*badgeTypes.QueryGetBalanceRequest     `json:"queryBalance,omitempty"`
-	QueryAddressMapping 	 				*badgeTypes.QueryGetAddressMappingRequest     `json:"queryAddressMapping,omitempty"`
-	QueryApprovalsTracker 	 			*badgeTypes.QueryGetApprovalsTrackerRequest     `json:"queryApprovalsTracker,omitempty"`
-	QueryGetNumUsedForChallenge 	*badgeTypes.QueryGetNumUsedForChallengeRequest     `json:"queryGetNumUsedForChallenge,omitempty"`
+	QueryCollection             *badgeTypes.QueryGetCollectionRequest          `json:"queryCollection,omitempty"`
+	QueryBalance                *badgeTypes.QueryGetBalanceRequest             `json:"queryBalance,omitempty"`
+	QueryAddressMapping         *badgeTypes.QueryGetAddressMappingRequest      `json:"queryAddressMapping,omitempty"`
+	QueryApprovalsTracker       *badgeTypes.QueryGetApprovalsTrackerRequest    `json:"queryApprovalsTracker,omitempty"`
+	QueryGetNumUsedForChallenge *badgeTypes.QueryGetNumUsedForChallengeRequest `json:"queryGetNumUsedForChallenge,omitempty"`
 }

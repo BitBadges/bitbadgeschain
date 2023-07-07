@@ -7,7 +7,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
-//Little hack to make AllowedCombinations a 1-element array so we know if disallowed/allowed for ArbitraryValue
+// Little hack to make AllowedCombinations a 1-element array so we know if disallowed/allowed for ArbitraryValue
 func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionApprovedTransfer) []*types.CollectionApprovedTransfer {
 	newCurrApprovedTransfers := []*types.CollectionApprovedTransfer{}
 	for _, approvedTransfer := range approvedTransfers {
@@ -38,30 +38,30 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 			}
 
 			newCurrApprovedTransfers = append(newCurrApprovedTransfers, &types.CollectionApprovedTransfer{
-				ToMappingId: toMappingId,
-				FromMappingId: fromMappingId,
+				ToMappingId:          toMappingId,
+				FromMappingId:        fromMappingId,
 				InitiatedByMappingId: initiatedByMappingId,
-				TransferTimes: times,
-				BadgeIds: badgeIds,
+				TransferTimes:        times,
+				BadgeIds:             badgeIds,
 				AllowedCombinations: []*types.IsCollectionTransferAllowed{
 					{
 						IsAllowed: allowedCombination.IsAllowed,
 					},
 				},
-				OverallApprovals: approvedTransfer.OverallApprovals,
-				PerAddressApprovals: approvedTransfer.PerAddressApprovals,
-				IncrementBadgeIdsBy: approvedTransfer.IncrementBadgeIdsBy,
-				IncrementOwnershipTimesBy: approvedTransfer.IncrementOwnershipTimesBy,
-				RequireFromEqualsInitiatedBy: approvedTransfer.RequireFromEqualsInitiatedBy,
-				RequireFromDoesNotEqualInitiatedBy: approvedTransfer.RequireFromDoesNotEqualInitiatedBy,
-				RequireToEqualsInitiatedBy: approvedTransfer.RequireToEqualsInitiatedBy,
-				RequireToDoesNotEqualInitiatedBy: approvedTransfer.RequireToDoesNotEqualInitiatedBy,
+				OverallApprovals:                       approvedTransfer.OverallApprovals,
+				PerAddressApprovals:                    approvedTransfer.PerAddressApprovals,
+				IncrementBadgeIdsBy:                    approvedTransfer.IncrementBadgeIdsBy,
+				IncrementOwnershipTimesBy:              approvedTransfer.IncrementOwnershipTimesBy,
+				RequireFromEqualsInitiatedBy:           approvedTransfer.RequireFromEqualsInitiatedBy,
+				RequireFromDoesNotEqualInitiatedBy:     approvedTransfer.RequireFromDoesNotEqualInitiatedBy,
+				RequireToEqualsInitiatedBy:             approvedTransfer.RequireToEqualsInitiatedBy,
+				RequireToDoesNotEqualInitiatedBy:       approvedTransfer.RequireToDoesNotEqualInitiatedBy,
 				OverridesFromApprovedOutgoingTransfers: approvedTransfer.OverridesFromApprovedOutgoingTransfers,
-				OverridesToApprovedIncomingTransfers: approvedTransfer.OverridesToApprovedIncomingTransfers,
-				CustomData: approvedTransfer.CustomData,
-				Uri: approvedTransfer.Uri,
-				TrackerId: approvedTransfer.TrackerId,
-				Challenges: approvedTransfer.Challenges,
+				OverridesToApprovedIncomingTransfers:   approvedTransfer.OverridesToApprovedIncomingTransfers,
+				CustomData:                             approvedTransfer.CustomData,
+				Uri:                                    approvedTransfer.Uri,
+				TrackerId:                              approvedTransfer.TrackerId,
+				Challenges:                             approvedTransfer.Challenges,
 			})
 		}
 	}
@@ -69,22 +69,21 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 	return newCurrApprovedTransfers
 }
 
-
-//By default, we approve all transfers if to === initiatedBy
+// By default, we approve all transfers if to === initiatedBy
 func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomingTransfer, userAddress string) []*types.UserApprovedIncomingTransfer {
 	currApprovedTransfers = append(currApprovedTransfers, &types.UserApprovedIncomingTransfer{
-		FromMappingId: "All", //everyone
+		FromMappingId:        "All", //everyone
 		InitiatedByMappingId: userAddress,
 		TransferTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
-				End: sdkmath.NewUint(uint64(math.MaxUint64)),
+				End:   sdkmath.NewUint(uint64(math.MaxUint64)),
 			},
 		},
 		BadgeIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
-				End: sdkmath.NewUint(math.MaxUint64),
+				End:   sdkmath.NewUint(math.MaxUint64),
 			},
 		},
 		AllowedCombinations: []*types.IsUserIncomingTransferAllowed{
@@ -97,21 +96,21 @@ func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomin
 	return currApprovedTransfers
 }
 
-//By default, we approve all transfers if from === initiatedBy
+// By default, we approve all transfers if from === initiatedBy
 func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoingTransfer, userAddress string) []*types.UserApprovedOutgoingTransfer {
 	currApprovedTransfers = append(currApprovedTransfers, &types.UserApprovedOutgoingTransfer{
-		ToMappingId: "All", //everyone
+		ToMappingId:          "All", //everyone
 		InitiatedByMappingId: userAddress,
 		TransferTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
-				End: sdkmath.NewUint(uint64(math.MaxUint64)),
+				End:   sdkmath.NewUint(uint64(math.MaxUint64)),
 			},
 		},
 		BadgeIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
-				End: sdkmath.NewUint(math.MaxUint64),
+				End:   sdkmath.NewUint(math.MaxUint64),
 			},
 		},
 		AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
@@ -123,4 +122,3 @@ func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoin
 
 	return currApprovedTransfers
 }
-

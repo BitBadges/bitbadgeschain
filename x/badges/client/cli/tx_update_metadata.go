@@ -15,7 +15,7 @@ func CmdUpdateMetadata() *cobra.Command {
 		Short: "Broadcast message updateMetadata",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-return nil
+			return nil
 			// argBadgeId := types.NewUintFromString(args[0])
 			// if err != nil {
 			// 	return err

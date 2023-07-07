@@ -6,9 +6,9 @@ import (
 	"math"
 )
 
-//We handle the following cases:
-//1) {amount: 1, badgeIds: [1 to 10, 5 to 20]} -> {amount: 1, badgeIds: [1 to 4, 11 to 20]}, {amount: 2: badgeIds: [5 to 10]}
-//2) {amount: 1, badgeIds: [5 to 10]}, {amount: 2: badgeIds: [5 to 10]} -> {amount: 3: badgeIds: [5 to 10]}
+// We handle the following cases:
+// 1) {amount: 1, badgeIds: [1 to 10, 5 to 20]} -> {amount: 1, badgeIds: [1 to 4, 11 to 20]}, {amount: 2: badgeIds: [5 to 10]}
+// 2) {amount: 1, badgeIds: [5 to 10]}, {amount: 2: badgeIds: [5 to 10]} -> {amount: 3: badgeIds: [5 to 10]}
 func HandleDuplicateBadgeIds(balances []*Balance) ([]*Balance, error) {
 	newBalances := []*Balance{}
 	err := *new(error)
@@ -16,8 +16,8 @@ func HandleDuplicateBadgeIds(balances []*Balance) ([]*Balance, error) {
 		for _, badgeId := range balance.BadgeIds {
 			for _, time := range balance.OwnershipTimes {
 				newBalances, err = AddBalance(newBalances, &Balance{
-					Amount:   balance.Amount,
-					BadgeIds: []*UintRange{badgeId},
+					Amount:         balance.Amount,
+					BadgeIds:       []*UintRange{badgeId},
 					OwnershipTimes: []*UintRange{time},
 				})
 				if err != nil {
@@ -73,13 +73,13 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 		for _, currRange := range balanceObj.BadgeIds {
 			for _, currTime := range balanceObj.OwnershipTimes {
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
-					BadgeId: currRange,
-					TimelineTime: currTime,
-					TransferTime: &UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
-					ToMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
-					FromMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
-					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
-					ArbitraryValue: balanceObj.Amount,
+					BadgeId:            currRange,
+					TimelineTime:       currTime,
+					TransferTime:       &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
+					ToMapping:          &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+					FromMapping:        &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+					InitiatedByMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+					ArbitraryValue:     balanceObj.Amount,
 				})
 			}
 		}
@@ -89,17 +89,16 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 	for _, rangeToFetch := range idRanges {
 		for _, timeToFetch := range times {
 			toFetchPermissionDetails = append(toFetchPermissionDetails, &UniversalPermissionDetails{
-					BadgeId: rangeToFetch,
-					TimelineTime: timeToFetch,
-					TransferTime: &UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
-					ToMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
-					FromMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
-					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
-				},
+				BadgeId:            rangeToFetch,
+				TimelineTime:       timeToFetch,
+				TransferTime:       &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
+				ToMapping:          &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+				FromMapping:        &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+				InitiatedByMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+			},
 			)
 		}
 	}
-
 
 	overlaps, _, inNewButNotOld := GetOverlapsAndNonOverlaps(currPermissionDetails, toFetchPermissionDetails)
 	//For all overlaps, we simply return the amount
@@ -108,8 +107,8 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 		amount := overlapObject.FirstDetails.ArbitraryValue.(sdkmath.Uint)
 
 		fetchedBalances = append(fetchedBalances, &Balance{
-			Amount:  amount,
-			BadgeIds: []*UintRange{overlap.BadgeId},
+			Amount:         amount,
+			BadgeIds:       []*UintRange{overlap.BadgeId},
 			OwnershipTimes: []*UintRange{overlap.TimelineTime},
 		})
 	}
@@ -117,12 +116,11 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 	//For those that were in toFetch but not currBalances, we return amount == 0
 	for _, detail := range inNewButNotOld {
 		fetchedBalances = append(fetchedBalances, &Balance{
-			Amount:   sdkmath.NewUint(0),
-			BadgeIds: []*UintRange{detail.BadgeId},
+			Amount:         sdkmath.NewUint(0),
+			BadgeIds:       []*UintRange{detail.BadgeId},
 			OwnershipTimes: []*UintRange{detail.TimelineTime},
 		})
 	}
-	
 
 	return fetchedBalances, nil
 }
@@ -145,7 +143,7 @@ func AddBalance(existingBalances []*Balance, balanceToAdd *Balance) ([]*Balance,
 			return existingBalances, err
 		}
 	}
-	
+
 	return existingBalances, nil
 }
 
@@ -181,12 +179,12 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 		for _, currRange := range balanceObj.BadgeIds {
 			for _, currTime := range balanceObj.OwnershipTimes {
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
-					BadgeId: currRange,
-					TimelineTime: currTime,
-					TransferTime: &UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
-					ToMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
-					FromMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
-					InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
+					BadgeId:            currRange,
+					TimelineTime:       currTime,
+					TransferTime:       &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
+					ToMapping:          &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+					FromMapping:        &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+					InitiatedByMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 				})
 			}
 		}
@@ -195,13 +193,13 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 		for _, rangeToDelete := range rangesToDelete {
 			for _, timeToDelete := range timesToDelete {
 				toDeletePermissionDetails = append(toDeletePermissionDetails, &UniversalPermissionDetails{
-						BadgeId: rangeToDelete,
-						TimelineTime: timeToDelete,
-						TransferTime: &UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) }, //dummy range
-						ToMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
-						FromMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
-						InitiatedByMapping: &AddressMapping{ Addresses: []string{}, IncludeAddresses: false },
-					},
+					BadgeId:            rangeToDelete,
+					TimelineTime:       timeToDelete,
+					TransferTime:       &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
+					ToMapping:          &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+					FromMapping:        &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+					InitiatedByMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+				},
 				)
 			}
 		}
@@ -209,8 +207,8 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 		_, inOldButNotNew, _ := GetOverlapsAndNonOverlaps(currPermissionDetails, toDeletePermissionDetails)
 		for _, remainingBalance := range inOldButNotNew {
 			newBalances = append(newBalances, &Balance{
-				Amount:   balanceObj.Amount,
-				BadgeIds: []*UintRange{remainingBalance.BadgeId},
+				Amount:         balanceObj.Amount,
+				BadgeIds:       []*UintRange{remainingBalance.BadgeId},
 				OwnershipTimes: []*UintRange{remainingBalance.TimelineTime},
 			})
 		}

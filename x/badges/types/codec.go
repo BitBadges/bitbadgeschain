@@ -8,69 +8,31 @@ import (
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgNewCollection{}, "badges/NewCollection", nil)
-	cdc.RegisterConcrete(&MsgMintAndDistributeBadges{}, "badges/MintAndDistributeBadges", nil)
-	cdc.RegisterConcrete(&MsgTransferBadge{}, "badges/TransferBadge", nil)
-	cdc.RegisterConcrete(&MsgUpdateCollectionApprovedTransfers{}, "badges/UpdateCollectionApprovedTransfers", nil)
-	cdc.RegisterConcrete(&MsgUpdateMetadata{}, "badges/UpdateMetadata", nil)
-	cdc.RegisterConcrete(&MsgUpdateCollectionPermissions{}, "badges/UpdateCollectionPermissions", nil)
-	cdc.RegisterConcrete(&MsgUpdateManager{}, "badges/UpdateManager", nil)
+	cdc.RegisterConcrete(&MsgTransferBadges{}, "badges/TransferBadges", nil)
 	cdc.RegisterConcrete(&MsgDeleteCollection{}, "badges/DeleteCollection", nil)
-	cdc.RegisterConcrete(&MsgArchiveCollection{}, "badges/ArchiveCollection", nil)
 	cdc.RegisterConcrete(&MsgUpdateUserApprovedTransfers{}, "badges/UpdateUserApprovedTransfers", nil)
-	cdc.RegisterConcrete(&MsgUpdateUserPermissions{}, "badges/UpdateUserPermissions", nil)
-// this line is used by starport scaffolding # 2
+	cdc.RegisterConcrete(&MsgUpdateCollection{}, "badges/UpdateCollection", nil)
+	cdc.RegisterConcrete(&MsgCreateAddressMappings{}, "badges/CreateAddressMappings", nil)
+	// this line is used by starport scaffolding # 2
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgNewCollection{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgMintAndDistributeBadges{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgTransferBadge{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgUpdateCollectionApprovedTransfers{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgUpdateMetadata{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgUpdateCollectionPermissions{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgUpdateManager{},
+		&MsgTransferBadges{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgDeleteCollection{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgArchiveCollection{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgUpdateUserApprovedTransfers{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-	&MsgUpdateUserPermissions{},
-)
-// this line is used by starport scaffolding # 3
-
-msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
-
-	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
-
-	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
-
-	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
-
-	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
-
-	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
-
-	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
+		&MsgUpdateCollection{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgCreateAddressMappings{},
+	)
+	// this line is used by starport scaffolding # 3
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

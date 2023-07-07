@@ -10,29 +10,20 @@ import (
 func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types.MsgUpdateUserApprovedTransfers) (*types.MsgUpdateUserApprovedTransfersResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator:                              msg.Creator,
-		CollectionId:                         msg.CollectionId,
-	})
-	if err != nil {
-		return nil, err
+	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
+	if !found {
+		return nil, ErrCollectionNotExists
 	}
 
 	if !IsStandardBalances(collection) {
 		return nil, ErrWrongBalancesType
 	}
 
-	for _, addressMapping := range msg.AddressMappings {
-		if err := k.CreateAddressMapping(ctx, addressMapping); err != nil {
-			return nil, err
-		}
-	}
-
 	balanceKey := ConstructBalanceKey(msg.Creator, collection.CollectionId)
 	userBalance, found := k.GetUserBalanceFromStore(ctx, balanceKey)
 	if !found {
 		userBalance = &types.UserBalanceStore{
-			Balances : []*types.Balance{},
+			Balances:                          []*types.Balance{},
 			ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
 			ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,
 			Permissions: &types.UserPermissions{
@@ -43,20 +34,42 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 	}
 
 	manager := types.GetCurrentManager(ctx, collection)
-	
-	if err := k.ValidateUserApprovedOutgoingTransfersUpdate(ctx, userBalance.ApprovedOutgoingTransfersTimeline, msg.ApprovedOutgoingTransfersTimeline, userBalance.Permissions.CanUpdateApprovedOutgoingTransfers, manager); err != nil {
-		return nil, err
+
+	if msg.UpdateApprovedOutgoingTransfersTimeline {
+		if err := k.ValidateUserApprovedOutgoingTransfersUpdate(ctx, userBalance.ApprovedOutgoingTransfersTimeline, msg.ApprovedOutgoingTransfersTimeline, userBalance.Permissions.CanUpdateApprovedOutgoingTransfers, manager); err != nil {
+			return nil, err
+		}
+		userBalance.ApprovedOutgoingTransfersTimeline = msg.ApprovedOutgoingTransfersTimeline
 	}
-	userBalance.ApprovedOutgoingTransfersTimeline = msg.ApprovedOutgoingTransfersTimeline
-	
 
-	if err := k.ValidateUserApprovedIncomingTransfersUpdate(ctx, userBalance.ApprovedIncomingTransfersTimeline, msg.ApprovedIncomingTransfersTimeline, userBalance.Permissions.CanUpdateApprovedIncomingTransfers, manager); err != nil {
-		return nil, err
+	if msg.UpdateApprovedIncomingTransfersTimeline {
+		if err := k.ValidateUserApprovedIncomingTransfersUpdate(ctx, userBalance.ApprovedIncomingTransfersTimeline, msg.ApprovedIncomingTransfersTimeline, userBalance.Permissions.CanUpdateApprovedIncomingTransfers, manager); err != nil {
+			return nil, err
+		}
+		userBalance.ApprovedIncomingTransfersTimeline = msg.ApprovedIncomingTransfersTimeline
 	}
-	userBalance.ApprovedIncomingTransfersTimeline = msg.ApprovedIncomingTransfersTimeline
+
+	if msg.UpdateApprovedTransfersUserPermissions {
+		err := k.ValidateUserPermissionsUpdate(ctx, userBalance.Permissions, msg.Permissions, true, manager)
+		if err != nil {
+			return nil, err
+		}
+
+		//iterate through the non-nil values
+		if msg.Permissions.CanUpdateApprovedIncomingTransfers != nil {
+			userBalance.Permissions.CanUpdateApprovedIncomingTransfers = msg.Permissions.CanUpdateApprovedIncomingTransfers
+		}
+
+		if msg.Permissions.CanUpdateApprovedOutgoingTransfers != nil {
+			userBalance.Permissions.CanUpdateApprovedOutgoingTransfers = msg.Permissions.CanUpdateApprovedOutgoingTransfers
+		}
+
+		userBalance.Permissions = msg.Permissions
+	}
 
 
-	err = k.SetUserBalanceInStore(ctx, balanceKey, userBalance)
+
+	err := k.SetUserBalanceInStore(ctx, balanceKey, userBalance)
 	if err != nil {
 		return nil, err
 	}

@@ -9,13 +9,13 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdTransferBadge() *cobra.Command {
+func CmdTransferBadges() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "transfer-badge [collection-id] [from] [transfers]",
-		Short: "Broadcast message transferBadge",
+		Short: "Broadcast message transferBadges",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-return nil
+			return nil
 			// argCollectionId := types.NewUintFromString(args[0])
 			// if err != nil {
 			// 	return err
@@ -37,7 +37,7 @@ return nil
 			// 	return err
 			// }
 
-			// msg := types.NewMsgTransferBadge(
+			// msg := types.NewMsgTransferBadges(
 			// 	clientCtx.GetFromAddress().String(),
 			// 	argCollectionId,
 			// 	argFrom,

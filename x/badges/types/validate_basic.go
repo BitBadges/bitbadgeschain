@@ -84,9 +84,8 @@ func ValidateRangesAreValid(badgeUintRanges []*UintRange, errorOnEmpty bool) err
 	if len(badgeUintRanges) == 0 {
 		if errorOnEmpty {
 			return sdkerrors.Wrapf(ErrInvalidUintRangeSpecified, "these id ranges can not be empty (length == 0)")
-		} 
+		}
 	}
-
 
 	for _, badgeUintRange := range badgeUintRanges {
 		if badgeUintRange == nil {
@@ -227,7 +226,7 @@ func ValidateCollectionApprovedTransfer(collectionApprovedTransfer *CollectionAp
 	}
 
 	if collectionApprovedTransfer.TrackerId == "" &&
-	 (collectionApprovedTransfer.OverallApprovals == nil || collectionApprovedTransfer.PerAddressApprovals == nil) {
+		(collectionApprovedTransfer.OverallApprovals == nil || collectionApprovedTransfer.PerAddressApprovals == nil) {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "tracker id is uninitialized")
 	}
 
@@ -314,8 +313,6 @@ func ValidateChallenges(challenges []*Challenge) error {
 		}
 	}
 
-	
-
 	return nil
 }
 
@@ -384,7 +381,6 @@ func ValidateTransfer(transfer *Transfer) error {
 func ValidateBadgeMetadata(badgeMetadata []*BadgeMetadata) error {
 	err := *new(error)
 
-
 	handledBadgeIds := []*UintRange{}
 	if len(badgeMetadata) > 0 {
 		for _, badgeMetadata := range badgeMetadata {
@@ -410,10 +406,8 @@ func ValidateBadgeMetadata(badgeMetadata []*BadgeMetadata) error {
 	return nil
 }
 
-
 func ValidateInheritedBalances(inheritedBalances []*InheritedBalance) error {
 	err := *new(error)
-
 
 	handledBadgeIds := []*UintRange{}
 	if len(inheritedBalances) > 0 {
@@ -436,7 +430,6 @@ func ValidateInheritedBalances(inheritedBalances []*InheritedBalance) error {
 			}
 
 			handledBadgeIds = append(handledBadgeIds, inheritedBalance.BadgeIds...)
-
 
 			if inheritedBalance.ParentCollectionId.IsNil() || inheritedBalance.ParentCollectionId.IsZero() {
 				return sdkerrors.Wrapf(ErrUintUnititialized, "parent collection id is uninitialized")

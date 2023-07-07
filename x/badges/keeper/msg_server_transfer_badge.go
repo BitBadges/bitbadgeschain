@@ -8,26 +8,22 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBadge) (*types.MsgTransferBadgeResponse, error) {
+func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferBadges) (*types.MsgTransferBadgesResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	collection, err := k.UniversalValidate(ctx, UniversalValidationParams{
-		Creator:                 msg.Creator,
-		CollectionId:            msg.CollectionId,
-	})
-	if err != nil {
-		return nil, err
+	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
+	if !found {
+		return nil, ErrCollectionNotExists
 	}
 
 	if !IsStandardBalances(collection) {
 		return nil, ErrWrongBalancesType
 	}
 
-	
 	if err := k.Keeper.HandleTransfers(ctx, collection, msg.Transfers, msg.Creator); err != nil {
 		return nil, err
 	}
-	
+
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
@@ -35,5 +31,5 @@ func (k msgServer) TransferBadge(goCtx context.Context, msg *types.MsgTransferBa
 		),
 	)
 
-	return &types.MsgTransferBadgeResponse{}, nil
+	return &types.MsgTransferBadgesResponse{}, nil
 }

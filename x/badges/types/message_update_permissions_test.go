@@ -13,15 +13,16 @@ import (
 func TestMsgUpdateCollectionPermissions_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgUpdateCollectionPermissions
+		msg  types.MsgUpdateCollection
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgUpdateCollectionPermissions{
+			msg: types.MsgUpdateCollection{
 				Creator:      "invalid_address",
 				CollectionId: sdkmath.NewUint(1),
-				Permissions:  &types.CollectionPermissions{
+				UpdateCollectionPermissions: true,
+				CollectionPermissions: &types.CollectionPermissions{
 					CanDeleteCollection: []*types.ActionPermission{
 						{
 							DefaultValues: &types.ActionDefaultValues{
@@ -38,18 +39,19 @@ func TestMsgUpdateCollectionPermissions_ValidateBasic(t *testing.T) {
 			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgUpdateCollectionPermissions{
+			msg: types.MsgUpdateCollection{
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
-				Permissions:  &types.CollectionPermissions{},
+				CollectionPermissions:  &types.CollectionPermissions{},
 			},
 		},
 		{
 			name: "invalid permissions",
-			msg: types.MsgUpdateCollectionPermissions{
+			msg: types.MsgUpdateCollection{
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
-				Permissions:  &types.CollectionPermissions{
+				UpdateCollectionPermissions: true,
+				CollectionPermissions: &types.CollectionPermissions{
 					CanDeleteCollection: []*types.ActionPermission{
 						{
 							DefaultValues: &types.ActionDefaultValues{
@@ -67,10 +69,11 @@ func TestMsgUpdateCollectionPermissions_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "valid permissions",
-			msg: types.MsgUpdateCollectionPermissions{
+			msg: types.MsgUpdateCollection{
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
-				Permissions:  &types.CollectionPermissions{
+				UpdateCollectionPermissions: true,
+				CollectionPermissions: &types.CollectionPermissions{
 					CanDeleteCollection: []*types.ActionPermission{
 						{
 							DefaultValues: &types.ActionDefaultValues{

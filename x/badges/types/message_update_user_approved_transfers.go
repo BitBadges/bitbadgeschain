@@ -32,7 +32,7 @@ func (msg *MsgUpdateUserApprovedTransfers) GetSigners() []sdk.AccAddress {
 }
 
 func (msg *MsgUpdateUserApprovedTransfers) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
+	bz := AminoCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
@@ -48,12 +48,15 @@ func (msg *MsgUpdateUserApprovedTransfers) ValidateBasic() error {
 
 	if err := ValidateUserApprovedOutgoingTransferTimeline(msg.ApprovedOutgoingTransfersTimeline, msg.Creator); err != nil {
 		return err
-	} 
+	}
 
-	for _, mapping := range msg.AddressMappings {
-		if err := ValidateAddressMapping(mapping); err != nil {
-			return err
-		}
+	if msg.Permissions == nil {
+		msg.Permissions = &UserPermissions{}
+	}
+
+	err = ValidateUserPermissions(msg.Permissions, true)
+	if err != nil {
+		return err
 	}
 
 	return nil

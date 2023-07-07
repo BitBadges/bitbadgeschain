@@ -14,8 +14,8 @@ var (
 	NextCollectionIdKey   = []byte{0x03}
 	UsedClaimChallengeKey = []byte{0x04}
 	WhitelistIndexKey     = []byte{0x05}
-	AddressMappingKey		 	= []byte{0x06}
-	ApprovalsTrackerKey    = []byte{0x07}
+	AddressMappingKey     = []byte{0x06}
+	ApprovalsTrackerKey   = []byte{0x07}
 
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}

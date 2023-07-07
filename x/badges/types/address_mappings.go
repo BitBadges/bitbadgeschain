@@ -1,7 +1,5 @@
 package types
 
-
-
 func RemoveAddressMappingFromAddressMapping(mappingToRemove *AddressMapping, addressMapping *AddressMapping) (*AddressMapping, *AddressMapping) {
 	//Each address mapping has a list of addresses and a boolean includeAddresses.
 	//Four cases (toRemove.IncludeAddresses, addressMapping.IncludeAddresses):
@@ -21,7 +19,6 @@ func RemoveAddressMappingFromAddressMapping(mappingToRemove *AddressMapping, add
 	duplicates := []string{}
 	inToRemoveButNotMapping := []string{}
 	inMappingButNotToRemove := []string{}
-
 
 	for _, address := range mappingToRemove.Addresses {
 		//Check if address is in addressMapping.Addresses
@@ -58,7 +55,6 @@ func RemoveAddressMappingFromAddressMapping(mappingToRemove *AddressMapping, add
 	removed := &AddressMapping{}
 	remaining := &AddressMapping{}
 
-	
 	if mappingToRemove.IncludeAddresses && addressMapping.IncludeAddresses {
 		//Case 1
 		removed.IncludeAddresses = true

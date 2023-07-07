@@ -14,21 +14,22 @@ import (
 func TestMsgUpdateManager_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgUpdateManager
+		msg  types.MsgUpdateCollection
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgUpdateManager{
+			msg: types.MsgUpdateCollection{
 				Creator:      "invalid_address",
 				CollectionId: sdkmath.NewUint(1),
 			},
 			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgUpdateManager{
+			msg: types.MsgUpdateCollection{
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
+				UpdateManagerTimeline: true,
 				ManagerTimeline: []*types.ManagerTimeline{
 					{
 						TimelineTimes: []*types.UintRange{
@@ -44,9 +45,10 @@ func TestMsgUpdateManager_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "invalid address 2",
-			msg: types.MsgUpdateManager{
+			msg: types.MsgUpdateCollection{
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
+				UpdateManagerTimeline: true,
 				ManagerTimeline: []*types.ManagerTimeline{
 					{
 						TimelineTimes: []*types.UintRange{
@@ -63,9 +65,10 @@ func TestMsgUpdateManager_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "invalid times",
-			msg: types.MsgUpdateManager{
+			msg: types.MsgUpdateCollection{
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
+				UpdateManagerTimeline: true,
 				ManagerTimeline: []*types.ManagerTimeline{
 					{
 						Manager: "invalid_address",

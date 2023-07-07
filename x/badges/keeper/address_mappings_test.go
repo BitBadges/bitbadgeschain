@@ -16,7 +16,7 @@ func (suite *TestSuite) TestReservedIds() {
 	for _, check := range toCheck {
 		err := suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 			MappingId: check,
-		})	
+		})
 		suite.Require().Error(err, "Error creating address mapping: %s", check)
 	}
 
@@ -24,7 +24,7 @@ func (suite *TestSuite) TestReservedIds() {
 	for _, check := range autoFetched {
 		err := suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 			MappingId: check,
-		})	
+		})
 		suite.Require().Error(err, "Error creating address mapping: %s", check)
 
 		mapping, err := suite.app.BadgesKeeper.GetAddressMappingById(suite.ctx, check, alice)
@@ -39,7 +39,6 @@ func (suite *TestSuite) TestReservedIds() {
 	found, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, "Mint", alice, alice)
 	suite.Require().False(found, "Error checking mapping addresses: %s", "Mint")
 	suite.Require().Nil(err, "Error checking mapping addresses: %s", "Mint")
-
 
 	found, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, "Manager", alice, alice)
 	suite.Require().True(found, "Error checking mapping addresses: %s", "Manager")
@@ -69,7 +68,7 @@ func (suite *TestSuite) TestStoreAddressMappings() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.AddressMappings = []*types.AddressMapping{
+	collectionsToCreate[0].AddressMappings = []*types.AddressMapping{
 		{
 			MappingId: "test1asdasfda",
 			Addresses: []string{alice},
@@ -201,7 +200,6 @@ func (suite *TestSuite) TestStoreAddressMappings() {
 // 	})
 // 	suite.Require().Nil(err, "Error creating address mapping: %s", "test")
 
-
 // 	_, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, "test", bob, bob)
 // 	suite.Require().Error(err, "Error checking address mapping circular lookups: %s", "test")
 
@@ -266,7 +264,6 @@ func (suite *TestSuite) TestStoreAddressMappings() {
 // 		},
 // 	})
 // 	suite.Require().Nil(err, "Error creating address mapping: %s", "test")
-
 
 // 	_, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, "test", bob, bob)
 // 	suite.Require().Error(err, "Error checking address mapping circular lookups: %s", "test")

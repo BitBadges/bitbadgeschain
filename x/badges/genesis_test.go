@@ -36,6 +36,5 @@ func TestGenesis(t *testing.T) {
 	// require.Equal(t, genesisState.Claims, got.Claims)
 	// require.Equal(t, genesisState.ClaimStoreKeys, got.ClaimStoreKeys)
 
-	
 	// this line is used by starport scaffolding # genesis/test/assert
 }

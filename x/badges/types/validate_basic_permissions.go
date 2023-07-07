@@ -38,7 +38,7 @@ func ValidateCollectionApprovedTransferPermissions(permissions []*CollectionAppr
 		if err != nil {
 			return err
 		}
-		
+
 		err = ValidateRangesAreValid(permission.DefaultValues.TransferTimes, false)
 		if err != nil {
 			return err
@@ -56,14 +56,14 @@ func ValidateCollectionApprovedTransferPermissions(permissions []*CollectionAppr
 		//Assert no two combinations are the same
 		for idx, combination := range permission.Combinations {
 			for _, combination2 := range permission.Combinations[idx+1:] {
-				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions && 
-				combination.TransferTimesOptions == combination2.TransferTimesOptions && 
-				combination.ToMappingOptions == combination2.ToMappingOptions &&
-				combination.FromMappingOptions == combination2.FromMappingOptions &&
-				combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
-				combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
-				combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-				combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
+				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
+					combination.TransferTimesOptions == combination2.TransferTimesOptions &&
+					combination.ToMappingOptions == combination2.ToMappingOptions &&
+					combination.FromMappingOptions == combination2.FromMappingOptions &&
+					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
+					combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
+					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
+					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
 					return ErrInvalidCombinations
 				}
 			}
@@ -80,7 +80,6 @@ func ValidateCollectionApprovedTransferPermissions(permissions []*CollectionAppr
 
 	return nil
 }
-
 
 func ValidateUserApprovedOutgoingTransferPermissions(permissions []*UserApprovedOutgoingTransferPermission) error {
 	for _, permission := range permissions {
@@ -96,7 +95,7 @@ func ValidateUserApprovedOutgoingTransferPermissions(permissions []*UserApproved
 		if err != nil {
 			return err
 		}
-		
+
 		err = ValidateRangesAreValid(permission.DefaultValues.TransferTimes, false)
 		if err != nil {
 			return err
@@ -111,16 +110,15 @@ func ValidateUserApprovedOutgoingTransferPermissions(permissions []*UserApproved
 		permission.DefaultValues.TransferTimes = SortAndMergeOverlapping(permission.DefaultValues.TransferTimes)
 		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
 
-		
 		for idx, combination := range permission.Combinations {
 			for _, combination2 := range permission.Combinations[idx+1:] {
-				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions && 
-				combination.TransferTimesOptions == combination2.TransferTimesOptions && 
-				combination.ToMappingOptions == combination2.ToMappingOptions &&
-				combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
-				combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
-				combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-				combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
+				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
+					combination.TransferTimesOptions == combination2.TransferTimesOptions &&
+					combination.ToMappingOptions == combination2.ToMappingOptions &&
+					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
+					combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
+					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
+					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
 					return ErrInvalidCombinations
 				}
 			}
@@ -136,7 +134,6 @@ func ValidateUserApprovedOutgoingTransferPermissions(permissions []*UserApproved
 
 	return nil
 }
-
 
 func ValidateUserApprovedIncomingTransferPermissions(permissions []*UserApprovedIncomingTransferPermission) error {
 	for _, permission := range permissions {
@@ -152,7 +149,7 @@ func ValidateUserApprovedIncomingTransferPermissions(permissions []*UserApproved
 		if err != nil {
 			return err
 		}
-		
+
 		err = ValidateRangesAreValid(permission.DefaultValues.TransferTimes, false)
 		if err != nil {
 			return err
@@ -167,16 +164,15 @@ func ValidateUserApprovedIncomingTransferPermissions(permissions []*UserApproved
 		permission.DefaultValues.TransferTimes = SortAndMergeOverlapping(permission.DefaultValues.TransferTimes)
 		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
 
-		
 		for idx, combination := range permission.Combinations {
 			for _, combination2 := range permission.Combinations[idx+1:] {
-				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions && 
-				combination.TransferTimesOptions == combination2.TransferTimesOptions && 
-				combination.FromMappingOptions == combination2.FromMappingOptions &&
-				combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
-				combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
-				combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-				combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
+				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
+					combination.TransferTimesOptions == combination2.TransferTimesOptions &&
+					combination.FromMappingOptions == combination2.FromMappingOptions &&
+					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
+					combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
+					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
+					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
 					return ErrInvalidCombinations
 				}
 			}
@@ -192,8 +188,6 @@ func ValidateUserApprovedIncomingTransferPermissions(permissions []*UserApproved
 
 	return nil
 }
-
-
 
 func ValidateTimedUpdateWithBadgeIdsPermission(permissions []*TimedUpdateWithBadgeIdsPermission) error {
 	for _, permission := range permissions {
@@ -218,13 +212,12 @@ func ValidateTimedUpdateWithBadgeIdsPermission(permissions []*TimedUpdateWithBad
 		permission.DefaultValues.TimelineTimes = SortAndMergeOverlapping(permission.DefaultValues.TimelineTimes)
 		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
 
-
 		for idx, combination := range permission.Combinations {
 			for _, combination2 := range permission.Combinations[idx+1:] {
 				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
-				combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
-				combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-				combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
+					combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
+					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
+					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
 					return ErrInvalidCombinations
 				}
 			}
@@ -270,13 +263,12 @@ func ValidateBalancesActionPermission(permissions []*BalancesActionPermission) e
 		permission.DefaultValues.OwnershipTimes = SortAndMergeOverlapping(permission.DefaultValues.OwnershipTimes)
 		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
 
-
 		for idx, combination := range permission.Combinations {
 			for _, combination2 := range permission.Combinations[idx+1:] {
 				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
-				combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-				combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions &&
-				combination.OwnershipTimesOptions == combination2.OwnershipTimesOptions {
+					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
+					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions &&
+					combination.OwnershipTimesOptions == combination2.OwnershipTimesOptions {
 					return ErrInvalidCombinations
 				}
 			}
@@ -311,12 +303,11 @@ func ValidateTimedUpdatePermission(permissions []*TimedUpdatePermission) error {
 
 		permission.DefaultValues.TimelineTimes = SortAndMergeOverlapping(permission.DefaultValues.TimelineTimes)
 
-
 		for idx, combination := range permission.Combinations {
 			for _, combination2 := range permission.Combinations[idx+1:] {
 				if combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
-				combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-				combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
+					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
+					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
 					return ErrInvalidCombinations
 				}
 			}
@@ -355,7 +346,7 @@ func ValidateActionPermission(permissions []*ActionPermission) error {
 		for idx, combination := range permission.Combinations {
 			for _, combination2 := range permission.Combinations[idx+1:] {
 				if combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-				combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
+					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
 					return ErrInvalidCombinations
 				}
 			}
@@ -364,7 +355,6 @@ func ValidateActionPermission(permissions []*ActionPermission) error {
 
 	return nil
 }
-
 
 func ValidateUserPermissions(permissions *UserPermissions, canBeNil bool) error {
 	if !canBeNil && (permissions.CanUpdateApprovedIncomingTransfers != nil || permissions.CanUpdateApprovedOutgoingTransfers != nil) {
@@ -386,13 +376,12 @@ func ValidateUserPermissions(permissions *UserPermissions, canBeNil bool) error 
 	return nil
 }
 
-
 // Validate permissions are validly formed. Disallows leading zeroes.
 func ValidatePermissions(permissions *CollectionPermissions) error {
 	if permissions == nil {
 		return ErrPermissionsIsNil
 	}
-	
+
 	if err := ValidateTimedUpdatePermission(permissions.CanUpdateCustomData); err != nil {
 		return err
 	}
@@ -400,7 +389,7 @@ func ValidatePermissions(permissions *CollectionPermissions) error {
 	if err := ValidateTimedUpdatePermission(permissions.CanUpdateStandards); err != nil {
 		return err
 	}
-	
+
 	if err := ValidateTimedUpdatePermission(permissions.CanUpdateManager); err != nil {
 		return err
 	}
@@ -421,11 +410,10 @@ func ValidatePermissions(permissions *CollectionPermissions) error {
 		return err
 	}
 
-
 	if err := ValidateActionPermission(permissions.CanDeleteCollection); err != nil {
 		return err
 	}
-	
+
 	if err := ValidateTimedUpdatePermission(permissions.CanUpdateOffChainBalancesMetadata); err != nil {
 		return err
 	}

@@ -500,7 +500,7 @@ func NewApp(
 		app.StakingKeeper,
 		app.DistrKeeper,
 		app.IBCKeeper.ChannelKeeper,
-		
+
 		&app.IBCKeeper.PortKeeper,
 		scopedWasmKeeper,
 		app.TransferKeeper,

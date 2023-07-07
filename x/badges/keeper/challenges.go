@@ -10,14 +10,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint,  challenges []*types.Challenge, solutions []*types.ChallengeSolution, creatorAddress string, level string) (bool, sdkmath.Uint, error) {
+func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.Challenge, solutions []*types.ChallengeSolution, creatorAddress string, level string) (bool, sdkmath.Uint, error) {
 	numIncrements := sdkmath.NewUint(0)
 	useLeafIndexForDistributionOrder := false
 
 	for _, challenge := range challenges {
 		root := challenge.Root
 		hasValidSolution := false
-		
+
 		for _, solution := range solutions {
 			if root != "" {
 				// Must be proper length to avoid preimage attacks
@@ -74,7 +74,6 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 
 	return useLeafIndexForDistributionOrder, numIncrements, nil
 }
-
 
 func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.ClaimProofItem) error {
 	hashedMsgLeaf := sha256.Sum256([]byte(leaf))

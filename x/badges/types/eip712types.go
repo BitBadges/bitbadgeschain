@@ -261,7 +261,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	// 		"CollectionApprovedTransfer": collectionApprovedTransferTypes,
 	// 	}
 
-	// case TypeMsgTransferBadge:
+	// case TypeMsgTransferBadges:
 	// 	return map[string][]apitypes.Type{
 	// 		"MsgValue": {
 	// 			{Name: "creator", Type: "string"},

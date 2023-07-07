@@ -18,7 +18,7 @@ func CmdUpdateUserApprovedOutgoingTransfers() *cobra.Command {
 		Short: "Broadcast message UpdateUserApprovedTransfers",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-return nil
+			return nil
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {

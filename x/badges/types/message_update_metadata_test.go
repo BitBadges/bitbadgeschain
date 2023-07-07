@@ -19,14 +19,16 @@ import (
 func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgUpdateMetadata
+		msg  types.MsgUpdateCollection
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgUpdateMetadata{
-				Creator:            "invalid_address",
-				CollectionId:       sdkmath.NewUint(1),
+			msg: types.MsgUpdateCollection{
+				Creator:      "invalid_address",
+				CollectionId: sdkmath.NewUint(1),
+				UpdateCollectionMetadataTimeline: true,
+				UpdateBadgeMetadataTimeline: true,
 				CollectionMetadataTimeline: []*types.CollectionMetadataTimeline{
 					{
 						CollectionMetadata: &types.CollectionMetadata{
@@ -43,7 +45,7 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 									{
 										Start: sdkmath.NewUint(1),
 
-										End:   sdkmath.NewUint(math.MaxUint64),
+										End: sdkmath.NewUint(math.MaxUint64),
 									},
 								},
 							},
@@ -54,9 +56,11 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgUpdateMetadata{
-				Creator:            sample.AccAddress(),
-				CollectionId:       sdkmath.NewUint(1),
+			msg: types.MsgUpdateCollection{
+				Creator:      sample.AccAddress(),
+				CollectionId: sdkmath.NewUint(1),
+				UpdateCollectionMetadataTimeline: true,
+				UpdateBadgeMetadataTimeline: true,
 				CollectionMetadataTimeline: []*types.CollectionMetadataTimeline{
 					{
 						CollectionMetadata: &types.CollectionMetadata{
@@ -65,7 +69,7 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 						TimelineTimes: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(1),
-								End:  sdkmath.NewUint(math.MaxUint64),
+								End:   sdkmath.NewUint(math.MaxUint64),
 							},
 						},
 					},
@@ -79,7 +83,7 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 									{
 										Start: sdkmath.NewUint(1),
 
-										End:   sdkmath.NewUint(math.MaxUint64),
+										End: sdkmath.NewUint(math.MaxUint64),
 									},
 								},
 							},
@@ -87,7 +91,7 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 						TimelineTimes: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(1),
-								End:  sdkmath.NewUint(math.MaxUint64),
+								End:   sdkmath.NewUint(math.MaxUint64),
 							},
 						},
 					},

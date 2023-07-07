@@ -33,91 +33,91 @@ func CmdNewCollection() *cobra.Command {
 		Short: "Broadcast message newCollection",
 		Args:  cobra.ExactArgs(11),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-return nil
-		// 	clientCtx, err := client.GetClientTxContext(cmd)
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			return nil
+			// 	clientCtx, err := client.GetClientTxContext(cmd)
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	argCollectionMetadata, err := cast.ToStringE(args[0])
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			// 	argCollectionMetadata, err := cast.ToStringE(args[0])
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	var argBadgeMetadata []*types.BadgeMetadata
-		// 	err = json.Unmarshal([]byte(args[1]), &argBadgeMetadata)
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			// 	var argBadgeMetadata []*types.BadgeMetadata
+			// 	err = json.Unmarshal([]byte(args[1]), &argBadgeMetadata)
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	argPermissions := types.NewUintFromString(args[2])
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			// 	argPermissions := types.NewUintFromString(args[2])
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	argBytesStr, err := cast.ToStringE(args[3])
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			// 	argBytesStr, err := cast.ToStringE(args[3])
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	var argApprovedTransfers []*types.CollectionApprovedTransfer
-		// 	err = json.Unmarshal([]byte(args[4]), &argApprovedTransfers)
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			// 	var argApprovedTransfers []*types.CollectionApprovedTransfer
+			// 	err = json.Unmarshal([]byte(args[4]), &argApprovedTransfers)
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	var argManagerApprovedTransfers []*types.CollectionApprovedTransfer
-		// 	err = json.Unmarshal([]byte(args[5]), &argManagerApprovedTransfers)
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			// 	var argManagerApprovedTransfers []*types.CollectionApprovedTransfer
+			// 	err = json.Unmarshal([]byte(args[5]), &argManagerApprovedTransfers)
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	argStandard := types.NewUintFromString(args[6])
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			// 	argStandard := types.NewUintFromString(args[6])
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	var argBadgesToCreate []*types.BadgeSupplyAndAmount
-		// 	err = json.Unmarshal([]byte(args[7]), &argBadgesToCreate)
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			// 	var argBadgesToCreate []*types.BadgeSupplyAndAmount
+			// 	err = json.Unmarshal([]byte(args[7]), &argBadgesToCreate)
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	var argTransfers []*types.Transfer
-		// 	err = json.Unmarshal([]byte(args[8]), &argTransfers)
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			// 	var argTransfers []*types.Transfer
+			// 	err = json.Unmarshal([]byte(args[8]), &argTransfers)
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	var argClaims []*types.Claim
-		// 	err = json.Unmarshal([]byte(args[9]), &argClaims)
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			// 	var argClaims []*types.Claim
+			// 	err = json.Unmarshal([]byte(args[9]), &argClaims)
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	argOffChainBalancesMetadata, err := cast.ToStringE(args[10])
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			// 	argOffChainBalancesMetadata, err := cast.ToStringE(args[10])
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	msg := types.NewMsgNewCollection(
-		// 		clientCtx.GetFromAddress().String(),
-		// 		argStandard,
-		// 		argBadgesToCreate,
-		// 		argCollectionMetadata,
-		// 		argBadgeMetadata,
-		// 		argPermissions,
-		// 		argApprovedTransfers,
-		// 		argManagerApprovedTransfers,
-		// 		argBytesStr,
-		// 		argTransfers,
-		// 		argClaims,
-		// 		argOffChainBalancesMetadata,
-		// 	)
-		// 	if err := msg.ValidateBasic(); err != nil {
-		// 		return err
-		// 	}
-		// 	return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+			// 	msg := types.NewMsgNewCollection(
+			// 		clientCtx.GetFromAddress().String(),
+			// 		argStandard,
+			// 		argBadgesToCreate,
+			// 		argCollectionMetadata,
+			// 		argBadgeMetadata,
+			// 		argPermissions,
+			// 		argApprovedTransfers,
+			// 		argManagerApprovedTransfers,
+			// 		argBytesStr,
+			// 		argTransfers,
+			// 		argClaims,
+			// 		argOffChainBalancesMetadata,
+			// 	)
+			// 	if err := msg.ValidateBasic(); err != nil {
+			// 		return err
+			// 	}
+			// 	return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 

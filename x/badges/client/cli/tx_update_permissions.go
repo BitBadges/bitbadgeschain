@@ -15,7 +15,7 @@ func CmdUpdateCollectionPermissions() *cobra.Command {
 		Short: "Broadcast message updateCollectionPermissions",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-return nil
+			return nil
 			// argBadgeId := types.NewUintFromString(args[0])
 			// if err != nil {
 			// 	return err

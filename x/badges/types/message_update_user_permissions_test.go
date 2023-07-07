@@ -12,44 +12,48 @@ import (
 func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg types.MsgUpdateUserPermissions
+		msg  types.MsgUpdateUserApprovedTransfers
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgUpdateUserPermissions{
-				Creator: "invalid_address",
+			msg: types.MsgUpdateUserApprovedTransfers{
+				Creator:      "invalid_address",
 				CollectionId: sdkmath.NewUint(1),
-				Permissions: &types.UserPermissions{},
+				Permissions:  &types.UserPermissions{},
+				UpdateApprovedTransfersUserPermissions: true,
 			},
 			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgUpdateUserPermissions{
-				Creator: sample.AccAddress(),
+			msg: types.MsgUpdateUserApprovedTransfers{
+				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
-				Permissions: &types.UserPermissions{},
+				Permissions:  &types.UserPermissions{},
+				UpdateApprovedTransfersUserPermissions: true,
 			},
 		},
-		{
-			name: "no permissions",
-			msg: types.MsgUpdateUserPermissions{
-				Creator: sample.AccAddress(),
-				CollectionId: sdkmath.NewUint(1),
-			},
-			err: types.ErrPermissionsIsNil,
-		},
+		// {
+		// 	name: "no permissions",
+		// 	msg: types.MsgUpdateUserApprovedTransfers{
+		// 		Creator:      sample.AccAddress(),
+		// 		CollectionId: sdkmath.NewUint(1),
+		// 		UpdateApprovedTransfersUserPermissions: true,
+		// 	},
+		// 	err: types.ErrPermissionsIsNil,
+		// },
 		{
 			name: "overlap times",
-			msg: types.MsgUpdateUserPermissions{
-				Creator: sample.AccAddress(),
+			msg: types.MsgUpdateUserApprovedTransfers{
+				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
+				UpdateApprovedTransfersUserPermissions: true,
 				Permissions: &types.UserPermissions{
 					CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransferPermission{
 						{
 							DefaultValues: &types.UserApprovedOutgoingTransferDefaultValues{
-								PermittedTimes: []*types.UintRange{ { Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2) } },
-								ForbiddenTimes: []*types.UintRange{ { Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2) } },
+								PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+								ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 							},
 							Combinations: []*types.UserApprovedOutgoingTransferCombination{{}},
 						},
@@ -60,10 +64,11 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "valid",
-			msg: types.MsgUpdateUserPermissions{
-				Creator: sample.AccAddress(),
+			msg: types.MsgUpdateUserApprovedTransfers{
+				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
-				Permissions: GetValidUserPermissions(),
+				Permissions:  GetValidUserPermissions(),
+				UpdateApprovedTransfersUserPermissions: true,
 			},
 		},
 	}

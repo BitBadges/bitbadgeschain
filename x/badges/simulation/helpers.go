@@ -23,7 +23,7 @@ func GetTimelineTimes(r *rand.Rand, length int) []*types.UintRange {
 	for i := 0; i < length; i++ {
 		timelineTimes = append(timelineTimes, &types.UintRange{
 			Start: sdkmath.NewUint(r.Uint64()),
-			End:  sdkmath.NewUint(r.Uint64()),
+			End:   sdkmath.NewUint(r.Uint64()),
 		})
 	}
 	return timelineTimes
@@ -33,8 +33,8 @@ func GetRandomBalances(r *rand.Rand, length int) []*types.Balance {
 	randomSubassets := []*types.Balance{}
 	for i := 0; i < r.Intn(length); i++ {
 		randomSubassets = append(randomSubassets, &types.Balance{
-			Amount: sdkmath.NewUint(r.Uint64()),
-			BadgeIds: GetTimelineTimes(r, 3),
+			Amount:         sdkmath.NewUint(r.Uint64()),
+			BadgeIds:       GetTimelineTimes(r, 3),
 			OwnershipTimes: GetTimelineTimes(r, 3),
 		})
 	}
@@ -44,7 +44,7 @@ func GetRandomBalances(r *rand.Rand, length int) []*types.Balance {
 
 func GetRandomAddresses(r *rand.Rand, length int, accs []simtypes.Account) []string {
 	randomAddresses := []string{}
-	for i := 0; i < r.Intn(length) + 1; i++ {
+	for i := 0; i < r.Intn(length)+1; i++ {
 		acc, _ := simtypes.RandomAcc(r, accs)
 		randomAddresses = append(randomAddresses, acc.Address.String())
 	}
@@ -55,18 +55,17 @@ func GetRandomAddresses(r *rand.Rand, length int, accs []simtypes.Account) []str
 func GetRandomTransfers(r *rand.Rand, length int, accs []simtypes.Account) []*types.Transfer {
 	randomTransfers := []*types.Transfer{}
 
-
 	randomTransfers = append(randomTransfers, &types.Transfer{
-		From: "Mint",
+		From:        "Mint",
 		ToAddresses: GetRandomAddresses(r, 3, accs),
-		Balances: GetRandomBalances(r, 3),
+		Balances:    GetRandomBalances(r, 3),
 	})
 
-	for i := 0; i < r.Intn(length - 1) + 1; i++ {
+	for i := 0; i < r.Intn(length-1)+1; i++ {
 		randomTransfers = append(randomTransfers, &types.Transfer{
-			From: GetRandomAddresses(r, 3, accs)[0],
+			From:        GetRandomAddresses(r, 3, accs)[0],
 			ToAddresses: GetRandomAddresses(r, 3, accs),
-			Balances: GetRandomBalances(r, 3),
+			Balances:    GetRandomBalances(r, 3),
 		})
 	}
 
@@ -78,8 +77,8 @@ func GetRandomValueOptions(r *rand.Rand) *types.ValueOptions {
 
 	return &types.ValueOptions{
 		InvertDefault: val == 0,
-		AllValues: val == 1,
-		NoValues: val == 2,
+		AllValues:     val == 1,
+		NoValues:      val == 2,
 	}
 }
 
@@ -102,12 +101,12 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				DefaultValues: &types.TimedUpdateDefaultValues{
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes: GetTimelineTimes(r, 3),
+					TimelineTimes:  GetTimelineTimes(r, 3),
 				},
 				Combinations: []*types.TimedUpdateCombination{{
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
-					TimelineTimesOptions: GetRandomValueOptions(r),
+					TimelineTimesOptions:  GetRandomValueOptions(r),
 				}},
 			},
 		},
@@ -116,12 +115,12 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				DefaultValues: &types.TimedUpdateDefaultValues{
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes: GetTimelineTimes(r, 3),
+					TimelineTimes:  GetTimelineTimes(r, 3),
 				},
 				Combinations: []*types.TimedUpdateCombination{{
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
-					TimelineTimesOptions: GetRandomValueOptions(r),
+					TimelineTimesOptions:  GetRandomValueOptions(r),
 				}},
 			},
 		},
@@ -130,12 +129,12 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				DefaultValues: &types.TimedUpdateDefaultValues{
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes: GetTimelineTimes(r, 3),
+					TimelineTimes:  GetTimelineTimes(r, 3),
 				},
 				Combinations: []*types.TimedUpdateCombination{{
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
-					TimelineTimesOptions: GetRandomValueOptions(r),
+					TimelineTimesOptions:  GetRandomValueOptions(r),
 				}},
 			},
 		},
@@ -144,12 +143,12 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				DefaultValues: &types.TimedUpdateDefaultValues{
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes: GetTimelineTimes(r, 3),
+					TimelineTimes:  GetTimelineTimes(r, 3),
 				},
 				Combinations: []*types.TimedUpdateCombination{{
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
-					TimelineTimesOptions: GetRandomValueOptions(r),
+					TimelineTimesOptions:  GetRandomValueOptions(r),
 				}},
 			},
 		},
@@ -158,12 +157,12 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				DefaultValues: &types.TimedUpdateDefaultValues{
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes: GetTimelineTimes(r, 3),
+					TimelineTimes:  GetTimelineTimes(r, 3),
 				},
 				Combinations: []*types.TimedUpdateCombination{{
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
-					TimelineTimesOptions: GetRandomValueOptions(r),
+					TimelineTimesOptions:  GetRandomValueOptions(r),
 				}},
 			},
 		},
@@ -172,12 +171,12 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				DefaultValues: &types.TimedUpdateDefaultValues{
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes: GetTimelineTimes(r, 3),
+					TimelineTimes:  GetTimelineTimes(r, 3),
 				},
 				Combinations: []*types.TimedUpdateCombination{{
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
-					TimelineTimesOptions: GetRandomValueOptions(r),
+					TimelineTimesOptions:  GetRandomValueOptions(r),
 				}},
 			},
 		},
@@ -186,12 +185,12 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				DefaultValues: &types.TimedUpdateDefaultValues{
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes: GetTimelineTimes(r, 3),
+					TimelineTimes:  GetTimelineTimes(r, 3),
 				},
 				Combinations: []*types.TimedUpdateCombination{{
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
-					TimelineTimesOptions: GetRandomValueOptions(r),
+					TimelineTimesOptions:  GetRandomValueOptions(r),
 				}},
 			},
 		},
@@ -201,12 +200,12 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
 					OwnershipTimes: GetTimelineTimes(r, 3),
-					BadgeIds: GetTimelineTimes(r, 3),
+					BadgeIds:       GetTimelineTimes(r, 3),
 				},
 				Combinations: []*types.BalancesActionCombination{{
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
-					BadgeIdsOptions: GetRandomValueOptions(r),
+					BadgeIdsOptions:       GetRandomValueOptions(r),
 					OwnershipTimesOptions: GetRandomValueOptions(r),
 				}},
 			},
@@ -216,14 +215,14 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				DefaultValues: &types.TimedUpdateWithBadgeIdsDefaultValues{
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes: GetTimelineTimes(r, 3),
-					BadgeIds: GetTimelineTimes(r, 3),
+					TimelineTimes:  GetTimelineTimes(r, 3),
+					BadgeIds:       GetTimelineTimes(r, 3),
 				},
 				Combinations: []*types.TimedUpdateWithBadgeIdsCombination{{
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
-					TimelineTimesOptions: GetRandomValueOptions(r),
-					BadgeIdsOptions: GetRandomValueOptions(r),
+					TimelineTimesOptions:  GetRandomValueOptions(r),
+					BadgeIdsOptions:       GetRandomValueOptions(r),
 				}},
 			},
 		},
@@ -232,37 +231,37 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				DefaultValues: &types.TimedUpdateWithBadgeIdsDefaultValues{
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes: GetTimelineTimes(r, 3),
-					BadgeIds: GetTimelineTimes(r, 3),
+					TimelineTimes:  GetTimelineTimes(r, 3),
+					BadgeIds:       GetTimelineTimes(r, 3),
 				},
 				Combinations: []*types.TimedUpdateWithBadgeIdsCombination{{
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
-					TimelineTimesOptions: GetRandomValueOptions(r),
-					BadgeIdsOptions: GetRandomValueOptions(r),
+					TimelineTimesOptions:  GetRandomValueOptions(r),
+					BadgeIdsOptions:       GetRandomValueOptions(r),
 				}},
 			},
 		},
 		CanUpdateCollectionApprovedTransfers: []*types.CollectionApprovedTransferPermission{
 			{
 				DefaultValues: &types.CollectionApprovedTransferDefaultValues{
-					PermittedTimes: GetTimelineTimes(r, 3),
-					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TransferTimes: GetTimelineTimes(r, 3),
-					BadgeIds: GetTimelineTimes(r, 3),
-					TimelineTimes: GetTimelineTimes(r, 3),
-					ToMappingId: GetRandomAddresses(r, 3, accs)[0],
-					FromMappingId: GetRandomAddresses(r, 3, accs)[0],
+					PermittedTimes:       GetTimelineTimes(r, 3),
+					ForbiddenTimes:       GetTimelineTimes(r, 3),
+					TransferTimes:        GetTimelineTimes(r, 3),
+					BadgeIds:             GetTimelineTimes(r, 3),
+					TimelineTimes:        GetTimelineTimes(r, 3),
+					ToMappingId:          GetRandomAddresses(r, 3, accs)[0],
+					FromMappingId:        GetRandomAddresses(r, 3, accs)[0],
 					InitiatedByMappingId: GetRandomAddresses(r, 3, accs)[0],
 				},
 				Combinations: []*types.CollectionApprovedTransferCombination{{
-					PermittedTimesOptions: GetRandomValueOptions(r),
-					ForbiddenTimesOptions: GetRandomValueOptions(r),
-					TransferTimesOptions: GetRandomValueOptions(r),
-					BadgeIdsOptions: GetRandomValueOptions(r),
-					TimelineTimesOptions: GetRandomValueOptions(r),
-					ToMappingOptions: GetRandomValueOptions(r),
-					FromMappingOptions: GetRandomValueOptions(r),
+					PermittedTimesOptions:     GetRandomValueOptions(r),
+					ForbiddenTimesOptions:     GetRandomValueOptions(r),
+					TransferTimesOptions:      GetRandomValueOptions(r),
+					BadgeIdsOptions:           GetRandomValueOptions(r),
+					TimelineTimesOptions:      GetRandomValueOptions(r),
+					ToMappingOptions:          GetRandomValueOptions(r),
+					FromMappingOptions:        GetRandomValueOptions(r),
 					InitiatedByMappingOptions: GetRandomValueOptions(r),
 				}},
 			},

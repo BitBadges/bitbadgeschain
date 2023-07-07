@@ -22,39 +22,21 @@ func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 		}
 
 		switch {
-		case badgeCustomMsg.NewCollection != nil:
-			badgeCustomMsg.NewCollection.Creator = sender.String()
-			return []sdk.Msg{badgeCustomMsg.NewCollection}, nil
-		case badgeCustomMsg.MintAndDistributeBadges != nil:
-			badgeCustomMsg.MintAndDistributeBadges.Creator = sender.String()
-			return []sdk.Msg{badgeCustomMsg.MintAndDistributeBadges}, nil
+		case badgeCustomMsg.CreateAddressMappings != nil:
+			badgeCustomMsg.CreateAddressMappings.Creator = sender.String()
+			return []sdk.Msg{badgeCustomMsg.CreateAddressMappings}, nil
+		case badgeCustomMsg.UpdateCollection != nil:
+			badgeCustomMsg.UpdateCollection.Creator = sender.String()
+			return []sdk.Msg{badgeCustomMsg.UpdateCollection}, nil
 		case badgeCustomMsg.DeleteCollection != nil:
 			badgeCustomMsg.DeleteCollection.Creator = sender.String()
 			return []sdk.Msg{badgeCustomMsg.DeleteCollection}, nil
-		case badgeCustomMsg.TransferBadge != nil:
-			badgeCustomMsg.TransferBadge.Creator = sender.String()
-			return []sdk.Msg{badgeCustomMsg.TransferBadge}, nil
-		case badgeCustomMsg.UpdateManager != nil:
-			badgeCustomMsg.UpdateManager.Creator = sender.String()
-			return []sdk.Msg{badgeCustomMsg.UpdateManager}, nil
-		case badgeCustomMsg.UpdateCollectionApprovedTransfers != nil:
-			badgeCustomMsg.UpdateCollectionApprovedTransfers.Creator = sender.String()
-			return []sdk.Msg{badgeCustomMsg.UpdateCollectionApprovedTransfers}, nil
-		case badgeCustomMsg.UpdateCollectionPermissions != nil:
-			badgeCustomMsg.UpdateCollectionPermissions.Creator = sender.String()
-			return []sdk.Msg{badgeCustomMsg.UpdateCollectionPermissions}, nil
-		case badgeCustomMsg.UpdateMetadata != nil:
-			badgeCustomMsg.UpdateMetadata.Creator = sender.String()
-			return []sdk.Msg{badgeCustomMsg.UpdateMetadata}, nil
-		case badgeCustomMsg.ArchiveCollection != nil:
-			badgeCustomMsg.ArchiveCollection.Creator = sender.String()
-			return []sdk.Msg{badgeCustomMsg.ArchiveCollection}, nil
+		case badgeCustomMsg.TransferBadges != nil:
+			badgeCustomMsg.TransferBadges.Creator = sender.String()
+			return []sdk.Msg{badgeCustomMsg.TransferBadges}, nil
 		case badgeCustomMsg.UpdateUserApprovedTransfers != nil:
 			badgeCustomMsg.UpdateUserApprovedTransfers.Creator = sender.String()
 			return []sdk.Msg{badgeCustomMsg.UpdateUserApprovedTransfers}, nil
-		case badgeCustomMsg.UpdateUserPermissions != nil:
-			badgeCustomMsg.UpdateUserPermissions.Creator = sender.String()
-			return []sdk.Msg{badgeCustomMsg.UpdateUserPermissions}, nil
 		default:
 			return nil, sdkerrors.Wrapf(types.ErrInvalidMsg, "Unknown custom badge message variant %s", badgeCustomMsg)
 		}
@@ -62,15 +44,9 @@ func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 }
 
 type badgeCustomMsg struct {
-	NewCollection                     *badgeTypes.MsgNewCollection                     `json:"newCollectionMsg,omitempty"`
-	MintAndDistributeBadges           *badgeTypes.MsgMintAndDistributeBadges                         `json:"mintAndDistributeBadgesMsg,omitempty"`
+	CreateAddressMappings 					 *badgeTypes.MsgCreateAddressMappings             `json:"createAddressMappingsMsg,omitempty"`
+	UpdateCollection   						*badgeTypes.MsgUpdateCollection                  `json:"updateCollectionMsg,omitempty"`
 	DeleteCollection                  *badgeTypes.MsgDeleteCollection                  `json:"deleteCollectionMsg,omitempty"`
-	TransferBadge                     *badgeTypes.MsgTransferBadge                     `json:"transferBadgeMsg,omitempty"`
-	UpdateManager                   *badgeTypes.MsgUpdateManager                   `json:"updateManagerMsg,omitempty"`
-	UpdateCollectionApprovedTransfers *badgeTypes.MsgUpdateCollectionApprovedTransfers `json:"UpdateCollectionApprovedTransfersMsg,omitempty"`
-	UpdateCollectionPermissions                 *badgeTypes.MsgUpdateCollectionPermissions                 `json:"updateCollectionPermissionsMsg,omitempty"`
-	UpdateMetadata                    *badgeTypes.MsgUpdateMetadata                    `json:"updateMetadataMsg,omitempty"`
-	ArchiveCollection 							 *badgeTypes.MsgArchiveCollection                 `json:"archiveCollectionMsg,omitempty"`
-	UpdateUserApprovedTransfers      *badgeTypes.MsgUpdateUserApprovedTransfers      `json:"updateUserApprovedTransfersMsg,omitempty"`
-	UpdateUserPermissions 					*badgeTypes.MsgUpdateUserPermissions            `json:"updateUserPermissionsMsg,omitempty"`
+	TransferBadges                     *badgeTypes.MsgTransferBadges                     `json:"transferBadgesMsg,omitempty"`
+	UpdateUserApprovedTransfers       *badgeTypes.MsgUpdateUserApprovedTransfers       `json:"updateUserApprovedTransfersMsg,omitempty"`
 }

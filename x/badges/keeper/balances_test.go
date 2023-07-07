@@ -40,7 +40,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 	err := *new(error)
 	balances := []*types.Balance{
 		{
-			Amount: sdkmath.NewUint(1),
+			Amount:         sdkmath.NewUint(1),
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
@@ -57,9 +57,9 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(1),
 			},
-		}, 
-		OwnershipTimes: GetFullUintRanges(), 
-		Amount: sdkmath.NewUint(10),
+		},
+		OwnershipTimes: GetFullUintRanges(),
+		Amount:         sdkmath.NewUint(10),
 	}, balances)
 	suite.Require().Nil(err, "Error updating balances: %s")
 
@@ -73,7 +73,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	AssertBalancesEqual(suite, balances, []*types.Balance{
 		{
-			Amount: sdkmath.NewUint(10),
+			Amount:         sdkmath.NewUint(10),
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
@@ -95,7 +95,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	AssertBalancesEqual(suite, fetchedBalances, []*types.Balance{
 		{
-			Amount: sdkmath.NewUint(10),
+			Amount:         sdkmath.NewUint(10),
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
@@ -116,7 +116,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	AssertBalancesEqual(suite, fetchedBalances, []*types.Balance{
 		{
-			Amount: sdkmath.NewUint(10),
+			Amount:         sdkmath.NewUint(10),
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
@@ -126,7 +126,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			},
 		},
 		{
-			Amount: sdkmath.NewUint(0),
+			Amount:         sdkmath.NewUint(0),
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
@@ -147,7 +147,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	AssertBalancesEqual(suite, fetchedBalances, []*types.Balance{
 		{
-			Amount: sdkmath.NewUint(0),
+			Amount:         sdkmath.NewUint(0),
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
@@ -157,7 +157,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			},
 		},
 		{
-			Amount: sdkmath.NewUint(10),
+			Amount:         sdkmath.NewUint(10),
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
@@ -186,7 +186,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	AssertBalancesEqual(suite, fetchedBalances, []*types.Balance{
 		{
-			Amount: sdkmath.NewUint(0),
+			Amount:         sdkmath.NewUint(0),
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
@@ -196,7 +196,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			},
 		},
 		{
-			Amount: sdkmath.NewUint(10),
+			Amount:         sdkmath.NewUint(10),
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
@@ -209,17 +209,16 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	balances, err = types.UpdateBalance(&types.Balance{
 		BadgeIds: []*types.UintRange{
-		{
-			Start: sdkmath.NewUint(1),
-			End:   sdkmath.NewUint(1),
-		},
-	}, OwnershipTimes: GetFullUintRanges(), Amount: sdkmath.NewUint(5)}, balances)
+			{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+		}, OwnershipTimes: GetFullUintRanges(), Amount: sdkmath.NewUint(5)}, balances)
 	suite.Require().Nil(err, "Error fetching balances: %s")
-
 
 	AssertBalancesEqual(suite, balances, []*types.Balance{
 		{
-			Amount: sdkmath.NewUint(5),
+			Amount:         sdkmath.NewUint(5),
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
@@ -242,16 +241,16 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	balances, err = types.UpdateBalance(&types.Balance{
 		BadgeIds: []*types.UintRange{
-		{
-			Start: sdkmath.NewUint(2),
-			End:   sdkmath.NewUint(math.MaxUint64),
-		},
-	}, OwnershipTimes: GetFullUintRanges(), Amount: sdkmath.NewUint(5)}, balances)
+			{
+				Start: sdkmath.NewUint(2),
+				End:   sdkmath.NewUint(math.MaxUint64),
+			},
+		}, OwnershipTimes: GetFullUintRanges(), Amount: sdkmath.NewUint(5)}, balances)
 	suite.Require().Nil(err, "Error fetching balances: %s")
 
 	AssertBalancesEqual(suite, balances, []*types.Balance{
 		{
-			Amount: sdkmath.NewUint(5),
+			Amount:         sdkmath.NewUint(5),
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
@@ -274,16 +273,16 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 	balances, err = types.UpdateBalance(&types.Balance{
 		BadgeIds: []*types.UintRange{
-		{
-			Start: sdkmath.NewUint(2),
-			End:   sdkmath.NewUint(2),
-		},
-	}, OwnershipTimes: GetFullUintRanges(), Amount: sdkmath.NewUint(10)}, balances)
+			{
+				Start: sdkmath.NewUint(2),
+				End:   sdkmath.NewUint(2),
+			},
+		}, OwnershipTimes: GetFullUintRanges(), Amount: sdkmath.NewUint(10)}, balances)
 	suite.Require().Nil(err, "Error fetching balances: %s")
 
 	AssertBalancesEqual(suite, balances, []*types.Balance{
 		{
-			Amount: sdkmath.NewUint(5),
+			Amount:         sdkmath.NewUint(5),
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				{
@@ -297,7 +296,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 			},
 		},
 		{
-			Amount: sdkmath.NewUint(10),
+			Amount:         sdkmath.NewUint(10),
 			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds: []*types.UintRange{
 				// {
@@ -313,12 +312,13 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 	})
 }
 
-//Adjust these values to test more or less
+// Adjust these values to test more or less
 const NUM_RUNS = 1
 const NUM_IDS = 10
 const NUM_OPERATIONS = 10
+
 func (suite *TestSuite) TestBalancesFuzz() {
-	for a:= 0; a< NUM_RUNS; a++ {
+	for a := 0; a < NUM_RUNS; a++ {
 		userBalance := &types.UserBalanceStore{}
 		balances := make([]sdkmath.Uint, NUM_IDS)
 		for i := 0; i < NUM_IDS; i++ {
@@ -331,12 +331,11 @@ func (suite *TestSuite) TestBalancesFuzz() {
 			//Get random start value
 			start := (uint64(rand.Intn(NUM_IDS / 2)))
 			//Get random end value
-			end := (uint64(NUM_IDS / 2 + rand.Intn(NUM_IDS / 2)))
+			end := (uint64(NUM_IDS/2 + rand.Intn(NUM_IDS/2)))
 
 			amount := sdkmath.NewUint(uint64(rand.Intn(100)))
 			err := *new(error)
 
-			
 			userBalance.Balances, err = types.AddBalance(userBalance.Balances, &types.Balance{
 				Amount: amount,
 				BadgeIds: []*types.UintRange{
@@ -360,14 +359,14 @@ func (suite *TestSuite) TestBalancesFuzz() {
 			}
 
 			start = (uint64(rand.Intn(NUM_IDS / 2)))
-			end = (uint64(NUM_IDS / 2 + rand.Intn(NUM_IDS / 2)))
+			end = (uint64(NUM_IDS/2 + rand.Intn(NUM_IDS/2)))
 			amount = sdkmath.NewUint(uint64(rand.Intn(20))) //Make this substantially less than add, so we have less chance of underflow
 			// println("removing", start, end, amount.String())
 
 			userBalancesCopy := make([]*types.Balance, len(userBalance.Balances))
 			copy(userBalancesCopy, userBalance.Balances)
-			
-			userBalance.Balances, err = types.SubtractBalance(userBalance.Balances,  &types.Balance{
+
+			userBalance.Balances, err = types.SubtractBalance(userBalance.Balances, &types.Balance{
 				Amount: amount,
 				BadgeIds: []*types.UintRange{
 					{
@@ -408,14 +407,12 @@ func (suite *TestSuite) TestBalancesFuzz() {
 				GetFullUintRanges(),
 				userBalance.Balances,
 			)
-			
+
 			// println("fetched", i, fetchedBalances[0].Amount.String(), balances[i].String())
 			AssertUintsEqual(suite, fetchedBalances[0].Amount, balances[i])
 		}
 	}
 }
-
-
 
 /* --------------------------------------START TESTING WITH TIMES-------------------------------------- */
 //Previously, everything was just FullUintRanges() for times
@@ -437,15 +434,14 @@ func (suite *TestSuite) TestBalancesWithTimesFuzz() {
 		// subs := make([]*types.UintRange, NUM_OPERATIONS)
 		for i := 0; i < NUM_OPERATIONS; i++ { //NUM_OPERATIONS iterations
 			start := (uint64(rand.Intn(NUM_IDS / 2)))
-			end := (uint64(NUM_IDS / 2 + rand.Intn(NUM_IDS / 2)))
+			end := (uint64(NUM_IDS/2 + rand.Intn(NUM_IDS/2)))
 			startTime := (uint64(rand.Intn(NUM_IDS / 2)))
-			endTime := (uint64(NUM_IDS / 2 + rand.Intn(NUM_IDS / 2)))
+			endTime := (uint64(NUM_IDS/2 + rand.Intn(NUM_IDS/2)))
 
 			amount := sdkmath.NewUint(uint64(rand.Intn(100)))
 			err := *new(error)
 
-			
-			userBalance.Balances, err = types.AddBalance(userBalance.Balances,  &types.Balance{
+			userBalance.Balances, err = types.AddBalance(userBalance.Balances, &types.Balance{
 				Amount: amount,
 				BadgeIds: []*types.UintRange{
 					{
@@ -462,8 +458,6 @@ func (suite *TestSuite) TestBalancesWithTimesFuzz() {
 			})
 			suite.Require().Nil(err, "error adding balance to approval")
 
-			
-
 			// adds = append(adds, &types.UintRange{
 			// 	Start: sdkmath.NewUint(start),
 			// 	End:   sdkmath.NewUint(end),
@@ -477,18 +471,18 @@ func (suite *TestSuite) TestBalancesWithTimesFuzz() {
 			}
 
 			start = (uint64(rand.Intn(NUM_IDS / 2)))
-			end = (uint64(NUM_IDS / 2 + rand.Intn(NUM_IDS / 2)))
+			end = (uint64(NUM_IDS/2 + rand.Intn(NUM_IDS/2)))
 			amount = sdkmath.NewUint(uint64(rand.Intn(20))) //Make this substantially less than add, so we have less chance of underflow
 			startTime = (uint64(rand.Intn(NUM_IDS / 2)))
-			endTime = (uint64(NUM_IDS / 2 + rand.Intn(NUM_IDS / 2)))
+			endTime = (uint64(NUM_IDS/2 + rand.Intn(NUM_IDS/2)))
 			// println("removing", start, end, startTime, endTime, amount.String())
 
 			userBalancesCopy := make([]*types.Balance, len(userBalance.Balances))
 			copy(userBalancesCopy, userBalance.Balances)
 
 			//removing 18 from IDs 1-7 Times 1-6
-			
-			userBalance.Balances, err = types.SubtractBalance(userBalance.Balances,  &types.Balance{
+
+			userBalance.Balances, err = types.SubtractBalance(userBalance.Balances, &types.Balance{
 				Amount: amount,
 				BadgeIds: []*types.UintRange{
 					{
@@ -542,7 +536,7 @@ func (suite *TestSuite) TestBalancesWithTimesFuzz() {
 					},
 					userBalance.Balances,
 				)
-				
+
 				//1 1 12 13
 				// add 31
 				// remove 13

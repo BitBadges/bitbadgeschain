@@ -15,7 +15,7 @@ func CmdArchiveCollection() *cobra.Command {
 		Short: "Broadcast message archiveCollection",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-return nil
+			return nil
 			// argCollectionId, err := cast.ToUint64E(args[0])
 			// if err != nil {
 			// 	return err

@@ -5,7 +5,7 @@ func CastOutgoingTransfersToCollectionTransfers(transfers []*UserApprovedOutgoin
 	for _, transfer := range transfers {
 		collectionTransfers = append(collectionTransfers, CastOutgoingTransferToCollectionTransfer(transfer, fromAddress))
 	}
-	
+
 	return collectionTransfers
 }
 
@@ -14,7 +14,7 @@ func CastIncomingTransfersToCollectionTransfers(transfers []*UserApprovedIncomin
 	for _, transfer := range transfers {
 		collectionTransfers = append(collectionTransfers, CastIncomingTransferToCollectionTransfer(transfer, toAddress))
 	}
-	
+
 	return collectionTransfers
 }
 
@@ -23,21 +23,21 @@ func CastOutgoingTransferToCollectionTransfer(transfer *UserApprovedOutgoingTran
 	for _, combination := range transfer.AllowedCombinations {
 		allowedCombinations = append(allowedCombinations, CastOutgoingCombinationToCollectionCombination(combination))
 	}
-	
+
 	return &CollectionApprovedTransfer{
-		ToMappingId: transfer.ToMappingId,
-		FromMappingId: fromAddress,
-		InitiatedByMappingId: transfer.InitiatedByMappingId,
-		TransferTimes: transfer.TransferTimes,
-		BadgeIds: transfer.BadgeIds,
-		AllowedCombinations: allowedCombinations,
-		PerAddressApprovals: transfer.PerAddressApprovals,
-		IncrementBadgeIdsBy: transfer.IncrementBadgeIdsBy,
-		IncrementOwnershipTimesBy: transfer.IncrementOwnershipTimesBy,
-		RequireToEqualsInitiatedBy: transfer.RequireToEqualsInitiatedBy,
+		ToMappingId:                      transfer.ToMappingId,
+		FromMappingId:                    fromAddress,
+		InitiatedByMappingId:             transfer.InitiatedByMappingId,
+		TransferTimes:                    transfer.TransferTimes,
+		BadgeIds:                         transfer.BadgeIds,
+		AllowedCombinations:              allowedCombinations,
+		PerAddressApprovals:              transfer.PerAddressApprovals,
+		IncrementBadgeIdsBy:              transfer.IncrementBadgeIdsBy,
+		IncrementOwnershipTimesBy:        transfer.IncrementOwnershipTimesBy,
+		RequireToEqualsInitiatedBy:       transfer.RequireToEqualsInitiatedBy,
 		RequireToDoesNotEqualInitiatedBy: transfer.RequireToDoesNotEqualInitiatedBy,
-		CustomData: transfer.CustomData,
-		TrackerId: transfer.TrackerId,
+		CustomData:                       transfer.CustomData,
+		TrackerId:                        transfer.TrackerId,
 	}
 }
 
@@ -46,40 +46,40 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApprovedTr
 	for _, combination := range transfer.AllowedCombinations {
 		allowedCombinations = append(allowedCombinations, CastFromCollectionCombinationToOutgoingCombination(combination))
 	}
-	
+
 	return &UserApprovedOutgoingTransfer{
-		ToMappingId: transfer.ToMappingId,
-		InitiatedByMappingId: transfer.InitiatedByMappingId,
-		TransferTimes: transfer.TransferTimes,
-		BadgeIds: transfer.BadgeIds,
-		AllowedCombinations: allowedCombinations,
-		PerAddressApprovals: transfer.PerAddressApprovals,
-		IncrementBadgeIdsBy: transfer.IncrementBadgeIdsBy,
-		IncrementOwnershipTimesBy: transfer.IncrementOwnershipTimesBy,
-		RequireToEqualsInitiatedBy: transfer.RequireToEqualsInitiatedBy,
+		ToMappingId:                      transfer.ToMappingId,
+		InitiatedByMappingId:             transfer.InitiatedByMappingId,
+		TransferTimes:                    transfer.TransferTimes,
+		BadgeIds:                         transfer.BadgeIds,
+		AllowedCombinations:              allowedCombinations,
+		PerAddressApprovals:              transfer.PerAddressApprovals,
+		IncrementBadgeIdsBy:              transfer.IncrementBadgeIdsBy,
+		IncrementOwnershipTimesBy:        transfer.IncrementOwnershipTimesBy,
+		RequireToEqualsInitiatedBy:       transfer.RequireToEqualsInitiatedBy,
 		RequireToDoesNotEqualInitiatedBy: transfer.RequireToDoesNotEqualInitiatedBy,
-		CustomData: transfer.CustomData,
-		TrackerId: transfer.TrackerId,
+		CustomData:                       transfer.CustomData,
+		TrackerId:                        transfer.TrackerId,
 	}
 }
 
 func CastOutgoingCombinationToCollectionCombination(combination *IsUserOutgoingTransferAllowed) *IsCollectionTransferAllowed {
 	return &IsCollectionTransferAllowed{
-		IsAllowed: combination.IsAllowed,
-		InvertBadgeIds: combination.InvertBadgeIds,
+		IsAllowed:           combination.IsAllowed,
+		InvertBadgeIds:      combination.InvertBadgeIds,
 		InvertTransferTimes: combination.InvertTransferTimes,
-		InvertTo: combination.InvertTo,
-		InvertInitiatedBy: combination.InvertInitiatedBy,
+		InvertTo:            combination.InvertTo,
+		InvertInitiatedBy:   combination.InvertInitiatedBy,
 	}
 }
 
 func CastFromCollectionCombinationToOutgoingCombination(combination *IsCollectionTransferAllowed) *IsUserOutgoingTransferAllowed {
 	return &IsUserOutgoingTransferAllowed{
-		IsAllowed: combination.IsAllowed,
-		InvertBadgeIds: combination.InvertBadgeIds,
+		IsAllowed:           combination.IsAllowed,
+		InvertBadgeIds:      combination.InvertBadgeIds,
 		InvertTransferTimes: combination.InvertTransferTimes,
-		InvertTo: combination.InvertTo,
-		InvertInitiatedBy: combination.InvertInitiatedBy,
+		InvertTo:            combination.InvertTo,
+		InvertInitiatedBy:   combination.InvertInitiatedBy,
 	}
 }
 
@@ -88,21 +88,21 @@ func CastIncomingTransferToCollectionTransfer(transfer *UserApprovedIncomingTran
 	for _, combination := range transfer.AllowedCombinations {
 		allowedCombinations = append(allowedCombinations, CastIncomingCombinationToCollectionCombination(combination))
 	}
-	
+
 	return &CollectionApprovedTransfer{
-		ToMappingId: toAddress,
-		FromMappingId: transfer.FromMappingId,
-		InitiatedByMappingId: transfer.InitiatedByMappingId,
-		TransferTimes: transfer.TransferTimes,
-		BadgeIds: transfer.BadgeIds,
-		AllowedCombinations: allowedCombinations,
-		PerAddressApprovals: transfer.PerAddressApprovals,
-		IncrementBadgeIdsBy: transfer.IncrementBadgeIdsBy,
-		IncrementOwnershipTimesBy: transfer.IncrementOwnershipTimesBy,
-		RequireFromEqualsInitiatedBy: transfer.RequireFromEqualsInitiatedBy,
+		ToMappingId:                        toAddress,
+		FromMappingId:                      transfer.FromMappingId,
+		InitiatedByMappingId:               transfer.InitiatedByMappingId,
+		TransferTimes:                      transfer.TransferTimes,
+		BadgeIds:                           transfer.BadgeIds,
+		AllowedCombinations:                allowedCombinations,
+		PerAddressApprovals:                transfer.PerAddressApprovals,
+		IncrementBadgeIdsBy:                transfer.IncrementBadgeIdsBy,
+		IncrementOwnershipTimesBy:          transfer.IncrementOwnershipTimesBy,
+		RequireFromEqualsInitiatedBy:       transfer.RequireFromEqualsInitiatedBy,
 		RequireFromDoesNotEqualInitiatedBy: transfer.RequireFromDoesNotEqualInitiatedBy,
-		CustomData: transfer.CustomData,
-		TrackerId: transfer.TrackerId,
+		CustomData:                         transfer.CustomData,
+		TrackerId:                          transfer.TrackerId,
 	}
 }
 
@@ -111,39 +111,39 @@ func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApprovedTr
 	for _, combination := range transfer.AllowedCombinations {
 		allowedCombinations = append(allowedCombinations, CastFromCollectionCombinationToIncomingCombination(combination))
 	}
-	
+
 	return &UserApprovedIncomingTransfer{
-		FromMappingId: transfer.FromMappingId,
-		InitiatedByMappingId: transfer.InitiatedByMappingId,
-		TransferTimes: transfer.TransferTimes,
-		BadgeIds: transfer.BadgeIds,
-		AllowedCombinations: allowedCombinations,
-		PerAddressApprovals: transfer.PerAddressApprovals,
-		IncrementBadgeIdsBy: transfer.IncrementBadgeIdsBy,
-		IncrementOwnershipTimesBy: transfer.IncrementOwnershipTimesBy,
-		RequireFromEqualsInitiatedBy: transfer.RequireFromEqualsInitiatedBy,
+		FromMappingId:                      transfer.FromMappingId,
+		InitiatedByMappingId:               transfer.InitiatedByMappingId,
+		TransferTimes:                      transfer.TransferTimes,
+		BadgeIds:                           transfer.BadgeIds,
+		AllowedCombinations:                allowedCombinations,
+		PerAddressApprovals:                transfer.PerAddressApprovals,
+		IncrementBadgeIdsBy:                transfer.IncrementBadgeIdsBy,
+		IncrementOwnershipTimesBy:          transfer.IncrementOwnershipTimesBy,
+		RequireFromEqualsInitiatedBy:       transfer.RequireFromEqualsInitiatedBy,
 		RequireFromDoesNotEqualInitiatedBy: transfer.RequireFromDoesNotEqualInitiatedBy,
-		CustomData: transfer.CustomData,
-		TrackerId: transfer.TrackerId,
+		CustomData:                         transfer.CustomData,
+		TrackerId:                          transfer.TrackerId,
 	}
 }
 
 func CastIncomingCombinationToCollectionCombination(combination *IsUserIncomingTransferAllowed) *IsCollectionTransferAllowed {
 	return &IsCollectionTransferAllowed{
-		IsAllowed: combination.IsAllowed,
-		InvertBadgeIds: combination.InvertBadgeIds,
+		IsAllowed:           combination.IsAllowed,
+		InvertBadgeIds:      combination.InvertBadgeIds,
 		InvertTransferTimes: combination.InvertTransferTimes,
-		InvertTo: combination.InvertFrom,
-		InvertInitiatedBy: combination.InvertInitiatedBy,
+		InvertTo:            combination.InvertFrom,
+		InvertInitiatedBy:   combination.InvertInitiatedBy,
 	}
 }
 
 func CastFromCollectionCombinationToIncomingCombination(combination *IsCollectionTransferAllowed) *IsUserIncomingTransferAllowed {
 	return &IsUserIncomingTransferAllowed{
-		IsAllowed: combination.IsAllowed,
-		InvertBadgeIds: combination.InvertBadgeIds,
+		IsAllowed:           combination.IsAllowed,
+		InvertBadgeIds:      combination.InvertBadgeIds,
 		InvertTransferTimes: combination.InvertTransferTimes,
-		InvertFrom: combination.InvertTo,
-		InvertInitiatedBy: combination.InvertInitiatedBy,
+		InvertFrom:          combination.InvertTo,
+		InvertInitiatedBy:   combination.InvertInitiatedBy,
 	}
 }

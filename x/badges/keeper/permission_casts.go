@@ -13,12 +13,12 @@ func (k Keeper) CastUserApprovedIncomingTransferPermissionToUniversalPermission(
 		castedCombinations := []*types.UniversalCombination{}
 		for _, combination := range permission.Combinations {
 			castedCombinations = append(castedCombinations, &types.UniversalCombination{
-				BadgeIdsOptions: combination.BadgeIdsOptions,
-				PermittedTimesOptions: combination.PermittedTimesOptions,
-				ForbiddenTimesOptions: combination.ForbiddenTimesOptions,
-				TimelineTimesOptions: combination.TimelineTimesOptions,
-				TransferTimesOptions: combination.TransferTimesOptions,
-				FromMappingOptions: combination.FromMappingOptions,
+				BadgeIdsOptions:           combination.BadgeIdsOptions,
+				PermittedTimesOptions:     combination.PermittedTimesOptions,
+				ForbiddenTimesOptions:     combination.ForbiddenTimesOptions,
+				TimelineTimesOptions:      combination.TimelineTimesOptions,
+				TransferTimesOptions:      combination.TransferTimesOptions,
+				FromMappingOptions:        combination.FromMappingOptions,
 				InitiatedByMappingOptions: combination.InitiatedByMappingOptions,
 			})
 		}
@@ -35,18 +35,18 @@ func (k Keeper) CastUserApprovedIncomingTransferPermissionToUniversalPermission(
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
-				BadgeIds: permission.DefaultValues.BadgeIds,
-				TimelineTimes: permission.DefaultValues.TimelineTimes,
-				TransferTimes: permission.DefaultValues.TransferTimes,
-				FromMapping: fromMapping,
-				InitiatedByMapping: initiatedByMapping,
-				UsesBadgeIds: true,
-				UsesTimelineTimes: true,
-				UsesTransferTimes: true,
-				UsesFromMapping: true,
+				BadgeIds:               permission.DefaultValues.BadgeIds,
+				TimelineTimes:          permission.DefaultValues.TimelineTimes,
+				TransferTimes:          permission.DefaultValues.TransferTimes,
+				FromMapping:            fromMapping,
+				InitiatedByMapping:     initiatedByMapping,
+				UsesBadgeIds:           true,
+				UsesTimelineTimes:      true,
+				UsesTransferTimes:      true,
+				UsesFromMapping:        true,
 				UsesInitiatedByMapping: true,
-				PermittedTimes: permission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: permission.DefaultValues.ForbiddenTimes,
+				PermittedTimes:         permission.DefaultValues.PermittedTimes,
+				ForbiddenTimes:         permission.DefaultValues.ForbiddenTimes,
 			},
 			Combinations: castedCombinations,
 		})
@@ -60,12 +60,12 @@ func (k Keeper) CastUserApprovedOutgoingTransferPermissionToUniversalPermission(
 		castedCombinations := []*types.UniversalCombination{}
 		for _, combination := range permission.Combinations {
 			castedCombinations = append(castedCombinations, &types.UniversalCombination{
-				BadgeIdsOptions: combination.BadgeIdsOptions,
-				PermittedTimesOptions: combination.PermittedTimesOptions,
-				ForbiddenTimesOptions: combination.ForbiddenTimesOptions,
-				TimelineTimesOptions: combination.TimelineTimesOptions,
-				TransferTimesOptions: combination.TransferTimesOptions,
-				ToMappingOptions: combination.ToMappingOptions,
+				BadgeIdsOptions:           combination.BadgeIdsOptions,
+				PermittedTimesOptions:     combination.PermittedTimesOptions,
+				ForbiddenTimesOptions:     combination.ForbiddenTimesOptions,
+				TimelineTimesOptions:      combination.TimelineTimesOptions,
+				TransferTimesOptions:      combination.TransferTimesOptions,
+				ToMappingOptions:          combination.ToMappingOptions,
 				InitiatedByMappingOptions: combination.InitiatedByMappingOptions,
 			})
 		}
@@ -79,29 +79,27 @@ func (k Keeper) CastUserApprovedOutgoingTransferPermissionToUniversalPermission(
 		if err != nil {
 			return nil, err
 		}
-		
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
-				BadgeIds: permission.DefaultValues.BadgeIds,
-				TimelineTimes: permission.DefaultValues.TimelineTimes,
-				TransferTimes: permission.DefaultValues.TransferTimes,
-				ToMapping: toMapping,
-				InitiatedByMapping: initiatedByMapping,
-				UsesBadgeIds: true,
-				UsesTimelineTimes: true,
-				UsesTransferTimes: true,
-				UsesToMapping: true,
+				BadgeIds:               permission.DefaultValues.BadgeIds,
+				TimelineTimes:          permission.DefaultValues.TimelineTimes,
+				TransferTimes:          permission.DefaultValues.TransferTimes,
+				ToMapping:              toMapping,
+				InitiatedByMapping:     initiatedByMapping,
+				UsesBadgeIds:           true,
+				UsesTimelineTimes:      true,
+				UsesTransferTimes:      true,
+				UsesToMapping:          true,
 				UsesInitiatedByMapping: true,
-				PermittedTimes: permission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: permission.DefaultValues.ForbiddenTimes,
+				PermittedTimes:         permission.DefaultValues.PermittedTimes,
+				ForbiddenTimes:         permission.DefaultValues.ForbiddenTimes,
 			},
 			Combinations: castedCombinations,
 		})
 	}
 	return castedPermissions, nil
 }
-
 
 func (k Keeper) CastActionPermissionToUniversalPermission(actionPermission []*types.ActionPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
@@ -131,14 +129,14 @@ func (k Keeper) CastCollectionApprovedTransferPermissionToUniversalPermission(ct
 		castedCombinations := []*types.UniversalCombination{}
 		for _, collectionUpdateCombination := range collectionUpdatePermission.Combinations {
 			castedCombinations = append(castedCombinations, &types.UniversalCombination{
-				PermittedTimesOptions: collectionUpdateCombination.PermittedTimesOptions,
-				ForbiddenTimesOptions: collectionUpdateCombination.ForbiddenTimesOptions,
-				TimelineTimesOptions: collectionUpdateCombination.TimelineTimesOptions,
-				TransferTimesOptions: collectionUpdateCombination.TransferTimesOptions,
-				ToMappingOptions: collectionUpdateCombination.ToMappingOptions,
-				FromMappingOptions: collectionUpdateCombination.FromMappingOptions,
+				PermittedTimesOptions:     collectionUpdateCombination.PermittedTimesOptions,
+				ForbiddenTimesOptions:     collectionUpdateCombination.ForbiddenTimesOptions,
+				TimelineTimesOptions:      collectionUpdateCombination.TimelineTimesOptions,
+				TransferTimesOptions:      collectionUpdateCombination.TransferTimesOptions,
+				ToMappingOptions:          collectionUpdateCombination.ToMappingOptions,
+				FromMappingOptions:        collectionUpdateCombination.FromMappingOptions,
 				InitiatedByMappingOptions: collectionUpdateCombination.InitiatedByMappingOptions,
-				BadgeIdsOptions: collectionUpdateCombination.BadgeIdsOptions,
+				BadgeIdsOptions:           collectionUpdateCombination.BadgeIdsOptions,
 			})
 		}
 
@@ -159,20 +157,20 @@ func (k Keeper) CastCollectionApprovedTransferPermissionToUniversalPermission(ct
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
-				TimelineTimes: collectionUpdatePermission.DefaultValues.TimelineTimes,
-				TransferTimes: collectionUpdatePermission.DefaultValues.TransferTimes,
-				ToMapping: toMapping,
-				FromMapping: fromMapping,
-				InitiatedByMapping: initiatedByMapping,
-				BadgeIds: collectionUpdatePermission.DefaultValues.BadgeIds,
-				UsesBadgeIds: true,
-				UsesTimelineTimes: true,
-				UsesTransferTimes: true,
-				UsesToMapping: true,
-				UsesFromMapping: true,
+				TimelineTimes:          collectionUpdatePermission.DefaultValues.TimelineTimes,
+				TransferTimes:          collectionUpdatePermission.DefaultValues.TransferTimes,
+				ToMapping:              toMapping,
+				FromMapping:            fromMapping,
+				InitiatedByMapping:     initiatedByMapping,
+				BadgeIds:               collectionUpdatePermission.DefaultValues.BadgeIds,
+				UsesBadgeIds:           true,
+				UsesTimelineTimes:      true,
+				UsesTransferTimes:      true,
+				UsesToMapping:          true,
+				UsesFromMapping:        true,
 				UsesInitiatedByMapping: true,
-				PermittedTimes: collectionUpdatePermission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: collectionUpdatePermission.DefaultValues.ForbiddenTimes,
+				PermittedTimes:         collectionUpdatePermission.DefaultValues.PermittedTimes,
+				ForbiddenTimes:         collectionUpdatePermission.DefaultValues.ForbiddenTimes,
 			},
 			Combinations: castedCombinations,
 		})
@@ -180,28 +178,27 @@ func (k Keeper) CastCollectionApprovedTransferPermissionToUniversalPermission(ct
 	return castedPermissions, nil
 }
 
-
 func (k Keeper) CastTimedUpdateWithBadgeIdsPermissionToUniversalPermission(timedUpdateWithBadgeIdsPermission []*types.TimedUpdateWithBadgeIdsPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, timedUpdateWithBadgeIdsPermission := range timedUpdateWithBadgeIdsPermission {
 		castedCombinations := []*types.UniversalCombination{}
 		for _, timedUpdateWithBadgeIdsCombination := range timedUpdateWithBadgeIdsPermission.Combinations {
 			castedCombinations = append(castedCombinations, &types.UniversalCombination{
-				BadgeIdsOptions: timedUpdateWithBadgeIdsCombination.BadgeIdsOptions,
+				BadgeIdsOptions:       timedUpdateWithBadgeIdsCombination.BadgeIdsOptions,
 				PermittedTimesOptions: timedUpdateWithBadgeIdsCombination.PermittedTimesOptions,
 				ForbiddenTimesOptions: timedUpdateWithBadgeIdsCombination.ForbiddenTimesOptions,
-				TimelineTimesOptions: timedUpdateWithBadgeIdsCombination.TimelineTimesOptions,
+				TimelineTimesOptions:  timedUpdateWithBadgeIdsCombination.TimelineTimesOptions,
 			})
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
-				TimelineTimes: timedUpdateWithBadgeIdsPermission.DefaultValues.TimelineTimes,
-				BadgeIds: timedUpdateWithBadgeIdsPermission.DefaultValues.BadgeIds,
+				TimelineTimes:     timedUpdateWithBadgeIdsPermission.DefaultValues.TimelineTimes,
+				BadgeIds:          timedUpdateWithBadgeIdsPermission.DefaultValues.BadgeIds,
 				UsesTimelineTimes: true,
-				UsesBadgeIds: true,
-				PermittedTimes: timedUpdateWithBadgeIdsPermission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: timedUpdateWithBadgeIdsPermission.DefaultValues.ForbiddenTimes,
+				UsesBadgeIds:      true,
+				PermittedTimes:    timedUpdateWithBadgeIdsPermission.DefaultValues.PermittedTimes,
+				ForbiddenTimes:    timedUpdateWithBadgeIdsPermission.DefaultValues.ForbiddenTimes,
 			},
 			Combinations: castedCombinations,
 		})
@@ -217,16 +214,16 @@ func (k Keeper) CastTimedUpdatePermissionToUniversalPermission(timedUpdatePermis
 			castedCombinations = append(castedCombinations, &types.UniversalCombination{
 				PermittedTimesOptions: timedUpdateCombination.PermittedTimesOptions,
 				ForbiddenTimesOptions: timedUpdateCombination.ForbiddenTimesOptions,
-				TimelineTimesOptions: timedUpdateCombination.TimelineTimesOptions,
+				TimelineTimesOptions:  timedUpdateCombination.TimelineTimesOptions,
 			})
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
-				TimelineTimes: timedUpdatePermission.DefaultValues.TimelineTimes,
+				TimelineTimes:     timedUpdatePermission.DefaultValues.TimelineTimes,
 				UsesTimelineTimes: true,
-				PermittedTimes: timedUpdatePermission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: timedUpdatePermission.DefaultValues.ForbiddenTimes,
+				PermittedTimes:    timedUpdatePermission.DefaultValues.PermittedTimes,
+				ForbiddenTimes:    timedUpdatePermission.DefaultValues.ForbiddenTimes,
 			},
 			Combinations: castedCombinations,
 		})
@@ -234,15 +231,14 @@ func (k Keeper) CastTimedUpdatePermissionToUniversalPermission(timedUpdatePermis
 	return castedPermissions, nil
 }
 
-
 func (k Keeper) CastBalancesActionPermissionToUniversalPermission(BalancesActionPermission []*types.BalancesActionPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, BalancesActionPermission := range BalancesActionPermission {
 		castedCombinations := []*types.UniversalCombination{}
 		for _, BalancesActionCombination := range BalancesActionPermission.Combinations {
 			castedCombinations = append(castedCombinations, &types.UniversalCombination{
-				BadgeIdsOptions: BalancesActionCombination.BadgeIdsOptions,
-				TransferTimesOptions: BalancesActionCombination.OwnershipTimesOptions, //we just use transferTimes for ownershipTimes
+				BadgeIdsOptions:       BalancesActionCombination.BadgeIdsOptions,
+				TransferTimesOptions:  BalancesActionCombination.OwnershipTimesOptions, //we just use transferTimes for ownershipTimes
 				PermittedTimesOptions: BalancesActionCombination.PermittedTimesOptions,
 				ForbiddenTimesOptions: BalancesActionCombination.ForbiddenTimesOptions,
 			})
@@ -250,12 +246,12 @@ func (k Keeper) CastBalancesActionPermissionToUniversalPermission(BalancesAction
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
-				BadgeIds: BalancesActionPermission.DefaultValues.BadgeIds,
-				TransferTimes: BalancesActionPermission.DefaultValues.OwnershipTimes,
-				UsesBadgeIds: true,
+				BadgeIds:          BalancesActionPermission.DefaultValues.BadgeIds,
+				TransferTimes:     BalancesActionPermission.DefaultValues.OwnershipTimes,
+				UsesBadgeIds:      true,
 				UsesTransferTimes: true,
-				PermittedTimes: BalancesActionPermission.DefaultValues.PermittedTimes,
-				ForbiddenTimes: BalancesActionPermission.DefaultValues.ForbiddenTimes,
+				PermittedTimes:    BalancesActionPermission.DefaultValues.PermittedTimes,
+				ForbiddenTimes:    BalancesActionPermission.DefaultValues.ForbiddenTimes,
 			},
 			Combinations: castedCombinations,
 		})

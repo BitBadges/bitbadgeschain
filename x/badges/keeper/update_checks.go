@@ -11,16 +11,20 @@ import (
 
 //See top of update_checks_helpers.go for documentation
 
-//Precondition: Assumes that all passed-in matches have .ArbitraryValue set
+// Precondition: Assumes that all passed-in matches have .ArbitraryValue set
+//
 //	We do this by getting from GetPotentialUpdatesForTimelineValues
-//This is a generic function that is used to get the "updated" field combinations
-//Ex: If we go from [badgeIDs 1 to 10 -> www.example.com] to [badgeIDs 1 to 2 -> www.example2.com, badgeIDs 3 to 10 -> www.example.com]
-//		This will return a UniversalPermissionDetails with badgeIDs 1 to 2 because they are the only ones that changed
-//Note that updates are field-specific, so the comparison logic is handled via a custom passed-in function - compareAndGetUpdateCombosToCheck
+//
+// This is a generic function that is used to get the "updated" field combinations
+// Ex: If we go from [badgeIDs 1 to 10 -> www.example.com] to [badgeIDs 1 to 2 -> www.example2.com, badgeIDs 3 to 10 -> www.example.com]
+//
+//	This will return a UniversalPermissionDetails with badgeIDs 1 to 2 because they are the only ones that changed
+//
+// Note that updates are field-specific, so the comparison logic is handled via a custom passed-in function - compareAndGetUpdateCombosToCheck
 func GetUpdateCombinationsToCheck(
 	ctx sdk.Context,
-	firstMatchesForOld []*types.UniversalPermissionDetails, 
-	firstMatchesForNew []*types.UniversalPermissionDetails, 
+	firstMatchesForOld []*types.UniversalPermissionDetails,
+	firstMatchesForNew []*types.UniversalPermissionDetails,
 	emptyValue interface{},
 	managerAddress string,
 	compareAndGetUpdateCombosToCheck func(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error),
@@ -28,20 +32,20 @@ func GetUpdateCombinationsToCheck(
 	detailsToCheck := []*types.UniversalPermissionDetails{}
 
 	overlapObjects, inOldButNotNew, inNewButNotOld := types.GetOverlapsAndNonOverlaps(firstMatchesForOld, firstMatchesForNew)
-	
+
 	//Handle all old combinations that are not in the new (by comparing to empty value)
 	for _, detail := range inOldButNotNew {
 		detailsToAdd, err := compareAndGetUpdateCombosToCheck(ctx, detail.ArbitraryValue, emptyValue, managerAddress)
 		if err != nil {
-			return nil, err 
+			return nil, err
 		}
 		for _, detailToAdd := range detailsToAdd {
 			detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
-				TimelineTime: detail.TimelineTime,
-				BadgeId: detailToAdd.BadgeId,
-				TransferTime: detailToAdd.TransferTime,
-				ToMapping: detailToAdd.ToMapping,
-				FromMapping: detailToAdd.FromMapping,
+				TimelineTime:       detail.TimelineTime,
+				BadgeId:            detailToAdd.BadgeId,
+				TransferTime:       detailToAdd.TransferTime,
+				ToMapping:          detailToAdd.ToMapping,
+				FromMapping:        detailToAdd.FromMapping,
 				InitiatedByMapping: detailToAdd.InitiatedByMapping,
 			})
 		}
@@ -51,15 +55,15 @@ func GetUpdateCombinationsToCheck(
 	for _, detail := range inNewButNotOld {
 		detailsToAdd, err := compareAndGetUpdateCombosToCheck(ctx, detail.ArbitraryValue, emptyValue, managerAddress)
 		if err != nil {
-			return nil, err 
+			return nil, err
 		}
 		for _, detailToAdd := range detailsToAdd {
 			detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
-				TimelineTime: detail.TimelineTime,
-				BadgeId: detailToAdd.BadgeId,
-				TransferTime: detailToAdd.TransferTime,
-				ToMapping: detailToAdd.ToMapping,
-				FromMapping: detailToAdd.FromMapping,
+				TimelineTime:       detail.TimelineTime,
+				BadgeId:            detailToAdd.BadgeId,
+				TransferTime:       detailToAdd.TransferTime,
+				ToMapping:          detailToAdd.ToMapping,
+				FromMapping:        detailToAdd.FromMapping,
 				InitiatedByMapping: detailToAdd.InitiatedByMapping,
 			})
 		}
@@ -76,11 +80,11 @@ func GetUpdateCombinationsToCheck(
 		}
 		for _, detailToAdd := range detailsToAdd {
 			detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
-				TimelineTime: overlap.TimelineTime,
-				BadgeId: detailToAdd.BadgeId,
-				TransferTime: detailToAdd.TransferTime,
-				ToMapping: detailToAdd.ToMapping,
-				FromMapping: detailToAdd.FromMapping,
+				TimelineTime:       overlap.TimelineTime,
+				BadgeId:            detailToAdd.BadgeId,
+				TransferTime:       detailToAdd.TransferTime,
+				ToMapping:          detailToAdd.ToMapping,
+				FromMapping:        detailToAdd.FromMapping,
 				InitiatedByMapping: detailToAdd.InitiatedByMapping,
 			})
 		}
@@ -88,7 +92,6 @@ func GetUpdateCombinationsToCheck(
 
 	return detailsToCheck, nil
 }
-
 
 func CheckNotForbidden(ctx sdk.Context, permission *types.UniversalPermissionDetails) error {
 	//Throw if current block time is a forbidden time
@@ -106,9 +109,9 @@ func (k Keeper) CheckActionPermission(ctx sdk.Context, permissions []*types.Acti
 	if err != nil {
 		return err
 	}
-	
+
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
-	
+
 	//In this case we only care about the first match since we have no extra criteria
 	for _, permissionDetail := range permissionDetails {
 		err := CheckNotForbidden(ctx, permissionDetail)
@@ -125,7 +128,7 @@ func (k Keeper) CheckTimedUpdatePermission(ctx sdk.Context, detailsToCheck []*ty
 	if err != nil {
 		return err
 	}
-	
+
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
 
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
@@ -136,7 +139,7 @@ func (k Keeper) CheckBalancesActionPermission(ctx sdk.Context, detailsToCheck []
 	if err != nil {
 		return err
 	}
-	
+
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
 
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
@@ -147,7 +150,7 @@ func (k Keeper) CheckTimedUpdateWithBadgeIdsPermission(ctx sdk.Context, detailsT
 	if err != nil {
 		return err
 	}
-	
+
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
 
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
@@ -158,19 +161,18 @@ func (k Keeper) CheckCollectionApprovedTransferPermission(ctx sdk.Context, detai
 	if err != nil {
 		return err
 	}
-	
+
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
 
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
 }
-
 
 func (k Keeper) CheckUserApprovedOutgoingTransferPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.UserApprovedOutgoingTransferPermission, managerAddress string) error {
 	castedPermissions, err := k.CastUserApprovedOutgoingTransferPermissionToUniversalPermission(ctx, managerAddress, permissions)
 	if err != nil {
 		return err
 	}
-	
+
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
 
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
@@ -181,25 +183,25 @@ func (k Keeper) CheckUserApprovedIncomingTransferPermission(ctx sdk.Context, det
 	if err != nil {
 		return err
 	}
-	
+
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
 
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
 }
 
 func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types.UniversalPermissionDetails, detailsToCheck []*types.UniversalPermissionDetails) error {
-	//Apply dummy ranges to all detailsToCheck 
+	//Apply dummy ranges to all detailsToCheck
 	for _, detailToCheck := range detailsToCheck {
 		if detailToCheck.BadgeId == nil {
-			detailToCheck.BadgeId = &types.UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) } //dummy range
+			detailToCheck.BadgeId = &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)} //dummy range
 		}
 
 		if detailToCheck.TimelineTime == nil {
-			detailToCheck.TimelineTime = &types.UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) } //dummy range
+			detailToCheck.TimelineTime = &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)} //dummy range
 		}
 
 		if detailToCheck.TransferTime == nil {
-			detailToCheck.TransferTime = &types.UintRange{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64) } //dummy range
+			detailToCheck.TransferTime = &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)} //dummy range
 		}
 
 		if detailToCheck.ToMapping == nil {
@@ -214,8 +216,7 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 			detailToCheck.InitiatedByMapping = &types.AddressMapping{Addresses: []string{}, IncludeAddresses: false}
 		}
 	}
-	
-	
+
 	//Validate that for each updated timeline time, the current time is permitted
 	//We iterate through all explicitly defined permissions (permissionDetails)
 	//If we find a match for some timeline time, we check that the current time is not forbidden

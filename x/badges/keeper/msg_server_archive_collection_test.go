@@ -9,7 +9,7 @@ func (suite *TestSuite) TestArchiveCollection() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.BadgesToCreate = []*types.Balance{}
+	collectionsToCreate[0].BadgesToCreate = []*types.Balance{}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
@@ -18,11 +18,11 @@ func (suite *TestSuite) TestArchiveCollection() {
 	suite.Require().Nil(err, "Error getting badge: %s")
 
 	err = ArchiveCollection(suite, wctx, &types.MsgArchiveCollection{
-		Creator:       bob,
-		CollectionId:  sdk.NewUint(1),
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
 		IsArchivedTimeline: []*types.IsArchivedTimeline{
 			{
-				IsArchived: true,
+				IsArchived:    true,
 				TimelineTimes: GetFullUintRanges(),
 			},
 		},
@@ -34,11 +34,11 @@ func (suite *TestSuite) TestArchiveCollection() {
 	suite.Require().Nil(err, "Error getting badge: %s")
 
 	err = UpdateManager(suite, wctx, &types.MsgUpdateManager{
-		Creator:       bob,
-		CollectionId:  sdk.NewUint(1),
-		ManagerTimeline:       []*types.ManagerTimeline{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		ManagerTimeline: []*types.ManagerTimeline{
 			{
-				Manager: alice,
+				Manager:       alice,
 				TimelineTimes: GetFullUintRanges(),
 			},
 		},
@@ -46,11 +46,11 @@ func (suite *TestSuite) TestArchiveCollection() {
 	suite.Require().Error(err, "Error updating manager: %s")
 
 	err = ArchiveCollection(suite, wctx, &types.MsgArchiveCollection{
-		Creator:       bob,
-		CollectionId:  sdk.NewUint(1),
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
 		IsArchivedTimeline: []*types.IsArchivedTimeline{
 			{
-				IsArchived: false,
+				IsArchived:    false,
 				TimelineTimes: GetFullUintRanges(),
 			},
 		},
@@ -58,11 +58,11 @@ func (suite *TestSuite) TestArchiveCollection() {
 	suite.Require().Nil(err, "Error archiving collection: %s")
 
 	err = UpdateManager(suite, wctx, &types.MsgUpdateManager{
-		Creator:       bob,
-		CollectionId:  sdk.NewUint(1),
-		ManagerTimeline:       []*types.ManagerTimeline{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		ManagerTimeline: []*types.ManagerTimeline{
 			{
-				Manager: alice,
+				Manager:       alice,
 				TimelineTimes: GetFullUintRanges(),
 			},
 		},

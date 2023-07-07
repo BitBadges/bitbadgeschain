@@ -19,7 +19,7 @@ func (suite *TestSuite) TestUpdateManager() {
 		CollectionId: sdkmath.NewUint(1),
 		ManagerTimeline: []*types.ManagerTimeline{
 			{
-				Manager: alice,
+				Manager:       alice,
 				TimelineTimes: GetFullUintRanges(),
 			},
 		},

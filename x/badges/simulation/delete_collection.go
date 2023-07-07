@@ -20,8 +20,8 @@ func SimulateMsgDeleteCollection(
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgDeleteCollection{
-			Creator: simAccount.Address.String(),
-			CollectionId: sdkmath.NewUint(uint64(r.Int63n(100))),
+			Creator:      simAccount.Address.String(),
+			CollectionId: sdkmath.NewUint(uint64(r.Int63n(5))),
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil

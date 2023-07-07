@@ -38,11 +38,10 @@ func TestMsgDeleteCollection_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid collection id 2",
 			msg: MsgDeleteCollection{
-				Creator:      sample.AccAddress(),
+				Creator: sample.AccAddress(),
 			},
 			err: ErrInvalidCollectionID,
 		},
-
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

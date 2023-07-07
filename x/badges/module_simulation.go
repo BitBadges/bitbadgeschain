@@ -26,41 +26,20 @@ var (
 )
 
 const (
-	opWeightMsgNewCollection          = "op_weight_msg_new_collection"
-	defaultWeightMsgNewCollection int = 1000
+	opWeightMsgTransferBadges          = "op_weight_msg_transfer_badge"
+	defaultWeightMsgTransferBadges int = 1000
 
-	opWeightMsgMintAndDistributeBadges          = "op_weight_msg_mint_and_distribute_badges"
-	defaultWeightMsgMintAndDistributeBadges int = 250
-
-	opWeightMsgTransferBadge          = "op_weight_msg_transfer_badge"
-	defaultWeightMsgTransferBadge int = 1000
-
-	opWeightMsgUpdateCollectionApprovedTransfers          = "op_weight_msg_update_collection_approved_transfers"
-	defaultWeightMsgUpdateCollectionApprovedTransfers int = 100
-
-	opWeightMsgUpdateMetadata          = "op_weight_msg_update_metadata"
-	defaultWeightMsgUpdateMetadata int = 100
-
-	opWeightMsgUpdateCollectionPermissions          = "op_weight_msg_update_collection_permissions"
-	defaultWeightMsgUpdateCollectionPermissions int = 100
-
-	opWeightMsgUpdateManager          = "op_weight_msg_update_manager"
-	defaultWeightMsgUpdateManager int = 100
-
-	opWeightMsgUpdateCustomData          = "op_weight_msg_update_custom_data"
-	defaultWeightMsgUpdateCustomData int = 100
-
-	opWeightMsgDeleteCollection = "op_weight_msg_delete_collection"
+	opWeightMsgDeleteCollection          = "op_weight_msg_delete_collection"
 	defaultWeightMsgDeleteCollection int = 100
 
-	opWeightMsgArchiveCollection = "op_weight_msg_archive_collection"
-	defaultWeightMsgArchiveCollection int = 100
-
-	opWeightMsgUpdateUserApprovedTransfers = "op_weight_msg_update_user_approved_transfers"
+	opWeightMsgUpdateUserApprovedTransfers          = "op_weight_msg_update_user_approved_transfers"
 	defaultWeightMsgUpdateUserApprovedTransfers int = 100
 
-	opWeightMsgUpdateUserPermissions = "op_weight_msg_update_user_permissions"
-	defaultWeightMsgUpdateUserPermissions int = 100
+	opWeightMsgUpdateCollection = "op_weight_msg_update_collection"
+	defaultWeightMsgUpdateCollection int = 1000
+
+	opWeightMsgCreateAddressMappings = "op_weight_msg_create_address_mappings"
+	defaultWeightMsgCreateAddressMappings int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const
 )
@@ -98,81 +77,15 @@ func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
 	operations := make([]simtypes.WeightedOperation, 0)
 
-	var weightMsgNewCollection int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgNewCollection, &weightMsgNewCollection, nil,
+	var weightMsgTransferBadges int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgTransferBadges, &weightMsgTransferBadges, nil,
 		func(_ *rand.Rand) {
-			weightMsgNewCollection = defaultWeightMsgNewCollection
+			weightMsgTransferBadges = defaultWeightMsgTransferBadges
 		},
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgNewCollection,
-		badgessimulation.SimulateMsgNewCollection(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgMintAndDistributeBadges int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgMintAndDistributeBadges, &weightMsgMintAndDistributeBadges, nil,
-		func(_ *rand.Rand) {
-			weightMsgMintAndDistributeBadges = defaultWeightMsgMintAndDistributeBadges
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgMintAndDistributeBadges,
-		badgessimulation.SimulateMsgMintAndDistributeBadges(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgTransferBadge int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgTransferBadge, &weightMsgTransferBadge, nil,
-		func(_ *rand.Rand) {
-			weightMsgTransferBadge = defaultWeightMsgTransferBadge
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgTransferBadge,
-		badgessimulation.SimulateMsgTransferBadge(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgUpdateCollectionApprovedTransfers int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateCollectionApprovedTransfers, &weightMsgUpdateCollectionApprovedTransfers, nil,
-		func(_ *rand.Rand) {
-			weightMsgUpdateCollectionApprovedTransfers = defaultWeightMsgUpdateCollectionApprovedTransfers
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgUpdateCollectionApprovedTransfers,
-		badgessimulation.SimulateMsgUpdateCollectionApprovedTransfers(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgUpdateMetadata int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateMetadata, &weightMsgUpdateMetadata, nil,
-		func(_ *rand.Rand) {
-			weightMsgUpdateMetadata = defaultWeightMsgUpdateMetadata
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgUpdateMetadata,
-		badgessimulation.SimulateMsgUpdateMetadata(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgUpdateCollectionPermissions int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateCollectionPermissions, &weightMsgUpdateCollectionPermissions, nil,
-		func(_ *rand.Rand) {
-			weightMsgUpdateCollectionPermissions = defaultWeightMsgUpdateCollectionPermissions
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgUpdateCollectionPermissions,
-		badgessimulation.SimulateMsgUpdateCollectionPermissions(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgUpdateManager int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateManager, &weightMsgUpdateManager, nil,
-		func(_ *rand.Rand) {
-			weightMsgUpdateManager = defaultWeightMsgUpdateManager
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgUpdateManager,
-		badgessimulation.SimulateMsgUpdateManager(am.accountKeeper, am.bankKeeper, am.keeper),
+		weightMsgTransferBadges,
+		badgessimulation.SimulateMsgTransferBadges(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	var weightMsgDeleteCollection int
@@ -186,17 +99,6 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		badgessimulation.SimulateMsgDeleteCollection(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgArchiveCollection int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgArchiveCollection, &weightMsgArchiveCollection, nil,
-		func(_ *rand.Rand) {
-			weightMsgArchiveCollection = defaultWeightMsgArchiveCollection
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgArchiveCollection,
-		badgessimulation.SimulateMsgArchiveCollection(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
 	var weightMsgUpdateUserApprovedTransfers int
 	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateUserApprovedTransfers, &weightMsgUpdateUserApprovedTransfers, nil,
 		func(_ *rand.Rand) {
@@ -208,15 +110,26 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		badgessimulation.SimulateMsgUpdateUserApprovedTransfers(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgUpdateUserPermissions int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateUserPermissions, &weightMsgUpdateUserPermissions, nil,
+	var weightMsgUpdateCollection int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateCollection, &weightMsgUpdateCollection, nil,
 		func(_ *rand.Rand) {
-			weightMsgUpdateUserPermissions = defaultWeightMsgUpdateUserPermissions
+			weightMsgUpdateCollection = defaultWeightMsgUpdateCollection
 		},
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgUpdateUserPermissions,
-		badgessimulation.SimulateMsgUpdateUserPermissions(am.accountKeeper, am.bankKeeper, am.keeper),
+		weightMsgUpdateCollection,
+		badgessimulation.SimulateMsgUpdateCollection(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgCreateAddressMappings int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgCreateAddressMappings, &weightMsgCreateAddressMappings, nil,
+		func(_ *rand.Rand) {
+			weightMsgCreateAddressMappings = defaultWeightMsgCreateAddressMappings
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgCreateAddressMappings,
+		badgessimulation.SimulateMsgCreateAddressMappings(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

@@ -12,32 +12,31 @@ import (
 func TestMsgMintAndDistributeBadges_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgMintAndDistributeBadges
+		msg  types.MsgUpdateCollection
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgMintAndDistributeBadges{
+			msg: types.MsgUpdateCollection{
 				Creator:      "invalid_address",
 				CollectionId: sdkmath.NewUint(1),
 			},
 			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid state",
-			msg: types.MsgMintAndDistributeBadges{
-				Creator:      sample.AccAddress(),
-				CollectionId: sdkmath.NewUint(1),
-				BadgesToCreate: []*types.Balance{	},
+			msg: types.MsgUpdateCollection{
+				Creator:        sample.AccAddress(),
+				CollectionId:   sdkmath.NewUint(1),
+				BadgesToCreate: []*types.Balance{},
 			},
 		}, {
 			name: "invalid amount",
-			msg: types.MsgMintAndDistributeBadges{
+			msg: types.MsgUpdateCollection{
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
 				BadgesToCreate: []*types.Balance{
 					{
 						Amount: sdkmath.NewUint(0),
-
 					},
 				},
 			},

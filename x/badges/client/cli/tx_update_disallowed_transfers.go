@@ -15,7 +15,7 @@ func CmdUpdateCollectionApprovedTransfers() *cobra.Command {
 		Short: "Broadcast message UpdateCollectionApprovedTransfers",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-return nil
+			return nil
 
 			// argCollectionId := types.NewUintFromString(args[0])
 			// if err != nil {

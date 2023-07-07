@@ -4,7 +4,7 @@ func ValidateTimelineTimesDoNotOverlap(times [][]*UintRange) error {
 	handledBadgeIds := []*UintRange{}
 	for _, time := range times {
 		if len(time) == 0 {
-			return ErrNoTimelineTimeSpecified	
+			return ErrNoTimelineTimeSpecified
 		}
 
 		err := AssertRangesDoNotOverlapAtAll(time, handledBadgeIds)
@@ -38,13 +38,13 @@ func ValidateApprovedTransferTimeline(timeline []*CollectionApprovedTransferTime
 }
 
 func ValidateOffChainBalancesMetadataTimeline(timeline []*OffChainBalancesMetadataTimeline) error {
-	for _, timelineVal := range timeline {	
+	for _, timelineVal := range timeline {
 		err := ValidateURI(timelineVal.OffChainBalancesMetadata.Uri)
 		if err != nil {
 			return err
 		}
 	}
-	
+
 	times, _ := GetOffChainBalancesMetadataTimesAndValues(timeline)
 	err := ValidateTimelineTimesDoNotOverlap(times)
 	if err != nil {
@@ -154,7 +154,6 @@ func ValidateIsArchivedTimeline(timeline []*IsArchivedTimeline) error {
 
 	return nil
 }
-
 
 func ValidateUserApprovedOutgoingTransferTimeline(timeline []*UserApprovedOutgoingTransferTimeline, address string) error {
 	for _, timelineVal := range timeline {

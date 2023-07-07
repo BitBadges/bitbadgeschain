@@ -16,7 +16,7 @@ func TestMsgUpdateUserApprovedTransfers_ValidateBasic(t *testing.T) {
 	}{
 		{
 			name: "invalid address",
-			msg:types. MsgUpdateUserApprovedTransfers{
+			msg: types.MsgUpdateUserApprovedTransfers{
 				Creator: "invalid_address",
 			},
 			err: types.ErrInvalidAddress,

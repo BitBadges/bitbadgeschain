@@ -10,11 +10,11 @@ import (
 func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.AddressMapping) error {
 	id := addressMapping.MappingId
 
-	//Validate ID 
-	if id == "Mint" || id == "Manager" || id == "All" || id == "None"	{
+	//Validate ID
+	if id == "Mint" || id == "Manager" || id == "All" || id == "None" {
 		return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot be %s", id)
 	}
-	
+
 	//if starts with !
 	if id[0] == '!' {
 		return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot start with !")
@@ -47,58 +47,58 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string, 
 		inverted = true
 		addressMappingId = addressMappingId[1:]
 	}
-	
+
 	if addressMappingId == "Mint" {
 		addressMapping = &types.AddressMapping{
-			MappingId: "Mint",
-			Addresses: []string{"Mint"},
+			MappingId:        "Mint",
+			Addresses:        []string{"Mint"},
 			IncludeAddresses: true,
-			Uri: "",
-			CustomData: "",
+			Uri:              "",
+			CustomData:       "",
 		}
 		handled = true
 	}
 
 	if addressMappingId == "Manager" {
 		addressMapping = &types.AddressMapping{
-			MappingId: "Manager",
-			Addresses: []string{managerAddress},
+			MappingId:        "Manager",
+			Addresses:        []string{managerAddress},
 			IncludeAddresses: true,
-			Uri: "",
-			CustomData: "",
+			Uri:              "",
+			CustomData:       "",
 		}
 		handled = true
 	}
 
 	if addressMappingId == "All" {
 		addressMapping = &types.AddressMapping{
-			MappingId: "All",
-			Addresses: []string{"Mint"},
+			MappingId:        "All",
+			Addresses:        []string{"Mint"},
 			IncludeAddresses: false,
-			Uri: "",
-			CustomData: "",
+			Uri:              "",
+			CustomData:       "",
 		}
 		handled = true
 	}
 
 	if addressMappingId == "None" {
 		addressMapping = &types.AddressMapping{
-			MappingId: "None",
-			Addresses: []string{},
+			MappingId:        "None",
+			Addresses:        []string{},
 			IncludeAddresses: true,
-			Uri: "",
-			CustomData: "",
+			Uri:              "",
+			CustomData:       "",
 		}
 		handled = true
 	}
 
 	if types.ValidateAddress(addressMappingId, false) == nil {
 		addressMapping = &types.AddressMapping{
-			MappingId: addressMappingId,
-			Addresses: []string{addressMappingId},
+			MappingId:        addressMappingId,
+			Addresses:        []string{addressMappingId},
 			IncludeAddresses: true,
-			Uri: "",
-			CustomData: "",
+			Uri:              "",
+			CustomData:       "",
 		}
 		handled = true
 	}
@@ -139,11 +139,9 @@ func (k Keeper) CheckMappingAddresses(ctx sdk.Context, addressMappingId string, 
 	if !found {
 		return false, nil
 	}
-	
+
 	return true, nil
 }
-
-
 
 // Checks if the addresses are in their respective mapping.
 // If includeAddresses is true, then we check if the address is in the Addresses field.
@@ -161,7 +159,7 @@ func (k Keeper) CheckIfAddressesMatchCollectionMappingIds(ctx sdk.Context, colle
 	if err != nil {
 		return false
 	}
-	
+
 	initiatedByFound, err := k.CheckMappingAddresses(ctx, collectionApprovedTransfer.InitiatedByMappingId, initiatedBy, managerAddress)
 	if err != nil {
 		return false

@@ -15,31 +15,31 @@ func CmdRequestUpdateManager() *cobra.Command {
 		Short: "Broadcast message requestUpdateManager",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-return nil
-		// 	argBadgeId := types.NewUintFromString(args[0])
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			return nil
+			// 	argBadgeId := types.NewUintFromString(args[0])
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	argAdd, err := cast.ToBoolE(args[0])
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			// 	argAdd, err := cast.ToBoolE(args[0])
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	clientCtx, err := client.GetClientTxContext(cmd)
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			// 	clientCtx, err := client.GetClientTxContext(cmd)
+			// 	if err != nil {
+			// 		return err
+			// 	}
 
-		// 	msg := types.NewMsgRequestUpdateManager(
-		// 		clientCtx.GetFromAddress().String(),
-		// 		argBadgeId,
-		// 		argAdd,
-		// 	)
-		// 	if err := msg.ValidateBasic(); err != nil {
-		// 		return err
-		// 	}
-		// 	return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+			// 	msg := types.NewMsgRequestUpdateManager(
+			// 		clientCtx.GetFromAddress().String(),
+			// 		argBadgeId,
+			// 		argAdd,
+			// 	)
+			// 	if err := msg.ValidateBasic(); err != nil {
+			// 		return err
+			// 	}
+			// 	return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 

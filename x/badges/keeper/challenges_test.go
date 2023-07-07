@@ -11,26 +11,26 @@ import (
 
 func (suite *TestSuite) TestNoChallengesWorking() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
-	
-	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
-	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].Challenges = []*types.Challenge{{}}
 
-	CreateCollections(suite, wctx, collectionsToCreate) 
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].Challenges = []*types.Challenge{{}}
+
+	CreateCollections(suite, wctx, collectionsToCreate)
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection,	GetTopHalfUintRanges(), GetFullUintRanges(),	bob,	alice,	alice,	sdkmath.NewUint(1),	[]*types.ChallengeSolution{},)
+	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.ChallengeSolution{})
 	suite.Require().Error(err, "Error getting user balance: %s")
 }
 
 func (suite *TestSuite) TestChallengesInvalidSolutions() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
-	
+
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
-	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].Challenges = []*types.Challenge{{
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].Challenges = []*types.Challenge{{
 		Root: "sample",
 	}}
 
@@ -38,14 +38,14 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection,	GetTopHalfUintRanges(), GetFullUintRanges(),	bob,	alice,	alice,	sdkmath.NewUint(1),	[]*types.ChallengeSolution{},)
+	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.ChallengeSolution{})
 	suite.Require().Error(err, "Error getting user balance: %s")
 
-	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection,	GetTopHalfUintRanges(), GetFullUintRanges(),	bob,	alice,	alice,	sdkmath.NewUint(1),	[]*types.ChallengeSolution{
+	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.ChallengeSolution{
 		{
 			Proof: &types.ClaimProof{
 				Aunts: []*types.ClaimProofItem{},
-				Leaf: "sample",
+				Leaf:  "sample",
 			},
 		},
 	})
@@ -76,12 +76,12 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
 		OverallApprovals: &types.ApprovalsTracker{
 			Amounts: []*types.Balance{
 				{
-					Amount: sdkmath.NewUint(10),
-					BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+					Amount:         sdkmath.NewUint(10),
+					BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
@@ -93,40 +93,40 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 		Uri: "",
 		Challenges: []*types.Challenge{
 			{
-				Root: hex.EncodeToString(rootHash),
+				Root:                hex.EncodeToString(rootHash),
 				ExpectedProofLength: sdk.NewUint(2),
-				MaxOneUsePerLeaf: true,
-				ChallengeId: "hello",
+				MaxOneUsePerLeaf:    true,
+				ChallengeId:         "hello",
 			},
 		},
-		TrackerId: "testing232",
-		TransferTimes: GetFullUintRanges(),
-		BadgeIds: GetOneUintRange(),
-		FromMappingId: "Mint",
-		ToMappingId: "All",
+		TrackerId:            "testing232",
+		TransferTimes:        GetFullUintRanges(),
+		BadgeIds:             GetOneUintRange(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
 		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers: true,
-		IncrementBadgeIdsBy: sdk.NewUint(0),
-		IncrementOwnershipTimesBy: sdk.NewUint(0),
+		OverridesToApprovedIncomingTransfers:   true,
+		IncrementBadgeIdsBy:                    sdk.NewUint(0),
+		IncrementOwnershipTimesBy:              sdk.NewUint(0),
 	})
-	
+
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
-		Creator: bob,
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From: "Mint",
+				From:        "Mint",
 				ToAddresses: []string{bob},
 				Balances: []*types.Balance{
 					{
-						Amount: sdkmath.NewUint(10),
-						BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						Amount:         sdkmath.NewUint(10),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -136,11 +136,11 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 							Leaf: "",
 							Aunts: []*types.ClaimProofItem{
 								{
-									Aunt: hex.EncodeToString(leafHashes[1]),
+									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
 								},
 								{
-									Aunt: hex.EncodeToString(levelTwoHashes[1]),
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
 									OnRight: true,
 								},
 							},
@@ -152,17 +152,17 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	})
 	suite.Require().Error(err, "Error transferring badge: %s")
 
-	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
-		Creator: bob,
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From: "Mint",
+				From:        "Mint",
 				ToAddresses: []string{bob},
 				Balances: []*types.Balance{
 					{
-						Amount: sdkmath.NewUint(1),
-						BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -172,11 +172,11 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 							Leaf: aliceLeaf,
 							Aunts: []*types.ClaimProofItem{
 								{
-									Aunt: hex.EncodeToString(leafHashes[1]),
+									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
 								},
 								{
-									Aunt: hex.EncodeToString(levelTwoHashes[1]),
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
 									OnRight: true,
 								},
 							},
@@ -188,17 +188,17 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	})
 	suite.Require().Nil(err, "Error transferring badge: %s")
 
-	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
-		Creator: bob,
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From: "Mint",
+				From:        "Mint",
 				ToAddresses: []string{bob},
 				Balances: []*types.Balance{
 					{
-						Amount: sdkmath.NewUint(1),
-						BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -208,11 +208,11 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 							Leaf: aliceLeaf,
 							Aunts: []*types.ClaimProofItem{
 								{
-									Aunt: hex.EncodeToString(leafHashes[1]),
+									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
 								},
 								{
-									Aunt: hex.EncodeToString(levelTwoHashes[1]),
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
 									OnRight: true,
 								},
 							},
@@ -250,12 +250,12 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
 		OverallApprovals: &types.ApprovalsTracker{
 			Amounts: []*types.Balance{
 				{
-					Amount: sdkmath.NewUint(10),
-					BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+					Amount:         sdkmath.NewUint(10),
+					BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
@@ -267,41 +267,41 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 		Uri: "",
 		Challenges: []*types.Challenge{
 			{
-				Root: hex.EncodeToString(rootHash),
-				ExpectedProofLength: sdk.NewUint(2),
-				MaxOneUsePerLeaf: true,
+				Root:                    hex.EncodeToString(rootHash),
+				ExpectedProofLength:     sdk.NewUint(2),
+				MaxOneUsePerLeaf:        true,
 				UseCreatorAddressAsLeaf: true,
-				ChallengeId: "hello",
+				ChallengeId:             "hello",
 			},
 		},
-		TrackerId: "testing232",
-		TransferTimes: GetFullUintRanges(),
-		BadgeIds: GetOneUintRange(),
-		FromMappingId: "Mint",
-		ToMappingId: "All",
+		TrackerId:            "testing232",
+		TransferTimes:        GetFullUintRanges(),
+		BadgeIds:             GetOneUintRange(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
 		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers: true,
-		IncrementBadgeIdsBy: sdk.NewUint(0),
-		IncrementOwnershipTimesBy: sdk.NewUint(0),
+		OverridesToApprovedIncomingTransfers:   true,
+		IncrementBadgeIdsBy:                    sdk.NewUint(0),
+		IncrementOwnershipTimesBy:              sdk.NewUint(0),
 	})
-	
+
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
-		Creator: bob,
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From: "Mint",
+				From:        "Mint",
 				ToAddresses: []string{bob},
 				Balances: []*types.Balance{
 					{
-						Amount: sdkmath.NewUint(1),
-						BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -311,11 +311,11 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 							Leaf: aliceLeaf,
 							Aunts: []*types.ClaimProofItem{
 								{
-									Aunt: hex.EncodeToString(leafHashes[1]),
+									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
 								},
 								{
-									Aunt: hex.EncodeToString(levelTwoHashes[1]),
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
 									OnRight: true,
 								},
 							},
@@ -327,8 +327,6 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 	})
 	suite.Require().Error(err, "Error transferring badge: %s")
 }
-
-
 
 func (suite *TestSuite) TestWrongExpectedProofLength() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -355,12 +353,12 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
 		OverallApprovals: &types.ApprovalsTracker{
 			Amounts: []*types.Balance{
 				{
-					Amount: sdkmath.NewUint(10),
-					BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+					Amount:         sdkmath.NewUint(10),
+					BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
@@ -372,56 +370,54 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 		Uri: "",
 		Challenges: []*types.Challenge{
 			{
-				Root: hex.EncodeToString(rootHash),
+				Root:                hex.EncodeToString(rootHash),
 				ExpectedProofLength: sdk.NewUint(5),
-				MaxOneUsePerLeaf: true,
-				ChallengeId: "hello",
+				MaxOneUsePerLeaf:    true,
+				ChallengeId:         "hello",
 			},
 		},
-		TrackerId: "testing232",
-		TransferTimes: GetFullUintRanges(),
-		BadgeIds: GetOneUintRange(),
-		FromMappingId: "Mint",
-		ToMappingId: "All",
+		TrackerId:            "testing232",
+		TransferTimes:        GetFullUintRanges(),
+		BadgeIds:             GetOneUintRange(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
 		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers: true,
-		IncrementBadgeIdsBy: sdk.NewUint(0),
-		IncrementOwnershipTimesBy: sdk.NewUint(0),
+		OverridesToApprovedIncomingTransfers:   true,
+		IncrementBadgeIdsBy:                    sdk.NewUint(0),
+		IncrementOwnershipTimesBy:              sdk.NewUint(0),
 	})
-	
+
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
-		Creator: bob,
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From: "Mint",
+				From:        "Mint",
 				ToAddresses: []string{bob},
 				Balances: []*types.Balance{
 					{
-						Amount: sdkmath.NewUint(1),
-						BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				Solutions: []*types.ChallengeSolution{
 					{
 						Proof: &types.ClaimProof{
-							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
-							},
+							Leaf:  aliceLeaf,
+							Aunts: []*types.ClaimProofItem{},
 						},
 					},
 					{
 						Proof: &types.ClaimProof{
-							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
-							},
+							Leaf:  aliceLeaf,
+							Aunts: []*types.ClaimProofItem{},
 						},
 					},
 					{
@@ -429,11 +425,11 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 							Leaf: aliceLeaf,
 							Aunts: []*types.ClaimProofItem{
 								{
-									Aunt: hex.EncodeToString(leafHashes[1]),
+									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
 								},
 								{
-									Aunt: hex.EncodeToString(levelTwoHashes[1]),
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
 									OnRight: true,
 								},
 							},
@@ -471,12 +467,12 @@ func (suite *TestSuite) TestIncrements() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].Collection.CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
 		OverallApprovals: &types.ApprovalsTracker{
 			Amounts: []*types.Balance{
 				{
-					Amount: sdkmath.NewUint(10),
-					BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+					Amount:         sdkmath.NewUint(10),
+					BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
@@ -488,41 +484,41 @@ func (suite *TestSuite) TestIncrements() {
 		Uri: "",
 		Challenges: []*types.Challenge{
 			{
-				Root: hex.EncodeToString(rootHash),
-				ExpectedProofLength: sdk.NewUint(2),
-				MaxOneUsePerLeaf: true,
+				Root:                             hex.EncodeToString(rootHash),
+				ExpectedProofLength:              sdk.NewUint(2),
+				MaxOneUsePerLeaf:                 true,
 				UseLeafIndexForDistributionOrder: true,
-				ChallengeId: "hello",
+				ChallengeId:                      "hello",
 			},
 		},
-		TrackerId: "testing232",
-		TransferTimes: GetFullUintRanges(),
-		BadgeIds: GetOneUintRange(),
-		FromMappingId: "Mint",
-		ToMappingId: "All",
+		TrackerId:            "testing232",
+		TransferTimes:        GetFullUintRanges(),
+		BadgeIds:             GetOneUintRange(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
 		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers: true,
-		IncrementBadgeIdsBy: sdk.NewUint(1),
-		IncrementOwnershipTimesBy: sdk.NewUint(0),
+		OverridesToApprovedIncomingTransfers:   true,
+		IncrementBadgeIdsBy:                    sdk.NewUint(1),
+		IncrementOwnershipTimesBy:              sdk.NewUint(0),
 	})
-	
+
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
-		Creator: bob,
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From: "Mint",
+				From:        "Mint",
 				ToAddresses: []string{bob},
 				Balances: []*types.Balance{
 					{
-						Amount: sdkmath.NewUint(1),
-						BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -532,11 +528,11 @@ func (suite *TestSuite) TestIncrements() {
 							Leaf: bobLeaf,
 							Aunts: []*types.ClaimProofItem{
 								{
-									Aunt: hex.EncodeToString(leafHashes[0]),
+									Aunt:    hex.EncodeToString(leafHashes[0]),
 									OnRight: false,
 								},
 								{
-									Aunt: hex.EncodeToString(levelTwoHashes[1]),
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
 									OnRight: true,
 								},
 							},
@@ -548,17 +544,17 @@ func (suite *TestSuite) TestIncrements() {
 	})
 	suite.Require().Error(err, "Error transferring badge: %s")
 
-	err = TransferBadge(suite, wctx, &types.MsgTransferBadge{
-		Creator: bob,
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From: "Mint",
+				From:        "Mint",
 				ToAddresses: []string{bob},
 				Balances: []*types.Balance{
 					{
-						Amount: sdkmath.NewUint(1),
-						BadgeIds: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -568,11 +564,11 @@ func (suite *TestSuite) TestIncrements() {
 							Leaf: aliceLeaf,
 							Aunts: []*types.ClaimProofItem{
 								{
-									Aunt: hex.EncodeToString(leafHashes[1]),
+									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
 								},
 								{
-									Aunt: hex.EncodeToString(levelTwoHashes[1]),
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
 									OnRight: true,
 								},
 							},
@@ -584,5 +580,3 @@ func (suite *TestSuite) TestIncrements() {
 	})
 	suite.Require().Nil(err, "Error transferring badge: %s")
 }
-
-

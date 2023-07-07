@@ -17,7 +17,7 @@ func SearchUintRangesForUint(id sdkmath.Uint, uintRanges []*UintRange) bool {
 	ranges := make([]*UintRange, len(uintRanges))
 	copy(ranges, uintRanges)
 
-	ranges = SortAndMergeOverlapping(ranges) 
+	ranges = SortAndMergeOverlapping(ranges)
 
 	//Binary search because ID ranges will be sorted
 	low := 0
@@ -132,7 +132,6 @@ func RemoveUintRangeFromUintRange(idsToRemove []*UintRange, rangeToRemoveFrom []
 	return rangeToRemoveFrom, removedRanges
 }
 
-
 func AssertRangesDoNotOverlapAtAll(rangeToCheck []*UintRange, overlappingRange []*UintRange) error {
 	//Check that for old times, there is 100% overlap with new times and 0% overlap with the opposite
 	for _, oldAllowedTime := range rangeToCheck {
@@ -147,7 +146,6 @@ func AssertRangesDoNotOverlapAtAll(rangeToCheck []*UintRange, overlappingRange [
 
 	return nil
 }
-
 
 // Will sort the ID ranges in order and merge overlapping IDs if we can
 func SortAndMergeOverlapping(ids []*UintRange) []*UintRange {
@@ -189,9 +187,9 @@ func SortAndMergeOverlapping(ids []*UintRange) []*UintRange {
 					//Example: prevRange = [1, 5], currRange = [2, 10] -> newRange = [1, 10]
 					newUintRanges[len(newUintRanges)-1].End = currRange.End
 				}
-			} 
+			}
 			// else {
-				//Note: If currRange.End <= prevInsertedRange.End, it is already fully contained within the previous. We can just continue.
+			//Note: If currRange.End <= prevInsertedRange.End, it is already fully contained within the previous. We can just continue.
 			// }
 		}
 		return newUintRanges

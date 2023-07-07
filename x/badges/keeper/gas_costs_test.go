@@ -138,7 +138,7 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		{F: func() { FreezeAddresses(suite, wctx, bob, sdkmath.NewUint(0), false, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 9999}}) }},
 // 		{F: func() { GetCollection(suite, wctx, sdkmath.NewUint(1)) }},
 // 		{F: func() {
-// 			TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
+// 			TransferBadges(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
@@ -146,7 +146,7 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
-// 			TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
+// 			TransferBadges(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
@@ -154,7 +154,7 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
-// 			TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
+// 			TransferBadges(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
@@ -165,7 +165,7 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
-// 			TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: 1000, End: sdkmath.NewUint(1)999}}, 0, 0)
+// 			TransferBadges(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: 1000, End: sdkmath.NewUint(1)999}}, 0, 0)
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
@@ -176,13 +176,13 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		}, IgnoreGas: true},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
-// 			RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
+// 			RequestTransferBadges(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() { HandlePendingTransfers(suite, wctx, bob, sdkmath.NewUint(0), []*types.UintRange{{Start:   sdkmath.NewUint(4), End: sdkmath.NewUint(4),}}, []uint64{2}) }},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
-// 			RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: 1000, End: sdkmath.NewUint(1)999}}, 0, 0)
+// 			RequestTransferBadges(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: 1000, End: sdkmath.NewUint(1)999}}, 0, 0)
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
@@ -190,7 +190,7 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
-// 			RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
+// 			RequestTransferBadges(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
@@ -201,7 +201,7 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		}, IgnoreGas: true},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
-// 			RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
+// 			RequestTransferBadges(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
@@ -236,24 +236,24 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		},
 // 	}) }},
 // 		{F: func() {
-// 			TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
+// 			TransferBadges(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
-// 			TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
+// 			TransferBadges(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
-// 			TransferBadge(suite, wctx, bob, bobAccountNum, addresses, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
+// 			TransferBadges(suite, wctx, bob, bobAccountNum, addresses, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
-// 			TransferBadge(suite, wctx, bob, bobAccountNum, addresses, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
+// 			TransferBadges(suite, wctx, bob, bobAccountNum, addresses, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum) }},
 // 		{F: func() {
 // 			for i := uint64(0); i < 1000; i++ {
-// 				TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.UintRange{{Start: i * 2, End: i * 2}}, 0, 0)
+// 				TransferBadges(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.UintRange{{Start: i * 2, End: i * 2}}, 0, 0)
 // 			}
 // 		}},
 // 		{F: func() { GetUserBalance(suite, wctx, 2, bobAccountNum) }},
@@ -376,10 +376,10 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		tbl.AddRow("GetBadge", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
-// 		err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
+// 		err = TransferBadges(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
 // 		suite.Require().Nil(err, "Error transferring badge")
 // 		endGas = suite.ctx.GasMeter().GasConsumed()
-// 		tbl.AddRow("TransferBadge - Pending 1", endGas-startGas)
+// 		tbl.AddRow("TransferBadges - Pending 1", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
 // 		_, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
@@ -398,10 +398,10 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
-// 		err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
+// 		err = TransferBadges(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
 // 		suite.Require().Nil(err, "Error transferring badge")
 // 		endGas = suite.ctx.GasMeter().GasConsumed()
-// 		tbl.AddRow("TransferBadge - Pending 1000 Diff IDs", endGas-startGas)
+// 		tbl.AddRow("TransferBadges - Pending 1000 Diff IDs", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
 // 		_, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
@@ -420,10 +420,10 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
-// 		err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
+// 		err = TransferBadges(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
 // 		suite.Require().Nil(err, "Error transferring badge")
 // 		endGas = suite.ctx.GasMeter().GasConsumed()
-// 		tbl.AddRow("TransferBadge - Pending 1", endGas-startGas)
+// 		tbl.AddRow("TransferBadges - Pending 1", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
 // 		_, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
@@ -444,10 +444,10 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
-// 		err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: 1000, End: sdkmath.NewUint(1)999}}, 0, 0)
+// 		err = TransferBadges(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 0, []*types.UintRange{{Start: 1000, End: sdkmath.NewUint(1)999}}, 0, 0)
 // 		suite.Require().Nil(err, "Error transferring badge")
 // 		endGas = suite.ctx.GasMeter().GasConsumed()
-// 		tbl.AddRow("TransferBadge - Pending 1000", endGas-startGas)
+// 		tbl.AddRow("TransferBadges - Pending 1000", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
 // 		_, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
@@ -468,10 +468,10 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
-// 		err = RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
+// 		err = RequestTransferBadges(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
 // 		suite.Require().Nil(err, "Error transferring badge")
 // 		endGas = suite.ctx.GasMeter().GasConsumed()
-// 		tbl.AddRow("RequestTransferBadge - 1", endGas-startGas)
+// 		tbl.AddRow("RequestTransferBadges - 1", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
 // 		_, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
@@ -492,7 +492,7 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
-// 		err = RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: 1000, End: sdkmath.NewUint(1)999}}, 0, 0)
+// 		err = RequestTransferBadges(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: 1000, End: sdkmath.NewUint(1)999}}, 0, 0)
 // 		suite.Require().Nil(err, "Error transferring badge")
 // 		endGas = suite.ctx.GasMeter().GasConsumed()
 // 		tbl.AddRow("Request Transfer- 1000", endGas-startGas)
@@ -516,10 +516,10 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
-// 		err = RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
+// 		err = RequestTransferBadges(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
 // 		suite.Require().Nil(err, "Error transferring badge")
 // 		endGas = suite.ctx.GasMeter().GasConsumed()
-// 		tbl.AddRow("RequestTransferBadge - 1", endGas-startGas)
+// 		tbl.AddRow("RequestTransferBadges - 1", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
 // 		_, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
@@ -540,7 +540,7 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
-// 		err = RequestTransferBadge(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
+// 		err = RequestTransferBadges(suite, wctx, alice, bobAccountNum, 1, 0, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
 // 		suite.Require().Nil(err, "Error transferring badge")
 // 		endGas = suite.ctx.GasMeter().GasConsumed()
 // 		tbl.AddRow("Request Transfer- 1000", endGas-startGas)
@@ -668,10 +668,10 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		tbl.AddRow("CreateBadge 10000 (Supply 10000)", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
-// 		err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
+// 		err = TransferBadges(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
 // 		suite.Require().Nil(err, "Error transferring badge")
 // 		endGas = suite.ctx.GasMeter().GasConsumed()
-// 		tbl.AddRow("TransferBadge - Forceful 1", endGas-startGas)
+// 		tbl.AddRow("TransferBadges - Forceful 1", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
 // 		_, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
@@ -679,10 +679,10 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
-// 		err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
+// 		err = TransferBadges(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
 // 		suite.Require().Nil(err, "Error transferring badge")
 // 		endGas = suite.ctx.GasMeter().GasConsumed()
-// 		tbl.AddRow("TransferBadge - Forceful 1000 (Same Address, Diff Badge ID)", endGas-startGas)
+// 		tbl.AddRow("TransferBadges - Forceful 1000 (Same Address, Diff Badge ID)", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
 // 		_, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
@@ -694,22 +694,22 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 // 		for i := 0; i < 1000; i++ {
 // 			addresses = append(addresses, aliceAccountNum+uint64(i))
 // 		}
-// 		err = TransferBadge(suite, wctx, bob, bobAccountNum, addresses, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
+// 		err = TransferBadges(suite, wctx, bob, bobAccountNum, addresses, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}, 0, 0)
 // 		suite.Require().Nil(err, "Error transferring badge")
 // 		suite.Require().Nil(err, "Error transferring badge")
 // 		endGas = suite.ctx.GasMeter().GasConsumed()
-// 		tbl.AddRow("TransferBadge - Forceful 1000 (Different Addresses, Same BadgeId)", endGas-startGas)
+// 		tbl.AddRow("TransferBadges - Forceful 1000 (Different Addresses, Same BadgeId)", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
 // 		_, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
 // 		endGas = suite.ctx.GasMeter().GasConsumed()
 // 		tbl.AddRow("GetUserBalance", endGas-startGas)
 
-// 		err = TransferBadge(suite, wctx, bob, bobAccountNum, addresses, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
+// 		err = TransferBadges(suite, wctx, bob, bobAccountNum, addresses, []uint64{1}, 1, []*types.UintRange{{Start: sdkmath.NewUint(0), End: 999}}, 0, 0)
 // 		suite.Require().Nil(err, "Error transferring badge")
 // 		suite.Require().Nil(err, "Error transferring badge")
 // 		endGas = suite.ctx.GasMeter().GasConsumed()
-// 		tbl.AddRow("TransferBadge - Forceful 1000 (Different Addresses, Diff BadgeId)", endGas-startGas)
+// 		tbl.AddRow("TransferBadges - Forceful 1000 (Different Addresses, Diff BadgeId)", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
 // 		_, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), aliceAccountNum)
@@ -718,12 +718,12 @@ func RunFunctionsAndPrintGasCosts(suite *TestSuite, tbl table.Table, functions [
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
 // 		for i := uint64(0); i < 1000; i++ {
-// 			err = TransferBadge(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.UintRange{{Start: i * 2, End: i * 2}}, 0, 0)
+// 			err = TransferBadges(suite, wctx, bob, bobAccountNum, []uint64{aliceAccountNum}, []uint64{1}, 1, []*types.UintRange{{Start: i * 2, End: i * 2}}, 0, 0)
 // 			suite.Require().Nil(err, "Error transferring badge")
 // 			suite.Require().Nil(err, "Error transferring badge")
 // 		}
 // 		endGas = suite.ctx.GasMeter().GasConsumed()
-// 		tbl.AddRow("TransferBadge - 1000 alternating badge IDs", endGas-startGas)
+// 		tbl.AddRow("TransferBadges - 1000 alternating badge IDs", endGas-startGas)
 
 // 		startGas = suite.ctx.GasMeter().GasConsumed()
 // 		UserBalance, _ := GetUserBalance(suite, wctx, 2, bobAccountNum)

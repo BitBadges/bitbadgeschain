@@ -1,18 +1,17 @@
 package keeper
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 func IsStandardBalances(collection *types.BadgeCollection) bool {
-	return collection.BalancesType.Equal(sdkmath.NewUint(1))
+	return collection.BalancesType == "Standard"
 }
 
 func IsOffChainBalances(collection *types.BadgeCollection) bool {
-	return collection.BalancesType.Equal(sdkmath.NewUint(2))
+	return collection.BalancesType == "Off-Chain"
 }
 
 func IsInheritedBalances(collection *types.BadgeCollection) bool {
-	return collection.BalancesType.Equal(sdkmath.NewUint(3))
+	return collection.BalancesType == "Inherited"
 }

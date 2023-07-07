@@ -9,21 +9,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
+func TestMsgTransferBadges_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgTransferBadge
+		msg  types.MsgTransferBadges
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgTransferBadge{
-				Creator:      "invalid_address",
-				
+			msg: types.MsgTransferBadges{
+				Creator: "invalid_address",
+
 				CollectionId: sdkmath.NewUint(1),
 				Transfers: []*types.Transfer{
 					{
-						From:         sample.AccAddress(),
+						From: sample.AccAddress(),
 						ToAddresses: []string{
 							sample.AccAddress(),
 						},
@@ -36,7 +36,6 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 										End:   sdkmath.NewUint(1),
 									},
 								},
-
 							},
 						},
 					},
@@ -45,12 +44,12 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid state",
-			msg: types.MsgTransferBadge{
+			msg: types.MsgTransferBadges{
 				Creator: sample.AccAddress(),
-				
+
 				Transfers: []*types.Transfer{
 					{
-						From:    sample.AccAddress(),
+						From: sample.AccAddress(),
 						ToAddresses: []string{
 							sample.AccAddress(),
 						},
@@ -63,7 +62,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 										End:   sdkmath.NewUint(1),
 									},
 								},
-								OwnershipTimes:  []*types.UintRange{
+								OwnershipTimes: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 										End:   sdkmath.NewUint(1),
@@ -76,12 +75,12 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 			},
 		}, {
 			name: "invalid amounts",
-			msg: types.MsgTransferBadge{
+			msg: types.MsgTransferBadges{
 				Creator: sample.AccAddress(),
-				
+
 				Transfers: []*types.Transfer{
 					{
-						From:    sample.AccAddress(),
+						From: sample.AccAddress(),
 						ToAddresses: []string{
 							sample.AccAddress(),
 						},
@@ -93,7 +92,7 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 										End:   sdkmath.NewUint(1),
 									},
 								},
-								OwnershipTimes:  []*types.UintRange{
+								OwnershipTimes: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 										End:   sdkmath.NewUint(1),
@@ -108,12 +107,12 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "invalid badge range",
-			msg: types.MsgTransferBadge{
+			msg: types.MsgTransferBadges{
 				Creator: sample.AccAddress(),
-				
+
 				Transfers: []*types.Transfer{
 					{
-						From:    sample.AccAddress(),
+						From:        sample.AccAddress(),
 						ToAddresses: []string{sample.AccAddress()},
 						Balances: []*types.Balance{
 							{
@@ -124,13 +123,12 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 										End:   sdkmath.NewUint(1),
 									},
 								},
-								OwnershipTimes:  []*types.UintRange{
+								OwnershipTimes: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 										End:   sdkmath.NewUint(1),
 									},
 								},
-
 							},
 						},
 					},
@@ -140,12 +138,12 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "invalid times",
-			msg: types.MsgTransferBadge{
+			msg: types.MsgTransferBadges{
 				Creator: sample.AccAddress(),
-				
+
 				Transfers: []*types.Transfer{
 					{
-						From:    sample.AccAddress(),
+						From:        sample.AccAddress(),
 						ToAddresses: []string{sample.AccAddress()},
 						Balances: []*types.Balance{
 							{
@@ -156,8 +154,6 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 										End:   sdkmath.NewUint(1),
 									},
 								},
-								
-
 							},
 						},
 					},
@@ -167,12 +163,12 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "invalid times 2",
-			msg: types.MsgTransferBadge{
+			msg: types.MsgTransferBadges{
 				Creator: sample.AccAddress(),
-				
+
 				Transfers: []*types.Transfer{
 					{
-						From:    sample.AccAddress(),
+						From:        sample.AccAddress(),
 						ToAddresses: []string{sample.AccAddress()},
 						Balances: []*types.Balance{
 							{
@@ -189,8 +185,6 @@ func TestMsgTransferBadge_ValidateBasic(t *testing.T) {
 										End:   sdkmath.NewUint(1),
 									},
 								},
-								
-
 							},
 						},
 					},
