@@ -29,6 +29,12 @@ func TestRemoveOverlaps(t *testing.T) {
 			Start: sdkmath.NewUint(5),
 			End:   sdkmath.NewUint(5),
 		},
+		OwnershipTime: &types.UintRange{
+			Start: sdkmath.NewUint(5),
+			End:   sdkmath.NewUint(5),
+		},
+
+
 		ToMapping: &types.AddressMapping{
 			Addresses:        []string{alice, bob, charlie},
 			IncludeAddresses: true,
@@ -51,6 +57,10 @@ func TestRemoveOverlaps(t *testing.T) {
 			End:   sdkmath.NewUint(10),
 		},
 		TransferTime: &types.UintRange{
+			Start: sdkmath.NewUint(1),
+			End:   sdkmath.NewUint(10),
+		},
+		OwnershipTime: &types.UintRange{
 			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(10),
 		},
@@ -81,6 +91,10 @@ func TestRemoveOverlaps(t *testing.T) {
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
+			OwnershipTime: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(10),
+			},
 			ToMapping: &types.AddressMapping{
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
@@ -104,6 +118,10 @@ func TestRemoveOverlaps(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			TransferTime: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(10),
+			},
+			OwnershipTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
@@ -133,6 +151,10 @@ func TestRemoveOverlaps(t *testing.T) {
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
+			OwnershipTime: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(10),
+			},
 			ToMapping: &types.AddressMapping{
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
@@ -159,6 +181,10 @@ func TestRemoveOverlaps(t *testing.T) {
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
+			OwnershipTime: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(10),
+			},
 			ToMapping: &types.AddressMapping{
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
@@ -182,6 +208,71 @@ func TestRemoveOverlaps(t *testing.T) {
 				End:   sdkmath.NewUint(5),
 			},
 			TransferTime: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(4),
+			},
+			OwnershipTime: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(10),
+			},
+			ToMapping: &types.AddressMapping{
+				Addresses:        []string{alice, bob, charlie},
+				IncludeAddresses: true,
+			},
+			FromMapping: &types.AddressMapping{
+				Addresses:        []string{alice, bob, charlie},
+				IncludeAddresses: true,
+			},
+			InitiatedByMapping: &types.AddressMapping{
+				Addresses:        []string{alice, bob, charlie},
+				IncludeAddresses: true,
+			},
+		},
+
+		{
+			TimelineTime: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
+			BadgeId: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
+			TransferTime: &types.UintRange{
+				Start: sdkmath.NewUint(6),
+				End:   sdkmath.NewUint(10),
+			},
+			OwnershipTime: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(10),
+			},
+			ToMapping: &types.AddressMapping{
+				Addresses:        []string{alice, bob, charlie},
+				IncludeAddresses: true,
+			},
+			FromMapping: &types.AddressMapping{
+				Addresses:        []string{alice, bob, charlie},
+				IncludeAddresses: true,
+			},
+			InitiatedByMapping: &types.AddressMapping{
+				Addresses:        []string{alice, bob, charlie},
+				IncludeAddresses: true,
+			},
+		},
+		{
+			TimelineTime: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
+			BadgeId: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
+			TransferTime: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
+			OwnershipTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(4),
 			},
@@ -209,6 +300,10 @@ func TestRemoveOverlaps(t *testing.T) {
 				End:   sdkmath.NewUint(5),
 			},
 			TransferTime: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
+			OwnershipTime: &types.UintRange{
 				Start: sdkmath.NewUint(6),
 				End:   sdkmath.NewUint(10),
 			},
@@ -277,6 +372,10 @@ func TestRemoveAddresses(t *testing.T) {
 			Start: sdkmath.NewUint(5),
 			End:   sdkmath.NewUint(5),
 		},
+		OwnershipTime: &types.UintRange{
+			Start: sdkmath.NewUint(5),
+			End:   sdkmath.NewUint(5),
+		},
 		ToMapping: &types.AddressMapping{
 			Addresses:        []string{alice},
 			IncludeAddresses: true,
@@ -299,6 +398,10 @@ func TestRemoveAddresses(t *testing.T) {
 			End:   sdkmath.NewUint(10),
 		},
 		TransferTime: &types.UintRange{
+			Start: sdkmath.NewUint(1),
+			End:   sdkmath.NewUint(10),
+		},
+		OwnershipTime: &types.UintRange{
 			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(10),
 		},
@@ -329,6 +432,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
+			OwnershipTime: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(10),
+			},
 			ToMapping: &types.AddressMapping{
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
@@ -352,6 +459,10 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			TransferTime: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(10),
+			},
+			OwnershipTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
@@ -381,6 +492,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
+			OwnershipTime: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(10),
+			},
 			ToMapping: &types.AddressMapping{
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
@@ -404,6 +519,10 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			TransferTime: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(10),
+			},
+			OwnershipTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
@@ -432,6 +551,10 @@ func TestRemoveAddresses(t *testing.T) {
 			TransferTime: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(4),
+			},
+			OwnershipTime: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(10),
 			},
 			ToMapping: &types.AddressMapping{
 				Addresses:        []string{alice, bob, charlie},
@@ -460,6 +583,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(6),
 				End:   sdkmath.NewUint(10),
 			},
+			OwnershipTime: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(10),
+			},
 			ToMapping: &types.AddressMapping{
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
@@ -483,6 +610,74 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(5),
 			},
 			TransferTime: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
+			OwnershipTime: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(4),
+			},
+			ToMapping: &types.AddressMapping{
+				Addresses:        []string{alice, bob, charlie},
+				IncludeAddresses: true,
+			},
+			FromMapping: &types.AddressMapping{
+				Addresses:        []string{alice, bob, charlie},
+				IncludeAddresses: true,
+			},
+			InitiatedByMapping: &types.AddressMapping{
+				Addresses:        []string{alice, bob, charlie},
+				IncludeAddresses: true,
+			},
+		},
+
+		{
+			TimelineTime: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
+			BadgeId: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
+			TransferTime: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
+			OwnershipTime: &types.UintRange{
+				Start: sdkmath.NewUint(6),
+				End:   sdkmath.NewUint(10),
+			},
+			ToMapping: &types.AddressMapping{
+				Addresses:        []string{alice, bob, charlie},
+				IncludeAddresses: true,
+			},
+			FromMapping: &types.AddressMapping{
+				Addresses:        []string{alice, bob, charlie},
+				IncludeAddresses: true,
+			},
+			InitiatedByMapping: &types.AddressMapping{
+				Addresses:        []string{alice, bob, charlie},
+				IncludeAddresses: true,
+			},
+		},
+
+
+
+		{
+			TimelineTime: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
+			BadgeId: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
+			TransferTime: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
+			OwnershipTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
@@ -512,6 +707,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
+			OwnershipTime: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
 			ToMapping: &types.AddressMapping{
 				Addresses:        []string{bob, charlie},
 				IncludeAddresses: true,
@@ -535,6 +734,10 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(5),
 			},
 			TransferTime: &types.UintRange{
+				Start: sdkmath.NewUint(5),
+				End:   sdkmath.NewUint(5),
+			},
+			OwnershipTime: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},

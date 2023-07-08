@@ -31,11 +31,11 @@ service Query {
   }
 
   rpc GetApprovalsTracker(QueryGetApprovalsTrackerRequest) returns (QueryGetApprovalsTrackerResponse) {
-    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_approvals_tracker/{trackerId}/{level}";
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_approvals_tracker/{collectionId}/{timelineType}/{address}/{approvalId}/{trackerType}";
   }
 
   rpc GetNumUsedForChallenge(QueryGetNumUsedForChallengeRequest) returns (QueryGetNumUsedForChallengeResponse) {
-    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{challengeId}/{level}/{leafIndex}";
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{collectionId}/{timelineType}/{address}/{approvalId}/{challengeIdx}/{leafIndex}";
   }
 
   // Queries an addresses balance for a badge collection, specified by its ID.
@@ -67,11 +67,7 @@ message QueryGetCollectionResponse {
 }
 
 message QueryGetBalanceRequest {
-  string collectionId = 1  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-      
-    ];
+  string collectionId = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   string address = 2;
 }
 
@@ -88,11 +84,11 @@ message QueryGetAddressMappingResponse {
 }
 
 message QueryGetApprovalsTrackerRequest {
-  string trackerId = 1;
-  string level = 2;
-  string depth = 3;
-  string address = 4;
   string collectionId = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string timelineType = 2; //"collection" or "incoming" or "outgoing"
+  string address = 3; //if timelineType is "collection", leave blank
+  string approvalId = 1; 
+  string trackerType = 4;; //"overall", "to", "from", "initiatedBy"
 }
 
 message QueryGetApprovalsTrackerResponse {
@@ -100,10 +96,12 @@ message QueryGetApprovalsTrackerResponse {
 }
 
 message QueryGetNumUsedForChallengeRequest {
-  string challengeId = 1;
-  string level = 2;
-  string leafIndex = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string collectionId = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string timelineType = 2; //"collection" or "incoming" or "outgoing"
+  string address = 3; //if timelineType is "collection", leave blank
+  string approvalId = 4;
+  string challengeIdx = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; //position in challenges array
+  string leafIndex = 6 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; 
 }
 
 message QueryGetNumUsedForChallengeResponse {

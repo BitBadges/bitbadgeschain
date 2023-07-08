@@ -43,7 +43,7 @@ export interface QueryGetAddressMappingResponse {
 }
 
 export interface QueryGetApprovalsTrackerRequest {
-  trackerId: string;
+  approvalId: string;
   level: string;
   depth: string;
   address: string;
@@ -460,13 +460,13 @@ export const QueryGetAddressMappingResponse = {
 };
 
 function createBaseQueryGetApprovalsTrackerRequest(): QueryGetApprovalsTrackerRequest {
-  return { trackerId: "", level: "", depth: "", address: "", collectionId: "" };
+  return { approvalId: "", level: "", depth: "", address: "", collectionId: "" };
 }
 
 export const QueryGetApprovalsTrackerRequest = {
   encode(message: QueryGetApprovalsTrackerRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.trackerId !== "") {
-      writer.uint32(10).string(message.trackerId);
+    if (message.approvalId !== "") {
+      writer.uint32(10).string(message.approvalId);
     }
     if (message.level !== "") {
       writer.uint32(18).string(message.level);
@@ -491,7 +491,7 @@ export const QueryGetApprovalsTrackerRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.trackerId = reader.string();
+          message.approvalId = reader.string();
           break;
         case 2:
           message.level = reader.string();
@@ -515,7 +515,7 @@ export const QueryGetApprovalsTrackerRequest = {
 
   fromJSON(object: any): QueryGetApprovalsTrackerRequest {
     return {
-      trackerId: isSet(object.trackerId) ? String(object.trackerId) : "",
+      approvalId: isSet(object.approvalId) ? String(object.approvalId) : "",
       level: isSet(object.level) ? String(object.level) : "",
       depth: isSet(object.depth) ? String(object.depth) : "",
       address: isSet(object.address) ? String(object.address) : "",
@@ -525,7 +525,7 @@ export const QueryGetApprovalsTrackerRequest = {
 
   toJSON(message: QueryGetApprovalsTrackerRequest): unknown {
     const obj: any = {};
-    message.trackerId !== undefined && (obj.trackerId = message.trackerId);
+    message.approvalId !== undefined && (obj.approvalId = message.approvalId);
     message.level !== undefined && (obj.level = message.level);
     message.depth !== undefined && (obj.depth = message.depth);
     message.address !== undefined && (obj.address = message.address);
@@ -537,7 +537,7 @@ export const QueryGetApprovalsTrackerRequest = {
     object: I,
   ): QueryGetApprovalsTrackerRequest {
     const message = createBaseQueryGetApprovalsTrackerRequest();
-    message.trackerId = object.trackerId ?? "";
+    message.approvalId = object.approvalId ?? "";
     message.level = object.level ?? "";
     message.depth = object.depth ?? "";
     message.address = object.address ?? "";

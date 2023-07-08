@@ -204,6 +204,10 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 			detailToCheck.TransferTime = &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)} //dummy range
 		}
 
+		if detailToCheck.OwnershipTime == nil {
+			detailToCheck.OwnershipTime = &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)} //dummy range
+		}
+
 		if detailToCheck.ToMapping == nil {
 			detailToCheck.ToMapping = &types.AddressMapping{Addresses: []string{}, IncludeAddresses: false}
 		}

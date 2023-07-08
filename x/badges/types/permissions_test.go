@@ -1696,6 +1696,12 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
+			OwnershipTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:  sdkmath.NewUint(50),
+				},
+			},
 			ToMappingId:          "All",
 			FromMappingId:        "All",
 			InitiatedByMappingId: "Manager",
@@ -1737,6 +1743,12 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
+				},
+			},
+			OwnershipTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:  sdkmath.NewUint(50),
 				},
 			},
 			ToMappingId:          "All",
@@ -1786,6 +1798,12 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
+			OwnershipTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:  sdkmath.NewUint(50),
+				},
+			},
 			ToMappingId:          "All",
 			FromMappingId:        "All",
 			InitiatedByMappingId: "Manager",
@@ -1833,6 +1851,12 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
+			OwnershipTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:  sdkmath.NewUint(50),
+				},
+			},
 			ToMappingId:          "x",
 			FromMappingId:        "All",
 			InitiatedByMappingId: "Manager",
@@ -1878,6 +1902,12 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
+				},
+			},
+			OwnershipTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:  sdkmath.NewUint(50),
 				},
 			},
 			ToMappingId:          "All",
@@ -1928,6 +1958,12 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
+			OwnershipTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:  sdkmath.NewUint(50),
+				},
+			},
 			ToMappingId:          "All",
 			FromMappingId:        "All",
 			InitiatedByMappingId: "Manager",
@@ -1969,6 +2005,12 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate2(t *testing.T) {
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(10),
+				},
+			},
+			OwnershipTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:  sdkmath.NewUint(50),
 				},
 			},
 			ToMappingId:          "All",
@@ -2042,6 +2084,12 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
+			OwnershipTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:  sdkmath.NewUint(50),
+				},
+			},
 			ToMappingId:          "ABC",
 			FromMappingId:        "All",
 			InitiatedByMappingId: "All",
@@ -2083,6 +2131,12 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate3(t *testing.T) {
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
+				},
+			},
+			OwnershipTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:  sdkmath.NewUint(50),
 				},
 			},
 			ToMappingId:          "All",
@@ -2155,6 +2209,12 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate4Invalid(t *testing.
 					End:   sdkmath.NewUint(100),
 				},
 			},
+			OwnershipTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:  sdkmath.NewUint(50),
+				},
+			},
 			ToMappingId:          "ABC",
 			FromMappingId:        "All",
 			InitiatedByMappingId: "All",
@@ -2196,6 +2256,12 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate4Invalid(t *testing.
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
+				},
+			},
+			OwnershipTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:  sdkmath.NewUint(50),
 				},
 			},
 			ToMappingId:          "BobCharlie",

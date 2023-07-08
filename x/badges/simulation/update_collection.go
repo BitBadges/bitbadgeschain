@@ -49,6 +49,7 @@ func SimulateMsgUpdateCollection(
 							ToMappingId:          GetRandomAddresses(r, 1, accs)[0],
 							InitiatedByMappingId: GetRandomAddresses(r, 1, accs)[0],
 							TransferTimes:        GetTimelineTimes(r, 100),
+							OwnershipTimes: 		 GetTimelineTimes(r, 100),
 							BadgeIds:             GetTimelineTimes(r, 3),
 							AllowedCombinations: []*types.IsCollectionTransferAllowed{
 								{

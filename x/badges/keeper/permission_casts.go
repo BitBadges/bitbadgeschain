@@ -18,8 +18,10 @@ func (k Keeper) CastUserApprovedIncomingTransferPermissionToUniversalPermission(
 				ForbiddenTimesOptions:     combination.ForbiddenTimesOptions,
 				TimelineTimesOptions:      combination.TimelineTimesOptions,
 				TransferTimesOptions:      combination.TransferTimesOptions,
+				OwnershipTimesOptions: 	 combination.OwnershipTimesOptions,
 				FromMappingOptions:        combination.FromMappingOptions,
 				InitiatedByMappingOptions: combination.InitiatedByMappingOptions,
+				
 			})
 		}
 
@@ -38,11 +40,13 @@ func (k Keeper) CastUserApprovedIncomingTransferPermissionToUniversalPermission(
 				BadgeIds:               permission.DefaultValues.BadgeIds,
 				TimelineTimes:          permission.DefaultValues.TimelineTimes,
 				TransferTimes:          permission.DefaultValues.TransferTimes,
+				OwnershipTimes: 				permission.DefaultValues.OwnershipTimes,
 				FromMapping:            fromMapping,
 				InitiatedByMapping:     initiatedByMapping,
 				UsesBadgeIds:           true,
 				UsesTimelineTimes:      true,
 				UsesTransferTimes:      true,
+				UsesOwnershipTimes: 		true,
 				UsesFromMapping:        true,
 				UsesInitiatedByMapping: true,
 				PermittedTimes:         permission.DefaultValues.PermittedTimes,
@@ -65,6 +69,7 @@ func (k Keeper) CastUserApprovedOutgoingTransferPermissionToUniversalPermission(
 				ForbiddenTimesOptions:     combination.ForbiddenTimesOptions,
 				TimelineTimesOptions:      combination.TimelineTimesOptions,
 				TransferTimesOptions:      combination.TransferTimesOptions,
+				OwnershipTimesOptions: 	 combination.OwnershipTimesOptions,
 				ToMappingOptions:          combination.ToMappingOptions,
 				InitiatedByMappingOptions: combination.InitiatedByMappingOptions,
 			})
@@ -85,11 +90,13 @@ func (k Keeper) CastUserApprovedOutgoingTransferPermissionToUniversalPermission(
 				BadgeIds:               permission.DefaultValues.BadgeIds,
 				TimelineTimes:          permission.DefaultValues.TimelineTimes,
 				TransferTimes:          permission.DefaultValues.TransferTimes,
+				OwnershipTimes: 				permission.DefaultValues.OwnershipTimes,
 				ToMapping:              toMapping,
 				InitiatedByMapping:     initiatedByMapping,
 				UsesBadgeIds:           true,
 				UsesTimelineTimes:      true,
 				UsesTransferTimes:      true,
+				UsesOwnershipTimes: 		true,
 				UsesToMapping:          true,
 				UsesInitiatedByMapping: true,
 				PermittedTimes:         permission.DefaultValues.PermittedTimes,
@@ -133,6 +140,7 @@ func (k Keeper) CastCollectionApprovedTransferPermissionToUniversalPermission(ct
 				ForbiddenTimesOptions:     collectionUpdateCombination.ForbiddenTimesOptions,
 				TimelineTimesOptions:      collectionUpdateCombination.TimelineTimesOptions,
 				TransferTimesOptions:      collectionUpdateCombination.TransferTimesOptions,
+				OwnershipTimesOptions: 	 collectionUpdateCombination.OwnershipTimesOptions,
 				ToMappingOptions:          collectionUpdateCombination.ToMappingOptions,
 				FromMappingOptions:        collectionUpdateCombination.FromMappingOptions,
 				InitiatedByMappingOptions: collectionUpdateCombination.InitiatedByMappingOptions,
@@ -159,6 +167,7 @@ func (k Keeper) CastCollectionApprovedTransferPermissionToUniversalPermission(ct
 			DefaultValues: &types.UniversalDefaultValues{
 				TimelineTimes:          collectionUpdatePermission.DefaultValues.TimelineTimes,
 				TransferTimes:          collectionUpdatePermission.DefaultValues.TransferTimes,
+				OwnershipTimes: 				collectionUpdatePermission.DefaultValues.OwnershipTimes,
 				ToMapping:              toMapping,
 				FromMapping:            fromMapping,
 				InitiatedByMapping:     initiatedByMapping,
@@ -166,6 +175,7 @@ func (k Keeper) CastCollectionApprovedTransferPermissionToUniversalPermission(ct
 				UsesBadgeIds:           true,
 				UsesTimelineTimes:      true,
 				UsesTransferTimes:      true,
+				UsesOwnershipTimes: 		true,
 				UsesToMapping:          true,
 				UsesFromMapping:        true,
 				UsesInitiatedByMapping: true,
@@ -238,7 +248,7 @@ func (k Keeper) CastBalancesActionPermissionToUniversalPermission(BalancesAction
 		for _, BalancesActionCombination := range BalancesActionPermission.Combinations {
 			castedCombinations = append(castedCombinations, &types.UniversalCombination{
 				BadgeIdsOptions:       BalancesActionCombination.BadgeIdsOptions,
-				TransferTimesOptions:  BalancesActionCombination.OwnershipTimesOptions, //we just use transferTimes for ownershipTimes
+				OwnershipTimesOptions:  BalancesActionCombination.OwnershipTimesOptions, 
 				PermittedTimesOptions: BalancesActionCombination.PermittedTimesOptions,
 				ForbiddenTimesOptions: BalancesActionCombination.ForbiddenTimesOptions,
 			})
@@ -247,9 +257,9 @@ func (k Keeper) CastBalancesActionPermissionToUniversalPermission(BalancesAction
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
 				BadgeIds:          BalancesActionPermission.DefaultValues.BadgeIds,
-				TransferTimes:     BalancesActionPermission.DefaultValues.OwnershipTimes,
+				OwnershipTimes:     BalancesActionPermission.DefaultValues.OwnershipTimes,
 				UsesBadgeIds:      true,
-				UsesTransferTimes: true,
+				UsesOwnershipTimes: true,
 				PermittedTimes:    BalancesActionPermission.DefaultValues.PermittedTimes,
 				ForbiddenTimes:    BalancesActionPermission.DefaultValues.ForbiddenTimes,
 			},

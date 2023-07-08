@@ -262,20 +262,20 @@ func (k Keeper) DeleteAddressMappingFromStore(ctx sdk.Context, addressMappingId 
 
 /****************************************TRANSFER TRACKERS****************************************/
 
-func (k Keeper) SetApprovalsTrackerInStore(ctx sdk.Context, collectionId sdkmath.Uint, trackerId string, approvalsTracker types.ApprovalsTracker, level string, depth string, address string) error {
+func (k Keeper) SetApprovalsTrackerInStore(ctx sdk.Context, collectionId sdkmath.Uint, approvalId string, approvalsTracker types.ApprovalsTracker, level string, depth string, address string) error {
 	marshaled_transfer_tracker, err := k.cdc.Marshal(&approvalsTracker)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.ApprovalsTracker failed")
 	}
 
 	store := ctx.KVStore(k.storeKey)
-	store.Set(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, trackerId, level, depth, address)), marshaled_transfer_tracker)
+	store.Set(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, approvalId, level, depth, address)), marshaled_transfer_tracker)
 	return nil
 }
 
-func (k Keeper) GetApprovalsTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, trackerId string, level string, depth string, address string) (types.ApprovalsTracker, bool) {
+func (k Keeper) GetApprovalsTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, approvalId string, level string, depth string, address string) (types.ApprovalsTracker, bool) {
 	store := ctx.KVStore(k.storeKey)
-	marshaled_transfer_tracker := store.Get(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, trackerId, level, depth, address)))
+	marshaled_transfer_tracker := store.Get(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, approvalId, level, depth, address)))
 
 	var approvalsTracker types.ApprovalsTracker
 	if len(marshaled_transfer_tracker) == 0 {
@@ -299,12 +299,12 @@ func (k Keeper) GetApprovalsTrackersFromStore(ctx sdk.Context) (approvalsTracker
 	return
 }
 
-func (k Keeper) StoreHasApprovalsTracker(ctx sdk.Context, collectionId sdkmath.Uint, trackerId string, level string, depth string, address string) bool {
+func (k Keeper) StoreHasApprovalsTracker(ctx sdk.Context, collectionId sdkmath.Uint, approvalId string, level string, depth string, address string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, trackerId, level, depth, address)))
+	return store.Has(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, approvalId, level, depth, address)))
 }
 
-func (k Keeper) DeleteApprovalsTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, trackerId string, level string, depth string, address string) {
+func (k Keeper) DeleteApprovalsTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, approvalId string, level string, depth string, address string) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, trackerId, level, depth, address)))
+	store.Delete(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, approvalId, level, depth, address)))
 }

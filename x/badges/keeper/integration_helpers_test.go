@@ -90,6 +90,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 							FromMappingId:        "All",
 							InitiatedByMappingId: "All",
 							TransferTimes:        GetFullUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
 							BadgeIds:             GetFullUintRanges(),
 							AllowedCombinations: []*types.IsCollectionTransferAllowed{
 								{
@@ -97,7 +98,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 								},
 							},
 							Challenges:                []*types.Challenge{},
-							TrackerId:                 "test",
+							ApprovalId:                 "test",
 							IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 							IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 							PerAddressApprovals: &types.PerAddressApprovals{
@@ -122,6 +123,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 							FromMappingId:        "All",
 							InitiatedByMappingId: "All",
 							TransferTimes:        GetFullUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
 							BadgeIds:             GetFullUintRanges(),
 							AllowedCombinations: []*types.IsUserIncomingTransferAllowed{
 								{
@@ -129,7 +131,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 								},
 							},
 							Challenges:                []*types.Challenge{},
-							TrackerId:                 "test",
+							ApprovalId:                 "test",
 							IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 							IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 							PerAddressApprovals: &types.PerAddressApprovals{
@@ -156,6 +158,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 							ToMappingId:          "All",
 							InitiatedByMappingId: "All",
 							TransferTimes:        GetFullUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
 							BadgeIds:             GetFullUintRanges(),
 							AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
 								{
@@ -163,7 +166,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 								},
 							},
 							Challenges:                []*types.Challenge{},
-							TrackerId:                 "test",
+							ApprovalId:                 "test",
 							IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 							IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 							PerAddressApprovals: &types.PerAddressApprovals{
@@ -231,13 +234,14 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*type
 		OverridesToApprovedIncomingTransfers:   true,
 		TransferTimes:                          GetFullUintRanges(),
 		BadgeIds:                               GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{
 			{
 				IsAllowed: true,
 			},
 		},
 		Challenges:                []*types.Challenge{},
-		TrackerId:                 "test",
+		ApprovalId:                 "test",
 		IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 		IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 		PerAddressApprovals: &types.PerAddressApprovals{

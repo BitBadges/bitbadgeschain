@@ -26,6 +26,7 @@ type UniversalCombination struct {
 	InitiatedByMappingOptions *ValueOptions
 	TransferTimesOptions      *ValueOptions
 	BadgeIdsOptions           *ValueOptions
+	OwnershipTimesOptions     *ValueOptions
 
 	PermittedTimesOptions *ValueOptions
 	ForbiddenTimesOptions *ValueOptions
@@ -40,6 +41,7 @@ type UniversalDefaultValues struct {
 	BadgeIds           []*UintRange
 	TimelineTimes      []*UintRange
 	TransferTimes      []*UintRange
+	OwnershipTimes     []*UintRange
 	ToMapping          *AddressMapping
 	FromMapping        *AddressMapping
 	InitiatedByMapping *AddressMapping
@@ -53,6 +55,7 @@ type UniversalDefaultValues struct {
 	UsesToMapping          bool
 	UsesFromMapping        bool
 	UsesInitiatedByMapping bool
+	UsesOwnershipTimes     bool
 
 	ArbitraryValue interface{}
 }
@@ -61,6 +64,7 @@ type UniversalPermissionDetails struct {
 	BadgeId            *UintRange
 	TimelineTime       *UintRange
 	TransferTime       *UintRange
+	OwnershipTime      *UintRange
 	ToMapping          *AddressMapping
 	FromMapping        *AddressMapping
 	InitiatedByMapping *AddressMapping
@@ -123,6 +127,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 	timelineTimesAfterRemoval, removedTimelineTimes := RemoveUintsFromUintRange(handled.TimelineTime, valueToCheck.TimelineTime)
 	badgesAfterRemoval, removedBadges := RemoveUintsFromUintRange(handled.BadgeId, valueToCheck.BadgeId)
 	transferTimesAfterRemoval, removedTransferTimes := RemoveUintsFromUintRange(handled.TransferTime, valueToCheck.TransferTime)
+	ownershipTimesAfterRemoval, removedOwnershipTimes := RemoveUintsFromUintRange(handled.OwnershipTime, valueToCheck.OwnershipTime)
 
 	toMappingAfterRemoval, removedToMapping := RemoveAddressMappingFromAddressMapping(handled.ToMapping, valueToCheck.ToMapping)
 	fromMappingAfterRemoval, removedFromMapping := RemoveAddressMappingFromAddressMapping(handled.FromMapping, valueToCheck.FromMapping)
@@ -155,16 +160,19 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 
 	//If some field does not overlap, we simply end up with the original values because it is only considered an overlap if all fields overlap.
 	//The function would work fine without this but it makes it more efficient and less complicated because it will not get broken down further
-	if len(removedTimelineTimes) == 0 || len(removedBadges) == 0 || len(removedTransferTimes) == 0 || !toMappingRemoved || !fromMappingRemoved || !initiatedByMappingRemoved {
+	if len(removedTimelineTimes) == 0 || len(removedBadges) == 0 || len(removedTransferTimes) == 0 || len(removedOwnershipTimes) == 0 || !toMappingRemoved || !fromMappingRemoved || !initiatedByMappingRemoved {
 		remaining = append(remaining, valueToCheck)
 		return remaining, []*UniversalPermissionDetails{}
 	}
+
+
 
 	for _, timelineTimeAfterRemoval := range timelineTimesAfterRemoval {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:       timelineTimeAfterRemoval,
 			BadgeId:            valueToCheck.BadgeId,
 			TransferTime:       valueToCheck.TransferTime,
+			OwnershipTime:      valueToCheck.OwnershipTime,
 			ToMapping:          valueToCheck.ToMapping,
 			FromMapping:        valueToCheck.FromMapping,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
@@ -176,6 +184,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			TimelineTime:       removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			BadgeId:            badgeAfterRemoval,
 			TransferTime:       valueToCheck.TransferTime,
+			OwnershipTime:      valueToCheck.OwnershipTime,
 			ToMapping:          valueToCheck.ToMapping,
 			FromMapping:        valueToCheck.FromMapping,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
@@ -187,6 +196,19 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			TimelineTime:       removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			BadgeId:            removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
 			TransferTime:       transferTimeAfterRemoval,
+			OwnershipTime:      valueToCheck.OwnershipTime,
+			ToMapping:          valueToCheck.ToMapping,
+			FromMapping:        valueToCheck.FromMapping,
+			InitiatedByMapping: valueToCheck.InitiatedByMapping,
+		})
+	}
+
+	for _, ownershipTimeAfterRemoval := range ownershipTimesAfterRemoval {
+		remaining = append(remaining, &UniversalPermissionDetails{
+			TimelineTime:       removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			BadgeId:            removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
+			TransferTime:       removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			OwnershipTime:      ownershipTimeAfterRemoval,
 			ToMapping:          valueToCheck.ToMapping,
 			FromMapping:        valueToCheck.FromMapping,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
@@ -198,6 +220,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			TimelineTime:       removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			BadgeId:            removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
 			TransferTime:       removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			OwnershipTime:      removedOwnershipTimes[0],
 			ToMapping:          toMappingAfterRemoval,
 			FromMapping:        valueToCheck.FromMapping,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
@@ -209,6 +232,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			TimelineTime:       removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			BadgeId:            removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
 			TransferTime:       removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			OwnershipTime:      removedOwnershipTimes[0],
 			ToMapping:          toMappingAfterRemoval,
 			FromMapping:        fromMappingAfterRemoval,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
@@ -220,6 +244,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			TimelineTime:       removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			BadgeId:            removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
 			TransferTime:       removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			OwnershipTime:      removedOwnershipTimes[0],
 			ToMapping:          toMappingAfterRemoval,
 			FromMapping:        fromMappingAfterRemoval,
 			InitiatedByMapping: initiatedByMappingAfterRemoval,
@@ -230,14 +255,17 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 	for _, removedTimelineTime := range removedTimelineTimes {
 		for _, removedBadge := range removedBadges {
 			for _, removedTransferTime := range removedTransferTimes {
-				removedDetails = append(removedDetails, &UniversalPermissionDetails{
-					TimelineTime:       removedTimelineTime,
-					BadgeId:            removedBadge,
-					TransferTime:       removedTransferTime,
-					ToMapping:          removedToMapping,
-					FromMapping:        removedFromMapping,
-					InitiatedByMapping: removedInitiatedByMapping,
-				})
+				for _, removedOwnershipTime := range removedOwnershipTimes {
+					removedDetails = append(removedDetails, &UniversalPermissionDetails{
+						TimelineTime:       removedTimelineTime,
+						BadgeId:            removedBadge,
+						TransferTime:       removedTransferTime,
+						OwnershipTime:      removedOwnershipTime,
+						ToMapping:          removedToMapping,
+						FromMapping:        removedFromMapping,
+						InitiatedByMapping: removedInitiatedByMapping,
+					})
+				}
 			}
 		}
 	}
@@ -301,6 +329,7 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissio
 			badgeIds := GetUintRangesWithOptions(permission.DefaultValues.BadgeIds, combination.BadgeIdsOptions, permission.DefaultValues.UsesBadgeIds)
 			timelineTimes := GetUintRangesWithOptions(permission.DefaultValues.TimelineTimes, combination.TimelineTimesOptions, permission.DefaultValues.UsesTimelineTimes)
 			transferTimes := GetUintRangesWithOptions(permission.DefaultValues.TransferTimes, combination.TransferTimesOptions, permission.DefaultValues.UsesTransferTimes)
+			ownershipTimes := GetUintRangesWithOptions(permission.DefaultValues.OwnershipTimes, combination.OwnershipTimesOptions, permission.DefaultValues.UsesOwnershipTimes)
 			permittedTimes := GetUintRangesWithOptions(permission.DefaultValues.PermittedTimes, combination.PermittedTimesOptions, true)
 			forbiddenTimes := GetUintRangesWithOptions(permission.DefaultValues.ForbiddenTimes, combination.ForbiddenTimesOptions, true)
 			arbitraryValue := permission.DefaultValues.ArbitraryValue
@@ -312,32 +341,36 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissio
 			for _, badgeId := range badgeIds {
 				for _, timelineTime := range timelineTimes {
 					for _, transferTime := range transferTimes {
-						brokenDown := []*UniversalPermissionDetails{
-							{
-								BadgeId:            badgeId,
-								TimelineTime:       timelineTime,
-								TransferTime:       transferTime,
-								ToMapping:          toMapping,
-								FromMapping:        fromMapping,
-								InitiatedByMapping: initiatedByMapping,
-							},
-						}
+						for _, ownershipTime := range ownershipTimes {
+							brokenDown := []*UniversalPermissionDetails{
+								{
+									BadgeId:            badgeId,
+									TimelineTime:       timelineTime,
+									TransferTime:       transferTime,
+									OwnershipTime:      ownershipTime,
+									ToMapping:          toMapping,
+									FromMapping:        fromMapping,
+									InitiatedByMapping: initiatedByMapping,
+								},
+							}
 
-						_, remainingAfterHandledIsRemoed, _ := GetOverlapsAndNonOverlaps(brokenDown, handled)
-						for _, remaining := range remainingAfterHandledIsRemoed {
-							handled = append(handled, &UniversalPermissionDetails{
-								TimelineTime:       remaining.TimelineTime,
-								BadgeId:            remaining.BadgeId,
-								TransferTime:       remaining.TransferTime,
-								ToMapping:          remaining.ToMapping,
-								FromMapping:        remaining.FromMapping,
-								InitiatedByMapping: remaining.InitiatedByMapping,
+							_, remainingAfterHandledIsRemoed, _ := GetOverlapsAndNonOverlaps(brokenDown, handled)
+							for _, remaining := range remainingAfterHandledIsRemoed {
+								handled = append(handled, &UniversalPermissionDetails{
+									TimelineTime:       remaining.TimelineTime,
+									BadgeId:            remaining.BadgeId,
+									TransferTime:       remaining.TransferTime,
+									OwnershipTime:      remaining.OwnershipTime,
+									ToMapping:          remaining.ToMapping,
+									FromMapping:        remaining.FromMapping,
+									InitiatedByMapping: remaining.InitiatedByMapping,
 
-								//Appended for future lookups (not involved in overlap logic)
-								PermittedTimes: permittedTimes,
-								ForbiddenTimes: forbiddenTimes,
-								ArbitraryValue: arbitraryValue,
-							})
+									//Appended for future lookups (not involved in overlap logic)
+									PermittedTimes: permittedTimes,
+									ForbiddenTimes: forbiddenTimes,
+									ArbitraryValue: arbitraryValue,
+								})
+							}
 						}
 					}
 				}
@@ -360,6 +393,10 @@ func GetPermissionString(permission *UniversalPermissionDetails) string {
 
 	if permission.TransferTime.Start.Equal(sdkmath.NewUint(math.MaxUint64)) || permission.TransferTime.End.Equal(sdkmath.NewUint(math.MaxUint64)) {
 		str += "transferTime: " + permission.TransferTime.Start.String() + " "
+	}
+
+	if permission.OwnershipTime.Start.Equal(sdkmath.NewUint(math.MaxUint64)) || permission.OwnershipTime.End.Equal(sdkmath.NewUint(math.MaxUint64)) {
+		str += "ownershipTime: " + permission.OwnershipTime.Start.String() + " "
 	}
 
 	if permission.ToMapping != nil {

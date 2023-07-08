@@ -41,34 +41,34 @@ func GetAddressMapping(suite *TestSuite, ctx context.Context, mappingId string) 
 	return res.Mapping, nil
 }
 
-func GetNumUsedForChallenge(suite *TestSuite, ctx context.Context, challengeId string, level string, leafIndex sdkmath.Uint, collectionId sdkmath.Uint) (sdkmath.Uint, error) {
-	res, err := suite.app.BadgesKeeper.GetNumUsedForChallenge(ctx, &types.QueryGetNumUsedForChallengeRequest{
-		ChallengeId:  challengeId,
-		Level:        level,
-		LeafIndex:    leafIndex,
-		CollectionId: collectionId,
-	})
-	if err != nil {
-		return sdkmath.Uint{}, err
-	}
+// func GetNumUsedForChallenge(suite *TestSuite, ctx context.Context, challengeId string, level string, leafIndex sdkmath.Uint, collectionId sdkmath.Uint) (sdkmath.Uint, error) {
+// 	res, err := suite.app.BadgesKeeper.GetNumUsedForChallenge(ctx, &types.QueryGetNumUsedForChallengeRequest{
+// 		ChallengeId:  challengeId,
+// 		Level:        level,
+// 		LeafIndex:    leafIndex,
+// 		CollectionId: collectionId,
+// 	})
+// 	if err != nil {
+// 		return sdkmath.Uint{}, err
+// 	}
 
-	return res.NumUsed, nil
-}
+// 	return res.NumUsed, nil
+// }
 
-func GetApprovalsTracker(suite *TestSuite, ctx context.Context, collectionId sdkmath.Uint, address string, trackerId string, level string, depth string) (*types.ApprovalsTracker, error) {
-	res, err := suite.app.BadgesKeeper.GetApprovalsTracker(ctx, &types.QueryGetApprovalsTrackerRequest{
-		CollectionId: sdkmath.Uint(collectionId),
-		Address:      address,
-		TrackerId:    trackerId,
-		Level:        level,
-		Depth:        depth,
-	})
-	if err != nil {
-		return &types.ApprovalsTracker{}, err
-	}
+// func GetApprovalsTracker(suite *TestSuite, ctx context.Context, collectionId sdkmath.Uint, address string, approvalId string, level string, depth string) (*types.ApprovalsTracker, error) {
+// 	res, err := suite.app.BadgesKeeper.GetApprovalsTracker(ctx, &types.QueryGetApprovalsTrackerRequest{
+// 		CollectionId: sdkmath.Uint(collectionId),
+// 		Address:      address,
+// 		ApprovalId:    approvalId,
+// 		Level:        level,
+// 		Depth:        depth,
+// 	})
+// 	if err != nil {
+// 		return &types.ApprovalsTracker{}, err
+// 	}
 
-	return res.Tracker, nil
-}
+// 	return res.Tracker, nil
+// }
 
 // /* Msg helpers */
 

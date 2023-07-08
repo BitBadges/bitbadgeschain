@@ -30,6 +30,7 @@ func CastOutgoingTransferToCollectionTransfer(transfer *UserApprovedOutgoingTran
 		InitiatedByMappingId:             transfer.InitiatedByMappingId,
 		TransferTimes:                    transfer.TransferTimes,
 		BadgeIds:                         transfer.BadgeIds,
+		OwnershipTimes: 								  transfer.OwnershipTimes,
 		AllowedCombinations:              allowedCombinations,
 		PerAddressApprovals:              transfer.PerAddressApprovals,
 		IncrementBadgeIdsBy:              transfer.IncrementBadgeIdsBy,
@@ -37,7 +38,7 @@ func CastOutgoingTransferToCollectionTransfer(transfer *UserApprovedOutgoingTran
 		RequireToEqualsInitiatedBy:       transfer.RequireToEqualsInitiatedBy,
 		RequireToDoesNotEqualInitiatedBy: transfer.RequireToDoesNotEqualInitiatedBy,
 		CustomData:                       transfer.CustomData,
-		TrackerId:                        transfer.TrackerId,
+		ApprovalId:                        transfer.ApprovalId,
 	}
 }
 
@@ -52,6 +53,7 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApprovedTr
 		InitiatedByMappingId:             transfer.InitiatedByMappingId,
 		TransferTimes:                    transfer.TransferTimes,
 		BadgeIds:                         transfer.BadgeIds,
+		OwnershipTimes: 								  transfer.OwnershipTimes,
 		AllowedCombinations:              allowedCombinations,
 		PerAddressApprovals:              transfer.PerAddressApprovals,
 		IncrementBadgeIdsBy:              transfer.IncrementBadgeIdsBy,
@@ -59,7 +61,7 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApprovedTr
 		RequireToEqualsInitiatedBy:       transfer.RequireToEqualsInitiatedBy,
 		RequireToDoesNotEqualInitiatedBy: transfer.RequireToDoesNotEqualInitiatedBy,
 		CustomData:                       transfer.CustomData,
-		TrackerId:                        transfer.TrackerId,
+		ApprovalId:                        transfer.ApprovalId,
 	}
 }
 
@@ -70,6 +72,7 @@ func CastOutgoingCombinationToCollectionCombination(combination *IsUserOutgoingT
 		InvertTransferTimes: combination.InvertTransferTimes,
 		InvertTo:            combination.InvertTo,
 		InvertInitiatedBy:   combination.InvertInitiatedBy,
+		InvertOwnershipTimes: combination.InvertOwnershipTimes,
 	}
 }
 
@@ -80,6 +83,7 @@ func CastFromCollectionCombinationToOutgoingCombination(combination *IsCollectio
 		InvertTransferTimes: combination.InvertTransferTimes,
 		InvertTo:            combination.InvertTo,
 		InvertInitiatedBy:   combination.InvertInitiatedBy,
+		InvertOwnershipTimes: combination.InvertOwnershipTimes,
 	}
 }
 
@@ -95,6 +99,7 @@ func CastIncomingTransferToCollectionTransfer(transfer *UserApprovedIncomingTran
 		InitiatedByMappingId:               transfer.InitiatedByMappingId,
 		TransferTimes:                      transfer.TransferTimes,
 		BadgeIds:                           transfer.BadgeIds,
+		OwnershipTimes: 								  	transfer.OwnershipTimes,
 		AllowedCombinations:                allowedCombinations,
 		PerAddressApprovals:                transfer.PerAddressApprovals,
 		IncrementBadgeIdsBy:                transfer.IncrementBadgeIdsBy,
@@ -102,7 +107,7 @@ func CastIncomingTransferToCollectionTransfer(transfer *UserApprovedIncomingTran
 		RequireFromEqualsInitiatedBy:       transfer.RequireFromEqualsInitiatedBy,
 		RequireFromDoesNotEqualInitiatedBy: transfer.RequireFromDoesNotEqualInitiatedBy,
 		CustomData:                         transfer.CustomData,
-		TrackerId:                          transfer.TrackerId,
+		ApprovalId:                          transfer.ApprovalId,
 	}
 }
 
@@ -117,6 +122,7 @@ func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApprovedTr
 		InitiatedByMappingId:               transfer.InitiatedByMappingId,
 		TransferTimes:                      transfer.TransferTimes,
 		BadgeIds:                           transfer.BadgeIds,
+		OwnershipTimes: 								  	transfer.OwnershipTimes,
 		AllowedCombinations:                allowedCombinations,
 		PerAddressApprovals:                transfer.PerAddressApprovals,
 		IncrementBadgeIdsBy:                transfer.IncrementBadgeIdsBy,
@@ -124,7 +130,7 @@ func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApprovedTr
 		RequireFromEqualsInitiatedBy:       transfer.RequireFromEqualsInitiatedBy,
 		RequireFromDoesNotEqualInitiatedBy: transfer.RequireFromDoesNotEqualInitiatedBy,
 		CustomData:                         transfer.CustomData,
-		TrackerId:                          transfer.TrackerId,
+		ApprovalId:                          transfer.ApprovalId,
 	}
 }
 
@@ -135,6 +141,7 @@ func CastIncomingCombinationToCollectionCombination(combination *IsUserIncomingT
 		InvertTransferTimes: combination.InvertTransferTimes,
 		InvertTo:            combination.InvertFrom,
 		InvertInitiatedBy:   combination.InvertInitiatedBy,
+		InvertOwnershipTimes: combination.InvertOwnershipTimes,
 	}
 }
 
@@ -145,5 +152,6 @@ func CastFromCollectionCombinationToIncomingCombination(combination *IsCollectio
 		InvertTransferTimes: combination.InvertTransferTimes,
 		InvertFrom:          combination.InvertTo,
 		InvertInitiatedBy:   combination.InvertInitiatedBy,
+		InvertOwnershipTimes: combination.InvertOwnershipTimes,
 	}
 }

@@ -243,7 +243,7 @@ export interface BadgesCollectionApprovedTransfer {
   badgeIds?: BadgesUintRange[];
   allowedCombinations?: BadgesIsCollectionTransferAllowed[];
   challenges?: BadgesChallenge[];
-  trackerId?: string;
+  approvalId?: string;
   incrementBadgeIdsBy?: string;
   incrementOwnershipTimesBy?: string;
   overallApprovals?: BadgesApprovalsTracker;
@@ -672,7 +672,7 @@ export interface BadgesUserApprovedIncomingTransfer {
   badgeIds?: BadgesUintRange[];
   allowedCombinations?: BadgesIsUserIncomingTransferAllowed[];
   challenges?: BadgesChallenge[];
-  trackerId?: string;
+  approvalId?: string;
   incrementBadgeIdsBy?: string;
   incrementOwnershipTimesBy?: string;
 
@@ -742,7 +742,7 @@ export interface BadgesUserApprovedOutgoingTransfer {
   badgeIds?: BadgesUintRange[];
   allowedCombinations?: BadgesIsUserOutgoingTransferAllowed[];
   challenges?: BadgesChallenge[];
-  trackerId?: string;
+  approvalId?: string;
   incrementBadgeIdsBy?: string;
   incrementOwnershipTimesBy?: string;
 
@@ -1052,8 +1052,8 @@ export class HttpClient<SecurityDataType = unknown> {
         property instanceof Blob
           ? property
           : typeof property === "object" && property !== null
-          ? JSON.stringify(property)
-          : `${property}`,
+            ? JSON.stringify(property)
+            : `${property}`,
       );
       return formData;
     }, new FormData());
@@ -1123,16 +1123,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    *
    * @tags Query
    * @name QueryGetApprovalsTracker
-   * @request GET:/bitbadges/bitbadgeschain/badges/get_approvals_tracker/{trackerId}/{level}
+   * @request GET:/bitbadges/bitbadgeschain/badges/get_approvals_tracker/{approvalId}/{level}
    */
   queryGetApprovalsTracker = (
-    trackerId: string,
+    approvalId: string,
     level: string,
     query?: { depth?: string; address?: string; collectionId?: string },
     params: RequestParams = {},
   ) =>
     this.request<BadgesQueryGetApprovalsTrackerResponse, RpcStatus>({
-      path: `/bitbadges/bitbadgeschain/badges/get_approvals_tracker/${trackerId}/${level}`,
+      path: `/bitbadges/bitbadgeschain/badges/get_approvals_tracker/${approvalId}/${level}`,
       method: "GET",
       query: query,
       format: "json",

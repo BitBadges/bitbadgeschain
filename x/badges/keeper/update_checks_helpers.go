@@ -101,7 +101,7 @@ func (k Keeper) ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, colle
 					newVal.RequireFromDoesNotEqualInitiatedBy != oldVal.RequireFromDoesNotEqualInitiatedBy ||
 					newVal.OverridesFromApprovedOutgoingTransfers != oldVal.OverridesFromApprovedOutgoingTransfers ||
 					newVal.OverridesToApprovedIncomingTransfers != oldVal.OverridesToApprovedIncomingTransfers ||
-					newVal.TrackerId != oldVal.TrackerId ||
+					newVal.ApprovalId != oldVal.ApprovalId ||
 					newVal.Uri != oldVal.Uri ||
 					newVal.CustomData != oldVal.CustomData {
 					different = true
@@ -207,7 +207,7 @@ func (k Keeper) ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, _ol
 
 				if newVal.RequireToEqualsInitiatedBy != oldVal.RequireToEqualsInitiatedBy ||
 					newVal.RequireToDoesNotEqualInitiatedBy != oldVal.RequireToDoesNotEqualInitiatedBy ||
-					newVal.TrackerId != oldVal.TrackerId ||
+					newVal.ApprovalId != oldVal.ApprovalId ||
 					newVal.Uri != oldVal.Uri ||
 					newVal.CustomData != oldVal.CustomData {
 					different = true
@@ -306,7 +306,7 @@ func (k Keeper) ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, _ol
 
 				if newVal.RequireFromDoesNotEqualInitiatedBy != oldVal.RequireFromDoesNotEqualInitiatedBy ||
 					newVal.RequireFromEqualsInitiatedBy != oldVal.RequireFromEqualsInitiatedBy ||
-					newVal.TrackerId != oldVal.TrackerId ||
+					newVal.ApprovalId != oldVal.ApprovalId ||
 					newVal.Uri != oldVal.Uri ||
 					newVal.CustomData != oldVal.CustomData {
 					different = true

@@ -161,10 +161,6 @@ func local_request_Query_GetAddressMapping_0(ctx context.Context, marshaler runt
 
 }
 
-var (
-	filter_Query_GetApprovalsTracker_0 = &utilities.DoubleArray{Encoding: map[string]int{"trackerId": 0, "level": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
-)
-
 func request_Query_GetApprovalsTracker_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetApprovalsTrackerRequest
 	var metadata runtime.ServerMetadata
@@ -176,33 +172,60 @@ func request_Query_GetApprovalsTracker_0(ctx context.Context, marshaler runtime.
 		_   = err
 	)
 
-	val, ok = pathParams["trackerId"]
+	val, ok = pathParams["collectionId"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trackerId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.TrackerId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = NewUintFromString(str)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trackerId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
 	}
 
-	val, ok = pathParams["level"]
+	val, ok = pathParams["timelineType"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "level")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "timelineType")
 	}
 
-	protoReq.Level, err = runtime.String(val)
+	protoReq.TimelineType, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "level", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "timelineType", err)
 	}
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	val, ok = pathParams["address"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_GetApprovalsTracker_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+
+	protoReq.Address, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
+	}
+
+	val, ok = pathParams["approvalId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approvalId")
+	}
+
+	protoReq.ApprovalId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvalId", err)
+	}
+
+	val, ok = pathParams["trackerType"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trackerType")
+	}
+
+	protoReq.TrackerType, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trackerType", err)
 	}
 
 	msg, err := client.GetApprovalsTracker(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -221,43 +244,66 @@ func local_request_Query_GetApprovalsTracker_0(ctx context.Context, marshaler ru
 		_   = err
 	)
 
-	val, ok = pathParams["trackerId"]
+	val, ok = pathParams["collectionId"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trackerId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.TrackerId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = NewUintFromString(str)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trackerId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
 	}
 
-	val, ok = pathParams["level"]
+	val, ok = pathParams["timelineType"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "level")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "timelineType")
 	}
 
-	protoReq.Level, err = runtime.String(val)
+	protoReq.TimelineType, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "level", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "timelineType", err)
 	}
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	val, ok = pathParams["address"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_GetApprovalsTracker_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+
+	protoReq.Address, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
+	}
+
+	val, ok = pathParams["approvalId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approvalId")
+	}
+
+	protoReq.ApprovalId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvalId", err)
+	}
+
+	val, ok = pathParams["trackerType"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trackerType")
+	}
+
+	protoReq.TrackerType, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trackerType", err)
 	}
 
 	msg, err := server.GetApprovalsTracker(ctx, &protoReq)
 	return msg, metadata, err
 
 }
-
-var (
-	filter_Query_GetNumUsedForChallenge_0 = &utilities.DoubleArray{Encoding: map[string]int{"challengeId": 0, "level": 1, "leafIndex": 2}, Base: []int{1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 1, 1, 2, 3, 4}}
-)
 
 func request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetNumUsedForChallengeRequest
@@ -270,26 +316,61 @@ func request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler runti
 		_   = err
 	)
 
-	val, ok = pathParams["challengeId"]
+	val, ok = pathParams["collectionId"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "challengeId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.ChallengeId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = NewUintFromString(str)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "challengeId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
 	}
 
-	val, ok = pathParams["level"]
+	val, ok = pathParams["timelineType"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "level")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "timelineType")
 	}
 
-	protoReq.Level, err = runtime.String(val)
+	protoReq.TimelineType, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "level", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "timelineType", err)
+	}
+
+	val, ok = pathParams["address"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
+	}
+
+	protoReq.Address, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
+	}
+
+	val, ok = pathParams["approvalId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approvalId")
+	}
+
+	protoReq.ApprovalId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvalId", err)
+	}
+
+	val, ok = pathParams["challengeIdx"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "challengeIdx")
+	}
+
+	str, err = runtime.String(val)
+	protoReq.ChallengeIdx = NewUintFromString(str)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "challengeIdx", err)
 	}
 
 	val, ok = pathParams["leafIndex"]
@@ -297,18 +378,11 @@ func request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "leafIndex")
 	}
 
-	str, err := runtime.String(val)
+	str, err = runtime.String(val)
 	protoReq.LeafIndex = NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "leafIndex", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_GetNumUsedForChallenge_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.GetNumUsedForChallenge(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -327,26 +401,61 @@ func local_request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler
 		_   = err
 	)
 
-	val, ok = pathParams["challengeId"]
+	val, ok = pathParams["collectionId"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "challengeId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.ChallengeId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = NewUintFromString(str)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "challengeId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
 	}
 
-	val, ok = pathParams["level"]
+	val, ok = pathParams["timelineType"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "level")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "timelineType")
 	}
 
-	protoReq.Level, err = runtime.String(val)
+	protoReq.TimelineType, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "level", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "timelineType", err)
+	}
+
+	val, ok = pathParams["address"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
+	}
+
+	protoReq.Address, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
+	}
+
+	val, ok = pathParams["approvalId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approvalId")
+	}
+
+	protoReq.ApprovalId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvalId", err)
+	}
+
+	val, ok = pathParams["challengeIdx"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "challengeIdx")
+	}
+
+	str, err = runtime.String(val)
+	protoReq.ChallengeIdx = NewUintFromString(str)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "challengeIdx", err)
 	}
 
 	val, ok = pathParams["leafIndex"]
@@ -354,18 +463,11 @@ func local_request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "leafIndex")
 	}
 
-	str, err := runtime.String(val)
+	str, err = runtime.String(val)
 	protoReq.LeafIndex = NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "leafIndex", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_GetNumUsedForChallenge_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.GetNumUsedForChallenge(ctx, &protoReq)
@@ -766,13 +868,11 @@ var (
 
 	pattern_Query_GetAddressMapping_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"bitbadges", "bitbadgeschain", "badges", "get_address_mapping", "mappingId"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetApprovalsTracker_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"bitbadges", "bitbadgeschain", "badges", "get_approvals_tracker", "trackerId", "level"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetApprovalsTracker_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"bitbadges", "bitbadgeschain", "badges", "get_approvals_tracker", "collectionId", "timelineType", "address", "approvalId", "trackerType"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetNumUsedForChallenge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"bitbadges", "bitbadgeschain", "badges", "get_num_used_for_challenge", "challengeId", "level", "leafIndex"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetNumUsedForChallenge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"bitbadges", "bitbadgeschain", "badges", "get_num_used_for_challenge", "collectionId", "timelineType", "address", "approvalId", "challengeIdx", "leafIndex"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_GetBalance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"bitbadges", "bitbadgeschain", "badges", "get_balance", "collectionId", "address"}, "", runtime.AssumeColonVerbOpt(true)))
-
-	pattern_Query_GetAddressById_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"bitbadges", "bitbadgeschain", "badges", "get_address_by_id", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -787,6 +887,4 @@ var (
 	forward_Query_GetNumUsedForChallenge_0 = runtime.ForwardResponseMessage
 
 	forward_Query_GetBalance_0 = runtime.ForwardResponseMessage
-
-	forward_Query_GetAddressById_0 = runtime.ForwardResponseMessage
 )

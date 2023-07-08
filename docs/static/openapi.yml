@@ -233,7 +233,7 @@ paths:
           type: string
       tags:
         - Query
-  /bitbadges/bitbadgeschain/badges/get_approvals_tracker/{trackerId}/{level}:
+  /bitbadges/bitbadgeschain/badges/get_approvals_tracker/{approvalId}/{level}:
     get:
       operationId: BitbadgesBitbadgeschainBadgesGetApprovalsTracker
       responses:
@@ -492,7 +492,7 @@ paths:
                           "value": "1.212s"
                         }
       parameters:
-        - name: trackerId
+        - name: approvalId
           in: path
           required: true
           type: string
@@ -722,7 +722,7 @@ paths:
                                     It is highly recommended to avoid updating a
                                     challenge without resetting the tally via a
                                     new challenge ID.
-                              trackerId:
+                              approvalId:
                                 type: string
                               incrementBadgeIdsBy:
                                 type: string
@@ -1105,7 +1105,7 @@ paths:
                                     It is highly recommended to avoid updating a
                                     challenge without resetting the tally via a
                                     new challenge ID.
-                              trackerId:
+                              approvalId:
                                 type: string
                               incrementBadgeIdsBy:
                                 type: string
@@ -4357,7 +4357,7 @@ paths:
                                     It is highly recommended to avoid updating a
                                     challenge without resetting the tally via a
                                     new challenge ID.
-                              trackerId:
+                              approvalId:
                                 type: string
                               incrementBadgeIdsBy:
                                 type: string
@@ -4920,7 +4920,7 @@ paths:
                                     It is highly recommended to avoid updating a
                                     challenge without resetting the tally via a
                                     new challenge ID.
-                              trackerId:
+                              approvalId:
                                 type: string
                               incrementBadgeIdsBy:
                                 type: string
@@ -5309,7 +5309,7 @@ paths:
                                     It is highly recommended to avoid updating a
                                     challenge without resetting the tally via a
                                     new challenge ID.
-                              trackerId:
+                              approvalId:
                                 type: string
                               incrementBadgeIdsBy:
                                 type: string
@@ -54591,7 +54591,7 @@ definitions:
 
                         It is highly recommended to avoid updating a challenge
                         without resetting the tally via a new challenge ID.
-                  trackerId:
+                  approvalId:
                     type: string
                   incrementBadgeIdsBy:
                     type: string
@@ -55138,7 +55138,7 @@ definitions:
 
                         It is highly recommended to avoid updating a challenge
                         without resetting the tally via a new challenge ID.
-                  trackerId:
+                  approvalId:
                     type: string
                   incrementBadgeIdsBy:
                     type: string
@@ -55517,7 +55517,7 @@ definitions:
 
                         It is highly recommended to avoid updating a challenge
                         without resetting the tally via a new challenge ID.
-                  trackerId:
+                  approvalId:
                     type: string
                   incrementBadgeIdsBy:
                     type: string
@@ -56426,7 +56426,7 @@ definitions:
 
             It is highly recommended to avoid updating a challenge without
             resetting the tally via a new challenge ID.
-      trackerId:
+      approvalId:
         type: string
       incrementBadgeIdsBy:
         type: string
@@ -57283,7 +57283,7 @@ definitions:
 
                   It is highly recommended to avoid updating a challenge without
                   resetting the tally via a new challenge ID.
-            trackerId:
+            approvalId:
               type: string
             incrementBadgeIdsBy:
               type: string
@@ -60125,7 +60125,7 @@ definitions:
                             It is highly recommended to avoid updating a
                             challenge without resetting the tally via a new
                             challenge ID.
-                      trackerId:
+                      approvalId:
                         type: string
                       incrementBadgeIdsBy:
                         type: string
@@ -60504,7 +60504,7 @@ definitions:
                             It is highly recommended to avoid updating a
                             challenge without resetting the tally via a new
                             challenge ID.
-                      trackerId:
+                      approvalId:
                         type: string
                       incrementBadgeIdsBy:
                         type: string
@@ -63474,7 +63474,7 @@ definitions:
                             It is highly recommended to avoid updating a
                             challenge without resetting the tally via a new
                             challenge ID.
-                      trackerId:
+                      approvalId:
                         type: string
                       incrementBadgeIdsBy:
                         type: string
@@ -64030,7 +64030,7 @@ definitions:
                             It is highly recommended to avoid updating a
                             challenge without resetting the tally via a new
                             challenge ID.
-                      trackerId:
+                      approvalId:
                         type: string
                       incrementBadgeIdsBy:
                         type: string
@@ -64415,7 +64415,7 @@ definitions:
                             It is highly recommended to avoid updating a
                             challenge without resetting the tally via a new
                             challenge ID.
-                      trackerId:
+                      approvalId:
                         type: string
                       incrementBadgeIdsBy:
                         type: string
@@ -65449,7 +65449,7 @@ definitions:
 
             It is highly recommended to avoid updating a challenge without
             resetting the tally via a new challenge ID.
-      trackerId:
+      approvalId:
         type: string
       incrementBadgeIdsBy:
         type: string
@@ -66176,7 +66176,7 @@ definitions:
 
                   It is highly recommended to avoid updating a challenge without
                   resetting the tally via a new challenge ID.
-            trackerId:
+            approvalId:
               type: string
             incrementBadgeIdsBy:
               type: string
@@ -66529,7 +66529,7 @@ definitions:
 
             It is highly recommended to avoid updating a challenge without
             resetting the tally via a new challenge ID.
-      trackerId:
+      approvalId:
         type: string
       incrementBadgeIdsBy:
         type: string
@@ -67257,7 +67257,7 @@ definitions:
 
                   It is highly recommended to avoid updating a challenge without
                   resetting the tally via a new challenge ID.
-            trackerId:
+            approvalId:
               type: string
             incrementBadgeIdsBy:
               type: string
@@ -67681,7 +67681,7 @@ definitions:
 
                         It is highly recommended to avoid updating a challenge
                         without resetting the tally via a new challenge ID.
-                  trackerId:
+                  approvalId:
                     type: string
                   incrementBadgeIdsBy:
                     type: string
@@ -68055,7 +68055,7 @@ definitions:
 
                         It is highly recommended to avoid updating a challenge
                         without resetting the tally via a new challenge ID.
-                  trackerId:
+                  approvalId:
                     type: string
                   incrementBadgeIdsBy:
                     type: string

@@ -62,7 +62,6 @@ message Challenge {
   bool useCreatorAddressAsLeaf = 3;
   bool maxOneUsePerLeaf = 4;
   bool useLeafIndexForDistributionOrder = 5;
-  string challengeId = 6;
 }
 
 //PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address.
@@ -77,7 +76,8 @@ message IsUserOutgoingTransferAllowed {
   bool invertInitiatedBy = 3;
   bool invertTransferTimes = 4;
   bool invertBadgeIds = 5;
-  bool isAllowed = 6;
+  bool invertOwnershipTimes = 6;
+  bool isAllowed = 7;
 }
 
 message IsUserIncomingTransferAllowed {
@@ -85,7 +85,8 @@ message IsUserIncomingTransferAllowed {
   bool invertInitiatedBy = 3;
   bool invertTransferTimes = 4;
   bool invertBadgeIds = 5;
-  bool isAllowed = 6;
+  bool invertOwnershipTimes = 6;
+  bool isAllowed = 7;
 }
 
 // UserApprovedOutgoingTransfer defines the rules for the approval of an outgoing transfer from a user.
@@ -95,11 +96,13 @@ message UserApprovedOutgoingTransfer {
   string initiatedByMappingId = 2;
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
+  repeated UintRange ownershipTimes = 16;
+
   repeated IsUserOutgoingTransferAllowed allowedCombinations = 5;
 
   repeated Challenge challenges = 6;
 
-  string trackerId = 7;
+  string approvalId = 7;
 
   string incrementBadgeIdsBy = 8 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   string incrementOwnershipTimesBy = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
@@ -120,11 +123,12 @@ message UserApprovedIncomingTransfer {
   string initiatedByMappingId = 2;
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
+  repeated UintRange ownershipTimes = 16;
   repeated IsUserIncomingTransferAllowed allowedCombinations = 5;
 
   repeated Challenge challenges = 6;
 
-  string trackerId = 7;
+  string approvalId = 7;
 
   string incrementBadgeIdsBy = 8 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   string incrementOwnershipTimesBy = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
@@ -144,7 +148,8 @@ message IsCollectionTransferAllowed {
   bool invertInitiatedBy = 3;
   bool invertTransferTimes = 4;
   bool invertBadgeIds = 5;
-  bool isAllowed = 6;
+  bool invertOwnershipTimes = 6;
+  bool isAllowed = 7;
 }
 
 // CollectionApprovedTransfer defines the rules for the approval of a transfer.
@@ -185,23 +190,27 @@ message IsCollectionTransferAllowed {
 // If these are set to false, the transfer must also be approved by the from /to user's approved outgoing / incoming transfers, respectively.
 
 message CollectionApprovedTransfer {
-  string fromMappingId = 1;
-  string toMappingId = 2;
-  string initiatedByMappingId = 3;
-  repeated UintRange transferTimes = 4;
-  repeated UintRange badgeIds = 5;
+  string approvalId = 1;
+
+  //Criteria 
+  string fromMappingId = 2;
+  string toMappingId = 3;
+  string initiatedByMappingId = 4;
+  repeated UintRange transferTimes = 5;
+  repeated UintRange badgeIds = 6;
+  repeated UintRange ownershipTimes = 7;
   
-  repeated IsCollectionTransferAllowed allowedCombinations = 6;
+  repeated IsCollectionTransferAllowed allowedCombinations = 8;
 
-  repeated Challenge challenges = 7;
+  //Restrictions (Challenges, Amounts, and MaxNumTransfers)
+  repeated Challenge challenges = 9;
 
-  string trackerId = 8;
+  string incrementBadgeIdsBy = 10 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string incrementOwnershipTimesBy = 11 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
-  string incrementBadgeIdsBy = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string incrementOwnershipTimesBy = 10 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-
-  ApprovalsTracker overallApprovals = 11;
-  PerAddressApprovals perAddressApprovals = 12;
+  ApprovalsTracker overallApprovals = 12;
+  PerAddressApprovals perAddressApprovals = 13;
+  
 
   bool overridesFromApprovedOutgoingTransfers = 15;
   bool overridesToApprovedIncomingTransfers = 16;
@@ -224,11 +233,12 @@ message Transfer {
   string from = 1;
   repeated string toAddresses = 2;
   repeated Balance balances = 3;
+  bool transferAsMuchAsPossible = 4;
 
   //Note here we remain optimistic that the solutions will apply to all potential challenges.
   //It is the Tx Sender's responsibility to ensure that the solutions are valid for all potential challenges.
   //If you are attempting to claim badges with different sets of challenges, you will need to make multiple transfers.
-  repeated ChallengeSolution solutions = 4;
+  repeated ChallengeSolution solutions = 5;
 }
 
 message ClaimProofItem {

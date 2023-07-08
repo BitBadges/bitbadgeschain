@@ -221,11 +221,15 @@ func ValidateCollectionApprovedTransfer(collectionApprovedTransfer *CollectionAp
 		return sdkerrors.Wrapf(err, "invalid transfer times")
 	}
 
+	if err := ValidateRangesAreValid(collectionApprovedTransfer.OwnershipTimes, true); err != nil {
+		return sdkerrors.Wrapf(err, "invalid transfer times")
+	}
+
 	if err := ValidateChallenges(collectionApprovedTransfer.Challenges); err != nil {
 		return sdkerrors.Wrapf(err, "invalid challenges")
 	}
 
-	if collectionApprovedTransfer.TrackerId == "" &&
+	if collectionApprovedTransfer.ApprovalId == "" &&
 		(collectionApprovedTransfer.OverallApprovals == nil || collectionApprovedTransfer.PerAddressApprovals == nil) {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "tracker id is uninitialized")
 	}
@@ -260,6 +264,7 @@ func ValidateCollectionApprovedTransfer(collectionApprovedTransfer *CollectionAp
 		for _, compCombination := range collectionApprovedTransfer.AllowedCombinations[idx+1:] {
 			if allowedCombination.InvertBadgeIds == compCombination.InvertBadgeIds &&
 				allowedCombination.InvertTransferTimes == compCombination.InvertTransferTimes &&
+				allowedCombination.InvertOwnershipTimes == compCombination.InvertOwnershipTimes &&
 				allowedCombination.InvertTo == compCombination.InvertTo &&
 				allowedCombination.InvertFrom == compCombination.InvertFrom &&
 				allowedCombination.InvertInitiatedBy == compCombination.InvertInitiatedBy {
@@ -306,10 +311,6 @@ func ValidateChallenges(challenges []*Challenge) error {
 
 		if !challenge.MaxOneUsePerLeaf && !challenge.UseCreatorAddressAsLeaf {
 			return ErrCanOnlyUseMaxOneUsePerLeafWithWhitelistTree
-		}
-
-		if challenge.ChallengeId == "" {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "challenge id is uninitialized")
 		}
 	}
 

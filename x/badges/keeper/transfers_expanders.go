@@ -17,6 +17,11 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 				badgeIds = types.InvertUintRanges(badgeIds, sdkmath.NewUint(math.MaxUint64))
 			}
 
+			ownershipTimes := approvedTransfer.OwnershipTimes
+			if allowedCombination.InvertOwnershipTimes {
+				ownershipTimes = types.InvertUintRanges(ownershipTimes, sdkmath.NewUint(math.MaxUint64))
+			}
+
 			times := approvedTransfer.TransferTimes
 			if allowedCombination.InvertTransferTimes {
 				times = types.InvertUintRanges(times, sdkmath.NewUint(math.MaxUint64))
@@ -43,6 +48,7 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 				InitiatedByMappingId: initiatedByMappingId,
 				TransferTimes:        times,
 				BadgeIds:             badgeIds,
+				OwnershipTimes: 		 	ownershipTimes,
 				AllowedCombinations: []*types.IsCollectionTransferAllowed{
 					{
 						IsAllowed: allowedCombination.IsAllowed,
@@ -60,7 +66,7 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 				OverridesToApprovedIncomingTransfers:   approvedTransfer.OverridesToApprovedIncomingTransfers,
 				CustomData:                             approvedTransfer.CustomData,
 				Uri:                                    approvedTransfer.Uri,
-				TrackerId:                              approvedTransfer.TrackerId,
+				ApprovalId:                              approvedTransfer.ApprovalId,
 				Challenges:                             approvedTransfer.Challenges,
 			})
 		}
@@ -75,6 +81,12 @@ func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomin
 		FromMappingId:        "All", //everyone
 		InitiatedByMappingId: userAddress,
 		TransferTimes: []*types.UintRange{
+			{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(uint64(math.MaxUint64)),
+			},
+		},
+		OwnershipTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(uint64(math.MaxUint64)),
@@ -102,6 +114,12 @@ func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoin
 		ToMappingId:          "All", //everyone
 		InitiatedByMappingId: userAddress,
 		TransferTimes: []*types.UintRange{
+			{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(uint64(math.MaxUint64)),
+			},
+		},
+		OwnershipTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(uint64(math.MaxUint64)),

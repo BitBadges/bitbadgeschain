@@ -81,6 +81,7 @@ message CollectionApprovedTransferCombination {
   ValueOptions initiatedByMappingOptions = 4;
   ValueOptions transferTimesOptions = 5;
   ValueOptions badgeIdsOptions = 6;
+  ValueOptions ownershipTimesOptions = 9;
 
   ValueOptions permittedTimesOptions = 7;
   ValueOptions forbiddenTimesOptions = 8;
@@ -94,6 +95,7 @@ message CollectionApprovedTransferDefaultValues {
   string initiatedByMappingId = 4;
   repeated UintRange transferTimes = 5;
   repeated UintRange badgeIds = 6;
+  repeated UintRange ownershipTimes = 9;
 
   repeated UintRange permittedTimes = 7;
   repeated UintRange forbiddenTimes = 8;
@@ -127,9 +129,10 @@ message UserApprovedOutgoingTransferCombination {
   ValueOptions initiatedByMappingOptions = 3;
   ValueOptions transferTimesOptions = 4;
   ValueOptions badgeIdsOptions = 5;
+  ValueOptions ownershipTimesOptions = 6;
 
-  ValueOptions permittedTimesOptions = 6;
-  ValueOptions forbiddenTimesOptions = 7;
+  ValueOptions permittedTimesOptions = 7;
+  ValueOptions forbiddenTimesOptions = 8;
 }
 
 message UserApprovedOutgoingTransferDefaultValues {
@@ -139,6 +142,7 @@ message UserApprovedOutgoingTransferDefaultValues {
   string initiatedByMappingId = 3;
   repeated UintRange transferTimes = 4;
   repeated UintRange badgeIds = 5;
+  repeated UintRange ownershipTimes = 6;
 
   repeated UintRange permittedTimes = 7;
   repeated UintRange forbiddenTimes = 8;
@@ -158,9 +162,11 @@ message UserApprovedIncomingTransferCombination {
   ValueOptions initiatedByMappingOptions = 3;
   ValueOptions transferTimesOptions = 4;
   ValueOptions badgeIdsOptions = 5;
+  ValueOptions ownershipTimesOptions = 6;
 
-  ValueOptions permittedTimesOptions = 6;
-  ValueOptions forbiddenTimesOptions = 7;
+
+  ValueOptions permittedTimesOptions = 7;
+  ValueOptions forbiddenTimesOptions = 8;
 }
 
 message UserApprovedIncomingTransferDefaultValues {
@@ -170,6 +176,7 @@ message UserApprovedIncomingTransferDefaultValues {
   string initiatedByMappingId = 3;
   repeated UintRange transferTimes = 4;
   repeated UintRange badgeIds = 5;
+  repeated UintRange ownershipTimes = 6;
 
   repeated UintRange permittedTimes = 7;
   repeated UintRange forbiddenTimes = 8;

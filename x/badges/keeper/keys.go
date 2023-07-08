@@ -46,9 +46,9 @@ func ConstructAddressMappingKey(addressMappingId string) string {
 	return addressMappingId
 }
 
-func ConstructApprovalsTrackerKey(collectionId sdkmath.Uint, trackerId string, level string, depth string, address string) string {
+func ConstructApprovalsTrackerKey(collectionId sdkmath.Uint, approvalId string, level string, depth string, address string) string {
 	collection_id_str := collectionId.String()
-	tracker_id_str := trackerId
+	tracker_id_str := approvalId
 	return collection_id_str + BalanceKeyDelimiter + tracker_id_str + BalanceKeyDelimiter + level + BalanceKeyDelimiter + depth + BalanceKeyDelimiter + address
 }
 

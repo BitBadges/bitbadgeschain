@@ -43,6 +43,11 @@ func ValidateCollectionApprovedTransferPermissions(permissions []*CollectionAppr
 		if err != nil {
 			return err
 		}
+		
+		err = ValidateRangesAreValid(permission.DefaultValues.OwnershipTimes, false)
+		if err != nil {
+			return err
+		}
 
 		err = ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false)
 		if err != nil {
@@ -51,6 +56,7 @@ func ValidateCollectionApprovedTransferPermissions(permissions []*CollectionAppr
 
 		permission.DefaultValues.TimelineTimes = SortAndMergeOverlapping(permission.DefaultValues.TimelineTimes)
 		permission.DefaultValues.TransferTimes = SortAndMergeOverlapping(permission.DefaultValues.TransferTimes)
+		permission.DefaultValues.OwnershipTimes = SortAndMergeOverlapping(permission.DefaultValues.OwnershipTimes)
 		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
 
 		//Assert no two combinations are the same
@@ -58,6 +64,7 @@ func ValidateCollectionApprovedTransferPermissions(permissions []*CollectionAppr
 			for _, combination2 := range permission.Combinations[idx+1:] {
 				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
 					combination.TransferTimesOptions == combination2.TransferTimesOptions &&
+					combination.OwnershipTimesOptions == combination2.OwnershipTimesOptions &&
 					combination.ToMappingOptions == combination2.ToMappingOptions &&
 					combination.FromMappingOptions == combination2.FromMappingOptions &&
 					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
@@ -106,6 +113,12 @@ func ValidateUserApprovedOutgoingTransferPermissions(permissions []*UserApproved
 			return err
 		}
 
+		err = ValidateRangesAreValid(permission.DefaultValues.OwnershipTimes, false)
+		if err != nil {
+			return err
+		}
+
+		permission.DefaultValues.OwnershipTimes = SortAndMergeOverlapping(permission.DefaultValues.OwnershipTimes)
 		permission.DefaultValues.TimelineTimes = SortAndMergeOverlapping(permission.DefaultValues.TimelineTimes)
 		permission.DefaultValues.TransferTimes = SortAndMergeOverlapping(permission.DefaultValues.TransferTimes)
 		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
@@ -114,6 +127,7 @@ func ValidateUserApprovedOutgoingTransferPermissions(permissions []*UserApproved
 			for _, combination2 := range permission.Combinations[idx+1:] {
 				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
 					combination.TransferTimesOptions == combination2.TransferTimesOptions &&
+					combination.OwnershipTimesOptions == combination2.OwnershipTimesOptions &&
 					combination.ToMappingOptions == combination2.ToMappingOptions &&
 					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
 					combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
@@ -160,6 +174,12 @@ func ValidateUserApprovedIncomingTransferPermissions(permissions []*UserApproved
 			return err
 		}
 
+		err = ValidateRangesAreValid(permission.DefaultValues.OwnershipTimes, false)
+		if err != nil {
+			return err
+		}
+
+		permission.DefaultValues.OwnershipTimes = SortAndMergeOverlapping(permission.DefaultValues.OwnershipTimes)
 		permission.DefaultValues.TimelineTimes = SortAndMergeOverlapping(permission.DefaultValues.TimelineTimes)
 		permission.DefaultValues.TransferTimes = SortAndMergeOverlapping(permission.DefaultValues.TransferTimes)
 		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
@@ -168,6 +188,7 @@ func ValidateUserApprovedIncomingTransferPermissions(permissions []*UserApproved
 			for _, combination2 := range permission.Combinations[idx+1:] {
 				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
 					combination.TransferTimesOptions == combination2.TransferTimesOptions &&
+					combination.OwnershipTimesOptions == combination2.OwnershipTimesOptions &&
 					combination.FromMappingOptions == combination2.FromMappingOptions &&
 					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
 					combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&

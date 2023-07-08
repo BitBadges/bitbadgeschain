@@ -215,13 +215,14 @@ func (suite *TestSuite) TestFirstMatchOnly() {
 						End:   sdkmath.NewUint(1),
 					},
 				},
+				OwnershipTimes: GetFullUintRanges(),
 				AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
 					{
 						IsAllowed: false,
 					},
 				},
 				Challenges:                []*types.Challenge{},
-				TrackerId:                 "test",
+				ApprovalId:                 "test",
 				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				PerAddressApprovals: &types.PerAddressApprovals{
@@ -269,13 +270,14 @@ func (suite *TestSuite) TestFirstMatchOnlyWrongTime() {
 				InitiatedByMappingId: alice,
 				TransferTimes:        []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 				BadgeIds:             GetFullUintRanges(),
+				OwnershipTimes: GetFullUintRanges(),
 				AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
 					{
 						IsAllowed: false,
 					},
 				},
 				Challenges:                []*types.Challenge{},
-				TrackerId:                 "test",
+				ApprovalId:                 "test",
 				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				PerAddressApprovals: &types.PerAddressApprovals{
@@ -319,6 +321,7 @@ func (suite *TestSuite) TestCombinations() {
 				ToMappingId:          "All",
 				InitiatedByMappingId: alice,
 				TransferTimes:        GetFullUintRanges(),
+				OwnershipTimes: GetFullUintRanges(),
 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 				AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
 					{
@@ -330,7 +333,7 @@ func (suite *TestSuite) TestCombinations() {
 					},
 				},
 				Challenges:                []*types.Challenge{},
-				TrackerId:                 "test",
+				ApprovalId:                 "test",
 				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				PerAddressApprovals: &types.PerAddressApprovals{
@@ -376,6 +379,7 @@ func (suite *TestSuite) TestCombinationsOrder() {
 				ToMappingId:          "All",
 				InitiatedByMappingId: alice,
 				TransferTimes:        GetFullUintRanges(),
+				OwnershipTimes: GetFullUintRanges(),
 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 				AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
 					{
@@ -387,7 +391,7 @@ func (suite *TestSuite) TestCombinationsOrder() {
 					},
 				},
 				Challenges:                []*types.Challenge{},
-				TrackerId:                 "test",
+				ApprovalId:                 "test",
 				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				PerAddressApprovals: &types.PerAddressApprovals{
@@ -430,6 +434,7 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 				ToMappingId:          "All",
 				InitiatedByMappingId: alice,
 				TransferTimes:        GetFullUintRanges(),
+				OwnershipTimes: GetFullUintRanges(),
 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 				AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
 					{
@@ -437,7 +442,7 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 					},
 				},
 				Challenges:                []*types.Challenge{},
-				TrackerId:                 "test",
+				ApprovalId:                 "test",
 				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				PerAddressApprovals: &types.PerAddressApprovals{
