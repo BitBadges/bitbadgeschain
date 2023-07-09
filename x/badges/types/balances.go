@@ -6,6 +6,32 @@ import (
 	"math"
 )
 
+func DeepCopyBalances(balances []*Balance) []*Balance {
+	newBalances := []*Balance{}
+	for _, approval := range balances {
+		balanceToAdd := &Balance{
+			Amount: 			 approval.Amount,
+		}
+		for _, badgeId := range approval.BadgeIds {
+			balanceToAdd.BadgeIds = append(balanceToAdd.BadgeIds, &UintRange{
+				Start: badgeId.Start,
+				End:   badgeId.End,
+			})
+		}
+
+		for _, time := range approval.OwnershipTimes {
+			balanceToAdd.OwnershipTimes = append(balanceToAdd.OwnershipTimes, &UintRange{
+				Start: time.Start,
+				End:   time.End,
+			})
+		}
+
+		newBalances = append(newBalances, balanceToAdd)
+	}
+
+	return newBalances
+}
+
 // We handle the following cases:
 // 1) {amount: 1, badgeIds: [1 to 10, 5 to 20]} -> {amount: 1, badgeIds: [1 to 4, 11 to 20]}, {amount: 2: badgeIds: [5 to 10]}
 // 2) {amount: 1, badgeIds: [5 to 10]}, {amount: 2: badgeIds: [5 to 10]} -> {amount: 3: badgeIds: [5 to 10]}
@@ -166,6 +192,29 @@ func SubtractBalance(balances []*Balance, balanceToRemove *Balance) ([]*Balance,
 		balances, err = UpdateBalance(currBalanceObj, balances)
 		if err != nil {
 			return balances, err
+		}
+	}
+
+	return balances, nil
+}
+
+// Subtracts a balance to all ids specified in []ranges
+func GetMaxSubtractableBalances(balances []*Balance, balanceToRemove *Balance) ([]*Balance, error) {
+	currBalances, err := GetBalancesForIds(balanceToRemove.BadgeIds, balanceToRemove.OwnershipTimes, balances)
+	if err != nil {
+		return balances, err
+	}
+
+	subtractableBalances := []*Balance{}
+	for _, currBalanceObj := range currBalances {
+		subtractableBalances = append(subtractableBalances, &Balance{
+			Amount:         balanceToRemove.Amount,
+			BadgeIds: 			currBalanceObj.BadgeIds,
+			OwnershipTimes: currBalanceObj.OwnershipTimes,
+		})
+
+		if currBalanceObj.Amount.LT(balanceToRemove.Amount) {
+			subtractableBalances[len(subtractableBalances)-1].Amount = currBalanceObj.Amount
 		}
 	}
 

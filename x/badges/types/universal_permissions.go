@@ -84,6 +84,7 @@ type Overlap struct {
 }
 
 func GetOverlapsAndNonOverlaps(firstDetails []*UniversalPermissionDetails, secondDetails []*UniversalPermissionDetails) ([]*Overlap, []*UniversalPermissionDetails, []*UniversalPermissionDetails) {
+	//TODO: deep copy???
 	inOldButNotNew := make([]*UniversalPermissionDetails, len(firstDetails))
 	copy(inOldButNotNew, firstDetails)
 	inNewButNotOld := make([]*UniversalPermissionDetails, len(secondDetails))
@@ -100,8 +101,8 @@ func GetOverlapsAndNonOverlaps(firstDetails []*UniversalPermissionDetails, secon
 					FirstDetails:  oldPermission,
 					SecondDetails: newPermission,
 				})
-				inOldButNotNew = UniversalRemoveOverlapFromValues(overlap, inOldButNotNew)
-				inNewButNotOld = UniversalRemoveOverlapFromValues(overlap, inNewButNotOld)
+				inOldButNotNew, _ = UniversalRemoveOverlapFromValues(overlap, inOldButNotNew)
+				inNewButNotOld, _ = UniversalRemoveOverlapFromValues(overlap, inNewButNotOld)
 			}
 		}
 	}
@@ -109,14 +110,16 @@ func GetOverlapsAndNonOverlaps(firstDetails []*UniversalPermissionDetails, secon
 	return allOverlaps, inOldButNotNew, inNewButNotOld
 }
 
-func UniversalRemoveOverlapFromValues(handled *UniversalPermissionDetails, valuesToCheck []*UniversalPermissionDetails) []*UniversalPermissionDetails {
+func UniversalRemoveOverlapFromValues(handled *UniversalPermissionDetails, valuesToCheck []*UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
 	newValuesToCheck := []*UniversalPermissionDetails{}
+	removed := []*UniversalPermissionDetails{}
 	for _, valueToCheck := range valuesToCheck {
-		remaining, _ := UniversalRemoveOverlaps(handled, valueToCheck)
+		remaining, overlaps := UniversalRemoveOverlaps(handled, valueToCheck)
 		newValuesToCheck = append(newValuesToCheck, remaining...)
+		removed = append(removed, overlaps...)
 	}
 
-	return newValuesToCheck
+	return newValuesToCheck, removed
 }
 
 func IsAddressMappingEmpty(mapping *AddressMapping) bool {
@@ -176,6 +179,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          valueToCheck.ToMapping,
 			FromMapping:        valueToCheck.FromMapping,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
+
+			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
 
@@ -188,6 +193,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          valueToCheck.ToMapping,
 			FromMapping:        valueToCheck.FromMapping,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
+
+			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
 
@@ -200,6 +207,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          valueToCheck.ToMapping,
 			FromMapping:        valueToCheck.FromMapping,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
+
+			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
 
@@ -212,6 +221,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          valueToCheck.ToMapping,
 			FromMapping:        valueToCheck.FromMapping,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
+
+			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
 
@@ -224,6 +235,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          toMappingAfterRemoval,
 			FromMapping:        valueToCheck.FromMapping,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
+
+			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
 
@@ -236,6 +249,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          toMappingAfterRemoval,
 			FromMapping:        fromMappingAfterRemoval,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
+
+			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
 
@@ -248,6 +263,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          toMappingAfterRemoval,
 			FromMapping:        fromMappingAfterRemoval,
 			InitiatedByMapping: initiatedByMappingAfterRemoval,
+
+			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
 
@@ -264,6 +281,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 						ToMapping:          removedToMapping,
 						FromMapping:        removedFromMapping,
 						InitiatedByMapping: removedInitiatedByMapping,
+
+						ArbitraryValue: valueToCheck.ArbitraryValue,
 					})
 				}
 			}

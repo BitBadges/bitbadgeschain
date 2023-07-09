@@ -60,7 +60,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 
 	allBadgeIds = types.SortAndMergeOverlapping(allBadgeIds)
 	if len(allBadgeIds) > 1 || (len(allBadgeIds) == 1 && !allBadgeIds[0].Start.Equal(sdkmath.NewUint(1))) {
-		return &types.BadgeCollection{}, sdkerrors.Wrapf(types.ErrNotSupported, "BadgeIds must be sequential starting from 1")
+		return &types.BadgeCollection{}, sdkerrors.Wrapf(types.ErrNotSupported, "Badge Ids must be sequential starting from 1")
 	}
 
 	//Create the badges and add newly created balances to unminted supplys

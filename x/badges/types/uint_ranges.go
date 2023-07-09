@@ -12,11 +12,17 @@ func CreateUintRange(start sdkmath.Uint, end sdkmath.Uint) *UintRange {
 	}
 }
 
+func DeepCopyRanges(ranges []*UintRange) []*UintRange {
+	newRanges := []*UintRange{}
+	for _, rangeObject := range ranges {
+		newRanges = append(newRanges, CreateUintRange(rangeObject.Start, rangeObject.End))
+	}
+	return newRanges
+}
+
 // Search ID ranges for a specific ID. Return (true) if found. And (false) if not.
 func SearchUintRangesForUint(id sdkmath.Uint, uintRanges []*UintRange) bool {
-	ranges := make([]*UintRange, len(uintRanges))
-	copy(ranges, uintRanges)
-
+	ranges := DeepCopyRanges(uintRanges)
 	ranges = SortAndMergeOverlapping(ranges)
 
 	//Binary search because ID ranges will be sorted
@@ -93,7 +99,7 @@ func RemoveUintsFromUintRange(idxsToRemove *UintRange, rangeObject *UintRange) (
 
 	if idxsToRemove.End.LT(rangeObject.End) {
 		// There's a range after idxsToRemove
-		// Overflow is not possible because idxsToRemove.End.LT(rangeObject.End
+		// Overflow is not possible because idxsToRemove.End.LT(rangeObject.End)
 		newRanges = append(newRanges, &UintRange{
 			Start: idxsToRemove.End.AddUint64(1),
 			End:   rangeObject.End,
@@ -109,6 +115,13 @@ func RemoveUintsFromUintRange(idxsToRemove *UintRange, rangeObject *UintRange) (
 			End:   idxsToRemove.End,
 		})
 	}
+
+	if idxsToRemove.End.LT(rangeObject.End) && idxsToRemove.Start.GT(rangeObject.Start) {
+		// idxsToRemove is in the middle of rangeObject
+
+		removedRanges = []*UintRange{idxsToRemove}
+	}
+	
 
 	return newRanges, removedRanges
 }

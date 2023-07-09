@@ -363,8 +363,7 @@ func (suite *TestSuite) TestBalancesFuzz() {
 			amount = sdkmath.NewUint(uint64(rand.Intn(20))) //Make this substantially less than add, so we have less chance of underflow
 			// println("removing", start, end, amount.String())
 
-			userBalancesCopy := make([]*types.Balance, len(userBalance.Balances))
-			copy(userBalancesCopy, userBalance.Balances)
+			userBalancesCopy := types.DeepCopyBalances(userBalance.Balances)
 
 			userBalance.Balances, err = types.SubtractBalance(userBalance.Balances, &types.Balance{
 				Amount: amount,
@@ -477,8 +476,7 @@ func (suite *TestSuite) TestBalancesWithTimesFuzz() {
 			endTime = (uint64(NUM_IDS/2 + rand.Intn(NUM_IDS/2)))
 			// println("removing", start, end, startTime, endTime, amount.String())
 
-			userBalancesCopy := make([]*types.Balance, len(userBalance.Balances))
-			copy(userBalancesCopy, userBalance.Balances)
+			userBalancesCopy := types.DeepCopyBalances(userBalance.Balances)
 
 			//removing 18 from IDs 1-7 Times 1-6
 

@@ -211,7 +211,6 @@ message CollectionApprovedTransfer {
   ApprovalsTracker overallApprovals = 12;
   PerAddressApprovals perAddressApprovals = 13;
   
-
   bool overridesFromApprovedOutgoingTransfers = 15;
   bool overridesToApprovedIncomingTransfers = 16;
 

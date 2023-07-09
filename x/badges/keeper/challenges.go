@@ -10,7 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.Challenge, solutions []*types.ChallengeSolution, creatorAddress string, level string, approvalId string) (bool, sdkmath.Uint, error) {
+func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.Challenge, solutions []*types.ChallengeSolution, creatorAddress string, level string, approvalId string, doNotStore bool) (bool, sdkmath.Uint, error) {
 	numIncrements := sdkmath.NewUint(0)
 	useLeafIndexForDistributionOrder := false
 
@@ -46,15 +46,28 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 					numIncrements = leafIndex.Sub(leftmostLeafIndex)
 				}
 
+				
 				if challenge.MaxOneUsePerLeaf {
-					numUsed, err := k.IncrementNumUsedForChallengeInStore(ctx, collectionId, approvalId, leafIndex, level)
-					if err != nil {
-						continue
-					}
+					if doNotStore {
+						numUsed, err := k.GetNumUsedForChallengeFromStore(ctx, collectionId, approvalId, leafIndex, level)
+						if err != nil {
+							continue
+						}
 
-					maxUses := sdkmath.NewUint(1)
-					if numUsed.GT(maxUses) {
-						continue
+						maxUses := sdkmath.NewUint(1)
+						if numUsed.GT(maxUses) {
+							continue
+						}
+					} else {
+						numUsed, err := k.IncrementNumUsedForChallengeInStore(ctx, collectionId, approvalId, leafIndex, level)
+						if err != nil {
+							continue
+						}
+
+						maxUses := sdkmath.NewUint(1)
+						if numUsed.GT(maxUses) {
+							continue
+						}
 					}
 				}
 

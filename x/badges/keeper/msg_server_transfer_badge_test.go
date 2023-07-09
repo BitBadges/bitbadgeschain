@@ -182,7 +182,7 @@ func (suite *TestSuite) TestTransferBadgesNotApprovedIncoming() {
 	suite.Require().Error(err, "Error transferring badge")
 }
 
-func (suite *TestSuite) TestTransferBadgesFromMintAddress() {
+func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)

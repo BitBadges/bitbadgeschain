@@ -59,49 +59,74 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, amount sdkmath.Uint, from string, to string, initiatedBy string, solutions []*types.ChallengeSolution, transferAsMuchAsPossible bool) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
 	err := *new(error)
 	
-	badgeIdsCopy := make([]*types.UintRange, len(badgeIds))
-	copy(badgeIdsCopy, badgeIds)
+	transferBalances :=  []*types.Balance{ { Amount: amount, BadgeIds: badgeIds, OwnershipTimes: times } }
 
-	timesCopy := make([]*types.UintRange, len(times))
-	copy(timesCopy, times)
-	
-	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection, badgeIdsCopy, timesCopy, from, to, initiatedBy, amount, solutions)
-	if err != nil {
-		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
-	}
 
-	if len(userApprovals) > 0 {
-		for _, userApproval := range userApprovals {
-			if userApproval.Outgoing {
-				err = k.DeductUserOutgoingApprovals(ctx, collection, fromUserBalance, userApproval.BadgeIds, timesCopy, from, to, initiatedBy, amount, solutions)
-				if err != nil {
-					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+	if transferAsMuchAsPossible {
+		userApprovals := []*UserApprovalsToCheck{}
+		userApprovals, transferBalances, err = k.GetUnapprovedBalancesForCollection(ctx, collection, transferBalances, from, to, initiatedBy, solutions, true)
+		if err != nil {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+		}
+
+		//here, we may double remove some balances
+		if len(userApprovals) > 0 {
+			for _, userApproval := range userApprovals {
+				if userApproval.Outgoing {
+					_, transferBalances, err = k.GetUnapprovedBalancesForOutgoing(ctx, collection, fromUserBalance, transferBalances, userApproval.Balances, from, to, initiatedBy, solutions, true)
+					if err != nil {
+						return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+					}
+				} else {
+					_, transferBalances, err = k.GetUnapprovedBalancesForIncoming(ctx, collection, toUserBalance, transferBalances, userApproval.Balances, from, to, initiatedBy, solutions, true)
+					if err != nil {
+						return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+					}
 				}
-			} else {
-				err = k.DeductUserIncomingApprovals(ctx, collection, toUserBalance, userApproval.BadgeIds, timesCopy, from, to, initiatedBy, amount, solutions)
-				if err != nil {
-					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+			}
+		}
+	} 
+
+	//TODO: make this balances[] instead of passing in times, etc
+
+	for _, balance := range transferBalances {
+		badgeIds := balance.BadgeIds
+		times := balance.OwnershipTimes
+		amount := balance.Amount
+		userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection, badgeIds, times, from, to, initiatedBy, amount, solutions, false)
+		if err != nil {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+		}
+
+		if len(userApprovals) > 0 {
+			for _, userApproval := range userApprovals {
+				for _, balance := range userApproval.Balances {
+					if userApproval.Outgoing {
+						err = k.DeductUserOutgoingApprovals(ctx, collection, fromUserBalance, balance.BadgeIds, balance.OwnershipTimes, from, to, initiatedBy, amount, solutions, false)
+						if err != nil {
+							return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+						}
+					} else {
+						err = k.DeductUserIncomingApprovals(ctx, collection, toUserBalance, balance.BadgeIds, balance.OwnershipTimes, from, to, initiatedBy, amount, solutions, false)
+						if err != nil {
+							return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+						}
+					}
 				}
 			}
 		}
 	}
 
-	fromUserBalance.Balances, err = types.SubtractBalance(fromUserBalance.Balances, &types.Balance{
-		Amount:         amount,
-		BadgeIds:       badgeIdsCopy,
-		OwnershipTimes: timesCopy,
-	})
-	if err != nil {
-		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
-	}
+	for _, balance := range transferBalances {
+		fromUserBalance.Balances, err = types.SubtractBalance(fromUserBalance.Balances, balance)
+		if err != nil {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+		}
 
-	toUserBalance.Balances, err = types.AddBalance(toUserBalance.Balances, &types.Balance{
-		Amount:         amount,
-		BadgeIds:       badgeIdsCopy,
-		OwnershipTimes: timesCopy,
-	})
-	if err != nil {
-		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+		toUserBalance.Balances, err = types.AddBalance(toUserBalance.Balances, balance)
+		if err != nil {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+		}
 	}
 
 	return fromUserBalance, toUserBalance, nil
