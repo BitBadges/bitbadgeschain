@@ -61,14 +61,7 @@ message Challenge {
   string expectedProofLength = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   bool useCreatorAddressAsLeaf = 3;
   bool maxOneUsePerLeaf = 4;
-  bool useLeafIndexForDistributionOrder = 5;
-}
-
-//PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address.
-message PerAddressApprovals {
-  ApprovalsTracker approvalsPerFromAddress = 1;
-  ApprovalsTracker approvalsPerToAddress = 2;
-  ApprovalsTracker approvalsPerInitiatedByAddress = 3;
+  bool useLeafIndexForTransferOrder = 5;
 }
 
 message IsUserOutgoingTransferAllowed {
@@ -76,7 +69,7 @@ message IsUserOutgoingTransferAllowed {
   bool invertInitiatedBy = 3;
   bool invertTransferTimes = 4;
   bool invertBadgeIds = 5;
-  bool invertOwnershipTimes = 6;
+  bool invertOwnedTimes = 6;
   bool isAllowed = 7;
 }
 
@@ -85,7 +78,7 @@ message IsUserIncomingTransferAllowed {
   bool invertInitiatedBy = 3;
   bool invertTransferTimes = 4;
   bool invertBadgeIds = 5;
-  bool invertOwnershipTimes = 6;
+  bool invertOwnedTimes = 6;
   bool isAllowed = 7;
 }
 
@@ -96,18 +89,17 @@ message UserApprovedOutgoingTransfer {
   string initiatedByMappingId = 2;
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
-  repeated UintRange ownershipTimes = 16;
+  repeated UintRange ownedTimes = 16;
 
   repeated IsUserOutgoingTransferAllowed allowedCombinations = 5;
 
-  repeated Challenge challenges = 6;
-
   string approvalId = 7;
 
-  string incrementBadgeIdsBy = 8 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string incrementOwnershipTimesBy = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated Challenge challenges = 6;
 
-  PerAddressApprovals perAddressApprovals = 10;
+  PredeterminedBalances predeterminedBalances = 8;
+  ApprovalAmounts approvalAmounts = 9;
+  MaxNumTransfers maxNumTransfers = 10;
   
   string uri = 12;
   string customData = 13;
@@ -123,17 +115,16 @@ message UserApprovedIncomingTransfer {
   string initiatedByMappingId = 2;
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
-  repeated UintRange ownershipTimes = 16;
+  repeated UintRange ownedTimes = 16;
   repeated IsUserIncomingTransferAllowed allowedCombinations = 5;
 
   repeated Challenge challenges = 6;
 
   string approvalId = 7;
 
-  string incrementBadgeIdsBy = 8 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string incrementOwnershipTimesBy = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-
-  PerAddressApprovals perAddressApprovals = 11;
+  PredeterminedBalances predeterminedBalances = 8;
+  ApprovalAmounts approvalAmounts = 9;
+  MaxNumTransfers maxNumTransfers = 10;
 
   string uri = 12;
   string customData = 13;
@@ -148,7 +139,7 @@ message IsCollectionTransferAllowed {
   bool invertInitiatedBy = 3;
   bool invertTransferTimes = 4;
   bool invertBadgeIds = 5;
-  bool invertOwnershipTimes = 6;
+  bool invertOwnedTimes = 6;
   bool isAllowed = 7;
 }
 
@@ -189,38 +180,45 @@ message IsCollectionTransferAllowed {
 // This is useful, for example, for forcefully revoking badges.
 // If these are set to false, the transfer must also be approved by the from /to user's approved outgoing / incoming transfers, respectively.
 
-message CollectionApprovedTransfer {
-  string approvalId = 1;
+message ManualBalances {
+  repeated Balance balances = 1;
+}
 
-  //Criteria 
-  string fromMappingId = 2;
-  string toMappingId = 3;
-  string initiatedByMappingId = 4;
-  repeated UintRange transferTimes = 5;
-  repeated UintRange badgeIds = 6;
-  repeated UintRange ownershipTimes = 7;
-  
-  repeated IsCollectionTransferAllowed allowedCombinations = 8;
+message IncrementedBalances {
+  repeated Balance startBalances = 1;
+  string incrementBadgeIdsBy = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string incrementOwnedTimesBy = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
 
-  //Restrictions (Challenges, Amounts, and MaxNumTransfers)
-  repeated Challenge challenges = 9;
+message PredeterminedOrderCalculationMethod {
+  bool useOverallNumTransfers = 1;
+  bool usePerToAddressNumTransfers = 2;
+  bool usePerFromAddressNumTransfers = 3;
+  bool usePerInitiatedByAddressNumTransfers = 4;
 
-  string incrementBadgeIdsBy = 10 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string incrementOwnershipTimesBy = 11 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  bool useChallengeLeafIndex = 5;
+}
 
-  ApprovalsTracker overallApprovals = 12;
-  PerAddressApprovals perAddressApprovals = 13;
-  
-  bool overridesFromApprovedOutgoingTransfers = 15;
-  bool overridesToApprovedIncomingTransfers = 16;
+message PredeterminedBalances {
+  repeated ManualBalances manualBalances = 1;
+  IncrementedBalances incrementedBalances = 2;
 
-  bool requireToEqualsInitiatedBy = 17;
-  bool requireFromEqualsInitiatedBy = 18;
-  bool requireToDoesNotEqualInitiatedBy = 19;
-  bool requireFromDoesNotEqualInitiatedBy = 20;
+  PredeterminedOrderCalculationMethod orderCalculationMethod = 3;
+}
 
-  string uri = 21;
-  string customData = 22;
+//PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address.
+message ApprovalAmounts {
+  string overallApprovalAmount = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string perToAddressApprovalAmount = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string perFromAddressApprovalAmount = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string perInitiatedByAddressApprovalAmount = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+message MaxNumTransfers {
+  string overallMaxNumTransfers = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string perToAddressMaxNumTransfers = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string perFromAddressMaxNumTransfers = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string perInitiatedByAddressMaxNumTransfers = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 message ApprovalsTracker {
@@ -228,15 +226,50 @@ message ApprovalsTracker {
   repeated Balance amounts = 2;
 }
 
+message CollectionApprovedTransfer {
+  //Metadata
+  string approvalId = 1;
+  string uri = 2;
+  string customData = 3;
+
+  //Match Criteria 
+  string fromMappingId = 4;
+  string toMappingId = 5;
+  string initiatedByMappingId = 6;
+  repeated UintRange transferTimes = 7;
+  repeated UintRange badgeIds = 8;
+  repeated UintRange ownedTimes = 9;
+  
+  repeated IsCollectionTransferAllowed allowedCombinations = 10;
+
+  //Restrictions (Challenges, Amounts, MaxNumTransfers)
+  repeated Challenge challenges = 11;
+  PredeterminedBalances predeterminedBalances = 12;
+  ApprovalAmounts approvalAmounts = 13;
+  MaxNumTransfers maxNumTransfers = 14;
+  
+  
+  bool requireToEqualsInitiatedBy = 15;
+  bool requireFromEqualsInitiatedBy = 16;
+  bool requireToDoesNotEqualInitiatedBy = 17;
+  bool requireFromDoesNotEqualInitiatedBy = 18;
+
+  //Is this approval forceful, or does it additionally require the to/from user's approval?
+  bool overridesFromApprovedOutgoingTransfers = 19;
+  bool overridesToApprovedIncomingTransfers = 20;
+}
+
+message ApprovalIdDetails {
+  string approvalId = 1;
+  string approvalLevel = 2; //"collection", "incoming", "outgoing"
+  string address = 3; //Leave blank if approvalLevel == "collection"
+}
+
 message Transfer {
   string from = 1;
   repeated string toAddresses = 2;
   repeated Balance balances = 3;
-  bool transferAsMuchAsPossible = 4;
-
-  //Note here we remain optimistic that the solutions will apply to all potential challenges.
-  //It is the Tx Sender's responsibility to ensure that the solutions are valid for all potential challenges.
-  //If you are attempting to claim badges with different sets of challenges, you will need to make multiple transfers.
+  ApprovalIdDetails precalculateFromApproval = 4;
   repeated ChallengeSolution solutions = 5;
 }
 

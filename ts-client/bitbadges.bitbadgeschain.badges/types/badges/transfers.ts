@@ -102,7 +102,7 @@ export interface UserApprovedOutgoingTransfer {
   challenges: Challenge[];
   approvalId: string;
   incrementBadgeIdsBy: string;
-  incrementOwnershipTimesBy: string;
+  incrementOwnedTimesBy: string;
   perAddressApprovals: PerAddressApprovals | undefined;
   uri: string;
   customData: string;
@@ -123,7 +123,7 @@ export interface UserApprovedIncomingTransfer {
   challenges: Challenge[];
   approvalId: string;
   incrementBadgeIdsBy: string;
-  incrementOwnershipTimesBy: string;
+  incrementOwnedTimesBy: string;
   perAddressApprovals: PerAddressApprovals | undefined;
   uri: string;
   customData: string;
@@ -150,7 +150,7 @@ export interface CollectionApprovedTransfer {
   challenges: Challenge[];
   approvalId: string;
   incrementBadgeIdsBy: string;
-  incrementOwnershipTimesBy: string;
+  incrementOwnedTimesBy: string;
   overallApprovals: ApprovalsTracker | undefined;
   perAddressApprovals: PerAddressApprovals | undefined;
   overridesFromApprovedOutgoingTransfers: boolean;
@@ -821,7 +821,7 @@ function createBaseUserApprovedOutgoingTransfer(): UserApprovedOutgoingTransfer 
     challenges: [],
     approvalId: "",
     incrementBadgeIdsBy: "",
-    incrementOwnershipTimesBy: "",
+    incrementOwnedTimesBy: "",
     perAddressApprovals: undefined,
     uri: "",
     customData: "",
@@ -856,8 +856,8 @@ export const UserApprovedOutgoingTransfer = {
     if (message.incrementBadgeIdsBy !== "") {
       writer.uint32(66).string(message.incrementBadgeIdsBy);
     }
-    if (message.incrementOwnershipTimesBy !== "") {
-      writer.uint32(74).string(message.incrementOwnershipTimesBy);
+    if (message.incrementOwnedTimesBy !== "") {
+      writer.uint32(74).string(message.incrementOwnedTimesBy);
     }
     if (message.perAddressApprovals !== undefined) {
       PerAddressApprovals.encode(message.perAddressApprovals, writer.uint32(82).fork()).ldelim();
@@ -909,7 +909,7 @@ export const UserApprovedOutgoingTransfer = {
           message.incrementBadgeIdsBy = reader.string();
           break;
         case 9:
-          message.incrementOwnershipTimesBy = reader.string();
+          message.incrementOwnedTimesBy = reader.string();
           break;
         case 10:
           message.perAddressApprovals = PerAddressApprovals.decode(reader, reader.uint32());
@@ -948,8 +948,8 @@ export const UserApprovedOutgoingTransfer = {
       challenges: Array.isArray(object?.challenges) ? object.challenges.map((e: any) => Challenge.fromJSON(e)) : [],
       approvalId: isSet(object.approvalId) ? String(object.approvalId) : "",
       incrementBadgeIdsBy: isSet(object.incrementBadgeIdsBy) ? String(object.incrementBadgeIdsBy) : "",
-      incrementOwnershipTimesBy: isSet(object.incrementOwnershipTimesBy)
-        ? String(object.incrementOwnershipTimesBy)
+      incrementOwnedTimesBy: isSet(object.incrementOwnedTimesBy)
+        ? String(object.incrementOwnedTimesBy)
         : "",
       perAddressApprovals: isSet(object.perAddressApprovals)
         ? PerAddressApprovals.fromJSON(object.perAddressApprovals)
@@ -993,8 +993,8 @@ export const UserApprovedOutgoingTransfer = {
     }
     message.approvalId !== undefined && (obj.approvalId = message.approvalId);
     message.incrementBadgeIdsBy !== undefined && (obj.incrementBadgeIdsBy = message.incrementBadgeIdsBy);
-    message.incrementOwnershipTimesBy !== undefined
-      && (obj.incrementOwnershipTimesBy = message.incrementOwnershipTimesBy);
+    message.incrementOwnedTimesBy !== undefined
+      && (obj.incrementOwnedTimesBy = message.incrementOwnedTimesBy);
     message.perAddressApprovals !== undefined && (obj.perAddressApprovals = message.perAddressApprovals
       ? PerAddressApprovals.toJSON(message.perAddressApprovals)
       : undefined);
@@ -1018,7 +1018,7 @@ export const UserApprovedOutgoingTransfer = {
     message.challenges = object.challenges?.map((e) => Challenge.fromPartial(e)) || [];
     message.approvalId = object.approvalId ?? "";
     message.incrementBadgeIdsBy = object.incrementBadgeIdsBy ?? "";
-    message.incrementOwnershipTimesBy = object.incrementOwnershipTimesBy ?? "";
+    message.incrementOwnedTimesBy = object.incrementOwnedTimesBy ?? "";
     message.perAddressApprovals = (object.perAddressApprovals !== undefined && object.perAddressApprovals !== null)
       ? PerAddressApprovals.fromPartial(object.perAddressApprovals)
       : undefined;
@@ -1040,7 +1040,7 @@ function createBaseUserApprovedIncomingTransfer(): UserApprovedIncomingTransfer 
     challenges: [],
     approvalId: "",
     incrementBadgeIdsBy: "",
-    incrementOwnershipTimesBy: "",
+    incrementOwnedTimesBy: "",
     perAddressApprovals: undefined,
     uri: "",
     customData: "",
@@ -1075,8 +1075,8 @@ export const UserApprovedIncomingTransfer = {
     if (message.incrementBadgeIdsBy !== "") {
       writer.uint32(66).string(message.incrementBadgeIdsBy);
     }
-    if (message.incrementOwnershipTimesBy !== "") {
-      writer.uint32(74).string(message.incrementOwnershipTimesBy);
+    if (message.incrementOwnedTimesBy !== "") {
+      writer.uint32(74).string(message.incrementOwnedTimesBy);
     }
     if (message.perAddressApprovals !== undefined) {
       PerAddressApprovals.encode(message.perAddressApprovals, writer.uint32(90).fork()).ldelim();
@@ -1128,7 +1128,7 @@ export const UserApprovedIncomingTransfer = {
           message.incrementBadgeIdsBy = reader.string();
           break;
         case 9:
-          message.incrementOwnershipTimesBy = reader.string();
+          message.incrementOwnedTimesBy = reader.string();
           break;
         case 11:
           message.perAddressApprovals = PerAddressApprovals.decode(reader, reader.uint32());
@@ -1167,8 +1167,8 @@ export const UserApprovedIncomingTransfer = {
       challenges: Array.isArray(object?.challenges) ? object.challenges.map((e: any) => Challenge.fromJSON(e)) : [],
       approvalId: isSet(object.approvalId) ? String(object.approvalId) : "",
       incrementBadgeIdsBy: isSet(object.incrementBadgeIdsBy) ? String(object.incrementBadgeIdsBy) : "",
-      incrementOwnershipTimesBy: isSet(object.incrementOwnershipTimesBy)
-        ? String(object.incrementOwnershipTimesBy)
+      incrementOwnedTimesBy: isSet(object.incrementOwnedTimesBy)
+        ? String(object.incrementOwnedTimesBy)
         : "",
       perAddressApprovals: isSet(object.perAddressApprovals)
         ? PerAddressApprovals.fromJSON(object.perAddressApprovals)
@@ -1212,8 +1212,8 @@ export const UserApprovedIncomingTransfer = {
     }
     message.approvalId !== undefined && (obj.approvalId = message.approvalId);
     message.incrementBadgeIdsBy !== undefined && (obj.incrementBadgeIdsBy = message.incrementBadgeIdsBy);
-    message.incrementOwnershipTimesBy !== undefined
-      && (obj.incrementOwnershipTimesBy = message.incrementOwnershipTimesBy);
+    message.incrementOwnedTimesBy !== undefined
+      && (obj.incrementOwnedTimesBy = message.incrementOwnedTimesBy);
     message.perAddressApprovals !== undefined && (obj.perAddressApprovals = message.perAddressApprovals
       ? PerAddressApprovals.toJSON(message.perAddressApprovals)
       : undefined);
@@ -1237,7 +1237,7 @@ export const UserApprovedIncomingTransfer = {
     message.challenges = object.challenges?.map((e) => Challenge.fromPartial(e)) || [];
     message.approvalId = object.approvalId ?? "";
     message.incrementBadgeIdsBy = object.incrementBadgeIdsBy ?? "";
-    message.incrementOwnershipTimesBy = object.incrementOwnershipTimesBy ?? "";
+    message.incrementOwnedTimesBy = object.incrementOwnedTimesBy ?? "";
     message.perAddressApprovals = (object.perAddressApprovals !== undefined && object.perAddressApprovals !== null)
       ? PerAddressApprovals.fromPartial(object.perAddressApprovals)
       : undefined;
@@ -1361,7 +1361,7 @@ function createBaseCollectionApprovedTransfer(): CollectionApprovedTransfer {
     challenges: [],
     approvalId: "",
     incrementBadgeIdsBy: "",
-    incrementOwnershipTimesBy: "",
+    incrementOwnedTimesBy: "",
     overallApprovals: undefined,
     perAddressApprovals: undefined,
     overridesFromApprovedOutgoingTransfers: false,
@@ -1404,8 +1404,8 @@ export const CollectionApprovedTransfer = {
     if (message.incrementBadgeIdsBy !== "") {
       writer.uint32(74).string(message.incrementBadgeIdsBy);
     }
-    if (message.incrementOwnershipTimesBy !== "") {
-      writer.uint32(82).string(message.incrementOwnershipTimesBy);
+    if (message.incrementOwnedTimesBy !== "") {
+      writer.uint32(82).string(message.incrementOwnedTimesBy);
     }
     if (message.overallApprovals !== undefined) {
       ApprovalsTracker.encode(message.overallApprovals, writer.uint32(90).fork()).ldelim();
@@ -1475,7 +1475,7 @@ export const CollectionApprovedTransfer = {
           message.incrementBadgeIdsBy = reader.string();
           break;
         case 10:
-          message.incrementOwnershipTimesBy = reader.string();
+          message.incrementOwnedTimesBy = reader.string();
           break;
         case 11:
           message.overallApprovals = ApprovalsTracker.decode(reader, reader.uint32());
@@ -1530,8 +1530,8 @@ export const CollectionApprovedTransfer = {
       challenges: Array.isArray(object?.challenges) ? object.challenges.map((e: any) => Challenge.fromJSON(e)) : [],
       approvalId: isSet(object.approvalId) ? String(object.approvalId) : "",
       incrementBadgeIdsBy: isSet(object.incrementBadgeIdsBy) ? String(object.incrementBadgeIdsBy) : "",
-      incrementOwnershipTimesBy: isSet(object.incrementOwnershipTimesBy)
-        ? String(object.incrementOwnershipTimesBy)
+      incrementOwnedTimesBy: isSet(object.incrementOwnedTimesBy)
+        ? String(object.incrementOwnedTimesBy)
         : "",
       overallApprovals: isSet(object.overallApprovals) ? ApprovalsTracker.fromJSON(object.overallApprovals) : undefined,
       perAddressApprovals: isSet(object.perAddressApprovals)
@@ -1589,8 +1589,8 @@ export const CollectionApprovedTransfer = {
     }
     message.approvalId !== undefined && (obj.approvalId = message.approvalId);
     message.incrementBadgeIdsBy !== undefined && (obj.incrementBadgeIdsBy = message.incrementBadgeIdsBy);
-    message.incrementOwnershipTimesBy !== undefined
-      && (obj.incrementOwnershipTimesBy = message.incrementOwnershipTimesBy);
+    message.incrementOwnedTimesBy !== undefined
+      && (obj.incrementOwnedTimesBy = message.incrementOwnedTimesBy);
     message.overallApprovals !== undefined && (obj.overallApprovals = message.overallApprovals
       ? ApprovalsTracker.toJSON(message.overallApprovals)
       : undefined);
@@ -1626,7 +1626,7 @@ export const CollectionApprovedTransfer = {
     message.challenges = object.challenges?.map((e) => Challenge.fromPartial(e)) || [];
     message.approvalId = object.approvalId ?? "";
     message.incrementBadgeIdsBy = object.incrementBadgeIdsBy ?? "";
-    message.incrementOwnershipTimesBy = object.incrementOwnershipTimesBy ?? "";
+    message.incrementOwnedTimesBy = object.incrementOwnedTimesBy ?? "";
     message.overallApprovals = (object.overallApprovals !== undefined && object.overallApprovals !== null)
       ? ApprovalsTracker.fromPartial(object.overallApprovals)
       : undefined;

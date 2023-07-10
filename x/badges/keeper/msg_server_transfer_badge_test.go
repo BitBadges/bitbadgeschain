@@ -32,7 +32,7 @@ func (suite *TestSuite) TestTransferBadgesForceful() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       GetOneUintRange(),
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 			},
@@ -79,7 +79,7 @@ func (suite *TestSuite) TestTransferBadgesHandleDuplicateIDs() {
 							GetOneUintRange()[0],
 							GetOneUintRange()[0],
 						},
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 			},
@@ -108,7 +108,7 @@ func (suite *TestSuite) TestTransferBadgesNotApprovedCollectionLevel() {
 		CollectionId: sdkmath.NewUint(1),
 		CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
 			{
-				ApprovedTransfers: []*types.CollectionApprovedTransfer{},
+				CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{},
 				TimelineTimes:     GetFullUintRanges(),
 			},
 		},
@@ -126,7 +126,7 @@ func (suite *TestSuite) TestTransferBadgesNotApprovedCollectionLevel() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       GetOneUintRange(),
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 			},
@@ -173,7 +173,7 @@ func (suite *TestSuite) TestTransferBadgesNotApprovedIncoming() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       GetOneUintRange(),
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 			},
@@ -209,7 +209,7 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 			{
 				Amount:         sdkmath.NewUint(1),
 				BadgeIds:       GetOneUintRange(),
-				OwnershipTimes: GetFullUintRanges(),
+				OwnedTimes: GetFullUintRanges(),
 			},
 		},
 		CollectionApprovedTransfersTimeline: collection.CollectionApprovedTransfersTimeline,
@@ -231,7 +231,7 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       GetOneUintRange(),
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 			},
@@ -254,7 +254,7 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       GetOneUintRange(),
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 			},

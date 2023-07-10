@@ -313,7 +313,7 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 						InitiatedByMappingId: "All",
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
-						OwnershipTimes: 		 GetFullUintRanges(),
+						OwnedTimes: 		 GetFullUintRanges(),
 					},
 					Combinations: []*types.CollectionApprovedTransferCombination{
 						{},
@@ -330,19 +330,19 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 		CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
 			{
 				TimelineTimes: GetFullUintRanges(),
-				ApprovedTransfers: []*types.CollectionApprovedTransfer{
+				CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
 						FromMappingId:                          alice,
 						ToMappingId:                            "All",
 						InitiatedByMappingId:                   "All",
 						BadgeIds:                               GetFullUintRanges(),
 						TransferTimes:                          GetFullUintRanges(),
-						OwnershipTimes: 		 GetFullUintRanges(),
+						OwnedTimes: 		 										GetFullUintRanges(),
 						OverridesFromApprovedOutgoingTransfers: true,
 						RequireToEqualsInitiatedBy:             true,
 						ApprovalId:                              "test",
-						IncrementBadgeIdsBy:                    sdkmath.NewUint(0),
-						IncrementOwnershipTimesBy:              sdkmath.NewUint(0),
+						MaxNumTransfers: 												&types.MaxNumTransfers{},
+						ApprovalAmounts: 												&types.ApprovalAmounts{},
 					},
 				},
 			},
@@ -356,19 +356,19 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 		CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
 			{
 				TimelineTimes: GetFullUintRanges(),
-				ApprovedTransfers: []*types.CollectionApprovedTransfer{
+				CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
 						FromMappingId:                          bob,
 						ToMappingId:                            "All",
 						InitiatedByMappingId:                   "All",
 						BadgeIds:                               GetFullUintRanges(),
 						TransferTimes:                          GetFullUintRanges(),
-						OwnershipTimes: 		 GetFullUintRanges(),
+						OwnedTimes: 		 GetFullUintRanges(),
 						OverridesFromApprovedOutgoingTransfers: true,
 						RequireToEqualsInitiatedBy:             true,
 						ApprovalId:                              "test",
-						IncrementBadgeIdsBy:                    sdkmath.NewUint(0),
-						IncrementOwnershipTimesBy:              sdkmath.NewUint(0),
+						MaxNumTransfers: 												&types.MaxNumTransfers{},
+						ApprovalAmounts: 												&types.ApprovalAmounts{},
 					},
 				},
 			},
@@ -400,7 +400,7 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						InitiatedByMappingId: "All",
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
-						OwnershipTimes: 		 GetFullUintRanges(),
+						OwnedTimes: 		 GetFullUintRanges(),
 					},
 					Combinations: []*types.UserApprovedOutgoingTransferCombination{
 						{},
@@ -416,7 +416,7 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						InitiatedByMappingId: "All",
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
-						OwnershipTimes: 		 GetFullUintRanges(),
+						OwnedTimes: 		 GetFullUintRanges(),
 					},
 					Combinations: []*types.UserApprovedIncomingTransferCombination{
 						{},
@@ -441,11 +441,11 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						InitiatedByMappingId:       "All",
 						BadgeIds:                   GetFullUintRanges(),
 						TransferTimes:              GetFullUintRanges(),
-						OwnershipTimes: 		 GetFullUintRanges(),
+						OwnedTimes: 		 GetFullUintRanges(),
 						RequireToEqualsInitiatedBy: true,
 						ApprovalId:                  "test",
-						IncrementBadgeIdsBy:        sdkmath.NewUint(0),
-						IncrementOwnershipTimesBy:  sdkmath.NewUint(0),
+						MaxNumTransfers: 												&types.MaxNumTransfers{},
+						ApprovalAmounts: &types.ApprovalAmounts{},
 					},
 				},
 			},
@@ -459,11 +459,11 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						InitiatedByMappingId: "All",
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
-						OwnershipTimes: 		 GetFullUintRanges(),
+						OwnedTimes: 		 GetFullUintRanges(),
 
 						ApprovalId:                 "test",
-						IncrementBadgeIdsBy:       sdkmath.NewUint(0),
-						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+						MaxNumTransfers: 												&types.MaxNumTransfers{},
+						ApprovalAmounts: 												&types.ApprovalAmounts{},
 					},
 				},
 			},
@@ -485,11 +485,11 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						InitiatedByMappingId:       "All",
 						BadgeIds:                   GetFullUintRanges(),
 						TransferTimes:              GetFullUintRanges(),
-						OwnershipTimes: 		 GetFullUintRanges(),
+						OwnedTimes: 		 GetFullUintRanges(),
 						RequireToEqualsInitiatedBy: true,
 						ApprovalId:                  "test",
-						IncrementBadgeIdsBy:        sdkmath.NewUint(0),
-						IncrementOwnershipTimesBy:  sdkmath.NewUint(0),
+						MaxNumTransfers: 												&types.MaxNumTransfers{},
+						ApprovalAmounts: 												&types.ApprovalAmounts{},
 					},
 				},
 			},
@@ -503,12 +503,16 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						InitiatedByMappingId:         "All",
 						BadgeIds:                     GetFullUintRanges(),
 						TransferTimes:                GetFullUintRanges(),
-						OwnershipTimes: 		 GetFullUintRanges(),
+						OwnedTimes: 		 GetFullUintRanges(),
 						RequireFromEqualsInitiatedBy: true,
 
 						ApprovalId:                 "test",
-						IncrementBadgeIdsBy:       sdkmath.NewUint(0),
-						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+						MaxNumTransfers: 												&types.MaxNumTransfers{
+							
+						},
+						ApprovalAmounts: 												&types.ApprovalAmounts{
+							
+						},
 					},
 				},
 			},

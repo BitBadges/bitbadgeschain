@@ -43,13 +43,13 @@ func SimulateMsgUpdateCollection(
 			BadgesToCreate: GetRandomBalances(r, 3),
 			CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
 				{
-					ApprovedTransfers: []*types.CollectionApprovedTransfer{
+					CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{
 						{
 							FromMappingId:        GetRandomAddresses(r, 1, accs)[0],
 							ToMappingId:          GetRandomAddresses(r, 1, accs)[0],
 							InitiatedByMappingId: GetRandomAddresses(r, 1, accs)[0],
 							TransferTimes:        GetTimelineTimes(r, 100),
-							OwnershipTimes: 		 GetTimelineTimes(r, 100),
+							OwnedTimes: 		 GetTimelineTimes(r, 100),
 							BadgeIds:             GetTimelineTimes(r, 3),
 							AllowedCombinations: []*types.IsCollectionTransferAllowed{
 								{

@@ -24,6 +24,7 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 			BalancesType:                     msg.BalancesType,
 			DefaultUserApprovedOutgoingTransfersTimeline: msg.DefaultApprovedOutgoingTransfersTimeline,
 			DefaultUserApprovedIncomingTransfersTimeline: msg.DefaultApprovedIncomingTransfersTimeline,
+			DefaultUserPermissions: msg.DefaultUserPermissions,
 			ManagerTimeline: []*types.ManagerTimeline{
 				{
 					Manager: msg.Creator,
@@ -55,7 +56,7 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 
 	previouslyArchived := types.GetIsArchived(ctx, collection)
 	if msg.UpdateIsArchivedTimeline {
-		if err := k.ValidateIsArchivedUpdate(ctx, collection.IsArchivedTimeline, msg.IsArchivedTimeline, collection.CollectionPermissions.CanArchive); err != nil {
+		if err := k.ValidateIsArchivedUpdate(ctx, collection.IsArchivedTimeline, msg.IsArchivedTimeline, collection.CollectionPermissions.CanArchiveCollection); err != nil {
 			return nil, err
 		}
 		collection.IsArchivedTimeline = msg.IsArchivedTimeline
@@ -150,8 +151,8 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 			collection.CollectionPermissions.CanDeleteCollection = msg.CollectionPermissions.CanDeleteCollection
 		}
 
-		if msg.CollectionPermissions.CanArchive != nil {
-			collection.CollectionPermissions.CanArchive = msg.CollectionPermissions.CanArchive
+		if msg.CollectionPermissions.CanArchiveCollection != nil {
+			collection.CollectionPermissions.CanArchiveCollection = msg.CollectionPermissions.CanArchiveCollection
 		}
 
 		if msg.CollectionPermissions.CanUpdateContractAddress != nil {

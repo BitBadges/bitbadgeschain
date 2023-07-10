@@ -55,4 +55,5 @@ var (
 	ErrSenderAndReceiverSame                       = sdkerrors.Register(ModuleName, 1543, "sender and receiver cannot be the same")
 	ErrInvalidTransfers                            = sdkerrors.Register(ModuleName, 1544, "invalid transfers")
 	ErrUintGreaterThanMax                          = sdkerrors.Register(ModuleName, 1545, "uint greater than max uint")
+	ErrExceedsThreshold														= sdkerrors.Register(ModuleName, 1546, "exceeds threshold")
 )

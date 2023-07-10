@@ -76,7 +76,7 @@ func GetCurrentCollectionApprovedTransfers(ctx sdk.Context, collection *BadgeCol
 	for _, approvedTransfersTimelineVal := range approvedTransfersTimeline {
 		found := SearchUintRangesForUint(blockTime, approvedTransfersTimelineVal.TimelineTimes)
 		if found {
-			return approvedTransfersTimelineVal.ApprovedTransfers
+			return approvedTransfersTimelineVal.CollectionApprovedTransfers
 		}
 	}
 
@@ -98,7 +98,7 @@ func GetCollectionApprovedTransferTimesAndValues(approvedTransfers []*Collection
 	values := []interface{}{}
 	for _, timelineVal := range approvedTransfers {
 		times = append(times, timelineVal.TimelineTimes)
-		values = append(values, timelineVal.ApprovedTransfers)
+		values = append(values, timelineVal.CollectionApprovedTransfers)
 	}
 	return times, values
 }

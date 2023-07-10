@@ -67,8 +67,7 @@ func request_Query_GetCollection_0(ctx context.Context, marshaler runtime.Marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -95,8 +94,7 @@ func local_request_Query_GetCollection_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -177,22 +175,21 @@ func request_Query_GetApprovalsTracker_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
 	}
 
-	val, ok = pathParams["timelineType"]
+	val, ok = pathParams["approvalLevel"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "timelineType")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approvalLevel")
 	}
 
-	protoReq.TimelineType, err = runtime.String(val)
+	protoReq.ApprovalLevel, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "timelineType", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvalLevel", err)
 	}
 
 	val, ok = pathParams["address"]
@@ -249,22 +246,21 @@ func local_request_Query_GetApprovalsTracker_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
 	}
 
-	val, ok = pathParams["timelineType"]
+	val, ok = pathParams["approvalLevel"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "timelineType")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approvalLevel")
 	}
 
-	protoReq.TimelineType, err = runtime.String(val)
+	protoReq.ApprovalLevel, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "timelineType", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvalLevel", err)
 	}
 
 	val, ok = pathParams["address"]
@@ -321,22 +317,21 @@ func request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
 	}
 
-	val, ok = pathParams["timelineType"]
+	val, ok = pathParams["approvalLevel"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "timelineType")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approvalLevel")
 	}
 
-	protoReq.TimelineType, err = runtime.String(val)
+	protoReq.ApprovalLevel, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "timelineType", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvalLevel", err)
 	}
 
 	val, ok = pathParams["address"]
@@ -366,8 +361,7 @@ func request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "challengeIdx")
 	}
 
-	str, err = runtime.String(val)
-	protoReq.ChallengeIdx = NewUintFromString(str)
+	protoReq.ChallengeIdx, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "challengeIdx", err)
@@ -378,8 +372,7 @@ func request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "leafIndex")
 	}
 
-	str, err = runtime.String(val)
-	protoReq.LeafIndex = NewUintFromString(str)
+	protoReq.LeafIndex, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "leafIndex", err)
@@ -406,22 +399,21 @@ func local_request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
 	}
 
-	val, ok = pathParams["timelineType"]
+	val, ok = pathParams["approvalLevel"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "timelineType")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approvalLevel")
 	}
 
-	protoReq.TimelineType, err = runtime.String(val)
+	protoReq.ApprovalLevel, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "timelineType", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvalLevel", err)
 	}
 
 	val, ok = pathParams["address"]
@@ -451,8 +443,7 @@ func local_request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "challengeIdx")
 	}
 
-	str, err = runtime.String(val)
-	protoReq.ChallengeIdx = NewUintFromString(str)
+	protoReq.ChallengeIdx, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "challengeIdx", err)
@@ -463,8 +454,7 @@ func local_request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "leafIndex")
 	}
 
-	str, err = runtime.String(val)
-	protoReq.LeafIndex = NewUintFromString(str)
+	protoReq.LeafIndex, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "leafIndex", err)
@@ -491,8 +481,7 @@ func request_Query_GetBalance_0(ctx context.Context, marshaler runtime.Marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -530,8 +519,7 @@ func local_request_Query_GetBalance_0(ctx context.Context, marshaler runtime.Mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.CollectionId = NewUintFromString(str)
+	protoReq.CollectionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -868,9 +856,9 @@ var (
 
 	pattern_Query_GetAddressMapping_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"bitbadges", "bitbadgeschain", "badges", "get_address_mapping", "mappingId"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetApprovalsTracker_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"bitbadges", "bitbadgeschain", "badges", "get_approvals_tracker", "collectionId", "timelineType", "address", "approvalId", "trackerType"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetApprovalsTracker_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"bitbadges", "bitbadgeschain", "badges", "get_approvals_tracker", "collectionId", "approvalLevel", "address", "approvalId", "trackerType"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetNumUsedForChallenge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"bitbadges", "bitbadgeschain", "badges", "get_num_used_for_challenge", "collectionId", "timelineType", "address", "approvalId", "challengeIdx", "leafIndex"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetNumUsedForChallenge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"bitbadges", "bitbadgeschain", "badges", "get_num_used_for_challenge", "collectionId", "approvalLevel", "address", "approvalId", "challengeIdx", "leafIndex"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_GetBalance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"bitbadges", "bitbadgeschain", "badges", "get_balance", "collectionId", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 )

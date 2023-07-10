@@ -20,7 +20,7 @@ export const protobufPackage = "bitbadges.bitbadgeschain.badges";
  * - timelineTimes: the times when a timeline-based field is a specific value
  * - permitted/forbiddenTimes - the times that a permission can be performed
  * - transferTimes - the times that a transfer occurs
- * - ownershipTimes - the times when a badge is owned by a user
+ * - ownedTimes - the times when a badge is owned by a user
  *
  * The permitted/forbiddenTimes are used to determine when a permission can be executed.
  * Once a time is set to be permitted or forbidden, it is PERMANENT and cannot be changed.
@@ -176,14 +176,14 @@ export interface UserApprovedIncomingTransferPermission {
 
 export interface BalancesActionCombination {
   badgeIdsOptions: ValueOptions | undefined;
-  ownershipTimesOptions: ValueOptions | undefined;
+  ownedTimesOptions: ValueOptions | undefined;
   permittedTimesOptions: ValueOptions | undefined;
   forbiddenTimesOptions: ValueOptions | undefined;
 }
 
 export interface BalancesActionDefaultValues {
   badgeIds: UintRange[];
-  ownershipTimes: UintRange[];
+  ownedTimes: UintRange[];
   permittedTimes: UintRange[];
   forbiddenTimes: UintRange[];
 }
@@ -192,7 +192,7 @@ export interface BalancesActionDefaultValues {
  * BalancesActionPermission defines the permissions for updating a timeline-based field for specific badges and specific badge ownership times.
  * Currently, this is only used for creating new badges.
  *
- * Ex: If you want to lock the ability to create new badges for badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021,
+ * Ex: If you want to lock the ability to create new badges for badgeIds [1,2] at ownedTimes 1/1/2020 - 1/1/2021,
  * you could set the combination (badgeIds: [1,2], ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
  */
 export interface BalancesActionPermission {
@@ -1811,7 +1811,7 @@ export const UserApprovedIncomingTransferPermission = {
 function createBaseBalancesActionCombination(): BalancesActionCombination {
   return {
     badgeIdsOptions: undefined,
-    ownershipTimesOptions: undefined,
+    ownedTimesOptions: undefined,
     permittedTimesOptions: undefined,
     forbiddenTimesOptions: undefined,
   };
@@ -1822,8 +1822,8 @@ export const BalancesActionCombination = {
     if (message.badgeIdsOptions !== undefined) {
       ValueOptions.encode(message.badgeIdsOptions, writer.uint32(10).fork()).ldelim();
     }
-    if (message.ownershipTimesOptions !== undefined) {
-      ValueOptions.encode(message.ownershipTimesOptions, writer.uint32(18).fork()).ldelim();
+    if (message.ownedTimesOptions !== undefined) {
+      ValueOptions.encode(message.ownedTimesOptions, writer.uint32(18).fork()).ldelim();
     }
     if (message.permittedTimesOptions !== undefined) {
       ValueOptions.encode(message.permittedTimesOptions, writer.uint32(26).fork()).ldelim();
@@ -1845,7 +1845,7 @@ export const BalancesActionCombination = {
           message.badgeIdsOptions = ValueOptions.decode(reader, reader.uint32());
           break;
         case 2:
-          message.ownershipTimesOptions = ValueOptions.decode(reader, reader.uint32());
+          message.ownedTimesOptions = ValueOptions.decode(reader, reader.uint32());
           break;
         case 3:
           message.permittedTimesOptions = ValueOptions.decode(reader, reader.uint32());
@@ -1864,8 +1864,8 @@ export const BalancesActionCombination = {
   fromJSON(object: any): BalancesActionCombination {
     return {
       badgeIdsOptions: isSet(object.badgeIdsOptions) ? ValueOptions.fromJSON(object.badgeIdsOptions) : undefined,
-      ownershipTimesOptions: isSet(object.ownershipTimesOptions)
-        ? ValueOptions.fromJSON(object.ownershipTimesOptions)
+      ownedTimesOptions: isSet(object.ownedTimesOptions)
+        ? ValueOptions.fromJSON(object.ownedTimesOptions)
         : undefined,
       permittedTimesOptions: isSet(object.permittedTimesOptions)
         ? ValueOptions.fromJSON(object.permittedTimesOptions)
@@ -1880,8 +1880,8 @@ export const BalancesActionCombination = {
     const obj: any = {};
     message.badgeIdsOptions !== undefined
       && (obj.badgeIdsOptions = message.badgeIdsOptions ? ValueOptions.toJSON(message.badgeIdsOptions) : undefined);
-    message.ownershipTimesOptions !== undefined && (obj.ownershipTimesOptions = message.ownershipTimesOptions
-      ? ValueOptions.toJSON(message.ownershipTimesOptions)
+    message.ownedTimesOptions !== undefined && (obj.ownedTimesOptions = message.ownedTimesOptions
+      ? ValueOptions.toJSON(message.ownedTimesOptions)
       : undefined);
     message.permittedTimesOptions !== undefined && (obj.permittedTimesOptions = message.permittedTimesOptions
       ? ValueOptions.toJSON(message.permittedTimesOptions)
@@ -1897,9 +1897,9 @@ export const BalancesActionCombination = {
     message.badgeIdsOptions = (object.badgeIdsOptions !== undefined && object.badgeIdsOptions !== null)
       ? ValueOptions.fromPartial(object.badgeIdsOptions)
       : undefined;
-    message.ownershipTimesOptions =
-      (object.ownershipTimesOptions !== undefined && object.ownershipTimesOptions !== null)
-        ? ValueOptions.fromPartial(object.ownershipTimesOptions)
+    message.ownedTimesOptions =
+      (object.ownedTimesOptions !== undefined && object.ownedTimesOptions !== null)
+        ? ValueOptions.fromPartial(object.ownedTimesOptions)
         : undefined;
     message.permittedTimesOptions =
       (object.permittedTimesOptions !== undefined && object.permittedTimesOptions !== null)
@@ -1914,7 +1914,7 @@ export const BalancesActionCombination = {
 };
 
 function createBaseBalancesActionDefaultValues(): BalancesActionDefaultValues {
-  return { badgeIds: [], ownershipTimes: [], permittedTimes: [], forbiddenTimes: [] };
+  return { badgeIds: [], ownedTimes: [], permittedTimes: [], forbiddenTimes: [] };
 }
 
 export const BalancesActionDefaultValues = {
@@ -1922,7 +1922,7 @@ export const BalancesActionDefaultValues = {
     for (const v of message.badgeIds) {
       UintRange.encode(v!, writer.uint32(10).fork()).ldelim();
     }
-    for (const v of message.ownershipTimes) {
+    for (const v of message.ownedTimes) {
       UintRange.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     for (const v of message.permittedTimes) {
@@ -1945,7 +1945,7 @@ export const BalancesActionDefaultValues = {
           message.badgeIds.push(UintRange.decode(reader, reader.uint32()));
           break;
         case 2:
-          message.ownershipTimes.push(UintRange.decode(reader, reader.uint32()));
+          message.ownedTimes.push(UintRange.decode(reader, reader.uint32()));
           break;
         case 3:
           message.permittedTimes.push(UintRange.decode(reader, reader.uint32()));
@@ -1964,8 +1964,8 @@ export const BalancesActionDefaultValues = {
   fromJSON(object: any): BalancesActionDefaultValues {
     return {
       badgeIds: Array.isArray(object?.badgeIds) ? object.badgeIds.map((e: any) => UintRange.fromJSON(e)) : [],
-      ownershipTimes: Array.isArray(object?.ownershipTimes)
-        ? object.ownershipTimes.map((e: any) => UintRange.fromJSON(e))
+      ownedTimes: Array.isArray(object?.ownedTimes)
+        ? object.ownedTimes.map((e: any) => UintRange.fromJSON(e))
         : [],
       permittedTimes: Array.isArray(object?.permittedTimes)
         ? object.permittedTimes.map((e: any) => UintRange.fromJSON(e))
@@ -1983,10 +1983,10 @@ export const BalancesActionDefaultValues = {
     } else {
       obj.badgeIds = [];
     }
-    if (message.ownershipTimes) {
-      obj.ownershipTimes = message.ownershipTimes.map((e) => e ? UintRange.toJSON(e) : undefined);
+    if (message.ownedTimes) {
+      obj.ownedTimes = message.ownedTimes.map((e) => e ? UintRange.toJSON(e) : undefined);
     } else {
-      obj.ownershipTimes = [];
+      obj.ownedTimes = [];
     }
     if (message.permittedTimes) {
       obj.permittedTimes = message.permittedTimes.map((e) => e ? UintRange.toJSON(e) : undefined);
@@ -2004,7 +2004,7 @@ export const BalancesActionDefaultValues = {
   fromPartial<I extends Exact<DeepPartial<BalancesActionDefaultValues>, I>>(object: I): BalancesActionDefaultValues {
     const message = createBaseBalancesActionDefaultValues();
     message.badgeIds = object.badgeIds?.map((e) => UintRange.fromPartial(e)) || [];
-    message.ownershipTimes = object.ownershipTimes?.map((e) => UintRange.fromPartial(e)) || [];
+    message.ownedTimes = object.ownedTimes?.map((e) => UintRange.fromPartial(e)) || [];
     message.permittedTimes = object.permittedTimes?.map((e) => UintRange.fromPartial(e)) || [];
     message.forbiddenTimes = object.forbiddenTimes?.map((e) => UintRange.fromPartial(e)) || [];
     return message;

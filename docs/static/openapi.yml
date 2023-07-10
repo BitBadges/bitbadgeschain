@@ -254,7 +254,7 @@ paths:
                       properties:
                         amount:
                           type: string
-                        ownershipTimes:
+                        ownedTimes:
                           type: array
                           items:
                             type: object
@@ -536,7 +536,7 @@ paths:
                       properties:
                         amount:
                           type: string
-                        ownershipTimes:
+                        ownedTimes:
                           type: array
                           items:
                             type: object
@@ -726,7 +726,7 @@ paths:
                                 type: string
                               incrementBadgeIdsBy:
                                 type: string
-                              incrementOwnershipTimesBy:
+                              incrementOwnedTimesBy:
                                 type: string
                               perAddressApprovals:
                                 type: object
@@ -743,7 +743,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -811,7 +811,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -879,7 +879,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -1109,7 +1109,7 @@ paths:
                                 type: string
                               incrementBadgeIdsBy:
                                 type: string
-                              incrementOwnershipTimesBy:
+                              incrementOwnedTimesBy:
                                 type: string
                               perAddressApprovals:
                                 type: object
@@ -1126,7 +1126,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -1194,7 +1194,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -1262,7 +1262,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -3438,7 +3438,7 @@ paths:
                                       They are used for evrything from badge IDs
                                       to time ranges to min / max balance
                                       amounts.
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -3519,7 +3519,7 @@ paths:
                                     description: >-
                                       ValueOptions defines how we manipulate the
                                       default values.
-                                  ownershipTimesOptions:
+                                  ownedTimesOptions:
                                     type: object
                                     properties:
                                       invertDefault:
@@ -3577,7 +3577,7 @@ paths:
 
 
                             Ex: If you want to lock the ability to create new
-                            badges for badgeIds [1,2] at ownershipTimes 1/1/2020
+                            badges for badgeIds [1,2] at ownedTimes 1/1/2020
                             - 1/1/2021, 
 
                             you could set the combination (badgeIds: [1,2],
@@ -4361,7 +4361,7 @@ paths:
                                 type: string
                               incrementBadgeIdsBy:
                                 type: string
-                              incrementOwnershipTimesBy:
+                              incrementOwnedTimesBy:
                                 type: string
                               overallApprovals:
                                 type: object
@@ -4375,7 +4375,7 @@ paths:
                                       properties:
                                         amount:
                                           type: string
-                                        ownershipTimes:
+                                        ownedTimes:
                                           type: array
                                           items:
                                             type: object
@@ -4446,7 +4446,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -4514,7 +4514,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -4582,7 +4582,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -4924,7 +4924,7 @@ paths:
                                 type: string
                               incrementBadgeIdsBy:
                                 type: string
-                              incrementOwnershipTimesBy:
+                              incrementOwnedTimesBy:
                                 type: string
                               perAddressApprovals:
                                 type: object
@@ -4941,7 +4941,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -5009,7 +5009,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -5077,7 +5077,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -5313,7 +5313,7 @@ paths:
                                 type: string
                               incrementBadgeIdsBy:
                                 type: string
-                              incrementOwnershipTimesBy:
+                              incrementOwnedTimesBy:
                                 type: string
                               perAddressApprovals:
                                 type: object
@@ -5330,7 +5330,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -5398,7 +5398,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -5466,7 +5466,7 @@ paths:
                                           properties:
                                             amount:
                                               type: string
-                                            ownershipTimes:
+                                            ownedTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -52432,7 +52432,7 @@ definitions:
           properties:
             amount:
               type: string
-            ownershipTimes:
+            ownedTimes:
               type: array
               items:
                 type: object
@@ -53748,7 +53748,7 @@ definitions:
 
                           They are used for evrything from badge IDs to time
                           ranges to min / max balance amounts.
-                    ownershipTimes:
+                    ownedTimes:
                       type: array
                       items:
                         type: object
@@ -53824,7 +53824,7 @@ definitions:
                         description: >-
                           ValueOptions defines how we manipulate the default
                           values.
-                      ownershipTimesOptions:
+                      ownedTimesOptions:
                         type: object
                         properties:
                           invertDefault:
@@ -53875,7 +53875,7 @@ definitions:
 
 
                 Ex: If you want to lock the ability to create new badges for
-                badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021, 
+                badgeIds [1,2] at ownedTimes 1/1/2020 - 1/1/2021, 
 
                 you could set the combination (badgeIds: [1,2],
                 ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be
@@ -54595,7 +54595,7 @@ definitions:
                     type: string
                   incrementBadgeIdsBy:
                     type: string
-                  incrementOwnershipTimesBy:
+                  incrementOwnedTimesBy:
                     type: string
                   overallApprovals:
                     type: object
@@ -54609,7 +54609,7 @@ definitions:
                           properties:
                             amount:
                               type: string
-                            ownershipTimes:
+                            ownedTimes:
                               type: array
                               items:
                                 type: object
@@ -54677,7 +54677,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -54744,7 +54744,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -54811,7 +54811,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -55142,7 +55142,7 @@ definitions:
                     type: string
                   incrementBadgeIdsBy:
                     type: string
-                  incrementOwnershipTimesBy:
+                  incrementOwnedTimesBy:
                     type: string
                   perAddressApprovals:
                     type: object
@@ -55159,7 +55159,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -55226,7 +55226,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -55293,7 +55293,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -55521,7 +55521,7 @@ definitions:
                     type: string
                   incrementBadgeIdsBy:
                     type: string
-                  incrementOwnershipTimesBy:
+                  incrementOwnedTimesBy:
                     type: string
                   perAddressApprovals:
                     type: object
@@ -55538,7 +55538,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -55605,7 +55605,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -55672,7 +55672,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -55887,7 +55887,7 @@ definitions:
     properties:
       amount:
         type: string
-      ownershipTimes:
+      ownedTimes:
         type: array
         items:
           type: object
@@ -55950,7 +55950,7 @@ definitions:
             type: boolean
             title: Override default values with no values
         description: ValueOptions defines how we manipulate the default values.
-      ownershipTimesOptions:
+      ownedTimesOptions:
         type: object
         properties:
           invertDefault:
@@ -56007,7 +56007,7 @@ definitions:
 
             They are used for evrything from badge IDs to time ranges to min /
             max balance amounts.
-      ownershipTimes:
+      ownedTimes:
         type: array
         items:
           type: object
@@ -56086,7 +56086,7 @@ definitions:
 
                 They are used for evrything from badge IDs to time ranges to min
                 / max balance amounts.
-          ownershipTimes:
+          ownedTimes:
             type: array
             items:
               type: object
@@ -56160,7 +56160,7 @@ definitions:
                   type: boolean
                   title: Override default values with no values
               description: ValueOptions defines how we manipulate the default values.
-            ownershipTimesOptions:
+            ownedTimesOptions:
               type: object
               properties:
                 invertDefault:
@@ -56205,7 +56205,7 @@ definitions:
 
 
       Ex: If you want to lock the ability to create new badges for badgeIds
-      [1,2] at ownershipTimes 1/1/2020 - 1/1/2021, 
+      [1,2] at ownedTimes 1/1/2020 - 1/1/2021, 
 
       you could set the combination (badgeIds: [1,2], ownershipTimelineTimes:
       [1/1/2020 - 1/1/2021]) to always be forbidden.
@@ -56430,7 +56430,7 @@ definitions:
         type: string
       incrementBadgeIdsBy:
         type: string
-      incrementOwnershipTimesBy:
+      incrementOwnedTimesBy:
         type: string
       overallApprovals:
         type: object
@@ -56444,7 +56444,7 @@ definitions:
               properties:
                 amount:
                   type: string
-                ownershipTimes:
+                ownedTimes:
                   type: array
                   items:
                     type: object
@@ -56509,7 +56509,7 @@ definitions:
                   properties:
                     amount:
                       type: string
-                    ownershipTimes:
+                    ownedTimes:
                       type: array
                       items:
                         type: object
@@ -56573,7 +56573,7 @@ definitions:
                   properties:
                     amount:
                       type: string
-                    ownershipTimes:
+                    ownedTimes:
                       type: array
                       items:
                         type: object
@@ -56637,7 +56637,7 @@ definitions:
                   properties:
                     amount:
                       type: string
-                    ownershipTimes:
+                    ownedTimes:
                       type: array
                       items:
                         type: object
@@ -57287,7 +57287,7 @@ definitions:
               type: string
             incrementBadgeIdsBy:
               type: string
-            incrementOwnershipTimesBy:
+            incrementOwnedTimesBy:
               type: string
             overallApprovals:
               type: object
@@ -57301,7 +57301,7 @@ definitions:
                     properties:
                       amount:
                         type: string
-                      ownershipTimes:
+                      ownedTimes:
                         type: array
                         items:
                           type: object
@@ -57368,7 +57368,7 @@ definitions:
                         properties:
                           amount:
                             type: string
-                          ownershipTimes:
+                          ownedTimes:
                             type: array
                             items:
                               type: object
@@ -57432,7 +57432,7 @@ definitions:
                         properties:
                           amount:
                             type: string
-                          ownershipTimes:
+                          ownedTimes:
                             type: array
                             items:
                               type: object
@@ -57496,7 +57496,7 @@ definitions:
                         properties:
                           amount:
                             type: string
-                          ownershipTimes:
+                          ownedTimes:
                             type: array
                             items:
                               type: object
@@ -58549,7 +58549,7 @@ definitions:
 
                       They are used for evrything from badge IDs to time ranges
                       to min / max balance amounts.
-                ownershipTimes:
+                ownedTimes:
                   type: array
                   items:
                     type: object
@@ -58623,7 +58623,7 @@ definitions:
                         type: boolean
                         title: Override default values with no values
                     description: ValueOptions defines how we manipulate the default values.
-                  ownershipTimesOptions:
+                  ownedTimesOptions:
                     type: object
                     properties:
                       invertDefault:
@@ -58668,7 +58668,7 @@ definitions:
 
 
             Ex: If you want to lock the ability to create new badges for
-            badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021, 
+            badgeIds [1,2] at ownedTimes 1/1/2020 - 1/1/2021, 
 
             you could set the combination (badgeIds: [1,2],
             ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be
@@ -59255,7 +59255,7 @@ definitions:
 
       - transferTimes - the times that a transfer occurs
 
-      - ownershipTimes - the times when a badge is owned by a user
+      - ownedTimes - the times when a badge is owned by a user
 
 
       The permitted/forbiddenTimes are used to determine when a permission can
@@ -59659,7 +59659,7 @@ definitions:
               properties:
                 amount:
                   type: string
-                ownershipTimes:
+                ownedTimes:
                   type: array
                   items:
                     type: object
@@ -59721,7 +59721,7 @@ definitions:
               properties:
                 amount:
                   type: string
-                ownershipTimes:
+                ownedTimes:
                   type: array
                   items:
                     type: object
@@ -59783,7 +59783,7 @@ definitions:
               properties:
                 amount:
                   type: string
-                ownershipTimes:
+                ownedTimes:
                   type: array
                   items:
                     type: object
@@ -59882,7 +59882,7 @@ definitions:
               properties:
                 amount:
                   type: string
-                ownershipTimes:
+                ownedTimes:
                   type: array
                   items:
                     type: object
@@ -59945,7 +59945,7 @@ definitions:
               properties:
                 amount:
                   type: string
-                ownershipTimes:
+                ownedTimes:
                   type: array
                   items:
                     type: object
@@ -60129,7 +60129,7 @@ definitions:
                         type: string
                       incrementBadgeIdsBy:
                         type: string
-                      incrementOwnershipTimesBy:
+                      incrementOwnedTimesBy:
                         type: string
                       perAddressApprovals:
                         type: object
@@ -60146,7 +60146,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -60214,7 +60214,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -60282,7 +60282,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -60508,7 +60508,7 @@ definitions:
                         type: string
                       incrementBadgeIdsBy:
                         type: string
-                      incrementOwnershipTimesBy:
+                      incrementOwnedTimesBy:
                         type: string
                       perAddressApprovals:
                         type: object
@@ -60525,7 +60525,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -60593,7 +60593,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -60661,7 +60661,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -62585,7 +62585,7 @@ definitions:
 
                               They are used for evrything from badge IDs to time
                               ranges to min / max balance amounts.
-                        ownershipTimes:
+                        ownedTimes:
                           type: array
                           items:
                             type: object
@@ -62663,7 +62663,7 @@ definitions:
                             description: >-
                               ValueOptions defines how we manipulate the default
                               values.
-                          ownershipTimesOptions:
+                          ownedTimesOptions:
                             type: object
                             properties:
                               invertDefault:
@@ -62720,7 +62720,7 @@ definitions:
 
 
                     Ex: If you want to lock the ability to create new badges for
-                    badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021, 
+                    badgeIds [1,2] at ownedTimes 1/1/2020 - 1/1/2021, 
 
                     you could set the combination (badgeIds: [1,2],
                     ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be
@@ -63478,7 +63478,7 @@ definitions:
                         type: string
                       incrementBadgeIdsBy:
                         type: string
-                      incrementOwnershipTimesBy:
+                      incrementOwnedTimesBy:
                         type: string
                       overallApprovals:
                         type: object
@@ -63492,7 +63492,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -63562,7 +63562,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -63630,7 +63630,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -63698,7 +63698,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -64034,7 +64034,7 @@ definitions:
                         type: string
                       incrementBadgeIdsBy:
                         type: string
-                      incrementOwnershipTimesBy:
+                      incrementOwnedTimesBy:
                         type: string
                       perAddressApprovals:
                         type: object
@@ -64051,7 +64051,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -64119,7 +64119,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -64187,7 +64187,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -64419,7 +64419,7 @@ definitions:
                         type: string
                       incrementBadgeIdsBy:
                         type: string
-                      incrementOwnershipTimesBy:
+                      incrementOwnedTimesBy:
                         type: string
                       perAddressApprovals:
                         type: object
@@ -64436,7 +64436,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -64504,7 +64504,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -64572,7 +64572,7 @@ definitions:
                                   properties:
                                     amount:
                                       type: string
-                                    ownershipTimes:
+                                    ownedTimes:
                                       type: array
                                       items:
                                         type: object
@@ -65238,7 +65238,7 @@ definitions:
           properties:
             amount:
               type: string
-            ownershipTimes:
+            ownedTimes:
               type: array
               items:
                 type: object
@@ -65453,7 +65453,7 @@ definitions:
         type: string
       incrementBadgeIdsBy:
         type: string
-      incrementOwnershipTimesBy:
+      incrementOwnedTimesBy:
         type: string
       perAddressApprovals:
         type: object
@@ -65470,7 +65470,7 @@ definitions:
                   properties:
                     amount:
                       type: string
-                    ownershipTimes:
+                    ownedTimes:
                       type: array
                       items:
                         type: object
@@ -65534,7 +65534,7 @@ definitions:
                   properties:
                     amount:
                       type: string
-                    ownershipTimes:
+                    ownedTimes:
                       type: array
                       items:
                         type: object
@@ -65598,7 +65598,7 @@ definitions:
                   properties:
                     amount:
                       type: string
-                    ownershipTimes:
+                    ownedTimes:
                       type: array
                       items:
                         type: object
@@ -66180,7 +66180,7 @@ definitions:
               type: string
             incrementBadgeIdsBy:
               type: string
-            incrementOwnershipTimesBy:
+            incrementOwnedTimesBy:
               type: string
             perAddressApprovals:
               type: object
@@ -66197,7 +66197,7 @@ definitions:
                         properties:
                           amount:
                             type: string
-                          ownershipTimes:
+                          ownedTimes:
                             type: array
                             items:
                               type: object
@@ -66261,7 +66261,7 @@ definitions:
                         properties:
                           amount:
                             type: string
-                          ownershipTimes:
+                          ownedTimes:
                             type: array
                             items:
                               type: object
@@ -66325,7 +66325,7 @@ definitions:
                         properties:
                           amount:
                             type: string
-                          ownershipTimes:
+                          ownedTimes:
                             type: array
                             items:
                               type: object
@@ -66533,7 +66533,7 @@ definitions:
         type: string
       incrementBadgeIdsBy:
         type: string
-      incrementOwnershipTimesBy:
+      incrementOwnedTimesBy:
         type: string
       perAddressApprovals:
         type: object
@@ -66550,7 +66550,7 @@ definitions:
                   properties:
                     amount:
                       type: string
-                    ownershipTimes:
+                    ownedTimes:
                       type: array
                       items:
                         type: object
@@ -66614,7 +66614,7 @@ definitions:
                   properties:
                     amount:
                       type: string
-                    ownershipTimes:
+                    ownedTimes:
                       type: array
                       items:
                         type: object
@@ -66678,7 +66678,7 @@ definitions:
                   properties:
                     amount:
                       type: string
-                    ownershipTimes:
+                    ownedTimes:
                       type: array
                       items:
                         type: object
@@ -67261,7 +67261,7 @@ definitions:
               type: string
             incrementBadgeIdsBy:
               type: string
-            incrementOwnershipTimesBy:
+            incrementOwnedTimesBy:
               type: string
             perAddressApprovals:
               type: object
@@ -67278,7 +67278,7 @@ definitions:
                         properties:
                           amount:
                             type: string
-                          ownershipTimes:
+                          ownedTimes:
                             type: array
                             items:
                               type: object
@@ -67342,7 +67342,7 @@ definitions:
                         properties:
                           amount:
                             type: string
-                          ownershipTimes:
+                          ownedTimes:
                             type: array
                             items:
                               type: object
@@ -67406,7 +67406,7 @@ definitions:
                         properties:
                           amount:
                             type: string
-                          ownershipTimes:
+                          ownedTimes:
                             type: array
                             items:
                               type: object
@@ -67503,7 +67503,7 @@ definitions:
           properties:
             amount:
               type: string
-            ownershipTimes:
+            ownedTimes:
               type: array
               items:
                 type: object
@@ -67685,7 +67685,7 @@ definitions:
                     type: string
                   incrementBadgeIdsBy:
                     type: string
-                  incrementOwnershipTimesBy:
+                  incrementOwnedTimesBy:
                     type: string
                   perAddressApprovals:
                     type: object
@@ -67702,7 +67702,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -67769,7 +67769,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -67836,7 +67836,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -68059,7 +68059,7 @@ definitions:
                     type: string
                   incrementBadgeIdsBy:
                     type: string
-                  incrementOwnershipTimesBy:
+                  incrementOwnedTimesBy:
                     type: string
                   perAddressApprovals:
                     type: object
@@ -68076,7 +68076,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -68143,7 +68143,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object
@@ -68210,7 +68210,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownershipTimes:
+                                ownedTimes:
                                   type: array
                                   items:
                                     type: object

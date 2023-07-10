@@ -136,11 +136,11 @@ func (k Keeper) ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, colle
 						}
 					}
 
-					if proto.MarshalTextString(newVal.PerAddressApprovals) != proto.MarshalTextString(oldVal.PerAddressApprovals) {
+					if proto.MarshalTextString(newVal.ApprovalAmounts) != proto.MarshalTextString(oldVal.ApprovalAmounts) {
 						different = true
 					}
 
-					if proto.MarshalTextString(newVal.OverallApprovals) != proto.MarshalTextString(oldVal.OverallApprovals) {
+					if proto.MarshalTextString(newVal.MaxNumTransfers) != proto.MarshalTextString(oldVal.MaxNumTransfers) {
 						different = true
 					}
 				}
@@ -238,9 +238,16 @@ func (k Keeper) ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, _ol
 					}
 				}
 
-				if proto.MarshalTextString(newVal.PerAddressApprovals) != proto.MarshalTextString(oldVal.PerAddressApprovals) {
+				if proto.MarshalTextString(newVal.ApprovalAmounts) != proto.MarshalTextString(oldVal.ApprovalAmounts) {
 					different = true
+				}
 
+				if proto.MarshalTextString(newVal.MaxNumTransfers) != proto.MarshalTextString(oldVal.MaxNumTransfers) {
+					different = true
+				}
+
+				if proto.MarshalTextString(newVal.PredeterminedBalances) != proto.MarshalTextString(oldVal.PredeterminedBalances) {
+					different = true
 				}
 			}
 
@@ -337,9 +344,16 @@ func (k Keeper) ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, _ol
 					}
 				}
 
-				if proto.MarshalTextString(newVal.PerAddressApprovals) != proto.MarshalTextString(oldVal.PerAddressApprovals) {
+				if proto.MarshalTextString(newVal.ApprovalAmounts) != proto.MarshalTextString(oldVal.ApprovalAmounts) {
 					different = true
+				}
 
+				if proto.MarshalTextString(newVal.MaxNumTransfers) != proto.MarshalTextString(oldVal.MaxNumTransfers) {
+					different = true
+				}
+
+				if proto.MarshalTextString(newVal.PredeterminedBalances) != proto.MarshalTextString(oldVal.PredeterminedBalances) {
+					different = true
 				}
 			}
 

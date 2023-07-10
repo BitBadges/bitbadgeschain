@@ -26,15 +26,45 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 					Balances:                          []*types.Balance{},
 					ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
 					ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,
-					UserPermissions: &types.UserPermissions{
-						CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransferPermission{},
-						CanUpdateApprovedIncomingTransfers: []*types.UserApprovedIncomingTransferPermission{},
-					},
+					UserPermissions: 								 collection.DefaultUserPermissions,
+				}
+			}
+
+			if transfer.PrecalculateFromApproval != nil {
+				approvedTransfers := types.GetCurrentCollectionApprovedTransfers(ctx, collection)
+				if transfer.PrecalculateFromApproval.Address != "" {
+					if transfer.PrecalculateFromApproval.Address != to && transfer.PrecalculateFromApproval.Address != transfer.From {
+						return sdkerrors.Wrapf(ErrNotImplemented, "approval id address %s does not match to or from address", transfer.PrecalculateFromApproval.Address)
+					}
+
+					if transfer.PrecalculateFromApproval.Address == to {
+						if transfer.PrecalculateFromApproval.ApprovalLevel == "incoming" {
+							userApprovedTransfers := types.GetCurrentUserApprovedIncomingTransfers(ctx, toUserBalance)
+							approvedTransfers = types.CastIncomingTransfersToCollectionTransfers(userApprovedTransfers, to)
+						} else {
+							userApprovedTransfers := types.GetCurrentUserApprovedOutgoingTransfers(ctx, toUserBalance)
+							approvedTransfers = types.CastOutgoingTransfersToCollectionTransfers(userApprovedTransfers, to)
+						}
+					} else {
+						if transfer.PrecalculateFromApproval.ApprovalLevel == "outgoing" {
+							userApprovedTransfers := types.GetCurrentUserApprovedOutgoingTransfers(ctx, fromUserBalance)
+							approvedTransfers = types.CastOutgoingTransfersToCollectionTransfers(userApprovedTransfers, transfer.From)
+						} else {
+							userApprovedTransfers := types.GetCurrentUserApprovedIncomingTransfers(ctx, fromUserBalance)
+							approvedTransfers = types.CastIncomingTransfersToCollectionTransfers(userApprovedTransfers, transfer.From)
+						}
+					}
+				}
+
+				//Precaluclate the balances that will be transferred
+				transfer.Balances, err = k.GetPredeterminedBalancesForApprovalId(ctx, approvedTransfers, collection, transfer.PrecalculateFromApproval.ApprovalId, transfer.PrecalculateFromApproval.ApprovalLevel, transfer.PrecalculateFromApproval.Address, transfer.Solutions, initiatedBy)
+				if err != nil {
+					return err
 				}
 			}
 
 			for _, balance := range transfer.Balances {
-				fromUserBalance, toUserBalance, err = k.HandleTransfer(ctx, collection, balance.BadgeIds, balance.OwnershipTimes, fromUserBalance, toUserBalance, balance.Amount, transfer.From, to, initiatedBy, transfer.Solutions, transfer.TransferAsMuchAsPossible)
+				fromUserBalance, toUserBalance, err = k.HandleTransfer(ctx, collection, balance.BadgeIds, balance.OwnedTimes, fromUserBalance, toUserBalance, balance.Amount, transfer.From, to, initiatedBy, transfer.Solutions)
 				if err != nil {
 					return err
 				}
@@ -56,44 +86,16 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 // Step 1: Check if transfer is allowed on collection level (deducting approvals if needed)
 // Step 2: If not overriden by collection, check necessary approvals on user level (deducting approvals if needed)
 // Step 3: If all good, we can transfer the balances
-func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, amount sdkmath.Uint, from string, to string, initiatedBy string, solutions []*types.ChallengeSolution, transferAsMuchAsPossible bool) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
+func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, amount sdkmath.Uint, from string, to string, initiatedBy string, solutions []*types.ChallengeSolution) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
 	err := *new(error)
+	transferBalances :=  []*types.Balance{ { Amount: amount, BadgeIds: badgeIds, OwnedTimes: times } }
 	
-	transferBalances :=  []*types.Balance{ { Amount: amount, BadgeIds: badgeIds, OwnershipTimes: times } }
-
-
-	if transferAsMuchAsPossible {
-		userApprovals := []*UserApprovalsToCheck{}
-		userApprovals, transferBalances, err = k.GetUnapprovedBalancesForCollection(ctx, collection, transferBalances, from, to, initiatedBy, solutions, true)
-		if err != nil {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
-		}
-
-		//here, we may double remove some balances
-		if len(userApprovals) > 0 {
-			for _, userApproval := range userApprovals {
-				if userApproval.Outgoing {
-					_, transferBalances, err = k.GetUnapprovedBalancesForOutgoing(ctx, collection, fromUserBalance, transferBalances, userApproval.Balances, from, to, initiatedBy, solutions, true)
-					if err != nil {
-						return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
-					}
-				} else {
-					_, transferBalances, err = k.GetUnapprovedBalancesForIncoming(ctx, collection, toUserBalance, transferBalances, userApproval.Balances, from, to, initiatedBy, solutions, true)
-					if err != nil {
-						return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
-					}
-				}
-			}
-		}
-	} 
-
-	//TODO: make this balances[] instead of passing in times, etc
 
 	for _, balance := range transferBalances {
 		badgeIds := balance.BadgeIds
-		times := balance.OwnershipTimes
+		times := balance.OwnedTimes
 		amount := balance.Amount
-		userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection, badgeIds, times, from, to, initiatedBy, amount, solutions, false)
+		userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, transferBalances, collection, badgeIds, times, from, to, initiatedBy, amount, solutions)
 		if err != nil {
 			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 		}
@@ -102,12 +104,12 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollectio
 			for _, userApproval := range userApprovals {
 				for _, balance := range userApproval.Balances {
 					if userApproval.Outgoing {
-						err = k.DeductUserOutgoingApprovals(ctx, collection, fromUserBalance, balance.BadgeIds, balance.OwnershipTimes, from, to, initiatedBy, amount, solutions, false)
+						err = k.DeductUserOutgoingApprovals(ctx, transferBalances, collection, fromUserBalance, balance.BadgeIds, balance.OwnedTimes, from, to, initiatedBy, amount, solutions)
 						if err != nil {
 							return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 						}
 					} else {
-						err = k.DeductUserIncomingApprovals(ctx, collection, toUserBalance, balance.BadgeIds, balance.OwnershipTimes, from, to, initiatedBy, amount, solutions, false)
+						err = k.DeductUserIncomingApprovals(ctx, transferBalances, collection, toUserBalance, balance.BadgeIds, balance.OwnedTimes, from, to, initiatedBy, amount, solutions)
 						if err != nil {
 							return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 						}
@@ -128,6 +130,7 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollectio
 			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 		}
 	}
+
 
 	return fromUserBalance, toUserBalance, nil
 }

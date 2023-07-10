@@ -10,9 +10,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.Challenge, solutions []*types.ChallengeSolution, creatorAddress string, level string, approvalId string, doNotStore bool) (bool, sdkmath.Uint, error) {
+func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.Challenge, solutions []*types.ChallengeSolution, creatorAddress string, approvalId string, simulation bool) (sdkmath.Uint, error) {
 	numIncrements := sdkmath.NewUint(0)
-	useLeafIndexForDistributionOrder := false
 
 	for _, challenge := range challenges {
 		root := challenge.Root
@@ -34,9 +33,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 				}
 
 				leafIndex := GetLeafIndex(solution.Proof.Aunts)
-				if challenge.UseLeafIndexForDistributionOrder {
-					useLeafIndexForDistributionOrder = true
-
+				if challenge.UseLeafIndexForTransferOrder {
 					//Get leftmost leaf index for layer === challenge.ExpectedProofLength
 					leftmostLeafIndex := sdkmath.NewUint(1)
 					for i := sdkmath.NewUint(0); i.LT(challenge.ExpectedProofLength); i = i.Add(sdkmath.NewUint(1)) {
@@ -48,18 +45,20 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 
 				
 				if challenge.MaxOneUsePerLeaf {
-					if doNotStore {
-						numUsed, err := k.GetNumUsedForChallengeFromStore(ctx, collectionId, approvalId, leafIndex, level)
+
+					if simulation {
+						numUsed, err := k.GetNumUsedForChallengeFromStore(ctx, collectionId, approvalId, leafIndex)
 						if err != nil {
 							continue
 						}
+						numUsed = numUsed.Add(sdkmath.NewUint(1))
 
 						maxUses := sdkmath.NewUint(1)
 						if numUsed.GT(maxUses) {
 							continue
 						}
 					} else {
-						numUsed, err := k.IncrementNumUsedForChallengeInStore(ctx, collectionId, approvalId, leafIndex, level)
+						numUsed, err := k.IncrementNumUsedForChallengeInStore(ctx, collectionId, approvalId, leafIndex)
 						if err != nil {
 							continue
 						}
@@ -77,15 +76,16 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 				}
 
 				hasValidSolution = true
+				break
 			}
 		}
 
 		if !hasValidSolution {
-			return false, numIncrements, ErrNoValidSolutionForChallenge
+			return numIncrements, ErrNoValidSolutionForChallenge
 		}
 	}
 
-	return useLeafIndexForDistributionOrder, numIncrements, nil
+	return numIncrements, nil
 }
 
 func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.ClaimProofItem) error {

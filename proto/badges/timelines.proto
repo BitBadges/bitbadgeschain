@@ -41,7 +41,7 @@ message ManagerTimeline {
 }
 
 message CollectionApprovedTransferTimeline {
-  repeated CollectionApprovedTransfer approvedTransfers = 1;
+  repeated CollectionApprovedTransfer collectionApprovedTransfers = 1;
   repeated UintRange timelineTimes = 2;
 }
 

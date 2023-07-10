@@ -86,7 +86,7 @@ func (suite *TestSuite) TestNewCollectionDuplicateBadgeIds() {
 						GetOneUintRange()[0],
 						GetOneUintRange()[0],
 					},
-					OwnershipTimes: GetFullUintRanges(),
+					OwnedTimes: GetFullUintRanges(),
 				},
 			},
 		},

@@ -166,9 +166,9 @@ func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) {
 
 /********************************************************************************/
 // Sets a usedClaimData in the store using UsedClaimDataKey ([]byte{0x07}) as the prefix. No check if store has key already.
-func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, leafIndex sdkmath.Uint, level string) (sdkmath.Uint, error) {
+func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
-	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex, level)))
+	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex)))
 	curr := sdkmath.NewUint(0)
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
@@ -179,13 +179,13 @@ func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionI
 		curr = sdkmath.NewUint(currUint)
 	}
 	incrementedNum := curr.AddUint64(1)
-	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex, level)), []byte(curr.Incr().String()))
+	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex)), []byte(curr.Incr().String()))
 	return incrementedNum, nil
 }
 
-func (k Keeper) GetNumUsedForChallengeFromStore(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, leafIndex sdkmath.Uint, level string) (sdkmath.Uint, error) {
+func (k Keeper) GetNumUsedForChallengeFromStore(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
-	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex, level)))
+	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex)))
 	curr := sdkmath.NewUint(0)
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
@@ -262,20 +262,20 @@ func (k Keeper) DeleteAddressMappingFromStore(ctx sdk.Context, addressMappingId 
 
 /****************************************TRANSFER TRACKERS****************************************/
 
-func (k Keeper) SetApprovalsTrackerInStore(ctx sdk.Context, collectionId sdkmath.Uint, approvalId string, approvalsTracker types.ApprovalsTracker, level string, depth string, address string) error {
+func (k Keeper) SetApprovalsTrackerInStore(ctx sdk.Context, collectionId sdkmath.Uint, approvalId string, approvalsTracker types.ApprovalsTracker, level string, trackerType string, address string) error {
 	marshaled_transfer_tracker, err := k.cdc.Marshal(&approvalsTracker)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.ApprovalsTracker failed")
 	}
 
 	store := ctx.KVStore(k.storeKey)
-	store.Set(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, approvalId, level, depth, address)), marshaled_transfer_tracker)
+	store.Set(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, approvalId, level, trackerType, address)), marshaled_transfer_tracker)
 	return nil
 }
 
-func (k Keeper) GetApprovalsTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, approvalId string, level string, depth string, address string) (types.ApprovalsTracker, bool) {
+func (k Keeper) GetApprovalsTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, approvalId string, level string, trackerType string, address string) (types.ApprovalsTracker, bool) {
 	store := ctx.KVStore(k.storeKey)
-	marshaled_transfer_tracker := store.Get(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, approvalId, level, depth, address)))
+	marshaled_transfer_tracker := store.Get(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, approvalId, level, trackerType, address)))
 
 	var approvalsTracker types.ApprovalsTracker
 	if len(marshaled_transfer_tracker) == 0 {
@@ -299,12 +299,12 @@ func (k Keeper) GetApprovalsTrackersFromStore(ctx sdk.Context) (approvalsTracker
 	return
 }
 
-func (k Keeper) StoreHasApprovalsTracker(ctx sdk.Context, collectionId sdkmath.Uint, approvalId string, level string, depth string, address string) bool {
+func (k Keeper) StoreHasApprovalsTracker(ctx sdk.Context, collectionId sdkmath.Uint, approvalId string, level string, trackerType string, address string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, approvalId, level, depth, address)))
+	return store.Has(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, approvalId, level, trackerType, address)))
 }
 
-func (k Keeper) DeleteApprovalsTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, approvalId string, level string, depth string, address string) {
+func (k Keeper) DeleteApprovalsTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, approvalId string, level string, trackerType string, address string) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, approvalId, level, depth, address)))
+	store.Delete(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, approvalId, level, trackerType, address)))
 }

@@ -17,9 +17,9 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 				badgeIds = types.InvertUintRanges(badgeIds, sdkmath.NewUint(math.MaxUint64))
 			}
 
-			ownershipTimes := approvedTransfer.OwnershipTimes
-			if allowedCombination.InvertOwnershipTimes {
-				ownershipTimes = types.InvertUintRanges(ownershipTimes, sdkmath.NewUint(math.MaxUint64))
+			ownedTimes := approvedTransfer.OwnedTimes
+			if allowedCombination.InvertOwnedTimes {
+				ownedTimes = types.InvertUintRanges(ownedTimes, sdkmath.NewUint(math.MaxUint64))
 			}
 
 			times := approvedTransfer.TransferTimes
@@ -48,16 +48,15 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 				InitiatedByMappingId: initiatedByMappingId,
 				TransferTimes:        times,
 				BadgeIds:             badgeIds,
-				OwnershipTimes: 		 	ownershipTimes,
+				OwnedTimes: 		 	ownedTimes,
 				AllowedCombinations: []*types.IsCollectionTransferAllowed{
 					{
 						IsAllowed: allowedCombination.IsAllowed,
 					},
 				},
-				OverallApprovals:                       approvedTransfer.OverallApprovals,
-				PerAddressApprovals:                    approvedTransfer.PerAddressApprovals,
-				IncrementBadgeIdsBy:                    approvedTransfer.IncrementBadgeIdsBy,
-				IncrementOwnershipTimesBy:              approvedTransfer.IncrementOwnershipTimesBy,
+				PredeterminedBalances: 				  			approvedTransfer.PredeterminedBalances,
+				ApprovalAmounts: 								  			approvedTransfer.ApprovalAmounts,
+				MaxNumTransfers: 								  			approvedTransfer.MaxNumTransfers,
 				RequireFromEqualsInitiatedBy:           approvedTransfer.RequireFromEqualsInitiatedBy,
 				RequireFromDoesNotEqualInitiatedBy:     approvedTransfer.RequireFromDoesNotEqualInitiatedBy,
 				RequireToEqualsInitiatedBy:             approvedTransfer.RequireToEqualsInitiatedBy,
@@ -86,7 +85,7 @@ func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomin
 				End:   sdkmath.NewUint(uint64(math.MaxUint64)),
 			},
 		},
-		OwnershipTimes: []*types.UintRange{
+		OwnedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(uint64(math.MaxUint64)),
@@ -103,6 +102,8 @@ func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomin
 				IsAllowed: true,
 			},
 		},
+		ApprovalAmounts: &types.ApprovalAmounts{},
+		MaxNumTransfers: &types.MaxNumTransfers{},
 	})
 
 	return currApprovedTransfers
@@ -119,7 +120,7 @@ func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoin
 				End:   sdkmath.NewUint(uint64(math.MaxUint64)),
 			},
 		},
-		OwnershipTimes: []*types.UintRange{
+		OwnedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(uint64(math.MaxUint64)),
@@ -136,6 +137,8 @@ func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoin
 				IsAllowed: true,
 			},
 		},
+		ApprovalAmounts: &types.ApprovalAmounts{},
+		MaxNumTransfers: &types.MaxNumTransfers{},
 	})
 
 	return currApprovedTransfers

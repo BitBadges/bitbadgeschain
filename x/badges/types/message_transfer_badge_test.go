@@ -62,7 +62,7 @@ func TestMsgTransferBadges_ValidateBasic(t *testing.T) {
 										End:   sdkmath.NewUint(1),
 									},
 								},
-								OwnershipTimes: []*types.UintRange{
+								OwnedTimes: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 										End:   sdkmath.NewUint(1),
@@ -92,7 +92,7 @@ func TestMsgTransferBadges_ValidateBasic(t *testing.T) {
 										End:   sdkmath.NewUint(1),
 									},
 								},
-								OwnershipTimes: []*types.UintRange{
+								OwnedTimes: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 										End:   sdkmath.NewUint(1),
@@ -123,7 +123,7 @@ func TestMsgTransferBadges_ValidateBasic(t *testing.T) {
 										End:   sdkmath.NewUint(1),
 									},
 								},
-								OwnershipTimes: []*types.UintRange{
+								OwnedTimes: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 										End:   sdkmath.NewUint(1),
@@ -173,7 +173,7 @@ func TestMsgTransferBadges_ValidateBasic(t *testing.T) {
 						Balances: []*types.Balance{
 							{
 								Amount: sdkmath.NewUint(10),
-								OwnershipTimes: []*types.UintRange{
+								OwnedTimes: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(10),
 										End:   sdkmath.NewUint(1),

@@ -1,10 +1,69 @@
 package types
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 
 	"math"
 )
+
+func FilterZeroBalances(balances []*Balance) []*Balance {
+	newBalances := []*Balance{}
+	for _, balance := range balances {
+		if balance.Amount.GT(sdkmath.NewUint(0)) {
+			newBalances = append(newBalances, balance)
+		}
+	}
+
+	return newBalances
+}
+
+func DoBalancesExceedThreshold(balances []*Balance, thresholdBalances []*Balance) bool {
+	//Check if we exceed the threshold; will underflow if we do exceed it
+	thresholdCopy := DeepCopyBalances(thresholdBalances)
+	_, err := SubtractBalances(balances, thresholdCopy)
+	if err != nil {
+		return true
+	}
+
+	return false
+}
+
+func AddBalancesAndAssertDoesntExceedThreshold(currTally []*Balance, toAdd []*Balance, threshold []*Balance) ([]*Balance, error) {
+	err := *new(error)
+	//If we transferAsMuchAsPossible, we need to increment the currTally by all that we can
+	//We then need to return the updated toAdd
+
+	currTally, err = AddBalances(toAdd, currTally)
+	if err != nil {
+		return []*Balance{}, err
+	}
+
+	//Check if we exceed the threshold; will underflow if we do exceed it
+	doExceed := DoBalancesExceedThreshold(currTally, threshold)
+	if doExceed {
+		return []*Balance{}, sdkerrors.Wrapf(ErrExceedsThreshold, "curr tally plus added amounts exceeds threshold")
+	}
+
+	return currTally, nil	
+}
+
+func AreBalancesEqual(expected []*Balance, actual []*Balance, checkZeroBalances bool) bool {
+	expected = DeepCopyBalances(expected)
+	actual = DeepCopyBalances(actual)
+
+	if !checkZeroBalances {
+		expected = FilterZeroBalances(expected)
+		actual = FilterZeroBalances(actual)
+	}
+
+	actual, err := SubtractBalances(expected, actual)
+	if len(actual) != 0 || err != nil {
+		return false
+	}
+
+	return true
+}
 
 func DeepCopyBalances(balances []*Balance) []*Balance {
 	newBalances := []*Balance{}
@@ -19,8 +78,8 @@ func DeepCopyBalances(balances []*Balance) []*Balance {
 			})
 		}
 
-		for _, time := range approval.OwnershipTimes {
-			balanceToAdd.OwnershipTimes = append(balanceToAdd.OwnershipTimes, &UintRange{
+		for _, time := range approval.OwnedTimes {
+			balanceToAdd.OwnedTimes = append(balanceToAdd.OwnedTimes, &UintRange{
 				Start: time.Start,
 				End:   time.End,
 			})
@@ -40,11 +99,11 @@ func HandleDuplicateBadgeIds(balances []*Balance) ([]*Balance, error) {
 	err := *new(error)
 	for _, balance := range balances {
 		for _, badgeId := range balance.BadgeIds {
-			for _, time := range balance.OwnershipTimes {
+			for _, time := range balance.OwnedTimes {
 				newBalances, err = AddBalance(newBalances, &Balance{
 					Amount:         balance.Amount,
 					BadgeIds:       []*UintRange{badgeId},
-					OwnershipTimes: []*UintRange{time},
+					OwnedTimes: []*UintRange{time},
 				})
 				if err != nil {
 					return []*Balance{}, err
@@ -65,7 +124,7 @@ func HandleDuplicateBadgeIds(balances []*Balance) ([]*Balance, error) {
 // 			matchingBalances = append(matchingBalances, &Balance{
 // 				Amount:   balance.Amount,
 // 				BadgeIds: []*UintRange{{Start: id, End: id}},
-// 				OwnershipTimes: balance.OwnershipTimes,
+// 				OwnedTimes: balance.OwnedTimes,
 // 			})
 // 		}
 // 	}
@@ -77,7 +136,7 @@ func UpdateBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error)
 	//Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
 	// ranges = SortAndMergeOverlapping(ranges)
 	err := *new(error)
-	balances, err = DeleteBalances(newBalance.BadgeIds, newBalance.OwnershipTimes, balances)
+	balances, err = DeleteBalances(newBalance.BadgeIds, newBalance.OwnedTimes, balances)
 	if err != nil {
 		return balances, err
 	}
@@ -97,7 +156,7 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 	currPermissionDetails := []*UniversalPermissionDetails{}
 	for _, balanceObj := range balances {
 		for _, currRange := range balanceObj.BadgeIds {
-			for _, currTime := range balanceObj.OwnershipTimes {
+			for _, currTime := range balanceObj.OwnedTimes {
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
 					BadgeId:            currRange,
 					OwnershipTime:       currTime,
@@ -137,7 +196,7 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 		fetchedBalances = append(fetchedBalances, &Balance{
 			Amount:         amount,
 			BadgeIds:       []*UintRange{overlap.BadgeId},
-			OwnershipTimes: []*UintRange{overlap.OwnershipTime},
+			OwnedTimes: []*UintRange{overlap.OwnershipTime},
 		})
 	}
 
@@ -146,16 +205,28 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 		fetchedBalances = append(fetchedBalances, &Balance{
 			Amount:         sdkmath.NewUint(0),
 			BadgeIds:       []*UintRange{detail.BadgeId},
-			OwnershipTimes: []*UintRange{detail.OwnershipTime},
+			OwnedTimes: []*UintRange{detail.OwnershipTime},
 		})
 	}
 
 	return fetchedBalances, nil
 }
 
+func AddBalances(balancesToAdd []*Balance, balances []*Balance) ([]*Balance, error) {
+	err := *new(error)
+	for _, balance := range balancesToAdd {
+		balances, err = AddBalance(balances, balance)
+		if err != nil {
+			return balances, err
+		}
+	}
+
+	return balances, nil
+}
+
 // Adds a balance to all ids specified in []ranges
 func AddBalance(existingBalances []*Balance, balanceToAdd *Balance) ([]*Balance, error) {
-	currBalances, err := GetBalancesForIds(balanceToAdd.BadgeIds, balanceToAdd.OwnershipTimes, existingBalances)
+	currBalances, err := GetBalancesForIds(balanceToAdd.BadgeIds, balanceToAdd.OwnedTimes, existingBalances)
 	if err != nil {
 		return existingBalances, err
 	}
@@ -175,10 +246,23 @@ func AddBalance(existingBalances []*Balance, balanceToAdd *Balance) ([]*Balance,
 	return existingBalances, nil
 }
 
+func SubtractBalances(balancesToSubtract []*Balance, balances []*Balance) ([]*Balance, error) {
+	err := *new(error)
+
+	for _, balance := range balancesToSubtract {
+		balances, err = SubtractBalance(balances, balance)
+		if err != nil {
+			return balances, err
+		}
+	}
+
+	return balances, nil
+}
+
 // Subtracts a balance to all ids specified in []ranges
 func SubtractBalance(balances []*Balance, balanceToRemove *Balance) ([]*Balance, error) {
 
-	currBalances, err := GetBalancesForIds(balanceToRemove.BadgeIds, balanceToRemove.OwnershipTimes, balances)
+	currBalances, err := GetBalancesForIds(balanceToRemove.BadgeIds, balanceToRemove.OwnedTimes, balances)
 	if err != nil {
 		return balances, err
 	}
@@ -200,7 +284,7 @@ func SubtractBalance(balances []*Balance, balanceToRemove *Balance) ([]*Balance,
 
 // Subtracts a balance to all ids specified in []ranges
 func GetMaxSubtractableBalances(balances []*Balance, balanceToRemove *Balance) ([]*Balance, error) {
-	currBalances, err := GetBalancesForIds(balanceToRemove.BadgeIds, balanceToRemove.OwnershipTimes, balances)
+	currBalances, err := GetBalancesForIds(balanceToRemove.BadgeIds, balanceToRemove.OwnedTimes, balances)
 	if err != nil {
 		return balances, err
 	}
@@ -210,7 +294,7 @@ func GetMaxSubtractableBalances(balances []*Balance, balanceToRemove *Balance) (
 		subtractableBalances = append(subtractableBalances, &Balance{
 			Amount:         balanceToRemove.Amount,
 			BadgeIds: 			currBalanceObj.BadgeIds,
-			OwnershipTimes: currBalanceObj.OwnershipTimes,
+			OwnedTimes: currBalanceObj.OwnedTimes,
 		})
 
 		if currBalanceObj.Amount.LT(balanceToRemove.Amount) {
@@ -228,7 +312,7 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 	for _, balanceObj := range balances {
 		currPermissionDetails := []*UniversalPermissionDetails{}
 		for _, currRange := range balanceObj.BadgeIds {
-			for _, currTime := range balanceObj.OwnershipTimes {
+			for _, currTime := range balanceObj.OwnedTimes {
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
 					BadgeId:            currRange,
 					OwnershipTime:       currTime,
@@ -262,7 +346,7 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 			newBalances = append(newBalances, &Balance{
 				Amount:         balanceObj.Amount,
 				BadgeIds:       []*UintRange{remainingBalance.BadgeId},
-				OwnershipTimes: []*UintRange{remainingBalance.OwnershipTime},
+				OwnedTimes: []*UintRange{remainingBalance.OwnershipTime},
 			})
 		}
 	}

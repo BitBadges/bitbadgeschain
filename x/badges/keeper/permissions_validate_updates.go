@@ -261,8 +261,8 @@ func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types
 		}
 	}
 
-	if newPermissions.CanArchive != nil {
-		if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanArchive, newPermissions.CanArchive); err != nil {
+	if newPermissions.CanArchiveCollection != nil {
+		if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanArchiveCollection, newPermissions.CanArchiveCollection); err != nil {
 			return err
 		}
 	}

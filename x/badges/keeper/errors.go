@@ -23,4 +23,5 @@ var (
 	ErrCircularDependency          = sdkerrors.Register(types.ModuleName, 75, "circular dependency")
 	ErrDisallowedTransfer          = sdkerrors.Register(types.ModuleName, 76, "disallowed transfer")
 	ErrNoValidSolutionForChallenge = sdkerrors.Register(types.ModuleName, 77, "no valid solution for challenge")
+	ErrExceedsThreshold						= sdkerrors.Register(types.ModuleName, 78, "exceeds threshold")
 )

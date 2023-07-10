@@ -24,7 +24,7 @@ export interface UintRange {
  */
 export interface Balance {
   amount: string;
-  ownershipTimes: UintRange[];
+  ownedTimes: UintRange[];
   badgeIds: UintRange[];
 }
 
@@ -100,7 +100,7 @@ export const UintRange = {
 };
 
 function createBaseBalance(): Balance {
-  return { amount: "", ownershipTimes: [], badgeIds: [] };
+  return { amount: "", ownedTimes: [], badgeIds: [] };
 }
 
 export const Balance = {
@@ -108,7 +108,7 @@ export const Balance = {
     if (message.amount !== "") {
       writer.uint32(10).string(message.amount);
     }
-    for (const v of message.ownershipTimes) {
+    for (const v of message.ownedTimes) {
       UintRange.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     for (const v of message.badgeIds) {
@@ -128,7 +128,7 @@ export const Balance = {
           message.amount = reader.string();
           break;
         case 2:
-          message.ownershipTimes.push(UintRange.decode(reader, reader.uint32()));
+          message.ownedTimes.push(UintRange.decode(reader, reader.uint32()));
           break;
         case 3:
           message.badgeIds.push(UintRange.decode(reader, reader.uint32()));
@@ -144,8 +144,8 @@ export const Balance = {
   fromJSON(object: any): Balance {
     return {
       amount: isSet(object.amount) ? String(object.amount) : "",
-      ownershipTimes: Array.isArray(object?.ownershipTimes)
-        ? object.ownershipTimes.map((e: any) => UintRange.fromJSON(e))
+      ownedTimes: Array.isArray(object?.ownedTimes)
+        ? object.ownedTimes.map((e: any) => UintRange.fromJSON(e))
         : [],
       badgeIds: Array.isArray(object?.badgeIds) ? object.badgeIds.map((e: any) => UintRange.fromJSON(e)) : [],
     };
@@ -154,10 +154,10 @@ export const Balance = {
   toJSON(message: Balance): unknown {
     const obj: any = {};
     message.amount !== undefined && (obj.amount = message.amount);
-    if (message.ownershipTimes) {
-      obj.ownershipTimes = message.ownershipTimes.map((e) => e ? UintRange.toJSON(e) : undefined);
+    if (message.ownedTimes) {
+      obj.ownedTimes = message.ownedTimes.map((e) => e ? UintRange.toJSON(e) : undefined);
     } else {
-      obj.ownershipTimes = [];
+      obj.ownedTimes = [];
     }
     if (message.badgeIds) {
       obj.badgeIds = message.badgeIds.map((e) => e ? UintRange.toJSON(e) : undefined);
@@ -170,7 +170,7 @@ export const Balance = {
   fromPartial<I extends Exact<DeepPartial<Balance>, I>>(object: I): Balance {
     const message = createBaseBalance();
     message.amount = object.amount ?? "";
-    message.ownershipTimes = object.ownershipTimes?.map((e) => UintRange.fromPartial(e)) || [];
+    message.ownedTimes = object.ownedTimes?.map((e) => UintRange.fromPartial(e)) || [];
     message.badgeIds = object.badgeIds?.map((e) => UintRange.fromPartial(e)) || [];
     return message;
   },

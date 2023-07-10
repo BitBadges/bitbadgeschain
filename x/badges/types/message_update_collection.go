@@ -117,6 +117,10 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		return err
 	}
 
+	if err := ValidateUserPermissions(msg.DefaultUserPermissions); err != nil {
+		return err
+	}
+
 	if err := ValidateOffChainBalancesMetadataTimeline(msg.OffChainBalancesMetadataTimeline); err != nil {
 		return err
 	}

@@ -156,7 +156,7 @@ If times or badgeIDs have len > 1, then the user owns all badge IDs specified fo
 */
 export interface BadgesBalance {
   amount?: string;
-  ownershipTimes?: BadgesUintRange[];
+  ownedTimes?: BadgesUintRange[];
   badgeIds?: BadgesUintRange[];
 }
 
@@ -165,7 +165,7 @@ export interface BadgesBalancesActionCombination {
   badgeIdsOptions?: BadgesValueOptions;
 
   /** ValueOptions defines how we manipulate the default values. */
-  ownershipTimesOptions?: BadgesValueOptions;
+  ownedTimesOptions?: BadgesValueOptions;
 
   /** ValueOptions defines how we manipulate the default values. */
   permittedTimesOptions?: BadgesValueOptions;
@@ -176,7 +176,7 @@ export interface BadgesBalancesActionCombination {
 
 export interface BadgesBalancesActionDefaultValues {
   badgeIds?: BadgesUintRange[];
-  ownershipTimes?: BadgesUintRange[];
+  ownedTimes?: BadgesUintRange[];
   permittedTimes?: BadgesUintRange[];
   forbiddenTimes?: BadgesUintRange[];
 }
@@ -185,7 +185,7 @@ export interface BadgesBalancesActionDefaultValues {
 * BalancesActionPermission defines the permissions for updating a timeline-based field for specific badges and specific badge ownership times.
 Currently, this is only used for creating new badges.
 
-Ex: If you want to lock the ability to create new badges for badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021, 
+Ex: If you want to lock the ability to create new badges for badgeIds [1,2] at ownedTimes 1/1/2020 - 1/1/2021, 
 you could set the combination (badgeIds: [1,2], ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
 */
 export interface BadgesBalancesActionPermission {
@@ -245,7 +245,7 @@ export interface BadgesCollectionApprovedTransfer {
   challenges?: BadgesChallenge[];
   approvalId?: string;
   incrementBadgeIdsBy?: string;
-  incrementOwnershipTimesBy?: string;
+  incrementOwnedTimesBy?: string;
   overallApprovals?: BadgesApprovalsTracker;
 
   /** PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address. */
@@ -359,7 +359,7 @@ Note there are a few different times here which could get confusing:
 - timelineTimes: the times when a timeline-based field is a specific value
 - permitted/forbiddenTimes - the times that a permission can be performed
 - transferTimes - the times that a transfer occurs
-- ownershipTimes - the times when a badge is owned by a user
+- ownedTimes - the times when a badge is owned by a user
 
 The permitted/forbiddenTimes are used to determine when a permission can be executed.
 Once a time is set to be permitted or forbidden, it is PERMANENT and cannot be changed.
@@ -674,7 +674,7 @@ export interface BadgesUserApprovedIncomingTransfer {
   challenges?: BadgesChallenge[];
   approvalId?: string;
   incrementBadgeIdsBy?: string;
-  incrementOwnershipTimesBy?: string;
+  incrementOwnedTimesBy?: string;
 
   /** PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address. */
   perAddressApprovals?: BadgesPerAddressApprovals;
@@ -744,7 +744,7 @@ export interface BadgesUserApprovedOutgoingTransfer {
   challenges?: BadgesChallenge[];
   approvalId?: string;
   incrementBadgeIdsBy?: string;
-  incrementOwnershipTimesBy?: string;
+  incrementOwnedTimesBy?: string;
 
   /** PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address. */
   perAddressApprovals?: BadgesPerAddressApprovals;

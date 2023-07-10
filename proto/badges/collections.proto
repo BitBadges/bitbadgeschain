@@ -74,4 +74,6 @@ message BadgeCollection {
   //
   // Ex: Set this to disallow all incoming transfers by default, making the user have to opt-in to receiving the badge.
   repeated UserApprovedIncomingTransferTimeline defaultUserApprovedIncomingTransfersTimeline = 15;
+
+  UserPermissions defaultUserPermissions = 16;
 }

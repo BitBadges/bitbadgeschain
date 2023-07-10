@@ -13,6 +13,11 @@ import "badges/timelines.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
+//Before switching to the universal Msgs, we had a separate Msg for each action.
+//This is the old Msg service definition. It is still used in some parts of the codebase for compatibility.
+
+
+
 // // Msg defines the Msg service.
 // service Msg {
 //   rpc NewCollection(MsgNewCollection) returns (MsgNewCollectionResponse);

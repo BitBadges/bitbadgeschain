@@ -23,7 +23,7 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 // - timelineTimes: the times when a timeline-based field is a specific value
 // - permitted/forbiddenTimes - the times that a permission can be performed
 // - transferTimes - the times that a transfer occurs
-// - ownershipTimes - the times when a badge is owned by a user
+// - ownedTimes - the times when a badge is owned by a user
 //
 // The permitted/forbiddenTimes are used to determine when a permission can be executed.
 // Once a time is set to be permitted or forbidden, it is PERMANENT and cannot be changed.
@@ -39,7 +39,7 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 // This would mean that badgeIds [1,2] are allowed and the second combination is ignored.
 message CollectionPermissions {
   repeated ActionPermission canDeleteCollection = 1;
-  repeated TimedUpdatePermission canArchive = 2;
+  repeated TimedUpdatePermission canArchiveCollection = 2;
   repeated TimedUpdatePermission canUpdateContractAddress = 3;
   repeated TimedUpdatePermission canUpdateOffChainBalancesMetadata = 4;
   repeated TimedUpdatePermission canUpdateStandards = 5;
@@ -81,7 +81,7 @@ message CollectionApprovedTransferCombination {
   ValueOptions initiatedByMappingOptions = 4;
   ValueOptions transferTimesOptions = 5;
   ValueOptions badgeIdsOptions = 6;
-  ValueOptions ownershipTimesOptions = 9;
+  ValueOptions ownedTimesOptions = 9;
 
   ValueOptions permittedTimesOptions = 7;
   ValueOptions forbiddenTimesOptions = 8;
@@ -95,7 +95,7 @@ message CollectionApprovedTransferDefaultValues {
   string initiatedByMappingId = 4;
   repeated UintRange transferTimes = 5;
   repeated UintRange badgeIds = 6;
-  repeated UintRange ownershipTimes = 9;
+  repeated UintRange ownedTimes = 9;
 
   repeated UintRange permittedTimes = 7;
   repeated UintRange forbiddenTimes = 8;
@@ -129,7 +129,7 @@ message UserApprovedOutgoingTransferCombination {
   ValueOptions initiatedByMappingOptions = 3;
   ValueOptions transferTimesOptions = 4;
   ValueOptions badgeIdsOptions = 5;
-  ValueOptions ownershipTimesOptions = 6;
+  ValueOptions ownedTimesOptions = 6;
 
   ValueOptions permittedTimesOptions = 7;
   ValueOptions forbiddenTimesOptions = 8;
@@ -142,7 +142,7 @@ message UserApprovedOutgoingTransferDefaultValues {
   string initiatedByMappingId = 3;
   repeated UintRange transferTimes = 4;
   repeated UintRange badgeIds = 5;
-  repeated UintRange ownershipTimes = 6;
+  repeated UintRange ownedTimes = 6;
 
   repeated UintRange permittedTimes = 7;
   repeated UintRange forbiddenTimes = 8;
@@ -162,7 +162,7 @@ message UserApprovedIncomingTransferCombination {
   ValueOptions initiatedByMappingOptions = 3;
   ValueOptions transferTimesOptions = 4;
   ValueOptions badgeIdsOptions = 5;
-  ValueOptions ownershipTimesOptions = 6;
+  ValueOptions ownedTimesOptions = 6;
 
 
   ValueOptions permittedTimesOptions = 7;
@@ -176,7 +176,7 @@ message UserApprovedIncomingTransferDefaultValues {
   string initiatedByMappingId = 3;
   repeated UintRange transferTimes = 4;
   repeated UintRange badgeIds = 5;
-  repeated UintRange ownershipTimes = 6;
+  repeated UintRange ownedTimes = 6;
 
   repeated UintRange permittedTimes = 7;
   repeated UintRange forbiddenTimes = 8;
@@ -191,7 +191,7 @@ message UserApprovedIncomingTransferPermission {
 
 message BalancesActionCombination {
   ValueOptions badgeIdsOptions = 1;
-  ValueOptions ownershipTimesOptions = 2;
+  ValueOptions ownedTimesOptions = 2;
 
   ValueOptions permittedTimesOptions = 3;
   ValueOptions forbiddenTimesOptions = 4;
@@ -199,7 +199,7 @@ message BalancesActionCombination {
 
 message BalancesActionDefaultValues {
   repeated UintRange badgeIds = 1;
-  repeated UintRange ownershipTimes = 2;
+  repeated UintRange ownedTimes = 2;
 
   repeated UintRange permittedTimes = 3;
   repeated UintRange forbiddenTimes = 4;
@@ -208,7 +208,7 @@ message BalancesActionDefaultValues {
 // BalancesActionPermission defines the permissions for updating a timeline-based field for specific badges and specific badge ownership times.
 // Currently, this is only used for creating new badges.
 //
-// Ex: If you want to lock the ability to create new badges for badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021, 
+// Ex: If you want to lock the ability to create new badges for badgeIds [1,2] at ownedTimes 1/1/2020 - 1/1/2021, 
 // you could set the combination (badgeIds: [1,2], ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
 message BalancesActionPermission {
   BalancesActionDefaultValues defaultValues = 1;

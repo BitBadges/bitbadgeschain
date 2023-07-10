@@ -13,14 +13,14 @@ func (suite *TestSuite) TestNoChallengesWorking() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].Challenges = []*types.Challenge{{}}
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].Challenges = []*types.Challenge{{}}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.ChallengeSolution{}, false)
+	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.ChallengeSolution{})
 	suite.Require().Error(err, "Error getting user balance: %s")
 }
 
@@ -28,9 +28,9 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers[0].Challenges = []*types.Challenge{{
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].Challenges = []*types.Challenge{{
 		Root: "sample",
 	}}
 
@@ -38,17 +38,17 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.ChallengeSolution{}, false)
+	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.ChallengeSolution{})
 	suite.Require().Error(err, "Error getting user balance: %s")
 
-	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.ChallengeSolution{
+	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.ChallengeSolution{
 		{
 			Proof: &types.ClaimProof{
 				Aunts: []*types.ClaimProofItem{},
 				Leaf:  "sample",
 			},
 		},
-	}, false)
+	})
 	suite.Require().Error(err, "Error getting user balance: %s")
 }
 func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
@@ -76,17 +76,14 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
-		OverallApprovals: &types.ApprovalsTracker{
-			Amounts: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(10),
-					BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-					OwnershipTimes: GetFullUintRanges(),
-				},
-			},
-			NumTransfers: sdk.NewUint(10),
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(10),
 		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			OverallApprovalAmount: sdkmath.NewUint(10),
+		},
+		
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
 		}},
@@ -101,15 +98,13 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
-		OwnershipTimes: GetFullUintRanges(),
+		OwnedTimes:       GetFullUintRanges(),
 		FromMappingId:        "Mint",
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
 		OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
-		IncrementBadgeIdsBy:                    sdk.NewUint(0),
-		IncrementOwnershipTimesBy:              sdk.NewUint(0),
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -127,7 +122,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 					{
 						Amount:         sdkmath.NewUint(10),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 				Solutions: []*types.ChallengeSolution{
@@ -163,7 +158,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 				Solutions: []*types.ChallengeSolution{
@@ -199,7 +194,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 				Solutions: []*types.ChallengeSolution{
@@ -250,16 +245,12 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
-		OverallApprovals: &types.ApprovalsTracker{
-			Amounts: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(10),
-					BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-					OwnershipTimes: GetFullUintRanges(),
-				},
-			},
-			NumTransfers: sdk.NewUint(10),
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(10),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			OverallApprovalAmount: sdkmath.NewUint(10),
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
@@ -275,7 +266,7 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 		},
 		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
-		OwnershipTimes: GetFullUintRanges(),
+		OwnedTimes: GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		FromMappingId:        "Mint",
 		ToMappingId:          "All",
@@ -283,8 +274,6 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 
 		OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
-		IncrementBadgeIdsBy:                    sdk.NewUint(0),
-		IncrementOwnershipTimesBy:              sdk.NewUint(0),
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -302,7 +291,7 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 				Solutions: []*types.ChallengeSolution{
@@ -353,16 +342,12 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
-		OverallApprovals: &types.ApprovalsTracker{
-			Amounts: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(10),
-					BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-					OwnershipTimes: GetFullUintRanges(),
-				},
-			},
-			NumTransfers: sdk.NewUint(10),
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(10),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			OverallApprovalAmount: sdkmath.NewUint(10),
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
@@ -377,7 +362,7 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 		},
 		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
-		OwnershipTimes: GetFullUintRanges(),
+		OwnedTimes: GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		FromMappingId:        "Mint",
 		ToMappingId:          "All",
@@ -385,8 +370,6 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 
 		OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
-		IncrementBadgeIdsBy:                    sdk.NewUint(0),
-		IncrementOwnershipTimesBy:              sdk.NewUint(0),
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -404,7 +387,7 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 				Solutions: []*types.ChallengeSolution{
@@ -467,16 +450,26 @@ func (suite *TestSuite) TestIncrements() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
-		OverallApprovals: &types.ApprovalsTracker{
-			Amounts: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(10),
-					BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-					OwnershipTimes: GetFullUintRanges(),
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(10),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			OverallApprovalAmount: sdkmath.NewUint(10),
+		},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseChallengeLeafIndex: true },
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						BadgeIds: GetOneUintRange(),
+						Amount:   sdkmath.NewUint(1),
+						OwnedTimes: GetFullUintRanges(),
+					},
 				},
+				IncrementBadgeIdsBy: sdkmath.NewUint(1),
+				IncrementOwnedTimesBy: sdkmath.NewUint(0),
 			},
-			NumTransfers: sdk.NewUint(10),
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
@@ -487,12 +480,12 @@ func (suite *TestSuite) TestIncrements() {
 				Root:                             hex.EncodeToString(rootHash),
 				ExpectedProofLength:              sdk.NewUint(2),
 				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForDistributionOrder: true,
+				UseLeafIndexForTransferOrder: true,
 			},
 		},
 		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
-		OwnershipTimes: 			GetFullUintRanges(),
+		OwnedTimes: 			GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		FromMappingId:        "Mint",
 		ToMappingId:          "All",
@@ -500,8 +493,6 @@ func (suite *TestSuite) TestIncrements() {
 
 		OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
-		IncrementBadgeIdsBy:                    sdk.NewUint(1),
-		IncrementOwnershipTimesBy:              sdk.NewUint(0),
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -519,7 +510,7 @@ func (suite *TestSuite) TestIncrements() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 				Solutions: []*types.ChallengeSolution{
@@ -555,7 +546,7 @@ func (suite *TestSuite) TestIncrements() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 				Solutions: []*types.ChallengeSolution{
@@ -606,32 +597,42 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
-		OverallApprovals: &types.ApprovalsTracker{
-			Amounts: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(10),
-					BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-					OwnershipTimes: GetFullUintRanges(),
-				},
-			},
-			NumTransfers: sdk.NewUint(10),
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(10),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			OverallApprovalAmount: sdkmath.NewUint(10),
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
 		}},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						BadgeIds: GetOneUintRange(),
+						Amount:   sdkmath.NewUint(1),
+						OwnedTimes: GetFullUintRanges(),
+					},
+				},
+				IncrementBadgeIdsBy: sdkmath.NewUint(1),
+				IncrementOwnedTimesBy: sdkmath.NewUint(0),
+			},
+		},
 		Uri: "",
 		Challenges: []*types.Challenge{
 			{
 				Root:                             hex.EncodeToString(rootHash),
 				ExpectedProofLength:              sdk.NewUint(2),
 				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForDistributionOrder: true,
+				UseLeafIndexForTransferOrder: true,
 			},
 		},
 		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
-		OwnershipTimes: GetFullUintRanges(),
+		OwnedTimes: 			GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		FromMappingId:        "Mint",
 		ToMappingId:          "All",
@@ -639,8 +640,6 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 
 		OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
-		IncrementBadgeIdsBy:                    sdk.NewUint(1),
-		IncrementOwnershipTimesBy:              sdk.NewUint(0),
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -652,14 +651,18 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				TransferAsMuchAsPossible: true,
+				PrecalculateFromApproval: &types.ApprovalIdDetails{
+					ApprovalId:   "testing232",
+					Address: "",
+					ApprovalLevel: "collection",
+				},
 				From:        "Mint",
 				ToAddresses: []string{bob},
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       GetFullUintRanges(),
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 				Solutions: []*types.ChallengeSolution{
@@ -689,7 +692,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
 		BadgeIds:       GetOneUintRange(),
-		OwnershipTimes: GetFullUintRanges(),
+		OwnedTimes: GetFullUintRanges(),
 	}}, bobBalance.Balances)
 }
 
@@ -719,16 +722,27 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
-		OverallApprovals: &types.ApprovalsTracker{
-			Amounts: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-					OwnershipTimes: GetFullUintRanges(),
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(10),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			OverallApprovalAmount: sdkmath.NewUint(10),
+		},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						BadgeIds: GetOneUintRange(),
+						Amount:   sdkmath.NewUint(1),
+						OwnedTimes: GetFullUintRanges(),
+					},
 				},
+				IncrementBadgeIdsBy: sdkmath.NewUint(1),
+				IncrementOwnedTimesBy: sdkmath.NewUint(0),
 			},
-			NumTransfers: sdk.NewUint(10),
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
@@ -739,12 +753,12 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 				Root:                             hex.EncodeToString(rootHash),
 				ExpectedProofLength:              sdk.NewUint(2),
 				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForDistributionOrder: true,
+				UseLeafIndexForTransferOrder: 		true,
 			},
 		},
 		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
-		OwnershipTimes:       GetFullUintRanges(),
+		OwnedTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromMappingId:        "Mint",
 		ToMappingId:          "All",
@@ -752,8 +766,6 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 
 		OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
-		IncrementBadgeIdsBy:                    sdk.NewUint(1),
-		IncrementOwnershipTimesBy:              sdk.NewUint(0),
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -765,14 +777,18 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				TransferAsMuchAsPossible: true,
+				PrecalculateFromApproval: &types.ApprovalIdDetails{
+					ApprovalId:   "testing232",
+					Address: "",
+					ApprovalLevel: "collection",
+				},
 				From:        "Mint",
 				ToAddresses: []string{bob},
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 				Solutions: []*types.ChallengeSolution{
@@ -802,7 +818,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
 		BadgeIds:       GetOneUintRange(),
-		OwnershipTimes: GetFullUintRanges(),
+		OwnedTimes: GetFullUintRanges(),
 	}}, bobBalance.Balances)
 
 
@@ -811,14 +827,18 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				TransferAsMuchAsPossible: true,
+				PrecalculateFromApproval: &types.ApprovalIdDetails{
+					ApprovalId:   "testing232",
+					Address: "",
+					ApprovalLevel: "collection",
+				},
 				From:        "Mint",
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 				Solutions: []*types.ChallengeSolution{
@@ -848,7 +868,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
 		BadgeIds:       GetTwoUintRanges(),
-		OwnershipTimes: GetFullUintRanges(),
+		OwnedTimes: GetFullUintRanges(),
 	}}, aliceBalance.Balances)
 }
 
@@ -879,16 +899,26 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
-		OverallApprovals: &types.ApprovalsTracker{
-			Amounts: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-					OwnershipTimes: GetFullUintRanges(),
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(10),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			OverallApprovalAmount: sdkmath.NewUint(1),
+		},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseChallengeLeafIndex: true },
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						BadgeIds: GetOneUintRange(),
+						Amount:   sdkmath.NewUint(1),
+						OwnedTimes: GetFullUintRanges(),
+					},
 				},
+				IncrementBadgeIdsBy: sdkmath.NewUint(1),
+				IncrementOwnedTimesBy: sdkmath.NewUint(0),
 			},
-			NumTransfers: sdk.NewUint(10),
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
@@ -899,12 +929,12 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 				Root:                             hex.EncodeToString(rootHash),
 				ExpectedProofLength:              sdk.NewUint(2),
 				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForDistributionOrder: true,
+				UseLeafIndexForTransferOrder: true,
 			},
 		},
 		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
-		OwnershipTimes:       GetFullUintRanges(),
+		OwnedTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromMappingId:        "Mint",
 		ToMappingId:          "All",
@@ -912,8 +942,6 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 
 		OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
-		IncrementBadgeIdsBy:                    sdk.NewUint(1),
-		IncrementOwnershipTimesBy:              sdk.NewUint(0),
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -925,14 +953,18 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				TransferAsMuchAsPossible: true,
+				PrecalculateFromApproval: &types.ApprovalIdDetails{
+					ApprovalId:   "testing232",
+					Address: "",
+					ApprovalLevel: "collection",
+				},
 				From:        "Mint",
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 				Solutions: []*types.ChallengeSolution{
@@ -962,7 +994,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
 		BadgeIds:       GetTwoUintRanges(),
-		OwnershipTimes: GetFullUintRanges(),
+		OwnedTimes: GetFullUintRanges(),
 	}}, aliceBalance.Balances)
 }
 
@@ -992,16 +1024,26 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].ApprovedTransfers, &types.CollectionApprovedTransfer{
-		OverallApprovals: &types.ApprovalsTracker{
-			Amounts: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-					OwnershipTimes: GetFullUintRanges(),
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(1),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			OverallApprovalAmount: sdkmath.NewUint(1),
+		},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseChallengeLeafIndex: true },
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						BadgeIds: GetOneUintRange(),
+						Amount:   sdkmath.NewUint(1),
+						OwnedTimes: GetFullUintRanges(),
+					},
 				},
+				IncrementBadgeIdsBy: sdkmath.NewUint(1),
+				IncrementOwnedTimesBy: sdkmath.NewUint(0),
 			},
-			NumTransfers: sdk.NewUint(1),
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
@@ -1012,12 +1054,12 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 				Root:                             hex.EncodeToString(rootHash),
 				ExpectedProofLength:              sdk.NewUint(2),
 				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForDistributionOrder: true,
+				UseLeafIndexForTransferOrder: true,
 			},
 		},
 		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
-		OwnershipTimes:       GetFullUintRanges(),
+		OwnedTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromMappingId:        "Mint",
 		ToMappingId:          "All",
@@ -1025,8 +1067,6 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 
 		OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
-		IncrementBadgeIdsBy:                    sdk.NewUint(1),
-		IncrementOwnershipTimesBy:              sdk.NewUint(0),
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -1038,14 +1078,18 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				TransferAsMuchAsPossible: true,
+				PrecalculateFromApproval: &types.ApprovalIdDetails{
+					ApprovalId:   "testing232",
+					Address: "",
+					ApprovalLevel: "collection",
+				},
 				From:        "Mint",
 				ToAddresses: []string{bob},
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 				Solutions: []*types.ChallengeSolution{
@@ -1075,7 +1119,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
 		BadgeIds:       GetOneUintRange(),
-		OwnershipTimes: GetFullUintRanges(),
+		OwnedTimes: GetFullUintRanges(),
 	}}, bobBalance.Balances)
 
 
@@ -1084,14 +1128,18 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				TransferAsMuchAsPossible: true,
+				PrecalculateFromApproval: &types.ApprovalIdDetails{
+					ApprovalId:   "testing232",
+					Address: "",
+					ApprovalLevel: "collection",
+				},
 				From:        "Mint",
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnershipTimes: GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
 					},
 				},
 				Solutions: []*types.ChallengeSolution{
@@ -1114,9 +1162,859 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 			},
 		},
 	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+}
+
+func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	aliceLeaf := "-" + alice + "-1-0-0"
+	bobLeaf := "-" + bob + "-1-0-0"
+	charlieLeaf := "-" + charlie + "-1-0-0"
+
+	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
+	leafHashes := make([][]byte, len(leafs))
+	for i, leaf := range leafs {
+		initialHash := sha256.Sum256(leaf)
+		leafHashes[i] = initialHash[:]
+	}
+
+	levelTwoHashes := make([][]byte, 2)
+	for i := 0; i < len(leafHashes); i += 2 {
+		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
+		levelTwoHashes[i/2] = iHash[:]
+	}
+
+	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
+	rootHash := rootHashI[:]
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(10),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			OverallApprovalAmount: sdkmath.NewUint(1),
+		},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						BadgeIds: GetOneUintRange(),
+						Amount:   sdkmath.NewUint(1),
+						OwnedTimes: GetFullUintRanges(),
+					},
+				},
+				IncrementBadgeIdsBy: sdkmath.NewUint(1),
+				IncrementOwnedTimesBy: sdkmath.NewUint(0),
+			},
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsAllowed: true,
+		}},
+		Uri: "",
+		Challenges: []*types.Challenge{
+			{
+				Root:                             hex.EncodeToString(rootHash),
+				ExpectedProofLength:              sdk.NewUint(2),
+				MaxOneUsePerLeaf:                 true,
+				UseLeafIndexForTransferOrder: false,
+			},
+		},
+		ApprovalId:            "testing232",
+		TransferTimes:        GetFullUintRanges(),
+		OwnedTimes:       GetFullUintRanges(),
+		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
+		FromMappingId:        "Mint",
+		ToMappingId:          "All",
+		InitiatedByMappingId: "All",
+
+		OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				PrecalculateFromApproval: &types.ApprovalIdDetails{
+					ApprovalId:   "testing232",
+					Address: "",
+					ApprovalLevel: "collection",
+				},
+				From:        "Mint",
+				ToAddresses: []string{bob, alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(10000),
+						BadgeIds:       GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt:    hex.EncodeToString(leafHashes[1]),
+									OnRight: true,
+								},
+								{
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+					{
+						Proof: &types.ClaimProof{
+							Leaf: bobLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt:    hex.EncodeToString(leafHashes[0]),
+									OnRight: false,
+								},
+								{
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
 	suite.Require().Nil(err, "Error transferring badge: %s")
+
+	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "Error getting user balance: %s")
 
 	aliceBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
 	suite.Require().Nil(err, "Error getting user balance: %s")
-	AssertBalancesEqual(suite, []*types.Balance{}, aliceBalance.Balances)
+
+	AssertBalancesEqual(suite, []*types.Balance{{
+		Amount:         sdkmath.NewUint(1),
+		BadgeIds:       []*types.UintRange{
+			GetOneUintRange()[0],
+		},
+		OwnedTimes: GetFullUintRanges(),
+	}}, bobBalance.Balances)
+
+	AssertBalancesEqual(suite, []*types.Balance{{
+		Amount:         sdkmath.NewUint(1),
+		BadgeIds:       []*types.UintRange{
+			GetTwoUintRanges()[0],
+		},
+		OwnedTimes: GetFullUintRanges(),
+	}}, aliceBalance.Balances)
 }
+
+
+func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	aliceLeaf := "-" + alice + "-1-0-0"
+	bobLeaf := "-" + bob + "-1-0-0"
+	charlieLeaf := "-" + charlie + "-1-0-0"
+
+	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
+	leafHashes := make([][]byte, len(leafs))
+	for i, leaf := range leafs {
+		initialHash := sha256.Sum256(leaf)
+		leafHashes[i] = initialHash[:]
+	}
+
+	levelTwoHashes := make([][]byte, 2)
+	for i := 0; i < len(leafHashes); i += 2 {
+		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
+		levelTwoHashes[i/2] = iHash[:]
+	}
+
+	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
+	rootHash := rootHashI[:]
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].BadgesToCreate = append(collectionsToCreate[0].BadgesToCreate, &types.Balance{
+		Amount:         sdkmath.NewUint(1),
+		BadgeIds:       GetFullUintRanges(),
+		OwnedTimes: GetFullUintRanges(),
+	})
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(10),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			OverallApprovalAmount: sdkmath.NewUint(10),
+		},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UsePerToAddressNumTransfers: true },
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						BadgeIds: GetOneUintRange(),
+						Amount:   sdkmath.NewUint(1),
+						OwnedTimes: GetFullUintRanges(),
+					},
+				},
+				IncrementBadgeIdsBy: sdkmath.NewUint(1),
+				IncrementOwnedTimesBy: sdkmath.NewUint(0),
+			},
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsAllowed: true,
+		}},
+		Uri: "",
+		Challenges: []*types.Challenge{
+			{
+				Root:                             hex.EncodeToString(rootHash),
+				ExpectedProofLength:              sdk.NewUint(2),
+				MaxOneUsePerLeaf:                 true,
+				UseLeafIndexForTransferOrder: false,
+			},
+		},
+		ApprovalId:            "testing232",
+		TransferTimes:        GetFullUintRanges(),
+		OwnedTimes:       GetFullUintRanges(),
+		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
+		FromMappingId:        "Mint",
+		ToMappingId:          "All",
+		InitiatedByMappingId: "All",
+
+		OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				PrecalculateFromApproval: &types.ApprovalIdDetails{
+					ApprovalId:   "testing232",
+					Address: "",
+					ApprovalLevel: "collection",
+				},
+				From:        "Mint",
+				ToAddresses: []string{bob, alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(10000),
+						BadgeIds:       GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt:    hex.EncodeToString(leafHashes[1]),
+									OnRight: true,
+								},
+								{
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+					{
+						Proof: &types.ClaimProof{
+							Leaf: bobLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt:    hex.EncodeToString(leafHashes[0]),
+									OnRight: false,
+								},
+								{
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge: %s")
+
+	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "Error getting user balance: %s")
+
+	aliceBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
+	suite.Require().Nil(err, "Error getting user balance: %s")
+
+	AssertBalancesEqual(suite, []*types.Balance{{
+		Amount:         sdkmath.NewUint(1),
+		BadgeIds:       []*types.UintRange{
+			GetOneUintRange()[0],
+		},
+		OwnedTimes: GetFullUintRanges(),
+	}}, bobBalance.Balances)
+
+	AssertBalancesEqual(suite, []*types.Balance{{
+		Amount:         sdkmath.NewUint(1),
+		BadgeIds:       []*types.UintRange{
+			GetOneUintRange()[0],
+		},
+		OwnedTimes: GetFullUintRanges(),
+	}}, aliceBalance.Balances)
+}
+
+
+func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndexOrder() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	aliceLeaf := "-" + alice + "-1-0-0"
+	bobLeaf := "-" + bob + "-1-0-0"
+	charlieLeaf := "-" + charlie + "-1-0-0"
+
+	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
+	leafHashes := make([][]byte, len(leafs))
+	for i, leaf := range leafs {
+		initialHash := sha256.Sum256(leaf)
+		leafHashes[i] = initialHash[:]
+	}
+
+	levelTwoHashes := make([][]byte, 2)
+	for i := 0; i < len(leafHashes); i += 2 {
+		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
+		levelTwoHashes[i/2] = iHash[:]
+	}
+
+	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
+	rootHash := rootHashI[:]
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(10),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			OverallApprovalAmount: sdkmath.NewUint(1),
+		},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						BadgeIds: GetOneUintRange(),
+						Amount:   sdkmath.NewUint(1),
+						OwnedTimes: GetFullUintRanges(),
+					},
+				},
+				IncrementBadgeIdsBy: sdkmath.NewUint(1),
+				IncrementOwnedTimesBy: sdkmath.NewUint(0),
+			},
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsAllowed: true,
+		}},
+		Uri: "",
+		Challenges: []*types.Challenge{
+			{
+				Root:                             hex.EncodeToString(rootHash),
+				ExpectedProofLength:              sdk.NewUint(2),
+				MaxOneUsePerLeaf:                 true,
+				UseLeafIndexForTransferOrder: true,
+			},
+		},
+		ApprovalId:            "testing232",
+		TransferTimes:        GetFullUintRanges(),
+		OwnedTimes:       GetFullUintRanges(),
+		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
+		FromMappingId:        "Mint",
+		ToMappingId:          "All",
+		InitiatedByMappingId: "All",
+
+		OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				PrecalculateFromApproval: &types.ApprovalIdDetails{
+					ApprovalId:   "testing232",
+					Address: "",
+					ApprovalLevel: "collection",
+				},
+				From:        "Mint",
+				ToAddresses: []string{bob, alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(10000),
+						BadgeIds:       GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt:    hex.EncodeToString(leafHashes[1]),
+									OnRight: true,
+								},
+								{
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+					{
+						Proof: &types.ClaimProof{
+							Leaf: bobLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt:    hex.EncodeToString(leafHashes[0]),
+									OnRight: false,
+								},
+								{
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge: %s")
+
+	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "Error getting user balance: %s")
+
+	aliceBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
+	suite.Require().Nil(err, "Error getting user balance: %s")
+
+	AssertBalancesEqual(suite, []*types.Balance{{
+		Amount:         sdkmath.NewUint(1),
+		BadgeIds:       []*types.UintRange{
+			GetOneUintRange()[0],
+		},
+		OwnedTimes: GetFullUintRanges(),
+	}}, bobBalance.Balances)
+
+	AssertBalancesEqual(suite, []*types.Balance{{
+		Amount:         sdkmath.NewUint(1),
+		BadgeIds:       []*types.UintRange{
+			GetTwoUintRanges()[0],
+		},
+		OwnedTimes: GetFullUintRanges(),
+	}}, aliceBalance.Balances)
+}
+
+
+
+func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	aliceLeaf := "-" + alice + "-1-0-0"
+	bobLeaf := "-" + bob + "-1-0-0"
+	charlieLeaf := "-" + charlie + "-1-0-0"
+
+	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
+	leafHashes := make([][]byte, len(leafs))
+	for i, leaf := range leafs {
+		initialHash := sha256.Sum256(leaf)
+		leafHashes[i] = initialHash[:]
+	}
+
+	levelTwoHashes := make([][]byte, 2)
+	for i := 0; i < len(leafHashes); i += 2 {
+		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
+		levelTwoHashes[i/2] = iHash[:]
+	}
+
+	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
+	rootHash := rootHashI[:]
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(10),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			OverallApprovalAmount: sdkmath.NewUint(1),
+		},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
+			ManualBalances: []*types.ManualBalances{
+				{
+					Balances: []*types.Balance{
+						{
+							BadgeIds: GetOneUintRange(),
+							Amount:   sdkmath.NewUint(1),
+							OwnedTimes: GetFullUintRanges(),
+						},
+					},
+				},
+			
+				{
+					Balances: []*types.Balance{
+						{
+							BadgeIds: GetTopHalfUintRanges(),
+							Amount:   sdkmath.NewUint(1),
+							OwnedTimes: GetFullUintRanges(),
+						},
+					},
+				},
+			},
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsAllowed: true,
+		}},
+		Uri: "",
+		Challenges: []*types.Challenge{
+			{
+				Root:                             hex.EncodeToString(rootHash),
+				ExpectedProofLength:              sdk.NewUint(2),
+				MaxOneUsePerLeaf:                 true,
+				UseLeafIndexForTransferOrder: true,
+			},
+		},
+		ApprovalId:            "testing232",
+		TransferTimes:        GetFullUintRanges(),
+		OwnedTimes:       GetFullUintRanges(),
+		BadgeIds:             GetFullUintRanges(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "All",
+		InitiatedByMappingId: "All",
+
+		OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				PrecalculateFromApproval: &types.ApprovalIdDetails{
+					ApprovalId:   "testing232",
+					Address: "",
+					ApprovalLevel: "collection",
+				},
+				From:        "Mint",
+				ToAddresses: []string{bob, alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(10000),
+						BadgeIds:       GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt:    hex.EncodeToString(leafHashes[1]),
+									OnRight: true,
+								},
+								{
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+					{
+						Proof: &types.ClaimProof{
+							Leaf: bobLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt:    hex.EncodeToString(leafHashes[0]),
+									OnRight: false,
+								},
+								{
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge: %s")
+
+	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "Error getting user balance: %s")
+
+	aliceBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
+	suite.Require().Nil(err, "Error getting user balance: %s")
+
+	AssertBalancesEqual(suite, []*types.Balance{{
+		Amount:         sdkmath.NewUint(1),
+		BadgeIds:       []*types.UintRange{
+			GetOneUintRange()[0],
+		},
+		OwnedTimes: GetFullUintRanges(),
+	}}, bobBalance.Balances)
+
+	AssertBalancesEqual(suite, []*types.Balance{{
+		Amount:         sdkmath.NewUint(1),
+		BadgeIds:       []*types.UintRange{
+			GetTopHalfUintRanges()[0],
+		},
+		OwnedTimes: GetFullUintRanges(),
+	}}, aliceBalance.Balances)
+}
+
+
+
+
+func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	aliceLeaf := "-" + alice + "-1-0-0"
+	bobLeaf := "-" + bob + "-1-0-0"
+	charlieLeaf := "-" + charlie + "-1-0-0"
+
+	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
+	leafHashes := make([][]byte, len(leafs))
+	for i, leaf := range leafs {
+		initialHash := sha256.Sum256(leaf)
+		leafHashes[i] = initialHash[:]
+	}
+
+	levelTwoHashes := make([][]byte, 2)
+	for i := 0; i < len(leafHashes); i += 2 {
+		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
+		levelTwoHashes[i/2] = iHash[:]
+	}
+
+	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
+	rootHash := rootHashI[:]
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(10),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			OverallApprovalAmount: sdkmath.NewUint(1),
+		},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						BadgeIds: GetBottomHalfUintRanges(),
+						Amount:   sdkmath.NewUint(1),
+						OwnedTimes: GetFullUintRanges(),
+					},
+				},
+				IncrementBadgeIdsBy: sdkmath.NewUint(1),
+				IncrementOwnedTimesBy: sdkmath.NewUint(0),
+			},
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsAllowed: true,
+		}},
+		Uri: "",
+		Challenges: []*types.Challenge{
+			{
+				Root:                             hex.EncodeToString(rootHash),
+				ExpectedProofLength:              sdk.NewUint(2),
+				MaxOneUsePerLeaf:                 true,
+				UseLeafIndexForTransferOrder: true,
+			},
+		},
+		ApprovalId:            "testing232",
+		TransferTimes:        GetFullUintRanges(),
+		OwnedTimes:       GetFullUintRanges(),
+		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
+		FromMappingId:        "Mint",
+		ToMappingId:          "All",
+		InitiatedByMappingId: "All",
+
+		OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob, alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(10000),
+						BadgeIds:       GetFullUintRanges(),
+						OwnedTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt:    hex.EncodeToString(leafHashes[1]),
+									OnRight: true,
+								},
+								{
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob, alice},
+				Balances: []*types.Balance{
+					{
+						BadgeIds: GetOneUintRange(),
+						Amount:   sdkmath.NewUint(2),
+						OwnedTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt:    hex.EncodeToString(leafHashes[1]),
+									OnRight: true,
+								},
+								{
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob, alice},
+				Balances: []*types.Balance{
+					{
+						BadgeIds: GetFullUintRanges(),
+						Amount:   sdkmath.NewUint(1),
+						OwnedTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt:    hex.EncodeToString(leafHashes[1]),
+									OnRight: true,
+								},
+								{
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob, alice},
+				Balances: []*types.Balance{
+					{
+						BadgeIds: GetOneUintRange(),
+						Amount:   sdkmath.NewUint(1),
+						OwnedTimes: GetFullUintRanges(),
+					},
+				},
+				Solutions: []*types.ChallengeSolution{
+					{
+						Proof: &types.ClaimProof{
+							Leaf: aliceLeaf,
+							Aunts: []*types.ClaimProofItem{
+								{
+									Aunt:    hex.EncodeToString(leafHashes[1]),
+									OnRight: true,
+								},
+								{
+									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
+									OnRight: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+}
+

@@ -20,11 +20,9 @@ func ValidateTimelineTimesDoNotOverlap(times [][]*UintRange) error {
 func ValidateApprovedTransferTimeline(timeline []*CollectionApprovedTransferTimeline) error {
 	err := *new(error)
 	for _, timelineVal := range timeline {
-		for _, approvedTransfer := range timelineVal.ApprovedTransfers {
-			err = ValidateCollectionApprovedTransfer(approvedTransfer)
-			if err != nil {
-				return err
-			}
+		err = ValidateCollectionApprovedTransfers(timelineVal.CollectionApprovedTransfers)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -157,11 +155,9 @@ func ValidateIsArchivedTimeline(timeline []*IsArchivedTimeline) error {
 
 func ValidateUserApprovedOutgoingTransferTimeline(timeline []*UserApprovedOutgoingTransferTimeline, address string) error {
 	for _, timelineVal := range timeline {
-		for _, approvedTransfer := range timelineVal.ApprovedOutgoingTransfers {
-			err := ValidateUserApprovedOutgoingTransfer(approvedTransfer, address)
-			if err != nil {
-				return err
-			}
+		err := ValidateUserApprovedOutgoingTransfers(timelineVal.ApprovedOutgoingTransfers, address)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -176,11 +172,9 @@ func ValidateUserApprovedOutgoingTransferTimeline(timeline []*UserApprovedOutgoi
 
 func ValidateUserApprovedIncomingTransferTimeline(timeline []*UserApprovedIncomingTransferTimeline, address string) error {
 	for _, timelineVal := range timeline {
-		for _, approvedTransfer := range timelineVal.ApprovedIncomingTransfers {
-			err := ValidateUserApprovedIncomingTransfer(approvedTransfer, address)
-			if err != nil {
-				return err
-			}
+		err := ValidateUserApprovedIncomingTransfers(timelineVal.ApprovedIncomingTransfers, address)
+		if err != nil {
+			return err
 		}
 	}
 

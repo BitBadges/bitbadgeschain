@@ -26,10 +26,7 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 			Balances:                          []*types.Balance{},
 			ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
 			ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,
-			UserPermissions: &types.UserPermissions{
-				CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransferPermission{},
-				CanUpdateApprovedIncomingTransfers: []*types.UserApprovedIncomingTransferPermission{},
-			},
+			UserPermissions:                   collection.DefaultUserPermissions,
 		}
 	}
 

@@ -112,7 +112,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -137,7 +137,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -175,7 +175,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(122),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(122),
@@ -212,7 +212,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(80),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(80),
@@ -249,7 +249,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(80),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(80),
@@ -287,7 +287,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -328,7 +328,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -369,7 +369,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -406,7 +406,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -443,7 +443,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1696,7 +1696,7 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:  sdkmath.NewUint(50),
@@ -1745,7 +1745,7 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:  sdkmath.NewUint(50),
@@ -1798,7 +1798,7 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:  sdkmath.NewUint(50),
@@ -1851,7 +1851,7 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:  sdkmath.NewUint(50),
@@ -1904,7 +1904,7 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:  sdkmath.NewUint(50),
@@ -1958,7 +1958,7 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:  sdkmath.NewUint(50),
@@ -2007,7 +2007,7 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(10),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:  sdkmath.NewUint(50),
@@ -2084,7 +2084,7 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:  sdkmath.NewUint(50),
@@ -2133,7 +2133,7 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:  sdkmath.NewUint(50),
@@ -2209,7 +2209,7 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate4Invalid(t *testing.
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:  sdkmath.NewUint(50),
@@ -2258,7 +2258,7 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate4Invalid(t *testing.
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			OwnershipTimes: []*types.UintRange{
+			OwnedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:  sdkmath.NewUint(50),
