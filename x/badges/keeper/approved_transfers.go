@@ -138,6 +138,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 				}
 
 				//TODO: Support inherited balances
+				//Assert that initiatedBy owns the required badges
 				for _, mustOwnBadge := range approvalDetails.MustOwnBadges {
 					initiatedByBalanceKey := ConstructBalanceKey(initiatedBy, mustOwnBadge.CollectionId)
 					initiatedByBalance, found := k.GetUserBalanceFromStore(ctx, initiatedByBalanceKey)
@@ -166,22 +167,22 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 				transferBalancesToCheck := []*types.Balance{{Amount: amount, OwnedTimes: []*types.UintRange{overlap.OwnershipTime}, BadgeIds: []*types.UintRange{overlap.BadgeId}}}
 
 				//here, we assert the transfer is good for each level of approvals and increment if necessary
-				err =  k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, overallTransferBalances, collection, approvalDetails.ApprovalAmounts.OverallApprovalAmount, approvalDetails.MaxNumTransfers.OverallMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approvalLevel, "overall", "")
+				err =  k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalDetails, overallTransferBalances, collection, approvalDetails.ApprovalAmounts.OverallApprovalAmount, approvalDetails.MaxNumTransfers.OverallMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approvalLevel, "overall", "")
 				if err != nil {
 					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error incrementing overall approvals: %s", transferStr)
 				}
 
-				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, overallTransferBalances, collection, approvalDetails.ApprovalAmounts.PerToAddressApprovalAmount, approvalDetails.MaxNumTransfers.PerToAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approvalLevel, "to", toAddress)
+				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalDetails, overallTransferBalances, collection, approvalDetails.ApprovalAmounts.PerToAddressApprovalAmount, approvalDetails.MaxNumTransfers.PerToAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approvalLevel, "to", toAddress)
 				if err != nil {
 					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error incrementing to approvals: %s", transferStr)
 				}
 
-				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, overallTransferBalances, collection, approvalDetails.ApprovalAmounts.PerFromAddressApprovalAmount, approvalDetails.MaxNumTransfers.PerFromAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approvalLevel, "from", fromAddress)
+				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalDetails, overallTransferBalances, collection, approvalDetails.ApprovalAmounts.PerFromAddressApprovalAmount, approvalDetails.MaxNumTransfers.PerFromAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approvalLevel, "from", fromAddress)
 				if err != nil {
 					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error incrementing from approvals: %s", transferStr)
 				}
 
-				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, overallTransferBalances, collection, approvalDetails.ApprovalAmounts.PerInitiatedByAddressApprovalAmount, approvalDetails.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approvalLevel, "initiatedBy", initiatedBy)
+				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalDetails, overallTransferBalances, collection, approvalDetails.ApprovalAmounts.PerInitiatedByAddressApprovalAmount, approvalDetails.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approvalLevel, "initiatedBy", initiatedBy)
 				if err != nil {
 					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error incrementing initiatedBy approvals: %s", transferStr)
 				}
@@ -235,6 +236,7 @@ func IncrementBalances(startBalances []*types.Balance, numIncrements sdkmath.Uin
 func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	ctx sdk.Context,
 	transferVal *types.CollectionApprovedTransfer,
+	approvalDetails *types.ApprovalDetails,
 	overallTransferBalances []*types.Balance,
 	collection *types.BadgeCollection,
 	approvedAmount sdkmath.Uint,
@@ -245,7 +247,6 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	trackerType string,
 	address string,
 ) (error) {
-	approvalDetails := transferVal.ApprovalDetails[0] //TODO: Change when we support multiple
 	approvalId := approvalDetails.ApprovalId
 	predeterminedBalances := approvalDetails.PredeterminedBalances
 	allApprovals := []*types.Balance{{

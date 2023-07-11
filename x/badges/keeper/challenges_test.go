@@ -2101,7 +2101,7 @@ func (suite *TestSuite) TestMustOwnBadges() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MinMaxBalance{
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2172,7 +2172,7 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MinMaxBalance{
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2244,7 +2244,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MinMaxBalance{
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2333,7 +2333,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MinMaxBalance{
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{

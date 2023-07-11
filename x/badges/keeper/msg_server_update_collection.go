@@ -24,7 +24,8 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 			BalancesType:                     msg.BalancesType,
 			DefaultUserApprovedOutgoingTransfersTimeline: msg.DefaultApprovedOutgoingTransfersTimeline,
 			DefaultUserApprovedIncomingTransfersTimeline: msg.DefaultApprovedIncomingTransfersTimeline,
-			DefaultUserPermissions: msg.DefaultUserPermissions,
+			DefaultUserPermissions: 				msg.DefaultUserPermissions,
+			CreatedBy: 											msg.Creator,
 			ManagerTimeline: []*types.ManagerTimeline{
 				{
 					Manager: msg.Creator,

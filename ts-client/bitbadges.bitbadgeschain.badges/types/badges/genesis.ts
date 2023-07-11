@@ -15,8 +15,8 @@ export interface GenesisState {
   nextCollectionId: string;
   balances: UserBalanceStore[];
   balanceStoreKeys: string[];
-  numUsedForChallenges: string[];
-  numUsedForChallengesStoreKeys: string[];
+  numUsedForMerkleChallenges: string[];
+  numUsedForMerkleChallengesStoreKeys: string[];
   addressMappings: AddressMapping[];
   approvalsTrackers: ApprovalsTracker[];
   /** this line is used by starport scaffolding # genesis/proto/state */
@@ -31,8 +31,8 @@ function createBaseGenesisState(): GenesisState {
     nextCollectionId: "",
     balances: [],
     balanceStoreKeys: [],
-    numUsedForChallenges: [],
-    numUsedForChallengesStoreKeys: [],
+    numUsedForMerkleChallenges: [],
+    numUsedForMerkleChallengesStoreKeys: [],
     addressMappings: [],
     approvalsTrackers: [],
     approvalsTrackerStoreKeys: [],
@@ -59,10 +59,10 @@ export const GenesisState = {
     for (const v of message.balanceStoreKeys) {
       writer.uint32(50).string(v!);
     }
-    for (const v of message.numUsedForChallenges) {
+    for (const v of message.numUsedForMerkleChallenges) {
       writer.uint32(58).string(v!);
     }
-    for (const v of message.numUsedForChallengesStoreKeys) {
+    for (const v of message.numUsedForMerkleChallengesStoreKeys) {
       writer.uint32(66).string(v!);
     }
     for (const v of message.addressMappings) {
@@ -103,10 +103,10 @@ export const GenesisState = {
           message.balanceStoreKeys.push(reader.string());
           break;
         case 7:
-          message.numUsedForChallenges.push(reader.string());
+          message.numUsedForMerkleChallenges.push(reader.string());
           break;
         case 8:
-          message.numUsedForChallengesStoreKeys.push(reader.string());
+          message.numUsedForMerkleChallengesStoreKeys.push(reader.string());
           break;
         case 9:
           message.addressMappings.push(AddressMapping.decode(reader, reader.uint32()));
@@ -137,11 +137,11 @@ export const GenesisState = {
       balanceStoreKeys: Array.isArray(object?.balanceStoreKeys)
         ? object.balanceStoreKeys.map((e: any) => String(e))
         : [],
-      numUsedForChallenges: Array.isArray(object?.numUsedForChallenges)
-        ? object.numUsedForChallenges.map((e: any) => String(e))
+      numUsedForMerkleChallenges: Array.isArray(object?.numUsedForMerkleChallenges)
+        ? object.numUsedForMerkleChallenges.map((e: any) => String(e))
         : [],
-      numUsedForChallengesStoreKeys: Array.isArray(object?.numUsedForChallengesStoreKeys)
-        ? object.numUsedForChallengesStoreKeys.map((e: any) => String(e))
+      numUsedForMerkleChallengesStoreKeys: Array.isArray(object?.numUsedForMerkleChallengesStoreKeys)
+        ? object.numUsedForMerkleChallengesStoreKeys.map((e: any) => String(e))
         : [],
       addressMappings: Array.isArray(object?.addressMappings)
         ? object.addressMappings.map((e: any) => AddressMapping.fromJSON(e))
@@ -175,15 +175,15 @@ export const GenesisState = {
     } else {
       obj.balanceStoreKeys = [];
     }
-    if (message.numUsedForChallenges) {
-      obj.numUsedForChallenges = message.numUsedForChallenges.map((e) => e);
+    if (message.numUsedForMerkleChallenges) {
+      obj.numUsedForMerkleChallenges = message.numUsedForMerkleChallenges.map((e) => e);
     } else {
-      obj.numUsedForChallenges = [];
+      obj.numUsedForMerkleChallenges = [];
     }
-    if (message.numUsedForChallengesStoreKeys) {
-      obj.numUsedForChallengesStoreKeys = message.numUsedForChallengesStoreKeys.map((e) => e);
+    if (message.numUsedForMerkleChallengesStoreKeys) {
+      obj.numUsedForMerkleChallengesStoreKeys = message.numUsedForMerkleChallengesStoreKeys.map((e) => e);
     } else {
-      obj.numUsedForChallengesStoreKeys = [];
+      obj.numUsedForMerkleChallengesStoreKeys = [];
     }
     if (message.addressMappings) {
       obj.addressMappings = message.addressMappings.map((e) => e ? AddressMapping.toJSON(e) : undefined);
@@ -213,8 +213,8 @@ export const GenesisState = {
     message.nextCollectionId = object.nextCollectionId ?? "";
     message.balances = object.balances?.map((e) => UserBalanceStore.fromPartial(e)) || [];
     message.balanceStoreKeys = object.balanceStoreKeys?.map((e) => e) || [];
-    message.numUsedForChallenges = object.numUsedForChallenges?.map((e) => e) || [];
-    message.numUsedForChallengesStoreKeys = object.numUsedForChallengesStoreKeys?.map((e) => e) || [];
+    message.numUsedForMerkleChallenges = object.numUsedForMerkleChallenges?.map((e) => e) || [];
+    message.numUsedForMerkleChallengesStoreKeys = object.numUsedForMerkleChallengesStoreKeys?.map((e) => e) || [];
     message.addressMappings = object.addressMappings?.map((e) => AddressMapping.fromPartial(e)) || [];
     message.approvalsTrackers = object.approvalsTrackers?.map((e) => ApprovalsTracker.fromPartial(e)) || [];
     message.approvalsTrackerStoreKeys = object.approvalsTrackerStoreKeys?.map((e) => e) || [];

@@ -166,7 +166,7 @@ func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) {
 
 /********************************************************************************/
 // Sets a usedClaimData in the store using UsedClaimDataKey ([]byte{0x07}) as the prefix. No check if store has key already.
-func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {
+func (k Keeper) IncrementNumUsedForMerkleChallengeInStore(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex)))
 	curr := sdkmath.NewUint(0)
@@ -183,7 +183,7 @@ func (k Keeper) IncrementNumUsedForChallengeInStore(ctx sdk.Context, collectionI
 	return incrementedNum, nil
 }
 
-func (k Keeper) GetNumUsedForChallengeFromStore(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {
+func (k Keeper) GetNumUsedForMerkleChallengeFromStore(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
 	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, challengeId, leafIndex)))
 	curr := sdkmath.NewUint(0)

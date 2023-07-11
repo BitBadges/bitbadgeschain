@@ -484,7 +484,7 @@ func (m *QueryGetApprovalsTrackerResponse) GetTracker() *ApprovalsTracker {
 	return nil
 }
 
-type QueryGetNumUsedForChallengeRequest struct {
+type QueryGetNumUsedForMerkleChallengeRequest struct {
 	CollectionId  Uint   `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 	ApprovalLevel string `protobuf:"bytes,2,opt,name=approvalLevel,proto3" json:"approvalLevel,omitempty"`
 	Address       string `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
@@ -492,18 +492,18 @@ type QueryGetNumUsedForChallengeRequest struct {
 	LeafIndex     Uint   `protobuf:"bytes,5,opt,name=leafIndex,proto3,customtype=Uint" json:"leafIndex"`
 }
 
-func (m *QueryGetNumUsedForChallengeRequest) Reset()         { *m = QueryGetNumUsedForChallengeRequest{} }
-func (m *QueryGetNumUsedForChallengeRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetNumUsedForChallengeRequest) ProtoMessage()    {}
-func (*QueryGetNumUsedForChallengeRequest) Descriptor() ([]byte, []int) {
+func (m *QueryGetNumUsedForMerkleChallengeRequest) Reset()         { *m = QueryGetNumUsedForMerkleChallengeRequest{} }
+func (m *QueryGetNumUsedForMerkleChallengeRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryGetNumUsedForMerkleChallengeRequest) ProtoMessage()    {}
+func (*QueryGetNumUsedForMerkleChallengeRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_938ed0d19dbc00d5, []int{10}
 }
-func (m *QueryGetNumUsedForChallengeRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetNumUsedForMerkleChallengeRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetNumUsedForChallengeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetNumUsedForMerkleChallengeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetNumUsedForChallengeRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetNumUsedForMerkleChallengeRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -513,55 +513,55 @@ func (m *QueryGetNumUsedForChallengeRequest) XXX_Marshal(b []byte, deterministic
 		return b[:n], nil
 	}
 }
-func (m *QueryGetNumUsedForChallengeRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetNumUsedForChallengeRequest.Merge(m, src)
+func (m *QueryGetNumUsedForMerkleChallengeRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetNumUsedForMerkleChallengeRequest.Merge(m, src)
 }
-func (m *QueryGetNumUsedForChallengeRequest) XXX_Size() int {
+func (m *QueryGetNumUsedForMerkleChallengeRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetNumUsedForChallengeRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetNumUsedForChallengeRequest.DiscardUnknown(m)
+func (m *QueryGetNumUsedForMerkleChallengeRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetNumUsedForMerkleChallengeRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetNumUsedForChallengeRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetNumUsedForMerkleChallengeRequest proto.InternalMessageInfo
 
-func (m *QueryGetNumUsedForChallengeRequest) GetApprovalLevel() string {
+func (m *QueryGetNumUsedForMerkleChallengeRequest) GetApprovalLevel() string {
 	if m != nil {
 		return m.ApprovalLevel
 	}
 	return ""
 }
 
-func (m *QueryGetNumUsedForChallengeRequest) GetAddress() string {
+func (m *QueryGetNumUsedForMerkleChallengeRequest) GetAddress() string {
 	if m != nil {
 		return m.Address
 	}
 	return ""
 }
 
-func (m *QueryGetNumUsedForChallengeRequest) GetChallengeId() string {
+func (m *QueryGetNumUsedForMerkleChallengeRequest) GetChallengeId() string {
 	if m != nil {
 		return m.ChallengeId
 	}
 	return ""
 }
 
-type QueryGetNumUsedForChallengeResponse struct {
+type QueryGetNumUsedForMerkleChallengeResponse struct {
 	NumUsed Uint `protobuf:"bytes,1,opt,name=numUsed,proto3,customtype=Uint" json:"numUsed"`
 }
 
-func (m *QueryGetNumUsedForChallengeResponse) Reset()         { *m = QueryGetNumUsedForChallengeResponse{} }
-func (m *QueryGetNumUsedForChallengeResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetNumUsedForChallengeResponse) ProtoMessage()    {}
-func (*QueryGetNumUsedForChallengeResponse) Descriptor() ([]byte, []int) {
+func (m *QueryGetNumUsedForMerkleChallengeResponse) Reset()         { *m = QueryGetNumUsedForMerkleChallengeResponse{} }
+func (m *QueryGetNumUsedForMerkleChallengeResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryGetNumUsedForMerkleChallengeResponse) ProtoMessage()    {}
+func (*QueryGetNumUsedForMerkleChallengeResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_938ed0d19dbc00d5, []int{11}
 }
-func (m *QueryGetNumUsedForChallengeResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetNumUsedForMerkleChallengeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetNumUsedForChallengeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetNumUsedForMerkleChallengeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetNumUsedForChallengeResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetNumUsedForMerkleChallengeResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -571,17 +571,17 @@ func (m *QueryGetNumUsedForChallengeResponse) XXX_Marshal(b []byte, deterministi
 		return b[:n], nil
 	}
 }
-func (m *QueryGetNumUsedForChallengeResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetNumUsedForChallengeResponse.Merge(m, src)
+func (m *QueryGetNumUsedForMerkleChallengeResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetNumUsedForMerkleChallengeResponse.Merge(m, src)
 }
-func (m *QueryGetNumUsedForChallengeResponse) XXX_Size() int {
+func (m *QueryGetNumUsedForMerkleChallengeResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetNumUsedForChallengeResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetNumUsedForChallengeResponse.DiscardUnknown(m)
+func (m *QueryGetNumUsedForMerkleChallengeResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetNumUsedForMerkleChallengeResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetNumUsedForChallengeResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetNumUsedForMerkleChallengeResponse proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*QueryParamsRequest)(nil), "bitbadges.bitbadgeschain.badges.QueryParamsRequest")
@@ -594,8 +594,8 @@ func init() {
 	proto.RegisterType((*QueryGetAddressMappingResponse)(nil), "bitbadges.bitbadgeschain.badges.QueryGetAddressMappingResponse")
 	proto.RegisterType((*QueryGetApprovalsTrackerRequest)(nil), "bitbadges.bitbadgeschain.badges.QueryGetApprovalsTrackerRequest")
 	proto.RegisterType((*QueryGetApprovalsTrackerResponse)(nil), "bitbadges.bitbadgeschain.badges.QueryGetApprovalsTrackerResponse")
-	proto.RegisterType((*QueryGetNumUsedForChallengeRequest)(nil), "bitbadges.bitbadgeschain.badges.QueryGetNumUsedForChallengeRequest")
-	proto.RegisterType((*QueryGetNumUsedForChallengeResponse)(nil), "bitbadges.bitbadgeschain.badges.QueryGetNumUsedForChallengeResponse")
+	proto.RegisterType((*QueryGetNumUsedForMerkleChallengeRequest)(nil), "bitbadges.bitbadgeschain.badges.QueryGetNumUsedForMerkleChallengeRequest")
+	proto.RegisterType((*QueryGetNumUsedForMerkleChallengeResponse)(nil), "bitbadges.bitbadgeschain.badges.QueryGetNumUsedForMerkleChallengeResponse")
 }
 
 func init() { proto.RegisterFile("badges/query.proto", fileDescriptor_938ed0d19dbc00d5) }
@@ -679,7 +679,7 @@ type QueryClient interface {
 	GetCollection(ctx context.Context, in *QueryGetCollectionRequest, opts ...grpc.CallOption) (*QueryGetCollectionResponse, error)
 	GetAddressMapping(ctx context.Context, in *QueryGetAddressMappingRequest, opts ...grpc.CallOption) (*QueryGetAddressMappingResponse, error)
 	GetApprovalsTracker(ctx context.Context, in *QueryGetApprovalsTrackerRequest, opts ...grpc.CallOption) (*QueryGetApprovalsTrackerResponse, error)
-	GetNumUsedForChallenge(ctx context.Context, in *QueryGetNumUsedForChallengeRequest, opts ...grpc.CallOption) (*QueryGetNumUsedForChallengeResponse, error)
+	GetNumUsedForMerkleChallenge(ctx context.Context, in *QueryGetNumUsedForMerkleChallengeRequest, opts ...grpc.CallOption) (*QueryGetNumUsedForMerkleChallengeResponse, error)
 	// Queries an addresses balance for a badge collection, specified by its ID.
 	GetBalance(ctx context.Context, in *QueryGetBalanceRequest, opts ...grpc.CallOption) (*QueryGetBalanceResponse, error)
 }
@@ -728,9 +728,9 @@ func (c *queryClient) GetApprovalsTracker(ctx context.Context, in *QueryGetAppro
 	return out, nil
 }
 
-func (c *queryClient) GetNumUsedForChallenge(ctx context.Context, in *QueryGetNumUsedForChallengeRequest, opts ...grpc.CallOption) (*QueryGetNumUsedForChallengeResponse, error) {
-	out := new(QueryGetNumUsedForChallengeResponse)
-	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Query/GetNumUsedForChallenge", in, out, opts...)
+func (c *queryClient) GetNumUsedForMerkleChallenge(ctx context.Context, in *QueryGetNumUsedForMerkleChallengeRequest, opts ...grpc.CallOption) (*QueryGetNumUsedForMerkleChallengeResponse, error) {
+	out := new(QueryGetNumUsedForMerkleChallengeResponse)
+	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Query/GetNumUsedForMerkleChallenge", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -754,7 +754,7 @@ type QueryServer interface {
 	GetCollection(context.Context, *QueryGetCollectionRequest) (*QueryGetCollectionResponse, error)
 	GetAddressMapping(context.Context, *QueryGetAddressMappingRequest) (*QueryGetAddressMappingResponse, error)
 	GetApprovalsTracker(context.Context, *QueryGetApprovalsTrackerRequest) (*QueryGetApprovalsTrackerResponse, error)
-	GetNumUsedForChallenge(context.Context, *QueryGetNumUsedForChallengeRequest) (*QueryGetNumUsedForChallengeResponse, error)
+	GetNumUsedForMerkleChallenge(context.Context, *QueryGetNumUsedForMerkleChallengeRequest) (*QueryGetNumUsedForMerkleChallengeResponse, error)
 	// Queries an addresses balance for a badge collection, specified by its ID.
 	GetBalance(context.Context, *QueryGetBalanceRequest) (*QueryGetBalanceResponse, error)
 }
@@ -775,8 +775,8 @@ func (*UnimplementedQueryServer) GetAddressMapping(ctx context.Context, req *Que
 func (*UnimplementedQueryServer) GetApprovalsTracker(ctx context.Context, req *QueryGetApprovalsTrackerRequest) (*QueryGetApprovalsTrackerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetApprovalsTracker not implemented")
 }
-func (*UnimplementedQueryServer) GetNumUsedForChallenge(ctx context.Context, req *QueryGetNumUsedForChallengeRequest) (*QueryGetNumUsedForChallengeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetNumUsedForChallenge not implemented")
+func (*UnimplementedQueryServer) GetNumUsedForMerkleChallenge(ctx context.Context, req *QueryGetNumUsedForMerkleChallengeRequest) (*QueryGetNumUsedForMerkleChallengeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNumUsedForMerkleChallenge not implemented")
 }
 func (*UnimplementedQueryServer) GetBalance(ctx context.Context, req *QueryGetBalanceRequest) (*QueryGetBalanceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBalance not implemented")
@@ -858,20 +858,20 @@ func _Query_GetApprovalsTracker_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_GetNumUsedForChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetNumUsedForChallengeRequest)
+func _Query_GetNumUsedForMerkleChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetNumUsedForMerkleChallengeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).GetNumUsedForChallenge(ctx, in)
+		return srv.(QueryServer).GetNumUsedForMerkleChallenge(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bitbadges.bitbadgeschain.badges.Query/GetNumUsedForChallenge",
+		FullMethod: "/bitbadges.bitbadgeschain.badges.Query/GetNumUsedForMerkleChallenge",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetNumUsedForChallenge(ctx, req.(*QueryGetNumUsedForChallengeRequest))
+		return srv.(QueryServer).GetNumUsedForMerkleChallenge(ctx, req.(*QueryGetNumUsedForMerkleChallengeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -915,8 +915,8 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Query_GetApprovalsTracker_Handler,
 		},
 		{
-			MethodName: "GetNumUsedForChallenge",
-			Handler:    _Query_GetNumUsedForChallenge_Handler,
+			MethodName: "GetNumUsedForMerkleChallenge",
+			Handler:    _Query_GetNumUsedForMerkleChallenge_Handler,
 		},
 		{
 			MethodName: "GetBalance",
@@ -1287,7 +1287,7 @@ func (m *QueryGetApprovalsTrackerResponse) MarshalToSizedBuffer(dAtA []byte) (in
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetNumUsedForChallengeRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetNumUsedForMerkleChallengeRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1297,12 +1297,12 @@ func (m *QueryGetNumUsedForChallengeRequest) Marshal() (dAtA []byte, err error) 
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetNumUsedForChallengeRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetNumUsedForMerkleChallengeRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetNumUsedForChallengeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetNumUsedForMerkleChallengeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1351,7 +1351,7 @@ func (m *QueryGetNumUsedForChallengeRequest) MarshalToSizedBuffer(dAtA []byte) (
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetNumUsedForChallengeResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetNumUsedForMerkleChallengeResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1361,12 +1361,12 @@ func (m *QueryGetNumUsedForChallengeResponse) Marshal() (dAtA []byte, err error)
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetNumUsedForChallengeResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetNumUsedForMerkleChallengeResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetNumUsedForChallengeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetNumUsedForMerkleChallengeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1533,7 +1533,7 @@ func (m *QueryGetApprovalsTrackerResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetNumUsedForChallengeRequest) Size() (n int) {
+func (m *QueryGetNumUsedForMerkleChallengeRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1558,7 +1558,7 @@ func (m *QueryGetNumUsedForChallengeRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetNumUsedForChallengeResponse) Size() (n int) {
+func (m *QueryGetNumUsedForMerkleChallengeResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2546,7 +2546,7 @@ func (m *QueryGetApprovalsTrackerResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetNumUsedForChallengeRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryGetNumUsedForMerkleChallengeRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2569,10 +2569,10 @@ func (m *QueryGetNumUsedForChallengeRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetNumUsedForChallengeRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetNumUsedForMerkleChallengeRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetNumUsedForChallengeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetNumUsedForMerkleChallengeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2760,7 +2760,7 @@ func (m *QueryGetNumUsedForChallengeRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetNumUsedForChallengeResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryGetNumUsedForMerkleChallengeResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2783,10 +2783,10 @@ func (m *QueryGetNumUsedForChallengeResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetNumUsedForChallengeResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetNumUsedForMerkleChallengeResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetNumUsedForChallengeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetNumUsedForMerkleChallengeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

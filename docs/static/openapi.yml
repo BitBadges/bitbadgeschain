@@ -5794,7 +5794,7 @@ paths:
         - Query
   /bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{challengeId}/{level}/{leafIndex}:
     get:
-      operationId: BitbadgesBitbadgeschainBadgesGetNumUsedForChallenge
+      operationId: BitbadgesBitbadgeschainBadgesGetNumUsedForMerkleChallenge
       responses:
         '200':
           description: A successful response.
@@ -64704,7 +64704,7 @@ definitions:
 
           Collections may have different balance types: standard vs off-chain vs
           inherited. See documentation for differences.
-  bitbadges.bitbadgeschain.badges.QueryGetNumUsedForChallengeResponse:
+  bitbadges.bitbadgeschain.badges.QueryGetNumUsedForMerkleChallengeResponse:
     type: object
     properties:
       numUsed:

@@ -28,7 +28,7 @@ message Balance {
   repeated UintRange badgeIds = 3;
 }
 
-message MinMaxBalance {
+message MustOwnBadges {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
   UintRange amountRange = 2;

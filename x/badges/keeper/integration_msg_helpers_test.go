@@ -41,8 +41,8 @@ func GetAddressMapping(suite *TestSuite, ctx context.Context, mappingId string) 
 	return res.Mapping, nil
 }
 
-// func GetNumUsedForChallenge(suite *TestSuite, ctx context.Context, challengeId string, level string, leafIndex sdkmath.Uint, collectionId sdkmath.Uint) (sdkmath.Uint, error) {
-// 	res, err := suite.app.BadgesKeeper.GetNumUsedForChallenge(ctx, &types.QueryGetNumUsedForChallengeRequest{
+// func GetNumUsedForMerkleChallenge(suite *TestSuite, ctx context.Context, challengeId string, level string, leafIndex sdkmath.Uint, collectionId sdkmath.Uint) (sdkmath.Uint, error) {
+// 	res, err := suite.app.BadgesKeeper.GetNumUsedForMerkleChallenge(ctx, &types.QueryGetNumUsedForMerkleChallengeRequest{
 // 		ChallengeId:  challengeId,
 // 		Level:        level,
 // 		LeafIndex:    leafIndex,

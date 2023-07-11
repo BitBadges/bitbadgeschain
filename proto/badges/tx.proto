@@ -15,7 +15,7 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 // Msg defines the Msg service.
 service Msg {
-  rpc UpdateCollection      (MsgUpdateCollection     ) returns (MsgUpdateCollectionResponse     );
+  rpc UpdateCollection      (MsgUpdateCollection) returns (MsgUpdateCollectionResponse);
   rpc CreateAddressMappings (MsgCreateAddressMappings) returns (MsgCreateAddressMappingsResponse);
   rpc TransferBadges(MsgTransferBadges) returns (MsgTransferBadgesResponse);
   rpc UpdateUserApprovedTransfers(MsgUpdateUserApprovedTransfers) returns (MsgUpdateUserApprovedTransfersResponse);

@@ -560,7 +560,7 @@ export interface BadgesQueryGetCollectionResponse {
   collection?: BadgesBadgeCollection;
 }
 
-export interface BadgesQueryGetNumUsedForChallengeResponse {
+export interface BadgesQueryGetNumUsedForMerkleChallengeResponse {
   numUsed?: string;
 }
 
@@ -1175,17 +1175,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryGetNumUsedForChallenge
+   * @name QueryGetNumUsedForMerkleChallenge
    * @request GET:/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{challengeId}/{level}/{leafIndex}
    */
-  queryGetNumUsedForChallenge = (
+  queryGetNumUsedForMerkleChallenge = (
     challengeId: string,
     level: string,
     leafIndex: string,
     query?: { collectionId?: string },
     params: RequestParams = {},
   ) =>
-    this.request<BadgesQueryGetNumUsedForChallengeResponse, RpcStatus>({
+    this.request<BadgesQueryGetNumUsedForMerkleChallengeResponse, RpcStatus>({
       path: `/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/${challengeId}/${level}/${leafIndex}`,
       method: "GET",
       query: query,

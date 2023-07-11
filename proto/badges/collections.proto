@@ -76,4 +76,6 @@ message BadgeCollection {
   repeated UserApprovedIncomingTransferTimeline defaultUserApprovedIncomingTransfersTimeline = 15;
 
   UserPermissions defaultUserPermissions = 16;
+
+  string createdBy = 17;
 }

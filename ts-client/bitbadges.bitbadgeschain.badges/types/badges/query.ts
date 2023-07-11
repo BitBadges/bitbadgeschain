@@ -54,14 +54,14 @@ export interface QueryGetApprovalsTrackerResponse {
   tracker: ApprovalsTracker | undefined;
 }
 
-export interface QueryGetNumUsedForChallengeRequest {
+export interface QueryGetNumUsedForMerkleChallengeRequest {
   challengeId: string;
   level: string;
   leafIndex: string;
   collectionId: string;
 }
 
-export interface QueryGetNumUsedForChallengeResponse {
+export interface QueryGetNumUsedForMerkleChallengeResponse {
   numUsed: string;
 }
 
@@ -598,12 +598,12 @@ export const QueryGetApprovalsTrackerResponse = {
   },
 };
 
-function createBaseQueryGetNumUsedForChallengeRequest(): QueryGetNumUsedForChallengeRequest {
+function createBaseQueryGetNumUsedForMerkleChallengeRequest(): QueryGetNumUsedForMerkleChallengeRequest {
   return { challengeId: "", level: "", leafIndex: "", collectionId: "" };
 }
 
-export const QueryGetNumUsedForChallengeRequest = {
-  encode(message: QueryGetNumUsedForChallengeRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const QueryGetNumUsedForMerkleChallengeRequest = {
+  encode(message: QueryGetNumUsedForMerkleChallengeRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.challengeId !== "") {
       writer.uint32(10).string(message.challengeId);
     }
@@ -619,10 +619,10 @@ export const QueryGetNumUsedForChallengeRequest = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetNumUsedForChallengeRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetNumUsedForMerkleChallengeRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryGetNumUsedForChallengeRequest();
+    const message = createBaseQueryGetNumUsedForMerkleChallengeRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -646,7 +646,7 @@ export const QueryGetNumUsedForChallengeRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetNumUsedForChallengeRequest {
+  fromJSON(object: any): QueryGetNumUsedForMerkleChallengeRequest {
     return {
       challengeId: isSet(object.challengeId) ? String(object.challengeId) : "",
       level: isSet(object.level) ? String(object.level) : "",
@@ -655,7 +655,7 @@ export const QueryGetNumUsedForChallengeRequest = {
     };
   },
 
-  toJSON(message: QueryGetNumUsedForChallengeRequest): unknown {
+  toJSON(message: QueryGetNumUsedForMerkleChallengeRequest): unknown {
     const obj: any = {};
     message.challengeId !== undefined && (obj.challengeId = message.challengeId);
     message.level !== undefined && (obj.level = message.level);
@@ -664,10 +664,10 @@ export const QueryGetNumUsedForChallengeRequest = {
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<QueryGetNumUsedForChallengeRequest>, I>>(
+  fromPartial<I extends Exact<DeepPartial<QueryGetNumUsedForMerkleChallengeRequest>, I>>(
     object: I,
-  ): QueryGetNumUsedForChallengeRequest {
-    const message = createBaseQueryGetNumUsedForChallengeRequest();
+  ): QueryGetNumUsedForMerkleChallengeRequest {
+    const message = createBaseQueryGetNumUsedForMerkleChallengeRequest();
     message.challengeId = object.challengeId ?? "";
     message.level = object.level ?? "";
     message.leafIndex = object.leafIndex ?? "";
@@ -676,22 +676,22 @@ export const QueryGetNumUsedForChallengeRequest = {
   },
 };
 
-function createBaseQueryGetNumUsedForChallengeResponse(): QueryGetNumUsedForChallengeResponse {
+function createBaseQueryGetNumUsedForMerkleChallengeResponse(): QueryGetNumUsedForMerkleChallengeResponse {
   return { numUsed: "" };
 }
 
-export const QueryGetNumUsedForChallengeResponse = {
-  encode(message: QueryGetNumUsedForChallengeResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const QueryGetNumUsedForMerkleChallengeResponse = {
+  encode(message: QueryGetNumUsedForMerkleChallengeResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.numUsed !== "") {
       writer.uint32(10).string(message.numUsed);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetNumUsedForChallengeResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetNumUsedForMerkleChallengeResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryGetNumUsedForChallengeResponse();
+    const message = createBaseQueryGetNumUsedForMerkleChallengeResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -706,20 +706,20 @@ export const QueryGetNumUsedForChallengeResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetNumUsedForChallengeResponse {
+  fromJSON(object: any): QueryGetNumUsedForMerkleChallengeResponse {
     return { numUsed: isSet(object.numUsed) ? String(object.numUsed) : "" };
   },
 
-  toJSON(message: QueryGetNumUsedForChallengeResponse): unknown {
+  toJSON(message: QueryGetNumUsedForMerkleChallengeResponse): unknown {
     const obj: any = {};
     message.numUsed !== undefined && (obj.numUsed = message.numUsed);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<QueryGetNumUsedForChallengeResponse>, I>>(
+  fromPartial<I extends Exact<DeepPartial<QueryGetNumUsedForMerkleChallengeResponse>, I>>(
     object: I,
-  ): QueryGetNumUsedForChallengeResponse {
-    const message = createBaseQueryGetNumUsedForChallengeResponse();
+  ): QueryGetNumUsedForMerkleChallengeResponse {
+    const message = createBaseQueryGetNumUsedForMerkleChallengeResponse();
     message.numUsed = object.numUsed ?? "";
     return message;
   },
@@ -733,7 +733,7 @@ export interface Query {
   GetCollection(request: QueryGetCollectionRequest): Promise<QueryGetCollectionResponse>;
   GetAddressMapping(request: QueryGetAddressMappingRequest): Promise<QueryGetAddressMappingResponse>;
   GetApprovalsTracker(request: QueryGetApprovalsTrackerRequest): Promise<QueryGetApprovalsTrackerResponse>;
-  GetNumUsedForChallenge(request: QueryGetNumUsedForChallengeRequest): Promise<QueryGetNumUsedForChallengeResponse>;
+  GetNumUsedForMerkleChallenge(request: QueryGetNumUsedForMerkleChallengeRequest): Promise<QueryGetNumUsedForMerkleChallengeResponse>;
   /** Queries an addresses balance for a badge collection, specified by its ID. */
   GetBalance(request: QueryGetBalanceRequest): Promise<QueryGetBalanceResponse>;
 }
@@ -746,7 +746,7 @@ export class QueryClientImpl implements Query {
     this.GetCollection = this.GetCollection.bind(this);
     this.GetAddressMapping = this.GetAddressMapping.bind(this);
     this.GetApprovalsTracker = this.GetApprovalsTracker.bind(this);
-    this.GetNumUsedForChallenge = this.GetNumUsedForChallenge.bind(this);
+    this.GetNumUsedForMerkleChallenge = this.GetNumUsedForMerkleChallenge.bind(this);
     this.GetBalance = this.GetBalance.bind(this);
   }
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse> {
@@ -773,10 +773,10 @@ export class QueryClientImpl implements Query {
     return promise.then((data) => QueryGetApprovalsTrackerResponse.decode(new _m0.Reader(data)));
   }
 
-  GetNumUsedForChallenge(request: QueryGetNumUsedForChallengeRequest): Promise<QueryGetNumUsedForChallengeResponse> {
-    const data = QueryGetNumUsedForChallengeRequest.encode(request).finish();
-    const promise = this.rpc.request("bitbadges.bitbadgeschain.badges.Query", "GetNumUsedForChallenge", data);
-    return promise.then((data) => QueryGetNumUsedForChallengeResponse.decode(new _m0.Reader(data)));
+  GetNumUsedForMerkleChallenge(request: QueryGetNumUsedForMerkleChallengeRequest): Promise<QueryGetNumUsedForMerkleChallengeResponse> {
+    const data = QueryGetNumUsedForMerkleChallengeRequest.encode(request).finish();
+    const promise = this.rpc.request("bitbadges.bitbadgeschain.badges.Query", "GetNumUsedForMerkleChallenge", data);
+    return promise.then((data) => QueryGetNumUsedForMerkleChallengeResponse.decode(new _m0.Reader(data)));
   }
 
   GetBalance(request: QueryGetBalanceRequest): Promise<QueryGetBalanceResponse> {

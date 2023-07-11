@@ -45,12 +45,12 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 				return nil, err
 			}
 			return json.Marshal(badgeTypes.QueryGetApprovalsTrackerResponse{Tracker: res.Tracker})
-		case custom.QueryGetNumUsedForChallenge != nil:
-			res, err := keeper.GetNumUsedForChallenge(ctx, custom.QueryGetNumUsedForChallenge)
+		case custom.QueryGetNumUsedForMerkleChallenge != nil:
+			res, err := keeper.GetNumUsedForMerkleChallenge(ctx, custom.QueryGetNumUsedForMerkleChallenge)
 			if err != nil {
 				return nil, err
 			}
-			return json.Marshal(badgeTypes.QueryGetNumUsedForChallengeResponse{NumUsed: res.NumUsed})
+			return json.Marshal(badgeTypes.QueryGetNumUsedForMerkleChallengeResponse{NumUsed: res.NumUsed})
 		}
 		return nil, sdkerrors.Wrap(types.ErrInvalidMsg, "Unknown Custom query variant")
 	}
@@ -61,5 +61,5 @@ type badgeCustomQuery struct {
 	QueryBalance                *badgeTypes.QueryGetBalanceRequest             `json:"queryBalance,omitempty"`
 	QueryAddressMapping         *badgeTypes.QueryGetAddressMappingRequest      `json:"queryAddressMapping,omitempty"`
 	QueryApprovalsTracker       *badgeTypes.QueryGetApprovalsTrackerRequest    `json:"queryApprovalsTracker,omitempty"`
-	QueryGetNumUsedForChallenge *badgeTypes.QueryGetNumUsedForChallengeRequest `json:"queryGetNumUsedForChallenge,omitempty"`
+	QueryGetNumUsedForMerkleChallenge *badgeTypes.QueryGetNumUsedForMerkleChallengeRequest `json:"queryGetNumUsedForMerkleChallenge,omitempty"`
 }

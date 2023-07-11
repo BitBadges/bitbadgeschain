@@ -47,7 +47,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 				if challenge.MaxOneUsePerLeaf {
 					challengeId := challenge.ChallengeId
 					if simulation {
-						numUsed, err := k.GetNumUsedForChallengeFromStore(ctx, collectionId, challengeId, leafIndex)
+						numUsed, err := k.GetNumUsedForMerkleChallengeFromStore(ctx, collectionId, challengeId, leafIndex)
 						if err != nil {
 							continue
 						}
@@ -58,7 +58,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 							continue
 						}
 					} else {
-						numUsed, err := k.IncrementNumUsedForChallengeInStore(ctx, collectionId, challengeId, leafIndex)
+						numUsed, err := k.IncrementNumUsedForMerkleChallengeInStore(ctx, collectionId, challengeId, leafIndex)
 						if err != nil {
 							continue
 						}
