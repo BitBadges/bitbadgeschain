@@ -37,7 +37,7 @@ export const protobufPackage = "bitbadges.bitbadgeschain.badges";
  */
 export interface CollectionPermissions {
   canDeleteCollection: ActionPermission[];
-  canArchive: TimedUpdatePermission[];
+  canArchiveCollection: TimedUpdatePermission[];
   canUpdateContractAddress: TimedUpdatePermission[];
   canUpdateOffChainBalancesMetadata: TimedUpdatePermission[];
   canUpdateStandards: TimedUpdatePermission[];
@@ -78,6 +78,7 @@ export interface CollectionApprovedTransferCombination {
   initiatedByMappingOptions: ValueOptions | undefined;
   transferTimesOptions: ValueOptions | undefined;
   badgeIdsOptions: ValueOptions | undefined;
+  ownedTimesOptions: ValueOptions | undefined;
   permittedTimesOptions: ValueOptions | undefined;
   forbiddenTimesOptions: ValueOptions | undefined;
 }
@@ -89,6 +90,7 @@ export interface CollectionApprovedTransferDefaultValues {
   initiatedByMappingId: string;
   transferTimes: UintRange[];
   badgeIds: UintRange[];
+  ownedTimes: UintRange[];
   permittedTimes: UintRange[];
   forbiddenTimes: UintRange[];
 }
@@ -122,6 +124,7 @@ export interface UserApprovedOutgoingTransferCombination {
   initiatedByMappingOptions: ValueOptions | undefined;
   transferTimesOptions: ValueOptions | undefined;
   badgeIdsOptions: ValueOptions | undefined;
+  ownedTimesOptions: ValueOptions | undefined;
   permittedTimesOptions: ValueOptions | undefined;
   forbiddenTimesOptions: ValueOptions | undefined;
 }
@@ -132,6 +135,7 @@ export interface UserApprovedOutgoingTransferDefaultValues {
   initiatedByMappingId: string;
   transferTimes: UintRange[];
   badgeIds: UintRange[];
+  ownedTimes: UintRange[];
   permittedTimes: UintRange[];
   forbiddenTimes: UintRange[];
 }
@@ -151,6 +155,7 @@ export interface UserApprovedIncomingTransferCombination {
   initiatedByMappingOptions: ValueOptions | undefined;
   transferTimesOptions: ValueOptions | undefined;
   badgeIdsOptions: ValueOptions | undefined;
+  ownedTimesOptions: ValueOptions | undefined;
   permittedTimesOptions: ValueOptions | undefined;
   forbiddenTimesOptions: ValueOptions | undefined;
 }
@@ -161,6 +166,7 @@ export interface UserApprovedIncomingTransferDefaultValues {
   initiatedByMappingId: string;
   transferTimes: UintRange[];
   badgeIds: UintRange[];
+  ownedTimes: UintRange[];
   permittedTimes: UintRange[];
   forbiddenTimes: UintRange[];
 }
@@ -271,7 +277,7 @@ export interface TimedUpdateWithBadgeIdsPermission {
 function createBaseCollectionPermissions(): CollectionPermissions {
   return {
     canDeleteCollection: [],
-    canArchive: [],
+    canArchiveCollection: [],
     canUpdateContractAddress: [],
     canUpdateOffChainBalancesMetadata: [],
     canUpdateStandards: [],
@@ -290,7 +296,7 @@ export const CollectionPermissions = {
     for (const v of message.canDeleteCollection) {
       ActionPermission.encode(v!, writer.uint32(10).fork()).ldelim();
     }
-    for (const v of message.canArchive) {
+    for (const v of message.canArchiveCollection) {
       TimedUpdatePermission.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     for (const v of message.canUpdateContractAddress) {
@@ -337,7 +343,7 @@ export const CollectionPermissions = {
           message.canDeleteCollection.push(ActionPermission.decode(reader, reader.uint32()));
           break;
         case 2:
-          message.canArchive.push(TimedUpdatePermission.decode(reader, reader.uint32()));
+          message.canArchiveCollection.push(TimedUpdatePermission.decode(reader, reader.uint32()));
           break;
         case 3:
           message.canUpdateContractAddress.push(TimedUpdatePermission.decode(reader, reader.uint32()));
@@ -384,8 +390,8 @@ export const CollectionPermissions = {
       canDeleteCollection: Array.isArray(object?.canDeleteCollection)
         ? object.canDeleteCollection.map((e: any) => ActionPermission.fromJSON(e))
         : [],
-      canArchive: Array.isArray(object?.canArchive)
-        ? object.canArchive.map((e: any) => TimedUpdatePermission.fromJSON(e))
+      canArchiveCollection: Array.isArray(object?.canArchiveCollection)
+        ? object.canArchiveCollection.map((e: any) => TimedUpdatePermission.fromJSON(e))
         : [],
       canUpdateContractAddress: Array.isArray(object?.canUpdateContractAddress)
         ? object.canUpdateContractAddress.map((e: any) => TimedUpdatePermission.fromJSON(e))
@@ -427,10 +433,12 @@ export const CollectionPermissions = {
     } else {
       obj.canDeleteCollection = [];
     }
-    if (message.canArchive) {
-      obj.canArchive = message.canArchive.map((e) => e ? TimedUpdatePermission.toJSON(e) : undefined);
+    if (message.canArchiveCollection) {
+      obj.canArchiveCollection = message.canArchiveCollection.map((e) =>
+        e ? TimedUpdatePermission.toJSON(e) : undefined
+      );
     } else {
-      obj.canArchive = [];
+      obj.canArchiveCollection = [];
     }
     if (message.canUpdateContractAddress) {
       obj.canUpdateContractAddress = message.canUpdateContractAddress.map((e) =>
@@ -502,7 +510,7 @@ export const CollectionPermissions = {
   fromPartial<I extends Exact<DeepPartial<CollectionPermissions>, I>>(object: I): CollectionPermissions {
     const message = createBaseCollectionPermissions();
     message.canDeleteCollection = object.canDeleteCollection?.map((e) => ActionPermission.fromPartial(e)) || [];
-    message.canArchive = object.canArchive?.map((e) => TimedUpdatePermission.fromPartial(e)) || [];
+    message.canArchiveCollection = object.canArchiveCollection?.map((e) => TimedUpdatePermission.fromPartial(e)) || [];
     message.canUpdateContractAddress = object.canUpdateContractAddress?.map((e) => TimedUpdatePermission.fromPartial(e))
       || [];
     message.canUpdateOffChainBalancesMetadata =
@@ -681,6 +689,7 @@ function createBaseCollectionApprovedTransferCombination(): CollectionApprovedTr
     initiatedByMappingOptions: undefined,
     transferTimesOptions: undefined,
     badgeIdsOptions: undefined,
+    ownedTimesOptions: undefined,
     permittedTimesOptions: undefined,
     forbiddenTimesOptions: undefined,
   };
@@ -705,6 +714,9 @@ export const CollectionApprovedTransferCombination = {
     }
     if (message.badgeIdsOptions !== undefined) {
       ValueOptions.encode(message.badgeIdsOptions, writer.uint32(50).fork()).ldelim();
+    }
+    if (message.ownedTimesOptions !== undefined) {
+      ValueOptions.encode(message.ownedTimesOptions, writer.uint32(74).fork()).ldelim();
     }
     if (message.permittedTimesOptions !== undefined) {
       ValueOptions.encode(message.permittedTimesOptions, writer.uint32(58).fork()).ldelim();
@@ -740,6 +752,9 @@ export const CollectionApprovedTransferCombination = {
         case 6:
           message.badgeIdsOptions = ValueOptions.decode(reader, reader.uint32());
           break;
+        case 9:
+          message.ownedTimesOptions = ValueOptions.decode(reader, reader.uint32());
+          break;
         case 7:
           message.permittedTimesOptions = ValueOptions.decode(reader, reader.uint32());
           break;
@@ -770,6 +785,7 @@ export const CollectionApprovedTransferCombination = {
         ? ValueOptions.fromJSON(object.transferTimesOptions)
         : undefined,
       badgeIdsOptions: isSet(object.badgeIdsOptions) ? ValueOptions.fromJSON(object.badgeIdsOptions) : undefined,
+      ownedTimesOptions: isSet(object.ownedTimesOptions) ? ValueOptions.fromJSON(object.ownedTimesOptions) : undefined,
       permittedTimesOptions: isSet(object.permittedTimesOptions)
         ? ValueOptions.fromJSON(object.permittedTimesOptions)
         : undefined,
@@ -798,6 +814,10 @@ export const CollectionApprovedTransferCombination = {
       : undefined);
     message.badgeIdsOptions !== undefined
       && (obj.badgeIdsOptions = message.badgeIdsOptions ? ValueOptions.toJSON(message.badgeIdsOptions) : undefined);
+    message.ownedTimesOptions !== undefined
+      && (obj.ownedTimesOptions = message.ownedTimesOptions
+        ? ValueOptions.toJSON(message.ownedTimesOptions)
+        : undefined);
     message.permittedTimesOptions !== undefined && (obj.permittedTimesOptions = message.permittedTimesOptions
       ? ValueOptions.toJSON(message.permittedTimesOptions)
       : undefined);
@@ -830,6 +850,9 @@ export const CollectionApprovedTransferCombination = {
     message.badgeIdsOptions = (object.badgeIdsOptions !== undefined && object.badgeIdsOptions !== null)
       ? ValueOptions.fromPartial(object.badgeIdsOptions)
       : undefined;
+    message.ownedTimesOptions = (object.ownedTimesOptions !== undefined && object.ownedTimesOptions !== null)
+      ? ValueOptions.fromPartial(object.ownedTimesOptions)
+      : undefined;
     message.permittedTimesOptions =
       (object.permittedTimesOptions !== undefined && object.permittedTimesOptions !== null)
         ? ValueOptions.fromPartial(object.permittedTimesOptions)
@@ -850,6 +873,7 @@ function createBaseCollectionApprovedTransferDefaultValues(): CollectionApproved
     initiatedByMappingId: "",
     transferTimes: [],
     badgeIds: [],
+    ownedTimes: [],
     permittedTimes: [],
     forbiddenTimes: [],
   };
@@ -874,6 +898,9 @@ export const CollectionApprovedTransferDefaultValues = {
     }
     for (const v of message.badgeIds) {
       UintRange.encode(v!, writer.uint32(50).fork()).ldelim();
+    }
+    for (const v of message.ownedTimes) {
+      UintRange.encode(v!, writer.uint32(74).fork()).ldelim();
     }
     for (const v of message.permittedTimes) {
       UintRange.encode(v!, writer.uint32(58).fork()).ldelim();
@@ -909,6 +936,9 @@ export const CollectionApprovedTransferDefaultValues = {
         case 6:
           message.badgeIds.push(UintRange.decode(reader, reader.uint32()));
           break;
+        case 9:
+          message.ownedTimes.push(UintRange.decode(reader, reader.uint32()));
+          break;
         case 7:
           message.permittedTimes.push(UintRange.decode(reader, reader.uint32()));
           break;
@@ -935,6 +965,7 @@ export const CollectionApprovedTransferDefaultValues = {
         ? object.transferTimes.map((e: any) => UintRange.fromJSON(e))
         : [],
       badgeIds: Array.isArray(object?.badgeIds) ? object.badgeIds.map((e: any) => UintRange.fromJSON(e)) : [],
+      ownedTimes: Array.isArray(object?.ownedTimes) ? object.ownedTimes.map((e: any) => UintRange.fromJSON(e)) : [],
       permittedTimes: Array.isArray(object?.permittedTimes)
         ? object.permittedTimes.map((e: any) => UintRange.fromJSON(e))
         : [],
@@ -964,6 +995,11 @@ export const CollectionApprovedTransferDefaultValues = {
     } else {
       obj.badgeIds = [];
     }
+    if (message.ownedTimes) {
+      obj.ownedTimes = message.ownedTimes.map((e) => e ? UintRange.toJSON(e) : undefined);
+    } else {
+      obj.ownedTimes = [];
+    }
     if (message.permittedTimes) {
       obj.permittedTimes = message.permittedTimes.map((e) => e ? UintRange.toJSON(e) : undefined);
     } else {
@@ -987,6 +1023,7 @@ export const CollectionApprovedTransferDefaultValues = {
     message.initiatedByMappingId = object.initiatedByMappingId ?? "";
     message.transferTimes = object.transferTimes?.map((e) => UintRange.fromPartial(e)) || [];
     message.badgeIds = object.badgeIds?.map((e) => UintRange.fromPartial(e)) || [];
+    message.ownedTimes = object.ownedTimes?.map((e) => UintRange.fromPartial(e)) || [];
     message.permittedTimes = object.permittedTimes?.map((e) => UintRange.fromPartial(e)) || [];
     message.forbiddenTimes = object.forbiddenTimes?.map((e) => UintRange.fromPartial(e)) || [];
     return message;
@@ -1074,6 +1111,7 @@ function createBaseUserApprovedOutgoingTransferCombination(): UserApprovedOutgoi
     initiatedByMappingOptions: undefined,
     transferTimesOptions: undefined,
     badgeIdsOptions: undefined,
+    ownedTimesOptions: undefined,
     permittedTimesOptions: undefined,
     forbiddenTimesOptions: undefined,
   };
@@ -1096,11 +1134,14 @@ export const UserApprovedOutgoingTransferCombination = {
     if (message.badgeIdsOptions !== undefined) {
       ValueOptions.encode(message.badgeIdsOptions, writer.uint32(42).fork()).ldelim();
     }
+    if (message.ownedTimesOptions !== undefined) {
+      ValueOptions.encode(message.ownedTimesOptions, writer.uint32(50).fork()).ldelim();
+    }
     if (message.permittedTimesOptions !== undefined) {
-      ValueOptions.encode(message.permittedTimesOptions, writer.uint32(50).fork()).ldelim();
+      ValueOptions.encode(message.permittedTimesOptions, writer.uint32(58).fork()).ldelim();
     }
     if (message.forbiddenTimesOptions !== undefined) {
-      ValueOptions.encode(message.forbiddenTimesOptions, writer.uint32(58).fork()).ldelim();
+      ValueOptions.encode(message.forbiddenTimesOptions, writer.uint32(66).fork()).ldelim();
     }
     return writer;
   },
@@ -1128,9 +1169,12 @@ export const UserApprovedOutgoingTransferCombination = {
           message.badgeIdsOptions = ValueOptions.decode(reader, reader.uint32());
           break;
         case 6:
-          message.permittedTimesOptions = ValueOptions.decode(reader, reader.uint32());
+          message.ownedTimesOptions = ValueOptions.decode(reader, reader.uint32());
           break;
         case 7:
+          message.permittedTimesOptions = ValueOptions.decode(reader, reader.uint32());
+          break;
+        case 8:
           message.forbiddenTimesOptions = ValueOptions.decode(reader, reader.uint32());
           break;
         default:
@@ -1154,6 +1198,7 @@ export const UserApprovedOutgoingTransferCombination = {
         ? ValueOptions.fromJSON(object.transferTimesOptions)
         : undefined,
       badgeIdsOptions: isSet(object.badgeIdsOptions) ? ValueOptions.fromJSON(object.badgeIdsOptions) : undefined,
+      ownedTimesOptions: isSet(object.ownedTimesOptions) ? ValueOptions.fromJSON(object.ownedTimesOptions) : undefined,
       permittedTimesOptions: isSet(object.permittedTimesOptions)
         ? ValueOptions.fromJSON(object.permittedTimesOptions)
         : undefined,
@@ -1179,6 +1224,10 @@ export const UserApprovedOutgoingTransferCombination = {
       : undefined);
     message.badgeIdsOptions !== undefined
       && (obj.badgeIdsOptions = message.badgeIdsOptions ? ValueOptions.toJSON(message.badgeIdsOptions) : undefined);
+    message.ownedTimesOptions !== undefined
+      && (obj.ownedTimesOptions = message.ownedTimesOptions
+        ? ValueOptions.toJSON(message.ownedTimesOptions)
+        : undefined);
     message.permittedTimesOptions !== undefined && (obj.permittedTimesOptions = message.permittedTimesOptions
       ? ValueOptions.toJSON(message.permittedTimesOptions)
       : undefined);
@@ -1208,6 +1257,9 @@ export const UserApprovedOutgoingTransferCombination = {
     message.badgeIdsOptions = (object.badgeIdsOptions !== undefined && object.badgeIdsOptions !== null)
       ? ValueOptions.fromPartial(object.badgeIdsOptions)
       : undefined;
+    message.ownedTimesOptions = (object.ownedTimesOptions !== undefined && object.ownedTimesOptions !== null)
+      ? ValueOptions.fromPartial(object.ownedTimesOptions)
+      : undefined;
     message.permittedTimesOptions =
       (object.permittedTimesOptions !== undefined && object.permittedTimesOptions !== null)
         ? ValueOptions.fromPartial(object.permittedTimesOptions)
@@ -1227,6 +1279,7 @@ function createBaseUserApprovedOutgoingTransferDefaultValues(): UserApprovedOutg
     initiatedByMappingId: "",
     transferTimes: [],
     badgeIds: [],
+    ownedTimes: [],
     permittedTimes: [],
     forbiddenTimes: [],
   };
@@ -1248,6 +1301,9 @@ export const UserApprovedOutgoingTransferDefaultValues = {
     }
     for (const v of message.badgeIds) {
       UintRange.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
+    for (const v of message.ownedTimes) {
+      UintRange.encode(v!, writer.uint32(50).fork()).ldelim();
     }
     for (const v of message.permittedTimes) {
       UintRange.encode(v!, writer.uint32(58).fork()).ldelim();
@@ -1280,6 +1336,9 @@ export const UserApprovedOutgoingTransferDefaultValues = {
         case 5:
           message.badgeIds.push(UintRange.decode(reader, reader.uint32()));
           break;
+        case 6:
+          message.ownedTimes.push(UintRange.decode(reader, reader.uint32()));
+          break;
         case 7:
           message.permittedTimes.push(UintRange.decode(reader, reader.uint32()));
           break;
@@ -1305,6 +1364,7 @@ export const UserApprovedOutgoingTransferDefaultValues = {
         ? object.transferTimes.map((e: any) => UintRange.fromJSON(e))
         : [],
       badgeIds: Array.isArray(object?.badgeIds) ? object.badgeIds.map((e: any) => UintRange.fromJSON(e)) : [],
+      ownedTimes: Array.isArray(object?.ownedTimes) ? object.ownedTimes.map((e: any) => UintRange.fromJSON(e)) : [],
       permittedTimes: Array.isArray(object?.permittedTimes)
         ? object.permittedTimes.map((e: any) => UintRange.fromJSON(e))
         : [],
@@ -1333,6 +1393,11 @@ export const UserApprovedOutgoingTransferDefaultValues = {
     } else {
       obj.badgeIds = [];
     }
+    if (message.ownedTimes) {
+      obj.ownedTimes = message.ownedTimes.map((e) => e ? UintRange.toJSON(e) : undefined);
+    } else {
+      obj.ownedTimes = [];
+    }
     if (message.permittedTimes) {
       obj.permittedTimes = message.permittedTimes.map((e) => e ? UintRange.toJSON(e) : undefined);
     } else {
@@ -1355,6 +1420,7 @@ export const UserApprovedOutgoingTransferDefaultValues = {
     message.initiatedByMappingId = object.initiatedByMappingId ?? "";
     message.transferTimes = object.transferTimes?.map((e) => UintRange.fromPartial(e)) || [];
     message.badgeIds = object.badgeIds?.map((e) => UintRange.fromPartial(e)) || [];
+    message.ownedTimes = object.ownedTimes?.map((e) => UintRange.fromPartial(e)) || [];
     message.permittedTimes = object.permittedTimes?.map((e) => UintRange.fromPartial(e)) || [];
     message.forbiddenTimes = object.forbiddenTimes?.map((e) => UintRange.fromPartial(e)) || [];
     return message;
@@ -1443,6 +1509,7 @@ function createBaseUserApprovedIncomingTransferCombination(): UserApprovedIncomi
     initiatedByMappingOptions: undefined,
     transferTimesOptions: undefined,
     badgeIdsOptions: undefined,
+    ownedTimesOptions: undefined,
     permittedTimesOptions: undefined,
     forbiddenTimesOptions: undefined,
   };
@@ -1465,11 +1532,14 @@ export const UserApprovedIncomingTransferCombination = {
     if (message.badgeIdsOptions !== undefined) {
       ValueOptions.encode(message.badgeIdsOptions, writer.uint32(42).fork()).ldelim();
     }
+    if (message.ownedTimesOptions !== undefined) {
+      ValueOptions.encode(message.ownedTimesOptions, writer.uint32(50).fork()).ldelim();
+    }
     if (message.permittedTimesOptions !== undefined) {
-      ValueOptions.encode(message.permittedTimesOptions, writer.uint32(50).fork()).ldelim();
+      ValueOptions.encode(message.permittedTimesOptions, writer.uint32(58).fork()).ldelim();
     }
     if (message.forbiddenTimesOptions !== undefined) {
-      ValueOptions.encode(message.forbiddenTimesOptions, writer.uint32(58).fork()).ldelim();
+      ValueOptions.encode(message.forbiddenTimesOptions, writer.uint32(66).fork()).ldelim();
     }
     return writer;
   },
@@ -1497,9 +1567,12 @@ export const UserApprovedIncomingTransferCombination = {
           message.badgeIdsOptions = ValueOptions.decode(reader, reader.uint32());
           break;
         case 6:
-          message.permittedTimesOptions = ValueOptions.decode(reader, reader.uint32());
+          message.ownedTimesOptions = ValueOptions.decode(reader, reader.uint32());
           break;
         case 7:
+          message.permittedTimesOptions = ValueOptions.decode(reader, reader.uint32());
+          break;
+        case 8:
           message.forbiddenTimesOptions = ValueOptions.decode(reader, reader.uint32());
           break;
         default:
@@ -1525,6 +1598,7 @@ export const UserApprovedIncomingTransferCombination = {
         ? ValueOptions.fromJSON(object.transferTimesOptions)
         : undefined,
       badgeIdsOptions: isSet(object.badgeIdsOptions) ? ValueOptions.fromJSON(object.badgeIdsOptions) : undefined,
+      ownedTimesOptions: isSet(object.ownedTimesOptions) ? ValueOptions.fromJSON(object.ownedTimesOptions) : undefined,
       permittedTimesOptions: isSet(object.permittedTimesOptions)
         ? ValueOptions.fromJSON(object.permittedTimesOptions)
         : undefined,
@@ -1551,6 +1625,10 @@ export const UserApprovedIncomingTransferCombination = {
       : undefined);
     message.badgeIdsOptions !== undefined
       && (obj.badgeIdsOptions = message.badgeIdsOptions ? ValueOptions.toJSON(message.badgeIdsOptions) : undefined);
+    message.ownedTimesOptions !== undefined
+      && (obj.ownedTimesOptions = message.ownedTimesOptions
+        ? ValueOptions.toJSON(message.ownedTimesOptions)
+        : undefined);
     message.permittedTimesOptions !== undefined && (obj.permittedTimesOptions = message.permittedTimesOptions
       ? ValueOptions.toJSON(message.permittedTimesOptions)
       : undefined);
@@ -1580,6 +1658,9 @@ export const UserApprovedIncomingTransferCombination = {
     message.badgeIdsOptions = (object.badgeIdsOptions !== undefined && object.badgeIdsOptions !== null)
       ? ValueOptions.fromPartial(object.badgeIdsOptions)
       : undefined;
+    message.ownedTimesOptions = (object.ownedTimesOptions !== undefined && object.ownedTimesOptions !== null)
+      ? ValueOptions.fromPartial(object.ownedTimesOptions)
+      : undefined;
     message.permittedTimesOptions =
       (object.permittedTimesOptions !== undefined && object.permittedTimesOptions !== null)
         ? ValueOptions.fromPartial(object.permittedTimesOptions)
@@ -1599,6 +1680,7 @@ function createBaseUserApprovedIncomingTransferDefaultValues(): UserApprovedInco
     initiatedByMappingId: "",
     transferTimes: [],
     badgeIds: [],
+    ownedTimes: [],
     permittedTimes: [],
     forbiddenTimes: [],
   };
@@ -1620,6 +1702,9 @@ export const UserApprovedIncomingTransferDefaultValues = {
     }
     for (const v of message.badgeIds) {
       UintRange.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
+    for (const v of message.ownedTimes) {
+      UintRange.encode(v!, writer.uint32(50).fork()).ldelim();
     }
     for (const v of message.permittedTimes) {
       UintRange.encode(v!, writer.uint32(58).fork()).ldelim();
@@ -1652,6 +1737,9 @@ export const UserApprovedIncomingTransferDefaultValues = {
         case 5:
           message.badgeIds.push(UintRange.decode(reader, reader.uint32()));
           break;
+        case 6:
+          message.ownedTimes.push(UintRange.decode(reader, reader.uint32()));
+          break;
         case 7:
           message.permittedTimes.push(UintRange.decode(reader, reader.uint32()));
           break;
@@ -1677,6 +1765,7 @@ export const UserApprovedIncomingTransferDefaultValues = {
         ? object.transferTimes.map((e: any) => UintRange.fromJSON(e))
         : [],
       badgeIds: Array.isArray(object?.badgeIds) ? object.badgeIds.map((e: any) => UintRange.fromJSON(e)) : [],
+      ownedTimes: Array.isArray(object?.ownedTimes) ? object.ownedTimes.map((e: any) => UintRange.fromJSON(e)) : [],
       permittedTimes: Array.isArray(object?.permittedTimes)
         ? object.permittedTimes.map((e: any) => UintRange.fromJSON(e))
         : [],
@@ -1705,6 +1794,11 @@ export const UserApprovedIncomingTransferDefaultValues = {
     } else {
       obj.badgeIds = [];
     }
+    if (message.ownedTimes) {
+      obj.ownedTimes = message.ownedTimes.map((e) => e ? UintRange.toJSON(e) : undefined);
+    } else {
+      obj.ownedTimes = [];
+    }
     if (message.permittedTimes) {
       obj.permittedTimes = message.permittedTimes.map((e) => e ? UintRange.toJSON(e) : undefined);
     } else {
@@ -1727,6 +1821,7 @@ export const UserApprovedIncomingTransferDefaultValues = {
     message.initiatedByMappingId = object.initiatedByMappingId ?? "";
     message.transferTimes = object.transferTimes?.map((e) => UintRange.fromPartial(e)) || [];
     message.badgeIds = object.badgeIds?.map((e) => UintRange.fromPartial(e)) || [];
+    message.ownedTimes = object.ownedTimes?.map((e) => UintRange.fromPartial(e)) || [];
     message.permittedTimes = object.permittedTimes?.map((e) => UintRange.fromPartial(e)) || [];
     message.forbiddenTimes = object.forbiddenTimes?.map((e) => UintRange.fromPartial(e)) || [];
     return message;
@@ -1864,9 +1959,7 @@ export const BalancesActionCombination = {
   fromJSON(object: any): BalancesActionCombination {
     return {
       badgeIdsOptions: isSet(object.badgeIdsOptions) ? ValueOptions.fromJSON(object.badgeIdsOptions) : undefined,
-      ownedTimesOptions: isSet(object.ownedTimesOptions)
-        ? ValueOptions.fromJSON(object.ownedTimesOptions)
-        : undefined,
+      ownedTimesOptions: isSet(object.ownedTimesOptions) ? ValueOptions.fromJSON(object.ownedTimesOptions) : undefined,
       permittedTimesOptions: isSet(object.permittedTimesOptions)
         ? ValueOptions.fromJSON(object.permittedTimesOptions)
         : undefined,
@@ -1880,9 +1973,10 @@ export const BalancesActionCombination = {
     const obj: any = {};
     message.badgeIdsOptions !== undefined
       && (obj.badgeIdsOptions = message.badgeIdsOptions ? ValueOptions.toJSON(message.badgeIdsOptions) : undefined);
-    message.ownedTimesOptions !== undefined && (obj.ownedTimesOptions = message.ownedTimesOptions
-      ? ValueOptions.toJSON(message.ownedTimesOptions)
-      : undefined);
+    message.ownedTimesOptions !== undefined
+      && (obj.ownedTimesOptions = message.ownedTimesOptions
+        ? ValueOptions.toJSON(message.ownedTimesOptions)
+        : undefined);
     message.permittedTimesOptions !== undefined && (obj.permittedTimesOptions = message.permittedTimesOptions
       ? ValueOptions.toJSON(message.permittedTimesOptions)
       : undefined);
@@ -1897,10 +1991,9 @@ export const BalancesActionCombination = {
     message.badgeIdsOptions = (object.badgeIdsOptions !== undefined && object.badgeIdsOptions !== null)
       ? ValueOptions.fromPartial(object.badgeIdsOptions)
       : undefined;
-    message.ownedTimesOptions =
-      (object.ownedTimesOptions !== undefined && object.ownedTimesOptions !== null)
-        ? ValueOptions.fromPartial(object.ownedTimesOptions)
-        : undefined;
+    message.ownedTimesOptions = (object.ownedTimesOptions !== undefined && object.ownedTimesOptions !== null)
+      ? ValueOptions.fromPartial(object.ownedTimesOptions)
+      : undefined;
     message.permittedTimesOptions =
       (object.permittedTimesOptions !== undefined && object.permittedTimesOptions !== null)
         ? ValueOptions.fromPartial(object.permittedTimesOptions)
@@ -1964,9 +2057,7 @@ export const BalancesActionDefaultValues = {
   fromJSON(object: any): BalancesActionDefaultValues {
     return {
       badgeIds: Array.isArray(object?.badgeIds) ? object.badgeIds.map((e: any) => UintRange.fromJSON(e)) : [],
-      ownedTimes: Array.isArray(object?.ownedTimes)
-        ? object.ownedTimes.map((e: any) => UintRange.fromJSON(e))
-        : [],
+      ownedTimes: Array.isArray(object?.ownedTimes) ? object.ownedTimes.map((e: any) => UintRange.fromJSON(e)) : [],
       permittedTimes: Array.isArray(object?.permittedTimes)
         ? object.permittedTimes.map((e: any) => UintRange.fromJSON(e))
         : [],

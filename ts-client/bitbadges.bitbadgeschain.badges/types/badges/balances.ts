@@ -28,6 +28,13 @@ export interface Balance {
   badgeIds: UintRange[];
 }
 
+export interface MustOwnBadges {
+  collectionId: string;
+  amountRange: UintRange | undefined;
+  ownedTimes: UintRange[];
+  badgeIds: UintRange[];
+}
+
 /**
  * InheritedBalances are a powerful feature of the BitBadges module.
  * They allow a colllection to inherit the balances from another collection.
@@ -144,9 +151,7 @@ export const Balance = {
   fromJSON(object: any): Balance {
     return {
       amount: isSet(object.amount) ? String(object.amount) : "",
-      ownedTimes: Array.isArray(object?.ownedTimes)
-        ? object.ownedTimes.map((e: any) => UintRange.fromJSON(e))
-        : [],
+      ownedTimes: Array.isArray(object?.ownedTimes) ? object.ownedTimes.map((e: any) => UintRange.fromJSON(e)) : [],
       badgeIds: Array.isArray(object?.badgeIds) ? object.badgeIds.map((e: any) => UintRange.fromJSON(e)) : [],
     };
   },
@@ -170,6 +175,93 @@ export const Balance = {
   fromPartial<I extends Exact<DeepPartial<Balance>, I>>(object: I): Balance {
     const message = createBaseBalance();
     message.amount = object.amount ?? "";
+    message.ownedTimes = object.ownedTimes?.map((e) => UintRange.fromPartial(e)) || [];
+    message.badgeIds = object.badgeIds?.map((e) => UintRange.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseMustOwnBadges(): MustOwnBadges {
+  return { collectionId: "", amountRange: undefined, ownedTimes: [], badgeIds: [] };
+}
+
+export const MustOwnBadges = {
+  encode(message: MustOwnBadges, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.collectionId !== "") {
+      writer.uint32(10).string(message.collectionId);
+    }
+    if (message.amountRange !== undefined) {
+      UintRange.encode(message.amountRange, writer.uint32(18).fork()).ldelim();
+    }
+    for (const v of message.ownedTimes) {
+      UintRange.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    for (const v of message.badgeIds) {
+      UintRange.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MustOwnBadges {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMustOwnBadges();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.collectionId = reader.string();
+          break;
+        case 2:
+          message.amountRange = UintRange.decode(reader, reader.uint32());
+          break;
+        case 3:
+          message.ownedTimes.push(UintRange.decode(reader, reader.uint32()));
+          break;
+        case 4:
+          message.badgeIds.push(UintRange.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MustOwnBadges {
+    return {
+      collectionId: isSet(object.collectionId) ? String(object.collectionId) : "",
+      amountRange: isSet(object.amountRange) ? UintRange.fromJSON(object.amountRange) : undefined,
+      ownedTimes: Array.isArray(object?.ownedTimes) ? object.ownedTimes.map((e: any) => UintRange.fromJSON(e)) : [],
+      badgeIds: Array.isArray(object?.badgeIds) ? object.badgeIds.map((e: any) => UintRange.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: MustOwnBadges): unknown {
+    const obj: any = {};
+    message.collectionId !== undefined && (obj.collectionId = message.collectionId);
+    message.amountRange !== undefined
+      && (obj.amountRange = message.amountRange ? UintRange.toJSON(message.amountRange) : undefined);
+    if (message.ownedTimes) {
+      obj.ownedTimes = message.ownedTimes.map((e) => e ? UintRange.toJSON(e) : undefined);
+    } else {
+      obj.ownedTimes = [];
+    }
+    if (message.badgeIds) {
+      obj.badgeIds = message.badgeIds.map((e) => e ? UintRange.toJSON(e) : undefined);
+    } else {
+      obj.badgeIds = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MustOwnBadges>, I>>(object: I): MustOwnBadges {
+    const message = createBaseMustOwnBadges();
+    message.collectionId = object.collectionId ?? "";
+    message.amountRange = (object.amountRange !== undefined && object.amountRange !== null)
+      ? UintRange.fromPartial(object.amountRange)
+      : undefined;
     message.ownedTimes = object.ownedTimes?.map((e) => UintRange.fromPartial(e)) || [];
     message.badgeIds = object.badgeIds?.map((e) => UintRange.fromPartial(e)) || [];
     return message;

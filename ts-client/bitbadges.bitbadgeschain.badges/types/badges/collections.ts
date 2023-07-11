@@ -1,6 +1,6 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
-import { CollectionPermissions } from "./permissions";
+import { CollectionPermissions, UserPermissions } from "./permissions";
 import {
   BadgeMetadataTimeline,
   CollectionApprovedTransferTimeline,
@@ -50,7 +50,7 @@ export interface BadgeCollection {
   /** The manager is the address of the manager of this collection. */
   managerTimeline: ManagerTimeline[];
   /** The permissions define what the manager of the collection can do or not do. */
-  permissions:
+  collectionPermissions:
     | CollectionPermissions
     | undefined;
   /**
@@ -82,6 +82,8 @@ export interface BadgeCollection {
    * Ex: Set this to disallow all incoming transfers by default, making the user have to opt-in to receiving the badge.
    */
   defaultUserApprovedIncomingTransfersTimeline: UserApprovedIncomingTransferTimeline[];
+  defaultUserPermissions: UserPermissions | undefined;
+  createdBy: string;
 }
 
 function createBaseBadgeCollection(): BadgeCollection {
@@ -94,13 +96,15 @@ function createBaseBadgeCollection(): BadgeCollection {
     inheritedBalancesTimeline: [],
     customDataTimeline: [],
     managerTimeline: [],
-    permissions: undefined,
+    collectionPermissions: undefined,
     collectionApprovedTransfersTimeline: [],
     standardsTimeline: [],
     isArchivedTimeline: [],
     contractAddressTimeline: [],
     defaultUserApprovedOutgoingTransfersTimeline: [],
     defaultUserApprovedIncomingTransfersTimeline: [],
+    defaultUserPermissions: undefined,
+    createdBy: "",
   };
 }
 
@@ -130,8 +134,8 @@ export const BadgeCollection = {
     for (const v of message.managerTimeline) {
       ManagerTimeline.encode(v!, writer.uint32(66).fork()).ldelim();
     }
-    if (message.permissions !== undefined) {
-      CollectionPermissions.encode(message.permissions, writer.uint32(74).fork()).ldelim();
+    if (message.collectionPermissions !== undefined) {
+      CollectionPermissions.encode(message.collectionPermissions, writer.uint32(74).fork()).ldelim();
     }
     for (const v of message.collectionApprovedTransfersTimeline) {
       CollectionApprovedTransferTimeline.encode(v!, writer.uint32(82).fork()).ldelim();
@@ -150,6 +154,12 @@ export const BadgeCollection = {
     }
     for (const v of message.defaultUserApprovedIncomingTransfersTimeline) {
       UserApprovedIncomingTransferTimeline.encode(v!, writer.uint32(122).fork()).ldelim();
+    }
+    if (message.defaultUserPermissions !== undefined) {
+      UserPermissions.encode(message.defaultUserPermissions, writer.uint32(130).fork()).ldelim();
+    }
+    if (message.createdBy !== "") {
+      writer.uint32(138).string(message.createdBy);
     }
     return writer;
   },
@@ -188,7 +198,7 @@ export const BadgeCollection = {
           message.managerTimeline.push(ManagerTimeline.decode(reader, reader.uint32()));
           break;
         case 9:
-          message.permissions = CollectionPermissions.decode(reader, reader.uint32());
+          message.collectionPermissions = CollectionPermissions.decode(reader, reader.uint32());
           break;
         case 10:
           message.collectionApprovedTransfersTimeline.push(
@@ -213,6 +223,12 @@ export const BadgeCollection = {
           message.defaultUserApprovedIncomingTransfersTimeline.push(
             UserApprovedIncomingTransferTimeline.decode(reader, reader.uint32()),
           );
+          break;
+        case 16:
+          message.defaultUserPermissions = UserPermissions.decode(reader, reader.uint32());
+          break;
+        case 17:
+          message.createdBy = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -244,7 +260,9 @@ export const BadgeCollection = {
       managerTimeline: Array.isArray(object?.managerTimeline)
         ? object.managerTimeline.map((e: any) => ManagerTimeline.fromJSON(e))
         : [],
-      permissions: isSet(object.permissions) ? CollectionPermissions.fromJSON(object.permissions) : undefined,
+      collectionPermissions: isSet(object.collectionPermissions)
+        ? CollectionPermissions.fromJSON(object.collectionPermissions)
+        : undefined,
       collectionApprovedTransfersTimeline: Array.isArray(object?.collectionApprovedTransfersTimeline)
         ? object.collectionApprovedTransfersTimeline.map((e: any) => CollectionApprovedTransferTimeline.fromJSON(e))
         : [],
@@ -267,6 +285,10 @@ export const BadgeCollection = {
           UserApprovedIncomingTransferTimeline.fromJSON(e)
         )
         : [],
+      defaultUserPermissions: isSet(object.defaultUserPermissions)
+        ? UserPermissions.fromJSON(object.defaultUserPermissions)
+        : undefined,
+      createdBy: isSet(object.createdBy) ? String(object.createdBy) : "",
     };
   },
 
@@ -312,8 +334,9 @@ export const BadgeCollection = {
     } else {
       obj.managerTimeline = [];
     }
-    message.permissions !== undefined
-      && (obj.permissions = message.permissions ? CollectionPermissions.toJSON(message.permissions) : undefined);
+    message.collectionPermissions !== undefined && (obj.collectionPermissions = message.collectionPermissions
+      ? CollectionPermissions.toJSON(message.collectionPermissions)
+      : undefined);
     if (message.collectionApprovedTransfersTimeline) {
       obj.collectionApprovedTransfersTimeline = message.collectionApprovedTransfersTimeline.map((e) =>
         e ? CollectionApprovedTransferTimeline.toJSON(e) : undefined
@@ -352,6 +375,10 @@ export const BadgeCollection = {
     } else {
       obj.defaultUserApprovedIncomingTransfersTimeline = [];
     }
+    message.defaultUserPermissions !== undefined && (obj.defaultUserPermissions = message.defaultUserPermissions
+      ? UserPermissions.toJSON(message.defaultUserPermissions)
+      : undefined);
+    message.createdBy !== undefined && (obj.createdBy = message.createdBy);
     return obj;
   },
 
@@ -369,9 +396,10 @@ export const BadgeCollection = {
       object.inheritedBalancesTimeline?.map((e) => InheritedBalancesTimeline.fromPartial(e)) || [];
     message.customDataTimeline = object.customDataTimeline?.map((e) => CustomDataTimeline.fromPartial(e)) || [];
     message.managerTimeline = object.managerTimeline?.map((e) => ManagerTimeline.fromPartial(e)) || [];
-    message.permissions = (object.permissions !== undefined && object.permissions !== null)
-      ? CollectionPermissions.fromPartial(object.permissions)
-      : undefined;
+    message.collectionPermissions =
+      (object.collectionPermissions !== undefined && object.collectionPermissions !== null)
+        ? CollectionPermissions.fromPartial(object.collectionPermissions)
+        : undefined;
     message.collectionApprovedTransfersTimeline =
       object.collectionApprovedTransfersTimeline?.map((e) => CollectionApprovedTransferTimeline.fromPartial(e)) || [];
     message.standardsTimeline = object.standardsTimeline?.map((e) => StandardsTimeline.fromPartial(e)) || [];
@@ -386,6 +414,11 @@ export const BadgeCollection = {
       object.defaultUserApprovedIncomingTransfersTimeline?.map((e) =>
         UserApprovedIncomingTransferTimeline.fromPartial(e)
       ) || [];
+    message.defaultUserPermissions =
+      (object.defaultUserPermissions !== undefined && object.defaultUserPermissions !== null)
+        ? UserPermissions.fromPartial(object.defaultUserPermissions)
+        : undefined;
+    message.createdBy = object.createdBy ?? "";
     return message;
   },
 };

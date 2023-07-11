@@ -37,7 +37,7 @@ export interface ManagerTimeline {
 }
 
 export interface CollectionApprovedTransferTimeline {
-  approvedTransfers: CollectionApprovedTransfer[];
+  collectionApprovedTransfers: CollectionApprovedTransfer[];
   timelineTimes: UintRange[];
 }
 
@@ -468,12 +468,12 @@ export const ManagerTimeline = {
 };
 
 function createBaseCollectionApprovedTransferTimeline(): CollectionApprovedTransferTimeline {
-  return { approvedTransfers: [], timelineTimes: [] };
+  return { collectionApprovedTransfers: [], timelineTimes: [] };
 }
 
 export const CollectionApprovedTransferTimeline = {
   encode(message: CollectionApprovedTransferTimeline, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.approvedTransfers) {
+    for (const v of message.collectionApprovedTransfers) {
       CollectionApprovedTransfer.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     for (const v of message.timelineTimes) {
@@ -490,7 +490,7 @@ export const CollectionApprovedTransferTimeline = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.approvedTransfers.push(CollectionApprovedTransfer.decode(reader, reader.uint32()));
+          message.collectionApprovedTransfers.push(CollectionApprovedTransfer.decode(reader, reader.uint32()));
           break;
         case 2:
           message.timelineTimes.push(UintRange.decode(reader, reader.uint32()));
@@ -505,8 +505,8 @@ export const CollectionApprovedTransferTimeline = {
 
   fromJSON(object: any): CollectionApprovedTransferTimeline {
     return {
-      approvedTransfers: Array.isArray(object?.approvedTransfers)
-        ? object.approvedTransfers.map((e: any) => CollectionApprovedTransfer.fromJSON(e))
+      collectionApprovedTransfers: Array.isArray(object?.collectionApprovedTransfers)
+        ? object.collectionApprovedTransfers.map((e: any) => CollectionApprovedTransfer.fromJSON(e))
         : [],
       timelineTimes: Array.isArray(object?.timelineTimes)
         ? object.timelineTimes.map((e: any) => UintRange.fromJSON(e))
@@ -516,12 +516,12 @@ export const CollectionApprovedTransferTimeline = {
 
   toJSON(message: CollectionApprovedTransferTimeline): unknown {
     const obj: any = {};
-    if (message.approvedTransfers) {
-      obj.approvedTransfers = message.approvedTransfers.map((e) =>
+    if (message.collectionApprovedTransfers) {
+      obj.collectionApprovedTransfers = message.collectionApprovedTransfers.map((e) =>
         e ? CollectionApprovedTransfer.toJSON(e) : undefined
       );
     } else {
-      obj.approvedTransfers = [];
+      obj.collectionApprovedTransfers = [];
     }
     if (message.timelineTimes) {
       obj.timelineTimes = message.timelineTimes.map((e) => e ? UintRange.toJSON(e) : undefined);
@@ -535,7 +535,8 @@ export const CollectionApprovedTransferTimeline = {
     object: I,
   ): CollectionApprovedTransferTimeline {
     const message = createBaseCollectionApprovedTransferTimeline();
-    message.approvedTransfers = object.approvedTransfers?.map((e) => CollectionApprovedTransfer.fromPartial(e)) || [];
+    message.collectionApprovedTransfers =
+      object.collectionApprovedTransfers?.map((e) => CollectionApprovedTransfer.fromPartial(e)) || [];
     message.timelineTimes = object.timelineTimes?.map((e) => UintRange.fromPartial(e)) || [];
     return message;
   },

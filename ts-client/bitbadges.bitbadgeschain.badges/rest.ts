@@ -47,6 +47,45 @@ export interface BadgesAddressMapping {
   customData?: string;
 }
 
+/**
+ * PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address.
+ */
+export interface BadgesApprovalAmounts {
+  overallApprovalAmount?: string;
+  perToAddressApprovalAmount?: string;
+  perFromAddressApprovalAmount?: string;
+  perInitiatedByAddressApprovalAmount?: string;
+}
+
+export interface BadgesApprovalDetails {
+  approvalId?: string;
+  uri?: string;
+  customData?: string;
+  mustOwnBadges?: BadgesMustOwnBadges[];
+  merkleChallenges?: BadgesMerkleChallenge[];
+  predeterminedBalances?: BadgesPredeterminedBalances;
+
+  /** PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address. */
+  approvalAmounts?: BadgesApprovalAmounts;
+  maxNumTransfers?: BadgesMaxNumTransfers;
+  requireToEqualsInitiatedBy?: boolean;
+  requireFromEqualsInitiatedBy?: boolean;
+  requireToDoesNotEqualInitiatedBy?: boolean;
+  requireFromDoesNotEqualInitiatedBy?: boolean;
+  overridesFromApprovedOutgoingTransfers?: boolean;
+  overridesToApprovedIncomingTransfers?: boolean;
+}
+
+export interface BadgesApprovalIdDetails {
+  approvalId?: string;
+
+  /** "collection", "incoming", "outgoing" */
+  approvalLevel?: string;
+
+  /** Leave blank if approvalLevel == "collection" */
+  address?: string;
+}
+
 export interface BadgesApprovalsTracker {
   numTransfers?: string;
   amounts?: BadgesBalance[];
@@ -93,7 +132,7 @@ export interface BadgesBadgeCollection {
   managerTimeline?: BadgesManagerTimeline[];
 
   /** The permissions define what the manager of the collection can do or not do. */
-  permissions?: BadgesCollectionPermissions;
+  collectionPermissions?: BadgesCollectionPermissions;
 
   /**
    * The approved transfers timeline defines the transferability of the collection for collections with standard balances.
@@ -129,6 +168,16 @@ export interface BadgesBadgeCollection {
    * Ex: Set this to disallow all incoming transfers by default, making the user have to opt-in to receiving the badge.
    */
   defaultUserApprovedIncomingTransfersTimeline?: BadgesUserApprovedIncomingTransferTimeline[];
+
+  /**
+   * UserPermissions defines the permissions for the user (i.e. what the user can and cannot do).
+   *
+   * See CollectionPermissions for more details on the different types of permissions.
+   * The UserApprovedOutgoing and UserApprovedIncoming permissions are the same as the CollectionApprovedTransferPermission,
+   * but certain fields are removed because they are not relevant to the user.
+   */
+  defaultUserPermissions?: BadgesUserPermissions;
+  createdBy?: string;
 }
 
 /**
@@ -193,71 +242,18 @@ export interface BadgesBalancesActionPermission {
   combinations?: BadgesBalancesActionCombination[];
 }
 
-/**
-* Challenges define the rules for the approval.
-If all challenge are not met with valid solutions, then the transfer is not approved.
-
-Currently, we only support Merkle tree challenges where the Merkle path must be to the provided root
-and be the expected length.
-
-We also support the following options:
--useCreatorAddressAsLeaf: If true, then the leaf will be set to the creator address. Used for whitelist trees.
--maxOneUsePerLeaf: If true, then each leaf can only be used once. If false, then the leaf can be used multiple times.
-This is very important to be set to true if you want to prevent replay attacks.
--useLeafIndexForDistributionOrder: If true, we will use the leafIndex to determine the order of the distribution of badges.
-leafIndex 0 will be the leftmost leaf of the expectedProofLength layer
-
-IMPORTANT: We track the number of uses per leaf according to a challenge ID.
-Please use unique challenge IDs for different challenges of the same timeline.
-If you update the challenge ID, then the used leaves tracker will reset and start a new tally.
-It is highly recommended to avoid updating a challenge without resetting the tally via a new challenge ID.
-*/
-export interface BadgesChallenge {
-  root?: string;
-  expectedProofLength?: string;
-  useCreatorAddressAsLeaf?: boolean;
-  maxOneUsePerLeaf?: boolean;
-  useLeafIndexForDistributionOrder?: boolean;
-  challengeId?: string;
-}
-
-export interface BadgesMerkleProof {
-  proof?: BadgesClaimProof;
-}
-
-export interface BadgesClaimProof {
-  leaf?: string;
-  aunts?: BadgesMerklePathItem[];
-}
-
-export interface BadgesMerklePathItem {
-  aunt?: string;
-  onRight?: boolean;
-}
-
 export interface BadgesCollectionApprovedTransfer {
+  /** Match Criteria */
   fromMappingId?: string;
   toMappingId?: string;
   initiatedByMappingId?: string;
   transferTimes?: BadgesUintRange[];
   badgeIds?: BadgesUintRange[];
+  ownedTimes?: BadgesUintRange[];
   allowedCombinations?: BadgesIsCollectionTransferAllowed[];
-  challenges?: BadgesChallenge[];
-  approvalId?: string;
-  incrementBadgeIdsBy?: string;
-  incrementOwnedTimesBy?: string;
-  overallApprovals?: BadgesApprovalsTracker;
 
-  /** PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address. */
-  perAddressApprovals?: BadgesPerAddressApprovals;
-  overridesFromApprovedOutgoingTransfers?: boolean;
-  overridesToApprovedIncomingTransfers?: boolean;
-  requireToEqualsInitiatedBy?: boolean;
-  requireFromEqualsInitiatedBy?: boolean;
-  requireToDoesNotEqualInitiatedBy?: boolean;
-  requireFromDoesNotEqualInitiatedBy?: boolean;
-  uri?: string;
-  customData?: string;
+  /** Restrictions (Challenges, Amounts, MaxNumTransfers) */
+  approvalDetails?: BadgesApprovalDetails[];
 }
 
 export interface BadgesCollectionApprovedTransferCombination {
@@ -280,6 +276,9 @@ export interface BadgesCollectionApprovedTransferCombination {
   badgeIdsOptions?: BadgesValueOptions;
 
   /** ValueOptions defines how we manipulate the default values. */
+  ownedTimesOptions?: BadgesValueOptions;
+
+  /** ValueOptions defines how we manipulate the default values. */
   permittedTimesOptions?: BadgesValueOptions;
 
   /** ValueOptions defines how we manipulate the default values. */
@@ -293,6 +292,7 @@ export interface BadgesCollectionApprovedTransferDefaultValues {
   initiatedByMappingId?: string;
   transferTimes?: BadgesUintRange[];
   badgeIds?: BadgesUintRange[];
+  ownedTimes?: BadgesUintRange[];
   permittedTimes?: BadgesUintRange[];
   forbiddenTimes?: BadgesUintRange[];
 }
@@ -321,7 +321,7 @@ export interface BadgesCollectionApprovedTransferPermission {
 }
 
 export interface BadgesCollectionApprovedTransferTimeline {
-  approvedTransfers?: BadgesCollectionApprovedTransfer[];
+  collectionApprovedTransfers?: BadgesCollectionApprovedTransfer[];
   timelineTimes?: BadgesUintRange[];
 }
 
@@ -376,7 +376,7 @@ This would mean that badgeIds [1,2] are allowed and the second combination is ig
 */
 export interface BadgesCollectionPermissions {
   canDeleteCollection?: BadgesActionPermission[];
-  canArchive?: BadgesTimedUpdatePermission[];
+  canArchiveCollection?: BadgesTimedUpdatePermission[];
   canUpdateContractAddress?: BadgesTimedUpdatePermission[];
   canUpdateOffChainBalancesMetadata?: BadgesTimedUpdatePermission[];
   canUpdateStandards?: BadgesTimedUpdatePermission[];
@@ -397,6 +397,27 @@ export interface BadgesContractAddressTimeline {
 export interface BadgesCustomDataTimeline {
   customData?: string;
   timelineTimes?: BadgesUintRange[];
+}
+
+export interface BadgesIncomingApprovalDetails {
+  approvalId?: string;
+  uri?: string;
+  customData?: string;
+  mustOwnBadges?: BadgesMustOwnBadges[];
+  merkleChallenges?: BadgesMerkleChallenge[];
+  predeterminedBalances?: BadgesPredeterminedBalances;
+
+  /** PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address. */
+  approvalAmounts?: BadgesApprovalAmounts;
+  maxNumTransfers?: BadgesMaxNumTransfers;
+  requireFromEqualsInitiatedBy?: boolean;
+  requireFromDoesNotEqualInitiatedBy?: boolean;
+}
+
+export interface BadgesIncrementedBalances {
+  startBalances?: BadgesBalance[];
+  incrementBadgeIdsBy?: string;
+  incrementOwnedTimesBy?: string;
 }
 
 /**
@@ -431,6 +452,7 @@ export interface BadgesIsCollectionTransferAllowed {
   invertInitiatedBy?: boolean;
   invertTransferTimes?: boolean;
   invertBadgeIds?: boolean;
+  invertOwnedTimes?: boolean;
   isAllowed?: boolean;
 }
 
@@ -439,6 +461,7 @@ export interface BadgesIsUserIncomingTransferAllowed {
   invertInitiatedBy?: boolean;
   invertTransferTimes?: boolean;
   invertBadgeIds?: boolean;
+  invertOwnedTimes?: boolean;
   isAllowed?: boolean;
 }
 
@@ -447,6 +470,7 @@ export interface BadgesIsUserOutgoingTransferAllowed {
   invertInitiatedBy?: boolean;
   invertTransferTimes?: boolean;
   invertBadgeIds?: boolean;
+  invertOwnedTimes?: boolean;
   isAllowed?: boolean;
 }
 
@@ -455,30 +479,81 @@ export interface BadgesManagerTimeline {
   timelineTimes?: BadgesUintRange[];
 }
 
-export type BadgesMsgArchiveCollectionResponse = object;
+export interface BadgesManualBalances {
+  balances?: BadgesBalance[];
+}
+
+export interface BadgesMaxNumTransfers {
+  overallMaxNumTransfers?: string;
+  perToAddressMaxNumTransfers?: string;
+  perFromAddressMaxNumTransfers?: string;
+  perInitiatedByAddressMaxNumTransfers?: string;
+}
+
+/**
+* Challenges define the rules for the approval.
+If all challenge are not met with valid solutions, then the transfer is not approved.
+
+Currently, we only support Merkle tree challenges where the Merkle path must be to the provided root
+and be the expected length.
+
+We also support the following options:
+-useCreatorAddressAsLeaf: If true, then the leaf will be set to the creator address. Used for whitelist trees.
+-maxOneUsePerLeaf: If true, then each leaf can only be used once. If false, then the leaf can be used multiple times.
+This is very important to be set to true if you want to prevent replay attacks.
+-useLeafIndexForDistributionOrder: If true, we will use the leafIndex to determine the order of the distribution of badges.
+leafIndex 0 will be the leftmost leaf of the expectedProofLength layer
+
+IMPORTANT: We track the number of uses per leaf according to a challenge ID.
+Please use unique challenge IDs for different challenges of the same timeline.
+If you update the challenge ID, then the used leaves tracker will reset and start a new tally.
+It is highly recommended to avoid updating a challenge without resetting the tally via a new challenge ID.
+*/
+export interface BadgesMerkleChallenge {
+  root?: string;
+  expectedProofLength?: string;
+  useCreatorAddressAsLeaf?: boolean;
+  maxOneUsePerLeaf?: boolean;
+  useLeafIndexForTransferOrder?: boolean;
+  challengeId?: string;
+}
+
+export interface BadgesMerklePathItem {
+  aunt?: string;
+  onRight?: boolean;
+}
+
+export interface BadgesMerkleProof {
+  leaf?: string;
+  aunts?: BadgesMerklePathItem[];
+}
+
+export type BadgesMsgCreateAddressMappingsResponse = object;
 
 export type BadgesMsgDeleteCollectionResponse = object;
 
-export type BadgesMsgMintAndDistributeBadgesResponse = object;
+export type BadgesMsgTransferBadgesResponse = object;
 
-export interface BadgesMsgNewCollectionResponse {
-  /** ID of created badge collecon */
+export interface BadgesMsgUpdateCollectionResponse {
+  /** ID of badge collection */
   collectionId?: string;
 }
 
-export type BadgesMsgTransferBadgesResponse = object;
-
-export type BadgesMsgUpdateCollectionApprovedTransfersResponse = object;
-
-export type BadgesMsgUpdateCollectionPermissionsResponse = object;
-
-export type BadgesMsgUpdateManagerResponse = object;
-
-export type BadgesMsgUpdateMetadataResponse = object;
-
 export type BadgesMsgUpdateUserApprovedTransfersResponse = object;
 
-export type BadgesMsgUpdateUserPermissionsResponse = object;
+export interface BadgesMustOwnBadges {
+  collectionId?: string;
+
+  /**
+   * uintRange is a range of IDs from some start to some end (inclusive).
+   *
+   * uintRanges are one of the core types used in the BitBadgesChain module.
+   * They are used for evrything from badge IDs to time ranges to min / max balance amounts.
+   */
+  amountRange?: BadgesUintRange;
+  ownedTimes?: BadgesUintRange[];
+  badgeIds?: BadgesUintRange[];
+}
 
 /**
 * This defines the metadata for the off-chain balances (if using this balances type).
@@ -498,18 +573,38 @@ export interface BadgesOffChainBalancesMetadataTimeline {
   timelineTimes?: BadgesUintRange[];
 }
 
+export interface BadgesOutgoingApprovalDetails {
+  approvalId?: string;
+  uri?: string;
+  customData?: string;
+  mustOwnBadges?: BadgesMustOwnBadges[];
+  merkleChallenges?: BadgesMerkleChallenge[];
+  predeterminedBalances?: BadgesPredeterminedBalances;
+
+  /** PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address. */
+  approvalAmounts?: BadgesApprovalAmounts;
+  maxNumTransfers?: BadgesMaxNumTransfers;
+  requireToEqualsInitiatedBy?: boolean;
+  requireToDoesNotEqualInitiatedBy?: boolean;
+}
+
 /**
  * Params defines the parameters for the module.
  */
 export type BadgesParams = object;
 
-/**
- * PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address.
- */
-export interface BadgesPerAddressApprovals {
-  approvalsPerFromAddress?: BadgesApprovalsTracker;
-  approvalsPerToAddress?: BadgesApprovalsTracker;
-  approvalsPerInitiatedByAddress?: BadgesApprovalsTracker;
+export interface BadgesPredeterminedBalances {
+  manualBalances?: BadgesManualBalances[];
+  incrementedBalances?: BadgesIncrementedBalances;
+  orderCalculationMethod?: BadgesPredeterminedOrderCalculationMethod;
+}
+
+export interface BadgesPredeterminedOrderCalculationMethod {
+  useOverallNumTransfers?: boolean;
+  usePerToAddressNumTransfers?: boolean;
+  usePerFromAddressNumTransfers?: boolean;
+  usePerInitiatedByAddressNumTransfers?: boolean;
+  useMerkleChallengeLeafIndex?: boolean;
 }
 
 export interface BadgesQueryGetAddressMappingResponse {
@@ -641,13 +736,9 @@ export interface BadgesTransfer {
   from?: string;
   toAddresses?: string[];
   balances?: BadgesBalance[];
-
-  /**
-   * Note here we remain optimistic that the solutions will apply to all potential challenges.
-   * It is the Tx Sender's responsibility to ensure that the solutions are valid for all potential challenges.
-   * If you are attempting to claim badges with different sets of challenges, you will need to make multiple transfers.
-   */
-  solutions?: BadgesMerkleProof[];
+  precalculateFromApproval?: BadgesApprovalIdDetails;
+  merkleProofs?: BadgesMerkleProof[];
+  memo?: string;
 }
 
 /**
@@ -670,18 +761,9 @@ export interface BadgesUserApprovedIncomingTransfer {
   initiatedByMappingId?: string;
   transferTimes?: BadgesUintRange[];
   badgeIds?: BadgesUintRange[];
+  ownedTimes?: BadgesUintRange[];
   allowedCombinations?: BadgesIsUserIncomingTransferAllowed[];
-  challenges?: BadgesChallenge[];
-  approvalId?: string;
-  incrementBadgeIdsBy?: string;
-  incrementOwnedTimesBy?: string;
-
-  /** PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address. */
-  perAddressApprovals?: BadgesPerAddressApprovals;
-  uri?: string;
-  customData?: string;
-  requireFromEqualsInitiatedBy?: boolean;
-  requireFromDoesNotEqualInitiatedBy?: boolean;
+  approvalDetails?: BadgesIncomingApprovalDetails[];
 }
 
 export interface BadgesUserApprovedIncomingTransferCombination {
@@ -701,6 +783,9 @@ export interface BadgesUserApprovedIncomingTransferCombination {
   badgeIdsOptions?: BadgesValueOptions;
 
   /** ValueOptions defines how we manipulate the default values. */
+  ownedTimesOptions?: BadgesValueOptions;
+
+  /** ValueOptions defines how we manipulate the default values. */
   permittedTimesOptions?: BadgesValueOptions;
 
   /** ValueOptions defines how we manipulate the default values. */
@@ -713,6 +798,7 @@ export interface BadgesUserApprovedIncomingTransferDefaultValues {
   initiatedByMappingId?: string;
   transferTimes?: BadgesUintRange[];
   badgeIds?: BadgesUintRange[];
+  ownedTimes?: BadgesUintRange[];
   permittedTimes?: BadgesUintRange[];
   forbiddenTimes?: BadgesUintRange[];
 }
@@ -740,18 +826,9 @@ export interface BadgesUserApprovedOutgoingTransfer {
   initiatedByMappingId?: string;
   transferTimes?: BadgesUintRange[];
   badgeIds?: BadgesUintRange[];
+  ownedTimes?: BadgesUintRange[];
   allowedCombinations?: BadgesIsUserOutgoingTransferAllowed[];
-  challenges?: BadgesChallenge[];
-  approvalId?: string;
-  incrementBadgeIdsBy?: string;
-  incrementOwnedTimesBy?: string;
-
-  /** PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address. */
-  perAddressApprovals?: BadgesPerAddressApprovals;
-  uri?: string;
-  customData?: string;
-  requireToEqualsInitiatedBy?: boolean;
-  requireToDoesNotEqualInitiatedBy?: boolean;
+  approvalDetails?: BadgesOutgoingApprovalDetails[];
 }
 
 export interface BadgesUserApprovedOutgoingTransferCombination {
@@ -771,6 +848,9 @@ export interface BadgesUserApprovedOutgoingTransferCombination {
   badgeIdsOptions?: BadgesValueOptions;
 
   /** ValueOptions defines how we manipulate the default values. */
+  ownedTimesOptions?: BadgesValueOptions;
+
+  /** ValueOptions defines how we manipulate the default values. */
   permittedTimesOptions?: BadgesValueOptions;
 
   /** ValueOptions defines how we manipulate the default values. */
@@ -783,6 +863,7 @@ export interface BadgesUserApprovedOutgoingTransferDefaultValues {
   initiatedByMappingId?: string;
   transferTimes?: BadgesUintRange[];
   badgeIds?: BadgesUintRange[];
+  ownedTimes?: BadgesUintRange[];
   permittedTimes?: BadgesUintRange[];
   forbiddenTimes?: BadgesUintRange[];
 }
@@ -829,7 +910,7 @@ export interface BadgesUserBalanceStore {
    * The UserApprovedOutgoing and UserApprovedIncoming permissions are the same as the CollectionApprovedTransferPermission,
    * but certain fields are removed because they are not relevant to the user.
    */
-  permissions?: BadgesUserPermissions;
+  userPermissions?: BadgesUserPermissions;
 }
 
 /**
@@ -1052,8 +1133,8 @@ export class HttpClient<SecurityDataType = unknown> {
         property instanceof Blob
           ? property
           : typeof property === "object" && property !== null
-            ? JSON.stringify(property)
-            : `${property}`,
+          ? JSON.stringify(property)
+          : `${property}`,
       );
       return formData;
     }, new FormData());
@@ -1123,18 +1204,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    *
    * @tags Query
    * @name QueryGetApprovalsTracker
-   * @request GET:/bitbadges/bitbadgeschain/badges/get_approvals_tracker/{approvalId}/{level}
+   * @request GET:/bitbadges/bitbadgeschain/badges/get_approvals_tracker/{collectionId}/{approvalLevel}/{address}/{approvalId}/{trackerType}
    */
   queryGetApprovalsTracker = (
+    collectionId: string,
+    approvalLevel: string,
+    address: string,
     approvalId: string,
-    level: string,
-    query?: { depth?: string; address?: string; collectionId?: string },
+    trackerType: string,
     params: RequestParams = {},
   ) =>
     this.request<BadgesQueryGetApprovalsTrackerResponse, RpcStatus>({
-      path: `/bitbadges/bitbadgeschain/badges/get_approvals_tracker/${approvalId}/${level}`,
+      path: `/bitbadges/bitbadgeschain/badges/get_approvals_tracker/${collectionId}/${approvalLevel}/${address}/${approvalId}/${trackerType}`,
       method: "GET",
-      query: query,
       format: "json",
       ...params,
     });
@@ -1176,19 +1258,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    *
    * @tags Query
    * @name QueryGetNumUsedForMerkleChallenge
-   * @request GET:/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{challengeId}/{level}/{leafIndex}
+   * @request GET:/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{collectionId}/{approvalLevel}/{address}/{challengeId}/{leafIndex}
    */
   queryGetNumUsedForMerkleChallenge = (
+    collectionId: string,
+    approvalLevel: string,
+    address: string,
     challengeId: string,
-    level: string,
     leafIndex: string,
-    query?: { collectionId?: string },
     params: RequestParams = {},
   ) =>
     this.request<BadgesQueryGetNumUsedForMerkleChallengeResponse, RpcStatus>({
-      path: `/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/${challengeId}/${level}/${leafIndex}`,
+      path: `/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/${collectionId}/${approvalLevel}/${address}/${challengeId}/${leafIndex}`,
       method: "GET",
-      query: query,
       format: "json",
       ...params,
     });

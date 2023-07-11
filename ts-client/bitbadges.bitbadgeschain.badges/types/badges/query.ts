@@ -43,11 +43,13 @@ export interface QueryGetAddressMappingResponse {
 }
 
 export interface QueryGetApprovalsTrackerRequest {
-  approvalId: string;
-  level: string;
-  depth: string;
-  address: string;
   collectionId: string;
+  /** "collection" or "incoming" or "outgoing" */
+  approvalLevel: string;
+  /** if approvalLevel is "collection", leave blank */
+  address: string;
+  approvalId: string;
+  trackerType: string;
 }
 
 export interface QueryGetApprovalsTrackerResponse {
@@ -55,10 +57,13 @@ export interface QueryGetApprovalsTrackerResponse {
 }
 
 export interface QueryGetNumUsedForMerkleChallengeRequest {
-  challengeId: string;
-  level: string;
-  leafIndex: string;
   collectionId: string;
+  /** "collection" or "incoming" or "outgoing" */
+  approvalLevel: string;
+  /** if approvalLevel is "collection", leave blank */
+  address: string;
+  challengeId: string;
+  leafIndex: string;
 }
 
 export interface QueryGetNumUsedForMerkleChallengeResponse {
@@ -460,25 +465,25 @@ export const QueryGetAddressMappingResponse = {
 };
 
 function createBaseQueryGetApprovalsTrackerRequest(): QueryGetApprovalsTrackerRequest {
-  return { approvalId: "", level: "", depth: "", address: "", collectionId: "" };
+  return { collectionId: "", approvalLevel: "", address: "", approvalId: "", trackerType: "" };
 }
 
 export const QueryGetApprovalsTrackerRequest = {
   encode(message: QueryGetApprovalsTrackerRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.collectionId !== "") {
+      writer.uint32(42).string(message.collectionId);
+    }
+    if (message.approvalLevel !== "") {
+      writer.uint32(18).string(message.approvalLevel);
+    }
+    if (message.address !== "") {
+      writer.uint32(26).string(message.address);
+    }
     if (message.approvalId !== "") {
       writer.uint32(10).string(message.approvalId);
     }
-    if (message.level !== "") {
-      writer.uint32(18).string(message.level);
-    }
-    if (message.depth !== "") {
-      writer.uint32(26).string(message.depth);
-    }
-    if (message.address !== "") {
-      writer.uint32(34).string(message.address);
-    }
-    if (message.collectionId !== "") {
-      writer.uint32(42).string(message.collectionId);
+    if (message.trackerType !== "") {
+      writer.uint32(34).string(message.trackerType);
     }
     return writer;
   },
@@ -490,20 +495,20 @@ export const QueryGetApprovalsTrackerRequest = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 5:
+          message.collectionId = reader.string();
+          break;
+        case 2:
+          message.approvalLevel = reader.string();
+          break;
+        case 3:
+          message.address = reader.string();
+          break;
         case 1:
           message.approvalId = reader.string();
           break;
-        case 2:
-          message.level = reader.string();
-          break;
-        case 3:
-          message.depth = reader.string();
-          break;
         case 4:
-          message.address = reader.string();
-          break;
-        case 5:
-          message.collectionId = reader.string();
+          message.trackerType = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -515,21 +520,21 @@ export const QueryGetApprovalsTrackerRequest = {
 
   fromJSON(object: any): QueryGetApprovalsTrackerRequest {
     return {
-      approvalId: isSet(object.approvalId) ? String(object.approvalId) : "",
-      level: isSet(object.level) ? String(object.level) : "",
-      depth: isSet(object.depth) ? String(object.depth) : "",
-      address: isSet(object.address) ? String(object.address) : "",
       collectionId: isSet(object.collectionId) ? String(object.collectionId) : "",
+      approvalLevel: isSet(object.approvalLevel) ? String(object.approvalLevel) : "",
+      address: isSet(object.address) ? String(object.address) : "",
+      approvalId: isSet(object.approvalId) ? String(object.approvalId) : "",
+      trackerType: isSet(object.trackerType) ? String(object.trackerType) : "",
     };
   },
 
   toJSON(message: QueryGetApprovalsTrackerRequest): unknown {
     const obj: any = {};
-    message.approvalId !== undefined && (obj.approvalId = message.approvalId);
-    message.level !== undefined && (obj.level = message.level);
-    message.depth !== undefined && (obj.depth = message.depth);
-    message.address !== undefined && (obj.address = message.address);
     message.collectionId !== undefined && (obj.collectionId = message.collectionId);
+    message.approvalLevel !== undefined && (obj.approvalLevel = message.approvalLevel);
+    message.address !== undefined && (obj.address = message.address);
+    message.approvalId !== undefined && (obj.approvalId = message.approvalId);
+    message.trackerType !== undefined && (obj.trackerType = message.trackerType);
     return obj;
   },
 
@@ -537,11 +542,11 @@ export const QueryGetApprovalsTrackerRequest = {
     object: I,
   ): QueryGetApprovalsTrackerRequest {
     const message = createBaseQueryGetApprovalsTrackerRequest();
-    message.approvalId = object.approvalId ?? "";
-    message.level = object.level ?? "";
-    message.depth = object.depth ?? "";
-    message.address = object.address ?? "";
     message.collectionId = object.collectionId ?? "";
+    message.approvalLevel = object.approvalLevel ?? "";
+    message.address = object.address ?? "";
+    message.approvalId = object.approvalId ?? "";
+    message.trackerType = object.trackerType ?? "";
     return message;
   },
 };
@@ -599,22 +604,25 @@ export const QueryGetApprovalsTrackerResponse = {
 };
 
 function createBaseQueryGetNumUsedForMerkleChallengeRequest(): QueryGetNumUsedForMerkleChallengeRequest {
-  return { challengeId: "", level: "", leafIndex: "", collectionId: "" };
+  return { collectionId: "", approvalLevel: "", address: "", challengeId: "", leafIndex: "" };
 }
 
 export const QueryGetNumUsedForMerkleChallengeRequest = {
   encode(message: QueryGetNumUsedForMerkleChallengeRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.challengeId !== "") {
-      writer.uint32(10).string(message.challengeId);
+    if (message.collectionId !== "") {
+      writer.uint32(10).string(message.collectionId);
     }
-    if (message.level !== "") {
-      writer.uint32(18).string(message.level);
+    if (message.approvalLevel !== "") {
+      writer.uint32(18).string(message.approvalLevel);
+    }
+    if (message.address !== "") {
+      writer.uint32(26).string(message.address);
+    }
+    if (message.challengeId !== "") {
+      writer.uint32(34).string(message.challengeId);
     }
     if (message.leafIndex !== "") {
-      writer.uint32(26).string(message.leafIndex);
-    }
-    if (message.collectionId !== "") {
-      writer.uint32(34).string(message.collectionId);
+      writer.uint32(42).string(message.leafIndex);
     }
     return writer;
   },
@@ -627,16 +635,19 @@ export const QueryGetNumUsedForMerkleChallengeRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.challengeId = reader.string();
+          message.collectionId = reader.string();
           break;
         case 2:
-          message.level = reader.string();
+          message.approvalLevel = reader.string();
           break;
         case 3:
-          message.leafIndex = reader.string();
+          message.address = reader.string();
           break;
         case 4:
-          message.collectionId = reader.string();
+          message.challengeId = reader.string();
+          break;
+        case 5:
+          message.leafIndex = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -648,19 +659,21 @@ export const QueryGetNumUsedForMerkleChallengeRequest = {
 
   fromJSON(object: any): QueryGetNumUsedForMerkleChallengeRequest {
     return {
-      challengeId: isSet(object.challengeId) ? String(object.challengeId) : "",
-      level: isSet(object.level) ? String(object.level) : "",
-      leafIndex: isSet(object.leafIndex) ? String(object.leafIndex) : "",
       collectionId: isSet(object.collectionId) ? String(object.collectionId) : "",
+      approvalLevel: isSet(object.approvalLevel) ? String(object.approvalLevel) : "",
+      address: isSet(object.address) ? String(object.address) : "",
+      challengeId: isSet(object.challengeId) ? String(object.challengeId) : "",
+      leafIndex: isSet(object.leafIndex) ? String(object.leafIndex) : "",
     };
   },
 
   toJSON(message: QueryGetNumUsedForMerkleChallengeRequest): unknown {
     const obj: any = {};
-    message.challengeId !== undefined && (obj.challengeId = message.challengeId);
-    message.level !== undefined && (obj.level = message.level);
-    message.leafIndex !== undefined && (obj.leafIndex = message.leafIndex);
     message.collectionId !== undefined && (obj.collectionId = message.collectionId);
+    message.approvalLevel !== undefined && (obj.approvalLevel = message.approvalLevel);
+    message.address !== undefined && (obj.address = message.address);
+    message.challengeId !== undefined && (obj.challengeId = message.challengeId);
+    message.leafIndex !== undefined && (obj.leafIndex = message.leafIndex);
     return obj;
   },
 
@@ -668,10 +681,11 @@ export const QueryGetNumUsedForMerkleChallengeRequest = {
     object: I,
   ): QueryGetNumUsedForMerkleChallengeRequest {
     const message = createBaseQueryGetNumUsedForMerkleChallengeRequest();
-    message.challengeId = object.challengeId ?? "";
-    message.level = object.level ?? "";
-    message.leafIndex = object.leafIndex ?? "";
     message.collectionId = object.collectionId ?? "";
+    message.approvalLevel = object.approvalLevel ?? "";
+    message.address = object.address ?? "";
+    message.challengeId = object.challengeId ?? "";
+    message.leafIndex = object.leafIndex ?? "";
     return message;
   },
 };
@@ -733,7 +747,9 @@ export interface Query {
   GetCollection(request: QueryGetCollectionRequest): Promise<QueryGetCollectionResponse>;
   GetAddressMapping(request: QueryGetAddressMappingRequest): Promise<QueryGetAddressMappingResponse>;
   GetApprovalsTracker(request: QueryGetApprovalsTrackerRequest): Promise<QueryGetApprovalsTrackerResponse>;
-  GetNumUsedForMerkleChallenge(request: QueryGetNumUsedForMerkleChallengeRequest): Promise<QueryGetNumUsedForMerkleChallengeResponse>;
+  GetNumUsedForMerkleChallenge(
+    request: QueryGetNumUsedForMerkleChallengeRequest,
+  ): Promise<QueryGetNumUsedForMerkleChallengeResponse>;
   /** Queries an addresses balance for a badge collection, specified by its ID. */
   GetBalance(request: QueryGetBalanceRequest): Promise<QueryGetBalanceResponse>;
 }
@@ -773,7 +789,9 @@ export class QueryClientImpl implements Query {
     return promise.then((data) => QueryGetApprovalsTrackerResponse.decode(new _m0.Reader(data)));
   }
 
-  GetNumUsedForMerkleChallenge(request: QueryGetNumUsedForMerkleChallengeRequest): Promise<QueryGetNumUsedForMerkleChallengeResponse> {
+  GetNumUsedForMerkleChallenge(
+    request: QueryGetNumUsedForMerkleChallengeRequest,
+  ): Promise<QueryGetNumUsedForMerkleChallengeResponse> {
     const data = QueryGetNumUsedForMerkleChallengeRequest.encode(request).finish();
     const promise = this.rpc.request("bitbadges.bitbadgeschain.badges.Query", "GetNumUsedForMerkleChallenge", data);
     return promise.then((data) => QueryGetNumUsedForMerkleChallengeResponse.decode(new _m0.Reader(data)));
