@@ -54,19 +54,7 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 						IsAllowed: allowedCombination.IsAllowed,
 					},
 				},
-				PredeterminedBalances: 				  			approvedTransfer.PredeterminedBalances,
-				ApprovalAmounts: 								  			approvedTransfer.ApprovalAmounts,
-				MaxNumTransfers: 								  			approvedTransfer.MaxNumTransfers,
-				RequireFromEqualsInitiatedBy:           approvedTransfer.RequireFromEqualsInitiatedBy,
-				RequireFromDoesNotEqualInitiatedBy:     approvedTransfer.RequireFromDoesNotEqualInitiatedBy,
-				RequireToEqualsInitiatedBy:             approvedTransfer.RequireToEqualsInitiatedBy,
-				RequireToDoesNotEqualInitiatedBy:       approvedTransfer.RequireToDoesNotEqualInitiatedBy,
-				OverridesFromApprovedOutgoingTransfers: approvedTransfer.OverridesFromApprovedOutgoingTransfers,
-				OverridesToApprovedIncomingTransfers:   approvedTransfer.OverridesToApprovedIncomingTransfers,
-				CustomData:                             approvedTransfer.CustomData,
-				Uri:                                    approvedTransfer.Uri,
-				ApprovalId:                              approvedTransfer.ApprovalId,
-				Challenges:                             approvedTransfer.Challenges,
+				ApprovalDetails: approvedTransfer.ApprovalDetails,
 			})
 		}
 	}
@@ -102,8 +90,6 @@ func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomin
 				IsAllowed: true,
 			},
 		},
-		ApprovalAmounts: &types.ApprovalAmounts{},
-		MaxNumTransfers: &types.MaxNumTransfers{},
 	})
 
 	return currApprovedTransfers
@@ -137,8 +123,6 @@ func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoin
 				IsAllowed: true,
 			},
 		},
-		ApprovalAmounts: &types.ApprovalAmounts{},
-		MaxNumTransfers: &types.MaxNumTransfers{},
 	})
 
 	return currApprovedTransfers

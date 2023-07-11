@@ -117,6 +117,13 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		return err
 	}
 
+	if msg.DefaultUserPermissions == nil {
+		msg.DefaultUserPermissions = &UserPermissions{
+			CanUpdateApprovedIncomingTransfers: []*UserApprovedIncomingTransferPermission{},
+			CanUpdateApprovedOutgoingTransfers: []*UserApprovedOutgoingTransferPermission{},
+		}
+	}
+
 	if err := ValidateUserPermissions(msg.DefaultUserPermissions); err != nil {
 		return err
 	}

@@ -31,7 +31,7 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 
 		//TODO: Recursive get inherited balance for user w/ inherited balances
 		if !IsStandardBalances(collection) {
-			return nil, status.Error(codes.NotFound, "collection and balances not found: unsupported balances type")
+			return nil, status.Error(codes.NotFound, "unsupported balances type")
 		}
 
 		blankUserBalance := &types.UserBalanceStore{

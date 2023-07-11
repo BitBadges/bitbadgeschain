@@ -198,7 +198,7 @@ func (k Keeper) GetNumUsedForChallengeFromStore(ctx sdk.Context, collectionId sd
 	return curr, nil
 }
 
-func (k Keeper) GetNumUsedForChallengesFromStore(ctx sdk.Context) (numUsed []sdkmath.Uint, ids []string) {
+func (k Keeper) GetNumUsedForMerkleChallengesFromStore(ctx sdk.Context) (numUsed []sdkmath.Uint, ids []string) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, UsedClaimChallengeKey)
 	defer iterator.Close()

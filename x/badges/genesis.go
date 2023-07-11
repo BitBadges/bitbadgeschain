@@ -64,7 +64,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		genesis.BalanceStoreKeys = append(genesis.BalanceStoreKeys, keeper.ConstructBalanceKey(addresses, balanceIds[i]))
 	}
 
-	genesis.NumUsedForChallenges, genesis.NumUsedForChallengesStoreKeys = k.GetNumUsedForChallengesFromStore(ctx)
+	genesis.NumUsedForMerkleChallenges, genesis.NumUsedForMerkleChallengesStoreKeys = k.GetNumUsedForMerkleChallengesFromStore(ctx)
 
 	genesis.AddressMappings = k.GetAddressMappingsFromStore(ctx)
 

@@ -16,7 +16,7 @@ func (k Keeper) GetNumUsedForChallenge(goCtx context.Context, req *types.QueryGe
 
 	// ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// numUsed, err := k.GetNumUsedForChallengeFromStore(ctx, req.CollectionId, req.ChallengeId, req.LeafIndex, req.Level)
+	// numUsed, err := k.GetNumUsedForChallengeFromStore(ctx, req.CollectionId, req.MerkleChallengeId, req.LeafIndex, req.Level)
 	// if err != nil {
 	// 	return nil, status.Error(codes.InvalidArgument, "invalid request")
 	// }

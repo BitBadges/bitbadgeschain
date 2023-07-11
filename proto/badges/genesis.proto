@@ -19,8 +19,8 @@ message GenesisState {
   string nextCollectionId = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated UserBalanceStore balances = 5;
   repeated string balanceStoreKeys = 6;
-  repeated string numUsedForChallenges = 7 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  repeated string numUsedForChallengesStoreKeys = 8;
+  repeated string numUsedForMerkleChallenges = 7 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated string numUsedForMerkleChallengesStoreKeys = 8;
   repeated AddressMapping addressMappings = 9;
   repeated ApprovalsTracker approvalsTrackers = 10;
   repeated string approvalsTrackerStoreKeys = 11;

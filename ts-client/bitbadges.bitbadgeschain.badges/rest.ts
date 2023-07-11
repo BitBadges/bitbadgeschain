@@ -221,16 +221,16 @@ export interface BadgesChallenge {
   challengeId?: string;
 }
 
-export interface BadgesChallengeSolution {
+export interface BadgesMerkleProof {
   proof?: BadgesClaimProof;
 }
 
 export interface BadgesClaimProof {
   leaf?: string;
-  aunts?: BadgesClaimProofItem[];
+  aunts?: BadgesMerklePathItem[];
 }
 
-export interface BadgesClaimProofItem {
+export interface BadgesMerklePathItem {
   aunt?: string;
   onRight?: boolean;
 }
@@ -647,7 +647,7 @@ export interface BadgesTransfer {
    * It is the Tx Sender's responsibility to ensure that the solutions are valid for all potential challenges.
    * If you are attempting to claim badges with different sets of challenges, you will need to make multiple transfers.
    */
-  solutions?: BadgesChallengeSolution[];
+  solutions?: BadgesMerkleProof[];
 }
 
 /**

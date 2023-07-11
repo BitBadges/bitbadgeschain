@@ -28,7 +28,7 @@ export interface Transfer {
    * It is the Tx Sender's responsibility to ensure that the solutions are valid for all potential challenges.
    * If you are attempting to claim badges with different sets of challenges, you will need to make multiple transfers.
    */
-  solutions: ChallengeSolution[];
+  solutions: MerkleProof[];
 }
 
 export interface MsgNewCollection {
@@ -156,7 +156,7 @@ export interface MsgUpdateManager {
 export interface MsgUpdateManagerResponse {
 }
 
-export interface ClaimProofItem {
+export interface MerklePathItem {
   aunt: string;
   onRight: boolean;
 }
@@ -164,10 +164,10 @@ export interface ClaimProofItem {
 /** Consistent with tendermint/crypto merkle tree */
 export interface ClaimProof {
   leaf: string;
-  aunts: ClaimProofItem[];
+  aunts: MerklePathItem[];
 }
 
-export interface ChallengeSolution {
+export interface MerkleProof {
   proof: ClaimProof | undefined;
 }
 
@@ -204,7 +204,7 @@ export const Transfer = {
       Balance.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     for (const v of message.solutions) {
-      ChallengeSolution.encode(v!, writer.uint32(34).fork()).ldelim();
+      MerkleProof.encode(v!, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -226,7 +226,7 @@ export const Transfer = {
           message.balances.push(Balance.decode(reader, reader.uint32()));
           break;
         case 4:
-          message.solutions.push(ChallengeSolution.decode(reader, reader.uint32()));
+          message.solutions.push(MerkleProof.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -242,7 +242,7 @@ export const Transfer = {
       toAddresses: Array.isArray(object?.toAddresses) ? object.toAddresses.map((e: any) => String(e)) : [],
       balances: Array.isArray(object?.balances) ? object.balances.map((e: any) => Balance.fromJSON(e)) : [],
       solutions: Array.isArray(object?.solutions)
-        ? object.solutions.map((e: any) => ChallengeSolution.fromJSON(e))
+        ? object.solutions.map((e: any) => MerkleProof.fromJSON(e))
         : [],
     };
   },
@@ -261,7 +261,7 @@ export const Transfer = {
       obj.balances = [];
     }
     if (message.solutions) {
-      obj.solutions = message.solutions.map((e) => e ? ChallengeSolution.toJSON(e) : undefined);
+      obj.solutions = message.solutions.map((e) => e ? MerkleProof.toJSON(e) : undefined);
     } else {
       obj.solutions = [];
     }
@@ -273,7 +273,7 @@ export const Transfer = {
     message.from = object.from ?? "";
     message.toAddresses = object.toAddresses?.map((e) => e) || [];
     message.balances = object.balances?.map((e) => Balance.fromPartial(e)) || [];
-    message.solutions = object.solutions?.map((e) => ChallengeSolution.fromPartial(e)) || [];
+    message.solutions = object.solutions?.map((e) => MerkleProof.fromPartial(e)) || [];
     return message;
   },
 };
@@ -1876,12 +1876,12 @@ export const MsgUpdateManagerResponse = {
   },
 };
 
-function createBaseClaimProofItem(): ClaimProofItem {
+function createBaseMerklePathItem(): MerklePathItem {
   return { aunt: "", onRight: false };
 }
 
-export const ClaimProofItem = {
-  encode(message: ClaimProofItem, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MerklePathItem = {
+  encode(message: MerklePathItem, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.aunt !== "") {
       writer.uint32(10).string(message.aunt);
     }
@@ -1891,10 +1891,10 @@ export const ClaimProofItem = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): ClaimProofItem {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MerklePathItem {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseClaimProofItem();
+    const message = createBaseMerklePathItem();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1912,22 +1912,22 @@ export const ClaimProofItem = {
     return message;
   },
 
-  fromJSON(object: any): ClaimProofItem {
+  fromJSON(object: any): MerklePathItem {
     return {
       aunt: isSet(object.aunt) ? String(object.aunt) : "",
       onRight: isSet(object.onRight) ? Boolean(object.onRight) : false,
     };
   },
 
-  toJSON(message: ClaimProofItem): unknown {
+  toJSON(message: MerklePathItem): unknown {
     const obj: any = {};
     message.aunt !== undefined && (obj.aunt = message.aunt);
     message.onRight !== undefined && (obj.onRight = message.onRight);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<ClaimProofItem>, I>>(object: I): ClaimProofItem {
-    const message = createBaseClaimProofItem();
+  fromPartial<I extends Exact<DeepPartial<MerklePathItem>, I>>(object: I): MerklePathItem {
+    const message = createBaseMerklePathItem();
     message.aunt = object.aunt ?? "";
     message.onRight = object.onRight ?? false;
     return message;
@@ -1944,7 +1944,7 @@ export const ClaimProof = {
       writer.uint32(10).string(message.leaf);
     }
     for (const v of message.aunts) {
-      ClaimProofItem.encode(v!, writer.uint32(18).fork()).ldelim();
+      MerklePathItem.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -1960,7 +1960,7 @@ export const ClaimProof = {
           message.leaf = reader.string();
           break;
         case 2:
-          message.aunts.push(ClaimProofItem.decode(reader, reader.uint32()));
+          message.aunts.push(MerklePathItem.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -1973,7 +1973,7 @@ export const ClaimProof = {
   fromJSON(object: any): ClaimProof {
     return {
       leaf: isSet(object.leaf) ? String(object.leaf) : "",
-      aunts: Array.isArray(object?.aunts) ? object.aunts.map((e: any) => ClaimProofItem.fromJSON(e)) : [],
+      aunts: Array.isArray(object?.aunts) ? object.aunts.map((e: any) => MerklePathItem.fromJSON(e)) : [],
     };
   },
 
@@ -1981,7 +1981,7 @@ export const ClaimProof = {
     const obj: any = {};
     message.leaf !== undefined && (obj.leaf = message.leaf);
     if (message.aunts) {
-      obj.aunts = message.aunts.map((e) => e ? ClaimProofItem.toJSON(e) : undefined);
+      obj.aunts = message.aunts.map((e) => e ? MerklePathItem.toJSON(e) : undefined);
     } else {
       obj.aunts = [];
     }
@@ -1991,27 +1991,27 @@ export const ClaimProof = {
   fromPartial<I extends Exact<DeepPartial<ClaimProof>, I>>(object: I): ClaimProof {
     const message = createBaseClaimProof();
     message.leaf = object.leaf ?? "";
-    message.aunts = object.aunts?.map((e) => ClaimProofItem.fromPartial(e)) || [];
+    message.aunts = object.aunts?.map((e) => MerklePathItem.fromPartial(e)) || [];
     return message;
   },
 };
 
-function createBaseChallengeSolution(): ChallengeSolution {
+function createBaseMerkleProof(): MerkleProof {
   return { proof: undefined };
 }
 
-export const ChallengeSolution = {
-  encode(message: ChallengeSolution, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MerkleProof = {
+  encode(message: MerkleProof, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.proof !== undefined) {
       ClaimProof.encode(message.proof, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): ChallengeSolution {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MerkleProof {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseChallengeSolution();
+    const message = createBaseMerkleProof();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2026,18 +2026,18 @@ export const ChallengeSolution = {
     return message;
   },
 
-  fromJSON(object: any): ChallengeSolution {
+  fromJSON(object: any): MerkleProof {
     return { proof: isSet(object.proof) ? ClaimProof.fromJSON(object.proof) : undefined };
   },
 
-  toJSON(message: ChallengeSolution): unknown {
+  toJSON(message: MerkleProof): unknown {
     const obj: any = {};
     message.proof !== undefined && (obj.proof = message.proof ? ClaimProof.toJSON(message.proof) : undefined);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<ChallengeSolution>, I>>(object: I): ChallengeSolution {
-    const message = createBaseChallengeSolution();
+  fromPartial<I extends Exact<DeepPartial<MerkleProof>, I>>(object: I): MerkleProof {
+    const message = createBaseMerkleProof();
     message.proof = (object.proof !== undefined && object.proof !== null)
       ? ClaimProof.fromPartial(object.proof)
       : undefined;

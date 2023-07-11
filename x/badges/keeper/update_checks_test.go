@@ -338,11 +338,16 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 						BadgeIds:                               GetFullUintRanges(),
 						TransferTimes:                          GetFullUintRanges(),
 						OwnedTimes: 		 										GetFullUintRanges(),
-						OverridesFromApprovedOutgoingTransfers: true,
-						RequireToEqualsInitiatedBy:             true,
-						ApprovalId:                              "test",
-						MaxNumTransfers: 												&types.MaxNumTransfers{},
-						ApprovalAmounts: 												&types.ApprovalAmounts{},
+						
+						ApprovalDetails: []*types.ApprovalDetails{
+							{
+								RequireToEqualsInitiatedBy:             true,
+								ApprovalId:                              "test",
+								MaxNumTransfers: 												&types.MaxNumTransfers{},
+								ApprovalAmounts: 												&types.ApprovalAmounts{},
+								OverridesFromApprovedOutgoingTransfers: true,
+							},
+						},
 					},
 				},
 			},
@@ -364,11 +369,16 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 						BadgeIds:                               GetFullUintRanges(),
 						TransferTimes:                          GetFullUintRanges(),
 						OwnedTimes: 		 GetFullUintRanges(),
-						OverridesFromApprovedOutgoingTransfers: true,
-						RequireToEqualsInitiatedBy:             true,
-						ApprovalId:                              "test",
-						MaxNumTransfers: 												&types.MaxNumTransfers{},
-						ApprovalAmounts: 												&types.ApprovalAmounts{},
+						
+						ApprovalDetails: []*types.ApprovalDetails{
+							{
+								RequireToEqualsInitiatedBy:             true,
+								ApprovalId:                              "test",
+								MaxNumTransfers: 												&types.MaxNumTransfers{},
+								ApprovalAmounts: 												&types.ApprovalAmounts{},
+								OverridesFromApprovedOutgoingTransfers: true,
+							},
+						},
 					},
 				},
 			},
@@ -442,10 +452,14 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						BadgeIds:                   GetFullUintRanges(),
 						TransferTimes:              GetFullUintRanges(),
 						OwnedTimes: 		 GetFullUintRanges(),
-						RequireToEqualsInitiatedBy: true,
-						ApprovalId:                  "test",
-						MaxNumTransfers: 												&types.MaxNumTransfers{},
-						ApprovalAmounts: &types.ApprovalAmounts{},
+						ApprovalDetails: 					[]*types.OutgoingApprovalDetails{
+							{
+								RequireToEqualsInitiatedBy: true,
+								ApprovalId:                  "test",
+								MaxNumTransfers: 												&types.MaxNumTransfers{},
+								ApprovalAmounts: &types.ApprovalAmounts{},
+							},
+						},
 					},
 				},
 			},
@@ -460,10 +474,13 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
 						OwnedTimes: 		 GetFullUintRanges(),
-
-						ApprovalId:                 "test",
-						MaxNumTransfers: 												&types.MaxNumTransfers{},
-						ApprovalAmounts: 												&types.ApprovalAmounts{},
+						ApprovalDetails: []*types.IncomingApprovalDetails{
+							{
+								ApprovalId:                 "test",
+								MaxNumTransfers: 												&types.MaxNumTransfers{},
+								ApprovalAmounts: 												&types.ApprovalAmounts{},
+							},
+						},
 					},
 				},
 			},
@@ -486,10 +503,14 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						BadgeIds:                   GetFullUintRanges(),
 						TransferTimes:              GetFullUintRanges(),
 						OwnedTimes: 		 GetFullUintRanges(),
-						RequireToEqualsInitiatedBy: true,
-						ApprovalId:                  "test",
-						MaxNumTransfers: 												&types.MaxNumTransfers{},
-						ApprovalAmounts: 												&types.ApprovalAmounts{},
+						ApprovalDetails: []*types.OutgoingApprovalDetails{
+							{
+								RequireToEqualsInitiatedBy: true,
+								ApprovalId:                  "test",
+								MaxNumTransfers: 												&types.MaxNumTransfers{},
+								ApprovalAmounts: 												&types.ApprovalAmounts{},
+							},
+						},
 					},
 				},
 			},
@@ -504,14 +525,18 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						BadgeIds:                     GetFullUintRanges(),
 						TransferTimes:                GetFullUintRanges(),
 						OwnedTimes: 		 GetFullUintRanges(),
-						RequireFromEqualsInitiatedBy: true,
+						ApprovalDetails: []*types.IncomingApprovalDetails{
+							{
+								RequireFromEqualsInitiatedBy: true,
 
-						ApprovalId:                 "test",
-						MaxNumTransfers: 												&types.MaxNumTransfers{
-							
-						},
-						ApprovalAmounts: 												&types.ApprovalAmounts{
-							
+								ApprovalId:                 "test",
+								MaxNumTransfers: 												&types.MaxNumTransfers{
+									
+								},
+								ApprovalAmounts: 												&types.ApprovalAmounts{
+									
+								},
+							},
 						},
 					},
 				},

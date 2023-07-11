@@ -38,9 +38,9 @@ func CmdClaimBadge() *cobra.Command {
 			// 	return err
 			// }
 
-			// solutions := []*types.ChallengeSolution{}
+			// solutions := []*types.MerkleProof{}
 			// for _, solutionInterface := range argSolutionsJsonArr {
-			// 	solution := solutionInterface.(*types.ChallengeSolution)
+			// 	solution := solutionInterface.(*types.MerkleProof)
 			// 	solutions = append(solutions, solution)
 			// }
 

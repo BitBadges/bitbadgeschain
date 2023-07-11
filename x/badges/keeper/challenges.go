@@ -10,29 +10,29 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.Challenge, solutions []*types.ChallengeSolution, creatorAddress string, approvalId string, simulation bool) (sdkmath.Uint, error) {
+func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool) (sdkmath.Uint, error) {
 	numIncrements := sdkmath.NewUint(0)
 
 	for _, challenge := range challenges {
 		root := challenge.Root
 		hasValidSolution := false
 
-		for _, solution := range solutions {
+		for _, proof := range merkleProofs {
 			if root != "" {
 				// Must be proper length to avoid preimage attacks
-				if len(solution.Proof.Aunts) != int(challenge.ExpectedProofLength.Uint64()) {
+				if len(proof.Aunts) != int(challenge.ExpectedProofLength.Uint64()) {
 					continue
 				}
 
 				if challenge.UseCreatorAddressAsLeaf {
-					solution.Proof.Leaf = creatorAddress //overwrites it
+					proof.Leaf = creatorAddress //overwrites it
 				}
 
-				if solution.Proof.Leaf == "" {
+				if proof.Leaf == "" {
 					continue
 				}
 
-				leafIndex := GetLeafIndex(solution.Proof.Aunts)
+				leafIndex := GetLeafIndex(proof.Aunts)
 				if challenge.UseLeafIndexForTransferOrder {
 					//Get leftmost leaf index for layer === challenge.ExpectedProofLength
 					leftmostLeafIndex := sdkmath.NewUint(1)
@@ -45,9 +45,9 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 
 				
 				if challenge.MaxOneUsePerLeaf {
-
+					challengeId := challenge.ChallengeId
 					if simulation {
-						numUsed, err := k.GetNumUsedForChallengeFromStore(ctx, collectionId, approvalId, leafIndex)
+						numUsed, err := k.GetNumUsedForChallengeFromStore(ctx, collectionId, challengeId, leafIndex)
 						if err != nil {
 							continue
 						}
@@ -58,7 +58,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 							continue
 						}
 					} else {
-						numUsed, err := k.IncrementNumUsedForChallengeInStore(ctx, collectionId, approvalId, leafIndex)
+						numUsed, err := k.IncrementNumUsedForChallengeInStore(ctx, collectionId, challengeId, leafIndex)
 						if err != nil {
 							continue
 						}
@@ -70,7 +70,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 					}
 				}
 
-				err := CheckMerklePath(solution.Proof.Leaf, root, solution.Proof.Aunts)
+				err := CheckMerklePath(proof.Leaf, root, proof.Aunts)
 				if err != nil {
 					continue
 				}
@@ -88,7 +88,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 	return numIncrements, nil
 }
 
-func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.ClaimProofItem) error {
+func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.MerklePathItem) error {
 	hashedMsgLeaf := sha256.Sum256([]byte(leaf))
 	currHash := hashedMsgLeaf[:]
 
@@ -115,7 +115,7 @@ func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.ClaimProof
 	return nil
 }
 
-func GetLeafIndex(aunts []*types.ClaimProofItem) sdkmath.Uint {
+func GetLeafIndex(aunts []*types.MerklePathItem) sdkmath.Uint {
 	leafIndex := sdkmath.NewUint(1)
 	//iterate through msg.WhitelistProof.Aunts backwards
 	for i := len(aunts) - 1; i >= 0; i-- {

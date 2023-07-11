@@ -20,67 +20,67 @@ import { MsgUpdateUserPermissions } from "./types/badges/tx";
 import { MsgUpdateCollectionPermissions } from "./types/badges/tx";
 import { MsgUpdateManager } from "./types/badges/tx";
 
-import { AddressMapping as typeAddressMapping} from "./types"
-import { UintRange as typeUintRange} from "./types"
-import { Balance as typeBalance} from "./types"
-import { InheritedBalance as typeInheritedBalance} from "./types"
-import { BadgeCollection as typeBadgeCollection} from "./types"
-import { BadgeMetadata as typeBadgeMetadata} from "./types"
-import { CollectionMetadata as typeCollectionMetadata} from "./types"
-import { OffChainBalancesMetadata as typeOffChainBalancesMetadata} from "./types"
-import { BadgesPacketData as typeBadgesPacketData} from "./types"
-import { NoData as typeNoData} from "./types"
-import { Params as typeParams} from "./types"
-import { CollectionPermissions as typeCollectionPermissions} from "./types"
-import { UserPermissions as typeUserPermissions} from "./types"
-import { ValueOptions as typeValueOptions} from "./types"
-import { CollectionApprovedTransferCombination as typeCollectionApprovedTransferCombination} from "./types"
-import { CollectionApprovedTransferDefaultValues as typeCollectionApprovedTransferDefaultValues} from "./types"
-import { CollectionApprovedTransferPermission as typeCollectionApprovedTransferPermission} from "./types"
-import { UserApprovedOutgoingTransferCombination as typeUserApprovedOutgoingTransferCombination} from "./types"
-import { UserApprovedOutgoingTransferDefaultValues as typeUserApprovedOutgoingTransferDefaultValues} from "./types"
-import { UserApprovedOutgoingTransferPermission as typeUserApprovedOutgoingTransferPermission} from "./types"
-import { UserApprovedIncomingTransferCombination as typeUserApprovedIncomingTransferCombination} from "./types"
-import { UserApprovedIncomingTransferDefaultValues as typeUserApprovedIncomingTransferDefaultValues} from "./types"
-import { UserApprovedIncomingTransferPermission as typeUserApprovedIncomingTransferPermission} from "./types"
-import { BalancesActionCombination as typeBalancesActionCombination} from "./types"
-import { BalancesActionDefaultValues as typeBalancesActionDefaultValues} from "./types"
-import { BalancesActionPermission as typeBalancesActionPermission} from "./types"
-import { ActionDefaultValues as typeActionDefaultValues} from "./types"
-import { ActionCombination as typeActionCombination} from "./types"
-import { ActionPermission as typeActionPermission} from "./types"
-import { TimedUpdateCombination as typeTimedUpdateCombination} from "./types"
-import { TimedUpdateDefaultValues as typeTimedUpdateDefaultValues} from "./types"
-import { TimedUpdatePermission as typeTimedUpdatePermission} from "./types"
-import { TimedUpdateWithBadgeIdsCombination as typeTimedUpdateWithBadgeIdsCombination} from "./types"
-import { TimedUpdateWithBadgeIdsDefaultValues as typeTimedUpdateWithBadgeIdsDefaultValues} from "./types"
-import { TimedUpdateWithBadgeIdsPermission as typeTimedUpdateWithBadgeIdsPermission} from "./types"
-import { CollectionMetadataTimeline as typeCollectionMetadataTimeline} from "./types"
-import { BadgeMetadataTimeline as typeBadgeMetadataTimeline} from "./types"
-import { OffChainBalancesMetadataTimeline as typeOffChainBalancesMetadataTimeline} from "./types"
-import { InheritedBalancesTimeline as typeInheritedBalancesTimeline} from "./types"
-import { CustomDataTimeline as typeCustomDataTimeline} from "./types"
-import { ManagerTimeline as typeManagerTimeline} from "./types"
-import { CollectionApprovedTransferTimeline as typeCollectionApprovedTransferTimeline} from "./types"
-import { IsArchivedTimeline as typeIsArchivedTimeline} from "./types"
-import { ContractAddressTimeline as typeContractAddressTimeline} from "./types"
-import { StandardsTimeline as typeStandardsTimeline} from "./types"
-import { UserBalanceStore as typeUserBalanceStore} from "./types"
-import { UserApprovedOutgoingTransferTimeline as typeUserApprovedOutgoingTransferTimeline} from "./types"
-import { UserApprovedIncomingTransferTimeline as typeUserApprovedIncomingTransferTimeline} from "./types"
-import { Challenge as typeChallenge} from "./types"
-import { PerAddressApprovals as typePerAddressApprovals} from "./types"
-import { IsUserOutgoingTransferAllowed as typeIsUserOutgoingTransferAllowed} from "./types"
-import { IsUserIncomingTransferAllowed as typeIsUserIncomingTransferAllowed} from "./types"
-import { UserApprovedOutgoingTransfer as typeUserApprovedOutgoingTransfer} from "./types"
-import { UserApprovedIncomingTransfer as typeUserApprovedIncomingTransfer} from "./types"
-import { IsCollectionTransferAllowed as typeIsCollectionTransferAllowed} from "./types"
-import { CollectionApprovedTransfer as typeCollectionApprovedTransfer} from "./types"
-import { ApprovalsTracker as typeApprovalsTracker} from "./types"
-import { Transfer as typeTransfer} from "./types"
-import { ClaimProofItem as typeClaimProofItem} from "./types"
-import { ClaimProof as typeClaimProof} from "./types"
-import { ChallengeSolution as typeChallengeSolution} from "./types"
+import { AddressMapping as typeAddressMapping } from "./types"
+import { UintRange as typeUintRange } from "./types"
+import { Balance as typeBalance } from "./types"
+import { InheritedBalance as typeInheritedBalance } from "./types"
+import { BadgeCollection as typeBadgeCollection } from "./types"
+import { BadgeMetadata as typeBadgeMetadata } from "./types"
+import { CollectionMetadata as typeCollectionMetadata } from "./types"
+import { OffChainBalancesMetadata as typeOffChainBalancesMetadata } from "./types"
+import { BadgesPacketData as typeBadgesPacketData } from "./types"
+import { NoData as typeNoData } from "./types"
+import { Params as typeParams } from "./types"
+import { CollectionPermissions as typeCollectionPermissions } from "./types"
+import { UserPermissions as typeUserPermissions } from "./types"
+import { ValueOptions as typeValueOptions } from "./types"
+import { CollectionApprovedTransferCombination as typeCollectionApprovedTransferCombination } from "./types"
+import { CollectionApprovedTransferDefaultValues as typeCollectionApprovedTransferDefaultValues } from "./types"
+import { CollectionApprovedTransferPermission as typeCollectionApprovedTransferPermission } from "./types"
+import { UserApprovedOutgoingTransferCombination as typeUserApprovedOutgoingTransferCombination } from "./types"
+import { UserApprovedOutgoingTransferDefaultValues as typeUserApprovedOutgoingTransferDefaultValues } from "./types"
+import { UserApprovedOutgoingTransferPermission as typeUserApprovedOutgoingTransferPermission } from "./types"
+import { UserApprovedIncomingTransferCombination as typeUserApprovedIncomingTransferCombination } from "./types"
+import { UserApprovedIncomingTransferDefaultValues as typeUserApprovedIncomingTransferDefaultValues } from "./types"
+import { UserApprovedIncomingTransferPermission as typeUserApprovedIncomingTransferPermission } from "./types"
+import { BalancesActionCombination as typeBalancesActionCombination } from "./types"
+import { BalancesActionDefaultValues as typeBalancesActionDefaultValues } from "./types"
+import { BalancesActionPermission as typeBalancesActionPermission } from "./types"
+import { ActionDefaultValues as typeActionDefaultValues } from "./types"
+import { ActionCombination as typeActionCombination } from "./types"
+import { ActionPermission as typeActionPermission } from "./types"
+import { TimedUpdateCombination as typeTimedUpdateCombination } from "./types"
+import { TimedUpdateDefaultValues as typeTimedUpdateDefaultValues } from "./types"
+import { TimedUpdatePermission as typeTimedUpdatePermission } from "./types"
+import { TimedUpdateWithBadgeIdsCombination as typeTimedUpdateWithBadgeIdsCombination } from "./types"
+import { TimedUpdateWithBadgeIdsDefaultValues as typeTimedUpdateWithBadgeIdsDefaultValues } from "./types"
+import { TimedUpdateWithBadgeIdsPermission as typeTimedUpdateWithBadgeIdsPermission } from "./types"
+import { CollectionMetadataTimeline as typeCollectionMetadataTimeline } from "./types"
+import { BadgeMetadataTimeline as typeBadgeMetadataTimeline } from "./types"
+import { OffChainBalancesMetadataTimeline as typeOffChainBalancesMetadataTimeline } from "./types"
+import { InheritedBalancesTimeline as typeInheritedBalancesTimeline } from "./types"
+import { CustomDataTimeline as typeCustomDataTimeline } from "./types"
+import { ManagerTimeline as typeManagerTimeline } from "./types"
+import { CollectionApprovedTransferTimeline as typeCollectionApprovedTransferTimeline } from "./types"
+import { IsArchivedTimeline as typeIsArchivedTimeline } from "./types"
+import { ContractAddressTimeline as typeContractAddressTimeline } from "./types"
+import { StandardsTimeline as typeStandardsTimeline } from "./types"
+import { UserBalanceStore as typeUserBalanceStore } from "./types"
+import { UserApprovedOutgoingTransferTimeline as typeUserApprovedOutgoingTransferTimeline } from "./types"
+import { UserApprovedIncomingTransferTimeline as typeUserApprovedIncomingTransferTimeline } from "./types"
+import { Challenge as typeChallenge } from "./types"
+import { PerAddressApprovals as typePerAddressApprovals } from "./types"
+import { IsUserOutgoingTransferAllowed as typeIsUserOutgoingTransferAllowed } from "./types"
+import { IsUserIncomingTransferAllowed as typeIsUserIncomingTransferAllowed } from "./types"
+import { UserApprovedOutgoingTransfer as typeUserApprovedOutgoingTransfer } from "./types"
+import { UserApprovedIncomingTransfer as typeUserApprovedIncomingTransfer } from "./types"
+import { IsCollectionTransferAllowed as typeIsCollectionTransferAllowed } from "./types"
+import { CollectionApprovedTransfer as typeCollectionApprovedTransfer } from "./types"
+import { ApprovalsTracker as typeApprovalsTracker } from "./types"
+import { Transfer as typeTransfer } from "./types"
+import { MerklePathItem as typeMerklePathItem } from "./types"
+import { ClaimProof as typeClaimProof } from "./types"
+import { MerkleProof as typeMerkleProof } from "./types"
 
 export { MsgNewCollection, MsgUpdateMetadata, MsgUpdateCollectionApprovedTransfers, MsgArchiveCollection, MsgMintAndDistributeBadges, MsgTransferBadges, MsgDeleteCollection, MsgUpdateUserApprovedTransfers, MsgUpdateCollection, MsgUpdateUserPermissions, MsgUpdateCollectionPermissions, MsgUpdateManager };
 
@@ -209,16 +209,16 @@ type msgUpdateManagerParams = {
 export const registry = new Registry(msgTypes);
 
 type Field = {
-	name: string;
-	type: unknown;
+  name: string;
+  type: unknown;
 }
 function getStructure(template) {
-	const structure: {fields: Field[]} = { fields: [] }
-	for (let [key, value] of Object.entries(template)) {
-		let field = { name: key, type: typeof value }
-		structure.fields.push(field)
-	}
-	return structure
+  const structure: { fields: Field[] } = { fields: [] }
+  for (let [key, value] of Object.entries(template)) {
+    let field = { name: key, type: typeof value }
+    structure.fields.push(field)
+  }
+  return structure
 }
 const defaultFee = {
   amount: [],
@@ -227,280 +227,280 @@ const defaultFee = {
 
 interface TxClientOptions {
   addr: string
-	prefix: string
-	signer?: OfflineSigner
+  prefix: string
+  signer?: OfflineSigner
 }
 
 export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "http://localhost:26657", prefix: "cosmos" }) => {
 
   return {
-		
-		async sendMsgNewCollection({ value, fee, memo }: sendMsgNewCollectionParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgNewCollection: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgNewCollection({ value: MsgNewCollection.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgNewCollection: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgUpdateMetadata({ value, fee, memo }: sendMsgUpdateMetadataParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgUpdateMetadata: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgUpdateMetadata({ value: MsgUpdateMetadata.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgUpdateMetadata: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgUpdateCollectionApprovedTransfers({ value, fee, memo }: sendMsgUpdateCollectionApprovedTransfersParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgUpdateCollectionApprovedTransfers: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgUpdateCollectionApprovedTransfers({ value: MsgUpdateCollectionApprovedTransfers.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgUpdateCollectionApprovedTransfers: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgArchiveCollection({ value, fee, memo }: sendMsgArchiveCollectionParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgArchiveCollection: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgArchiveCollection({ value: MsgArchiveCollection.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgArchiveCollection: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgMintAndDistributeBadges({ value, fee, memo }: sendMsgMintAndDistributeBadgesParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgMintAndDistributeBadges: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgMintAndDistributeBadges({ value: MsgMintAndDistributeBadges.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgMintAndDistributeBadges: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgTransferBadges({ value, fee, memo }: sendMsgTransferBadgesParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgTransferBadges: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgTransferBadges({ value: MsgTransferBadges.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgTransferBadges: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgDeleteCollection({ value, fee, memo }: sendMsgDeleteCollectionParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgDeleteCollection: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgDeleteCollection({ value: MsgDeleteCollection.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgDeleteCollection: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgUpdateUserApprovedTransfers({ value, fee, memo }: sendMsgUpdateUserApprovedTransfersParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgUpdateUserApprovedTransfers: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgUpdateUserApprovedTransfers({ value: MsgUpdateUserApprovedTransfers.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgUpdateUserApprovedTransfers: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgUpdateCollection({ value, fee, memo }: sendMsgUpdateCollectionParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgUpdateCollection: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgUpdateCollection({ value: MsgUpdateCollection.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgUpdateCollection: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgUpdateUserPermissions({ value, fee, memo }: sendMsgUpdateUserPermissionsParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgUpdateUserPermissions: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgUpdateUserPermissions({ value: MsgUpdateUserPermissions.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgUpdateUserPermissions: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgUpdateCollectionPermissions({ value, fee, memo }: sendMsgUpdateCollectionPermissionsParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgUpdateCollectionPermissions: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgUpdateCollectionPermissions({ value: MsgUpdateCollectionPermissions.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgUpdateCollectionPermissions: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgUpdateManager({ value, fee, memo }: sendMsgUpdateManagerParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgUpdateManager: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgUpdateManager({ value: MsgUpdateManager.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgUpdateManager: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		
-		msgNewCollection({ value }: msgNewCollectionParams): EncodeObject {
-			try {
-				return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgNewCollection", value: MsgNewCollection.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgNewCollection: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgUpdateMetadata({ value }: msgUpdateMetadataParams): EncodeObject {
-			try {
-				return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgUpdateMetadata", value: MsgUpdateMetadata.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgUpdateMetadata: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgUpdateCollectionApprovedTransfers({ value }: msgUpdateCollectionApprovedTransfersParams): EncodeObject {
-			try {
-				return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgUpdateCollectionApprovedTransfers", value: MsgUpdateCollectionApprovedTransfers.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgUpdateCollectionApprovedTransfers: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgArchiveCollection({ value }: msgArchiveCollectionParams): EncodeObject {
-			try {
-				return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgArchiveCollection", value: MsgArchiveCollection.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgArchiveCollection: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgMintAndDistributeBadges({ value }: msgMintAndDistributeBadgesParams): EncodeObject {
-			try {
-				return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgMintAndDistributeBadges", value: MsgMintAndDistributeBadges.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgMintAndDistributeBadges: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgTransferBadges({ value }: msgTransferBadgesParams): EncodeObject {
-			try {
-				return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgTransferBadges", value: MsgTransferBadges.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgTransferBadges: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgDeleteCollection({ value }: msgDeleteCollectionParams): EncodeObject {
-			try {
-				return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgDeleteCollection", value: MsgDeleteCollection.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgDeleteCollection: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgUpdateUserApprovedTransfers({ value }: msgUpdateUserApprovedTransfersParams): EncodeObject {
-			try {
-				return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgUpdateUserApprovedTransfers", value: MsgUpdateUserApprovedTransfers.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgUpdateUserApprovedTransfers: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgUpdateCollection({ value }: msgUpdateCollectionParams): EncodeObject {
-			try {
-				return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgUpdateCollection", value: MsgUpdateCollection.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgUpdateCollection: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgUpdateUserPermissions({ value }: msgUpdateUserPermissionsParams): EncodeObject {
-			try {
-				return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgUpdateUserPermissions", value: MsgUpdateUserPermissions.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgUpdateUserPermissions: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgUpdateCollectionPermissions({ value }: msgUpdateCollectionPermissionsParams): EncodeObject {
-			try {
-				return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgUpdateCollectionPermissions", value: MsgUpdateCollectionPermissions.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgUpdateCollectionPermissions: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgUpdateManager({ value }: msgUpdateManagerParams): EncodeObject {
-			try {
-				return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgUpdateManager", value: MsgUpdateManager.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgUpdateManager: Could not create message: ' + e.message)
-			}
-		},
-		
-	}
+
+    async sendMsgNewCollection({ value, fee, memo }: sendMsgNewCollectionParams): Promise<DeliverTxResponse> {
+      if (!signer) {
+        throw new Error('TxClient:sendMsgNewCollection: Unable to sign Tx. Signer is not present.')
+      }
+      try {
+        const { address } = (await signer.getAccounts())[0];
+        const signingClient = await SigningStargateClient.connectWithSigner(addr, signer, { registry, prefix });
+        let msg = this.msgNewCollection({ value: MsgNewCollection.fromPartial(value) })
+        return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+      } catch (e: any) {
+        throw new Error('TxClient:sendMsgNewCollection: Could not broadcast Tx: ' + e.message)
+      }
+    },
+
+    async sendMsgUpdateMetadata({ value, fee, memo }: sendMsgUpdateMetadataParams): Promise<DeliverTxResponse> {
+      if (!signer) {
+        throw new Error('TxClient:sendMsgUpdateMetadata: Unable to sign Tx. Signer is not present.')
+      }
+      try {
+        const { address } = (await signer.getAccounts())[0];
+        const signingClient = await SigningStargateClient.connectWithSigner(addr, signer, { registry, prefix });
+        let msg = this.msgUpdateMetadata({ value: MsgUpdateMetadata.fromPartial(value) })
+        return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+      } catch (e: any) {
+        throw new Error('TxClient:sendMsgUpdateMetadata: Could not broadcast Tx: ' + e.message)
+      }
+    },
+
+    async sendMsgUpdateCollectionApprovedTransfers({ value, fee, memo }: sendMsgUpdateCollectionApprovedTransfersParams): Promise<DeliverTxResponse> {
+      if (!signer) {
+        throw new Error('TxClient:sendMsgUpdateCollectionApprovedTransfers: Unable to sign Tx. Signer is not present.')
+      }
+      try {
+        const { address } = (await signer.getAccounts())[0];
+        const signingClient = await SigningStargateClient.connectWithSigner(addr, signer, { registry, prefix });
+        let msg = this.msgUpdateCollectionApprovedTransfers({ value: MsgUpdateCollectionApprovedTransfers.fromPartial(value) })
+        return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+      } catch (e: any) {
+        throw new Error('TxClient:sendMsgUpdateCollectionApprovedTransfers: Could not broadcast Tx: ' + e.message)
+      }
+    },
+
+    async sendMsgArchiveCollection({ value, fee, memo }: sendMsgArchiveCollectionParams): Promise<DeliverTxResponse> {
+      if (!signer) {
+        throw new Error('TxClient:sendMsgArchiveCollection: Unable to sign Tx. Signer is not present.')
+      }
+      try {
+        const { address } = (await signer.getAccounts())[0];
+        const signingClient = await SigningStargateClient.connectWithSigner(addr, signer, { registry, prefix });
+        let msg = this.msgArchiveCollection({ value: MsgArchiveCollection.fromPartial(value) })
+        return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+      } catch (e: any) {
+        throw new Error('TxClient:sendMsgArchiveCollection: Could not broadcast Tx: ' + e.message)
+      }
+    },
+
+    async sendMsgMintAndDistributeBadges({ value, fee, memo }: sendMsgMintAndDistributeBadgesParams): Promise<DeliverTxResponse> {
+      if (!signer) {
+        throw new Error('TxClient:sendMsgMintAndDistributeBadges: Unable to sign Tx. Signer is not present.')
+      }
+      try {
+        const { address } = (await signer.getAccounts())[0];
+        const signingClient = await SigningStargateClient.connectWithSigner(addr, signer, { registry, prefix });
+        let msg = this.msgMintAndDistributeBadges({ value: MsgMintAndDistributeBadges.fromPartial(value) })
+        return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+      } catch (e: any) {
+        throw new Error('TxClient:sendMsgMintAndDistributeBadges: Could not broadcast Tx: ' + e.message)
+      }
+    },
+
+    async sendMsgTransferBadges({ value, fee, memo }: sendMsgTransferBadgesParams): Promise<DeliverTxResponse> {
+      if (!signer) {
+        throw new Error('TxClient:sendMsgTransferBadges: Unable to sign Tx. Signer is not present.')
+      }
+      try {
+        const { address } = (await signer.getAccounts())[0];
+        const signingClient = await SigningStargateClient.connectWithSigner(addr, signer, { registry, prefix });
+        let msg = this.msgTransferBadges({ value: MsgTransferBadges.fromPartial(value) })
+        return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+      } catch (e: any) {
+        throw new Error('TxClient:sendMsgTransferBadges: Could not broadcast Tx: ' + e.message)
+      }
+    },
+
+    async sendMsgDeleteCollection({ value, fee, memo }: sendMsgDeleteCollectionParams): Promise<DeliverTxResponse> {
+      if (!signer) {
+        throw new Error('TxClient:sendMsgDeleteCollection: Unable to sign Tx. Signer is not present.')
+      }
+      try {
+        const { address } = (await signer.getAccounts())[0];
+        const signingClient = await SigningStargateClient.connectWithSigner(addr, signer, { registry, prefix });
+        let msg = this.msgDeleteCollection({ value: MsgDeleteCollection.fromPartial(value) })
+        return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+      } catch (e: any) {
+        throw new Error('TxClient:sendMsgDeleteCollection: Could not broadcast Tx: ' + e.message)
+      }
+    },
+
+    async sendMsgUpdateUserApprovedTransfers({ value, fee, memo }: sendMsgUpdateUserApprovedTransfersParams): Promise<DeliverTxResponse> {
+      if (!signer) {
+        throw new Error('TxClient:sendMsgUpdateUserApprovedTransfers: Unable to sign Tx. Signer is not present.')
+      }
+      try {
+        const { address } = (await signer.getAccounts())[0];
+        const signingClient = await SigningStargateClient.connectWithSigner(addr, signer, { registry, prefix });
+        let msg = this.msgUpdateUserApprovedTransfers({ value: MsgUpdateUserApprovedTransfers.fromPartial(value) })
+        return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+      } catch (e: any) {
+        throw new Error('TxClient:sendMsgUpdateUserApprovedTransfers: Could not broadcast Tx: ' + e.message)
+      }
+    },
+
+    async sendMsgUpdateCollection({ value, fee, memo }: sendMsgUpdateCollectionParams): Promise<DeliverTxResponse> {
+      if (!signer) {
+        throw new Error('TxClient:sendMsgUpdateCollection: Unable to sign Tx. Signer is not present.')
+      }
+      try {
+        const { address } = (await signer.getAccounts())[0];
+        const signingClient = await SigningStargateClient.connectWithSigner(addr, signer, { registry, prefix });
+        let msg = this.msgUpdateCollection({ value: MsgUpdateCollection.fromPartial(value) })
+        return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+      } catch (e: any) {
+        throw new Error('TxClient:sendMsgUpdateCollection: Could not broadcast Tx: ' + e.message)
+      }
+    },
+
+    async sendMsgUpdateUserPermissions({ value, fee, memo }: sendMsgUpdateUserPermissionsParams): Promise<DeliverTxResponse> {
+      if (!signer) {
+        throw new Error('TxClient:sendMsgUpdateUserPermissions: Unable to sign Tx. Signer is not present.')
+      }
+      try {
+        const { address } = (await signer.getAccounts())[0];
+        const signingClient = await SigningStargateClient.connectWithSigner(addr, signer, { registry, prefix });
+        let msg = this.msgUpdateUserPermissions({ value: MsgUpdateUserPermissions.fromPartial(value) })
+        return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+      } catch (e: any) {
+        throw new Error('TxClient:sendMsgUpdateUserPermissions: Could not broadcast Tx: ' + e.message)
+      }
+    },
+
+    async sendMsgUpdateCollectionPermissions({ value, fee, memo }: sendMsgUpdateCollectionPermissionsParams): Promise<DeliverTxResponse> {
+      if (!signer) {
+        throw new Error('TxClient:sendMsgUpdateCollectionPermissions: Unable to sign Tx. Signer is not present.')
+      }
+      try {
+        const { address } = (await signer.getAccounts())[0];
+        const signingClient = await SigningStargateClient.connectWithSigner(addr, signer, { registry, prefix });
+        let msg = this.msgUpdateCollectionPermissions({ value: MsgUpdateCollectionPermissions.fromPartial(value) })
+        return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+      } catch (e: any) {
+        throw new Error('TxClient:sendMsgUpdateCollectionPermissions: Could not broadcast Tx: ' + e.message)
+      }
+    },
+
+    async sendMsgUpdateManager({ value, fee, memo }: sendMsgUpdateManagerParams): Promise<DeliverTxResponse> {
+      if (!signer) {
+        throw new Error('TxClient:sendMsgUpdateManager: Unable to sign Tx. Signer is not present.')
+      }
+      try {
+        const { address } = (await signer.getAccounts())[0];
+        const signingClient = await SigningStargateClient.connectWithSigner(addr, signer, { registry, prefix });
+        let msg = this.msgUpdateManager({ value: MsgUpdateManager.fromPartial(value) })
+        return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+      } catch (e: any) {
+        throw new Error('TxClient:sendMsgUpdateManager: Could not broadcast Tx: ' + e.message)
+      }
+    },
+
+
+    msgNewCollection({ value }: msgNewCollectionParams): EncodeObject {
+      try {
+        return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgNewCollection", value: MsgNewCollection.fromPartial(value) }
+      } catch (e: any) {
+        throw new Error('TxClient:MsgNewCollection: Could not create message: ' + e.message)
+      }
+    },
+
+    msgUpdateMetadata({ value }: msgUpdateMetadataParams): EncodeObject {
+      try {
+        return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgUpdateMetadata", value: MsgUpdateMetadata.fromPartial(value) }
+      } catch (e: any) {
+        throw new Error('TxClient:MsgUpdateMetadata: Could not create message: ' + e.message)
+      }
+    },
+
+    msgUpdateCollectionApprovedTransfers({ value }: msgUpdateCollectionApprovedTransfersParams): EncodeObject {
+      try {
+        return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgUpdateCollectionApprovedTransfers", value: MsgUpdateCollectionApprovedTransfers.fromPartial(value) }
+      } catch (e: any) {
+        throw new Error('TxClient:MsgUpdateCollectionApprovedTransfers: Could not create message: ' + e.message)
+      }
+    },
+
+    msgArchiveCollection({ value }: msgArchiveCollectionParams): EncodeObject {
+      try {
+        return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgArchiveCollection", value: MsgArchiveCollection.fromPartial(value) }
+      } catch (e: any) {
+        throw new Error('TxClient:MsgArchiveCollection: Could not create message: ' + e.message)
+      }
+    },
+
+    msgMintAndDistributeBadges({ value }: msgMintAndDistributeBadgesParams): EncodeObject {
+      try {
+        return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgMintAndDistributeBadges", value: MsgMintAndDistributeBadges.fromPartial(value) }
+      } catch (e: any) {
+        throw new Error('TxClient:MsgMintAndDistributeBadges: Could not create message: ' + e.message)
+      }
+    },
+
+    msgTransferBadges({ value }: msgTransferBadgesParams): EncodeObject {
+      try {
+        return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgTransferBadges", value: MsgTransferBadges.fromPartial(value) }
+      } catch (e: any) {
+        throw new Error('TxClient:MsgTransferBadges: Could not create message: ' + e.message)
+      }
+    },
+
+    msgDeleteCollection({ value }: msgDeleteCollectionParams): EncodeObject {
+      try {
+        return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgDeleteCollection", value: MsgDeleteCollection.fromPartial(value) }
+      } catch (e: any) {
+        throw new Error('TxClient:MsgDeleteCollection: Could not create message: ' + e.message)
+      }
+    },
+
+    msgUpdateUserApprovedTransfers({ value }: msgUpdateUserApprovedTransfersParams): EncodeObject {
+      try {
+        return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgUpdateUserApprovedTransfers", value: MsgUpdateUserApprovedTransfers.fromPartial(value) }
+      } catch (e: any) {
+        throw new Error('TxClient:MsgUpdateUserApprovedTransfers: Could not create message: ' + e.message)
+      }
+    },
+
+    msgUpdateCollection({ value }: msgUpdateCollectionParams): EncodeObject {
+      try {
+        return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgUpdateCollection", value: MsgUpdateCollection.fromPartial(value) }
+      } catch (e: any) {
+        throw new Error('TxClient:MsgUpdateCollection: Could not create message: ' + e.message)
+      }
+    },
+
+    msgUpdateUserPermissions({ value }: msgUpdateUserPermissionsParams): EncodeObject {
+      try {
+        return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgUpdateUserPermissions", value: MsgUpdateUserPermissions.fromPartial(value) }
+      } catch (e: any) {
+        throw new Error('TxClient:MsgUpdateUserPermissions: Could not create message: ' + e.message)
+      }
+    },
+
+    msgUpdateCollectionPermissions({ value }: msgUpdateCollectionPermissionsParams): EncodeObject {
+      try {
+        return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgUpdateCollectionPermissions", value: MsgUpdateCollectionPermissions.fromPartial(value) }
+      } catch (e: any) {
+        throw new Error('TxClient:MsgUpdateCollectionPermissions: Could not create message: ' + e.message)
+      }
+    },
+
+    msgUpdateManager({ value }: msgUpdateManagerParams): EncodeObject {
+      try {
+        return { typeUrl: "/bitbadges.bitbadgeschain.badges.MsgUpdateManager", value: MsgUpdateManager.fromPartial(value) }
+      } catch (e: any) {
+        throw new Error('TxClient:MsgUpdateManager: Could not create message: ' + e.message)
+      }
+    },
+
+  }
 };
 
 interface QueryClientOptions {
@@ -512,103 +512,103 @@ export const queryClient = ({ addr: addr }: QueryClientOptions = { addr: "http:/
 };
 
 class SDKModule {
-	public query: ReturnType<typeof queryClient>;
-	public tx: ReturnType<typeof txClient>;
-	public structure: Record<string,unknown>;
-	public registry: Array<[string, GeneratedType]> = [];
+  public query: ReturnType<typeof queryClient>;
+  public tx: ReturnType<typeof txClient>;
+  public structure: Record<string, unknown>;
+  public registry: Array<[string, GeneratedType]> = [];
 
-	constructor(client: IgniteClient) {		
-	
-		this.query = queryClient({ addr: client.env.apiURL });		
-		this.updateTX(client);
-		this.structure =  {
-						AddressMapping: getStructure(typeAddressMapping.fromPartial({})),
-						UintRange: getStructure(typeUintRange.fromPartial({})),
-						Balance: getStructure(typeBalance.fromPartial({})),
-						InheritedBalance: getStructure(typeInheritedBalance.fromPartial({})),
-						BadgeCollection: getStructure(typeBadgeCollection.fromPartial({})),
-						BadgeMetadata: getStructure(typeBadgeMetadata.fromPartial({})),
-						CollectionMetadata: getStructure(typeCollectionMetadata.fromPartial({})),
-						OffChainBalancesMetadata: getStructure(typeOffChainBalancesMetadata.fromPartial({})),
-						BadgesPacketData: getStructure(typeBadgesPacketData.fromPartial({})),
-						NoData: getStructure(typeNoData.fromPartial({})),
-						Params: getStructure(typeParams.fromPartial({})),
-						CollectionPermissions: getStructure(typeCollectionPermissions.fromPartial({})),
-						UserPermissions: getStructure(typeUserPermissions.fromPartial({})),
-						ValueOptions: getStructure(typeValueOptions.fromPartial({})),
-						CollectionApprovedTransferCombination: getStructure(typeCollectionApprovedTransferCombination.fromPartial({})),
-						CollectionApprovedTransferDefaultValues: getStructure(typeCollectionApprovedTransferDefaultValues.fromPartial({})),
-						CollectionApprovedTransferPermission: getStructure(typeCollectionApprovedTransferPermission.fromPartial({})),
-						UserApprovedOutgoingTransferCombination: getStructure(typeUserApprovedOutgoingTransferCombination.fromPartial({})),
-						UserApprovedOutgoingTransferDefaultValues: getStructure(typeUserApprovedOutgoingTransferDefaultValues.fromPartial({})),
-						UserApprovedOutgoingTransferPermission: getStructure(typeUserApprovedOutgoingTransferPermission.fromPartial({})),
-						UserApprovedIncomingTransferCombination: getStructure(typeUserApprovedIncomingTransferCombination.fromPartial({})),
-						UserApprovedIncomingTransferDefaultValues: getStructure(typeUserApprovedIncomingTransferDefaultValues.fromPartial({})),
-						UserApprovedIncomingTransferPermission: getStructure(typeUserApprovedIncomingTransferPermission.fromPartial({})),
-						BalancesActionCombination: getStructure(typeBalancesActionCombination.fromPartial({})),
-						BalancesActionDefaultValues: getStructure(typeBalancesActionDefaultValues.fromPartial({})),
-						BalancesActionPermission: getStructure(typeBalancesActionPermission.fromPartial({})),
-						ActionDefaultValues: getStructure(typeActionDefaultValues.fromPartial({})),
-						ActionCombination: getStructure(typeActionCombination.fromPartial({})),
-						ActionPermission: getStructure(typeActionPermission.fromPartial({})),
-						TimedUpdateCombination: getStructure(typeTimedUpdateCombination.fromPartial({})),
-						TimedUpdateDefaultValues: getStructure(typeTimedUpdateDefaultValues.fromPartial({})),
-						TimedUpdatePermission: getStructure(typeTimedUpdatePermission.fromPartial({})),
-						TimedUpdateWithBadgeIdsCombination: getStructure(typeTimedUpdateWithBadgeIdsCombination.fromPartial({})),
-						TimedUpdateWithBadgeIdsDefaultValues: getStructure(typeTimedUpdateWithBadgeIdsDefaultValues.fromPartial({})),
-						TimedUpdateWithBadgeIdsPermission: getStructure(typeTimedUpdateWithBadgeIdsPermission.fromPartial({})),
-						CollectionMetadataTimeline: getStructure(typeCollectionMetadataTimeline.fromPartial({})),
-						BadgeMetadataTimeline: getStructure(typeBadgeMetadataTimeline.fromPartial({})),
-						OffChainBalancesMetadataTimeline: getStructure(typeOffChainBalancesMetadataTimeline.fromPartial({})),
-						InheritedBalancesTimeline: getStructure(typeInheritedBalancesTimeline.fromPartial({})),
-						CustomDataTimeline: getStructure(typeCustomDataTimeline.fromPartial({})),
-						ManagerTimeline: getStructure(typeManagerTimeline.fromPartial({})),
-						CollectionApprovedTransferTimeline: getStructure(typeCollectionApprovedTransferTimeline.fromPartial({})),
-						IsArchivedTimeline: getStructure(typeIsArchivedTimeline.fromPartial({})),
-						ContractAddressTimeline: getStructure(typeContractAddressTimeline.fromPartial({})),
-						StandardsTimeline: getStructure(typeStandardsTimeline.fromPartial({})),
-						UserBalanceStore: getStructure(typeUserBalanceStore.fromPartial({})),
-						UserApprovedOutgoingTransferTimeline: getStructure(typeUserApprovedOutgoingTransferTimeline.fromPartial({})),
-						UserApprovedIncomingTransferTimeline: getStructure(typeUserApprovedIncomingTransferTimeline.fromPartial({})),
-						Challenge: getStructure(typeChallenge.fromPartial({})),
-						PerAddressApprovals: getStructure(typePerAddressApprovals.fromPartial({})),
-						IsUserOutgoingTransferAllowed: getStructure(typeIsUserOutgoingTransferAllowed.fromPartial({})),
-						IsUserIncomingTransferAllowed: getStructure(typeIsUserIncomingTransferAllowed.fromPartial({})),
-						UserApprovedOutgoingTransfer: getStructure(typeUserApprovedOutgoingTransfer.fromPartial({})),
-						UserApprovedIncomingTransfer: getStructure(typeUserApprovedIncomingTransfer.fromPartial({})),
-						IsCollectionTransferAllowed: getStructure(typeIsCollectionTransferAllowed.fromPartial({})),
-						CollectionApprovedTransfer: getStructure(typeCollectionApprovedTransfer.fromPartial({})),
-						ApprovalsTracker: getStructure(typeApprovalsTracker.fromPartial({})),
-						Transfer: getStructure(typeTransfer.fromPartial({})),
-						ClaimProofItem: getStructure(typeClaimProofItem.fromPartial({})),
-						ClaimProof: getStructure(typeClaimProof.fromPartial({})),
-						ChallengeSolution: getStructure(typeChallengeSolution.fromPartial({})),
-						
-		};
-		client.on('signer-changed',(signer) => {			
-		 this.updateTX(client);
-		})
-	}
-	updateTX(client: IgniteClient) {
-    const methods = txClient({
-        signer: client.signer,
-        addr: client.env.rpcURL,
-        prefix: client.env.prefix ?? "cosmos",
+  constructor(client: IgniteClient) {
+
+    this.query = queryClient({ addr: client.env.apiURL });
+    this.updateTX(client);
+    this.structure = {
+      AddressMapping: getStructure(typeAddressMapping.fromPartial({})),
+      UintRange: getStructure(typeUintRange.fromPartial({})),
+      Balance: getStructure(typeBalance.fromPartial({})),
+      InheritedBalance: getStructure(typeInheritedBalance.fromPartial({})),
+      BadgeCollection: getStructure(typeBadgeCollection.fromPartial({})),
+      BadgeMetadata: getStructure(typeBadgeMetadata.fromPartial({})),
+      CollectionMetadata: getStructure(typeCollectionMetadata.fromPartial({})),
+      OffChainBalancesMetadata: getStructure(typeOffChainBalancesMetadata.fromPartial({})),
+      BadgesPacketData: getStructure(typeBadgesPacketData.fromPartial({})),
+      NoData: getStructure(typeNoData.fromPartial({})),
+      Params: getStructure(typeParams.fromPartial({})),
+      CollectionPermissions: getStructure(typeCollectionPermissions.fromPartial({})),
+      UserPermissions: getStructure(typeUserPermissions.fromPartial({})),
+      ValueOptions: getStructure(typeValueOptions.fromPartial({})),
+      CollectionApprovedTransferCombination: getStructure(typeCollectionApprovedTransferCombination.fromPartial({})),
+      CollectionApprovedTransferDefaultValues: getStructure(typeCollectionApprovedTransferDefaultValues.fromPartial({})),
+      CollectionApprovedTransferPermission: getStructure(typeCollectionApprovedTransferPermission.fromPartial({})),
+      UserApprovedOutgoingTransferCombination: getStructure(typeUserApprovedOutgoingTransferCombination.fromPartial({})),
+      UserApprovedOutgoingTransferDefaultValues: getStructure(typeUserApprovedOutgoingTransferDefaultValues.fromPartial({})),
+      UserApprovedOutgoingTransferPermission: getStructure(typeUserApprovedOutgoingTransferPermission.fromPartial({})),
+      UserApprovedIncomingTransferCombination: getStructure(typeUserApprovedIncomingTransferCombination.fromPartial({})),
+      UserApprovedIncomingTransferDefaultValues: getStructure(typeUserApprovedIncomingTransferDefaultValues.fromPartial({})),
+      UserApprovedIncomingTransferPermission: getStructure(typeUserApprovedIncomingTransferPermission.fromPartial({})),
+      BalancesActionCombination: getStructure(typeBalancesActionCombination.fromPartial({})),
+      BalancesActionDefaultValues: getStructure(typeBalancesActionDefaultValues.fromPartial({})),
+      BalancesActionPermission: getStructure(typeBalancesActionPermission.fromPartial({})),
+      ActionDefaultValues: getStructure(typeActionDefaultValues.fromPartial({})),
+      ActionCombination: getStructure(typeActionCombination.fromPartial({})),
+      ActionPermission: getStructure(typeActionPermission.fromPartial({})),
+      TimedUpdateCombination: getStructure(typeTimedUpdateCombination.fromPartial({})),
+      TimedUpdateDefaultValues: getStructure(typeTimedUpdateDefaultValues.fromPartial({})),
+      TimedUpdatePermission: getStructure(typeTimedUpdatePermission.fromPartial({})),
+      TimedUpdateWithBadgeIdsCombination: getStructure(typeTimedUpdateWithBadgeIdsCombination.fromPartial({})),
+      TimedUpdateWithBadgeIdsDefaultValues: getStructure(typeTimedUpdateWithBadgeIdsDefaultValues.fromPartial({})),
+      TimedUpdateWithBadgeIdsPermission: getStructure(typeTimedUpdateWithBadgeIdsPermission.fromPartial({})),
+      CollectionMetadataTimeline: getStructure(typeCollectionMetadataTimeline.fromPartial({})),
+      BadgeMetadataTimeline: getStructure(typeBadgeMetadataTimeline.fromPartial({})),
+      OffChainBalancesMetadataTimeline: getStructure(typeOffChainBalancesMetadataTimeline.fromPartial({})),
+      InheritedBalancesTimeline: getStructure(typeInheritedBalancesTimeline.fromPartial({})),
+      CustomDataTimeline: getStructure(typeCustomDataTimeline.fromPartial({})),
+      ManagerTimeline: getStructure(typeManagerTimeline.fromPartial({})),
+      CollectionApprovedTransferTimeline: getStructure(typeCollectionApprovedTransferTimeline.fromPartial({})),
+      IsArchivedTimeline: getStructure(typeIsArchivedTimeline.fromPartial({})),
+      ContractAddressTimeline: getStructure(typeContractAddressTimeline.fromPartial({})),
+      StandardsTimeline: getStructure(typeStandardsTimeline.fromPartial({})),
+      UserBalanceStore: getStructure(typeUserBalanceStore.fromPartial({})),
+      UserApprovedOutgoingTransferTimeline: getStructure(typeUserApprovedOutgoingTransferTimeline.fromPartial({})),
+      UserApprovedIncomingTransferTimeline: getStructure(typeUserApprovedIncomingTransferTimeline.fromPartial({})),
+      Challenge: getStructure(typeChallenge.fromPartial({})),
+      PerAddressApprovals: getStructure(typePerAddressApprovals.fromPartial({})),
+      IsUserOutgoingTransferAllowed: getStructure(typeIsUserOutgoingTransferAllowed.fromPartial({})),
+      IsUserIncomingTransferAllowed: getStructure(typeIsUserIncomingTransferAllowed.fromPartial({})),
+      UserApprovedOutgoingTransfer: getStructure(typeUserApprovedOutgoingTransfer.fromPartial({})),
+      UserApprovedIncomingTransfer: getStructure(typeUserApprovedIncomingTransfer.fromPartial({})),
+      IsCollectionTransferAllowed: getStructure(typeIsCollectionTransferAllowed.fromPartial({})),
+      CollectionApprovedTransfer: getStructure(typeCollectionApprovedTransfer.fromPartial({})),
+      ApprovalsTracker: getStructure(typeApprovalsTracker.fromPartial({})),
+      Transfer: getStructure(typeTransfer.fromPartial({})),
+      MerklePathItem: getStructure(typeMerklePathItem.fromPartial({})),
+      ClaimProof: getStructure(typeClaimProof.fromPartial({})),
+      MerkleProof: getStructure(typeMerkleProof.fromPartial({})),
+
+    };
+    client.on('signer-changed', (signer) => {
+      this.updateTX(client);
     })
-	
+  }
+  updateTX(client: IgniteClient) {
+    const methods = txClient({
+      signer: client.signer,
+      addr: client.env.rpcURL,
+      prefix: client.env.prefix ?? "cosmos",
+    })
+
     this.tx = methods;
     for (let m in methods) {
-        this.tx[m] = methods[m].bind(this.tx);
+      this.tx[m] = methods[m].bind(this.tx);
     }
-	}
+  }
 };
 
 const Module = (test: IgniteClient) => {
-	return {
-		module: {
-			BitbadgesBitbadgeschainBadges: new SDKModule(test)
-		},
-		registry: msgTypes
+  return {
+    module: {
+      BitbadgesBitbadgeschainBadges: new SDKModule(test)
+    },
+    registry: msgTypes
   }
 }
 export default Module;

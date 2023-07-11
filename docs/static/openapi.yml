@@ -56209,7 +56209,7 @@ definitions:
 
       you could set the combination (badgeIds: [1,2], ownershipTimelineTimes:
       [1/1/2020 - 1/1/2021]) to always be forbidden.
-  bitbadges.bitbadgeschain.badges.Challenge:
+  bitbadges.bitbadgeschain.badges.MerkleChallenge:
     type: object
     properties:
       root:
@@ -56265,7 +56265,7 @@ definitions:
 
       It is highly recommended to avoid updating a challenge without resetting
       the tally via a new challenge ID.
-  bitbadges.bitbadgeschain.badges.ChallengeSolution:
+  bitbadges.bitbadgeschain.badges.MerkleProof:
     type: object
     properties:
       proof:
@@ -56298,7 +56298,7 @@ definitions:
             onRight:
               type: boolean
     title: Consistent with tendermint/crypto merkle tree
-  bitbadges.bitbadgeschain.badges.ClaimProofItem:
+  bitbadges.bitbadgeschain.badges.MerklePathItem:
     type: object
     properties:
       aunt:

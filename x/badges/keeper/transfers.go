@@ -57,14 +57,14 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 				}
 
 				//Precaluclate the balances that will be transferred
-				transfer.Balances, err = k.GetPredeterminedBalancesForApprovalId(ctx, approvedTransfers, collection, transfer.PrecalculateFromApproval.ApprovalId, transfer.PrecalculateFromApproval.ApprovalLevel, transfer.PrecalculateFromApproval.Address, transfer.Solutions, initiatedBy)
+				transfer.Balances, err = k.GetPredeterminedBalancesForApprovalId(ctx, approvedTransfers, collection, transfer.PrecalculateFromApproval.ApprovalId, transfer.PrecalculateFromApproval.ApprovalLevel, transfer.PrecalculateFromApproval.Address, transfer.MerkleProofs, initiatedBy)
 				if err != nil {
 					return err
 				}
 			}
 
 			for _, balance := range transfer.Balances {
-				fromUserBalance, toUserBalance, err = k.HandleTransfer(ctx, collection, balance.BadgeIds, balance.OwnedTimes, fromUserBalance, toUserBalance, balance.Amount, transfer.From, to, initiatedBy, transfer.Solutions)
+				fromUserBalance, toUserBalance, err = k.HandleTransfer(ctx, collection, balance.BadgeIds, balance.OwnedTimes, fromUserBalance, toUserBalance, balance.Amount, transfer.From, to, initiatedBy, transfer.MerkleProofs)
 				if err != nil {
 					return err
 				}
@@ -86,7 +86,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 // Step 1: Check if transfer is allowed on collection level (deducting approvals if needed)
 // Step 2: If not overriden by collection, check necessary approvals on user level (deducting approvals if needed)
 // Step 3: If all good, we can transfer the balances
-func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, amount sdkmath.Uint, from string, to string, initiatedBy string, solutions []*types.ChallengeSolution) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
+func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, amount sdkmath.Uint, from string, to string, initiatedBy string, solutions []*types.MerkleProof) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
 	err := *new(error)
 	transferBalances :=  []*types.Balance{ { Amount: amount, BadgeIds: badgeIds, OwnedTimes: times } }
 	

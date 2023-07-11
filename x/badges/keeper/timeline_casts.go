@@ -65,7 +65,7 @@ func (k Keeper) CastCollectionApprovedTransferToUniversalPermission(ctx sdk.Cont
 			DefaultValues: &types.UniversalDefaultValues{
 				BadgeIds:               approvedTransfer.BadgeIds,
 				TransferTimes:          approvedTransfer.TransferTimes,
-				OwnedTimes: 			 	approvedTransfer.OwnedTimes,
+				OwnedTimes: 			 			approvedTransfer.OwnedTimes,
 				FromMapping:            fromMapping,
 				ToMapping:              toMapping,
 				InitiatedByMapping:     initiatedByMapping,

@@ -162,7 +162,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	// }
 
 	// proofTypes := []apitypes.Type{
-	// 	{Name: "aunts", Type: "ClaimProofItem[]"},
+	// 	{Name: "aunts", Type: "MerklePathItem[]"},
 	// 	{Name: "leaf", Type: "string"},
 	// }
 

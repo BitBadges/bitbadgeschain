@@ -82,6 +82,16 @@ func UpdateCollection(suite *TestSuite, ctx context.Context, msg *types.MsgUpdat
 	return err
 }
 
+func UpdateCollectionWithRes(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateCollection) (*types.MsgUpdateCollectionResponse, error) {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := suite.msgServer.UpdateCollection(ctx, msg)
+	return res, err
+}
+
 func DeleteCollection(suite *TestSuite, ctx context.Context, msg *types.MsgDeleteCollection) error {
 	err := msg.ValidateBasic()
 	if err != nil {
@@ -136,7 +146,7 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			balancesType = "Inherited"
 		}
 
-		collectionRes, err := suite.msgServer.UpdateCollection(ctx, &types.MsgUpdateCollection{
+		collectionRes, err := UpdateCollectionWithRes(suite, ctx, &types.MsgUpdateCollection{
 			CollectionId: sdkmath.NewUint(0),
 			Creator:      bob,
 			BalancesType: balancesType,
@@ -178,16 +188,18 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			return err
 		}
 
-		_, err = suite.msgServer.TransferBadges(ctx, &types.MsgTransferBadges{
-			Creator: bob,
-			CollectionId: collectionRes.CollectionId,
-			Transfers: collectionToCreate.Transfers,
-		})
-		if err != nil {
-			return err
+		if len(collectionToCreate.Transfers) > 0 {
+			err = TransferBadges(suite, ctx, &types.MsgTransferBadges{
+				Creator: bob,
+				CollectionId: collectionRes.CollectionId,
+				Transfers: collectionToCreate.Transfers,
+			})
+			if err != nil {
+				return err
+			}
 		}
 
-		_, err = suite.msgServer.CreateAddressMappings(ctx, &types.MsgCreateAddressMappings{
+		err = CreateAddressMappings(suite, ctx, &types.MsgCreateAddressMappings{
 			Creator: bob,
 			AddressMappings: collectionToCreate.AddressMappings,
 		})

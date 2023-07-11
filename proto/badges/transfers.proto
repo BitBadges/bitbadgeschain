@@ -56,12 +56,14 @@ message UserApprovedIncomingTransferTimeline {
 // Please use unique challenge IDs for different challenges of the same timeline.
 // If you update the challenge ID, then the used leaves tracker will reset and start a new tally.
 // It is highly recommended to avoid updating a challenge without resetting the tally via a new challenge ID.
-message Challenge {
+message MerkleChallenge {
   string root = 1;
   string expectedProofLength = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   bool useCreatorAddressAsLeaf = 3;
   bool maxOneUsePerLeaf = 4;
   bool useLeafIndexForTransferOrder = 5;
+
+  string challengeId = 6;
 }
 
 message IsUserOutgoingTransferAllowed {
@@ -93,19 +95,7 @@ message UserApprovedOutgoingTransfer {
 
   repeated IsUserOutgoingTransferAllowed allowedCombinations = 5;
 
-  string approvalId = 7;
-
-  repeated Challenge challenges = 6;
-
-  PredeterminedBalances predeterminedBalances = 8;
-  ApprovalAmounts approvalAmounts = 9;
-  MaxNumTransfers maxNumTransfers = 10;
-  
-  string uri = 12;
-  string customData = 13;
-  
-  bool requireToEqualsInitiatedBy = 14;
-  bool requireToDoesNotEqualInitiatedBy = 15;
+  repeated OutgoingApprovalDetails approvalDetails = 6;
 }
 
 // UserApprovedIncomingTransfer defines the rules for the approval of an incoming transfer to a user.
@@ -118,19 +108,7 @@ message UserApprovedIncomingTransfer {
   repeated UintRange ownedTimes = 16;
   repeated IsUserIncomingTransferAllowed allowedCombinations = 5;
 
-  repeated Challenge challenges = 6;
-
-  string approvalId = 7;
-
-  PredeterminedBalances predeterminedBalances = 8;
-  ApprovalAmounts approvalAmounts = 9;
-  MaxNumTransfers maxNumTransfers = 10;
-
-  string uri = 12;
-  string customData = 13;
-
-  bool requireFromEqualsInitiatedBy = 14;
-  bool requireFromDoesNotEqualInitiatedBy = 15;
+  repeated IncomingApprovalDetails approvalDetails = 11;
 }
 
 message IsCollectionTransferAllowed {
@@ -196,7 +174,7 @@ message PredeterminedOrderCalculationMethod {
   bool usePerFromAddressNumTransfers = 3;
   bool usePerInitiatedByAddressNumTransfers = 4;
 
-  bool useChallengeLeafIndex = 5;
+  bool useMerkleChallengeLeafIndex = 5;
 }
 
 message PredeterminedBalances {
@@ -226,12 +204,57 @@ message ApprovalsTracker {
   repeated Balance amounts = 2;
 }
 
-message CollectionApprovedTransfer {
-  //Metadata
-  string approvalId = 1;
-  string uri = 2;
-  string customData = 3;
+message ApprovalDetails {
+  string approvalId = 6;
+  string uri = 7;
+  string customData = 8;
 
+  repeated MinMaxBalance mustOwnBadges = 1;
+  repeated MerkleChallenge merkleChallenges = 2;
+  PredeterminedBalances predeterminedBalances = 3;
+  ApprovalAmounts approvalAmounts = 4;
+  MaxNumTransfers maxNumTransfers = 5;
+
+  bool requireToEqualsInitiatedBy = 9;
+  bool requireFromEqualsInitiatedBy = 10;
+  bool requireToDoesNotEqualInitiatedBy = 11;
+  bool requireFromDoesNotEqualInitiatedBy = 12;
+
+  bool overridesFromApprovedOutgoingTransfers = 13;
+  bool overridesToApprovedIncomingTransfers = 14;
+}
+
+message OutgoingApprovalDetails {
+  string approvalId = 6;
+  string uri = 7;
+  string customData = 8;
+
+  repeated MinMaxBalance mustOwnBadges = 1;
+  repeated MerkleChallenge merkleChallenges = 2;
+  PredeterminedBalances predeterminedBalances = 3;
+  ApprovalAmounts approvalAmounts = 4;
+  MaxNumTransfers maxNumTransfers = 5;
+
+  bool requireToEqualsInitiatedBy = 9;
+  bool requireToDoesNotEqualInitiatedBy = 11;
+}
+
+message IncomingApprovalDetails {
+  string approvalId = 6;
+  string uri = 7;
+  string customData = 8;
+
+  repeated MinMaxBalance mustOwnBadges = 1;
+  repeated MerkleChallenge merkleChallenges = 2;
+  PredeterminedBalances predeterminedBalances = 3;
+  ApprovalAmounts approvalAmounts = 4;
+  MaxNumTransfers maxNumTransfers = 5;
+
+  bool requireFromEqualsInitiatedBy = 10;
+  bool requireFromDoesNotEqualInitiatedBy = 12;
+}
+
+message CollectionApprovedTransfer {
   //Match Criteria 
   string fromMappingId = 4;
   string toMappingId = 5;
@@ -243,20 +266,7 @@ message CollectionApprovedTransfer {
   repeated IsCollectionTransferAllowed allowedCombinations = 10;
 
   //Restrictions (Challenges, Amounts, MaxNumTransfers)
-  repeated Challenge challenges = 11;
-  PredeterminedBalances predeterminedBalances = 12;
-  ApprovalAmounts approvalAmounts = 13;
-  MaxNumTransfers maxNumTransfers = 14;
-  
-  
-  bool requireToEqualsInitiatedBy = 15;
-  bool requireFromEqualsInitiatedBy = 16;
-  bool requireToDoesNotEqualInitiatedBy = 17;
-  bool requireFromDoesNotEqualInitiatedBy = 18;
-
-  //Is this approval forceful, or does it additionally require the to/from user's approval?
-  bool overridesFromApprovedOutgoingTransfers = 19;
-  bool overridesToApprovedIncomingTransfers = 20;
+  repeated ApprovalDetails approvalDetails = 11;
 }
 
 message ApprovalIdDetails {
@@ -270,20 +280,16 @@ message Transfer {
   repeated string toAddresses = 2;
   repeated Balance balances = 3;
   ApprovalIdDetails precalculateFromApproval = 4;
-  repeated ChallengeSolution solutions = 5;
+  repeated MerkleProof merkleProofs = 5;
 }
 
-message ClaimProofItem {
+message MerklePathItem {
   string aunt = 1;
   bool onRight = 2;
 }
 
 //Consistent with tendermint/crypto merkle tree
-message ClaimProof {
+message MerkleProof {
   string leaf = 1;
-  repeated ClaimProofItem aunts = 2;
-}
-
-message ChallengeSolution {
-  ClaimProof proof = 1;
+  repeated MerklePathItem aunts = 2;
 }

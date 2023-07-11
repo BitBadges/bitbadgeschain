@@ -6,12 +6,12 @@ import (
 
 func ValidatePermittedTimes(permittedTimes []*UintRange, forbiddenTimes []*UintRange) error {
 	//Check if any overlap between permittedTimes and forbiddenTimes
-	err := ValidateRangesAreValid(permittedTimes, false)
+	err := ValidateRangesAreValid(permittedTimes, false, false)
 	if err != nil {
 		return sdkerrors.Wrap(err, "permittedTimes is invalid")
 	}
 
-	err = ValidateRangesAreValid(forbiddenTimes, false)
+	err = ValidateRangesAreValid(forbiddenTimes, false, false)
 	if err != nil {
 		return sdkerrors.Wrap(err, "forbiddenTimes is invalid")
 	}
@@ -34,22 +34,22 @@ func ValidateCollectionApprovedTransferPermissions(permissions []*CollectionAppr
 			return ErrCombinationsIsNil
 		}
 
-		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, false)
+		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TransferTimes, false)
+		err = ValidateRangesAreValid(permission.DefaultValues.TransferTimes, false, false)
 		if err != nil {
 			return err
 		}
 		
-		err = ValidateRangesAreValid(permission.DefaultValues.OwnedTimes, false)
+		err = ValidateRangesAreValid(permission.DefaultValues.OwnedTimes, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false)
+		err = ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false, false)
 		if err != nil {
 			return err
 		}
@@ -98,22 +98,22 @@ func ValidateUserApprovedOutgoingTransferPermissions(permissions []*UserApproved
 			return ErrCombinationsIsNil
 		}
 
-		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, false)
+		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TransferTimes, false)
+		err = ValidateRangesAreValid(permission.DefaultValues.TransferTimes, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false)
+		err = ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.OwnedTimes, false)
+		err = ValidateRangesAreValid(permission.DefaultValues.OwnedTimes, false, false)
 		if err != nil {
 			return err
 		}
@@ -159,22 +159,22 @@ func ValidateUserApprovedIncomingTransferPermissions(permissions []*UserApproved
 			return ErrCombinationsIsNil
 		}
 
-		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, false)
+		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TransferTimes, false)
+		err = ValidateRangesAreValid(permission.DefaultValues.TransferTimes, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false)
+		err = ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.OwnedTimes, false)
+		err = ValidateRangesAreValid(permission.DefaultValues.OwnedTimes, false, false)
 		if err != nil {
 			return err
 		}
@@ -220,12 +220,12 @@ func ValidateTimedUpdateWithBadgeIdsPermission(permissions []*TimedUpdateWithBad
 			return ErrCombinationsIsNil
 		}
 
-		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, true)
+		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, false, true)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, true)
+		err = ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false, true)
 		if err != nil {
 			return err
 		}
@@ -271,12 +271,12 @@ func ValidateBalancesActionPermission(permissions []*BalancesActionPermission) e
 			return ErrCombinationsIsNil
 		}
 
-		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, false)
+		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.OwnedTimes, false)
+		err = ValidateRangesAreValid(permission.DefaultValues.OwnedTimes, false, false)
 		if err != nil {
 			return err
 		}
@@ -317,7 +317,7 @@ func ValidateTimedUpdatePermission(permissions []*TimedUpdatePermission) error {
 			return ErrCombinationsIsNil
 		}
 
-		err := ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false)
+		err := ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false, false)
 		if err != nil {
 			return err
 		}

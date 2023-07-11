@@ -9,28 +9,29 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (suite *TestSuite) TestNoChallengesWorking() {
+func (suite *TestSuite) TestNoMerkleChallengesWorking() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].Challenges = []*types.Challenge{{}}
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].MerkleChallenges = []*types.MerkleChallenge{{}}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.ChallengeSolution{})
+	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{})
 	suite.Require().Error(err, "Error getting user balance: %s")
 }
 
-func (suite *TestSuite) TestChallengesInvalidSolutions() {
+func (suite *TestSuite) TestMerkleChallengesInvalidSolutions() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].OverridesFromApprovedOutgoingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].Challenges = []*types.Challenge{{
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].MerkleChallenges = []*types.MerkleChallenge{{
+		ChallengeId: "testchallenge",
 		Root: "sample",
 	}}
 
@@ -38,16 +39,16 @@ func (suite *TestSuite) TestChallengesInvalidSolutions() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.ChallengeSolution{})
+	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{})
 	suite.Require().Error(err, "Error getting user balance: %s")
 
-	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.ChallengeSolution{
-		{
-			Proof: &types.ClaimProof{
-				Aunts: []*types.ClaimProofItem{},
+	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{
+		
+			{
+				Aunts: []*types.MerklePathItem{},
 				Leaf:  "sample",
 			},
-		},
+		
 	})
 	suite.Require().Error(err, "Error getting user balance: %s")
 }
@@ -77,25 +78,33 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		MaxNumTransfers: &types.MaxNumTransfers{
-			OverallMaxNumTransfers: sdkmath.NewUint(10),
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+				
+			
+				Uri: "",
+				MerkleChallenges: []*types.MerkleChallenge{
+					{
+						ChallengeId: "testchallenge",
+						Root:                hex.EncodeToString(rootHash),
+						ExpectedProofLength: sdk.NewUint(2),
+						MaxOneUsePerLeaf:    true,
+					},
+				},
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
+			},
 		},
-		ApprovalAmounts: &types.ApprovalAmounts{
-			OverallApprovalAmount: sdkmath.NewUint(10),
-		},
-		
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
 		}},
-		Uri: "",
-		Challenges: []*types.Challenge{
-			{
-				Root:                hex.EncodeToString(rootHash),
-				ExpectedProofLength: sdk.NewUint(2),
-				MaxOneUsePerLeaf:    true,
-			},
-		},
-		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnedTimes:       GetFullUintRanges(),
@@ -103,8 +112,6 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
-		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -125,11 +132,11 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: "",
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -139,7 +146,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -161,11 +168,11 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -175,7 +182,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -197,11 +204,11 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -211,7 +218,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -246,25 +253,33 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		MaxNumTransfers: &types.MaxNumTransfers{
-			OverallMaxNumTransfers: sdkmath.NewUint(10),
-		},
-		ApprovalAmounts: &types.ApprovalAmounts{
-			OverallApprovalAmount: sdkmath.NewUint(10),
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+			
+				Uri: "",
+				MerkleChallenges: []*types.MerkleChallenge{
+					{
+						ChallengeId: "testchallenge",
+						Root:                    hex.EncodeToString(rootHash),
+						ExpectedProofLength:     sdk.NewUint(2),
+						MaxOneUsePerLeaf:        true,
+						UseCreatorAddressAsLeaf: true,
+					},
+				},
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
+			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
 		}},
-		Uri: "",
-		Challenges: []*types.Challenge{
-			{
-				Root:                    hex.EncodeToString(rootHash),
-				ExpectedProofLength:     sdk.NewUint(2),
-				MaxOneUsePerLeaf:        true,
-				UseCreatorAddressAsLeaf: true,
-			},
-		},
-		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
 		OwnedTimes: GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -272,8 +287,6 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
-		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -294,11 +307,11 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -308,7 +321,7 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -343,24 +356,32 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		MaxNumTransfers: &types.MaxNumTransfers{
-			OverallMaxNumTransfers: sdkmath.NewUint(10),
-		},
-		ApprovalAmounts: &types.ApprovalAmounts{
-			OverallApprovalAmount: sdkmath.NewUint(10),
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+			
+				Uri: "",
+				MerkleChallenges: []*types.MerkleChallenge{
+					{
+						ChallengeId: "testchallenge",
+						Root:                hex.EncodeToString(rootHash),
+						ExpectedProofLength: sdk.NewUint(5),
+						MaxOneUsePerLeaf:    true,
+					},
+				},
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
+			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
 		}},
-		Uri: "",
-		Challenges: []*types.Challenge{
-			{
-				Root:                hex.EncodeToString(rootHash),
-				ExpectedProofLength: sdk.NewUint(5),
-				MaxOneUsePerLeaf:    true,
-			},
-		},
-		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
 		OwnedTimes: GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -368,8 +389,6 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
-		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -390,23 +409,23 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf:  aliceLeaf,
-							Aunts: []*types.ClaimProofItem{},
-						},
+							Aunts: []*types.MerklePathItem{},
+						
 					},
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf:  aliceLeaf,
-							Aunts: []*types.ClaimProofItem{},
-						},
+							Aunts: []*types.MerklePathItem{},
+						
 					},
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -416,7 +435,7 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -451,39 +470,48 @@ func (suite *TestSuite) TestIncrements() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		MaxNumTransfers: &types.MaxNumTransfers{
-			OverallMaxNumTransfers: sdkmath.NewUint(10),
-		},
-		ApprovalAmounts: &types.ApprovalAmounts{
-			OverallApprovalAmount: sdkmath.NewUint(10),
-		},
-		PredeterminedBalances: &types.PredeterminedBalances{
-			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseChallengeLeafIndex: true },
-			IncrementedBalances: &types.IncrementedBalances{
-				StartBalances: []*types.Balance{
-					{
-						BadgeIds: GetOneUintRange(),
-						Amount:   sdkmath.NewUint(1),
-						OwnedTimes: GetFullUintRanges(),
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+				PredeterminedBalances: &types.PredeterminedBalances{
+					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseMerkleChallengeLeafIndex: true },
+					IncrementedBalances: &types.IncrementedBalances{
+						StartBalances: []*types.Balance{
+							{
+								BadgeIds: GetOneUintRange(),
+								Amount:   sdkmath.NewUint(1),
+								OwnedTimes: GetFullUintRanges(),
+							},
+						},
+						IncrementBadgeIdsBy: sdkmath.NewUint(1),
+						IncrementOwnedTimesBy: sdkmath.NewUint(0),
 					},
 				},
-				IncrementBadgeIdsBy: sdkmath.NewUint(1),
-				IncrementOwnedTimesBy: sdkmath.NewUint(0),
+			
+				Uri: "",
+				MerkleChallenges: []*types.MerkleChallenge{
+					{
+						ChallengeId: "testchallenge",
+						Root:                             hex.EncodeToString(rootHash),
+						ExpectedProofLength:              sdk.NewUint(2),
+						MaxOneUsePerLeaf:                 true,
+						UseLeafIndexForTransferOrder: true,
+					},
+				},
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
 			},
+
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
 		}},
-		Uri: "",
-		Challenges: []*types.Challenge{
-			{
-				Root:                             hex.EncodeToString(rootHash),
-				ExpectedProofLength:              sdk.NewUint(2),
-				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForTransferOrder: true,
-			},
-		},
-		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
 		OwnedTimes: 			GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -491,8 +519,6 @@ func (suite *TestSuite) TestIncrements() {
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
-		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -513,11 +539,11 @@ func (suite *TestSuite) TestIncrements() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: bobLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[0]),
 									OnRight: false,
@@ -527,7 +553,7 @@ func (suite *TestSuite) TestIncrements() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -549,11 +575,11 @@ func (suite *TestSuite) TestIncrements() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+					
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -562,7 +588,7 @@ func (suite *TestSuite) TestIncrements() {
 									Aunt:    hex.EncodeToString(levelTwoHashes[1]),
 									OnRight: true,
 								},
-							},
+							
 						},
 					},
 				},
@@ -598,39 +624,47 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		MaxNumTransfers: &types.MaxNumTransfers{
-			OverallMaxNumTransfers: sdkmath.NewUint(10),
-		},
-		ApprovalAmounts: &types.ApprovalAmounts{
-			OverallApprovalAmount: sdkmath.NewUint(10),
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+			
+				PredeterminedBalances: &types.PredeterminedBalances{
+					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
+					IncrementedBalances: &types.IncrementedBalances{
+						StartBalances: []*types.Balance{
+							{
+								BadgeIds: GetOneUintRange(),
+								Amount:   sdkmath.NewUint(1),
+								OwnedTimes: GetFullUintRanges(),
+							},
+						},
+						IncrementBadgeIdsBy: sdkmath.NewUint(1),
+						IncrementOwnedTimesBy: sdkmath.NewUint(0),
+					},
+				},
+				Uri: "",
+				MerkleChallenges: []*types.MerkleChallenge{
+					{
+						ChallengeId: "testchallenge",
+						Root:                             hex.EncodeToString(rootHash),
+						ExpectedProofLength:              sdk.NewUint(2),
+						MaxOneUsePerLeaf:                 true,
+						UseLeafIndexForTransferOrder: true,
+					},
+				},
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
+			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
 		}},
-		PredeterminedBalances: &types.PredeterminedBalances{
-			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
-			IncrementedBalances: &types.IncrementedBalances{
-				StartBalances: []*types.Balance{
-					{
-						BadgeIds: GetOneUintRange(),
-						Amount:   sdkmath.NewUint(1),
-						OwnedTimes: GetFullUintRanges(),
-					},
-				},
-				IncrementBadgeIdsBy: sdkmath.NewUint(1),
-				IncrementOwnedTimesBy: sdkmath.NewUint(0),
-			},
-		},
-		Uri: "",
-		Challenges: []*types.Challenge{
-			{
-				Root:                             hex.EncodeToString(rootHash),
-				ExpectedProofLength:              sdk.NewUint(2),
-				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForTransferOrder: true,
-			},
-		},
-		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
 		OwnedTimes: 			GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -638,8 +672,6 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
-		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -665,11 +697,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -679,7 +711,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -723,40 +755,47 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-
-		MaxNumTransfers: &types.MaxNumTransfers{
-			OverallMaxNumTransfers: sdkmath.NewUint(10),
-		},
-		ApprovalAmounts: &types.ApprovalAmounts{
-			OverallApprovalAmount: sdkmath.NewUint(10),
-		},
-		PredeterminedBalances: &types.PredeterminedBalances{
-			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
-			IncrementedBalances: &types.IncrementedBalances{
-				StartBalances: []*types.Balance{
-					{
-						BadgeIds: GetOneUintRange(),
-						Amount:   sdkmath.NewUint(1),
-						OwnedTimes: GetFullUintRanges(),
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+				PredeterminedBalances: &types.PredeterminedBalances{
+					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
+					IncrementedBalances: &types.IncrementedBalances{
+						StartBalances: []*types.Balance{
+							{
+								BadgeIds: GetOneUintRange(),
+								Amount:   sdkmath.NewUint(1),
+								OwnedTimes: GetFullUintRanges(),
+							},
+						},
+						IncrementBadgeIdsBy: sdkmath.NewUint(1),
+						IncrementOwnedTimesBy: sdkmath.NewUint(0),
 					},
 				},
-				IncrementBadgeIdsBy: sdkmath.NewUint(1),
-				IncrementOwnedTimesBy: sdkmath.NewUint(0),
+			
+				Uri: "",
+				MerkleChallenges: []*types.MerkleChallenge{
+					{
+						ChallengeId: "testchallenge",
+						Root:                             hex.EncodeToString(rootHash),
+						ExpectedProofLength:              sdk.NewUint(2),
+						MaxOneUsePerLeaf:                 true,
+						UseLeafIndexForTransferOrder: 		true,
+					},
+				},
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
 		}},
-		Uri: "",
-		Challenges: []*types.Challenge{
-			{
-				Root:                             hex.EncodeToString(rootHash),
-				ExpectedProofLength:              sdk.NewUint(2),
-				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForTransferOrder: 		true,
-			},
-		},
-		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
 		OwnedTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
@@ -764,8 +803,6 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
-		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -791,11 +828,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -805,7 +842,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -841,11 +878,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: bobLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[0]),
 									OnRight: false,
@@ -855,7 +892,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -900,39 +937,47 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		MaxNumTransfers: &types.MaxNumTransfers{
-			OverallMaxNumTransfers: sdkmath.NewUint(10),
-		},
-		ApprovalAmounts: &types.ApprovalAmounts{
-			OverallApprovalAmount: sdkmath.NewUint(1),
-		},
-		PredeterminedBalances: &types.PredeterminedBalances{
-			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseChallengeLeafIndex: true },
-			IncrementedBalances: &types.IncrementedBalances{
-				StartBalances: []*types.Balance{
-					{
-						BadgeIds: GetOneUintRange(),
-						Amount:   sdkmath.NewUint(1),
-						OwnedTimes: GetFullUintRanges(),
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(1),
+				},
+				PredeterminedBalances: &types.PredeterminedBalances{
+					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseMerkleChallengeLeafIndex: true },
+					IncrementedBalances: &types.IncrementedBalances{
+						StartBalances: []*types.Balance{
+							{
+								BadgeIds: GetOneUintRange(),
+								Amount:   sdkmath.NewUint(1),
+								OwnedTimes: GetFullUintRanges(),
+							},
+						},
+						IncrementBadgeIdsBy: sdkmath.NewUint(1),
+						IncrementOwnedTimesBy: sdkmath.NewUint(0),
 					},
 				},
-				IncrementBadgeIdsBy: sdkmath.NewUint(1),
-				IncrementOwnedTimesBy: sdkmath.NewUint(0),
+			
+				Uri: "",
+				MerkleChallenges: []*types.MerkleChallenge{
+					{
+						ChallengeId: "testchallenge",
+						Root:                             hex.EncodeToString(rootHash),
+						ExpectedProofLength:              sdk.NewUint(2),
+						MaxOneUsePerLeaf:                 true,
+						UseLeafIndexForTransferOrder: true,
+					},
+				},
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
 		}},
-		Uri: "",
-		Challenges: []*types.Challenge{
-			{
-				Root:                             hex.EncodeToString(rootHash),
-				ExpectedProofLength:              sdk.NewUint(2),
-				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForTransferOrder: true,
-			},
-		},
-		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
 		OwnedTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
@@ -940,8 +985,6 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
-		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -967,11 +1010,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: bobLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[0]),
 									OnRight: false,
@@ -981,7 +1024,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -1025,39 +1068,47 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		MaxNumTransfers: &types.MaxNumTransfers{
-			OverallMaxNumTransfers: sdkmath.NewUint(1),
-		},
-		ApprovalAmounts: &types.ApprovalAmounts{
-			OverallApprovalAmount: sdkmath.NewUint(1),
-		},
-		PredeterminedBalances: &types.PredeterminedBalances{
-			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseChallengeLeafIndex: true },
-			IncrementedBalances: &types.IncrementedBalances{
-				StartBalances: []*types.Balance{
-					{
-						BadgeIds: GetOneUintRange(),
-						Amount:   sdkmath.NewUint(1),
-						OwnedTimes: GetFullUintRanges(),
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(1),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(1),
+				},
+				PredeterminedBalances: &types.PredeterminedBalances{
+					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseMerkleChallengeLeafIndex: true },
+					IncrementedBalances: &types.IncrementedBalances{
+						StartBalances: []*types.Balance{
+							{
+								BadgeIds: GetOneUintRange(),
+								Amount:   sdkmath.NewUint(1),
+								OwnedTimes: GetFullUintRanges(),
+							},
+						},
+						IncrementBadgeIdsBy: sdkmath.NewUint(1),
+						IncrementOwnedTimesBy: sdkmath.NewUint(0),
 					},
 				},
-				IncrementBadgeIdsBy: sdkmath.NewUint(1),
-				IncrementOwnedTimesBy: sdkmath.NewUint(0),
+			
+				Uri: "",
+				MerkleChallenges: []*types.MerkleChallenge{
+					{
+						ChallengeId: "testchallenge",
+						Root:                             hex.EncodeToString(rootHash),
+						ExpectedProofLength:              sdk.NewUint(2),
+						MaxOneUsePerLeaf:                 true,
+						UseLeafIndexForTransferOrder: true,
+					},
+				},
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
 		}},
-		Uri: "",
-		Challenges: []*types.Challenge{
-			{
-				Root:                             hex.EncodeToString(rootHash),
-				ExpectedProofLength:              sdk.NewUint(2),
-				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForTransferOrder: true,
-			},
-		},
-		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
 		OwnedTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
@@ -1065,8 +1116,6 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
-		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -1092,11 +1141,11 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -1106,7 +1155,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -1142,11 +1191,11 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: bobLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[0]),
 									OnRight: false,
@@ -1156,7 +1205,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -1191,39 +1240,47 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		MaxNumTransfers: &types.MaxNumTransfers{
-			OverallMaxNumTransfers: sdkmath.NewUint(10),
-		},
-		ApprovalAmounts: &types.ApprovalAmounts{
-			OverallApprovalAmount: sdkmath.NewUint(1),
-		},
-		PredeterminedBalances: &types.PredeterminedBalances{
-			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
-			IncrementedBalances: &types.IncrementedBalances{
-				StartBalances: []*types.Balance{
-					{
-						BadgeIds: GetOneUintRange(),
-						Amount:   sdkmath.NewUint(1),
-						OwnedTimes: GetFullUintRanges(),
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(1),
+				},
+				PredeterminedBalances: &types.PredeterminedBalances{
+					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
+					IncrementedBalances: &types.IncrementedBalances{
+						StartBalances: []*types.Balance{
+							{
+								BadgeIds: GetOneUintRange(),
+								Amount:   sdkmath.NewUint(1),
+								OwnedTimes: GetFullUintRanges(),
+							},
+						},
+						IncrementBadgeIdsBy: sdkmath.NewUint(1),
+						IncrementOwnedTimesBy: sdkmath.NewUint(0),
 					},
 				},
-				IncrementBadgeIdsBy: sdkmath.NewUint(1),
-				IncrementOwnedTimesBy: sdkmath.NewUint(0),
+			
+				Uri: "",
+				MerkleChallenges: []*types.MerkleChallenge{
+					{
+						ChallengeId: "testchallenge",
+						Root:                             hex.EncodeToString(rootHash),
+						ExpectedProofLength:              sdk.NewUint(2),
+						MaxOneUsePerLeaf:                 true,
+						UseLeafIndexForTransferOrder: false,
+					},
+				},
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
 		}},
-		Uri: "",
-		Challenges: []*types.Challenge{
-			{
-				Root:                             hex.EncodeToString(rootHash),
-				ExpectedProofLength:              sdk.NewUint(2),
-				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForTransferOrder: false,
-			},
-		},
-		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
 		OwnedTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
@@ -1231,8 +1288,6 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
-		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -1258,11 +1313,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -1272,12 +1327,12 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: bobLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[0]),
 									OnRight: false,
@@ -1287,7 +1342,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -1350,39 +1405,47 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 		OwnedTimes: GetFullUintRanges(),
 	})
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		MaxNumTransfers: &types.MaxNumTransfers{
-			OverallMaxNumTransfers: sdkmath.NewUint(10),
-		},
-		ApprovalAmounts: &types.ApprovalAmounts{
-			OverallApprovalAmount: sdkmath.NewUint(10),
-		},
-		PredeterminedBalances: &types.PredeterminedBalances{
-			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UsePerToAddressNumTransfers: true },
-			IncrementedBalances: &types.IncrementedBalances{
-				StartBalances: []*types.Balance{
-					{
-						BadgeIds: GetOneUintRange(),
-						Amount:   sdkmath.NewUint(1),
-						OwnedTimes: GetFullUintRanges(),
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+				PredeterminedBalances: &types.PredeterminedBalances{
+					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UsePerToAddressNumTransfers: true },
+					IncrementedBalances: &types.IncrementedBalances{
+						StartBalances: []*types.Balance{
+							{
+								BadgeIds: GetOneUintRange(),
+								Amount:   sdkmath.NewUint(1),
+								OwnedTimes: GetFullUintRanges(),
+							},
+						},
+						IncrementBadgeIdsBy: sdkmath.NewUint(1),
+						IncrementOwnedTimesBy: sdkmath.NewUint(0),
 					},
 				},
-				IncrementBadgeIdsBy: sdkmath.NewUint(1),
-				IncrementOwnedTimesBy: sdkmath.NewUint(0),
+			
+				Uri: "",
+				MerkleChallenges: []*types.MerkleChallenge{
+					{
+						ChallengeId: "testchallenge",
+						Root:                             hex.EncodeToString(rootHash),
+						ExpectedProofLength:              sdk.NewUint(2),
+						MaxOneUsePerLeaf:                 true,
+						UseLeafIndexForTransferOrder: false,
+					},
+				},
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
 		}},
-		Uri: "",
-		Challenges: []*types.Challenge{
-			{
-				Root:                             hex.EncodeToString(rootHash),
-				ExpectedProofLength:              sdk.NewUint(2),
-				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForTransferOrder: false,
-			},
-		},
-		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
 		OwnedTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
@@ -1390,8 +1453,6 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
-		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -1417,11 +1478,11 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -1431,12 +1492,12 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: bobLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[0]),
 									OnRight: false,
@@ -1446,7 +1507,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -1504,39 +1565,47 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		MaxNumTransfers: &types.MaxNumTransfers{
-			OverallMaxNumTransfers: sdkmath.NewUint(10),
-		},
-		ApprovalAmounts: &types.ApprovalAmounts{
-			OverallApprovalAmount: sdkmath.NewUint(1),
-		},
-		PredeterminedBalances: &types.PredeterminedBalances{
-			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
-			IncrementedBalances: &types.IncrementedBalances{
-				StartBalances: []*types.Balance{
-					{
-						BadgeIds: GetOneUintRange(),
-						Amount:   sdkmath.NewUint(1),
-						OwnedTimes: GetFullUintRanges(),
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(1),
+				},
+				PredeterminedBalances: &types.PredeterminedBalances{
+					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
+					IncrementedBalances: &types.IncrementedBalances{
+						StartBalances: []*types.Balance{
+							{
+								BadgeIds: GetOneUintRange(),
+								Amount:   sdkmath.NewUint(1),
+								OwnedTimes: GetFullUintRanges(),
+							},
+						},
+						IncrementBadgeIdsBy: sdkmath.NewUint(1),
+						IncrementOwnedTimesBy: sdkmath.NewUint(0),
 					},
 				},
-				IncrementBadgeIdsBy: sdkmath.NewUint(1),
-				IncrementOwnedTimesBy: sdkmath.NewUint(0),
+			
+				Uri: "",
+				MerkleChallenges: []*types.MerkleChallenge{
+					{
+						ChallengeId: "testchallenge",
+						Root:                             hex.EncodeToString(rootHash),
+						ExpectedProofLength:              sdk.NewUint(2),
+						MaxOneUsePerLeaf:                 true,
+						UseLeafIndexForTransferOrder: true,
+					},
+				},
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
 		}},
-		Uri: "",
-		Challenges: []*types.Challenge{
-			{
-				Root:                             hex.EncodeToString(rootHash),
-				ExpectedProofLength:              sdk.NewUint(2),
-				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForTransferOrder: true,
-			},
-		},
-		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
 		OwnedTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
@@ -1544,8 +1613,6 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
-		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -1571,11 +1638,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -1585,12 +1652,12 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: bobLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[0]),
 									OnRight: false,
@@ -1600,7 +1667,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -1659,49 +1726,57 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		MaxNumTransfers: &types.MaxNumTransfers{
-			OverallMaxNumTransfers: sdkmath.NewUint(10),
-		},
-		ApprovalAmounts: &types.ApprovalAmounts{
-			OverallApprovalAmount: sdkmath.NewUint(1),
-		},
-		PredeterminedBalances: &types.PredeterminedBalances{
-			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
-			ManualBalances: []*types.ManualBalances{
-				{
-					Balances: []*types.Balance{
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(1),
+				},
+				PredeterminedBalances: &types.PredeterminedBalances{
+					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
+					ManualBalances: []*types.ManualBalances{
 						{
-							BadgeIds: GetOneUintRange(),
-							Amount:   sdkmath.NewUint(1),
-							OwnedTimes: GetFullUintRanges(),
+							Balances: []*types.Balance{
+								{
+									BadgeIds: GetOneUintRange(),
+									Amount:   sdkmath.NewUint(1),
+									OwnedTimes: GetFullUintRanges(),
+								},
+							},
+						},
+					
+						{
+							Balances: []*types.Balance{
+								{
+									BadgeIds: GetTopHalfUintRanges(),
+									Amount:   sdkmath.NewUint(1),
+									OwnedTimes: GetFullUintRanges(),
+								},
+							},
 						},
 					},
 				},
 			
-				{
-					Balances: []*types.Balance{
-						{
-							BadgeIds: GetTopHalfUintRanges(),
-							Amount:   sdkmath.NewUint(1),
-							OwnedTimes: GetFullUintRanges(),
-						},
+				Uri: "",
+				MerkleChallenges: []*types.MerkleChallenge{
+					{
+						ChallengeId: "testchallenge",
+						Root:                             hex.EncodeToString(rootHash),
+						ExpectedProofLength:              sdk.NewUint(2),
+						MaxOneUsePerLeaf:                 true,
+						UseLeafIndexForTransferOrder: true,
 					},
 				},
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
 			IsAllowed: true,
 		}},
-		Uri: "",
-		Challenges: []*types.Challenge{
-			{
-				Root:                             hex.EncodeToString(rootHash),
-				ExpectedProofLength:              sdk.NewUint(2),
-				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForTransferOrder: true,
-			},
-		},
-		ApprovalId:            "testing232",
 		TransferTimes:        GetFullUintRanges(),
 		OwnedTimes:       GetFullUintRanges(),
 		BadgeIds:             GetFullUintRanges(),
@@ -1709,8 +1784,6 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
-		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -1736,11 +1809,11 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -1750,12 +1823,12 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: bobLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[0]),
 									OnRight: false,
@@ -1765,7 +1838,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -1825,48 +1898,53 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		MaxNumTransfers: &types.MaxNumTransfers{
-			OverallMaxNumTransfers: sdkmath.NewUint(10),
-		},
-		ApprovalAmounts: &types.ApprovalAmounts{
-			OverallApprovalAmount: sdkmath.NewUint(1),
-		},
-		PredeterminedBalances: &types.PredeterminedBalances{
-			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
-			IncrementedBalances: &types.IncrementedBalances{
-				StartBalances: []*types.Balance{
-					{
-						BadgeIds: GetBottomHalfUintRanges(),
-						Amount:   sdkmath.NewUint(1),
-						OwnedTimes: GetFullUintRanges(),
-					},
-				},
-				IncrementBadgeIdsBy: sdkmath.NewUint(1),
-				IncrementOwnedTimesBy: sdkmath.NewUint(0),
-			},
-		},
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
-		}},
-		Uri: "",
-		Challenges: []*types.Challenge{
+		ApprovalDetails: []*types.ApprovalDetails{
 			{
-				Root:                             hex.EncodeToString(rootHash),
-				ExpectedProofLength:              sdk.NewUint(2),
-				MaxOneUsePerLeaf:                 true,
-				UseLeafIndexForTransferOrder: true,
+				MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(10),
 			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				OverallApprovalAmount: sdkmath.NewUint(1),
+			},
+			PredeterminedBalances: &types.PredeterminedBalances{
+				OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
+				IncrementedBalances: &types.IncrementedBalances{
+					StartBalances: []*types.Balance{
+						{
+							BadgeIds: GetBottomHalfUintRanges(),
+							Amount:   sdkmath.NewUint(1),
+							OwnedTimes: GetFullUintRanges(),
+						},
+					},
+					IncrementBadgeIdsBy: sdkmath.NewUint(1),
+					IncrementOwnedTimesBy: sdkmath.NewUint(0),
+				},
+			},
+			Uri: "",
+			MerkleChallenges: []*types.MerkleChallenge{
+				{
+					ChallengeId: "testchallenge",
+					Root:                             hex.EncodeToString(rootHash),
+					ExpectedProofLength:              sdk.NewUint(2),
+					MaxOneUsePerLeaf:                 true,
+					UseLeafIndexForTransferOrder: true,
+				},
+			},
+			ApprovalId:            "testing232",
+			OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
 		},
-		ApprovalId:            "testing232",
-		TransferTimes:        GetFullUintRanges(),
+	},
+	AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsAllowed: true,
+		}},	
+	TransferTimes:        GetFullUintRanges(),
 		OwnedTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromMappingId:        "Mint",
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
 
-		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -1887,11 +1965,11 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -1901,7 +1979,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -1923,11 +2001,11 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -1937,7 +2015,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -1959,11 +2037,11 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -1973,7 +2051,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -1995,11 +2073,11 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 						OwnedTimes: GetFullUintRanges(),
 					},
 				},
-				Solutions: []*types.ChallengeSolution{
+				MerkleProofs: []*types.MerkleProof{
 					{
-						Proof: &types.ClaimProof{
+						
 							Leaf: aliceLeaf,
-							Aunts: []*types.ClaimProofItem{
+							Aunts: []*types.MerklePathItem{
 								{
 									Aunt:    hex.EncodeToString(leafHashes[1]),
 									OnRight: true,
@@ -2009,7 +2087,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 									OnRight: true,
 								},
 							},
-						},
+						
 					},
 				},
 			},
@@ -2018,3 +2096,322 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 	suite.Require().Error(err, "Error transferring badge: %s")
 }
 
+func (suite *TestSuite) TestMustOwnBadges() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MinMaxBalance{
+		{
+			CollectionId: sdk.NewUint(1),
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			BadgeIds: GetFullUintRanges(),
+			OwnedTimes: GetFullUintRanges(),
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+			
+				Uri: "",
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+				OverridesToApprovedIncomingTransfers:   true,
+			},
+
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsAllowed: true,
+		}},
+		TransferTimes:        GetFullUintRanges(),
+		BadgeIds:             GetOneUintRange(),
+		OwnedTimes:       GetFullUintRanges(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "All",
+		InitiatedByMappingId: "All",
+
+		
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnedTimes: 		GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge: %s")
+}
+
+func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MinMaxBalance{
+		{
+			CollectionId: sdk.NewUint(1),
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			BadgeIds: GetFullUintRanges(),
+			OwnedTimes: GetFullUintRanges(),
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+					MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+				
+				Uri: "",
+					
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
+			},
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsAllowed: true,
+		}},
+		TransferTimes:        GetFullUintRanges(),
+		BadgeIds:             GetOneUintRange(),
+		OwnedTimes:       GetFullUintRanges(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "All",
+		InitiatedByMappingId: "All",
+
+		
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      alice,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnedTimes: 		GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+}
+
+
+func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MinMaxBalance{
+		{
+			CollectionId: sdk.NewUint(1),
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(0),
+				End:   sdkmath.NewUint(0),
+			},
+			BadgeIds: GetFullUintRanges(),
+			OwnedTimes: GetFullUintRanges(),
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+				Uri: "",
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+				OverridesToApprovedIncomingTransfers:   true,
+			},
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsAllowed: true,
+		}},
+		TransferTimes:        GetFullUintRanges(),
+		BadgeIds:             GetOneUintRange(),
+		OwnedTimes:       		GetFullUintRanges(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "All",
+		InitiatedByMappingId: "All",
+
+		
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnedTimes: 		GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      alice,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnedTimes: 		GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge: %s")
+}
+
+
+func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MinMaxBalance{
+		{
+			CollectionId: sdk.NewUint(1),
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(2),
+				End:   sdkmath.NewUint(100),
+			},
+			BadgeIds: GetFullUintRanges(),
+			OwnedTimes: GetFullUintRanges(),
+		},
+	}
+	
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+				
+				Uri: "",
+				ApprovalId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+		OverridesToApprovedIncomingTransfers:   true,
+			},
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsAllowed: true,
+		}},
+		TransferTimes:        GetFullUintRanges(),
+		BadgeIds:             GetOneUintRange(),
+		OwnedTimes:       GetFullUintRanges(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "All",
+		InitiatedByMappingId: "All",
+
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnedTimes: 		GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      alice,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnedTimes: 		GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+}

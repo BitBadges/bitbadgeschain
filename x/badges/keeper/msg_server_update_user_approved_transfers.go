@@ -30,6 +30,10 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 		}
 	}
 
+	if userBalance.UserPermissions == nil {
+		userBalance.UserPermissions = &types.UserPermissions{}
+	}
+
 	manager := types.GetCurrentManager(ctx, collection)
 
 	if msg.UpdateApprovedOutgoingTransfersTimeline {

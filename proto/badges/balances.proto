@@ -28,6 +28,14 @@ message Balance {
   repeated UintRange badgeIds = 3;
 }
 
+message MinMaxBalance {
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  UintRange amountRange = 2;
+  repeated UintRange ownedTimes = 3;
+  repeated UintRange badgeIds = 4;
+}
+
 // InheritedBalances are a powerful feature of the BitBadges module.
 // They allow a colllection to inherit the balances from another collection.
 // Ex: Badges from Collection A inherits the balances from badges from Collection B.

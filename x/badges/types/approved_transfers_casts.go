@@ -24,6 +24,11 @@ func CastOutgoingTransferToCollectionTransfer(transfer *UserApprovedOutgoingTran
 		allowedCombinations = append(allowedCombinations, CastOutgoingCombinationToCollectionCombination(combination))
 	}
 
+	approvalDetails := []*ApprovalDetails{}
+	for _, approvalDetail := range transfer.ApprovalDetails {
+		approvalDetails = append(approvalDetails, CastOutgoingApprovalDetailsToCollectionApprovalDetails(approvalDetail))
+	}
+
 	return &CollectionApprovedTransfer{
 		ToMappingId:                      transfer.ToMappingId,
 		FromMappingId:                    fromAddress,
@@ -32,13 +37,7 @@ func CastOutgoingTransferToCollectionTransfer(transfer *UserApprovedOutgoingTran
 		BadgeIds:                         transfer.BadgeIds,
 		OwnedTimes: 								  transfer.OwnedTimes,
 		AllowedCombinations:              allowedCombinations,
-		PredeterminedBalances: 				  transfer.PredeterminedBalances,
-		ApprovalAmounts: 								  transfer.ApprovalAmounts,
-		MaxNumTransfers: 								  transfer.MaxNumTransfers,
-		RequireToEqualsInitiatedBy:       transfer.RequireToEqualsInitiatedBy,
-		RequireToDoesNotEqualInitiatedBy: transfer.RequireToDoesNotEqualInitiatedBy,
-		CustomData:                       transfer.CustomData,
-		ApprovalId:                        transfer.ApprovalId,
+		ApprovalDetails: 								approvalDetails,
 	}
 }
 
@@ -48,6 +47,11 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApprovedTr
 		allowedCombinations = append(allowedCombinations, CastFromCollectionCombinationToOutgoingCombination(combination))
 	}
 
+	approvalDetails := []*OutgoingApprovalDetails{}
+	for _, approvalDetail := range transfer.ApprovalDetails {
+		approvalDetails = append(approvalDetails, CastFromCollectionApprovalDetailsToOutgoingApprovalDetails(approvalDetail))
+	}
+
 	return &UserApprovedOutgoingTransfer{
 		ToMappingId:                      transfer.ToMappingId,
 		InitiatedByMappingId:             transfer.InitiatedByMappingId,
@@ -55,13 +59,7 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApprovedTr
 		BadgeIds:                         transfer.BadgeIds,
 		OwnedTimes: 								  transfer.OwnedTimes,
 		AllowedCombinations:              allowedCombinations,
-		PredeterminedBalances: 				  transfer.PredeterminedBalances,
-		ApprovalAmounts: 								  transfer.ApprovalAmounts,
-		MaxNumTransfers: 								  transfer.MaxNumTransfers,
-		RequireToEqualsInitiatedBy:       transfer.RequireToEqualsInitiatedBy,
-		RequireToDoesNotEqualInitiatedBy: transfer.RequireToDoesNotEqualInitiatedBy,
-		CustomData:                       transfer.CustomData,
-		ApprovalId:                        transfer.ApprovalId,
+		ApprovalDetails: 								approvalDetails,
 	}
 }
 
@@ -93,6 +91,11 @@ func CastIncomingTransferToCollectionTransfer(transfer *UserApprovedIncomingTran
 		allowedCombinations = append(allowedCombinations, CastIncomingCombinationToCollectionCombination(combination))
 	}
 
+	approvalDetails := []*ApprovalDetails{}
+	for _, approvalDetail := range transfer.ApprovalDetails {
+		approvalDetails = append(approvalDetails, CastIncomingApprovalDetailsToCollectionApprovalDetails(approvalDetail))
+	}
+
 	return &CollectionApprovedTransfer{
 		ToMappingId:                        toAddress,
 		FromMappingId:                      transfer.FromMappingId,
@@ -101,13 +104,7 @@ func CastIncomingTransferToCollectionTransfer(transfer *UserApprovedIncomingTran
 		BadgeIds:                           transfer.BadgeIds,
 		OwnedTimes: 								  	transfer.OwnedTimes,
 		AllowedCombinations:                allowedCombinations,
-		PredeterminedBalances: 				  transfer.PredeterminedBalances,
-		ApprovalAmounts: 								  transfer.ApprovalAmounts,
-		MaxNumTransfers: 								  transfer.MaxNumTransfers,
-		RequireFromEqualsInitiatedBy:       transfer.RequireFromEqualsInitiatedBy,
-		RequireFromDoesNotEqualInitiatedBy: transfer.RequireFromDoesNotEqualInitiatedBy,
-		CustomData:                         transfer.CustomData,
-		ApprovalId:                          transfer.ApprovalId,
+		ApprovalDetails:                    approvalDetails,
 	}
 }
 
@@ -117,20 +114,19 @@ func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApprovedTr
 		allowedCombinations = append(allowedCombinations, CastFromCollectionCombinationToIncomingCombination(combination))
 	}
 
+	approvalDetails := []*IncomingApprovalDetails{}
+	for _, approvalDetail := range transfer.ApprovalDetails {
+		approvalDetails = append(approvalDetails, CastFromCollectionApprovalDetailsToIncomingApprovalDetails(approvalDetail))
+	}
+
 	return &UserApprovedIncomingTransfer{
 		FromMappingId:                      transfer.FromMappingId,
 		InitiatedByMappingId:               transfer.InitiatedByMappingId,
 		TransferTimes:                      transfer.TransferTimes,
 		BadgeIds:                           transfer.BadgeIds,
-		OwnedTimes: 								  	transfer.OwnedTimes,
+		OwnedTimes: 								  			transfer.OwnedTimes,
 		AllowedCombinations:                allowedCombinations,
-		PredeterminedBalances: 				  transfer.PredeterminedBalances,
-		ApprovalAmounts: 								  transfer.ApprovalAmounts,
-		MaxNumTransfers: 								  transfer.MaxNumTransfers,
-		RequireFromEqualsInitiatedBy:       transfer.RequireFromEqualsInitiatedBy,
-		RequireFromDoesNotEqualInitiatedBy: transfer.RequireFromDoesNotEqualInitiatedBy,
-		CustomData:                         transfer.CustomData,
-		ApprovalId:                          transfer.ApprovalId,
+		ApprovalDetails:                    approvalDetails,
 	}
 }
 
@@ -153,5 +149,66 @@ func CastFromCollectionCombinationToIncomingCombination(combination *IsCollectio
 		InvertFrom:          combination.InvertTo,
 		InvertInitiatedBy:   combination.InvertInitiatedBy,
 		InvertOwnedTimes: combination.InvertOwnedTimes,
+	}
+}
+
+
+func CastIncomingApprovalDetailsToCollectionApprovalDetails(approvalDetails *IncomingApprovalDetails) *ApprovalDetails {
+	return &ApprovalDetails{
+		ApprovalId: approvalDetails.ApprovalId,
+		ApprovalAmounts: approvalDetails.ApprovalAmounts,
+		MaxNumTransfers: approvalDetails.MaxNumTransfers,
+		RequireFromEqualsInitiatedBy: approvalDetails.RequireFromEqualsInitiatedBy,
+		RequireFromDoesNotEqualInitiatedBy: approvalDetails.RequireFromDoesNotEqualInitiatedBy,
+		Uri: approvalDetails.Uri,
+		CustomData: approvalDetails.CustomData,
+		PredeterminedBalances: approvalDetails.PredeterminedBalances,
+		MustOwnBadges: approvalDetails.MustOwnBadges,
+		MerkleChallenges: approvalDetails.MerkleChallenges,
+	}
+}
+
+func CastOutgoingApprovalDetailsToCollectionApprovalDetails(approvalDetails *OutgoingApprovalDetails) *ApprovalDetails {
+	return &ApprovalDetails{
+		ApprovalId: approvalDetails.ApprovalId,
+		ApprovalAmounts: approvalDetails.ApprovalAmounts,
+		MaxNumTransfers: approvalDetails.MaxNumTransfers,
+		RequireToEqualsInitiatedBy: approvalDetails.RequireToEqualsInitiatedBy,
+		RequireToDoesNotEqualInitiatedBy: approvalDetails.RequireToDoesNotEqualInitiatedBy,
+		Uri: approvalDetails.Uri,
+		CustomData: approvalDetails.CustomData,
+		PredeterminedBalances: approvalDetails.PredeterminedBalances,
+		MustOwnBadges: approvalDetails.MustOwnBadges,
+		MerkleChallenges: approvalDetails.MerkleChallenges,
+	}
+}
+
+func CastFromCollectionApprovalDetailsToIncomingApprovalDetails(approvalDetails *ApprovalDetails) *IncomingApprovalDetails {
+	return &IncomingApprovalDetails{
+		ApprovalId: approvalDetails.ApprovalId,
+		ApprovalAmounts: approvalDetails.ApprovalAmounts,
+		MaxNumTransfers: approvalDetails.MaxNumTransfers,
+		RequireFromEqualsInitiatedBy: approvalDetails.RequireFromEqualsInitiatedBy,
+		RequireFromDoesNotEqualInitiatedBy: approvalDetails.RequireFromDoesNotEqualInitiatedBy,
+		Uri: approvalDetails.Uri,
+		CustomData: approvalDetails.CustomData,
+		PredeterminedBalances: approvalDetails.PredeterminedBalances,
+		MustOwnBadges: approvalDetails.MustOwnBadges,
+		MerkleChallenges: approvalDetails.MerkleChallenges,
+	}
+}
+
+func CastFromCollectionApprovalDetailsToOutgoingApprovalDetails(approvalDetails *ApprovalDetails) *OutgoingApprovalDetails {
+	return &OutgoingApprovalDetails{
+		ApprovalId: approvalDetails.ApprovalId,
+		ApprovalAmounts: approvalDetails.ApprovalAmounts,
+		MaxNumTransfers: approvalDetails.MaxNumTransfers,
+		RequireToEqualsInitiatedBy: approvalDetails.RequireToEqualsInitiatedBy,
+		RequireToDoesNotEqualInitiatedBy: approvalDetails.RequireToDoesNotEqualInitiatedBy,
+		Uri: approvalDetails.Uri,
+		CustomData: approvalDetails.CustomData,
+		PredeterminedBalances: approvalDetails.PredeterminedBalances,
+		MustOwnBadges: approvalDetails.MustOwnBadges,
+		MerkleChallenges: approvalDetails.MerkleChallenges,
 	}
 }

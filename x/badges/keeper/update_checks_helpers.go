@@ -95,53 +95,13 @@ func (k Keeper) ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, colle
 				oldVal := oldDetails.ArbitraryValue.(*types.CollectionApprovedTransfer)
 				newVal := newDetails.ArbitraryValue.(*types.CollectionApprovedTransfer)
 
-				if newVal.RequireToEqualsInitiatedBy != oldVal.RequireToEqualsInitiatedBy ||
-					newVal.RequireFromEqualsInitiatedBy != oldVal.RequireFromEqualsInitiatedBy ||
-					newVal.RequireToDoesNotEqualInitiatedBy != oldVal.RequireToDoesNotEqualInitiatedBy ||
-					newVal.RequireFromDoesNotEqualInitiatedBy != oldVal.RequireFromDoesNotEqualInitiatedBy ||
-					newVal.OverridesFromApprovedOutgoingTransfers != oldVal.OverridesFromApprovedOutgoingTransfers ||
-					newVal.OverridesToApprovedIncomingTransfers != oldVal.OverridesToApprovedIncomingTransfers ||
-					newVal.ApprovalId != oldVal.ApprovalId ||
-					newVal.Uri != oldVal.Uri ||
-					newVal.CustomData != oldVal.CustomData {
+				if len(oldVal.ApprovalDetails) != len(newVal.ApprovalDetails) {
 					different = true
-
-				}
-
-				if len(newVal.AllowedCombinations) != len(oldVal.AllowedCombinations) {
-					different = true
-
 				} else {
-					if len(newVal.AllowedCombinations) != len(oldVal.AllowedCombinations) {
-						different = true
-
-					} else {
-						for j := 0; j < len(newVal.AllowedCombinations); j++ {
-							if proto.MarshalTextString(newVal.AllowedCombinations[j]) != proto.MarshalTextString(oldVal.AllowedCombinations[j]) {
-								different = true
-
-							}
+					for i := 0; i < len(oldVal.ApprovalDetails); i++ {
+						if proto.MarshalTextString(oldVal.ApprovalDetails[i]) != proto.MarshalTextString(newVal.ApprovalDetails[i]) {
+							different = true
 						}
-					}
-
-					if len(newVal.Challenges) != len(oldVal.Challenges) {
-						different = true
-
-					} else {
-						for j := 0; j < len(newVal.Challenges); j++ {
-							if proto.MarshalTextString(newVal.Challenges[j]) != proto.MarshalTextString(oldVal.Challenges[j]) {
-								different = true
-
-							}
-						}
-					}
-
-					if proto.MarshalTextString(newVal.ApprovalAmounts) != proto.MarshalTextString(oldVal.ApprovalAmounts) {
-						different = true
-					}
-
-					if proto.MarshalTextString(newVal.MaxNumTransfers) != proto.MarshalTextString(oldVal.MaxNumTransfers) {
-						different = true
 					}
 				}
 			}
@@ -205,49 +165,14 @@ func (k Keeper) ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, _ol
 				oldVal := oldDetails.ArbitraryValue.(*types.UserApprovedOutgoingTransfer)
 				newVal := newDetails.ArbitraryValue.(*types.UserApprovedOutgoingTransfer)
 
-				if newVal.RequireToEqualsInitiatedBy != oldVal.RequireToEqualsInitiatedBy ||
-					newVal.RequireToDoesNotEqualInitiatedBy != oldVal.RequireToDoesNotEqualInitiatedBy ||
-					newVal.ApprovalId != oldVal.ApprovalId ||
-					newVal.Uri != oldVal.Uri ||
-					newVal.CustomData != oldVal.CustomData {
+				if len(oldVal.ApprovalDetails) != len(newVal.ApprovalDetails) {
 					different = true
-
-				}
-
-				if len(newVal.AllowedCombinations) != len(oldVal.AllowedCombinations) {
-					different = true
-
 				} else {
-					for j := 0; j < len(newVal.AllowedCombinations); j++ {
-						if proto.MarshalTextString(newVal.AllowedCombinations[j]) != proto.MarshalTextString(oldVal.AllowedCombinations[j]) {
+					for i := 0; i < len(oldVal.ApprovalDetails); i++ {
+						if proto.MarshalTextString(oldVal.ApprovalDetails[i]) != proto.MarshalTextString(newVal.ApprovalDetails[i]) {
 							different = true
-
 						}
 					}
-				}
-
-				if len(newVal.Challenges) != len(oldVal.Challenges) {
-					different = true
-
-				} else {
-					for j := 0; j < len(newVal.Challenges); j++ {
-						if proto.MarshalTextString(newVal.Challenges[j]) != proto.MarshalTextString(oldVal.Challenges[j]) {
-							different = true
-
-						}
-					}
-				}
-
-				if proto.MarshalTextString(newVal.ApprovalAmounts) != proto.MarshalTextString(oldVal.ApprovalAmounts) {
-					different = true
-				}
-
-				if proto.MarshalTextString(newVal.MaxNumTransfers) != proto.MarshalTextString(oldVal.MaxNumTransfers) {
-					different = true
-				}
-
-				if proto.MarshalTextString(newVal.PredeterminedBalances) != proto.MarshalTextString(oldVal.PredeterminedBalances) {
-					different = true
 				}
 			}
 
@@ -311,49 +236,14 @@ func (k Keeper) ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, _ol
 				oldVal := oldDetails.ArbitraryValue.(*types.UserApprovedIncomingTransfer)
 				newVal := newDetails.ArbitraryValue.(*types.UserApprovedIncomingTransfer)
 
-				if newVal.RequireFromDoesNotEqualInitiatedBy != oldVal.RequireFromDoesNotEqualInitiatedBy ||
-					newVal.RequireFromEqualsInitiatedBy != oldVal.RequireFromEqualsInitiatedBy ||
-					newVal.ApprovalId != oldVal.ApprovalId ||
-					newVal.Uri != oldVal.Uri ||
-					newVal.CustomData != oldVal.CustomData {
+				if len(oldVal.ApprovalDetails) != len(newVal.ApprovalDetails) {
 					different = true
-
-				}
-
-				if len(newVal.AllowedCombinations) != len(oldVal.AllowedCombinations) {
-					different = true
-
 				} else {
-					for j := 0; j < len(newVal.AllowedCombinations); j++ {
-						if proto.MarshalTextString(newVal.AllowedCombinations[j]) != proto.MarshalTextString(oldVal.AllowedCombinations[j]) {
+					for i := 0; i < len(oldVal.ApprovalDetails); i++ {
+						if proto.MarshalTextString(oldVal.ApprovalDetails[i]) != proto.MarshalTextString(newVal.ApprovalDetails[i]) {
 							different = true
-
 						}
 					}
-				}
-
-				if len(newVal.Challenges) != len(oldVal.Challenges) {
-					different = true
-
-				} else {
-					for j := 0; j < len(newVal.Challenges); j++ {
-						if proto.MarshalTextString(newVal.Challenges[j]) != proto.MarshalTextString(oldVal.Challenges[j]) {
-							different = true
-
-						}
-					}
-				}
-
-				if proto.MarshalTextString(newVal.ApprovalAmounts) != proto.MarshalTextString(oldVal.ApprovalAmounts) {
-					different = true
-				}
-
-				if proto.MarshalTextString(newVal.MaxNumTransfers) != proto.MarshalTextString(oldVal.MaxNumTransfers) {
-					different = true
-				}
-
-				if proto.MarshalTextString(newVal.PredeterminedBalances) != proto.MarshalTextString(oldVal.PredeterminedBalances) {
-					different = true
 				}
 			}
 

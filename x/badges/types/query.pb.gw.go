@@ -22,6 +22,8 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+
+	sdkmath "cosmossdk.io/math"
 )
 
 // Suppress "imported and not used" errors
@@ -67,7 +69,8 @@ func request_Query_GetCollection_0(ctx context.Context, marshaler runtime.Marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -94,7 +97,8 @@ func local_request_Query_GetCollection_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -175,7 +179,8 @@ func request_Query_GetApprovalsTracker_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -246,7 +251,8 @@ func local_request_Query_GetApprovalsTracker_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -317,7 +323,8 @@ func request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -345,26 +352,15 @@ func request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
 	}
 
-	val, ok = pathParams["approvalId"]
+	val, ok = pathParams["challengeId"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approvalId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "challengeId")
 	}
 
-	protoReq.ApprovalId, err = runtime.String(val)
+	protoReq.ChallengeId, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvalId", err)
-	}
-
-	val, ok = pathParams["challengeIdx"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "challengeIdx")
-	}
-
-	protoReq.ChallengeIdx, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "challengeIdx", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "challengeId", err)
 	}
 
 	val, ok = pathParams["leafIndex"]
@@ -372,7 +368,8 @@ func request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "leafIndex")
 	}
 
-	protoReq.LeafIndex, err = runtime.String(val)
+	str, err = runtime.String(val)
+	protoReq.LeafIndex = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "leafIndex", err)
@@ -399,7 +396,8 @@ func local_request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -427,26 +425,15 @@ func local_request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
 	}
 
-	val, ok = pathParams["approvalId"]
+	val, ok = pathParams["challengeId"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approvalId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "challengeId")
 	}
 
-	protoReq.ApprovalId, err = runtime.String(val)
+	protoReq.ChallengeId, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvalId", err)
-	}
-
-	val, ok = pathParams["challengeIdx"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "challengeIdx")
-	}
-
-	protoReq.ChallengeIdx, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "challengeIdx", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "challengeId", err)
 	}
 
 	val, ok = pathParams["leafIndex"]
@@ -454,7 +441,8 @@ func local_request_Query_GetNumUsedForChallenge_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "leafIndex")
 	}
 
-	protoReq.LeafIndex, err = runtime.String(val)
+	str, err = runtime.String(val)
+	protoReq.LeafIndex = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "leafIndex", err)
@@ -481,7 +469,8 @@ func request_Query_GetBalance_0(ctx context.Context, marshaler runtime.Marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -519,7 +508,8 @@ func local_request_Query_GetBalance_0(ctx context.Context, marshaler runtime.Mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -858,7 +848,7 @@ var (
 
 	pattern_Query_GetApprovalsTracker_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"bitbadges", "bitbadgeschain", "badges", "get_approvals_tracker", "collectionId", "approvalLevel", "address", "approvalId", "trackerType"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetNumUsedForChallenge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"bitbadges", "bitbadgeschain", "badges", "get_num_used_for_challenge", "collectionId", "approvalLevel", "address", "approvalId", "challengeIdx", "leafIndex"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetNumUsedForChallenge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"bitbadges", "bitbadgeschain", "badges", "get_num_used_for_challenge", "collectionId", "approvalLevel", "address", "challengeId", "leafIndex"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_GetBalance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"bitbadges", "bitbadgeschain", "badges", "get_balance", "collectionId", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 )

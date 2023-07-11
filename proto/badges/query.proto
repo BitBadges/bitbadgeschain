@@ -35,7 +35,7 @@ service Query {
   }
 
   rpc GetNumUsedForChallenge(QueryGetNumUsedForChallengeRequest) returns (QueryGetNumUsedForChallengeResponse) {
-    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{collectionId}/{approvalLevel}/{address}/{approvalId}/{challengeIdx}/{leafIndex}";
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{collectionId}/{approvalLevel}/{address}/{challengeId}/{leafIndex}";
   }
 
   // Queries an addresses balance for a badge collection, specified by its ID.
@@ -99,9 +99,8 @@ message QueryGetNumUsedForChallengeRequest {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   string approvalLevel = 2; //"collection" or "incoming" or "outgoing"
   string address = 3; //if approvalLevel is "collection", leave blank
-  string approvalId = 4;
-  string challengeIdx = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; //position in challenges array
-  string leafIndex = 6 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; 
+  string challengeId = 4;
+  string leafIndex = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; 
 }
 
 message QueryGetNumUsedForChallengeResponse {

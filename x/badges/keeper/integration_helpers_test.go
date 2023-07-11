@@ -97,13 +97,17 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 									IsAllowed: true,
 								},
 							},
-							Challenges:                []*types.Challenge{},
-							ApprovalId:                 "test",
-							MaxNumTransfers: &types.MaxNumTransfers{
-								OverallMaxNumTransfers: sdkmath.NewUint(1000),
-							},
-							ApprovalAmounts: &types.ApprovalAmounts{
-								PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+							ApprovalDetails: []*types.ApprovalDetails{
+								{
+									MerkleChallenges:                []*types.MerkleChallenge{},
+									ApprovalId:                 "test",
+									MaxNumTransfers: &types.MaxNumTransfers{
+										OverallMaxNumTransfers: sdkmath.NewUint(1000),
+									},
+									ApprovalAmounts: &types.ApprovalAmounts{
+										PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+									},
+								},
 							},
 						}},
 				},
@@ -122,13 +126,17 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 									IsAllowed: true,
 								},
 							},
-							Challenges:                []*types.Challenge{},
-							ApprovalId:                 "test",
-							MaxNumTransfers: &types.MaxNumTransfers{
-								OverallMaxNumTransfers: sdkmath.NewUint(1000),
-							},
-							ApprovalAmounts: &types.ApprovalAmounts{
-								PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+							ApprovalDetails: []*types.IncomingApprovalDetails{
+								{
+									MerkleChallenges:                []*types.MerkleChallenge{},
+									ApprovalId:                 "test",
+									MaxNumTransfers: &types.MaxNumTransfers{
+										OverallMaxNumTransfers: sdkmath.NewUint(1000),
+									},
+									ApprovalAmounts: &types.ApprovalAmounts{
+										PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+									},
+								},
 							},
 						},
 					},
@@ -149,13 +157,17 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 									IsAllowed: true,
 								},
 							},
-							Challenges:                []*types.Challenge{},
-							ApprovalId:                 "test",
-							MaxNumTransfers: &types.MaxNumTransfers{
-								OverallMaxNumTransfers: sdkmath.NewUint(1000),
-							},
-							ApprovalAmounts: &types.ApprovalAmounts{
-								PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+							ApprovalDetails: []*types.OutgoingApprovalDetails{
+								{
+									MerkleChallenges:                []*types.MerkleChallenge{},
+									ApprovalId:                 "test",
+									MaxNumTransfers: &types.MaxNumTransfers{
+										OverallMaxNumTransfers: sdkmath.NewUint(1000),
+									},
+									ApprovalAmounts: &types.ApprovalAmounts{
+										PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+									},
+								},
 							},
 						},
 					},
@@ -200,14 +212,13 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 
 func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*types.MsgNewCollection {
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(uint64(math.MaxUint64))
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(uint64(math.MaxUint64))
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append([]*types.CollectionApprovedTransfer{{
 
 		ToMappingId:                            "All",
 		FromMappingId:                          "Mint",
 		InitiatedByMappingId:                   "All",
-		OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
+		
 		TransferTimes:                          GetFullUintRanges(),
 		BadgeIds:                               GetFullUintRanges(),
 		OwnedTimes: GetFullUintRanges(),
@@ -216,13 +227,19 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*type
 				IsAllowed: true,
 			},
 		},
-		Challenges:                []*types.Challenge{},
-		ApprovalId:                 "test",
-		MaxNumTransfers: &types.MaxNumTransfers{
-			OverallMaxNumTransfers: sdkmath.NewUint(1000),
-		},
-		ApprovalAmounts: &types.ApprovalAmounts{
-			PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MerkleChallenges:                []*types.MerkleChallenge{},
+				ApprovalId:                 "mint-test",
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				},
+				OverridesFromApprovedOutgoingTransfers: true,
+				OverridesToApprovedIncomingTransfers:   true,
+			},
 		},
 	},
 	}, collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers...,
