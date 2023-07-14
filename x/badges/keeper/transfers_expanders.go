@@ -12,36 +12,13 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 	newCurrApprovedTransfers := []*types.CollectionApprovedTransfer{}
 	for _, approvedTransfer := range approvedTransfers {
 		for _, allowedCombination := range approvedTransfer.AllowedCombinations {
-			badgeIds := approvedTransfer.BadgeIds
-			if allowedCombination.InvertBadgeIds {
-				badgeIds = types.InvertUintRanges(badgeIds, sdkmath.NewUint(math.MaxUint64))
-			}
-
-			ownedTimes := approvedTransfer.OwnedTimes
-			if allowedCombination.InvertOwnedTimes {
-				ownedTimes = types.InvertUintRanges(ownedTimes, sdkmath.NewUint(math.MaxUint64))
-			}
-
-			times := approvedTransfer.TransferTimes
-			if allowedCombination.InvertTransferTimes {
-				times = types.InvertUintRanges(times, sdkmath.NewUint(math.MaxUint64))
-			}
-
-			toMappingId := approvedTransfer.ToMappingId
-			if allowedCombination.InvertTo {
-				toMappingId = "!" + toMappingId
-			}
-
-			fromMappingId := approvedTransfer.FromMappingId
-			if allowedCombination.InvertFrom {
-				fromMappingId = "!" + fromMappingId
-			}
-
-			initiatedByMappingId := approvedTransfer.InitiatedByMappingId
-			if allowedCombination.InvertInitiatedBy {
-				initiatedByMappingId = "!" + initiatedByMappingId
-			}
-
+			badgeIds := types.GetUintRangesWithOptions(approvedTransfer.BadgeIds, allowedCombination.BadgeIdsOptions, true)
+			ownedTimes := types.GetUintRangesWithOptions(approvedTransfer.OwnedTimes, allowedCombination.OwnedTimesOptions, true)
+			times := types.GetUintRangesWithOptions(approvedTransfer.TransferTimes, allowedCombination.TransferTimesOptions, true)
+			toMappingId := types.GetMappingIdWithOptions(approvedTransfer.ToMappingId, allowedCombination.ToMappingOptions, true)
+			fromMappingId := types.GetMappingIdWithOptions(approvedTransfer.FromMappingId, allowedCombination.FromMappingOptions, true)
+			initiatedByMappingId := types.GetMappingIdWithOptions(approvedTransfer.InitiatedByMappingId, allowedCombination.InitiatedByMappingOptions, true)
+			
 			newCurrApprovedTransfers = append(newCurrApprovedTransfers, &types.CollectionApprovedTransfer{
 				ToMappingId:          toMappingId,
 				FromMappingId:        fromMappingId,

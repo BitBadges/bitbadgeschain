@@ -160,7 +160,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 							ApprovalDetails: []*types.OutgoingApprovalDetails{
 								{
 									MerkleChallenges:                []*types.MerkleChallenge{},
-									ApprovalId:                 "test",
+									ApprovalId:                 		"test",
 									MaxNumTransfers: &types.MaxNumTransfers{
 										OverallMaxNumTransfers: sdkmath.NewUint(1000),
 									},
@@ -196,7 +196,8 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 				CanCreateMoreBadges: []*types.BalancesActionPermission{
 					{
 						DefaultValues: &types.BalancesActionDefaultValues{
-							BadgeIds:       GetFullUintRanges(),
+							// BadgeIds:       GetFullUintRanges(),
+							// OwnedTimes:     GetFullUintRanges(),
 							PermittedTimes: GetFullUintRanges(),
 							ForbiddenTimes: []*types.UintRange{},
 						},

@@ -86,249 +86,545 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 
 // first bool is if URI is needed, second is if ID Range is needed
 func GetMsgValueTypes(route string) map[string][]apitypes.Type {
+	valueOptionsTypes := []apitypes.Type{
+		{Name: "invertDefault", Type: "bool"},
+		{Name: "allValues", Type: "bool"}, //Override default values with all possible values
+		{Name: "noValues", Type: "bool"}, //Override default values with no values
+	}
 
-	// permissionType := []apitypes.Type{
-	// 	{Name: "isFrozen", Type: "bool"},
-	// 	{Name: "timeIntervals", Type: "UintRange[]"},
-	// }
+	uintRangeTypes := []apitypes.Type{
+		{Name: "start", Type: "uint64"},
+		{Name: "end", Type: "uint64"},
+	}
 
-	// permissionsTypes := []apitypes.Type{
-	// 	{Name: "canArchive", Type: "Permission"},
-	// 	{Name: "canUpdateContractAddress", Type: "Permission"},
-	// 	{Name: "canUpdateOffChainBalancesMetadata", Type: "Permission"},
-	// 	{Name: "canDeleteCollection", Type: "Permission"},
-	// 	{Name: "canUpdateCustomData", Type: "Permission"},
-	// 	{Name: "canUpdateManager", Type: "Permission"},
-	// 	{Name: "canUpdateCollectionMetadata", Type: "Permission"},
-	// 	{Name: "canUpdateBadgeMetadata", Type: "Permission"},
-	// 	{Name: "canCreateMoreBadges", Type: "Permission"},
-	// 	{Name: "canUpdateCollectionApprovedTransfers", Type: "Permission"},
-	// }
+	balanceTypes := []apitypes.Type{
+		{Name: "amount", Type: "uint64"},
+		{Name: "badgeIds", Type: "UintRange[]"},
+		{Name: "ownedTimes", Type: "UintRange[]"},
+	}
 
-	// collectionApprovedTransferTypes := []apitypes.Type{
-	// 	{Name: "from", Type: "AddressMapping"},
-	// 	{Name: "to", Type: "AddressMapping"},
-	// 	{Name: "initiatedBy", Type: "AddressMapping"},
-	// 	{Name: "includeMints", Type: "bool"},
-	// 	{Name: "isAllowed", Type: "bool"},
-	// 	{Name: "isFrozen", Type: "bool"},
-	// 	{Name: "noApprovalRequired", Type: "bool"},
-	// 	{Name: "badgeIds", Type: "UintRange[]"},
-	// 	{Name: "timeIntervals", Type: "UintRange[]"},
-	// }
+	proofItemTypes := []apitypes.Type{
+		{Name: "aunt", Type: "string"},
+		{Name: "onRight", Type: "bool"},
+	}
 
-	// addressesTypes := []apitypes.Type{
-	// 	{Name: "addresses", Type: "string[]"},
-	// 	{Name: "includeAddresses", Type: "bool"},
-	// }
+	proofTypes := []apitypes.Type{
+		{Name: "aunts", Type: "MerklePathItem[]"},
+		{Name: "leaf", Type: "string"},
+	}
+	UserApprovedOutgoingTransferTimelineTypes := []apitypes.Type{
+		{Name: "approvedOutgoingTransfers", Type: "UserApprovedOutgoingTransfer[]"},
+		{Name: "timelineTimes", Type: "UintRange[]"},
+	}
+	UserApprovedIncomingTransferTimelineTypes := []apitypes.Type{
+		{Name: "approvedIncomingTransfers", Type: "UserApprovedIncomingTransfer[]"},
+		{Name: "timelineTimes", Type: "UintRange[]"},
+	}
+	UserPermissionsTypes := []apitypes.Type{
+		{Name: "canUpdateApprovedOutgoingTransfers", Type: "UserApprovedOutgoingTransferPermission[]"},
+		{Name: "canUpdateApprovedIncomingTransfers", Type: "UserApprovedIncomingTransferPermission[]"},
+	}
+	UserApprovedOutgoingTransferTypes := []apitypes.Type{
+		{Name: "toMappingId", Type: "string"},
+		{Name: "initiatedByMappingId", Type: "string"},
+		{Name: "transferTimes", Type: "UintRange[]"},
+		{Name: "badgeIds", Type: "UintRange[]"},
+		{Name: "ownedTimes", Type: "UintRange[]"},
+		{Name: "allowedCombinations", Type: "IsUserOutgoingTransferAllowed[]"},
+		{Name: "approvalDetails", Type: "OutgoingApprovalDetails[]"},
+	}
+	UserApprovedIncomingTransferTypes := []apitypes.Type{
+		{Name: "fromMappingId", Type: "string"},
+		{Name: "initiatedByMappingId", Type: "string"},
+		{Name: "transferTimes", Type: "UintRange[]"},
+		{Name: "badgeIds", Type: "UintRange[]"},
+		{Name: "ownedTimes", Type: "UintRange[]"},
+		{Name: "allowedCombinations", Type: "IsUserIncomingTransferAllowed[]"},
+		{Name: "approvalDetails", Type: "IncomingApprovalDetails[]"},
+	}
+	UserApprovedOutgoingTransferPermissionTypes := []apitypes.Type{
+		{Name: "defaultValues", Type: "UserApprovedOutgoingTransferDefaultValues"},
+		{Name: "combinations", Type: "UserApprovedOutgoingTransferCombination[]"},
+	}
+	UserApprovedIncomingTransferPermissionTypes := []apitypes.Type{
+		{Name: "defaultValues", Type: "UserApprovedIncomingTransferDefaultValues"},
+		{Name: "combinations", Type: "UserApprovedIncomingTransferCombination[]"},
+	}
+	UserApprovedOutgoingTransferDefaultValuesTypes := []apitypes.Type{
+		{Name: "timelineTimes", Type: "UintRange[]"},
+		{Name: "toMappingId", Type: "string"},
+		{Name: "initiatedByMappingId", Type: "string"},
+		{Name: "transferTimes", Type: "UintRange[]"},
+		{Name: "badgeIds", Type: "UintRange[]"},
+		{Name: "ownedTimes", Type: "UintRange[]"},
 
-	// uintRangeTypes := []apitypes.Type{
-	// 	{Name: "start", Type: "uint64"},
-	// 	{Name: "end", Type: "uint64"},
-	// }
+		{Name: "permittedTimes", Type: "UintRange[]"},
+		{Name: "forbiddenTimes", Type: "UintRange[]"},
+	}
+	UserApprovedOutgoingTransferCombinationTypes := []apitypes.Type{
+		{Name: "timelineTimeOptions", Type: "ValueOptions"},
+		{Name: "toMappingOptions", Type: "ValueOptions"},
+		{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
+		{Name: "transferTimesOptions", Type: "ValueOptions"},
+		{Name: "badgeIdsOptions", Type: "ValueOptions"},
+		{Name: "ownedTimesOptions", Type: "ValueOptions"},
+		{Name: "permittedTimesOptions", Type: "ValueOptions"},
+		{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
+	}
+	UserApprovedIncomingTransferDefaultValuesTypes := []apitypes.Type{
+		{Name: "timelineTimes", Type: "UintRange[]"},
+		{Name: "fromMappingId", Type: "string"},
+		{Name: "initiatedByMappingId", Type: "string"},
+		{Name: "transferTimes", Type: "UintRange[]"},
+		{Name: "badgeIds", Type: "UintRange[]"},
+		{Name: "ownedTimes", Type: "UintRange[]"},
 
-	// balanceTypes := []apitypes.Type{
-	// 	{Name: "amount", Type: "uint64"},
-	// 	{Name: "badgeIds", Type: "UintRange[]"},
-	// }
+		{Name: "permittedTimes", Type: "UintRange[]"},
+		{Name: "forbiddenTimes", Type: "UintRange[]"},
+	}
+	UserApprovedIncomingTransferCombinationTypes := []apitypes.Type{
+		{Name: "timelineTimeOptions", Type: "ValueOptions"},
+		{Name: "fromMappingOptions", Type: "ValueOptions"},
+		{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
+		{Name: "transferTimesOptions", Type: "ValueOptions"},
+		{Name: "badgeIdsOptions", Type: "ValueOptions"},
+		{Name: "ownedTimesOptions", Type: "ValueOptions"},
+		{Name: "permittedTimesOptions", Type: "ValueOptions"},
+		{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
+	}
+	IsUserOutgoingTransferAllowedTypes := []apitypes.Type{
+		{Name: "toMappingOptions", Type: "ValueOptions"},
+		{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
+		{Name: "transferTimesOptions", Type: "ValueOptions"},
+		{Name: "badgeIdsOptions", Type: "ValueOptions"},
+		{Name: "ownedTimesOptions", Type: "ValueOptions"},
+		{Name: "isAllowed", Type: "bool"},
+	}
+	OutgoingApprovalDetailsTypes := []apitypes.Type{
+		{Name: "approvalId", Type: "string"},
+		{Name: "uri", Type: "string"},
+		{Name: "customData", Type: "string"},
 
-	// badgeSupplyAndAmountTypes := []apitypes.Type{
-	// 	{Name: "supply", Type: "uint64"},
-	// 	{Name: "amount", Type: "uint64"},
-	// }
+		{Name: "mustOwnBadges", Type: "MustOwnBadges[]"},
+		{Name: "merkleChallenges", Type: "MerkleChallenge[]"},
+		{Name: "predeterminedBalances", Type: "PredeterminedBalances"},
+		{Name: "approvalAmounts", Type: "ApprovalAmounts"},
+		{Name: "maxNumTransfers", Type: "MaxNumTransfers"},
 
-	// transfersTypes := []apitypes.Type{
-	// 	{Name: "toAddresses", Type: "string[]"},
-	// 	{Name: "balances", Type: "Balance[]"},
-	// }
+		{Name: "requireToEqualsInitiatedBy", Type: "bool"},
+		{Name: "requireToDoesNotEqualInitiatedBy", Type: "bool"},
+	}
+	IsUserIncomingTransferAllowedTypes := []apitypes.Type{
+		{Name: "fromMappingOptions", Type: "ValueOptions"},
+		{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
+		{Name: "transferTimesOptions", Type: "ValueOptions"},
+		{Name: "badgeIdsOptions", Type: "ValueOptions"},
+		{Name: "ownedTimesOptions", Type: "ValueOptions"},
+		{Name: "isAllowed", Type: "bool"},
+	}
+	IncomingApprovalDetailsTypes := []apitypes.Type{
+		{Name: "approvalId", Type: "string"},
+		{Name: "uri", Type: "string"},
+		{Name: "customData", Type: "string"},
 
-	// claimsTypes := []apitypes.Type{
-	// 	{Name: "balances", Type: "Balance[]"},
-	// 	{Name: "timeIntervals", Type: "UintRange[]"},
-	// 	{Name: "uri", Type: "string"},
-	// 	{Name: "numClaimsPerAddress", Type: "uint64"},
-	// 	{Name: "IncrementBadgeIdsBy", Type: "uint64"},
-	// 	{Name: "startingClaimAmounts", Type: "Balance[]"},
-	// 	{Name: "challenges", Type: "Challenge[]"},
-	// 	{Name: "totalClaimsProcessed", Type: "uint64"},
-	// 	{Name: "isAssignable", Type: "bool"},
-	// 	{Name: "createdBy", Type: "string"},
-	// 	{Name: "isReturnable", Type: "bool"},
-	// }
+		{Name: "mustOwnBadges", Type: "MustOwnBadges[]"},
+		{Name: "merkleChallenges", Type: "MerkleChallenge[]"},
+		{Name: "predeterminedBalances", Type: "PredeterminedBalances"},
+		{Name: "approvalAmounts", Type: "ApprovalAmounts"},
+		{Name: "maxNumTransfers", Type: "MaxNumTransfers"},
 
-	// proofItemTypes := []apitypes.Type{
-	// 	{Name: "aunt", Type: "string"},
-	// 	{Name: "onRight", Type: "bool"},
-	// }
-
-	// proofTypes := []apitypes.Type{
-	// 	{Name: "aunts", Type: "MerklePathItem[]"},
-	// 	{Name: "leaf", Type: "string"},
-	// }
-
-	// badgeMetadataType := []apitypes.Type{
-	// 	{Name: "uri", Type: "string"},
-	// 	{Name: "badgeIds", Type: "UintRange[]"},
-	// 	{Name: "customData", Type: "string"},
-	// 	{Name: "isFrozen", Type: "bool"},
-	// }
-
-	// collectionMetadataType := []apitypes.Type{
-	// 	{Name: "uri", Type: "string"},
-	// 	{Name: "customData", Type: "string"},
-	// }
-
-	// offChainBalancesMetadataType := []apitypes.Type{
-	// 	{Name: "uri", Type: "string"},
-	// 	{Name: "customData", Type: "string"},
-	// }
-
-	// challengeType := []apitypes.Type{
-	// 	{Name: "root", Type: "string"},
-	// 	{Name: "expectedProofLength", Type: "uint64"},
-	// 	{Name: "isWhitelistTree", Type: "bool"},
-	// 	{Name: "maxOneUsePerLeaf", Type: "bool"},
-	// 	{Name: "useLeafIndexForBadgeIds", Type: "bool"},
-	// }
-
-	// challengeSolutionType := []apitypes.Type{
-	// 	{Name: "proof", Type: "ClaimProof"},
-	// }
-
+		{Name: "requireFromEqualsInitiatedBy", Type: "bool"},
+		{Name: "requireFromDoesNotEqualInitiatedBy", Type: "bool"},
+	}
+	MustOwnBadgesTypes := []apitypes.Type{
+		{Name: "collectionId", Type: "uint64"},
+		{Name: "amountRange", Type: "UintRange"},
+		{Name: "badgeIds", Type: "UintRange[]"},
+		{Name: "ownedTimes", Type: "UintRange[]"},
+	}
+	MerkleChallengeTypes := []apitypes.Type{
+		{Name: "root", Type: "string"},
+		{Name: "expectedProofLength", Type: "uint64"},
+		{Name: "useCreatorAddressAsLeaf", Type: "bool"},
+		{Name: "maxOneUsePerLeaf", Type: "bool"},
+		{Name: "useLeafIndexForTransferOrder", Type: "bool"},
+		{Name: "challengeId", Type: "string"},
+	}
+	PredeterminedBalancesTypes := []apitypes.Type{
+		{Name: "manualBalances", Type: "ManualBalances[]"},
+		{Name: "incrementedBalances", Type: "IncrementedBalances"},
+		{Name: "orderCalculationMethod", Type: "PredeterminedOrderCalculationMethod"},
+	}
+	ApprovalAmountsTypes := []apitypes.Type{
+		{Name: "overallApprovalAmount", Type: "uint64"},
+		{Name: "perToAddressApprovalAmount", Type: "uint64"},
+		{Name: "perFromAddressApprovalAmount", Type: "uint64"},
+		{Name: "perInitiatedByAddressApprovalAmount", Type: "uint64"},
+	}
+	MaxNumTransfersTypes := []apitypes.Type{
+		{Name: "overallMaxNumTransfers", Type: "uint64"},
+		{Name: "perToAddressMaxNumTransfers", Type: "uint64"},
+		{Name: "perFromAddressMaxNumTransfers", Type: "uint64"},
+		{Name: "perInitiatedByAddressMaxNumTransfers", Type: "uint64"},
+	}
+	ManualBalancesTypes := []apitypes.Type{
+		{Name: "balances", Type: "Balance[]"},
+	}
+	IncrementedBalancesTypes := []apitypes.Type{
+		{Name: "startBalances", Type: "Balance[]"},
+		{Name: "incrementBadgeIdsBy", Type: "uint64"},
+		{Name: "incrementOwnedTimesBy", Type: "uint64"},
+	}
+	PredeterminedOrderCalculationMethodTypes := []apitypes.Type{
+		{Name: "useOverallNumTransfers", Type: "bool"},
+		{Name: "usePerToAddressNumTransfers", Type: "bool"},
+		{Name: "usePerFromAddressNumTransfers", Type: "bool"},
+		{Name: "usePerInitiatedByAddressNumTransfers", Type: "bool"},
+		{Name: "useMerkleChallengeLeafIndex", Type: "bool"},
+	}
+	
 	switch route {
 
-	// case TypeMsgDeleteCollection:
-	// 	return map[string][]apitypes.Type{
-	// 		"MsgValue": {
-	// 			{Name: "creator", Type: "string"},
-	// 			{Name: "collectionId", Type: "uint64"},
-	// 		},
-	// 	}
+	case TypeMsgDeleteCollection:
+		return map[string][]apitypes.Type{
+			"MsgValue": {
+				{Name: "creator", Type: "string"},
+				{Name: "collectionId", Type: "uint64"},
+			},
+		}
+		
+	case TypeMsgCreateAddressMappings:
+		return map[string][]apitypes.Type{
+			"MsgValue": {
+				{Name: "creator", Type: "string"},
+				{Name: "addressMappings", Type: "AddressMapping[]"},
+			},
+			"AddressMapping": {
+				{Name: "mappingId", Type: "string"},
+				{Name: "addresses", Type: "string[]"},
+				{Name: "includeAddresses", Type: "bool"},
+				{Name: "uri", Type: "string"},
+				{Name: "customData", Type: "string"},
+			},
+		}
+	case TypeMsgTransferBadges:
+		return map[string][]apitypes.Type{
+			"MsgValue": {
+				{Name: "creator", Type: "string"},
+				{Name: "collectionId", Type: "uint64"},
+				{Name: "transfers", Type: "Transfer[]"},
+			},
+			"Transfer": {
+				{Name: "from", Type: "string"},
+				{Name: "toAddresses", Type: "string[]"},
+				{Name: "balances", Type: "Balance[]"},
+				{Name: "precalculateFromApproval", Type: "ApprovalIdDetails"},
+				{Name: "merkleProofs", Type: "MerkleProof[]"},
+				{Name: "memo", Type: "string"},
+			},
+			"Balance": balanceTypes,
+			"ApprovalIdDetails": {
+				{Name: "approvalId", Type: "string"},
+				{Name: "approvalLevel", Type: "string"},
+				{Name: "address", Type: "string"},
+			},
+			"MerkleProof": proofTypes,
+			"MerkePathItem": proofItemTypes,
+		}
 
-	// case TypeMsgNewCollection:
-	// 	return map[string][]apitypes.Type{
-	// 		"MsgValue": {
-	// 			{Name: "creator", Type: "string"},
-	// 			{Name: "collectionMetadata", Type: "CollectionMetadata"},
-	// 			{Name: "badgeMetadata", Type: "BadgeMetadata[]"},
-	// 			{Name: "offChainBalancesMetadata", Type: "OffChainBalancesMetadata"},
-	// 			{Name: "customData", Type: "string"},
-	// 			{Name: "permissions", Type: "Permissions"},
-	// 			{Name: "approvedTransfers", Type: "CollectionApprovedTransfer[]"},
-	// 			{Name: "standard", Type: "uint64"},
-	// 			{Name: "badgesToCreate", Type: "BadgeSupplyAndAmount[]"},
-	// 			{Name: "transfers", Type: "Transfer[]"},
-	// 			{Name: "claims", Type: "Claim[]"},
-	// 			{Name: "contractAddress", Type: "string"},
-	// 		},
-	// 		"CollectionApprovedTransfer": collectionApprovedTransferTypes,
-	// 		"AddressMapping":           addressesTypes,
-	// 		"UintRange":                    uintRangeTypes,
-	// 		"BadgeSupplyAndAmount":       badgeSupplyAndAmountTypes,
-	// 		"Transfer":                   transfersTypes,
-	// 		"Claim":                      claimsTypes,
-	// 		"Balance":                    balanceTypes,
-	// 		"BadgeMetadata":              badgeMetadataType,
-	// 		"CollectionMetadata":         collectionMetadataType,
-	// 		"OffChainBalancesMetadata":           offChainBalancesMetadataType,
-	// 		"Challenge":                  challengeType,
-	// 		"Permissions":                permissionsTypes,
-	// 		"Permission":                 permissionType,
-	// 	}
-	// case TypeMsgMintAndDistributeBadges:
-
-	// 	return map[string][]apitypes.Type{
-	// 		"MsgValue": {
-	// 			{Name: "creator", Type: "string"},
-	// 			{Name: "collectionId", Type: "uint64"},
-	// 			{Name: "badgesToCreate", Type: "BadgeSupplyAndAmount[]"},
-	// 			{Name: "transfers", Type: "Transfer[]"},
-	// 			{Name: "claims", Type: "Claim[]"},
-	// 			{Name: "collectionMetadata", Type: "CollectionMetadata"},
-	// 			{Name: "badgeMetadata", Type: "BadgeMetadata[]"},
-	// 			{Name: "offChainBalancesMetadata", Type: "OffChainBalancesMetadata"},
-	// 			{Name: "approvedTransfers", Type: "CollectionApprovedTransfer[]"},
-	// 		},
-	// 		"BadgeSupplyAndAmount":       badgeSupplyAndAmountTypes,
-	// 		"Transfer":                   transfersTypes,
-	// 		"Claim":                      claimsTypes,
-	// 		"Balance":                    balanceTypes,
-	// 		"UintRange":                    uintRangeTypes,
-	// 		"BadgeMetadata":              badgeMetadataType,
-	// 		"CollectionMetadata":         collectionMetadataType,
-	// 		"OffChainBalancesMetadata":           offChainBalancesMetadataType,
-	// 		"Challenge":                  challengeType,
-	// 		"CollectionApprovedTransfer": collectionApprovedTransferTypes,
-	// 	}
-
-	// case TypeMsgTransferBadges:
-	// 	return map[string][]apitypes.Type{
-	// 		"MsgValue": {
-	// 			{Name: "creator", Type: "string"},
-	// 			{Name: "from", Type: "string"},
-	// 			{Name: "transfers", Type: "Transfer[]"},
-	// 			{Name: "collectionId", Type: "uint64"},
-	// 		},
-	// 		"Transfer": transfersTypes,
-	// 		"Balance":  balanceTypes,
-	// 		"UintRange":  uintRangeTypes,
-	// 	}
-	// case TypeMsgUpdateUserApprovedTransfers:
-	// 	return map[string][]apitypes.Type{
-	// 		"MsgValue": {
-	// 			{Name: "creator", Type: "string"},
-	// 			{Name: "collectionId", Type: "uint64"},
-	// 			{Name: "approvedTransfers", Type: "UserApprovedOutgoingTransfer[]"},
-	// 		},
-	// 		"UserApprovedOutgoingTransfer": 			UserApprovedOutgoingTransferTypes,
-	// 		"AddressMapping":           addressesTypes,
-	// 		"UintRange":                    uintRangeTypes,
-	// 	}
-	// case TypeMsgUpdateCollectionApprovedTransfers:
-	// 	return map[string][]apitypes.Type{
-	// 		"MsgValue": {
-	// 			{Name: "creator", Type: "string"},
-	// 			{Name: "collectionId", Type: "uint64"},
-	// 			{Name: "approvedTransfers", Type: "CollectionApprovedTransfer[]"},
-	// 		},
-	// 		"CollectionApprovedTransfer": collectionApprovedTransferTypes,
-	// 		"AddressMapping":           addressesTypes,
-	// 		"UintRange":                    uintRangeTypes,
-	// 	}
-	// case TypeMsgUpdateMetadata:
-	// 	return map[string][]apitypes.Type{
-	// 		"MsgValue": {
-	// 			{Name: "creator", Type: "string"},
-	// 			{Name: "collectionId", Type: "uint64"},
-	// 			{Name: "collectionMetadata", Type: "CollectionMetadata"},
-	// 			{Name: "badgeMetadata", Type: "BadgeMetadata[]"},
-	// 			{Name: "offChainBalancesMetadata", Type: "OffChainBalancesMetadata"},
-	// 			{Name: "customData", Type: "string"},
-	// 			{Name: "contractAddress", Type: "string"},
-	// 		},
-	// 		"BadgeMetadata":      badgeMetadataType,
-	// 		"CollectionMetadata": collectionMetadataType,
-	// 		"OffChainBalancesMetadata":   offChainBalancesMetadataType,
-	// 		"UintRange":            uintRangeTypes,
-	// 	}
-	// case TypeMsgUpdateCollectionPermissions:
-	// 	return map[string][]apitypes.Type{
-	// 		"MsgValue": {
-	// 			{Name: "creator", Type: "string"},
-	// 			{Name: "collectionId", Type: "uint64"},
-	// 			{Name: "permissions", Type: "Permissions"},
-	// 		},
-	// 		"Permissions": permissionsTypes,
-	// 		"Permission":  permissionType,
-	// 	}
-	// case TypeMsgUpdateManager:
-	// 	return map[string][]apitypes.Type{
-	// 		"MsgValue": {
-	// 			{Name: "creator", Type: "string"},
-	// 			{Name: "collectionId", Type: "uint64"},
-	// 			{Name: "address", Type: "string"},
-	// 		},
-	// 	}
+	case TypeMsgUpdateUserApprovedTransfers:
+		return map[string][]apitypes.Type{
+			"MsgValue": {
+				{Name: "creator", Type: "string"},
+				{Name: "collectionId", Type: "uint64"},
+				{Name: "updateApprovedOutgoingTransfersTimeline", Type: "bool"},
+				{Name: "approvedOutgoingTransfersTimeline", Type: "UserApprovedOutgoingTransferTimeline[]"},
+				{Name: "updateApprovedIncomingTransfersTimeline", Type: "bool"},
+				{Name: "approvedIncomingTransfersTimeline", Type: "UserApprovedIncomingTransferTimeline[]"},
+				{Name: "updateUserPermissions", Type: "bool"},
+				{Name: "userPermissions", Type: "UserPermissions"},
+			},
+			"UserApprovedOutgoingTransferTimeline": UserApprovedOutgoingTransferTimelineTypes,
+			"UserApprovedIncomingTransferTimeline": UserApprovedIncomingTransferTimelineTypes,
+			"UserPermissions": UserPermissionsTypes,
+			"UserApprovedOutgoingTransfer": UserApprovedOutgoingTransferTypes,
+			"UserApprovedIncomingTransfer": UserApprovedIncomingTransferTypes,
+			"UserApprovedOutgoingTransferPermission": UserApprovedOutgoingTransferPermissionTypes,
+			"UserApprovedIncomingTransferPermission": UserApprovedIncomingTransferPermissionTypes,
+			"UserApprovedOutgoingTransferDefaultValues": UserApprovedOutgoingTransferDefaultValuesTypes,
+			"UserApprovedOutgoingTransferCombination": UserApprovedOutgoingTransferCombinationTypes,
+			"UserApprovedIncomingTransferDefaultValues": UserApprovedIncomingTransferDefaultValuesTypes,
+			"UserApprovedIncomingTransferCombination": UserApprovedIncomingTransferCombinationTypes,
+			"Balance": balanceTypes,
+			"UintRange": uintRangeTypes,
+			"ValueOptions": valueOptionsTypes,
+			"IsUserOutgoingTransferAllowed": IsUserOutgoingTransferAllowedTypes,
+			"OutgoingApprovalDetails": OutgoingApprovalDetailsTypes,
+			"IsUserIncomingTransferAllowed": IsUserIncomingTransferAllowedTypes,
+			"IncomingApprovalDetails": IncomingApprovalDetailsTypes,
+			"MustOwnBadges": MustOwnBadgesTypes,
+			"MerkleChallenge": MerkleChallengeTypes,
+			"PredeterminedBalances": PredeterminedBalancesTypes,
+			"ApprovalAmounts": ApprovalAmountsTypes,
+			"MaxNumTransfers":	MaxNumTransfersTypes,
+			"ManualBalances":  ManualBalancesTypes,
+			"IncrementedBalances": IncrementedBalancesTypes,
+			"PredeterminedOrderCalculationMethod": PredeterminedOrderCalculationMethodTypes,
+		}
+	
+	
+	case TypeMsgUpdateCollection:
+		return map[string][]apitypes.Type{
+			"MsgValue": {
+				{Name: "creator", Type: "string"},
+				{Name: "collectionId", Type: "uint64"},
+				{Name: "balancesType", Type: "string"},
+				{Name: "defaultApprovedOutgoingTransfersTimeline", Type: "UserApprovedOutgoingTransferTimeline[]"},
+				{Name: "defaultApprovedIncomingTransfersTimeline", Type: "UserApprovedIncomingTransferTimeline[]"},
+				{Name: "defaultUserPermissions", Type: "UserPermissions"},
+				{Name: "badgesToCreate", Type: "Balance[]"},
+				{Name: "updateCollectionPermissions", Type: "bool"},
+				{Name: "collectionPermissions", Type: "CollectionPermissions"},
+				{Name: "updateManagerTimeline", Type: "bool"},
+				{Name: "managerTimeline", Type: "ManagerTimeline[]"},
+				{Name: "updateCollectionMetadataTimeline", Type: "bool"},
+				{Name: "collectionMetadataTimeline", Type: "CollectionMetadataTimeline[]"},
+				{Name: "updateBadgeMetadataTimeline", Type: "bool"},
+				{Name: "badgeMetadataTimeline", Type: "BadgeMetadataTimeline[]"},
+				{Name: "updateOffChainBalancesMetadataTimeline", Type: "bool"},
+				{Name: "offChainBalancesMetadataTimeline", Type: "OffChainBalancesMetadataTimeline[]"},
+				{Name: "updateCustomDataTimeline", Type: "bool"},
+				{Name: "customDataTimeline", Type: "CustomDataTimeline[]"},
+				{Name: "updateInheritedBalancesTimeline", Type: "bool"},
+				{Name: "inheritedBalancesTimeline", Type: "InheritedBalancesTimeline[]"},
+				{Name: "updateCollectionApprovedTransfersTimeline", Type: "bool"},
+				{Name: "collectionApprovedTransfersTimeline", Type: "CollectionApprovedTransferTimeline[]"},
+				{Name: "updateStandardsTimeline", Type: "bool"},
+				{Name: "standardsTimeline", Type: "StandardsTimeline[]"},
+				{Name: "updateContractAddressTimeline", Type: "bool"},
+				{Name: "contractAddressTimeline", Type: "ContractAddressTimeline[]"},
+				{Name: "updateIsArchivedTimeline", Type: "bool"},
+				{Name: "isArchivedTimeline", Type: "IsArchivedTimeline[]"},
+			},
+			
+			"CollectionsPermissions": {
+				{Name: "canDeleteCollection", Type: "ActionPermission[]"},
+				{Name: "canArchiveCollection", Type: "TimedUpdatePermission[]"},
+				{Name: "canUpdateContractAddress", Type: "TimedUpdatePermission[]"},
+				{Name: "canUpdateOffChainBalancesMetadata", Type: "TimedUpdatePermission[]"},
+				{Name: "canUpdateStandards", Type: "TimedUpdatePermission[]"},
+				{Name: "canUpdateCustomData", Type: "TimedUpdatePermission[]"},
+				{Name: "canUpdateManager", Type: "TimedUpdatePermission[]"},
+				{Name: "canUpdateCollectionMetadata", Type: "TimedUpdatePermission[]"},
+				{Name: "canCreateMoreBadges", Type: "BalancesActionPermission[]"},
+				{Name: "canUpdateBadgeMetadata", Type: "TimedUpdateWithBadgeIdsPermission[]"},
+				{Name: "canUpdateInheritedBalances", Type: "TimedUpdateWithBadgeIdsPermission[]"},
+				{Name: "canUpdateCollectionApprovedTransfers", Type: "CollectionApprovedTransferPermission[]"},
+			},
+			"ManagerTimeline": {
+				{Name: "manager", Type: "string"},
+				{Name: "timelineTimes", Type: "UintRange[]"},
+			},
+			"CollectionMetadataTimeline": {
+				{Name: "collectionMetadata", Type: "CollectionMetadata"},
+				{Name: "timelineTimes", Type: "UintRange[]"},
+			},
+			"BadgeMetadataTimeline": {
+				{Name: "badgeMetadata", Type: "BadgeMetadata[]"},
+				{Name: "timelineTimes", Type: "UintRange[]"},
+			},
+			"OffChainBalancesMetadataTimeline": {
+				{Name: "offChainBalancesMetadata", Type: "OffChainBalancesMetadata"},
+				{Name: "timelineTimes", Type: "UintRange[]"},
+			},
+			"CustomDataTimeline": {
+				{Name: "customData", Type: "string"},
+				{Name: "timelineTimes", Type: "UintRange[]"},
+			},
+			"InheritedBalancesTimeline": {
+				{Name: "inheritedBalances", Type: "InheritedBalance[]"},
+				{Name: "timelineTimes", Type: "UintRange[]"},
+			},
+			"CollectionApprovedTransferTimeline": {
+				{Name: "collectionApprovedTransfers", Type: "CollectionApprovedTransfer[]"},
+				{Name: "timelineTimes", Type: "UintRange[]"},
+			},
+			"StandardsTimeline": {
+				{Name: "standards", Type: "string[]"},
+				{Name: "timelineTimes", Type: "UintRange[]"},
+			},
+			"ContractAddressTimeline": {
+				{Name: "contractAddress", Type: "string"},
+				{Name: "timelineTimes", Type: "UintRange[]"},
+			},
+			"IsArchivedTimeline": {
+				{Name: "isArchived", Type: "bool"},
+				{Name: "timelineTimes", Type: "UintRange[]"},
+			},
+			"CollectionApprovedTransfer": {
+				{Name: "fromMappingId", Type: "string"},
+				{Name: "toMappingId", Type: "string"},
+				{Name: "initiatedByMappingId", Type: "string"},
+				{Name: "transferTimes", Type: "UintRange[]"},
+				{Name: "badgeIds", Type: "UintRange[]"},
+				{Name: "ownedTimes", Type: "UintRange[]"},
+				{Name: "allowedCombinations", Type: "IsCollectionTransferAllowed[]"},
+				{Name: "approvalDetails", Type: "ApprovalDetails[]"},
+			},
+			"InheritedBalance": {
+				{Name: "collectionId", Type: "uint64"},
+				{Name: "parentCollectionId", Type: "uint64"},
+				{Name: "parentBadgeIds", Type: "UintRange[]"},
+			},
+			"UintRange": uintRangeTypes,
+			"Balance": balanceTypes,
+			"BadgeMetadata": {
+				{Name: "uri", Type: "string"},
+				{Name: "customData", Type: "string"},
+				{Name: "badgeIds", Type: "UintRange[]"},
+			},
+			"CollectionMetadata": {
+				{Name: "uri", Type: "string"},
+				{Name: "customData", Type: "string"},
+			},
+			"OffChainBalancesMetadata": {
+				{Name: "uri", Type: "string"},
+				{Name: "customData", Type: "string"},
+			},
+			"IsCollectionTransferAllowed": {
+				{Name: "fromMappingOptions", Type: "ValueOptions"},
+				{Name: "toMappingOptions", Type: "ValueOptions"},
+				{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
+				{Name: "transferTimesOptions", Type: "ValueOptions"},
+				{Name: "badgeIdsOptions", Type: "ValueOptions"},
+				{Name: "ownedTimesOptions", Type: "ValueOptions"},
+				{Name: "isAllowed", Type: "bool"},
+			},
+			"ActionPermission": {
+				{Name: "defaultValues", Type: "ActionDefaultValues"},
+				{Name: "combinations", Type: "ActionCombination[]"},
+			},
+			"TimedUpdatePermission": {
+				{Name: "defaultValues", Type: "TimedUpdateDefaultValues"},
+				{Name: "combinations", Type: "TimedUpdateCombination[]"},
+			},
+			"BalancesActionPermission": {
+				{Name: "defaultValues", Type: "BalancesActionDefaultValues"},
+				{Name: "combinations", Type: "BalancesActionCombination[]"},
+			},
+			"TimedUpdateWithBadgeIdsPermission": {
+				{Name: "defaultValues", Type: "TimedUpdateWithBadgeIdsDefaultValues"},
+				{Name: "combinations", Type: "TimedUpdateWithBadgeIdsCombination[]"},
+			},
+			"CollectionApprovedTransferPermission": {
+				{Name: "defaultValues", Type: "CollectionApprovedTransferDefaultValues"},
+				{Name: "combinations", Type: "CollectionApprovedTransferCombination[]"},
+			},
+			"CollectionApprovedTransferCombination": {
+				{Name: "timelineTimeOptions", Type: "ValueOptions"},
+				{Name: "fromMappingOptions", Type: "ValueOptions"},
+				{Name: "toMappingOptions", Type: "ValueOptions"},
+				{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
+				{Name: "transferTimesOptions", Type: "ValueOptions"},
+				{Name: "badgeIdsOptions", Type: "ValueOptions"},
+				{Name: "ownedTimesOptions", Type: "ValueOptions"},
+				{Name: "permittedTimesOptions", Type: "ValueOptions"},
+				{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
+			},
+			"CollectionApprovedTransferDefaultValues": {
+				{Name: "timelineTimes", Type: "UintRange[]"},
+				{Name: "fromMappingId", Type: "string"},
+				{Name: "toMappingId", Type: "string"},
+				{Name: "initiatedByMappingId", Type: "string"},
+				{Name: "transferTimes", Type: "UintRange[]"},
+				{Name: "badgeIds", Type: "UintRange[]"},
+				{Name: "ownedTimes", Type: "UintRange[]"},
+				{Name: "permittedTimes", Type: "UintRange[]"},
+				{Name: "forbiddenTimes", Type: "UintRange[]"},
+			},
+			"BalancesActionCombination": {
+				{Name: "badgeIdsOptions", Type: "ValueOptions"},
+				{Name: "ownedTimesOptions", Type: "ValueOptions"},
+				{Name: "permittedTimesOptions", Type: "ValueOptions"},
+				{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
+			},
+			"BalancesActionDefaultValues": {
+				{Name: "badgeIds", Type: "UintRange[]"},
+				{Name: "ownedTimes", Type: "UintRange[]"},
+				{Name: "permittedTimes", Type: "UintRange[]"},
+				{Name: "forbiddenTimes", Type: "UintRange[]"},
+			},
+			"ActionCombination": {
+				{Name: "permittedTimesOptions", Type: "ValueOptions"},
+				{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
+			},
+			"ActionDefaultValues": {
+				{Name: "permittedTimes", Type: "UintRange[]"},
+				{Name: "forbiddenTimes", Type: "UintRange[]"},
+			},
+			"TimedUpdateCombination": {
+				{Name: "timelineTimeOptions", Type: "ValueOptions"},
+				{Name: "permittedTimesOptions", Type: "ValueOptions"},
+				{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
+			},
+			"TimedUpdateDefaultValues": {
+				{Name: "timelineTimes", Type: "UintRange[]"},
+				{Name: "permittedTimes", Type: "UintRange[]"},
+				{Name: "forbiddenTimes", Type: "UintRange[]"},
+			},
+			"TimedUpdateWithBadgeIdsCombination": {
+				{Name: "timelineTimeOptions", Type: "ValueOptions"},
+				{Name: "badgeIdsOptions", Type: "ValueOptions"},
+				{Name: "permittedTimesOptions", Type: "ValueOptions"},
+				{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
+			},
+			"TimedUpdateWithBadgeIdsDefaultValues": {
+				{Name: "timelineTimes", Type: "UintRange[]"},
+				{Name: "badgeIds", Type: "UintRange[]"},
+				{Name: "permittedTimes", Type: "UintRange[]"},
+				{Name: "forbiddenTimes", Type: "UintRange[]"},
+			},
+			"ApprovalDetails": {
+				{Name: "approvalId", Type: "string"},
+				{Name: "uri", Type: "string"},
+				{Name: "customData", Type: "string"},
+				{Name: "mustOwnBadges", Type: "MustOwnBadges[]"},
+				{Name: "merkleChallenges", Type: "MerkleChallenge[]"},
+				{Name: "predeterminedBalances", Type: "PredeterminedBalances"},
+				{Name: "approvalAmounts", Type: "ApprovalAmounts"},
+				{Name: "maxNumTransfers", Type: "MaxNumTransfers"},
+				{Name: "requireToEqualsInitiatedBy", Type: "bool"},
+				{Name: "requireToDoesNotEqualInitiatedBy", Type: "bool"},
+				{Name: "requireFromEqualsInitiatedBy", Type: "bool"},
+				{Name: "requireFromDoesNotEqualInitiatedBy", Type: "bool"},
+				{Name: "overridesFromApprovedOutgoingTransfers", Type: "bool"},
+				{Name: "overridesToApprovedIncomingTransfers", Type: "bool"},
+			},
+			"UserApprovedOutgoingTransferTimeline": UserApprovedOutgoingTransferTimelineTypes,
+			"UserApprovedIncomingTransferTimeline": UserApprovedIncomingTransferTimelineTypes,
+			"UserPermissions": UserPermissionsTypes,
+			"UserApprovedOutgoingTransfer": UserApprovedOutgoingTransferTypes,
+			"UserApprovedIncomingTransfer": UserApprovedIncomingTransferTypes,
+			"UserApprovedOutgoingTransferPermission": UserApprovedOutgoingTransferPermissionTypes,
+			"UserApprovedIncomingTransferPermission": UserApprovedIncomingTransferPermissionTypes,
+			"UserApprovedOutgoingTransferDefaultValues": UserApprovedOutgoingTransferDefaultValuesTypes,
+			"UserApprovedOutgoingTransferCombination": UserApprovedOutgoingTransferCombinationTypes,
+			"UserApprovedIncomingTransferDefaultValues": UserApprovedIncomingTransferDefaultValuesTypes,
+			"UserApprovedIncomingTransferCombination": UserApprovedIncomingTransferCombinationTypes,
+			"ValueOptions": valueOptionsTypes,
+			"IsUserOutgoingTransferAllowed": IsUserOutgoingTransferAllowedTypes,
+			"OutgoingApprovalDetails": OutgoingApprovalDetailsTypes,
+			"IsUserIncomingTransferAllowed": IsUserIncomingTransferAllowedTypes,
+			"IncomingApprovalDetails": IncomingApprovalDetailsTypes,
+			"MustOwnBadges": MustOwnBadgesTypes,
+			"MerkleChallenge": MerkleChallengeTypes,
+			"PredeterminedBalances": PredeterminedBalancesTypes,
+			"ApprovalAmounts": ApprovalAmountsTypes,
+			"MaxNumTransfers":	MaxNumTransfersTypes,
+			"ManualBalances":  ManualBalancesTypes,
+			"IncrementedBalances": IncrementedBalancesTypes,
+			"PredeterminedOrderCalculationMethod": PredeterminedOrderCalculationMethodTypes,
+		}
 	default:
 		return map[string][]apitypes.Type{}
 	}

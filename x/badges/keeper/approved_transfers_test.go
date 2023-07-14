@@ -369,7 +369,7 @@ func (suite *TestSuite) TestCombinations() {
 						IsAllowed: true,
 					},
 					{
-						InvertBadgeIds: true,
+						BadgeIdsOptions: &types.ValueOptions{ InvertDefault: true },
 						IsAllowed:      false,
 					},
 				},
@@ -424,7 +424,7 @@ func (suite *TestSuite) TestCombinationsOrder() {
 						IsAllowed: false,
 					},
 					{
-						InvertInitiatedBy: true,
+						InitiatedByMappingOptions: &types.ValueOptions{ InvertDefault: true },
 						IsAllowed:         true,
 					},
 				},

@@ -66,22 +66,22 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApprovedTr
 func CastOutgoingCombinationToCollectionCombination(combination *IsUserOutgoingTransferAllowed) *IsCollectionTransferAllowed {
 	return &IsCollectionTransferAllowed{
 		IsAllowed:           combination.IsAllowed,
-		InvertBadgeIds:      combination.InvertBadgeIds,
-		InvertTransferTimes: combination.InvertTransferTimes,
-		InvertTo:            combination.InvertTo,
-		InvertInitiatedBy:   combination.InvertInitiatedBy,
-		InvertOwnedTimes: combination.InvertOwnedTimes,
+		BadgeIdsOptions:      combination.BadgeIdsOptions,
+		TransferTimesOptions: combination.TransferTimesOptions,
+		ToMappingOptions:            combination.ToMappingOptions,
+		InitiatedByMappingOptions:   combination.InitiatedByMappingOptions,
+		OwnedTimesOptions: combination.OwnedTimesOptions,
 	}
 }
 
 func CastFromCollectionCombinationToOutgoingCombination(combination *IsCollectionTransferAllowed) *IsUserOutgoingTransferAllowed {
 	return &IsUserOutgoingTransferAllowed{
 		IsAllowed:           combination.IsAllowed,
-		InvertBadgeIds:      combination.InvertBadgeIds,
-		InvertTransferTimes: combination.InvertTransferTimes,
-		InvertTo:            combination.InvertTo,
-		InvertInitiatedBy:   combination.InvertInitiatedBy,
-		InvertOwnedTimes: combination.InvertOwnedTimes,
+		BadgeIdsOptions:      combination.BadgeIdsOptions,
+		TransferTimesOptions: combination.TransferTimesOptions,
+		ToMappingOptions:            combination.ToMappingOptions,
+		InitiatedByMappingOptions:   combination.InitiatedByMappingOptions,
+		OwnedTimesOptions: combination.OwnedTimesOptions,
 	}
 }
 
@@ -133,22 +133,22 @@ func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApprovedTr
 func CastIncomingCombinationToCollectionCombination(combination *IsUserIncomingTransferAllowed) *IsCollectionTransferAllowed {
 	return &IsCollectionTransferAllowed{
 		IsAllowed:           combination.IsAllowed,
-		InvertBadgeIds:      combination.InvertBadgeIds,
-		InvertTransferTimes: combination.InvertTransferTimes,
-		InvertTo:            combination.InvertFrom,
-		InvertInitiatedBy:   combination.InvertInitiatedBy,
-		InvertOwnedTimes: combination.InvertOwnedTimes,
+		BadgeIdsOptions:      combination.BadgeIdsOptions,
+		TransferTimesOptions: combination.TransferTimesOptions,
+		FromMappingOptions:            combination.FromMappingOptions,
+		InitiatedByMappingOptions:   combination.InitiatedByMappingOptions,
+		OwnedTimesOptions: combination.OwnedTimesOptions,
 	}
 }
 
 func CastFromCollectionCombinationToIncomingCombination(combination *IsCollectionTransferAllowed) *IsUserIncomingTransferAllowed {
 	return &IsUserIncomingTransferAllowed{
 		IsAllowed:           combination.IsAllowed,
-		InvertBadgeIds:      combination.InvertBadgeIds,
-		InvertTransferTimes: combination.InvertTransferTimes,
-		InvertFrom:          combination.InvertTo,
-		InvertInitiatedBy:   combination.InvertInitiatedBy,
-		InvertOwnedTimes: combination.InvertOwnedTimes,
+		BadgeIdsOptions:      combination.BadgeIdsOptions,
+		TransferTimesOptions: combination.TransferTimesOptions,
+		FromMappingOptions:          combination.FromMappingOptions,
+		InitiatedByMappingOptions:   combination.InitiatedByMappingOptions,
+		OwnedTimesOptions: combination.OwnedTimesOptions,
 	}
 }
 

@@ -317,6 +317,30 @@ func GetUintRangesWithOptions(ranges []*UintRange, options *ValueOptions, uses b
 	return ranges
 }
 
+func GetMappingIdWithOptions(mappingId string, options *ValueOptions, uses bool) string {
+	if !uses {
+		mappingId = "All"
+	}
+
+	if options == nil {
+		return mappingId
+	}
+
+	if options.AllValues {
+		mappingId = "All"
+	}
+
+	if options.InvertDefault {
+		mappingId = "!" + mappingId
+	}
+
+	if options.NoValues {
+		mappingId = "None"
+	}
+
+	return mappingId
+}
+
 func GetMappingWithOptions(mapping *AddressMapping, options *ValueOptions, uses bool) *AddressMapping {
 	if !uses {
 		mapping = &AddressMapping{Addresses: []string{}, IncludeAddresses: false} //All addresses
@@ -528,3 +552,5 @@ func ValidateUniversalPermissionUpdate(oldPermissions []*UniversalPermissionDeta
 
 	return nil
 }
+
+

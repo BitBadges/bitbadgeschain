@@ -356,12 +356,12 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 
 		for idx, allowedCombination := range collectionApprovedTransfer.AllowedCombinations {
 			for _, compCombination := range collectionApprovedTransfer.AllowedCombinations[idx+1:] {
-				if allowedCombination.InvertBadgeIds == compCombination.InvertBadgeIds &&
-					allowedCombination.InvertTransferTimes == compCombination.InvertTransferTimes &&
-					allowedCombination.InvertOwnedTimes == compCombination.InvertOwnedTimes &&
-					allowedCombination.InvertTo == compCombination.InvertTo &&
-					allowedCombination.InvertFrom == compCombination.InvertFrom &&
-					allowedCombination.InvertInitiatedBy == compCombination.InvertInitiatedBy {
+				if allowedCombination.BadgeIdsOptions == compCombination.BadgeIdsOptions &&
+					allowedCombination.TransferTimesOptions == compCombination.TransferTimesOptions &&
+					allowedCombination.OwnedTimesOptions == compCombination.OwnedTimesOptions &&
+					allowedCombination.ToMappingOptions == compCombination.ToMappingOptions &&
+					allowedCombination.FromMappingOptions == compCombination.FromMappingOptions &&
+					allowedCombination.InitiatedByMappingOptions == compCombination.InitiatedByMappingOptions {
 					return ErrInvalidCombinations
 				}
 			}

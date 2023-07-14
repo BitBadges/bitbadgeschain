@@ -282,29 +282,6 @@ func SubtractBalance(balances []*Balance, balanceToRemove *Balance) ([]*Balance,
 	return balances, nil
 }
 
-// Subtracts a balance to all ids specified in []ranges
-func GetMaxSubtractableBalances(balances []*Balance, balanceToRemove *Balance) ([]*Balance, error) {
-	currBalances, err := GetBalancesForIds(balanceToRemove.BadgeIds, balanceToRemove.OwnedTimes, balances)
-	if err != nil {
-		return balances, err
-	}
-
-	subtractableBalances := []*Balance{}
-	for _, currBalanceObj := range currBalances {
-		subtractableBalances = append(subtractableBalances, &Balance{
-			Amount:         balanceToRemove.Amount,
-			BadgeIds: 			currBalanceObj.BadgeIds,
-			OwnedTimes: currBalanceObj.OwnedTimes,
-		})
-
-		if currBalanceObj.Amount.LT(balanceToRemove.Amount) {
-			subtractableBalances[len(subtractableBalances)-1].Amount = currBalanceObj.Amount
-		}
-	}
-
-	return balances, nil
-}
-
 // Deletes the balance for a specific id.
 func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, balances []*Balance) ([]*Balance, error) {
 	newBalances := []*Balance{}

@@ -42,6 +42,7 @@ message BadgeCollection {
 
   // The custom data field is an arbitrary field that can be used to store any data.
   repeated CustomDataTimeline customDataTimeline = 7;
+  
   // The manager is the address of the manager of this collection.
   repeated ManagerTimeline managerTimeline = 8;
   

@@ -67,20 +67,20 @@ message MerkleChallenge {
 }
 
 message IsUserOutgoingTransferAllowed {
-  bool invertTo = 2;
-  bool invertInitiatedBy = 3;
-  bool invertTransferTimes = 4;
-  bool invertBadgeIds = 5;
-  bool invertOwnedTimes = 6;
+  ValueOptions toMappingOptions = 2;
+  ValueOptions initiatedByMappingOptions = 3;
+  ValueOptions transferTimesOptions = 4;
+  ValueOptions badgeIdsOptions = 5;
+  ValueOptions ownedTimesOptions = 6;
   bool isAllowed = 7;
 }
 
 message IsUserIncomingTransferAllowed {
-  bool invertFrom = 2;
-  bool invertInitiatedBy = 3;
-  bool invertTransferTimes = 4;
-  bool invertBadgeIds = 5;
-  bool invertOwnedTimes = 6;
+  ValueOptions fromMappingOptions = 2;
+  ValueOptions initiatedByMappingOptions = 3;
+  ValueOptions transferTimesOptions = 4;
+  ValueOptions badgeIdsOptions = 5;
+  ValueOptions ownedTimesOptions = 6;
   bool isAllowed = 7;
 }
 
@@ -112,12 +112,12 @@ message UserApprovedIncomingTransfer {
 }
 
 message IsCollectionTransferAllowed {
-  bool invertFrom = 1;
-  bool invertTo = 2;
-  bool invertInitiatedBy = 3;
-  bool invertTransferTimes = 4;
-  bool invertBadgeIds = 5;
-  bool invertOwnedTimes = 6;
+  ValueOptions fromMappingOptions = 1;
+  ValueOptions toMappingOptions = 2;
+  ValueOptions initiatedByMappingOptions = 3;
+  ValueOptions transferTimesOptions = 4;
+  ValueOptions badgeIdsOptions = 5;
+  ValueOptions ownedTimesOptions = 6;
   bool isAllowed = 7;
 }
 
@@ -167,6 +167,7 @@ message IncrementedBalances {
   string incrementBadgeIdsBy = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   string incrementOwnedTimesBy = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
+
 
 message PredeterminedOrderCalculationMethod {
   bool useOverallNumTransfers = 1;

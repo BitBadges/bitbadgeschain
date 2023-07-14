@@ -2206,12 +2206,10 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 		}},
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
-		OwnedTimes:       GetFullUintRanges(),
+		OwnedTimes:       		GetFullUintRanges(),
 		FromMappingId:        "Mint",
 		ToMappingId:          "All",
 		InitiatedByMappingId: "All",
-
-		
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
