@@ -31,11 +31,11 @@ service Query {
   }
 
   rpc GetApprovalsTracker(QueryGetApprovalsTrackerRequest) returns (QueryGetApprovalsTrackerResponse) {
-    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_approvals_tracker/{collectionId}/{approvalLevel}/{address}/{approvalId}/{trackerType}";
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_approvals_tracker/{collectionId}/{approvalLevel}/{approverAddress}/{approvalId}/{trackerType}/{approvedAddress}";
   }
 
   rpc GetNumUsedForMerkleChallenge(QueryGetNumUsedForMerkleChallengeRequest) returns (QueryGetNumUsedForMerkleChallengeResponse) {
-    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{collectionId}/{approvalLevel}/{address}/{challengeId}/{leafIndex}";
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{collectionId}/{approvalLevel}/{approverAddress}/{challengeId}/{leafIndex}";
   }
 
   // Queries an addresses balance for a badge collection, specified by its ID.
@@ -86,9 +86,10 @@ message QueryGetAddressMappingResponse {
 message QueryGetApprovalsTrackerRequest {
   string collectionId = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   string approvalLevel = 2; //"collection" or "incoming" or "outgoing"
-  string address = 3; //if approvalLevel is "collection", leave blank
+  string approverAddress = 3; //if approvalLevel is "collection", leave blank
   string approvalId = 1; 
   string trackerType = 4;; //"overall", "to", "from", "initiatedBy"
+  string approvedAddress = 6; //if trackerType is "overall", leave blank
 }
 
 message QueryGetApprovalsTrackerResponse {
@@ -98,7 +99,7 @@ message QueryGetApprovalsTrackerResponse {
 message QueryGetNumUsedForMerkleChallengeRequest {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   string approvalLevel = 2; //"collection" or "incoming" or "outgoing"
-  string address = 3; //if approvalLevel is "collection", leave blank
+  string approverAddress = 3; //if approvalLevel is "collection", leave blank
   string challengeId = 4;
   string leafIndex = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; 
 }

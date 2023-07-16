@@ -249,6 +249,8 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "maxOneUsePerLeaf", Type: "bool"},
 		{Name: "useLeafIndexForTransferOrder", Type: "bool"},
 		{Name: "challengeId", Type: "string"},
+		{Name: "uri", Type: "string"},
+		{Name: "customData", Type: "string"},
 	}
 	PredeterminedBalancesTypes := []apitypes.Type{
 		{Name: "manualBalances", Type: "ManualBalances[]"},
@@ -318,12 +320,12 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "from", Type: "string"},
 				{Name: "toAddresses", Type: "string[]"},
 				{Name: "balances", Type: "Balance[]"},
-				{Name: "precalculateFromApproval", Type: "ApprovalIdDetails"},
+				{Name: "precalculationDetails", Type: "PrecalulationDetails"},
 				{Name: "merkleProofs", Type: "MerkleProof[]"},
 				{Name: "memo", Type: "string"},
 			},
 			"Balance": balanceTypes,
-			"ApprovalIdDetails": {
+			"PrecalulationDetails": {
 				{Name: "approvalId", Type: "string"},
 				{Name: "approvalLevel", Type: "string"},
 				{Name: "address", Type: "string"},

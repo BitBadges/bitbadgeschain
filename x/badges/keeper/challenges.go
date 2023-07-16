@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"crypto/sha256"
 	"encoding/hex"
 
@@ -10,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool) (sdkmath.Uint, error) {
+func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool, challengeAddress string, challengeLevel string) (sdkmath.Uint, error) {
 	numIncrements := sdkmath.NewUint(0)
 
 	for _, challenge := range challenges {
@@ -43,36 +44,46 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 					numIncrements = leafIndex.Sub(leftmostLeafIndex)
 				}
 
-				
-				if challenge.MaxOneUsePerLeaf {
-					challengeId := challenge.ChallengeId
-					if simulation {
-						numUsed, err := k.GetNumUsedForMerkleChallengeFromStore(ctx, collectionId, challengeId, leafIndex)
-						if err != nil {
-							continue
-						}
-						numUsed = numUsed.Add(sdkmath.NewUint(1))
-
-						maxUses := sdkmath.NewUint(1)
-						if numUsed.GT(maxUses) {
-							continue
-						}
-					} else {
-						numUsed, err := k.IncrementNumUsedForMerkleChallengeInStore(ctx, collectionId, challengeId, leafIndex)
-						if err != nil {
-							continue
-						}
-
-						maxUses := sdkmath.NewUint(1)
-						if numUsed.GT(maxUses) {
-							continue
-						}
-					}
-				}
-
 				err := CheckMerklePath(proof.Leaf, root, proof.Aunts)
 				if err != nil {
 					continue
+				}
+
+				
+				if challenge.MaxOneUsePerLeaf {
+					challengeId := challenge.ChallengeId
+					numUsed, err := k.GetNumUsedForMerkleChallengeFromStore(ctx, collectionId, challengeAddress, challengeLevel, challengeId, leafIndex)
+					if err != nil {
+						continue
+					}
+					numUsed = numUsed.Add(sdkmath.NewUint(1))
+
+					maxUses := sdkmath.NewUint(1)
+					if numUsed.GT(maxUses) {
+						continue
+					}
+
+					if !simulation {
+						newNumUsed, err := k.IncrementNumUsedForMerkleChallengeInStore(ctx, collectionId, challengeAddress, challengeLevel, challengeId, leafIndex)
+						if err != nil {
+							continue
+						}
+
+						//Currently added for indexer, but note that it is planned to be deprecated
+						ctx.EventManager().EmitEvent(
+							sdk.NewEvent(sdk.EventTypeMessage,
+								sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+								sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
+								sdk.NewAttribute("challengeId", fmt.Sprint(challengeId)),
+								sdk.NewAttribute("leafIndex", fmt.Sprint(leafIndex)),
+								sdk.NewAttribute("challengeAddress", fmt.Sprint(challengeAddress)),
+								sdk.NewAttribute("challengeLevel", fmt.Sprint(challengeLevel)),
+								sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),
+							),
+						)
+					}
+
+
 				}
 
 				hasValidSolution = true

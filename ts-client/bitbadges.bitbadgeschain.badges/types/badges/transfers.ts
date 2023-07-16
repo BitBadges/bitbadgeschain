@@ -222,7 +222,7 @@ export interface CollectionApprovedTransfer {
   approvalDetails: ApprovalDetails[];
 }
 
-export interface ApprovalIdDetails {
+export interface PrecalulationDetails {
   approvalId: string;
   /** "collection", "incoming", "outgoing" */
   approvalLevel: string;
@@ -234,7 +234,7 @@ export interface Transfer {
   from: string;
   toAddresses: string[];
   balances: Balance[];
-  precalculateFromApproval: ApprovalIdDetails | undefined;
+  precalculateFromApproval: PrecalulationDetails | undefined;
   merkleProofs: MerkleProof[];
   memo: string;
 }
@@ -2486,12 +2486,12 @@ export const CollectionApprovedTransfer = {
   },
 };
 
-function createBaseApprovalIdDetails(): ApprovalIdDetails {
+function createBasePrecalulationDetails(): PrecalulationDetails {
   return { approvalId: "", approvalLevel: "", address: "" };
 }
 
-export const ApprovalIdDetails = {
-  encode(message: ApprovalIdDetails, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const PrecalulationDetails = {
+  encode(message: PrecalulationDetails, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.approvalId !== "") {
       writer.uint32(10).string(message.approvalId);
     }
@@ -2504,10 +2504,10 @@ export const ApprovalIdDetails = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): ApprovalIdDetails {
+  decode(input: _m0.Reader | Uint8Array, length?: number): PrecalulationDetails {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseApprovalIdDetails();
+    const message = createBasePrecalulationDetails();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2528,7 +2528,7 @@ export const ApprovalIdDetails = {
     return message;
   },
 
-  fromJSON(object: any): ApprovalIdDetails {
+  fromJSON(object: any): PrecalulationDetails {
     return {
       approvalId: isSet(object.approvalId) ? String(object.approvalId) : "",
       approvalLevel: isSet(object.approvalLevel) ? String(object.approvalLevel) : "",
@@ -2536,7 +2536,7 @@ export const ApprovalIdDetails = {
     };
   },
 
-  toJSON(message: ApprovalIdDetails): unknown {
+  toJSON(message: PrecalulationDetails): unknown {
     const obj: any = {};
     message.approvalId !== undefined && (obj.approvalId = message.approvalId);
     message.approvalLevel !== undefined && (obj.approvalLevel = message.approvalLevel);
@@ -2544,8 +2544,8 @@ export const ApprovalIdDetails = {
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<ApprovalIdDetails>, I>>(object: I): ApprovalIdDetails {
-    const message = createBaseApprovalIdDetails();
+  fromPartial<I extends Exact<DeepPartial<PrecalulationDetails>, I>>(object: I): PrecalulationDetails {
+    const message = createBasePrecalulationDetails();
     message.approvalId = object.approvalId ?? "";
     message.approvalLevel = object.approvalLevel ?? "";
     message.address = object.address ?? "";
@@ -2569,7 +2569,7 @@ export const Transfer = {
       Balance.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     if (message.precalculateFromApproval !== undefined) {
-      ApprovalIdDetails.encode(message.precalculateFromApproval, writer.uint32(34).fork()).ldelim();
+      PrecalulationDetails.encode(message.precalculateFromApproval, writer.uint32(34).fork()).ldelim();
     }
     for (const v of message.merkleProofs) {
       MerkleProof.encode(v!, writer.uint32(42).fork()).ldelim();
@@ -2597,7 +2597,7 @@ export const Transfer = {
           message.balances.push(Balance.decode(reader, reader.uint32()));
           break;
         case 4:
-          message.precalculateFromApproval = ApprovalIdDetails.decode(reader, reader.uint32());
+          message.precalculateFromApproval = PrecalulationDetails.decode(reader, reader.uint32());
           break;
         case 5:
           message.merkleProofs.push(MerkleProof.decode(reader, reader.uint32()));
@@ -2619,7 +2619,7 @@ export const Transfer = {
       toAddresses: Array.isArray(object?.toAddresses) ? object.toAddresses.map((e: any) => String(e)) : [],
       balances: Array.isArray(object?.balances) ? object.balances.map((e: any) => Balance.fromJSON(e)) : [],
       precalculateFromApproval: isSet(object.precalculateFromApproval)
-        ? ApprovalIdDetails.fromJSON(object.precalculateFromApproval)
+        ? PrecalulationDetails.fromJSON(object.precalculateFromApproval)
         : undefined,
       merkleProofs: Array.isArray(object?.merkleProofs)
         ? object.merkleProofs.map((e: any) => MerkleProof.fromJSON(e))
@@ -2642,7 +2642,7 @@ export const Transfer = {
       obj.balances = [];
     }
     message.precalculateFromApproval !== undefined && (obj.precalculateFromApproval = message.precalculateFromApproval
-      ? ApprovalIdDetails.toJSON(message.precalculateFromApproval)
+      ? PrecalulationDetails.toJSON(message.precalculateFromApproval)
       : undefined);
     if (message.merkleProofs) {
       obj.merkleProofs = message.merkleProofs.map((e) => e ? MerkleProof.toJSON(e) : undefined);
@@ -2660,7 +2660,7 @@ export const Transfer = {
     message.balances = object.balances?.map((e) => Balance.fromPartial(e)) || [];
     message.precalculateFromApproval =
       (object.precalculateFromApproval !== undefined && object.precalculateFromApproval !== null)
-        ? ApprovalIdDetails.fromPartial(object.precalculateFromApproval)
+        ? PrecalulationDetails.fromPartial(object.precalculateFromApproval)
         : undefined;
     message.merkleProofs = object.merkleProofs?.map((e) => MerkleProof.fromPartial(e)) || [];
     message.memo = object.memo ?? "";

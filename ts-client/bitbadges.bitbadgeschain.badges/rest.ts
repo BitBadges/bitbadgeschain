@@ -76,7 +76,7 @@ export interface BadgesApprovalDetails {
   overridesToApprovedIncomingTransfers?: boolean;
 }
 
-export interface BadgesApprovalIdDetails {
+export interface BadgesPrecalulationDetails {
   approvalId?: string;
 
   /** "collection", "incoming", "outgoing" */
@@ -736,7 +736,7 @@ export interface BadgesTransfer {
   from?: string;
   toAddresses?: string[];
   balances?: BadgesBalance[];
-  precalculateFromApproval?: BadgesApprovalIdDetails;
+  precalculateFromApproval?: BadgesPrecalulationDetails;
   merkleProofs?: BadgesMerkleProof[];
   memo?: string;
 }
@@ -1133,8 +1133,8 @@ export class HttpClient<SecurityDataType = unknown> {
         property instanceof Blob
           ? property
           : typeof property === "object" && property !== null
-          ? JSON.stringify(property)
-          : `${property}`,
+            ? JSON.stringify(property)
+            : `${property}`,
       );
       return formData;
     }, new FormData());

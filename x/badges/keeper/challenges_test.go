@@ -683,7 +683,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateFromApproval: &types.ApprovalIdDetails{
+				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
 					Address: "",
 					ApprovalLevel: "collection",
@@ -814,7 +814,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateFromApproval: &types.ApprovalIdDetails{
+				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
 					Address: "",
 					ApprovalLevel: "collection",
@@ -864,7 +864,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateFromApproval: &types.ApprovalIdDetails{
+				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
 					Address: "",
 					ApprovalLevel: "collection",
@@ -996,7 +996,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateFromApproval: &types.ApprovalIdDetails{
+				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
 					Address: "",
 					ApprovalLevel: "collection",
@@ -1127,7 +1127,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateFromApproval: &types.ApprovalIdDetails{
+				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
 					Address: "",
 					ApprovalLevel: "collection",
@@ -1177,7 +1177,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateFromApproval: &types.ApprovalIdDetails{
+				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
 					Address: "",
 					ApprovalLevel: "collection",
@@ -1299,7 +1299,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateFromApproval: &types.ApprovalIdDetails{
+				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
 					Address: "",
 					ApprovalLevel: "collection",
@@ -1464,7 +1464,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateFromApproval: &types.ApprovalIdDetails{
+				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
 					Address: "",
 					ApprovalLevel: "collection",
@@ -1624,7 +1624,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateFromApproval: &types.ApprovalIdDetails{
+				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
 					Address: "",
 					ApprovalLevel: "collection",
@@ -1795,7 +1795,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateFromApproval: &types.ApprovalIdDetails{
+				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
 					Address: "",
 					ApprovalLevel: "collection",

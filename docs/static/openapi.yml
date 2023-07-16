@@ -53664,7 +53664,7 @@ definitions:
         type: boolean
       overridesToApprovedIncomingTransfers:
         type: boolean
-  bitbadges.bitbadgeschain.badges.ApprovalIdDetails:
+  bitbadges.bitbadgeschain.badges.PrecalulationDetails:
     type: object
     properties:
       approvalId:

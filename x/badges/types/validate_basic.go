@@ -463,13 +463,13 @@ func ValidateTransfer(transfer *Transfer) error {
 		}
 	}
 
-	if transfer.PrecalculateFromApproval != nil {
-		if transfer.PrecalculateFromApproval.ApprovalLevel != "collection" && transfer.PrecalculateFromApproval.ApprovalLevel != "incoming" && transfer.PrecalculateFromApproval.ApprovalLevel != "outgoing" {
+	if transfer.PrecalculationDetails != nil {
+		if transfer.PrecalculationDetails.ApprovalLevel != "collection" && transfer.PrecalculationDetails.ApprovalLevel != "incoming" && transfer.PrecalculationDetails.ApprovalLevel != "outgoing" {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "approval level must be collection, incoming, or outgoing")
 		}
 
-		if transfer.PrecalculateFromApproval.Address != "" {
-			if err := ValidateAddress(transfer.PrecalculateFromApproval.Address, false); err != nil {
+		if transfer.PrecalculationDetails.ApproverAddress != "" {
+			if err := ValidateAddress(transfer.PrecalculationDetails.ApproverAddress, false); err != nil {
 				return sdkerrors.Wrapf(ErrInvalidAddress, "invalid approval id address (%s)", err)
 			}
 		}

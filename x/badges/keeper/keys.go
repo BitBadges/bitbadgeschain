@@ -46,10 +46,10 @@ func ConstructAddressMappingKey(addressMappingId string) string {
 	return addressMappingId
 }
 
-func ConstructApprovalsTrackerKey(collectionId sdkmath.Uint, approvalId string, level string, trackerType string, address string) string {
+func ConstructApprovalsTrackerKey(collectionId sdkmath.Uint, addressForApproval string, approvalId string, level string, trackerType string, address string) string {
 	collection_id_str := collectionId.String()
 	tracker_id_str := approvalId
-	return collection_id_str + BalanceKeyDelimiter + tracker_id_str + BalanceKeyDelimiter + level + BalanceKeyDelimiter + trackerType + BalanceKeyDelimiter + address
+	return collection_id_str + BalanceKeyDelimiter + addressForApproval + BalanceKeyDelimiter + tracker_id_str + BalanceKeyDelimiter + level + BalanceKeyDelimiter + trackerType + BalanceKeyDelimiter + address
 }
 
 // Creates the used claim data key from an id and data. Note this is not prefixed yet. It is just performing a delimited string concatenation.
@@ -59,11 +59,13 @@ func ConstructUsedClaimDataKey(collectionId sdkmath.Uint, claimId sdkmath.Uint) 
 	return collection_id_str + BalanceKeyDelimiter + claim_id_str
 }
 
-func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, challengeId string, codeLeafIndex sdkmath.Uint) string {
+func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, addressForChallenge string, challengeLevel string, challengeId string, codeLeafIndex sdkmath.Uint) string {
 	collection_id_str := collectionId.String()
 	code_leaf_index_str := codeLeafIndex.String()
 	challenge_id_str := challengeId
-	return collection_id_str + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + code_leaf_index_str
+	address_for_challenge_str := addressForChallenge
+	challenge_level_str := challengeLevel
+	return collection_id_str + BalanceKeyDelimiter + address_for_challenge_str + BalanceKeyDelimiter + challenge_level_str + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + code_leaf_index_str
 }
 
 // Helper function to unparse a balance key and get the information from it.

@@ -197,15 +197,15 @@ func request_Query_GetApprovalsTracker_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvalLevel", err)
 	}
 
-	val, ok = pathParams["address"]
+	val, ok = pathParams["approverAddress"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approverAddress")
 	}
 
-	protoReq.Address, err = runtime.String(val)
+	protoReq.ApproverAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approverAddress", err)
 	}
 
 	val, ok = pathParams["approvalId"]
@@ -228,6 +228,17 @@ func request_Query_GetApprovalsTracker_0(ctx context.Context, marshaler runtime.
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trackerType", err)
+	}
+
+	val, ok = pathParams["approvedAddress"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approvedAddress")
+	}
+
+	protoReq.ApprovedAddress, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvedAddress", err)
 	}
 
 	msg, err := client.GetApprovalsTracker(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -269,15 +280,15 @@ func local_request_Query_GetApprovalsTracker_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvalLevel", err)
 	}
 
-	val, ok = pathParams["address"]
+	val, ok = pathParams["approverAddress"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approverAddress")
 	}
 
-	protoReq.Address, err = runtime.String(val)
+	protoReq.ApproverAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approverAddress", err)
 	}
 
 	val, ok = pathParams["approvalId"]
@@ -300,6 +311,17 @@ func local_request_Query_GetApprovalsTracker_0(ctx context.Context, marshaler ru
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trackerType", err)
+	}
+
+	val, ok = pathParams["approvedAddress"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approvedAddress")
+	}
+
+	protoReq.ApprovedAddress, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvedAddress", err)
 	}
 
 	msg, err := server.GetApprovalsTracker(ctx, &protoReq)
@@ -341,15 +363,15 @@ func request_Query_GetNumUsedForMerkleChallenge_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvalLevel", err)
 	}
 
-	val, ok = pathParams["address"]
+	val, ok = pathParams["approverAddress"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approverAddress")
 	}
 
-	protoReq.Address, err = runtime.String(val)
+	protoReq.ApproverAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approverAddress", err)
 	}
 
 	val, ok = pathParams["challengeId"]
@@ -414,15 +436,15 @@ func local_request_Query_GetNumUsedForMerkleChallenge_0(ctx context.Context, mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvalLevel", err)
 	}
 
-	val, ok = pathParams["address"]
+	val, ok = pathParams["approverAddress"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "approverAddress")
 	}
 
-	protoReq.Address, err = runtime.String(val)
+	protoReq.ApproverAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approverAddress", err)
 	}
 
 	val, ok = pathParams["challengeId"]
@@ -846,9 +868,9 @@ var (
 
 	pattern_Query_GetAddressMapping_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"bitbadges", "bitbadgeschain", "badges", "get_address_mapping", "mappingId"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetApprovalsTracker_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"bitbadges", "bitbadgeschain", "badges", "get_approvals_tracker", "collectionId", "approvalLevel", "address", "approvalId", "trackerType"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetApprovalsTracker_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"bitbadges", "bitbadgeschain", "badges", "get_approvals_tracker", "collectionId", "approvalLevel", "approverAddress", "approvalId", "trackerType", "approvedAddress"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetNumUsedForMerkleChallenge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"bitbadges", "bitbadgeschain", "badges", "get_num_used_for_challenge", "collectionId", "approvalLevel", "address", "challengeId", "leafIndex"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetNumUsedForMerkleChallenge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"bitbadges", "bitbadgeschain", "badges", "get_num_used_for_challenge", "collectionId", "approvalLevel", "approverAddress", "challengeId", "leafIndex"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_GetBalance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"bitbadges", "bitbadgeschain", "badges", "get_balance", "collectionId", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 )
