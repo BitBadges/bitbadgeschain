@@ -11,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool, challengeAddress string, challengeLevel string) (sdkmath.Uint, error) {
+func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool, approverAddress string, challengeLevel string) (sdkmath.Uint, error) {
 	numIncrements := sdkmath.NewUint(0)
 
 	for _, challenge := range challenges {
@@ -52,7 +52,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 				
 				if challenge.MaxOneUsePerLeaf {
 					challengeId := challenge.ChallengeId
-					numUsed, err := k.GetNumUsedForMerkleChallengeFromStore(ctx, collectionId, challengeAddress, challengeLevel, challengeId, leafIndex)
+					numUsed, err := k.GetNumUsedForMerkleChallengeFromStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex)
 					if err != nil {
 						continue
 					}
@@ -64,7 +64,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 					}
 
 					if !simulation {
-						newNumUsed, err := k.IncrementNumUsedForMerkleChallengeInStore(ctx, collectionId, challengeAddress, challengeLevel, challengeId, leafIndex)
+						newNumUsed, err := k.IncrementNumUsedForMerkleChallengeInStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex)
 						if err != nil {
 							continue
 						}
@@ -76,7 +76,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 								sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 								sdk.NewAttribute("challengeId", fmt.Sprint(challengeId)),
 								sdk.NewAttribute("leafIndex", fmt.Sprint(leafIndex)),
-								sdk.NewAttribute("challengeAddress", fmt.Sprint(challengeAddress)),
+								sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
 								sdk.NewAttribute("challengeLevel", fmt.Sprint(challengeLevel)),
 								sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),
 							),
