@@ -303,11 +303,11 @@ func GetUintRangesWithOptions(ranges []*UintRange, options *ValueOptions, uses b
 	}
 
 	if options.AllValues {
-		ranges = []*UintRange{{Start: sdkmath.NewUint(0), End: sdkmath.NewUint(math.MaxUint64)}}
+		ranges = []*UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}}
 	}
 
 	if options.InvertDefault {
-		ranges = InvertUintRanges(ranges, sdkmath.NewUint(math.MaxUint64))
+		ranges = InvertUintRanges(ranges, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64))
 	}
 
 	if options.NoValues {

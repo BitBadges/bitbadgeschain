@@ -32,12 +32,12 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 
 			if transfer.PrecalculationDetails != nil {
 				approvedTransfers := types.GetCurrentCollectionApprovedTransfers(ctx, collection)
-				if transfer.PrecalculationDetails.Address != "" {
-					if transfer.PrecalculationDetails.Address != to && transfer.PrecalculationDetails.Address != transfer.From {
-						return sdkerrors.Wrapf(ErrNotImplemented, "approval id address %s does not match to or from address", transfer.PrecalculationDetails.Address)
+				if transfer.PrecalculationDetails.ApproverAddress != "" {
+					if transfer.PrecalculationDetails.ApproverAddress != to && transfer.PrecalculationDetails.ApproverAddress != transfer.From {
+						return sdkerrors.Wrapf(ErrNotImplemented, "approval id address %s does not match to or from address", transfer.PrecalculationDetails.ApproverAddress)
 					}
 
-					if transfer.PrecalculationDetails.Address == to {
+					if transfer.PrecalculationDetails.ApproverAddress == to {
 						if transfer.PrecalculationDetails.ApprovalLevel == "incoming" {
 							userApprovedTransfers := types.GetCurrentUserApprovedIncomingTransfers(ctx, toUserBalance)
 							approvedTransfers = types.CastIncomingTransfersToCollectionTransfers(userApprovedTransfers, to)
@@ -57,7 +57,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 				}
 
 				//Precaluclate the balances that will be transferred
-				transfer.Balances, err = k.GetPredeterminedBalancesForApprovalId(ctx, approvedTransfers, collection, "", transfer.PrecalculationDetails.ApprovalId, transfer.PrecalculationDetails.ApprovalLevel, transfer.PrecalculationDetails.Address, transfer.MerkleProofs, initiatedBy)
+				transfer.Balances, err = k.GetPredeterminedBalancesForApprovalId(ctx, approvedTransfers, collection, "", transfer.PrecalculationDetails.ApprovalId, transfer.PrecalculationDetails.ApprovalLevel, transfer.PrecalculationDetails.ApproverAddress, transfer.MerkleProofs, initiatedBy)
 				if err != nil {
 					return err
 				}

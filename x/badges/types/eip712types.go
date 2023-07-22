@@ -93,12 +93,12 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	}
 
 	uintRangeTypes := []apitypes.Type{
-		{Name: "start", Type: "uint64"},
-		{Name: "end", Type: "uint64"},
+		{Name: "start", Type: "string"},
+		{Name: "end", Type: "string"},
 	}
 
 	balanceTypes := []apitypes.Type{
-		{Name: "amount", Type: "uint64"},
+		{Name: "amount", Type: "string"},
 		{Name: "badgeIds", Type: "UintRange[]"},
 		{Name: "ownedTimes", Type: "UintRange[]"},
 	}
@@ -162,7 +162,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "forbiddenTimes", Type: "UintRange[]"},
 	}
 	UserApprovedOutgoingTransferCombinationTypes := []apitypes.Type{
-		{Name: "timelineTimeOptions", Type: "ValueOptions"},
+		{Name: "timelineTimesOptions", Type: "ValueOptions"},
 		{Name: "toMappingOptions", Type: "ValueOptions"},
 		{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
 		{Name: "transferTimesOptions", Type: "ValueOptions"},
@@ -183,7 +183,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "forbiddenTimes", Type: "UintRange[]"},
 	}
 	UserApprovedIncomingTransferCombinationTypes := []apitypes.Type{
-		{Name: "timelineTimeOptions", Type: "ValueOptions"},
+		{Name: "timelineTimesOptions", Type: "ValueOptions"},
 		{Name: "fromMappingOptions", Type: "ValueOptions"},
 		{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
 		{Name: "transferTimesOptions", Type: "ValueOptions"},
@@ -237,14 +237,14 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "requireFromDoesNotEqualInitiatedBy", Type: "bool"},
 	}
 	MustOwnBadgesTypes := []apitypes.Type{
-		{Name: "collectionId", Type: "uint64"},
+		{Name: "collectionId", Type: "string"},
 		{Name: "amountRange", Type: "UintRange"},
 		{Name: "badgeIds", Type: "UintRange[]"},
 		{Name: "ownedTimes", Type: "UintRange[]"},
 	}
 	MerkleChallengeTypes := []apitypes.Type{
 		{Name: "root", Type: "string"},
-		{Name: "expectedProofLength", Type: "uint64"},
+		{Name: "expectedProofLength", Type: "string"},
 		{Name: "useCreatorAddressAsLeaf", Type: "bool"},
 		{Name: "maxOneUsePerLeaf", Type: "bool"},
 		{Name: "useLeafIndexForTransferOrder", Type: "bool"},
@@ -258,24 +258,24 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "orderCalculationMethod", Type: "PredeterminedOrderCalculationMethod"},
 	}
 	ApprovalAmountsTypes := []apitypes.Type{
-		{Name: "overallApprovalAmount", Type: "uint64"},
-		{Name: "perToAddressApprovalAmount", Type: "uint64"},
-		{Name: "perFromAddressApprovalAmount", Type: "uint64"},
-		{Name: "perInitiatedByAddressApprovalAmount", Type: "uint64"},
+		{Name: "overallApprovalAmount", Type: "string"},
+		{Name: "perToAddressApprovalAmount", Type: "string"},
+		{Name: "perFromAddressApprovalAmount", Type: "string"},
+		{Name: "perInitiatedByAddressApprovalAmount", Type: "string"},
 	}
 	MaxNumTransfersTypes := []apitypes.Type{
-		{Name: "overallMaxNumTransfers", Type: "uint64"},
-		{Name: "perToAddressMaxNumTransfers", Type: "uint64"},
-		{Name: "perFromAddressMaxNumTransfers", Type: "uint64"},
-		{Name: "perInitiatedByAddressMaxNumTransfers", Type: "uint64"},
+		{Name: "overallMaxNumTransfers", Type: "string"},
+		{Name: "perToAddressMaxNumTransfers", Type: "string"},
+		{Name: "perFromAddressMaxNumTransfers", Type: "string"},
+		{Name: "perInitiatedByAddressMaxNumTransfers", Type: "string"},
 	}
 	ManualBalancesTypes := []apitypes.Type{
 		{Name: "balances", Type: "Balance[]"},
 	}
 	IncrementedBalancesTypes := []apitypes.Type{
 		{Name: "startBalances", Type: "Balance[]"},
-		{Name: "incrementBadgeIdsBy", Type: "uint64"},
-		{Name: "incrementOwnedTimesBy", Type: "uint64"},
+		{Name: "incrementBadgeIdsBy", Type: "string"},
+		{Name: "incrementOwnedTimesBy", Type: "string"},
 	}
 	PredeterminedOrderCalculationMethodTypes := []apitypes.Type{
 		{Name: "useOverallNumTransfers", Type: "bool"},
@@ -291,7 +291,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		return map[string][]apitypes.Type{
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
-				{Name: "collectionId", Type: "uint64"},
+				{Name: "collectionId", Type: "string"},
 			},
 		}
 		
@@ -313,7 +313,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		return map[string][]apitypes.Type{
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
-				{Name: "collectionId", Type: "uint64"},
+				{Name: "collectionId", Type: "string"},
 				{Name: "transfers", Type: "Transfer[]"},
 			},
 			"Transfer": {
@@ -338,7 +338,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		return map[string][]apitypes.Type{
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
-				{Name: "collectionId", Type: "uint64"},
+				{Name: "collectionId", Type: "string"},
 				{Name: "updateApprovedOutgoingTransfersTimeline", Type: "bool"},
 				{Name: "approvedOutgoingTransfersTimeline", Type: "UserApprovedOutgoingTransferTimeline[]"},
 				{Name: "updateApprovedIncomingTransfersTimeline", Type: "bool"},
@@ -379,7 +379,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		return map[string][]apitypes.Type{
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
-				{Name: "collectionId", Type: "uint64"},
+				{Name: "collectionId", Type: "string"},
 				{Name: "balancesType", Type: "string"},
 				{Name: "defaultApprovedOutgoingTransfersTimeline", Type: "UserApprovedOutgoingTransferTimeline[]"},
 				{Name: "defaultApprovedIncomingTransfersTimeline", Type: "UserApprovedIncomingTransferTimeline[]"},
@@ -409,7 +409,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "isArchivedTimeline", Type: "IsArchivedTimeline[]"},
 			},
 			
-			"CollectionsPermissions": {
+			"CollectionPermissions": {
 				{Name: "canDeleteCollection", Type: "ActionPermission[]"},
 				{Name: "canArchiveCollection", Type: "TimedUpdatePermission[]"},
 				{Name: "canUpdateContractAddress", Type: "TimedUpdatePermission[]"},
@@ -474,8 +474,8 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "approvalDetails", Type: "ApprovalDetails[]"},
 			},
 			"InheritedBalance": {
-				{Name: "collectionId", Type: "uint64"},
-				{Name: "parentCollectionId", Type: "uint64"},
+				{Name: "collectionId", Type: "string"},
+				{Name: "parentCollectionId", Type: "string"},
 				{Name: "parentBadgeIds", Type: "UintRange[]"},
 			},
 			"UintRange": uintRangeTypes,
@@ -523,7 +523,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "combinations", Type: "CollectionApprovedTransferCombination[]"},
 			},
 			"CollectionApprovedTransferCombination": {
-				{Name: "timelineTimeOptions", Type: "ValueOptions"},
+				{Name: "timelineTimesOptions", Type: "ValueOptions"},
 				{Name: "fromMappingOptions", Type: "ValueOptions"},
 				{Name: "toMappingOptions", Type: "ValueOptions"},
 				{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
@@ -565,7 +565,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "forbiddenTimes", Type: "UintRange[]"},
 			},
 			"TimedUpdateCombination": {
-				{Name: "timelineTimeOptions", Type: "ValueOptions"},
+				{Name: "timelineTimesOptions", Type: "ValueOptions"},
 				{Name: "permittedTimesOptions", Type: "ValueOptions"},
 				{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
 			},
@@ -575,7 +575,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "forbiddenTimes", Type: "UintRange[]"},
 			},
 			"TimedUpdateWithBadgeIdsCombination": {
-				{Name: "timelineTimeOptions", Type: "ValueOptions"},
+				{Name: "timelineTimesOptions", Type: "ValueOptions"},
 				{Name: "badgeIdsOptions", Type: "ValueOptions"},
 				{Name: "permittedTimesOptions", Type: "ValueOptions"},
 				{Name: "forbiddenTimesOptions", Type: "ValueOptions"},

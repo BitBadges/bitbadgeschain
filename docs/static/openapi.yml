@@ -233,7 +233,7 @@ paths:
           type: string
       tags:
         - Query
-  /bitbadges/bitbadgeschain/badges/get_approvals_tracker/{collectionId}/{approvalLevel}/{address}/{approvalId}/{trackerType}:
+  /bitbadges/bitbadgeschain/badges/get_approvals_tracker/{collectionId}/{approvalLevel}/{approverAddress}/{approvalId}/{trackerType}/{approvedAddress}:
     get:
       operationId: BitbadgesBitbadgeschainBadgesGetApprovalsTracker
       responses:
@@ -501,7 +501,7 @@ paths:
           in: path
           required: true
           type: string
-        - name: address
+        - name: approverAddress
           description: if approvalLevel is "collection", leave blank
           in: path
           required: true
@@ -511,6 +511,11 @@ paths:
           required: true
           type: string
         - name: trackerType
+          in: path
+          required: true
+          type: string
+        - name: approvedAddress
+          description: if trackerType is "overall", leave blank
           in: path
           required: true
           type: string
@@ -666,16 +671,86 @@ paths:
                                 items:
                                   type: object
                                   properties:
-                                    invertTo:
-                                      type: boolean
-                                    invertInitiatedBy:
-                                      type: boolean
-                                    invertTransferTimes:
-                                      type: boolean
-                                    invertBadgeIds:
-                                      type: boolean
-                                    invertOwnedTimes:
-                                      type: boolean
+                                    toMappingOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    initiatedByMappingOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    transferTimesOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    badgeIdsOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    ownedTimesOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
                                     isAllowed:
                                       type: boolean
                               approvalDetails:
@@ -770,6 +845,10 @@ paths:
                                           useLeafIndexForTransferOrder:
                                             type: boolean
                                           challengeId:
+                                            type: string
+                                          uri:
+                                            type: string
+                                          customData:
                                             type: string
                                         description: >-
                                           Challenges define the rules for the
@@ -1109,16 +1188,86 @@ paths:
                                 items:
                                   type: object
                                   properties:
-                                    invertFrom:
-                                      type: boolean
-                                    invertInitiatedBy:
-                                      type: boolean
-                                    invertTransferTimes:
-                                      type: boolean
-                                    invertBadgeIds:
-                                      type: boolean
-                                    invertOwnedTimes:
-                                      type: boolean
+                                    fromMappingOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    initiatedByMappingOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    transferTimesOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    badgeIdsOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    ownedTimesOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
                                     isAllowed:
                                       type: boolean
                               approvalDetails:
@@ -1213,6 +1362,10 @@ paths:
                                           useLeafIndexForTransferOrder:
                                             type: boolean
                                           challengeId:
+                                            type: string
+                                          uri:
+                                            type: string
+                                          customData:
                                             type: string
                                         description: >-
                                           Challenges define the rules for the
@@ -4528,18 +4681,102 @@ paths:
                                 items:
                                   type: object
                                   properties:
-                                    invertFrom:
-                                      type: boolean
-                                    invertTo:
-                                      type: boolean
-                                    invertInitiatedBy:
-                                      type: boolean
-                                    invertTransferTimes:
-                                      type: boolean
-                                    invertBadgeIds:
-                                      type: boolean
-                                    invertOwnedTimes:
-                                      type: boolean
+                                    fromMappingOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    toMappingOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    initiatedByMappingOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    transferTimesOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    badgeIdsOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    ownedTimesOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
                                     isAllowed:
                                       type: boolean
                               approvalDetails:
@@ -4634,6 +4871,10 @@ paths:
                                           useLeafIndexForTransferOrder:
                                             type: boolean
                                           challengeId:
+                                            type: string
+                                          uri:
+                                            type: string
+                                          customData:
                                             type: string
                                         description: >-
                                           Challenges define the rules for the
@@ -5088,16 +5329,86 @@ paths:
                                 items:
                                   type: object
                                   properties:
-                                    invertTo:
-                                      type: boolean
-                                    invertInitiatedBy:
-                                      type: boolean
-                                    invertTransferTimes:
-                                      type: boolean
-                                    invertBadgeIds:
-                                      type: boolean
-                                    invertOwnedTimes:
-                                      type: boolean
+                                    toMappingOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    initiatedByMappingOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    transferTimesOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    badgeIdsOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    ownedTimesOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
                                     isAllowed:
                                       type: boolean
                               approvalDetails:
@@ -5192,6 +5503,10 @@ paths:
                                           useLeafIndexForTransferOrder:
                                             type: boolean
                                           challengeId:
+                                            type: string
+                                          uri:
+                                            type: string
+                                          customData:
                                             type: string
                                         description: >-
                                           Challenges define the rules for the
@@ -5537,16 +5852,86 @@ paths:
                                 items:
                                   type: object
                                   properties:
-                                    invertFrom:
-                                      type: boolean
-                                    invertInitiatedBy:
-                                      type: boolean
-                                    invertTransferTimes:
-                                      type: boolean
-                                    invertBadgeIds:
-                                      type: boolean
-                                    invertOwnedTimes:
-                                      type: boolean
+                                    fromMappingOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    initiatedByMappingOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    transferTimesOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    badgeIdsOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
+                                    ownedTimesOptions:
+                                      type: object
+                                      properties:
+                                        invertDefault:
+                                          type: boolean
+                                        allValues:
+                                          type: boolean
+                                          title: >-
+                                            Override default values with all
+                                            possible values
+                                        noValues:
+                                          type: boolean
+                                          title: Override default values with no values
+                                      description: >-
+                                        ValueOptions defines how we manipulate
+                                        the default values.
                                     isAllowed:
                                       type: boolean
                               approvalDetails:
@@ -5641,6 +6026,10 @@ paths:
                                           useLeafIndexForTransferOrder:
                                             type: boolean
                                           challengeId:
+                                            type: string
+                                          uri:
+                                            type: string
+                                          customData:
                                             type: string
                                         description: >-
                                           Challenges define the rules for the
@@ -6703,7 +7092,7 @@ paths:
           type: string
       tags:
         - Query
-  /bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{collectionId}/{approvalLevel}/{address}/{challengeId}/{leafIndex}:
+  /bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{collectionId}/{approvalLevel}/{approverAddress}/{challengeId}/{leafIndex}:
     get:
       operationId: BitbadgesBitbadgeschainBadgesGetNumUsedForMerkleChallenge
       responses:
@@ -6909,7 +7298,7 @@ paths:
           in: path
           required: true
           type: string
-        - name: address
+        - name: approverAddress
           description: if approvalLevel is "collection", leave blank
           in: path
           required: true
@@ -53439,6 +53828,10 @@ definitions:
               type: boolean
             challengeId:
               type: string
+            uri:
+              type: string
+            customData:
+              type: string
           description: >-
             Challenges define the rules for the approval.
 
@@ -53664,17 +54057,6 @@ definitions:
         type: boolean
       overridesToApprovedIncomingTransfers:
         type: boolean
-  bitbadges.bitbadgeschain.badges.PrecalulationDetails:
-    type: object
-    properties:
-      approvalId:
-        type: string
-      approvalLevel:
-        type: string
-        title: '"collection", "incoming", "outgoing"'
-      address:
-        type: string
-        title: Leave blank if approvalLevel == "collection"
   bitbadges.bitbadgeschain.badges.ApprovalsTracker:
     type: object
     properties:
@@ -55826,18 +56208,90 @@ definitions:
                     items:
                       type: object
                       properties:
-                        invertFrom:
-                          type: boolean
-                        invertTo:
-                          type: boolean
-                        invertInitiatedBy:
-                          type: boolean
-                        invertTransferTimes:
-                          type: boolean
-                        invertBadgeIds:
-                          type: boolean
-                        invertOwnedTimes:
-                          type: boolean
+                        fromMappingOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        toMappingOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        initiatedByMappingOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        transferTimesOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        badgeIdsOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        ownedTimesOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
                         isAllowed:
                           type: boolean
                   approvalDetails:
@@ -55929,6 +56383,10 @@ definitions:
                               useLeafIndexForTransferOrder:
                                 type: boolean
                               challengeId:
+                                type: string
+                              uri:
+                                type: string
+                              customData:
                                 type: string
                             description: >-
                               Challenges define the rules for the approval.
@@ -56369,16 +56827,76 @@ definitions:
                     items:
                       type: object
                       properties:
-                        invertTo:
-                          type: boolean
-                        invertInitiatedBy:
-                          type: boolean
-                        invertTransferTimes:
-                          type: boolean
-                        invertBadgeIds:
-                          type: boolean
-                        invertOwnedTimes:
-                          type: boolean
+                        toMappingOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        initiatedByMappingOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        transferTimesOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        badgeIdsOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        ownedTimesOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
                         isAllowed:
                           type: boolean
                   approvalDetails:
@@ -56470,6 +56988,10 @@ definitions:
                               useLeafIndexForTransferOrder:
                                 type: boolean
                               challengeId:
+                                type: string
+                              uri:
+                                type: string
+                              customData:
                                 type: string
                             description: >-
                               Challenges define the rules for the approval.
@@ -56806,16 +57328,76 @@ definitions:
                     items:
                       type: object
                       properties:
-                        invertFrom:
-                          type: boolean
-                        invertInitiatedBy:
-                          type: boolean
-                        invertTransferTimes:
-                          type: boolean
-                        invertBadgeIds:
-                          type: boolean
-                        invertOwnedTimes:
-                          type: boolean
+                        fromMappingOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        initiatedByMappingOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        transferTimesOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        badgeIdsOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        ownedTimesOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
                         isAllowed:
                           type: boolean
                   approvalDetails:
@@ -56907,6 +57489,10 @@ definitions:
                               useLeafIndexForTransferOrder:
                                 type: boolean
                               challengeId:
+                                type: string
+                              uri:
+                                type: string
+                              customData:
                                 type: string
                             description: >-
                               Challenges define the rules for the approval.
@@ -58195,18 +58781,78 @@ definitions:
         items:
           type: object
           properties:
-            invertFrom:
-              type: boolean
-            invertTo:
-              type: boolean
-            invertInitiatedBy:
-              type: boolean
-            invertTransferTimes:
-              type: boolean
-            invertBadgeIds:
-              type: boolean
-            invertOwnedTimes:
-              type: boolean
+            fromMappingOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
+            toMappingOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
+            initiatedByMappingOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
+            transferTimesOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
+            badgeIdsOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
+            ownedTimesOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
             isAllowed:
               type: boolean
       approvalDetails:
@@ -58298,6 +58944,10 @@ definitions:
                   useLeafIndexForTransferOrder:
                     type: boolean
                   challengeId:
+                    type: string
+                  uri:
+                    type: string
+                  customData:
                     type: string
                 description: >-
                   Challenges define the rules for the approval.
@@ -59111,18 +59761,78 @@ definitions:
               items:
                 type: object
                 properties:
-                  invertFrom:
-                    type: boolean
-                  invertTo:
-                    type: boolean
-                  invertInitiatedBy:
-                    type: boolean
-                  invertTransferTimes:
-                    type: boolean
-                  invertBadgeIds:
-                    type: boolean
-                  invertOwnedTimes:
-                    type: boolean
+                  fromMappingOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
+                  toMappingOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
+                  initiatedByMappingOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
+                  transferTimesOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
+                  badgeIdsOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
+                  ownedTimesOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
                   isAllowed:
                     type: boolean
             approvalDetails:
@@ -59214,6 +59924,10 @@ definitions:
                         useLeafIndexForTransferOrder:
                           type: boolean
                         challengeId:
+                          type: string
+                        uri:
+                          type: string
+                        customData:
                           type: string
                       description: >-
                         Challenges define the rules for the approval.
@@ -61337,6 +62051,10 @@ definitions:
               type: boolean
             challengeId:
               type: string
+            uri:
+              type: string
+            customData:
+              type: string
           description: >-
             Challenges define the rules for the approval.
 
@@ -61792,48 +62510,208 @@ definitions:
   bitbadges.bitbadgeschain.badges.IsCollectionTransferAllowed:
     type: object
     properties:
-      invertFrom:
-        type: boolean
-      invertTo:
-        type: boolean
-      invertInitiatedBy:
-        type: boolean
-      invertTransferTimes:
-        type: boolean
-      invertBadgeIds:
-        type: boolean
-      invertOwnedTimes:
-        type: boolean
+      fromMappingOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
+      toMappingOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
+      initiatedByMappingOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
+      transferTimesOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
+      badgeIdsOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
+      ownedTimesOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
       isAllowed:
         type: boolean
   bitbadges.bitbadgeschain.badges.IsUserIncomingTransferAllowed:
     type: object
     properties:
-      invertFrom:
-        type: boolean
-      invertInitiatedBy:
-        type: boolean
-      invertTransferTimes:
-        type: boolean
-      invertBadgeIds:
-        type: boolean
-      invertOwnedTimes:
-        type: boolean
+      fromMappingOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
+      initiatedByMappingOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
+      transferTimesOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
+      badgeIdsOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
+      ownedTimesOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
       isAllowed:
         type: boolean
   bitbadges.bitbadgeschain.badges.IsUserOutgoingTransferAllowed:
     type: object
     properties:
-      invertTo:
-        type: boolean
-      invertInitiatedBy:
-        type: boolean
-      invertTransferTimes:
-        type: boolean
-      invertBadgeIds:
-        type: boolean
-      invertOwnedTimes:
-        type: boolean
+      toMappingOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
+      initiatedByMappingOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
+      transferTimesOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
+      badgeIdsOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
+      ownedTimesOptions:
+        type: object
+        properties:
+          invertDefault:
+            type: boolean
+          allValues:
+            type: boolean
+            title: Override default values with all possible values
+          noValues:
+            type: boolean
+            title: Override default values with no values
+        description: ValueOptions defines how we manipulate the default values.
       isAllowed:
         type: boolean
   bitbadges.bitbadgeschain.badges.ManagerTimeline:
@@ -61944,6 +62822,10 @@ definitions:
       useLeafIndexForTransferOrder:
         type: boolean
       challengeId:
+        type: string
+      uri:
+        type: string
+      customData:
         type: string
     description: >-
       Challenges define the rules for the approval.
@@ -62212,6 +63094,10 @@ definitions:
               type: boolean
             challengeId:
               type: string
+            uri:
+              type: string
+            customData:
+              type: string
           description: >-
             Challenges define the rules for the approval.
 
@@ -62432,6 +63318,17 @@ definitions:
   bitbadges.bitbadgeschain.badges.Params:
     type: object
     description: Params defines the parameters for the module.
+  bitbadges.bitbadgeschain.badges.PrecalulationDetails:
+    type: object
+    properties:
+      approvalId:
+        type: string
+      approvalLevel:
+        type: string
+        title: '"collection", "incoming", "outgoing"'
+      approverAddress:
+        type: string
+        title: Leave blank if approvalLevel == "collection"
   bitbadges.bitbadgeschain.badges.PredeterminedBalances:
     type: object
     properties:
@@ -62823,16 +63720,86 @@ definitions:
                         items:
                           type: object
                           properties:
-                            invertTo:
-                              type: boolean
-                            invertInitiatedBy:
-                              type: boolean
-                            invertTransferTimes:
-                              type: boolean
-                            invertBadgeIds:
-                              type: boolean
-                            invertOwnedTimes:
-                              type: boolean
+                            toMappingOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            initiatedByMappingOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            transferTimesOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            badgeIdsOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            ownedTimesOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
                             isAllowed:
                               type: boolean
                       approvalDetails:
@@ -62927,6 +63894,10 @@ definitions:
                                   useLeafIndexForTransferOrder:
                                     type: boolean
                                   challengeId:
+                                    type: string
+                                  uri:
+                                    type: string
+                                  customData:
                                     type: string
                                 description: >-
                                   Challenges define the rules for the approval.
@@ -63260,16 +64231,86 @@ definitions:
                         items:
                           type: object
                           properties:
-                            invertFrom:
-                              type: boolean
-                            invertInitiatedBy:
-                              type: boolean
-                            invertTransferTimes:
-                              type: boolean
-                            invertBadgeIds:
-                              type: boolean
-                            invertOwnedTimes:
-                              type: boolean
+                            fromMappingOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            initiatedByMappingOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            transferTimesOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            badgeIdsOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            ownedTimesOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
                             isAllowed:
                               type: boolean
                       approvalDetails:
@@ -63364,6 +64405,10 @@ definitions:
                                   useLeafIndexForTransferOrder:
                                     type: boolean
                                   challengeId:
+                                    type: string
+                                  uri:
+                                    type: string
+                                  customData:
                                     type: string
                                 description: >-
                                   Challenges define the rules for the approval.
@@ -66392,18 +67437,102 @@ definitions:
                         items:
                           type: object
                           properties:
-                            invertFrom:
-                              type: boolean
-                            invertTo:
-                              type: boolean
-                            invertInitiatedBy:
-                              type: boolean
-                            invertTransferTimes:
-                              type: boolean
-                            invertBadgeIds:
-                              type: boolean
-                            invertOwnedTimes:
-                              type: boolean
+                            fromMappingOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            toMappingOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            initiatedByMappingOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            transferTimesOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            badgeIdsOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            ownedTimesOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
                             isAllowed:
                               type: boolean
                       approvalDetails:
@@ -66498,6 +67627,10 @@ definitions:
                                   useLeafIndexForTransferOrder:
                                     type: boolean
                                   challengeId:
+                                    type: string
+                                  uri:
+                                    type: string
+                                  customData:
                                     type: string
                                 description: >-
                                   Challenges define the rules for the approval.
@@ -66942,16 +68075,86 @@ definitions:
                         items:
                           type: object
                           properties:
-                            invertTo:
-                              type: boolean
-                            invertInitiatedBy:
-                              type: boolean
-                            invertTransferTimes:
-                              type: boolean
-                            invertBadgeIds:
-                              type: boolean
-                            invertOwnedTimes:
-                              type: boolean
+                            toMappingOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            initiatedByMappingOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            transferTimesOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            badgeIdsOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            ownedTimesOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
                             isAllowed:
                               type: boolean
                       approvalDetails:
@@ -67046,6 +68249,10 @@ definitions:
                                   useLeafIndexForTransferOrder:
                                     type: boolean
                                   challengeId:
+                                    type: string
+                                  uri:
+                                    type: string
+                                  customData:
                                     type: string
                                 description: >-
                                   Challenges define the rules for the approval.
@@ -67385,16 +68592,86 @@ definitions:
                         items:
                           type: object
                           properties:
-                            invertFrom:
-                              type: boolean
-                            invertInitiatedBy:
-                              type: boolean
-                            invertTransferTimes:
-                              type: boolean
-                            invertBadgeIds:
-                              type: boolean
-                            invertOwnedTimes:
-                              type: boolean
+                            fromMappingOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            initiatedByMappingOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            transferTimesOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            badgeIdsOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
+                            ownedTimesOptions:
+                              type: object
+                              properties:
+                                invertDefault:
+                                  type: boolean
+                                allValues:
+                                  type: boolean
+                                  title: >-
+                                    Override default values with all possible
+                                    values
+                                noValues:
+                                  type: boolean
+                                  title: Override default values with no values
+                              description: >-
+                                ValueOptions defines how we manipulate the
+                                default values.
                             isAllowed:
                               type: boolean
                       approvalDetails:
@@ -67489,6 +68766,10 @@ definitions:
                                   useLeafIndexForTransferOrder:
                                     type: boolean
                                   challengeId:
+                                    type: string
+                                  uri:
+                                    type: string
+                                  customData:
                                     type: string
                                 description: >-
                                   Challenges define the rules for the approval.
@@ -68922,7 +70203,7 @@ definitions:
 
             If times or badgeIDs have len > 1, then the user owns all badge IDs
             specified for all time ranges specified.
-      precalculateFromApproval:
+      precalculationDetails:
         type: object
         properties:
           approvalId:
@@ -68930,7 +70211,7 @@ definitions:
           approvalLevel:
             type: string
             title: '"collection", "incoming", "outgoing"'
-          address:
+          approverAddress:
             type: string
             title: Leave blank if approvalLevel == "collection"
       merkleProofs:
@@ -69033,16 +70314,66 @@ definitions:
         items:
           type: object
           properties:
-            invertFrom:
-              type: boolean
-            invertInitiatedBy:
-              type: boolean
-            invertTransferTimes:
-              type: boolean
-            invertBadgeIds:
-              type: boolean
-            invertOwnedTimes:
-              type: boolean
+            fromMappingOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
+            initiatedByMappingOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
+            transferTimesOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
+            badgeIdsOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
+            ownedTimesOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
             isAllowed:
               type: boolean
       approvalDetails:
@@ -69134,6 +70465,10 @@ definitions:
                   useLeafIndexForTransferOrder:
                     type: boolean
                   challengeId:
+                    type: string
+                  uri:
+                    type: string
+                  customData:
                     type: string
                 description: >-
                   Challenges define the rules for the approval.
@@ -69879,16 +71214,66 @@ definitions:
               items:
                 type: object
                 properties:
-                  invertFrom:
-                    type: boolean
-                  invertInitiatedBy:
-                    type: boolean
-                  invertTransferTimes:
-                    type: boolean
-                  invertBadgeIds:
-                    type: boolean
-                  invertOwnedTimes:
-                    type: boolean
+                  fromMappingOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
+                  initiatedByMappingOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
+                  transferTimesOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
+                  badgeIdsOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
+                  ownedTimesOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
                   isAllowed:
                     type: boolean
             approvalDetails:
@@ -69980,6 +71365,10 @@ definitions:
                         useLeafIndexForTransferOrder:
                           type: boolean
                         challengeId:
+                          type: string
+                        uri:
+                          type: string
+                        customData:
                           type: string
                       description: >-
                         Challenges define the rules for the approval.
@@ -70297,16 +71686,66 @@ definitions:
         items:
           type: object
           properties:
-            invertTo:
-              type: boolean
-            invertInitiatedBy:
-              type: boolean
-            invertTransferTimes:
-              type: boolean
-            invertBadgeIds:
-              type: boolean
-            invertOwnedTimes:
-              type: boolean
+            toMappingOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
+            initiatedByMappingOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
+            transferTimesOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
+            badgeIdsOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
+            ownedTimesOptions:
+              type: object
+              properties:
+                invertDefault:
+                  type: boolean
+                allValues:
+                  type: boolean
+                  title: Override default values with all possible values
+                noValues:
+                  type: boolean
+                  title: Override default values with no values
+              description: ValueOptions defines how we manipulate the default values.
             isAllowed:
               type: boolean
       approvalDetails:
@@ -70398,6 +71837,10 @@ definitions:
                   useLeafIndexForTransferOrder:
                     type: boolean
                   challengeId:
+                    type: string
+                  uri:
+                    type: string
+                  customData:
                     type: string
                 description: >-
                   Challenges define the rules for the approval.
@@ -71144,16 +72587,66 @@ definitions:
               items:
                 type: object
                 properties:
-                  invertTo:
-                    type: boolean
-                  invertInitiatedBy:
-                    type: boolean
-                  invertTransferTimes:
-                    type: boolean
-                  invertBadgeIds:
-                    type: boolean
-                  invertOwnedTimes:
-                    type: boolean
+                  toMappingOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
+                  initiatedByMappingOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
+                  transferTimesOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
+                  badgeIdsOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
+                  ownedTimesOptions:
+                    type: object
+                    properties:
+                      invertDefault:
+                        type: boolean
+                      allValues:
+                        type: boolean
+                        title: Override default values with all possible values
+                      noValues:
+                        type: boolean
+                        title: Override default values with no values
+                    description: ValueOptions defines how we manipulate the default values.
                   isAllowed:
                     type: boolean
             approvalDetails:
@@ -71245,6 +72738,10 @@ definitions:
                         useLeafIndexForTransferOrder:
                           type: boolean
                         challengeId:
+                          type: string
+                        uri:
+                          type: string
+                        customData:
                           type: string
                       description: >-
                         Challenges define the rules for the approval.
@@ -71632,16 +73129,76 @@ definitions:
                     items:
                       type: object
                       properties:
-                        invertTo:
-                          type: boolean
-                        invertInitiatedBy:
-                          type: boolean
-                        invertTransferTimes:
-                          type: boolean
-                        invertBadgeIds:
-                          type: boolean
-                        invertOwnedTimes:
-                          type: boolean
+                        toMappingOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        initiatedByMappingOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        transferTimesOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        badgeIdsOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        ownedTimesOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
                         isAllowed:
                           type: boolean
                   approvalDetails:
@@ -71733,6 +73290,10 @@ definitions:
                               useLeafIndexForTransferOrder:
                                 type: boolean
                               challengeId:
+                                type: string
+                              uri:
+                                type: string
+                              customData:
                                 type: string
                             description: >-
                               Challenges define the rules for the approval.
@@ -72064,16 +73625,76 @@ definitions:
                     items:
                       type: object
                       properties:
-                        invertFrom:
-                          type: boolean
-                        invertInitiatedBy:
-                          type: boolean
-                        invertTransferTimes:
-                          type: boolean
-                        invertBadgeIds:
-                          type: boolean
-                        invertOwnedTimes:
-                          type: boolean
+                        fromMappingOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        initiatedByMappingOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        transferTimesOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        badgeIdsOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
+                        ownedTimesOptions:
+                          type: object
+                          properties:
+                            invertDefault:
+                              type: boolean
+                            allValues:
+                              type: boolean
+                              title: Override default values with all possible values
+                            noValues:
+                              type: boolean
+                              title: Override default values with no values
+                          description: >-
+                            ValueOptions defines how we manipulate the default
+                            values.
                         isAllowed:
                           type: boolean
                   approvalDetails:
@@ -72165,6 +73786,10 @@ definitions:
                               useLeafIndexForTransferOrder:
                                 type: boolean
                               challengeId:
+                                type: string
+                              uri:
+                                type: string
+                              customData:
                                 type: string
                             description: >-
                               Challenges define the rules for the approval.

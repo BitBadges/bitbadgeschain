@@ -45,9 +45,9 @@ func SearchUintRangesForUint(id sdkmath.Uint, uintRanges []*UintRange) bool {
 	return false
 }
 
-func InvertUintRanges(uintRanges []*UintRange, maxId sdkmath.Uint) []*UintRange {
+func InvertUintRanges(uintRanges []*UintRange, minId sdkmath.Uint, maxId sdkmath.Uint) []*UintRange {
 	ranges := []*UintRange{}
-	ranges = append(ranges, CreateUintRange(sdkmath.NewUint(0), maxId))
+	ranges = append(ranges, CreateUintRange(minId, maxId))
 
 	for _, uintRange := range uintRanges {
 		newRanges := []*UintRange{}
