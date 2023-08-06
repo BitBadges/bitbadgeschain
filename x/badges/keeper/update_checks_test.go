@@ -324,6 +324,9 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 	})
 	suite.Require().Nil(err, "Error updating collection permissions")
 
+	
+
+
 	err = UpdateCollectionApprovedTransfers(suite, wctx, &types.MsgUpdateCollectionApprovedTransfers{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -355,37 +358,45 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 	})
 	suite.Require().Error(err, "Error updating collection approved transfers")
 
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+
+	approvedTransfers := []*types.CollectionApprovedTransfer{
+		{
+			FromMappingId:                          bob,
+			ToMappingId:                            "AllWithoutMint",
+			InitiatedByMappingId:                   "AllWithoutMint",
+			BadgeIds:                               GetFullUintRanges(),
+			TransferTimes:                          GetFullUintRanges(),
+			OwnershipTimes: 		 										GetFullUintRanges(),
+			
+			ApprovalDetails: []*types.ApprovalDetails{
+				{
+					RequireToEqualsInitiatedBy:             true,
+					ApprovalId:                             "test",
+					MaxNumTransfers: 												&types.MaxNumTransfers{},
+					ApprovalAmounts: 												&types.ApprovalAmounts{},
+					OverridesFromApprovedOutgoingTransfers: true,
+				},
+			},
+		},
+	}
+	approvedTransfers = append(approvedTransfers, collection.CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers...)
+
+
 	err = UpdateCollectionApprovedTransfers(suite, wctx, &types.MsgUpdateCollectionApprovedTransfers{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
 			{
 				TimelineTimes: GetFullUintRanges(),
-				CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{
-					{
-						FromMappingId:                          bob,
-						ToMappingId:                            "AllWithoutMint",
-						InitiatedByMappingId:                   "AllWithoutMint",
-						BadgeIds:                               GetFullUintRanges(),
-						TransferTimes:                          GetFullUintRanges(),
-						OwnershipTimes: 		 										GetFullUintRanges(),
-						
-						ApprovalDetails: []*types.ApprovalDetails{
-							{
-								RequireToEqualsInitiatedBy:             true,
-								ApprovalId:                             "test",
-								MaxNumTransfers: 												&types.MaxNumTransfers{},
-								ApprovalAmounts: 												&types.ApprovalAmounts{},
-								OverridesFromApprovedOutgoingTransfers: true,
-							},
-						},
-					},
-				},
+				CollectionApprovedTransfers: approvedTransfers,
 			},
 		},
 	})
 	suite.Require().Nil(err, "Error updating collection approved transfers")
 }
+
 
 func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 	wctx := sdk.WrapSDKContext(suite.ctx)

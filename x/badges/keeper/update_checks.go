@@ -44,6 +44,7 @@ func GetUpdateCombinationsToCheck(
 				TimelineTime:       detail.TimelineTime,
 				BadgeId:            detailToAdd.BadgeId,
 				TransferTime:       detailToAdd.TransferTime,
+				OwnershipTime: 			detailToAdd.OwnershipTime,
 				ToMapping:          detailToAdd.ToMapping,
 				FromMapping:        detailToAdd.FromMapping,
 				InitiatedByMapping: detailToAdd.InitiatedByMapping,
@@ -62,6 +63,7 @@ func GetUpdateCombinationsToCheck(
 				TimelineTime:       detail.TimelineTime,
 				BadgeId:            detailToAdd.BadgeId,
 				TransferTime:       detailToAdd.TransferTime,
+				OwnershipTime: 			detailToAdd.OwnershipTime,
 				ToMapping:          detailToAdd.ToMapping,
 				FromMapping:        detailToAdd.FromMapping,
 				InitiatedByMapping: detailToAdd.InitiatedByMapping,
@@ -83,6 +85,7 @@ func GetUpdateCombinationsToCheck(
 				TimelineTime:       overlap.TimelineTime,
 				BadgeId:            detailToAdd.BadgeId,
 				TransferTime:       detailToAdd.TransferTime,
+				OwnershipTime: 			detailToAdd.OwnershipTime,
 				ToMapping:          detailToAdd.ToMapping,
 				FromMapping:        detailToAdd.FromMapping,
 				InitiatedByMapping: detailToAdd.InitiatedByMapping,
@@ -94,22 +97,7 @@ func GetUpdateCombinationsToCheck(
 }
 
 func CheckNotForbidden(ctx sdk.Context, permission *types.UniversalPermissionDetails) error {
-	//Throw if current block time is a forbidden time
-	// blockTimeMilli := ctx.BlockTime().UnixMilli()
-	blockTimeMilli := 1
-
-	blockTimeMilliUint := uint64(blockTimeMilli)
-	blockTime := sdkmath.NewUint(blockTimeMilliUint)
-
-	print("blockTime: ", blockTime.String(), "\n")
-
-	print("blockTime: ", blockTime.String(), ctx.BlockTime().UnixMilli(), uint64(ctx.BlockTime().UnixMilli()), "\n")
-	// print(uint64(62135596800000), "\n")
-
-	for _, forbiddenTime := range permission.ForbiddenTimes {
-		print("forbiddenTime: ", forbiddenTime.String(), "\n")
-	}
-	print("permission.ForbiddenTimes: ", permission.ForbiddenTimes, "\n")
+	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 
 	found := types.SearchUintRangesForUint(blockTime, permission.ForbiddenTimes)
 	if found {

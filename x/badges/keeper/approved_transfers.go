@@ -1,10 +1,9 @@
 package keeper
 
 import (
-	"math"
-	"fmt"
 	"encoding/json"
-
+	"fmt"
+	"math"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -156,7 +155,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 					}
 
 					if mustOwnBadge.OverrideWithCurrentTime {
-						mustOwnBadge.OwnershipTimes = []*types.UintRange{&types.UintRange{Start: currTime, End: currTime}}
+						mustOwnBadge.OwnershipTimes = []*types.UintRange{{Start: currTime, End: currTime}}
 					}
 
 					fetchedBalances, err := types.GetBalancesForIds(mustOwnBadge.BadgeIds, mustOwnBadge.OwnershipTimes, balances)
