@@ -35,7 +35,7 @@ func CastOutgoingTransferToCollectionTransfer(transfer *UserApprovedOutgoingTran
 		InitiatedByMappingId:             transfer.InitiatedByMappingId,
 		TransferTimes:                    transfer.TransferTimes,
 		BadgeIds:                         transfer.BadgeIds,
-		OwnedTimes: 								  transfer.OwnedTimes,
+		OwnershipTimes: 								  transfer.OwnershipTimes,
 		AllowedCombinations:              allowedCombinations,
 		ApprovalDetails: 								approvalDetails,
 	}
@@ -57,7 +57,7 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApprovedTr
 		InitiatedByMappingId:             transfer.InitiatedByMappingId,
 		TransferTimes:                    transfer.TransferTimes,
 		BadgeIds:                         transfer.BadgeIds,
-		OwnedTimes: 								  transfer.OwnedTimes,
+		OwnershipTimes: 								  transfer.OwnershipTimes,
 		AllowedCombinations:              allowedCombinations,
 		ApprovalDetails: 								approvalDetails,
 	}
@@ -65,23 +65,23 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApprovedTr
 
 func CastOutgoingCombinationToCollectionCombination(combination *IsUserOutgoingTransferAllowed) *IsCollectionTransferAllowed {
 	return &IsCollectionTransferAllowed{
-		IsAllowed:           combination.IsAllowed,
+		IsApproved:           combination.IsApproved,
 		BadgeIdsOptions:      combination.BadgeIdsOptions,
 		TransferTimesOptions: combination.TransferTimesOptions,
 		ToMappingOptions:            combination.ToMappingOptions,
 		InitiatedByMappingOptions:   combination.InitiatedByMappingOptions,
-		OwnedTimesOptions: combination.OwnedTimesOptions,
+		OwnershipTimesOptions: combination.OwnershipTimesOptions,
 	}
 }
 
 func CastFromCollectionCombinationToOutgoingCombination(combination *IsCollectionTransferAllowed) *IsUserOutgoingTransferAllowed {
 	return &IsUserOutgoingTransferAllowed{
-		IsAllowed:           combination.IsAllowed,
+		IsApproved:           combination.IsApproved,
 		BadgeIdsOptions:      combination.BadgeIdsOptions,
 		TransferTimesOptions: combination.TransferTimesOptions,
 		ToMappingOptions:            combination.ToMappingOptions,
 		InitiatedByMappingOptions:   combination.InitiatedByMappingOptions,
-		OwnedTimesOptions: combination.OwnedTimesOptions,
+		OwnershipTimesOptions: combination.OwnershipTimesOptions,
 	}
 }
 
@@ -102,7 +102,7 @@ func CastIncomingTransferToCollectionTransfer(transfer *UserApprovedIncomingTran
 		InitiatedByMappingId:               transfer.InitiatedByMappingId,
 		TransferTimes:                      transfer.TransferTimes,
 		BadgeIds:                           transfer.BadgeIds,
-		OwnedTimes: 								  	transfer.OwnedTimes,
+		OwnershipTimes: 								  	transfer.OwnershipTimes,
 		AllowedCombinations:                allowedCombinations,
 		ApprovalDetails:                    approvalDetails,
 	}
@@ -124,7 +124,7 @@ func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApprovedTr
 		InitiatedByMappingId:               transfer.InitiatedByMappingId,
 		TransferTimes:                      transfer.TransferTimes,
 		BadgeIds:                           transfer.BadgeIds,
-		OwnedTimes: 								  			transfer.OwnedTimes,
+		OwnershipTimes: 								  			transfer.OwnershipTimes,
 		AllowedCombinations:                allowedCombinations,
 		ApprovalDetails:                    approvalDetails,
 	}
@@ -132,23 +132,23 @@ func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApprovedTr
 
 func CastIncomingCombinationToCollectionCombination(combination *IsUserIncomingTransferAllowed) *IsCollectionTransferAllowed {
 	return &IsCollectionTransferAllowed{
-		IsAllowed:           combination.IsAllowed,
+		IsApproved:           combination.IsApproved,
 		BadgeIdsOptions:      combination.BadgeIdsOptions,
 		TransferTimesOptions: combination.TransferTimesOptions,
 		FromMappingOptions:            combination.FromMappingOptions,
 		InitiatedByMappingOptions:   combination.InitiatedByMappingOptions,
-		OwnedTimesOptions: combination.OwnedTimesOptions,
+		OwnershipTimesOptions: combination.OwnershipTimesOptions,
 	}
 }
 
 func CastFromCollectionCombinationToIncomingCombination(combination *IsCollectionTransferAllowed) *IsUserIncomingTransferAllowed {
 	return &IsUserIncomingTransferAllowed{
-		IsAllowed:           combination.IsAllowed,
+		IsApproved:           combination.IsApproved,
 		BadgeIdsOptions:      combination.BadgeIdsOptions,
 		TransferTimesOptions: combination.TransferTimesOptions,
 		FromMappingOptions:          combination.FromMappingOptions,
 		InitiatedByMappingOptions:   combination.InitiatedByMappingOptions,
-		OwnedTimesOptions: combination.OwnedTimesOptions,
+		OwnershipTimesOptions: combination.OwnershipTimesOptions,
 	}
 }
 

@@ -50,7 +50,7 @@ func GetPotentialUpdatesForTimelineValues(times [][]*types.UintRange, values []i
 		})
 	}
 
-	firstMatches := types.GetFirstMatchOnly(castedPermissions) //I think this is unnecessary because we already disallow duplicate timeline times in ValidateBasic
+	firstMatches := types.GetFirstMatchOnly(castedPermissions) //I think this is unnecessary because we already disallow duplicate timeline times in ValidateBasic but if we allow duplicates, this may be needed
 
 	return firstMatches
 }

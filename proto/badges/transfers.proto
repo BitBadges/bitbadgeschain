@@ -73,8 +73,8 @@ message IsUserOutgoingTransferAllowed {
   ValueOptions initiatedByMappingOptions = 3;
   ValueOptions transferTimesOptions = 4;
   ValueOptions badgeIdsOptions = 5;
-  ValueOptions ownedTimesOptions = 6;
-  bool isAllowed = 7;
+  ValueOptions ownershipTimesOptions = 6;
+  bool isApproved = 7;
 }
 
 message IsUserIncomingTransferAllowed {
@@ -82,8 +82,8 @@ message IsUserIncomingTransferAllowed {
   ValueOptions initiatedByMappingOptions = 3;
   ValueOptions transferTimesOptions = 4;
   ValueOptions badgeIdsOptions = 5;
-  ValueOptions ownedTimesOptions = 6;
-  bool isAllowed = 7;
+  ValueOptions ownershipTimesOptions = 6;
+  bool isApproved = 7;
 }
 
 // UserApprovedOutgoingTransfer defines the rules for the approval of an outgoing transfer from a user.
@@ -93,7 +93,7 @@ message UserApprovedOutgoingTransfer {
   string initiatedByMappingId = 2;
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
-  repeated UintRange ownedTimes = 16;
+  repeated UintRange ownershipTimes = 16;
 
   repeated IsUserOutgoingTransferAllowed allowedCombinations = 5;
 
@@ -107,7 +107,7 @@ message UserApprovedIncomingTransfer {
   string initiatedByMappingId = 2;
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
-  repeated UintRange ownedTimes = 16;
+  repeated UintRange ownershipTimes = 16;
   repeated IsUserIncomingTransferAllowed allowedCombinations = 5;
 
   repeated IncomingApprovalDetails approvalDetails = 11;
@@ -119,8 +119,8 @@ message IsCollectionTransferAllowed {
   ValueOptions initiatedByMappingOptions = 3;
   ValueOptions transferTimesOptions = 4;
   ValueOptions badgeIdsOptions = 5;
-  ValueOptions ownedTimesOptions = 6;
-  bool isAllowed = 7;
+  ValueOptions ownershipTimesOptions = 6;
+  bool isApproved = 7;
 }
 
 // CollectionApprovedTransfer defines the rules for the approval of a transfer.
@@ -167,7 +167,7 @@ message ManualBalances {
 message IncrementedBalances {
   repeated Balance startBalances = 1;
   string incrementBadgeIdsBy = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string incrementOwnedTimesBy = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string incrementOwnershipTimesBy = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 
@@ -264,7 +264,7 @@ message CollectionApprovedTransfer {
   string initiatedByMappingId = 6;
   repeated UintRange transferTimes = 7;
   repeated UintRange badgeIds = 8;
-  repeated UintRange ownedTimes = 9;
+  repeated UintRange ownershipTimes = 9;
   
   repeated IsCollectionTransferAllowed allowedCombinations = 10;
 

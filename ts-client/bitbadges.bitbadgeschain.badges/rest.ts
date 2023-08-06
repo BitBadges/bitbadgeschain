@@ -308,12 +308,12 @@ AddressMappings are used for (from, to, initiatedBy) which are a permanent list 
 TimelineTimes: which timeline times of the collection's approvedTransfersTimeline field can be updated or not?
 permitted/forbidden TimelineTimes: when can the manager execute this permission?
 
-Ex: Let's say we are updating the transferability for timelineTime 1 and the transfer tuple ("All", "All", "All", 10, 1000).
+Ex: Let's say we are updating the transferability for timelineTime 1 and the transfer tuple ("AllWithoutMint", "AllWithoutMint", "AllWithoutMint", 10, 1000).
 We would check to find the FIRST CollectionApprovedTransferPermission that matches this combination.
 If we find a match, we would check the permitted/forbidden times to see if we can execute this permission (default is ALLOWED).
 
 Ex: So if you wanted to freeze the transferability to enforce that badge ID 1 will always be transferable, you could set
-the combination ("All", "All", "All", "All Transfer Times", 1) to always be forbidden at all timelineTimes.
+the combination ("AllWithoutMint", "AllWithoutMint", "AllWithoutMint", "All Transfer Times", 1) to always be forbidden at all timelineTimes.
 */
 export interface BadgesCollectionApprovedTransferPermission {
   defaultValues?: BadgesCollectionApprovedTransferDefaultValues;

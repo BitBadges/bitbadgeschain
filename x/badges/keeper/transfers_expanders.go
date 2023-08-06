@@ -13,7 +13,7 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 	for _, approvedTransfer := range approvedTransfers {
 		for _, allowedCombination := range approvedTransfer.AllowedCombinations {
 			badgeIds := types.GetUintRangesWithOptions(approvedTransfer.BadgeIds, allowedCombination.BadgeIdsOptions, true)
-			ownedTimes := types.GetUintRangesWithOptions(approvedTransfer.OwnedTimes, allowedCombination.OwnedTimesOptions, true)
+			ownershipTimes := types.GetUintRangesWithOptions(approvedTransfer.OwnershipTimes, allowedCombination.OwnershipTimesOptions, true)
 			times := types.GetUintRangesWithOptions(approvedTransfer.TransferTimes, allowedCombination.TransferTimesOptions, true)
 			toMappingId := types.GetMappingIdWithOptions(approvedTransfer.ToMappingId, allowedCombination.ToMappingOptions, true)
 			fromMappingId := types.GetMappingIdWithOptions(approvedTransfer.FromMappingId, allowedCombination.FromMappingOptions, true)
@@ -25,10 +25,10 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 				InitiatedByMappingId: initiatedByMappingId,
 				TransferTimes:        times,
 				BadgeIds:             badgeIds,
-				OwnedTimes: 		 	ownedTimes,
+				OwnershipTimes: 		 	ownershipTimes,
 				AllowedCombinations: []*types.IsCollectionTransferAllowed{
 					{
-						IsAllowed: allowedCombination.IsAllowed,
+						IsApproved: allowedCombination.IsApproved,
 					},
 				},
 				ApprovalDetails: approvedTransfer.ApprovalDetails,
@@ -42,7 +42,7 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 // By default, we approve all transfers if to === initiatedBy
 func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomingTransfer, userAddress string) []*types.UserApprovedIncomingTransfer {
 	currApprovedTransfers = append(currApprovedTransfers, &types.UserApprovedIncomingTransfer{
-		FromMappingId:        "All", //everyone
+		FromMappingId:        "AllWithMint", //everyone
 		InitiatedByMappingId: userAddress,
 		TransferTimes: []*types.UintRange{
 			{
@@ -50,7 +50,7 @@ func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomin
 				End:   sdkmath.NewUint(uint64(math.MaxUint64)),
 			},
 		},
-		OwnedTimes: []*types.UintRange{
+		OwnershipTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(uint64(math.MaxUint64)),
@@ -64,7 +64,7 @@ func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomin
 		},
 		AllowedCombinations: []*types.IsUserIncomingTransferAllowed{
 			{
-				IsAllowed: true,
+				IsApproved: true,
 			},
 		},
 	})
@@ -75,7 +75,7 @@ func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomin
 // By default, we approve all transfers if from === initiatedBy
 func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoingTransfer, userAddress string) []*types.UserApprovedOutgoingTransfer {
 	currApprovedTransfers = append(currApprovedTransfers, &types.UserApprovedOutgoingTransfer{
-		ToMappingId:          "All", //everyone
+		ToMappingId:          "AllWithMint", //everyone
 		InitiatedByMappingId: userAddress,
 		TransferTimes: []*types.UintRange{
 			{
@@ -83,7 +83,7 @@ func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoin
 				End:   sdkmath.NewUint(uint64(math.MaxUint64)),
 			},
 		},
-		OwnedTimes: []*types.UintRange{
+		OwnershipTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(uint64(math.MaxUint64)),
@@ -97,7 +97,7 @@ func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoin
 		},
 		AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
 			{
-				IsAllowed: true,
+				IsApproved: true,
 			},
 		},
 	})

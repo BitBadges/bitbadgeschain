@@ -32,7 +32,7 @@ func (suite *TestSuite) TestTransferBadgesForceful() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       GetOneUintRange(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 			},
@@ -79,7 +79,7 @@ func (suite *TestSuite) TestTransferBadgesHandleDuplicateIDs() {
 							GetOneUintRange()[0],
 							GetOneUintRange()[0],
 						},
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 			},
@@ -126,7 +126,7 @@ func (suite *TestSuite) TestTransferBadgesNotApprovedCollectionLevel() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       GetOneUintRange(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 			},
@@ -173,7 +173,7 @@ func (suite *TestSuite) TestTransferBadgesNotApprovedIncoming() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       GetOneUintRange(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 			},
@@ -209,7 +209,7 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 			{
 				Amount:         sdkmath.NewUint(1),
 				BadgeIds:       GetOneUintRange(),
-				OwnedTimes: GetFullUintRanges(),
+				OwnershipTimes: GetFullUintRanges(),
 			},
 		},
 		CollectionApprovedTransfersTimeline: collection.CollectionApprovedTransfersTimeline,
@@ -231,7 +231,7 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       GetOneUintRange(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 			},
@@ -254,7 +254,7 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       GetOneUintRange(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 			},

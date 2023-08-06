@@ -24,7 +24,7 @@ message UintRange {
 // If times or badgeIDs have len > 1, then the user owns all badge IDs specified for all time ranges specified.
 message Balance {
   string amount = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  repeated UintRange ownedTimes = 2;
+  repeated UintRange ownershipTimes = 2;
   repeated UintRange badgeIds = 3;
 }
 
@@ -32,8 +32,10 @@ message MustOwnBadges {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
   UintRange amountRange = 2;
-  repeated UintRange ownedTimes = 3;
+  repeated UintRange ownershipTimes = 3;
   repeated UintRange badgeIds = 4;
+
+  bool overrideWithCurrentTime = 5;
 }
 
 // InheritedBalances are a powerful feature of the BitBadges module.

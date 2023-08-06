@@ -307,13 +307,13 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 				{
 					DefaultValues: &types.CollectionApprovedTransferDefaultValues{
 						FromMappingId:        alice,
-						ToMappingId:          "All",
+						ToMappingId:          "AllWithoutMint",
 						ForbiddenTimes:       GetFullUintRanges(),
 						TimelineTimes:        GetFullUintRanges(),
-						InitiatedByMappingId: "All",
+						InitiatedByMappingId: "AllWithoutMint",
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
-						OwnedTimes: 		 GetFullUintRanges(),
+						OwnershipTimes: 		 	GetFullUintRanges(),
 					},
 					Combinations: []*types.CollectionApprovedTransferCombination{
 						{},
@@ -333,11 +333,11 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 				CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
 						FromMappingId:                          alice,
-						ToMappingId:                            "All",
-						InitiatedByMappingId:                   "All",
+						ToMappingId:                            "AllWithoutMint",
+						InitiatedByMappingId:                   "AllWithoutMint",
 						BadgeIds:                               GetFullUintRanges(),
 						TransferTimes:                          GetFullUintRanges(),
-						OwnedTimes: 		 										GetFullUintRanges(),
+						OwnershipTimes: 		 										GetFullUintRanges(),
 						
 						ApprovalDetails: []*types.ApprovalDetails{
 							{
@@ -364,16 +364,16 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 				CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
 						FromMappingId:                          bob,
-						ToMappingId:                            "All",
-						InitiatedByMappingId:                   "All",
+						ToMappingId:                            "AllWithoutMint",
+						InitiatedByMappingId:                   "AllWithoutMint",
 						BadgeIds:                               GetFullUintRanges(),
 						TransferTimes:                          GetFullUintRanges(),
-						OwnedTimes: 		 GetFullUintRanges(),
+						OwnershipTimes: 		 										GetFullUintRanges(),
 						
 						ApprovalDetails: []*types.ApprovalDetails{
 							{
 								RequireToEqualsInitiatedBy:             true,
-								ApprovalId:                              "test",
+								ApprovalId:                             "test",
 								MaxNumTransfers: 												&types.MaxNumTransfers{},
 								ApprovalAmounts: 												&types.ApprovalAmounts{},
 								OverridesFromApprovedOutgoingTransfers: true,
@@ -407,10 +407,10 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						ToMappingId:          alice,
 						ForbiddenTimes:       GetFullUintRanges(),
 						TimelineTimes:        GetFullUintRanges(),
-						InitiatedByMappingId: "All",
+						InitiatedByMappingId: "AllWithoutMint",
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
-						OwnedTimes: 		 GetFullUintRanges(),
+						OwnershipTimes: 		 GetFullUintRanges(),
 					},
 					Combinations: []*types.UserApprovedOutgoingTransferCombination{
 						{},
@@ -423,10 +423,10 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						FromMappingId:        alice,
 						ForbiddenTimes:       GetFullUintRanges(),
 						TimelineTimes:        GetFullUintRanges(),
-						InitiatedByMappingId: "All",
+						InitiatedByMappingId: "AllWithoutMint",
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
-						OwnedTimes: 		 GetFullUintRanges(),
+						OwnershipTimes: 		 GetFullUintRanges(),
 					},
 					Combinations: []*types.UserApprovedIncomingTransferCombination{
 						{},
@@ -448,10 +448,10 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 				ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
 					{
 						ToMappingId:                alice,
-						InitiatedByMappingId:       "All",
+						InitiatedByMappingId:       "AllWithoutMint",
 						BadgeIds:                   GetFullUintRanges(),
 						TransferTimes:              GetFullUintRanges(),
-						OwnedTimes: 		 GetFullUintRanges(),
+						OwnershipTimes: 		 GetFullUintRanges(),
 						ApprovalDetails: 					[]*types.OutgoingApprovalDetails{
 							{
 								RequireToEqualsInitiatedBy: true,
@@ -470,10 +470,10 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 				ApprovedIncomingTransfers: []*types.UserApprovedIncomingTransfer{
 					{
 						FromMappingId:        alice,
-						InitiatedByMappingId: "All",
+						InitiatedByMappingId: "AllWithoutMint",
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
-						OwnedTimes: 		 GetFullUintRanges(),
+						OwnershipTimes: 		 GetFullUintRanges(),
 						ApprovalDetails: []*types.IncomingApprovalDetails{
 							{
 								ApprovalId:                 "test",
@@ -499,10 +499,10 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 				ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
 					{
 						ToMappingId:                bob,
-						InitiatedByMappingId:       "All",
+						InitiatedByMappingId:       "AllWithoutMint",
 						BadgeIds:                   GetFullUintRanges(),
 						TransferTimes:              GetFullUintRanges(),
-						OwnedTimes: 		 GetFullUintRanges(),
+						OwnershipTimes: 		 GetFullUintRanges(),
 						ApprovalDetails: []*types.OutgoingApprovalDetails{
 							{
 								RequireToEqualsInitiatedBy: true,
@@ -521,10 +521,10 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 				ApprovedIncomingTransfers: []*types.UserApprovedIncomingTransfer{
 					{
 						FromMappingId:                bob,
-						InitiatedByMappingId:         "All",
+						InitiatedByMappingId:         "AllWithoutMint",
 						BadgeIds:                     GetFullUintRanges(),
 						TransferTimes:                GetFullUintRanges(),
-						OwnedTimes: 		 GetFullUintRanges(),
+						OwnershipTimes: 		 GetFullUintRanges(),
 						ApprovalDetails: []*types.IncomingApprovalDetails{
 							{
 								RequireFromEqualsInitiatedBy: true,

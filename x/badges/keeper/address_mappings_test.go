@@ -12,7 +12,7 @@ func (suite *TestSuite) TestReservedIds() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	toCheck := []string{"Mint", "Manager", "!dadsf", "1asdsdfa:1234", "All", "None", alice, bob, charlie} //"122:323",
+	toCheck := []string{"Mint", "Manager", "!dadsf", "1asdsdfa:1234", "AllWithoutMint", "None", alice, bob, charlie} //"122:323",
 	for _, check := range toCheck {
 		err := suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 			MappingId: check,
@@ -20,7 +20,7 @@ func (suite *TestSuite) TestReservedIds() {
 		suite.Require().Error(err, "Error creating address mapping: %s", check)
 	}
 
-	autoFetched := []string{"Mint", "Manager", "All", "None", alice, bob, charlie} //"122:323",
+	autoFetched := []string{"Mint", "Manager", "AllWithoutMint", "None", alice, bob, charlie} //"122:323",
 	for _, check := range autoFetched {
 		err := suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 			MappingId: check,
@@ -48,9 +48,9 @@ func (suite *TestSuite) TestReservedIds() {
 	suite.Require().False(found, "Error checking mapping addresses: %s", "Manager")
 	suite.Require().Nil(err, "Error checking mapping addresses: %s", "Manager")
 
-	found, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, "All", "Mint", alice)
-	suite.Require().False(found, "Error checking mapping addresses: %s", "All")
-	suite.Require().Nil(err, "Error checking mapping addresses: %s", "All")
+	found, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, "AllWithoutMint", "Mint", alice)
+	suite.Require().False(found, "Error checking mapping addresses: %s", "AllWithoutMint")
+	suite.Require().Nil(err, "Error checking mapping addresses: %s", "AllWithoutMint")
 
 	found, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, "None", alice, alice)
 	suite.Require().False(found, "Error checking mapping addresses: %s", "None")

@@ -11,6 +11,7 @@ func (k msgServer) CreateAddressMappings(goCtx context.Context, msg *types.MsgCr
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	for _, addressMapping := range msg.AddressMappings {
+		addressMapping.CreatedBy = msg.Creator
 		if err := k.CreateAddressMapping(ctx, addressMapping); err != nil {
 			return nil, err
 		}

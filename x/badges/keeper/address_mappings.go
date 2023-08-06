@@ -11,7 +11,7 @@ func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.Addr
 	id := addressMapping.MappingId
 
 	//Validate ID
-	if id == "Mint" || id == "Manager" || id == "All" || id == "None" {
+	if id == "Mint" || id == "Manager" || id == "AllWithoutMint" || id == "None" || id == "AllWithMint" {
 		return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot be %s", id)
 	}
 
@@ -70,10 +70,21 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string, 
 		handled = true
 	}
 
-	if addressMappingId == "All" {
+	if addressMappingId == "AllWithoutMint" {
 		addressMapping = &types.AddressMapping{
-			MappingId:        "All",
+			MappingId:        "AllWithoutMint",
 			Addresses:        []string{"Mint"},
+			IncludeAddresses: false,
+			Uri:              "",
+			CustomData:       "",
+		}
+		handled = true
+	}
+
+	if addressMappingId == "AllWithMint" {
+		addressMapping = &types.AddressMapping{
+			MappingId:        "AllWithMint",
+			Addresses:        []string{},
 			IncludeAddresses: false,
 			Uri:              "",
 			CustomData:       "",

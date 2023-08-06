@@ -23,7 +23,7 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 // - timelineTimes: the times when a timeline-based field is a specific value
 // - permitted/forbiddenTimes - the times that a permission can be performed
 // - transferTimes - the times that a transfer occurs
-// - ownedTimes - the times when a badge is owned by a user
+// - ownershipTimes - the times when a badge is owned by a user
 //
 // The permitted/forbiddenTimes are used to determine when a permission can be executed.
 // Once a time is set to be permitted or forbidden, it is PERMANENT and cannot be changed.
@@ -31,11 +31,11 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 //
 // Each permission type has a defaultValues field and a combinations field.
 // The defaultValues field defines the default values for the permission which can be manipulated by the combinations field (to avoid unnecessary repetition).
-// Ex: We can have default value badgeIds = [1,2] and combinations = [{invertDefault: true, isAllowed: false}, {isAllowed: true}].
+// Ex: We can have default value badgeIds = [1,2] and combinations = [{invertDefault: true, isApproved: false}, {isApproved: true}].
 // This would mean that badgeIds [1,2] are allowed but everything else is not allowed.
 //
 // IMPORTANT: For all permissions, we ONLY take the first combination that matches. Any subsequent combinations are ignored. 
-// Ex: If we have defaultValues = {badgeIds: [1,2]} and combinations = [{isAllowed: true}, {isAllowed: false}].
+// Ex: If we have defaultValues = {badgeIds: [1,2]} and combinations = [{isApproved: true}, {isApproved: false}].
 // This would mean that badgeIds [1,2] are allowed and the second combination is ignored.
 message CollectionPermissions {
   repeated ActionPermission canDeleteCollection = 1;
@@ -81,7 +81,7 @@ message CollectionApprovedTransferCombination {
   ValueOptions initiatedByMappingOptions = 4;
   ValueOptions transferTimesOptions = 5;
   ValueOptions badgeIdsOptions = 6;
-  ValueOptions ownedTimesOptions = 9;
+  ValueOptions ownershipTimesOptions = 9;
 
   ValueOptions permittedTimesOptions = 7;
   ValueOptions forbiddenTimesOptions = 8;
@@ -95,7 +95,7 @@ message CollectionApprovedTransferDefaultValues {
   string initiatedByMappingId = 4;
   repeated UintRange transferTimes = 5;
   repeated UintRange badgeIds = 6;
-  repeated UintRange ownedTimes = 9;
+  repeated UintRange ownershipTimes = 9;
 
   repeated UintRange permittedTimes = 7;
   repeated UintRange forbiddenTimes = 8;
@@ -111,12 +111,12 @@ message CollectionApprovedTransferDefaultValues {
 // TimelineTimes: which timeline times of the collection's approvedTransfersTimeline field can be updated or not?
 // permitted/forbidden TimelineTimes: when can the manager execute this permission?
 //
-// Ex: Let's say we are updating the transferability for timelineTime 1 and the transfer tuple ("All", "All", "All", 10, 1000).
+// Ex: Let's say we are updating the transferability for timelineTime 1 and the transfer tuple ("AllWithoutMint", "AllWithoutMint", "AllWithoutMint", 10, 1000).
 // We would check to find the FIRST CollectionApprovedTransferPermission that matches this combination.
 // If we find a match, we would check the permitted/forbidden times to see if we can execute this permission (default is ALLOWED).
 //
 // Ex: So if you wanted to freeze the transferability to enforce that badge ID 1 will always be transferable, you could set
-// the combination ("All", "All", "All", "All Transfer Times", 1) to always be forbidden at all timelineTimes.
+// the combination ("AllWithoutMint", "AllWithoutMint", "AllWithoutMint", "All Transfer Times", 1) to always be forbidden at all timelineTimes.
 message CollectionApprovedTransferPermission {
   CollectionApprovedTransferDefaultValues defaultValues = 1;
   repeated CollectionApprovedTransferCombination combinations = 7;
@@ -129,7 +129,7 @@ message UserApprovedOutgoingTransferCombination {
   ValueOptions initiatedByMappingOptions = 3;
   ValueOptions transferTimesOptions = 4;
   ValueOptions badgeIdsOptions = 5;
-  ValueOptions ownedTimesOptions = 6;
+  ValueOptions ownershipTimesOptions = 6;
 
   ValueOptions permittedTimesOptions = 7;
   ValueOptions forbiddenTimesOptions = 8;
@@ -142,7 +142,7 @@ message UserApprovedOutgoingTransferDefaultValues {
   string initiatedByMappingId = 3;
   repeated UintRange transferTimes = 4;
   repeated UintRange badgeIds = 5;
-  repeated UintRange ownedTimes = 6;
+  repeated UintRange ownershipTimes = 6;
 
   repeated UintRange permittedTimes = 7;
   repeated UintRange forbiddenTimes = 8;
@@ -162,7 +162,7 @@ message UserApprovedIncomingTransferCombination {
   ValueOptions initiatedByMappingOptions = 3;
   ValueOptions transferTimesOptions = 4;
   ValueOptions badgeIdsOptions = 5;
-  ValueOptions ownedTimesOptions = 6;
+  ValueOptions ownershipTimesOptions = 6;
 
 
   ValueOptions permittedTimesOptions = 7;
@@ -176,7 +176,7 @@ message UserApprovedIncomingTransferDefaultValues {
   string initiatedByMappingId = 3;
   repeated UintRange transferTimes = 4;
   repeated UintRange badgeIds = 5;
-  repeated UintRange ownedTimes = 6;
+  repeated UintRange ownershipTimes = 6;
 
   repeated UintRange permittedTimes = 7;
   repeated UintRange forbiddenTimes = 8;
@@ -191,7 +191,7 @@ message UserApprovedIncomingTransferPermission {
 
 message BalancesActionCombination {
   ValueOptions badgeIdsOptions = 1;
-  ValueOptions ownedTimesOptions = 2;
+  ValueOptions ownershipTimesOptions = 2;
 
   ValueOptions permittedTimesOptions = 3;
   ValueOptions forbiddenTimesOptions = 4;
@@ -199,7 +199,7 @@ message BalancesActionCombination {
 
 message BalancesActionDefaultValues {
   repeated UintRange badgeIds = 1;
-  repeated UintRange ownedTimes = 2;
+  repeated UintRange ownershipTimes = 2;
 
   repeated UintRange permittedTimes = 3;
   repeated UintRange forbiddenTimes = 4;
@@ -208,7 +208,7 @@ message BalancesActionDefaultValues {
 // BalancesActionPermission defines the permissions for updating a timeline-based field for specific badges and specific badge ownership times.
 // Currently, this is only used for creating new badges.
 //
-// Ex: If you want to lock the ability to create new badges for badgeIds [1,2] at ownedTimes 1/1/2020 - 1/1/2021, 
+// Ex: If you want to lock the ability to create new badges for badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021, 
 // you could set the combination (badgeIds: [1,2], ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
 message BalancesActionPermission {
   BalancesActionDefaultValues defaultValues = 1;

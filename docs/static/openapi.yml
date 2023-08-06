@@ -4583,8 +4583,9 @@ paths:
 
 
                             Ex: Let's say we are updating the transferability
-                            for timelineTime 1 and the transfer tuple ("All",
-                            "All", "All", 10, 1000).
+                            for timelineTime 1 and the transfer tuple
+                            ("AllWithoutMint", "AllWithoutMint",
+                            "AllWithoutMint", 10, 1000).
 
                             We would check to find the FIRST
                             CollectionApprovedTransferPermission that matches
@@ -4599,9 +4600,9 @@ paths:
                             to enforce that badge ID 1 will always be
                             transferable, you could set
 
-                            the combination ("All", "All", "All", "All Transfer
-                            Times", 1) to always be forbidden at all
-                            timelineTimes.
+                            the combination ("AllWithoutMint", "AllWithoutMint",
+                            "AllWithoutMint", "All Transfer Times", 1) to always
+                            be forbidden at all timelineTimes.
                   collectionApprovedTransfersTimeline:
                     type: array
                     items:
@@ -56113,8 +56114,8 @@ definitions:
 
 
                 Ex: Let's say we are updating the transferability for
-                timelineTime 1 and the transfer tuple ("All", "All", "All", 10,
-                1000).
+                timelineTime 1 and the transfer tuple ("AllWithoutMint",
+                "AllWithoutMint", "AllWithoutMint", 10, 1000).
 
                 We would check to find the FIRST
                 CollectionApprovedTransferPermission that matches this
@@ -56127,8 +56128,9 @@ definitions:
                 Ex: So if you wanted to freeze the transferability to enforce
                 that badge ID 1 will always be transferable, you could set
 
-                the combination ("All", "All", "All", "All Transfer Times", 1)
-                to always be forbidden at all timelineTimes.
+                the combination ("AllWithoutMint", "AllWithoutMint",
+                "AllWithoutMint", "All Transfer Times", 1) to always be
+                forbidden at all timelineTimes.
       collectionApprovedTransfersTimeline:
         type: array
         items:
@@ -59670,7 +59672,8 @@ definitions:
 
 
       Ex: Let's say we are updating the transferability for timelineTime 1 and
-      the transfer tuple ("All", "All", "All", 10, 1000).
+      the transfer tuple ("AllWithoutMint", "AllWithoutMint", "AllWithoutMint",
+      10, 1000).
 
       We would check to find the FIRST CollectionApprovedTransferPermission that
       matches this combination.
@@ -59682,8 +59685,8 @@ definitions:
       Ex: So if you wanted to freeze the transferability to enforce that badge
       ID 1 will always be transferable, you could set
 
-      the combination ("All", "All", "All", "All Transfer Times", 1) to always
-      be forbidden at all timelineTimes.
+      the combination ("AllWithoutMint", "AllWithoutMint", "AllWithoutMint",
+      "All Transfer Times", 1) to always be forbidden at all timelineTimes.
   bitbadges.bitbadgeschain.badges.CollectionApprovedTransferTimeline:
     type: object
     properties:
@@ -61832,7 +61835,8 @@ definitions:
 
 
             Ex: Let's say we are updating the transferability for timelineTime 1
-            and the transfer tuple ("All", "All", "All", 10, 1000).
+            and the transfer tuple ("AllWithoutMint", "AllWithoutMint",
+            "AllWithoutMint", 10, 1000).
 
             We would check to find the FIRST
             CollectionApprovedTransferPermission that matches this combination.
@@ -61844,8 +61848,9 @@ definitions:
             Ex: So if you wanted to freeze the transferability to enforce that
             badge ID 1 will always be transferable, you could set
 
-            the combination ("All", "All", "All", "All Transfer Times", 1) to
-            always be forbidden at all timelineTimes.
+            the combination ("AllWithoutMint", "AllWithoutMint",
+            "AllWithoutMint", "All Transfer Times", 1) to always be forbidden at
+            all timelineTimes.
     description: >-
       CollectionPermissions defines the permissions for the collection (i.e.
       what the manager can and cannot do).
@@ -67340,8 +67345,8 @@ definitions:
 
 
                     Ex: Let's say we are updating the transferability for
-                    timelineTime 1 and the transfer tuple ("All", "All", "All",
-                    10, 1000).
+                    timelineTime 1 and the transfer tuple ("AllWithoutMint",
+                    "AllWithoutMint", "AllWithoutMint", 10, 1000).
 
                     We would check to find the FIRST
                     CollectionApprovedTransferPermission that matches this
@@ -67356,8 +67361,9 @@ definitions:
                     enforce that badge ID 1 will always be transferable, you
                     could set
 
-                    the combination ("All", "All", "All", "All Transfer Times",
-                    1) to always be forbidden at all timelineTimes.
+                    the combination ("AllWithoutMint", "AllWithoutMint",
+                    "AllWithoutMint", "All Transfer Times", 1) to always be
+                    forbidden at all timelineTimes.
           collectionApprovedTransfersTimeline:
             type: array
             items:

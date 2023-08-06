@@ -712,7 +712,7 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(5),
 			},
 			ToMapping: &types.AddressMapping{
-				Addresses:        []string{bob, charlie},
+				Addresses:        []string{alice},
 				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
@@ -742,11 +742,11 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(5),
 			},
 			ToMapping: &types.AddressMapping{
-				Addresses:        []string{bob, charlie},
+				Addresses:        []string{alice},
 				IncludeAddresses: true,
 			},
 			FromMapping: &types.AddressMapping{
-				Addresses:        []string{bob, charlie},
+				Addresses:        []string{alice},
 				IncludeAddresses: true,
 			},
 			InitiatedByMapping: &types.AddressMapping{

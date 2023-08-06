@@ -144,7 +144,7 @@ func ValidateAddressMapping(addressMapping *AddressMapping) error {
 	if addressMapping.MappingId == "" ||
 		addressMapping.MappingId == "Mint" ||
 		addressMapping.MappingId == "Manager" ||
-		addressMapping.MappingId == "All" ||
+		addressMapping.MappingId == "AllWithoutMint" ||
 		addressMapping.MappingId == "None" {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "mapping id is uninitialized")
 	}
@@ -237,7 +237,7 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 			return sdkerrors.Wrapf(err, "invalid transfer times")
 		}
 
-		if err := ValidateRangesAreValid(collectionApprovedTransfer.OwnedTimes, false, true); err != nil {
+		if err := ValidateRangesAreValid(collectionApprovedTransfer.OwnershipTimes, false, true); err != nil {
 			return sdkerrors.Wrapf(err, "invalid transfer times")
 		}
 
@@ -263,7 +263,7 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 					return sdkerrors.Wrapf(err, "invalid badge IDs")
 				}
 
-				if err := ValidateRangesAreValid(mustOwnBadgeBalance.OwnedTimes, false, true); err != nil {
+				if err := ValidateRangesAreValid(mustOwnBadgeBalance.OwnershipTimes, false, true); err != nil {
 					return sdkerrors.Wrapf(err, "invalid owned times")
 				}
 
@@ -330,7 +330,7 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 						return sdkerrors.Wrapf(ErrUintUnititialized, "increment ids by is uninitialized")
 					}
 				
-					if sequentialTransfer.IncrementOwnedTimesBy.IsNil() {
+					if sequentialTransfer.IncrementOwnershipTimesBy.IsNil() {
 						return sdkerrors.Wrapf(ErrUintUnititialized, "max num transfers is uninitialized")
 					}
 				} else if (!isManualNil && isSequentialNil) {
@@ -358,7 +358,7 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 			for _, compCombination := range collectionApprovedTransfer.AllowedCombinations[idx+1:] {
 				if allowedCombination.BadgeIdsOptions == compCombination.BadgeIdsOptions &&
 					allowedCombination.TransferTimesOptions == compCombination.TransferTimesOptions &&
-					allowedCombination.OwnedTimesOptions == compCombination.OwnedTimesOptions &&
+					allowedCombination.OwnershipTimesOptions == compCombination.OwnershipTimesOptions &&
 					allowedCombination.ToMappingOptions == compCombination.ToMappingOptions &&
 					allowedCombination.FromMappingOptions == compCombination.FromMappingOptions &&
 					allowedCombination.InitiatedByMappingOptions == compCombination.InitiatedByMappingOptions {
@@ -420,7 +420,7 @@ func ValidateBalances(balances []*Balance) ([]*Balance, error) {
 			return balances, sdkerrors.Wrapf(err, "invalid balance badge ids")
 		}
 
-		err = ValidateRangesAreValid(balance.OwnedTimes, false, true)
+		err = ValidateRangesAreValid(balance.OwnershipTimes, false, true)
 		if err != nil {
 			return balances, sdkerrors.Wrapf(err, "invalid balance times")
 		}
@@ -463,7 +463,7 @@ func ValidateTransfer(transfer *Transfer) error {
 		}
 	}
 
-	if transfer.PrecalculationDetails != nil {
+	if transfer.PrecalculationDetails != nil && transfer.PrecalculationDetails.ApprovalId != "" {
 		if transfer.PrecalculationDetails.ApprovalLevel != "collection" && transfer.PrecalculationDetails.ApprovalLevel != "incoming" && transfer.PrecalculationDetails.ApprovalLevel != "outgoing" {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "approval level must be collection, incoming, or outgoing")
 		}

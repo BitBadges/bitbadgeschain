@@ -21,7 +21,7 @@ func (suite *TestSuite) TestDeductFromOutgoing() {
 	overallTransferBalances := []*types.Balance{
 		{
 			BadgeIds:      GetFullUintRanges(),
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 			Amount:        sdkmath.NewUint(1),
 		},
 	}
@@ -120,13 +120,13 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].ApprovalDetails[0].PredeterminedBalances.IncrementedBalances = &types.IncrementedBalances{
 		StartBalances: []*types.Balance{
 			{
-				OwnedTimes: GetFullUintRanges(),
+				OwnershipTimes: GetFullUintRanges(),
 				BadgeIds:       GetFullUintRanges(),
 				Amount:         sdkmath.NewUint(1),
 			},
 		},
 		IncrementBadgeIdsBy: sdkmath.NewUint(math.MaxUint64),
-		IncrementOwnedTimesBy: sdkmath.NewUint(math.MaxUint64),
+		IncrementOwnershipTimesBy: sdkmath.NewUint(math.MaxUint64),
 	}
 	
 	collectionsToCreate[0].DefaultApprovedIncomingTransfersTimeline[0].ApprovedIncomingTransfers[0].ApprovalDetails[0].PredeterminedBalances = &types.PredeterminedBalances{
@@ -137,13 +137,13 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 	collectionsToCreate[0].DefaultApprovedIncomingTransfersTimeline[0].ApprovedIncomingTransfers[0].ApprovalDetails[0].PredeterminedBalances.IncrementedBalances = &types.IncrementedBalances{
 		StartBalances: []*types.Balance{
 			{
-				OwnedTimes: GetFullUintRanges(),
+				OwnershipTimes: GetFullUintRanges(),
 				BadgeIds:             GetFullUintRanges(),
 				Amount:               sdkmath.NewUint(1),
 			},
 		},
 		IncrementBadgeIdsBy: sdkmath.NewUint(math.MaxUint64),
-		IncrementOwnedTimesBy: sdkmath.NewUint(math.MaxUint64),
+		IncrementOwnershipTimesBy: sdkmath.NewUint(math.MaxUint64),
 	}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -154,7 +154,7 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 
 	overallTransferBalances := []*types.Balance{
 		{
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 			BadgeIds:             GetFullUintRanges(),
 			Amount:               sdkmath.NewUint(1),
 		},
@@ -254,7 +254,7 @@ func (suite *TestSuite) TestFirstMatchOnly() {
 	newOutgoingTimeline := []*types.UserApprovedOutgoingTransferTimeline{{
 		ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
 			{
-				ToMappingId:          "All",
+				ToMappingId:          "AllWithoutMint",
 				InitiatedByMappingId: alice,
 				TransferTimes:        GetFullUintRanges(),
 				BadgeIds: []*types.UintRange{
@@ -263,10 +263,10 @@ func (suite *TestSuite) TestFirstMatchOnly() {
 						End:   sdkmath.NewUint(1),
 					},
 				},
-				OwnedTimes: GetFullUintRanges(),
+				OwnershipTimes: GetFullUintRanges(),
 				AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
 					{
-						IsAllowed: false,
+						IsApproved: false,
 					},
 				},
 				ApprovalDetails: []*types.OutgoingApprovalDetails{
@@ -310,14 +310,14 @@ func (suite *TestSuite) TestFirstMatchOnlyWrongTime() {
 	newOutgoingTimeline := []*types.UserApprovedOutgoingTransferTimeline{{
 		ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
 			{
-				ToMappingId:          "All",
+				ToMappingId:          "AllWithoutMint",
 				InitiatedByMappingId: alice,
 				TransferTimes:        []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 				BadgeIds:             GetFullUintRanges(),
-				OwnedTimes: GetFullUintRanges(),
+				OwnershipTimes: GetFullUintRanges(),
 				AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
 					{
-						IsAllowed: false,
+						IsApproved: false,
 					},
 				},
 				ApprovalDetails: []*types.OutgoingApprovalDetails{
@@ -359,18 +359,18 @@ func (suite *TestSuite) TestCombinations() {
 	newOutgoingTimeline := []*types.UserApprovedOutgoingTransferTimeline{{
 		ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
 			{
-				ToMappingId:          "All",
+				ToMappingId:          "AllWithoutMint",
 				InitiatedByMappingId: alice,
 				TransferTimes:        GetFullUintRanges(),
-				OwnedTimes: GetFullUintRanges(),
+				OwnershipTimes: GetFullUintRanges(),
 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 				AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
 					{
-						IsAllowed: true,
+						IsApproved: true,
 					},
 					{
 						BadgeIdsOptions: &types.ValueOptions{ InvertDefault: true },
-						IsAllowed:      false,
+						IsApproved:      false,
 					},
 				},
 				ApprovalDetails: []*types.OutgoingApprovalDetails{
@@ -414,18 +414,18 @@ func (suite *TestSuite) TestCombinationsOrder() {
 	newOutgoingTimeline := []*types.UserApprovedOutgoingTransferTimeline{{
 		ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
 			{
-				ToMappingId:          "All",
+				ToMappingId:          "AllWithoutMint",
 				InitiatedByMappingId: alice,
 				TransferTimes:        GetFullUintRanges(),
-				OwnedTimes: GetFullUintRanges(),
+				OwnershipTimes: GetFullUintRanges(),
 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 				AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
 					{
-						IsAllowed: false,
+						IsApproved: false,
 					},
 					{
 						InitiatedByMappingOptions: &types.ValueOptions{ InvertDefault: true },
-						IsAllowed:         true,
+						IsApproved:         true,
 					},
 				},
 				ApprovalDetails: []*types.OutgoingApprovalDetails{
@@ -466,14 +466,14 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 	newOutgoingTimeline := []*types.UserApprovedOutgoingTransferTimeline{{
 		ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
 			{
-				ToMappingId:          "All",
+				ToMappingId:          "AllWithoutMint",
 				InitiatedByMappingId: alice,
 				TransferTimes:        GetFullUintRanges(),
-				OwnedTimes: GetFullUintRanges(),
+				OwnershipTimes: GetFullUintRanges(),
 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 				AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
 					{
-						IsAllowed: true,
+						IsApproved: true,
 					},
 				},
 				ApprovalDetails: []*types.OutgoingApprovalDetails{

@@ -35,7 +35,7 @@ func GetRandomBalances(r *rand.Rand, length int) []*types.Balance {
 		randomSubassets = append(randomSubassets, &types.Balance{
 			Amount:         sdkmath.NewUint(r.Uint64()),
 			BadgeIds:       GetTimelineTimes(r, 3),
-			OwnedTimes: GetTimelineTimes(r, 3),
+			OwnershipTimes: GetTimelineTimes(r, 3),
 		})
 	}
 
@@ -199,14 +199,14 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				DefaultValues: &types.BalancesActionDefaultValues{
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
-					OwnedTimes: GetTimelineTimes(r, 3),
+					OwnershipTimes: GetTimelineTimes(r, 3),
 					BadgeIds:       GetTimelineTimes(r, 3),
 				},
 				Combinations: []*types.BalancesActionCombination{{
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
 					BadgeIdsOptions:       GetRandomValueOptions(r),
-					OwnedTimesOptions: GetRandomValueOptions(r),
+					OwnershipTimesOptions: GetRandomValueOptions(r),
 				}},
 			},
 		},
@@ -248,7 +248,7 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 					PermittedTimes:       GetTimelineTimes(r, 3),
 					ForbiddenTimes:       GetTimelineTimes(r, 3),
 					TransferTimes:        GetTimelineTimes(r, 3),
-					OwnedTimes: 		 GetTimelineTimes(r, 3),
+					OwnershipTimes: 		 GetTimelineTimes(r, 3),
 					BadgeIds:             GetTimelineTimes(r, 3),
 					TimelineTimes:        GetTimelineTimes(r, 3),
 					ToMappingId:          GetRandomAddresses(r, 3, accs)[0],
@@ -259,7 +259,7 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 					PermittedTimesOptions:     GetRandomValueOptions(r),
 					ForbiddenTimesOptions:     GetRandomValueOptions(r),
 					TransferTimesOptions:      GetRandomValueOptions(r),
-					OwnedTimesOptions: 	 GetRandomValueOptions(r),
+					OwnershipTimesOptions: 	 GetRandomValueOptions(r),
 					BadgeIdsOptions:           GetRandomValueOptions(r),
 					TimelineTimesOptions:      GetRandomValueOptions(r),
 					ToMappingOptions:          GetRandomValueOptions(r),

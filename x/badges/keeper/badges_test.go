@@ -17,7 +17,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		{
 			Amount:         sdkmath.NewUint(1),
 			BadgeIds:       GetOneUintRange(),
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	}
 	collectionsToCreate[0].Transfers = []*types.Transfer{
@@ -28,7 +28,7 @@ func (suite *TestSuite) TestCreateBadges() {
 				{
 					Amount:         sdkmath.NewUint(1),
 					BadgeIds:       GetOneUintRange(),
-					OwnedTimes: GetFullUintRanges(),
+					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
 		},
@@ -50,7 +50,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		{
 			Amount:         sdkmath.NewUint(1),
 			BadgeIds:       GetOneUintRange(),
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	})
 
@@ -68,7 +68,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		{
 			Amount:         sdkmath.NewUint(1),
 			BadgeIds:       GetTwoUintRanges(),
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badges: %s")
@@ -84,7 +84,7 @@ func (suite *TestSuite) TestCreateBadges() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       GetTwoUintRanges(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 			},
@@ -101,7 +101,7 @@ func (suite *TestSuite) TestCreateBadges() {
 			GetOneUintRange()[0],
 			GetTwoUintRanges()[0],
 		},
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 		Amount:         sdkmath.NewUint(1),
 	})
 	suite.Require().Nil(err, "Error subtracting balances: %s")
@@ -113,7 +113,7 @@ func (suite *TestSuite) TestCreateBadges() {
 			GetOneUintRange()[0],
 			GetTwoUintRanges()[0],
 		},
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 		Amount:         sdkmath.NewUint(1),
 	})
 	suite.Require().Nil(err, "Error subtracting balances: %s")
@@ -126,7 +126,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		{
 			Amount:         sdkmath.NewUint(1),
 			BadgeIds:       GetTwoUintRanges(),
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badges: %s")
@@ -137,7 +137,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		BadgeIds: []*types.UintRange{
 			GetTwoUintRanges()[0],
 		},
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 		Amount:         sdkmath.NewUint(2),
 	})
 	suite.Require().Nil(err, "Error subtracting balances: %s")
@@ -148,7 +148,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		BadgeIds: []*types.UintRange{
 			GetTwoUintRanges()[0],
 		},
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 		Amount:         sdkmath.NewUint(2),
 	})
 	suite.Require().Error(err, "Error subtracting balances: %s")
@@ -159,7 +159,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		BadgeIds: []*types.UintRange{
 			GetTwoUintRanges()[0],
 		},
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 		Amount:         sdkmath.NewUint(1),
 	})
 	suite.Require().Nil(err, "Error subtracting balances: %s")
@@ -168,7 +168,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		{
 			Amount:         types.NewUintFromString("1000000000000000000000000000000000000000000000000000000000000"),
 			BadgeIds:       GetTopHalfUintRanges(),
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	})
 	suite.Require().Error(err, "Error creating badges: %s")
@@ -177,12 +177,12 @@ func (suite *TestSuite) TestCreateBadges() {
 		{
 			Amount:         types.NewUintFromString("1000000000000000000000000000000000000000000000000000000000000"),
 			BadgeIds:       GetBottomHalfUintRanges(),
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 		{
 			Amount:         types.NewUintFromString("1000000000000000000000000000000000000000000000000000000000000"),
 			BadgeIds:       GetTopHalfUintRanges(),
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badges: %s")
@@ -194,7 +194,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		BadgeIds: []*types.UintRange{
 			GetTopHalfUintRanges()[0],
 		},
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 		Amount:         types.NewUintFromString("1000000000000000000000000000000000000000000000000000000000000"),
 	})
 	suite.Require().Nil(err, "Error subtracting balances: %s")
@@ -203,7 +203,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		{
 			Amount:         sdkmath.NewUint(1),
 			BadgeIds:       GetTwoUintRanges(),
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	})
 	suite.Require().Nil(err, "Error creating badges: %s")
@@ -219,7 +219,7 @@ func (suite *TestSuite) TestCreateBadges() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       GetTwoUintRanges(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 			},
@@ -236,7 +236,7 @@ func (suite *TestSuite) TestCreateBadgesIdGreaterThanMax() {
 		{
 			Amount:         sdkmath.NewUint(1),
 			BadgeIds:       GetOneUintRange(),
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	}
 	collectionsToCreate[0].Transfers = []*types.Transfer{
@@ -252,7 +252,7 @@ func (suite *TestSuite) TestCreateBadgesIdGreaterThanMax() {
 							End:   sdkmath.NewUint(math.MaxUint64).Add(sdkmath.NewUint(1)),
 						},
 					},
-					OwnedTimes: GetFullUintRanges(),
+					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
 		},

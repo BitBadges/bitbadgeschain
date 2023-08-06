@@ -103,14 +103,14 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
-		OwnedTimes:       GetFullUintRanges(),
+		OwnershipTimes:       GetFullUintRanges(),
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 	})
 
@@ -129,7 +129,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 					{
 						Amount:         sdkmath.NewUint(10),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -165,7 +165,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -201,7 +201,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -278,14 +278,14 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 	})
 
@@ -304,7 +304,7 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -380,14 +380,14 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 	})
 
@@ -406,7 +406,7 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -485,11 +485,11 @@ func (suite *TestSuite) TestIncrements() {
 							{
 								BadgeIds: GetOneUintRange(),
 								Amount:   sdkmath.NewUint(1),
-								OwnedTimes: GetFullUintRanges(),
+								OwnershipTimes: GetFullUintRanges(),
 							},
 						},
 						IncrementBadgeIdsBy: sdkmath.NewUint(1),
-						IncrementOwnedTimesBy: sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					},
 				},
 			
@@ -510,14 +510,14 @@ func (suite *TestSuite) TestIncrements() {
 
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
-		OwnedTimes: 			GetFullUintRanges(),
+		OwnershipTimes: 			GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 	})
 
@@ -536,7 +536,7 @@ func (suite *TestSuite) TestIncrements() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -572,7 +572,7 @@ func (suite *TestSuite) TestIncrements() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -640,11 +640,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 							{
 								BadgeIds: GetOneUintRange(),
 								Amount:   sdkmath.NewUint(1),
-								OwnedTimes: GetFullUintRanges(),
+								OwnershipTimes: GetFullUintRanges(),
 							},
 						},
 						IncrementBadgeIdsBy: sdkmath.NewUint(1),
-						IncrementOwnedTimesBy: sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					},
 				},
 				Uri: "",
@@ -663,14 +663,14 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
-		OwnedTimes: 			GetFullUintRanges(),
+		OwnershipTimes: 			GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 	})
 
@@ -685,7 +685,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
-					Address: "",
+					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
 				From:        "Mint",
@@ -694,7 +694,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       GetFullUintRanges(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -724,7 +724,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
 		BadgeIds:       GetOneUintRange(),
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 	}}, bobBalance.Balances)
 }
 
@@ -770,11 +770,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 							{
 								BadgeIds: GetOneUintRange(),
 								Amount:   sdkmath.NewUint(1),
-								OwnedTimes: GetFullUintRanges(),
+								OwnershipTimes: GetFullUintRanges(),
 							},
 						},
 						IncrementBadgeIdsBy: sdkmath.NewUint(1),
-						IncrementOwnedTimesBy: sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					},
 				},
 			
@@ -794,14 +794,14 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
-		OwnedTimes:       GetFullUintRanges(),
+		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 	})
 
@@ -816,7 +816,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
-					Address: "",
+					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
 				From:        "Mint",
@@ -825,7 +825,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -855,7 +855,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
 		BadgeIds:       GetOneUintRange(),
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 	}}, bobBalance.Balances)
 
 
@@ -866,7 +866,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
-					Address: "",
+					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
 				From:        "Mint",
@@ -875,7 +875,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -905,7 +905,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
 		BadgeIds:       GetTwoUintRanges(),
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 	}}, aliceBalance.Balances)
 }
 
@@ -952,11 +952,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 							{
 								BadgeIds: GetOneUintRange(),
 								Amount:   sdkmath.NewUint(1),
-								OwnedTimes: GetFullUintRanges(),
+								OwnershipTimes: GetFullUintRanges(),
 							},
 						},
 						IncrementBadgeIdsBy: sdkmath.NewUint(1),
-						IncrementOwnedTimesBy: sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					},
 				},
 			
@@ -976,14 +976,14 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
-		OwnedTimes:       GetFullUintRanges(),
+		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 	})
 
@@ -998,7 +998,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
-					Address: "",
+					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
 				From:        "Mint",
@@ -1007,7 +1007,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -1037,7 +1037,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
 		BadgeIds:       GetTwoUintRanges(),
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 	}}, aliceBalance.Balances)
 }
 
@@ -1083,11 +1083,11 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 							{
 								BadgeIds: GetOneUintRange(),
 								Amount:   sdkmath.NewUint(1),
-								OwnedTimes: GetFullUintRanges(),
+								OwnershipTimes: GetFullUintRanges(),
 							},
 						},
 						IncrementBadgeIdsBy: sdkmath.NewUint(1),
-						IncrementOwnedTimesBy: sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					},
 				},
 			
@@ -1107,14 +1107,14 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
-		OwnedTimes:       GetFullUintRanges(),
+		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 	})
 
@@ -1129,7 +1129,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
-					Address: "",
+					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
 				From:        "Mint",
@@ -1138,7 +1138,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -1168,7 +1168,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
 		BadgeIds:       GetOneUintRange(),
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 	}}, bobBalance.Balances)
 
 
@@ -1179,7 +1179,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
-					Address: "",
+					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
 				From:        "Mint",
@@ -1188,7 +1188,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -1255,11 +1255,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 							{
 								BadgeIds: GetOneUintRange(),
 								Amount:   sdkmath.NewUint(1),
-								OwnedTimes: GetFullUintRanges(),
+								OwnershipTimes: GetFullUintRanges(),
 							},
 						},
 						IncrementBadgeIdsBy: sdkmath.NewUint(1),
-						IncrementOwnedTimesBy: sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					},
 				},
 			
@@ -1279,14 +1279,14 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
-		OwnedTimes:       GetFullUintRanges(),
+		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 	})
 
@@ -1301,7 +1301,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
-					Address: "",
+					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
 				From:        "Mint",
@@ -1310,7 +1310,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -1361,7 +1361,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 		BadgeIds:       []*types.UintRange{
 			GetOneUintRange()[0],
 		},
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 	}}, bobBalance.Balances)
 
 	AssertBalancesEqual(suite, []*types.Balance{{
@@ -1369,7 +1369,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 		BadgeIds:       []*types.UintRange{
 			GetTwoUintRanges()[0],
 		},
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 	}}, aliceBalance.Balances)
 }
 
@@ -1402,7 +1402,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 	collectionsToCreate[0].BadgesToCreate = append(collectionsToCreate[0].BadgesToCreate, &types.Balance{
 		Amount:         sdkmath.NewUint(1),
 		BadgeIds:       GetFullUintRanges(),
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 	})
 	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
@@ -1420,11 +1420,11 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 							{
 								BadgeIds: GetOneUintRange(),
 								Amount:   sdkmath.NewUint(1),
-								OwnedTimes: GetFullUintRanges(),
+								OwnershipTimes: GetFullUintRanges(),
 							},
 						},
 						IncrementBadgeIdsBy: sdkmath.NewUint(1),
-						IncrementOwnedTimesBy: sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					},
 				},
 			
@@ -1444,14 +1444,14 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
-		OwnedTimes:       GetFullUintRanges(),
+		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 	})
 
@@ -1466,7 +1466,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
-					Address: "",
+					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
 				From:        "Mint",
@@ -1475,7 +1475,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -1526,7 +1526,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 		BadgeIds:       []*types.UintRange{
 			GetOneUintRange()[0],
 		},
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 	}}, bobBalance.Balances)
 
 	AssertBalancesEqual(suite, []*types.Balance{{
@@ -1534,7 +1534,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 		BadgeIds:       []*types.UintRange{
 			GetOneUintRange()[0],
 		},
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 	}}, aliceBalance.Balances)
 }
 
@@ -1580,11 +1580,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 							{
 								BadgeIds: GetOneUintRange(),
 								Amount:   sdkmath.NewUint(1),
-								OwnedTimes: GetFullUintRanges(),
+								OwnershipTimes: GetFullUintRanges(),
 							},
 						},
 						IncrementBadgeIdsBy: sdkmath.NewUint(1),
-						IncrementOwnedTimesBy: sdkmath.NewUint(0),
+						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					},
 				},
 			
@@ -1604,14 +1604,14 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
-		OwnedTimes:       GetFullUintRanges(),
+		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 	})
 
@@ -1626,7 +1626,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
-					Address: "",
+					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
 				From:        "Mint",
@@ -1635,7 +1635,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -1686,7 +1686,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 		BadgeIds:       []*types.UintRange{
 			GetOneUintRange()[0],
 		},
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 	}}, bobBalance.Balances)
 
 	AssertBalancesEqual(suite, []*types.Balance{{
@@ -1694,7 +1694,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 		BadgeIds:       []*types.UintRange{
 			GetTwoUintRanges()[0],
 		},
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 	}}, aliceBalance.Balances)
 }
 
@@ -1742,7 +1742,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 								{
 									BadgeIds: GetOneUintRange(),
 									Amount:   sdkmath.NewUint(1),
-									OwnedTimes: GetFullUintRanges(),
+									OwnershipTimes: GetFullUintRanges(),
 								},
 							},
 						},
@@ -1752,7 +1752,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 								{
 									BadgeIds: GetTopHalfUintRanges(),
 									Amount:   sdkmath.NewUint(1),
-									OwnedTimes: GetFullUintRanges(),
+									OwnershipTimes: GetFullUintRanges(),
 								},
 							},
 						},
@@ -1775,14 +1775,14 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
-		OwnedTimes:       GetFullUintRanges(),
+		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             GetFullUintRanges(),
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 	})
 
@@ -1797,7 +1797,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
 					ApprovalId:   "testing232",
-					Address: "",
+					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
 				From:        "Mint",
@@ -1806,7 +1806,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -1857,7 +1857,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 		BadgeIds:       []*types.UintRange{
 			GetOneUintRange()[0],
 		},
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 	}}, bobBalance.Balances)
 
 	AssertBalancesEqual(suite, []*types.Balance{{
@@ -1865,7 +1865,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 		BadgeIds:       []*types.UintRange{
 			GetTopHalfUintRanges()[0],
 		},
-		OwnedTimes: GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
 	}}, aliceBalance.Balances)
 }
 
@@ -1913,11 +1913,11 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 						{
 							BadgeIds: GetBottomHalfUintRanges(),
 							Amount:   sdkmath.NewUint(1),
-							OwnedTimes: GetFullUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
 						},
 					},
 					IncrementBadgeIdsBy: sdkmath.NewUint(1),
-					IncrementOwnedTimesBy: sdkmath.NewUint(0),
+					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				},
 			},
 			Uri: "",
@@ -1936,14 +1936,14 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 		},
 	},
 	AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},	
 	TransferTimes:        GetFullUintRanges(),
-		OwnedTimes:       GetFullUintRanges(),
+		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 	})
 
@@ -1962,7 +1962,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 					{
 						Amount:         sdkmath.NewUint(10000),
 						BadgeIds:       GetFullUintRanges(),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -1998,7 +1998,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 					{
 						BadgeIds: GetOneUintRange(),
 						Amount:   sdkmath.NewUint(2),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -2034,7 +2034,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 					{
 						BadgeIds: GetFullUintRanges(),
 						Amount:   sdkmath.NewUint(1),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -2070,7 +2070,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 					{
 						BadgeIds: GetOneUintRange(),
 						Amount:   sdkmath.NewUint(1),
-						OwnedTimes: GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 				MerkleProofs: []*types.MerkleProof{
@@ -2109,7 +2109,7 @@ func (suite *TestSuite) TestMustOwnBadges() {
 				End:   sdkmath.NewUint(1),
 			},
 			BadgeIds: GetFullUintRanges(),
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	}
 
@@ -2131,14 +2131,14 @@ func (suite *TestSuite) TestMustOwnBadges() {
 
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
-		OwnedTimes:       GetFullUintRanges(),
+		OwnershipTimes:       GetFullUintRanges(),
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 		
 	})
@@ -2158,7 +2158,7 @@ func (suite *TestSuite) TestMustOwnBadges() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnedTimes: 		GetFullUintRanges(),
+						OwnershipTimes: 		GetFullUintRanges(),
 					},
 				},
 			},
@@ -2180,7 +2180,7 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 				End:   sdkmath.NewUint(1),
 			},
 			BadgeIds: GetFullUintRanges(),
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	}
 
@@ -2202,14 +2202,14 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
-		OwnedTimes:       		GetFullUintRanges(),
+		OwnershipTimes:       		GetFullUintRanges(),
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -2227,7 +2227,7 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnedTimes: 		GetFullUintRanges(),
+						OwnershipTimes: 		GetFullUintRanges(),
 					},
 				},
 			},
@@ -2250,7 +2250,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 				End:   sdkmath.NewUint(0),
 			},
 			BadgeIds: GetFullUintRanges(),
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	}
 
@@ -2270,14 +2270,14 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
-		OwnedTimes:       		GetFullUintRanges(),
+		OwnershipTimes:       		GetFullUintRanges(),
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 		
 	})
@@ -2297,7 +2297,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnedTimes: 		GetFullUintRanges(),
+						OwnershipTimes: 		GetFullUintRanges(),
 					},
 				},
 			},
@@ -2316,7 +2316,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnedTimes: 		GetFullUintRanges(),
+						OwnershipTimes: 		GetFullUintRanges(),
 					},
 				},
 			},
@@ -2339,7 +2339,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 				End:   sdkmath.NewUint(100),
 			},
 			BadgeIds: GetFullUintRanges(),
-			OwnedTimes: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
 		},
 	}
 	
@@ -2360,14 +2360,14 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 			},
 		},
 		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsAllowed: true,
+			IsApproved: true,
 		}},
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
-		OwnedTimes:       GetFullUintRanges(),
+		OwnershipTimes:       GetFullUintRanges(),
 		FromMappingId:        "Mint",
-		ToMappingId:          "All",
-		InitiatedByMappingId: "All",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
 
 	})
 
@@ -2386,7 +2386,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnedTimes: 		GetFullUintRanges(),
+						OwnershipTimes: 		GetFullUintRanges(),
 					},
 				},
 			},
@@ -2405,7 +2405,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 					{
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-						OwnedTimes: 		GetFullUintRanges(),
+						OwnershipTimes: 		GetFullUintRanges(),
 					},
 				},
 			},
