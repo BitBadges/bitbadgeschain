@@ -281,76 +281,96 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 					return err
 				}
 			}
+
 	
 			if approvalDetails.PredeterminedBalances != nil {
-				orderType := approvalDetails.PredeterminedBalances.OrderCalculationMethod
-				if orderType == nil {
-					return sdkerrors.Wrapf(ErrInvalidRequest, "order type is nil")
-				}
-	
-				numTrue := 0
-				if orderType.UseMerkleChallengeLeafIndex {
-					numTrue++
-				}
-	
-				if orderType.UseOverallNumTransfers {
-					numTrue++
-				}
-	
-				if orderType.UsePerToAddressNumTransfers {
-					numTrue++
-				}
-	
-				if orderType.UsePerFromAddressNumTransfers {
-					numTrue++
-				}
-	
-				if orderType.UsePerInitiatedByAddressNumTransfers {
-					numTrue++
-				}
-	
-	
-				if numTrue != 1 {
-					return sdkerrors.Wrapf(ErrInvalidRequest, "only one of use challenge leaf index, use overall num transfers, use per to address num transfers, use per from address num transfers, use per initiated by address num transfers can be true")
-				}
-	
-	
-				isManualNil := approvalDetails.PredeterminedBalances.ManualBalances == nil
-				isSequentialNil := approvalDetails.PredeterminedBalances.IncrementedBalances == nil
-	
-				err := *new(error)
-				if (isManualNil && !isSequentialNil) {
-					sequentialTransfer := approvalDetails.PredeterminedBalances.IncrementedBalances 
-					sequentialTransfer.StartBalances, err = ValidateBalances(sequentialTransfer.StartBalances)
-					if err != nil {
-						return err
+				orderCalculationMethodIsBasicallyNil := !approvalDetails.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex &&
+					!approvalDetails.PredeterminedBalances.OrderCalculationMethod.UseOverallNumTransfers &&
+					!approvalDetails.PredeterminedBalances.OrderCalculationMethod.UsePerToAddressNumTransfers &&
+					!approvalDetails.PredeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers &&
+					!approvalDetails.PredeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers
+
+				sequentialTransferIsBasicallyNil :=
+				approvalDetails.PredeterminedBalances.IncrementedBalances == nil || (approvalDetails.PredeterminedBalances.IncrementedBalances.StartBalances == nil &&
+					approvalDetails.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsZero() &&
+					approvalDetails.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy.IsZero())
+
+					manualBalancesIsBasicallyNil := approvalDetails.PredeterminedBalances.ManualBalances == nil
+
+				isBasicallyNil := orderCalculationMethodIsBasicallyNil && sequentialTransferIsBasicallyNil && manualBalancesIsBasicallyNil
+
+				if (!isBasicallyNil) {
+					orderType := approvalDetails.PredeterminedBalances.OrderCalculationMethod
+					if orderType == nil {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "order type is nil")
 					}
-	
-					if sequentialTransfer.IncrementBadgeIdsBy.IsNil() {
-						return sdkerrors.Wrapf(ErrUintUnititialized, "increment ids by is uninitialized")
+		
+					numTrue := 0
+					if orderType.UseMerkleChallengeLeafIndex {
+						numTrue++
 					}
-				
-					if sequentialTransfer.IncrementOwnershipTimesBy.IsNil() {
-						return sdkerrors.Wrapf(ErrUintUnititialized, "max num transfers is uninitialized")
+		
+					if orderType.UseOverallNumTransfers {
+						numTrue++
 					}
-				} else if (!isManualNil && isSequentialNil) {
-					for _, manualTransfer := range approvalDetails.PredeterminedBalances.ManualBalances {
-						manualTransfer.Balances, err = ValidateBalances(manualTransfer.Balances)
+		
+					if orderType.UsePerToAddressNumTransfers {
+						numTrue++
+					}
+		
+					if orderType.UsePerFromAddressNumTransfers {
+						numTrue++
+					}
+		
+					if orderType.UsePerInitiatedByAddressNumTransfers {
+						numTrue++
+					}
+		
+		
+					if numTrue != 1 {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "only one of use challenge leaf index, use overall num transfers, use per to address num transfers, use per from address num transfers, use per initiated by address num transfers can be true")
+					}
+		
+		
+					isManualNil := approvalDetails.PredeterminedBalances.ManualBalances == nil
+					isSequentialNil := approvalDetails.PredeterminedBalances.IncrementedBalances == nil
+		
+					err := *new(error)
+					if (isManualNil && !isSequentialNil) {
+						sequentialTransfer := approvalDetails.PredeterminedBalances.IncrementedBalances 
+						sequentialTransfer.StartBalances, err = ValidateBalances(sequentialTransfer.StartBalances)
 						if err != nil {
 							return err
 						}
+		
+						if sequentialTransfer.IncrementBadgeIdsBy.IsNil() {
+							return sdkerrors.Wrapf(ErrUintUnititialized, "increment ids by is uninitialized")
+						}
+					
+						if sequentialTransfer.IncrementOwnershipTimesBy.IsNil() {
+							return sdkerrors.Wrapf(ErrUintUnititialized, "max num transfers is uninitialized")
+						}
+					} else if (!isManualNil && isSequentialNil) {
+						for _, manualTransfer := range approvalDetails.PredeterminedBalances.ManualBalances {
+							manualTransfer.Balances, err = ValidateBalances(manualTransfer.Balances)
+							if err != nil {
+								return err
+							}
+						}
+					} else {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "manual transfers and sequential transfers cannot be both nil or both defined")
 					}
-				} else {
-					return sdkerrors.Wrapf(ErrInvalidRequest, "manual transfers and sequential transfers cannot be both nil or both defined")
 				}
-			}
 
-			if approvalDetails.ApprovalAmounts == nil {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "approval amounts is uninitialized")
-			}
+				if approvalDetails.ApprovalAmounts == nil {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "approval amounts is uninitialized")
+				}
 
-			if approvalDetails.MaxNumTransfers == nil {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "max num transfers must not be nil")
+				if approvalDetails.MaxNumTransfers == nil {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "max num transfers must not be nil")
+				}
+			} else {
+				approvalDetails.PredeterminedBalances = nil
 			}
 		}
 

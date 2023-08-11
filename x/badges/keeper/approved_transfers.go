@@ -393,7 +393,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 		numTransfersStr := string(numTransfersJsonData)
 
 		ctx.EventManager().EmitEvent(
-			sdk.NewEvent("approval",
+			sdk.NewEvent("approval" + fmt.Sprint(collection.CollectionId) + fmt.Sprint(approverAddress) + fmt.Sprint(approvalId) + fmt.Sprint(approvalLevel) + fmt.Sprint(trackerType) + fmt.Sprint(address),
 				sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 				sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
 				sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),

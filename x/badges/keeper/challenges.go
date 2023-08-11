@@ -71,7 +71,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 
 						//Currently added for indexer, but note that it is planned to be deprecated
 						ctx.EventManager().EmitEvent(
-							sdk.NewEvent("challenge",
+							sdk.NewEvent("challenge" + fmt.Sprint(challengeId) + fmt.Sprint(challengeId) + fmt.Sprint(leafIndex) + fmt.Sprint(approverAddress) + fmt.Sprint(challengeLevel) + fmt.Sprint(newNumUsed),
 								sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 								sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 								sdk.NewAttribute("challengeId", fmt.Sprint(challengeId)),
