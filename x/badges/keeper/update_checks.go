@@ -96,18 +96,18 @@ func GetUpdateCombinationsToCheck(
 	return detailsToCheck, nil
 }
 
-func CheckNotForbidden(ctx sdk.Context, permission *types.UniversalPermissionDetails) error {
+func CheckNotForbidden(ctx sdk.Context, permission *types.UniversalPermissionDetails, permissionStr string) error {
 	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 
 	found := types.SearchUintRangesForUint(blockTime, permission.ForbiddenTimes)
 	if found {
-		return sdkerrors.Wrapf(ErrForbiddenTime, "current time %s is forbidden", blockTime.String())
+		return sdkerrors.Wrapf(ErrForbiddenTime, "current time %s is forbidden for permission %s", blockTime.String(), permissionStr)
 	}
 
 	return nil
 }
 
-func (k Keeper) CheckActionPermission(ctx sdk.Context, permissions []*types.ActionPermission) error {
+func (k Keeper) CheckActionPermission(ctx sdk.Context, permissions []*types.ActionPermission, permissionStr string) error {
 	castedPermissions, err := k.CastActionPermissionToUniversalPermission(permissions)
 	if err != nil {
 		return err
@@ -117,7 +117,7 @@ func (k Keeper) CheckActionPermission(ctx sdk.Context, permissions []*types.Acti
 
 	//In this case we only care about the first match since we have no extra criteria
 	for _, permissionDetail := range permissionDetails {
-		err := CheckNotForbidden(ctx, permissionDetail)
+		err := CheckNotForbidden(ctx, permissionDetail, permissionStr)
 		if err != nil {
 			return err
 		}
@@ -126,7 +126,7 @@ func (k Keeper) CheckActionPermission(ctx sdk.Context, permissions []*types.Acti
 	return nil
 }
 
-func (k Keeper) CheckTimedUpdatePermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.TimedUpdatePermission) error {
+func (k Keeper) CheckTimedUpdatePermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.TimedUpdatePermission, permissionStr string) error {
 	castedPermissions, err := k.CastTimedUpdatePermissionToUniversalPermission(permissions)
 	if err != nil {
 		return err
@@ -134,10 +134,10 @@ func (k Keeper) CheckTimedUpdatePermission(ctx sdk.Context, detailsToCheck []*ty
 
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
 
-	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
+	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
 
-func (k Keeper) CheckBalancesActionPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.BalancesActionPermission) error {
+func (k Keeper) CheckBalancesActionPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.BalancesActionPermission, permissionStr string) error {
 	castedPermissions, err := k.CastBalancesActionPermissionToUniversalPermission(permissions)
 	if err != nil {
 		return err
@@ -145,10 +145,10 @@ func (k Keeper) CheckBalancesActionPermission(ctx sdk.Context, detailsToCheck []
 
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
 
-	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
+	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
 
-func (k Keeper) CheckTimedUpdateWithBadgeIdsPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.TimedUpdateWithBadgeIdsPermission) error {
+func (k Keeper) CheckTimedUpdateWithBadgeIdsPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.TimedUpdateWithBadgeIdsPermission, permissionStr string) error {
 	castedPermissions, err := k.CastTimedUpdateWithBadgeIdsPermissionToUniversalPermission(permissions)
 	if err != nil {
 		return err
@@ -156,10 +156,10 @@ func (k Keeper) CheckTimedUpdateWithBadgeIdsPermission(ctx sdk.Context, detailsT
 
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
 
-	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
+	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
 
-func (k Keeper) CheckCollectionApprovedTransferPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.CollectionApprovedTransferPermission, managerAddress string) error {
+func (k Keeper) CheckCollectionApprovedTransferPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.CollectionApprovedTransferPermission, managerAddress string, permissionStr string) error {
 	castedPermissions, err := k.CastCollectionApprovedTransferPermissionToUniversalPermission(ctx, managerAddress, permissions)
 	if err != nil {
 		return err
@@ -167,10 +167,10 @@ func (k Keeper) CheckCollectionApprovedTransferPermission(ctx sdk.Context, detai
 
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
 
-	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
+	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
 
-func (k Keeper) CheckUserApprovedOutgoingTransferPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.UserApprovedOutgoingTransferPermission, managerAddress string) error {
+func (k Keeper) CheckUserApprovedOutgoingTransferPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.UserApprovedOutgoingTransferPermission, managerAddress string, permissionStr string) error {
 	castedPermissions, err := k.CastUserApprovedOutgoingTransferPermissionToUniversalPermission(ctx, managerAddress, permissions)
 	if err != nil {
 		return err
@@ -178,10 +178,10 @@ func (k Keeper) CheckUserApprovedOutgoingTransferPermission(ctx sdk.Context, det
 
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
 
-	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
+	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
 
-func (k Keeper) CheckUserApprovedIncomingTransferPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.UserApprovedIncomingTransferPermission, managerAddress string) error {
+func (k Keeper) CheckUserApprovedIncomingTransferPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.UserApprovedIncomingTransferPermission, managerAddress string, permissionStr string) error {
 	castedPermissions, err := k.CastUserApprovedIncomingTransferPermissionToUniversalPermission(ctx, managerAddress, permissions)
 	if err != nil {
 		return err
@@ -189,10 +189,10 @@ func (k Keeper) CheckUserApprovedIncomingTransferPermission(ctx sdk.Context, det
 
 	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
 
-	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck)
+	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
 
-func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types.UniversalPermissionDetails, detailsToCheck []*types.UniversalPermissionDetails) error {
+func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types.UniversalPermissionDetails, detailsToCheck []*types.UniversalPermissionDetails, permissionStr string) error {
 	//Apply dummy ranges to all detailsToCheck
 	for _, detailToCheck := range detailsToCheck {
 		if detailToCheck.BadgeId == nil {
@@ -231,7 +231,7 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 		for _, detailToCheck := range detailsToCheck {
 			_, overlap := types.UniversalRemoveOverlaps(permissionDetail, detailToCheck)
 			if len(overlap) > 0 {
-				err := CheckNotForbidden(ctx, permissionDetail) //forbiddenTimes and permittedTimes are stored in here
+				err := CheckNotForbidden(ctx, permissionDetail, permissionStr) //forbiddenTimes and permittedTimes are stored in here
 				if err != nil {
 					return err
 				}

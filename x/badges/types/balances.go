@@ -1,6 +1,8 @@
 package types
 
 import (
+	"encoding/json"
+
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 
@@ -337,7 +339,45 @@ func SetBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error) {
 		return balances, nil
 	}
 
-	balances = append(balances, newBalance)
+	for i, balance := range balances {
+		if balance.Amount != newBalance.Amount {
+			continue
+		}
 
+		if compareSlices(balance.BadgeIds, newBalance.BadgeIds) {
+			balances[i].OwnershipTimes = append(balances[i].OwnershipTimes, newBalance.OwnershipTimes...)
+			balances[i].OwnershipTimes = SortAndMergeOverlapping(balances[i].OwnershipTimes)
+
+			return balances, nil
+		} else if compareSlices(balance.OwnershipTimes, newBalance.OwnershipTimes) {
+			balances[i].BadgeIds = append(balances[i].BadgeIds, newBalance.BadgeIds...)
+			balances[i].BadgeIds = SortAndMergeOverlapping(balances[i].BadgeIds)
+
+			return balances, nil
+		}
+	}
+
+	balances = append(balances, newBalance)
 	return balances, nil
+}
+
+
+func compareSlices(slice1, slice2 []*UintRange) bool {
+	// Compare two slices for equality
+	return jsonEqual(slice1, slice2)
+}
+
+func jsonEqual(a, b interface{}) bool {
+	// Compare JSON representations of two values
+	aJSON, err := json.Marshal(a)
+	if err != nil {
+		return false
+	}
+
+	bJSON, err := json.Marshal(b)
+	if err != nil {
+		return false
+	}
+
+	return string(aJSON) == string(bJSON)
 }

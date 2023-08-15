@@ -220,9 +220,9 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 
 	//If all are not explicitly allowed, we return that it is disallowed by default
 	if len(unhandled) > 0 {
-		transferStr := "(from: " + fromAddress + ", to: " + toAddress + ", initiatedBy: " + initiatedBy + ", badgeId: " + unhandled[0].BadgeId.Start.String() + ", ownershipTime: " + unhandled[0].OwnershipTime.Start.String() + ")"
+		transferStr := "(from: " + fromAddress + ", to: " + toAddress + ", initiatedBy: " + initiatedBy + ", badgeId: " + unhandled[0].BadgeId.Start.String() + ", ownershipTime (unix milliseconds): " + unhandled[0].OwnershipTime.Start.String() + ")"
 
-		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "transfer disallowed because no approved transfer was found for: %s", transferStr)
+		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "transfer disallowed because currently, there is no approval for the following transfer: %s", transferStr)
 	}
 
 	return userApprovalsToCheck, nil

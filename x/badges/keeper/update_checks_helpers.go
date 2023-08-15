@@ -121,7 +121,7 @@ func (k Keeper) ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, colle
 		return err
 	}
 
-	err = k.CheckCollectionApprovedTransferPermission(ctx, detailsToCheck, CanUpdateCollectionApprovedTransfers, managerAddress)
+	err = k.CheckCollectionApprovedTransferPermission(ctx, detailsToCheck, CanUpdateCollectionApprovedTransfers, managerAddress, "update collection approved transfers")
 	if err != nil {
 		return err
 	}
@@ -191,7 +191,7 @@ func (k Keeper) ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, _ol
 		return err
 	}
 
-	err = k.CheckUserApprovedOutgoingTransferPermission(ctx, detailsToCheck, CanUpdateCollectionApprovedTransfers, managerAddress)
+	err = k.CheckUserApprovedOutgoingTransferPermission(ctx, detailsToCheck, CanUpdateCollectionApprovedTransfers, managerAddress, "update user approved outgoing transfers")
 	if err != nil {
 		return err
 	}
@@ -262,7 +262,7 @@ func (k Keeper) ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, _ol
 		return err
 	}
 
-	err = k.CheckUserApprovedIncomingTransferPermission(ctx, detailsToCheck, CanUpdateCollectionApprovedTransfers, managerAddress)
+	err = k.CheckUserApprovedIncomingTransferPermission(ctx, detailsToCheck, CanUpdateCollectionApprovedTransfers, managerAddress, "update user approved incoming transfers")
 	if err != nil {
 		return err
 	}
@@ -316,7 +316,7 @@ func (k Keeper) ValidateBadgeMetadataUpdate(ctx sdk.Context, oldBadgeMetadata []
 		return err
 	}
 
-	err = k.CheckTimedUpdateWithBadgeIdsPermission(ctx, detailsToCheck, canUpdateBadgeMetadata)
+	err = k.CheckTimedUpdateWithBadgeIdsPermission(ctx, detailsToCheck, canUpdateBadgeMetadata, "update badge metadata")
 	if err != nil {
 		return err
 	}
@@ -349,7 +349,7 @@ func (k Keeper) ValidateCollectionMetadataUpdate(ctx sdk.Context, oldCollectionM
 		return err
 	}
 
-	err = k.CheckTimedUpdatePermission(ctx, detailsToCheck, canUpdateCollectionMetadata)
+	err = k.CheckTimedUpdatePermission(ctx, detailsToCheck, canUpdateCollectionMetadata, "update collection metadata")
 	if err != nil {
 		return err
 	}
@@ -390,7 +390,7 @@ func (k Keeper) ValidateOffChainBalancesMetadataUpdate(ctx sdk.Context, collecti
 		return err
 	}
 
-	err = k.CheckTimedUpdatePermission(ctx, detailsToCheck, canUpdateOffChainBalancesMetadata)
+	err = k.CheckTimedUpdatePermission(ctx, detailsToCheck, canUpdateOffChainBalancesMetadata, "update off chain balances metadata")
 	if err != nil {
 		return err
 	}
@@ -470,7 +470,7 @@ func (k Keeper) ValidateInheritedBalancesUpdate(ctx sdk.Context, collection *typ
 		return err
 	}
 
-	err = k.CheckTimedUpdateWithBadgeIdsPermission(ctx, detailsToCheck, canUpdateInheritedBalances)
+	err = k.CheckTimedUpdateWithBadgeIdsPermission(ctx, detailsToCheck, canUpdateInheritedBalances, "update inherited balances")
 	if err != nil {
 		return err
 	}
@@ -517,7 +517,7 @@ func (k Keeper) ValidateManagerUpdate(ctx sdk.Context, oldManager []*types.Manag
 		return err
 	}
 
-	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateManager); err != nil {
+	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateManager, "update manager"); err != nil {
 		return err
 	}
 
@@ -536,7 +536,7 @@ func (k Keeper) ValidateCustomDataUpdate(ctx sdk.Context, oldCustomData []*types
 		return err
 	}
 
-	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateCustomData); err != nil {
+	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateCustomData, "update custom data"); err != nil {
 		return err
 	}
 
@@ -574,7 +574,7 @@ func (k Keeper) ValidateStandardsUpdate(ctx sdk.Context, oldStandards []*types.S
 		return err
 	}
 
-	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateStandards); err != nil {
+	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateStandards, "update standards"); err != nil {
 		return err
 	}
 
@@ -593,7 +593,7 @@ func (k Keeper) ValidateContractAddressUpdate(ctx sdk.Context, oldContractAddres
 		return err
 	}
 
-	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateContractAddress); err != nil {
+	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateContractAddress, "update contract address"); err != nil {
 		return err
 	}
 
@@ -612,7 +612,7 @@ func (k Keeper) ValidateIsArchivedUpdate(ctx sdk.Context, oldIsArchived []*types
 		return err
 	}
 
-	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateIsArchived); err != nil {
+	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateIsArchived, "update is archived"); err != nil {
 		return err
 	}
 

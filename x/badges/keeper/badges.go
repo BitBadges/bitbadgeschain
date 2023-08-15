@@ -34,7 +34,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		}
 	}
 
-	err = k.CheckBalancesActionPermission(ctx, detailsToCheck, collection.CollectionPermissions.CanCreateMoreBadges)
+	err = k.CheckBalancesActionPermission(ctx, detailsToCheck, collection.CollectionPermissions.CanCreateMoreBadges, "can create more badges")
 	if err != nil {
 		return &types.BadgeCollection{}, err
 	}
