@@ -1,8 +1,8 @@
 package keeper
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -118,7 +118,7 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollectio
 		amount := balance.Amount
 		userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, transferBalances, collection, badgeIds, times, from, to, initiatedBy, amount, solutions)
 		if err != nil {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "collection approvals not satisfied")
 		}
 
 
@@ -129,12 +129,12 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollectio
 					if userApproval.Outgoing {
 						err = k.DeductUserOutgoingApprovals(ctx, transferBalances, collection, fromUserBalance, balance.BadgeIds, balance.OwnershipTimes, from, to, initiatedBy, amount, solutions)
 						if err != nil {
-							return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+							return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "outgoing approvals for %s not satisfied", from)
 						}
 					} else {
 						err = k.DeductUserIncomingApprovals(ctx, transferBalances, collection, toUserBalance, balance.BadgeIds, balance.OwnershipTimes, from, to, initiatedBy, amount, solutions)
 						if err != nil {
-							return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+							return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "incoming approvals for %s not satisfied", to)
 						}
 					}
 				}
@@ -145,7 +145,7 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollectio
 	for _, balance := range transferBalances {
 		fromUserBalance.Balances, err = types.SubtractBalance(fromUserBalance.Balances, balance)
 		if err != nil {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "inadequate balances for transfer from %s", from)
 		}
 
 		toUserBalance.Balances, err = types.AddBalance(toUserBalance.Balances, balance)
