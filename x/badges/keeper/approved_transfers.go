@@ -222,7 +222,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 	if len(unhandled) > 0 {
 		transferStr := "(from: " + fromAddress + ", to: " + toAddress + ", initiatedBy: " + initiatedBy + ", badgeId: " + unhandled[0].BadgeId.Start.String() + ", ownershipTime (unix milliseconds): " + unhandled[0].OwnershipTime.Start.String() + ")"
 
-		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "transfer disallowed because currently, there is no approval for the following transfer: %s", transferStr)
+		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "transfer disallowed because there is no current approval for the following transfer: %s", transferStr)
 	}
 
 	return userApprovalsToCheck, nil

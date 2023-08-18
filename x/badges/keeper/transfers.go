@@ -75,6 +75,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 				ctx.EventManager().EmitEvent(
 					sdk.NewEvent(sdk.EventTypeMessage,
 						sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+						sdk.NewAttribute("creator", initiatedBy),
 						sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
 						sdk.NewAttribute("transfer", amountsStr),
 					),
