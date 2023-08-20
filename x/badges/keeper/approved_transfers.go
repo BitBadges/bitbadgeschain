@@ -141,7 +141,8 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 				//    If so, useLeafIndexForNumIncrements will be true 
 				challengeNumIncrements, err := k.AssertValidSolutionForEveryChallenge(ctx, collection.CollectionId, approvalDetails.MerkleChallenges, solutions, initiatedBy, false, approverAddress, approvalLevel)
 				if err != nil {
-					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "transfer disallowed because of invalid challenges / solutions: %s", transferStr)
+
+					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "%s", transferStr)
 				}
 
 				//TODO: Support inherited balances
@@ -169,7 +170,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 						maxAmount := mustOwnBadge.AmountRange.End
 
 						if fetchedBalance.Amount.LT(minAmount) || fetchedBalance.Amount.GT(maxAmount) {
-							return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrDisallowedTransfer, "transfer disallowed because user does not own the required badges in mustOwnBadges: %s", transferStr)
+							return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrDisallowedTransfer, "initiator does not own the required badges: %s", transferStr)
 						}
 					}
 				}
@@ -180,22 +181,22 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 				//here, we assert the transfer is good for each level of approvals and increment if necessary
 				err =  k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalDetails, overallTransferBalances, collection, approvalDetails.ApprovalAmounts.OverallApprovalAmount, approvalDetails.MaxNumTransfers.OverallMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "overall", "")
 				if err != nil {
-					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error incrementing overall approvals: %s", transferStr)
+					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "exceeded overall approvals: %s", transferStr)
 				}
 
 				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalDetails, overallTransferBalances, collection, approvalDetails.ApprovalAmounts.PerToAddressApprovalAmount, approvalDetails.MaxNumTransfers.PerToAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "to", toAddress)
 				if err != nil {
-					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error incrementing to approvals: %s", transferStr)
+					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "exceeded to approvals: %s", transferStr)
 				}
 
 				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalDetails, overallTransferBalances, collection, approvalDetails.ApprovalAmounts.PerFromAddressApprovalAmount, approvalDetails.MaxNumTransfers.PerFromAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "from", fromAddress)
 				if err != nil {
-					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error incrementing from approvals: %s", transferStr)
+					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "exceeded from approvals: %s", transferStr)
 				}
 
 				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalDetails, overallTransferBalances, collection, approvalDetails.ApprovalAmounts.PerInitiatedByAddressApprovalAmount, approvalDetails.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "initiatedBy", initiatedBy)
 				if err != nil {
-					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error incrementing initiatedBy approvals: %s", transferStr)
+					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "exceeded initiatedBy approvals: %s", transferStr)
 				}
 
 				//If we do not override the approved outgoing / incoming transfers, we need to check the user approvals
@@ -222,7 +223,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 	if len(unhandled) > 0 {
 		transferStr := "(from: " + fromAddress + ", to: " + toAddress + ", initiatedBy: " + initiatedBy + ", badgeId: " + unhandled[0].BadgeId.Start.String() + ", ownershipTime (unix milliseconds): " + unhandled[0].OwnershipTime.Start.String() + ")"
 
-		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "transfer disallowed because there is no current approval for the following transfer: %s", transferStr)
+		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval found: %s", transferStr)
 	}
 
 	return userApprovalsToCheck, nil
@@ -372,7 +373,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 		//only check exceeds if maxNumTransfers is not 0 (because 0 means no limit)
 		if maxNumTransfers.GT(sdkmath.NewUint(0)) {
 			if approvalTrackerDetails.NumTransfers.GT(maxNumTransfers) {
-				return sdkerrors.Wrapf(ErrDisallowedTransfer, "exceeded max num transfers - %s", maxNumTransfers.String())	
+				return sdkerrors.Wrapf(ErrDisallowedTransfer, "exceeded max transfers allowed - %s", maxNumTransfers.String())	
 			}
 		}
 	}

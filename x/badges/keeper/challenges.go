@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	"fmt"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -14,14 +14,25 @@ import (
 func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool, approverAddress string, challengeLevel string) (sdkmath.Uint, error) {
 	numIncrements := sdkmath.NewUint(0)
 
+	
 	for _, challenge := range challenges {
 		root := challenge.Root
 		hasValidSolution := false
+		errStr := ""
+		if challenge.UseCreatorAddressAsLeaf {
+			errStr = "does not satisfy whitelist"
+		} else {
+			errStr = "invalid code / password"
+		}
+
+		additionalDetailsErrorStr := ""
 
 		for _, proof := range merkleProofs {
+			additionalDetailsErrorStr = ""
 			if root != "" {
 				// Must be proper length to avoid preimage attacks
 				if len(proof.Aunts) != int(challenge.ExpectedProofLength.Uint64()) {
+					additionalDetailsErrorStr = "invalid proof length"
 					continue
 				}
 
@@ -30,6 +41,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 				}
 
 				if proof.Leaf == "" {
+					additionalDetailsErrorStr = "empty leaf"
 					continue
 				}
 
@@ -46,45 +58,47 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 
 				err := CheckMerklePath(proof.Leaf, root, proof.Aunts)
 				if err != nil {
+					additionalDetailsErrorStr = ""
 					continue
 				}
 
-				
+				challengeId := challenge.ChallengeId
+				newNumUsed := sdk.NewUint(0)
 				if challenge.MaxOneUsePerLeaf {
-					challengeId := challenge.ChallengeId
+					
 					numUsed, err := k.GetNumUsedForMerkleChallengeFromStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex)
 					if err != nil {
+						additionalDetailsErrorStr = "error getting num processed"
 						continue
 					}
 					numUsed = numUsed.Add(sdkmath.NewUint(1))
 
 					maxUses := sdkmath.NewUint(1)
 					if numUsed.GT(maxUses) {
+						additionalDetailsErrorStr = "exceeded max number of uses"
 						continue
 					}
 
 					if !simulation {
-						newNumUsed, err := k.IncrementNumUsedForMerkleChallengeInStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex)
+						newNumUsed, err = k.IncrementNumUsedForMerkleChallengeInStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex)
 						if err != nil {
 							continue
 						}
-
-						//Currently added for indexer, but note that it is planned to be deprecated
-						ctx.EventManager().EmitEvent(
-							sdk.NewEvent("challenge" + fmt.Sprint(challengeId) + fmt.Sprint(challengeId) + fmt.Sprint(leafIndex) + fmt.Sprint(approverAddress) + fmt.Sprint(challengeLevel) + fmt.Sprint(newNumUsed),
-								sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-								sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-								sdk.NewAttribute("challengeId", fmt.Sprint(challengeId)),
-								sdk.NewAttribute("leafIndex", fmt.Sprint(leafIndex)),
-								sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
-								sdk.NewAttribute("challengeLevel", fmt.Sprint(challengeLevel)),
-								sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),
-							),
-						)
 					}
-
-
 				}
+
+				//Currently added for indexer, but note that it is planned to be deprecated
+				ctx.EventManager().EmitEvent(
+					sdk.NewEvent("challenge" + fmt.Sprint(challengeId) + fmt.Sprint(challengeId) + fmt.Sprint(leafIndex) + fmt.Sprint(approverAddress) + fmt.Sprint(challengeLevel) + fmt.Sprint(newNumUsed),
+						sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+						sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
+						sdk.NewAttribute("challengeId", fmt.Sprint(challengeId)),
+						sdk.NewAttribute("leafIndex", fmt.Sprint(numIncrements)),
+						sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
+						sdk.NewAttribute("challengeLevel", fmt.Sprint(challengeLevel)),
+						sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),
+					),
+				)
 
 				hasValidSolution = true
 				break
@@ -92,7 +106,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 		}
 
 		if !hasValidSolution {
-			return numIncrements, ErrNoValidSolutionForChallenge
+			return numIncrements, sdkerrors.Wrapf(ErrNoValidSolutionForChallenge, "%s - %s", errStr, additionalDetailsErrorStr)
 		}
 	}
 

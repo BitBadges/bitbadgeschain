@@ -22,6 +22,6 @@ var (
 	ErrAddressMappingNotFound      = sdkerrors.Register(types.ModuleName, 73, "address mapping not found")
 	ErrCircularDependency          = sdkerrors.Register(types.ModuleName, 75, "circular dependency")
 	ErrDisallowedTransfer          = sdkerrors.Register(types.ModuleName, 76, "disallowed transfer")
-	ErrNoValidSolutionForChallenge = sdkerrors.Register(types.ModuleName, 77, "no valid solution for challenge")
+	ErrNoValidSolutionForChallenge = sdkerrors.Register(types.ModuleName, 77, "challenge failed")
 	ErrExceedsThreshold						= sdkerrors.Register(types.ModuleName, 78, "exceeds threshold")
 )
