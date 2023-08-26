@@ -40,6 +40,13 @@ genesis:
       params:
         bond_denom: badge
   chain_id: bitbadges_1-2
+  
 validators:
 - name: alice
   bonded: 100000000badge
+  config:
+      consensus:
+        timeout_commit: "1s"
+        timeout_propose: "1s"
+
+# set block time

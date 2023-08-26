@@ -22,8 +22,8 @@ func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.Addr
 
 	//if any char is a :
 	for _, char := range id {
-		if char == ':' {
-			return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot contain :")
+		if char == ':'  || char == '_' {
+			return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot contain : or _")
 		}
 	}
 

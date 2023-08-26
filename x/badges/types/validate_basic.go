@@ -330,13 +330,12 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 					if numTrue != 1 {
 						return sdkerrors.Wrapf(ErrInvalidRequest, "only one of use challenge leaf index, use overall num transfers, use per to address num transfers, use per from address num transfers, use per initiated by address num transfers can be true")
 					}
+					
 		
-		
-					isManualNil := approvalDetails.PredeterminedBalances.ManualBalances == nil
-					isSequentialNil := approvalDetails.PredeterminedBalances.IncrementedBalances == nil
+					
 		
 					err := *new(error)
-					if (isManualNil && !isSequentialNil) {
+					if (manualBalancesIsBasicallyNil && !sequentialTransferIsBasicallyNil) {
 						sequentialTransfer := approvalDetails.PredeterminedBalances.IncrementedBalances 
 						sequentialTransfer.StartBalances, err = ValidateBalances(sequentialTransfer.StartBalances)
 						if err != nil {
@@ -350,7 +349,7 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 						if sequentialTransfer.IncrementOwnershipTimesBy.IsNil() {
 							return sdkerrors.Wrapf(ErrUintUnititialized, "max num transfers is uninitialized")
 						}
-					} else if (!isManualNil && isSequentialNil) {
+					} else if (!manualBalancesIsBasicallyNil && sequentialTransferIsBasicallyNil) {
 						for _, manualTransfer := range approvalDetails.PredeterminedBalances.ManualBalances {
 							manualTransfer.Balances, err = ValidateBalances(manualTransfer.Balances)
 							if err != nil {
