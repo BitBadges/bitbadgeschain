@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"sort"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -97,24 +98,25 @@ func DeepCopyBalances(balances []*Balance) []*Balance {
 // 1) {amount: 1, badgeIds: [1 to 10, 5 to 20]} -> {amount: 1, badgeIds: [1 to 4, 11 to 20]}, {amount: 2: badgeIds: [5 to 10]}
 // 2) {amount: 1, badgeIds: [5 to 10]}, {amount: 2: badgeIds: [5 to 10]} -> {amount: 3: badgeIds: [5 to 10]}
 func HandleDuplicateBadgeIds(balances []*Balance) ([]*Balance, error) {
-	newBalances := []*Balance{}
-	err := *new(error)
-	for _, balance := range balances {
-		for _, badgeId := range balance.BadgeIds {
-			for _, time := range balance.OwnershipTimes {
-				newBalances, err = AddBalance(newBalances, &Balance{
-					Amount:         balance.Amount,
-					BadgeIds:       []*UintRange{badgeId},
-					OwnershipTimes: []*UintRange{time},
-				})
-				if err != nil {
-					return []*Balance{}, err
-				}
-			}
-		}
-	}
+	//TODO: commented out bc it messes up EIP712 since we change Msg from what was signed
+	// newBalances := []*Balance{}
+	// err := *new(error)
+	// for _, balance := range balances {
+	// 	for _, badgeId := range balance.BadgeIds {
+	// 		for _, time := range balance.OwnershipTimes {
+	// 			newBalances, err = AddBalance(newBalances, &Balance{
+	// 				Amount:         balance.Amount,
+	// 				BadgeIds:       []*UintRange{badgeId},
+	// 				OwnershipTimes: []*UintRange{time},
+	// 			})
+	// 			if err != nil {
+	// 				return []*Balance{}, err
+	// 			}
+	// 		}
+	// 	}
+	// }
 
-	return newBalances, nil
+	return balances, nil
 }
 
 // // Gets the balances for a specific ID
@@ -333,32 +335,54 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 	return newBalances, nil
 }
 
+
+func SortAndMergeBalances(balances []*Balance) []*Balance {
+	//Sort by amount in increasing order
+	sort.Slice(balances, func(i, j int) bool {
+		return balances[i].Amount.LT(balances[j].Amount)
+	})
+
+	//Merge those which have same amount and ownership times or amount and badge ids
+	newBalances := []*Balance{}
+
+	for _, balance := range balances {
+		found := false
+		for _, newBalance := range newBalances {
+			if newBalance.Amount.Equal(balance.Amount) {
+				if compareSlices(newBalance.OwnershipTimes, balance.OwnershipTimes) {
+					newBalance.BadgeIds = append(newBalance.BadgeIds, balance.BadgeIds...)
+					newBalance.BadgeIds = SortAndMergeOverlapping(newBalance.BadgeIds)
+					found = true
+					break
+				} else if compareSlices(newBalance.BadgeIds, balance.BadgeIds) {
+					newBalance.OwnershipTimes = append(newBalance.OwnershipTimes, balance.OwnershipTimes...)
+					newBalance.OwnershipTimes = SortAndMergeOverlapping(newBalance.OwnershipTimes)
+					found = true
+					break
+				}
+			} else if newBalance.Amount.GT(balance.Amount) {
+				//We are past the point where we can find a match since it is sorted
+				break
+			}
+		}
+
+		if !found {
+			newBalances = append(newBalances, balance)
+		}
+	}
+
+	return newBalances
+}
+
+
 // Sets the balance for a specific id. Precondition: assumes balance does not exist.
 func SetBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error) {
 	if newBalance.Amount.IsZero() {
 		return balances, nil
 	}
 
-	for i, balance := range balances {
-		if balance.Amount != newBalance.Amount {
-			continue
-		}
-
-		if compareSlices(balance.BadgeIds, newBalance.BadgeIds) {
-			balances[i].OwnershipTimes = append(balances[i].OwnershipTimes, newBalance.OwnershipTimes...)
-			balances[i].OwnershipTimes = SortAndMergeOverlapping(balances[i].OwnershipTimes)
-
-			return balances, nil
-		} else if compareSlices(balance.OwnershipTimes, newBalance.OwnershipTimes) {
-			balances[i].BadgeIds = append(balances[i].BadgeIds, newBalance.BadgeIds...)
-			balances[i].BadgeIds = SortAndMergeOverlapping(balances[i].BadgeIds)
-
-			return balances, nil
-		}
-	}
-
 	balances = append(balances, newBalance)
-	return balances, nil
+	return SortAndMergeBalances(balances), nil
 }
 
 
