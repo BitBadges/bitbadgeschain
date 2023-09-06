@@ -177,6 +177,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 							// return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "transfer disallowed: err fetching balances for mustOwnBadges: %s", transferStr)
 						}
 
+						ownedOne := false
 						for _, fetchedBalance := range fetchedBalances {
 							//check if amount is within range
 							minAmount := mustOwnBadge.AmountRange.Start
@@ -184,10 +185,16 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 
 							if fetchedBalance.Amount.LT(minAmount) || fetchedBalance.Amount.GT(maxAmount) {
 								failedMustOwnBadges = true
-								break
-								// continue
-								// return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrDisallowedTransfer, "initiator does not own the required badges: %s", transferStr)
+								
+							} else if !mustOwnBadge.MustOwnAll {
+								ownedOne = true
 							}
+							
+						}
+
+						if !mustOwnBadge.MustOwnAll && ownedOne {
+							failedMustOwnBadges = false
+							break
 						}
 					}
 

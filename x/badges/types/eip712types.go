@@ -242,6 +242,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "badgeIds", Type: "UintRange[]"},
 		{Name: "ownershipTimes", Type: "UintRange[]"},
 		{Name: "overrideWithCurrentTime", Type: "bool"},
+		{Name: "mustOwnAll", Type: "bool"},
 	}
 	MerkleChallengeTypes := []apitypes.Type{
 		{Name: "root", Type: "string"},

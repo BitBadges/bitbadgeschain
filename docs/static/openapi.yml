@@ -833,6 +833,8 @@ paths:
                                                 amounts.
                                           overrideWithCurrentTime:
                                             type: boolean
+                                          mustOwnAll:
+                                            type: boolean
                                     merkleChallenges:
                                       type: array
                                       items:
@@ -1353,6 +1355,8 @@ paths:
                                                 IDs to time ranges to min / max balance
                                                 amounts.
                                           overrideWithCurrentTime:
+                                            type: boolean
+                                          mustOwnAll:
                                             type: boolean
                                     merkleChallenges:
                                       type: array
@@ -4868,6 +4872,8 @@ paths:
                                                 amounts.
                                           overrideWithCurrentTime:
                                             type: boolean
+                                          mustOwnAll:
+                                            type: boolean
                                     merkleChallenges:
                                       type: array
                                       items:
@@ -5504,6 +5510,8 @@ paths:
                                                 amounts.
                                           overrideWithCurrentTime:
                                             type: boolean
+                                          mustOwnAll:
+                                            type: boolean
                                     merkleChallenges:
                                       type: array
                                       items:
@@ -6030,6 +6038,8 @@ paths:
                                                 IDs to time ranges to min / max balance
                                                 amounts.
                                           overrideWithCurrentTime:
+                                            type: boolean
+                                          mustOwnAll:
                                             type: boolean
                                     merkleChallenges:
                                       type: array
@@ -53838,6 +53848,8 @@ definitions:
                   min / max balance amounts.
             overrideWithCurrentTime:
               type: boolean
+            mustOwnAll:
+              type: boolean
       merkleChallenges:
         type: array
         items:
@@ -56399,6 +56411,8 @@ definitions:
                                     to time ranges to min / max balance amounts.
                               overrideWithCurrentTime:
                                 type: boolean
+                              mustOwnAll:
+                                type: boolean
                         merkleChallenges:
                           type: array
                           items:
@@ -57008,6 +57022,8 @@ definitions:
                                     to time ranges to min / max balance amounts.
                               overrideWithCurrentTime:
                                 type: boolean
+                              mustOwnAll:
+                                type: boolean
                         merkleChallenges:
                           type: array
                           items:
@@ -57512,6 +57528,8 @@ definitions:
                                     They are used for evrything from badge IDs
                                     to time ranges to min / max balance amounts.
                               overrideWithCurrentTime:
+                                type: boolean
+                              mustOwnAll:
                                 type: boolean
                         merkleChallenges:
                           type: array
@@ -58972,6 +58990,8 @@ definitions:
                         ranges to min / max balance amounts.
                   overrideWithCurrentTime:
                     type: boolean
+                  mustOwnAll:
+                    type: boolean
             merkleChallenges:
               type: array
               items:
@@ -59956,6 +59976,8 @@ definitions:
                               They are used for evrything from badge IDs to time
                               ranges to min / max balance amounts.
                         overrideWithCurrentTime:
+                          type: boolean
+                        mustOwnAll:
                           type: boolean
                   merkleChallenges:
                     type: array
@@ -62089,6 +62111,8 @@ definitions:
                   min / max balance amounts.
             overrideWithCurrentTime:
               type: boolean
+            mustOwnAll:
+              type: boolean
       merkleChallenges:
         type: array
         items:
@@ -63020,6 +63044,8 @@ definitions:
             max balance amounts.
       overrideWithCurrentTime:
         type: boolean
+      mustOwnAll:
+        type: boolean
   bitbadges.bitbadgeschain.badges.OffChainBalancesMetadata:
     type: object
     properties:
@@ -63137,6 +63163,8 @@ definitions:
                   They are used for evrything from badge IDs to time ranges to
                   min / max balance amounts.
             overrideWithCurrentTime:
+              type: boolean
+            mustOwnAll:
               type: boolean
       merkleChallenges:
         type: array
@@ -63947,6 +63975,8 @@ definitions:
                                         amounts.
                                   overrideWithCurrentTime:
                                     type: boolean
+                                  mustOwnAll:
+                                    type: boolean
                             merkleChallenges:
                               type: array
                               items:
@@ -64461,6 +64491,8 @@ definitions:
                                         IDs to time ranges to min / max balance
                                         amounts.
                                   overrideWithCurrentTime:
+                                    type: boolean
+                                  mustOwnAll:
                                     type: boolean
                             merkleChallenges:
                               type: array
@@ -67689,6 +67721,8 @@ definitions:
                                         amounts.
                                   overrideWithCurrentTime:
                                     type: boolean
+                                  mustOwnAll:
+                                    type: boolean
                             merkleChallenges:
                               type: array
                               items:
@@ -68315,6 +68349,8 @@ definitions:
                                         amounts.
                                   overrideWithCurrentTime:
                                     type: boolean
+                                  mustOwnAll:
+                                    type: boolean
                             merkleChallenges:
                               type: array
                               items:
@@ -68835,6 +68871,8 @@ definitions:
                                         IDs to time ranges to min / max balance
                                         amounts.
                                   overrideWithCurrentTime:
+                                    type: boolean
+                                  mustOwnAll:
                                     type: boolean
                             merkleChallenges:
                               type: array
@@ -70539,6 +70577,8 @@ definitions:
                         ranges to min / max balance amounts.
                   overrideWithCurrentTime:
                     type: boolean
+                  mustOwnAll:
+                    type: boolean
             merkleChallenges:
               type: array
               items:
@@ -71443,6 +71483,8 @@ definitions:
                               ranges to min / max balance amounts.
                         overrideWithCurrentTime:
                           type: boolean
+                        mustOwnAll:
+                          type: boolean
                   merkleChallenges:
                     type: array
                     items:
@@ -71918,6 +71960,8 @@ definitions:
                         They are used for evrything from badge IDs to time
                         ranges to min / max balance amounts.
                   overrideWithCurrentTime:
+                    type: boolean
+                  mustOwnAll:
                     type: boolean
             merkleChallenges:
               type: array
@@ -72824,6 +72868,8 @@ definitions:
                               ranges to min / max balance amounts.
                         overrideWithCurrentTime:
                           type: boolean
+                        mustOwnAll:
+                          type: boolean
                   merkleChallenges:
                     type: array
                     items:
@@ -73380,6 +73426,8 @@ definitions:
                                     to time ranges to min / max balance amounts.
                               overrideWithCurrentTime:
                                 type: boolean
+                              mustOwnAll:
+                                type: boolean
                         merkleChallenges:
                           type: array
                           items:
@@ -73879,6 +73927,8 @@ definitions:
                                     They are used for evrything from badge IDs
                                     to time ranges to min / max balance amounts.
                               overrideWithCurrentTime:
+                                type: boolean
+                              mustOwnAll:
                                 type: boolean
                         merkleChallenges:
                           type: array

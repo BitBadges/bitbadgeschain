@@ -56,9 +56,6 @@ message MsgUpdateCollection {
   bool updateCustomDataTimeline = 17;
   repeated CustomDataTimeline customDataTimeline = 18;
 
-  bool updateInheritedBalancesTimeline = 19;
-  repeated InheritedBalancesTimeline inheritedBalancesTimeline = 20;
-
   bool updateCollectionApprovedTransfersTimeline = 21;
   repeated CollectionApprovedTransferTimeline collectionApprovedTransfersTimeline = 22;
 
@@ -68,8 +65,8 @@ message MsgUpdateCollection {
   bool updateContractAddressTimeline = 25;
   repeated ContractAddressTimeline contractAddressTimeline = 26;
 
-  bool updateIsArchivedTimeline = 27;
-  repeated IsArchivedTimeline isArchivedTimeline = 28;  
+  bool updateIsArchivedTimeline = 19;
+  repeated IsArchivedTimeline isArchivedTimeline = 20;  
 }
 
 message MsgUpdateCollectionResponse {

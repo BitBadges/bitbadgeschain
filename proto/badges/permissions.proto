@@ -51,7 +51,6 @@ message CollectionPermissions {
   repeated BalancesActionPermission canCreateMoreBadges = 9;
 
   repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 10;
-  repeated TimedUpdateWithBadgeIdsPermission canUpdateInheritedBalances = 11;
 
   repeated CollectionApprovedTransferPermission canUpdateCollectionApprovedTransfers = 12;
 }

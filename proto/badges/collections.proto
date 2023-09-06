@@ -37,8 +37,9 @@ message BadgeCollection {
   string balancesType = 4;
   // The off-chain balances metadata defines where to fetch the balances for collections with off-chain balances.
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 5;
-  // The inherited balances metadata defines the parent balances for collections with inherited balances.
-  repeated InheritedBalancesTimeline inheritedBalancesTimeline = 6;
+  
+  // The inherited balances that defines the parent collection for inherited balances.
+  string inheritedCollectionId = 6;
 
   // The custom data field is an arbitrary field that can be used to store any data.
   repeated CustomDataTimeline customDataTimeline = 7;

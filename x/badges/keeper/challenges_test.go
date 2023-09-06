@@ -2176,6 +2176,313 @@ func (suite *TestSuite) TestMustOwnBadges() {
 	suite.Require().Nil(err, "Error transferring badge: %s")
 }
 
+func (suite *TestSuite) TestMustOwnBadgesMustOwnAll() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
+		{
+			CollectionId: sdk.NewUint(1),
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			BadgeIds: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
+			MustOwnAll: true,
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+			
+				Uri: "",
+				ApprovalTrackerId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+				OverridesToApprovedIncomingTransfers:   true,
+			},
+
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsApproved: true,
+		}},
+		TransferTimes:        GetFullUintRanges(),
+		BadgeIds:             GetOneUintRange(),
+		OwnershipTimes:       GetFullUintRanges(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
+
+		
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: 		GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge: %s")
+}
+
+func (suite *TestSuite) TestMustOwnBadgesMustOwnAll2() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
+		{
+			CollectionId: sdk.NewUint(1),
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(2),
+			},
+			BadgeIds: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
+			MustOwnAll: true,
+		},
+		{
+			CollectionId: sdk.NewUint(2),
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(2),
+			},
+			BadgeIds: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
+			MustOwnAll: true,
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+			
+				Uri: "",
+				ApprovalTrackerId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+				OverridesToApprovedIncomingTransfers:   true,
+			},
+
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsApproved: true,
+		}},
+		TransferTimes:        GetFullUintRanges(),
+		BadgeIds:             GetOneUintRange(),
+		OwnershipTimes:       GetFullUintRanges(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
+
+		
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: 		GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+}
+
+
+func (suite *TestSuite) TestMustOwnBadgesMustOwnOne() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
+		{
+			CollectionId: sdk.NewUint(1),
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			BadgeIds: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
+		},
+		{
+			CollectionId: sdk.NewUint(2),
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			BadgeIds: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+			
+				Uri: "",
+				ApprovalTrackerId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+				OverridesToApprovedIncomingTransfers:   true,
+			},
+
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsApproved: true,
+		}},
+		TransferTimes:        GetFullUintRanges(),
+		BadgeIds:             GetOneUintRange(),
+		OwnershipTimes:       GetFullUintRanges(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
+
+		
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: 		GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge: %s")
+}
+
+func (suite *TestSuite) TestMustOwnBadgesMustOwnOne2() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
+		{
+			CollectionId: sdk.NewUint(2),
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(2),
+			},
+			BadgeIds: GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+			
+				Uri: "",
+				ApprovalTrackerId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+				OverridesToApprovedIncomingTransfers:   true,
+			},
+
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsApproved: true,
+		}},
+		TransferTimes:        GetFullUintRanges(),
+		BadgeIds:             GetOneUintRange(),
+		OwnershipTimes:       GetFullUintRanges(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
+
+		
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: 		GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+}
+
+
 func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
