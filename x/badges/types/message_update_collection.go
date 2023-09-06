@@ -73,9 +73,7 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateInheritedBalancesTimeline(msg.InheritedBalancesTimeline); err != nil {
-		return err
-	}
+
 
 	if err := ValidateOffChainBalancesMetadataTimeline(msg.OffChainBalancesMetadataTimeline); err != nil {
 		return err
@@ -156,16 +154,44 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		if msg.BalancesType != "Standard" && msg.BalancesType != "Inherited" && msg.BalancesType != "Off-Chain" {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "balances type must be Standard, Inherited, or Off-Chain")
 		}
+	}
 
-		if msg.BalancesType != "Standard" {
-			if len(msg.CollectionApprovedTransfersTimeline) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but claims and/or transfers are set")
-			}
+	if msg.BalancesType != "Standard" {
+		if len(msg.CollectionApprovedTransfersTimeline) > 0 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but claims and/or transfers are set")
+		}
+
+		if len(msg.DefaultApprovedIncomingTransfersTimeline) > 0 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default approvals are set")
+		}
+
+		if len(msg.DefaultApprovedOutgoingTransfersTimeline) > 0 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default approvals are set")
+		}
+
+		if len(msg.DefaultUserPermissions.CanUpdateApprovedIncomingTransfers) > 0 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
+		}
+
+		if len(msg.DefaultUserPermissions.CanUpdateApprovedOutgoingTransfers) > 0 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
 		}
 	}
 
-	if err := ValidateInheritedBalancesTimeline(msg.InheritedBalancesTimeline); err != nil {
-		return err
+	if msg.BalancesType != "Off-Chain" {
+		if len(msg.OffChainBalancesMetadataTimeline) > 0 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes on-chain balances but off-chain balances are set")
+		}
+	}
+
+	if msg.BalancesType == "Inherited" {
+		if msg.InheritedCollectionId.IsNil() || msg.InheritedCollectionId.IsZero() {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "inherited collection id must be set for inherited balances")
+		}
+
+		if msg.BadgesToCreate != nil && len(msg.BadgesToCreate) > 0 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "badges are inherited from parent so you should not specify to create any badges")
+		}
 	}
 
 	if len(msg.CollectionApprovedTransfersTimeline) > 0 {
@@ -173,7 +199,7 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "transfers and/or claims are set but collection has balances type = off-chain")
 		}
 
-		if msg.InheritedBalancesTimeline != nil && len(msg.InheritedBalancesTimeline) > 0 {
+		if msg.BalancesType == "Inherited" {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "transfers and/or claims are set but collection has balances type = inherited")
 		}
 	}

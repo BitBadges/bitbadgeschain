@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,7 +21,8 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 
 		collection = &types.BadgeCollection{
 			CollectionId:                     nextCollectionId,
-			CollectionPermissions:                      &types.CollectionPermissions{},
+			InheritedCollectionId: 					 	msg.InheritedCollectionId,
+			CollectionPermissions:            &types.CollectionPermissions{},
 			BalancesType:                     msg.BalancesType,
 			DefaultUserApprovedOutgoingTransfersTimeline: msg.DefaultApprovedOutgoingTransfersTimeline,
 			DefaultUserApprovedIncomingTransfersTimeline: msg.DefaultApprovedIncomingTransfersTimeline,
@@ -38,6 +40,11 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 				},
 			},
 		}
+
+		if IsInheritedBalances(collection) && (collection.InheritedCollectionId.IsNil() || collection.InheritedCollectionId.IsZero() ) {
+			return nil, sdkerrors.Wrapf(ErrWrongBalancesType, "inherited balances are being set but collection %s does not have inherited balances", collection.CollectionId)
+		}
+		
 	} else {
 		found := false
 		collection, found = k.GetCollectionFromStore(ctx, msg.CollectionId)
@@ -94,12 +101,7 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 		collection.OffChainBalancesMetadataTimeline = msg.OffChainBalancesMetadataTimeline
 	}
 
-	if msg.UpdateInheritedBalancesTimeline {
-		if err := k.ValidateInheritedBalancesUpdate(ctx, collection, collection.InheritedBalancesTimeline, msg.InheritedBalancesTimeline, collection.CollectionPermissions.CanUpdateInheritedBalances); err != nil {
-			return nil, err
-		}
-		collection.InheritedBalancesTimeline = msg.InheritedBalancesTimeline
-	}
+
 
 	if msg.UpdateBadgeMetadataTimeline {
 		if err := k.ValidateBadgeMetadataUpdate(ctx, collection.BadgeMetadataTimeline, msg.BadgeMetadataTimeline, collection.CollectionPermissions.CanUpdateBadgeMetadata); err != nil {
@@ -186,10 +188,6 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 
 		if msg.CollectionPermissions.CanUpdateBadgeMetadata != nil {
 			collection.CollectionPermissions.CanUpdateBadgeMetadata = msg.CollectionPermissions.CanUpdateBadgeMetadata
-		}
-
-		if msg.CollectionPermissions.CanUpdateInheritedBalances != nil {
-			collection.CollectionPermissions.CanUpdateInheritedBalances = msg.CollectionPermissions.CanUpdateInheritedBalances
 		}
 
 		if msg.CollectionPermissions.CanUpdateCollectionApprovedTransfers != nil {

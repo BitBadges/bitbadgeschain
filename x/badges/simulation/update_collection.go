@@ -28,7 +28,6 @@ func SimulateMsgUpdateCollection(
 			UpdateBadgeMetadataTimeline: r.Int63n(2) == 0,
 			UpdateOffChainBalancesMetadataTimeline: r.Int63n(2) == 0,
 			UpdateCustomDataTimeline: r.Int63n(2) == 0,
-			UpdateInheritedBalancesTimeline: r.Int63n(2) == 0,
 			UpdateCollectionApprovedTransfersTimeline: r.Int63n(2) == 0,
 			UpdateStandardsTimeline: r.Int63n(2) == 0,
 			UpdateContractAddressTimeline: r.Int63n(2) == 0,

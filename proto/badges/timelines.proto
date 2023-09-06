@@ -25,6 +25,11 @@ message OffChainBalancesMetadataTimeline {
   repeated UintRange timelineTimes = 2;
 }
 
+message InheritedBalancesTimeline {
+  repeated InheritedBalance inheritedBalances = 1;
+  repeated UintRange timelineTimes = 2;
+}
+
 message CustomDataTimeline {
   string customData = 1;
   repeated UintRange timelineTimes = 2;

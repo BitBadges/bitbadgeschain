@@ -41,7 +41,7 @@ message MsgNewCollection {
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 4;
   repeated CustomDataTimeline customDataTimeline = 5;
   string balancesType = 6 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
-  repeated InheritedBalancesTimeline inheritedBalancesTimeline = 7;
+  string inheritedCollectionId = 7 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
   repeated CollectionApprovedTransferTimeline collectionApprovedTransfersTimeline = 8;
   CollectionPermissions permissions = 9;
   repeated StandardsTimeline standardsTimeline = 10;
@@ -82,7 +82,6 @@ message MsgMintAndDistributeBadges {
   repeated Balance badgesToCreate = 3;
 
   repeated Transfer transfers = 4;
-  repeated InheritedBalancesTimeline inheritedBalancesTimeline = 5;
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 6; 
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 7;
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 8;

@@ -56,7 +56,7 @@ func GetPotentialUpdatesForTimelineValues(times [][]*types.UintRange, values []i
 }
 
 func (k Keeper) ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldApprovedTransfers []*types.CollectionApprovedTransferTimeline, newApprovedTransfers []*types.CollectionApprovedTransferTimeline, CanUpdateCollectionApprovedTransfers []*types.CollectionApprovedTransferPermission, managerAddress string) error {
-	if !IsStandardBalances(collection) {
+	if !IsStandardBalances(collection) && newApprovedTransfers != nil && len(newApprovedTransfers) > 0 {
 		return sdkerrors.Wrapf(ErrWrongBalancesType, "collection %s does not have standard balances", collection.CollectionId)
 	}
 

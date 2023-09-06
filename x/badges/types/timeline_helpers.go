@@ -44,19 +44,6 @@ func GetCurrentManager(ctx sdk.Context, collection *BadgeCollection) string {
 	return ""
 }
 
-func GetCurrentInheritedBalances(ctx sdk.Context, collection *BadgeCollection) []*InheritedBalance {
-	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-	inheritedBalancesTimeline := collection.InheritedBalancesTimeline
-	for _, inheritedBalancesTimelineVal := range inheritedBalancesTimeline {
-		found := SearchUintRangesForUint(blockTime, inheritedBalancesTimelineVal.TimelineTimes)
-		if found {
-			return inheritedBalancesTimelineVal.InheritedBalances
-		}
-	}
-
-	return []*InheritedBalance{}
-}
-
 func GetIsArchived(ctx sdk.Context, collection *BadgeCollection) bool {
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	isArchivedTimeline := collection.IsArchivedTimeline

@@ -153,18 +153,46 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 						//return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrDisallowedTransfer, "transfer disallowed because to != initiatedBy: %s", transferStr)
 					}
 
-
-					//TODO: Support inherited balances
 					//Assert that initiatedBy owns the required badges
 					failedMustOwnBadges := false
 					for _, mustOwnBadge := range approvalDetails.MustOwnBadges {
-						initiatedByBalanceKey := ConstructBalanceKey(initiatedBy, mustOwnBadge.CollectionId)
-						initiatedByBalance, found := k.GetUserBalanceFromStore(ctx, initiatedByBalanceKey)
 						balances := []*types.Balance{}
-						if found {
-							balances = initiatedByBalance.Balances
-						}
+						balancesFound := false
 
+						alreadyChecked := []sdkmath.Uint{} //Do not want to circularly check the same collection
+						currCollectionId := mustOwnBadge.CollectionId
+						for !balancesFound {
+							//Check if we have already searched this collection
+							for _, alreadyCheckedId := range alreadyChecked {
+								if alreadyCheckedId.Equal(currCollectionId) {
+									return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrCircularInheritance, "circular inheritance detected for collection %s", currCollectionId)
+								}
+							}
+
+							//Check if the collection has inherited balances
+							collection, found := k.GetCollectionFromStore(ctx, currCollectionId)
+							if !found {
+								//Just continue with blank balances
+								balancesFound = true
+							} else {
+								isStandardBalances := collection.BalancesType == "Standard"
+								isInheritedBalances := collection.BalancesType == "Inherited"
+								if isStandardBalances {
+									balancesFound = true
+									initiatedByBalanceKey := ConstructBalanceKey(initiatedBy, currCollectionId)
+									initiatedByBalance, found := k.GetUserBalanceFromStore(ctx, initiatedByBalanceKey)
+									if found {
+										balances = initiatedByBalance.Balances
+									}
+								} else if isInheritedBalances {
+									alreadyChecked = append(alreadyChecked, currCollectionId)
+									currCollectionId = collection.InheritedCollectionId
+								} else {
+									return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrWrongBalancesType, "balances type for must own badges: collection %s is not Standard or Inherited", collection.CollectionId)
+								}
+							}
+						}
+						
 						if mustOwnBadge.OverrideWithCurrentTime {
 							mustOwnBadge.OwnershipTimes = []*types.UintRange{{Start: currTime, End: currTime}}
 						}

@@ -191,7 +191,6 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 				CanUpdateManager:                     []*types.TimedUpdatePermission{},
 				CanUpdateCollectionMetadata:          []*types.TimedUpdatePermission{},
 				CanUpdateBadgeMetadata:               []*types.TimedUpdateWithBadgeIdsPermission{},
-				CanUpdateInheritedBalances:           []*types.TimedUpdateWithBadgeIdsPermission{},
 				CanUpdateCollectionApprovedTransfers: []*types.CollectionApprovedTransferPermission{},
 				CanCreateMoreBadges: []*types.BalancesActionPermission{
 					{

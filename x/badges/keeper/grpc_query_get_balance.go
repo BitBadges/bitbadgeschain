@@ -3,6 +3,8 @@ package keeper
 import (
 	"context"
 
+	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
@@ -14,31 +16,62 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
-
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	userBalanceKey := ConstructBalanceKey(req.Address, req.CollectionId)
-	userBalance, found := k.GetUserBalanceFromStore(ctx, userBalanceKey)
-	if found {
+	//Assert that initiatedBy owns the required badges
+	balances := &types.UserBalanceStore{}
+	balancesFound := false
+	isBlank := false
+
+	alreadyChecked := []sdkmath.Uint{} //Do not want to circularly check the same collection
+	currCollectionId := req.CollectionId
+	currCollection := &types.BadgeCollection{}
+	for !balancesFound {
+		//Check if we have already searched this collection
+		for _, alreadyCheckedId := range alreadyChecked {
+			if alreadyCheckedId.Equal(currCollectionId) {
+				return nil, sdkerrors.Wrapf(ErrCircularInheritance, "circular inheritance detected for collection %s", currCollectionId)
+			}
+		}
+
+		//Check if the collection has inherited balances
+		collection, found := k.GetCollectionFromStore(ctx, currCollectionId)
+		if !found {
+			//Just continue with blank balances
+			balancesFound = true
+			isBlank = true
+		} else {
+			currCollection = collection
+			isStandardBalances := collection.BalancesType == "Standard"
+			isInheritedBalances := collection.BalancesType == "Inherited"
+			if isStandardBalances {
+				balancesFound = true
+				initiatedByBalanceKey := ConstructBalanceKey(req.Address, currCollectionId)
+				initiatedByBalance, found := k.GetUserBalanceFromStore(ctx, initiatedByBalanceKey)
+				if found {
+					balances = initiatedByBalance
+				} else {
+					isBlank = true 
+				}
+			} else if isInheritedBalances {
+				alreadyChecked = append(alreadyChecked, currCollectionId)
+				currCollectionId = collection.InheritedCollectionId
+			} else {
+				return nil, sdkerrors.Wrapf(ErrWrongBalancesType, "unsupported balances type %s", collection.BalancesType)
+			}
+		}
+	}
+
+	if !isBlank {
 		return &types.QueryGetBalanceResponse{
-			Balance: userBalance,
+			Balance: balances,
 		}, nil
 	} else {
-		collection, found := k.GetCollectionFromStore(ctx, req.CollectionId)
-		if !found {
-			return nil, status.Error(codes.NotFound, "collection and balances not found")
-		}
-
-		//TODO: Recursive get inherited balance for user w/ inherited balances
-		if !IsStandardBalances(collection) {
-			return nil, status.Error(codes.NotFound, "unsupported balances type")
-		}
-
 		blankUserBalance := &types.UserBalanceStore{
 			Balances:                          []*types.Balance{},
-			ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
-			ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,
-			UserPermissions:                   collection.DefaultUserPermissions,
+			ApprovedOutgoingTransfersTimeline: currCollection.DefaultUserApprovedOutgoingTransfersTimeline,
+			ApprovedIncomingTransfersTimeline: currCollection.DefaultUserApprovedIncomingTransfersTimeline,
+			UserPermissions:                   currCollection.DefaultUserPermissions,
 		}
 		return &types.QueryGetBalanceResponse{
 			Balance: blankUserBalance,

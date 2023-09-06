@@ -36,6 +36,21 @@ message MustOwnBadges {
   repeated UintRange badgeIds = 4;
 
   bool overrideWithCurrentTime = 5;
-
+  
   bool mustOwnAll = 6;
+}
+
+// InheritedBalances are a powerful feature of the BitBadges module.
+// They allow a colllection to inherit the balances from another collection.
+// Ex: Badges from Collection A inherits the balances from badges from Collection B.
+//
+// The badgeIds specified will inherit the balances from the parent collection and badges specified.
+// If the total number of parent badges == 1, then all the badgeIds will inherit the balance from that parent badge.
+// Otherwise, the total number of parent badges must equal the total number of badgeIds specified.
+// By total number, we mean the sum of the number of badgeIds in each UintRange.
+message InheritedBalance {
+  repeated UintRange badgeIds = 1;
+
+  string parentCollectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated UintRange parentBadgeIds = 3;
 }

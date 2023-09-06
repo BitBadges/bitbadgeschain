@@ -402,8 +402,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "offChainBalancesMetadataTimeline", Type: "OffChainBalancesMetadataTimeline[]"},
 				{Name: "updateCustomDataTimeline", Type: "bool"},
 				{Name: "customDataTimeline", Type: "CustomDataTimeline[]"},
-				{Name: "updateInheritedBalancesTimeline", Type: "bool"},
-				{Name: "inheritedBalancesTimeline", Type: "InheritedBalancesTimeline[]"},
+				{Name: "inheritedCollectionId", Type: "string"},
 				{Name: "updateCollectionApprovedTransfersTimeline", Type: "bool"},
 				{Name: "collectionApprovedTransfersTimeline", Type: "CollectionApprovedTransferTimeline[]"},
 				{Name: "updateStandardsTimeline", Type: "bool"},
@@ -425,7 +424,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "canUpdateCollectionMetadata", Type: "TimedUpdatePermission[]"},
 				{Name: "canCreateMoreBadges", Type: "BalancesActionPermission[]"},
 				{Name: "canUpdateBadgeMetadata", Type: "TimedUpdateWithBadgeIdsPermission[]"},
-				{Name: "canUpdateInheritedBalances", Type: "TimedUpdateWithBadgeIdsPermission[]"},
 				{Name: "canUpdateCollectionApprovedTransfers", Type: "CollectionApprovedTransferPermission[]"},
 			},
 			"ManagerTimeline": {
@@ -446,10 +444,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			},
 			"CustomDataTimeline": {
 				{Name: "customData", Type: "string"},
-				{Name: "timelineTimes", Type: "UintRange[]"},
-			},
-			"InheritedBalancesTimeline": {
-				{Name: "inheritedBalances", Type: "InheritedBalance[]"},
 				{Name: "timelineTimes", Type: "UintRange[]"},
 			},
 			"CollectionApprovedTransferTimeline": {
@@ -477,11 +471,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "ownershipTimes", Type: "UintRange[]"},
 				{Name: "allowedCombinations", Type: "IsCollectionTransferAllowed[]"},
 				{Name: "approvalDetails", Type: "ApprovalDetails[]"},
-			},
-			"InheritedBalance": {
-				{Name: "collectionId", Type: "string"},
-				{Name: "parentCollectionId", Type: "string"},
-				{Name: "parentBadgeIds", Type: "UintRange[]"},
 			},
 			"UintRange": uintRangeTypes,
 			"Balance": balanceTypes,

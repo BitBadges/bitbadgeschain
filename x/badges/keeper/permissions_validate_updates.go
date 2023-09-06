@@ -297,12 +297,6 @@ func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types
 		}
 	}
 
-	if newPermissions.CanUpdateInheritedBalances != nil {
-		if err := k.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldPermissions.CanUpdateInheritedBalances, newPermissions.CanUpdateInheritedBalances); err != nil {
-			return err
-		}
-	}
-
 	if newPermissions.CanUpdateCollectionApprovedTransfers != nil {
 		if err := k.ValidateCollectionApprovedTransferPermissionsUpdate(ctx, oldPermissions.CanUpdateCollectionApprovedTransfers, newPermissions.CanUpdateCollectionApprovedTransfers, managerAddress); err != nil {
 			return err

@@ -226,22 +226,6 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				}},
 			},
 		},
-		CanUpdateInheritedBalances: []*types.TimedUpdateWithBadgeIdsPermission{
-			{
-				DefaultValues: &types.TimedUpdateWithBadgeIdsDefaultValues{
-					PermittedTimes: GetTimelineTimes(r, 3),
-					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes:  GetTimelineTimes(r, 3),
-					BadgeIds:       GetTimelineTimes(r, 3),
-				},
-				Combinations: []*types.TimedUpdateWithBadgeIdsCombination{{
-					PermittedTimesOptions: GetRandomValueOptions(r),
-					ForbiddenTimesOptions: GetRandomValueOptions(r),
-					TimelineTimesOptions:  GetRandomValueOptions(r),
-					BadgeIdsOptions:       GetRandomValueOptions(r),
-				}},
-			},
-		},
 		CanUpdateCollectionApprovedTransfers: []*types.CollectionApprovedTransferPermission{
 			{
 				DefaultValues: &types.CollectionApprovedTransferDefaultValues{

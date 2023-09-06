@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"context"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
@@ -144,6 +145,8 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			balancesType = "Off-Chain"
 		} else if collectionToCreate.BalancesType.Equal(sdkmath.NewUint(3)) {
 			balancesType = "Inherited"
+		} else {
+			return sdkerrors.Wrapf(types.ErrInvalidCollectionID, "Balances type %s not supported", collectionToCreate.BalancesType)
 		}
 
 		collectionRes, err := UpdateCollectionWithRes(suite, ctx, &types.MsgUpdateCollection{
@@ -163,7 +166,7 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			CollectionMetadataTimeline: collectionToCreate.CollectionMetadataTimeline,
 			BadgeMetadataTimeline: collectionToCreate.BadgeMetadataTimeline,
 			OffChainBalancesMetadataTimeline: collectionToCreate.OffChainBalancesMetadataTimeline,
-			InheritedBalancesTimeline: collectionToCreate.InheritedBalancesTimeline,
+			InheritedCollectionId: collectionToCreate.InheritedCollectionId,
 			CustomDataTimeline: collectionToCreate.CustomDataTimeline,
 			ContractAddressTimeline: collectionToCreate.ContractAddressTimeline,
 			StandardsTimeline: collectionToCreate.StandardsTimeline,
@@ -177,7 +180,7 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			UpdateCollectionMetadataTimeline: true,
 			UpdateBadgeMetadataTimeline: true,
 			UpdateOffChainBalancesMetadataTimeline: true,
-			UpdateInheritedBalancesTimeline: true,
+			
 			UpdateCustomDataTimeline: true,
 			UpdateContractAddressTimeline: true,
 			UpdateCollectionApprovedTransfersTimeline: true,
@@ -216,8 +219,6 @@ func MintAndDistributeBadges(suite *TestSuite, ctx context.Context, msg *types.M
 		Creator: bob,
 		CollectionId: msg.CollectionId,
 		BadgesToCreate: msg.BadgesToCreate,
-		InheritedBalancesTimeline: msg.InheritedBalancesTimeline,
-		UpdateInheritedBalancesTimeline: true,
 		CollectionMetadataTimeline: msg.CollectionMetadataTimeline,
 		UpdateCollectionMetadataTimeline: true,
 		BadgeMetadataTimeline: msg.BadgeMetadataTimeline,

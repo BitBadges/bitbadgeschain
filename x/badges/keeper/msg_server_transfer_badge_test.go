@@ -213,7 +213,7 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 			},
 		},
 		CollectionApprovedTransfersTimeline: collection.CollectionApprovedTransfersTimeline,
-		InheritedBalancesTimeline:           collection.InheritedBalancesTimeline,
+		// InheritedBalancesTimeline: 				 collection.InheritedBalancesTimeline,
 		CollectionMetadataTimeline:          collection.CollectionMetadataTimeline,
 		BadgeMetadataTimeline:               collection.BadgeMetadataTimeline,
 		OffChainBalancesMetadataTimeline:    collection.OffChainBalancesMetadataTimeline,

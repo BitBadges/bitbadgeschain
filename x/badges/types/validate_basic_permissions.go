@@ -443,9 +443,5 @@ func ValidatePermissions(permissions *CollectionPermissions) error {
 		return err
 	}
 
-	if err := ValidateTimedUpdateWithBadgeIdsPermission(permissions.CanUpdateInheritedBalances); err != nil {
-		return err
-	}
-
 	return nil
 }

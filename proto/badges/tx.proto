@@ -33,7 +33,9 @@ message MsgUpdateCollection {
   string balancesType = 3;
   repeated UserApprovedOutgoingTransferTimeline defaultApprovedOutgoingTransfersTimeline = 4; //The user's approved transfers for each badge ID.
   repeated UserApprovedIncomingTransferTimeline defaultApprovedIncomingTransfersTimeline = 5; //The user's approved incoming transfers for each badge ID.
-  UserPermissions defaultUserPermissions = 29;
+  UserPermissions defaultUserPermissions = 27;
+
+  string inheritedCollectionId = 28  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; //0 for no inheritance
 
   //The rest of the fields are allowed to be set on creation or update.
   repeated Balance badgesToCreate = 6; 
