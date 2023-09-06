@@ -201,7 +201,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "isApproved", Type: "bool"},
 	}
 	OutgoingApprovalDetailsTypes := []apitypes.Type{
-		{Name: "approvalId", Type: "string"},
+		{Name: "approvalTrackerId", Type: "string"},
 		{Name: "uri", Type: "string"},
 		{Name: "customData", Type: "string"},
 
@@ -223,7 +223,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "isApproved", Type: "bool"},
 	}
 	IncomingApprovalDetailsTypes := []apitypes.Type{
-		{Name: "approvalId", Type: "string"},
+		{Name: "approvalTrackerId", Type: "string"},
 		{Name: "uri", Type: "string"},
 		{Name: "customData", Type: "string"},
 
@@ -257,6 +257,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "manualBalances", Type: "ManualBalances[]"},
 		{Name: "incrementedBalances", Type: "IncrementedBalances"},
 		{Name: "orderCalculationMethod", Type: "PredeterminedOrderCalculationMethod"},
+		{Name: "precalculationId", Type: "string"},
 	}
 	ApprovalAmountsTypes := []apitypes.Type{
 		{Name: "overallApprovalAmount", Type: "string"},
@@ -329,7 +330,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			"UintRange": uintRangeTypes,
 			"Balance": balanceTypes,
 			"PrecalculationDetails": {
-				{Name: "approvalId", Type: "string"},
+				{Name: "precalculationId", Type: "string"},
 				{Name: "approvalLevel", Type: "string"},
 				{Name: "approverAddress", Type: "string"},
 			},
@@ -590,7 +591,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "forbiddenTimes", Type: "UintRange[]"},
 			},
 			"ApprovalDetails": {
-				{Name: "approvalId", Type: "string"},
+				{Name: "approvalTrackerId", Type: "string"},
 				{Name: "uri", Type: "string"},
 				{Name: "customData", Type: "string"},
 				{Name: "mustOwnBadges", Type: "MustOwnBadges[]"},

@@ -33,7 +33,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 				}
 			}
 
-			if transfer.PrecalculationDetails != nil && transfer.PrecalculationDetails.ApprovalId != "" {
+			if transfer.PrecalculationDetails != nil && transfer.PrecalculationDetails.PrecalculationId != "" {
 				approvedTransfers := types.GetCurrentCollectionApprovedTransfers(ctx, collection)
 				if transfer.PrecalculationDetails.ApproverAddress != "" {
 					if transfer.PrecalculationDetails.ApproverAddress != to && transfer.PrecalculationDetails.ApproverAddress != transfer.From {
@@ -60,7 +60,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 				}
 
 				//Precaluclate the balances that will be transferred
-				transfer.Balances, err = k.GetPredeterminedBalancesForApprovalId(ctx, approvedTransfers, collection, "", transfer.PrecalculationDetails.ApprovalId, transfer.PrecalculationDetails.ApprovalLevel, transfer.PrecalculationDetails.ApproverAddress, transfer.MerkleProofs, initiatedBy)
+				transfer.Balances, err = k.GetPredeterminedBalancesForPrecalculationId(ctx, approvedTransfers, collection, "", transfer.PrecalculationDetails.PrecalculationId, transfer.PrecalculationDetails.ApprovalLevel, transfer.PrecalculationDetails.ApproverAddress, transfer.MerkleProofs, initiatedBy)
 				if err != nil {
 					return err
 				}

@@ -28,6 +28,8 @@ paths:
                     type: string
                   customData:
                     type: string
+                  createdBy:
+                    type: string
                 description: >-
                   An AddressMapping is a permanent list of addresses that are
                   referenced by a mapping ID.
@@ -233,7 +235,7 @@ paths:
           type: string
       tags:
         - Query
-  /bitbadges/bitbadgeschain/badges/get_approvals_tracker/{collectionId}/{approvalLevel}/{approverAddress}/{approvalId}/{trackerType}/{approvedAddress}:
+  /bitbadges/bitbadgeschain/badges/get_approvals_tracker/{collectionId}/{approvalLevel}/{approverAddress}/{approvalTrackerId}/{trackerType}/{approvedAddress}:
     get:
       operationId: BitbadgesBitbadgeschainBadgesGetApprovalsTracker
       responses:
@@ -254,7 +256,7 @@ paths:
                       properties:
                         amount:
                           type: string
-                        ownedTimes:
+                        ownershipTimes:
                           type: array
                           items:
                             type: object
@@ -506,7 +508,7 @@ paths:
           in: path
           required: true
           type: string
-        - name: approvalId
+        - name: approvalTrackerId
           in: path
           required: true
           type: string
@@ -543,7 +545,7 @@ paths:
                       properties:
                         amount:
                           type: string
-                        ownedTimes:
+                        ownershipTimes:
                           type: array
                           items:
                             type: object
@@ -647,7 +649,7 @@ paths:
 
                                     They are used for evrything from badge IDs
                                     to time ranges to min / max balance amounts.
-                              ownedTimes:
+                              ownershipTimes:
                                 type: array
                                 items:
                                   type: object
@@ -735,7 +737,7 @@ paths:
                                       description: >-
                                         ValueOptions defines how we manipulate
                                         the default values.
-                                    ownedTimesOptions:
+                                    ownershipTimesOptions:
                                       type: object
                                       properties:
                                         invertDefault:
@@ -751,14 +753,14 @@ paths:
                                       description: >-
                                         ValueOptions defines how we manipulate
                                         the default values.
-                                    isAllowed:
+                                    isApproved:
                                       type: boolean
                               approvalDetails:
                                 type: array
                                 items:
                                   type: object
                                   properties:
-                                    approvalId:
+                                    approvalTrackerId:
                                       type: string
                                     uri:
                                       type: string
@@ -789,7 +791,7 @@ paths:
                                               They are used for evrything from badge
                                               IDs to time ranges to min / max balance
                                               amounts.
-                                          ownedTimes:
+                                          ownershipTimes:
                                             type: array
                                             items:
                                               type: object
@@ -829,6 +831,8 @@ paths:
                                                 They are used for evrything from badge
                                                 IDs to time ranges to min / max balance
                                                 amounts.
+                                          overrideWithCurrentTime:
+                                            type: boolean
                                     merkleChallenges:
                                       type: array
                                       items:
@@ -906,6 +910,8 @@ paths:
                                     predeterminedBalances:
                                       type: object
                                       properties:
+                                        precalculationId:
+                                          type: string
                                         manualBalances:
                                           type: array
                                           items:
@@ -918,7 +924,7 @@ paths:
                                                   properties:
                                                     amount:
                                                       type: string
-                                                    ownedTimes:
+                                                    ownershipTimes:
                                                       type: array
                                                       items:
                                                         type: object
@@ -984,7 +990,7 @@ paths:
                                                 properties:
                                                   amount:
                                                     type: string
-                                                  ownedTimes:
+                                                  ownershipTimes:
                                                     type: array
                                                     items:
                                                       type: object
@@ -1042,7 +1048,7 @@ paths:
                                                   for all time ranges specified.
                                             incrementBadgeIdsBy:
                                               type: string
-                                            incrementOwnedTimesBy:
+                                            incrementOwnershipTimesBy:
                                               type: string
                                         orderCalculationMethod:
                                           type: object
@@ -1164,7 +1170,7 @@ paths:
 
                                     They are used for evrything from badge IDs
                                     to time ranges to min / max balance amounts.
-                              ownedTimes:
+                              ownershipTimes:
                                 type: array
                                 items:
                                   type: object
@@ -1252,7 +1258,7 @@ paths:
                                       description: >-
                                         ValueOptions defines how we manipulate
                                         the default values.
-                                    ownedTimesOptions:
+                                    ownershipTimesOptions:
                                       type: object
                                       properties:
                                         invertDefault:
@@ -1268,14 +1274,14 @@ paths:
                                       description: >-
                                         ValueOptions defines how we manipulate
                                         the default values.
-                                    isAllowed:
+                                    isApproved:
                                       type: boolean
                               approvalDetails:
                                 type: array
                                 items:
                                   type: object
                                   properties:
-                                    approvalId:
+                                    approvalTrackerId:
                                       type: string
                                     uri:
                                       type: string
@@ -1306,7 +1312,7 @@ paths:
                                               They are used for evrything from badge
                                               IDs to time ranges to min / max balance
                                               amounts.
-                                          ownedTimes:
+                                          ownershipTimes:
                                             type: array
                                             items:
                                               type: object
@@ -1346,6 +1352,8 @@ paths:
                                                 They are used for evrything from badge
                                                 IDs to time ranges to min / max balance
                                                 amounts.
+                                          overrideWithCurrentTime:
+                                            type: boolean
                                     merkleChallenges:
                                       type: array
                                       items:
@@ -1423,6 +1431,8 @@ paths:
                                     predeterminedBalances:
                                       type: object
                                       properties:
+                                        precalculationId:
+                                          type: string
                                         manualBalances:
                                           type: array
                                           items:
@@ -1435,7 +1445,7 @@ paths:
                                                   properties:
                                                     amount:
                                                       type: string
-                                                    ownedTimes:
+                                                    ownershipTimes:
                                                       type: array
                                                       items:
                                                         type: object
@@ -1501,7 +1511,7 @@ paths:
                                                 properties:
                                                   amount:
                                                     type: string
-                                                  ownedTimes:
+                                                  ownershipTimes:
                                                     type: array
                                                     items:
                                                       type: object
@@ -1559,7 +1569,7 @@ paths:
                                                   for all time ranges specified.
                                             incrementBadgeIdsBy:
                                               type: string
-                                            incrementOwnedTimesBy:
+                                            incrementOwnershipTimesBy:
                                               type: string
                                         orderCalculationMethod:
                                           type: object
@@ -1704,7 +1714,7 @@ paths:
                                       They are used for evrything from badge IDs
                                       to time ranges to min / max balance
                                       amounts.
-                                ownedTimes:
+                                ownershipTimes:
                                   type: array
                                   items:
                                     type: object
@@ -1849,7 +1859,7 @@ paths:
                                     description: >-
                                       ValueOptions defines how we manipulate the
                                       default values.
-                                  ownedTimesOptions:
+                                  ownershipTimesOptions:
                                     type: object
                                     properties:
                                       invertDefault:
@@ -1977,7 +1987,7 @@ paths:
                                       They are used for evrything from badge IDs
                                       to time ranges to min / max balance
                                       amounts.
-                                ownedTimes:
+                                ownershipTimes:
                                   type: array
                                   items:
                                     type: object
@@ -2122,7 +2132,7 @@ paths:
                                     description: >-
                                       ValueOptions defines how we manipulate the
                                       default values.
-                                  ownedTimesOptions:
+                                  ownershipTimesOptions:
                                     type: object
                                     properties:
                                       invertDefault:
@@ -3785,7 +3795,7 @@ paths:
                                       They are used for evrything from badge IDs
                                       to time ranges to min / max balance
                                       amounts.
-                                ownedTimes:
+                                ownershipTimes:
                                   type: array
                                   items:
                                     type: object
@@ -3866,7 +3876,7 @@ paths:
                                     description: >-
                                       ValueOptions defines how we manipulate the
                                       default values.
-                                  ownedTimesOptions:
+                                  ownershipTimesOptions:
                                     type: object
                                     properties:
                                       invertDefault:
@@ -3924,8 +3934,8 @@ paths:
 
 
                             Ex: If you want to lock the ability to create new
-                            badges for badgeIds [1,2] at ownedTimes 1/1/2020 -
-                            1/1/2021, 
+                            badges for badgeIds [1,2] at ownershipTimes 1/1/2020
+                            - 1/1/2021, 
 
                             you could set the combination (badgeIds: [1,2],
                             ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to
@@ -4344,7 +4354,7 @@ paths:
                                       They are used for evrything from badge IDs
                                       to time ranges to min / max balance
                                       amounts.
-                                ownedTimes:
+                                ownershipTimes:
                                   type: array
                                   items:
                                     type: object
@@ -4505,7 +4515,7 @@ paths:
                                     description: >-
                                       ValueOptions defines how we manipulate the
                                       default values.
-                                  ownedTimesOptions:
+                                  ownershipTimesOptions:
                                     type: object
                                     properties:
                                       invertDefault:
@@ -4658,7 +4668,7 @@ paths:
 
                                     They are used for evrything from badge IDs
                                     to time ranges to min / max balance amounts.
-                              ownedTimes:
+                              ownershipTimes:
                                 type: array
                                 items:
                                   type: object
@@ -4762,7 +4772,7 @@ paths:
                                       description: >-
                                         ValueOptions defines how we manipulate
                                         the default values.
-                                    ownedTimesOptions:
+                                    ownershipTimesOptions:
                                       type: object
                                       properties:
                                         invertDefault:
@@ -4778,14 +4788,14 @@ paths:
                                       description: >-
                                         ValueOptions defines how we manipulate
                                         the default values.
-                                    isAllowed:
+                                    isApproved:
                                       type: boolean
                               approvalDetails:
                                 type: array
                                 items:
                                   type: object
                                   properties:
-                                    approvalId:
+                                    approvalTrackerId:
                                       type: string
                                     uri:
                                       type: string
@@ -4816,7 +4826,7 @@ paths:
                                               They are used for evrything from badge
                                               IDs to time ranges to min / max balance
                                               amounts.
-                                          ownedTimes:
+                                          ownershipTimes:
                                             type: array
                                             items:
                                               type: object
@@ -4856,6 +4866,8 @@ paths:
                                                 They are used for evrything from badge
                                                 IDs to time ranges to min / max balance
                                                 amounts.
+                                          overrideWithCurrentTime:
+                                            type: boolean
                                     merkleChallenges:
                                       type: array
                                       items:
@@ -4933,6 +4945,8 @@ paths:
                                     predeterminedBalances:
                                       type: object
                                       properties:
+                                        precalculationId:
+                                          type: string
                                         manualBalances:
                                           type: array
                                           items:
@@ -4945,7 +4959,7 @@ paths:
                                                   properties:
                                                     amount:
                                                       type: string
-                                                    ownedTimes:
+                                                    ownershipTimes:
                                                       type: array
                                                       items:
                                                         type: object
@@ -5011,7 +5025,7 @@ paths:
                                                 properties:
                                                   amount:
                                                     type: string
-                                                  ownedTimes:
+                                                  ownershipTimes:
                                                     type: array
                                                     items:
                                                       type: object
@@ -5069,7 +5083,7 @@ paths:
                                                   for all time ranges specified.
                                             incrementBadgeIdsBy:
                                               type: string
-                                            incrementOwnedTimesBy:
+                                            incrementOwnershipTimesBy:
                                               type: string
                                         orderCalculationMethod:
                                           type: object
@@ -5306,7 +5320,7 @@ paths:
 
                                     They are used for evrything from badge IDs
                                     to time ranges to min / max balance amounts.
-                              ownedTimes:
+                              ownershipTimes:
                                 type: array
                                 items:
                                   type: object
@@ -5394,7 +5408,7 @@ paths:
                                       description: >-
                                         ValueOptions defines how we manipulate
                                         the default values.
-                                    ownedTimesOptions:
+                                    ownershipTimesOptions:
                                       type: object
                                       properties:
                                         invertDefault:
@@ -5410,14 +5424,14 @@ paths:
                                       description: >-
                                         ValueOptions defines how we manipulate
                                         the default values.
-                                    isAllowed:
+                                    isApproved:
                                       type: boolean
                               approvalDetails:
                                 type: array
                                 items:
                                   type: object
                                   properties:
-                                    approvalId:
+                                    approvalTrackerId:
                                       type: string
                                     uri:
                                       type: string
@@ -5448,7 +5462,7 @@ paths:
                                               They are used for evrything from badge
                                               IDs to time ranges to min / max balance
                                               amounts.
-                                          ownedTimes:
+                                          ownershipTimes:
                                             type: array
                                             items:
                                               type: object
@@ -5488,6 +5502,8 @@ paths:
                                                 They are used for evrything from badge
                                                 IDs to time ranges to min / max balance
                                                 amounts.
+                                          overrideWithCurrentTime:
+                                            type: boolean
                                     merkleChallenges:
                                       type: array
                                       items:
@@ -5565,6 +5581,8 @@ paths:
                                     predeterminedBalances:
                                       type: object
                                       properties:
+                                        precalculationId:
+                                          type: string
                                         manualBalances:
                                           type: array
                                           items:
@@ -5577,7 +5595,7 @@ paths:
                                                   properties:
                                                     amount:
                                                       type: string
-                                                    ownedTimes:
+                                                    ownershipTimes:
                                                       type: array
                                                       items:
                                                         type: object
@@ -5643,7 +5661,7 @@ paths:
                                                 properties:
                                                   amount:
                                                     type: string
-                                                  ownedTimes:
+                                                  ownershipTimes:
                                                     type: array
                                                     items:
                                                       type: object
@@ -5701,7 +5719,7 @@ paths:
                                                   for all time ranges specified.
                                             incrementBadgeIdsBy:
                                               type: string
-                                            incrementOwnedTimesBy:
+                                            incrementOwnershipTimesBy:
                                               type: string
                                         orderCalculationMethod:
                                           type: object
@@ -5829,7 +5847,7 @@ paths:
 
                                     They are used for evrything from badge IDs
                                     to time ranges to min / max balance amounts.
-                              ownedTimes:
+                              ownershipTimes:
                                 type: array
                                 items:
                                   type: object
@@ -5917,7 +5935,7 @@ paths:
                                       description: >-
                                         ValueOptions defines how we manipulate
                                         the default values.
-                                    ownedTimesOptions:
+                                    ownershipTimesOptions:
                                       type: object
                                       properties:
                                         invertDefault:
@@ -5933,14 +5951,14 @@ paths:
                                       description: >-
                                         ValueOptions defines how we manipulate
                                         the default values.
-                                    isAllowed:
+                                    isApproved:
                                       type: boolean
                               approvalDetails:
                                 type: array
                                 items:
                                   type: object
                                   properties:
-                                    approvalId:
+                                    approvalTrackerId:
                                       type: string
                                     uri:
                                       type: string
@@ -5971,7 +5989,7 @@ paths:
                                               They are used for evrything from badge
                                               IDs to time ranges to min / max balance
                                               amounts.
-                                          ownedTimes:
+                                          ownershipTimes:
                                             type: array
                                             items:
                                               type: object
@@ -6011,6 +6029,8 @@ paths:
                                                 They are used for evrything from badge
                                                 IDs to time ranges to min / max balance
                                                 amounts.
+                                          overrideWithCurrentTime:
+                                            type: boolean
                                     merkleChallenges:
                                       type: array
                                       items:
@@ -6088,6 +6108,8 @@ paths:
                                     predeterminedBalances:
                                       type: object
                                       properties:
+                                        precalculationId:
+                                          type: string
                                         manualBalances:
                                           type: array
                                           items:
@@ -6100,7 +6122,7 @@ paths:
                                                   properties:
                                                     amount:
                                                       type: string
-                                                    ownedTimes:
+                                                    ownershipTimes:
                                                       type: array
                                                       items:
                                                         type: object
@@ -6166,7 +6188,7 @@ paths:
                                                 properties:
                                                   amount:
                                                     type: string
-                                                  ownedTimes:
+                                                  ownershipTimes:
                                                     type: array
                                                     items:
                                                       type: object
@@ -6224,7 +6246,7 @@ paths:
                                                   for all time ranges specified.
                                             incrementBadgeIdsBy:
                                               type: string
-                                            incrementOwnedTimesBy:
+                                            incrementOwnershipTimesBy:
                                               type: string
                                         orderCalculationMethod:
                                           type: object
@@ -6380,7 +6402,7 @@ paths:
                                       They are used for evrything from badge IDs
                                       to time ranges to min / max balance
                                       amounts.
-                                ownedTimes:
+                                ownershipTimes:
                                   type: array
                                   items:
                                     type: object
@@ -6525,7 +6547,7 @@ paths:
                                     description: >-
                                       ValueOptions defines how we manipulate the
                                       default values.
-                                  ownedTimesOptions:
+                                  ownershipTimesOptions:
                                     type: object
                                     properties:
                                       invertDefault:
@@ -6653,7 +6675,7 @@ paths:
                                       They are used for evrything from badge IDs
                                       to time ranges to min / max balance
                                       amounts.
-                                ownedTimes:
+                                ownershipTimes:
                                   type: array
                                   items:
                                     type: object
@@ -6798,7 +6820,7 @@ paths:
                                     description: >-
                                       ValueOptions defines how we manipulate the
                                       default values.
-                                  ownedTimesOptions:
+                                  ownershipTimesOptions:
                                     type: object
                                     properties:
                                       invertDefault:
@@ -53714,6 +53736,8 @@ definitions:
         type: string
       customData:
         type: string
+      createdBy:
+        type: string
     description: >-
       An AddressMapping is a permanent list of addresses that are referenced by
       a mapping ID.
@@ -53744,7 +53768,7 @@ definitions:
   bitbadges.bitbadgeschain.badges.ApprovalDetails:
     type: object
     properties:
-      approvalId:
+      approvalTrackerId:
         type: string
       uri:
         type: string
@@ -53774,7 +53798,7 @@ definitions:
 
                 They are used for evrything from badge IDs to time ranges to min
                 / max balance amounts.
-            ownedTimes:
+            ownershipTimes:
               type: array
               items:
                 type: object
@@ -53812,6 +53836,8 @@ definitions:
 
                   They are used for evrything from badge IDs to time ranges to
                   min / max balance amounts.
+            overrideWithCurrentTime:
+              type: boolean
       merkleChallenges:
         type: array
         items:
@@ -53878,6 +53904,8 @@ definitions:
       predeterminedBalances:
         type: object
         properties:
+          precalculationId:
+            type: string
           manualBalances:
             type: array
             items:
@@ -53890,7 +53918,7 @@ definitions:
                     properties:
                       amount:
                         type: string
-                      ownedTimes:
+                      ownershipTimes:
                         type: array
                         items:
                           type: object
@@ -53952,7 +53980,7 @@ definitions:
                   properties:
                     amount:
                       type: string
-                    ownedTimes:
+                    ownershipTimes:
                       type: array
                       items:
                         type: object
@@ -54006,7 +54034,7 @@ definitions:
                     badge IDs specified for all time ranges specified.
               incrementBadgeIdsBy:
                 type: string
-              incrementOwnedTimesBy:
+              incrementOwnershipTimesBy:
                 type: string
           orderCalculationMethod:
             type: object
@@ -54070,7 +54098,7 @@ definitions:
           properties:
             amount:
               type: string
-            ownedTimes:
+            ownershipTimes:
               type: array
               items:
                 type: object
@@ -55386,7 +55414,7 @@ definitions:
 
                           They are used for evrything from badge IDs to time
                           ranges to min / max balance amounts.
-                    ownedTimes:
+                    ownershipTimes:
                       type: array
                       items:
                         type: object
@@ -55462,7 +55490,7 @@ definitions:
                         description: >-
                           ValueOptions defines how we manipulate the default
                           values.
-                      ownedTimesOptions:
+                      ownershipTimesOptions:
                         type: object
                         properties:
                           invertDefault:
@@ -55513,7 +55541,7 @@ definitions:
 
 
                 Ex: If you want to lock the ability to create new badges for
-                badgeIds [1,2] at ownedTimes 1/1/2020 - 1/1/2021, 
+                badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021, 
 
                 you could set the combination (badgeIds: [1,2],
                 ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be
@@ -55899,7 +55927,7 @@ definitions:
 
                           They are used for evrything from badge IDs to time
                           ranges to min / max balance amounts.
-                    ownedTimes:
+                    ownershipTimes:
                       type: array
                       items:
                         type: object
@@ -56045,7 +56073,7 @@ definitions:
                         description: >-
                           ValueOptions defines how we manipulate the default
                           values.
-                      ownedTimesOptions:
+                      ownershipTimesOptions:
                         type: object
                         properties:
                           invertDefault:
@@ -56186,7 +56214,7 @@ definitions:
 
                         They are used for evrything from badge IDs to time
                         ranges to min / max balance amounts.
-                  ownedTimes:
+                  ownershipTimes:
                     type: array
                     items:
                       type: object
@@ -56280,7 +56308,7 @@ definitions:
                           description: >-
                             ValueOptions defines how we manipulate the default
                             values.
-                        ownedTimesOptions:
+                        ownershipTimesOptions:
                           type: object
                           properties:
                             invertDefault:
@@ -56294,14 +56322,14 @@ definitions:
                           description: >-
                             ValueOptions defines how we manipulate the default
                             values.
-                        isAllowed:
+                        isApproved:
                           type: boolean
                   approvalDetails:
                     type: array
                     items:
                       type: object
                       properties:
-                        approvalId:
+                        approvalTrackerId:
                           type: string
                         uri:
                           type: string
@@ -56331,7 +56359,7 @@ definitions:
 
                                   They are used for evrything from badge IDs to
                                   time ranges to min / max balance amounts.
-                              ownedTimes:
+                              ownershipTimes:
                                 type: array
                                 items:
                                   type: object
@@ -56369,6 +56397,8 @@ definitions:
 
                                     They are used for evrything from badge IDs
                                     to time ranges to min / max balance amounts.
+                              overrideWithCurrentTime:
+                                type: boolean
                         merkleChallenges:
                           type: array
                           items:
@@ -56439,6 +56469,8 @@ definitions:
                         predeterminedBalances:
                           type: object
                           properties:
+                            precalculationId:
+                              type: string
                             manualBalances:
                               type: array
                               items:
@@ -56451,7 +56483,7 @@ definitions:
                                       properties:
                                         amount:
                                           type: string
-                                        ownedTimes:
+                                        ownershipTimes:
                                           type: array
                                           items:
                                             type: object
@@ -56517,7 +56549,7 @@ definitions:
                                     properties:
                                       amount:
                                         type: string
-                                      ownedTimes:
+                                      ownershipTimes:
                                         type: array
                                         items:
                                           type: object
@@ -56575,7 +56607,7 @@ definitions:
                                       all time ranges specified.
                                 incrementBadgeIdsBy:
                                   type: string
-                                incrementOwnedTimesBy:
+                                incrementOwnershipTimesBy:
                                   type: string
                             orderCalculationMethod:
                               type: object
@@ -56805,7 +56837,7 @@ definitions:
 
                         They are used for evrything from badge IDs to time
                         ranges to min / max balance amounts.
-                  ownedTimes:
+                  ownershipTimes:
                     type: array
                     items:
                       type: object
@@ -56885,7 +56917,7 @@ definitions:
                           description: >-
                             ValueOptions defines how we manipulate the default
                             values.
-                        ownedTimesOptions:
+                        ownershipTimesOptions:
                           type: object
                           properties:
                             invertDefault:
@@ -56899,14 +56931,14 @@ definitions:
                           description: >-
                             ValueOptions defines how we manipulate the default
                             values.
-                        isAllowed:
+                        isApproved:
                           type: boolean
                   approvalDetails:
                     type: array
                     items:
                       type: object
                       properties:
-                        approvalId:
+                        approvalTrackerId:
                           type: string
                         uri:
                           type: string
@@ -56936,7 +56968,7 @@ definitions:
 
                                   They are used for evrything from badge IDs to
                                   time ranges to min / max balance amounts.
-                              ownedTimes:
+                              ownershipTimes:
                                 type: array
                                 items:
                                   type: object
@@ -56974,6 +57006,8 @@ definitions:
 
                                     They are used for evrything from badge IDs
                                     to time ranges to min / max balance amounts.
+                              overrideWithCurrentTime:
+                                type: boolean
                         merkleChallenges:
                           type: array
                           items:
@@ -57044,6 +57078,8 @@ definitions:
                         predeterminedBalances:
                           type: object
                           properties:
+                            precalculationId:
+                              type: string
                             manualBalances:
                               type: array
                               items:
@@ -57056,7 +57092,7 @@ definitions:
                                       properties:
                                         amount:
                                           type: string
-                                        ownedTimes:
+                                        ownershipTimes:
                                           type: array
                                           items:
                                             type: object
@@ -57122,7 +57158,7 @@ definitions:
                                     properties:
                                       amount:
                                         type: string
-                                      ownedTimes:
+                                      ownershipTimes:
                                         type: array
                                         items:
                                           type: object
@@ -57180,7 +57216,7 @@ definitions:
                                       all time ranges specified.
                                 incrementBadgeIdsBy:
                                   type: string
-                                incrementOwnedTimesBy:
+                                incrementOwnershipTimesBy:
                                   type: string
                             orderCalculationMethod:
                               type: object
@@ -57306,7 +57342,7 @@ definitions:
 
                         They are used for evrything from badge IDs to time
                         ranges to min / max balance amounts.
-                  ownedTimes:
+                  ownershipTimes:
                     type: array
                     items:
                       type: object
@@ -57386,7 +57422,7 @@ definitions:
                           description: >-
                             ValueOptions defines how we manipulate the default
                             values.
-                        ownedTimesOptions:
+                        ownershipTimesOptions:
                           type: object
                           properties:
                             invertDefault:
@@ -57400,14 +57436,14 @@ definitions:
                           description: >-
                             ValueOptions defines how we manipulate the default
                             values.
-                        isAllowed:
+                        isApproved:
                           type: boolean
                   approvalDetails:
                     type: array
                     items:
                       type: object
                       properties:
-                        approvalId:
+                        approvalTrackerId:
                           type: string
                         uri:
                           type: string
@@ -57437,7 +57473,7 @@ definitions:
 
                                   They are used for evrything from badge IDs to
                                   time ranges to min / max balance amounts.
-                              ownedTimes:
+                              ownershipTimes:
                                 type: array
                                 items:
                                   type: object
@@ -57475,6 +57511,8 @@ definitions:
 
                                     They are used for evrything from badge IDs
                                     to time ranges to min / max balance amounts.
+                              overrideWithCurrentTime:
+                                type: boolean
                         merkleChallenges:
                           type: array
                           items:
@@ -57545,6 +57583,8 @@ definitions:
                         predeterminedBalances:
                           type: object
                           properties:
+                            precalculationId:
+                              type: string
                             manualBalances:
                               type: array
                               items:
@@ -57557,7 +57597,7 @@ definitions:
                                       properties:
                                         amount:
                                           type: string
-                                        ownedTimes:
+                                        ownershipTimes:
                                           type: array
                                           items:
                                             type: object
@@ -57623,7 +57663,7 @@ definitions:
                                     properties:
                                       amount:
                                         type: string
-                                      ownedTimes:
+                                      ownershipTimes:
                                         type: array
                                         items:
                                           type: object
@@ -57681,7 +57721,7 @@ definitions:
                                       all time ranges specified.
                                 incrementBadgeIdsBy:
                                   type: string
-                                incrementOwnedTimesBy:
+                                incrementOwnershipTimesBy:
                                   type: string
                             orderCalculationMethod:
                               type: object
@@ -57831,7 +57871,7 @@ definitions:
 
                           They are used for evrything from badge IDs to time
                           ranges to min / max balance amounts.
-                    ownedTimes:
+                    ownershipTimes:
                       type: array
                       items:
                         type: object
@@ -57963,7 +58003,7 @@ definitions:
                         description: >-
                           ValueOptions defines how we manipulate the default
                           values.
-                      ownedTimesOptions:
+                      ownershipTimesOptions:
                         type: object
                         properties:
                           invertDefault:
@@ -58081,7 +58121,7 @@ definitions:
 
                           They are used for evrything from badge IDs to time
                           ranges to min / max balance amounts.
-                    ownedTimes:
+                    ownershipTimes:
                       type: array
                       items:
                         type: object
@@ -58213,7 +58253,7 @@ definitions:
                         description: >-
                           ValueOptions defines how we manipulate the default
                           values.
-                      ownedTimesOptions:
+                      ownershipTimesOptions:
                         type: object
                         properties:
                           invertDefault:
@@ -58392,7 +58432,7 @@ definitions:
     properties:
       amount:
         type: string
-      ownedTimes:
+      ownershipTimes:
         type: array
         items:
           type: object
@@ -58455,7 +58495,7 @@ definitions:
             type: boolean
             title: Override default values with no values
         description: ValueOptions defines how we manipulate the default values.
-      ownedTimesOptions:
+      ownershipTimesOptions:
         type: object
         properties:
           invertDefault:
@@ -58512,7 +58552,7 @@ definitions:
 
             They are used for evrything from badge IDs to time ranges to min /
             max balance amounts.
-      ownedTimes:
+      ownershipTimes:
         type: array
         items:
           type: object
@@ -58591,7 +58631,7 @@ definitions:
 
                 They are used for evrything from badge IDs to time ranges to min
                 / max balance amounts.
-          ownedTimes:
+          ownershipTimes:
             type: array
             items:
               type: object
@@ -58665,7 +58705,7 @@ definitions:
                   type: boolean
                   title: Override default values with no values
               description: ValueOptions defines how we manipulate the default values.
-            ownedTimesOptions:
+            ownershipTimesOptions:
               type: object
               properties:
                 invertDefault:
@@ -58710,7 +58750,7 @@ definitions:
 
 
       Ex: If you want to lock the ability to create new badges for badgeIds
-      [1,2] at ownedTimes 1/1/2020 - 1/1/2021, 
+      [1,2] at ownershipTimes 1/1/2020 - 1/1/2021, 
 
       you could set the combination (badgeIds: [1,2], ownershipTimelineTimes:
       [1/1/2020 - 1/1/2021]) to always be forbidden.
@@ -58760,7 +58800,7 @@ definitions:
 
             They are used for evrything from badge IDs to time ranges to min /
             max balance amounts.
-      ownedTimes:
+      ownershipTimes:
         type: array
         items:
           type: object
@@ -58843,7 +58883,7 @@ definitions:
                   type: boolean
                   title: Override default values with no values
               description: ValueOptions defines how we manipulate the default values.
-            ownedTimesOptions:
+            ownershipTimesOptions:
               type: object
               properties:
                 invertDefault:
@@ -58855,14 +58895,14 @@ definitions:
                   type: boolean
                   title: Override default values with no values
               description: ValueOptions defines how we manipulate the default values.
-            isAllowed:
+            isApproved:
               type: boolean
       approvalDetails:
         type: array
         items:
           type: object
           properties:
-            approvalId:
+            approvalTrackerId:
               type: string
             uri:
               type: string
@@ -58892,7 +58932,7 @@ definitions:
 
                       They are used for evrything from badge IDs to time ranges
                       to min / max balance amounts.
-                  ownedTimes:
+                  ownershipTimes:
                     type: array
                     items:
                       type: object
@@ -58930,6 +58970,8 @@ definitions:
 
                         They are used for evrything from badge IDs to time
                         ranges to min / max balance amounts.
+                  overrideWithCurrentTime:
+                    type: boolean
             merkleChallenges:
               type: array
               items:
@@ -58997,6 +59039,8 @@ definitions:
             predeterminedBalances:
               type: object
               properties:
+                precalculationId:
+                  type: string
                 manualBalances:
                   type: array
                   items:
@@ -59009,7 +59053,7 @@ definitions:
                           properties:
                             amount:
                               type: string
-                            ownedTimes:
+                            ownershipTimes:
                               type: array
                               items:
                                 type: object
@@ -59072,7 +59116,7 @@ definitions:
                         properties:
                           amount:
                             type: string
-                          ownedTimes:
+                          ownershipTimes:
                             type: array
                             items:
                               type: object
@@ -59126,7 +59170,7 @@ definitions:
                           all badge IDs specified for all time ranges specified.
                     incrementBadgeIdsBy:
                       type: string
-                    incrementOwnedTimesBy:
+                    incrementOwnershipTimesBy:
                       type: string
                 orderCalculationMethod:
                   type: object
@@ -59254,7 +59298,7 @@ definitions:
             type: boolean
             title: Override default values with no values
         description: ValueOptions defines how we manipulate the default values.
-      ownedTimesOptions:
+      ownershipTimesOptions:
         type: object
         properties:
           invertDefault:
@@ -59353,7 +59397,7 @@ definitions:
 
             They are used for evrything from badge IDs to time ranges to min /
             max balance amounts.
-      ownedTimes:
+      ownershipTimes:
         type: array
         items:
           type: object
@@ -59476,7 +59520,7 @@ definitions:
 
                 They are used for evrything from badge IDs to time ranges to min
                 / max balance amounts.
-          ownedTimes:
+          ownershipTimes:
             type: array
             items:
               type: object
@@ -59610,7 +59654,7 @@ definitions:
                   type: boolean
                   title: Override default values with no values
               description: ValueOptions defines how we manipulate the default values.
-            ownedTimesOptions:
+            ownershipTimesOptions:
               type: object
               properties:
                 invertDefault:
@@ -59740,7 +59784,7 @@ definitions:
 
                   They are used for evrything from badge IDs to time ranges to
                   min / max balance amounts.
-            ownedTimes:
+            ownershipTimes:
               type: array
               items:
                 type: object
@@ -59824,7 +59868,7 @@ definitions:
                         type: boolean
                         title: Override default values with no values
                     description: ValueOptions defines how we manipulate the default values.
-                  ownedTimesOptions:
+                  ownershipTimesOptions:
                     type: object
                     properties:
                       invertDefault:
@@ -59836,14 +59880,14 @@ definitions:
                         type: boolean
                         title: Override default values with no values
                     description: ValueOptions defines how we manipulate the default values.
-                  isAllowed:
+                  isApproved:
                     type: boolean
             approvalDetails:
               type: array
               items:
                 type: object
                 properties:
-                  approvalId:
+                  approvalTrackerId:
                     type: string
                   uri:
                     type: string
@@ -59873,7 +59917,7 @@ definitions:
 
                             They are used for evrything from badge IDs to time
                             ranges to min / max balance amounts.
-                        ownedTimes:
+                        ownershipTimes:
                           type: array
                           items:
                             type: object
@@ -59911,6 +59955,8 @@ definitions:
 
                               They are used for evrything from badge IDs to time
                               ranges to min / max balance amounts.
+                        overrideWithCurrentTime:
+                          type: boolean
                   merkleChallenges:
                     type: array
                     items:
@@ -59979,6 +60025,8 @@ definitions:
                   predeterminedBalances:
                     type: object
                     properties:
+                      precalculationId:
+                        type: string
                       manualBalances:
                         type: array
                         items:
@@ -59991,7 +60039,7 @@ definitions:
                                 properties:
                                   amount:
                                     type: string
-                                  ownedTimes:
+                                  ownershipTimes:
                                     type: array
                                     items:
                                       type: object
@@ -60057,7 +60105,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownedTimes:
+                                ownershipTimes:
                                   type: array
                                   items:
                                     type: object
@@ -60114,7 +60162,7 @@ definitions:
                                 specified.
                           incrementBadgeIdsBy:
                             type: string
-                          incrementOwnedTimesBy:
+                          incrementOwnershipTimesBy:
                             type: string
                       orderCalculationMethod:
                         type: object
@@ -61149,7 +61197,7 @@ definitions:
 
                       They are used for evrything from badge IDs to time ranges
                       to min / max balance amounts.
-                ownedTimes:
+                ownershipTimes:
                   type: array
                   items:
                     type: object
@@ -61223,7 +61271,7 @@ definitions:
                         type: boolean
                         title: Override default values with no values
                     description: ValueOptions defines how we manipulate the default values.
-                  ownedTimesOptions:
+                  ownershipTimesOptions:
                     type: object
                     properties:
                       invertDefault:
@@ -61268,7 +61316,7 @@ definitions:
 
 
             Ex: If you want to lock the ability to create new badges for
-            badgeIds [1,2] at ownedTimes 1/1/2020 - 1/1/2021, 
+            badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021, 
 
             you could set the combination (badgeIds: [1,2],
             ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be
@@ -61638,7 +61686,7 @@ definitions:
 
                       They are used for evrything from badge IDs to time ranges
                       to min / max balance amounts.
-                ownedTimes:
+                ownershipTimes:
                   type: array
                   items:
                     type: object
@@ -61772,7 +61820,7 @@ definitions:
                         type: boolean
                         title: Override default values with no values
                     description: ValueOptions defines how we manipulate the default values.
-                  ownedTimesOptions:
+                  ownershipTimesOptions:
                     type: object
                     properties:
                       invertDefault:
@@ -61888,7 +61936,7 @@ definitions:
 
       - transferTimes - the times that a transfer occurs
 
-      - ownedTimes - the times when a badge is owned by a user
+      - ownershipTimes - the times when a badge is owned by a user
 
 
       The permitted/forbiddenTimes are used to determine when a permission can
@@ -61908,7 +61956,7 @@ definitions:
       repetition).
 
       Ex: We can have default value badgeIds = [1,2] and combinations =
-      [{invertDefault: true, isAllowed: false}, {isAllowed: true}].
+      [{invertDefault: true, isApproved: false}, {isApproved: true}].
 
       This would mean that badgeIds [1,2] are allowed but everything else is not
       allowed.
@@ -61918,7 +61966,7 @@ definitions:
       matches. Any subsequent combinations are ignored. 
 
       Ex: If we have defaultValues = {badgeIds: [1,2]} and combinations =
-      [{isAllowed: true}, {isAllowed: false}].
+      [{isApproved: true}, {isApproved: false}].
 
       This would mean that badgeIds [1,2] are allowed and the second combination
       is ignored.
@@ -61971,7 +62019,7 @@ definitions:
   bitbadges.bitbadgeschain.badges.IncomingApprovalDetails:
     type: object
     properties:
-      approvalId:
+      approvalTrackerId:
         type: string
       uri:
         type: string
@@ -62001,7 +62049,7 @@ definitions:
 
                 They are used for evrything from badge IDs to time ranges to min
                 / max balance amounts.
-            ownedTimes:
+            ownershipTimes:
               type: array
               items:
                 type: object
@@ -62039,6 +62087,8 @@ definitions:
 
                   They are used for evrything from badge IDs to time ranges to
                   min / max balance amounts.
+            overrideWithCurrentTime:
+              type: boolean
       merkleChallenges:
         type: array
         items:
@@ -62105,6 +62155,8 @@ definitions:
       predeterminedBalances:
         type: object
         properties:
+          precalculationId:
+            type: string
           manualBalances:
             type: array
             items:
@@ -62117,7 +62169,7 @@ definitions:
                     properties:
                       amount:
                         type: string
-                      ownedTimes:
+                      ownershipTimes:
                         type: array
                         items:
                           type: object
@@ -62179,7 +62231,7 @@ definitions:
                   properties:
                     amount:
                       type: string
-                    ownedTimes:
+                    ownershipTimes:
                       type: array
                       items:
                         type: object
@@ -62233,7 +62285,7 @@ definitions:
                     badge IDs specified for all time ranges specified.
               incrementBadgeIdsBy:
                 type: string
-              incrementOwnedTimesBy:
+              incrementOwnershipTimesBy:
                 type: string
           orderCalculationMethod:
             type: object
@@ -62287,7 +62339,7 @@ definitions:
           properties:
             amount:
               type: string
-            ownedTimes:
+            ownershipTimes:
               type: array
               items:
                 type: object
@@ -62339,7 +62391,7 @@ definitions:
             specified for all time ranges specified.
       incrementBadgeIdsBy:
         type: string
-      incrementOwnedTimesBy:
+      incrementOwnershipTimesBy:
         type: string
   bitbadges.bitbadgeschain.badges.InheritedBalance:
     type: object
@@ -62575,7 +62627,7 @@ definitions:
             type: boolean
             title: Override default values with no values
         description: ValueOptions defines how we manipulate the default values.
-      ownedTimesOptions:
+      ownershipTimesOptions:
         type: object
         properties:
           invertDefault:
@@ -62587,7 +62639,7 @@ definitions:
             type: boolean
             title: Override default values with no values
         description: ValueOptions defines how we manipulate the default values.
-      isAllowed:
+      isApproved:
         type: boolean
   bitbadges.bitbadgeschain.badges.IsUserIncomingTransferAllowed:
     type: object
@@ -62640,7 +62692,7 @@ definitions:
             type: boolean
             title: Override default values with no values
         description: ValueOptions defines how we manipulate the default values.
-      ownedTimesOptions:
+      ownershipTimesOptions:
         type: object
         properties:
           invertDefault:
@@ -62652,7 +62704,7 @@ definitions:
             type: boolean
             title: Override default values with no values
         description: ValueOptions defines how we manipulate the default values.
-      isAllowed:
+      isApproved:
         type: boolean
   bitbadges.bitbadgeschain.badges.IsUserOutgoingTransferAllowed:
     type: object
@@ -62705,7 +62757,7 @@ definitions:
             type: boolean
             title: Override default values with no values
         description: ValueOptions defines how we manipulate the default values.
-      ownedTimesOptions:
+      ownershipTimesOptions:
         type: object
         properties:
           invertDefault:
@@ -62717,7 +62769,7 @@ definitions:
             type: boolean
             title: Override default values with no values
         description: ValueOptions defines how we manipulate the default values.
-      isAllowed:
+      isApproved:
         type: boolean
   bitbadges.bitbadgeschain.badges.ManagerTimeline:
     type: object
@@ -62752,7 +62804,7 @@ definitions:
           properties:
             amount:
               type: string
-            ownedTimes:
+            ownershipTimes:
               type: array
               items:
                 type: object
@@ -62930,7 +62982,7 @@ definitions:
 
           They are used for evrything from badge IDs to time ranges to min / max
           balance amounts.
-      ownedTimes:
+      ownershipTimes:
         type: array
         items:
           type: object
@@ -62966,6 +63018,8 @@ definitions:
 
             They are used for evrything from badge IDs to time ranges to min /
             max balance amounts.
+      overrideWithCurrentTime:
+        type: boolean
   bitbadges.bitbadgeschain.badges.OffChainBalancesMetadata:
     type: object
     properties:
@@ -63014,7 +63068,7 @@ definitions:
   bitbadges.bitbadgeschain.badges.OutgoingApprovalDetails:
     type: object
     properties:
-      approvalId:
+      approvalTrackerId:
         type: string
       uri:
         type: string
@@ -63044,7 +63098,7 @@ definitions:
 
                 They are used for evrything from badge IDs to time ranges to min
                 / max balance amounts.
-            ownedTimes:
+            ownershipTimes:
               type: array
               items:
                 type: object
@@ -63082,6 +63136,8 @@ definitions:
 
                   They are used for evrything from badge IDs to time ranges to
                   min / max balance amounts.
+            overrideWithCurrentTime:
+              type: boolean
       merkleChallenges:
         type: array
         items:
@@ -63148,6 +63204,8 @@ definitions:
       predeterminedBalances:
         type: object
         properties:
+          precalculationId:
+            type: string
           manualBalances:
             type: array
             items:
@@ -63160,7 +63218,7 @@ definitions:
                     properties:
                       amount:
                         type: string
-                      ownedTimes:
+                      ownershipTimes:
                         type: array
                         items:
                           type: object
@@ -63222,7 +63280,7 @@ definitions:
                   properties:
                     amount:
                       type: string
-                    ownedTimes:
+                    ownershipTimes:
                       type: array
                       items:
                         type: object
@@ -63276,7 +63334,7 @@ definitions:
                     badge IDs specified for all time ranges specified.
               incrementBadgeIdsBy:
                 type: string
-              incrementOwnedTimesBy:
+              incrementOwnershipTimesBy:
                 type: string
           orderCalculationMethod:
             type: object
@@ -63326,7 +63384,7 @@ definitions:
   bitbadges.bitbadgeschain.badges.PrecalulationDetails:
     type: object
     properties:
-      approvalId:
+      precalculationId:
         type: string
       approvalLevel:
         type: string
@@ -63337,6 +63395,8 @@ definitions:
   bitbadges.bitbadgeschain.badges.PredeterminedBalances:
     type: object
     properties:
+      precalculationId:
+        type: string
       manualBalances:
         type: array
         items:
@@ -63349,7 +63409,7 @@ definitions:
                 properties:
                   amount:
                     type: string
-                  ownedTimes:
+                  ownershipTimes:
                     type: array
                     items:
                       type: object
@@ -63410,7 +63470,7 @@ definitions:
               properties:
                 amount:
                   type: string
-                ownedTimes:
+                ownershipTimes:
                   type: array
                   items:
                     type: object
@@ -63462,7 +63522,7 @@ definitions:
                 IDs specified for all time ranges specified.
           incrementBadgeIdsBy:
             type: string
-          incrementOwnedTimesBy:
+          incrementOwnershipTimesBy:
             type: string
       orderCalculationMethod:
         type: object
@@ -63508,6 +63568,8 @@ definitions:
             type: string
           customData:
             type: string
+          createdBy:
+            type: string
         description: >-
           An AddressMapping is a permanent list of addresses that are referenced
           by a mapping ID.
@@ -63536,7 +63598,7 @@ definitions:
               properties:
                 amount:
                   type: string
-                ownedTimes:
+                ownershipTimes:
                   type: array
                   items:
                     type: object
@@ -63599,7 +63661,7 @@ definitions:
               properties:
                 amount:
                   type: string
-                ownedTimes:
+                ownershipTimes:
                   type: array
                   items:
                     type: object
@@ -63701,7 +63763,7 @@ definitions:
 
                             They are used for evrything from badge IDs to time
                             ranges to min / max balance amounts.
-                      ownedTimes:
+                      ownershipTimes:
                         type: array
                         items:
                           type: object
@@ -63789,7 +63851,7 @@ definitions:
                               description: >-
                                 ValueOptions defines how we manipulate the
                                 default values.
-                            ownedTimesOptions:
+                            ownershipTimesOptions:
                               type: object
                               properties:
                                 invertDefault:
@@ -63805,14 +63867,14 @@ definitions:
                               description: >-
                                 ValueOptions defines how we manipulate the
                                 default values.
-                            isAllowed:
+                            isApproved:
                               type: boolean
                       approvalDetails:
                         type: array
                         items:
                           type: object
                           properties:
-                            approvalId:
+                            approvalTrackerId:
                               type: string
                             uri:
                               type: string
@@ -63843,7 +63905,7 @@ definitions:
                                       They are used for evrything from badge IDs
                                       to time ranges to min / max balance
                                       amounts.
-                                  ownedTimes:
+                                  ownershipTimes:
                                     type: array
                                     items:
                                       type: object
@@ -63883,6 +63945,8 @@ definitions:
                                         They are used for evrything from badge
                                         IDs to time ranges to min / max balance
                                         amounts.
+                                  overrideWithCurrentTime:
+                                    type: boolean
                             merkleChallenges:
                               type: array
                               items:
@@ -63955,6 +64019,8 @@ definitions:
                             predeterminedBalances:
                               type: object
                               properties:
+                                precalculationId:
+                                  type: string
                                 manualBalances:
                                   type: array
                                   items:
@@ -63967,7 +64033,7 @@ definitions:
                                           properties:
                                             amount:
                                               type: string
-                                            ownedTimes:
+                                            ownershipTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -64033,7 +64099,7 @@ definitions:
                                         properties:
                                           amount:
                                             type: string
-                                          ownedTimes:
+                                          ownershipTimes:
                                             type: array
                                             items:
                                               type: object
@@ -64091,7 +64157,7 @@ definitions:
                                           for all time ranges specified.
                                     incrementBadgeIdsBy:
                                       type: string
-                                    incrementOwnedTimesBy:
+                                    incrementOwnershipTimesBy:
                                       type: string
                                 orderCalculationMethod:
                                   type: object
@@ -64212,7 +64278,7 @@ definitions:
 
                             They are used for evrything from badge IDs to time
                             ranges to min / max balance amounts.
-                      ownedTimes:
+                      ownershipTimes:
                         type: array
                         items:
                           type: object
@@ -64300,7 +64366,7 @@ definitions:
                               description: >-
                                 ValueOptions defines how we manipulate the
                                 default values.
-                            ownedTimesOptions:
+                            ownershipTimesOptions:
                               type: object
                               properties:
                                 invertDefault:
@@ -64316,14 +64382,14 @@ definitions:
                               description: >-
                                 ValueOptions defines how we manipulate the
                                 default values.
-                            isAllowed:
+                            isApproved:
                               type: boolean
                       approvalDetails:
                         type: array
                         items:
                           type: object
                           properties:
-                            approvalId:
+                            approvalTrackerId:
                               type: string
                             uri:
                               type: string
@@ -64354,7 +64420,7 @@ definitions:
                                       They are used for evrything from badge IDs
                                       to time ranges to min / max balance
                                       amounts.
-                                  ownedTimes:
+                                  ownershipTimes:
                                     type: array
                                     items:
                                       type: object
@@ -64394,6 +64460,8 @@ definitions:
                                         They are used for evrything from badge
                                         IDs to time ranges to min / max balance
                                         amounts.
+                                  overrideWithCurrentTime:
+                                    type: boolean
                             merkleChallenges:
                               type: array
                               items:
@@ -64466,6 +64534,8 @@ definitions:
                             predeterminedBalances:
                               type: object
                               properties:
+                                precalculationId:
+                                  type: string
                                 manualBalances:
                                   type: array
                                   items:
@@ -64478,7 +64548,7 @@ definitions:
                                           properties:
                                             amount:
                                               type: string
-                                            ownedTimes:
+                                            ownershipTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -64544,7 +64614,7 @@ definitions:
                                         properties:
                                           amount:
                                             type: string
-                                          ownedTimes:
+                                          ownershipTimes:
                                             type: array
                                             items:
                                               type: object
@@ -64602,7 +64672,7 @@ definitions:
                                           for all time ranges specified.
                                     incrementBadgeIdsBy:
                                       type: string
-                                    incrementOwnedTimesBy:
+                                    incrementOwnershipTimesBy:
                                       type: string
                                 orderCalculationMethod:
                                   type: object
@@ -64743,7 +64813,7 @@ definitions:
 
                               They are used for evrything from badge IDs to time
                               ranges to min / max balance amounts.
-                        ownedTimes:
+                        ownershipTimes:
                           type: array
                           items:
                             type: object
@@ -64885,7 +64955,7 @@ definitions:
                             description: >-
                               ValueOptions defines how we manipulate the default
                               values.
-                          ownedTimesOptions:
+                          ownershipTimesOptions:
                             type: object
                             properties:
                               invertDefault:
@@ -65010,7 +65080,7 @@ definitions:
 
                               They are used for evrything from badge IDs to time
                               ranges to min / max balance amounts.
-                        ownedTimes:
+                        ownershipTimes:
                           type: array
                           items:
                             type: object
@@ -65152,7 +65222,7 @@ definitions:
                             description: >-
                               ValueOptions defines how we manipulate the default
                               values.
-                          ownedTimesOptions:
+                          ownershipTimesOptions:
                             type: object
                             properties:
                               invertDefault:
@@ -66573,7 +66643,7 @@ definitions:
 
                               They are used for evrything from badge IDs to time
                               ranges to min / max balance amounts.
-                        ownedTimes:
+                        ownershipTimes:
                           type: array
                           items:
                             type: object
@@ -66651,7 +66721,7 @@ definitions:
                             description: >-
                               ValueOptions defines how we manipulate the default
                               values.
-                          ownedTimesOptions:
+                          ownershipTimesOptions:
                             type: object
                             properties:
                               invertDefault:
@@ -66708,7 +66778,7 @@ definitions:
 
 
                     Ex: If you want to lock the ability to create new badges for
-                    badgeIds [1,2] at ownedTimes 1/1/2020 - 1/1/2021, 
+                    badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021, 
 
                     you could set the combination (badgeIds: [1,2],
                     ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be
@@ -67112,7 +67182,7 @@ definitions:
 
                               They are used for evrything from badge IDs to time
                               ranges to min / max balance amounts.
-                        ownedTimes:
+                        ownershipTimes:
                           type: array
                           items:
                             type: object
@@ -67270,7 +67340,7 @@ definitions:
                             description: >-
                               ValueOptions defines how we manipulate the default
                               values.
-                          ownedTimesOptions:
+                          ownershipTimesOptions:
                             type: object
                             properties:
                               invertDefault:
@@ -67419,7 +67489,7 @@ definitions:
 
                             They are used for evrything from badge IDs to time
                             ranges to min / max balance amounts.
-                      ownedTimes:
+                      ownershipTimes:
                         type: array
                         items:
                           type: object
@@ -67523,7 +67593,7 @@ definitions:
                               description: >-
                                 ValueOptions defines how we manipulate the
                                 default values.
-                            ownedTimesOptions:
+                            ownershipTimesOptions:
                               type: object
                               properties:
                                 invertDefault:
@@ -67539,14 +67609,14 @@ definitions:
                               description: >-
                                 ValueOptions defines how we manipulate the
                                 default values.
-                            isAllowed:
+                            isApproved:
                               type: boolean
                       approvalDetails:
                         type: array
                         items:
                           type: object
                           properties:
-                            approvalId:
+                            approvalTrackerId:
                               type: string
                             uri:
                               type: string
@@ -67577,7 +67647,7 @@ definitions:
                                       They are used for evrything from badge IDs
                                       to time ranges to min / max balance
                                       amounts.
-                                  ownedTimes:
+                                  ownershipTimes:
                                     type: array
                                     items:
                                       type: object
@@ -67617,6 +67687,8 @@ definitions:
                                         They are used for evrything from badge
                                         IDs to time ranges to min / max balance
                                         amounts.
+                                  overrideWithCurrentTime:
+                                    type: boolean
                             merkleChallenges:
                               type: array
                               items:
@@ -67689,6 +67761,8 @@ definitions:
                             predeterminedBalances:
                               type: object
                               properties:
+                                precalculationId:
+                                  type: string
                                 manualBalances:
                                   type: array
                                   items:
@@ -67701,7 +67775,7 @@ definitions:
                                           properties:
                                             amount:
                                               type: string
-                                            ownedTimes:
+                                            ownershipTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -67767,7 +67841,7 @@ definitions:
                                         properties:
                                           amount:
                                             type: string
-                                          ownedTimes:
+                                          ownershipTimes:
                                             type: array
                                             items:
                                               type: object
@@ -67825,7 +67899,7 @@ definitions:
                                           for all time ranges specified.
                                     incrementBadgeIdsBy:
                                       type: string
-                                    incrementOwnedTimesBy:
+                                    incrementOwnershipTimesBy:
                                       type: string
                                 orderCalculationMethod:
                                   type: object
@@ -68057,7 +68131,7 @@ definitions:
 
                             They are used for evrything from badge IDs to time
                             ranges to min / max balance amounts.
-                      ownedTimes:
+                      ownershipTimes:
                         type: array
                         items:
                           type: object
@@ -68145,7 +68219,7 @@ definitions:
                               description: >-
                                 ValueOptions defines how we manipulate the
                                 default values.
-                            ownedTimesOptions:
+                            ownershipTimesOptions:
                               type: object
                               properties:
                                 invertDefault:
@@ -68161,14 +68235,14 @@ definitions:
                               description: >-
                                 ValueOptions defines how we manipulate the
                                 default values.
-                            isAllowed:
+                            isApproved:
                               type: boolean
                       approvalDetails:
                         type: array
                         items:
                           type: object
                           properties:
-                            approvalId:
+                            approvalTrackerId:
                               type: string
                             uri:
                               type: string
@@ -68199,7 +68273,7 @@ definitions:
                                       They are used for evrything from badge IDs
                                       to time ranges to min / max balance
                                       amounts.
-                                  ownedTimes:
+                                  ownershipTimes:
                                     type: array
                                     items:
                                       type: object
@@ -68239,6 +68313,8 @@ definitions:
                                         They are used for evrything from badge
                                         IDs to time ranges to min / max balance
                                         amounts.
+                                  overrideWithCurrentTime:
+                                    type: boolean
                             merkleChallenges:
                               type: array
                               items:
@@ -68311,6 +68387,8 @@ definitions:
                             predeterminedBalances:
                               type: object
                               properties:
+                                precalculationId:
+                                  type: string
                                 manualBalances:
                                   type: array
                                   items:
@@ -68323,7 +68401,7 @@ definitions:
                                           properties:
                                             amount:
                                               type: string
-                                            ownedTimes:
+                                            ownershipTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -68389,7 +68467,7 @@ definitions:
                                         properties:
                                           amount:
                                             type: string
-                                          ownedTimes:
+                                          ownershipTimes:
                                             type: array
                                             items:
                                               type: object
@@ -68447,7 +68525,7 @@ definitions:
                                           for all time ranges specified.
                                     incrementBadgeIdsBy:
                                       type: string
-                                    incrementOwnedTimesBy:
+                                    incrementOwnershipTimesBy:
                                       type: string
                                 orderCalculationMethod:
                                   type: object
@@ -68574,7 +68652,7 @@ definitions:
 
                             They are used for evrything from badge IDs to time
                             ranges to min / max balance amounts.
-                      ownedTimes:
+                      ownershipTimes:
                         type: array
                         items:
                           type: object
@@ -68662,7 +68740,7 @@ definitions:
                               description: >-
                                 ValueOptions defines how we manipulate the
                                 default values.
-                            ownedTimesOptions:
+                            ownershipTimesOptions:
                               type: object
                               properties:
                                 invertDefault:
@@ -68678,14 +68756,14 @@ definitions:
                               description: >-
                                 ValueOptions defines how we manipulate the
                                 default values.
-                            isAllowed:
+                            isApproved:
                               type: boolean
                       approvalDetails:
                         type: array
                         items:
                           type: object
                           properties:
-                            approvalId:
+                            approvalTrackerId:
                               type: string
                             uri:
                               type: string
@@ -68716,7 +68794,7 @@ definitions:
                                       They are used for evrything from badge IDs
                                       to time ranges to min / max balance
                                       amounts.
-                                  ownedTimes:
+                                  ownershipTimes:
                                     type: array
                                     items:
                                       type: object
@@ -68756,6 +68834,8 @@ definitions:
                                         They are used for evrything from badge
                                         IDs to time ranges to min / max balance
                                         amounts.
+                                  overrideWithCurrentTime:
+                                    type: boolean
                             merkleChallenges:
                               type: array
                               items:
@@ -68828,6 +68908,8 @@ definitions:
                             predeterminedBalances:
                               type: object
                               properties:
+                                precalculationId:
+                                  type: string
                                 manualBalances:
                                   type: array
                                   items:
@@ -68840,7 +68922,7 @@ definitions:
                                           properties:
                                             amount:
                                               type: string
-                                            ownedTimes:
+                                            ownershipTimes:
                                               type: array
                                               items:
                                                 type: object
@@ -68906,7 +68988,7 @@ definitions:
                                         properties:
                                           amount:
                                             type: string
-                                          ownedTimes:
+                                          ownershipTimes:
                                             type: array
                                             items:
                                               type: object
@@ -68964,7 +69046,7 @@ definitions:
                                           for all time ranges specified.
                                     incrementBadgeIdsBy:
                                       type: string
-                                    incrementOwnedTimesBy:
+                                    incrementOwnershipTimesBy:
                                       type: string
                                 orderCalculationMethod:
                                   type: object
@@ -69115,7 +69197,7 @@ definitions:
 
                               They are used for evrything from badge IDs to time
                               ranges to min / max balance amounts.
-                        ownedTimes:
+                        ownershipTimes:
                           type: array
                           items:
                             type: object
@@ -69257,7 +69339,7 @@ definitions:
                             description: >-
                               ValueOptions defines how we manipulate the default
                               values.
-                          ownedTimesOptions:
+                          ownershipTimesOptions:
                             type: object
                             properties:
                               invertDefault:
@@ -69382,7 +69464,7 @@ definitions:
 
                               They are used for evrything from badge IDs to time
                               ranges to min / max balance amounts.
-                        ownedTimes:
+                        ownershipTimes:
                           type: array
                           items:
                             type: object
@@ -69524,7 +69606,7 @@ definitions:
                             description: >-
                               ValueOptions defines how we manipulate the default
                               values.
-                          ownedTimesOptions:
+                          ownershipTimesOptions:
                             type: object
                             properties:
                               invertDefault:
@@ -70159,7 +70241,7 @@ definitions:
           properties:
             amount:
               type: string
-            ownedTimes:
+            ownershipTimes:
               type: array
               items:
                 type: object
@@ -70212,7 +70294,7 @@ definitions:
       precalculationDetails:
         type: object
         properties:
-          approvalId:
+          precalculationId:
             type: string
           approvalLevel:
             type: string
@@ -70297,7 +70379,7 @@ definitions:
 
             They are used for evrything from badge IDs to time ranges to min /
             max balance amounts.
-      ownedTimes:
+      ownershipTimes:
         type: array
         items:
           type: object
@@ -70368,7 +70450,7 @@ definitions:
                   type: boolean
                   title: Override default values with no values
               description: ValueOptions defines how we manipulate the default values.
-            ownedTimesOptions:
+            ownershipTimesOptions:
               type: object
               properties:
                 invertDefault:
@@ -70380,14 +70462,14 @@ definitions:
                   type: boolean
                   title: Override default values with no values
               description: ValueOptions defines how we manipulate the default values.
-            isAllowed:
+            isApproved:
               type: boolean
       approvalDetails:
         type: array
         items:
           type: object
           properties:
-            approvalId:
+            approvalTrackerId:
               type: string
             uri:
               type: string
@@ -70417,7 +70499,7 @@ definitions:
 
                       They are used for evrything from badge IDs to time ranges
                       to min / max balance amounts.
-                  ownedTimes:
+                  ownershipTimes:
                     type: array
                     items:
                       type: object
@@ -70455,6 +70537,8 @@ definitions:
 
                         They are used for evrything from badge IDs to time
                         ranges to min / max balance amounts.
+                  overrideWithCurrentTime:
+                    type: boolean
             merkleChallenges:
               type: array
               items:
@@ -70522,6 +70606,8 @@ definitions:
             predeterminedBalances:
               type: object
               properties:
+                precalculationId:
+                  type: string
                 manualBalances:
                   type: array
                   items:
@@ -70534,7 +70620,7 @@ definitions:
                           properties:
                             amount:
                               type: string
-                            ownedTimes:
+                            ownershipTimes:
                               type: array
                               items:
                                 type: object
@@ -70597,7 +70683,7 @@ definitions:
                         properties:
                           amount:
                             type: string
-                          ownedTimes:
+                          ownershipTimes:
                             type: array
                             items:
                               type: object
@@ -70651,7 +70737,7 @@ definitions:
                           all badge IDs specified for all time ranges specified.
                     incrementBadgeIdsBy:
                       type: string
-                    incrementOwnedTimesBy:
+                    incrementOwnershipTimesBy:
                       type: string
                 orderCalculationMethod:
                   type: object
@@ -70764,7 +70850,7 @@ definitions:
             type: boolean
             title: Override default values with no values
         description: ValueOptions defines how we manipulate the default values.
-      ownedTimesOptions:
+      ownershipTimesOptions:
         type: object
         properties:
           invertDefault:
@@ -70861,7 +70947,7 @@ definitions:
 
             They are used for evrything from badge IDs to time ranges to min /
             max balance amounts.
-      ownedTimes:
+      ownershipTimes:
         type: array
         items:
           type: object
@@ -70982,7 +71068,7 @@ definitions:
 
                 They are used for evrything from badge IDs to time ranges to min
                 / max balance amounts.
-          ownedTimes:
+          ownershipTimes:
             type: array
             items:
               type: object
@@ -71104,7 +71190,7 @@ definitions:
                   type: boolean
                   title: Override default values with no values
               description: ValueOptions defines how we manipulate the default values.
-            ownedTimesOptions:
+            ownershipTimesOptions:
               type: object
               properties:
                 invertDefault:
@@ -71196,7 +71282,7 @@ definitions:
 
                   They are used for evrything from badge IDs to time ranges to
                   min / max balance amounts.
-            ownedTimes:
+            ownershipTimes:
               type: array
               items:
                 type: object
@@ -71268,7 +71354,7 @@ definitions:
                         type: boolean
                         title: Override default values with no values
                     description: ValueOptions defines how we manipulate the default values.
-                  ownedTimesOptions:
+                  ownershipTimesOptions:
                     type: object
                     properties:
                       invertDefault:
@@ -71280,14 +71366,14 @@ definitions:
                         type: boolean
                         title: Override default values with no values
                     description: ValueOptions defines how we manipulate the default values.
-                  isAllowed:
+                  isApproved:
                     type: boolean
             approvalDetails:
               type: array
               items:
                 type: object
                 properties:
-                  approvalId:
+                  approvalTrackerId:
                     type: string
                   uri:
                     type: string
@@ -71317,7 +71403,7 @@ definitions:
 
                             They are used for evrything from badge IDs to time
                             ranges to min / max balance amounts.
-                        ownedTimes:
+                        ownershipTimes:
                           type: array
                           items:
                             type: object
@@ -71355,6 +71441,8 @@ definitions:
 
                               They are used for evrything from badge IDs to time
                               ranges to min / max balance amounts.
+                        overrideWithCurrentTime:
+                          type: boolean
                   merkleChallenges:
                     type: array
                     items:
@@ -71423,6 +71511,8 @@ definitions:
                   predeterminedBalances:
                     type: object
                     properties:
+                      precalculationId:
+                        type: string
                       manualBalances:
                         type: array
                         items:
@@ -71435,7 +71525,7 @@ definitions:
                                 properties:
                                   amount:
                                     type: string
-                                  ownedTimes:
+                                  ownershipTimes:
                                     type: array
                                     items:
                                       type: object
@@ -71501,7 +71591,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownedTimes:
+                                ownershipTimes:
                                   type: array
                                   items:
                                     type: object
@@ -71558,7 +71648,7 @@ definitions:
                                 specified.
                           incrementBadgeIdsBy:
                             type: string
-                          incrementOwnedTimesBy:
+                          incrementOwnershipTimesBy:
                             type: string
                       orderCalculationMethod:
                         type: object
@@ -71669,7 +71759,7 @@ definitions:
 
             They are used for evrything from badge IDs to time ranges to min /
             max balance amounts.
-      ownedTimes:
+      ownershipTimes:
         type: array
         items:
           type: object
@@ -71740,7 +71830,7 @@ definitions:
                   type: boolean
                   title: Override default values with no values
               description: ValueOptions defines how we manipulate the default values.
-            ownedTimesOptions:
+            ownershipTimesOptions:
               type: object
               properties:
                 invertDefault:
@@ -71752,14 +71842,14 @@ definitions:
                   type: boolean
                   title: Override default values with no values
               description: ValueOptions defines how we manipulate the default values.
-            isAllowed:
+            isApproved:
               type: boolean
       approvalDetails:
         type: array
         items:
           type: object
           properties:
-            approvalId:
+            approvalTrackerId:
               type: string
             uri:
               type: string
@@ -71789,7 +71879,7 @@ definitions:
 
                       They are used for evrything from badge IDs to time ranges
                       to min / max balance amounts.
-                  ownedTimes:
+                  ownershipTimes:
                     type: array
                     items:
                       type: object
@@ -71827,6 +71917,8 @@ definitions:
 
                         They are used for evrything from badge IDs to time
                         ranges to min / max balance amounts.
+                  overrideWithCurrentTime:
+                    type: boolean
             merkleChallenges:
               type: array
               items:
@@ -71894,6 +71986,8 @@ definitions:
             predeterminedBalances:
               type: object
               properties:
+                precalculationId:
+                  type: string
                 manualBalances:
                   type: array
                   items:
@@ -71906,7 +72000,7 @@ definitions:
                           properties:
                             amount:
                               type: string
-                            ownedTimes:
+                            ownershipTimes:
                               type: array
                               items:
                                 type: object
@@ -71969,7 +72063,7 @@ definitions:
                         properties:
                           amount:
                             type: string
-                          ownedTimes:
+                          ownershipTimes:
                             type: array
                             items:
                               type: object
@@ -72023,7 +72117,7 @@ definitions:
                           all badge IDs specified for all time ranges specified.
                     incrementBadgeIdsBy:
                       type: string
-                    incrementOwnedTimesBy:
+                    incrementOwnershipTimesBy:
                       type: string
                 orderCalculationMethod:
                   type: object
@@ -72136,7 +72230,7 @@ definitions:
             type: boolean
             title: Override default values with no values
         description: ValueOptions defines how we manipulate the default values.
-      ownedTimesOptions:
+      ownershipTimesOptions:
         type: object
         properties:
           invertDefault:
@@ -72233,7 +72327,7 @@ definitions:
 
             They are used for evrything from badge IDs to time ranges to min /
             max balance amounts.
-      ownedTimes:
+      ownershipTimes:
         type: array
         items:
           type: object
@@ -72354,7 +72448,7 @@ definitions:
 
                 They are used for evrything from badge IDs to time ranges to min
                 / max balance amounts.
-          ownedTimes:
+          ownershipTimes:
             type: array
             items:
               type: object
@@ -72476,7 +72570,7 @@ definitions:
                   type: boolean
                   title: Override default values with no values
               description: ValueOptions defines how we manipulate the default values.
-            ownedTimesOptions:
+            ownershipTimesOptions:
               type: object
               properties:
                 invertDefault:
@@ -72569,7 +72663,7 @@ definitions:
 
                   They are used for evrything from badge IDs to time ranges to
                   min / max balance amounts.
-            ownedTimes:
+            ownershipTimes:
               type: array
               items:
                 type: object
@@ -72641,7 +72735,7 @@ definitions:
                         type: boolean
                         title: Override default values with no values
                     description: ValueOptions defines how we manipulate the default values.
-                  ownedTimesOptions:
+                  ownershipTimesOptions:
                     type: object
                     properties:
                       invertDefault:
@@ -72653,14 +72747,14 @@ definitions:
                         type: boolean
                         title: Override default values with no values
                     description: ValueOptions defines how we manipulate the default values.
-                  isAllowed:
+                  isApproved:
                     type: boolean
             approvalDetails:
               type: array
               items:
                 type: object
                 properties:
-                  approvalId:
+                  approvalTrackerId:
                     type: string
                   uri:
                     type: string
@@ -72690,7 +72784,7 @@ definitions:
 
                             They are used for evrything from badge IDs to time
                             ranges to min / max balance amounts.
-                        ownedTimes:
+                        ownershipTimes:
                           type: array
                           items:
                             type: object
@@ -72728,6 +72822,8 @@ definitions:
 
                               They are used for evrything from badge IDs to time
                               ranges to min / max balance amounts.
+                        overrideWithCurrentTime:
+                          type: boolean
                   merkleChallenges:
                     type: array
                     items:
@@ -72796,6 +72892,8 @@ definitions:
                   predeterminedBalances:
                     type: object
                     properties:
+                      precalculationId:
+                        type: string
                       manualBalances:
                         type: array
                         items:
@@ -72808,7 +72906,7 @@ definitions:
                                 properties:
                                   amount:
                                     type: string
-                                  ownedTimes:
+                                  ownershipTimes:
                                     type: array
                                     items:
                                       type: object
@@ -72874,7 +72972,7 @@ definitions:
                               properties:
                                 amount:
                                   type: string
-                                ownedTimes:
+                                ownershipTimes:
                                   type: array
                                   items:
                                     type: object
@@ -72931,7 +73029,7 @@ definitions:
                                 specified.
                           incrementBadgeIdsBy:
                             type: string
-                          incrementOwnedTimesBy:
+                          incrementOwnershipTimesBy:
                             type: string
                       orderCalculationMethod:
                         type: object
@@ -73009,7 +73107,7 @@ definitions:
           properties:
             amount:
               type: string
-            ownedTimes:
+            ownershipTimes:
               type: array
               items:
                 type: object
@@ -73111,7 +73209,7 @@ definitions:
 
                         They are used for evrything from badge IDs to time
                         ranges to min / max balance amounts.
-                  ownedTimes:
+                  ownershipTimes:
                     type: array
                     items:
                       type: object
@@ -73191,7 +73289,7 @@ definitions:
                           description: >-
                             ValueOptions defines how we manipulate the default
                             values.
-                        ownedTimesOptions:
+                        ownershipTimesOptions:
                           type: object
                           properties:
                             invertDefault:
@@ -73205,14 +73303,14 @@ definitions:
                           description: >-
                             ValueOptions defines how we manipulate the default
                             values.
-                        isAllowed:
+                        isApproved:
                           type: boolean
                   approvalDetails:
                     type: array
                     items:
                       type: object
                       properties:
-                        approvalId:
+                        approvalTrackerId:
                           type: string
                         uri:
                           type: string
@@ -73242,7 +73340,7 @@ definitions:
 
                                   They are used for evrything from badge IDs to
                                   time ranges to min / max balance amounts.
-                              ownedTimes:
+                              ownershipTimes:
                                 type: array
                                 items:
                                   type: object
@@ -73280,6 +73378,8 @@ definitions:
 
                                     They are used for evrything from badge IDs
                                     to time ranges to min / max balance amounts.
+                              overrideWithCurrentTime:
+                                type: boolean
                         merkleChallenges:
                           type: array
                           items:
@@ -73350,6 +73450,8 @@ definitions:
                         predeterminedBalances:
                           type: object
                           properties:
+                            precalculationId:
+                              type: string
                             manualBalances:
                               type: array
                               items:
@@ -73362,7 +73464,7 @@ definitions:
                                       properties:
                                         amount:
                                           type: string
-                                        ownedTimes:
+                                        ownershipTimes:
                                           type: array
                                           items:
                                             type: object
@@ -73428,7 +73530,7 @@ definitions:
                                     properties:
                                       amount:
                                         type: string
-                                      ownedTimes:
+                                      ownershipTimes:
                                         type: array
                                         items:
                                           type: object
@@ -73486,7 +73588,7 @@ definitions:
                                       all time ranges specified.
                                 incrementBadgeIdsBy:
                                   type: string
-                                incrementOwnedTimesBy:
+                                incrementOwnershipTimesBy:
                                   type: string
                             orderCalculationMethod:
                               type: object
@@ -73607,7 +73709,7 @@ definitions:
 
                         They are used for evrything from badge IDs to time
                         ranges to min / max balance amounts.
-                  ownedTimes:
+                  ownershipTimes:
                     type: array
                     items:
                       type: object
@@ -73687,7 +73789,7 @@ definitions:
                           description: >-
                             ValueOptions defines how we manipulate the default
                             values.
-                        ownedTimesOptions:
+                        ownershipTimesOptions:
                           type: object
                           properties:
                             invertDefault:
@@ -73701,14 +73803,14 @@ definitions:
                           description: >-
                             ValueOptions defines how we manipulate the default
                             values.
-                        isAllowed:
+                        isApproved:
                           type: boolean
                   approvalDetails:
                     type: array
                     items:
                       type: object
                       properties:
-                        approvalId:
+                        approvalTrackerId:
                           type: string
                         uri:
                           type: string
@@ -73738,7 +73840,7 @@ definitions:
 
                                   They are used for evrything from badge IDs to
                                   time ranges to min / max balance amounts.
-                              ownedTimes:
+                              ownershipTimes:
                                 type: array
                                 items:
                                   type: object
@@ -73776,6 +73878,8 @@ definitions:
 
                                     They are used for evrything from badge IDs
                                     to time ranges to min / max balance amounts.
+                              overrideWithCurrentTime:
+                                type: boolean
                         merkleChallenges:
                           type: array
                           items:
@@ -73846,6 +73950,8 @@ definitions:
                         predeterminedBalances:
                           type: object
                           properties:
+                            precalculationId:
+                              type: string
                             manualBalances:
                               type: array
                               items:
@@ -73858,7 +73964,7 @@ definitions:
                                       properties:
                                         amount:
                                           type: string
-                                        ownedTimes:
+                                        ownershipTimes:
                                           type: array
                                           items:
                                             type: object
@@ -73924,7 +74030,7 @@ definitions:
                                     properties:
                                       amount:
                                         type: string
-                                      ownedTimes:
+                                      ownershipTimes:
                                         type: array
                                         items:
                                           type: object
@@ -73982,7 +74088,7 @@ definitions:
                                       all time ranges specified.
                                 incrementBadgeIdsBy:
                                   type: string
-                                incrementOwnedTimesBy:
+                                incrementOwnershipTimesBy:
                                   type: string
                             orderCalculationMethod:
                               type: object
@@ -74123,7 +74229,7 @@ definitions:
 
                           They are used for evrything from badge IDs to time
                           ranges to min / max balance amounts.
-                    ownedTimes:
+                    ownershipTimes:
                       type: array
                       items:
                         type: object
@@ -74255,7 +74361,7 @@ definitions:
                         description: >-
                           ValueOptions defines how we manipulate the default
                           values.
-                      ownedTimesOptions:
+                      ownershipTimesOptions:
                         type: object
                         properties:
                           invertDefault:
@@ -74373,7 +74479,7 @@ definitions:
 
                           They are used for evrything from badge IDs to time
                           ranges to min / max balance amounts.
-                    ownedTimes:
+                    ownershipTimes:
                       type: array
                       items:
                         type: object
@@ -74505,7 +74611,7 @@ definitions:
                         description: >-
                           ValueOptions defines how we manipulate the default
                           values.
-                      ownedTimesOptions:
+                      ownershipTimesOptions:
                         type: object
                         properties:
                           invertDefault:
@@ -74670,7 +74776,7 @@ definitions:
 
                       They are used for evrything from badge IDs to time ranges
                       to min / max balance amounts.
-                ownedTimes:
+                ownershipTimes:
                   type: array
                   items:
                     type: object
@@ -74792,7 +74898,7 @@ definitions:
                         type: boolean
                         title: Override default values with no values
                     description: ValueOptions defines how we manipulate the default values.
-                  ownedTimesOptions:
+                  ownershipTimesOptions:
                     type: object
                     properties:
                       invertDefault:
@@ -74904,7 +75010,7 @@ definitions:
 
                       They are used for evrything from badge IDs to time ranges
                       to min / max balance amounts.
-                ownedTimes:
+                ownershipTimes:
                   type: array
                   items:
                     type: object
@@ -75026,7 +75132,7 @@ definitions:
                         type: boolean
                         title: Override default values with no values
                     description: ValueOptions defines how we manipulate the default values.
-                  ownedTimesOptions:
+                  ownershipTimesOptions:
                     type: object
                     properties:
                       invertDefault:

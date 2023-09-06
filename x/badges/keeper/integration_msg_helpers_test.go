@@ -55,11 +55,11 @@ func GetAddressMapping(suite *TestSuite, ctx context.Context, mappingId string) 
 // 	return res.NumUsed, nil
 // }
 
-// func GetApprovalsTracker(suite *TestSuite, ctx context.Context, collectionId sdkmath.Uint, address string, approvalId string, level string, trackerType string) (*types.ApprovalsTracker, error) {
+// func GetApprovalsTracker(suite *TestSuite, ctx context.Context, collectionId sdkmath.Uint, address string, approvalTrackerId string, level string, trackerType string) (*types.ApprovalsTracker, error) {
 // 	res, err := suite.app.BadgesKeeper.GetApprovalsTracker(ctx, &types.QueryGetApprovalsTrackerRequest{
 // 		CollectionId: sdkmath.Uint(collectionId),
 // 		Address:      address,
-// 		ApprovalId:    approvalId,
+// 		ApprovalTrackerId:    approvalTrackerId,
 // 		Level:        level,
 // 		Depth:        depth,
 // 	})

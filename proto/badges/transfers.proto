@@ -181,6 +181,7 @@ message PredeterminedOrderCalculationMethod {
 }
 
 message PredeterminedBalances {
+  string precalculationId = 4;
   repeated ManualBalances manualBalances = 1;
   IncrementedBalances incrementedBalances = 2;
 
@@ -208,7 +209,7 @@ message ApprovalsTracker {
 }
 
 message ApprovalDetails {
-  string approvalId = 6;
+  string approvalTrackerId = 6;
   string uri = 7;
   string customData = 8;
 
@@ -228,7 +229,7 @@ message ApprovalDetails {
 }
 
 message OutgoingApprovalDetails {
-  string approvalId = 6;
+  string approvalTrackerId = 6;
   string uri = 7;
   string customData = 8;
 
@@ -243,7 +244,7 @@ message OutgoingApprovalDetails {
 }
 
 message IncomingApprovalDetails {
-  string approvalId = 6;
+  string approvalTrackerId = 6;
   string uri = 7;
   string customData = 8;
 
@@ -273,7 +274,7 @@ message CollectionApprovedTransfer {
 }
 
 message PrecalulationDetails {
-  string approvalId = 1;
+  string precalculationId = 1;
   string approvalLevel = 2; //"collection", "incoming", "outgoing"
   string approverAddress = 3; //Leave blank if approvalLevel == "collection"
 }

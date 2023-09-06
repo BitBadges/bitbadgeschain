@@ -97,7 +97,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 						MaxOneUsePerLeaf:    true,
 					},
 				},
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -272,7 +272,7 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 						UseCreatorAddressAsLeaf: true,
 					},
 				},
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -374,7 +374,7 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 						MaxOneUsePerLeaf:    true,
 					},
 				},
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -479,6 +479,7 @@ func (suite *TestSuite) TestIncrements() {
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
 				PredeterminedBalances: &types.PredeterminedBalances{
+					PrecalculationId: "asadsdas",
 					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseMerkleChallengeLeafIndex: true },
 					IncrementedBalances: &types.IncrementedBalances{
 						StartBalances: []*types.Balance{
@@ -503,7 +504,7 @@ func (suite *TestSuite) TestIncrements() {
 						UseLeafIndexForTransferOrder: true,
 					},
 				},
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -634,6 +635,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 				},
 			
 				PredeterminedBalances: &types.PredeterminedBalances{
+					PrecalculationId: "asadsdas",
 					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
 					IncrementedBalances: &types.IncrementedBalances{
 						StartBalances: []*types.Balance{
@@ -657,7 +659,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 						UseLeafIndexForTransferOrder: true,
 					},
 				},
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -684,7 +686,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 		Transfers: []*types.Transfer{
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
-					ApprovalId:   "testing232",
+					PrecalculationId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
@@ -764,6 +766,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
 				PredeterminedBalances: &types.PredeterminedBalances{
+					PrecalculationId: "asadsdas",
 					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
 					IncrementedBalances: &types.IncrementedBalances{
 						StartBalances: []*types.Balance{
@@ -788,7 +791,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 						UseLeafIndexForTransferOrder: 		true,
 					},
 				},
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -815,7 +818,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 		Transfers: []*types.Transfer{
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
-					ApprovalId:   "testing232",
+					PrecalculationId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
@@ -865,7 +868,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 		Transfers: []*types.Transfer{
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
-					ApprovalId:   "testing232",
+					PrecalculationId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
@@ -880,7 +883,6 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 				},
 				MerkleProofs: []*types.MerkleProof{
 					{
-						
 							Leaf: bobLeaf,
 							Aunts: []*types.MerklePathItem{
 								{
@@ -946,6 +948,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 					OverallApprovalAmount: sdkmath.NewUint(1),
 				},
 				PredeterminedBalances: &types.PredeterminedBalances{
+					PrecalculationId: "asadsdas",
 					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseMerkleChallengeLeafIndex: true },
 					IncrementedBalances: &types.IncrementedBalances{
 						StartBalances: []*types.Balance{
@@ -970,7 +973,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 						UseLeafIndexForTransferOrder: true,
 					},
 				},
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -997,7 +1000,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 		Transfers: []*types.Transfer{
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
-					ApprovalId:   "testing232",
+					PrecalculationId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
@@ -1077,6 +1080,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 					OverallApprovalAmount: sdkmath.NewUint(1),
 				},
 				PredeterminedBalances: &types.PredeterminedBalances{
+					PrecalculationId: "asadsdas",
 					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseMerkleChallengeLeafIndex: true },
 					IncrementedBalances: &types.IncrementedBalances{
 						StartBalances: []*types.Balance{
@@ -1101,7 +1105,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 						UseLeafIndexForTransferOrder: true,
 					},
 				},
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -1128,7 +1132,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		Transfers: []*types.Transfer{
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
-					ApprovalId:   "testing232",
+					PrecalculationId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
@@ -1178,7 +1182,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		Transfers: []*types.Transfer{
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
-					ApprovalId:   "testing232",
+					PrecalculationId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
@@ -1249,6 +1253,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 					OverallApprovalAmount: sdkmath.NewUint(1),
 				},
 				PredeterminedBalances: &types.PredeterminedBalances{
+					PrecalculationId: "asadsdas",
 					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
 					IncrementedBalances: &types.IncrementedBalances{
 						StartBalances: []*types.Balance{
@@ -1273,7 +1278,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 						UseLeafIndexForTransferOrder: false,
 					},
 				},
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -1300,7 +1305,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 		Transfers: []*types.Transfer{
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
-					ApprovalId:   "testing232",
+					PrecalculationId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
@@ -1414,6 +1419,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
 				PredeterminedBalances: &types.PredeterminedBalances{
+					PrecalculationId: "asadsdas",
 					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UsePerToAddressNumTransfers: true },
 					IncrementedBalances: &types.IncrementedBalances{
 						StartBalances: []*types.Balance{
@@ -1438,7 +1444,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 						UseLeafIndexForTransferOrder: false,
 					},
 				},
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -1465,7 +1471,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 		Transfers: []*types.Transfer{
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
-					ApprovalId:   "testing232",
+					PrecalculationId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
@@ -1574,6 +1580,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 					OverallApprovalAmount: sdkmath.NewUint(1),
 				},
 				PredeterminedBalances: &types.PredeterminedBalances{
+					PrecalculationId: "asadsdas",
 					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
 					IncrementedBalances: &types.IncrementedBalances{
 						StartBalances: []*types.Balance{
@@ -1598,7 +1605,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 						UseLeafIndexForTransferOrder: true,
 					},
 				},
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -1625,7 +1632,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 		Transfers: []*types.Transfer{
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
-					ApprovalId:   "testing232",
+					PrecalculationId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
@@ -1735,6 +1742,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 					OverallApprovalAmount: sdkmath.NewUint(1),
 				},
 				PredeterminedBalances: &types.PredeterminedBalances{
+					PrecalculationId: "asadsdas",
 					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
 					ManualBalances: []*types.ManualBalances{
 						{
@@ -1769,7 +1777,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 						UseLeafIndexForTransferOrder: true,
 					},
 				},
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -1796,7 +1804,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 		Transfers: []*types.Transfer{
 			{
 				PrecalculationDetails: &types.PrecalulationDetails{
-					ApprovalId:   "testing232",
+					PrecalculationId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
 				},
@@ -1907,6 +1915,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 				OverallApprovalAmount: sdkmath.NewUint(1),
 			},
 			PredeterminedBalances: &types.PredeterminedBalances{
+				PrecalculationId: "asadsdas",
 				OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UseOverallNumTransfers: true },
 				IncrementedBalances: &types.IncrementedBalances{
 					StartBalances: []*types.Balance{
@@ -1930,7 +1939,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 					UseLeafIndexForTransferOrder: true,
 				},
 			},
-			ApprovalId:            "testing232",
+			ApprovalTrackerId:            "testing232",
 			OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 		},
@@ -2124,7 +2133,7 @@ func (suite *TestSuite) TestMustOwnBadges() {
 				},
 			
 				Uri: "",
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 				OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -2196,7 +2205,7 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 				
 				Uri: "",
 					
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -2264,7 +2273,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
 				Uri: "",
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 				OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -2354,7 +2363,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 				},
 				
 				Uri: "",
-				ApprovalId:            "testing232",
+				ApprovalTrackerId:            "testing232",
 				OverridesFromApprovedOutgoingTransfers: true,
 		OverridesToApprovedIncomingTransfers:   true,
 			},
@@ -2406,6 +2415,340 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 						Amount:         sdkmath.NewUint(1),
 						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: 		GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+}
+
+
+
+func (suite *TestSuite) TestMultipleApprovalDetails() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].PredeterminedBalances = &types.PredeterminedBalances{
+		PrecalculationId: "asadsdas",
+		// ManualBalances: &types.ManualBalances{},
+		IncrementedBalances: &types.IncrementedBalances{
+			StartBalances: []*types.Balance{
+				{
+					BadgeIds: GetBottomHalfUintRanges(),
+					Amount:   sdkmath.NewUint(1),
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+			IncrementBadgeIdsBy: sdkmath.NewUint(0),
+			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+		},
+		OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+			UseOverallNumTransfers: true,
+		},
+	}
+	
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails, &types.ApprovalDetails{
+		
+		MerkleChallenges:                []*types.MerkleChallenge{},
+		ApprovalTrackerId:                 		"test2",
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(1000),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+		},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			PrecalculationId: "asadsdas",
+			// ManualBalances: &types.ManualBalances{},
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						BadgeIds: GetTopHalfUintRanges(),
+						Amount:   sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				IncrementBadgeIdsBy: sdkmath.NewUint(0),
+				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+			},
+			OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+				UseOverallNumTransfers: true,
+			},
+		},
+	})
+
+
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+				Uri: "",
+				ApprovalTrackerId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+				OverridesToApprovedIncomingTransfers:   true,
+			},
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsApproved: true,
+		}},
+		TransferTimes:        GetFullUintRanges(),
+		BadgeIds:             GetOneUintRange(),
+		OwnershipTimes:       GetFullUintRanges(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
+	})
+
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	//Fails because we do not take overflows
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: 	 []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetBottomHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge: %s")
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge: %s")
+}
+
+
+
+func (suite *TestSuite) TestMultipleApprovalDetailsSameApprovalTrackerId() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].DefaultApprovedIncomingTransfersTimeline[0].ApprovedIncomingTransfers[0].ApprovalDetails = nil
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].ApprovalDetails = nil
+	
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].PredeterminedBalances = &types.PredeterminedBalances{
+		PrecalculationId: "asadsdas",
+		// ManualBalances: &types.ManualBalances{},
+		IncrementedBalances: &types.IncrementedBalances{
+			StartBalances: []*types.Balance{
+				{
+					BadgeIds: GetBottomHalfUintRanges(),
+					Amount:   sdkmath.NewUint(1),
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+			IncrementBadgeIdsBy: sdkmath.NewUint(0),
+			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+		},
+		OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+			UseOverallNumTransfers: true,
+		},
+	}
+	
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails, &types.ApprovalDetails{
+		
+		MerkleChallenges:                []*types.MerkleChallenge{},
+		ApprovalTrackerId:                 		"test2",
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(1000),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+		},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			PrecalculationId: "asadsdas",
+			// ManualBalances: &types.ManualBalances{},
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						BadgeIds: GetBottomHalfUintRanges(),
+						Amount:   sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				IncrementBadgeIdsBy: sdkmath.NewUint(0),
+				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+			},
+			OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+				UseOverallNumTransfers: true,
+			},
+		},
+	})
+
+
+	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+		ApprovalDetails: []*types.ApprovalDetails{
+			{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(10),
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					OverallApprovalAmount: sdkmath.NewUint(10),
+				},
+				Uri: "",
+				ApprovalTrackerId:            "testing232",
+				OverridesFromApprovedOutgoingTransfers: true,
+				OverridesToApprovedIncomingTransfers:   true,
+			},
+		},
+		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
+			IsApproved: true,
+		}},
+		TransferTimes:        GetFullUintRanges(),
+		BadgeIds:             GetOneUintRange(),
+		OwnershipTimes:       GetFullUintRanges(),
+		FromMappingId:        "Mint",
+		ToMappingId:          "AllWithoutMint",
+		InitiatedByMappingId: "AllWithoutMint",
+	})
+
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	//Fails because we do not take overflows
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: 	 []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge: %s")
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetBottomHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge: %s")
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      alice,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        alice,
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetBottomHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge: %s")
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetBottomHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge: %s")
+
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdk.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetBottomHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
 			},

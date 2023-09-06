@@ -155,7 +155,7 @@ func CastFromCollectionCombinationToIncomingCombination(combination *IsCollectio
 
 func CastIncomingApprovalDetailsToCollectionApprovalDetails(approvalDetails *IncomingApprovalDetails) *ApprovalDetails {
 	return &ApprovalDetails{
-		ApprovalId: approvalDetails.ApprovalId,
+		ApprovalTrackerId: approvalDetails.ApprovalTrackerId,
 		ApprovalAmounts: approvalDetails.ApprovalAmounts,
 		MaxNumTransfers: approvalDetails.MaxNumTransfers,
 		RequireFromEqualsInitiatedBy: approvalDetails.RequireFromEqualsInitiatedBy,
@@ -170,7 +170,7 @@ func CastIncomingApprovalDetailsToCollectionApprovalDetails(approvalDetails *Inc
 
 func CastOutgoingApprovalDetailsToCollectionApprovalDetails(approvalDetails *OutgoingApprovalDetails) *ApprovalDetails {
 	return &ApprovalDetails{
-		ApprovalId: approvalDetails.ApprovalId,
+		ApprovalTrackerId: approvalDetails.ApprovalTrackerId,
 		ApprovalAmounts: approvalDetails.ApprovalAmounts,
 		MaxNumTransfers: approvalDetails.MaxNumTransfers,
 		RequireToEqualsInitiatedBy: approvalDetails.RequireToEqualsInitiatedBy,
@@ -185,7 +185,7 @@ func CastOutgoingApprovalDetailsToCollectionApprovalDetails(approvalDetails *Out
 
 func CastFromCollectionApprovalDetailsToIncomingApprovalDetails(approvalDetails *ApprovalDetails) *IncomingApprovalDetails {
 	return &IncomingApprovalDetails{
-		ApprovalId: approvalDetails.ApprovalId,
+		ApprovalTrackerId: approvalDetails.ApprovalTrackerId,
 		ApprovalAmounts: approvalDetails.ApprovalAmounts,
 		MaxNumTransfers: approvalDetails.MaxNumTransfers,
 		RequireFromEqualsInitiatedBy: approvalDetails.RequireFromEqualsInitiatedBy,
@@ -200,7 +200,7 @@ func CastFromCollectionApprovalDetailsToIncomingApprovalDetails(approvalDetails 
 
 func CastFromCollectionApprovalDetailsToOutgoingApprovalDetails(approvalDetails *ApprovalDetails) *OutgoingApprovalDetails {
 	return &OutgoingApprovalDetails{
-		ApprovalId: approvalDetails.ApprovalId,
+		ApprovalTrackerId: approvalDetails.ApprovalTrackerId,
 		ApprovalAmounts: approvalDetails.ApprovalAmounts,
 		MaxNumTransfers: approvalDetails.MaxNumTransfers,
 		RequireToEqualsInitiatedBy: approvalDetails.RequireToEqualsInitiatedBy,

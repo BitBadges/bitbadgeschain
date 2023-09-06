@@ -116,8 +116,10 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 		OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{
 			UseOverallNumTransfers: true,
 		},
+		PrecalculationId: "asdas",
 	}
 	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].ApprovalDetails[0].PredeterminedBalances.IncrementedBalances = &types.IncrementedBalances{
+		
 		StartBalances: []*types.Balance{
 			{
 				OwnershipTimes: GetFullUintRanges(),
@@ -133,6 +135,7 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 		OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{
 			UseOverallNumTransfers: true,
 		},
+		PrecalculationId: "asdas2",
 	}
 	collectionsToCreate[0].DefaultApprovedIncomingTransfersTimeline[0].ApprovedIncomingTransfers[0].ApprovalDetails[0].PredeterminedBalances.IncrementedBalances = &types.IncrementedBalances{
 		StartBalances: []*types.Balance{
@@ -272,7 +275,7 @@ func (suite *TestSuite) TestFirstMatchOnly() {
 				ApprovalDetails: []*types.OutgoingApprovalDetails{
 					{
 						MerkleChallenges:                []*types.MerkleChallenge{},
-						ApprovalId:                 "test-alice",
+						ApprovalTrackerId:                 "test-alice",
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
 						},
@@ -323,7 +326,7 @@ func (suite *TestSuite) TestFirstMatchOnlyWrongTime() {
 				ApprovalDetails: []*types.OutgoingApprovalDetails{
 					{
 						MerkleChallenges:                []*types.MerkleChallenge{},
-						ApprovalId:                 "test-alice",
+						ApprovalTrackerId:                 "test-alice",
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
 						},
@@ -376,7 +379,7 @@ func (suite *TestSuite) TestCombinations() {
 				ApprovalDetails: []*types.OutgoingApprovalDetails{
 					{
 						MerkleChallenges:                []*types.MerkleChallenge{},
-						ApprovalId:                 "test",
+						ApprovalTrackerId:                 "test",
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
 						},
@@ -431,7 +434,7 @@ func (suite *TestSuite) TestCombinationsOrder() {
 				ApprovalDetails: []*types.OutgoingApprovalDetails{
 					{
 						MerkleChallenges:                []*types.MerkleChallenge{},
-						ApprovalId:                 "test",
+						ApprovalTrackerId:                 "test",
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
 						},
@@ -479,7 +482,7 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 				ApprovalDetails: []*types.OutgoingApprovalDetails{
 					{
 						MerkleChallenges:                []*types.MerkleChallenge{},
-						ApprovalId:                 "test",
+						ApprovalTrackerId:                 "test",
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
 						},

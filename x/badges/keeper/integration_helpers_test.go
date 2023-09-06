@@ -100,7 +100,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 							ApprovalDetails: []*types.ApprovalDetails{
 								{
 									MerkleChallenges:                []*types.MerkleChallenge{},
-									ApprovalId:                 "test",
+									ApprovalTrackerId:                 "test",
 									MaxNumTransfers: &types.MaxNumTransfers{
 										OverallMaxNumTransfers: sdkmath.NewUint(1000),
 									},
@@ -119,7 +119,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 							FromMappingId:        "AllWithoutMint",
 							InitiatedByMappingId: "AllWithoutMint",
 							TransferTimes:        GetFullUintRanges(),
-							OwnershipTimes: GetFullUintRanges(),
+							OwnershipTimes: 			GetFullUintRanges(),
 							BadgeIds:             GetFullUintRanges(),
 							AllowedCombinations: []*types.IsUserIncomingTransferAllowed{
 								{
@@ -129,7 +129,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 							ApprovalDetails: []*types.IncomingApprovalDetails{
 								{
 									MerkleChallenges:                []*types.MerkleChallenge{},
-									ApprovalId:                 "test",
+									ApprovalTrackerId:                 "test",
 									MaxNumTransfers: &types.MaxNumTransfers{
 										OverallMaxNumTransfers: sdkmath.NewUint(1000),
 									},
@@ -160,7 +160,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 							ApprovalDetails: []*types.OutgoingApprovalDetails{
 								{
 									MerkleChallenges:                []*types.MerkleChallenge{},
-									ApprovalId:                 		"test",
+									ApprovalTrackerId:                 		"test",
 									MaxNumTransfers: &types.MaxNumTransfers{
 										OverallMaxNumTransfers: sdkmath.NewUint(1000),
 									},
@@ -231,7 +231,7 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*type
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MerkleChallenges:                []*types.MerkleChallenge{},
-				ApprovalId:                 "mint-test",
+				ApprovalTrackerId:                 "mint-test",
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(1000),
 				},

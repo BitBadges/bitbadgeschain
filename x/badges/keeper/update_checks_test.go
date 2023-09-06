@@ -345,7 +345,7 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 						ApprovalDetails: []*types.ApprovalDetails{
 							{
 								RequireToEqualsInitiatedBy:             true,
-								ApprovalId:                              "test",
+								ApprovalTrackerId:                              "test",
 								MaxNumTransfers: 												&types.MaxNumTransfers{},
 								ApprovalAmounts: 												&types.ApprovalAmounts{},
 								OverridesFromApprovedOutgoingTransfers: true,
@@ -373,7 +373,7 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 			ApprovalDetails: []*types.ApprovalDetails{
 				{
 					RequireToEqualsInitiatedBy:             true,
-					ApprovalId:                             "test",
+					ApprovalTrackerId:                             "test",
 					MaxNumTransfers: 												&types.MaxNumTransfers{},
 					ApprovalAmounts: 												&types.ApprovalAmounts{},
 					OverridesFromApprovedOutgoingTransfers: true,
@@ -466,7 +466,7 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						ApprovalDetails: 					[]*types.OutgoingApprovalDetails{
 							{
 								RequireToEqualsInitiatedBy: true,
-								ApprovalId:                  "test",
+								ApprovalTrackerId:                  "test",
 								MaxNumTransfers: 												&types.MaxNumTransfers{},
 								ApprovalAmounts: &types.ApprovalAmounts{},
 							},
@@ -487,7 +487,7 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						OwnershipTimes: 		 GetFullUintRanges(),
 						ApprovalDetails: []*types.IncomingApprovalDetails{
 							{
-								ApprovalId:                 "test",
+								ApprovalTrackerId:                 "test",
 								MaxNumTransfers: 												&types.MaxNumTransfers{},
 								ApprovalAmounts: 												&types.ApprovalAmounts{},
 							},
@@ -517,7 +517,7 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 						ApprovalDetails: []*types.OutgoingApprovalDetails{
 							{
 								RequireToEqualsInitiatedBy: true,
-								ApprovalId:                  "test",
+								ApprovalTrackerId:                  "test",
 								MaxNumTransfers: 												&types.MaxNumTransfers{},
 								ApprovalAmounts: 												&types.ApprovalAmounts{},
 							},
@@ -540,7 +540,7 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 							{
 								RequireFromEqualsInitiatedBy: true,
 
-								ApprovalId:                 "test",
+								ApprovalTrackerId:                 "test",
 								MaxNumTransfers: 												&types.MaxNumTransfers{
 									
 								},
