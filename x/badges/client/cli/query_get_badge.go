@@ -17,7 +17,6 @@ func CmdGetCollection() *cobra.Command {
 		Short: "Query getCollection",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			return nil
 			reqId := types.NewUintFromString(args[0])
 
 			clientCtx, err := client.GetClientTxContext(cmd)

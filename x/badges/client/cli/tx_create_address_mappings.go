@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -14,9 +15,9 @@ var _ = strconv.Itoa(0)
 
 func CmdCreateAddressMappings() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-address-mappings",
+		Use:   "create-address-mappings [tx-json]",
 		Short: "Broadcast message createAddressMappings",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.ExactArgs(1), // Accept exactly one argument (the JSON string)
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -24,13 +25,25 @@ func CmdCreateAddressMappings() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateAddressMappings(
-				clientCtx.GetFromAddress().String(),
-			)
-			if err := msg.ValidateBasic(); err != nil {
+			// Retrieve the JSON string from the command-line argument
+			txJSON := args[0]
+
+			// Unmarshal the JSON into a transaction structure
+			var txData types.MsgCreateAddressMappings
+			if err := json.Unmarshal([]byte(txJSON), &txData); err != nil {
 				return err
 			}
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+
+			
+			// Validate the transaction data
+			if err := txData.ValidateBasic(); err != nil {
+				return err
+			}
+			
+			txData.Creator = clientCtx.GetFromAddress().String()
+
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &txData)
 		},
 	}
 

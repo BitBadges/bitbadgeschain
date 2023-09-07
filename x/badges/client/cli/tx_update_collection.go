@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -12,25 +13,50 @@ import (
 
 var _ = strconv.Itoa(0)
 
+/*
+your-cli-command update-collection '{
+  "creator": "your-creator-address",
+  "collectionId": "your-collection-id",
+  "badgesToCreate": [
+    {
+      "badgeId": "badge1",
+      "amount": "10"
+    },
+    {
+      "badgeId": "badge2",
+      "amount": "5"
+    }
+  ],
+  "collectionPermissions": {...}, // Populate with permissions
+  // Add other fields as needed
+}'
+*/
+
 func CmdUpdateCollection() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-collection",
+		Use:   "update-collection [tx-json]",
 		Short: "Broadcast message updateCollection",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.ExactArgs(1), // Accept exactly one argument (the JSON string)
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgUpdateCollection(
-				clientCtx.GetFromAddress().String(),
-			)
-			if err := msg.ValidateBasic(); err != nil {
+			txJSON := args[0]
+
+			var txData types.MsgUpdateCollection
+			if err := json.Unmarshal([]byte(txJSON), &txData); err != nil {
 				return err
 			}
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+
+			txData.Creator = clientCtx.GetFromAddress().String()
+
+			if err := txData.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &txData)
 		},
 	}
 

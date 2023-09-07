@@ -18,7 +18,6 @@ func CmdDeleteCollection() *cobra.Command {
 		Short: "Broadcast message deleteCollection",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			return nil
 			argCollectionId := types.NewUintFromString(args[0])
 			if err != nil {
 				return err
