@@ -176,7 +176,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 								balancesFound = true
 							} else {
 								isStandardBalances := collection.BalancesType == "Standard"
-								isInheritedBalances := collection.BalancesType == "Inherited"
+								// isInheritedBalances := collection.BalancesType == "Inherited"
 								if isStandardBalances {
 									balancesFound = true
 									initiatedByBalanceKey := ConstructBalanceKey(initiatedBy, currCollectionId)
@@ -184,11 +184,8 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 									if found {
 										balances = initiatedByBalance.Balances
 									}
-								} else if isInheritedBalances {
-									alreadyChecked = append(alreadyChecked, currCollectionId)
-									currCollectionId = collection.InheritedCollectionId
 								} else {
-									return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrWrongBalancesType, "balances type for must own badges: collection %s is not Standard or Inherited", collection.CollectionId)
+									return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrWrongBalancesType, "must own badges must have Standard balances type %s", collection.CollectionId)
 								}
 							}
 						}

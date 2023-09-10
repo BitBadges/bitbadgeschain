@@ -41,7 +41,6 @@ message MsgNewCollection {
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 4;
   repeated CustomDataTimeline customDataTimeline = 5;
   string balancesType = 6 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
-  string inheritedCollectionId = 7 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
   repeated CollectionApprovedTransferTimeline collectionApprovedTransfersTimeline = 8;
   CollectionPermissions permissions = 9;
   repeated StandardsTimeline standardsTimeline = 10;

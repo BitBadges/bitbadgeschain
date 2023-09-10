@@ -43,7 +43,6 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 		} else {
 			currCollection = collection
 			isStandardBalances := collection.BalancesType == "Standard"
-			isInheritedBalances := collection.BalancesType == "Inherited"
 			if isStandardBalances {
 				balancesFound = true
 				initiatedByBalanceKey := ConstructBalanceKey(req.Address, currCollectionId)
@@ -53,9 +52,6 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 				} else {
 					isBlank = true 
 				}
-			} else if isInheritedBalances {
-				alreadyChecked = append(alreadyChecked, currCollectionId)
-				currCollectionId = collection.InheritedCollectionId
 			} else {
 				return nil, sdkerrors.Wrapf(ErrWrongBalancesType, "unsupported balances type %s", collection.BalancesType)
 			}

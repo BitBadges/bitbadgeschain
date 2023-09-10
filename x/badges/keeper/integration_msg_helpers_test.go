@@ -166,7 +166,7 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			CollectionMetadataTimeline: collectionToCreate.CollectionMetadataTimeline,
 			BadgeMetadataTimeline: collectionToCreate.BadgeMetadataTimeline,
 			OffChainBalancesMetadataTimeline: collectionToCreate.OffChainBalancesMetadataTimeline,
-			InheritedCollectionId: collectionToCreate.InheritedCollectionId,
+			// InheritedCollectionId: collectionToCreate.InheritedCollectionId,
 			CustomDataTimeline: collectionToCreate.CustomDataTimeline,
 			ContractAddressTimeline: collectionToCreate.ContractAddressTimeline,
 			StandardsTimeline: collectionToCreate.StandardsTimeline,

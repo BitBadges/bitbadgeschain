@@ -41,7 +41,7 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 			},
 		}
 
-		if IsInheritedBalances(collection) && (collection.InheritedCollectionId.IsNil() || collection.InheritedCollectionId.IsZero() ) {
+		if IsInheritedBalances(collection) && (collection.InheritedCollectionId.IsZero() || collection.InheritedCollectionId.IsZero() ) {
 			return nil, sdkerrors.Wrapf(ErrWrongBalancesType, "inherited balances are being set but collection %s does not have inherited balances", collection.CollectionId)
 		}
 		

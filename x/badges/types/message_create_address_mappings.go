@@ -9,9 +9,10 @@ const TypeMsgCreateAddressMappings = "create_address_mappings"
 
 var _ sdk.Msg = &MsgCreateAddressMappings{}
 
-func NewMsgCreateAddressMappings(creator string) *MsgCreateAddressMappings {
+func NewMsgCreateAddressMappings(creator string, addressMappings []*AddressMapping) *MsgCreateAddressMappings {
 	return &MsgCreateAddressMappings{
 		Creator: creator,
+		AddressMappings: addressMappings,
 	}
 }
 
