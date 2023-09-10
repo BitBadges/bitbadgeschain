@@ -402,7 +402,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "offChainBalancesMetadataTimeline", Type: "OffChainBalancesMetadataTimeline[]"},
 				{Name: "updateCustomDataTimeline", Type: "bool"},
 				{Name: "customDataTimeline", Type: "CustomDataTimeline[]"},
-				{Name: "inheritedCollectionId", Type: "string"},
+				// {Name: "inheritedCollectionId", Type: "string"},
 				{Name: "updateCollectionApprovedTransfersTimeline", Type: "bool"},
 				{Name: "collectionApprovedTransfersTimeline", Type: "CollectionApprovedTransferTimeline[]"},
 				{Name: "updateStandardsTimeline", Type: "bool"},

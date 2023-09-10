@@ -2596,11 +2596,6 @@ paths:
                     description: >-
                       The off-chain balances metadata defines where to fetch the
                       balances for collections with off-chain balances.
-                  inheritedCollectionId:
-                    type: string
-                    description: >-
-                      The inherited balances that defines the parent collection
-                      for inherited balances.
                   customDataTimeline:
                     type: array
                     items:
@@ -54043,11 +54038,6 @@ definitions:
         description: >-
           The off-chain balances metadata defines where to fetch the balances
           for collections with off-chain balances.
-      inheritedCollectionId:
-        type: string
-        description: >-
-          The inherited balances that defines the parent collection for
-          inherited balances.
       customDataTimeline:
         type: array
         items:
@@ -64707,11 +64697,6 @@ definitions:
             description: >-
               The off-chain balances metadata defines where to fetch the
               balances for collections with off-chain balances.
-          inheritedCollectionId:
-            type: string
-            description: >-
-              The inherited balances that defines the parent collection for
-              inherited balances.
           customDataTimeline:
             type: array
             items:

@@ -185,9 +185,9 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 	}
 
 	if msg.BalancesType == "Inherited" {
-		if msg.InheritedCollectionId.IsNil() || msg.InheritedCollectionId.IsZero() {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "inherited collection id must be set for inherited balances")
-		}
+		// if msg.InheritedCollectionId.IsNil() || msg.InheritedCollectionId.IsZero() {
+		// 	return sdkerrors.Wrapf(ErrInvalidRequest, "inherited collection id must be set for inherited balances")
+		// }
 
 		if msg.BadgesToCreate != nil && len(msg.BadgesToCreate) > 0 {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "badges are inherited from parent so you should not specify to create any badges")

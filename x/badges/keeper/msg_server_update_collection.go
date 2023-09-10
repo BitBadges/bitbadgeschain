@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math"
 
-	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -21,7 +20,7 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 
 		collection = &types.BadgeCollection{
 			CollectionId:                     nextCollectionId,
-			InheritedCollectionId: 					 	msg.InheritedCollectionId,
+			// InheritedCollectionId: 					 	msg.InheritedCollectionId,
 			CollectionPermissions:            &types.CollectionPermissions{},
 			BalancesType:                     msg.BalancesType,
 			DefaultUserApprovedOutgoingTransfersTimeline: msg.DefaultApprovedOutgoingTransfersTimeline,
@@ -41,9 +40,9 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 			},
 		}
 
-		if IsInheritedBalances(collection) && (collection.InheritedCollectionId.IsZero() || collection.InheritedCollectionId.IsZero() ) {
-			return nil, sdkerrors.Wrapf(ErrWrongBalancesType, "inherited balances are being set but collection %s does not have inherited balances", collection.CollectionId)
-		}
+		// if IsInheritedBalances(collection) && (collection.InheritedCollectionId.IsZero() || collection.InheritedCollectionId.IsZero() ) {
+		// 	return nil, sdkerrors.Wrapf(ErrWrongBalancesType, "inherited balances are being set but collection %s does not have inherited balances", collection.CollectionId)
+		// }
 		
 	} else {
 		found := false
