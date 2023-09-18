@@ -1676,14 +1676,8 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 
 func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 	oldActionPermission := &types.CollectionApprovedTransferPermission{
-		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TimelineTimesOptions: &types.ValueOptions{InvertDefault: true}}},
+		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TransferTimesOptions: &types.ValueOptions{InvertDefault: true}}},
 		DefaultValues: &types.CollectionApprovedTransferDefaultValues{
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(20),
-					End:   sdkmath.NewUint(100),
-				},
-			},
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1725,14 +1719,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 	}
 
 	newActionPermission := &types.CollectionApprovedTransferPermission{
-		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TimelineTimesOptions: &types.ValueOptions{InvertDefault: true}}},
+		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TransferTimesOptions: &types.ValueOptions{InvertDefault: true}}},
 		DefaultValues: &types.CollectionApprovedTransferDefaultValues{
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(10),
-					End:   sdkmath.NewUint(50),
-				},
-			},
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
@@ -1774,14 +1762,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 	}
 
 	newActionPermission2 := &types.CollectionApprovedTransferPermission{
-		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TimelineTimesOptions: &types.ValueOptions{InvertDefault: true}}},
+		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TransferTimesOptions: &types.ValueOptions{InvertDefault: true}}},
 		DefaultValues: &types.CollectionApprovedTransferDefaultValues{
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(1),
-					End:   sdkmath.NewUint(100),
-				},
-			},
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1831,14 +1813,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 	require.NoError(t, err)
 
 	newActionPermission = &types.CollectionApprovedTransferPermission{
-		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TimelineTimesOptions: &types.ValueOptions{InvertDefault: true}}},
+		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TransferTimesOptions: &types.ValueOptions{InvertDefault: true}}},
 		DefaultValues: &types.CollectionApprovedTransferDefaultValues{
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(10),
-					End:   sdkmath.NewUint(50),
-				},
-			},
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
@@ -1880,14 +1856,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 	}
 
 	newActionPermission2 = &types.CollectionApprovedTransferPermission{
-		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TimelineTimesOptions: &types.ValueOptions{InvertDefault: true}}},
+		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TransferTimesOptions: &types.ValueOptions{InvertDefault: true}}},
 		DefaultValues: &types.CollectionApprovedTransferDefaultValues{
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(1),
-					End:   sdkmath.NewUint(100),
-				},
-			},
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1938,14 +1908,9 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 
 func TestValidateCollectionApprovedTransferPermissionsUpdate2(t *testing.T) {
 	oldActionPermission := &types.CollectionApprovedTransferPermission{
-		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TimelineTimesOptions: &types.ValueOptions{InvertDefault: true}}},
+		Combinations: []*types.CollectionApprovedTransferCombination{{}, {BadgeIdsOptions: &types.ValueOptions{InvertDefault: true}}},
 		DefaultValues: &types.CollectionApprovedTransferDefaultValues{
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(20),
-					End:   sdkmath.NewUint(100),
-				},
-			},
+			
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1987,14 +1952,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate2(t *testing.T) {
 	}
 
 	newActionPermission := &types.CollectionApprovedTransferPermission{
-		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TimelineTimesOptions: &types.ValueOptions{InvertDefault: true}}},
+		Combinations: []*types.CollectionApprovedTransferCombination{{}, {BadgeIdsOptions: &types.ValueOptions{InvertDefault: true}}},
 		DefaultValues: &types.CollectionApprovedTransferDefaultValues{
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(20),
-					End:   sdkmath.NewUint(100),
-				},
-			},
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2064,14 +2023,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate3(t *testing.T) {
 	require.NoError(t, err)
 
 	oldActionPermission := &types.CollectionApprovedTransferPermission{
-		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TimelineTimesOptions: &types.ValueOptions{InvertDefault: true}}},
+		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TransferTimesOptions: &types.ValueOptions{InvertDefault: true}}},
 		DefaultValues: &types.CollectionApprovedTransferDefaultValues{
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(20),
-					End:   sdkmath.NewUint(100),
-				},
-			},
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2113,14 +2066,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate3(t *testing.T) {
 	}
 
 	newActionPermission := &types.CollectionApprovedTransferPermission{
-		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TimelineTimesOptions: &types.ValueOptions{InvertDefault: true}}},
+		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TransferTimesOptions: &types.ValueOptions{InvertDefault: true}}},
 		DefaultValues: &types.CollectionApprovedTransferDefaultValues{
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(20),
-					End:   sdkmath.NewUint(100),
-				},
-			},
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2189,14 +2136,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate4Invalid(t *testing.
 	require.NoError(t, err)
 
 	oldActionPermission := &types.CollectionApprovedTransferPermission{
-		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TimelineTimesOptions: &types.ValueOptions{InvertDefault: true}}},
+		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TransferTimesOptions: &types.ValueOptions{InvertDefault: true}}},
 		DefaultValues: &types.CollectionApprovedTransferDefaultValues{
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(20),
-					End:   sdkmath.NewUint(100),
-				},
-			},
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2238,14 +2179,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate4Invalid(t *testing.
 	}
 
 	newActionPermission := &types.CollectionApprovedTransferPermission{
-		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TimelineTimesOptions: &types.ValueOptions{InvertDefault: true}}},
+		Combinations: []*types.CollectionApprovedTransferCombination{{}, {TransferTimesOptions: &types.ValueOptions{InvertDefault: true}}},
 		DefaultValues: &types.CollectionApprovedTransferDefaultValues{
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(20),
-					End:   sdkmath.NewUint(100),
-				},
-			},
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),

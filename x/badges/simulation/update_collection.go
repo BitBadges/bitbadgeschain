@@ -28,7 +28,7 @@ func SimulateMsgUpdateCollection(
 			UpdateBadgeMetadataTimeline: r.Int63n(2) == 0,
 			UpdateOffChainBalancesMetadataTimeline: r.Int63n(2) == 0,
 			UpdateCustomDataTimeline: r.Int63n(2) == 0,
-			UpdateCollectionApprovedTransfersTimeline: r.Int63n(2) == 0,
+			UpdateCollectionApprovedTransfers: r.Int63n(2) == 0,
 			UpdateStandardsTimeline: r.Int63n(2) == 0,
 			UpdateContractAddressTimeline: r.Int63n(2) == 0,
 
@@ -40,24 +40,19 @@ func SimulateMsgUpdateCollection(
 				},
 			},
 			BadgesToCreate: GetRandomBalances(r, 3),
-			CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
+			CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{
 				{
-					CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{
+					FromMappingId:        GetRandomAddresses(r, 1, accs)[0],
+					ToMappingId:          GetRandomAddresses(r, 1, accs)[0],
+					InitiatedByMappingId: GetRandomAddresses(r, 1, accs)[0],
+					TransferTimes:        GetTimelineTimes(r, 100),
+					OwnershipTimes: 		 GetTimelineTimes(r, 100),
+					BadgeIds:             GetTimelineTimes(r, 3),
+					AllowedCombinations: []*types.IsCollectionTransferAllowed{
 						{
-							FromMappingId:        GetRandomAddresses(r, 1, accs)[0],
-							ToMappingId:          GetRandomAddresses(r, 1, accs)[0],
-							InitiatedByMappingId: GetRandomAddresses(r, 1, accs)[0],
-							TransferTimes:        GetTimelineTimes(r, 100),
-							OwnershipTimes: 		 GetTimelineTimes(r, 100),
-							BadgeIds:             GetTimelineTimes(r, 3),
-							AllowedCombinations: []*types.IsCollectionTransferAllowed{
-								{
-									IsApproved: r.Int63n(2) == 0,
-								},
-							},
+							IsApproved: r.Int63n(2) == 0,
 						},
 					},
-					TimelineTimes: GetTimelineTimes(r, 100),
 				},
 			},
 			ManagerTimeline: []*types.ManagerTimeline{

@@ -69,7 +69,7 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateApprovedTransferTimeline(msg.CollectionApprovedTransfersTimeline); err != nil {
+	if err := ValidateCollectionApprovedTransfers(msg.CollectionApprovedTransfers); err != nil {
 		return err
 	}
 
@@ -107,11 +107,11 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateUserApprovedIncomingTransferTimeline(msg.DefaultApprovedIncomingTransfersTimeline, msg.Creator); err != nil {
+	if err := ValidateUserApprovedIncomingTransfers(msg.DefaultApprovedIncomingTransfers, msg.Creator); err != nil {
 		return err
 	}
 
-	if err := ValidateUserApprovedOutgoingTransferTimeline(msg.DefaultApprovedOutgoingTransfersTimeline, msg.Creator); err != nil {
+	if err := ValidateUserApprovedOutgoingTransfers(msg.DefaultApprovedOutgoingTransfers, msg.Creator); err != nil {
 		return err
 	}
 
@@ -157,15 +157,15 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 	}
 
 	if msg.BalancesType != "Standard" {
-		if len(msg.CollectionApprovedTransfersTimeline) > 0 {
+		if len(msg.CollectionApprovedTransfers) > 0 {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but claims and/or transfers are set")
 		}
 
-		if len(msg.DefaultApprovedIncomingTransfersTimeline) > 0 {
+		if len(msg.DefaultApprovedIncomingTransfers) > 0 {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default approvals are set")
 		}
 
-		if len(msg.DefaultApprovedOutgoingTransfersTimeline) > 0 {
+		if len(msg.DefaultApprovedOutgoingTransfers) > 0 {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default approvals are set")
 		}
 
@@ -194,7 +194,7 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		}
 	}
 
-	if len(msg.CollectionApprovedTransfersTimeline) > 0 {
+	if len(msg.CollectionApprovedTransfers) > 0 {
 		if msg.OffChainBalancesMetadataTimeline != nil && len(msg.OffChainBalancesMetadataTimeline) > 0 {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "transfers and/or claims are set but collection has balances type = off-chain")
 		}

@@ -24,19 +24,9 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 // the user approved transfers.
 message UserBalanceStore {
   repeated Balance balances = 1;
-  repeated UserApprovedOutgoingTransferTimeline approvedOutgoingTransfersTimeline = 2;
-  repeated UserApprovedIncomingTransferTimeline approvedIncomingTransfersTimeline = 3;
+  repeated UserApprovedOutgoingTransfer approvedOutgoingTransfers = 2;
+  repeated UserApprovedIncomingTransfer approvedIncomingTransfers = 3;
   UserPermissions userPermissions = 4;
-}
-
-message UserApprovedOutgoingTransferTimeline {
-  repeated UserApprovedOutgoingTransfer approvedOutgoingTransfers = 1;
-  repeated UintRange timelineTimes = 2;
-}
-
-message UserApprovedIncomingTransferTimeline {
-  repeated UserApprovedIncomingTransfer approvedIncomingTransfers = 1;
-  repeated UintRange timelineTimes = 2;
 }
 
 // Challenges define the rules for the approval.
@@ -93,7 +83,7 @@ message UserApprovedOutgoingTransfer {
   string initiatedByMappingId = 2;
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
-  repeated UintRange ownershipTimes = 16;
+  repeated UintRange ownershipTimes = 7;
 
   repeated IsUserOutgoingTransferAllowed allowedCombinations = 5;
 
@@ -107,10 +97,10 @@ message UserApprovedIncomingTransfer {
   string initiatedByMappingId = 2;
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
-  repeated UintRange ownershipTimes = 16;
-  repeated IsUserIncomingTransferAllowed allowedCombinations = 5;
+  repeated UintRange ownershipTimes = 5;
+  repeated IsUserIncomingTransferAllowed allowedCombinations = 6;
 
-  repeated IncomingApprovalDetails approvalDetails = 11;
+  repeated IncomingApprovalDetails approvalDetails = 7;
 }
 
 message IsCollectionTransferAllowed {

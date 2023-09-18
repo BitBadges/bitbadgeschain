@@ -13,9 +13,9 @@ func (suite *TestSuite) TestNoMerkleChallengesWorking() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].MerkleChallenges = []*types.MerkleChallenge{{}}
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].MerkleChallenges = []*types.MerkleChallenge{{}}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
@@ -28,9 +28,9 @@ func (suite *TestSuite) TestMerkleChallengesInvalidSolutions() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].MerkleChallenges = []*types.MerkleChallenge{{
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].MerkleChallenges = []*types.MerkleChallenge{{
 		ChallengeId: "testchallenge",
 		Root: "sample",
 	}}
@@ -77,7 +77,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -252,7 +252,7 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -355,7 +355,7 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -469,7 +469,7 @@ func (suite *TestSuite) TestIncrements() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -624,7 +624,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -756,7 +756,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -938,7 +938,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -1070,7 +1070,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -1243,7 +1243,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -1409,7 +1409,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 		BadgeIds:       GetFullUintRanges(),
 		OwnershipTimes: GetFullUintRanges(),
 	})
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -1570,7 +1570,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -1732,7 +1732,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -1905,7 +1905,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -2110,7 +2110,7 @@ func (suite *TestSuite) TestMustOwnBadges() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2122,7 +2122,7 @@ func (suite *TestSuite) TestMustOwnBadges() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -2181,7 +2181,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2194,7 +2194,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -2253,7 +2253,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll2() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2276,7 +2276,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll2() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -2336,7 +2336,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2357,7 +2357,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -2416,7 +2416,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne2() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(2),
 			AmountRange: &types.UintRange{
@@ -2428,7 +2428,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne2() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -2488,7 +2488,7 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2500,7 +2500,7 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 					MaxNumTransfers: &types.MaxNumTransfers{
@@ -2558,7 +2558,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2570,7 +2570,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -2647,7 +2647,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails[0].MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2659,7 +2659,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 		},
 	}
 	
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -2737,7 +2737,7 @@ func (suite *TestSuite) TestMultipleApprovalDetails() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].PredeterminedBalances = &types.PredeterminedBalances{
+	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails[0].PredeterminedBalances = &types.PredeterminedBalances{
 		PrecalculationId: "asadsdas",
 		// ManualBalances: &types.ManualBalances{},
 		IncrementedBalances: &types.IncrementedBalances{
@@ -2756,7 +2756,7 @@ func (suite *TestSuite) TestMultipleApprovalDetails() {
 		},
 	}
 	
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails, &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails = append(collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails, &types.ApprovalDetails{
 		
 		MerkleChallenges:                []*types.MerkleChallenge{},
 		ApprovalTrackerId:                 		"test2",
@@ -2787,7 +2787,7 @@ func (suite *TestSuite) TestMultipleApprovalDetails() {
 	})
 
 
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{
@@ -2883,10 +2883,10 @@ func (suite *TestSuite) TestMultipleApprovalDetailsSameApprovalTrackerId() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].DefaultApprovedIncomingTransfersTimeline[0].ApprovedIncomingTransfers[0].ApprovalDetails = nil
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].ApprovalDetails = nil
-	
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails[0].PredeterminedBalances = &types.PredeterminedBalances{
+	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].ApprovalDetails = nil
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].ApprovalDetails = nil
+
+	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails[0].PredeterminedBalances = &types.PredeterminedBalances{
 		PrecalculationId: "asadsdas",
 		// ManualBalances: &types.ManualBalances{},
 		IncrementedBalances: &types.IncrementedBalances{
@@ -2905,7 +2905,7 @@ func (suite *TestSuite) TestMultipleApprovalDetailsSameApprovalTrackerId() {
 		},
 	}
 	
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[1].ApprovalDetails, &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails = append(collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails, &types.ApprovalDetails{
 		
 		MerkleChallenges:                []*types.MerkleChallenge{},
 		ApprovalTrackerId:                 		"test2",
@@ -2936,7 +2936,7 @@ func (suite *TestSuite) TestMultipleApprovalDetailsSameApprovalTrackerId() {
 	})
 
 
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
 		ApprovalDetails: []*types.ApprovalDetails{
 			{
 				MaxNumTransfers: &types.MaxNumTransfers{

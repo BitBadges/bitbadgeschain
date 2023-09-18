@@ -73,28 +73,24 @@ message ValueOptions {
 }
 
 message CollectionApprovedTransferCombination {
-  ValueOptions timelineTimesOptions = 1;
-
-  ValueOptions fromMappingOptions = 2;
-  ValueOptions toMappingOptions = 3;
-  ValueOptions initiatedByMappingOptions = 4;
-  ValueOptions transferTimesOptions = 5;
-  ValueOptions badgeIdsOptions = 6;
-  ValueOptions ownershipTimesOptions = 9;
+  ValueOptions fromMappingOptions = 1;
+  ValueOptions toMappingOptions = 2;
+  ValueOptions initiatedByMappingOptions = 3;
+  ValueOptions transferTimesOptions = 4;
+  ValueOptions badgeIdsOptions = 5;
+  ValueOptions ownershipTimesOptions = 6;
 
   ValueOptions permittedTimesOptions = 7;
   ValueOptions forbiddenTimesOptions = 8;
 }
 
 message CollectionApprovedTransferDefaultValues {
-  repeated UintRange timelineTimes = 1;
-
-  string fromMappingId = 2;
-  string toMappingId = 3;
-  string initiatedByMappingId = 4;
-  repeated UintRange transferTimes = 5;
-  repeated UintRange badgeIds = 6;
-  repeated UintRange ownershipTimes = 9;
+  string fromMappingId = 1;
+  string toMappingId = 2;
+  string initiatedByMappingId = 3;
+  repeated UintRange transferTimes = 4;
+  repeated UintRange badgeIds = 5;
+  repeated UintRange ownershipTimes = 6;
 
   repeated UintRange permittedTimes = 7;
   repeated UintRange forbiddenTimes = 8;
@@ -122,29 +118,25 @@ message CollectionApprovedTransferPermission {
 }
 
 message UserApprovedOutgoingTransferCombination {
-  ValueOptions timelineTimesOptions = 1;
+  ValueOptions toMappingOptions = 1;
+  ValueOptions initiatedByMappingOptions = 2;
+  ValueOptions transferTimesOptions = 3;
+  ValueOptions badgeIdsOptions = 4;
+  ValueOptions ownershipTimesOptions = 5;
 
-  ValueOptions toMappingOptions = 2;
-  ValueOptions initiatedByMappingOptions = 3;
-  ValueOptions transferTimesOptions = 4;
-  ValueOptions badgeIdsOptions = 5;
-  ValueOptions ownershipTimesOptions = 6;
-
-  ValueOptions permittedTimesOptions = 7;
-  ValueOptions forbiddenTimesOptions = 8;
+  ValueOptions permittedTimesOptions = 6;
+  ValueOptions forbiddenTimesOptions = 7;
 }
 
 message UserApprovedOutgoingTransferDefaultValues {
-  repeated UintRange timelineTimes = 1;
+  string toMappingId = 1;
+  string initiatedByMappingId = 2;
+  repeated UintRange transferTimes = 3;
+  repeated UintRange badgeIds = 4;
+  repeated UintRange ownershipTimes = 5;
 
-  string toMappingId = 2;
-  string initiatedByMappingId = 3;
-  repeated UintRange transferTimes = 4;
-  repeated UintRange badgeIds = 5;
-  repeated UintRange ownershipTimes = 6;
-
-  repeated UintRange permittedTimes = 7;
-  repeated UintRange forbiddenTimes = 8;
+  repeated UintRange permittedTimes = 6;
+  repeated UintRange forbiddenTimes = 7;
 }
 
 // UserApprovedOutgoingTransferPermission defines the permissions for updating the user's approved outgoing transfers.
@@ -155,30 +147,26 @@ message UserApprovedOutgoingTransferPermission {
 }
 
 message UserApprovedIncomingTransferCombination {
-  ValueOptions timelineTimesOptions = 1;
-
-  ValueOptions fromMappingOptions = 2;
-  ValueOptions initiatedByMappingOptions = 3;
-  ValueOptions transferTimesOptions = 4;
-  ValueOptions badgeIdsOptions = 5;
-  ValueOptions ownershipTimesOptions = 6;
+  ValueOptions fromMappingOptions = 1;
+  ValueOptions initiatedByMappingOptions = 2;
+  ValueOptions transferTimesOptions = 3;
+  ValueOptions badgeIdsOptions = 4;
+  ValueOptions ownershipTimesOptions = 5;
 
 
-  ValueOptions permittedTimesOptions = 7;
-  ValueOptions forbiddenTimesOptions = 8;
+  ValueOptions permittedTimesOptions = 6;
+  ValueOptions forbiddenTimesOptions = 7;
 }
 
 message UserApprovedIncomingTransferDefaultValues {
-  repeated UintRange timelineTimes = 1;
+  string fromMappingId = 1;
+  string initiatedByMappingId = 2;
+  repeated UintRange transferTimes = 3;
+  repeated UintRange badgeIds = 4;
+  repeated UintRange ownershipTimes = 5;
 
-  string fromMappingId = 2;
-  string initiatedByMappingId = 3;
-  repeated UintRange transferTimes = 4;
-  repeated UintRange badgeIds = 5;
-  repeated UintRange ownershipTimes = 6;
-
-  repeated UintRange permittedTimes = 7;
-  repeated UintRange forbiddenTimes = 8;
+  repeated UintRange permittedTimes = 6;
+  repeated UintRange forbiddenTimes = 7;
 }
 
 // UserApprovedIncomingTransferPermission defines the permissions for updating the user's approved incoming transfers.

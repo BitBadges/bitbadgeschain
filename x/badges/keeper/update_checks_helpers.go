@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"math"
+
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	proto "github.com/gogo/protobuf/proto"
@@ -55,16 +57,31 @@ func GetPotentialUpdatesForTimelineValues(times [][]*types.UintRange, values []i
 	return firstMatches
 }
 
-func (k Keeper) ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldApprovedTransfers []*types.CollectionApprovedTransferTimeline, newApprovedTransfers []*types.CollectionApprovedTransferTimeline, CanUpdateCollectionApprovedTransfers []*types.CollectionApprovedTransferPermission, managerAddress string) error {
+func (k Keeper) ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldApprovedTransfers []*types.CollectionApprovedTransfer, newApprovedTransfers []*types.CollectionApprovedTransfer, CanUpdateCollectionApprovedTransfers []*types.CollectionApprovedTransferPermission, managerAddress string) error {
 	if !IsStandardBalances(collection) && newApprovedTransfers != nil && len(newApprovedTransfers) > 0 {
 		return sdkerrors.Wrapf(ErrWrongBalancesType, "collection %s does not have standard balances", collection.CollectionId)
 	}
 
-	oldTimes, oldValues := types.GetCollectionApprovedTransferTimesAndValues(oldApprovedTransfers)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
+	x := [][]*types.UintRange{}
+	x = append(x, []*types.UintRange{
+		//Dummmy range
+		{
+			Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64),
+		},
+	})
 
-	newTimes, newValues := types.GetCollectionApprovedTransferTimesAndValues(newApprovedTransfers)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
+	y := [][]*types.UintRange{}
+	y = append(y, []*types.UintRange{
+		//Dummmy range
+		{
+			Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64),
+		},
+	})
+
+	//This is just to maintain consistency with the legacy features when we used to have timeline times
+	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(x, []interface{}{oldApprovedTransfers})
+
+	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(y, []interface{}{newApprovedTransfers})
 
 	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []*types.CollectionApprovedTransfer{}, managerAddress, func(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error) {
 		//Cast to UniversalPermissionDetails for comaptibility with these overlap functions and get first matches only (i.e. first match for each badge ID)
@@ -129,12 +146,24 @@ func (k Keeper) ValidateCollectionApprovedTransfersUpdate(ctx sdk.Context, colle
 	return nil
 }
 
-func (k Keeper) ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, _oldApprovedTransfers []*types.UserApprovedOutgoingTransferTimeline, _newApprovedTransfers []*types.UserApprovedOutgoingTransferTimeline, CanUpdateCollectionApprovedTransfers []*types.UserApprovedOutgoingTransferPermission, managerAddress string) error {
-	oldTimes, oldValues := types.GetUserApprovedOutgoingTransferTimesAndValues(_oldApprovedTransfers)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
+func (k Keeper) ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, _oldApprovedTransfers []*types.UserApprovedOutgoingTransfer, _newApprovedTransfers []*types.UserApprovedOutgoingTransfer, CanUpdateCollectionApprovedTransfers []*types.UserApprovedOutgoingTransferPermission, managerAddress string) error {
+	x := [][]*types.UintRange{}
+	x = append(x, []*types.UintRange{
+		//Dummmy range
+		{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64), },
+	})
 
-	newTimes, newValues := types.GetUserApprovedOutgoingTransferTimesAndValues(_newApprovedTransfers)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
+	y := [][]*types.UintRange{}
+	y = append(y, []*types.UintRange{
+		//Dummmy range
+		{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64), },
+	})
+
+	//This is just to maintain consistency with the legacy features when we used to have timeline times
+	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(x, []interface{}{_oldApprovedTransfers})
+
+	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(y, []interface{}{_newApprovedTransfers})
+
 
 	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []*types.UserApprovedOutgoingTransfer{}, managerAddress, func(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error) {
 		//Cast to UniversalPermissionDetails for comaptibility with these overlap functions and get first matches only (i.e. first match for each badge ID)
@@ -199,12 +228,23 @@ func (k Keeper) ValidateUserApprovedOutgoingTransfersUpdate(ctx sdk.Context, _ol
 	return nil
 }
 
-func (k Keeper) ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, _oldApprovedTransfers []*types.UserApprovedIncomingTransferTimeline, _newApprovedTransfers []*types.UserApprovedIncomingTransferTimeline, CanUpdateCollectionApprovedTransfers []*types.UserApprovedIncomingTransferPermission, managerAddress string) error {
-	oldTimes, oldValues := types.GetUserApprovedIncomingTransferTimesAndValues(_oldApprovedTransfers)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
+func (k Keeper) ValidateUserApprovedIncomingTransfersUpdate(ctx sdk.Context, _oldApprovedTransfers []*types.UserApprovedIncomingTransfer, _newApprovedTransfers []*types.UserApprovedIncomingTransfer, CanUpdateCollectionApprovedTransfers []*types.UserApprovedIncomingTransferPermission, managerAddress string) error {
+	x := [][]*types.UintRange{}
+	x = append(x, []*types.UintRange{
+		//Dummmy range
+		{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64), },
+	})
 
-	newTimes, newValues := types.GetUserApprovedIncomingTransferTimesAndValues(_newApprovedTransfers)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
+	y := [][]*types.UintRange{}
+	y = append(y, []*types.UintRange{
+		//Dummmy range
+		{ Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64), },
+	})
+
+	//This is just to maintain consistency with the legacy features when we used to have timeline times
+	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(x, []interface{}{_oldApprovedTransfers})
+
+	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(y, []interface{}{_newApprovedTransfers})
 
 	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []*types.UserApprovedIncomingTransfer{}, managerAddress, func(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error) {
 		//Cast to UniversalPermissionDetails for comaptibility with these overlap functions and get first matches only (i.e. first match for each badge ID)

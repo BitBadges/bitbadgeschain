@@ -27,14 +27,14 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 			if !found {
 				toUserBalance = &types.UserBalanceStore{
 					Balances:                          []*types.Balance{},
-					ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
-					ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,
+					ApprovedOutgoingTransfers: collection.DefaultUserApprovedOutgoingTransfers,
+					ApprovedIncomingTransfers: collection.DefaultUserApprovedIncomingTransfers,
 					UserPermissions: 								   collection.DefaultUserPermissions,
 				}
 			}
 
 			if transfer.PrecalculationDetails != nil && transfer.PrecalculationDetails.PrecalculationId != "" {
-				approvedTransfers := types.GetCurrentCollectionApprovedTransfers(ctx, collection)
+				approvedTransfers := collection.CollectionApprovedTransfers
 				if transfer.PrecalculationDetails.ApproverAddress != "" {
 					if transfer.PrecalculationDetails.ApproverAddress != to && transfer.PrecalculationDetails.ApproverAddress != transfer.From {
 						return sdkerrors.Wrapf(ErrNotImplemented, "approval id address %s does not match to or from address", transfer.PrecalculationDetails.ApproverAddress)
@@ -42,18 +42,18 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 
 					if transfer.PrecalculationDetails.ApproverAddress == to {
 						if transfer.PrecalculationDetails.ApprovalLevel == "incoming" {
-							userApprovedTransfers := types.GetCurrentUserApprovedIncomingTransfers(ctx, toUserBalance)
+							userApprovedTransfers := toUserBalance.ApprovedIncomingTransfers
 							approvedTransfers = types.CastIncomingTransfersToCollectionTransfers(userApprovedTransfers, to)
 						} else {
-							userApprovedTransfers := types.GetCurrentUserApprovedOutgoingTransfers(ctx, toUserBalance)
+							userApprovedTransfers := toUserBalance.ApprovedOutgoingTransfers
 							approvedTransfers = types.CastOutgoingTransfersToCollectionTransfers(userApprovedTransfers, to)
 						}
 					} else {
 						if transfer.PrecalculationDetails.ApprovalLevel == "outgoing" {
-							userApprovedTransfers := types.GetCurrentUserApprovedOutgoingTransfers(ctx, fromUserBalance)
+							userApprovedTransfers := fromUserBalance.ApprovedOutgoingTransfers
 							approvedTransfers = types.CastOutgoingTransfersToCollectionTransfers(userApprovedTransfers, transfer.From)
 						} else {
-							userApprovedTransfers := types.GetCurrentUserApprovedIncomingTransfers(ctx, fromUserBalance)
+							userApprovedTransfers := fromUserBalance.ApprovedIncomingTransfers
 							approvedTransfers = types.CastIncomingTransfersToCollectionTransfers(userApprovedTransfers, transfer.From)
 						}
 					}

@@ -88,7 +88,7 @@ func (suite *TestSuite) TestMaxOneTransfer() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].ApprovalDetails[0].MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(1)
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].ApprovalDetails[0].MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(1)
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
 
@@ -112,13 +112,13 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].ApprovalDetails[0].PredeterminedBalances = &types.PredeterminedBalances{
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].ApprovalDetails[0].PredeterminedBalances = &types.PredeterminedBalances{
 		OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{
 			UseOverallNumTransfers: true,
 		},
 		PrecalculationId: "asdas",
 	}
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].ApprovalDetails[0].PredeterminedBalances.IncrementedBalances = &types.IncrementedBalances{
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].ApprovalDetails[0].PredeterminedBalances.IncrementedBalances = &types.IncrementedBalances{
 		
 		StartBalances: []*types.Balance{
 			{
@@ -131,13 +131,13 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 		IncrementOwnershipTimesBy: sdkmath.NewUint(math.MaxUint64),
 	}
 	
-	collectionsToCreate[0].DefaultApprovedIncomingTransfersTimeline[0].ApprovedIncomingTransfers[0].ApprovalDetails[0].PredeterminedBalances = &types.PredeterminedBalances{
+	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].ApprovalDetails[0].PredeterminedBalances = &types.PredeterminedBalances{
 		OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{
 			UseOverallNumTransfers: true,
 		},
 		PrecalculationId: "asdas2",
 	}
-	collectionsToCreate[0].DefaultApprovedIncomingTransfersTimeline[0].ApprovedIncomingTransfers[0].ApprovalDetails[0].PredeterminedBalances.IncrementedBalances = &types.IncrementedBalances{
+	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].ApprovalDetails[0].PredeterminedBalances.IncrementedBalances = &types.IncrementedBalances{
 		StartBalances: []*types.Balance{
 			{
 				OwnershipTimes: GetFullUintRanges(),
@@ -180,8 +180,8 @@ func (suite *TestSuite) TestRequiresEquals() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].ApprovalDetails[0].RequireToDoesNotEqualInitiatedBy = true
-	collectionsToCreate[0].DefaultApprovedIncomingTransfersTimeline[0].ApprovedIncomingTransfers[0].ApprovalDetails[0].RequireFromDoesNotEqualInitiatedBy = true
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].ApprovalDetails[0].RequireToDoesNotEqualInitiatedBy = true
+	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].ApprovalDetails[0].RequireFromDoesNotEqualInitiatedBy = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -206,8 +206,8 @@ func (suite *TestSuite) TestSpecificApproved() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].InitiatedByMappingId = alice
-	collectionsToCreate[0].DefaultApprovedIncomingTransfersTimeline[0].ApprovedIncomingTransfers[0].InitiatedByMappingId = alice
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].InitiatedByMappingId = alice
+	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].InitiatedByMappingId = alice
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -233,8 +233,8 @@ func (suite *TestSuite) TestDefaults() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].InitiatedByMappingId = alice
-	collectionsToCreate[0].DefaultApprovedIncomingTransfersTimeline[0].ApprovedIncomingTransfers[0].InitiatedByMappingId = alice
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].InitiatedByMappingId = alice
+	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].InitiatedByMappingId = alice
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -253,9 +253,8 @@ func (suite *TestSuite) TestFirstMatchOnly() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0].InitiatedByMappingId = alice
-	newOutgoingTimeline := []*types.UserApprovedOutgoingTransferTimeline{{
-		ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].InitiatedByMappingId = alice
+	newOutgoingTimeline := []*types.UserApprovedOutgoingTransfer{
 			{
 				ToMappingId:          "AllWithoutMint",
 				InitiatedByMappingId: alice,
@@ -285,12 +284,9 @@ func (suite *TestSuite) TestFirstMatchOnly() {
 					},
 				},
 			},
-			collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0],
-		},
-		TimelineTimes: GetFullUintRanges(),
-	},
+			collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0],
 	}
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline = newOutgoingTimeline
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers = newOutgoingTimeline
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -310,39 +306,36 @@ func (suite *TestSuite) TestFirstMatchOnlyWrongTime() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 
-	newOutgoingTimeline := []*types.UserApprovedOutgoingTransferTimeline{{
-		ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
-			{
-				ToMappingId:          "AllWithoutMint",
-				InitiatedByMappingId: alice,
-				TransferTimes:        []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-				BadgeIds:             GetFullUintRanges(),
-				OwnershipTimes: GetFullUintRanges(),
-				AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
-					{
-						IsApproved: false,
-					},
+	newOutgoingTimeline := []*types.UserApprovedOutgoingTransfer{
+		{
+			ToMappingId:          "AllWithoutMint",
+			InitiatedByMappingId: alice,
+			TransferTimes:        []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+			BadgeIds:             GetFullUintRanges(),
+			OwnershipTimes: GetFullUintRanges(),
+			AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
+				{
+					IsApproved: false,
 				},
-				ApprovalDetails: []*types.OutgoingApprovalDetails{
-					{
-						MerkleChallenges:                []*types.MerkleChallenge{},
-						ApprovalTrackerId:                 "test-alice",
-						MaxNumTransfers: &types.MaxNumTransfers{
-							OverallMaxNumTransfers: sdkmath.NewUint(1000),
-						},
-						ApprovalAmounts: &types.ApprovalAmounts{
-							PerFromAddressApprovalAmount: sdkmath.NewUint(1),
-						},
-					},
-				},
-				
 			},
-			collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline[0].ApprovedOutgoingTransfers[0],
+			ApprovalDetails: []*types.OutgoingApprovalDetails{
+				{
+					MerkleChallenges:                []*types.MerkleChallenge{},
+					ApprovalTrackerId:                 "test-alice",
+					MaxNumTransfers: &types.MaxNumTransfers{
+						OverallMaxNumTransfers: sdkmath.NewUint(1000),
+					},
+					ApprovalAmounts: &types.ApprovalAmounts{
+						PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+					},
+				},
+			},
+			
 		},
-		TimelineTimes: GetFullUintRanges(),
-	},
+		collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0],
 	}
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline = newOutgoingTimeline
+	
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers = newOutgoingTimeline
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -359,8 +352,7 @@ func (suite *TestSuite) TestCombinations() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 
-	newOutgoingTimeline := []*types.UserApprovedOutgoingTransferTimeline{{
-		ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
+	newOutgoingTimeline :=  []*types.UserApprovedOutgoingTransfer{
 			{
 				ToMappingId:          "AllWithoutMint",
 				InitiatedByMappingId: alice,
@@ -390,11 +382,8 @@ func (suite *TestSuite) TestCombinations() {
 				},
 				
 			},
-		},
-		TimelineTimes: GetFullUintRanges(),
-	},
 	}
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline = newOutgoingTimeline
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers = newOutgoingTimeline
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -414,8 +403,7 @@ func (suite *TestSuite) TestCombinationsOrder() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 
-	newOutgoingTimeline := []*types.UserApprovedOutgoingTransferTimeline{{
-		ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
+	newOutgoingTimeline := []*types.UserApprovedOutgoingTransfer{
 			{
 				ToMappingId:          "AllWithoutMint",
 				InitiatedByMappingId: alice,
@@ -445,11 +433,9 @@ func (suite *TestSuite) TestCombinationsOrder() {
 				},
 				
 			},
-		},
-		TimelineTimes: GetFullUintRanges(),
-	},
-	}
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline = newOutgoingTimeline
+		}
+	
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers = newOutgoingTimeline
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -466,8 +452,7 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 
-	newOutgoingTimeline := []*types.UserApprovedOutgoingTransferTimeline{{
-		ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
+	newOutgoingTimeline := []*types.UserApprovedOutgoingTransfer{
 			{
 				ToMappingId:          "AllWithoutMint",
 				InitiatedByMappingId: alice,
@@ -492,11 +477,8 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 					},
 				},
 			},
-		},
-		TimelineTimes: GetFullUintRanges(),
-	},
 	}
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline = newOutgoingTimeline
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers = newOutgoingTimeline
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -512,7 +494,7 @@ func (suite *TestSuite) TestUserApprovalsReturned() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	// collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
+	// collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -529,7 +511,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesOutgoing() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -546,7 +528,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesIncoming() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesToApprovedIncomingTransfers = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -563,8 +545,8 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")

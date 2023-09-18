@@ -32,6 +32,21 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 // }
 
 //The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
+message UserApprovedOutgoingTransferTimeline {
+  repeated UserApprovedOutgoingTransfer approvedOutgoingTransfers = 1;
+  repeated UintRange timelineTimes = 2;
+}
+
+message UserApprovedIncomingTransferTimeline {
+  repeated UserApprovedIncomingTransfer approvedIncomingTransfers = 1;
+  repeated UintRange timelineTimes = 2;
+}
+
+message CollectionApprovedTransferTimeline {
+  repeated CollectionApprovedTransfer collectionApprovedTransfers = 1;
+  repeated UintRange timelineTimes = 2;
+}
+
 
 message MsgNewCollection {
   // See collections.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
@@ -41,7 +56,7 @@ message MsgNewCollection {
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 4;
   repeated CustomDataTimeline customDataTimeline = 5;
   string balancesType = 6 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
-  repeated CollectionApprovedTransferTimeline collectionApprovedTransfersTimeline = 8;
+  repeated CollectionApprovedTransfer collectionApprovedTransfers = 8;
   CollectionPermissions permissions = 9;
   repeated StandardsTimeline standardsTimeline = 10;
 
@@ -52,8 +67,8 @@ message MsgNewCollection {
   repeated ContractAddressTimeline contractAddressTimeline = 13;
   repeated AddressMapping addressMappings = 14;
 
-  repeated UserApprovedOutgoingTransferTimeline defaultApprovedOutgoingTransfersTimeline = 15; //The user's approved transfers for each badge ID.
-  repeated UserApprovedIncomingTransferTimeline defaultApprovedIncomingTransfersTimeline = 16; //The user's approved incoming transfers for each badge ID.
+  repeated UserApprovedOutgoingTransfer defaultApprovedOutgoingTransfers = 15; //The user's approved transfers for each badge ID.
+  repeated UserApprovedIncomingTransfer defaultApprovedIncomingTransfers = 16; //The user's approved incoming transfers for each badge ID.
 }
 
 message MsgNewCollectionResponse {
@@ -84,7 +99,7 @@ message MsgMintAndDistributeBadges {
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 6; 
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 7;
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 8;
-  repeated CollectionApprovedTransferTimeline collectionApprovedTransfersTimeline = 9;
+  repeated CollectionApprovedTransfer collectionApprovedTransfers = 9;
 
   repeated AddressMapping addressMappings = 10;
 }
@@ -97,7 +112,7 @@ message MsgUpdateCollectionApprovedTransfers {
       (gogoproto.customtype) = "Uint", 
       (gogoproto.nullable) = false
     ];
-  repeated CollectionApprovedTransferTimeline collectionApprovedTransfersTimeline = 3;
+  repeated CollectionApprovedTransfer collectionApprovedTransfers = 3;
   repeated AddressMapping addressMappings = 4;
 }
 

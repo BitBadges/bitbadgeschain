@@ -106,12 +106,7 @@ func (suite *TestSuite) TestTransferBadgesNotApprovedCollectionLevel() {
 	err = UpdateCollectionApprovedTransfers(suite, wctx, &types.MsgUpdateCollectionApprovedTransfers{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
-			{
-				CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{},
-				TimelineTimes:     GetFullUintRanges(),
-			},
-		},
+		CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{},
 	})
 	suite.Require().Nil(err, "Error updating approved transfers")
 
@@ -152,13 +147,8 @@ func (suite *TestSuite) TestTransferBadgesNotApprovedIncoming() {
 	err = UpdateUserApprovedTransfers(suite, wctx, &types.MsgUpdateUserApprovedTransfers{
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
-		UpdateApprovedIncomingTransfersTimeline: true,
-		ApprovedIncomingTransfersTimeline: []*types.UserApprovedIncomingTransferTimeline{
-			{
-				// ApprovedIncomingTransfers: []*types.CollectionApprovedTransfer{},
-				TimelineTimes: GetFullUintRanges(),
-			},
-		},
+		UpdateApprovedIncomingTransfers: true,
+		ApprovedIncomingTransfers: []*types.UserApprovedIncomingTransfer{},
 	})
 	suite.Require().Nil(err, "Error updating approved transfers")
 
@@ -212,7 +202,7 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 				OwnershipTimes: GetFullUintRanges(),
 			},
 		},
-		CollectionApprovedTransfersTimeline: collection.CollectionApprovedTransfersTimeline,
+		CollectionApprovedTransfers: collection.CollectionApprovedTransfers,
 		// InheritedBalancesTimeline: 				 collection.InheritedBalancesTimeline,
 		CollectionMetadataTimeline:          collection.CollectionMetadataTimeline,
 		BadgeMetadataTimeline:               collection.BadgeMetadataTimeline,

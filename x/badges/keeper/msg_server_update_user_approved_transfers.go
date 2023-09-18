@@ -24,8 +24,8 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 	if !found {
 		userBalance = &types.UserBalanceStore{
 			Balances:                          []*types.Balance{},
-			ApprovedOutgoingTransfersTimeline: collection.DefaultUserApprovedOutgoingTransfersTimeline,
-			ApprovedIncomingTransfersTimeline: collection.DefaultUserApprovedIncomingTransfersTimeline,
+			ApprovedOutgoingTransfers: collection.DefaultUserApprovedOutgoingTransfers,
+			ApprovedIncomingTransfers: collection.DefaultUserApprovedIncomingTransfers,
 			UserPermissions:                   collection.DefaultUserPermissions,
 		}
 	}
@@ -36,18 +36,18 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 
 	manager := types.GetCurrentManager(ctx, collection)
 
-	if msg.UpdateApprovedOutgoingTransfersTimeline {
-		if err := k.ValidateUserApprovedOutgoingTransfersUpdate(ctx, userBalance.ApprovedOutgoingTransfersTimeline, msg.ApprovedOutgoingTransfersTimeline, userBalance.UserPermissions.CanUpdateApprovedOutgoingTransfers, manager); err != nil {
+	if msg.UpdateApprovedOutgoingTransfers {
+		if err := k.ValidateUserApprovedOutgoingTransfersUpdate(ctx, userBalance.ApprovedOutgoingTransfers, msg.ApprovedOutgoingTransfers, userBalance.UserPermissions.CanUpdateApprovedOutgoingTransfers, manager); err != nil {
 			return nil, err
 		}
-		userBalance.ApprovedOutgoingTransfersTimeline = msg.ApprovedOutgoingTransfersTimeline
+		userBalance.ApprovedOutgoingTransfers = msg.ApprovedOutgoingTransfers
 	}
 
-	if msg.UpdateApprovedIncomingTransfersTimeline {
-		if err := k.ValidateUserApprovedIncomingTransfersUpdate(ctx, userBalance.ApprovedIncomingTransfersTimeline, msg.ApprovedIncomingTransfersTimeline, userBalance.UserPermissions.CanUpdateApprovedIncomingTransfers, manager); err != nil {
+	if msg.UpdateApprovedIncomingTransfers {
+		if err := k.ValidateUserApprovedIncomingTransfersUpdate(ctx, userBalance.ApprovedIncomingTransfers, msg.ApprovedIncomingTransfers, userBalance.UserPermissions.CanUpdateApprovedIncomingTransfers, manager); err != nil {
 			return nil, err
 		}
-		userBalance.ApprovedIncomingTransfersTimeline = msg.ApprovedIncomingTransfersTimeline
+		userBalance.ApprovedIncomingTransfers = msg.ApprovedIncomingTransfers
 	}
 
 	if msg.UpdateUserPermissions {

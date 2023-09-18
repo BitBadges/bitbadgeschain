@@ -21,7 +21,7 @@ type UserApprovalsToCheck struct {
 
 // DeductUserOutgoingApprovals will check if the current transfer is approved from the from's outgoing approvals and handle the approval tallying accordingly
 func (k Keeper) DeductUserOutgoingApprovals(ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.MerkleProof) error {
-	currApprovedTransfers := types.GetCurrentUserApprovedOutgoingTransfers(ctx, userBalance)
+	currApprovedTransfers := userBalance.ApprovedOutgoingTransfers
 	currApprovedTransfers = AppendDefaultForOutgoing(currApprovedTransfers, from)
 
 	//Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
@@ -32,7 +32,7 @@ func (k Keeper) DeductUserOutgoingApprovals(ctx sdk.Context, overallTransferBala
 
 // DeductUserIncomingApprovals will check if the current transfer is approved from the to's outgoing approvals and handle the approval tallying accordingly
 func (k Keeper) DeductUserIncomingApprovals(ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.MerkleProof) error {
-	currApprovedTransfers := types.GetCurrentUserApprovedIncomingTransfers(ctx, userBalance)
+	currApprovedTransfers := userBalance.ApprovedIncomingTransfers
 	currApprovedTransfers = AppendDefaultForIncoming(currApprovedTransfers, to)
 
 	//Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
@@ -43,7 +43,7 @@ func (k Keeper) DeductUserIncomingApprovals(ctx sdk.Context, overallTransferBala
 
 // DeductCollectionApprovalsAndGetUserApprovalsToCheck will check if the current transfer is allowed via the collection's approved transfers and handle any tallying accordingly
 func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, fromAddress string, toAddress string, initiatedBy string, amount sdkmath.Uint, solutions []*types.MerkleProof) ([]*UserApprovalsToCheck, error) {
-	approvedTransfers := types.GetCurrentCollectionApprovedTransfers(ctx, collection)
+	approvedTransfers := collection.CollectionApprovedTransfers
 	return k.DeductAndGetUserApprovals(overallTransferBalances, approvedTransfers, ctx, collection, badgeIds, times, fromAddress, toAddress, initiatedBy, amount, solutions, "collection", "")
 }
 

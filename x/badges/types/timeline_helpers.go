@@ -5,31 +5,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func GetCurrentUserApprovedIncomingTransfers(ctx sdk.Context, userBalance *UserBalanceStore) []*UserApprovedIncomingTransfer {
-	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-	approvedTransfersTimeline := userBalance.ApprovedIncomingTransfersTimeline
-	for _, approvedTransfersTimelineVal := range approvedTransfersTimeline {
-		found := SearchUintRangesForUint(blockTime, approvedTransfersTimelineVal.TimelineTimes)
-		if found {
-			return approvedTransfersTimelineVal.ApprovedIncomingTransfers
-		}
-	}
-
-	return []*UserApprovedIncomingTransfer{}
-}
-
-func GetCurrentUserApprovedOutgoingTransfers(ctx sdk.Context, userBalance *UserBalanceStore) []*UserApprovedOutgoingTransfer {
-	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-	approvedTransfersTimeline := userBalance.ApprovedOutgoingTransfersTimeline
-	for _, approvedTransfersTimelineVal := range approvedTransfersTimeline {
-		found := SearchUintRangesForUint(blockTime, approvedTransfersTimelineVal.TimelineTimes)
-		if found {
-			return approvedTransfersTimelineVal.ApprovedOutgoingTransfers
-		}
-	}
-
-	return []*UserApprovedOutgoingTransfer{}
-}
 
 func GetCurrentManager(ctx sdk.Context, collection *BadgeCollection) string {
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
@@ -55,19 +30,6 @@ func GetIsArchived(ctx sdk.Context, collection *BadgeCollection) bool {
 	}
 
 	return false
-}
-
-func GetCurrentCollectionApprovedTransfers(ctx sdk.Context, collection *BadgeCollection) []*CollectionApprovedTransfer {
-	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-	approvedTransfersTimeline := collection.CollectionApprovedTransfersTimeline
-	for _, approvedTransfersTimelineVal := range approvedTransfersTimeline {
-		found := SearchUintRangesForUint(blockTime, approvedTransfersTimelineVal.TimelineTimes)
-		if found {
-			return approvedTransfersTimelineVal.CollectionApprovedTransfers
-		}
-	}
-
-	return []*CollectionApprovedTransfer{}
 }
 
 func GetIsArchivedTimesAndValues(isArchivedTimeline []*IsArchivedTimeline) ([][]*UintRange, []interface{}) {

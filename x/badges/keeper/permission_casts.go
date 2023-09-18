@@ -16,7 +16,6 @@ func (k Keeper) CastUserApprovedIncomingTransferPermissionToUniversalPermission(
 				BadgeIdsOptions:           combination.BadgeIdsOptions,
 				PermittedTimesOptions:     combination.PermittedTimesOptions,
 				ForbiddenTimesOptions:     combination.ForbiddenTimesOptions,
-				TimelineTimesOptions:      combination.TimelineTimesOptions,
 				TransferTimesOptions:      combination.TransferTimesOptions,
 				OwnershipTimesOptions: 	 combination.OwnershipTimesOptions,
 				FromMappingOptions:        combination.FromMappingOptions,
@@ -38,13 +37,11 @@ func (k Keeper) CastUserApprovedIncomingTransferPermissionToUniversalPermission(
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
 				BadgeIds:               permission.DefaultValues.BadgeIds,
-				TimelineTimes:          permission.DefaultValues.TimelineTimes,
 				TransferTimes:          permission.DefaultValues.TransferTimes,
 				OwnershipTimes: 				permission.DefaultValues.OwnershipTimes,
 				FromMapping:            fromMapping,
 				InitiatedByMapping:     initiatedByMapping,
 				UsesBadgeIds:           true,
-				UsesTimelineTimes:      true,
 				UsesTransferTimes:      true,
 				UsesOwnershipTimes: 		true,
 				UsesFromMapping:        true,
@@ -67,7 +64,6 @@ func (k Keeper) CastUserApprovedOutgoingTransferPermissionToUniversalPermission(
 				BadgeIdsOptions:           combination.BadgeIdsOptions,
 				PermittedTimesOptions:     combination.PermittedTimesOptions,
 				ForbiddenTimesOptions:     combination.ForbiddenTimesOptions,
-				TimelineTimesOptions:      combination.TimelineTimesOptions,
 				TransferTimesOptions:      combination.TransferTimesOptions,
 				OwnershipTimesOptions: 	 combination.OwnershipTimesOptions,
 				ToMappingOptions:          combination.ToMappingOptions,
@@ -88,13 +84,11 @@ func (k Keeper) CastUserApprovedOutgoingTransferPermissionToUniversalPermission(
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
 				BadgeIds:               permission.DefaultValues.BadgeIds,
-				TimelineTimes:          permission.DefaultValues.TimelineTimes,
 				TransferTimes:          permission.DefaultValues.TransferTimes,
 				OwnershipTimes: 				permission.DefaultValues.OwnershipTimes,
 				ToMapping:              toMapping,
 				InitiatedByMapping:     initiatedByMapping,
 				UsesBadgeIds:           true,
-				UsesTimelineTimes:      true,
 				UsesTransferTimes:      true,
 				UsesOwnershipTimes: 		true,
 				UsesToMapping:          true,
@@ -138,7 +132,6 @@ func (k Keeper) CastCollectionApprovedTransferPermissionToUniversalPermission(ct
 			castedCombinations = append(castedCombinations, &types.UniversalCombination{
 				PermittedTimesOptions:     collectionUpdateCombination.PermittedTimesOptions,
 				ForbiddenTimesOptions:     collectionUpdateCombination.ForbiddenTimesOptions,
-				TimelineTimesOptions:      collectionUpdateCombination.TimelineTimesOptions,
 				TransferTimesOptions:      collectionUpdateCombination.TransferTimesOptions,
 				OwnershipTimesOptions: 	 collectionUpdateCombination.OwnershipTimesOptions,
 				ToMappingOptions:          collectionUpdateCombination.ToMappingOptions,
@@ -165,7 +158,6 @@ func (k Keeper) CastCollectionApprovedTransferPermissionToUniversalPermission(ct
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
-				TimelineTimes:          collectionUpdatePermission.DefaultValues.TimelineTimes,
 				TransferTimes:          collectionUpdatePermission.DefaultValues.TransferTimes,
 				OwnershipTimes: 				collectionUpdatePermission.DefaultValues.OwnershipTimes,
 				ToMapping:              toMapping,
@@ -173,7 +165,6 @@ func (k Keeper) CastCollectionApprovedTransferPermissionToUniversalPermission(ct
 				InitiatedByMapping:     initiatedByMapping,
 				BadgeIds:               collectionUpdatePermission.DefaultValues.BadgeIds,
 				UsesBadgeIds:           true,
-				UsesTimelineTimes:      true,
 				UsesTransferTimes:      true,
 				UsesOwnershipTimes: 		true,
 				UsesToMapping:          true,

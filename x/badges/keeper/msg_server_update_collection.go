@@ -23,8 +23,8 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 			// InheritedCollectionId: 					 	msg.InheritedCollectionId,
 			CollectionPermissions:            &types.CollectionPermissions{},
 			BalancesType:                     msg.BalancesType,
-			DefaultUserApprovedOutgoingTransfersTimeline: msg.DefaultApprovedOutgoingTransfersTimeline,
-			DefaultUserApprovedIncomingTransfersTimeline: msg.DefaultApprovedIncomingTransfersTimeline,
+			DefaultUserApprovedOutgoingTransfers: msg.DefaultApprovedOutgoingTransfers,
+			DefaultUserApprovedIncomingTransfers: msg.DefaultApprovedIncomingTransfers,
 			DefaultUserPermissions: 				msg.DefaultUserPermissions,
 			CreatedBy: 											msg.Creator,
 			ManagerTimeline: []*types.ManagerTimeline{
@@ -79,11 +79,11 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 	//not previouslyArchived && not stillArchived - unarchived before and now so we allow
 
 
-	if msg.UpdateCollectionApprovedTransfersTimeline {
-		if err := k.ValidateCollectionApprovedTransfersUpdate(ctx, collection, collection.CollectionApprovedTransfersTimeline, msg.CollectionApprovedTransfersTimeline, collection.CollectionPermissions.CanUpdateCollectionApprovedTransfers, msg.Creator); err != nil {
+	if msg.UpdateCollectionApprovedTransfers {
+		if err := k.ValidateCollectionApprovedTransfersUpdate(ctx, collection, collection.CollectionApprovedTransfers, msg.CollectionApprovedTransfers, collection.CollectionPermissions.CanUpdateCollectionApprovedTransfers, msg.Creator); err != nil {
 			return nil, err
 		}
-		collection.CollectionApprovedTransfersTimeline = msg.CollectionApprovedTransfersTimeline
+		collection.CollectionApprovedTransfers = msg.CollectionApprovedTransfers
 	}
 
 	if msg.UpdateCollectionMetadataTimeline {

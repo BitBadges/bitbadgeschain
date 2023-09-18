@@ -49,12 +49,6 @@ func ValidateCollectionApprovedTransferPermissions(permissions []*CollectionAppr
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false, false)
-		if err != nil {
-			return err
-		}
-
-		permission.DefaultValues.TimelineTimes = SortAndMergeOverlapping(permission.DefaultValues.TimelineTimes)
 		permission.DefaultValues.TransferTimes = SortAndMergeOverlapping(permission.DefaultValues.TransferTimes)
 		permission.DefaultValues.OwnershipTimes = SortAndMergeOverlapping(permission.DefaultValues.OwnershipTimes)
 		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
@@ -68,7 +62,6 @@ func ValidateCollectionApprovedTransferPermissions(permissions []*CollectionAppr
 					combination.ToMappingOptions == combination2.ToMappingOptions &&
 					combination.FromMappingOptions == combination2.FromMappingOptions &&
 					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
-					combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
 					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
 					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
 					return ErrInvalidCombinations
@@ -108,18 +101,12 @@ func ValidateUserApprovedOutgoingTransferPermissions(permissions []*UserApproved
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false, false)
-		if err != nil {
-			return err
-		}
-
 		err = ValidateRangesAreValid(permission.DefaultValues.OwnershipTimes, false, false)
 		if err != nil {
 			return err
 		}
 
 		permission.DefaultValues.OwnershipTimes = SortAndMergeOverlapping(permission.DefaultValues.OwnershipTimes)
-		permission.DefaultValues.TimelineTimes = SortAndMergeOverlapping(permission.DefaultValues.TimelineTimes)
 		permission.DefaultValues.TransferTimes = SortAndMergeOverlapping(permission.DefaultValues.TransferTimes)
 		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
 
@@ -130,7 +117,6 @@ func ValidateUserApprovedOutgoingTransferPermissions(permissions []*UserApproved
 					combination.OwnershipTimesOptions == combination2.OwnershipTimesOptions &&
 					combination.ToMappingOptions == combination2.ToMappingOptions &&
 					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
-					combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
 					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
 					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
 					return ErrInvalidCombinations
@@ -169,18 +155,12 @@ func ValidateUserApprovedIncomingTransferPermissions(permissions []*UserApproved
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false, false)
-		if err != nil {
-			return err
-		}
-
 		err = ValidateRangesAreValid(permission.DefaultValues.OwnershipTimes, false, false)
 		if err != nil {
 			return err
 		}
 
 		permission.DefaultValues.OwnershipTimes = SortAndMergeOverlapping(permission.DefaultValues.OwnershipTimes)
-		permission.DefaultValues.TimelineTimes = SortAndMergeOverlapping(permission.DefaultValues.TimelineTimes)
 		permission.DefaultValues.TransferTimes = SortAndMergeOverlapping(permission.DefaultValues.TransferTimes)
 		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
 
@@ -191,7 +171,6 @@ func ValidateUserApprovedIncomingTransferPermissions(permissions []*UserApproved
 					combination.OwnershipTimesOptions == combination2.OwnershipTimesOptions &&
 					combination.FromMappingOptions == combination2.FromMappingOptions &&
 					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
-					combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
 					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
 					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
 					return ErrInvalidCombinations

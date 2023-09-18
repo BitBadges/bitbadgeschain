@@ -31,8 +31,8 @@ message MsgUpdateCollection {
 
   //The following section of fields are only allowed to be set upon creation of a new collection.
   string balancesType = 3;
-  repeated UserApprovedOutgoingTransferTimeline defaultApprovedOutgoingTransfersTimeline = 4; //The user's approved transfers for each badge ID.
-  repeated UserApprovedIncomingTransferTimeline defaultApprovedIncomingTransfersTimeline = 5; //The user's approved incoming transfers for each badge ID.
+  repeated UserApprovedOutgoingTransfer defaultApprovedOutgoingTransfers = 4; //The user's approved transfers for each badge ID.
+  repeated UserApprovedIncomingTransfer defaultApprovedIncomingTransfers = 5; //The user's approved incoming transfers for each badge ID.
   UserPermissions defaultUserPermissions = 27;
 
   //The rest of the fields are allowed to be set on creation or update.
@@ -56,8 +56,8 @@ message MsgUpdateCollection {
   bool updateCustomDataTimeline = 17;
   repeated CustomDataTimeline customDataTimeline = 18;
 
-  bool updateCollectionApprovedTransfersTimeline = 21;
-  repeated CollectionApprovedTransferTimeline collectionApprovedTransfersTimeline = 22;
+  bool updateCollectionApprovedTransfers = 21;
+  repeated CollectionApprovedTransfer collectionApprovedTransfers = 22;
 
   bool updateStandardsTimeline = 23;
   repeated StandardsTimeline standardsTimeline = 24;
@@ -101,11 +101,11 @@ message MsgUpdateUserApprovedTransfers {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
-  bool updateApprovedOutgoingTransfersTimeline = 3;
-  repeated UserApprovedOutgoingTransferTimeline approvedOutgoingTransfersTimeline = 4;
+  bool updateApprovedOutgoingTransfers = 3;
+  repeated UserApprovedOutgoingTransfer approvedOutgoingTransfers = 4;
 
-  bool updateApprovedIncomingTransfersTimeline = 5;
-  repeated UserApprovedIncomingTransferTimeline approvedIncomingTransfersTimeline = 6;
+  bool updateApprovedIncomingTransfers = 5;
+  repeated UserApprovedIncomingTransfer approvedIncomingTransfers = 6;
   
   bool updateUserPermissions = 7;
   UserPermissions userPermissions = 8;

@@ -309,7 +309,6 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 						FromMappingId:        alice,
 						ToMappingId:          "AllWithoutMint",
 						ForbiddenTimes:       GetFullUintRanges(),
-						TimelineTimes:        GetFullUintRanges(),
 						InitiatedByMappingId: "AllWithoutMint",
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
@@ -330,10 +329,7 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 	err = UpdateCollectionApprovedTransfers(suite, wctx, &types.MsgUpdateCollectionApprovedTransfers{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
-			{
-				TimelineTimes: GetFullUintRanges(),
-				CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{
+		CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{
 					{
 						FromMappingId:                          alice,
 						ToMappingId:                            "AllWithoutMint",
@@ -345,7 +341,7 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 						ApprovalDetails: []*types.ApprovalDetails{
 							{
 								RequireToEqualsInitiatedBy:             true,
-								ApprovalTrackerId:                              "test",
+								ApprovalTrackerId:                      "test",
 								MaxNumTransfers: 												&types.MaxNumTransfers{},
 								ApprovalAmounts: 												&types.ApprovalAmounts{},
 								OverridesFromApprovedOutgoingTransfers: true,
@@ -353,8 +349,7 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 						},
 					},
 				},
-			},
-		},
+
 	})
 	suite.Require().Error(err, "Error updating collection approved transfers")
 
@@ -381,18 +376,13 @@ func (suite *TestSuite) TestCheckCollectionApprovedTransferUpdate() {
 			},
 		},
 	}
-	approvedTransfers = append(approvedTransfers, collection.CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers...)
+	approvedTransfers = append(approvedTransfers, collection.CollectionApprovedTransfers...)
 
 
 	err = UpdateCollectionApprovedTransfers(suite, wctx, &types.MsgUpdateCollectionApprovedTransfers{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
-			{
-				TimelineTimes: GetFullUintRanges(),
-				CollectionApprovedTransfers: approvedTransfers,
-			},
-		},
+		CollectionApprovedTransfers: approvedTransfers,
 	})
 	suite.Require().Nil(err, "Error updating collection approved transfers")
 }
@@ -402,8 +392,8 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].DefaultApprovedIncomingTransfersTimeline = []*types.UserApprovedIncomingTransferTimeline{}
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline = []*types.UserApprovedOutgoingTransferTimeline{}
+	collectionsToCreate[0].DefaultApprovedIncomingTransfers = []*types.UserApprovedIncomingTransfer{}
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers = []*types.UserApprovedOutgoingTransfer{}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating collections")
@@ -417,7 +407,6 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 					DefaultValues: &types.UserApprovedOutgoingTransferDefaultValues{
 						ToMappingId:          alice,
 						ForbiddenTimes:       GetFullUintRanges(),
-						TimelineTimes:        GetFullUintRanges(),
 						InitiatedByMappingId: "AllWithoutMint",
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
@@ -433,7 +422,6 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 					DefaultValues: &types.UserApprovedIncomingTransferDefaultValues{
 						FromMappingId:        alice,
 						ForbiddenTimes:       GetFullUintRanges(),
-						TimelineTimes:        GetFullUintRanges(),
 						InitiatedByMappingId: "AllWithoutMint",
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
@@ -451,47 +439,37 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 	err = UpdateUserApprovedTransfers(suite, wctx, &types.MsgUpdateUserApprovedTransfers{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		UpdateApprovedOutgoingTransfersTimeline: true,
-		UpdateApprovedIncomingTransfersTimeline: true,
-		ApprovedOutgoingTransfersTimeline: []*types.UserApprovedOutgoingTransferTimeline{
+		UpdateApprovedOutgoingTransfers: true,
+		UpdateApprovedIncomingTransfers: true,
+		ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
 			{
-				TimelineTimes: GetFullUintRanges(),
-				ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
+				ToMappingId:                alice,
+				InitiatedByMappingId:       "AllWithoutMint",
+				BadgeIds:                   GetFullUintRanges(),
+				TransferTimes:              GetFullUintRanges(),
+				OwnershipTimes: 		 GetFullUintRanges(),
+				ApprovalDetails: 					[]*types.OutgoingApprovalDetails{
 					{
-						ToMappingId:                alice,
-						InitiatedByMappingId:       "AllWithoutMint",
-						BadgeIds:                   GetFullUintRanges(),
-						TransferTimes:              GetFullUintRanges(),
-						OwnershipTimes: 		 GetFullUintRanges(),
-						ApprovalDetails: 					[]*types.OutgoingApprovalDetails{
-							{
-								RequireToEqualsInitiatedBy: true,
-								ApprovalTrackerId:                  "test",
-								MaxNumTransfers: 												&types.MaxNumTransfers{},
-								ApprovalAmounts: &types.ApprovalAmounts{},
-							},
-						},
+						RequireToEqualsInitiatedBy: true,
+						ApprovalTrackerId:                  "test",
+						MaxNumTransfers: 												&types.MaxNumTransfers{},
+						ApprovalAmounts: &types.ApprovalAmounts{},
 					},
 				},
 			},
 		},
-		ApprovedIncomingTransfersTimeline: []*types.UserApprovedIncomingTransferTimeline{
+		ApprovedIncomingTransfers: []*types.UserApprovedIncomingTransfer{
 			{
-				TimelineTimes: GetFullUintRanges(),
-				ApprovedIncomingTransfers: []*types.UserApprovedIncomingTransfer{
+				FromMappingId:        alice,
+				InitiatedByMappingId: "AllWithoutMint",
+				BadgeIds:             GetFullUintRanges(),
+				TransferTimes:        GetFullUintRanges(),
+				OwnershipTimes: 		 GetFullUintRanges(),
+				ApprovalDetails: []*types.IncomingApprovalDetails{
 					{
-						FromMappingId:        alice,
-						InitiatedByMappingId: "AllWithoutMint",
-						BadgeIds:             GetFullUintRanges(),
-						TransferTimes:        GetFullUintRanges(),
-						OwnershipTimes: 		 GetFullUintRanges(),
-						ApprovalDetails: []*types.IncomingApprovalDetails{
-							{
-								ApprovalTrackerId:                 "test",
-								MaxNumTransfers: 												&types.MaxNumTransfers{},
-								ApprovalAmounts: 												&types.ApprovalAmounts{},
-							},
-						},
+						ApprovalTrackerId:                 "test",
+						MaxNumTransfers: 												&types.MaxNumTransfers{},
+						ApprovalAmounts: 												&types.ApprovalAmounts{},
 					},
 				},
 			},
@@ -502,52 +480,42 @@ func (suite *TestSuite) TestCheckUserApprovedTransferUpdate() {
 	err = UpdateUserApprovedTransfers(suite, wctx, &types.MsgUpdateUserApprovedTransfers{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		UpdateApprovedOutgoingTransfersTimeline: true,
-		UpdateApprovedIncomingTransfersTimeline: true,
-		ApprovedOutgoingTransfersTimeline: []*types.UserApprovedOutgoingTransferTimeline{
+		UpdateApprovedOutgoingTransfers: true,
+		UpdateApprovedIncomingTransfers: true,
+		ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
 			{
-				TimelineTimes: GetFullUintRanges(),
-				ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
+				ToMappingId:                bob,
+				InitiatedByMappingId:       "AllWithoutMint",
+				BadgeIds:                   GetFullUintRanges(),
+				TransferTimes:              GetFullUintRanges(),
+				OwnershipTimes: 		 GetFullUintRanges(),
+				ApprovalDetails: []*types.OutgoingApprovalDetails{
 					{
-						ToMappingId:                bob,
-						InitiatedByMappingId:       "AllWithoutMint",
-						BadgeIds:                   GetFullUintRanges(),
-						TransferTimes:              GetFullUintRanges(),
-						OwnershipTimes: 		 GetFullUintRanges(),
-						ApprovalDetails: []*types.OutgoingApprovalDetails{
-							{
-								RequireToEqualsInitiatedBy: true,
-								ApprovalTrackerId:                  "test",
-								MaxNumTransfers: 												&types.MaxNumTransfers{},
-								ApprovalAmounts: 												&types.ApprovalAmounts{},
-							},
-						},
+						RequireToEqualsInitiatedBy: true,
+						ApprovalTrackerId:                  "test",
+						MaxNumTransfers: 												&types.MaxNumTransfers{},
+						ApprovalAmounts: 												&types.ApprovalAmounts{},
 					},
 				},
 			},
 		},
-		ApprovedIncomingTransfersTimeline: []*types.UserApprovedIncomingTransferTimeline{
+		ApprovedIncomingTransfers: []*types.UserApprovedIncomingTransfer{
 			{
-				TimelineTimes: GetFullUintRanges(),
-				ApprovedIncomingTransfers: []*types.UserApprovedIncomingTransfer{
+				FromMappingId:                bob,
+				InitiatedByMappingId:         "AllWithoutMint",
+				BadgeIds:                     GetFullUintRanges(),
+				TransferTimes:                GetFullUintRanges(),
+				OwnershipTimes: 		 GetFullUintRanges(),
+				ApprovalDetails: []*types.IncomingApprovalDetails{
 					{
-						FromMappingId:                bob,
-						InitiatedByMappingId:         "AllWithoutMint",
-						BadgeIds:                     GetFullUintRanges(),
-						TransferTimes:                GetFullUintRanges(),
-						OwnershipTimes: 		 GetFullUintRanges(),
-						ApprovalDetails: []*types.IncomingApprovalDetails{
-							{
-								RequireFromEqualsInitiatedBy: true,
+						RequireFromEqualsInitiatedBy: true,
 
-								ApprovalTrackerId:                 "test",
-								MaxNumTransfers: 												&types.MaxNumTransfers{
-									
-								},
-								ApprovalAmounts: 												&types.ApprovalAmounts{
-									
-								},
-							},
+						ApprovalTrackerId:                 "test",
+						MaxNumTransfers: 												&types.MaxNumTransfers{
+							
+						},
+						ApprovalAmounts: 												&types.ApprovalAmounts{
+							
 						},
 					},
 				},

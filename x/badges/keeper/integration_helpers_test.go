@@ -81,10 +81,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 		{
 			Creator:      bob,
 			BalancesType: sdkmath.NewUint(1),
-			CollectionApprovedTransfersTimeline: []*types.CollectionApprovedTransferTimeline{
-				{
-					TimelineTimes: GetFullUintRanges(),
-					CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{
+			CollectionApprovedTransfers:  []*types.CollectionApprovedTransfer{
 						{
 							ToMappingId:          "AllWithoutMint",
 							FromMappingId:        "AllWithoutMint",
@@ -110,11 +107,9 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 								},
 							},
 						}},
-				},
-			},
-			DefaultApprovedIncomingTransfersTimeline: []*types.UserApprovedIncomingTransferTimeline{
-				{
-					ApprovedIncomingTransfers: []*types.UserApprovedIncomingTransfer{
+				
+			
+			DefaultApprovedIncomingTransfers:[]*types.UserApprovedIncomingTransfer{
 						{
 							FromMappingId:        "AllWithoutMint",
 							InitiatedByMappingId: "AllWithoutMint",
@@ -139,13 +134,9 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 								},
 							},
 						},
-					},
-					TimelineTimes: GetFullUintRanges(),
-				},
+					
 			},
-			DefaultApprovedOutgoingTransfersTimeline: []*types.UserApprovedOutgoingTransferTimeline{
-				{
-					ApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
+			DefaultApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransfer{
 						{
 							ToMappingId:          "AllWithoutMint",
 							InitiatedByMappingId: "AllWithoutMint",
@@ -170,9 +161,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 								},
 							},
 						},
-					},
-					TimelineTimes: GetFullUintRanges(),
-				},
+					
 			},
 			BadgesToCreate: []*types.Balance{
 				{
@@ -212,8 +201,8 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 
 func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*types.MsgNewCollection {
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers[0].ApprovalDetails[0].ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(uint64(math.MaxUint64))
-	collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers = append([]*types.CollectionApprovedTransfer{{
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(uint64(math.MaxUint64))
+	collectionsToCreate[0].CollectionApprovedTransfers = append([]*types.CollectionApprovedTransfer{{
 
 		ToMappingId:                            "AllWithoutMint",
 		FromMappingId:                          "Mint",
@@ -242,7 +231,7 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*type
 			},
 		},
 	},
-	}, collectionsToCreate[0].CollectionApprovedTransfersTimeline[0].CollectionApprovedTransfers...,
+	}, collectionsToCreate[0].CollectionApprovedTransfers...,
 	)
 
 	collectionsToCreate[0].Transfers = []*types.Transfer{

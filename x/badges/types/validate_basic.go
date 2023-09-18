@@ -205,6 +205,7 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 			for _, approvalDetails := range collectionApprovedTransfers[i].ApprovalDetails {
 				for _, compApprovalDetails := range collectionApprovedTransfers[j].ApprovalDetails {
 					if approvalDetails.PredeterminedBalances != nil && compApprovalDetails.PredeterminedBalances != nil && 
+						approvalDetails.PredeterminedBalances.PrecalculationId != "" &&
 						approvalDetails.PredeterminedBalances.PrecalculationId == compApprovalDetails.PredeterminedBalances.PrecalculationId {
 						return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate precalculation ids")
 					}

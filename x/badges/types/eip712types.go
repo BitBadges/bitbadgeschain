@@ -112,14 +112,14 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "aunts", Type: "MerklePathItem[]"},
 		{Name: "leaf", Type: "string"},
 	}
-	UserApprovedOutgoingTransferTimelineTypes := []apitypes.Type{
-		{Name: "approvedOutgoingTransfers", Type: "UserApprovedOutgoingTransfer[]"},
-		{Name: "timelineTimes", Type: "UintRange[]"},
-	}
-	UserApprovedIncomingTransferTimelineTypes := []apitypes.Type{
-		{Name: "approvedIncomingTransfers", Type: "UserApprovedIncomingTransfer[]"},
-		{Name: "timelineTimes", Type: "UintRange[]"},
-	}
+	// UserApprovedOutgoingTransferTimelineTypes := []apitypes.Type{
+	// 	{Name: "approvedOutgoingTransfers", Type: "UserApprovedOutgoingTransfer[]"},
+	// 	{Name: "timelineTimes", Type: "UintRange[]"},
+	// }
+	// UserApprovedIncomingTransferTimelineTypes := []apitypes.Type{
+	// 	{Name: "approvedIncomingTransfers", Type: "UserApprovedIncomingTransfer[]"},
+	// 	{Name: "timelineTimes", Type: "UintRange[]"},
+	// }
 	UserPermissionsTypes := []apitypes.Type{
 		{Name: "canUpdateApprovedOutgoingTransfers", Type: "UserApprovedOutgoingTransferPermission[]"},
 		{Name: "canUpdateApprovedIncomingTransfers", Type: "UserApprovedIncomingTransferPermission[]"},
@@ -151,7 +151,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "combinations", Type: "UserApprovedIncomingTransferCombination[]"},
 	}
 	UserApprovedOutgoingTransferDefaultValuesTypes := []apitypes.Type{
-		{Name: "timelineTimes", Type: "UintRange[]"},
 		{Name: "toMappingId", Type: "string"},
 		{Name: "initiatedByMappingId", Type: "string"},
 		{Name: "transferTimes", Type: "UintRange[]"},
@@ -162,7 +161,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "forbiddenTimes", Type: "UintRange[]"},
 	}
 	UserApprovedOutgoingTransferCombinationTypes := []apitypes.Type{
-		{Name: "timelineTimesOptions", Type: "ValueOptions"},
 		{Name: "toMappingOptions", Type: "ValueOptions"},
 		{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
 		{Name: "transferTimesOptions", Type: "ValueOptions"},
@@ -172,7 +170,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
 	}
 	UserApprovedIncomingTransferDefaultValuesTypes := []apitypes.Type{
-		{Name: "timelineTimes", Type: "UintRange[]"},
 		{Name: "fromMappingId", Type: "string"},
 		{Name: "initiatedByMappingId", Type: "string"},
 		{Name: "transferTimes", Type: "UintRange[]"},
@@ -183,7 +180,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "forbiddenTimes", Type: "UintRange[]"},
 	}
 	UserApprovedIncomingTransferCombinationTypes := []apitypes.Type{
-		{Name: "timelineTimesOptions", Type: "ValueOptions"},
 		{Name: "fromMappingOptions", Type: "ValueOptions"},
 		{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
 		{Name: "transferTimesOptions", Type: "ValueOptions"},
@@ -344,15 +340,13 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "string"},
-				{Name: "updateApprovedOutgoingTransfersTimeline", Type: "bool"},
-				{Name: "approvedOutgoingTransfersTimeline", Type: "UserApprovedOutgoingTransferTimeline[]"},
-				{Name: "updateApprovedIncomingTransfersTimeline", Type: "bool"},
-				{Name: "approvedIncomingTransfersTimeline", Type: "UserApprovedIncomingTransferTimeline[]"},
+				{Name: "updateApprovedOutgoingTransfers", Type: "bool"},
+				{Name: "approvedOutgoingTransfers", Type: "UserApprovedOutgoingTransfer[][]"},
+				{Name: "updateApprovedIncomingTransfers", Type: "bool"},
+				{Name: "approvedIncomingTransfers", Type: "UserApprovedIncomingTransfer[]"},
 				{Name: "updateUserPermissions", Type: "bool"},
 				{Name: "userPermissions", Type: "UserPermissions"},
 			},
-			"UserApprovedOutgoingTransferTimeline": UserApprovedOutgoingTransferTimelineTypes,
-			"UserApprovedIncomingTransferTimeline": UserApprovedIncomingTransferTimelineTypes,
 			"UserPermissions": UserPermissionsTypes,
 			"UserApprovedOutgoingTransfer": UserApprovedOutgoingTransferTypes,
 			"UserApprovedIncomingTransfer": UserApprovedIncomingTransferTypes,
@@ -386,8 +380,8 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "string"},
 				{Name: "balancesType", Type: "string"},
-				{Name: "defaultApprovedOutgoingTransfersTimeline", Type: "UserApprovedOutgoingTransferTimeline[]"},
-				{Name: "defaultApprovedIncomingTransfersTimeline", Type: "UserApprovedIncomingTransferTimeline[]"},
+				{Name: "defaultApprovedOutgoingTransfers", Type: "UserApprovedOutgoingTransfer[]"},
+				{Name: "defaultApprovedIncomingTransfers", Type: "UserApprovedIncomingTransfer[]"},
 				{Name: "defaultUserPermissions", Type: "UserPermissions"},
 				{Name: "badgesToCreate", Type: "Balance[]"},
 				{Name: "updateCollectionPermissions", Type: "bool"},
@@ -403,8 +397,8 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "updateCustomDataTimeline", Type: "bool"},
 				{Name: "customDataTimeline", Type: "CustomDataTimeline[]"},
 				// {Name: "inheritedCollectionId", Type: "string"},
-				{Name: "updateCollectionApprovedTransfersTimeline", Type: "bool"},
-				{Name: "collectionApprovedTransfersTimeline", Type: "CollectionApprovedTransferTimeline[]"},
+				{Name: "updateCollectionApprovedTransfers", Type: "bool"},
+				{Name: "collectionApprovedTransfers", Type: "CollectionApprovedTransfer[]"},
 				{Name: "updateStandardsTimeline", Type: "bool"},
 				{Name: "standardsTimeline", Type: "StandardsTimeline[]"},
 				{Name: "updateContractAddressTimeline", Type: "bool"},
@@ -444,10 +438,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			},
 			"CustomDataTimeline": {
 				{Name: "customData", Type: "string"},
-				{Name: "timelineTimes", Type: "UintRange[]"},
-			},
-			"CollectionApprovedTransferTimeline": {
-				{Name: "collectionApprovedTransfers", Type: "CollectionApprovedTransfer[]"},
 				{Name: "timelineTimes", Type: "UintRange[]"},
 			},
 			"StandardsTimeline": {
@@ -517,7 +507,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "combinations", Type: "CollectionApprovedTransferCombination[]"},
 			},
 			"CollectionApprovedTransferCombination": {
-				{Name: "timelineTimesOptions", Type: "ValueOptions"},
 				{Name: "fromMappingOptions", Type: "ValueOptions"},
 				{Name: "toMappingOptions", Type: "ValueOptions"},
 				{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
@@ -528,7 +517,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
 			},
 			"CollectionApprovedTransferDefaultValues": {
-				{Name: "timelineTimes", Type: "UintRange[]"},
 				{Name: "fromMappingId", Type: "string"},
 				{Name: "toMappingId", Type: "string"},
 				{Name: "initiatedByMappingId", Type: "string"},
@@ -596,8 +584,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "overridesFromApprovedOutgoingTransfers", Type: "bool"},
 				{Name: "overridesToApprovedIncomingTransfers", Type: "bool"},
 			},
-			"UserApprovedOutgoingTransferTimeline": UserApprovedOutgoingTransferTimelineTypes,
-			"UserApprovedIncomingTransferTimeline": UserApprovedIncomingTransferTimelineTypes,
 			"UserPermissions": UserPermissionsTypes,
 			"UserApprovedOutgoingTransfer": UserApprovedOutgoingTransferTypes,
 			"UserApprovedIncomingTransfer": UserApprovedIncomingTransferTypes,

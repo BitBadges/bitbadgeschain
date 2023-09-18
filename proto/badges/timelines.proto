@@ -40,11 +40,6 @@ message ManagerTimeline {
   repeated UintRange timelineTimes = 2;
 }
 
-message CollectionApprovedTransferTimeline {
-  repeated CollectionApprovedTransfer collectionApprovedTransfers = 1;
-  repeated UintRange timelineTimes = 2;
-}
-
 message IsArchivedTimeline {
   bool isArchived = 1;
   repeated UintRange timelineTimes = 2;

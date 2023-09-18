@@ -154,9 +154,9 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			Creator:      bob,
 			BalancesType: balancesType,
 			CollectionPermissions: collectionToCreate.Permissions,
-			CollectionApprovedTransfersTimeline: collectionToCreate.CollectionApprovedTransfersTimeline,
-			DefaultApprovedOutgoingTransfersTimeline: collectionToCreate.DefaultApprovedOutgoingTransfersTimeline,
-			DefaultApprovedIncomingTransfersTimeline: collectionToCreate.DefaultApprovedIncomingTransfersTimeline,
+			CollectionApprovedTransfers: collectionToCreate.CollectionApprovedTransfers,
+			DefaultApprovedOutgoingTransfers: collectionToCreate.DefaultApprovedOutgoingTransfers,
+			DefaultApprovedIncomingTransfers: collectionToCreate.DefaultApprovedIncomingTransfers,
 			// ManagerTimeline: []*types.ManagerTimeline{
 			// 	{
 			// 		Manager: collectionToCreate.Creator,
@@ -183,7 +183,7 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			
 			UpdateCustomDataTimeline: true,
 			UpdateContractAddressTimeline: true,
-			UpdateCollectionApprovedTransfersTimeline: true,
+			UpdateCollectionApprovedTransfers: true,
 			UpdateStandardsTimeline: true,
 			// UpdateIsArchivedTimeline: true,
 		})
@@ -225,8 +225,8 @@ func MintAndDistributeBadges(suite *TestSuite, ctx context.Context, msg *types.M
 		UpdateBadgeMetadataTimeline: true,
 		OffChainBalancesMetadataTimeline: msg.OffChainBalancesMetadataTimeline,
 		UpdateOffChainBalancesMetadataTimeline: true,
-		CollectionApprovedTransfersTimeline: msg.CollectionApprovedTransfersTimeline,
-		UpdateCollectionApprovedTransfersTimeline: true,
+		CollectionApprovedTransfers: msg.CollectionApprovedTransfers,
+		UpdateCollectionApprovedTransfers: true,
 	})
 	if err != nil {
 		return err 
@@ -244,8 +244,8 @@ func UpdateCollectionApprovedTransfers(suite *TestSuite, ctx context.Context, ms
 	_, err := suite.msgServer.UpdateCollection(ctx, &types.MsgUpdateCollection{
 		Creator: bob,
 		CollectionId: msg.CollectionId,
-		CollectionApprovedTransfersTimeline: msg.CollectionApprovedTransfersTimeline,
-		UpdateCollectionApprovedTransfersTimeline: true,
+		CollectionApprovedTransfers: msg.CollectionApprovedTransfers,
+		UpdateCollectionApprovedTransfers: true,
 	})
 	return err
 }

@@ -30,7 +30,7 @@ func (suite *TestSuite) TestNewBadges() {
 				OwnershipTimes: GetFullUintRanges(),
 			},
 		},
-		CollectionApprovedTransfersTimeline: collection.CollectionApprovedTransfersTimeline,
+		CollectionApprovedTransfers: collection.CollectionApprovedTransfers,
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
