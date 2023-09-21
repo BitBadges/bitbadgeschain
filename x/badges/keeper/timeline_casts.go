@@ -65,7 +65,7 @@ func (k Keeper) CastCollectionApprovedTransferToUniversalPermission(ctx sdk.Cont
 			DefaultValues: &types.UniversalDefaultValues{
 				BadgeIds:               approvedTransfer.BadgeIds,
 				TransferTimes:          approvedTransfer.TransferTimes,
-				OwnershipTimes: 			 			approvedTransfer.OwnershipTimes,
+				OwnershipTimes: 			 	approvedTransfer.OwnershipTimes,
 				FromMapping:            fromMapping,
 				ToMapping:              toMapping,
 				InitiatedByMapping:     initiatedByMapping,
@@ -74,7 +74,7 @@ func (k Keeper) CastCollectionApprovedTransferToUniversalPermission(ctx sdk.Cont
 				UsesToMapping:          true,
 				UsesFromMapping:        true,
 				UsesInitiatedByMapping: true,
-				UsesOwnershipTimes: 	 			true,
+				UsesOwnershipTimes: 	 	true,
 				ArbitraryValue:         approvedTransfer,
 			},
 			Combinations: []*types.UniversalCombination{{}},

@@ -19,20 +19,41 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 			fromMappingId := types.GetMappingIdWithOptions(approvedTransfer.FromMappingId, allowedCombination.FromMappingOptions, true)
 			initiatedByMappingId := types.GetMappingIdWithOptions(approvedTransfer.InitiatedByMappingId, allowedCombination.InitiatedByMappingOptions, true)
 			
-			newCurrApprovedTransfers = append(newCurrApprovedTransfers, &types.CollectionApprovedTransfer{
-				ToMappingId:          toMappingId,
-				FromMappingId:        fromMappingId,
-				InitiatedByMappingId: initiatedByMappingId,
-				TransferTimes:        times,
-				BadgeIds:             badgeIds,
-				OwnershipTimes: 		 	ownershipTimes,
-				AllowedCombinations: []*types.IsCollectionTransferAllowed{
-					{
-						IsApproved: allowedCombination.IsApproved,
+			if len(approvedTransfer.ApprovalDetails) == 0 {
+				newCurrApprovedTransfers = append(newCurrApprovedTransfers, &types.CollectionApprovedTransfer{
+					ToMappingId:          toMappingId,
+					FromMappingId:        fromMappingId,
+					InitiatedByMappingId: initiatedByMappingId,
+					TransferTimes:        times,
+					BadgeIds:             badgeIds,
+					OwnershipTimes: 		 	ownershipTimes,
+					AllowedCombinations: []*types.IsCollectionTransferAllowed{
+						{
+							IsApproved: allowedCombination.IsApproved,
+						},
 					},
-				},
-				ApprovalDetails: approvedTransfer.ApprovalDetails,
-			})
+					ApprovalDetails: []*types.ApprovalDetails{},
+				})
+			}
+
+			for _, approvalDetails := range approvedTransfer.ApprovalDetails {
+				newCurrApprovedTransfers = append(newCurrApprovedTransfers, &types.CollectionApprovedTransfer{
+					ToMappingId:          toMappingId,
+					FromMappingId:        fromMappingId,
+					InitiatedByMappingId: initiatedByMappingId,
+					TransferTimes:        times,
+					BadgeIds:             badgeIds,
+					OwnershipTimes: 		 	ownershipTimes,
+					AllowedCombinations: []*types.IsCollectionTransferAllowed{
+						{
+							IsApproved: allowedCombination.IsApproved,
+						},
+					},
+					ApprovalDetails: []*types.ApprovalDetails{
+						approvalDetails,
+					},
+				})
+			}
 		}
 	}
 
@@ -41,7 +62,8 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 
 // By default, we approve all transfers if to === initiatedBy
 func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomingTransfer, userAddress string) []*types.UserApprovedIncomingTransfer {
-	currApprovedTransfers = append(currApprovedTransfers, &types.UserApprovedIncomingTransfer{
+	currApprovedTransfers = append([]*types.UserApprovedIncomingTransfer{
+		{
 		FromMappingId:        "AllWithMint", //everyone
 		InitiatedByMappingId: userAddress,
 		TransferTimes: []*types.UintRange{
@@ -67,14 +89,16 @@ func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomin
 				IsApproved: true,
 			},
 		},
-	})
+	}	}, currApprovedTransfers...)
 
 	return currApprovedTransfers
 }
 
 // By default, we approve all transfers if from === initiatedBy
 func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoingTransfer, userAddress string) []*types.UserApprovedOutgoingTransfer {
-	currApprovedTransfers = append(currApprovedTransfers, &types.UserApprovedOutgoingTransfer{
+	//prepend it 
+	currApprovedTransfers = append([]*types.UserApprovedOutgoingTransfer{
+		{
 		ToMappingId:          "AllWithMint", //everyone
 		InitiatedByMappingId: userAddress,
 		TransferTimes: []*types.UintRange{
@@ -100,7 +124,8 @@ func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoin
 				IsApproved: true,
 			},
 		},
-	})
+	}}, currApprovedTransfers...)
+
 
 	return currApprovedTransfers
 }

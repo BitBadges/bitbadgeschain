@@ -37,14 +37,14 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 	manager := types.GetCurrentManager(ctx, collection)
 
 	if msg.UpdateApprovedOutgoingTransfers {
-		if err := k.ValidateUserApprovedOutgoingTransfersUpdate(ctx, userBalance.ApprovedOutgoingTransfers, msg.ApprovedOutgoingTransfers, userBalance.UserPermissions.CanUpdateApprovedOutgoingTransfers, manager); err != nil {
+		if err := k.ValidateUserApprovedOutgoingTransfersUpdate(ctx, collection, userBalance.ApprovedOutgoingTransfers, msg.ApprovedOutgoingTransfers, userBalance.UserPermissions.CanUpdateApprovedOutgoingTransfers, manager, msg.Creator); err != nil {
 			return nil, err
 		}
 		userBalance.ApprovedOutgoingTransfers = msg.ApprovedOutgoingTransfers
 	}
 
 	if msg.UpdateApprovedIncomingTransfers {
-		if err := k.ValidateUserApprovedIncomingTransfersUpdate(ctx, userBalance.ApprovedIncomingTransfers, msg.ApprovedIncomingTransfers, userBalance.UserPermissions.CanUpdateApprovedIncomingTransfers, manager); err != nil {
+		if err := k.ValidateUserApprovedIncomingTransfersUpdate(ctx, collection,  userBalance.ApprovedIncomingTransfers, msg.ApprovedIncomingTransfers, userBalance.UserPermissions.CanUpdateApprovedIncomingTransfers, manager, msg.Creator); err != nil {
 			return nil, err
 		}
 		userBalance.ApprovedIncomingTransfers = msg.ApprovedIncomingTransfers

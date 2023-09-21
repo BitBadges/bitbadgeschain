@@ -365,6 +365,54 @@ func GetMappingWithOptions(mapping *AddressMapping, options *ValueOptions, uses 
 	return mapping
 }
 
+func ApplyManipulations(permissions []*UniversalPermission) []*UniversalPermissionDetails {
+	handled := []*UniversalPermissionDetails{}
+	for _, permission := range permissions {
+		for _, combination := range permission.Combinations {
+			badgeIds := GetUintRangesWithOptions(permission.DefaultValues.BadgeIds, combination.BadgeIdsOptions, permission.DefaultValues.UsesBadgeIds)
+			timelineTimes := GetUintRangesWithOptions(permission.DefaultValues.TimelineTimes, combination.TimelineTimesOptions, permission.DefaultValues.UsesTimelineTimes)
+			transferTimes := GetUintRangesWithOptions(permission.DefaultValues.TransferTimes, combination.TransferTimesOptions, permission.DefaultValues.UsesTransferTimes)
+			ownershipTimes := GetUintRangesWithOptions(permission.DefaultValues.OwnershipTimes, combination.OwnershipTimesOptions, permission.DefaultValues.UsesOwnershipTimes)
+			permittedTimes := GetUintRangesWithOptions(permission.DefaultValues.PermittedTimes, combination.PermittedTimesOptions, true)
+			forbiddenTimes := GetUintRangesWithOptions(permission.DefaultValues.ForbiddenTimes, combination.ForbiddenTimesOptions, true)
+			arbitraryValue := permission.DefaultValues.ArbitraryValue
+
+			toMapping := GetMappingWithOptions(permission.DefaultValues.ToMapping, combination.ToMappingOptions, permission.DefaultValues.UsesToMapping)
+			fromMapping := GetMappingWithOptions(permission.DefaultValues.FromMapping, combination.FromMappingOptions, permission.DefaultValues.UsesFromMapping)
+			initiatedByMapping := GetMappingWithOptions(permission.DefaultValues.InitiatedByMapping, combination.InitiatedByMappingOptions, permission.DefaultValues.UsesInitiatedByMapping)
+
+			for _, badgeId := range badgeIds {
+				for _, timelineTime := range timelineTimes {
+					for _, transferTime := range transferTimes {
+						for _, ownershipTime := range ownershipTimes {
+							brokenDown := []*UniversalPermissionDetails{
+								{
+									BadgeId:            badgeId,
+									TimelineTime:       timelineTime,
+									TransferTime:       transferTime,
+									OwnershipTime:      ownershipTime,
+									ToMapping:          toMapping,
+									FromMapping:        fromMapping,
+									InitiatedByMapping: initiatedByMapping,
+
+									//Appended for future lookups (not involved in overlap logic)
+									PermittedTimes: permittedTimes,
+									ForbiddenTimes: forbiddenTimes,
+									ArbitraryValue: arbitraryValue,
+								},
+							}
+							
+							handled = append(handled, brokenDown...)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return handled
+}
+
 func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissionDetails {
 	handled := []*UniversalPermissionDetails{}
 	for _, permission := range permissions {
@@ -397,8 +445,8 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissio
 								},
 							}
 
-							_, remainingAfterHandledIsRemoed, _ := GetOverlapsAndNonOverlaps(brokenDown, handled)
-							for _, remaining := range remainingAfterHandledIsRemoed {
+							_, inBrokenDownButNotHandled, _ := GetOverlapsAndNonOverlaps(brokenDown, handled)
+							for _, remaining := range inBrokenDownButNotHandled {
 								handled = append(handled, &UniversalPermissionDetails{
 									TimelineTime:       remaining.TimelineTime,
 									BadgeId:            remaining.BadgeId,
