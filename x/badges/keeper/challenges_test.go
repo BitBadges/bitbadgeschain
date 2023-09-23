@@ -20,7 +20,7 @@ func (suite *TestSuite) TestNoMerkleChallengesWorking() {
 	CreateCollections(suite, wctx, collectionsToCreate)
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{})
+	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
 	suite.Require().Error(err, "Error getting user balance: %s")
 }
 
@@ -39,7 +39,7 @@ func (suite *TestSuite) TestMerkleChallengesInvalidSolutions() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{})
+	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
 	suite.Require().Error(err, "Error getting user balance: %s")
 
 	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{
@@ -49,7 +49,7 @@ func (suite *TestSuite) TestMerkleChallengesInvalidSolutions() {
 				Leaf:  "sample",
 			},
 		
-	})
+	}, &[]string{}, &[]string{})
 	suite.Require().Error(err, "Error getting user balance: %s")
 }
 func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
@@ -2908,7 +2908,7 @@ func (suite *TestSuite) TestMultipleApprovalDetailsSameApprovalTrackerId() {
 	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails = append(collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails, &types.ApprovalDetails{
 		
 		MerkleChallenges:                []*types.MerkleChallenge{},
-		ApprovalTrackerId:                 		"test2",
+		ApprovalTrackerId:               "test2",
 		MaxNumTransfers: &types.MaxNumTransfers{
 			OverallMaxNumTransfers: sdkmath.NewUint(1000),
 		},

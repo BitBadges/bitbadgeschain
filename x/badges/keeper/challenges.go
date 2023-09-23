@@ -11,10 +11,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool, approverAddress string, challengeLevel string) (sdkmath.Uint, error) {
+func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool, approverAddress string, challengeLevel string, challengeIdsIncremented *[]string) (sdkmath.Uint, error) {
 	numIncrements := sdkmath.NewUint(0)
 
-	
 	for _, challenge := range challenges {
 		root := challenge.Root
 		hasValidSolution := false
@@ -80,9 +79,21 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 					}
 
 					if !simulation {
-						newNumUsed, err = k.IncrementNumUsedForMerkleChallengeInStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex)
-						if err != nil {
-							continue
+						incrementId := fmt.Sprint(collectionId) + "-" + fmt.Sprint(approverAddress) + "-" + fmt.Sprint(challengeLevel) + "-" + fmt.Sprint(challengeId) + "-" + fmt.Sprint(leafIndex)
+						alreadyIncremented := false
+						for _, id := range *challengeIdsIncremented {
+							if id == incrementId {
+								alreadyIncremented = true
+								break
+							}
+						}
+
+						if !alreadyIncremented {
+							*challengeIdsIncremented = append(*challengeIdsIncremented, incrementId)
+							newNumUsed, err = k.IncrementNumUsedForMerkleChallengeInStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex)
+							if err != nil {
+								continue
+							}
 						}
 					}
 				}

@@ -103,7 +103,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		},
 		OwnershipTimes: GetFullUintRanges(),
 		Amount:         sdkmath.NewUint(1),
-	})
+	}, false)
 	suite.Require().Nil(err, "Error subtracting balances: %s")
 
 	totalSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Total")
@@ -115,7 +115,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		},
 		OwnershipTimes: GetFullUintRanges(),
 		Amount:         sdkmath.NewUint(1),
-	})
+	}, false)
 	suite.Require().Nil(err, "Error subtracting balances: %s")
 
 	unmintedSupplys, err := GetUserBalance(suite, wctx, sdk.NewUint(1), "Mint")
@@ -139,7 +139,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		},
 		OwnershipTimes: GetFullUintRanges(),
 		Amount:         sdkmath.NewUint(2),
-	})
+	}, false)
 	suite.Require().Nil(err, "Error subtracting balances: %s")
 
 	unmintedSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Mint")
@@ -150,7 +150,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		},
 		OwnershipTimes: GetFullUintRanges(),
 		Amount:         sdkmath.NewUint(2),
-	})
+	}, false)
 	suite.Require().Error(err, "Error subtracting balances: %s")
 
 	unmintedSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Mint")
@@ -161,7 +161,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		},
 		OwnershipTimes: GetFullUintRanges(),
 		Amount:         sdkmath.NewUint(1),
-	})
+	}, false)
 	suite.Require().Nil(err, "Error subtracting balances: %s")
 
 	_, err = suite.app.BadgesKeeper.CreateBadges(suite.ctx, collection, []*types.Balance{
@@ -196,7 +196,7 @@ func (suite *TestSuite) TestCreateBadges() {
 		},
 		OwnershipTimes: GetFullUintRanges(),
 		Amount:         types.NewUintFromString("1000000000000000000000000000000000000000000000000000000000000"),
-	})
+	}, false)
 	suite.Require().Nil(err, "Error subtracting balances: %s")
 
 	collection, err = suite.app.BadgesKeeper.CreateBadges(suite.ctx, collection, []*types.Balance{

@@ -374,7 +374,7 @@ func (suite *TestSuite) TestBalancesFuzz() {
 					},
 				},
 				OwnershipTimes: GetFullUintRanges(),
-			})
+			}, false)
 
 			if err != nil {
 				suite.Require().EqualError(err, types.ErrUnderflow.Error())
@@ -494,7 +494,7 @@ func (suite *TestSuite) TestBalancesWithTimesFuzz() {
 						End:   sdkmath.NewUint(endTime),
 					},
 				},
-			})
+			}, false)
 
 			if err != nil {
 				suite.Require().EqualError(err, types.ErrUnderflow.Error())

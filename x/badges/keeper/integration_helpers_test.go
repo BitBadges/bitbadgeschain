@@ -24,7 +24,7 @@ func AssertBalancesEqual(suite *TestSuite, expected []*types.Balance, actual []*
 
 	err := *new(error)
 	for _, balance := range expected {
-		actual, err = types.SubtractBalance(actual, balance)
+		actual, err = types.SubtractBalance(actual, balance, false)
 		suite.Require().Nil(err, "Underflow error comparing balances: %s")
 	}
 

@@ -8,7 +8,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	sdkerrors "cosmossdk.io/errors"
-	sdkmath "cosmossdk.io/math"
 )
 
 func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollection, transfers []*types.Transfer, initiatedBy string) error {
@@ -82,14 +81,11 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 				)
 			}
 
-			
-
-			for _, balance := range transfer.Balances {
-
-				fromUserBalance, toUserBalance, err = k.HandleTransfer(ctx, collection, balance.BadgeIds, balance.OwnershipTimes, fromUserBalance, toUserBalance, balance.Amount, transfer.From, to, initiatedBy, transfer.MerkleProofs)
-				if err != nil {
-					return err
-				}
+			challengeIdsIncremented := &[]string{}
+			trackerIdsIncremented := &[]string{}
+			fromUserBalance, toUserBalance, err = k.HandleTransfer(ctx, collection, transfer.Balances, fromUserBalance, toUserBalance, transfer.From, to, initiatedBy, transfer.MerkleProofs, challengeIdsIncremented, trackerIdsIncremented)
+			if err != nil {
+				return err
 			}
 
 			if err := k.SetUserBalanceInStore(ctx, toBalanceKey, toUserBalance); err != nil {
@@ -108,16 +104,15 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 // Step 1: Check if transfer is allowed on collection level (deducting approvals if needed)
 // Step 2: If not overriden by collection, check necessary approvals on user level (deducting approvals if needed)
 // Step 3: If all good, we can transfer the balances
-func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, amount sdkmath.Uint, from string, to string, initiatedBy string, solutions []*types.MerkleProof) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
+func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, transferBalances []*types.Balance, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, from string, to string, initiatedBy string, solutions []*types.MerkleProof, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
 	err := *new(error)
-	transferBalances :=  []*types.Balance{ { Amount: amount, BadgeIds: badgeIds, OwnershipTimes: times } }
 	
 
 	for _, balance := range transferBalances {
 		badgeIds := balance.BadgeIds
 		times := balance.OwnershipTimes
 		amount := balance.Amount
-		userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, transferBalances, collection, badgeIds, times, from, to, initiatedBy, amount, solutions)
+		userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, transferBalances, collection, badgeIds, times, from, to, initiatedBy, amount, solutions, challengeIdsIncremented, trackerIdsIncremented)
 		if err != nil {
 			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "collection approvals not satisfied")
 		}
@@ -128,12 +123,12 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollectio
 			for _, userApproval := range userApprovals {
 				for _, balance := range userApproval.Balances {
 					if userApproval.Outgoing {
-						err = k.DeductUserOutgoingApprovals(ctx, transferBalances, collection, fromUserBalance, balance.BadgeIds, balance.OwnershipTimes, from, to, initiatedBy, amount, solutions)
+						err = k.DeductUserOutgoingApprovals(ctx, transferBalances, collection, fromUserBalance, balance.BadgeIds, balance.OwnershipTimes, from, to, initiatedBy, amount, solutions, challengeIdsIncremented, trackerIdsIncremented)
 						if err != nil {
 							return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "outgoing approvals for %s not satisfied", from)
 						}
 					} else {
-						err = k.DeductUserIncomingApprovals(ctx, transferBalances, collection, toUserBalance, balance.BadgeIds, balance.OwnershipTimes, from, to, initiatedBy, amount, solutions)
+						err = k.DeductUserIncomingApprovals(ctx, transferBalances, collection, toUserBalance, balance.BadgeIds, balance.OwnershipTimes, from, to, initiatedBy, amount, solutions, challengeIdsIncremented, trackerIdsIncremented)
 						if err != nil {
 							return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "incoming approvals for %s not satisfied", to)
 						}
@@ -144,7 +139,7 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollectio
 	}
 
 	for _, balance := range transferBalances {
-		fromUserBalance.Balances, err = types.SubtractBalance(fromUserBalance.Balances, balance)
+		fromUserBalance.Balances, err = types.SubtractBalance(fromUserBalance.Balances, balance, false)
 		if err != nil {
 			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "inadequate balances for transfer from %s", from)
 		}

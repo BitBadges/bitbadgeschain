@@ -384,7 +384,8 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 					allowedCombination.OwnershipTimesOptions == compCombination.OwnershipTimesOptions &&
 					allowedCombination.ToMappingOptions == compCombination.ToMappingOptions &&
 					allowedCombination.FromMappingOptions == compCombination.FromMappingOptions &&
-					allowedCombination.InitiatedByMappingOptions == compCombination.InitiatedByMappingOptions {
+					allowedCombination.InitiatedByMappingOptions == compCombination.InitiatedByMappingOptions &&
+					allowedCombination.IsApproved == compCombination.IsApproved {
 					return ErrInvalidCombinations
 				}
 			}

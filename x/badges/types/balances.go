@@ -216,6 +216,34 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 	return fetchedBalances, nil
 }
 
+func GetOverlappingBalances(transferBalancesToCheck []*Balance, maxPossible []*Balance) ([]*Balance, error) {
+	newBalances := []*Balance{}
+	for _, balance := range transferBalancesToCheck {
+		prevAmount := balance.Amount
+
+		fetchedBalances, err := GetBalancesForIds(balance.BadgeIds, balance.OwnershipTimes, maxPossible)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, fetchedBalance := range fetchedBalances {
+			balanceToAdd := &Balance{
+				Amount: fetchedBalance.Amount,
+				BadgeIds: fetchedBalance.BadgeIds,
+				OwnershipTimes: fetchedBalance.OwnershipTimes,
+			}
+
+			//Take min amount
+			if balanceToAdd.Amount.GT(prevAmount) {
+				balanceToAdd.Amount = prevAmount
+			}
+
+			newBalances = append(newBalances, balanceToAdd)
+		}
+	}
+	return newBalances, nil
+}
+
 func AddBalances(balancesToAdd []*Balance, balances []*Balance) ([]*Balance, error) {
 	err := *new(error)
 	for _, balance := range balancesToAdd {
@@ -254,7 +282,20 @@ func SubtractBalances(balancesToSubtract []*Balance, balances []*Balance) ([]*Ba
 	err := *new(error)
 
 	for _, balance := range balancesToSubtract {
-		balances, err = SubtractBalance(balances, balance)
+		balances, err = SubtractBalance(balances, balance, false)
+		if err != nil {
+			return balances, err
+		}
+	}
+
+	return balances, nil
+}
+
+func SubtractBalancesWithZeroForUnderflows(balancesToSubtract []*Balance, balances []*Balance) ([]*Balance, error) {
+	err := *new(error)
+
+	for _, balance := range balancesToSubtract {
+		balances, err = SubtractBalance(balances, balance , true)
 		if err != nil {
 			return balances, err
 		}
@@ -264,7 +305,7 @@ func SubtractBalances(balancesToSubtract []*Balance, balances []*Balance) ([]*Ba
 }
 
 // Subtracts a balance to all ids specified in []ranges
-func SubtractBalance(balances []*Balance, balanceToRemove *Balance) ([]*Balance, error) {
+func SubtractBalance(balances []*Balance, balanceToRemove *Balance, setToZeroOnUnderflow bool) ([]*Balance, error) {
 
 	currBalances, err := GetBalancesForIds(balanceToRemove.BadgeIds, balanceToRemove.OwnershipTimes, balances)
 	if err != nil {
@@ -274,7 +315,11 @@ func SubtractBalance(balances []*Balance, balanceToRemove *Balance) ([]*Balance,
 	for _, currBalanceObj := range currBalances {
 		currBalanceObj.Amount, err = SafeSubtract(currBalanceObj.Amount, balanceToRemove.Amount)
 		if err != nil {
+			if setToZeroOnUnderflow {
+				currBalanceObj.Amount = sdkmath.NewUint(0)
+			} else {
 			return balances, err
+			}
 		}
 
 		balances, err = UpdateBalance(currBalanceObj, balances)
