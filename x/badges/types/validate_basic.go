@@ -205,6 +205,10 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id is uninitialized")
 		}
 
+		if collectionApprovedTransfers[i].ApprovalId == "default-outgoing" || collectionApprovedTransfers[i].ApprovalId == "default-incoming" {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be default-outgoing or default-incoming")
+		}
+
 		for j := i + 1; j < len(collectionApprovedTransfers); j++ {
 			if collectionApprovedTransfers[i].ApprovalId == collectionApprovedTransfers[j].ApprovalId {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate approval ids")

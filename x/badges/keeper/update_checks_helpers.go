@@ -126,11 +126,6 @@ func GetFirstMatchOnlyWithApprovalDetails(permissions []*types.UniversalPermissi
 									mergedApprovalDetails = append(mergedApprovalDetails, approvalDetail)
 								}
 
-								//Handle empty array
-								if len(overlap.FirstDetails.ArbitraryValue.(*ApprovalDetailsWithIsApproved).ApprovalDetails) == 0 {
-									mergedApprovalDetails = append(mergedApprovalDetails, &types.ApprovalDetails{})
-								}
-
 								isApprovedFirst := overlap.FirstDetails.ArbitraryValue.(*ApprovalDetailsWithIsApproved).IsApproved
 								isApprovedSecond := overlap.SecondDetails.ArbitraryValue.(*ApprovalDetailsWithIsApproved).IsApproved
 
