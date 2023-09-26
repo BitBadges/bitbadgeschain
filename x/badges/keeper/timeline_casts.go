@@ -61,6 +61,34 @@ func (k Keeper) CastCollectionApprovedTransferToUniversalPermission(ctx sdk.Cont
 			return nil, err
 		}
 
+		approvalTrackerMapping := &types.AddressMapping{}
+		if approvedTransfer.ApprovalTrackerId == "All" {
+			approvalTrackerMapping = &types.AddressMapping{
+				Addresses: []string{},
+				IncludeAddresses: false,
+			}
+		} else {
+			approvalTrackerMapping = &types.AddressMapping{
+				Addresses: []string{approvedTransfer.ApprovalTrackerId},
+				IncludeAddresses: true,
+			}
+		}
+
+		challengeTrackerMapping := &types.AddressMapping{}
+		if approvedTransfer.ChallengeTrackerId == "All" {
+			challengeTrackerMapping = &types.AddressMapping{
+				Addresses: []string{},
+				IncludeAddresses: false,
+			}
+		} else {
+			challengeTrackerMapping = &types.AddressMapping{
+				Addresses: []string{approvedTransfer.ChallengeTrackerId},
+				IncludeAddresses: true,
+			}
+		}
+
+
+
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
 				BadgeIds:               approvedTransfer.BadgeIds,
@@ -69,12 +97,16 @@ func (k Keeper) CastCollectionApprovedTransferToUniversalPermission(ctx sdk.Cont
 				FromMapping:            fromMapping,
 				ToMapping:              toMapping,
 				InitiatedByMapping:     initiatedByMapping,
+				ApprovalTrackerIdMapping: approvalTrackerMapping,
+				ChallengeTrackerIdMapping: challengeTrackerMapping,
 				UsesBadgeIds:           true,
 				UsesTransferTimes:      true,
 				UsesToMapping:          true,
 				UsesFromMapping:        true,
 				UsesInitiatedByMapping: true,
 				UsesOwnershipTimes: 	 	true,
+				UsesApprovalTrackerId: 	true,
+				UsesChallengeTrackerId: true,
 				ArbitraryValue:         approvedTransfer,
 			},
 			Combinations: []*types.UniversalCombination{{}},
@@ -96,6 +128,33 @@ func (k Keeper) CastUserApprovedOutgoingTransferToUniversalPermission(ctx sdk.Co
 			return nil, err
 		}
 
+		approvalTrackerMapping := &types.AddressMapping{}
+		if approvedTransfer.ApprovalTrackerId == "All" {
+			approvalTrackerMapping = &types.AddressMapping{
+				Addresses: []string{},
+				IncludeAddresses: false,
+			}
+		} else {
+			approvalTrackerMapping = &types.AddressMapping{
+				Addresses: []string{approvedTransfer.ApprovalTrackerId},
+				IncludeAddresses: true,
+			}
+		}
+
+		challengeTrackerMapping := &types.AddressMapping{}
+		if approvedTransfer.ChallengeTrackerId == "All" {
+			challengeTrackerMapping = &types.AddressMapping{
+				Addresses: []string{},
+				IncludeAddresses: false,
+			}
+		} else {
+			challengeTrackerMapping = &types.AddressMapping{
+				Addresses: []string{approvedTransfer.ChallengeTrackerId},
+				IncludeAddresses: true,
+			}
+		}
+
+
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
 				BadgeIds:               approvedTransfer.BadgeIds,
@@ -103,6 +162,10 @@ func (k Keeper) CastUserApprovedOutgoingTransferToUniversalPermission(ctx sdk.Co
 				OwnershipTimes: 			 	approvedTransfer.OwnershipTimes,
 				ToMapping:              toMapping,
 				InitiatedByMapping:     initiatedByMapping,
+				ApprovalTrackerIdMapping: approvalTrackerMapping,
+				ChallengeTrackerIdMapping: challengeTrackerMapping,
+				UsesApprovalTrackerId: 	true,
+				UsesChallengeTrackerId: true,
 				UsesBadgeIds:           true,
 				UsesTransferTimes:      true,
 				UsesOwnershipTimes: 	 true,
@@ -130,6 +193,32 @@ func (k Keeper) CastUserApprovedIncomingTransferToUniversalPermission(ctx sdk.Co
 			return nil, err
 		}
 
+		approvalTrackerMapping := &types.AddressMapping{}
+		if approvedTransfer.ApprovalTrackerId == "All" {
+			approvalTrackerMapping = &types.AddressMapping{
+				Addresses: []string{},
+				IncludeAddresses: false,
+			}
+		} else {
+			approvalTrackerMapping = &types.AddressMapping{
+				Addresses: []string{approvedTransfer.ApprovalTrackerId},
+				IncludeAddresses: true,
+			}
+		}
+
+		challengeTrackerMapping := &types.AddressMapping{}
+		if approvedTransfer.ChallengeTrackerId == "All" {
+			challengeTrackerMapping = &types.AddressMapping{
+				Addresses: []string{},
+				IncludeAddresses: false,
+			}
+		} else {
+			challengeTrackerMapping = &types.AddressMapping{
+				Addresses: []string{approvedTransfer.ChallengeTrackerId},
+				IncludeAddresses: true,
+			}
+		}
+
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			DefaultValues: &types.UniversalDefaultValues{
 				BadgeIds:               approvedTransfer.BadgeIds,
@@ -137,6 +226,10 @@ func (k Keeper) CastUserApprovedIncomingTransferToUniversalPermission(ctx sdk.Co
 				OwnershipTimes: 			 			approvedTransfer.OwnershipTimes,
 				FromMapping:            fromMapping,
 				InitiatedByMapping:     initiatedByMapping,
+				ApprovalTrackerIdMapping: approvalTrackerMapping,
+				ChallengeTrackerIdMapping: challengeTrackerMapping,
+				UsesApprovalTrackerId: 	true,
+				UsesChallengeTrackerId: true,
 				UsesBadgeIds:           true,
 				UsesTransferTimes:      true,
 				UsesOwnershipTimes: 	 			true,

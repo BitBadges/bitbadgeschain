@@ -56,4 +56,7 @@ var (
 	ErrInvalidTransfers                            = sdkerrors.Register(ModuleName, 1544, "invalid transfers")
 	ErrUintGreaterThanMax                          = sdkerrors.Register(ModuleName, 1545, "uint greater than max uint")
 	ErrExceedsThreshold														= sdkerrors.Register(ModuleName, 1546, "exceeds threshold")
+	ErrApprovalTrackerIdIsNil 										= sdkerrors.Register(ModuleName, 1547, "approval tracker id is nil")
+	ErrChallengeTrackerIdIsNil 										= sdkerrors.Register(ModuleName, 1548, "challenge tracker id is nil")
+	ErrIdsContainsInvalidChars 										= sdkerrors.Register(ModuleName, 1549, "ids contains invalid chars")
 )

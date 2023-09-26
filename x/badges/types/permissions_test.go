@@ -1699,6 +1699,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "Manager",
+			ApprovalTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1742,6 +1744,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "Manager",
+			ApprovalTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1789,6 +1793,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "Manager",
+			ApprovalTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1836,6 +1842,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 			ToMappingId:          "x",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "Manager",
+			ApprovalTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1883,6 +1891,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate(t *testing.T) {
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "Manager",
+			ApprovalTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1932,6 +1942,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate2(t *testing.T) {
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "Manager",
+			ApprovalTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1975,6 +1987,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate2(t *testing.T) {
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "Manager",
+			ApprovalTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2046,6 +2060,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate3(t *testing.T) {
 			ToMappingId:          "ABC",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "AllWithoutMint",
+			ApprovalTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2089,6 +2105,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate3(t *testing.T) {
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "AllWithoutMint",
+			ApprovalTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2159,6 +2177,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate4Invalid(t *testing.
 			ToMappingId:          "ABC",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "AllWithoutMint",
+			ApprovalTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2202,6 +2222,8 @@ func TestValidateCollectionApprovedTransferPermissionsUpdate4Invalid(t *testing.
 			ToMappingId:          "BobCharlie",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "AllWithoutMint",
+			ApprovalTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),

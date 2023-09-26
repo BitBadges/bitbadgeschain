@@ -19,41 +19,23 @@ func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionAppr
 			fromMappingId := types.GetMappingIdWithOptions(approvedTransfer.FromMappingId, allowedCombination.FromMappingOptions, true)
 			initiatedByMappingId := types.GetMappingIdWithOptions(approvedTransfer.InitiatedByMappingId, allowedCombination.InitiatedByMappingOptions, true)
 			
-			if len(approvedTransfer.ApprovalDetails) == 0 {
-				newCurrApprovedTransfers = append(newCurrApprovedTransfers, &types.CollectionApprovedTransfer{
-					ToMappingId:          toMappingId,
-					FromMappingId:        fromMappingId,
-					InitiatedByMappingId: initiatedByMappingId,
-					TransferTimes:        times,
-					BadgeIds:             badgeIds,
-					OwnershipTimes: 		 	ownershipTimes,
-					AllowedCombinations: []*types.IsCollectionTransferAllowed{
-						{
-							IsApproved: allowedCombination.IsApproved,
-						},
+			newCurrApprovedTransfers = append(newCurrApprovedTransfers, &types.CollectionApprovedTransfer{
+				ToMappingId:          toMappingId,
+				FromMappingId:        fromMappingId,
+				InitiatedByMappingId: initiatedByMappingId,
+				TransferTimes:        times,
+				BadgeIds:             badgeIds,
+				OwnershipTimes: 		 	ownershipTimes,
+				AllowedCombinations: []*types.IsCollectionTransferAllowed{
+					{
+						IsApproved: allowedCombination.IsApproved,
 					},
-					ApprovalDetails: []*types.ApprovalDetails{},
-				})
-			}
-
-			for _, approvalDetails := range approvedTransfer.ApprovalDetails {
-				newCurrApprovedTransfers = append(newCurrApprovedTransfers, &types.CollectionApprovedTransfer{
-					ToMappingId:          toMappingId,
-					FromMappingId:        fromMappingId,
-					InitiatedByMappingId: initiatedByMappingId,
-					TransferTimes:        times,
-					BadgeIds:             badgeIds,
-					OwnershipTimes: 		 	ownershipTimes,
-					AllowedCombinations: []*types.IsCollectionTransferAllowed{
-						{
-							IsApproved: allowedCombination.IsApproved,
-						},
-					},
-					ApprovalDetails: []*types.ApprovalDetails{
-						approvalDetails,
-					},
-				})
-			}
+				},
+				ApprovalDetails: approvedTransfer.ApprovalDetails,
+				ApprovalId: approvedTransfer.ApprovalId,
+				ApprovalTrackerId: approvedTransfer.ApprovalTrackerId,
+				ChallengeTrackerId: approvedTransfer.ChallengeTrackerId,
+			})
 		}
 	}
 

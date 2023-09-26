@@ -49,6 +49,14 @@ func ValidateCollectionApprovedTransferPermissions(permissions []*CollectionAppr
 			return err
 		}
 
+		// if permission.DefaultValues.ApprovalTrackerId == "" {
+		// 	return ErrApprovalTrackerIdIsNil
+		// }
+
+		// if permission.DefaultValues.ChallengeTrackerId == "" {
+		// 	return ErrChallengeTrackerIdIsNil
+		// }
+		
 		permission.DefaultValues.TransferTimes = SortAndMergeOverlapping(permission.DefaultValues.TransferTimes)
 		permission.DefaultValues.OwnershipTimes = SortAndMergeOverlapping(permission.DefaultValues.OwnershipTimes)
 		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
@@ -63,7 +71,9 @@ func ValidateCollectionApprovedTransferPermissions(permissions []*CollectionAppr
 					combination.FromMappingOptions == combination2.FromMappingOptions &&
 					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
 					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
+					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions &&
+					combination.ApprovalTrackerIdOptions == combination2.ApprovalTrackerIdOptions &&
+					combination.ChallengeTrackerIdOptions == combination2.ChallengeTrackerIdOptions {
 					return ErrInvalidCombinations
 				}
 			}
@@ -118,7 +128,9 @@ func ValidateUserApprovedOutgoingTransferPermissions(permissions []*UserApproved
 					combination.ToMappingOptions == combination2.ToMappingOptions &&
 					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
 					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
+					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions &&
+					combination.ApprovalTrackerIdOptions == combination2.ApprovalTrackerIdOptions &&
+					combination.ChallengeTrackerIdOptions == combination2.ChallengeTrackerIdOptions {
 					return ErrInvalidCombinations
 				}
 			}
@@ -172,7 +184,9 @@ func ValidateUserApprovedIncomingTransferPermissions(permissions []*UserApproved
 					combination.FromMappingOptions == combination2.FromMappingOptions &&
 					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
 					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
+					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions &&
+					combination.ApprovalTrackerIdOptions == combination2.ApprovalTrackerIdOptions &&
+					combination.ChallengeTrackerIdOptions == combination2.ChallengeTrackerIdOptions {
 					return ErrInvalidCombinations
 				}
 			}

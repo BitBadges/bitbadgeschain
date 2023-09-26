@@ -32,7 +32,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 				}
 			}
 
-			if transfer.PrecalculationDetails != nil && transfer.PrecalculationDetails.PrecalculationId != "" {
+			if transfer.PrecalculationDetails != nil && transfer.PrecalculationDetails.ApprovalId != "" {
 				approvedTransfers := collection.CollectionApprovedTransfers
 				if transfer.PrecalculationDetails.ApproverAddress != "" {
 					if transfer.PrecalculationDetails.ApproverAddress != to && transfer.PrecalculationDetails.ApproverAddress != transfer.From {
@@ -59,7 +59,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 				}
 
 				//Precaluclate the balances that will be transferred
-				transfer.Balances, err = k.GetPredeterminedBalancesForPrecalculationId(ctx, approvedTransfers, collection, "", transfer.PrecalculationDetails.PrecalculationId, transfer.PrecalculationDetails.ApprovalLevel, transfer.PrecalculationDetails.ApproverAddress, transfer.MerkleProofs, initiatedBy)
+				transfer.Balances, err = k.GetPredeterminedBalancesForPrecalculationId(ctx, approvedTransfers, collection, "", transfer.PrecalculationDetails.ApprovalId, transfer.PrecalculationDetails.ApprovalLevel, transfer.PrecalculationDetails.ApproverAddress, transfer.MerkleProofs, initiatedBy)
 				if err != nil {
 					return err
 				}
@@ -83,7 +83,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 
 			challengeIdsIncremented := &[]string{}
 			trackerIdsIncremented := &[]string{}
-			fromUserBalance, toUserBalance, err = k.HandleTransfer(ctx, collection, transfer.Balances, fromUserBalance, toUserBalance, transfer.From, to, initiatedBy, transfer.MerkleProofs, challengeIdsIncremented, trackerIdsIncremented)
+			fromUserBalance, toUserBalance, err = k.HandleTransfer(ctx, collection, transfer.Balances, fromUserBalance, toUserBalance, transfer.From, to, initiatedBy, transfer.MerkleProofs, challengeIdsIncremented, trackerIdsIncremented, transfer.PrioritizedApprovals, transfer.OnlyCheckPrioritizedApprovals)
 			if err != nil {
 				return err
 			}
@@ -104,15 +104,15 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 // Step 1: Check if transfer is allowed on collection level (deducting approvals if needed)
 // Step 2: If not overriden by collection, check necessary approvals on user level (deducting approvals if needed)
 // Step 3: If all good, we can transfer the balances
-func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, transferBalances []*types.Balance, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, from string, to string, initiatedBy string, solutions []*types.MerkleProof, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
+func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, transferBalances []*types.Balance, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, from string, to string, initiatedBy string, solutions []*types.MerkleProof, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string, prioritizedApprovals []*types.ApprovalIdentifierDetails, onlyCheckPrioritized bool) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
 	err := *new(error)
-	
+
 
 	for _, balance := range transferBalances {
 		badgeIds := balance.BadgeIds
 		times := balance.OwnershipTimes
 		amount := balance.Amount
-		userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, transferBalances, collection, badgeIds, times, from, to, initiatedBy, amount, solutions, challengeIdsIncremented, trackerIdsIncremented)
+		userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, transferBalances, collection, badgeIds, times, from, to, initiatedBy, amount, solutions, challengeIdsIncremented, trackerIdsIncremented, prioritizedApprovals, onlyCheckPrioritized)
 		if err != nil {
 			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "collection approvals not satisfied")
 		}
@@ -123,12 +123,12 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollectio
 			for _, userApproval := range userApprovals {
 				for _, balance := range userApproval.Balances {
 					if userApproval.Outgoing {
-						err = k.DeductUserOutgoingApprovals(ctx, transferBalances, collection, fromUserBalance, balance.BadgeIds, balance.OwnershipTimes, from, to, initiatedBy, amount, solutions, challengeIdsIncremented, trackerIdsIncremented)
+						err = k.DeductUserOutgoingApprovals(ctx, transferBalances, collection, fromUserBalance, balance.BadgeIds, balance.OwnershipTimes, from, to, initiatedBy, amount, solutions, challengeIdsIncremented, trackerIdsIncremented, prioritizedApprovals, onlyCheckPrioritized)
 						if err != nil {
 							return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "outgoing approvals for %s not satisfied", from)
 						}
 					} else {
-						err = k.DeductUserIncomingApprovals(ctx, transferBalances, collection, toUserBalance, balance.BadgeIds, balance.OwnershipTimes, from, to, initiatedBy, amount, solutions, challengeIdsIncremented, trackerIdsIncremented)
+						err = k.DeductUserIncomingApprovals(ctx, transferBalances, collection, toUserBalance, balance.BadgeIds, balance.OwnershipTimes, from, to, initiatedBy, amount, solutions, challengeIdsIncremented, trackerIdsIncremented, prioritizedApprovals, onlyCheckPrioritized)
 						if err != nil {
 							return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "incoming approvals for %s not satisfied", to)
 						}

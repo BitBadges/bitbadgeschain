@@ -78,11 +78,18 @@ func GetFirstMatchOnlyWithApprovalDetails(permissions []*types.UniversalPermissi
 			fromMapping := types.GetMappingWithOptions(permission.DefaultValues.FromMapping, combination.FromMappingOptions, permission.DefaultValues.UsesFromMapping)
 			initiatedByMapping := types.GetMappingWithOptions(permission.DefaultValues.InitiatedByMapping, combination.InitiatedByMappingOptions, permission.DefaultValues.UsesInitiatedByMapping)
 
+			approvalTrackerIdMapping := types.GetMappingWithOptions(permission.DefaultValues.ApprovalTrackerIdMapping, combination.ApprovalTrackerIdOptions, permission.DefaultValues.UsesApprovalTrackerId)
+			challengeTrackerIdMapping := types.GetMappingWithOptions(permission.DefaultValues.ChallengeTrackerIdMapping, combination.ChallengeTrackerIdOptions, permission.DefaultValues.UsesChallengeTrackerId)
+			
+
 			for _, badgeId := range badgeIds {
 				for _, timelineTime := range timelineTimes {
 					for _, transferTime := range transferTimes {
 						for _, ownershipTime := range ownershipTimes {
-							approvalDetails := permission.DefaultValues.ArbitraryValue.(*types.CollectionApprovedTransfer).ApprovalDetails
+							approvalDetails := 
+							[]*types.ApprovalDetails{
+								permission.DefaultValues.ArbitraryValue.(*types.CollectionApprovedTransfer).ApprovalDetails,
+							}
 							isApproved := permission.DefaultValues.ArbitraryValue.(*types.CollectionApprovedTransfer).AllowedCombinations[0].IsApproved
 							arbValue := &ApprovalDetailsWithIsApproved{
 								IsApproved:      isApproved,
@@ -98,6 +105,8 @@ func GetFirstMatchOnlyWithApprovalDetails(permissions []*types.UniversalPermissi
 									ToMapping:          toMapping,
 									FromMapping:        fromMapping,
 									InitiatedByMapping: initiatedByMapping,
+									ApprovalTrackerIdMapping: approvalTrackerIdMapping,
+									ChallengeTrackerIdMapping: challengeTrackerIdMapping,
 
 									ArbitraryValue: arbValue,
 								},
@@ -141,6 +150,9 @@ func GetFirstMatchOnlyWithApprovalDetails(permissions []*types.UniversalPermissi
 									ToMapping:          overlap.Overlap.ToMapping,
 									FromMapping:        overlap.Overlap.FromMapping,
 									InitiatedByMapping: overlap.Overlap.InitiatedByMapping,
+
+									ApprovalTrackerIdMapping: overlap.Overlap.ApprovalTrackerIdMapping,
+									ChallengeTrackerIdMapping: overlap.Overlap.ChallengeTrackerIdMapping,
 
 									//Appended for future lookups (not involved in overlap logic)
 									PermittedTimes: permittedTimes,

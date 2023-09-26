@@ -26,22 +26,22 @@ func (suite *TestSuite) TestDeductFromOutgoing() {
 		},
 	}
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 }
 
@@ -58,28 +58,28 @@ func (suite *TestSuite) TestDeductFromOutgoingTwoSeparateTransfers() {
 
 
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, aliceBalance, GetTopHalfUintRanges(), GetFullUintRanges(), alice, bob, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, aliceBalance, GetTopHalfUintRanges(), GetFullUintRanges(), alice, bob, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, aliceBalance, GetTopHalfUintRanges(), GetFullUintRanges(), alice, bob, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, aliceBalance, GetTopHalfUintRanges(), GetFullUintRanges(), alice, bob, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 }
 
@@ -88,8 +88,8 @@ func (suite *TestSuite) TestMaxOneTransfer() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].ApprovalDetails[0].MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(1)
-	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].ApprovalDetails[0].MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(1)
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].ApprovalDetails.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(1)
+	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].ApprovalDetails.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(1)
 	
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -97,16 +97,16 @@ func (suite *TestSuite) TestMaxOneTransfer() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 }
 
@@ -114,13 +114,12 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].ApprovalDetails[0].PredeterminedBalances = &types.PredeterminedBalances{
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].ApprovalDetails.PredeterminedBalances = &types.PredeterminedBalances{
 		OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{
 			UseOverallNumTransfers: true,
 		},
-		PrecalculationId: "asdas",
 	}
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].ApprovalDetails[0].PredeterminedBalances.IncrementedBalances = &types.IncrementedBalances{
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].ApprovalDetails.PredeterminedBalances.IncrementedBalances = &types.IncrementedBalances{
 		
 		StartBalances: []*types.Balance{
 			{
@@ -133,13 +132,12 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 		IncrementOwnershipTimesBy: sdkmath.NewUint(math.MaxUint64),
 	}
 	
-	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].ApprovalDetails[0].PredeterminedBalances = &types.PredeterminedBalances{
+	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].ApprovalDetails.PredeterminedBalances = &types.PredeterminedBalances{
 		OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{
 			UseOverallNumTransfers: true,
 		},
-		PrecalculationId: "asdas2",
 	}
-	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].ApprovalDetails[0].PredeterminedBalances.IncrementedBalances = &types.IncrementedBalances{
+	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].ApprovalDetails.PredeterminedBalances.IncrementedBalances = &types.IncrementedBalances{
 		StartBalances: []*types.Balance{
 			{
 				OwnershipTimes: GetFullUintRanges(),
@@ -165,16 +163,16 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 		},
 	}
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 }
 
@@ -182,8 +180,8 @@ func (suite *TestSuite) TestRequiresEquals() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].ApprovalDetails[0].RequireToDoesNotEqualInitiatedBy = true
-	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].ApprovalDetails[0].RequireFromDoesNotEqualInitiatedBy = true
+	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].ApprovalDetails.RequireToDoesNotEqualInitiatedBy = true
+	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].ApprovalDetails.RequireFromDoesNotEqualInitiatedBy = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -191,16 +189,16 @@ func (suite *TestSuite) TestRequiresEquals() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 }
 
@@ -217,16 +215,16 @@ func (suite *TestSuite) TestSpecificApproved() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
 }
@@ -244,10 +242,10 @@ func (suite *TestSuite) TestDefaults() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 }
 
@@ -273,17 +271,16 @@ func (suite *TestSuite) TestFirstMatchOnly() {
 						IsApproved: false,
 					},
 				},
-				ApprovalDetails: []*types.OutgoingApprovalDetails{
-					{
-						MerkleChallenges:                []*types.MerkleChallenge{},
-						ApprovalTrackerId:                 "test-alice",
-						MaxNumTransfers: &types.MaxNumTransfers{
-							OverallMaxNumTransfers: sdkmath.NewUint(1000),
-						},
-						ApprovalAmounts: &types.ApprovalAmounts{
-							PerFromAddressApprovalAmount: sdkmath.NewUint(1),
-						},
+				ApprovalId: "sdfsdfg",
+				ApprovalTrackerId:                 "test-alice",
+				ApprovalDetails: &types.OutgoingApprovalDetails{
+					MaxNumTransfers: &types.MaxNumTransfers{
+						OverallMaxNumTransfers: sdkmath.NewUint(1000),
 					},
+					ApprovalAmounts: &types.ApprovalAmounts{
+						PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+					},
+					
 				},
 			},
 			collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0],
@@ -296,10 +293,10 @@ func (suite *TestSuite) TestFirstMatchOnly() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 }
 
@@ -320,19 +317,17 @@ func (suite *TestSuite) TestFirstMatchOnlyWrongTime() {
 					IsApproved: false,
 				},
 			},
-			ApprovalDetails: []*types.OutgoingApprovalDetails{
-				{
-					MerkleChallenges:                []*types.MerkleChallenge{},
-					ApprovalTrackerId:                 "test-alice",
+			ApprovalId: "sdgfsdfg",
+			ApprovalTrackerId:                 "test-alice",
+			ApprovalDetails: &types.OutgoingApprovalDetails{
 					MaxNumTransfers: &types.MaxNumTransfers{
 						OverallMaxNumTransfers: sdkmath.NewUint(1000),
 					},
 					ApprovalAmounts: &types.ApprovalAmounts{
 						PerFromAddressApprovalAmount: sdkmath.NewUint(1),
 					},
-				},
 			},
-			
+
 		},
 		collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0],
 	}
@@ -345,7 +340,7 @@ func (suite *TestSuite) TestFirstMatchOnlyWrongTime() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 }
 
@@ -359,7 +354,7 @@ func (suite *TestSuite) TestCombinations() {
 				ToMappingId:          "AllWithoutMint",
 				InitiatedByMappingId: alice,
 				TransferTimes:        GetFullUintRanges(),
-				OwnershipTimes: GetFullUintRanges(),
+				OwnershipTimes: 			GetFullUintRanges(),
 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 				AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
 					{
@@ -370,19 +365,17 @@ func (suite *TestSuite) TestCombinations() {
 						IsApproved:      false,
 					},
 				},
-				ApprovalDetails: []*types.OutgoingApprovalDetails{
-					{
-						MerkleChallenges:                []*types.MerkleChallenge{},
-						ApprovalTrackerId:                 "test",
-						MaxNumTransfers: &types.MaxNumTransfers{
-							OverallMaxNumTransfers: sdkmath.NewUint(1000),
-						},
-						ApprovalAmounts: &types.ApprovalAmounts{
-							PerFromAddressApprovalAmount: sdkmath.NewUint(1),
-						},
+				ApprovalId: "test",
+				ApprovalTrackerId:                 "test",
+				ApprovalDetails: &types.OutgoingApprovalDetails{
+					
+					MaxNumTransfers: &types.MaxNumTransfers{
+						OverallMaxNumTransfers: sdkmath.NewUint(1000),
+					},
+					ApprovalAmounts: &types.ApprovalAmounts{
+						PerFromAddressApprovalAmount: sdkmath.NewUint(1),
 					},
 				},
-				
 			},
 	}
 	collectionsToCreate[0].DefaultApprovedOutgoingTransfers = newOutgoingTimeline
@@ -393,10 +386,10 @@ func (suite *TestSuite) TestCombinations() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetOneUintRange(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetOneUintRange(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 }
 
@@ -421,10 +414,9 @@ func (suite *TestSuite) TestCombinationsOrder() {
 						IsApproved:         true,
 					},
 				},
-				ApprovalDetails: []*types.OutgoingApprovalDetails{
-					{
-						MerkleChallenges:                []*types.MerkleChallenge{},
-						ApprovalTrackerId:                 "test",
+				ApprovalId: "test",
+				ApprovalTrackerId:                 "test",
+				ApprovalDetails: &types.OutgoingApprovalDetails{
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
 						},
@@ -434,7 +426,7 @@ func (suite *TestSuite) TestCombinationsOrder() {
 					},
 				},
 				
-			},
+			
 		}
 	
 	collectionsToCreate[0].DefaultApprovedOutgoingTransfers = newOutgoingTimeline
@@ -445,7 +437,7 @@ func (suite *TestSuite) TestCombinationsOrder() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetOneUintRange(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetOneUintRange(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 }
 
@@ -466,17 +458,19 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 						IsApproved: true,
 					},
 				},
-				ApprovalDetails: []*types.OutgoingApprovalDetails{
-					{
-						MerkleChallenges:                []*types.MerkleChallenge{},
-						ApprovalTrackerId:                 "test",
+				ApprovalId: "test",
+				ApprovalTrackerId:                 "test",
+				ApprovalDetails: &types.OutgoingApprovalDetails{
+					
+
+						
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
 						},
 						ApprovalAmounts: &types.ApprovalAmounts{
 							PerFromAddressApprovalAmount: sdkmath.NewUint(1),
 						},
-					},
+					
 				},
 			},
 	}
@@ -488,7 +482,7 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 }
 
@@ -513,7 +507,7 @@ func (suite *TestSuite) TestExplicitlyDisallowed() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 }
 
@@ -522,14 +516,14 @@ func (suite *TestSuite) TestUserApprovalsReturned() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	// collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
+	// collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.OverridesFromApprovedOutgoingTransfers = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	x, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(2, len(x), "Error deducting outgoing approvals")
 	suite.Require().True(x[0].Outgoing != x[1].Outgoing, "Error deducting outgoing approvals")
@@ -539,14 +533,14 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesOutgoing() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.OverridesFromApprovedOutgoingTransfers = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	x, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(1, len(x), "Error deducting outgoing approvals")
 	suite.Require().False(x[0].Outgoing, "Error deducting outgoing approvals")
@@ -556,14 +550,14 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesIncoming() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.OverridesToApprovedIncomingTransfers = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	x, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(1, len(x), "Error deducting outgoing approvals")
 	suite.Require().True(x[0].Outgoing, "Error deducting outgoing approvals")
@@ -573,15 +567,15 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails[0].OverridesFromApprovedOutgoingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.OverridesFromApprovedOutgoingTransfers = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{})
+	x, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(0, len(x), "Error deducting outgoing approvals")
 }

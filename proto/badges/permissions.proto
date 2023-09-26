@@ -80,6 +80,10 @@ message CollectionApprovedTransferCombination {
   ValueOptions badgeIdsOptions = 5;
   ValueOptions ownershipTimesOptions = 6;
 
+  ValueOptions approvalTrackerIdOptions = 10;
+  ValueOptions challengeTrackerIdOptions = 9;
+  
+
   ValueOptions permittedTimesOptions = 7;
   ValueOptions forbiddenTimesOptions = 8;
 }
@@ -91,6 +95,9 @@ message CollectionApprovedTransferDefaultValues {
   repeated UintRange transferTimes = 4;
   repeated UintRange badgeIds = 5;
   repeated UintRange ownershipTimes = 6;
+
+  string approvalTrackerId = 10;
+  string challengeTrackerId = 9;
 
   repeated UintRange permittedTimes = 7;
   repeated UintRange forbiddenTimes = 8;
@@ -124,6 +131,9 @@ message UserApprovedOutgoingTransferCombination {
   ValueOptions badgeIdsOptions = 4;
   ValueOptions ownershipTimesOptions = 5;
 
+  ValueOptions approvalTrackerIdOptions = 10;
+  ValueOptions challengeTrackerIdOptions = 9;
+
   ValueOptions permittedTimesOptions = 6;
   ValueOptions forbiddenTimesOptions = 7;
 }
@@ -134,6 +144,9 @@ message UserApprovedOutgoingTransferDefaultValues {
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
   repeated UintRange ownershipTimes = 5;
+
+  string approvalTrackerId = 10;
+  string challengeTrackerId = 9;
 
   repeated UintRange permittedTimes = 6;
   repeated UintRange forbiddenTimes = 7;
@@ -154,6 +167,9 @@ message UserApprovedIncomingTransferCombination {
   ValueOptions ownershipTimesOptions = 5;
 
 
+  ValueOptions approvalTrackerIdOptions = 10;
+  ValueOptions challengeTrackerIdOptions = 9;
+
   ValueOptions permittedTimesOptions = 6;
   ValueOptions forbiddenTimesOptions = 7;
 }
@@ -164,6 +180,9 @@ message UserApprovedIncomingTransferDefaultValues {
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
   repeated UintRange ownershipTimes = 5;
+
+  string approvalTrackerId = 10;
+  string challengeTrackerId = 9;
 
   repeated UintRange permittedTimes = 6;
   repeated UintRange forbiddenTimes = 7;

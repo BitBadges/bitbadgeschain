@@ -53,9 +53,8 @@ message MerkleChallenge {
   bool maxOneUsePerLeaf = 4;
   bool useLeafIndexForTransferOrder = 5;
 
-  string challengeId = 6;
-  string uri = 7;
-  string customData = 8;
+  string uri = 6;
+  string customData = 7;
 }
 
 message IsUserOutgoingTransferAllowed {
@@ -64,7 +63,11 @@ message IsUserOutgoingTransferAllowed {
   ValueOptions transferTimesOptions = 4;
   ValueOptions badgeIdsOptions = 5;
   ValueOptions ownershipTimesOptions = 6;
-  bool isApproved = 7;
+
+  ValueOptions approvalTrackerIdOptions = 7;
+  ValueOptions challengeTrackerIdOptions = 8;
+
+  bool isApproved = 9;
 }
 
 message IsUserIncomingTransferAllowed {
@@ -73,7 +76,11 @@ message IsUserIncomingTransferAllowed {
   ValueOptions transferTimesOptions = 4;
   ValueOptions badgeIdsOptions = 5;
   ValueOptions ownershipTimesOptions = 6;
-  bool isApproved = 7;
+
+  ValueOptions approvalTrackerIdOptions = 7;
+  ValueOptions challengeTrackerIdOptions = 8;
+
+  bool isApproved = 9;
 }
 
 // UserApprovedOutgoingTransfer defines the rules for the approval of an outgoing transfer from a user.
@@ -83,11 +90,15 @@ message UserApprovedOutgoingTransfer {
   string initiatedByMappingId = 2;
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
-  repeated UintRange ownershipTimes = 7;
+  repeated UintRange ownershipTimes = 10;
+
+  string approvalId = 7; //if applicable
+  string approvalTrackerId = 8; //if applicable
+  string challengeTrackerId = 9; //if applicable
 
   repeated IsUserOutgoingTransferAllowed allowedCombinations = 5;
 
-  repeated OutgoingApprovalDetails approvalDetails = 6;
+  OutgoingApprovalDetails approvalDetails = 6;
 }
 
 // UserApprovedIncomingTransfer defines the rules for the approval of an incoming transfer to a user.
@@ -98,9 +109,14 @@ message UserApprovedIncomingTransfer {
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
   repeated UintRange ownershipTimes = 5;
+
+  string approvalId = 7; //if applicable
+  string approvalTrackerId = 8; //if applicable
+  string challengeTrackerId = 9; //if applicable
+
   repeated IsUserIncomingTransferAllowed allowedCombinations = 6;
 
-  repeated IncomingApprovalDetails approvalDetails = 7;
+  IncomingApprovalDetails approvalDetails = 10;
 }
 
 message IsCollectionTransferAllowed {
@@ -110,7 +126,11 @@ message IsCollectionTransferAllowed {
   ValueOptions transferTimesOptions = 4;
   ValueOptions badgeIdsOptions = 5;
   ValueOptions ownershipTimesOptions = 6;
-  bool isApproved = 7;
+
+  ValueOptions approvalTrackerIdOptions = 7;
+  ValueOptions challengeTrackerIdOptions = 8;
+
+  bool isApproved = 9;
 }
 
 // CollectionApprovedTransfer defines the rules for the approval of a transfer.
@@ -166,12 +186,10 @@ message PredeterminedOrderCalculationMethod {
   bool usePerToAddressNumTransfers = 2;
   bool usePerFromAddressNumTransfers = 3;
   bool usePerInitiatedByAddressNumTransfers = 4;
-
   bool useMerkleChallengeLeafIndex = 5;
 }
 
 message PredeterminedBalances {
-  string precalculationId = 4;
   repeated ManualBalances manualBalances = 1;
   IncrementedBalances incrementedBalances = 2;
 
@@ -199,12 +217,11 @@ message ApprovalsTracker {
 }
 
 message ApprovalDetails {
-  string approvalTrackerId = 6;
   string uri = 7;
   string customData = 8;
 
   repeated MustOwnBadges mustOwnBadges = 1;
-  repeated MerkleChallenge merkleChallenges = 2;
+  MerkleChallenge merkleChallenge = 2;
   PredeterminedBalances predeterminedBalances = 3;
   ApprovalAmounts approvalAmounts = 4;
   MaxNumTransfers maxNumTransfers = 5;
@@ -219,12 +236,11 @@ message ApprovalDetails {
 }
 
 message OutgoingApprovalDetails {
-  string approvalTrackerId = 6;
   string uri = 7;
   string customData = 8;
 
   repeated MustOwnBadges mustOwnBadges = 1;
-  repeated MerkleChallenge merkleChallenges = 2;
+  MerkleChallenge merkleChallenge = 2;
   PredeterminedBalances predeterminedBalances = 3;
   ApprovalAmounts approvalAmounts = 4;
   MaxNumTransfers maxNumTransfers = 5;
@@ -234,12 +250,11 @@ message OutgoingApprovalDetails {
 }
 
 message IncomingApprovalDetails {
-  string approvalTrackerId = 6;
   string uri = 7;
   string customData = 8;
 
   repeated MustOwnBadges mustOwnBadges = 1;
-  repeated MerkleChallenge merkleChallenges = 2;
+  MerkleChallenge merkleChallenge= 2;
   PredeterminedBalances predeterminedBalances = 3;
   ApprovalAmounts approvalAmounts = 4;
   MaxNumTransfers maxNumTransfers = 5;
@@ -250,21 +265,25 @@ message IncomingApprovalDetails {
 
 message CollectionApprovedTransfer {
   //Match Criteria 
-  string fromMappingId = 4;
-  string toMappingId = 5;
-  string initiatedByMappingId = 6;
-  repeated UintRange transferTimes = 7;
-  repeated UintRange badgeIds = 8;
-  repeated UintRange ownershipTimes = 9;
-  
+  string fromMappingId = 1;
+  string toMappingId = 2;
+  string initiatedByMappingId = 3;
+  repeated UintRange transferTimes = 4;
+  repeated UintRange badgeIds = 5;
+  repeated UintRange ownershipTimes = 6;
+
+  string approvalId = 7; //if applicable
+  string approvalTrackerId = 8; //if applicable
+  string challengeTrackerId = 9; //if applicable
+
   repeated IsCollectionTransferAllowed allowedCombinations = 10;
 
   //Restrictions (Challenges, Amounts, MaxNumTransfers)
-  repeated ApprovalDetails approvalDetails = 11;
+  ApprovalDetails approvalDetails = 11;
 }
 
-message PrecalulationDetails {
-  string precalculationId = 1;
+message ApprovalIdentifierDetails {
+  string approvalId = 1;
   string approvalLevel = 2; //"collection", "incoming", "outgoing"
   string approverAddress = 3; //Leave blank if approvalLevel == "collection"
 }
@@ -273,9 +292,11 @@ message Transfer {
   string from = 1;
   repeated string toAddresses = 2;
   repeated Balance balances = 3;
-  PrecalulationDetails precalculationDetails = 4;
+  ApprovalIdentifierDetails precalculationDetails = 4;
   repeated MerkleProof merkleProofs = 5;
   string memo = 6;
+  repeated ApprovalIdentifierDetails prioritizedApprovals = 7;
+  bool onlyCheckPrioritizedApprovals = 8;
 }
 
 message MerklePathItem {

@@ -116,6 +116,7 @@ message MsgUpdateCollectionApprovedTransfers {
   repeated AddressMapping addressMappings = 4;
 }
 
+
 message MsgUpdateCollectionApprovedTransfersResponse {}
 
 

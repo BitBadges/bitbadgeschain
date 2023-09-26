@@ -21,7 +21,35 @@ func (k Keeper) CastUserApprovedIncomingTransferPermissionToUniversalPermission(
 				FromMappingOptions:        combination.FromMappingOptions,
 				InitiatedByMappingOptions: combination.InitiatedByMappingOptions,
 				
+				ApprovalTrackerIdOptions: combination.ApprovalTrackerIdOptions,
+				ChallengeTrackerIdOptions: combination.ChallengeTrackerIdOptions,
 			})
+		}
+
+		approvalTrackerMapping := &types.AddressMapping{}
+		if permission.DefaultValues.ApprovalTrackerId == "All" {
+			approvalTrackerMapping = &types.AddressMapping{
+				Addresses: []string{},
+				IncludeAddresses: false,
+			}
+		} else {
+			approvalTrackerMapping = &types.AddressMapping{
+				Addresses: []string{permission.DefaultValues.ApprovalTrackerId},
+				IncludeAddresses: true,
+			}
+		}
+
+		challengeTrackerMapping := &types.AddressMapping{}
+		if permission.DefaultValues.ChallengeTrackerId == "All" {
+			challengeTrackerMapping = &types.AddressMapping{
+				Addresses: []string{},
+				IncludeAddresses: false,
+			}
+		} else {
+			challengeTrackerMapping = &types.AddressMapping{
+				Addresses: []string{permission.DefaultValues.ChallengeTrackerId},
+				IncludeAddresses: true,
+			}
 		}
 
 		fromMapping, err := k.GetAddressMappingById(ctx, permission.DefaultValues.FromMappingId, managerAddress)
@@ -41,11 +69,16 @@ func (k Keeper) CastUserApprovedIncomingTransferPermissionToUniversalPermission(
 				OwnershipTimes: 				permission.DefaultValues.OwnershipTimes,
 				FromMapping:            fromMapping,
 				InitiatedByMapping:     initiatedByMapping,
+				ApprovalTrackerIdMapping: approvalTrackerMapping,
+				ChallengeTrackerIdMapping: challengeTrackerMapping,
+				
 				UsesBadgeIds:           true,
 				UsesTransferTimes:      true,
 				UsesOwnershipTimes: 		true,
 				UsesFromMapping:        true,
 				UsesInitiatedByMapping: true,
+				UsesApprovalTrackerId: 	true,
+				UsesChallengeTrackerId: true,
 				PermittedTimes:         permission.DefaultValues.PermittedTimes,
 				ForbiddenTimes:         permission.DefaultValues.ForbiddenTimes,
 			},
@@ -68,9 +101,35 @@ func (k Keeper) CastUserApprovedOutgoingTransferPermissionToUniversalPermission(
 				OwnershipTimesOptions: 	 combination.OwnershipTimesOptions,
 				ToMappingOptions:          combination.ToMappingOptions,
 				InitiatedByMappingOptions: combination.InitiatedByMappingOptions,
+				ApprovalTrackerIdOptions: combination.ApprovalTrackerIdOptions,
+				ChallengeTrackerIdOptions: combination.ChallengeTrackerIdOptions,
 			})
 		}
+		approvalTrackerMapping := &types.AddressMapping{}
+		if permission.DefaultValues.ApprovalTrackerId == "All" {
+			approvalTrackerMapping = &types.AddressMapping{
+				Addresses: []string{},
+				IncludeAddresses: false,
+			}
+		} else {
+			approvalTrackerMapping = &types.AddressMapping{
+				Addresses: []string{permission.DefaultValues.ApprovalTrackerId},
+				IncludeAddresses: true,
+			}
+		}
 
+		challengeTrackerMapping := &types.AddressMapping{}
+		if permission.DefaultValues.ChallengeTrackerId == "All" {
+			challengeTrackerMapping = &types.AddressMapping{
+				Addresses: []string{},
+				IncludeAddresses: false,
+			}
+		} else {
+			challengeTrackerMapping = &types.AddressMapping{
+				Addresses: []string{permission.DefaultValues.ChallengeTrackerId},
+				IncludeAddresses: true,
+			}
+		}
 		initiatedByMapping, err := k.GetAddressMappingById(ctx, permission.DefaultValues.InitiatedByMappingId, managerAddress)
 		if err != nil {
 			return nil, err
@@ -88,6 +147,10 @@ func (k Keeper) CastUserApprovedOutgoingTransferPermissionToUniversalPermission(
 				OwnershipTimes: 				permission.DefaultValues.OwnershipTimes,
 				ToMapping:              toMapping,
 				InitiatedByMapping:     initiatedByMapping,
+				ApprovalTrackerIdMapping: approvalTrackerMapping,
+				ChallengeTrackerIdMapping: challengeTrackerMapping,
+				UsesApprovalTrackerId: 	true,
+				UsesChallengeTrackerId: true,
 				UsesBadgeIds:           true,
 				UsesTransferTimes:      true,
 				UsesOwnershipTimes: 		true,
@@ -138,7 +201,35 @@ func (k Keeper) CastCollectionApprovedTransferPermissionToUniversalPermission(ct
 				FromMappingOptions:        collectionUpdateCombination.FromMappingOptions,
 				InitiatedByMappingOptions: collectionUpdateCombination.InitiatedByMappingOptions,
 				BadgeIdsOptions:           collectionUpdateCombination.BadgeIdsOptions,
+				ApprovalTrackerIdOptions: collectionUpdateCombination.ApprovalTrackerIdOptions,
+				ChallengeTrackerIdOptions: collectionUpdateCombination.ChallengeTrackerIdOptions,
 			})
+		}
+
+		approvalTrackerMapping := &types.AddressMapping{}
+		if collectionUpdatePermission.DefaultValues.ApprovalTrackerId == "All" {
+			approvalTrackerMapping = &types.AddressMapping{
+				Addresses: []string{},
+				IncludeAddresses: false,
+			}
+		} else {
+			approvalTrackerMapping = &types.AddressMapping{
+				Addresses: []string{collectionUpdatePermission.DefaultValues.ApprovalTrackerId},
+				IncludeAddresses: true,
+			}
+		}
+
+		challengeTrackerMapping := &types.AddressMapping{}
+		if collectionUpdatePermission.DefaultValues.ChallengeTrackerId == "All" {
+			challengeTrackerMapping = &types.AddressMapping{
+				Addresses: []string{},
+				IncludeAddresses: false,
+			}
+		} else {
+			challengeTrackerMapping = &types.AddressMapping{
+				Addresses: []string{collectionUpdatePermission.DefaultValues.ChallengeTrackerId},
+				IncludeAddresses: true,
+			}
 		}
 
 		fromMapping, err := k.GetAddressMappingById(ctx, collectionUpdatePermission.DefaultValues.FromMappingId, managerAddress)
@@ -164,6 +255,11 @@ func (k Keeper) CastCollectionApprovedTransferPermissionToUniversalPermission(ct
 				FromMapping:            fromMapping,
 				InitiatedByMapping:     initiatedByMapping,
 				BadgeIds:               collectionUpdatePermission.DefaultValues.BadgeIds,
+				ApprovalTrackerIdMapping: approvalTrackerMapping,
+				ChallengeTrackerIdMapping: challengeTrackerMapping,
+
+				UsesApprovalTrackerId: 	true,
+				UsesChallengeTrackerId: true,
 				UsesBadgeIds:           true,
 				UsesTransferTimes:      true,
 				UsesOwnershipTimes: 		true,

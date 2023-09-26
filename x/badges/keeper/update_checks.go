@@ -48,6 +48,8 @@ func GetUpdateCombinationsToCheck(
 				ToMapping:          detailToAdd.ToMapping,
 				FromMapping:        detailToAdd.FromMapping,
 				InitiatedByMapping: detailToAdd.InitiatedByMapping,
+				ApprovalTrackerIdMapping: detailToAdd.ApprovalTrackerIdMapping,
+				ChallengeTrackerIdMapping: detailToAdd.ChallengeTrackerIdMapping,
 			})
 		}
 	}
@@ -67,6 +69,8 @@ func GetUpdateCombinationsToCheck(
 				ToMapping:          detailToAdd.ToMapping,
 				FromMapping:        detailToAdd.FromMapping,
 				InitiatedByMapping: detailToAdd.InitiatedByMapping,
+				ApprovalTrackerIdMapping: detailToAdd.ApprovalTrackerIdMapping,
+				ChallengeTrackerIdMapping: detailToAdd.ChallengeTrackerIdMapping,
 			})
 		}
 	}
@@ -89,6 +93,8 @@ func GetUpdateCombinationsToCheck(
 				ToMapping:          detailToAdd.ToMapping,
 				FromMapping:        detailToAdd.FromMapping,
 				InitiatedByMapping: detailToAdd.InitiatedByMapping,
+				ApprovalTrackerIdMapping: detailToAdd.ApprovalTrackerIdMapping,
+				ChallengeTrackerIdMapping: detailToAdd.ChallengeTrackerIdMapping,
 			})
 		}
 	}
@@ -209,6 +215,14 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 
 		if detailToCheck.OwnershipTime == nil {
 			detailToCheck.OwnershipTime = &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)} //dummy range
+		}
+
+		if detailToCheck.ApprovalTrackerIdMapping == nil {
+			detailToCheck.ApprovalTrackerIdMapping = &types.AddressMapping{Addresses: []string{}, IncludeAddresses: false}
+		}
+
+		if detailToCheck.ChallengeTrackerIdMapping == nil {
+			detailToCheck.ChallengeTrackerIdMapping = &types.AddressMapping{Addresses: []string{}, IncludeAddresses: false}
 		}
 
 		if detailToCheck.ToMapping == nil {

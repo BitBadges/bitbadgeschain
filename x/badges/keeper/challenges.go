@@ -11,10 +11,15 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool, approverAddress string, challengeLevel string, challengeIdsIncremented *[]string) (sdkmath.Uint, error) {
+func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool, approverAddress string, challengeLevel string, challengeIdsIncremented *[]string) (sdkmath.Uint, error) {
 	numIncrements := sdkmath.NewUint(0)
 
 	for _, challenge := range challenges {
+		if challenge == nil {
+			//No challenge specified
+			continue
+		}
+
 		root := challenge.Root
 		hasValidSolution := false
 		errStr := ""
@@ -61,7 +66,6 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 					continue
 				}
 
-				challengeId := challenge.ChallengeId
 				newNumUsed := sdk.NewUint(0)
 				if challenge.MaxOneUsePerLeaf {
 					

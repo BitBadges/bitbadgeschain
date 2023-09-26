@@ -47,6 +47,13 @@ func TestRemoveOverlaps(t *testing.T) {
 			Addresses:        []string{alice, bob, charlie},
 			IncludeAddresses: true,
 		},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 	}, &types.UniversalPermissionDetails{
 		BadgeId: &types.UintRange{
 			Start: sdkmath.NewUint(1),
@@ -75,6 +82,13 @@ func TestRemoveOverlaps(t *testing.T) {
 		InitiatedByMapping: &types.AddressMapping{
 			Addresses:        []string{alice, bob, charlie},
 			IncludeAddresses: true,
+		},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
 		},
 	})
 	expected := []*types.UniversalPermissionDetails{
@@ -107,6 +121,11 @@ func TestRemoveOverlaps(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+			ApprovalTrackerIdMapping: &types.AddressMapping{
+			},
+			ChallengeTrackerIdMapping: &types.AddressMapping{
+			},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -137,6 +156,13 @@ func TestRemoveOverlaps(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -167,6 +193,13 @@ func TestRemoveOverlaps(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -197,6 +230,13 @@ func TestRemoveOverlaps(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -227,6 +267,13 @@ func TestRemoveOverlaps(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 
 		{
@@ -258,6 +305,13 @@ func TestRemoveOverlaps(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -288,6 +342,13 @@ func TestRemoveOverlaps(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 
 		{
@@ -319,6 +380,13 @@ func TestRemoveOverlaps(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 	}
 
@@ -388,6 +456,13 @@ func TestRemoveAddresses(t *testing.T) {
 			Addresses:        []string{alice},
 			IncludeAddresses: true,
 		},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 	}, &types.UniversalPermissionDetails{
 		BadgeId: &types.UintRange{
 			Start: sdkmath.NewUint(1),
@@ -416,6 +491,13 @@ func TestRemoveAddresses(t *testing.T) {
 		InitiatedByMapping: &types.AddressMapping{
 			Addresses:        []string{alice, bob, charlie},
 			IncludeAddresses: true,
+		},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
 		},
 	})
 	expected := []*types.UniversalPermissionDetails{
@@ -448,6 +530,13 @@ func TestRemoveAddresses(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -478,6 +567,13 @@ func TestRemoveAddresses(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -508,6 +604,13 @@ func TestRemoveAddresses(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -538,6 +641,13 @@ func TestRemoveAddresses(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -568,6 +678,13 @@ func TestRemoveAddresses(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 
 		{
@@ -599,6 +716,13 @@ func TestRemoveAddresses(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -629,6 +753,13 @@ func TestRemoveAddresses(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 
 		{
@@ -660,6 +791,13 @@ func TestRemoveAddresses(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 
 
@@ -693,6 +831,13 @@ func TestRemoveAddresses(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -723,6 +868,13 @@ func TestRemoveAddresses(t *testing.T) {
 				Addresses:        []string{alice, bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -753,6 +905,13 @@ func TestRemoveAddresses(t *testing.T) {
 				Addresses:        []string{bob, charlie},
 				IncludeAddresses: true,
 			},
+
+		ApprovalTrackerIdMapping: &types.AddressMapping{
+
+		},
+
+		ChallengeTrackerIdMapping: &types.AddressMapping{
+		},
 		},
 	}
 
