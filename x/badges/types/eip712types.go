@@ -357,7 +357,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "string"},
 				{Name: "updateApprovedOutgoingTransfers", Type: "bool"},
-				{Name: "approvedOutgoingTransfers", Type: "UserApprovedOutgoingTransfer[][]"},
+				{Name: "approvedOutgoingTransfers", Type: "UserApprovedOutgoingTransfer[]"},
 				{Name: "updateApprovedIncomingTransfers", Type: "bool"},
 				{Name: "approvedIncomingTransfers", Type: "UserApprovedIncomingTransfer[]"},
 				{Name: "updateUserPermissions", Type: "bool"},

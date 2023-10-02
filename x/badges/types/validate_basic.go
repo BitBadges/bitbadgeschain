@@ -407,14 +407,12 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 			}
 		}
 	}
-		
-	
 
 	return nil
 }
 
 func ValidateMerkleChallenge(challenge *MerkleChallenge, challengeId string) error {
-	if challenge == nil {
+	if challenge == nil || challenge.Root == "" {
 		return nil
 	}
 
@@ -511,13 +509,17 @@ func ValidateTransfer(transfer *Transfer) error {
 	}
 
 	if transfer.PrecalculationDetails != nil {
-		if transfer.PrecalculationDetails.ApprovalLevel != "collection" && transfer.PrecalculationDetails.ApprovalLevel != "incoming" && transfer.PrecalculationDetails.ApprovalLevel != "outgoing" {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "approval level must be collection, incoming, or outgoing")
-		}
+		if transfer.PrecalculationDetails.ApprovalLevel == "" && transfer.PrecalculationDetails.ApproverAddress == "" && transfer.PrecalculationDetails.ApprovalId == "" {
+			//basically nil
+		} else {
+			if transfer.PrecalculationDetails.ApprovalLevel != "collection" && transfer.PrecalculationDetails.ApprovalLevel != "incoming" && transfer.PrecalculationDetails.ApprovalLevel != "outgoing" {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "approval level must be collection, incoming, or outgoing")
+			}
 
-		if transfer.PrecalculationDetails.ApproverAddress != "" {
-			if err := ValidateAddress(transfer.PrecalculationDetails.ApproverAddress, false); err != nil {
-				return sdkerrors.Wrapf(ErrInvalidAddress, "invalid approval id address (%s)", err)
+			if transfer.PrecalculationDetails.ApproverAddress != "" {
+				if err := ValidateAddress(transfer.PrecalculationDetails.ApproverAddress, false); err != nil {
+					return sdkerrors.Wrapf(ErrInvalidAddress, "invalid approval id address (%s)", err)
+				}
 			}
 		}
 	}

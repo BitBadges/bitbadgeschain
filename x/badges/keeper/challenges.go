@@ -15,7 +15,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 	numIncrements := sdkmath.NewUint(0)
 
 	for _, challenge := range challenges {
-		if challenge == nil {
+		if challenge == nil || challenge.Root == "" {
 			//No challenge specified
 			continue
 		}
