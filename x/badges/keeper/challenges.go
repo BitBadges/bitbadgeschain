@@ -98,22 +98,24 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 							if err != nil {
 								continue
 							}
+
+							//Currently added for indexer, but note that it is planned to be deprecated
+							ctx.EventManager().EmitEvent(
+								sdk.NewEvent("challenge" + fmt.Sprint(challengeId) + fmt.Sprint(challengeId) + fmt.Sprint(leafIndex) + fmt.Sprint(approverAddress) + fmt.Sprint(challengeLevel) + fmt.Sprint(newNumUsed),
+									sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+									sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
+									sdk.NewAttribute("challengeId", fmt.Sprint(challengeId)),
+									sdk.NewAttribute("leafIndex", fmt.Sprint(numIncrements)),
+									sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
+									sdk.NewAttribute("challengeLevel", fmt.Sprint(challengeLevel)),
+									sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),
+								),
+							)
 						}
 					}
 				}
 
-				//Currently added for indexer, but note that it is planned to be deprecated
-				ctx.EventManager().EmitEvent(
-					sdk.NewEvent("challenge" + fmt.Sprint(challengeId) + fmt.Sprint(challengeId) + fmt.Sprint(leafIndex) + fmt.Sprint(approverAddress) + fmt.Sprint(challengeLevel) + fmt.Sprint(newNumUsed),
-						sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-						sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-						sdk.NewAttribute("challengeId", fmt.Sprint(challengeId)),
-						sdk.NewAttribute("leafIndex", fmt.Sprint(numIncrements)),
-						sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
-						sdk.NewAttribute("challengeLevel", fmt.Sprint(challengeLevel)),
-						sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),
-					),
-				)
+				
 
 				hasValidSolution = true
 				break
