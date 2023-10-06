@@ -23,6 +23,15 @@ service Msg {
   // this line is used by starport scaffolding # proto/tx/rpc
 }
 
+message BadgeCustomMsgType {
+  MsgCreateAddressMappings createAddressMappingsMsg = 1;
+  MsgUpdateCollection updateCollectionMsg = 2;
+  MsgDeleteCollection deleteCollectionMsg = 3;
+  MsgTransferBadges transferBadgesMsg = 4;
+  MsgUpdateUserApprovedTransfers updateUserApprovedTransfersMsg = 5;
+}
+
+
 //The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
 
 message MsgUpdateCollection {

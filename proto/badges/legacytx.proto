@@ -55,7 +55,7 @@ message MsgNewCollection {
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 4;
   repeated CustomDataTimeline customDataTimeline = 5;
-  string balancesType = 6 [(gogoproto.nullable) = false, (gogoproto.customtype) = "Uint"];
+  string balancesType = 6 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated CollectionApprovedTransfer collectionApprovedTransfers = 8;
   CollectionPermissions permissions = 9;
   repeated StandardsTimeline standardsTimeline = 10;
@@ -108,10 +108,7 @@ message MsgMintAndDistributeBadgesResponse {}
 
 message MsgUpdateCollectionApprovedTransfers {
   string creator = 1;
-  string collectionId = 2  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-    ];
+  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated CollectionApprovedTransfer collectionApprovedTransfers = 3;
   repeated AddressMapping addressMappings = 4;
 }
@@ -123,10 +120,7 @@ message MsgUpdateCollectionApprovedTransfersResponse {}
 //Update badge Uris with new URI object, if permitted.
 message MsgUpdateMetadata {
   string creator = 1;
-  string collectionId = 2  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-    ];
+  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 3; 
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 4;
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 5;
@@ -140,10 +134,7 @@ message MsgUpdateMetadataResponse {}
 //Update badge permissions with new permissions, if permitted.
 message MsgUpdateCollectionPermissions {
   string creator = 1;
-  string collectionId = 2  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-    ];
+  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   CollectionPermissions permissions = 3;
   repeated AddressMapping addressMappings = 4;
 }
@@ -152,10 +143,7 @@ message MsgUpdateCollectionPermissionsResponse {}
 
 message MsgUpdateUserPermissions {
   string creator = 1;
-  string collectionId = 2  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-    ];
+  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   UserPermissions permissions = 3;
   repeated AddressMapping addressMappings = 4;
 }
@@ -165,10 +153,7 @@ message MsgUpdateUserPermissionsResponse {}
 //Transfer manager to this address. Recipient must have made a request.
 message MsgUpdateManager {
   string creator = 1;
-  string collectionId = 2  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-    ];
+  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated ManagerTimeline managerTimeline = 3;
 }
 
@@ -177,10 +162,7 @@ message MsgUpdateManagerResponse {}
 
 message MsgArchiveCollection {
   string creator      = 1;
-  string collectionId = 2 [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-    ];
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated IsArchivedTimeline isArchivedTimeline = 3;
 }
 

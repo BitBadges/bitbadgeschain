@@ -79,10 +79,8 @@ message CollectionApprovedTransferCombination {
   ValueOptions transferTimesOptions = 4;
   ValueOptions badgeIdsOptions = 5;
   ValueOptions ownershipTimesOptions = 6;
-
   ValueOptions approvalTrackerIdOptions = 10;
   ValueOptions challengeTrackerIdOptions = 9;
-  
 
   ValueOptions permittedTimesOptions = 7;
   ValueOptions forbiddenTimesOptions = 8;
@@ -121,7 +119,7 @@ message CollectionApprovedTransferDefaultValues {
 // the combination ("AllWithoutMint", "AllWithoutMint", "AllWithoutMint", "All Transfer Times", 1) to always be forbidden at all timelineTimes.
 message CollectionApprovedTransferPermission {
   CollectionApprovedTransferDefaultValues defaultValues = 1;
-  repeated CollectionApprovedTransferCombination combinations = 7;
+  repeated CollectionApprovedTransferCombination combinations = 2;
 }
 
 message UserApprovedOutgoingTransferCombination {

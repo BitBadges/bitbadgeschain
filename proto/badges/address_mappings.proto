@@ -15,12 +15,10 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 // AddressMappings are used for things like whitelists, blacklists, approvals, etc.
 message AddressMapping {
   string mappingId = 1;
-
   repeated string addresses = 2;
   bool includeAddresses = 3;
 
   string uri = 4;
   string customData = 5;
-
   string createdBy = 6;
 }

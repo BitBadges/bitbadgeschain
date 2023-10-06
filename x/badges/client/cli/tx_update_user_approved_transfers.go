@@ -1,13 +1,13 @@
 package cli
 
 import (
-	"encoding/json"
 	"strconv"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/spf13/cobra"
 )
 
@@ -45,7 +45,7 @@ func CmdUpdateUserApprovedOutgoingTransfers() *cobra.Command {
 			txJSON := args[0]
 
 			var txData types.MsgUpdateUserApprovedTransfers
-			if err := json.Unmarshal([]byte(txJSON), &txData); err != nil {
+			if err := jsonpb.UnmarshalString(txJSON, &txData); err != nil {
 				return err
 			}
 

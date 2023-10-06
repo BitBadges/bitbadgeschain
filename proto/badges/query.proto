@@ -56,10 +56,7 @@ message QueryParamsResponse {
 }
 
 message QueryGetCollectionRequest {
-  string collectionId = 1  [
-      (gogoproto.customtype) = "Uint", 
-      (gogoproto.nullable) = false
-    ];
+  string collectionId = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 message QueryGetCollectionResponse {
@@ -100,7 +97,7 @@ message QueryGetNumUsedForMerkleChallengeRequest {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   string approvalLevel = 2; //"collection" or "incoming" or "outgoing"
   string approverAddress = 3; //if approvalLevel is "collection", leave blank
-  string challengeId = 4;
+  string challengeTrackerId = 4;
   string leafIndex = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; 
 }
 

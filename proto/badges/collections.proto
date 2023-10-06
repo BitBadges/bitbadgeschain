@@ -64,15 +64,15 @@ message BadgeCollection {
   // The contractAddressTimeline defines the contract address for the collection (if it has a corresponding contract).
   repeated ContractAddressTimeline contractAddressTimeline = 13;
 
-  // The defaultUserApprovedOutgoingTransfersTimeline defines the default user approved outgoing transfers for an uninitialized user balance. 
+  // The defaultUserOutgoingApprovals defines the default user approved outgoing transfers for an uninitialized user balance. 
   // The user can change this value at any time.
-  repeated UserApprovedOutgoingTransfer defaultUserApprovedOutgoingTransfers = 14;
+  repeated UserApprovedOutgoingTransfer defaultUserOutgoingApprovals = 14;
 
   // The defaultUserApprovedIncomingTransfers defines the default user approved incoming transfers for an uninitialized user balance.
   // The user can change this value at any time.
   //
   // Ex: Set this to disallow all incoming transfers by default, making the user have to opt-in to receiving the badge.
-  repeated UserApprovedIncomingTransfer defaultUserApprovedIncomingTransfers = 15;
+  repeated UserApprovedIncomingTransfer defaultUserIncomingApprovals = 15;
 
   UserPermissions defaultUserPermissions = 16;
 
