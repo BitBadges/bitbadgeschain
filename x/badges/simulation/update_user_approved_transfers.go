@@ -10,7 +10,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 )
 
-func SimulateMsgUpdateUserApprovedTransfers(
+func SimulateMsgUpdateUserApprovals(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	k keeper.Keeper,
@@ -18,12 +18,12 @@ func SimulateMsgUpdateUserApprovedTransfers(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := &types.MsgUpdateUserApprovedTransfers{
+		msg := &types.MsgUpdateUserApprovals{
 			Creator: simAccount.Address.String(),
 		}
 
-		// TODO: Handling the UpdateUserApprovedOutgoingTransfers simulation
+		// TODO: Handling the UpdateUserOutgoingApprovals simulation
 
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "UpdateUserApprovedOutgoingTransfers simulation not implemented"), nil, nil
+		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "UpdateUserOutgoingApprovals simulation not implemented"), nil, nil
 	}
 }

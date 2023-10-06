@@ -25,13 +25,8 @@ func TestMsgUpdateCollectionPermissions_ValidateBasic(t *testing.T) {
 				CollectionPermissions: &types.CollectionPermissions{
 					CanDeleteCollection: []*types.ActionPermission{
 						{
-							DefaultValues: &types.ActionDefaultValues{
-								PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
-								ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
-							},
-							Combinations: []*types.ActionCombination{
-								{},
-							},
+							PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+							ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 						},
 					},
 				},
@@ -54,13 +49,8 @@ func TestMsgUpdateCollectionPermissions_ValidateBasic(t *testing.T) {
 				CollectionPermissions: &types.CollectionPermissions{
 					CanDeleteCollection: []*types.ActionPermission{
 						{
-							DefaultValues: &types.ActionDefaultValues{
-								PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+							PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 								ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
-							},
-							Combinations: []*types.ActionCombination{
-								{},
-							},
 						},
 					},
 				},
@@ -76,13 +66,8 @@ func TestMsgUpdateCollectionPermissions_ValidateBasic(t *testing.T) {
 				CollectionPermissions: &types.CollectionPermissions{
 					CanDeleteCollection: []*types.ActionPermission{
 						{
-							DefaultValues: &types.ActionDefaultValues{
-								PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+							PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 								ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(10), End: sdkmath.NewUint(22)}},
-							},
-							Combinations: []*types.ActionCombination{
-								{},
-							},
 						},
 					},
 				},

@@ -42,32 +42,32 @@ func GetIsArchivedTimesAndValues(isArchivedTimeline []*IsArchivedTimeline) ([][]
 	return times, values
 }
 
-func GetCollectionApprovedTransferTimesAndValues(approvedTransfers []*CollectionApprovedTransferTimeline) ([][]*UintRange, []interface{}) {
+func GetCollectionApprovalTimesAndValues(approvals []*CollectionApprovalTimeline) ([][]*UintRange, []interface{}) {
 	times := [][]*UintRange{}
 	values := []interface{}{}
-	for _, timelineVal := range approvedTransfers {
+	for _, timelineVal := range approvals {
 		times = append(times, timelineVal.TimelineTimes)
-		values = append(values, timelineVal.CollectionApprovedTransfers)
+		values = append(values, timelineVal.CollectionApprovals)
 	}
 	return times, values
 }
 
-func GetUserApprovedOutgoingTransferTimesAndValues(approvedTransfers []*UserApprovedOutgoingTransferTimeline) ([][]*UintRange, []interface{}) {
+func GetUserOutgoingApprovalTimesAndValues(approvals []*UserOutgoingApprovalTimeline) ([][]*UintRange, []interface{}) {
 	times := [][]*UintRange{}
 	values := []interface{}{}
-	for _, timelineVal := range approvedTransfers {
+	for _, timelineVal := range approvals {
 		times = append(times, timelineVal.TimelineTimes)
-		values = append(values, timelineVal.ApprovedOutgoingTransfers)
+		values = append(values, timelineVal.OutgoingApprovals)
 	}
 	return times, values
 }
 
-func GetUserApprovedIncomingTransferTimesAndValues(approvedTransfers []*UserApprovedIncomingTransferTimeline) ([][]*UintRange, []interface{}) {
+func GetUserIncomingApprovalTimesAndValues(approvals []*UserIncomingApprovalTimeline) ([][]*UintRange, []interface{}) {
 	times := [][]*UintRange{}
 	values := []interface{}{}
-	for _, timelineVal := range approvedTransfers {
+	for _, timelineVal := range approvals {
 		times = append(times, timelineVal.TimelineTimes)
-		values = append(values, timelineVal.ApprovedIncomingTransfers)
+		values = append(values, timelineVal.IncomingApprovals)
 	}
 	return times, values
 }

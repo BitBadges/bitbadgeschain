@@ -9,13 +9,10 @@ import (
 
 func GetValidUserPermissions() *types.UserPermissions {
 	return &types.UserPermissions{
-		CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransferPermission{
+		CanUpdateOutgoingApprovals: []*types.UserOutgoingApprovalPermission{
 			{
-				DefaultValues: &types.UserApprovedOutgoingTransferDefaultValues{
-					PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
-					ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(6), End: sdkmath.NewUint(8)}},
-				},
-				Combinations: []*types.UserApprovedOutgoingTransferCombination{{}},
+				PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+				ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(6), End: sdkmath.NewUint(8)}},
 			},
 		},
 	}

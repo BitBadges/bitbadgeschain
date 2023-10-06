@@ -41,13 +41,13 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Error(err, "Error creating badge: %s")
 
-	//This is fine. Just comented out bc with new MsgUpdateCollection logic, we have to set UpdateCollectionApprovedTransfers to false 
+	//This is fine. Just comented out bc with new MsgUpdateCollection logic, we have to set UpdateCollectionApprovals to false 
 	//which is not possible with the way the integration helpers are written
 
 	// collectionsToCreate = GetCollectionsToCreate()
 	// collectionsToCreate[0].BadgesToCreate = []*types.Balance{}
 	// collectionsToCreate[0].BalancesType = sdkmath.NewUint(2)
-	// collectionsToCreate[0].CollectionApprovedTransfersTimeline = nil
+	// collectionsToCreate[0].CollectionApprovalsTimeline = nil
 
 	// err = CreateCollections(suite, wctx, collectionsToCreate)
 	// suite.Require().Nil(err, "Error creating badge: %s")
@@ -62,7 +62,7 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 	// collectionsToCreate = GetCollectionsToCreate()
 	// collectionsToCreate[0].BadgesToCreate = []*types.Balance{}
 	// collectionsToCreate[0].BalancesType = sdkmath.NewUint(3)
-	// collectionsToCreate[0].CollectionApprovedTransfersTimeline = nil
+	// collectionsToCreate[0].CollectionApprovalsTimeline = nil
 
 	// err = CreateCollections(suite, wctx, collectionsToCreate)
 	// suite.Require().Nil(err, "Error creating badge: %s")

@@ -46,9 +46,9 @@ func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 			case badgeCustomMsg.TransferBadgesMsg != nil:
 				badgeCustomMsg.TransferBadgesMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.TransferBadgesMsg}, nil
-			case badgeCustomMsg.UpdateUserApprovedTransfersMsg != nil:
-				badgeCustomMsg.UpdateUserApprovedTransfersMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.UpdateUserApprovedTransfersMsg}, nil
+			case badgeCustomMsg.UpdateUserApprovalsMsg != nil:
+				badgeCustomMsg.UpdateUserApprovalsMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.UpdateUserApprovalsMsg}, nil
 			default:
 				return nil, sdkerrors.Wrapf(types.ErrInvalidMsg, "Unknown custom badge message variant %s", badgeCustomMsg)
 			}

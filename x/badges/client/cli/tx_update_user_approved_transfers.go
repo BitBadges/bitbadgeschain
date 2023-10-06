@@ -17,12 +17,12 @@ var _ = strconv.Itoa(0)
 your-cli-command update-user-approved-transfers '{
   "creator": "your-creator-address",
   "collectionId": "your-collection-id",
-  "updateApprovedOutgoingTransfersTimeline": true,
-  "approvedOutgoingTransfersTimeline": [
+  "updateOutgoingApprovalsTimeline": true,
+  "outgoingApprovalsTimeline": [
     {...}, // Populate with approved outgoing transfer data
   ],
-  "updateApprovedIncomingTransfersTimeline": true,
-  "approvedIncomingTransfersTimeline": [
+  "updateIncomingApprovalsTimeline": true,
+  "incomingApprovalsTimeline": [
     {...}, // Populate with approved incoming transfer data
   ],
   "updateUserPermissions": true,
@@ -31,10 +31,10 @@ your-cli-command update-user-approved-transfers '{
 
 */
 
-func CmdUpdateUserApprovedOutgoingTransfers() *cobra.Command {
+func CmdUpdateUserOutgoingApprovals() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-user-approved-transfers [tx-json]",
-		Short: "Broadcast message UpdateUserApprovedTransfers",
+		Short: "Broadcast message UpdateUserApprovals",
 		Args:  cobra.ExactArgs(1), // Accept exactly one argument (the JSON string)
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -44,7 +44,7 @@ func CmdUpdateUserApprovedOutgoingTransfers() *cobra.Command {
 
 			txJSON := args[0]
 
-			var txData types.MsgUpdateUserApprovedTransfers
+			var txData types.MsgUpdateUserApprovals
 			if err := jsonpb.UnmarshalString(txJSON, &txData); err != nil {
 				return err
 			}

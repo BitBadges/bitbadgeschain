@@ -23,8 +23,8 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 			// InheritedCollectionId: 					 	msg.InheritedCollectionId,
 			CollectionPermissions:            &types.CollectionPermissions{},
 			BalancesType:                     msg.BalancesType,
-			DefaultUserApprovedOutgoingTransfers: msg.DefaultApprovedOutgoingTransfers,
-			DefaultUserApprovedIncomingTransfers: msg.DefaultApprovedIncomingTransfers,
+			DefaultUserOutgoingApprovals: msg.DefaultOutgoingApprovals,
+			DefaultUserIncomingApprovals: msg.DefaultIncomingApprovals,
 			DefaultUserPermissions: 				msg.DefaultUserPermissions,
 			CreatedBy: 											msg.Creator,
 			ManagerTimeline: []*types.ManagerTimeline{
@@ -79,11 +79,11 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 	//not previouslyArchived && not stillArchived - unarchived before and now so we allow
 
 
-	if msg.UpdateCollectionApprovedTransfers {
-		if err := k.ValidateCollectionApprovedTransfersUpdate(ctx, collection, collection.CollectionApprovedTransfers, msg.CollectionApprovedTransfers, collection.CollectionPermissions.CanUpdateCollectionApprovedTransfers, msg.Creator); err != nil {
+	if msg.UpdateCollectionApprovals {
+		if err := k.ValidateCollectionApprovalsUpdate(ctx, collection, collection.CollectionApprovals, msg.CollectionApprovals, collection.CollectionPermissions.CanUpdateCollectionApprovals, msg.Creator); err != nil {
 			return nil, err
 		}
-		collection.CollectionApprovedTransfers = msg.CollectionApprovedTransfers
+		collection.CollectionApprovals = msg.CollectionApprovals
 	}
 
 	if msg.UpdateCollectionMetadataTimeline {
@@ -189,8 +189,8 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 			collection.CollectionPermissions.CanUpdateBadgeMetadata = msg.CollectionPermissions.CanUpdateBadgeMetadata
 		}
 
-		if msg.CollectionPermissions.CanUpdateCollectionApprovedTransfers != nil {
-			collection.CollectionPermissions.CanUpdateCollectionApprovedTransfers = msg.CollectionPermissions.CanUpdateCollectionApprovedTransfers
+		if msg.CollectionPermissions.CanUpdateCollectionApprovals != nil {
+			collection.CollectionPermissions.CanUpdateCollectionApprovals = msg.CollectionPermissions.CanUpdateCollectionApprovals
 		}
 
 		collection.CollectionPermissions = msg.CollectionPermissions

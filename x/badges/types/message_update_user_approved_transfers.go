@@ -5,25 +5,25 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const TypeMsgUpdateUserApprovedTransfers = "update_user_approved_transfers"
+const TypeMsgUpdateUserApprovals = "update_user_approved_transfers"
 
-var _ sdk.Msg = &MsgUpdateUserApprovedTransfers{}
+var _ sdk.Msg = &MsgUpdateUserApprovals{}
 
-func NewMsgUpdateUserApprovedTransfers(creator string) *MsgUpdateUserApprovedTransfers {
-	return &MsgUpdateUserApprovedTransfers{
+func NewMsgUpdateUserApprovals(creator string) *MsgUpdateUserApprovals {
+	return &MsgUpdateUserApprovals{
 		Creator: creator,
 	}
 }
 
-func (msg *MsgUpdateUserApprovedTransfers) Route() string {
+func (msg *MsgUpdateUserApprovals) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgUpdateUserApprovedTransfers) Type() string {
-	return TypeMsgUpdateUserApprovedTransfers
+func (msg *MsgUpdateUserApprovals) Type() string {
+	return TypeMsgUpdateUserApprovals
 }
 
-func (msg *MsgUpdateUserApprovedTransfers) GetSigners() []sdk.AccAddress {
+func (msg *MsgUpdateUserApprovals) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -31,22 +31,22 @@ func (msg *MsgUpdateUserApprovedTransfers) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgUpdateUserApprovedTransfers) GetSignBytes() []byte {
+func (msg *MsgUpdateUserApprovals) GetSignBytes() []byte {
 	bz := AminoCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgUpdateUserApprovedTransfers) ValidateBasic() error {
+func (msg *MsgUpdateUserApprovals) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if err := ValidateUserApprovedIncomingTransfers(msg.ApprovedIncomingTransfers, msg.Creator); err != nil {
+	if err := ValidateUserIncomingApprovals(msg.IncomingApprovals, msg.Creator); err != nil {
 		return err
 	}
 
-	if err := ValidateUserApprovedOutgoingTransfers(msg.ApprovedOutgoingTransfers, msg.Creator); err != nil {
+	if err := ValidateUserOutgoingApprovals(msg.OutgoingApprovals, msg.Creator); err != nil {
 		return err
 	}
 

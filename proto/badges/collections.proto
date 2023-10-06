@@ -52,7 +52,7 @@ message BadgeCollection {
   // 
   // Collection approved transfers can optionally specify to override the user approvals for a transfer (e.g. forcefully revoke a badge).
   // If user approvals are not overriden, then a transfer must also satisfy the From user's approved outgoing transfers and the To user's approved incoming transfers.
-  repeated CollectionApprovedTransfer collectionApprovedTransfers = 10;
+  repeated CollectionApproval collectionApprovals = 10;
   
   // Standards allow us to define a standard for the collection. This lets others know how to interpret the fields of the collection.
   repeated StandardsTimeline standardsTimeline = 11;
@@ -66,13 +66,13 @@ message BadgeCollection {
 
   // The defaultUserOutgoingApprovals defines the default user approved outgoing transfers for an uninitialized user balance. 
   // The user can change this value at any time.
-  repeated UserApprovedOutgoingTransfer defaultUserOutgoingApprovals = 14;
+  repeated UserOutgoingApproval defaultUserOutgoingApprovals = 14;
 
-  // The defaultUserApprovedIncomingTransfers defines the default user approved incoming transfers for an uninitialized user balance.
+  // The defaultUserIncomingApprovals defines the default user approved incoming transfers for an uninitialized user balance.
   // The user can change this value at any time.
   //
   // Ex: Set this to disallow all incoming transfers by default, making the user have to opt-in to receiving the badge.
-  repeated UserApprovedIncomingTransfer defaultUserIncomingApprovals = 15;
+  repeated UserIncomingApproval defaultUserIncomingApprovals = 15;
 
   UserPermissions defaultUserPermissions = 16;
 

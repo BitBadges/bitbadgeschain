@@ -32,8 +32,8 @@ const (
 	opWeightMsgDeleteCollection          = "op_weight_msg_delete_collection"
 	defaultWeightMsgDeleteCollection int = 100
 
-	opWeightMsgUpdateUserApprovedTransfers          = "op_weight_msg_update_user_approved_transfers"
-	defaultWeightMsgUpdateUserApprovedTransfers int = 100
+	opWeightMsgUpdateUserApprovals          = "op_weight_msg_update_user_approved_transfers"
+	defaultWeightMsgUpdateUserApprovals int = 100
 
 	opWeightMsgUpdateCollection = "op_weight_msg_update_collection"
 	defaultWeightMsgUpdateCollection int = 1000
@@ -99,15 +99,15 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		badgessimulation.SimulateMsgDeleteCollection(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgUpdateUserApprovedTransfers int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateUserApprovedTransfers, &weightMsgUpdateUserApprovedTransfers, nil,
+	var weightMsgUpdateUserApprovals int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateUserApprovals, &weightMsgUpdateUserApprovals, nil,
 		func(_ *rand.Rand) {
-			weightMsgUpdateUserApprovedTransfers = defaultWeightMsgUpdateUserApprovedTransfers
+			weightMsgUpdateUserApprovals = defaultWeightMsgUpdateUserApprovals
 		},
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgUpdateUserApprovedTransfers,
-		badgessimulation.SimulateMsgUpdateUserApprovedTransfers(am.accountKeeper, am.bankKeeper, am.keeper),
+		weightMsgUpdateUserApprovals,
+		badgessimulation.SimulateMsgUpdateUserApprovals(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	var weightMsgUpdateCollection int

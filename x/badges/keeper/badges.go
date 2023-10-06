@@ -11,7 +11,7 @@ import (
 func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, badgesToCreate []*types.Balance) (*types.BadgeCollection, error) {
 	if !IsStandardBalances(collection) {
 		//For readability, we do not allow transfers to happen on-chain, if not defined in the collection
-		if len(collection.CollectionApprovedTransfers) > 0 {
+		if len(collection.CollectionApprovals) > 0 {
 			return &types.BadgeCollection{}, ErrWrongBalancesType
 		}
 	}

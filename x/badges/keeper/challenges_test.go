@@ -14,25 +14,25 @@ func (suite *TestSuite) TestNoMerkleChallengeWorking() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.OverridesFromApprovedOutgoingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.MerkleChallenge = &types.MerkleChallenge{}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.MerkleChallenge = &types.MerkleChallenge{}
 
 	CreateCollections(suite, wctx, collectionsToCreate)
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
 	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
-	suite.Require().Error(err, "Error getting user balance: %s")
+	suite.Require().Nil(err, "Error getting user balance: %s")
 }
 
 func (suite *TestSuite) TestMerkleChallengeInvalidSolutions() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.OverridesToApprovedIncomingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.OverridesFromApprovedOutgoingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ChallengeTrackerId = "testchallenge"
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.MerkleChallenge = &types.MerkleChallenge{
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ChallengeTrackerId = "testchallenge"
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.MerkleChallenge = &types.MerkleChallenge{
 		Root: "sample",
 	}
 
@@ -78,11 +78,11 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
 		ChallengeTrackerId: "testchallenge",
 		ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
-		ApprovalDetails: &types.ApprovalDetails{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -92,7 +92,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 				},
 				
 				
-				Uri: "",
+				
 				MerkleChallenge: &types.MerkleChallenge{
 					
 						
@@ -101,12 +101,11 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 						MaxOneUsePerLeaf:    true,
 				},
 				
-				OverridesFromApprovedOutgoingTransfers: true,
-				OverridesToApprovedIncomingTransfers:   true,
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
 		},
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -254,8 +253,8 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -264,7 +263,7 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
 			
-				Uri: "",
+				
 				MerkleChallenge: &types.MerkleChallenge{
 					
 						
@@ -274,15 +273,14 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 						UseCreatorAddressAsLeaf: true,
 				},
 				
-				OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
+				OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
 		},
 		ChallengeTrackerId: "testchallenge",
 		ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes: GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -358,8 +356,8 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -368,7 +366,7 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
 			
-				Uri: "",
+				
 				MerkleChallenge: &types.MerkleChallenge{
 					
 						
@@ -377,15 +375,14 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 						MaxOneUsePerLeaf:    true,
 				},
 				
-				OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
+				OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
 		},
 		ChallengeTrackerId: "testchallenge",
 		ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes: GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -473,8 +470,8 @@ func (suite *TestSuite) TestIncrements() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -497,17 +494,17 @@ func (suite *TestSuite) TestIncrements() {
 					},
 				},
 			
-				Uri: "",
+				
 				MerkleChallenge: &types.MerkleChallenge{
 					
 						
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
 						MaxOneUsePerLeaf:                 true,
-						UseLeafIndexForTransferOrder: true,
+						
 				},
-				OverridesFromApprovedOutgoingTransfers: true,
-				OverridesToApprovedIncomingTransfers:   true,
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
 			
 
 		},
@@ -515,9 +512,8 @@ func (suite *TestSuite) TestIncrements() {
 		ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
 		ChallengeTrackerId: "testchallenge",
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes: 			GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -629,8 +625,8 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -653,25 +649,24 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					},
 				},
-				Uri: "",
+				
 				MerkleChallenge: &types.MerkleChallenge{
 					
 						
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
 						MaxOneUsePerLeaf:                 true,
-						UseLeafIndexForTransferOrder: true,
+						
 				},
-				OverridesFromApprovedOutgoingTransfers: true,
-			OverridesToApprovedIncomingTransfers:   true,
+				OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
 		},
 
 		ChallengeTrackerId: "testchallenge",
 		ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes: 			GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -690,7 +685,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculationDetails: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
 					ApprovalId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
@@ -761,8 +756,8 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -785,26 +780,24 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 					},
 				},
 			
-				Uri: "",
+				
 				MerkleChallenge: &types.MerkleChallenge{
 					
 						
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
 						MaxOneUsePerLeaf:                 true,
-						UseLeafIndexForTransferOrder: 		true,
 				},
-				OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
+				OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
 	
 
 		},
 		ChallengeTrackerId: "testchallenge",
 		ApprovalTrackerId:            "testing232",	
 		ApprovalId: "asadsdas",
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
@@ -823,7 +816,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculationDetails: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
 					ApprovalId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
@@ -873,7 +866,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculationDetails: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
 					ApprovalId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
@@ -944,8 +937,8 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -968,23 +961,22 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 					},
 				},
 			
-				Uri: "",
+				
 				MerkleChallenge: &types.MerkleChallenge{
 					
 						
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
 						MaxOneUsePerLeaf:                 true,
-						UseLeafIndexForTransferOrder: true,
-				},OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
+						
+				},OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
 		},
 		ChallengeTrackerId: "testchallenge",
 		ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
@@ -1003,7 +995,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculationDetails: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
 					ApprovalId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
@@ -1074,8 +1066,8 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(1),
@@ -1098,21 +1090,20 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 					},
 				},
 			
-				Uri: "",
+				
 				MerkleChallenge: &types.MerkleChallenge{
 					
 						
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
 						MaxOneUsePerLeaf:                 true,
-						UseLeafIndexForTransferOrder: true,
+						
 				},
-				OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
+				OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
 		},
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 
 		ChallengeTrackerId: "testchallenge",
 		ApprovalTrackerId:            "testing232",
@@ -1135,7 +1126,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculationDetails: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
 					ApprovalId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
@@ -1185,7 +1176,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculationDetails: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
 					ApprovalId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
@@ -1247,8 +1238,8 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -1271,23 +1262,21 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 					},
 				},
 			
-				Uri: "",
+				
 				MerkleChallenge: &types.MerkleChallenge{
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
 						MaxOneUsePerLeaf:                 true,
-						UseLeafIndexForTransferOrder: false,
 				},
-				OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
+				OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
 		},
 
 		ChallengeTrackerId: "testchallenge",
 		ApprovalTrackerId:   "testing232",
 		ApprovalId: "asadsdas",
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
@@ -1306,7 +1295,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculationDetails: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
 					ApprovalId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
@@ -1411,45 +1400,39 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 		BadgeIds:       GetFullUintRanges(),
 		OwnershipTimes: GetFullUintRanges(),
 	})
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
-				MaxNumTransfers: &types.MaxNumTransfers{
-					OverallMaxNumTransfers: sdkmath.NewUint(10),
-				},
-				ApprovalAmounts: &types.ApprovalAmounts{
-					OverallApprovalAmount: sdkmath.NewUint(10),
-				},
-				PredeterminedBalances: &types.PredeterminedBalances{
-					OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UsePerToAddressNumTransfers: true },
-					IncrementedBalances: &types.IncrementedBalances{
-						StartBalances: []*types.Balance{
-							{
-								BadgeIds: GetOneUintRange(),
-								Amount:   sdkmath.NewUint(1),
-								OwnershipTimes: GetFullUintRanges(),
-							},
-						},
-						IncrementBadgeIdsBy: sdkmath.NewUint(1),
-						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(10),
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{
+			OverallApprovalAmount: sdkmath.NewUint(10),
+		},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			OrderCalculationMethod:  &types.PredeterminedOrderCalculationMethod{ UsePerToAddressNumTransfers: true },
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						BadgeIds: GetOneUintRange(),
+						Amount:   sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-			
-				Uri: "",
-				MerkleChallenge: &types.MerkleChallenge{
-					
-						
-						Root:                             hex.EncodeToString(rootHash),
-						ExpectedProofLength:              sdk.NewUint(2),
-						MaxOneUsePerLeaf:                 true,
-						UseLeafIndexForTransferOrder: false,
-				},
-				OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
+				IncrementBadgeIdsBy: sdkmath.NewUint(1),
+				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+			},
 		},
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		MerkleChallenge: &types.MerkleChallenge{
+				Root:                             hex.EncodeToString(rootHash),
+				ExpectedProofLength:              sdk.NewUint(2),
+				MaxOneUsePerLeaf:                 true,
+		},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+		IsApproved: true,
+	
 
 		ChallengeTrackerId: "testchallenge",
 		ApprovalTrackerId:            "testing232",
@@ -1472,7 +1455,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculationDetails: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
 					ApprovalId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
@@ -1572,8 +1555,8 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -1596,25 +1579,24 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 					},
 				},
 			
-				Uri: "",
+				
 				MerkleChallenge: &types.MerkleChallenge{
 					
 						
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
 						MaxOneUsePerLeaf:                 true,
-						UseLeafIndexForTransferOrder: true,
+						
 				},
 				
-				OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
+				OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
 		},
 		ChallengeTrackerId: "testchallenge",
 		ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
@@ -1633,7 +1615,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculationDetails: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
 					ApprovalId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
@@ -1734,8 +1716,8 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -1768,24 +1750,23 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 					},
 				},
 			
-				Uri: "",
+				
 				MerkleChallenge: &types.MerkleChallenge{
 					
 						
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
 						MaxOneUsePerLeaf:                 true,
-						UseLeafIndexForTransferOrder: true,
+						
 				},
-				OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
+				OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
 		},
 		ChallengeTrackerId: "testchallenge",
 		ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             GetFullUintRanges(),
@@ -1804,7 +1785,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 		CollectionId: sdk.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculationDetails: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
 					ApprovalId:   "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel: "collection",
@@ -1906,8 +1887,8 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -1929,24 +1910,23 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				},
 			},
-			Uri: "",
+			
 			MerkleChallenge: &types.MerkleChallenge{
 					Root:                             hex.EncodeToString(rootHash),
 					ExpectedProofLength:              sdk.NewUint(2),
 					MaxOneUsePerLeaf:                 true,
-					UseLeafIndexForTransferOrder: true,
+					
 				},
 			
-			OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
+			OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
 		
 	},
 	ChallengeTrackerId: "testchallenge",
 	ApprovalTrackerId:            "testing232",
 	ApprovalId: "asadsdas",
-	AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},	
+	IsApproved: true,
+		
 	TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
@@ -2110,7 +2090,7 @@ func (suite *TestSuite) TestMustOwnBadges() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails.MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2122,8 +2102,8 @@ func (suite *TestSuite) TestMustOwnBadges() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -2132,16 +2112,15 @@ func (suite *TestSuite) TestMustOwnBadges() {
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
 			
-				Uri: "",
 				
-				OverridesFromApprovedOutgoingTransfers: true,
-				OverridesToApprovedIncomingTransfers:   true,
+				
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
 
 		},ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -2181,7 +2160,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails.MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2194,8 +2173,8 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -2204,16 +2183,15 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll() {
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
 			
-				Uri: "",
 				
-				OverridesFromApprovedOutgoingTransfers: true,
-				OverridesToApprovedIncomingTransfers:   true,
+				
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
 
 		},ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -2253,7 +2231,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll2() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails.MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2276,8 +2254,8 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll2() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -2286,16 +2264,15 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll2() {
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
 			
-				Uri: "",
 				
-				OverridesFromApprovedOutgoingTransfers: true,
-				OverridesToApprovedIncomingTransfers:   true,
+				
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
 
 		},ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -2336,7 +2313,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails.MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2357,8 +2334,8 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -2367,15 +2344,14 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne() {
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
 			
-				Uri: "",
-				OverridesFromApprovedOutgoingTransfers: true,
-				OverridesToApprovedIncomingTransfers:   true,
+				
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
 		},ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",	
 		
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -2415,7 +2391,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne2() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails.MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(2),
 			AmountRange: &types.UintRange{
@@ -2427,8 +2403,8 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne2() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -2437,15 +2413,14 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne2() {
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
 			
-				Uri: "",
-				OverridesFromApprovedOutgoingTransfers: true,
-				OverridesToApprovedIncomingTransfers:   true,
+				
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
 		},ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",	
 		
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -2486,7 +2461,7 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails.MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2498,8 +2473,8 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 					MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -2508,17 +2483,16 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
 				
-				Uri: "",
+				
 					
-				OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
+				OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
 		},
 		ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
 		
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       		GetFullUintRanges(),
@@ -2557,7 +2531,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails.MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2569,8 +2543,8 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -2578,15 +2552,14 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 				ApprovalAmounts: &types.ApprovalAmounts{
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
-				Uri: "",
-				OverridesFromApprovedOutgoingTransfers: true,
-				OverridesToApprovedIncomingTransfers:   true,
+				
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
 		},ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",	
 		
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       		GetFullUintRanges(),
@@ -2646,7 +2619,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails.MustOwnBadges = []*types.MustOwnBadges{
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
 			CollectionId: sdk.NewUint(1),
 			AmountRange: &types.UintRange{
@@ -2658,8 +2631,8 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 		},
 	}
 	
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -2668,16 +2641,15 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
 				
-				Uri: "",
-				OverridesFromApprovedOutgoingTransfers: true,
-		OverridesToApprovedIncomingTransfers:   true,
+				
+				OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
 		},
 		ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
 		
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -2732,12 +2704,12 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 
 
 
-func (suite *TestSuite) TestMultipleApprovalDetails() {
+func (suite *TestSuite) TestMultipleApprovalCriteria() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails.PredeterminedBalances = &types.PredeterminedBalances{
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.PredeterminedBalances = &types.PredeterminedBalances{
 		// ManualBalances: &types.ManualBalances{},
 		IncrementedBalances: &types.IncrementedBalances{
 			StartBalances: []*types.Balance{
@@ -2755,13 +2727,13 @@ func (suite *TestSuite) TestMultipleApprovalDetails() {
 		},
 	}
 
-	deepCopy := *collectionsToCreate[0].CollectionApprovedTransfers[1]
+	deepCopy := *collectionsToCreate[0].CollectionApprovals[1]
 
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &deepCopy)
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &deepCopy)
 
-	collectionsToCreate[0].CollectionApprovedTransfers[2].ApprovalTrackerId = "test2"
-	collectionsToCreate[0].CollectionApprovedTransfers[2].ApprovalId = "fasdfasdf"
-	collectionsToCreate[0].CollectionApprovedTransfers[2].ApprovalDetails = &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals[2].ApprovalTrackerId = "test2"
+	collectionsToCreate[0].CollectionApprovals[2].ApprovalId = "fasdfasdf"
+	collectionsToCreate[0].CollectionApprovals[2].ApprovalCriteria = &types.ApprovalCriteria{
 		MaxNumTransfers: &types.MaxNumTransfers{
 			OverallMaxNumTransfers: sdkmath.NewUint(1000),
 		},
@@ -2787,8 +2759,8 @@ func (suite *TestSuite) TestMultipleApprovalDetails() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -2796,15 +2768,14 @@ func (suite *TestSuite) TestMultipleApprovalDetails() {
 				ApprovalAmounts: &types.ApprovalAmounts{
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
-				Uri: "",
-				OverridesFromApprovedOutgoingTransfers: true,
-				OverridesToApprovedIncomingTransfers:   true,
+				
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
 		},ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdas",	
 		
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -2876,26 +2847,24 @@ func (suite *TestSuite) TestMultipleApprovalDetails() {
 	suite.Require().Nil(err, "Error transferring badge: %s")
 }
 
-func (suite *TestSuite) TestMultipleApprovalDetailsPrioritizedApprovals() {
+func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfers = []*types.CollectionApprovedTransfer{
-		collectionsToCreate[0].CollectionApprovedTransfers[0],
+	collectionsToCreate[0].CollectionApprovals = []*types.CollectionApproval{
+		collectionsToCreate[0].CollectionApprovals[0],
 		{
 			FromMappingId: 			"AllWithoutMint",
 			ToMappingId: 			"AllWithoutMint",
 			InitiatedByMappingId: 	"AllWithoutMint",
 			ApprovalTrackerId:            "testing232",
 			ApprovalId: "asadsdas",
-			AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-				IsApproved: true,
-			}},
+			IsApproved: true,
 			TransferTimes:        GetFullUintRanges(),
 			BadgeIds:             GetFullUintRanges(),
 			OwnershipTimes:       GetFullUintRanges(),
-			ApprovalDetails: &types.ApprovalDetails{
+			ApprovalCriteria: &types.ApprovalCriteria{
 				ApprovalAmounts: &types.ApprovalAmounts{},
 				MaxNumTransfers: &types.MaxNumTransfers{},
 				PredeterminedBalances: &types.PredeterminedBalances{
@@ -2923,13 +2892,11 @@ func (suite *TestSuite) TestMultipleApprovalDetailsPrioritizedApprovals() {
 			InitiatedByMappingId: 	"AllWithoutMint",
 			ApprovalTrackerId:            "testing232",
 			ApprovalId: "target approval",
-			AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-				IsApproved: true,
-			}},
+			IsApproved: true,
 			TransferTimes:        GetFullUintRanges(),
 			BadgeIds:             GetFullUintRanges(),
 			OwnershipTimes:       GetFullUintRanges(),
-			ApprovalDetails: &types.ApprovalDetails{
+			ApprovalCriteria: &types.ApprovalCriteria{
 				ApprovalAmounts: &types.ApprovalAmounts{},
 				MaxNumTransfers: &types.MaxNumTransfers{},
 				PredeterminedBalances: &types.PredeterminedBalances{
@@ -2971,7 +2938,7 @@ func (suite *TestSuite) TestMultipleApprovalDetailsPrioritizedApprovals() {
 				From:        bob,
 				ToAddresses: []string{alice},
 				Balances: 	 []*types.Balance{},
-				PrecalculationDetails: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
 					ApprovalId: "target approval",
 					ApprovalLevel: "collection",
 					ApproverAddress: "",
@@ -2999,26 +2966,24 @@ func (suite *TestSuite) TestMultipleApprovalDetailsPrioritizedApprovals() {
 }
 
 
-func (suite *TestSuite) TestMultipleApprovalDetailsPrioritizedApprovalsOnlyCheckPrioritized() {
+func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyCheckPrioritized() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CollectionApprovedTransfers = []*types.CollectionApprovedTransfer{
-		collectionsToCreate[0].CollectionApprovedTransfers[0],
+	collectionsToCreate[0].CollectionApprovals = []*types.CollectionApproval{
+		collectionsToCreate[0].CollectionApprovals[0],
 		{
 			FromMappingId: 			"AllWithoutMint",
 			ToMappingId: 			"AllWithoutMint",
 			InitiatedByMappingId: 	"AllWithoutMint",
 			ApprovalTrackerId:            "testing232",
 			ApprovalId: "asadsdas",
-			AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-				IsApproved: true,
-			}},
+			IsApproved: true,
 			TransferTimes:        GetFullUintRanges(),
 			BadgeIds:             GetFullUintRanges(),
 			OwnershipTimes:       GetFullUintRanges(),
-			ApprovalDetails: &types.ApprovalDetails{
+			ApprovalCriteria: &types.ApprovalCriteria{
 				ApprovalAmounts: &types.ApprovalAmounts{},
 				MaxNumTransfers: &types.MaxNumTransfers{},
 				PredeterminedBalances: &types.PredeterminedBalances{
@@ -3046,13 +3011,11 @@ func (suite *TestSuite) TestMultipleApprovalDetailsPrioritizedApprovalsOnlyCheck
 			InitiatedByMappingId: 	"AllWithoutMint",
 			ApprovalTrackerId:            "testing232",
 			ApprovalId: "target approval",
-			AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-				IsApproved: true,
-			}},
+			IsApproved: true,
 			TransferTimes:        GetFullUintRanges(),
 			BadgeIds:             GetFullUintRanges(),
 			OwnershipTimes:       GetFullUintRanges(),
-			ApprovalDetails: &types.ApprovalDetails{
+			ApprovalCriteria: &types.ApprovalCriteria{
 				ApprovalAmounts: &types.ApprovalAmounts{},
 				MaxNumTransfers: &types.MaxNumTransfers{},
 				PredeterminedBalances: &types.PredeterminedBalances{
@@ -3093,7 +3056,7 @@ func (suite *TestSuite) TestMultipleApprovalDetailsPrioritizedApprovalsOnlyCheck
 				From:        bob,
 				ToAddresses: []string{alice},
 				Balances: 	 []*types.Balance{},
-				PrecalculationDetails: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
 					ApprovalId: "target approval",
 					ApprovalLevel: "collection",
 					ApproverAddress: "",
@@ -3119,7 +3082,7 @@ func (suite *TestSuite) TestMultipleApprovalDetailsPrioritizedApprovalsOnlyCheck
 				From:        bob,
 				ToAddresses: []string{alice},
 				Balances: 	 []*types.Balance{},
-				PrecalculationDetails: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
 					ApprovalId: "target approval",
 					ApprovalLevel: "collection",
 					ApproverAddress: "",
@@ -3149,16 +3112,16 @@ func (suite *TestSuite) TestMultipleApprovalDetailsPrioritizedApprovalsOnlyCheck
 
 
 
-func (suite *TestSuite) TestMultipleApprovalDetailsSameApprovalTrackerId() {
+func (suite *TestSuite) TestMultipleApprovalCriteriaSameApprovalTrackerId() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].DefaultApprovedIncomingTransfers[0].ApprovalDetails = nil
-	collectionsToCreate[0].DefaultApprovedOutgoingTransfers[0].ApprovalDetails = nil
+	collectionsToCreate[0].DefaultIncomingApprovals[0].ApprovalCriteria = nil
+	collectionsToCreate[0].DefaultOutgoingApprovals[0].ApprovalCriteria = nil
 
-	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalId = "asadsdasfghdsfasdfasdf"
-	collectionsToCreate[0].CollectionApprovedTransfers[1].ApprovalDetails.PredeterminedBalances = &types.PredeterminedBalances{
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalId = "asadsdasfghdsfasdfasdf"
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.PredeterminedBalances = &types.PredeterminedBalances{
 		// ManualBalances: &types.ManualBalances{},
 		IncrementedBalances: &types.IncrementedBalances{
 			StartBalances: []*types.Balance{
@@ -3176,13 +3139,13 @@ func (suite *TestSuite) TestMultipleApprovalDetailsSameApprovalTrackerId() {
 		},
 	}
 
-	deepCopy := *collectionsToCreate[0].CollectionApprovedTransfers[1]
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &deepCopy)
+	deepCopy := *collectionsToCreate[0].CollectionApprovals[1]
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &deepCopy)
 
-	collectionsToCreate[0].CollectionApprovedTransfers[2].ApprovalTrackerId = "test2"
-	collectionsToCreate[0].CollectionApprovedTransfers[2].ApprovalId = "asadsdasfghaaadsd"
+	collectionsToCreate[0].CollectionApprovals[2].ApprovalTrackerId = "test2"
+	collectionsToCreate[0].CollectionApprovals[2].ApprovalId = "asadsdasfghaaadsd"
 	
-	collectionsToCreate[0].CollectionApprovedTransfers[2].ApprovalDetails = &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals[2].ApprovalCriteria = &types.ApprovalCriteria{
 		MaxNumTransfers: &types.MaxNumTransfers{
 			OverallMaxNumTransfers: sdkmath.NewUint(1000),
 		},
@@ -3209,8 +3172,8 @@ func (suite *TestSuite) TestMultipleApprovalDetailsSameApprovalTrackerId() {
 	}
 
 
-	collectionsToCreate[0].CollectionApprovedTransfers = append(collectionsToCreate[0].CollectionApprovedTransfers, &types.CollectionApprovedTransfer{
-		ApprovalDetails: &types.ApprovalDetails{
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
 			
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(10),
@@ -3218,17 +3181,16 @@ func (suite *TestSuite) TestMultipleApprovalDetailsSameApprovalTrackerId() {
 				ApprovalAmounts: &types.ApprovalAmounts{
 					OverallApprovalAmount: sdkmath.NewUint(10),
 				},
-				Uri: "",
-				OverridesFromApprovedOutgoingTransfers: true,
-				OverridesToApprovedIncomingTransfers:   true,
+				
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
 		},
 		
 		ApprovalTrackerId:            "testing232",
 		ApprovalId: "asadsdasfghd",	
 		
-		AllowedCombinations: []*types.IsCollectionTransferAllowed{{
-			IsApproved: true,
-		}},
+		IsApproved: true,
+	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),

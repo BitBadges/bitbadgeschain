@@ -17,16 +17,16 @@ func ValidateTimelineTimesDoNotOverlap(times [][]*UintRange) error {
 	return nil
 }
 
-func ValidateApprovedTransferTimeline(timeline []*CollectionApprovedTransferTimeline) error {
+func ValidateApprovalTimeline(timeline []*CollectionApprovalTimeline) error {
 	err := *new(error)
 	for _, timelineVal := range timeline {
-		err = ValidateCollectionApprovedTransfers(timelineVal.CollectionApprovedTransfers)
+		err = ValidateCollectionApprovals(timelineVal.CollectionApprovals)
 		if err != nil {
 			return err
 		}
 	}
 
-	times, _ := GetCollectionApprovedTransferTimesAndValues(timeline)
+	times, _ := GetCollectionApprovalTimesAndValues(timeline)
 	err = ValidateTimelineTimesDoNotOverlap(times)
 	if err != nil {
 		return err
@@ -153,15 +153,15 @@ func ValidateIsArchivedTimeline(timeline []*IsArchivedTimeline) error {
 	return nil
 }
 
-func ValidateUserApprovedOutgoingTransferTimeline(timeline []*UserApprovedOutgoingTransferTimeline, address string) error {
+func ValidateUserOutgoingApprovalTimeline(timeline []*UserOutgoingApprovalTimeline, address string) error {
 	for _, timelineVal := range timeline {
-		err := ValidateUserApprovedOutgoingTransfers(timelineVal.ApprovedOutgoingTransfers, address)
+		err := ValidateUserOutgoingApprovals(timelineVal.OutgoingApprovals, address)
 		if err != nil {
 			return err
 		}
 	}
 
-	times, _ := GetUserApprovedOutgoingTransferTimesAndValues(timeline)
+	times, _ := GetUserOutgoingApprovalTimesAndValues(timeline)
 	err := ValidateTimelineTimesDoNotOverlap(times)
 	if err != nil {
 		return err
@@ -170,15 +170,15 @@ func ValidateUserApprovedOutgoingTransferTimeline(timeline []*UserApprovedOutgoi
 	return nil
 }
 
-func ValidateUserApprovedIncomingTransferTimeline(timeline []*UserApprovedIncomingTransferTimeline, address string) error {
+func ValidateUserIncomingApprovalTimeline(timeline []*UserIncomingApprovalTimeline, address string) error {
 	for _, timelineVal := range timeline {
-		err := ValidateUserApprovedIncomingTransfers(timelineVal.ApprovedIncomingTransfers, address)
+		err := ValidateUserIncomingApprovals(timelineVal.IncomingApprovals, address)
 		if err != nil {
 			return err
 		}
 	}
 
-	times, _ := GetUserApprovedIncomingTransferTimesAndValues(timeline)
+	times, _ := GetUserIncomingApprovalTimesAndValues(timeline)
 	err := ValidateTimelineTimesDoNotOverlap(times)
 	if err != nil {
 		return err

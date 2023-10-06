@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types.MsgUpdateUserApprovedTransfers) (*types.MsgUpdateUserApprovedTransfersResponse, error) {
+func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpdateUserApprovals) (*types.MsgUpdateUserApprovalsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
@@ -24,8 +24,8 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 	if !found {
 		userBalance = &types.UserBalanceStore{
 			Balances:                          []*types.Balance{},
-			ApprovedOutgoingTransfers: collection.DefaultUserApprovedOutgoingTransfers,
-			ApprovedIncomingTransfers: collection.DefaultUserApprovedIncomingTransfers,
+			OutgoingApprovals: collection.DefaultUserOutgoingApprovals,
+			IncomingApprovals: collection.DefaultUserIncomingApprovals,
 			UserPermissions:                   collection.DefaultUserPermissions,
 		}
 	}
@@ -36,18 +36,18 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 
 	manager := types.GetCurrentManager(ctx, collection)
 
-	if msg.UpdateApprovedOutgoingTransfers {
-		if err := k.ValidateUserApprovedOutgoingTransfersUpdate(ctx, collection, userBalance.ApprovedOutgoingTransfers, msg.ApprovedOutgoingTransfers, userBalance.UserPermissions.CanUpdateApprovedOutgoingTransfers, manager, msg.Creator); err != nil {
+	if msg.UpdateOutgoingApprovals {
+		if err := k.ValidateUserOutgoingApprovalsUpdate(ctx, collection, userBalance.OutgoingApprovals, msg.OutgoingApprovals, userBalance.UserPermissions.CanUpdateOutgoingApprovals, manager, msg.Creator); err != nil {
 			return nil, err
 		}
-		userBalance.ApprovedOutgoingTransfers = msg.ApprovedOutgoingTransfers
+		userBalance.OutgoingApprovals = msg.OutgoingApprovals
 	}
 
-	if msg.UpdateApprovedIncomingTransfers {
-		if err := k.ValidateUserApprovedIncomingTransfersUpdate(ctx, collection,  userBalance.ApprovedIncomingTransfers, msg.ApprovedIncomingTransfers, userBalance.UserPermissions.CanUpdateApprovedIncomingTransfers, manager, msg.Creator); err != nil {
+	if msg.UpdateIncomingApprovals {
+		if err := k.ValidateUserIncomingApprovalsUpdate(ctx, collection,  userBalance.IncomingApprovals, msg.IncomingApprovals, userBalance.UserPermissions.CanUpdateIncomingApprovals, manager, msg.Creator); err != nil {
 			return nil, err
 		}
-		userBalance.ApprovedIncomingTransfers = msg.ApprovedIncomingTransfers
+		userBalance.IncomingApprovals = msg.IncomingApprovals
 	}
 
 	if msg.UpdateUserPermissions {
@@ -57,12 +57,12 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 		}
 
 		//iterate through the non-nil values
-		if msg.UserPermissions.CanUpdateApprovedIncomingTransfers != nil {
-			userBalance.UserPermissions.CanUpdateApprovedIncomingTransfers = msg.UserPermissions.CanUpdateApprovedIncomingTransfers
+		if msg.UserPermissions.CanUpdateIncomingApprovals != nil {
+			userBalance.UserPermissions.CanUpdateIncomingApprovals = msg.UserPermissions.CanUpdateIncomingApprovals
 		}
 
-		if msg.UserPermissions.CanUpdateApprovedOutgoingTransfers != nil {
-			userBalance.UserPermissions.CanUpdateApprovedOutgoingTransfers = msg.UserPermissions.CanUpdateApprovedOutgoingTransfers
+		if msg.UserPermissions.CanUpdateOutgoingApprovals != nil {
+			userBalance.UserPermissions.CanUpdateOutgoingApprovals = msg.UserPermissions.CanUpdateOutgoingApprovals
 		}
 
 		userBalance.UserPermissions = msg.UserPermissions
@@ -82,5 +82,5 @@ func (k msgServer) UpdateUserApprovedTransfers(goCtx context.Context, msg *types
 		),
 	)
 
-	return &types.MsgUpdateUserApprovedTransfersResponse{}, nil
+	return &types.MsgUpdateUserApprovalsResponse{}, nil
 }

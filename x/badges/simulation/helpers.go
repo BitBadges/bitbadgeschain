@@ -86,149 +86,139 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 	randomCollectionPermissions := &types.CollectionPermissions{
 		CanDeleteCollection: []*types.ActionPermission{
 			{
-				DefaultValues: &types.ActionDefaultValues{
+				
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
-				},
-				Combinations: []*types.ActionCombination{{
+				
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
-				}},
+				
 			},
 		},
 		CanArchiveCollection: []*types.TimedUpdatePermission{
 			{
-				DefaultValues: &types.TimedUpdateDefaultValues{
+				
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
 					TimelineTimes:  GetTimelineTimes(r, 3),
-				},
-				Combinations: []*types.TimedUpdateCombination{{
+				
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
 					TimelineTimesOptions:  GetRandomValueOptions(r),
-				}},
+				
 			},
 		},
 		CanUpdateContractAddress: []*types.TimedUpdatePermission{
 			{
-				DefaultValues: &types.TimedUpdateDefaultValues{
+				
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
 					TimelineTimes:  GetTimelineTimes(r, 3),
-				},
-				Combinations: []*types.TimedUpdateCombination{{
+				
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
 					TimelineTimesOptions:  GetRandomValueOptions(r),
-				}},
+				
 			},
 		},
 		CanUpdateOffChainBalancesMetadata: []*types.TimedUpdatePermission{
 			{
-				DefaultValues: &types.TimedUpdateDefaultValues{
+				
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
 					TimelineTimes:  GetTimelineTimes(r, 3),
-				},
-				Combinations: []*types.TimedUpdateCombination{{
+				
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
 					TimelineTimesOptions:  GetRandomValueOptions(r),
-				}},
+				
 			},
 		},
 		CanUpdateStandards: []*types.TimedUpdatePermission{
 			{
-				DefaultValues: &types.TimedUpdateDefaultValues{
+				
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
 					TimelineTimes:  GetTimelineTimes(r, 3),
-				},
-				Combinations: []*types.TimedUpdateCombination{{
+				
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
 					TimelineTimesOptions:  GetRandomValueOptions(r),
-				}},
+				
 			},
 		},
 		CanUpdateCustomData: []*types.TimedUpdatePermission{
 			{
-				DefaultValues: &types.TimedUpdateDefaultValues{
+				
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
 					TimelineTimes:  GetTimelineTimes(r, 3),
-				},
-				Combinations: []*types.TimedUpdateCombination{{
+				
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
 					TimelineTimesOptions:  GetRandomValueOptions(r),
-				}},
+				
 			},
 		},
 		CanUpdateManager: []*types.TimedUpdatePermission{
 			{
-				DefaultValues: &types.TimedUpdateDefaultValues{
+				
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
 					TimelineTimes:  GetTimelineTimes(r, 3),
-				},
-				Combinations: []*types.TimedUpdateCombination{{
+				
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
 					TimelineTimesOptions:  GetRandomValueOptions(r),
-				}},
+				
 			},
 		},
 		CanUpdateCollectionMetadata: []*types.TimedUpdatePermission{
 			{
-				DefaultValues: &types.TimedUpdateDefaultValues{
+				
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
 					TimelineTimes:  GetTimelineTimes(r, 3),
-				},
-				Combinations: []*types.TimedUpdateCombination{{
+				
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
 					TimelineTimesOptions:  GetRandomValueOptions(r),
-				}},
+				
 			},
 		},
 		CanCreateMoreBadges: []*types.BalancesActionPermission{
 			{
-				DefaultValues: &types.BalancesActionDefaultValues{
+				
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
 					OwnershipTimes: GetTimelineTimes(r, 3),
 					BadgeIds:       GetTimelineTimes(r, 3),
-				},
-				Combinations: []*types.BalancesActionCombination{{
+			
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
 					BadgeIdsOptions:       GetRandomValueOptions(r),
 					OwnershipTimesOptions: GetRandomValueOptions(r),
-				}},
+				
 			},
 		},
 		CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{
 			{
-				DefaultValues: &types.TimedUpdateWithBadgeIdsDefaultValues{
+				
 					PermittedTimes: GetTimelineTimes(r, 3),
 					ForbiddenTimes: GetTimelineTimes(r, 3),
 					TimelineTimes:  GetTimelineTimes(r, 3),
 					BadgeIds:       GetTimelineTimes(r, 3),
-				},
-				Combinations: []*types.TimedUpdateWithBadgeIdsCombination{{
+				
 					PermittedTimesOptions: GetRandomValueOptions(r),
 					ForbiddenTimesOptions: GetRandomValueOptions(r),
 					TimelineTimesOptions:  GetRandomValueOptions(r),
 					BadgeIdsOptions:       GetRandomValueOptions(r),
-				}},
+				
 			},
 		},
-		CanUpdateCollectionApprovedTransfers: []*types.CollectionApprovedTransferPermission{
+		CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{
 			{
-				DefaultValues: &types.CollectionApprovedTransferDefaultValues{
+				
 					PermittedTimes:       GetTimelineTimes(r, 3),
 					ForbiddenTimes:       GetTimelineTimes(r, 3),
 					TransferTimes:        GetTimelineTimes(r, 3),
@@ -237,8 +227,7 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 					ToMappingId:          GetRandomAddresses(r, 3, accs)[0],
 					FromMappingId:        GetRandomAddresses(r, 3, accs)[0],
 					InitiatedByMappingId: GetRandomAddresses(r, 3, accs)[0],
-				},
-				Combinations: []*types.CollectionApprovedTransferCombination{{
+				
 					PermittedTimesOptions:     GetRandomValueOptions(r),
 					ForbiddenTimesOptions:     GetRandomValueOptions(r),
 					TransferTimesOptions:      GetRandomValueOptions(r),
@@ -247,7 +236,7 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 					ToMappingOptions:          GetRandomValueOptions(r),
 					FromMappingOptions:        GetRandomValueOptions(r),
 					InitiatedByMappingOptions: GetRandomValueOptions(r),
-				}},
+				
 			},
 		},
 	}

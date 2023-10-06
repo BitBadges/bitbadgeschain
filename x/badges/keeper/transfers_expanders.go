@@ -8,43 +8,41 @@ import (
 )
 
 // Little hack to make AllowedCombinations a 1-element array so we know if disallowed/allowed for ArbitraryValue
-func ExpandCollectionApprovedTransfers(approvedTransfers []*types.CollectionApprovedTransfer) []*types.CollectionApprovedTransfer {
-	newCurrApprovedTransfers := []*types.CollectionApprovedTransfer{}
-	for _, approvedTransfer := range approvedTransfers {
-		for _, allowedCombination := range approvedTransfer.AllowedCombinations {
-			badgeIds := types.GetUintRangesWithOptions(approvedTransfer.BadgeIds, allowedCombination.BadgeIdsOptions, true)
-			ownershipTimes := types.GetUintRangesWithOptions(approvedTransfer.OwnershipTimes, allowedCombination.OwnershipTimesOptions, true)
-			times := types.GetUintRangesWithOptions(approvedTransfer.TransferTimes, allowedCombination.TransferTimesOptions, true)
-			toMappingId := types.GetMappingIdWithOptions(approvedTransfer.ToMappingId, allowedCombination.ToMappingOptions, true)
-			fromMappingId := types.GetMappingIdWithOptions(approvedTransfer.FromMappingId, allowedCombination.FromMappingOptions, true)
-			initiatedByMappingId := types.GetMappingIdWithOptions(approvedTransfer.InitiatedByMappingId, allowedCombination.InitiatedByMappingOptions, true)
-			
-			newCurrApprovedTransfers = append(newCurrApprovedTransfers, &types.CollectionApprovedTransfer{
-				ToMappingId:          toMappingId,
-				FromMappingId:        fromMappingId,
-				InitiatedByMappingId: initiatedByMappingId,
-				TransferTimes:        times,
-				BadgeIds:             badgeIds,
-				OwnershipTimes: 		 	ownershipTimes,
-				AllowedCombinations: []*types.IsCollectionTransferAllowed{
-					{
-						IsApproved: allowedCombination.IsApproved,
-					},
-				},
-				ApprovalDetails: approvedTransfer.ApprovalDetails,
-				ApprovalId: approvedTransfer.ApprovalId,
-				ApprovalTrackerId: approvedTransfer.ApprovalTrackerId,
-				ChallengeTrackerId: approvedTransfer.ChallengeTrackerId,
-			})
-		}
+func ExpandCollectionApprovals(approvals []*types.CollectionApproval) []*types.CollectionApproval {
+	newCurrApprovals := []*types.CollectionApproval{}
+	for _, approval := range approvals {
+		badgeIds := types.GetUintRangesWithOptions(approval.BadgeIds, approval.BadgeIdsOptions, true)
+		ownershipTimes := types.GetUintRangesWithOptions(approval.OwnershipTimes, approval.OwnershipTimesOptions, true)
+		times := types.GetUintRangesWithOptions(approval.TransferTimes, approval.TransferTimesOptions, true)
+		toMappingId := types.GetMappingIdWithOptions(approval.ToMappingId, approval.ToMappingOptions, true)
+		fromMappingId := types.GetMappingIdWithOptions(approval.FromMappingId, approval.FromMappingOptions, true)
+		initiatedByMappingId := types.GetMappingIdWithOptions(approval.InitiatedByMappingId, approval.InitiatedByMappingOptions, true)
+		
+		newCurrApprovals = append(newCurrApprovals, &types.CollectionApproval{
+			ToMappingId:          toMappingId,
+			FromMappingId:        fromMappingId,
+			InitiatedByMappingId: initiatedByMappingId,
+			TransferTimes:        times,
+			BadgeIds:             badgeIds,
+			OwnershipTimes: 		 	ownershipTimes,
+			IsApproved: approval.IsApproved,
+			Uri: approval.Uri,
+			CustomData: approval.CustomData,
+			ApprovalCriteria: approval.ApprovalCriteria,
+			ApprovalId: approval.ApprovalId,
+			ApprovalTrackerId: approval.ApprovalTrackerId,
+			ChallengeTrackerId: approval.ChallengeTrackerId,
+
+			//Leave all options nil bc we applied them already
+		})
 	}
 
-	return newCurrApprovedTransfers
+	return newCurrApprovals
 }
 
 // By default, we approve all transfers if to === initiatedBy
-func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomingTransfer, userAddress string) []*types.UserApprovedIncomingTransfer {
-	currApprovedTransfers = append([]*types.UserApprovedIncomingTransfer{
+func AppendDefaultForIncoming(currApprovals []*types.UserIncomingApproval, userAddress string) []*types.UserIncomingApproval {
+	currApprovals = append([]*types.UserIncomingApproval{
 		{
 		FromMappingId:        "AllWithMint", //everyone
 		InitiatedByMappingId: userAddress,
@@ -66,20 +64,16 @@ func AppendDefaultForIncoming(currApprovedTransfers []*types.UserApprovedIncomin
 				End:   sdkmath.NewUint(math.MaxUint64),
 			},
 		},
-		AllowedCombinations: []*types.IsUserIncomingTransferAllowed{
-			{
-				IsApproved: true,
-			},
-		},
-	}	}, currApprovedTransfers...)
+		IsApproved: true,
+	}	}, currApprovals...)
 
-	return currApprovedTransfers
+	return currApprovals
 }
 
 // By default, we approve all transfers if from === initiatedBy
-func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoingTransfer, userAddress string) []*types.UserApprovedOutgoingTransfer {
+func AppendDefaultForOutgoing(currApprovals []*types.UserOutgoingApproval, userAddress string) []*types.UserOutgoingApproval {
 	//prepend it 
-	currApprovedTransfers = append([]*types.UserApprovedOutgoingTransfer{
+	currApprovals = append([]*types.UserOutgoingApproval{
 		{
 		ToMappingId:          "AllWithMint", //everyone
 		InitiatedByMappingId: userAddress,
@@ -101,13 +95,9 @@ func AppendDefaultForOutgoing(currApprovedTransfers []*types.UserApprovedOutgoin
 				End:   sdkmath.NewUint(math.MaxUint64),
 			},
 		},
-		AllowedCombinations: []*types.IsUserOutgoingTransferAllowed{
-			{
-				IsApproved: true,
-			},
-		},
-	}}, currApprovedTransfers...)
+		IsApproved: true,
+	}}, currApprovals...)
 
 
-	return currApprovedTransfers
+	return currApprovals
 }

@@ -33,9 +33,9 @@ func (suite *TestSuite) TestCreateBadges() {
 			},
 		},
 	}
-	collectionsToCreate[0].CollectionApprovedTransfers[0].FromMappingId = "Mint"
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.OverridesFromApprovedOutgoingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].CollectionApprovals[0].FromMappingId = "Mint"
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
@@ -257,9 +257,9 @@ func (suite *TestSuite) TestCreateBadgesIdGreaterThanMax() {
 			},
 		},
 	}
-	collectionsToCreate[0].CollectionApprovedTransfers[0].FromMappingId = "Mint"
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.OverridesFromApprovedOutgoingTransfers = true
-	collectionsToCreate[0].CollectionApprovedTransfers[0].ApprovalDetails.OverridesToApprovedIncomingTransfers = true
+	collectionsToCreate[0].CollectionApprovals[0].FromMappingId = "Mint"
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Error(err, "Error creating badge: %s")

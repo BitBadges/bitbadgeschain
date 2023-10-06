@@ -12,12 +12,12 @@ import (
 func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgUpdateUserApprovedTransfers
+		msg  types.MsgUpdateUserApprovals
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgUpdateUserApprovedTransfers{
+			msg: types.MsgUpdateUserApprovals{
 				Creator:      "invalid_address",
 				CollectionId: sdkmath.NewUint(1),
 				UserPermissions:  &types.UserPermissions{},
@@ -26,7 +26,7 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgUpdateUserApprovedTransfers{
+			msg: types.MsgUpdateUserApprovals{
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
 				UserPermissions:  &types.UserPermissions{},
@@ -35,7 +35,7 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 		},
 		// {
 		// 	name: "no permissions",
-		// 	msg: types.MsgUpdateUserApprovedTransfers{
+		// 	msg: types.MsgUpdateUserApprovals{
 		// 		Creator:      sample.AccAddress(),
 		// 		CollectionId: sdkmath.NewUint(1),
 		// 		UpdateUserPermissions: true,
@@ -44,18 +44,15 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 		// },
 		{
 			name: "overlap times",
-			msg: types.MsgUpdateUserApprovedTransfers{
+			msg: types.MsgUpdateUserApprovals{
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
 				UpdateUserPermissions: true,
 				UserPermissions: &types.UserPermissions{
-					CanUpdateApprovedOutgoingTransfers: []*types.UserApprovedOutgoingTransferPermission{
+					CanUpdateOutgoingApprovals: []*types.UserOutgoingApprovalPermission{
 						{
-							DefaultValues: &types.UserApprovedOutgoingTransferDefaultValues{
-								PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
-								ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
-							},
-							Combinations: []*types.UserApprovedOutgoingTransferCombination{{}},
+							PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+							ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 						},
 					},
 				},
@@ -64,7 +61,7 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "valid",
-			msg: types.MsgUpdateUserApprovedTransfers{
+			msg: types.MsgUpdateUserApprovals{
 				Creator:      sample.AccAddress(),
 				CollectionId: sdkmath.NewUint(1),
 				UserPermissions:  GetValidUserPermissions(),

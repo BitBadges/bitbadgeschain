@@ -30,7 +30,7 @@ func (suite *TestSuite) TestNewBadges() {
 				OwnershipTimes: GetFullUintRanges(),
 			},
 		},
-		CollectionApprovedTransfers: collection.CollectionApprovedTransfers,
+		CollectionApprovals: collection.CollectionApprovals,
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -137,12 +137,9 @@ func (suite *TestSuite) TestNewBadgesNotAllowed() {
 		Permissions: &types.CollectionPermissions{
 			CanCreateMoreBadges: []*types.BalancesActionPermission{
 				{
-					DefaultValues: &types.BalancesActionDefaultValues{
-						ForbiddenTimes: GetFullUintRanges(),
+					ForbiddenTimes: GetFullUintRanges(),
 						BadgeIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
-					},
-					Combinations: []*types.BalancesActionCombination{{}},
 				},
 			},
 		},
@@ -190,20 +187,14 @@ func (suite *TestSuite) TestNewBadgesPermissionIsApproved() {
 		Permissions: &types.CollectionPermissions{
 			CanCreateMoreBadges: []*types.BalancesActionPermission{
 				{
-					DefaultValues: &types.BalancesActionDefaultValues{
-						PermittedTimes: GetFullUintRanges(),
+					PermittedTimes: GetFullUintRanges(),
 						BadgeIds:       GetOneUintRange(),
 						OwnershipTimes: GetOneUintRange(),
-					},
-					Combinations: []*types.BalancesActionCombination{{}},
 				},
 				{
-					DefaultValues: &types.BalancesActionDefaultValues{
-						ForbiddenTimes: GetFullUintRanges(),
+					ForbiddenTimes: GetFullUintRanges(),
 						BadgeIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
-					},
-					Combinations: []*types.BalancesActionCombination{{}},
 				},
 			},
 		},

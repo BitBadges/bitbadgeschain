@@ -24,23 +24,23 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
-type UserApprovedOutgoingTransferTimeline struct {
-	ApprovedOutgoingTransfers []*UserApprovedOutgoingTransfer `protobuf:"bytes,1,rep,name=approvedOutgoingTransfers,proto3" json:"approvedOutgoingTransfers,omitempty"`
-	TimelineTimes             []*UintRange                    `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+type UserOutgoingApprovalTimeline struct {
+	OutgoingApprovals []*UserOutgoingApproval `protobuf:"bytes,1,rep,name=outgoingApprovals,proto3" json:"outgoingApprovals,omitempty"`
+	TimelineTimes    []*UintRange            `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
-func (m *UserApprovedOutgoingTransferTimeline) Reset()         { *m = UserApprovedOutgoingTransferTimeline{} }
-func (m *UserApprovedOutgoingTransferTimeline) String() string { return proto.CompactTextString(m) }
-func (*UserApprovedOutgoingTransferTimeline) ProtoMessage()    {}
-func (*UserApprovedOutgoingTransferTimeline) Descriptor() ([]byte, []int) {
+func (m *UserOutgoingApprovalTimeline) Reset()         { *m = UserOutgoingApprovalTimeline{} }
+func (m *UserOutgoingApprovalTimeline) String() string { return proto.CompactTextString(m) }
+func (*UserOutgoingApprovalTimeline) ProtoMessage()    {}
+func (*UserOutgoingApprovalTimeline) Descriptor() ([]byte, []int) {
 	return fileDescriptor_90968f2be9d0828d, []int{0}
 }
-func (m *UserApprovedOutgoingTransferTimeline) XXX_Unmarshal(b []byte) error {
+func (m *UserOutgoingApprovalTimeline) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *UserApprovedOutgoingTransferTimeline) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UserOutgoingApprovalTimeline) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_UserApprovedOutgoingTransferTimeline.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UserOutgoingApprovalTimeline.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -50,49 +50,49 @@ func (m *UserApprovedOutgoingTransferTimeline) XXX_Marshal(b []byte, determinist
 		return b[:n], nil
 	}
 }
-func (m *UserApprovedOutgoingTransferTimeline) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UserApprovedOutgoingTransferTimeline.Merge(m, src)
+func (m *UserOutgoingApprovalTimeline) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserOutgoingApprovalTimeline.Merge(m, src)
 }
-func (m *UserApprovedOutgoingTransferTimeline) XXX_Size() int {
+func (m *UserOutgoingApprovalTimeline) XXX_Size() int {
 	return m.Size()
 }
-func (m *UserApprovedOutgoingTransferTimeline) XXX_DiscardUnknown() {
-	xxx_messageInfo_UserApprovedOutgoingTransferTimeline.DiscardUnknown(m)
+func (m *UserOutgoingApprovalTimeline) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserOutgoingApprovalTimeline.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_UserApprovedOutgoingTransferTimeline proto.InternalMessageInfo
+var xxx_messageInfo_UserOutgoingApprovalTimeline proto.InternalMessageInfo
 
-func (m *UserApprovedOutgoingTransferTimeline) GetApprovedOutgoingTransfers() []*UserApprovedOutgoingTransfer {
+func (m *UserOutgoingApprovalTimeline) GetOutgoingApprovals() []*UserOutgoingApproval {
 	if m != nil {
-		return m.ApprovedOutgoingTransfers
+		return m.OutgoingApprovals
 	}
 	return nil
 }
 
-func (m *UserApprovedOutgoingTransferTimeline) GetTimelineTimes() []*UintRange {
+func (m *UserOutgoingApprovalTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
 	return nil
 }
 
-type UserApprovedIncomingTransferTimeline struct {
-	ApprovedIncomingTransfers []*UserApprovedIncomingTransfer `protobuf:"bytes,1,rep,name=approvedIncomingTransfers,proto3" json:"approvedIncomingTransfers,omitempty"`
-	TimelineTimes             []*UintRange                    `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+type UserIncomingApprovalTimeline struct {
+	IncomingApprovals []*UserIncomingApproval `protobuf:"bytes,1,rep,name=incomingApprovals,proto3" json:"incomingApprovals,omitempty"`
+	TimelineTimes    []*UintRange            `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
-func (m *UserApprovedIncomingTransferTimeline) Reset()         { *m = UserApprovedIncomingTransferTimeline{} }
-func (m *UserApprovedIncomingTransferTimeline) String() string { return proto.CompactTextString(m) }
-func (*UserApprovedIncomingTransferTimeline) ProtoMessage()    {}
-func (*UserApprovedIncomingTransferTimeline) Descriptor() ([]byte, []int) {
+func (m *UserIncomingApprovalTimeline) Reset()         { *m = UserIncomingApprovalTimeline{} }
+func (m *UserIncomingApprovalTimeline) String() string { return proto.CompactTextString(m) }
+func (*UserIncomingApprovalTimeline) ProtoMessage()    {}
+func (*UserIncomingApprovalTimeline) Descriptor() ([]byte, []int) {
 	return fileDescriptor_90968f2be9d0828d, []int{1}
 }
-func (m *UserApprovedIncomingTransferTimeline) XXX_Unmarshal(b []byte) error {
+func (m *UserIncomingApprovalTimeline) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *UserApprovedIncomingTransferTimeline) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UserIncomingApprovalTimeline) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_UserApprovedIncomingTransferTimeline.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UserIncomingApprovalTimeline.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -102,49 +102,49 @@ func (m *UserApprovedIncomingTransferTimeline) XXX_Marshal(b []byte, determinist
 		return b[:n], nil
 	}
 }
-func (m *UserApprovedIncomingTransferTimeline) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UserApprovedIncomingTransferTimeline.Merge(m, src)
+func (m *UserIncomingApprovalTimeline) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserIncomingApprovalTimeline.Merge(m, src)
 }
-func (m *UserApprovedIncomingTransferTimeline) XXX_Size() int {
+func (m *UserIncomingApprovalTimeline) XXX_Size() int {
 	return m.Size()
 }
-func (m *UserApprovedIncomingTransferTimeline) XXX_DiscardUnknown() {
-	xxx_messageInfo_UserApprovedIncomingTransferTimeline.DiscardUnknown(m)
+func (m *UserIncomingApprovalTimeline) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserIncomingApprovalTimeline.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_UserApprovedIncomingTransferTimeline proto.InternalMessageInfo
+var xxx_messageInfo_UserIncomingApprovalTimeline proto.InternalMessageInfo
 
-func (m *UserApprovedIncomingTransferTimeline) GetApprovedIncomingTransfers() []*UserApprovedIncomingTransfer {
+func (m *UserIncomingApprovalTimeline) GetIncomingApprovals() []*UserIncomingApproval {
 	if m != nil {
-		return m.ApprovedIncomingTransfers
+		return m.IncomingApprovals
 	}
 	return nil
 }
 
-func (m *UserApprovedIncomingTransferTimeline) GetTimelineTimes() []*UintRange {
+func (m *UserIncomingApprovalTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
 	return nil
 }
 
-type CollectionApprovedTransferTimeline struct {
-	CollectionApprovedTransfers []*CollectionApprovedTransfer `protobuf:"bytes,1,rep,name=collectionApprovedTransfers,proto3" json:"collectionApprovedTransfers,omitempty"`
-	TimelineTimes               []*UintRange                  `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+type CollectionApprovalTimeline struct {
+	CollectionApprovals []*CollectionApproval `protobuf:"bytes,1,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
+	TimelineTimes      []*UintRange          `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
-func (m *CollectionApprovedTransferTimeline) Reset()         { *m = CollectionApprovedTransferTimeline{} }
-func (m *CollectionApprovedTransferTimeline) String() string { return proto.CompactTextString(m) }
-func (*CollectionApprovedTransferTimeline) ProtoMessage()    {}
-func (*CollectionApprovedTransferTimeline) Descriptor() ([]byte, []int) {
+func (m *CollectionApprovalTimeline) Reset()         { *m = CollectionApprovalTimeline{} }
+func (m *CollectionApprovalTimeline) String() string { return proto.CompactTextString(m) }
+func (*CollectionApprovalTimeline) ProtoMessage()    {}
+func (*CollectionApprovalTimeline) Descriptor() ([]byte, []int) {
 	return fileDescriptor_90968f2be9d0828d, []int{2}
 }
-func (m *CollectionApprovedTransferTimeline) XXX_Unmarshal(b []byte) error {
+func (m *CollectionApprovalTimeline) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *CollectionApprovedTransferTimeline) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *CollectionApprovalTimeline) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_CollectionApprovedTransferTimeline.Marshal(b, m, deterministic)
+		return xxx_messageInfo_CollectionApprovalTimeline.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -154,26 +154,26 @@ func (m *CollectionApprovedTransferTimeline) XXX_Marshal(b []byte, deterministic
 		return b[:n], nil
 	}
 }
-func (m *CollectionApprovedTransferTimeline) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CollectionApprovedTransferTimeline.Merge(m, src)
+func (m *CollectionApprovalTimeline) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CollectionApprovalTimeline.Merge(m, src)
 }
-func (m *CollectionApprovedTransferTimeline) XXX_Size() int {
+func (m *CollectionApprovalTimeline) XXX_Size() int {
 	return m.Size()
 }
-func (m *CollectionApprovedTransferTimeline) XXX_DiscardUnknown() {
-	xxx_messageInfo_CollectionApprovedTransferTimeline.DiscardUnknown(m)
+func (m *CollectionApprovalTimeline) XXX_DiscardUnknown() {
+	xxx_messageInfo_CollectionApprovalTimeline.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_CollectionApprovedTransferTimeline proto.InternalMessageInfo
+var xxx_messageInfo_CollectionApprovalTimeline proto.InternalMessageInfo
 
-func (m *CollectionApprovedTransferTimeline) GetCollectionApprovedTransfers() []*CollectionApprovedTransfer {
+func (m *CollectionApprovalTimeline) GetCollectionApprovals() []*CollectionApproval {
 	if m != nil {
-		return m.CollectionApprovedTransfers
+		return m.CollectionApprovals
 	}
 	return nil
 }
 
-func (m *CollectionApprovedTransferTimeline) GetTimelineTimes() []*UintRange {
+func (m *CollectionApprovalTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -188,17 +188,17 @@ type MsgNewCollection struct {
 	OffChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline `protobuf:"bytes,4,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
 	CustomDataTimeline               []*CustomDataTimeline               `protobuf:"bytes,5,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
 	BalancesType                     Uint                                `protobuf:"bytes,6,opt,name=balancesType,proto3,customtype=Uint" json:"balancesType"`
-	CollectionApprovedTransfers      []*CollectionApprovedTransfer       `protobuf:"bytes,8,rep,name=collectionApprovedTransfers,proto3" json:"collectionApprovedTransfers,omitempty"`
+	CollectionApprovals              []*CollectionApproval               `protobuf:"bytes,8,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
 	Permissions                      *CollectionPermissions              `protobuf:"bytes,9,opt,name=permissions,proto3" json:"permissions,omitempty"`
 	StandardsTimeline                []*StandardsTimeline                `protobuf:"bytes,10,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
 	//Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
 	//If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
-	BadgesToCreate                   []*Balance                      `protobuf:"bytes,11,rep,name=badgesToCreate,proto3" json:"badgesToCreate,omitempty"`
-	Transfers                        []*Transfer                     `protobuf:"bytes,12,rep,name=transfers,proto3" json:"transfers,omitempty"`
-	ContractAddressTimeline          []*ContractAddressTimeline      `protobuf:"bytes,13,rep,name=contractAddressTimeline,proto3" json:"contractAddressTimeline,omitempty"`
-	AddressMappings                  []*AddressMapping               `protobuf:"bytes,14,rep,name=addressMappings,proto3" json:"addressMappings,omitempty"`
-	DefaultApprovedOutgoingTransfers []*UserApprovedOutgoingTransfer `protobuf:"bytes,15,rep,name=defaultApprovedOutgoingTransfers,proto3" json:"defaultApprovedOutgoingTransfers,omitempty"`
-	DefaultApprovedIncomingTransfers []*UserApprovedIncomingTransfer `protobuf:"bytes,16,rep,name=defaultApprovedIncomingTransfers,proto3" json:"defaultApprovedIncomingTransfers,omitempty"`
+	BadgesToCreate           []*Balance                 `protobuf:"bytes,11,rep,name=badgesToCreate,proto3" json:"badgesToCreate,omitempty"`
+	Transfers                []*Transfer                `protobuf:"bytes,12,rep,name=transfers,proto3" json:"transfers,omitempty"`
+	ContractAddressTimeline  []*ContractAddressTimeline `protobuf:"bytes,13,rep,name=contractAddressTimeline,proto3" json:"contractAddressTimeline,omitempty"`
+	AddressMappings          []*AddressMapping          `protobuf:"bytes,14,rep,name=addressMappings,proto3" json:"addressMappings,omitempty"`
+	DefaultOutgoingApprovals []*UserOutgoingApproval    `protobuf:"bytes,15,rep,name=defaultOutgoingApprovals,proto3" json:"defaultOutgoingApprovals,omitempty"`
+	DefaultIncomingApprovals []*UserIncomingApproval    `protobuf:"bytes,16,rep,name=defaultIncomingApprovals,proto3" json:"defaultIncomingApprovals,omitempty"`
 }
 
 func (m *MsgNewCollection) Reset()         { *m = MsgNewCollection{} }
@@ -269,9 +269,9 @@ func (m *MsgNewCollection) GetCustomDataTimeline() []*CustomDataTimeline {
 	return nil
 }
 
-func (m *MsgNewCollection) GetCollectionApprovedTransfers() []*CollectionApprovedTransfer {
+func (m *MsgNewCollection) GetCollectionApprovals() []*CollectionApproval {
 	if m != nil {
-		return m.CollectionApprovedTransfers
+		return m.CollectionApprovals
 	}
 	return nil
 }
@@ -318,16 +318,16 @@ func (m *MsgNewCollection) GetAddressMappings() []*AddressMapping {
 	return nil
 }
 
-func (m *MsgNewCollection) GetDefaultApprovedOutgoingTransfers() []*UserApprovedOutgoingTransfer {
+func (m *MsgNewCollection) GetDefaultOutgoingApprovals() []*UserOutgoingApproval {
 	if m != nil {
-		return m.DefaultApprovedOutgoingTransfers
+		return m.DefaultOutgoingApprovals
 	}
 	return nil
 }
 
-func (m *MsgNewCollection) GetDefaultApprovedIncomingTransfers() []*UserApprovedIncomingTransfer {
+func (m *MsgNewCollection) GetDefaultIncomingApprovals() []*UserIncomingApproval {
 	if m != nil {
-		return m.DefaultApprovedIncomingTransfers
+		return m.DefaultIncomingApprovals
 	}
 	return nil
 }
@@ -378,7 +378,7 @@ type MsgMintAndDistributeBadges struct {
 	CollectionMetadataTimeline       []*CollectionMetadataTimeline       `protobuf:"bytes,6,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
 	BadgeMetadataTimeline            []*BadgeMetadataTimeline            `protobuf:"bytes,7,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
 	OffChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline `protobuf:"bytes,8,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
-	CollectionApprovedTransfers      []*CollectionApprovedTransfer       `protobuf:"bytes,9,rep,name=collectionApprovedTransfers,proto3" json:"collectionApprovedTransfers,omitempty"`
+	CollectionApprovals              []*CollectionApproval               `protobuf:"bytes,9,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
 	AddressMappings                  []*AddressMapping                   `protobuf:"bytes,10,rep,name=addressMappings,proto3" json:"addressMappings,omitempty"`
 }
 
@@ -457,9 +457,9 @@ func (m *MsgMintAndDistributeBadges) GetOffChainBalancesMetadataTimeline() []*Of
 	return nil
 }
 
-func (m *MsgMintAndDistributeBadges) GetCollectionApprovedTransfers() []*CollectionApprovedTransfer {
+func (m *MsgMintAndDistributeBadges) GetCollectionApprovals() []*CollectionApproval {
 	if m != nil {
-		return m.CollectionApprovedTransfers
+		return m.CollectionApprovals
 	}
 	return nil
 }
@@ -507,25 +507,25 @@ func (m *MsgMintAndDistributeBadgesResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgMintAndDistributeBadgesResponse proto.InternalMessageInfo
 
-type MsgUpdateCollectionApprovedTransfers struct {
-	Creator                     string                        `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	CollectionId                Uint                          `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
-	CollectionApprovedTransfers []*CollectionApprovedTransfer `protobuf:"bytes,3,rep,name=collectionApprovedTransfers,proto3" json:"collectionApprovedTransfers,omitempty"`
-	AddressMappings             []*AddressMapping             `protobuf:"bytes,4,rep,name=addressMappings,proto3" json:"addressMappings,omitempty"`
+type MsgUpdateCollectionApprovals struct {
+	Creator             string                `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionId        Uint                  `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+	CollectionApprovals []*CollectionApproval `protobuf:"bytes,3,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
+	AddressMappings     []*AddressMapping     `protobuf:"bytes,4,rep,name=addressMappings,proto3" json:"addressMappings,omitempty"`
 }
 
-func (m *MsgUpdateCollectionApprovedTransfers) Reset()         { *m = MsgUpdateCollectionApprovedTransfers{} }
-func (m *MsgUpdateCollectionApprovedTransfers) String() string { return proto.CompactTextString(m) }
-func (*MsgUpdateCollectionApprovedTransfers) ProtoMessage()    {}
-func (*MsgUpdateCollectionApprovedTransfers) Descriptor() ([]byte, []int) {
+func (m *MsgUpdateCollectionApprovals) Reset()         { *m = MsgUpdateCollectionApprovals{} }
+func (m *MsgUpdateCollectionApprovals) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateCollectionApprovals) ProtoMessage()    {}
+func (*MsgUpdateCollectionApprovals) Descriptor() ([]byte, []int) {
 	return fileDescriptor_90968f2be9d0828d, []int{7}
 }
-func (m *MsgUpdateCollectionApprovedTransfers) XXX_Unmarshal(b []byte) error {
+func (m *MsgUpdateCollectionApprovals) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdateCollectionApprovedTransfers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgUpdateCollectionApprovals) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdateCollectionApprovedTransfers.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgUpdateCollectionApprovals.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -535,58 +535,54 @@ func (m *MsgUpdateCollectionApprovedTransfers) XXX_Marshal(b []byte, determinist
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdateCollectionApprovedTransfers) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdateCollectionApprovedTransfers.Merge(m, src)
+func (m *MsgUpdateCollectionApprovals) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateCollectionApprovals.Merge(m, src)
 }
-func (m *MsgUpdateCollectionApprovedTransfers) XXX_Size() int {
+func (m *MsgUpdateCollectionApprovals) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdateCollectionApprovedTransfers) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdateCollectionApprovedTransfers.DiscardUnknown(m)
+func (m *MsgUpdateCollectionApprovals) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateCollectionApprovals.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdateCollectionApprovedTransfers proto.InternalMessageInfo
+var xxx_messageInfo_MsgUpdateCollectionApprovals proto.InternalMessageInfo
 
-func (m *MsgUpdateCollectionApprovedTransfers) GetCreator() string {
+func (m *MsgUpdateCollectionApprovals) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgUpdateCollectionApprovedTransfers) GetCollectionApprovedTransfers() []*CollectionApprovedTransfer {
+func (m *MsgUpdateCollectionApprovals) GetCollectionApprovals() []*CollectionApproval {
 	if m != nil {
-		return m.CollectionApprovedTransfers
+		return m.CollectionApprovals
 	}
 	return nil
 }
 
-func (m *MsgUpdateCollectionApprovedTransfers) GetAddressMappings() []*AddressMapping {
+func (m *MsgUpdateCollectionApprovals) GetAddressMappings() []*AddressMapping {
 	if m != nil {
 		return m.AddressMappings
 	}
 	return nil
 }
 
-type MsgUpdateCollectionApprovedTransfersResponse struct {
+type MsgUpdateCollectionApprovalsResponse struct {
 }
 
-func (m *MsgUpdateCollectionApprovedTransfersResponse) Reset() {
-	*m = MsgUpdateCollectionApprovedTransfersResponse{}
-}
-func (m *MsgUpdateCollectionApprovedTransfersResponse) String() string {
-	return proto.CompactTextString(m)
-}
-func (*MsgUpdateCollectionApprovedTransfersResponse) ProtoMessage() {}
-func (*MsgUpdateCollectionApprovedTransfersResponse) Descriptor() ([]byte, []int) {
+func (m *MsgUpdateCollectionApprovalsResponse) Reset()         { *m = MsgUpdateCollectionApprovalsResponse{} }
+func (m *MsgUpdateCollectionApprovalsResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateCollectionApprovalsResponse) ProtoMessage()    {}
+func (*MsgUpdateCollectionApprovalsResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_90968f2be9d0828d, []int{8}
 }
-func (m *MsgUpdateCollectionApprovedTransfersResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgUpdateCollectionApprovalsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdateCollectionApprovedTransfersResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgUpdateCollectionApprovalsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdateCollectionApprovedTransfersResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgUpdateCollectionApprovalsResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -596,17 +592,17 @@ func (m *MsgUpdateCollectionApprovedTransfersResponse) XXX_Marshal(b []byte, det
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdateCollectionApprovedTransfersResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdateCollectionApprovedTransfersResponse.Merge(m, src)
+func (m *MsgUpdateCollectionApprovalsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateCollectionApprovalsResponse.Merge(m, src)
 }
-func (m *MsgUpdateCollectionApprovedTransfersResponse) XXX_Size() int {
+func (m *MsgUpdateCollectionApprovalsResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdateCollectionApprovedTransfersResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdateCollectionApprovedTransfersResponse.DiscardUnknown(m)
+func (m *MsgUpdateCollectionApprovalsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateCollectionApprovalsResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdateCollectionApprovedTransfersResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgUpdateCollectionApprovalsResponse proto.InternalMessageInfo
 
 // Update badge Uris with new URI object, if permitted.
 type MsgUpdateMetadata struct {
@@ -1115,15 +1111,15 @@ func (m *MsgArchiveCollectionResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgArchiveCollectionResponse proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*UserApprovedOutgoingTransferTimeline)(nil), "bitbadges.bitbadgeschain.badges.UserApprovedOutgoingTransferTimeline")
-	proto.RegisterType((*UserApprovedIncomingTransferTimeline)(nil), "bitbadges.bitbadgeschain.badges.UserApprovedIncomingTransferTimeline")
-	proto.RegisterType((*CollectionApprovedTransferTimeline)(nil), "bitbadges.bitbadgeschain.badges.CollectionApprovedTransferTimeline")
+	proto.RegisterType((*UserOutgoingApprovalTimeline)(nil), "bitbadges.bitbadgeschain.badges.UserOutgoingApprovalTimeline")
+	proto.RegisterType((*UserIncomingApprovalTimeline)(nil), "bitbadges.bitbadgeschain.badges.UserIncomingApprovalTimeline")
+	proto.RegisterType((*CollectionApprovalTimeline)(nil), "bitbadges.bitbadgeschain.badges.CollectionApprovalTimeline")
 	proto.RegisterType((*MsgNewCollection)(nil), "bitbadges.bitbadgeschain.badges.MsgNewCollection")
 	proto.RegisterType((*MsgNewCollectionResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgNewCollectionResponse")
 	proto.RegisterType((*MsgMintAndDistributeBadges)(nil), "bitbadges.bitbadgeschain.badges.MsgMintAndDistributeBadges")
 	proto.RegisterType((*MsgMintAndDistributeBadgesResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgMintAndDistributeBadgesResponse")
-	proto.RegisterType((*MsgUpdateCollectionApprovedTransfers)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateCollectionApprovedTransfers")
-	proto.RegisterType((*MsgUpdateCollectionApprovedTransfersResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateCollectionApprovedTransfersResponse")
+	proto.RegisterType((*MsgUpdateCollectionApprovals)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateCollectionApprovals")
+	proto.RegisterType((*MsgUpdateCollectionApprovalsResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateCollectionApprovalsResponse")
 	proto.RegisterType((*MsgUpdateMetadata)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateMetadata")
 	proto.RegisterType((*MsgUpdateMetadataResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateMetadataResponse")
 	proto.RegisterType((*MsgUpdateCollectionPermissions)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateCollectionPermissions")
@@ -1139,74 +1135,74 @@ func init() {
 func init() { proto.RegisterFile("badges/legacytx.proto", fileDescriptor_90968f2be9d0828d) }
 
 var fileDescriptor_90968f2be9d0828d = []byte{
-	// 1023 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x58, 0x4f, 0x6f, 0x1b, 0x45,
-	0x14, 0xcf, 0xda, 0xae, 0x93, 0xbc, 0xa4, 0x4d, 0x3b, 0x2a, 0xb0, 0x75, 0xc1, 0xb1, 0x56, 0x11,
-	0x0a, 0x08, 0xd9, 0x55, 0x2a, 0x21, 0x24, 0xc4, 0xc1, 0x49, 0x25, 0x14, 0xa9, 0xa6, 0xd1, 0x90,
-	0x4a, 0xd0, 0x0b, 0x8c, 0x77, 0xc7, 0x9b, 0x95, 0xec, 0x9d, 0xd5, 0xce, 0xb8, 0x34, 0xaa, 0xf8,
-	0x00, 0x1c, 0x90, 0xb8, 0xf0, 0x01, 0xf8, 0x1a, 0x7c, 0x01, 0x7a, 0xe0, 0xd0, 0x63, 0xc5, 0xa1,
-	0x42, 0xc9, 0x67, 0xe0, 0xc4, 0x05, 0x79, 0xf6, 0x8f, 0xed, 0xfd, 0x37, 0x2e, 0x5d, 0xc7, 0xb7,
-	0xcd, 0xe6, 0xbd, 0xdf, 0xef, 0xbd, 0xdf, 0xce, 0xfb, 0xe3, 0x81, 0x77, 0xfa, 0xc4, 0xb2, 0x29,
-	0xef, 0x0c, 0xa9, 0x4d, 0xcc, 0x73, 0xf1, 0xac, 0xed, 0xf9, 0x4c, 0x30, 0xb4, 0xdb, 0x77, 0x44,
-	0xf0, 0x9f, 0x76, 0xfc, 0x64, 0x9e, 0x11, 0xc7, 0x6d, 0x07, 0xcf, 0x8d, 0x77, 0x43, 0x3f, 0xe1,
-	0x13, 0x97, 0x0f, 0xa8, 0xcf, 0x03, 0xc7, 0x46, 0x84, 0xd7, 0x27, 0x43, 0xe2, 0x9a, 0x34, 0x7a,
-	0xad, 0x87, 0xaf, 0x3d, 0xea, 0x8f, 0x1c, 0xce, 0x1d, 0xe6, 0x26, 0x1d, 0x46, 0x54, 0x10, 0x8b,
-	0x08, 0x92, 0x70, 0x30, 0xd9, 0x70, 0x48, 0x4d, 0x31, 0xe3, 0x70, 0xdb, 0x66, 0x36, 0x93, 0x8f,
-	0x9d, 0xc9, 0x53, 0xf8, 0xf6, 0x83, 0xd0, 0x9e, 0x58, 0x96, 0x4f, 0x39, 0xff, 0x6e, 0x44, 0x3c,
-	0xcf, 0x71, 0xed, 0xc8, 0x29, 0x0e, 0xd7, 0x19, 0xd1, 0xa1, 0xe3, 0x46, 0x71, 0x19, 0xff, 0x68,
-	0xb0, 0xf7, 0x98, 0x53, 0xbf, 0xeb, 0x79, 0x3e, 0x7b, 0x4a, 0xad, 0x47, 0x63, 0x61, 0x33, 0xc7,
-	0xb5, 0x4f, 0xc3, 0xb4, 0x4e, 0x43, 0x7b, 0xf4, 0x1c, 0xee, 0x90, 0x1c, 0x1b, 0xae, 0x6b, 0xad,
-	0xea, 0xfe, 0xd6, 0xc1, 0x17, 0x6d, 0x85, 0x68, 0xed, 0x22, 0x26, 0x9c, 0x8f, 0x8f, 0x4e, 0xe0,
-	0x7a, 0x14, 0xf8, 0x24, 0x20, 0xae, 0x57, 0x24, 0xe1, 0xc7, 0x6a, 0x42, 0xc7, 0x15, 0x98, 0xb8,
-	0x36, 0xc5, 0xf3, 0x00, 0xa9, 0xbc, 0x8f, 0x5d, 0x93, 0x8d, 0x14, 0x79, 0x27, 0x6d, 0xfe, 0x5f,
-	0xde, 0x49, 0x14, 0x9c, 0x8f, 0xbf, 0x9c, 0xbc, 0x8d, 0xa3, 0xf8, 0x48, 0x45, 0x31, 0xa5, 0xb2,
-	0xfe, 0x11, 0xee, 0x9a, 0xb9, 0x56, 0x51, 0xde, 0x9f, 0x2b, 0xc3, 0xc8, 0x67, 0xc2, 0x45, 0xf8,
-	0x4b, 0xc8, 0xfb, 0xdf, 0x2d, 0xb8, 0xd9, 0xe3, 0xf6, 0x57, 0xf4, 0x87, 0x69, 0x4c, 0x48, 0x87,
-	0x75, 0xd3, 0xa7, 0x44, 0x30, 0x5f, 0xd7, 0x5a, 0xda, 0xfe, 0x26, 0x8e, 0xfe, 0x44, 0xcf, 0xa1,
-	0x31, 0x8d, 0xaf, 0x17, 0x56, 0x66, 0xa4, 0x4e, 0x18, 0xcd, 0x9b, 0xa4, 0x9f, 0x84, 0xc0, 0x05,
-	0xf0, 0x68, 0x18, 0x36, 0xa5, 0x14, 0x6f, 0x55, 0xf2, 0x7e, 0xaa, 0xe4, 0x3d, 0xcc, 0xf2, 0xc6,
-	0xd9, 0xa0, 0xe8, 0x67, 0x0d, 0x5a, 0x6c, 0x30, 0x38, 0x9a, 0x00, 0x1c, 0x86, 0x4d, 0x2b, 0xc5,
-	0x5c, 0x93, 0xcc, 0x5d, 0x25, 0xf3, 0x23, 0x05, 0x10, 0x56, 0x52, 0x21, 0x13, 0x90, 0x39, 0xe6,
-	0x82, 0x8d, 0x1e, 0xcc, 0x06, 0x70, 0x4d, 0x06, 0x70, 0x5f, 0x2d, 0x79, 0xca, 0x15, 0x67, 0xc0,
-	0xa1, 0x7b, 0xb0, 0x1d, 0x35, 0xe8, 0xd3, 0x73, 0x8f, 0xea, 0xf5, 0xc9, 0xe7, 0x3f, 0xdc, 0x7e,
-	0xf1, 0x7a, 0x77, 0xed, 0xaf, 0xd7, 0xbb, 0x35, 0x79, 0x8c, 0xe6, 0x2c, 0x54, 0x15, 0xb1, 0xb1,
-	0xe4, 0x8a, 0xf8, 0x06, 0xb6, 0x66, 0x46, 0x87, 0xbe, 0xd9, 0xd2, 0x16, 0x3a, 0x09, 0x53, 0xba,
-	0x93, 0xa9, 0x37, 0x9e, 0x85, 0x42, 0xdf, 0xc3, 0x2d, 0x2e, 0x88, 0x6b, 0x11, 0xdf, 0xe2, 0xb1,
-	0xdc, 0x20, 0xd3, 0x39, 0x50, 0xe2, 0x7f, 0x9d, 0xf4, 0xc4, 0x69, 0x30, 0x74, 0x02, 0x37, 0x02,
-	0xf3, 0x53, 0x76, 0x34, 0xa9, 0x2f, 0xaa, 0x6f, 0x49, 0xf8, 0xfd, 0x05, 0x0e, 0xb2, 0xfc, 0x02,
-	0x38, 0xe1, 0x8f, 0xbe, 0x84, 0xcd, 0x78, 0xee, 0xea, 0xdb, 0x12, 0xec, 0x23, 0x25, 0x58, 0x2c,
-	0xf4, 0xd4, 0x17, 0xf9, 0xf0, 0x9e, 0xc9, 0x5c, 0xe1, 0x13, 0x53, 0x74, 0x83, 0xc1, 0x19, 0x4b,
-	0x70, 0x5d, 0xc2, 0x7e, 0xb6, 0x80, 0xc4, 0x99, 0xfe, 0x38, 0x0f, 0x18, 0x7d, 0x0b, 0x3b, 0xe1,
-	0x90, 0xee, 0x85, 0x33, 0x5a, 0xbf, 0x21, 0xb9, 0x3a, 0x4a, 0xae, 0xee, 0x9c, 0x1f, 0x4e, 0xe2,
-	0xa0, 0x9f, 0x34, 0x68, 0x59, 0x74, 0x40, 0xc6, 0x43, 0xd1, 0xcd, 0x1d, 0xd6, 0x3b, 0x65, 0x0c,
-	0x6b, 0x25, 0x4d, 0x56, 0x2c, 0xe9, 0x01, 0x7a, 0xb3, 0x8c, 0x01, 0xaa, 0xa4, 0x31, 0x1e, 0x82,
-	0x9e, 0x6c, 0xfe, 0x98, 0x72, 0x8f, 0xb9, 0x5c, 0xb6, 0x82, 0x69, 0xe1, 0x1d, 0x5b, 0xc1, 0x24,
-	0x48, 0xb6, 0x82, 0x59, 0x0b, 0xe3, 0x55, 0x1d, 0x1a, 0x3d, 0x6e, 0xf7, 0x1c, 0x57, 0x74, 0x5d,
-	0xeb, 0x81, 0xc3, 0x85, 0xef, 0xf4, 0xc7, 0x82, 0xca, 0xb6, 0xcb, 0x0b, 0xa6, 0x4a, 0x92, 0xaa,
-	0xa2, 0xa2, 0xca, 0x28, 0x9d, 0x6a, 0x99, 0xa5, 0x53, 0x7b, 0x8b, 0xd2, 0x29, 0x1e, 0x91, 0xf5,
-	0x15, 0x8d, 0xc8, 0xf5, 0x95, 0x8d, 0xc8, 0x8d, 0xab, 0x1b, 0x91, 0x8a, 0x59, 0xb4, 0xb9, 0xe4,
-	0x59, 0x94, 0xd1, 0xc0, 0xa0, 0x9c, 0x06, 0x66, 0xec, 0x81, 0x91, 0x5f, 0x59, 0x51, 0xc9, 0x1a,
-	0x7f, 0x56, 0x60, 0xaf, 0xc7, 0xed, 0xc7, 0x9e, 0x45, 0x04, 0x3d, 0x2a, 0x88, 0xb4, 0xcc, 0x52,
-	0x54, 0x88, 0x5e, 0xbd, 0x7a, 0xd1, 0x6b, 0x25, 0x89, 0xde, 0x86, 0x4f, 0x16, 0x51, 0x33, 0x96,
-	0xff, 0xd7, 0x3a, 0xdc, 0x8a, 0x1d, 0xa2, 0xc3, 0x59, 0xaa, 0xd6, 0xc5, 0xbd, 0xa5, 0xba, 0xa2,
-	0xde, 0x52, 0x5b, 0x59, 0x6f, 0xb9, 0xb6, 0xea, 0xf5, 0xbb, 0x5e, 0xee, 0xfa, 0x5d, 0xb0, 0x76,
-	0xad, 0x2f, 0x6b, 0xed, 0xca, 0xdc, 0x73, 0x37, 0x4a, 0xdc, 0x73, 0x8d, 0xbb, 0x70, 0x27, 0x55,
-	0x16, 0x71, 0xd1, 0xfc, 0x56, 0x81, 0x66, 0x46, 0x95, 0xcd, 0xac, 0xe5, 0xa5, 0x56, 0x50, 0xe2,
-	0xf7, 0x42, 0xb5, 0xbc, 0xdf, 0x0b, 0x4b, 0x6c, 0x44, 0xfb, 0xf0, 0x61, 0xb1, 0x44, 0xd3, 0x16,
-	0x54, 0x91, 0x1b, 0x5d, 0x60, 0x3a, 0x59, 0x0e, 0x97, 0xa5, 0x23, 0xce, 0xd2, 0xf1, 0xde, 0x42,
-	0xfb, 0xea, 0x2a, 0x14, 0x34, 0xa0, 0x95, 0x27, 0x4b, 0xac, 0xdd, 0xef, 0x9a, 0xbc, 0x0a, 0x09,
-	0xcf, 0x29, 0x71, 0x89, 0x4d, 0xfd, 0x52, 0x35, 0x7b, 0x02, 0x3b, 0xa3, 0x00, 0x36, 0xd1, 0xb2,
-	0xd5, 0xba, 0xf5, 0xe6, 0xfd, 0x70, 0x12, 0xc8, 0x68, 0xcc, 0x7c, 0xf7, 0xd0, 0x38, 0x4e, 0xec,
-	0x0f, 0x0d, 0x6e, 0xf7, 0xb8, 0xdd, 0xf5, 0xcd, 0x33, 0xe7, 0x29, 0x5d, 0xe8, 0x9e, 0xe7, 0xcd,
-	0x93, 0x33, 0x01, 0x39, 0x3c, 0xa4, 0xb0, 0x12, 0xf9, 0xa9, 0xfb, 0xe3, 0x71, 0xca, 0x15, 0x67,
-	0xc0, 0x19, 0x4d, 0x78, 0x3f, 0x2b, 0x91, 0x28, 0xd3, 0xc3, 0x87, 0x2f, 0x2e, 0x9a, 0xda, 0xcb,
-	0x8b, 0xa6, 0xf6, 0xf7, 0x45, 0x53, 0xfb, 0xe5, 0xb2, 0xb9, 0xf6, 0xf2, 0xb2, 0xb9, 0xf6, 0xea,
-	0xb2, 0xb9, 0xf6, 0xe4, 0xc0, 0x76, 0xc4, 0xd9, 0xb8, 0xdf, 0x36, 0xd9, 0xa8, 0x13, 0x87, 0xd0,
-	0x99, 0x0f, 0xa6, 0xf3, 0xac, 0x13, 0xdd, 0x06, 0x9f, 0x7b, 0x94, 0xf7, 0xeb, 0xf2, 0x2a, 0xf8,
-	0xfe, 0x7f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x71, 0x8e, 0x1c, 0x77, 0x0b, 0x17, 0x00, 0x00,
+	// 1016 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x58, 0x4f, 0x6f, 0xe3, 0x44,
+	0x14, 0xaf, 0x93, 0x6c, 0xda, 0xbe, 0x96, 0x76, 0x3b, 0x2c, 0x60, 0xc2, 0x92, 0x46, 0xd6, 0x6a,
+	0x55, 0x38, 0x24, 0xab, 0xae, 0x40, 0x48, 0x9c, 0xd2, 0xae, 0x84, 0x2a, 0x6d, 0xe8, 0x6a, 0xe8,
+	0x4a, 0xb0, 0x17, 0x98, 0x8c, 0xa7, 0xae, 0x25, 0xc7, 0x63, 0x3c, 0x93, 0x65, 0x2b, 0x3e, 0x03,
+	0x12, 0x17, 0x3e, 0x00, 0x77, 0x2e, 0x5c, 0x39, 0x71, 0x63, 0x8f, 0x7b, 0x03, 0x71, 0x58, 0xa1,
+	0xf6, 0x8b, 0xa0, 0x4c, 0x6c, 0x27, 0x1d, 0xdb, 0x71, 0xaa, 0x3a, 0x9b, 0x9b, 0x13, 0xcf, 0xfb,
+	0xfd, 0xde, 0xfb, 0xf9, 0xfd, 0xd3, 0xc0, 0x3b, 0x7d, 0x62, 0x3b, 0x4c, 0x74, 0x3c, 0xe6, 0x10,
+	0x7a, 0x2e, 0x5f, 0xb4, 0x83, 0x90, 0x4b, 0x8e, 0x76, 0xfb, 0xae, 0x1c, 0xbf, 0x69, 0x27, 0x4f,
+	0xf4, 0x8c, 0xb8, 0x7e, 0x7b, 0xfc, 0xdc, 0x78, 0x37, 0xb2, 0x93, 0x21, 0xf1, 0xc5, 0x29, 0x0b,
+	0xc5, 0xd8, 0xb0, 0x11, 0xe3, 0xf5, 0x89, 0x47, 0x7c, 0xca, 0xe2, 0xbf, 0xcd, 0xe8, 0xef, 0x80,
+	0x85, 0x03, 0x57, 0x08, 0x97, 0xfb, 0xba, 0xc1, 0x80, 0x49, 0x62, 0x13, 0x49, 0x34, 0x03, 0xca,
+	0x3d, 0x8f, 0x51, 0x39, 0x65, 0x70, 0xc7, 0xe1, 0x0e, 0x57, 0x8f, 0x9d, 0xd1, 0x53, 0xf4, 0xef,
+	0x87, 0xd1, 0x79, 0x62, 0xdb, 0x21, 0x13, 0xe2, 0xdb, 0x01, 0x09, 0x02, 0xd7, 0x77, 0x62, 0xa3,
+	0xc4, 0x5d, 0x77, 0xc0, 0x3c, 0xd7, 0x8f, 0xfd, 0xb2, 0xfe, 0x36, 0xe0, 0xee, 0x53, 0xc1, 0xc2,
+	0xe3, 0xa1, 0x74, 0xb8, 0xeb, 0x3b, 0xdd, 0x20, 0x08, 0xf9, 0x73, 0xe2, 0x9d, 0x44, 0xe7, 0x10,
+	0x85, 0x1d, 0xae, 0xbd, 0x13, 0xa6, 0xd1, 0xaa, 0xee, 0x6d, 0xec, 0x7f, 0xd2, 0x2e, 0x10, 0xa9,
+	0x9d, 0x85, 0x8c, 0xd3, 0x78, 0x08, 0xc3, 0x96, 0xa0, 0x67, 0xcc, 0x1e, 0x7a, 0xcc, 0x1e, 0x31,
+	0x0b, 0xb3, 0xa2, 0x18, 0x3e, 0x2e, 0x66, 0x70, 0x7d, 0x89, 0x89, 0xef, 0x30, 0xac, 0x21, 0x24,
+	0x91, 0x1d, 0xf9, 0x94, 0x0f, 0x72, 0x22, 0x73, 0xb5, 0x77, 0xd7, 0x8b, 0x4c, 0x47, 0xc6, 0x69,
+	0xbc, 0x45, 0x45, 0xd6, 0x38, 0x4c, 0xd2, 0x22, 0x15, 0x17, 0x83, 0xb7, 0x69, 0xea, 0x6d, 0x1c,
+	0xd9, 0xc3, 0x42, 0xde, 0x34, 0x32, 0xce, 0xc2, 0x5b, 0x48, 0x64, 0xbf, 0x6f, 0xc0, 0xed, 0x9e,
+	0x70, 0xbe, 0x64, 0x3f, 0x4c, 0xbc, 0x40, 0x26, 0xac, 0xd2, 0x90, 0x11, 0xc9, 0x43, 0xd3, 0x68,
+	0x19, 0x7b, 0xeb, 0x38, 0xfe, 0x89, 0x7e, 0x84, 0xc6, 0xc4, 0xb3, 0x5e, 0x54, 0x3f, 0xb1, 0x0e,
+	0x91, 0x3b, 0x9f, 0x5f, 0x23, 0x60, 0x1d, 0x02, 0xcf, 0x80, 0x47, 0x5e, 0xd4, 0x3a, 0x52, 0xbc,
+	0x55, 0xc5, 0xfb, 0x69, 0x21, 0xef, 0x41, 0x96, 0x35, 0xce, 0x06, 0x45, 0x3f, 0x19, 0xd0, 0xe2,
+	0xa7, 0xa7, 0x87, 0x23, 0x80, 0x83, 0xa8, 0xb5, 0xa4, 0x98, 0x6b, 0x8a, 0xb9, 0x5b, 0xc8, 0x7c,
+	0x5c, 0x00, 0x84, 0x0b, 0xa9, 0x10, 0x05, 0x44, 0x87, 0x42, 0xf2, 0xc1, 0xa3, 0x69, 0x07, 0x6e,
+	0xcd, 0x9b, 0x63, 0x29, 0x53, 0x9c, 0x01, 0x87, 0x1e, 0xc0, 0x66, 0xdc, 0x46, 0x4f, 0xce, 0x03,
+	0x66, 0xd6, 0x47, 0x9f, 0xff, 0x60, 0xf3, 0xe5, 0xeb, 0xdd, 0x95, 0x7f, 0x5f, 0xef, 0xd6, 0x54,
+	0x1e, 0x5d, 0x39, 0x91, 0x97, 0xfb, 0x6b, 0x25, 0xe7, 0xfe, 0xd7, 0xb0, 0x31, 0xd5, 0xc8, 0xcd,
+	0xf5, 0x96, 0x31, 0xd7, 0x17, 0x9f, 0xc0, 0x3f, 0x99, 0x58, 0xe3, 0x69, 0x28, 0xf4, 0x1d, 0xec,
+	0x08, 0x49, 0x7c, 0x9b, 0x84, 0xb6, 0x48, 0x64, 0x05, 0xe5, 0xfe, 0x7e, 0x21, 0xfe, 0x57, 0xba,
+	0x25, 0x4e, 0x83, 0xa1, 0x27, 0xb0, 0x35, 0x3e, 0x7e, 0xc2, 0x0f, 0x47, 0x75, 0xc4, 0xcc, 0x0d,
+	0x05, 0xbf, 0x37, 0x47, 0xc2, 0x2a, 0xa5, 0xb1, 0x66, 0x8f, 0xbe, 0x80, 0xf5, 0x64, 0x0a, 0x9a,
+	0x9b, 0x0a, 0xec, 0xa3, 0x42, 0xb0, 0x93, 0xc8, 0x02, 0x4f, 0x6c, 0x51, 0x08, 0xef, 0x51, 0xee,
+	0xcb, 0x90, 0x50, 0xd9, 0x1d, 0x8f, 0xb1, 0x44, 0x82, 0xb7, 0x14, 0xec, 0x67, 0x73, 0x48, 0x9c,
+	0x69, 0x8f, 0xf3, 0x80, 0xd1, 0x37, 0xb0, 0x1d, 0x8d, 0xcc, 0x5e, 0x34, 0x31, 0xcd, 0x2d, 0xc5,
+	0xd5, 0x29, 0xe4, 0xea, 0x5e, 0xb1, 0xc3, 0x3a, 0x0e, 0xfa, 0x1e, 0x4c, 0x9b, 0x9d, 0x92, 0xa1,
+	0x27, 0x8f, 0x53, 0x13, 0x74, 0xfb, 0x26, 0x13, 0x34, 0x17, 0x76, 0x8a, 0xf2, 0x28, 0x35, 0xda,
+	0x6e, 0xdf, 0x64, 0xb4, 0xe5, 0xc2, 0x5a, 0x8f, 0xc1, 0xd4, 0x5b, 0x36, 0x66, 0x22, 0xe0, 0xbe,
+	0x50, 0x05, 0x3c, 0x29, 0x9f, 0x23, 0x7b, 0xdc, 0xbf, 0xf5, 0x02, 0x9e, 0x3e, 0x61, 0xfd, 0x59,
+	0x87, 0x46, 0x4f, 0x38, 0x3d, 0xd7, 0x97, 0x5d, 0xdf, 0x7e, 0xe4, 0x0a, 0x19, 0xba, 0xfd, 0xa1,
+	0x64, 0xaa, 0x59, 0x8a, 0x19, 0xb3, 0x40, 0xa7, 0xaa, 0x14, 0x51, 0x65, 0x14, 0x42, 0xb5, 0xcc,
+	0x42, 0xa8, 0xdd, 0xa0, 0x10, 0x66, 0x0f, 0xb6, 0xfa, 0x92, 0x06, 0xdb, 0xea, 0xd2, 0x06, 0xdb,
+	0xda, 0x9b, 0x1b, 0x6c, 0x39, 0x13, 0x64, 0xbd, 0xe4, 0x09, 0x92, 0xd1, 0x76, 0xa0, 0x9c, 0xb6,
+	0x63, 0xdd, 0x03, 0x2b, 0xbf, 0x82, 0xe2, 0xd2, 0xb4, 0x7e, 0xab, 0xc0, 0xdd, 0x9e, 0x70, 0x9e,
+	0x06, 0x36, 0x91, 0xec, 0x30, 0xc3, 0xc3, 0x32, 0x4b, 0x2d, 0x47, 0xd4, 0xea, 0xe2, 0x45, 0xad,
+	0x95, 0x24, 0xea, 0x7d, 0xb8, 0x37, 0x4b, 0xad, 0x44, 0xd6, 0x5f, 0xea, 0xb0, 0x93, 0x1c, 0x8c,
+	0x93, 0xab, 0x54, 0x2d, 0x67, 0xf7, 0x86, 0xea, 0x92, 0x7a, 0x43, 0x6d, 0x69, 0xbd, 0xe1, 0xd6,
+	0xb2, 0x97, 0xde, 0x7a, 0xb9, 0x4b, 0xef, 0x8c, 0x25, 0x68, 0x75, 0x51, 0x4b, 0x50, 0xe6, 0xd6,
+	0xb9, 0x56, 0xe2, 0xd6, 0x69, 0x7d, 0x00, 0xef, 0xa7, 0xca, 0x22, 0x29, 0x9a, 0x5f, 0x2b, 0xd0,
+	0xcc, 0xa8, 0xae, 0xa9, 0x25, 0xb9, 0xd4, 0x0a, 0xd2, 0xb6, 0xf7, 0x6a, 0x79, 0xdb, 0xfb, 0x02,
+	0x1b, 0xd0, 0x1e, 0xdc, 0x9f, 0x2d, 0xd1, 0xa4, 0x05, 0x55, 0xd4, 0x46, 0x36, 0x3e, 0x3a, 0x5a,
+	0xe6, 0x16, 0xa5, 0x23, 0xce, 0xd2, 0xf1, 0xc1, 0x5c, 0xfb, 0xe5, 0x32, 0x14, 0xb4, 0xa0, 0x95,
+	0x27, 0x4b, 0xa2, 0xdd, 0x1f, 0x86, 0xba, 0x80, 0x88, 0xf2, 0x94, 0xf8, 0xc4, 0x61, 0x61, 0xa9,
+	0x9a, 0x3d, 0x83, 0xed, 0xc1, 0x18, 0x56, 0x6b, 0xd9, 0xc5, 0xba, 0xf5, 0xae, 0xda, 0x61, 0x1d,
+	0xc8, 0x6a, 0x4c, 0x7d, 0xf7, 0xe8, 0x70, 0x12, 0xd8, 0x5f, 0x06, 0xdc, 0xe9, 0x09, 0xa7, 0x1b,
+	0xd2, 0x33, 0xf7, 0x39, 0x9b, 0xeb, 0x76, 0xe5, 0xfa, 0xc1, 0x51, 0x40, 0xae, 0x88, 0x28, 0x6c,
+	0x2d, 0xbe, 0xe2, 0xfe, 0x78, 0x94, 0x32, 0xc5, 0x19, 0x70, 0x56, 0x53, 0xed, 0x2d, 0xa9, 0x40,
+	0xe2, 0x48, 0x0f, 0x1e, 0xbf, 0xbc, 0x68, 0x1a, 0xaf, 0x2e, 0x9a, 0xc6, 0x7f, 0x17, 0x4d, 0xe3,
+	0xe7, 0xcb, 0xe6, 0xca, 0xab, 0xcb, 0xe6, 0xca, 0x3f, 0x97, 0xcd, 0x95, 0x67, 0xfb, 0x8e, 0x2b,
+	0xcf, 0x86, 0xfd, 0x36, 0xe5, 0x83, 0x4e, 0xe2, 0x42, 0xe7, 0xaa, 0x33, 0x9d, 0x17, 0x9d, 0xf8,
+	0xa6, 0xf4, 0x3c, 0x60, 0xa2, 0x5f, 0x57, 0xd7, 0xa4, 0x0f, 0xff, 0x0f, 0x00, 0x00, 0xff, 0xff,
+	0x66, 0xee, 0x50, 0xbf, 0x27, 0x16, 0x00, 0x00,
 }
 
-func (m *UserApprovedOutgoingTransferTimeline) Marshal() (dAtA []byte, err error) {
+func (m *UserOutgoingApprovalTimeline) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1216,12 +1212,12 @@ func (m *UserApprovedOutgoingTransferTimeline) Marshal() (dAtA []byte, err error
 	return dAtA[:n], nil
 }
 
-func (m *UserApprovedOutgoingTransferTimeline) MarshalTo(dAtA []byte) (int, error) {
+func (m *UserOutgoingApprovalTimeline) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *UserApprovedOutgoingTransferTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UserOutgoingApprovalTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1240,10 +1236,10 @@ func (m *UserApprovedOutgoingTransferTimeline) MarshalToSizedBuffer(dAtA []byte)
 			dAtA[i] = 0x12
 		}
 	}
-	if len(m.ApprovedOutgoingTransfers) > 0 {
-		for iNdEx := len(m.ApprovedOutgoingTransfers) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.OutgoingApprovals) > 0 {
+		for iNdEx := len(m.OutgoingApprovals) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.ApprovedOutgoingTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.OutgoingApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1257,7 +1253,7 @@ func (m *UserApprovedOutgoingTransferTimeline) MarshalToSizedBuffer(dAtA []byte)
 	return len(dAtA) - i, nil
 }
 
-func (m *UserApprovedIncomingTransferTimeline) Marshal() (dAtA []byte, err error) {
+func (m *UserIncomingApprovalTimeline) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1267,12 +1263,12 @@ func (m *UserApprovedIncomingTransferTimeline) Marshal() (dAtA []byte, err error
 	return dAtA[:n], nil
 }
 
-func (m *UserApprovedIncomingTransferTimeline) MarshalTo(dAtA []byte) (int, error) {
+func (m *UserIncomingApprovalTimeline) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *UserApprovedIncomingTransferTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UserIncomingApprovalTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1291,10 +1287,10 @@ func (m *UserApprovedIncomingTransferTimeline) MarshalToSizedBuffer(dAtA []byte)
 			dAtA[i] = 0x12
 		}
 	}
-	if len(m.ApprovedIncomingTransfers) > 0 {
-		for iNdEx := len(m.ApprovedIncomingTransfers) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.IncomingApprovals) > 0 {
+		for iNdEx := len(m.IncomingApprovals) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.ApprovedIncomingTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.IncomingApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1308,7 +1304,7 @@ func (m *UserApprovedIncomingTransferTimeline) MarshalToSizedBuffer(dAtA []byte)
 	return len(dAtA) - i, nil
 }
 
-func (m *CollectionApprovedTransferTimeline) Marshal() (dAtA []byte, err error) {
+func (m *CollectionApprovalTimeline) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1318,12 +1314,12 @@ func (m *CollectionApprovedTransferTimeline) Marshal() (dAtA []byte, err error) 
 	return dAtA[:n], nil
 }
 
-func (m *CollectionApprovedTransferTimeline) MarshalTo(dAtA []byte) (int, error) {
+func (m *CollectionApprovalTimeline) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *CollectionApprovedTransferTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *CollectionApprovalTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1342,10 +1338,10 @@ func (m *CollectionApprovedTransferTimeline) MarshalToSizedBuffer(dAtA []byte) (
 			dAtA[i] = 0x12
 		}
 	}
-	if len(m.CollectionApprovedTransfers) > 0 {
-		for iNdEx := len(m.CollectionApprovedTransfers) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.CollectionApprovals) > 0 {
+		for iNdEx := len(m.CollectionApprovals) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.CollectionApprovedTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.CollectionApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1379,10 +1375,10 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.DefaultApprovedIncomingTransfers) > 0 {
-		for iNdEx := len(m.DefaultApprovedIncomingTransfers) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.DefaultIncomingApprovals) > 0 {
+		for iNdEx := len(m.DefaultIncomingApprovals) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.DefaultApprovedIncomingTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.DefaultIncomingApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1395,10 +1391,10 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x82
 		}
 	}
-	if len(m.DefaultApprovedOutgoingTransfers) > 0 {
-		for iNdEx := len(m.DefaultApprovedOutgoingTransfers) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.DefaultOutgoingApprovals) > 0 {
+		for iNdEx := len(m.DefaultOutgoingApprovals) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.DefaultApprovedOutgoingTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.DefaultOutgoingApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1491,10 +1487,10 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x4a
 	}
-	if len(m.CollectionApprovedTransfers) > 0 {
-		for iNdEx := len(m.CollectionApprovedTransfers) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.CollectionApprovals) > 0 {
+		for iNdEx := len(m.CollectionApprovals) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.CollectionApprovedTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.CollectionApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1648,10 +1644,10 @@ func (m *MsgMintAndDistributeBadges) MarshalToSizedBuffer(dAtA []byte) (int, err
 			dAtA[i] = 0x52
 		}
 	}
-	if len(m.CollectionApprovedTransfers) > 0 {
-		for iNdEx := len(m.CollectionApprovedTransfers) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.CollectionApprovals) > 0 {
+		for iNdEx := len(m.CollectionApprovals) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.CollectionApprovedTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.CollectionApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1775,7 +1771,7 @@ func (m *MsgMintAndDistributeBadgesResponse) MarshalToSizedBuffer(dAtA []byte) (
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdateCollectionApprovedTransfers) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateCollectionApprovals) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1785,12 +1781,12 @@ func (m *MsgUpdateCollectionApprovedTransfers) Marshal() (dAtA []byte, err error
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdateCollectionApprovedTransfers) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateCollectionApprovals) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateCollectionApprovedTransfers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateCollectionApprovals) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1809,10 +1805,10 @@ func (m *MsgUpdateCollectionApprovedTransfers) MarshalToSizedBuffer(dAtA []byte)
 			dAtA[i] = 0x22
 		}
 	}
-	if len(m.CollectionApprovedTransfers) > 0 {
-		for iNdEx := len(m.CollectionApprovedTransfers) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.CollectionApprovals) > 0 {
+		for iNdEx := len(m.CollectionApprovals) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.CollectionApprovedTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.CollectionApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1843,7 +1839,7 @@ func (m *MsgUpdateCollectionApprovedTransfers) MarshalToSizedBuffer(dAtA []byte)
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdateCollectionApprovedTransfersResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateCollectionApprovalsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1853,12 +1849,12 @@ func (m *MsgUpdateCollectionApprovedTransfersResponse) Marshal() (dAtA []byte, e
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdateCollectionApprovedTransfersResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateCollectionApprovalsResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateCollectionApprovedTransfersResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateCollectionApprovalsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -2356,14 +2352,14 @@ func encodeVarintLegacytx(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *UserApprovedOutgoingTransferTimeline) Size() (n int) {
+func (m *UserOutgoingApprovalTimeline) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.ApprovedOutgoingTransfers) > 0 {
-		for _, e := range m.ApprovedOutgoingTransfers {
+	if len(m.OutgoingApprovals) > 0 {
+		for _, e := range m.OutgoingApprovals {
 			l = e.Size()
 			n += 1 + l + sovLegacytx(uint64(l))
 		}
@@ -2377,14 +2373,14 @@ func (m *UserApprovedOutgoingTransferTimeline) Size() (n int) {
 	return n
 }
 
-func (m *UserApprovedIncomingTransferTimeline) Size() (n int) {
+func (m *UserIncomingApprovalTimeline) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.ApprovedIncomingTransfers) > 0 {
-		for _, e := range m.ApprovedIncomingTransfers {
+	if len(m.IncomingApprovals) > 0 {
+		for _, e := range m.IncomingApprovals {
 			l = e.Size()
 			n += 1 + l + sovLegacytx(uint64(l))
 		}
@@ -2398,14 +2394,14 @@ func (m *UserApprovedIncomingTransferTimeline) Size() (n int) {
 	return n
 }
 
-func (m *CollectionApprovedTransferTimeline) Size() (n int) {
+func (m *CollectionApprovalTimeline) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.CollectionApprovedTransfers) > 0 {
-		for _, e := range m.CollectionApprovedTransfers {
+	if len(m.CollectionApprovals) > 0 {
+		for _, e := range m.CollectionApprovals {
 			l = e.Size()
 			n += 1 + l + sovLegacytx(uint64(l))
 		}
@@ -2455,8 +2451,8 @@ func (m *MsgNewCollection) Size() (n int) {
 	}
 	l = m.BalancesType.Size()
 	n += 1 + l + sovLegacytx(uint64(l))
-	if len(m.CollectionApprovedTransfers) > 0 {
-		for _, e := range m.CollectionApprovedTransfers {
+	if len(m.CollectionApprovals) > 0 {
+		for _, e := range m.CollectionApprovals {
 			l = e.Size()
 			n += 1 + l + sovLegacytx(uint64(l))
 		}
@@ -2495,14 +2491,14 @@ func (m *MsgNewCollection) Size() (n int) {
 			n += 1 + l + sovLegacytx(uint64(l))
 		}
 	}
-	if len(m.DefaultApprovedOutgoingTransfers) > 0 {
-		for _, e := range m.DefaultApprovedOutgoingTransfers {
+	if len(m.DefaultOutgoingApprovals) > 0 {
+		for _, e := range m.DefaultOutgoingApprovals {
 			l = e.Size()
 			n += 1 + l + sovLegacytx(uint64(l))
 		}
 	}
-	if len(m.DefaultApprovedIncomingTransfers) > 0 {
-		for _, e := range m.DefaultApprovedIncomingTransfers {
+	if len(m.DefaultIncomingApprovals) > 0 {
+		for _, e := range m.DefaultIncomingApprovals {
 			l = e.Size()
 			n += 2 + l + sovLegacytx(uint64(l))
 		}
@@ -2563,8 +2559,8 @@ func (m *MsgMintAndDistributeBadges) Size() (n int) {
 			n += 1 + l + sovLegacytx(uint64(l))
 		}
 	}
-	if len(m.CollectionApprovedTransfers) > 0 {
-		for _, e := range m.CollectionApprovedTransfers {
+	if len(m.CollectionApprovals) > 0 {
+		for _, e := range m.CollectionApprovals {
 			l = e.Size()
 			n += 1 + l + sovLegacytx(uint64(l))
 		}
@@ -2587,7 +2583,7 @@ func (m *MsgMintAndDistributeBadgesResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgUpdateCollectionApprovedTransfers) Size() (n int) {
+func (m *MsgUpdateCollectionApprovals) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2599,8 +2595,8 @@ func (m *MsgUpdateCollectionApprovedTransfers) Size() (n int) {
 	}
 	l = m.CollectionId.Size()
 	n += 1 + l + sovLegacytx(uint64(l))
-	if len(m.CollectionApprovedTransfers) > 0 {
-		for _, e := range m.CollectionApprovedTransfers {
+	if len(m.CollectionApprovals) > 0 {
+		for _, e := range m.CollectionApprovals {
 			l = e.Size()
 			n += 1 + l + sovLegacytx(uint64(l))
 		}
@@ -2614,7 +2610,7 @@ func (m *MsgUpdateCollectionApprovedTransfers) Size() (n int) {
 	return n
 }
 
-func (m *MsgUpdateCollectionApprovedTransfersResponse) Size() (n int) {
+func (m *MsgUpdateCollectionApprovalsResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2817,7 +2813,7 @@ func sovLegacytx(x uint64) (n int) {
 func sozLegacytx(x uint64) (n int) {
 	return sovLegacytx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *UserApprovedOutgoingTransferTimeline) Unmarshal(dAtA []byte) error {
+func (m *UserOutgoingApprovalTimeline) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2840,15 +2836,15 @@ func (m *UserApprovedOutgoingTransferTimeline) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: UserApprovedOutgoingTransferTimeline: wiretype end group for non-group")
+			return fmt.Errorf("proto: UserOutgoingApprovalTimeline: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UserApprovedOutgoingTransferTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UserOutgoingApprovalTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApprovedOutgoingTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field OutgoingApprovals", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2875,8 +2871,8 @@ func (m *UserApprovedOutgoingTransferTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ApprovedOutgoingTransfers = append(m.ApprovedOutgoingTransfers, &UserApprovedOutgoingTransfer{})
-			if err := m.ApprovedOutgoingTransfers[len(m.ApprovedOutgoingTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.OutgoingApprovals = append(m.OutgoingApprovals, &UserOutgoingApproval{})
+			if err := m.OutgoingApprovals[len(m.OutgoingApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2935,7 +2931,7 @@ func (m *UserApprovedOutgoingTransferTimeline) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *UserApprovedIncomingTransferTimeline) Unmarshal(dAtA []byte) error {
+func (m *UserIncomingApprovalTimeline) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2958,15 +2954,15 @@ func (m *UserApprovedIncomingTransferTimeline) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: UserApprovedIncomingTransferTimeline: wiretype end group for non-group")
+			return fmt.Errorf("proto: UserIncomingApprovalTimeline: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UserApprovedIncomingTransferTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UserIncomingApprovalTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApprovedIncomingTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field IncomingApprovals", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2993,8 +2989,8 @@ func (m *UserApprovedIncomingTransferTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ApprovedIncomingTransfers = append(m.ApprovedIncomingTransfers, &UserApprovedIncomingTransfer{})
-			if err := m.ApprovedIncomingTransfers[len(m.ApprovedIncomingTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.IncomingApprovals = append(m.IncomingApprovals, &UserIncomingApproval{})
+			if err := m.IncomingApprovals[len(m.IncomingApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3053,7 +3049,7 @@ func (m *UserApprovedIncomingTransferTimeline) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *CollectionApprovedTransferTimeline) Unmarshal(dAtA []byte) error {
+func (m *CollectionApprovalTimeline) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3076,15 +3072,15 @@ func (m *CollectionApprovedTransferTimeline) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: CollectionApprovedTransferTimeline: wiretype end group for non-group")
+			return fmt.Errorf("proto: CollectionApprovalTimeline: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: CollectionApprovedTransferTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: CollectionApprovalTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CollectionApprovedTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionApprovals", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3111,8 +3107,8 @@ func (m *CollectionApprovedTransferTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CollectionApprovedTransfers = append(m.CollectionApprovedTransfers, &CollectionApprovedTransfer{})
-			if err := m.CollectionApprovedTransfers[len(m.CollectionApprovedTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.CollectionApprovals = append(m.CollectionApprovals, &CollectionApproval{})
+			if err := m.CollectionApprovals[len(m.CollectionApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3404,7 +3400,7 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CollectionApprovedTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionApprovals", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3431,8 +3427,8 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CollectionApprovedTransfers = append(m.CollectionApprovedTransfers, &CollectionApprovedTransfer{})
-			if err := m.CollectionApprovedTransfers[len(m.CollectionApprovedTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.CollectionApprovals = append(m.CollectionApprovals, &CollectionApproval{})
+			if err := m.CollectionApprovals[len(m.CollectionApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3644,7 +3640,7 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 15:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DefaultApprovedOutgoingTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DefaultOutgoingApprovals", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3671,14 +3667,14 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DefaultApprovedOutgoingTransfers = append(m.DefaultApprovedOutgoingTransfers, &UserApprovedOutgoingTransfer{})
-			if err := m.DefaultApprovedOutgoingTransfers[len(m.DefaultApprovedOutgoingTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.DefaultOutgoingApprovals = append(m.DefaultOutgoingApprovals, &UserOutgoingApproval{})
+			if err := m.DefaultOutgoingApprovals[len(m.DefaultOutgoingApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 16:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DefaultApprovedIncomingTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DefaultIncomingApprovals", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3705,8 +3701,8 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DefaultApprovedIncomingTransfers = append(m.DefaultApprovedIncomingTransfers, &UserApprovedIncomingTransfer{})
-			if err := m.DefaultApprovedIncomingTransfers[len(m.DefaultApprovedIncomingTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.DefaultIncomingApprovals = append(m.DefaultIncomingApprovals, &UserIncomingApproval{})
+			if err := m.DefaultIncomingApprovals[len(m.DefaultIncomingApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4082,7 +4078,7 @@ func (m *MsgMintAndDistributeBadges) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 9:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CollectionApprovedTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionApprovals", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4109,8 +4105,8 @@ func (m *MsgMintAndDistributeBadges) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CollectionApprovedTransfers = append(m.CollectionApprovedTransfers, &CollectionApprovedTransfer{})
-			if err := m.CollectionApprovedTransfers[len(m.CollectionApprovedTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.CollectionApprovals = append(m.CollectionApprovals, &CollectionApproval{})
+			if err := m.CollectionApprovals[len(m.CollectionApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4219,7 +4215,7 @@ func (m *MsgMintAndDistributeBadgesResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdateCollectionApprovedTransfers) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateCollectionApprovals) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4242,10 +4238,10 @@ func (m *MsgUpdateCollectionApprovedTransfers) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdateCollectionApprovedTransfers: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateCollectionApprovals: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdateCollectionApprovedTransfers: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateCollectionApprovals: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -4316,7 +4312,7 @@ func (m *MsgUpdateCollectionApprovedTransfers) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CollectionApprovedTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionApprovals", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4343,8 +4339,8 @@ func (m *MsgUpdateCollectionApprovedTransfers) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CollectionApprovedTransfers = append(m.CollectionApprovedTransfers, &CollectionApprovedTransfer{})
-			if err := m.CollectionApprovedTransfers[len(m.CollectionApprovedTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.CollectionApprovals = append(m.CollectionApprovals, &CollectionApproval{})
+			if err := m.CollectionApprovals[len(m.CollectionApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4403,7 +4399,7 @@ func (m *MsgUpdateCollectionApprovedTransfers) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdateCollectionApprovedTransfersResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateCollectionApprovalsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4426,10 +4422,10 @@ func (m *MsgUpdateCollectionApprovedTransfersResponse) Unmarshal(dAtA []byte) er
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdateCollectionApprovedTransfersResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateCollectionApprovalsResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdateCollectionApprovedTransfersResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateCollectionApprovalsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

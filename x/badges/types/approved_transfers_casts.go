@@ -1,7 +1,7 @@
 package types
 
-func CastOutgoingTransfersToCollectionTransfers(transfers []*UserApprovedOutgoingTransfer, fromAddress string) []*CollectionApprovedTransfer {
-	collectionTransfers := []*CollectionApprovedTransfer{}
+func CastOutgoingTransfersToCollectionTransfers(transfers []*UserOutgoingApproval, fromAddress string) []*CollectionApproval {
+	collectionTransfers := []*CollectionApproval{}
 	for _, transfer := range transfers {
 		collectionTransfers = append(collectionTransfers, CastOutgoingTransferToCollectionTransfer(transfer, fromAddress))
 	}
@@ -9,8 +9,8 @@ func CastOutgoingTransfersToCollectionTransfers(transfers []*UserApprovedOutgoin
 	return collectionTransfers
 }
 
-func CastIncomingTransfersToCollectionTransfers(transfers []*UserApprovedIncomingTransfer, toAddress string) []*CollectionApprovedTransfer {
-	collectionTransfers := []*CollectionApprovedTransfer{}
+func CastIncomingTransfersToCollectionTransfers(transfers []*UserIncomingApproval, toAddress string) []*CollectionApproval {
+	collectionTransfers := []*CollectionApproval{}
 	for _, transfer := range transfers {
 		collectionTransfers = append(collectionTransfers, CastIncomingTransferToCollectionTransfer(transfer, toAddress))
 	}
@@ -18,209 +18,172 @@ func CastIncomingTransfersToCollectionTransfers(transfers []*UserApprovedIncomin
 	return collectionTransfers
 }
 
-func CastOutgoingTransferToCollectionTransfer(transfer *UserApprovedOutgoingTransfer, fromAddress string) *CollectionApprovedTransfer {
-	allowedCombinations := []*IsCollectionTransferAllowed{}
-	for _, combination := range transfer.AllowedCombinations {
-		allowedCombinations = append(allowedCombinations, CastOutgoingCombinationToCollectionCombination(combination))
-	}
+func CastOutgoingTransferToCollectionTransfer(transfer *UserOutgoingApproval, fromAddress string) *CollectionApproval {
 
-	approvalDetails := CastOutgoingApprovalDetailsToCollectionApprovalDetails(transfer.ApprovalDetails)
-
-	return &CollectionApprovedTransfer{
+	approvalCriteria := CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(transfer.ApprovalCriteria)
+	return &CollectionApproval{
 		ToMappingId:                      transfer.ToMappingId,
 		FromMappingId:                    fromAddress,
 		InitiatedByMappingId:             transfer.InitiatedByMappingId,
 		TransferTimes:                    transfer.TransferTimes,
 		BadgeIds:                         transfer.BadgeIds,
 		OwnershipTimes: 								  transfer.OwnershipTimes,
-		AllowedCombinations:              allowedCombinations,
-		ApprovalDetails: 								approvalDetails,
+		ApprovalCriteria: 								approvalCriteria,
 		ApprovalId: transfer.ApprovalId,
 		ApprovalTrackerId: transfer.ApprovalTrackerId,
 		ChallengeTrackerId: transfer.ChallengeTrackerId,
+		Uri: transfer.Uri,
+		CustomData: transfer.CustomData,
+
+		IsApproved:           transfer.IsApproved,
+		BadgeIdsOptions:      transfer.BadgeIdsOptions,
+		TransferTimesOptions: transfer.TransferTimesOptions,
+		ToMappingOptions:            transfer.ToMappingOptions,
+		InitiatedByMappingOptions:   transfer.InitiatedByMappingOptions,
+		OwnershipTimesOptions: transfer.OwnershipTimesOptions,
+		ApprovalTrackerIdOptions: transfer.ApprovalTrackerIdOptions,
+		ChallengeTrackerIdOptions: transfer.ChallengeTrackerIdOptions,
 	}
 }
 
-func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApprovedTransfer) *UserApprovedOutgoingTransfer {
-	allowedCombinations := []*IsUserOutgoingTransferAllowed{}
-	for _, combination := range transfer.AllowedCombinations {
-		allowedCombinations = append(allowedCombinations, CastFromCollectionCombinationToOutgoingCombination(combination))
-	}
+func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApproval) *UserOutgoingApproval {
 
-	approvalDetails := CastFromCollectionApprovalDetailsToOutgoingApprovalDetails(transfer.ApprovalDetails)
+	approvalCriteria := CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(transfer.ApprovalCriteria)
 
-	return &UserApprovedOutgoingTransfer{
+	return &UserOutgoingApproval{
 		ToMappingId:                      transfer.ToMappingId,
 		InitiatedByMappingId:             transfer.InitiatedByMappingId,
 		TransferTimes:                    transfer.TransferTimes,
 		BadgeIds:                         transfer.BadgeIds,
 		OwnershipTimes: 								  transfer.OwnershipTimes,
-		AllowedCombinations:              allowedCombinations,
-		ApprovalDetails: 								approvalDetails,
+		ApprovalCriteria: 								approvalCriteria,
 		ApprovalId: transfer.ApprovalId,
 		ApprovalTrackerId: transfer.ApprovalTrackerId,
 		ChallengeTrackerId: transfer.ChallengeTrackerId,
+		Uri: transfer.Uri,
+		CustomData: transfer.CustomData,
+
+		IsApproved:           transfer.IsApproved,
+		BadgeIdsOptions:      transfer.BadgeIdsOptions,
+		TransferTimesOptions: transfer.TransferTimesOptions,
+		ToMappingOptions:            transfer.ToMappingOptions,
+		InitiatedByMappingOptions:   transfer.InitiatedByMappingOptions,
+		OwnershipTimesOptions: transfer.OwnershipTimesOptions,
+		ApprovalTrackerIdOptions: transfer.ApprovalTrackerIdOptions,
+		ChallengeTrackerIdOptions: transfer.ChallengeTrackerIdOptions,
 	}
 }
 
-func CastOutgoingCombinationToCollectionCombination(combination *IsUserOutgoingTransferAllowed) *IsCollectionTransferAllowed {
-	return &IsCollectionTransferAllowed{
-		IsApproved:           combination.IsApproved,
-		BadgeIdsOptions:      combination.BadgeIdsOptions,
-		TransferTimesOptions: combination.TransferTimesOptions,
-		ToMappingOptions:            combination.ToMappingOptions,
-		InitiatedByMappingOptions:   combination.InitiatedByMappingOptions,
-		OwnershipTimesOptions: combination.OwnershipTimesOptions,
-		ApprovalTrackerIdOptions: combination.ApprovalTrackerIdOptions,
-		ChallengeTrackerIdOptions: combination.ChallengeTrackerIdOptions,
-	}
-}
 
-func CastFromCollectionCombinationToOutgoingCombination(combination *IsCollectionTransferAllowed) *IsUserOutgoingTransferAllowed {
-	return &IsUserOutgoingTransferAllowed{
-		IsApproved:           combination.IsApproved,
-		BadgeIdsOptions:      combination.BadgeIdsOptions,
-		TransferTimesOptions: combination.TransferTimesOptions,
-		ToMappingOptions:            combination.ToMappingOptions,
-		InitiatedByMappingOptions:   combination.InitiatedByMappingOptions,
-		OwnershipTimesOptions: combination.OwnershipTimesOptions,
-		ApprovalTrackerIdOptions: combination.ApprovalTrackerIdOptions,
-		ChallengeTrackerIdOptions: combination.ChallengeTrackerIdOptions,
-	}
-}
+func CastIncomingTransferToCollectionTransfer(transfer *UserIncomingApproval, toAddress string) *CollectionApproval {
 
-func CastIncomingTransferToCollectionTransfer(transfer *UserApprovedIncomingTransfer, toAddress string) *CollectionApprovedTransfer {
-	allowedCombinations := []*IsCollectionTransferAllowed{}
-	for _, combination := range transfer.AllowedCombinations {
-		allowedCombinations = append(allowedCombinations, CastIncomingCombinationToCollectionCombination(combination))
-	}
+	approvalCriteria := CastIncomingApprovalCriteriaToCollectionApprovalCriteria(transfer.ApprovalCriteria)
 
-	approvalDetails := CastIncomingApprovalDetailsToCollectionApprovalDetails(transfer.ApprovalDetails)
-
-	return &CollectionApprovedTransfer{
+	return &CollectionApproval{
 		ToMappingId:                        toAddress,
 		FromMappingId:                      transfer.FromMappingId,
 		InitiatedByMappingId:               transfer.InitiatedByMappingId,
 		TransferTimes:                      transfer.TransferTimes,
 		BadgeIds:                           transfer.BadgeIds,
 		OwnershipTimes: 								  	transfer.OwnershipTimes,
-		AllowedCombinations:                allowedCombinations,
-		ApprovalDetails:                    approvalDetails,
+		ApprovalCriteria:                    approvalCriteria,
 		ApprovalId: transfer.ApprovalId,
 		ApprovalTrackerId: transfer.ApprovalTrackerId,
 		ChallengeTrackerId: transfer.ChallengeTrackerId,
+		Uri: transfer.Uri,
+		CustomData: transfer.CustomData,
+
+		IsApproved:           transfer.IsApproved,
+		BadgeIdsOptions:      transfer.BadgeIdsOptions,
+		TransferTimesOptions: transfer.TransferTimesOptions,
+		FromMappingOptions:            transfer.FromMappingOptions,
+		InitiatedByMappingOptions:   transfer.InitiatedByMappingOptions,
+		OwnershipTimesOptions: transfer.OwnershipTimesOptions,
+		ApprovalTrackerIdOptions: transfer.ApprovalTrackerIdOptions,
+		ChallengeTrackerIdOptions: transfer.ChallengeTrackerIdOptions,
 	}
 }
 
-func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApprovedTransfer) *UserApprovedIncomingTransfer {
-	allowedCombinations := []*IsUserIncomingTransferAllowed{}
-	for _, combination := range transfer.AllowedCombinations {
-		allowedCombinations = append(allowedCombinations, CastFromCollectionCombinationToIncomingCombination(combination))
-	}
+func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApproval) *UserIncomingApproval {
 
-	approvalDetails := CastFromCollectionApprovalDetailsToIncomingApprovalDetails(transfer.ApprovalDetails)
+	approvalCriteria := CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(transfer.ApprovalCriteria)
 
-	return &UserApprovedIncomingTransfer{
+	return &UserIncomingApproval{
 		FromMappingId:                      transfer.FromMappingId,
 		InitiatedByMappingId:               transfer.InitiatedByMappingId,
 		TransferTimes:                      transfer.TransferTimes,
 		BadgeIds:                           transfer.BadgeIds,
 		OwnershipTimes: 								  			transfer.OwnershipTimes,
-		AllowedCombinations:                allowedCombinations,
-		ApprovalDetails:                    approvalDetails,
+		ApprovalCriteria:                    approvalCriteria,
 		ApprovalId: transfer.ApprovalId,
 		ApprovalTrackerId: transfer.ApprovalTrackerId,
 		ChallengeTrackerId: transfer.ChallengeTrackerId,
+		Uri: transfer.Uri,
+		CustomData: transfer.CustomData,
+
+		IsApproved:           transfer.IsApproved,
+		BadgeIdsOptions:      transfer.BadgeIdsOptions,
+		TransferTimesOptions: transfer.TransferTimesOptions,
+		FromMappingOptions:          transfer.FromMappingOptions,
+		InitiatedByMappingOptions:   transfer.InitiatedByMappingOptions,
+		OwnershipTimesOptions: transfer.OwnershipTimesOptions,
+		ApprovalTrackerIdOptions: transfer.ApprovalTrackerIdOptions,
+		ChallengeTrackerIdOptions: transfer.ChallengeTrackerIdOptions,
 	}
 }
 
-func CastIncomingCombinationToCollectionCombination(combination *IsUserIncomingTransferAllowed) *IsCollectionTransferAllowed {
-	return &IsCollectionTransferAllowed{
-		IsApproved:           combination.IsApproved,
-		BadgeIdsOptions:      combination.BadgeIdsOptions,
-		TransferTimesOptions: combination.TransferTimesOptions,
-		FromMappingOptions:            combination.FromMappingOptions,
-		InitiatedByMappingOptions:   combination.InitiatedByMappingOptions,
-		OwnershipTimesOptions: combination.OwnershipTimesOptions,
-		ApprovalTrackerIdOptions: combination.ApprovalTrackerIdOptions,
-		ChallengeTrackerIdOptions: combination.ChallengeTrackerIdOptions,
-	}
-}
-
-func CastFromCollectionCombinationToIncomingCombination(combination *IsCollectionTransferAllowed) *IsUserIncomingTransferAllowed {
-	return &IsUserIncomingTransferAllowed{
-		IsApproved:           combination.IsApproved,
-		BadgeIdsOptions:      combination.BadgeIdsOptions,
-		TransferTimesOptions: combination.TransferTimesOptions,
-		FromMappingOptions:          combination.FromMappingOptions,
-		InitiatedByMappingOptions:   combination.InitiatedByMappingOptions,
-		OwnershipTimesOptions: combination.OwnershipTimesOptions,
-		ApprovalTrackerIdOptions: combination.ApprovalTrackerIdOptions,
-		ChallengeTrackerIdOptions: combination.ChallengeTrackerIdOptions,
-	}
-}
-
-
-func CastIncomingApprovalDetailsToCollectionApprovalDetails(approvalDetails *IncomingApprovalDetails) *ApprovalDetails {
-	if approvalDetails == nil {
+func CastIncomingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *IncomingApprovalCriteria) *ApprovalCriteria {
+	if approvalCriteria == nil {
 		return nil
 	}
 
-	return &ApprovalDetails{
-		ApprovalAmounts: approvalDetails.ApprovalAmounts,
-		MaxNumTransfers: approvalDetails.MaxNumTransfers,
-		RequireFromEqualsInitiatedBy: approvalDetails.RequireFromEqualsInitiatedBy,
-		RequireFromDoesNotEqualInitiatedBy: approvalDetails.RequireFromDoesNotEqualInitiatedBy,
-		Uri: approvalDetails.Uri,
-		CustomData: approvalDetails.CustomData,
-		PredeterminedBalances: approvalDetails.PredeterminedBalances,
-		MustOwnBadges: approvalDetails.MustOwnBadges,
-		MerkleChallenge: approvalDetails.MerkleChallenge,
+	return &ApprovalCriteria{
+		ApprovalAmounts: approvalCriteria.ApprovalAmounts,
+		MaxNumTransfers: approvalCriteria.MaxNumTransfers,
+		RequireFromEqualsInitiatedBy: approvalCriteria.RequireFromEqualsInitiatedBy,
+		RequireFromDoesNotEqualInitiatedBy: approvalCriteria.RequireFromDoesNotEqualInitiatedBy,
+		PredeterminedBalances: approvalCriteria.PredeterminedBalances,
+		MustOwnBadges: approvalCriteria.MustOwnBadges,
+		MerkleChallenge: approvalCriteria.MerkleChallenge,
 	}
 }
 
-func CastOutgoingApprovalDetailsToCollectionApprovalDetails(approvalDetails *OutgoingApprovalDetails) *ApprovalDetails {
-	if approvalDetails == nil {
+func CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *OutgoingApprovalCriteria) *ApprovalCriteria {
+	if approvalCriteria == nil {
 		return nil
 	}
 
-	return &ApprovalDetails{
-		ApprovalAmounts: approvalDetails.ApprovalAmounts,
-		MaxNumTransfers: approvalDetails.MaxNumTransfers,
-		RequireToEqualsInitiatedBy: approvalDetails.RequireToEqualsInitiatedBy,
-		RequireToDoesNotEqualInitiatedBy: approvalDetails.RequireToDoesNotEqualInitiatedBy,
-		Uri: approvalDetails.Uri,
-		CustomData: approvalDetails.CustomData,
-		PredeterminedBalances: approvalDetails.PredeterminedBalances,
-		MustOwnBadges: approvalDetails.MustOwnBadges,
-		MerkleChallenge: approvalDetails.MerkleChallenge,
+	return &ApprovalCriteria{
+		ApprovalAmounts: approvalCriteria.ApprovalAmounts,
+		MaxNumTransfers: approvalCriteria.MaxNumTransfers,
+		RequireToEqualsInitiatedBy: approvalCriteria.RequireToEqualsInitiatedBy,
+		RequireToDoesNotEqualInitiatedBy: approvalCriteria.RequireToDoesNotEqualInitiatedBy,
+		PredeterminedBalances: approvalCriteria.PredeterminedBalances,
+		MustOwnBadges: approvalCriteria.MustOwnBadges,
+		MerkleChallenge: approvalCriteria.MerkleChallenge,
 	}
 }
 
-func CastFromCollectionApprovalDetailsToIncomingApprovalDetails(approvalDetails *ApprovalDetails) *IncomingApprovalDetails {
-	return &IncomingApprovalDetails{
-		ApprovalAmounts: approvalDetails.ApprovalAmounts,
-		MaxNumTransfers: approvalDetails.MaxNumTransfers,
-		RequireFromEqualsInitiatedBy: approvalDetails.RequireFromEqualsInitiatedBy,
-		RequireFromDoesNotEqualInitiatedBy: approvalDetails.RequireFromDoesNotEqualInitiatedBy,
-		Uri: approvalDetails.Uri,
-		CustomData: approvalDetails.CustomData,
-		PredeterminedBalances: approvalDetails.PredeterminedBalances,
-		MustOwnBadges: approvalDetails.MustOwnBadges,
-		MerkleChallenge: approvalDetails.MerkleChallenge,
+func CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(approvalCriteria *ApprovalCriteria) *IncomingApprovalCriteria {
+	return &IncomingApprovalCriteria{
+		ApprovalAmounts: approvalCriteria.ApprovalAmounts,
+		MaxNumTransfers: approvalCriteria.MaxNumTransfers,
+		RequireFromEqualsInitiatedBy: approvalCriteria.RequireFromEqualsInitiatedBy,
+		RequireFromDoesNotEqualInitiatedBy: approvalCriteria.RequireFromDoesNotEqualInitiatedBy,
+		PredeterminedBalances: approvalCriteria.PredeterminedBalances,
+		MustOwnBadges: approvalCriteria.MustOwnBadges,
+		MerkleChallenge: approvalCriteria.MerkleChallenge,
 	}
 }
 
-func CastFromCollectionApprovalDetailsToOutgoingApprovalDetails(approvalDetails *ApprovalDetails) *OutgoingApprovalDetails {
-	return &OutgoingApprovalDetails{
-		ApprovalAmounts: approvalDetails.ApprovalAmounts,
-		MaxNumTransfers: approvalDetails.MaxNumTransfers,
-		RequireToEqualsInitiatedBy: approvalDetails.RequireToEqualsInitiatedBy,
-		RequireToDoesNotEqualInitiatedBy: approvalDetails.RequireToDoesNotEqualInitiatedBy,
-		Uri: approvalDetails.Uri,
-		CustomData: approvalDetails.CustomData,
-		PredeterminedBalances: approvalDetails.PredeterminedBalances,
-		MustOwnBadges: approvalDetails.MustOwnBadges,
-		MerkleChallenge: approvalDetails.MerkleChallenge,
+func CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(approvalCriteria *ApprovalCriteria) *OutgoingApprovalCriteria {
+	return &OutgoingApprovalCriteria{
+		ApprovalAmounts: approvalCriteria.ApprovalAmounts,
+		MaxNumTransfers: approvalCriteria.MaxNumTransfers,
+		RequireToEqualsInitiatedBy: approvalCriteria.RequireToEqualsInitiatedBy,
+		RequireToDoesNotEqualInitiatedBy: approvalCriteria.RequireToDoesNotEqualInitiatedBy,
+		PredeterminedBalances: approvalCriteria.PredeterminedBalances,
+		MustOwnBadges: approvalCriteria.MustOwnBadges,
+		MerkleChallenge: approvalCriteria.MerkleChallenge,
 	}
 }

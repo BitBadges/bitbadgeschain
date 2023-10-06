@@ -26,40 +26,40 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 			if !found {
 				toUserBalance = &types.UserBalanceStore{
 					Balances:                          []*types.Balance{},
-					ApprovedOutgoingTransfers: collection.DefaultUserApprovedOutgoingTransfers,
-					ApprovedIncomingTransfers: collection.DefaultUserApprovedIncomingTransfers,
+					OutgoingApprovals: collection.DefaultUserOutgoingApprovals,
+					IncomingApprovals: collection.DefaultUserIncomingApprovals,
 					UserPermissions: 								   collection.DefaultUserPermissions,
 				}
 			}
 
-			if transfer.PrecalculationDetails != nil && transfer.PrecalculationDetails.ApprovalId != "" {
-				approvedTransfers := collection.CollectionApprovedTransfers
-				if transfer.PrecalculationDetails.ApproverAddress != "" {
-					if transfer.PrecalculationDetails.ApproverAddress != to && transfer.PrecalculationDetails.ApproverAddress != transfer.From {
-						return sdkerrors.Wrapf(ErrNotImplemented, "approval id address %s does not match to or from address", transfer.PrecalculationDetails.ApproverAddress)
+			if transfer.PrecalculateBalancesFromApproval != nil && transfer.PrecalculateBalancesFromApproval.ApprovalId != "" {
+				approvals := collection.CollectionApprovals
+				if transfer.PrecalculateBalancesFromApproval.ApproverAddress != "" {
+					if transfer.PrecalculateBalancesFromApproval.ApproverAddress != to && transfer.PrecalculateBalancesFromApproval.ApproverAddress != transfer.From {
+						return sdkerrors.Wrapf(ErrNotImplemented, "approval id address %s does not match to or from address", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
 					}
 
-					if transfer.PrecalculationDetails.ApproverAddress == to {
-						if transfer.PrecalculationDetails.ApprovalLevel == "incoming" {
-							userApprovedTransfers := toUserBalance.ApprovedIncomingTransfers
-							approvedTransfers = types.CastIncomingTransfersToCollectionTransfers(userApprovedTransfers, to)
+					if transfer.PrecalculateBalancesFromApproval.ApproverAddress == to {
+						if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "incoming" {
+							userApprovals := toUserBalance.IncomingApprovals
+							approvals = types.CastIncomingTransfersToCollectionTransfers(userApprovals, to)
 						} else {
-							userApprovedTransfers := toUserBalance.ApprovedOutgoingTransfers
-							approvedTransfers = types.CastOutgoingTransfersToCollectionTransfers(userApprovedTransfers, to)
+							userApprovals := toUserBalance.OutgoingApprovals
+							approvals = types.CastOutgoingTransfersToCollectionTransfers(userApprovals, to)
 						}
 					} else {
-						if transfer.PrecalculationDetails.ApprovalLevel == "outgoing" {
-							userApprovedTransfers := fromUserBalance.ApprovedOutgoingTransfers
-							approvedTransfers = types.CastOutgoingTransfersToCollectionTransfers(userApprovedTransfers, transfer.From)
+						if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "outgoing" {
+							userApprovals := fromUserBalance.OutgoingApprovals
+							approvals = types.CastOutgoingTransfersToCollectionTransfers(userApprovals, transfer.From)
 						} else {
-							userApprovedTransfers := fromUserBalance.ApprovedIncomingTransfers
-							approvedTransfers = types.CastIncomingTransfersToCollectionTransfers(userApprovedTransfers, transfer.From)
+							userApprovals := fromUserBalance.IncomingApprovals
+							approvals = types.CastIncomingTransfersToCollectionTransfers(userApprovals, transfer.From)
 						}
 					}
 				}
 
 				//Precaluclate the balances that will be transferred
-				transfer.Balances, err = k.GetPredeterminedBalancesForPrecalculationId(ctx, approvedTransfers, collection, "", transfer.PrecalculationDetails.ApprovalId, transfer.PrecalculationDetails.ApprovalLevel, transfer.PrecalculationDetails.ApproverAddress, transfer.MerkleProofs, initiatedBy)
+				transfer.Balances, err = k.GetPredeterminedBalancesForPrecalculationId(ctx, approvals, collection, "", transfer.PrecalculateBalancesFromApproval.ApprovalId, transfer.PrecalculateBalancesFromApproval.ApprovalLevel, transfer.PrecalculateBalancesFromApproval.ApproverAddress, transfer.MerkleProofs, initiatedBy)
 				if err != nil {
 					return err
 				}

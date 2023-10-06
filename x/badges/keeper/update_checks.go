@@ -165,8 +165,8 @@ func (k Keeper) CheckTimedUpdateWithBadgeIdsPermission(ctx sdk.Context, detailsT
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
 
-func (k Keeper) CheckCollectionApprovedTransferPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.CollectionApprovedTransferPermission, managerAddress string, permissionStr string) error {
-	castedPermissions, err := k.CastCollectionApprovedTransferPermissionToUniversalPermission(ctx, managerAddress, permissions)
+func (k Keeper) CheckCollectionApprovalPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.CollectionApprovalPermission, managerAddress string, permissionStr string) error {
+	castedPermissions, err := k.CastCollectionApprovalPermissionToUniversalPermission(ctx, managerAddress, permissions)
 	if err != nil {
 		return err
 	}
@@ -176,8 +176,8 @@ func (k Keeper) CheckCollectionApprovedTransferPermission(ctx sdk.Context, detai
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
 
-func (k Keeper) CheckUserApprovedOutgoingTransferPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.UserApprovedOutgoingTransferPermission, managerAddress string, permissionStr string) error {
-	castedPermissions, err := k.CastUserApprovedOutgoingTransferPermissionToUniversalPermission(ctx, managerAddress, permissions)
+func (k Keeper) CheckUserOutgoingApprovalPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.UserOutgoingApprovalPermission, managerAddress string, permissionStr string) error {
+	castedPermissions, err := k.CastUserOutgoingApprovalPermissionToUniversalPermission(ctx, managerAddress, permissions)
 	if err != nil {
 		return err
 	}
@@ -187,8 +187,8 @@ func (k Keeper) CheckUserApprovedOutgoingTransferPermission(ctx sdk.Context, det
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
 
-func (k Keeper) CheckUserApprovedIncomingTransferPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.UserApprovedIncomingTransferPermission, managerAddress string, permissionStr string) error {
-	castedPermissions, err := k.CastUserApprovedIncomingTransferPermissionToUniversalPermission(ctx, managerAddress, permissions)
+func (k Keeper) CheckUserIncomingApprovalPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.UserIncomingApprovalPermission, managerAddress string, permissionStr string) error {
+	castedPermissions, err := k.CastUserIncomingApprovalPermissionToUniversalPermission(ctx, managerAddress, permissions)
 	if err != nil {
 		return err
 	}

@@ -112,51 +112,57 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "aunts", Type: "MerklePathItem[]"},
 		{Name: "leaf", Type: "string"},
 	}
-	// UserApprovedOutgoingTransferTimelineTypes := []apitypes.Type{
-	// 	{Name: "approvedOutgoingTransfers", Type: "UserApprovedOutgoingTransfer[]"},
-	// 	{Name: "timelineTimes", Type: "UintRange[]"},
-	// }
-	// UserApprovedIncomingTransferTimelineTypes := []apitypes.Type{
-	// 	{Name: "approvedIncomingTransfers", Type: "UserApprovedIncomingTransfer[]"},
-	// 	{Name: "timelineTimes", Type: "UintRange[]"},
-	// }
 	UserPermissionsTypes := []apitypes.Type{
-		{Name: "canUpdateApprovedOutgoingTransfers", Type: "UserApprovedOutgoingTransferPermission[]"},
-		{Name: "canUpdateApprovedIncomingTransfers", Type: "UserApprovedIncomingTransferPermission[]"},
+		{Name: "canUpdateOutgoingApprovals", Type: "UserOutgoingApprovalPermission[]"},
+		{Name: "canUpdateIncomingApprovals", Type: "UserIncomingApprovalPermission[]"},
 	}
-	UserApprovedOutgoingTransferTypes := []apitypes.Type{
+	UserOutgoingApprovalTypes := []apitypes.Type{
 		{Name: "toMappingId", Type: "string"},
 		{Name: "initiatedByMappingId", Type: "string"},
 		{Name: "transferTimes", Type: "UintRange[]"},
 		{Name: "badgeIds", Type: "UintRange[]"},
 		{Name: "ownershipTimes", Type: "UintRange[]"},
-		{Name: "approvalId", Type: "string"},
 		{Name: "approvalTrackerId", Type: "string"},
 		{Name: "challengeTrackerId", Type: "string"},
-		{Name: "allowedCombinations", Type: "IsUserOutgoingTransferAllowed[]"},
-		{Name: "approvalDetails", Type: "OutgoingApprovalDetails"},
+		{Name: "approvalCriteria", Type: "OutgoingApprovalCriteria"},
+		{Name: "toMappingOptions", Type: "ValueOptions"},
+		{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
+		{Name: "transferTimesOptions", Type: "ValueOptions"},
+		{Name: "badgeIdsOptions", Type: "ValueOptions"},
+		{Name: "ownershipTimesOptions", Type: "ValueOptions"},
+		{Name: "approvalTrackerIdOptions", Type: "ValueOptions"},
+		{Name: "challengeTrackerIdOptions", Type: "ValueOptions"},
+		{Name: "isApproved", Type: "bool"},
+		{Name: "uri", Type: "string"},
+		{Name: "customData", Type: "string"},
+		{Name: "approvalId", Type: "string"},
+		{Name: "approvalCriteria", Type: "OutgoingApprovalCriteria"},
 	}
-	UserApprovedIncomingTransferTypes := []apitypes.Type{
+	
+	UserIncomingApprovalTypes := []apitypes.Type{
 		{Name: "fromMappingId", Type: "string"},
 		{Name: "initiatedByMappingId", Type: "string"},
 		{Name: "transferTimes", Type: "UintRange[]"},
 		{Name: "badgeIds", Type: "UintRange[]"},
 		{Name: "ownershipTimes", Type: "UintRange[]"},
-		{Name: "approvalId", Type: "string"},
 		{Name: "approvalTrackerId", Type: "string"},
 		{Name: "challengeTrackerId", Type: "string"},
-		{Name: "allowedCombinations", Type: "IsUserIncomingTransferAllowed[]"},
-		{Name: "approvalDetails", Type: "IncomingApprovalDetails"},
+	
+		{Name: "fromMappingOptions", Type: "ValueOptions"},
+		{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
+		{Name: "transferTimesOptions", Type: "ValueOptions"},
+		{Name: "badgeIdsOptions", Type: "ValueOptions"},
+		{Name: "ownershipTimesOptions", Type: "ValueOptions"},
+		{Name: "approvalTrackerIdOptions", Type: "ValueOptions"},
+		{Name: "challengeTrackerIdOptions", Type: "ValueOptions"},
+
+		{Name: "isApproved", Type: "bool"},
+		{Name: "uri", Type: "string"},
+		{Name: "customData", Type: "string"},
+		{Name: "approvalId", Type: "string"},
+		{Name: "approvalCriteria", Type: "IncomingApprovalCriteria"},
 	}
-	UserApprovedOutgoingTransferPermissionTypes := []apitypes.Type{
-		{Name: "defaultValues", Type: "UserApprovedOutgoingTransferDefaultValues"},
-		{Name: "combinations", Type: "UserApprovedOutgoingTransferCombination[]"},
-	}
-	UserApprovedIncomingTransferPermissionTypes := []apitypes.Type{
-		{Name: "defaultValues", Type: "UserApprovedIncomingTransferDefaultValues"},
-		{Name: "combinations", Type: "UserApprovedIncomingTransferCombination[]"},
-	}
-	UserApprovedOutgoingTransferDefaultValuesTypes := []apitypes.Type{
+	UserOutgoingApprovalPermissionTypes := []apitypes.Type{
 		{Name: "toMappingId", Type: "string"},
 		{Name: "initiatedByMappingId", Type: "string"},
 		{Name: "transferTimes", Type: "UintRange[]"},
@@ -167,8 +173,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 
 		{Name: "permittedTimes", Type: "UintRange[]"},
 		{Name: "forbiddenTimes", Type: "UintRange[]"},
-	}
-	UserApprovedOutgoingTransferCombinationTypes := []apitypes.Type{
+
 		{Name: "toMappingOptions", Type: "ValueOptions"},
 		{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
 		{Name: "transferTimesOptions", Type: "ValueOptions"},
@@ -179,7 +184,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "permittedTimesOptions", Type: "ValueOptions"},
 		{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
 	}
-	UserApprovedIncomingTransferDefaultValuesTypes := []apitypes.Type{
+	UserIncomingApprovalPermissionTypes := []apitypes.Type{
 		{Name: "fromMappingId", Type: "string"},
 		{Name: "initiatedByMappingId", Type: "string"},
 		{Name: "transferTimes", Type: "UintRange[]"},
@@ -190,8 +195,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 
 		{Name: "permittedTimes", Type: "UintRange[]"},
 		{Name: "forbiddenTimes", Type: "UintRange[]"},
-	}
-	UserApprovedIncomingTransferCombinationTypes := []apitypes.Type{
+
 		{Name: "fromMappingOptions", Type: "ValueOptions"},
 		{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
 		{Name: "transferTimesOptions", Type: "ValueOptions"},
@@ -202,20 +206,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "permittedTimesOptions", Type: "ValueOptions"},
 		{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
 	}
-	IsUserOutgoingTransferAllowedTypes := []apitypes.Type{
-		{Name: "toMappingOptions", Type: "ValueOptions"},
-		{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
-		{Name: "transferTimesOptions", Type: "ValueOptions"},
-		{Name: "badgeIdsOptions", Type: "ValueOptions"},
-		{Name: "ownershipTimesOptions", Type: "ValueOptions"},
-		{Name: "approvalTrackerIdOptions", Type: "ValueOptions"},
-		{Name: "challengeTrackerIdOptions", Type: "ValueOptions"},
-		{Name: "isApproved", Type: "bool"},
-	}
-	OutgoingApprovalDetailsTypes := []apitypes.Type{
-		{Name: "uri", Type: "string"},
-		{Name: "customData", Type: "string"},
-
+	OutgoingApprovalCriteriaTypes := []apitypes.Type{
 		{Name: "mustOwnBadges", Type: "MustOwnBadges[]"},
 		{Name: "merkleChallenge", Type: "MerkleChallenge"},
 		{Name: "predeterminedBalances", Type: "PredeterminedBalances"},
@@ -225,20 +216,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "requireToEqualsInitiatedBy", Type: "bool"},
 		{Name: "requireToDoesNotEqualInitiatedBy", Type: "bool"},
 	}
-	IsUserIncomingTransferAllowedTypes := []apitypes.Type{
-		{Name: "fromMappingOptions", Type: "ValueOptions"},
-		{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
-		{Name: "transferTimesOptions", Type: "ValueOptions"},
-		{Name: "badgeIdsOptions", Type: "ValueOptions"},
-		{Name: "ownershipTimesOptions", Type: "ValueOptions"},
-		{Name: "approvalTrackerIdOptions", Type: "ValueOptions"},
-		{Name: "challengeTrackerIdOptions", Type: "ValueOptions"},
-		{Name: "isApproved", Type: "bool"},
-	}
-	IncomingApprovalDetailsTypes := []apitypes.Type{
-		{Name: "uri", Type: "string"},
-		{Name: "customData", Type: "string"},
-
+	IncomingApprovalCriteriaTypes := []apitypes.Type{
 		{Name: "mustOwnBadges", Type: "MustOwnBadges[]"},
 		{Name: "merkleChallenge", Type: "MerkleChallenge"},
 		{Name: "predeterminedBalances", Type: "PredeterminedBalances"},
@@ -261,7 +239,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "expectedProofLength", Type: "string"},
 		{Name: "useCreatorAddressAsLeaf", Type: "bool"},
 		{Name: "maxOneUsePerLeaf", Type: "bool"},
-		{Name: "useLeafIndexForTransferOrder", Type: "bool"},
 		{Name: "uri", Type: "string"},
 		{Name: "customData", Type: "string"},
 	}
@@ -333,7 +310,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "from", Type: "string"},
 				{Name: "toAddresses", Type: "string[]"},
 				{Name: "balances", Type: "Balance[]"},
-				{Name: "precalculationDetails", Type: "ApprovalIdentifierDetails"},
+				{Name: "precalculateBalancesFromApproval", Type: "ApprovalIdentifierDetails"},
 				{Name: "merkleProofs", Type: "MerkleProof[]"},
 				{Name: "memo", Type: "string"},
 				{Name: "prioritizedApprovals", Type: "ApprovalIdentifierDetails[]"},
@@ -351,34 +328,28 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			"MerklePathItem": proofItemTypes,
 		}
 
-	case TypeMsgUpdateUserApprovedTransfers:
+	case TypeMsgUpdateUserApprovals:
 		return map[string][]apitypes.Type{
 			"MsgValue": {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "string"},
-				{Name: "updateApprovedOutgoingTransfers", Type: "bool"},
-				{Name: "approvedOutgoingTransfers", Type: "UserApprovedOutgoingTransfer[]"},
-				{Name: "updateApprovedIncomingTransfers", Type: "bool"},
-				{Name: "approvedIncomingTransfers", Type: "UserApprovedIncomingTransfer[]"},
+				{Name: "updateOutgoingApprovals", Type: "bool"},
+				{Name: "outgoingApprovals", Type: "UserOutgoingApproval[]"},
+				{Name: "updateIncomingApprovals", Type: "bool"},
+				{Name: "incomingApprovals", Type: "UserIncomingApproval[]"},
 				{Name: "updateUserPermissions", Type: "bool"},
 				{Name: "userPermissions", Type: "UserPermissions"},
 			},
 			"UserPermissions": UserPermissionsTypes,
-			"UserApprovedOutgoingTransfer": UserApprovedOutgoingTransferTypes,
-			"UserApprovedIncomingTransfer": UserApprovedIncomingTransferTypes,
-			"UserApprovedOutgoingTransferPermission": UserApprovedOutgoingTransferPermissionTypes,
-			"UserApprovedIncomingTransferPermission": UserApprovedIncomingTransferPermissionTypes,
-			"UserApprovedOutgoingTransferDefaultValues": UserApprovedOutgoingTransferDefaultValuesTypes,
-			"UserApprovedOutgoingTransferCombination": UserApprovedOutgoingTransferCombinationTypes,
-			"UserApprovedIncomingTransferDefaultValues": UserApprovedIncomingTransferDefaultValuesTypes,
-			"UserApprovedIncomingTransferCombination": UserApprovedIncomingTransferCombinationTypes,
+			"UserOutgoingApproval": UserOutgoingApprovalTypes,
+			"UserIncomingApproval": UserIncomingApprovalTypes,
+			"UserOutgoingApprovalPermission": UserOutgoingApprovalPermissionTypes,
+			"UserIncomingApprovalPermission": UserIncomingApprovalPermissionTypes,
 			"Balance": balanceTypes,
 			"UintRange": uintRangeTypes,
 			"ValueOptions": valueOptionsTypes,
-			"IsUserOutgoingTransferAllowed": IsUserOutgoingTransferAllowedTypes,
-			"OutgoingApprovalDetails": OutgoingApprovalDetailsTypes,
-			"IsUserIncomingTransferAllowed": IsUserIncomingTransferAllowedTypes,
-			"IncomingApprovalDetails": IncomingApprovalDetailsTypes,
+			"OutgoingApprovalCriteria": OutgoingApprovalCriteriaTypes,
+			"IncomingApprovalCriteria": IncomingApprovalCriteriaTypes,
 			"MustOwnBadges": MustOwnBadgesTypes,
 			"MerkleChallenge": MerkleChallengeTypes,
 			"PredeterminedBalances": PredeterminedBalancesTypes,
@@ -396,8 +367,8 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "string"},
 				{Name: "balancesType", Type: "string"},
-				{Name: "defaultApprovedOutgoingTransfers", Type: "UserApprovedOutgoingTransfer[]"},
-				{Name: "defaultApprovedIncomingTransfers", Type: "UserApprovedIncomingTransfer[]"},
+				{Name: "defaultOutgoingApprovals", Type: "UserOutgoingApproval[]"},
+				{Name: "defaultIncomingApprovals", Type: "UserIncomingApproval[]"},
 				{Name: "defaultUserPermissions", Type: "UserPermissions"},
 				{Name: "badgesToCreate", Type: "Balance[]"},
 				{Name: "updateCollectionPermissions", Type: "bool"},
@@ -413,8 +384,8 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "updateCustomDataTimeline", Type: "bool"},
 				{Name: "customDataTimeline", Type: "CustomDataTimeline[]"},
 				// {Name: "inheritedCollectionId", Type: "string"},
-				{Name: "updateCollectionApprovedTransfers", Type: "bool"},
-				{Name: "collectionApprovedTransfers", Type: "CollectionApprovedTransfer[]"},
+				{Name: "updateCollectionApprovals", Type: "bool"},
+				{Name: "collectionApprovals", Type: "CollectionApproval[]"},
 				{Name: "updateStandardsTimeline", Type: "bool"},
 				{Name: "standardsTimeline", Type: "StandardsTimeline[]"},
 				{Name: "updateContractAddressTimeline", Type: "bool"},
@@ -434,7 +405,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "canUpdateCollectionMetadata", Type: "TimedUpdatePermission[]"},
 				{Name: "canCreateMoreBadges", Type: "BalancesActionPermission[]"},
 				{Name: "canUpdateBadgeMetadata", Type: "TimedUpdateWithBadgeIdsPermission[]"},
-				{Name: "canUpdateCollectionApprovedTransfers", Type: "CollectionApprovedTransferPermission[]"},
+				{Name: "canUpdateCollectionApprovals", Type: "CollectionApprovalPermission[]"},
 			},
 			"ManagerTimeline": {
 				{Name: "manager", Type: "string"},
@@ -468,18 +439,30 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "isArchived", Type: "bool"},
 				{Name: "timelineTimes", Type: "UintRange[]"},
 			},
-			"CollectionApprovedTransfer": {
+			"CollectionApproval": {
 				{Name: "fromMappingId", Type: "string"},
 				{Name: "toMappingId", Type: "string"},
 				{Name: "initiatedByMappingId", Type: "string"},
 				{Name: "transferTimes", Type: "UintRange[]"},
 				{Name: "badgeIds", Type: "UintRange[]"},
 				{Name: "ownershipTimes", Type: "UintRange[]"},
-				{Name: "approvalId", Type: "string"},
 				{Name: "approvalTrackerId", Type: "string"},
 				{Name: "challengeTrackerId", Type: "string"},
-				{Name: "allowedCombinations", Type: "IsCollectionTransferAllowed[]"},
-				{Name: "approvalDetails", Type: "ApprovalDetails"},
+
+				{Name: "fromMappingOptions", Type: "ValueOptions"},
+				{Name: "toMappingOptions", Type: "ValueOptions"},
+				{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
+				{Name: "transferTimesOptions", Type: "ValueOptions"},
+				{Name: "badgeIdsOptions", Type: "ValueOptions"},
+				{Name: "ownershipTimesOptions", Type: "ValueOptions"},
+				{Name: "approvalTrackerIdOptions", Type: "ValueOptions"},
+				{Name: "challengeTrackerIdOptions", Type: "ValueOptions"},
+				{Name: "isApproved", Type: "bool"},
+
+				{Name: "uri", Type: "string"},
+				{Name: "customData", Type: "string"},
+				{Name: "approvalId", Type: "string"},
+				{Name: "approvalCriteria", Type: "ApprovalCriteria"},
 			},
 			"UintRange": uintRangeTypes,
 			"Balance": balanceTypes,
@@ -496,50 +479,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "uri", Type: "string"},
 				{Name: "customData", Type: "string"},
 			},
-			"IsCollectionTransferAllowed": {
-				{Name: "fromMappingOptions", Type: "ValueOptions"},
-				{Name: "toMappingOptions", Type: "ValueOptions"},
-				{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
-				{Name: "transferTimesOptions", Type: "ValueOptions"},
-				{Name: "badgeIdsOptions", Type: "ValueOptions"},
-				{Name: "ownershipTimesOptions", Type: "ValueOptions"},
-				{Name: "approvalTrackerIdOptions", Type: "ValueOptions"},
-				{Name: "challengeTrackerIdOptions", Type: "ValueOptions"},
-				{Name: "isApproved", Type: "bool"},
-			},
-			"ActionPermission": {
-				{Name: "defaultValues", Type: "ActionDefaultValues"},
-				{Name: "combinations", Type: "ActionCombination[]"},
-			},
-			"TimedUpdatePermission": {
-				{Name: "defaultValues", Type: "TimedUpdateDefaultValues"},
-				{Name: "combinations", Type: "TimedUpdateCombination[]"},
-			},
-			"BalancesActionPermission": {
-				{Name: "defaultValues", Type: "BalancesActionDefaultValues"},
-				{Name: "combinations", Type: "BalancesActionCombination[]"},
-			},
-			"TimedUpdateWithBadgeIdsPermission": {
-				{Name: "defaultValues", Type: "TimedUpdateWithBadgeIdsDefaultValues"},
-				{Name: "combinations", Type: "TimedUpdateWithBadgeIdsCombination[]"},
-			},
-			"CollectionApprovedTransferPermission": {
-				{Name: "defaultValues", Type: "CollectionApprovedTransferDefaultValues"},
-				{Name: "combinations", Type: "CollectionApprovedTransferCombination[]"},
-			},
-			"CollectionApprovedTransferCombination": {
-				{Name: "fromMappingOptions", Type: "ValueOptions"},
-				{Name: "toMappingOptions", Type: "ValueOptions"},
-				{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
-				{Name: "transferTimesOptions", Type: "ValueOptions"},
-				{Name: "badgeIdsOptions", Type: "ValueOptions"},
-				{Name: "ownershipTimesOptions", Type: "ValueOptions"},
-				{Name: "approvalTrackerIdOptions", Type: "ValueOptions"},
-				{Name: "challengeTrackerIdOptions", Type: "ValueOptions"},
-				{Name: "permittedTimesOptions", Type: "ValueOptions"},
-				{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
-			},
-			"CollectionApprovedTransferDefaultValues": {
+			"CollectionApprovalPermission": {
 				{Name: "fromMappingId", Type: "string"},
 				{Name: "toMappingId", Type: "string"},
 				{Name: "initiatedByMappingId", Type: "string"},
@@ -550,52 +490,59 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "challengeTrackerId", Type: "string"},
 				{Name: "permittedTimes", Type: "UintRange[]"},
 				{Name: "forbiddenTimes", Type: "UintRange[]"},
-			},
-			"BalancesActionCombination": {
+
+				{Name: "fromMappingOptions", Type: "ValueOptions"},
+				{Name: "toMappingOptions", Type: "ValueOptions"},
+				{Name: "initiatedByMappingOptions", Type: "ValueOptions"},
+				{Name: "transferTimesOptions", Type: "ValueOptions"},
 				{Name: "badgeIdsOptions", Type: "ValueOptions"},
 				{Name: "ownershipTimesOptions", Type: "ValueOptions"},
+				{Name: "approvalTrackerIdOptions", Type: "ValueOptions"},
+				{Name: "challengeTrackerIdOptions", Type: "ValueOptions"},
 				{Name: "permittedTimesOptions", Type: "ValueOptions"},
 				{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
 			},
-			"BalancesActionDefaultValues": {
+			"BalancesActionPermission": {
 				{Name: "badgeIds", Type: "UintRange[]"},
 				{Name: "ownershipTimes", Type: "UintRange[]"},
 				{Name: "permittedTimes", Type: "UintRange[]"},
 				{Name: "forbiddenTimes", Type: "UintRange[]"},
+				
+				{Name: "badgeIdsOptions", Type: "ValueOptions"},
+				{Name: "ownershipTimesOptions", Type: "ValueOptions"},
+				{Name: "permittedTimesOptions", Type: "ValueOptions"},
+				{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
+
+				
 			},
-			"ActionCombination": {
+			"ActionPermission": {	
+				{Name: "permittedTimes", Type: "UintRange[]"},
+				{Name: "forbiddenTimes", Type: "UintRange[]"},
+
 				{Name: "permittedTimesOptions", Type: "ValueOptions"},
 				{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
 			},
-			"ActionDefaultValues": {
+			"TimedUpdatePermission": {
+				{Name: "timelineTimes", Type: "UintRange[]"},
 				{Name: "permittedTimes", Type: "UintRange[]"},
 				{Name: "forbiddenTimes", Type: "UintRange[]"},
-			},
-			"TimedUpdateCombination": {
+
 				{Name: "timelineTimesOptions", Type: "ValueOptions"},
 				{Name: "permittedTimesOptions", Type: "ValueOptions"},
 				{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
 			},
-			"TimedUpdateDefaultValues": {
+			"TimedUpdateWithBadgeIdsPermission": {
 				{Name: "timelineTimes", Type: "UintRange[]"},
+				{Name: "badgeIds", Type: "UintRange[]"},
 				{Name: "permittedTimes", Type: "UintRange[]"},
 				{Name: "forbiddenTimes", Type: "UintRange[]"},
-			},
-			"TimedUpdateWithBadgeIdsCombination": {
+
 				{Name: "timelineTimesOptions", Type: "ValueOptions"},
 				{Name: "badgeIdsOptions", Type: "ValueOptions"},
 				{Name: "permittedTimesOptions", Type: "ValueOptions"},
 				{Name: "forbiddenTimesOptions", Type: "ValueOptions"},
 			},
-			"TimedUpdateWithBadgeIdsDefaultValues": {
-				{Name: "timelineTimes", Type: "UintRange[]"},
-				{Name: "badgeIds", Type: "UintRange[]"},
-				{Name: "permittedTimes", Type: "UintRange[]"},
-				{Name: "forbiddenTimes", Type: "UintRange[]"},
-			},
-			"ApprovalDetails": {
-				{Name: "uri", Type: "string"},
-				{Name: "customData", Type: "string"},
+			"ApprovalCriteria": {
 				{Name: "mustOwnBadges", Type: "MustOwnBadges[]"},
 				{Name: "merkleChallenge", Type: "MerkleChallenge"},
 				{Name: "predeterminedBalances", Type: "PredeterminedBalances"},
@@ -605,23 +552,17 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "requireToDoesNotEqualInitiatedBy", Type: "bool"},
 				{Name: "requireFromEqualsInitiatedBy", Type: "bool"},
 				{Name: "requireFromDoesNotEqualInitiatedBy", Type: "bool"},
-				{Name: "overridesFromApprovedOutgoingTransfers", Type: "bool"},
-				{Name: "overridesToApprovedIncomingTransfers", Type: "bool"},
+				{Name: "overridesFromOutgoingApprovals", Type: "bool"},
+				{Name: "overridesToIncomingApprovals", Type: "bool"},
 			},
 			"UserPermissions": UserPermissionsTypes,
-			"UserApprovedOutgoingTransfer": UserApprovedOutgoingTransferTypes,
-			"UserApprovedIncomingTransfer": UserApprovedIncomingTransferTypes,
-			"UserApprovedOutgoingTransferPermission": UserApprovedOutgoingTransferPermissionTypes,
-			"UserApprovedIncomingTransferPermission": UserApprovedIncomingTransferPermissionTypes,
-			"UserApprovedOutgoingTransferDefaultValues": UserApprovedOutgoingTransferDefaultValuesTypes,
-			"UserApprovedOutgoingTransferCombination": UserApprovedOutgoingTransferCombinationTypes,
-			"UserApprovedIncomingTransferDefaultValues": UserApprovedIncomingTransferDefaultValuesTypes,
-			"UserApprovedIncomingTransferCombination": UserApprovedIncomingTransferCombinationTypes,
+			"UserOutgoingApproval": UserOutgoingApprovalTypes,
+			"UserIncomingApproval": UserIncomingApprovalTypes,
+			"UserOutgoingApprovalPermission": UserOutgoingApprovalPermissionTypes,
+			"UserIncomingApprovalPermission": UserIncomingApprovalPermissionTypes,
 			"ValueOptions": valueOptionsTypes,
-			"IsUserOutgoingTransferAllowed": IsUserOutgoingTransferAllowedTypes,
-			"OutgoingApprovalDetails": OutgoingApprovalDetailsTypes,
-			"IsUserIncomingTransferAllowed": IsUserIncomingTransferAllowedTypes,
-			"IncomingApprovalDetails": IncomingApprovalDetailsTypes,
+			"OutgoingApprovalCriteria": OutgoingApprovalCriteriaTypes,
+			"IncomingApprovalCriteria": IncomingApprovalCriteriaTypes,
 			"MustOwnBadges": MustOwnBadgesTypes,
 			"MerkleChallenge": MerkleChallengeTypes,
 			"PredeterminedBalances": PredeterminedBalancesTypes,

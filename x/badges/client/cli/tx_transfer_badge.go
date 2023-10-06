@@ -24,7 +24,7 @@ your-cli-command transfer-badges '{
       "balances": [
 				...
       ],
-      "precalculationDetails": {...}, // Populate with details
+      "precalculateBalancesFromApproval": {...}, // Populate with details
       "merkleProofs": [...], // Populate with proofs
       "memo": "Transfer memo"
     }

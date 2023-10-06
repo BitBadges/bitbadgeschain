@@ -95,21 +95,21 @@ func (k Keeper) ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldPermissions [
 	return nil
 }
 
-func (k Keeper) ValidateCollectionApprovedTransferPermissionsUpdate(ctx sdk.Context, oldPermissions []*types.CollectionApprovedTransferPermission, newPermissions []*types.CollectionApprovedTransferPermission, managerAddress string) error {
-	if err := types.ValidateCollectionApprovedTransferPermissions(oldPermissions); err != nil {
+func (k Keeper) ValidateCollectionApprovalPermissionsUpdate(ctx sdk.Context, oldPermissions []*types.CollectionApprovalPermission, newPermissions []*types.CollectionApprovalPermission, managerAddress string) error {
+	if err := types.ValidateCollectionApprovalPermissions(oldPermissions); err != nil {
 		return err
 	}
 
-	if err := types.ValidateCollectionApprovedTransferPermissions(newPermissions); err != nil {
+	if err := types.ValidateCollectionApprovalPermissions(newPermissions); err != nil {
 		return err
 	}
 
-	castedOldPermissions, err := k.CastCollectionApprovedTransferPermissionToUniversalPermission(ctx, managerAddress, oldPermissions)
+	castedOldPermissions, err := k.CastCollectionApprovalPermissionToUniversalPermission(ctx, managerAddress, oldPermissions)
 	if err != nil {
 		return err
 	}
 
-	castedNewPermissions, err := k.CastCollectionApprovedTransferPermissionToUniversalPermission(ctx, managerAddress, newPermissions)
+	castedNewPermissions, err := k.CastCollectionApprovalPermissionToUniversalPermission(ctx, managerAddress, newPermissions)
 	if err != nil {
 		return err
 	}
@@ -149,21 +149,21 @@ func (k Keeper) ValidateActionPermissionUpdate(oldPermissions []*types.ActionPer
 	return nil
 }
 
-func (k Keeper) ValidateUserApprovedIncomingTransferPermissionsUpdate(ctx sdk.Context, oldPermissions []*types.UserApprovedIncomingTransferPermission, newPermissions []*types.UserApprovedIncomingTransferPermission, managerAddress string) error {
-	if err := types.ValidateUserApprovedIncomingTransferPermissions(oldPermissions); err != nil {
+func (k Keeper) ValidateUserIncomingApprovalPermissionsUpdate(ctx sdk.Context, oldPermissions []*types.UserIncomingApprovalPermission, newPermissions []*types.UserIncomingApprovalPermission, managerAddress string) error {
+	if err := types.ValidateUserIncomingApprovalPermissions(oldPermissions); err != nil {
 		return err
 	}
 
-	if err := types.ValidateUserApprovedIncomingTransferPermissions(newPermissions); err != nil {
+	if err := types.ValidateUserIncomingApprovalPermissions(newPermissions); err != nil {
 		return err
 	}
 
-	castedOldPermissions, err := k.CastUserApprovedIncomingTransferPermissionToUniversalPermission(ctx, managerAddress, oldPermissions)
+	castedOldPermissions, err := k.CastUserIncomingApprovalPermissionToUniversalPermission(ctx, managerAddress, oldPermissions)
 	if err != nil {
 		return err
 	}
 
-	castedNewPermissions, err := k.CastUserApprovedIncomingTransferPermissionToUniversalPermission(ctx, managerAddress, newPermissions)
+	castedNewPermissions, err := k.CastUserIncomingApprovalPermissionToUniversalPermission(ctx, managerAddress, newPermissions)
 	if err != nil {
 		return err
 	}
@@ -176,21 +176,21 @@ func (k Keeper) ValidateUserApprovedIncomingTransferPermissionsUpdate(ctx sdk.Co
 	return nil
 }
 
-func (k Keeper) ValidateUserApprovedOutgoingTransferPermissionsUpdate(ctx sdk.Context, oldPermissions []*types.UserApprovedOutgoingTransferPermission, newPermissions []*types.UserApprovedOutgoingTransferPermission, managerAddress string) error {
-	if err := types.ValidateUserApprovedOutgoingTransferPermissions(oldPermissions); err != nil {
+func (k Keeper) ValidateUserOutgoingApprovalPermissionsUpdate(ctx sdk.Context, oldPermissions []*types.UserOutgoingApprovalPermission, newPermissions []*types.UserOutgoingApprovalPermission, managerAddress string) error {
+	if err := types.ValidateUserOutgoingApprovalPermissions(oldPermissions); err != nil {
 		return err
 	}
 
-	if err := types.ValidateUserApprovedOutgoingTransferPermissions(newPermissions); err != nil {
+	if err := types.ValidateUserOutgoingApprovalPermissions(newPermissions); err != nil {
 		return err
 	}
 
-	castedOldPermissions, err := k.CastUserApprovedOutgoingTransferPermissionToUniversalPermission(ctx, managerAddress, oldPermissions)
+	castedOldPermissions, err := k.CastUserOutgoingApprovalPermissionToUniversalPermission(ctx, managerAddress, oldPermissions)
 	if err != nil {
 		return err
 	}
 
-	castedNewPermissions, err := k.CastUserApprovedOutgoingTransferPermissionToUniversalPermission(ctx, managerAddress, newPermissions)
+	castedNewPermissions, err := k.CastUserOutgoingApprovalPermissionToUniversalPermission(ctx, managerAddress, newPermissions)
 	if err != nil {
 		return err
 	}
@@ -212,14 +212,14 @@ func (k Keeper) ValidateUserPermissionsUpdate(ctx sdk.Context, oldPermissions *t
 		return err
 	}
 
-	if newPermissions.CanUpdateApprovedIncomingTransfers != nil {
-		if err := k.ValidateUserApprovedIncomingTransferPermissionsUpdate(ctx, oldPermissions.CanUpdateApprovedIncomingTransfers, newPermissions.CanUpdateApprovedIncomingTransfers, managerAddress); err != nil {
+	if newPermissions.CanUpdateIncomingApprovals != nil {
+		if err := k.ValidateUserIncomingApprovalPermissionsUpdate(ctx, oldPermissions.CanUpdateIncomingApprovals, newPermissions.CanUpdateIncomingApprovals, managerAddress); err != nil {
 			return err
 		}
 	}
 
-	if newPermissions.CanUpdateApprovedOutgoingTransfers != nil {
-		if err := k.ValidateUserApprovedOutgoingTransferPermissionsUpdate(ctx, oldPermissions.CanUpdateApprovedOutgoingTransfers, newPermissions.CanUpdateApprovedOutgoingTransfers, managerAddress); err != nil {
+	if newPermissions.CanUpdateOutgoingApprovals != nil {
+		if err := k.ValidateUserOutgoingApprovalPermissionsUpdate(ctx, oldPermissions.CanUpdateOutgoingApprovals, newPermissions.CanUpdateOutgoingApprovals, managerAddress); err != nil {
 			return err
 		}
 	}
@@ -297,8 +297,8 @@ func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types
 		}
 	}
 
-	if newPermissions.CanUpdateCollectionApprovedTransfers != nil {
-		if err := k.ValidateCollectionApprovedTransferPermissionsUpdate(ctx, oldPermissions.CanUpdateCollectionApprovedTransfers, newPermissions.CanUpdateCollectionApprovedTransfers, managerAddress); err != nil {
+	if newPermissions.CanUpdateCollectionApprovals != nil {
+		if err := k.ValidateCollectionApprovalPermissionsUpdate(ctx, oldPermissions.CanUpdateCollectionApprovals, newPermissions.CanUpdateCollectionApprovals, managerAddress); err != nil {
 			return err
 		}
 	}

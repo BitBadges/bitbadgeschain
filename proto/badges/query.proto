@@ -35,7 +35,7 @@ service Query {
   }
 
   rpc GetNumUsedForMerkleChallenge(QueryGetNumUsedForMerkleChallengeRequest) returns (QueryGetNumUsedForMerkleChallengeResponse) {
-    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{collectionId}/{approvalLevel}/{approverAddress}/{challengeId}/{leafIndex}";
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{collectionId}/{approvalLevel}/{approverAddress}/{challengeTrackerId}/{leafIndex}";
   }
 
   // Queries an addresses balance for a badge collection, specified by its ID.

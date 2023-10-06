@@ -24,8 +24,8 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 // the user approved transfers.
 message UserBalanceStore {
   repeated Balance balances = 1;
-  repeated UserApprovedOutgoingTransfer approvedOutgoingTransfers = 2;
-  repeated UserApprovedIncomingTransfer approvedIncomingTransfers = 3;
+  repeated UserOutgoingApproval outgoingApprovals = 2;
+  repeated UserIncomingApproval incomingApprovals = 3;
   UserPermissions userPermissions = 4;
 }
 
@@ -51,91 +51,70 @@ message MerkleChallenge {
   string expectedProofLength = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   bool useCreatorAddressAsLeaf = 3;
   bool maxOneUsePerLeaf = 4;
-  bool useLeafIndexForTransferOrder = 5;
 
   string uri = 6;
   string customData = 7;
 }
 
-message IsUserOutgoingTransferAllowed {
-  ValueOptions toMappingOptions = 2;
-  ValueOptions initiatedByMappingOptions = 3;
-  ValueOptions transferTimesOptions = 4;
-  ValueOptions badgeIdsOptions = 5;
-  ValueOptions ownershipTimesOptions = 6;
-
-  ValueOptions approvalTrackerIdOptions = 7;
-  ValueOptions challengeTrackerIdOptions = 8;
-
-  bool isApproved = 9;
-}
-
-message IsUserIncomingTransferAllowed {
-  ValueOptions fromMappingOptions = 2;
-  ValueOptions initiatedByMappingOptions = 3;
-  ValueOptions transferTimesOptions = 4;
-  ValueOptions badgeIdsOptions = 5;
-  ValueOptions ownershipTimesOptions = 6;
-
-  ValueOptions approvalTrackerIdOptions = 7;
-  ValueOptions challengeTrackerIdOptions = 8;
-
-  bool isApproved = 9;
-}
-
-// UserApprovedOutgoingTransfer defines the rules for the approval of an outgoing transfer from a user.
-// See CollectionApprovedTransfer for more details. This is the same minus a few fields.
-message UserApprovedOutgoingTransfer {
+// UserOutgoingApproval defines the rules for the approval of an outgoing transfer from a user.
+// See CollectionApproval for more details. This is the same minus a few fields.
+message UserOutgoingApproval {
   string toMappingId = 1;
   string initiatedByMappingId = 2;
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
-  repeated UintRange ownershipTimes = 10;
+  repeated UintRange ownershipTimes = 5;
+  string approvalTrackerId = 6; 
+  string challengeTrackerId = 7; 
 
-  string approvalId = 7; //if applicable
-  string approvalTrackerId = 8; //if applicable
-  string challengeTrackerId = 9; //if applicable
+  ValueOptions toMappingOptions = 8;
+  ValueOptions initiatedByMappingOptions = 9;
+  ValueOptions transferTimesOptions = 10;
+  ValueOptions badgeIdsOptions = 11;
+  ValueOptions ownershipTimesOptions = 12;
+  ValueOptions approvalTrackerIdOptions = 13;
+  ValueOptions challengeTrackerIdOptions = 14;
 
-  repeated IsUserOutgoingTransferAllowed allowedCombinations = 5;
+  bool isApproved = 15;
 
-  OutgoingApprovalDetails approvalDetails = 6;
+  //if approved, we use these. if not, these are ignored
+  string uri = 16;
+  string customData = 17;
+  string approvalId = 18; 
+  OutgoingApprovalCriteria approvalCriteria = 19;
 }
 
-// UserApprovedIncomingTransfer defines the rules for the approval of an incoming transfer to a user.
-// See CollectionApprovedTransfer for more details. This is the same minus a few fields.
-message UserApprovedIncomingTransfer {
+// UserIncomingApproval defines the rules for the approval of an incoming transfer to a user.
+// See CollectionApproval for more details. This is the same minus a few fields.
+message UserIncomingApproval {
   string fromMappingId = 1;
   string initiatedByMappingId = 2;
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
   repeated UintRange ownershipTimes = 5;
+  string approvalTrackerId = 6; // if applicable
+  string challengeTrackerId = 7; // if applicable
 
-  string approvalId = 7; //if applicable
-  string approvalTrackerId = 8; //if applicable
-  string challengeTrackerId = 9; //if applicable
+  ValueOptions fromMappingOptions = 8;
+  ValueOptions initiatedByMappingOptions = 9;
+  ValueOptions transferTimesOptions = 10;
+  ValueOptions badgeIdsOptions = 11;
+  ValueOptions ownershipTimesOptions = 12;
+  ValueOptions approvalTrackerIdOptions = 13;
+  ValueOptions challengeTrackerIdOptions = 14;
 
-  repeated IsUserIncomingTransferAllowed allowedCombinations = 6;
+  bool isApproved = 15;
 
-  IncomingApprovalDetails approvalDetails = 10;
+  string uri = 16;
+  string customData = 17;
+  string approvalId = 18; // if applicable
+  IncomingApprovalCriteria approvalCriteria = 19;
 }
 
-message IsCollectionTransferAllowed {
-  ValueOptions fromMappingOptions = 1;
-  ValueOptions toMappingOptions = 2;
-  ValueOptions initiatedByMappingOptions = 3;
-  ValueOptions transferTimesOptions = 4;
-  ValueOptions badgeIdsOptions = 5;
-  ValueOptions ownershipTimesOptions = 6;
 
-  ValueOptions approvalTrackerIdOptions = 7;
-  ValueOptions challengeTrackerIdOptions = 8;
-
-  bool isApproved = 9;
-}
-
-// CollectionApprovedTransfer defines the rules for the approval of a transfer.
+// CollectionApproval defines the rules for the approval of a transfer.
 // Each transfer can be broken down into a (from, to, initiatedBy, transferTime, badgeId) tuple.
-// We check the approvedTransfers for first match of this tuple, using the allowedCombinations. Subsequent matches are ignored.
+// We check the approvals for first match of this tuple, using the approvals. Subsequent matches are ignored.
 //
 // If the first match is disallowed, the transfer is disallowed.
 // If the first match is allowed, then we check the rest of the restrictions. If any restrictions fail, then the transfer is disallowed. 
@@ -165,7 +144,7 @@ message IsCollectionTransferAllowed {
 // For example, if you don't have per address rules set and you update the approved transfer rules to include per address rules, 
 // then the tally doesn't retroactively apply the per address rules to the previous transfers. It starts at that time.
 //
-// Lastly, we have overridesFromApprovedOutgoingTransfers and overridesToApprovedIncomingTransfers.
+// Lastly, we have overridesFromOutgoingApprovals and overridesToIncomingApprovals.
 // If these are set to true, we ignore the from / to user's approved outgoing / incoming transfers, respectively.
 // This is useful, for example, for forcefully revoking badges.
 // If these are set to false, the transfer must also be approved by the from /to user's approved outgoing / incoming transfers, respectively.
@@ -216,10 +195,7 @@ message ApprovalsTracker {
   repeated Balance amounts = 2;
 }
 
-message ApprovalDetails {
-  string uri = 7;
-  string customData = 8;
-
+message ApprovalCriteria {
   repeated MustOwnBadges mustOwnBadges = 1;
   MerkleChallenge merkleChallenge = 2;
   PredeterminedBalances predeterminedBalances = 3;
@@ -231,14 +207,11 @@ message ApprovalDetails {
   bool requireToDoesNotEqualInitiatedBy = 11;
   bool requireFromDoesNotEqualInitiatedBy = 12;
 
-  bool overridesFromApprovedOutgoingTransfers = 13;
-  bool overridesToApprovedIncomingTransfers = 14;
+  bool overridesFromOutgoingApprovals = 13;
+  bool overridesToIncomingApprovals = 14;
 }
 
-message OutgoingApprovalDetails {
-  string uri = 7;
-  string customData = 8;
-
+message OutgoingApprovalCriteria {
   repeated MustOwnBadges mustOwnBadges = 1;
   MerkleChallenge merkleChallenge = 2;
   PredeterminedBalances predeterminedBalances = 3;
@@ -249,10 +222,7 @@ message OutgoingApprovalDetails {
   bool requireToDoesNotEqualInitiatedBy = 11;
 }
 
-message IncomingApprovalDetails {
-  string uri = 7;
-  string customData = 8;
-
+message IncomingApprovalCriteria {
   repeated MustOwnBadges mustOwnBadges = 1;
   MerkleChallenge merkleChallenge= 2;
   PredeterminedBalances predeterminedBalances = 3;
@@ -263,24 +233,34 @@ message IncomingApprovalDetails {
   bool requireFromDoesNotEqualInitiatedBy = 12;
 }
 
-message CollectionApprovedTransfer {
-  //Match Criteria 
+message CollectionApproval {
+  // Match Criteria 
   string fromMappingId = 1;
   string toMappingId = 2;
   string initiatedByMappingId = 3;
   repeated UintRange transferTimes = 4;
   repeated UintRange badgeIds = 5;
   repeated UintRange ownershipTimes = 6;
+  string approvalTrackerId = 7; // if applicable
+  string challengeTrackerId = 8; // if applicable
 
-  string approvalId = 7; //if applicable
-  string approvalTrackerId = 8; //if applicable
-  string challengeTrackerId = 9; //if applicable
+  ValueOptions fromMappingOptions = 9;
+  ValueOptions toMappingOptions = 10;
+  ValueOptions initiatedByMappingOptions = 11;
+  ValueOptions transferTimesOptions = 12;
+  ValueOptions badgeIdsOptions = 13;
+  ValueOptions ownershipTimesOptions = 14;
+  ValueOptions approvalTrackerIdOptions = 15;
+  ValueOptions challengeTrackerIdOptions = 16;
 
-  repeated IsCollectionTransferAllowed allowedCombinations = 10;
+  bool isApproved = 17;
 
-  //Restrictions (Challenges, Amounts, MaxNumTransfers)
-  ApprovalDetails approvalDetails = 11;
+  string uri = 18;
+  string customData = 19;
+  string approvalId = 20; // if applicable
+  ApprovalCriteria approvalCriteria = 21;
 }
+
 
 message ApprovalIdentifierDetails {
   string approvalId = 1;
@@ -292,7 +272,7 @@ message Transfer {
   string from = 1;
   repeated string toAddresses = 2;
   repeated Balance balances = 3;
-  ApprovalIdentifierDetails precalculationDetails = 4;
+  ApprovalIdentifierDetails precalculateBalancesFromApproval = 4;
   repeated MerkleProof merkleProofs = 5;
   string memo = 6;
   repeated ApprovalIdentifierDetails prioritizedApprovals = 7;

@@ -9,10 +9,10 @@ package keeper_test
 // 	collectionsToCreate := GetCollectionsToCreate()
 // 	collectionsToCreate[0].BadgesToCreate = []*types.Balance{}
 // 	collectionsToCreate[0].BalancesType = sdkmath.NewUint(3)
-// 	collectionsToCreate[0].CollectionApprovedTransfersTimeline = nil
+// 	collectionsToCreate[0].CollectionApprovalsTimeline = nil
 // 	collectionsToCreate[0].InheritedCollectionId = sdkmath.NewUint(2)
-// 	collectionsToCreate[0].DefaultApprovedIncomingTransfersTimeline = nil
-// 	collectionsToCreate[0].DefaultApprovedOutgoingTransfersTimeline = nil
+// 	collectionsToCreate[0].DefaultIncomingApprovalsTimeline = nil
+// 	collectionsToCreate[0].DefaultOutgoingApprovalsTimeline = nil
 // 	// collectionsToCreate[0].DefaultUserPermissions = nil
 
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -25,7 +25,7 @@ package keeper_test
 // 	collectionsToCreate = GetCollectionsToCreate()
 // 	collectionsToCreate[0].BadgesToCreate = []*types.Balance{{ Amount: sdkmath.NewUint(1), BadgeIds: GetOneUintRange(), OwnershipTimes: GetFullUintRanges() }}
 // 	collectionsToCreate[0].BalancesType = sdkmath.NewUint(3)
-// 	collectionsToCreate[0].CollectionApprovedTransfersTimeline = nil
+// 	collectionsToCreate[0].CollectionApprovalsTimeline = nil
 // 	collectionsToCreate[0].InheritedCollectionId = sdkmath.NewUint(2)
 
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)

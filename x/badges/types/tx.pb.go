@@ -28,12 +28,13 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// Used for WASM bindings and JSON parsing
 type BadgeCustomMsgType struct {
-	CreateAddressMappingsMsg       *MsgCreateAddressMappings       `protobuf:"bytes,1,opt,name=createAddressMappingsMsg,proto3" json:"createAddressMappingsMsg,omitempty"`
-	UpdateCollectionMsg            *MsgUpdateCollection            `protobuf:"bytes,2,opt,name=updateCollectionMsg,proto3" json:"updateCollectionMsg,omitempty"`
-	DeleteCollectionMsg            *MsgDeleteCollection            `protobuf:"bytes,3,opt,name=deleteCollectionMsg,proto3" json:"deleteCollectionMsg,omitempty"`
-	TransferBadgesMsg              *MsgTransferBadges              `protobuf:"bytes,4,opt,name=transferBadgesMsg,proto3" json:"transferBadgesMsg,omitempty"`
-	UpdateUserApprovedTransfersMsg *MsgUpdateUserApprovedTransfers `protobuf:"bytes,5,opt,name=updateUserApprovedTransfersMsg,proto3" json:"updateUserApprovedTransfersMsg,omitempty"`
+	CreateAddressMappingsMsg *MsgCreateAddressMappings `protobuf:"bytes,1,opt,name=createAddressMappingsMsg,proto3" json:"createAddressMappingsMsg,omitempty"`
+	UpdateCollectionMsg      *MsgUpdateCollection      `protobuf:"bytes,2,opt,name=updateCollectionMsg,proto3" json:"updateCollectionMsg,omitempty"`
+	DeleteCollectionMsg      *MsgDeleteCollection      `protobuf:"bytes,3,opt,name=deleteCollectionMsg,proto3" json:"deleteCollectionMsg,omitempty"`
+	TransferBadgesMsg        *MsgTransferBadges        `protobuf:"bytes,4,opt,name=transferBadgesMsg,proto3" json:"transferBadgesMsg,omitempty"`
+	UpdateUserApprovalsMsg   *MsgUpdateUserApprovals   `protobuf:"bytes,5,opt,name=updateUserApprovalsMsg,proto3" json:"updateUserApprovalsMsg,omitempty"`
 }
 
 func (m *BadgeCustomMsgType) Reset()         { *m = BadgeCustomMsgType{} }
@@ -97,21 +98,22 @@ func (m *BadgeCustomMsgType) GetTransferBadgesMsg() *MsgTransferBadges {
 	return nil
 }
 
-func (m *BadgeCustomMsgType) GetUpdateUserApprovedTransfersMsg() *MsgUpdateUserApprovedTransfers {
+func (m *BadgeCustomMsgType) GetUpdateUserApprovalsMsg() *MsgUpdateUserApprovals {
 	if m != nil {
-		return m.UpdateUserApprovedTransfersMsg
+		return m.UpdateUserApprovalsMsg
 	}
 	return nil
 }
 
+// The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
 type MsgUpdateCollection struct {
 	Creator      string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId Uint   `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 	//The following section of fields are only allowed to be set upon creation of a new collection.
-	BalancesType                     string                          `protobuf:"bytes,3,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
-	DefaultApprovedOutgoingTransfers []*UserApprovedOutgoingTransfer `protobuf:"bytes,4,rep,name=defaultApprovedOutgoingTransfers,proto3" json:"defaultApprovedOutgoingTransfers,omitempty"`
-	DefaultApprovedIncomingTransfers []*UserApprovedIncomingTransfer `protobuf:"bytes,5,rep,name=defaultApprovedIncomingTransfers,proto3" json:"defaultApprovedIncomingTransfers,omitempty"`
-	DefaultUserPermissions           *UserPermissions                `protobuf:"bytes,27,opt,name=defaultUserPermissions,proto3" json:"defaultUserPermissions,omitempty"`
+	BalancesType             string                  `protobuf:"bytes,3,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
+	DefaultOutgoingApprovals []*UserOutgoingApproval `protobuf:"bytes,4,rep,name=defaultOutgoingApprovals,proto3" json:"defaultOutgoingApprovals,omitempty"`
+	DefaultIncomingApprovals []*UserIncomingApproval `protobuf:"bytes,5,rep,name=defaultIncomingApprovals,proto3" json:"defaultIncomingApprovals,omitempty"`
+	DefaultUserPermissions   *UserPermissions        `protobuf:"bytes,27,opt,name=defaultUserPermissions,proto3" json:"defaultUserPermissions,omitempty"`
 	//The rest of the fields are allowed to be set on creation or update.
 	BadgesToCreate                         []*Balance                          `protobuf:"bytes,6,rep,name=badgesToCreate,proto3" json:"badgesToCreate,omitempty"`
 	UpdateCollectionPermissions            bool                                `protobuf:"varint,7,opt,name=updateCollectionPermissions,proto3" json:"updateCollectionPermissions,omitempty"`
@@ -126,8 +128,8 @@ type MsgUpdateCollection struct {
 	OffChainBalancesMetadataTimeline       []*OffChainBalancesMetadataTimeline `protobuf:"bytes,16,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
 	UpdateCustomDataTimeline               bool                                `protobuf:"varint,17,opt,name=updateCustomDataTimeline,proto3" json:"updateCustomDataTimeline,omitempty"`
 	CustomDataTimeline                     []*CustomDataTimeline               `protobuf:"bytes,18,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
-	UpdateCollectionApprovedTransfers      bool                                `protobuf:"varint,21,opt,name=updateCollectionApprovedTransfers,proto3" json:"updateCollectionApprovedTransfers,omitempty"`
-	CollectionApprovedTransfers            []*CollectionApprovedTransfer       `protobuf:"bytes,22,rep,name=collectionApprovedTransfers,proto3" json:"collectionApprovedTransfers,omitempty"`
+	UpdateCollectionApprovals              bool                                `protobuf:"varint,21,opt,name=updateCollectionApprovals,proto3" json:"updateCollectionApprovals,omitempty"`
+	CollectionApprovals                    []*CollectionApproval               `protobuf:"bytes,22,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
 	UpdateStandardsTimeline                bool                                `protobuf:"varint,23,opt,name=updateStandardsTimeline,proto3" json:"updateStandardsTimeline,omitempty"`
 	StandardsTimeline                      []*StandardsTimeline                `protobuf:"bytes,24,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
 	UpdateContractAddressTimeline          bool                                `protobuf:"varint,25,opt,name=updateContractAddressTimeline,proto3" json:"updateContractAddressTimeline,omitempty"`
@@ -183,16 +185,16 @@ func (m *MsgUpdateCollection) GetBalancesType() string {
 	return ""
 }
 
-func (m *MsgUpdateCollection) GetDefaultApprovedOutgoingTransfers() []*UserApprovedOutgoingTransfer {
+func (m *MsgUpdateCollection) GetDefaultOutgoingApprovals() []*UserOutgoingApproval {
 	if m != nil {
-		return m.DefaultApprovedOutgoingTransfers
+		return m.DefaultOutgoingApprovals
 	}
 	return nil
 }
 
-func (m *MsgUpdateCollection) GetDefaultApprovedIncomingTransfers() []*UserApprovedIncomingTransfer {
+func (m *MsgUpdateCollection) GetDefaultIncomingApprovals() []*UserIncomingApproval {
 	if m != nil {
-		return m.DefaultApprovedIncomingTransfers
+		return m.DefaultIncomingApprovals
 	}
 	return nil
 }
@@ -295,16 +297,16 @@ func (m *MsgUpdateCollection) GetCustomDataTimeline() []*CustomDataTimeline {
 	return nil
 }
 
-func (m *MsgUpdateCollection) GetUpdateCollectionApprovedTransfers() bool {
+func (m *MsgUpdateCollection) GetUpdateCollectionApprovals() bool {
 	if m != nil {
-		return m.UpdateCollectionApprovedTransfers
+		return m.UpdateCollectionApprovals
 	}
 	return false
 }
 
-func (m *MsgUpdateCollection) GetCollectionApprovedTransfers() []*CollectionApprovedTransfer {
+func (m *MsgUpdateCollection) GetCollectionApprovals() []*CollectionApproval {
 	if m != nil {
-		return m.CollectionApprovedTransfers
+		return m.CollectionApprovals
 	}
 	return nil
 }
@@ -647,29 +649,29 @@ func (m *MsgDeleteCollectionResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDeleteCollectionResponse proto.InternalMessageInfo
 
-type MsgUpdateUserApprovedTransfers struct {
-	Creator                         string                          `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	CollectionId                    Uint                            `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
-	UpdateApprovedOutgoingTransfers bool                            `protobuf:"varint,3,opt,name=updateApprovedOutgoingTransfers,proto3" json:"updateApprovedOutgoingTransfers,omitempty"`
-	ApprovedOutgoingTransfers       []*UserApprovedOutgoingTransfer `protobuf:"bytes,4,rep,name=approvedOutgoingTransfers,proto3" json:"approvedOutgoingTransfers,omitempty"`
-	UpdateApprovedIncomingTransfers bool                            `protobuf:"varint,5,opt,name=updateApprovedIncomingTransfers,proto3" json:"updateApprovedIncomingTransfers,omitempty"`
-	ApprovedIncomingTransfers       []*UserApprovedIncomingTransfer `protobuf:"bytes,6,rep,name=approvedIncomingTransfers,proto3" json:"approvedIncomingTransfers,omitempty"`
-	UpdateUserPermissions           bool                            `protobuf:"varint,7,opt,name=updateUserPermissions,proto3" json:"updateUserPermissions,omitempty"`
-	UserPermissions                 *UserPermissions                `protobuf:"bytes,8,opt,name=userPermissions,proto3" json:"userPermissions,omitempty"`
+type MsgUpdateUserApprovals struct {
+	Creator                 string                  `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionId            Uint                    `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+	UpdateOutgoingApprovals bool                    `protobuf:"varint,3,opt,name=updateOutgoingApprovals,proto3" json:"updateOutgoingApprovals,omitempty"`
+	OutgoingApprovals       []*UserOutgoingApproval `protobuf:"bytes,4,rep,name=outgoingApprovals,proto3" json:"outgoingApprovals,omitempty"`
+	UpdateIncomingApprovals bool                    `protobuf:"varint,5,opt,name=updateIncomingApprovals,proto3" json:"updateIncomingApprovals,omitempty"`
+	IncomingApprovals       []*UserIncomingApproval `protobuf:"bytes,6,rep,name=incomingApprovals,proto3" json:"incomingApprovals,omitempty"`
+	UpdateUserPermissions   bool                    `protobuf:"varint,7,opt,name=updateUserPermissions,proto3" json:"updateUserPermissions,omitempty"`
+	UserPermissions         *UserPermissions        `protobuf:"bytes,8,opt,name=userPermissions,proto3" json:"userPermissions,omitempty"`
 }
 
-func (m *MsgUpdateUserApprovedTransfers) Reset()         { *m = MsgUpdateUserApprovedTransfers{} }
-func (m *MsgUpdateUserApprovedTransfers) String() string { return proto.CompactTextString(m) }
-func (*MsgUpdateUserApprovedTransfers) ProtoMessage()    {}
-func (*MsgUpdateUserApprovedTransfers) Descriptor() ([]byte, []int) {
+func (m *MsgUpdateUserApprovals) Reset()         { *m = MsgUpdateUserApprovals{} }
+func (m *MsgUpdateUserApprovals) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateUserApprovals) ProtoMessage()    {}
+func (*MsgUpdateUserApprovals) Descriptor() ([]byte, []int) {
 	return fileDescriptor_bc897b33479788c9, []int{9}
 }
-func (m *MsgUpdateUserApprovedTransfers) XXX_Unmarshal(b []byte) error {
+func (m *MsgUpdateUserApprovals) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdateUserApprovedTransfers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgUpdateUserApprovals) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdateUserApprovedTransfers.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgUpdateUserApprovals.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -679,84 +681,82 @@ func (m *MsgUpdateUserApprovedTransfers) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdateUserApprovedTransfers) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdateUserApprovedTransfers.Merge(m, src)
+func (m *MsgUpdateUserApprovals) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateUserApprovals.Merge(m, src)
 }
-func (m *MsgUpdateUserApprovedTransfers) XXX_Size() int {
+func (m *MsgUpdateUserApprovals) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdateUserApprovedTransfers) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdateUserApprovedTransfers.DiscardUnknown(m)
+func (m *MsgUpdateUserApprovals) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateUserApprovals.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdateUserApprovedTransfers proto.InternalMessageInfo
+var xxx_messageInfo_MsgUpdateUserApprovals proto.InternalMessageInfo
 
-func (m *MsgUpdateUserApprovedTransfers) GetCreator() string {
+func (m *MsgUpdateUserApprovals) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgUpdateUserApprovedTransfers) GetUpdateApprovedOutgoingTransfers() bool {
+func (m *MsgUpdateUserApprovals) GetUpdateOutgoingApprovals() bool {
 	if m != nil {
-		return m.UpdateApprovedOutgoingTransfers
+		return m.UpdateOutgoingApprovals
 	}
 	return false
 }
 
-func (m *MsgUpdateUserApprovedTransfers) GetApprovedOutgoingTransfers() []*UserApprovedOutgoingTransfer {
+func (m *MsgUpdateUserApprovals) GetOutgoingApprovals() []*UserOutgoingApproval {
 	if m != nil {
-		return m.ApprovedOutgoingTransfers
+		return m.OutgoingApprovals
 	}
 	return nil
 }
 
-func (m *MsgUpdateUserApprovedTransfers) GetUpdateApprovedIncomingTransfers() bool {
+func (m *MsgUpdateUserApprovals) GetUpdateIncomingApprovals() bool {
 	if m != nil {
-		return m.UpdateApprovedIncomingTransfers
+		return m.UpdateIncomingApprovals
 	}
 	return false
 }
 
-func (m *MsgUpdateUserApprovedTransfers) GetApprovedIncomingTransfers() []*UserApprovedIncomingTransfer {
+func (m *MsgUpdateUserApprovals) GetIncomingApprovals() []*UserIncomingApproval {
 	if m != nil {
-		return m.ApprovedIncomingTransfers
+		return m.IncomingApprovals
 	}
 	return nil
 }
 
-func (m *MsgUpdateUserApprovedTransfers) GetUpdateUserPermissions() bool {
+func (m *MsgUpdateUserApprovals) GetUpdateUserPermissions() bool {
 	if m != nil {
 		return m.UpdateUserPermissions
 	}
 	return false
 }
 
-func (m *MsgUpdateUserApprovedTransfers) GetUserPermissions() *UserPermissions {
+func (m *MsgUpdateUserApprovals) GetUserPermissions() *UserPermissions {
 	if m != nil {
 		return m.UserPermissions
 	}
 	return nil
 }
 
-type MsgUpdateUserApprovedTransfersResponse struct {
+type MsgUpdateUserApprovalsResponse struct {
 }
 
-func (m *MsgUpdateUserApprovedTransfersResponse) Reset() {
-	*m = MsgUpdateUserApprovedTransfersResponse{}
-}
-func (m *MsgUpdateUserApprovedTransfersResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgUpdateUserApprovedTransfersResponse) ProtoMessage()    {}
-func (*MsgUpdateUserApprovedTransfersResponse) Descriptor() ([]byte, []int) {
+func (m *MsgUpdateUserApprovalsResponse) Reset()         { *m = MsgUpdateUserApprovalsResponse{} }
+func (m *MsgUpdateUserApprovalsResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateUserApprovalsResponse) ProtoMessage()    {}
+func (*MsgUpdateUserApprovalsResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_bc897b33479788c9, []int{10}
 }
-func (m *MsgUpdateUserApprovedTransfersResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgUpdateUserApprovalsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdateUserApprovedTransfersResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgUpdateUserApprovalsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdateUserApprovedTransfersResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgUpdateUserApprovalsResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -766,17 +766,17 @@ func (m *MsgUpdateUserApprovedTransfersResponse) XXX_Marshal(b []byte, determini
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdateUserApprovedTransfersResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdateUserApprovedTransfersResponse.Merge(m, src)
+func (m *MsgUpdateUserApprovalsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateUserApprovalsResponse.Merge(m, src)
 }
-func (m *MsgUpdateUserApprovedTransfersResponse) XXX_Size() int {
+func (m *MsgUpdateUserApprovalsResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdateUserApprovedTransfersResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdateUserApprovedTransfersResponse.DiscardUnknown(m)
+func (m *MsgUpdateUserApprovalsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateUserApprovalsResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdateUserApprovedTransfersResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgUpdateUserApprovalsResponse proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*BadgeCustomMsgType)(nil), "bitbadges.bitbadgeschain.badges.BadgeCustomMsgType")
@@ -788,88 +788,87 @@ func init() {
 	proto.RegisterType((*MsgTransferBadgesResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgTransferBadgesResponse")
 	proto.RegisterType((*MsgDeleteCollection)(nil), "bitbadges.bitbadgeschain.badges.MsgDeleteCollection")
 	proto.RegisterType((*MsgDeleteCollectionResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgDeleteCollectionResponse")
-	proto.RegisterType((*MsgUpdateUserApprovedTransfers)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateUserApprovedTransfers")
-	proto.RegisterType((*MsgUpdateUserApprovedTransfersResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateUserApprovedTransfersResponse")
+	proto.RegisterType((*MsgUpdateUserApprovals)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateUserApprovals")
+	proto.RegisterType((*MsgUpdateUserApprovalsResponse)(nil), "bitbadges.bitbadgeschain.badges.MsgUpdateUserApprovalsResponse")
 }
 
 func init() { proto.RegisterFile("badges/tx.proto", fileDescriptor_bc897b33479788c9) }
 
 var fileDescriptor_bc897b33479788c9 = []byte{
-	// 1169 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x58, 0xcd, 0x6f, 0x1b, 0x45,
-	0x14, 0xcf, 0x36, 0xdf, 0x2f, 0x21, 0x69, 0x26, 0x4d, 0xb2, 0xb1, 0x15, 0xc7, 0xec, 0xa1, 0x0a,
-	0x17, 0xbb, 0x4a, 0xab, 0xaa, 0x14, 0x10, 0xe4, 0x43, 0x2a, 0x41, 0x8d, 0x52, 0x0d, 0x09, 0x12,
-	0xb9, 0xc0, 0x78, 0x77, 0xec, 0xac, 0x64, 0xef, 0x5a, 0x3b, 0x6b, 0xd4, 0xaa, 0x42, 0xe2, 0x04,
-	0x42, 0x02, 0xc1, 0x85, 0xbf, 0x01, 0xfe, 0x13, 0x7a, 0xec, 0x11, 0x21, 0x54, 0x41, 0xf2, 0x8f,
-	0xa0, 0x9d, 0xfd, 0xb0, 0x3d, 0x33, 0xeb, 0xd9, 0xba, 0xe9, 0x6d, 0xbd, 0xfb, 0x7e, 0x1f, 0xef,
-	0xed, 0xdb, 0xf1, 0x9b, 0x81, 0xe5, 0x06, 0x71, 0x5a, 0x94, 0xd5, 0xc3, 0xa7, 0xb5, 0x6e, 0xe0,
-	0x87, 0x3e, 0xda, 0x6e, 0xb8, 0x61, 0x7c, 0xaf, 0x96, 0x5d, 0xd9, 0x17, 0xc4, 0xf5, 0x6a, 0xf1,
-	0x75, 0x69, 0x3d, 0x45, 0x04, 0xc4, 0x63, 0x4d, 0x1a, 0xb0, 0x18, 0x58, 0x5a, 0x4b, 0xee, 0x37,
-	0x48, 0x9b, 0x78, 0x36, 0x4d, 0x6f, 0x9b, 0xc9, 0xed, 0x2e, 0x0d, 0x3a, 0x2e, 0x63, 0xae, 0xef,
-	0x89, 0x80, 0x0e, 0x0d, 0x89, 0x43, 0x42, 0x22, 0x00, 0x6c, 0xbf, 0xdd, 0xa6, 0x76, 0x38, 0x00,
-	0xb8, 0xd5, 0xf2, 0x5b, 0x3e, 0xbf, 0xac, 0x47, 0x57, 0xc9, 0xdd, 0xad, 0x24, 0x9e, 0x38, 0x4e,
-	0x40, 0x19, 0xfb, 0xaa, 0x43, 0xba, 0x5d, 0xd7, 0x6b, 0xa5, 0xa0, 0xcc, 0xae, 0xdb, 0xa1, 0x6d,
-	0xd7, 0x4b, 0x7d, 0x59, 0x7f, 0x4e, 0x01, 0xda, 0x8f, 0x1e, 0x1d, 0xf4, 0x58, 0xe8, 0x77, 0x8e,
-	0x59, 0xeb, 0xf4, 0x59, 0x97, 0xa2, 0x1e, 0x98, 0x76, 0x40, 0x49, 0x48, 0xf7, 0x62, 0xba, 0xe3,
-	0x84, 0xed, 0x98, 0xb5, 0x4c, 0xa3, 0x6a, 0xec, 0x2c, 0xec, 0xbe, 0x5f, 0xd3, 0x54, 0xa8, 0x76,
-	0xcc, 0x5a, 0x07, 0x2a, 0x0e, 0x9c, 0x4b, 0x8d, 0x9a, 0xb0, 0xda, 0xeb, 0x3a, 0x24, 0xa4, 0x07,
-	0x59, 0xd6, 0x91, 0xe2, 0x0d, 0xae, 0x78, 0xaf, 0x88, 0xe2, 0x99, 0x00, 0xc7, 0x2a, 0xc2, 0x48,
-	0xc7, 0xa1, 0x6d, 0x2a, 0xea, 0x4c, 0x16, 0xd7, 0x39, 0x14, 0xe0, 0x58, 0x45, 0x88, 0xbe, 0x86,
-	0x95, 0xb4, 0x3f, 0x78, 0x91, 0x79, 0xfd, 0xa6, 0xb8, 0xca, 0x6e, 0x11, 0x95, 0xd3, 0x21, 0x30,
-	0x96, 0xc9, 0xd0, 0x0f, 0x06, 0x54, 0xe2, 0x0c, 0xcf, 0x18, 0x0d, 0xf6, 0xba, 0xdd, 0xc0, 0xff,
-	0x86, 0x3a, 0x29, 0x8e, 0xeb, 0x4d, 0x73, 0xbd, 0x8f, 0x8b, 0x57, 0x4f, 0xc9, 0x84, 0x35, 0x32,
-	0xd6, 0x7f, 0x08, 0x56, 0x15, 0x2f, 0x00, 0x99, 0x30, 0xcb, 0xdf, 0xb7, 0x1f, 0xf0, 0xce, 0x99,
-	0xc7, 0xe9, 0x4f, 0x74, 0x07, 0x16, 0xfb, 0xdd, 0x7d, 0xe4, 0xf0, 0xd7, 0x3c, 0xbf, 0xbf, 0xf8,
-	0xe2, 0xd5, 0xf6, 0xc4, 0xdf, 0xaf, 0xb6, 0xa7, 0xce, 0x5c, 0x2f, 0xc4, 0x43, 0x11, 0xc8, 0x82,
-	0xc5, 0xf4, 0xbb, 0x8a, 0xda, 0x94, 0xbf, 0xb0, 0x79, 0x3c, 0x74, 0x0f, 0xfd, 0x68, 0x40, 0xd5,
-	0xa1, 0x4d, 0xd2, 0x6b, 0x87, 0xa9, 0xcf, 0x93, 0x5e, 0xd8, 0xf2, 0x5d, 0x2f, 0x2b, 0x27, 0x33,
-	0xa7, 0xaa, 0x93, 0x3b, 0x0b, 0xbb, 0x1f, 0x69, 0x6b, 0x32, 0x98, 0xad, 0xc8, 0x82, 0xb5, 0x32,
-	0x2a, 0x2f, 0x47, 0x9e, 0xed, 0x77, 0x86, 0xbc, 0x4c, 0x8f, 0xe1, 0x45, 0x64, 0xc1, 0x5a, 0x19,
-	0x74, 0x01, 0xeb, 0x49, 0x4c, 0x44, 0xf4, 0xa4, 0xbf, 0x0e, 0x99, 0x65, 0xde, 0x20, 0x77, 0x0a,
-	0x19, 0x18, 0xc0, 0xe1, 0x1c, 0x3e, 0xf4, 0x04, 0x96, 0x62, 0xc4, 0xa9, 0x1f, 0x2f, 0x00, 0xe6,
-	0x0c, 0x4f, 0x71, 0x47, 0xab, 0xb0, 0x1f, 0xbf, 0x48, 0x2c, 0xe0, 0xd1, 0x27, 0x50, 0x16, 0x3f,
-	0xe3, 0xc1, 0x04, 0x66, 0xab, 0xc6, 0xce, 0x1c, 0x1e, 0x15, 0x82, 0xda, 0xb0, 0x66, 0x2b, 0xb1,
-	0x73, 0x3c, 0xf9, 0xfb, 0x5a, 0x6b, 0x4a, 0x5a, 0xac, 0x26, 0x45, 0xf7, 0x60, 0x2d, 0x36, 0x73,
-	0x4c, 0x3c, 0xd2, 0xa2, 0xc1, 0x69, 0xb2, 0xea, 0x9a, 0xf3, 0xdc, 0xa9, 0xfa, 0x21, 0x3a, 0x87,
-	0xe5, 0x8e, 0x10, 0x0f, 0xbc, 0x70, 0xfa, 0x57, 0x23, 0x50, 0x61, 0x91, 0x08, 0x7d, 0x06, 0x55,
-	0x69, 0x21, 0x4c, 0xfe, 0x70, 0x32, 0xb1, 0x05, 0x6e, 0x4e, 0x1b, 0x87, 0x9e, 0x43, 0xc9, 0xce,
-	0x67, 0x59, 0xe4, 0x96, 0x3f, 0x78, 0x8d, 0x82, 0x8a, 0x14, 0x78, 0x04, 0x7d, 0xbf, 0x15, 0xf8,
-	0x1a, 0x28, 0xa9, 0xbf, 0x33, 0xd8, 0x0a, 0xca, 0x90, 0xa8, 0x15, 0x1a, 0x4a, 0xec, 0x12, 0x77,
-	0x7e, 0xbf, 0x40, 0x97, 0x2a, 0xd0, 0x58, 0x4d, 0x8a, 0xbe, 0x80, 0xdb, 0xb1, 0x99, 0x93, 0x66,
-	0xf3, 0x20, 0x62, 0x49, 0x7a, 0x9c, 0x49, 0xf2, 0xcb, 0xdc, 0x7a, 0xc1, 0x68, 0xf4, 0xb3, 0x01,
-	0x55, 0x5f, 0x47, 0x79, 0x93, 0x67, 0xb4, 0xa7, 0xcd, 0x48, 0xa7, 0x86, 0xb5, 0x52, 0xe8, 0x21,
-	0x98, 0x49, 0xe3, 0xf0, 0x41, 0xe2, 0x70, 0xd0, 0xc6, 0x0a, 0xcf, 0x2c, 0xf7, 0x39, 0xb2, 0x01,
-	0xd9, 0x32, 0x0a, 0x71, 0xf3, 0x77, 0xf5, 0x8d, 0x24, 0x41, 0xb1, 0x82, 0x0e, 0x3d, 0x86, 0x77,
-	0xc5, 0xce, 0x96, 0xfe, 0xc7, 0xcc, 0x35, 0xee, 0x54, 0x1f, 0x88, 0xbe, 0x85, 0xb2, 0x3d, 0x82,
-	0x67, 0xfd, 0xb5, 0x3f, 0x02, 0x91, 0x03, 0x8f, 0xe2, 0x47, 0x0f, 0x60, 0x23, 0xf6, 0xf8, 0x79,
-	0x48, 0x3c, 0x87, 0x04, 0x0e, 0xcb, 0xca, 0xb6, 0xc1, 0x53, 0xc8, 0x7b, 0x1c, 0x8d, 0x24, 0x4c,
-	0xc2, 0x98, 0xdc, 0xae, 0x7e, 0x24, 0x91, 0xe8, 0xb0, 0x4c, 0x86, 0x0e, 0x61, 0x2b, 0xad, 0x9f,
-	0x17, 0x06, 0xc4, 0x0e, 0x93, 0x41, 0x2f, 0x53, 0xdb, 0xe4, 0x0e, 0x47, 0x07, 0xa1, 0x00, 0x36,
-	0xec, 0x1c, 0x7c, 0x89, 0xbb, 0x7d, 0x50, 0xa0, 0xb8, 0x4a, 0x3c, 0xce, 0x23, 0xee, 0xf7, 0xf0,
-	0x11, 0xdb, 0x0b, 0xec, 0x0b, 0x37, 0x2a, 0x79, 0x2a, 0xba, 0x3a, 0xd8, 0xc3, 0xf2, 0xf3, 0xa8,
-	0x87, 0x5d, 0x19, 0x75, 0xab, 0x60, 0x0f, 0xcb, 0x84, 0x58, 0x41, 0x67, 0x9d, 0x40, 0x59, 0x35,
-	0xe3, 0x52, 0xd6, 0xf5, 0x3d, 0x46, 0xa5, 0x81, 0xca, 0xd0, 0x0d, 0x54, 0xd6, 0x2f, 0x06, 0x98,
-	0x79, 0x73, 0xfa, 0x88, 0xc9, 0xed, 0x4b, 0x58, 0x26, 0xc3, 0xc1, 0xe6, 0x0d, 0x9e, 0x69, 0x5d,
-	0x9b, 0xe9, 0xb0, 0x08, 0x16, 0x79, 0x2c, 0x0b, 0xaa, 0xb9, 0x1b, 0x87, 0x24, 0x4f, 0xeb, 0x0f,
-	0x03, 0x56, 0xa4, 0xe9, 0xf8, 0x5a, 0x07, 0xcd, 0x47, 0x30, 0x9f, 0x6d, 0xec, 0xcc, 0x49, 0x9e,
-	0xda, 0x7b, 0xda, 0xd4, 0xb2, 0x4f, 0xb7, 0x8f, 0xb5, 0xca, 0xb0, 0x29, 0xcf, 0xf1, 0x69, 0x1e,
-	0x84, 0x4f, 0xcc, 0xe2, 0x56, 0xe2, 0x3a, 0x13, 0xb1, 0xb6, 0x78, 0xc7, 0x48, 0xbb, 0x95, 0xd4,
-	0xc1, 0x4f, 0xd3, 0x50, 0x19, 0x3d, 0xf7, 0x5f, 0x6b, 0x59, 0x3f, 0x85, 0xed, 0xf8, 0x03, 0xca,
-	0x9f, 0xcc, 0x27, 0xf9, 0x77, 0xa6, 0x0b, 0x43, 0xcf, 0x61, 0x93, 0xbc, 0xdd, 0xe9, 0x3e, 0x9f,
-	0x5f, 0x4e, 0x43, 0x35, 0xd4, 0x2b, 0xd2, 0x90, 0x87, 0xf2, 0x81, 0x34, 0x64, 0x8e, 0x99, 0xeb,
-	0xd8, 0x18, 0xe4, 0xf3, 0xf7, 0xa7, 0x54, 0x71, 0x43, 0x30, 0x3b, 0x38, 0xa5, 0x8a, 0xd3, 0xfd,
-	0x39, 0x2c, 0xf7, 0x84, 0xf8, 0xb9, 0x31, 0x37, 0x10, 0x22, 0x91, 0xb5, 0x03, 0xb7, 0x35, 0xbb,
-	0xd0, 0xa4, 0x71, 0x77, 0xff, 0x99, 0x86, 0xc9, 0x68, 0xff, 0xfb, 0xbd, 0x01, 0x37, 0xa5, 0x2d,
-	0xe7, 0x58, 0x27, 0x05, 0xa5, 0x0f, 0xc7, 0x3a, 0x5f, 0x48, 0xd7, 0xde, 0xdf, 0x0c, 0x58, 0x53,
-	0x2f, 0xa3, 0xe3, 0x9f, 0x94, 0x94, 0xf6, 0xc6, 0x3f, 0x64, 0x49, 0x7d, 0x7d, 0x67, 0xc0, 0x92,
-	0xb0, 0x50, 0x8e, 0x71, 0xf4, 0x50, 0x7a, 0x38, 0xc6, 0x71, 0x45, 0x6a, 0xe1, 0x77, 0x03, 0xca,
-	0xa3, 0x56, 0x98, 0x37, 0x3d, 0x9a, 0x28, 0x3d, 0x7a, 0xd3, 0xb3, 0x8d, 0xd4, 0x69, 0xd4, 0x4d,
-	0xd2, 0x72, 0x3c, 0xd6, 0x79, 0x50, 0xb1, 0x6e, 0xca, 0x5b, 0x97, 0xf7, 0x1f, 0xbf, 0xb8, 0xac,
-	0x18, 0x2f, 0x2f, 0x2b, 0xc6, 0xbf, 0x97, 0x15, 0xe3, 0xd7, 0xab, 0xca, 0xc4, 0xcb, 0xab, 0xca,
-	0xc4, 0x5f, 0x57, 0x95, 0x89, 0xf3, 0xdd, 0x96, 0x1b, 0x5e, 0xf4, 0x1a, 0x35, 0xdb, 0xef, 0xd4,
-	0x33, 0xde, 0xfa, 0xb0, 0x42, 0xfd, 0x69, 0x3d, 0x3d, 0xee, 0x7b, 0xd6, 0xa5, 0xac, 0x31, 0xc3,
-	0xcf, 0xfa, 0xee, 0xfe, 0x1f, 0x00, 0x00, 0xff, 0xff, 0xce, 0xf9, 0x4d, 0x8a, 0xe6, 0x14, 0x00,
-	0x00,
+	// 1155 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x58, 0xcf, 0x6f, 0xdc, 0x44,
+	0x14, 0x8e, 0x9b, 0xdf, 0x2f, 0x21, 0x69, 0x26, 0xcd, 0xc6, 0xd9, 0x28, 0x9b, 0x95, 0x0f, 0x28,
+	0x5c, 0x76, 0xab, 0x6d, 0x29, 0xa5, 0x54, 0x82, 0x4d, 0x22, 0xa1, 0x20, 0x56, 0xa9, 0x86, 0x04,
+	0x89, 0x5c, 0x60, 0xd6, 0x9e, 0x75, 0x2c, 0xed, 0xda, 0xc6, 0xf6, 0x56, 0xad, 0xb8, 0x70, 0x82,
+	0x13, 0x2a, 0x17, 0xfe, 0x07, 0x4e, 0x9c, 0xf8, 0x13, 0x38, 0xf4, 0xd8, 0x23, 0xe2, 0x50, 0xa1,
+	0xe4, 0x1f, 0x41, 0x1e, 0xff, 0x58, 0xef, 0xcc, 0x38, 0x76, 0x4d, 0x6e, 0xce, 0xcc, 0x7c, 0xdf,
+	0xfb, 0xde, 0xcc, 0xdb, 0x97, 0x6f, 0x06, 0xd6, 0xfb, 0xc4, 0x30, 0xa9, 0xdf, 0x0e, 0x5e, 0xb4,
+	0x5c, 0xcf, 0x09, 0x1c, 0xb4, 0xdf, 0xb7, 0x82, 0x68, 0xac, 0x95, 0x7e, 0xe9, 0x97, 0xc4, 0xb2,
+	0x5b, 0xd1, 0x77, 0xbd, 0x96, 0x20, 0x3c, 0x62, 0xfb, 0x03, 0xea, 0xf9, 0x11, 0xb0, 0xbe, 0x15,
+	0x8f, 0xf7, 0xc9, 0x90, 0xd8, 0x3a, 0x4d, 0x86, 0xd5, 0x78, 0xd8, 0xa5, 0xde, 0xc8, 0xf2, 0x7d,
+	0xcb, 0xb1, 0x79, 0xc0, 0x88, 0x06, 0xc4, 0x20, 0x01, 0xe1, 0x00, 0xba, 0x33, 0x1c, 0x52, 0x3d,
+	0xc8, 0x00, 0xee, 0x99, 0x8e, 0xe9, 0xb0, 0xcf, 0x76, 0xf8, 0x15, 0x8f, 0xee, 0xc5, 0xeb, 0x89,
+	0x61, 0x78, 0xd4, 0xf7, 0xbf, 0x1d, 0x11, 0xd7, 0xb5, 0x6c, 0x33, 0x01, 0xa5, 0x72, 0xad, 0x11,
+	0x1d, 0x5a, 0x76, 0xa2, 0x4b, 0xfb, 0x63, 0x0e, 0xd0, 0x61, 0x38, 0x75, 0x34, 0xf6, 0x03, 0x67,
+	0xd4, 0xf3, 0xcd, 0xb3, 0x97, 0x2e, 0x45, 0x63, 0x50, 0x75, 0x8f, 0x92, 0x80, 0x76, 0x23, 0xba,
+	0x5e, 0xcc, 0xd6, 0xf3, 0x4d, 0x55, 0x69, 0x2a, 0x07, 0x2b, 0x9d, 0x8f, 0x5b, 0x05, 0x3b, 0xd4,
+	0xea, 0xf9, 0xe6, 0x91, 0x8c, 0x03, 0xe7, 0x52, 0xa3, 0x01, 0x6c, 0x8e, 0x5d, 0x83, 0x04, 0xf4,
+	0x28, 0xcd, 0x3a, 0x8c, 0x78, 0x87, 0x45, 0x7c, 0x58, 0x26, 0xe2, 0x39, 0x07, 0xc7, 0x32, 0xc2,
+	0x30, 0x8e, 0x41, 0x87, 0x94, 0x8f, 0x33, 0x5b, 0x3e, 0xce, 0x31, 0x07, 0xc7, 0x32, 0x42, 0xf4,
+	0x1d, 0x6c, 0x24, 0xf5, 0xc1, 0x36, 0x99, 0xed, 0xdf, 0x1c, 0x8b, 0xd2, 0x29, 0x13, 0xe5, 0x6c,
+	0x0a, 0x8c, 0x45, 0x32, 0xe4, 0x40, 0x2d, 0x4a, 0xf0, 0xdc, 0xa7, 0x5e, 0xd7, 0x75, 0x3d, 0xe7,
+	0x39, 0x19, 0xb2, 0x30, 0xf3, 0x2c, 0xcc, 0x47, 0xe5, 0x37, 0x6d, 0x8a, 0x01, 0xe7, 0xd0, 0x6a,
+	0x3f, 0x23, 0xd8, 0x94, 0xec, 0x33, 0x52, 0x61, 0x91, 0x1d, 0xab, 0xe3, 0xb1, 0x02, 0x59, 0xc6,
+	0xc9, 0x9f, 0xe8, 0x3e, 0xac, 0x4e, 0x8a, 0xf8, 0xc4, 0x60, 0xa7, 0xb9, 0x7c, 0xb8, 0xfa, 0xfa,
+	0xed, 0xfe, 0xcc, 0x3f, 0x6f, 0xf7, 0xe7, 0xce, 0x2d, 0x3b, 0xc0, 0x53, 0x2b, 0x90, 0x06, 0xab,
+	0xc9, 0xcf, 0x27, 0xac, 0x46, 0x76, 0x2e, 0xcb, 0x78, 0x6a, 0x0c, 0x7d, 0x0f, 0xaa, 0x41, 0x07,
+	0x64, 0x3c, 0x0c, 0x4e, 0xc7, 0x81, 0xe9, 0x58, 0xb6, 0x99, 0xca, 0x54, 0xe7, 0x9a, 0xb3, 0x07,
+	0x2b, 0x9d, 0x0f, 0x0b, 0x53, 0x0f, 0x93, 0xe3, 0xd1, 0x38, 0x97, 0x36, 0x13, 0xf2, 0xc4, 0xd6,
+	0x9d, 0xd1, 0x54, 0xc8, 0xf9, 0x77, 0x08, 0xc9, 0xa3, 0x71, 0x2e, 0x2d, 0xba, 0x84, 0x5a, 0x3c,
+	0x17, 0x02, 0x9f, 0x4d, 0x9a, 0x87, 0xba, 0xcb, 0x8e, 0xf7, 0x7e, 0xa9, 0x80, 0x19, 0x1c, 0xce,
+	0xe1, 0x43, 0xcf, 0x60, 0x2d, 0x42, 0x9c, 0x39, 0xd1, 0xaf, 0x56, 0x5d, 0x60, 0x29, 0x1d, 0x14,
+	0x46, 0x38, 0x8c, 0x8e, 0x05, 0x73, 0x78, 0xf4, 0x19, 0xec, 0xf2, 0xbf, 0xbd, 0x6c, 0x02, 0x8b,
+	0x4d, 0xe5, 0x60, 0x09, 0xdf, 0xb4, 0x04, 0x0d, 0x61, 0x4b, 0x97, 0x62, 0x97, 0x58, 0xf2, 0x8f,
+	0x0a, 0xa5, 0x49, 0x69, 0xb1, 0x9c, 0x14, 0x3d, 0x84, 0xad, 0x48, 0x4c, 0x8f, 0xd8, 0xc4, 0xa4,
+	0xde, 0x59, 0xdc, 0x2a, 0xd5, 0x65, 0xa6, 0x54, 0x3e, 0x89, 0x2e, 0x60, 0x7d, 0xc4, 0xad, 0x07,
+	0xb6, 0x71, 0xc5, 0x47, 0xc3, 0x51, 0x61, 0x9e, 0x08, 0x7d, 0x01, 0x4d, 0xa1, 0x7b, 0xc5, 0xff,
+	0x25, 0xd2, 0x60, 0x2b, 0x4c, 0x5c, 0xe1, 0x3a, 0xf4, 0x03, 0xd4, 0xf5, 0x7c, 0x96, 0x55, 0x26,
+	0xf9, 0x93, 0x77, 0xd8, 0x50, 0x9e, 0x02, 0xdf, 0x40, 0x3f, 0x29, 0x05, 0xd6, 0xb8, 0x84, 0xe8,
+	0xef, 0x65, 0x4b, 0x41, 0xba, 0x24, 0x2c, 0x85, 0xbe, 0x14, 0xbb, 0xc6, 0x94, 0x3f, 0x2a, 0x51,
+	0xa5, 0x12, 0x34, 0x96, 0x93, 0xa2, 0xaf, 0xe1, 0xfd, 0x48, 0xcc, 0xe9, 0x60, 0x70, 0x14, 0xb2,
+	0xc4, 0x35, 0xee, 0x0b, 0xe1, 0xd7, 0x99, 0xf4, 0x92, 0xab, 0xd1, 0x2f, 0x0a, 0x34, 0x9d, 0x22,
+	0xca, 0xbb, 0x2c, 0xa3, 0x6e, 0x61, 0x46, 0x45, 0xd1, 0x70, 0x61, 0x28, 0xf4, 0x04, 0xd4, 0xb8,
+	0x70, 0xd8, 0x7f, 0xff, 0xe3, 0xac, 0x8c, 0x0d, 0x96, 0x59, 0xee, 0x3c, 0xd2, 0x01, 0xe9, 0x22,
+	0x0a, 0x31, 0xf1, 0x0f, 0x8a, 0x0b, 0x49, 0x80, 0x62, 0x09, 0x1d, 0x7a, 0x0a, 0x3b, 0x7c, 0x65,
+	0x4f, 0x7a, 0xee, 0x16, 0x53, 0x98, 0xbf, 0x00, 0x51, 0xd8, 0xd4, 0x25, 0xb8, 0x5a, 0x59, 0x8d,
+	0x02, 0x16, 0xcb, 0xf8, 0xd0, 0x63, 0xd8, 0x8e, 0x34, 0x7c, 0x15, 0x10, 0xdb, 0x20, 0x9e, 0xe1,
+	0xa7, 0xdb, 0xb1, 0xcd, 0x24, 0xe6, 0x4d, 0x87, 0xfe, 0xc0, 0x17, 0x30, 0x2a, 0x93, 0x57, 0xec,
+	0x0f, 0x04, 0x3a, 0x2c, 0x92, 0xa1, 0x63, 0xd8, 0x4b, 0xf6, 0xc7, 0x0e, 0x3c, 0xa2, 0x07, 0xb1,
+	0xeb, 0x4a, 0xa3, 0xed, 0x30, 0x85, 0x37, 0x2f, 0x42, 0x1e, 0x6c, 0xeb, 0x39, 0xf8, 0x3a, 0x53,
+	0xfb, 0xb8, 0xc4, 0x66, 0x4a, 0xf1, 0x38, 0x8f, 0x78, 0x52, 0x9b, 0x27, 0x7e, 0xd7, 0xd3, 0x2f,
+	0xad, 0xe7, 0xd4, 0x48, 0x83, 0x6e, 0x66, 0x6b, 0x53, 0x9c, 0x0f, 0x6b, 0xd3, 0x12, 0x51, 0xf7,
+	0x4a, 0x9e, 0xbb, 0x48, 0x88, 0x25, 0x74, 0xda, 0x29, 0xec, 0xca, 0x0c, 0x27, 0xf5, 0x5d, 0xc7,
+	0xf6, 0xa9, 0x60, 0x7b, 0x94, 0x22, 0xdb, 0xa3, 0xbd, 0x52, 0x40, 0xcd, 0x33, 0xcd, 0x37, 0xf8,
+	0xab, 0x6f, 0x60, 0x9d, 0x4c, 0x2f, 0x56, 0xef, 0xb0, 0x4c, 0xdb, 0x85, 0x99, 0x4e, 0x07, 0xc1,
+	0x3c, 0x8f, 0xa6, 0x41, 0x33, 0xd7, 0xc5, 0xc7, 0x79, 0x6a, 0xbf, 0x2b, 0xb0, 0x21, 0x58, 0xd5,
+	0x5b, 0xb5, 0x83, 0x9f, 0xc3, 0x72, 0x7a, 0xcb, 0x52, 0x67, 0x59, 0x6a, 0x1f, 0x14, 0xa6, 0x96,
+	0xe8, 0xc1, 0x13, 0xac, 0xb6, 0x0b, 0x3b, 0xa2, 0xa9, 0x4e, 0xf2, 0x20, 0xcc, 0xd7, 0xf2, 0xbe,
+	0xfe, 0x36, 0x13, 0xd1, 0xf6, 0x58, 0xc5, 0x08, 0x57, 0x87, 0x44, 0xc1, 0x9f, 0x73, 0x50, 0x93,
+	0xbb, 0xf1, 0x5b, 0xdd, 0xce, 0xb4, 0x5d, 0x89, 0xc6, 0x79, 0x36, 0xdb, 0xae, 0x44, 0x03, 0xac,
+	0xc3, 0x86, 0x73, 0xbb, 0x66, 0x5b, 0xe4, 0x9b, 0xc8, 0x93, 0x99, 0xec, 0x8c, 0x3c, 0xd1, 0x2c,
+	0xeb, 0xb0, 0x61, 0x09, 0x98, 0x85, 0xff, 0x63, 0xcc, 0x45, 0xbe, 0x89, 0x4b, 0xe4, 0x0d, 0xf9,
+	0x62, 0xd6, 0x25, 0xf2, 0xee, 0xfa, 0x02, 0xd6, 0xc7, 0xdc, 0xfa, 0xa5, 0x8a, 0x06, 0x9e, 0x27,
+	0xd2, 0x9a, 0xd0, 0xc8, 0xb9, 0xc3, 0xc5, 0x85, 0xd5, 0xf9, 0x6b, 0x1e, 0x66, 0xc3, 0xcb, 0xe2,
+	0x4f, 0x0a, 0xdc, 0x15, 0x2e, 0x6e, 0x95, 0xae, 0xd5, 0xf5, 0xa7, 0x95, 0x2e, 0xe3, 0x49, 0x6f,
+	0xfc, 0x4d, 0x81, 0x2d, 0x79, 0x9b, 0xab, 0xfe, 0xac, 0x50, 0xef, 0x56, 0x7f, 0x91, 0x48, 0x74,
+	0xfd, 0xa8, 0xc0, 0x1a, 0xd7, 0xc8, 0x2a, 0xdc, 0xd3, 0xeb, 0x4f, 0x2a, 0xdc, 0xed, 0x13, 0x09,
+	0xaf, 0x14, 0xd8, 0x94, 0x75, 0x80, 0xaa, 0x17, 0xf9, 0xfa, 0xa7, 0x55, 0x5f, 0x00, 0x12, 0x45,
+	0x61, 0xd5, 0x08, 0x6d, 0xb1, 0xd2, 0x23, 0x49, 0xb9, 0xaa, 0xc9, 0xeb, 0x8f, 0x87, 0x5f, 0xbe,
+	0xbe, 0x6a, 0x28, 0x6f, 0xae, 0x1a, 0xca, 0xbf, 0x57, 0x0d, 0xe5, 0xd7, 0xeb, 0xc6, 0xcc, 0x9b,
+	0xeb, 0xc6, 0xcc, 0xdf, 0xd7, 0x8d, 0x99, 0x8b, 0x8e, 0x69, 0x05, 0x97, 0xe3, 0x7e, 0x4b, 0x77,
+	0x46, 0xed, 0x94, 0xb7, 0x3d, 0x1d, 0xa1, 0xfd, 0xa2, 0x9d, 0xbc, 0x81, 0xbd, 0x74, 0xa9, 0xdf,
+	0x5f, 0x60, 0x0f, 0x60, 0x0f, 0xfe, 0x0b, 0x00, 0x00, 0xff, 0xff, 0x03, 0xd9, 0xda, 0x96, 0xfb,
+	0x13, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -887,7 +886,7 @@ type MsgClient interface {
 	UpdateCollection(ctx context.Context, in *MsgUpdateCollection, opts ...grpc.CallOption) (*MsgUpdateCollectionResponse, error)
 	CreateAddressMappings(ctx context.Context, in *MsgCreateAddressMappings, opts ...grpc.CallOption) (*MsgCreateAddressMappingsResponse, error)
 	TransferBadges(ctx context.Context, in *MsgTransferBadges, opts ...grpc.CallOption) (*MsgTransferBadgesResponse, error)
-	UpdateUserApprovedTransfers(ctx context.Context, in *MsgUpdateUserApprovedTransfers, opts ...grpc.CallOption) (*MsgUpdateUserApprovedTransfersResponse, error)
+	UpdateUserApprovals(ctx context.Context, in *MsgUpdateUserApprovals, opts ...grpc.CallOption) (*MsgUpdateUserApprovalsResponse, error)
 	DeleteCollection(ctx context.Context, in *MsgDeleteCollection, opts ...grpc.CallOption) (*MsgDeleteCollectionResponse, error)
 }
 
@@ -926,9 +925,9 @@ func (c *msgClient) TransferBadges(ctx context.Context, in *MsgTransferBadges, o
 	return out, nil
 }
 
-func (c *msgClient) UpdateUserApprovedTransfers(ctx context.Context, in *MsgUpdateUserApprovedTransfers, opts ...grpc.CallOption) (*MsgUpdateUserApprovedTransfersResponse, error) {
-	out := new(MsgUpdateUserApprovedTransfersResponse)
-	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/UpdateUserApprovedTransfers", in, out, opts...)
+func (c *msgClient) UpdateUserApprovals(ctx context.Context, in *MsgUpdateUserApprovals, opts ...grpc.CallOption) (*MsgUpdateUserApprovalsResponse, error) {
+	out := new(MsgUpdateUserApprovalsResponse)
+	err := c.cc.Invoke(ctx, "/bitbadges.bitbadgeschain.badges.Msg/UpdateUserApprovals", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -949,7 +948,7 @@ type MsgServer interface {
 	UpdateCollection(context.Context, *MsgUpdateCollection) (*MsgUpdateCollectionResponse, error)
 	CreateAddressMappings(context.Context, *MsgCreateAddressMappings) (*MsgCreateAddressMappingsResponse, error)
 	TransferBadges(context.Context, *MsgTransferBadges) (*MsgTransferBadgesResponse, error)
-	UpdateUserApprovedTransfers(context.Context, *MsgUpdateUserApprovedTransfers) (*MsgUpdateUserApprovedTransfersResponse, error)
+	UpdateUserApprovals(context.Context, *MsgUpdateUserApprovals) (*MsgUpdateUserApprovalsResponse, error)
 	DeleteCollection(context.Context, *MsgDeleteCollection) (*MsgDeleteCollectionResponse, error)
 }
 
@@ -966,8 +965,8 @@ func (*UnimplementedMsgServer) CreateAddressMappings(ctx context.Context, req *M
 func (*UnimplementedMsgServer) TransferBadges(ctx context.Context, req *MsgTransferBadges) (*MsgTransferBadgesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TransferBadges not implemented")
 }
-func (*UnimplementedMsgServer) UpdateUserApprovedTransfers(ctx context.Context, req *MsgUpdateUserApprovedTransfers) (*MsgUpdateUserApprovedTransfersResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserApprovedTransfers not implemented")
+func (*UnimplementedMsgServer) UpdateUserApprovals(ctx context.Context, req *MsgUpdateUserApprovals) (*MsgUpdateUserApprovalsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserApprovals not implemented")
 }
 func (*UnimplementedMsgServer) DeleteCollection(ctx context.Context, req *MsgDeleteCollection) (*MsgDeleteCollectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCollection not implemented")
@@ -1031,20 +1030,20 @@ func _Msg_TransferBadges_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_UpdateUserApprovedTransfers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUpdateUserApprovedTransfers)
+func _Msg_UpdateUserApprovals_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateUserApprovals)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).UpdateUserApprovedTransfers(ctx, in)
+		return srv.(MsgServer).UpdateUserApprovals(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bitbadges.bitbadgeschain.badges.Msg/UpdateUserApprovedTransfers",
+		FullMethod: "/bitbadges.bitbadgeschain.badges.Msg/UpdateUserApprovals",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdateUserApprovedTransfers(ctx, req.(*MsgUpdateUserApprovedTransfers))
+		return srv.(MsgServer).UpdateUserApprovals(ctx, req.(*MsgUpdateUserApprovals))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1084,8 +1083,8 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_TransferBadges_Handler,
 		},
 		{
-			MethodName: "UpdateUserApprovedTransfers",
-			Handler:    _Msg_UpdateUserApprovedTransfers_Handler,
+			MethodName: "UpdateUserApprovals",
+			Handler:    _Msg_UpdateUserApprovals_Handler,
 		},
 		{
 			MethodName: "DeleteCollection",
@@ -1116,9 +1115,9 @@ func (m *BadgeCustomMsgType) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.UpdateUserApprovedTransfersMsg != nil {
+	if m.UpdateUserApprovalsMsg != nil {
 		{
-			size, err := m.UpdateUserApprovedTransfersMsg.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.UpdateUserApprovalsMsg.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -1269,10 +1268,10 @@ func (m *MsgUpdateCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0xb8
 	}
-	if len(m.CollectionApprovedTransfers) > 0 {
-		for iNdEx := len(m.CollectionApprovedTransfers) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.CollectionApprovals) > 0 {
+		for iNdEx := len(m.CollectionApprovals) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.CollectionApprovedTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.CollectionApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1285,9 +1284,9 @@ func (m *MsgUpdateCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0xb2
 		}
 	}
-	if m.UpdateCollectionApprovedTransfers {
+	if m.UpdateCollectionApprovals {
 		i--
-		if m.UpdateCollectionApprovedTransfers {
+		if m.UpdateCollectionApprovals {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -1487,10 +1486,10 @@ func (m *MsgUpdateCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x32
 		}
 	}
-	if len(m.DefaultApprovedIncomingTransfers) > 0 {
-		for iNdEx := len(m.DefaultApprovedIncomingTransfers) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.DefaultIncomingApprovals) > 0 {
+		for iNdEx := len(m.DefaultIncomingApprovals) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.DefaultApprovedIncomingTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.DefaultIncomingApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1501,10 +1500,10 @@ func (m *MsgUpdateCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x2a
 		}
 	}
-	if len(m.DefaultApprovedOutgoingTransfers) > 0 {
-		for iNdEx := len(m.DefaultApprovedOutgoingTransfers) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.DefaultOutgoingApprovals) > 0 {
+		for iNdEx := len(m.DefaultOutgoingApprovals) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.DefaultApprovedOutgoingTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.DefaultOutgoingApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1782,7 +1781,7 @@ func (m *MsgDeleteCollectionResponse) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdateUserApprovedTransfers) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateUserApprovals) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1792,12 +1791,12 @@ func (m *MsgUpdateUserApprovedTransfers) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdateUserApprovedTransfers) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateUserApprovals) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateUserApprovedTransfers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateUserApprovals) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1824,10 +1823,10 @@ func (m *MsgUpdateUserApprovedTransfers) MarshalToSizedBuffer(dAtA []byte) (int,
 		i--
 		dAtA[i] = 0x38
 	}
-	if len(m.ApprovedIncomingTransfers) > 0 {
-		for iNdEx := len(m.ApprovedIncomingTransfers) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.IncomingApprovals) > 0 {
+		for iNdEx := len(m.IncomingApprovals) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.ApprovedIncomingTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.IncomingApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1838,9 +1837,9 @@ func (m *MsgUpdateUserApprovedTransfers) MarshalToSizedBuffer(dAtA []byte) (int,
 			dAtA[i] = 0x32
 		}
 	}
-	if m.UpdateApprovedIncomingTransfers {
+	if m.UpdateIncomingApprovals {
 		i--
-		if m.UpdateApprovedIncomingTransfers {
+		if m.UpdateIncomingApprovals {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -1848,10 +1847,10 @@ func (m *MsgUpdateUserApprovedTransfers) MarshalToSizedBuffer(dAtA []byte) (int,
 		i--
 		dAtA[i] = 0x28
 	}
-	if len(m.ApprovedOutgoingTransfers) > 0 {
-		for iNdEx := len(m.ApprovedOutgoingTransfers) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.OutgoingApprovals) > 0 {
+		for iNdEx := len(m.OutgoingApprovals) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.ApprovedOutgoingTransfers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.OutgoingApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1862,9 +1861,9 @@ func (m *MsgUpdateUserApprovedTransfers) MarshalToSizedBuffer(dAtA []byte) (int,
 			dAtA[i] = 0x22
 		}
 	}
-	if m.UpdateApprovedOutgoingTransfers {
+	if m.UpdateOutgoingApprovals {
 		i--
-		if m.UpdateApprovedOutgoingTransfers {
+		if m.UpdateOutgoingApprovals {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -1892,7 +1891,7 @@ func (m *MsgUpdateUserApprovedTransfers) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdateUserApprovedTransfersResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateUserApprovalsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1902,12 +1901,12 @@ func (m *MsgUpdateUserApprovedTransfersResponse) Marshal() (dAtA []byte, err err
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdateUserApprovedTransfersResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateUserApprovalsResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateUserApprovedTransfersResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateUserApprovalsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1948,8 +1947,8 @@ func (m *BadgeCustomMsgType) Size() (n int) {
 		l = m.TransferBadgesMsg.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.UpdateUserApprovedTransfersMsg != nil {
-		l = m.UpdateUserApprovedTransfersMsg.Size()
+	if m.UpdateUserApprovalsMsg != nil {
+		l = m.UpdateUserApprovalsMsg.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
@@ -1971,14 +1970,14 @@ func (m *MsgUpdateCollection) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if len(m.DefaultApprovedOutgoingTransfers) > 0 {
-		for _, e := range m.DefaultApprovedOutgoingTransfers {
+	if len(m.DefaultOutgoingApprovals) > 0 {
+		for _, e := range m.DefaultOutgoingApprovals {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if len(m.DefaultApprovedIncomingTransfers) > 0 {
-		for _, e := range m.DefaultApprovedIncomingTransfers {
+	if len(m.DefaultIncomingApprovals) > 0 {
+		for _, e := range m.DefaultIncomingApprovals {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -2050,11 +2049,11 @@ func (m *MsgUpdateCollection) Size() (n int) {
 			n += 2 + l + sovTx(uint64(l))
 		}
 	}
-	if m.UpdateCollectionApprovedTransfers {
+	if m.UpdateCollectionApprovals {
 		n += 3
 	}
-	if len(m.CollectionApprovedTransfers) > 0 {
-		for _, e := range m.CollectionApprovedTransfers {
+	if len(m.CollectionApprovals) > 0 {
+		for _, e := range m.CollectionApprovals {
 			l = e.Size()
 			n += 2 + l + sovTx(uint64(l))
 		}
@@ -2177,7 +2176,7 @@ func (m *MsgDeleteCollectionResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgUpdateUserApprovedTransfers) Size() (n int) {
+func (m *MsgUpdateUserApprovals) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2189,20 +2188,20 @@ func (m *MsgUpdateUserApprovedTransfers) Size() (n int) {
 	}
 	l = m.CollectionId.Size()
 	n += 1 + l + sovTx(uint64(l))
-	if m.UpdateApprovedOutgoingTransfers {
+	if m.UpdateOutgoingApprovals {
 		n += 2
 	}
-	if len(m.ApprovedOutgoingTransfers) > 0 {
-		for _, e := range m.ApprovedOutgoingTransfers {
+	if len(m.OutgoingApprovals) > 0 {
+		for _, e := range m.OutgoingApprovals {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if m.UpdateApprovedIncomingTransfers {
+	if m.UpdateIncomingApprovals {
 		n += 2
 	}
-	if len(m.ApprovedIncomingTransfers) > 0 {
-		for _, e := range m.ApprovedIncomingTransfers {
+	if len(m.IncomingApprovals) > 0 {
+		for _, e := range m.IncomingApprovals {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -2217,7 +2216,7 @@ func (m *MsgUpdateUserApprovedTransfers) Size() (n int) {
 	return n
 }
 
-func (m *MsgUpdateUserApprovedTransfersResponse) Size() (n int) {
+func (m *MsgUpdateUserApprovalsResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2407,7 +2406,7 @@ func (m *BadgeCustomMsgType) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdateUserApprovedTransfersMsg", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateUserApprovalsMsg", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2434,10 +2433,10 @@ func (m *BadgeCustomMsgType) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.UpdateUserApprovedTransfersMsg == nil {
-				m.UpdateUserApprovedTransfersMsg = &MsgUpdateUserApprovedTransfers{}
+			if m.UpdateUserApprovalsMsg == nil {
+				m.UpdateUserApprovalsMsg = &MsgUpdateUserApprovals{}
 			}
-			if err := m.UpdateUserApprovedTransfersMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.UpdateUserApprovalsMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2591,7 +2590,7 @@ func (m *MsgUpdateCollection) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DefaultApprovedOutgoingTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DefaultOutgoingApprovals", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2618,14 +2617,14 @@ func (m *MsgUpdateCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DefaultApprovedOutgoingTransfers = append(m.DefaultApprovedOutgoingTransfers, &UserApprovedOutgoingTransfer{})
-			if err := m.DefaultApprovedOutgoingTransfers[len(m.DefaultApprovedOutgoingTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.DefaultOutgoingApprovals = append(m.DefaultOutgoingApprovals, &UserOutgoingApproval{})
+			if err := m.DefaultOutgoingApprovals[len(m.DefaultOutgoingApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DefaultApprovedIncomingTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DefaultIncomingApprovals", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2652,8 +2651,8 @@ func (m *MsgUpdateCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DefaultApprovedIncomingTransfers = append(m.DefaultApprovedIncomingTransfers, &UserApprovedIncomingTransfer{})
-			if err := m.DefaultApprovedIncomingTransfers[len(m.DefaultApprovedIncomingTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.DefaultIncomingApprovals = append(m.DefaultIncomingApprovals, &UserIncomingApproval{})
+			if err := m.DefaultIncomingApprovals[len(m.DefaultIncomingApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3073,7 +3072,7 @@ func (m *MsgUpdateCollection) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 21:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdateCollectionApprovedTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateCollectionApprovals", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -3090,10 +3089,10 @@ func (m *MsgUpdateCollection) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.UpdateCollectionApprovedTransfers = bool(v != 0)
+			m.UpdateCollectionApprovals = bool(v != 0)
 		case 22:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CollectionApprovedTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionApprovals", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3120,8 +3119,8 @@ func (m *MsgUpdateCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CollectionApprovedTransfers = append(m.CollectionApprovedTransfers, &CollectionApprovedTransfer{})
-			if err := m.CollectionApprovedTransfers[len(m.CollectionApprovedTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.CollectionApprovals = append(m.CollectionApprovals, &CollectionApproval{})
+			if err := m.CollectionApprovals[len(m.CollectionApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3906,7 +3905,7 @@ func (m *MsgDeleteCollectionResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdateUserApprovedTransfers) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateUserApprovals) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3929,10 +3928,10 @@ func (m *MsgUpdateUserApprovedTransfers) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdateUserApprovedTransfers: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateUserApprovals: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdateUserApprovedTransfers: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateUserApprovals: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -4003,7 +4002,7 @@ func (m *MsgUpdateUserApprovedTransfers) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdateApprovedOutgoingTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateOutgoingApprovals", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -4020,10 +4019,10 @@ func (m *MsgUpdateUserApprovedTransfers) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.UpdateApprovedOutgoingTransfers = bool(v != 0)
+			m.UpdateOutgoingApprovals = bool(v != 0)
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApprovedOutgoingTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field OutgoingApprovals", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4050,14 +4049,14 @@ func (m *MsgUpdateUserApprovedTransfers) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ApprovedOutgoingTransfers = append(m.ApprovedOutgoingTransfers, &UserApprovedOutgoingTransfer{})
-			if err := m.ApprovedOutgoingTransfers[len(m.ApprovedOutgoingTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.OutgoingApprovals = append(m.OutgoingApprovals, &UserOutgoingApproval{})
+			if err := m.OutgoingApprovals[len(m.OutgoingApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 5:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdateApprovedIncomingTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateIncomingApprovals", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -4074,10 +4073,10 @@ func (m *MsgUpdateUserApprovedTransfers) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.UpdateApprovedIncomingTransfers = bool(v != 0)
+			m.UpdateIncomingApprovals = bool(v != 0)
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApprovedIncomingTransfers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field IncomingApprovals", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4104,8 +4103,8 @@ func (m *MsgUpdateUserApprovedTransfers) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ApprovedIncomingTransfers = append(m.ApprovedIncomingTransfers, &UserApprovedIncomingTransfer{})
-			if err := m.ApprovedIncomingTransfers[len(m.ApprovedIncomingTransfers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.IncomingApprovals = append(m.IncomingApprovals, &UserIncomingApproval{})
+			if err := m.IncomingApprovals[len(m.IncomingApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4186,7 +4185,7 @@ func (m *MsgUpdateUserApprovedTransfers) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdateUserApprovedTransfersResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateUserApprovalsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4209,10 +4208,10 @@ func (m *MsgUpdateUserApprovedTransfersResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdateUserApprovedTransfersResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateUserApprovalsResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdateUserApprovedTransfersResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateUserApprovalsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

@@ -11,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool, approverAddress string, challengeLevel string, challengeIdsIncremented *[]string) (sdkmath.Uint, error) {
+func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool, approverAddress string, challengeLevel string, challengeIdsIncremented *[]string, approval *types.CollectionApproval) (sdkmath.Uint, error) {
 	numIncrements := sdkmath.NewUint(0)
 
 	for _, challenge := range challenges {
@@ -50,7 +50,12 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 				}
 
 				leafIndex := GetLeafIndex(proof.Aunts)
-				if challenge.UseLeafIndexForTransferOrder {
+
+				useLeafIndexForTransferOrder := false
+				if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.PredeterminedBalances != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
+					useLeafIndexForTransferOrder = true
+				}
+				if useLeafIndexForTransferOrder {
 					//Get leftmost leaf index for layer === challenge.ExpectedProofLength
 					leftmostLeafIndex := sdkmath.NewUint(1)
 					for i := sdkmath.NewUint(0); i.LT(challenge.ExpectedProofLength); i = i.Add(sdkmath.NewUint(1)) {

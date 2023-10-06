@@ -24,180 +24,122 @@ func ValidatePermittedTimes(permittedTimes []*UintRange, forbiddenTimes []*UintR
 	return nil
 }
 
-func ValidateCollectionApprovedTransferPermissions(permissions []*CollectionApprovedTransferPermission) error {
+func ValidateCollectionApprovalPermissions(permissions []*CollectionApprovalPermission) error {
 	for _, permission := range permissions {
-		if permission.DefaultValues == nil {
+		if permission == nil {
 			return ErrPermissionsValueIsNil
 		}
 
-		if permission.Combinations == nil || len(permission.Combinations) == 0 {
-			return ErrCombinationsIsNil
-		}
-
-		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, false, false)
+		err := ValidateRangesAreValid(permission.BadgeIds, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TransferTimes, false, false)
+		err = ValidateRangesAreValid(permission.TransferTimes, false, false)
 		if err != nil {
 			return err
 		}
 		
-		err = ValidateRangesAreValid(permission.DefaultValues.OwnershipTimes, false, false)
+		err = ValidateRangesAreValid(permission.OwnershipTimes, false, false)
 		if err != nil {
 			return err
 		}
 
-		// if permission.DefaultValues.ApprovalTrackerId == "" {
+		// if permission.ApprovalTrackerId == "" {
 		// 	return ErrApprovalTrackerIdIsNil
 		// }
 
-		// if permission.DefaultValues.ChallengeTrackerId == "" {
+		// if permission.ChallengeTrackerId == "" {
 		// 	return ErrChallengeTrackerIdIsNil
 		// }
 		
-		permission.DefaultValues.TransferTimes = SortAndMergeOverlapping(permission.DefaultValues.TransferTimes)
-		permission.DefaultValues.OwnershipTimes = SortAndMergeOverlapping(permission.DefaultValues.OwnershipTimes)
-		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
+		permission.TransferTimes = SortAndMergeOverlapping(permission.TransferTimes)
+		permission.OwnershipTimes = SortAndMergeOverlapping(permission.OwnershipTimes)
+		permission.BadgeIds = SortAndMergeOverlapping(permission.BadgeIds)
 
-		//Assert no two combinations are the same
-		for idx, combination := range permission.Combinations {
-			for _, combination2 := range permission.Combinations[idx+1:] {
-				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
-					combination.TransferTimesOptions == combination2.TransferTimesOptions &&
-					combination.OwnershipTimesOptions == combination2.OwnershipTimesOptions &&
-					combination.ToMappingOptions == combination2.ToMappingOptions &&
-					combination.FromMappingOptions == combination2.FromMappingOptions &&
-					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
-					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions &&
-					combination.ApprovalTrackerIdOptions == combination2.ApprovalTrackerIdOptions &&
-					combination.ChallengeTrackerIdOptions == combination2.ChallengeTrackerIdOptions {
-					return ErrInvalidCombinations
-				}
-			}
-
-			err := ValidatePermittedTimes(permission.DefaultValues.PermittedTimes, permission.DefaultValues.ForbiddenTimes)
-			if err != nil {
-				return err
-			}
-
-			permission.DefaultValues.PermittedTimes = SortAndMergeOverlapping(permission.DefaultValues.PermittedTimes)
-			permission.DefaultValues.ForbiddenTimes = SortAndMergeOverlapping(permission.DefaultValues.ForbiddenTimes)
+		err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
+		if err != nil {
+			return err
 		}
+
+		permission.PermittedTimes = SortAndMergeOverlapping(permission.PermittedTimes)
+		permission.ForbiddenTimes = SortAndMergeOverlapping(permission.ForbiddenTimes)
 	}
 
 	return nil
 }
 
-func ValidateUserApprovedOutgoingTransferPermissions(permissions []*UserApprovedOutgoingTransferPermission) error {
+func ValidateUserOutgoingApprovalPermissions(permissions []*UserOutgoingApprovalPermission) error {
 	for _, permission := range permissions {
-		if permission.DefaultValues == nil {
+		if permission == nil {
 			return ErrPermissionsValueIsNil
 		}
 
-		if permission.Combinations == nil || len(permission.Combinations) == 0 {
-			return ErrCombinationsIsNil
-		}
-
-		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, false, false)
+		err := ValidateRangesAreValid(permission.BadgeIds, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TransferTimes, false, false)
+		err = ValidateRangesAreValid(permission.TransferTimes, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.OwnershipTimes, false, false)
+		err = ValidateRangesAreValid(permission.OwnershipTimes, false, false)
 		if err != nil {
 			return err
 		}
 
-		permission.DefaultValues.OwnershipTimes = SortAndMergeOverlapping(permission.DefaultValues.OwnershipTimes)
-		permission.DefaultValues.TransferTimes = SortAndMergeOverlapping(permission.DefaultValues.TransferTimes)
-		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
+		permission.OwnershipTimes = SortAndMergeOverlapping(permission.OwnershipTimes)
+		permission.TransferTimes = SortAndMergeOverlapping(permission.TransferTimes)
+		permission.BadgeIds = SortAndMergeOverlapping(permission.BadgeIds)
 
-		for idx, combination := range permission.Combinations {
-			for _, combination2 := range permission.Combinations[idx+1:] {
-				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
-					combination.TransferTimesOptions == combination2.TransferTimesOptions &&
-					combination.OwnershipTimesOptions == combination2.OwnershipTimesOptions &&
-					combination.ToMappingOptions == combination2.ToMappingOptions &&
-					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
-					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions &&
-					combination.ApprovalTrackerIdOptions == combination2.ApprovalTrackerIdOptions &&
-					combination.ChallengeTrackerIdOptions == combination2.ChallengeTrackerIdOptions {
-					return ErrInvalidCombinations
-				}
-			}
-			err := ValidatePermittedTimes(permission.DefaultValues.PermittedTimes, permission.DefaultValues.ForbiddenTimes)
-			if err != nil {
-				return err
-			}
-
-			permission.DefaultValues.PermittedTimes = SortAndMergeOverlapping(permission.DefaultValues.PermittedTimes)
-			permission.DefaultValues.ForbiddenTimes = SortAndMergeOverlapping(permission.DefaultValues.ForbiddenTimes)
+		err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
+		if err != nil {
+			return err
 		}
+
+		permission.PermittedTimes = SortAndMergeOverlapping(permission.PermittedTimes)
+		permission.ForbiddenTimes = SortAndMergeOverlapping(permission.ForbiddenTimes)
+		
 	}
 
 	return nil
 }
 
-func ValidateUserApprovedIncomingTransferPermissions(permissions []*UserApprovedIncomingTransferPermission) error {
+func ValidateUserIncomingApprovalPermissions(permissions []*UserIncomingApprovalPermission) error {
 	for _, permission := range permissions {
-		if permission.DefaultValues == nil {
+		if permission == nil {
 			return ErrPermissionsValueIsNil
 		}
 
-		if permission.Combinations == nil || len(permission.Combinations) == 0 {
-			return ErrCombinationsIsNil
-		}
-
-		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, false, false)
+		err := ValidateRangesAreValid(permission.BadgeIds, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TransferTimes, false, false)
+		err = ValidateRangesAreValid(permission.TransferTimes, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.OwnershipTimes, false, false)
+		err = ValidateRangesAreValid(permission.OwnershipTimes, false, false)
 		if err != nil {
 			return err
 		}
 
-		permission.DefaultValues.OwnershipTimes = SortAndMergeOverlapping(permission.DefaultValues.OwnershipTimes)
-		permission.DefaultValues.TransferTimes = SortAndMergeOverlapping(permission.DefaultValues.TransferTimes)
-		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
+		permission.OwnershipTimes = SortAndMergeOverlapping(permission.OwnershipTimes)
+		permission.TransferTimes = SortAndMergeOverlapping(permission.TransferTimes)
+		permission.BadgeIds = SortAndMergeOverlapping(permission.BadgeIds)
 
-		for idx, combination := range permission.Combinations {
-			for _, combination2 := range permission.Combinations[idx+1:] {
-				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
-					combination.TransferTimesOptions == combination2.TransferTimesOptions &&
-					combination.OwnershipTimesOptions == combination2.OwnershipTimesOptions &&
-					combination.FromMappingOptions == combination2.FromMappingOptions &&
-					combination.InitiatedByMappingOptions == combination2.InitiatedByMappingOptions &&
-					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions &&
-					combination.ApprovalTrackerIdOptions == combination2.ApprovalTrackerIdOptions &&
-					combination.ChallengeTrackerIdOptions == combination2.ChallengeTrackerIdOptions {
-					return ErrInvalidCombinations
-				}
-			}
-			err := ValidatePermittedTimes(permission.DefaultValues.PermittedTimes, permission.DefaultValues.ForbiddenTimes)
-			if err != nil {
-				return err
-			}
-
-			permission.DefaultValues.PermittedTimes = SortAndMergeOverlapping(permission.DefaultValues.PermittedTimes)
-			permission.DefaultValues.ForbiddenTimes = SortAndMergeOverlapping(permission.DefaultValues.ForbiddenTimes)
+		err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
+		if err != nil {
+			return err
 		}
+
+		permission.PermittedTimes = SortAndMergeOverlapping(permission.PermittedTimes)
+		permission.ForbiddenTimes = SortAndMergeOverlapping(permission.ForbiddenTimes)
+
 	}
 
 	return nil
@@ -205,45 +147,32 @@ func ValidateUserApprovedIncomingTransferPermissions(permissions []*UserApproved
 
 func ValidateTimedUpdateWithBadgeIdsPermission(permissions []*TimedUpdateWithBadgeIdsPermission) error {
 	for _, permission := range permissions {
-		if permission.DefaultValues == nil {
+		if permission == nil {
 			return ErrPermissionsValueIsNil
 		}
 
-		if permission.Combinations == nil || len(permission.Combinations) == 0 {
-			return ErrCombinationsIsNil
-		}
-
-		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, false, true)
+		err := ValidateRangesAreValid(permission.BadgeIds, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false, true)
+		err = ValidateRangesAreValid(permission.TimelineTimes, false, false)
 		if err != nil {
 			return err
 		}
 
-		permission.DefaultValues.TimelineTimes = SortAndMergeOverlapping(permission.DefaultValues.TimelineTimes)
-		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
+		permission.TimelineTimes = SortAndMergeOverlapping(permission.TimelineTimes)
+		permission.BadgeIds = SortAndMergeOverlapping(permission.BadgeIds)
 
-		for idx, combination := range permission.Combinations {
-			for _, combination2 := range permission.Combinations[idx+1:] {
-				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
-					combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
-					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
-					return ErrInvalidCombinations
-				}
-			}
 
-			err := ValidatePermittedTimes(permission.DefaultValues.PermittedTimes, permission.DefaultValues.ForbiddenTimes)
+			err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
 			if err != nil {
 				return err
 			}
 
-			permission.DefaultValues.PermittedTimes = SortAndMergeOverlapping(permission.DefaultValues.PermittedTimes)
-			permission.DefaultValues.ForbiddenTimes = SortAndMergeOverlapping(permission.DefaultValues.ForbiddenTimes)
-		}
+			permission.PermittedTimes = SortAndMergeOverlapping(permission.PermittedTimes)
+			permission.ForbiddenTimes = SortAndMergeOverlapping(permission.ForbiddenTimes)
+		
 
 		//Note we can check overlap here with other badgeIds but
 		//that would take away from the flexibility of the BadgeIdsOptions.
@@ -256,45 +185,32 @@ func ValidateTimedUpdateWithBadgeIdsPermission(permissions []*TimedUpdateWithBad
 
 func ValidateBalancesActionPermission(permissions []*BalancesActionPermission) error {
 	for _, permission := range permissions {
-		if permission.DefaultValues == nil {
+		if permission == nil {
 			return ErrPermissionsValueIsNil
 		}
 
-		if permission.Combinations == nil || len(permission.Combinations) == 0 {
-			return ErrCombinationsIsNil
-		}
-
-		err := ValidateRangesAreValid(permission.DefaultValues.BadgeIds, false, false)
+		err := ValidateRangesAreValid(permission.BadgeIds, false, false)
 		if err != nil {
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.DefaultValues.OwnershipTimes, false, false)
+		err = ValidateRangesAreValid(permission.OwnershipTimes, false, false)
 		if err != nil {
 			return err
 		}
 
-		permission.DefaultValues.OwnershipTimes = SortAndMergeOverlapping(permission.DefaultValues.OwnershipTimes)
-		permission.DefaultValues.BadgeIds = SortAndMergeOverlapping(permission.DefaultValues.BadgeIds)
+		permission.OwnershipTimes = SortAndMergeOverlapping(permission.OwnershipTimes)
+		permission.BadgeIds = SortAndMergeOverlapping(permission.BadgeIds)
 
-		for idx, combination := range permission.Combinations {
-			for _, combination2 := range permission.Combinations[idx+1:] {
-				if combination.BadgeIdsOptions == combination2.BadgeIdsOptions &&
-					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions &&
-					combination.OwnershipTimesOptions == combination2.OwnershipTimesOptions {
-					return ErrInvalidCombinations
-				}
-			}
 
-			err := ValidatePermittedTimes(permission.DefaultValues.PermittedTimes, permission.DefaultValues.ForbiddenTimes)
+			err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
 			if err != nil {
 				return err
 			}
 
-			permission.DefaultValues.PermittedTimes = SortAndMergeOverlapping(permission.DefaultValues.PermittedTimes)
-			permission.DefaultValues.ForbiddenTimes = SortAndMergeOverlapping(permission.DefaultValues.ForbiddenTimes)
-		}
+			permission.PermittedTimes = SortAndMergeOverlapping(permission.PermittedTimes)
+			permission.ForbiddenTimes = SortAndMergeOverlapping(permission.ForbiddenTimes)
+		
 	}
 
 	return nil
@@ -302,38 +218,27 @@ func ValidateBalancesActionPermission(permissions []*BalancesActionPermission) e
 
 func ValidateTimedUpdatePermission(permissions []*TimedUpdatePermission) error {
 	for _, permission := range permissions {
-		if permission.DefaultValues == nil {
+		if permission == nil {
 			return ErrPermissionsValueIsNil
 		}
 
-		if permission.Combinations == nil || len(permission.Combinations) == 0 {
-			return ErrCombinationsIsNil
-		}
-
-		err := ValidateRangesAreValid(permission.DefaultValues.TimelineTimes, false, false)
+		err := ValidateRangesAreValid(permission.TimelineTimes, false, false)
 		if err != nil {
 			return err
 		}
 
-		permission.DefaultValues.TimelineTimes = SortAndMergeOverlapping(permission.DefaultValues.TimelineTimes)
+		permission.TimelineTimes = SortAndMergeOverlapping(permission.TimelineTimes)
 
-		for idx, combination := range permission.Combinations {
-			for _, combination2 := range permission.Combinations[idx+1:] {
-				if combination.TimelineTimesOptions == combination2.TimelineTimesOptions &&
-					combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
-					return ErrInvalidCombinations
-				}
-			}
+		
 
-			err := ValidatePermittedTimes(permission.DefaultValues.PermittedTimes, permission.DefaultValues.ForbiddenTimes)
+			err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
 			if err != nil {
 				return err
 			}
 
-			permission.DefaultValues.PermittedTimes = SortAndMergeOverlapping(permission.DefaultValues.PermittedTimes)
-			permission.DefaultValues.ForbiddenTimes = SortAndMergeOverlapping(permission.DefaultValues.ForbiddenTimes)
-		}
+			permission.PermittedTimes = SortAndMergeOverlapping(permission.PermittedTimes)
+			permission.ForbiddenTimes = SortAndMergeOverlapping(permission.ForbiddenTimes)
+		
 	}
 
 	return nil
@@ -345,40 +250,27 @@ func ValidateActionPermission(permissions []*ActionPermission) error {
 	}
 
 	for _, permission := range permissions {
-		err := ValidatePermittedTimes(permission.DefaultValues.PermittedTimes, permission.DefaultValues.ForbiddenTimes)
+		err := ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
 		if err != nil {
 			return err
 		}
 
-		if permission.Combinations == nil || len(permission.Combinations) == 0 {
-			return ErrCombinationsIsNil
-		}
-
-		permission.DefaultValues.PermittedTimes = SortAndMergeOverlapping(permission.DefaultValues.PermittedTimes)
-		permission.DefaultValues.ForbiddenTimes = SortAndMergeOverlapping(permission.DefaultValues.ForbiddenTimes)
-
-		for idx, combination := range permission.Combinations {
-			for _, combination2 := range permission.Combinations[idx+1:] {
-				if combination.PermittedTimesOptions == combination2.PermittedTimesOptions &&
-					combination.ForbiddenTimesOptions == combination2.ForbiddenTimesOptions {
-					return ErrInvalidCombinations
-				}
-			}
-		}
+		permission.PermittedTimes = SortAndMergeOverlapping(permission.PermittedTimes)
+		permission.ForbiddenTimes = SortAndMergeOverlapping(permission.ForbiddenTimes)
 	}
 
 	return nil
 }
 
 func ValidateUserPermissions(permissions *UserPermissions) error {
-	if permissions.CanUpdateApprovedIncomingTransfers != nil {
-		if err := ValidateUserApprovedIncomingTransferPermissions(permissions.CanUpdateApprovedIncomingTransfers); err != nil {
+	if permissions.CanUpdateIncomingApprovals != nil {
+		if err := ValidateUserIncomingApprovalPermissions(permissions.CanUpdateIncomingApprovals); err != nil {
 			return err
 		}
 	}
 
-	if permissions.CanUpdateApprovedOutgoingTransfers != nil {
-		if err := ValidateUserApprovedOutgoingTransferPermissions(permissions.CanUpdateApprovedOutgoingTransfers); err != nil {
+	if permissions.CanUpdateOutgoingApprovals != nil {
+		if err := ValidateUserOutgoingApprovalPermissions(permissions.CanUpdateOutgoingApprovals); err != nil {
 			return err
 		}
 	}
@@ -416,7 +308,7 @@ func ValidatePermissions(permissions *CollectionPermissions) error {
 		return err
 	}
 
-	if err := ValidateCollectionApprovedTransferPermissions(permissions.CanUpdateCollectionApprovedTransfers); err != nil {
+	if err := ValidateCollectionApprovalPermissions(permissions.CanUpdateCollectionApprovals); err != nil {
 		return err
 	}
 

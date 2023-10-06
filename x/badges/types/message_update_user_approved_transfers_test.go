@@ -8,21 +8,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMsgUpdateUserApprovedTransfers_ValidateBasic(t *testing.T) {
+func TestMsgUpdateUserApprovals_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgUpdateUserApprovedTransfers
+		msg  types.MsgUpdateUserApprovals
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgUpdateUserApprovedTransfers{
+			msg: types.MsgUpdateUserApprovals{
 				Creator: "invalid_address",
 			},
 			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgUpdateUserApprovedTransfers{
+			msg: types.MsgUpdateUserApprovals{
 				Creator: sample.AccAddress(),
 			},
 		},

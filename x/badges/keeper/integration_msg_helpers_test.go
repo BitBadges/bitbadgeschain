@@ -113,13 +113,13 @@ func TransferBadges(suite *TestSuite, ctx context.Context, msg *types.MsgTransfe
 	return err
 }
 
-func UpdateUserApprovedTransfers(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateUserApprovedTransfers) error {
+func UpdateUserApprovals(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateUserApprovals) error {
 	err := msg.ValidateBasic()
 	if err != nil {
 		return err
 	}
 
-	_, err = suite.msgServer.UpdateUserApprovedTransfers(ctx, msg)
+	_, err = suite.msgServer.UpdateUserApprovals(ctx, msg)
 	return err
 }
 
@@ -154,9 +154,9 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			Creator:      bob,
 			BalancesType: balancesType,
 			CollectionPermissions: collectionToCreate.Permissions,
-			CollectionApprovedTransfers: collectionToCreate.CollectionApprovedTransfers,
-			DefaultApprovedOutgoingTransfers: collectionToCreate.DefaultApprovedOutgoingTransfers,
-			DefaultApprovedIncomingTransfers: collectionToCreate.DefaultApprovedIncomingTransfers,
+			CollectionApprovals: collectionToCreate.CollectionApprovals,
+			DefaultOutgoingApprovals: collectionToCreate.DefaultOutgoingApprovals,
+			DefaultIncomingApprovals: collectionToCreate.DefaultIncomingApprovals,
 			// ManagerTimeline: []*types.ManagerTimeline{
 			// 	{
 			// 		Manager: collectionToCreate.Creator,
@@ -183,7 +183,7 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			
 			UpdateCustomDataTimeline: true,
 			UpdateContractAddressTimeline: true,
-			UpdateCollectionApprovedTransfers: true,
+			UpdateCollectionApprovals: true,
 			UpdateStandardsTimeline: true,
 			// UpdateIsArchivedTimeline: true,
 		})
@@ -225,8 +225,8 @@ func MintAndDistributeBadges(suite *TestSuite, ctx context.Context, msg *types.M
 		UpdateBadgeMetadataTimeline: true,
 		OffChainBalancesMetadataTimeline: msg.OffChainBalancesMetadataTimeline,
 		UpdateOffChainBalancesMetadataTimeline: true,
-		CollectionApprovedTransfers: msg.CollectionApprovedTransfers,
-		UpdateCollectionApprovedTransfers: true,
+		CollectionApprovals: msg.CollectionApprovals,
+		UpdateCollectionApprovals: true,
 	})
 	if err != nil {
 		return err 
@@ -240,12 +240,12 @@ func MintAndDistributeBadges(suite *TestSuite, ctx context.Context, msg *types.M
 	return err
 }
 
-func UpdateCollectionApprovedTransfers(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateCollectionApprovedTransfers) error {
+func UpdateCollectionApprovals(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateCollectionApprovals) error {
 	_, err := suite.msgServer.UpdateCollection(ctx, &types.MsgUpdateCollection{
 		Creator: bob,
 		CollectionId: msg.CollectionId,
-		CollectionApprovedTransfers: msg.CollectionApprovedTransfers,
-		UpdateCollectionApprovedTransfers: true,
+		CollectionApprovals: msg.CollectionApprovals,
+		UpdateCollectionApprovals: true,
 	})
 	return err
 }
@@ -306,7 +306,7 @@ func UpdateCollectionPermissions(suite *TestSuite, ctx context.Context, msg *typ
 
 
 func UpdateUserPermissions(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateUserPermissions) error {
-	_, err := suite.msgServer.UpdateUserApprovedTransfers(ctx, &types.MsgUpdateUserApprovedTransfers{
+	_, err := suite.msgServer.UpdateUserApprovals(ctx, &types.MsgUpdateUserApprovals{
 		Creator: bob,
 		CollectionId: msg.CollectionId,
 		UserPermissions: msg.Permissions,

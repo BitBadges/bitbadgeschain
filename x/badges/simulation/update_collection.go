@@ -28,7 +28,7 @@ func SimulateMsgUpdateCollection(
 			UpdateBadgeMetadataTimeline: r.Int63n(2) == 0,
 			UpdateOffChainBalancesMetadataTimeline: r.Int63n(2) == 0,
 			UpdateCustomDataTimeline: r.Int63n(2) == 0,
-			UpdateCollectionApprovedTransfers: r.Int63n(2) == 0,
+			UpdateCollectionApprovals: r.Int63n(2) == 0,
 			UpdateStandardsTimeline: r.Int63n(2) == 0,
 			UpdateContractAddressTimeline: r.Int63n(2) == 0,
 
@@ -40,7 +40,7 @@ func SimulateMsgUpdateCollection(
 				},
 			},
 			BadgesToCreate: GetRandomBalances(r, 3),
-			CollectionApprovedTransfers: []*types.CollectionApprovedTransfer{
+			CollectionApprovals: []*types.CollectionApproval{
 				{
 					FromMappingId:        GetRandomAddresses(r, 1, accs)[0],
 					ToMappingId:          GetRandomAddresses(r, 1, accs)[0],
@@ -48,11 +48,7 @@ func SimulateMsgUpdateCollection(
 					TransferTimes:        GetTimelineTimes(r, 100),
 					OwnershipTimes: 		 GetTimelineTimes(r, 100),
 					BadgeIds:             GetTimelineTimes(r, 3),
-					AllowedCombinations: []*types.IsCollectionTransferAllowed{
-						{
-							IsApproved: r.Int63n(2) == 0,
-						},
-					},
+					IsApproved: r.Int63n(2) == 0,
 				},
 			},
 			ManagerTimeline: []*types.ManagerTimeline{

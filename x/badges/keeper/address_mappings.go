@@ -160,18 +160,18 @@ func (k Keeper) CheckMappingAddresses(ctx sdk.Context, addressMappingId string, 
 
 // Note addresses matching does not mean the transfer is allowed. It just means the addresses match.
 // All other criteria must also be met.
-func (k Keeper) CheckIfAddressesMatchCollectionMappingIds(ctx sdk.Context, collectionApprovedTransfer *types.CollectionApprovedTransfer, from string, to string, initiatedBy string, managerAddress string) bool {
-	fromFound, err := k.CheckMappingAddresses(ctx, collectionApprovedTransfer.FromMappingId, from, managerAddress)
+func (k Keeper) CheckIfAddressesMatchCollectionMappingIds(ctx sdk.Context, collectionApproval *types.CollectionApproval, from string, to string, initiatedBy string, managerAddress string) bool {
+	fromFound, err := k.CheckMappingAddresses(ctx, collectionApproval.FromMappingId, from, managerAddress)
 	if err != nil {
 		return false
 	}
 
-	toFound, err := k.CheckMappingAddresses(ctx, collectionApprovedTransfer.ToMappingId, to, managerAddress)
+	toFound, err := k.CheckMappingAddresses(ctx, collectionApproval.ToMappingId, to, managerAddress)
 	if err != nil {
 		return false
 	}
 
-	initiatedByFound, err := k.CheckMappingAddresses(ctx, collectionApprovedTransfer.InitiatedByMappingId, initiatedBy, managerAddress)
+	initiatedByFound, err := k.CheckMappingAddresses(ctx, collectionApproval.InitiatedByMappingId, initiatedBy, managerAddress)
 	if err != nil {
 		return false
 	}

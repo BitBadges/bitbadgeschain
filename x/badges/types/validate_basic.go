@@ -172,116 +172,103 @@ func ValidateAddressMapping(addressMapping *AddressMapping) error {
 	return nil
 }
 
-func ValidateUserApprovedOutgoingTransfers(userApprovedOutgoingTransfers []*UserApprovedOutgoingTransfer, fromAddress string) error {
-	castedTransfers := CastOutgoingTransfersToCollectionTransfers(userApprovedOutgoingTransfers, fromAddress)
-	err := ValidateCollectionApprovedTransfers(castedTransfers)
+func ValidateUserOutgoingApprovals(userOutgoingApprovals []*UserOutgoingApproval, fromAddress string) error {
+	castedTransfers := CastOutgoingTransfersToCollectionTransfers(userOutgoingApprovals, fromAddress)
+	err := ValidateCollectionApprovals(castedTransfers)
 	return err
 }
 
-func ValidateUserApprovedIncomingTransfers(userApprovedIncomingTransfers []*UserApprovedIncomingTransfer, toAddress string) error {
-	castedTransfers := CastIncomingTransfersToCollectionTransfers(userApprovedIncomingTransfers, toAddress)
-	err := ValidateCollectionApprovedTransfers(castedTransfers)
+func ValidateUserIncomingApprovals(userIncomingApprovals []*UserIncomingApproval, toAddress string) error {
+	castedTransfers := CastIncomingTransfersToCollectionTransfers(userIncomingApprovals, toAddress)
+	err := ValidateCollectionApprovals(castedTransfers)
 	return err
 }
 
-func ValidateApprovalsTracker(approvalsTracker *ApprovalsTracker) error {
-	if approvalsTracker.NumTransfers.IsNil() {
-		return sdkerrors.Wrapf(ErrUintUnititialized, "num transfers is uninitialized")
-	}
-
-	err := *new(error)
-	approvalsTracker.Amounts, err = ValidateBalances(approvalsTracker.Amounts)
-
-	if err != nil {
-		return sdkerrors.Wrapf(err, "invalid balances")
-	}
-
-	return nil
-}
-
-func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*CollectionApprovedTransfer) error {
-	for i := 0; i < len(collectionApprovedTransfers); i++ {
-		if collectionApprovedTransfers[i].ApprovalId == "" {
+func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval) error {
+	for i := 0; i < len(collectionApprovals); i++ {
+		if collectionApprovals[i].IsApproved && collectionApprovals[i].ApprovalId == "" {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id is uninitialized")
 		}
 
-		if collectionApprovedTransfers[i].ApprovalId == "default-outgoing" || collectionApprovedTransfers[i].ApprovalId == "default-incoming" {
+		if collectionApprovals[i].ApprovalId == "default-outgoing" || collectionApprovals[i].ApprovalId == "default-incoming" {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be default-outgoing or default-incoming")
 		}
 
-		for j := i + 1; j < len(collectionApprovedTransfers); j++ {
-			if collectionApprovedTransfers[i].ApprovalId == collectionApprovedTransfers[j].ApprovalId {
+		for j := i + 1; j < len(collectionApprovals); j++ {
+			if !collectionApprovals[i].IsApproved || !collectionApprovals[j].IsApproved {
+				continue
+			}
+			
+			if collectionApprovals[i].ApprovalId == collectionApprovals[j].ApprovalId {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate approval ids")
 			}
 		}
 	}
 
-	for _, collectionApprovedTransfer := range collectionApprovedTransfers {
-		count := 0
-		for _, combination := range collectionApprovedTransfer.AllowedCombinations {
-			if combination.IsApproved {
-				count++
-			}
-		}
-
-		if count > 1 {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "only one combination can have isApproved = true")
-		}
-	}
-
-	for _, collectionApprovedTransfer := range collectionApprovedTransfers {
-		if collectionApprovedTransfer == nil {
+	for _, collectionApproval := range collectionApprovals {
+		if collectionApproval == nil {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "collection approved transfer is nil")
 		}
 
-		if collectionApprovedTransfer.FromMappingId == "" {
+		if collectionApproval.FromMappingId == "" {
 			return sdkerrors.Wrapf(ErrInvalidAddress, "from mapping id is uninitialized")
 		}
 
-		if collectionApprovedTransfer.ToMappingId == "" {
+		if collectionApproval.ToMappingId == "" {
 			return sdkerrors.Wrapf(ErrInvalidAddress, "to mapping id is uninitialized")
 		}
 
-		if collectionApprovedTransfer.InitiatedByMappingId == "" {
+		if collectionApproval.InitiatedByMappingId == "" {
 			return sdkerrors.Wrapf(ErrInvalidAddress, "initiated by mapping id is uninitialized")
 		}
 
-		if err := ValidateRangesAreValid(collectionApprovedTransfer.BadgeIds, false, true); err != nil {
+		if err := ValidateRangesAreValid(collectionApproval.BadgeIds, false, false); err != nil {
 			return sdkerrors.Wrapf(err, "invalid badge IDs")
 		}
 
-		if err := ValidateRangesAreValid(collectionApprovedTransfer.TransferTimes, false, true); err != nil {
+		if err := ValidateRangesAreValid(collectionApproval.TransferTimes, false, false); err != nil {
 			return sdkerrors.Wrapf(err, "invalid transfer times")
 		}
 
-		if err := ValidateRangesAreValid(collectionApprovedTransfer.OwnershipTimes, false, true); err != nil {
+		if err := ValidateRangesAreValid(collectionApproval.OwnershipTimes, false, false); err != nil {
 			return sdkerrors.Wrapf(err, "invalid transfer times")
 		}
+
+		if collectionApproval.Uri != "" {
+			if err := ValidateURI(collectionApproval.Uri); err != nil {
+				return err
+			}
+		}
+
 		
-		approvalDetails := collectionApprovedTransfer.ApprovalDetails
-		if approvalDetails != nil {
-			if err := ValidateMerkleChallenge(approvalDetails.MerkleChallenge, collectionApprovedTransfer.ChallengeTrackerId); err != nil {
+		approvalCriteria := collectionApproval.ApprovalCriteria
+		if approvalCriteria != nil {
+			usingLeafIndexForTransferOrder := false
+			if (approvalCriteria.PredeterminedBalances != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex) {
+				usingLeafIndexForTransferOrder = true
+			}
+			if err := ValidateMerkleChallenge(approvalCriteria.MerkleChallenge, collectionApproval.ChallengeTrackerId, usingLeafIndexForTransferOrder); err != nil {
 				return sdkerrors.Wrapf(err, "invalid challenges")
 			}
 
-			if collectionApprovedTransfer.ApprovalTrackerId == "All" {
+			if collectionApproval.ApprovalTrackerId == "All" {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "approval tracker id can not be All")
 			}
 
-			if strings.Contains(collectionApprovedTransfer.ApprovalTrackerId, ":") || strings.Contains(collectionApprovedTransfer.ApprovalTrackerId, "!") {
+			if strings.Contains(collectionApproval.ApprovalTrackerId, ":") || strings.Contains(collectionApproval.ApprovalTrackerId, "!") {
 				return sdkerrors.Wrapf(ErrIdsContainsInvalidChars, "approval tracker id can not contain : or !")
 			}
 			
-			for _, mustOwnBadgeBalance := range approvalDetails.MustOwnBadges {
+			for _, mustOwnBadgeBalance := range approvalCriteria.MustOwnBadges {
 				if mustOwnBadgeBalance == nil {
 					return sdkerrors.Wrapf(ErrInvalidRequest, "mustOwnBadges balance is nil")
 				}
 
-				if err := ValidateRangesAreValid(mustOwnBadgeBalance.BadgeIds, false, true); err != nil {
+				if err := ValidateRangesAreValid(mustOwnBadgeBalance.BadgeIds, false, false); err != nil {
 					return sdkerrors.Wrapf(err, "invalid badge IDs")
 				}
 
-				if err := ValidateRangesAreValid(mustOwnBadgeBalance.OwnershipTimes, false, true); err != nil {
+				if err := ValidateRangesAreValid(mustOwnBadgeBalance.OwnershipTimes, false, false); err != nil {
 					return sdkerrors.Wrapf(err, "invalid owned times")
 				}
 
@@ -294,32 +281,27 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 				}
 			}
 			
-			if approvalDetails.Uri != "" {
-				if err := ValidateURI(approvalDetails.Uri); err != nil {
-					return err
-				}
-			}
-
+			
 	
-			if approvalDetails.PredeterminedBalances != nil {
-				orderCalculationMethodIsBasicallyNil := !approvalDetails.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex &&
-					!approvalDetails.PredeterminedBalances.OrderCalculationMethod.UseOverallNumTransfers &&
-					!approvalDetails.PredeterminedBalances.OrderCalculationMethod.UsePerToAddressNumTransfers &&
-					!approvalDetails.PredeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers &&
-					!approvalDetails.PredeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers
+			if approvalCriteria.PredeterminedBalances != nil {
+				orderCalculationMethodIsBasicallyNil := !approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex &&
+					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseOverallNumTransfers &&
+					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerToAddressNumTransfers &&
+					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers &&
+					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers
 
 				sequentialTransferIsBasicallyNil :=
-				approvalDetails.PredeterminedBalances.IncrementedBalances == nil || (approvalDetails.PredeterminedBalances.IncrementedBalances.StartBalances == nil &&
-					approvalDetails.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsZero() &&
-					approvalDetails.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy.IsZero())
+				approvalCriteria.PredeterminedBalances.IncrementedBalances == nil || (approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances == nil &&
+					approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsZero() &&
+					approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy.IsZero())
 
 
-					manualBalancesIsBasicallyNil := approvalDetails.PredeterminedBalances.ManualBalances == nil
+					manualBalancesIsBasicallyNil := approvalCriteria.PredeterminedBalances.ManualBalances == nil
 
 				isBasicallyNil := orderCalculationMethodIsBasicallyNil && sequentialTransferIsBasicallyNil && manualBalancesIsBasicallyNil
 
 				if (!isBasicallyNil) {
-					orderType := approvalDetails.PredeterminedBalances.OrderCalculationMethod
+					orderType := approvalCriteria.PredeterminedBalances.OrderCalculationMethod
 					if orderType == nil {
 						return sdkerrors.Wrapf(ErrInvalidRequest, "order type is nil")
 					}
@@ -355,7 +337,7 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 		
 					err := *new(error)
 					if (manualBalancesIsBasicallyNil && !sequentialTransferIsBasicallyNil) {
-						sequentialTransfer := approvalDetails.PredeterminedBalances.IncrementedBalances 
+						sequentialTransfer := approvalCriteria.PredeterminedBalances.IncrementedBalances 
 						sequentialTransfer.StartBalances, err = ValidateBalances(sequentialTransfer.StartBalances)
 						if err != nil {
 							return err
@@ -369,7 +351,7 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 							return sdkerrors.Wrapf(ErrUintUnititialized, "max num transfers is uninitialized")
 						}
 					} else if (!manualBalancesIsBasicallyNil && sequentialTransferIsBasicallyNil) {
-						for _, manualTransfer := range approvalDetails.PredeterminedBalances.ManualBalances {
+						for _, manualTransfer := range approvalCriteria.PredeterminedBalances.ManualBalances {
 							manualTransfer.Balances, err = ValidateBalances(manualTransfer.Balances)
 							if err != nil {
 								return err
@@ -380,30 +362,15 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 					}
 				}
 
-				if approvalDetails.ApprovalAmounts == nil {
+				if approvalCriteria.ApprovalAmounts == nil {
 					return sdkerrors.Wrapf(ErrInvalidRequest, "approval amounts is uninitialized")
 				}
 
-				if approvalDetails.MaxNumTransfers == nil {
+				if approvalCriteria.MaxNumTransfers == nil {
 					return sdkerrors.Wrapf(ErrInvalidRequest, "max num transfers must not be nil")
 				}
 			} else {
-				approvalDetails.PredeterminedBalances = nil
-			}
-		}
-		
-
-		for idx, allowedCombination := range collectionApprovedTransfer.AllowedCombinations {
-			for _, compCombination := range collectionApprovedTransfer.AllowedCombinations[idx+1:] {
-				if allowedCombination.BadgeIdsOptions == compCombination.BadgeIdsOptions &&
-					allowedCombination.TransferTimesOptions == compCombination.TransferTimesOptions &&
-					allowedCombination.OwnershipTimesOptions == compCombination.OwnershipTimesOptions &&
-					allowedCombination.ToMappingOptions == compCombination.ToMappingOptions &&
-					allowedCombination.FromMappingOptions == compCombination.FromMappingOptions &&
-					allowedCombination.InitiatedByMappingOptions == compCombination.InitiatedByMappingOptions &&
-					allowedCombination.IsApproved == compCombination.IsApproved {
-					return ErrInvalidCombinations
-				}
+				approvalCriteria.PredeterminedBalances = nil
 			}
 		}
 	}
@@ -411,12 +378,11 @@ func ValidateCollectionApprovedTransfers(collectionApprovedTransfers []*Collecti
 	return nil
 }
 
-func ValidateMerkleChallenge(challenge *MerkleChallenge, challengeId string) error {
+func ValidateMerkleChallenge(challenge *MerkleChallenge, challengeId string, usingLeafIndexForTransferOrder bool) error {
 	if challenge == nil || challenge.Root == "" {
 		return nil
 	}
 
-	hasOrderMatters := false
 	if challenge.ExpectedProofLength.IsNil() {
 		return sdkerrors.Wrapf(ErrUintUnititialized, "expected proof length is uninitialized")
 	}
@@ -429,15 +395,7 @@ func ValidateMerkleChallenge(challenge *MerkleChallenge, challengeId string) err
 		return sdkerrors.Wrapf(ErrIdsContainsInvalidChars, "approval tracker id can not contain : or !")
 	}
 
-	if challenge.UseLeafIndexForTransferOrder {
-		if hasOrderMatters {
-			return ErrCanOnlyUseLeafIndexForBadgeIdsOnce
-		}
-
-		hasOrderMatters = true
-	}
-
-	if !challenge.MaxOneUsePerLeaf && challenge.UseLeafIndexForTransferOrder {
+	if !challenge.MaxOneUsePerLeaf && usingLeafIndexForTransferOrder {
 		return ErrPrimaryChallengeMustBeOneUsePerLeaf
 	}
 
@@ -456,7 +414,7 @@ func ValidateBalances(balances []*Balance) ([]*Balance, error) {
 			return balances, sdkerrors.Wrapf(ErrInvalidLengthBalances, "balances is nil")
 		}
 
-		if balance.Amount.IsNil() {
+		if balance.Amount.IsNil() || balance.Amount.IsZero() {
 			return balances, sdkerrors.Wrapf(ErrAmountEqualsZero, "amount is uninitialized")
 		}
 
@@ -508,16 +466,16 @@ func ValidateTransfer(transfer *Transfer) error {
 		}
 	}
 
-	if transfer.PrecalculationDetails != nil {
-		if transfer.PrecalculationDetails.ApprovalLevel == "" && transfer.PrecalculationDetails.ApproverAddress == "" && transfer.PrecalculationDetails.ApprovalId == "" {
+	if transfer.PrecalculateBalancesFromApproval != nil {
+		if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "" && transfer.PrecalculateBalancesFromApproval.ApproverAddress == "" && transfer.PrecalculateBalancesFromApproval.ApprovalId == "" {
 			//basically nil
 		} else {
-			if transfer.PrecalculationDetails.ApprovalLevel != "collection" && transfer.PrecalculationDetails.ApprovalLevel != "incoming" && transfer.PrecalculationDetails.ApprovalLevel != "outgoing" {
+			if transfer.PrecalculateBalancesFromApproval.ApprovalLevel != "collection" && transfer.PrecalculateBalancesFromApproval.ApprovalLevel != "incoming" && transfer.PrecalculateBalancesFromApproval.ApprovalLevel != "outgoing" {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "approval level must be collection, incoming, or outgoing")
 			}
 
-			if transfer.PrecalculationDetails.ApproverAddress != "" {
-				if err := ValidateAddress(transfer.PrecalculationDetails.ApproverAddress, false); err != nil {
+			if transfer.PrecalculateBalancesFromApproval.ApproverAddress != "" {
+				if err := ValidateAddress(transfer.PrecalculateBalancesFromApproval.ApproverAddress, false); err != nil {
 					return sdkerrors.Wrapf(ErrInvalidAddress, "invalid approval id address (%s)", err)
 				}
 			}
@@ -538,7 +496,7 @@ func ValidateBadgeMetadata(badgeMetadata []*BadgeMetadata) error {
 				return err
 			}
 
-			err = ValidateRangesAreValid(badgeMetadata.BadgeIds, false, true)
+			err = ValidateRangesAreValid(badgeMetadata.BadgeIds, false, false)
 			if err != nil {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "invalid badgeIds")
 			}
@@ -561,12 +519,12 @@ func ValidateInheritedBalances(inheritedBalances []*InheritedBalance) error {
 	handledBadgeIds := []*UintRange{}
 	if len(inheritedBalances) > 0 {
 		for _, inheritedBalance := range inheritedBalances {
-			err = ValidateRangesAreValid(inheritedBalance.BadgeIds, false, true)
+			err = ValidateRangesAreValid(inheritedBalance.BadgeIds, false, false)
 			if err != nil {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "invalid badgeIds")
 			}
 
-			err = ValidateRangesAreValid(inheritedBalance.ParentBadgeIds, false, true)
+			err = ValidateRangesAreValid(inheritedBalance.ParentBadgeIds, false, false)
 			if err != nil {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "invalid badgeIds")
 			}
