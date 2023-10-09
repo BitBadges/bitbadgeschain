@@ -48,7 +48,7 @@ func TestRemoveOverlaps(t *testing.T) {
 			IncludeAddresses: true,
 		},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -84,7 +84,7 @@ func TestRemoveOverlaps(t *testing.T) {
 			IncludeAddresses: true,
 		},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -122,7 +122,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-			ApprovalTrackerIdMapping: &types.AddressMapping{
+			AmountTrackerIdMapping: &types.AddressMapping{
 			},
 			ChallengeTrackerIdMapping: &types.AddressMapping{
 			},
@@ -157,7 +157,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -194,7 +194,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -231,7 +231,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -268,7 +268,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -306,7 +306,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -343,7 +343,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -381,7 +381,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -457,7 +457,7 @@ func TestRemoveAddresses(t *testing.T) {
 			IncludeAddresses: true,
 		},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -493,7 +493,7 @@ func TestRemoveAddresses(t *testing.T) {
 			IncludeAddresses: true,
 		},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -531,7 +531,7 @@ func TestRemoveAddresses(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -568,7 +568,7 @@ func TestRemoveAddresses(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -605,7 +605,7 @@ func TestRemoveAddresses(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -642,7 +642,7 @@ func TestRemoveAddresses(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -679,7 +679,7 @@ func TestRemoveAddresses(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -717,7 +717,7 @@ func TestRemoveAddresses(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -754,7 +754,7 @@ func TestRemoveAddresses(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -792,7 +792,7 @@ func TestRemoveAddresses(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -832,7 +832,7 @@ func TestRemoveAddresses(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -869,7 +869,7 @@ func TestRemoveAddresses(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 
@@ -906,7 +906,7 @@ func TestRemoveAddresses(t *testing.T) {
 				IncludeAddresses: true,
 			},
 
-		ApprovalTrackerIdMapping: &types.AddressMapping{
+		AmountTrackerIdMapping: &types.AddressMapping{
 
 		},
 

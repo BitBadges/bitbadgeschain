@@ -80,7 +80,8 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
 		ChallengeTrackerId: "testchallenge",
-		ApprovalTrackerId:            "testing232",
+		AmountTrackerId:            "testing232",
+		
 		ApprovalId: "asadsdas",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			
@@ -104,7 +105,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 				OverridesFromOutgoingApprovals: true,
 				OverridesToIncomingApprovals:   true,
 		},
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -277,9 +278,10 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 		OverridesToIncomingApprovals:   true,
 		},
 		ChallengeTrackerId: "testchallenge",
-		ApprovalTrackerId:            "testing232",
+		AmountTrackerId:            "testing232",
+		
 		ApprovalId: "asadsdas",
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes: GetFullUintRanges(),
@@ -379,9 +381,10 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 		OverridesToIncomingApprovals:   true,
 		},
 		ChallengeTrackerId: "testchallenge",
-		ApprovalTrackerId:            "testing232",
+		AmountTrackerId:            "testing232",
+		
 		ApprovalId: "asadsdas",
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes: GetFullUintRanges(),
@@ -509,10 +512,10 @@ func (suite *TestSuite) TestIncrements() {
 
 		},
 
-		ApprovalTrackerId:            "testing232",
+		AmountTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
 		ChallengeTrackerId: "testchallenge",
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes: 			GetFullUintRanges(),
@@ -663,9 +666,10 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 		},
 
 		ChallengeTrackerId: "testchallenge",
-		ApprovalTrackerId:            "testing232",
+		AmountTrackerId:            "testing232",
+		
 		ApprovalId: "asadsdas",
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes: 			GetFullUintRanges(),
@@ -794,9 +798,10 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 
 		},
 		ChallengeTrackerId: "testchallenge",
-		ApprovalTrackerId:            "testing232",	
+		AmountTrackerId:            "testing232",
+			
 		ApprovalId: "asadsdas",
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -973,9 +978,10 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 		OverridesToIncomingApprovals:   true,
 		},
 		ChallengeTrackerId: "testchallenge",
-		ApprovalTrackerId:            "testing232",
+		AmountTrackerId:            "testing232",
+		
 		ApprovalId: "asadsdas",
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -1102,11 +1108,12 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 				OverridesFromOutgoingApprovals: true,
 		OverridesToIncomingApprovals:   true,
 		},
-		IsApproved: true,
+		
 	
 
 		ChallengeTrackerId: "testchallenge",
-		ApprovalTrackerId:            "testing232",
+		AmountTrackerId:            "testing232",
+		
 		ApprovalId: "asadsdas",
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -1273,9 +1280,9 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 		},
 
 		ChallengeTrackerId: "testchallenge",
-		ApprovalTrackerId:   "testing232",
+		AmountTrackerId:   "testing232",
 		ApprovalId: "asadsdas",
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -1431,11 +1438,12 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 			OverridesFromOutgoingApprovals: true,
 			OverridesToIncomingApprovals:   true,
 		},
-		IsApproved: true,
+		
 	
 
 		ChallengeTrackerId: "testchallenge",
-		ApprovalTrackerId:            "testing232",
+		AmountTrackerId:            "testing232",
+		
 		ApprovalId: "asadsdas",
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -1593,9 +1601,9 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 		OverridesToIncomingApprovals:   true,
 		},
 		ChallengeTrackerId: "testchallenge",
-		ApprovalTrackerId:            "testing232",
+		AmountTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -1763,9 +1771,9 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 		OverridesToIncomingApprovals:   true,
 		},
 		ChallengeTrackerId: "testchallenge",
-		ApprovalTrackerId:            "testing232",
+		AmountTrackerId:            "testing232",
 		ApprovalId: "asadsdas",
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -1923,9 +1931,9 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 		
 	},
 	ChallengeTrackerId: "testchallenge",
-	ApprovalTrackerId:            "testing232",
+	AmountTrackerId:            "testing232",
 	ApprovalId: "asadsdas",
-	IsApproved: true,
+	
 		
 	TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
@@ -2117,9 +2125,10 @@ func (suite *TestSuite) TestMustOwnBadges() {
 				OverridesFromOutgoingApprovals: true,
 				OverridesToIncomingApprovals:   true,
 
-		},ApprovalTrackerId:            "testing232",
+		},AmountTrackerId:            "testing232",
+		ChallengeTrackerId: "testing232",
 		ApprovalId: "asadsdas",
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -2188,9 +2197,10 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll() {
 				OverridesFromOutgoingApprovals: true,
 				OverridesToIncomingApprovals:   true,
 
-		},ApprovalTrackerId:            "testing232",
+		},AmountTrackerId:            "testing232",
+		ChallengeTrackerId: "testing232",
 		ApprovalId: "asadsdas",
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -2269,9 +2279,10 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll2() {
 				OverridesFromOutgoingApprovals: true,
 				OverridesToIncomingApprovals:   true,
 
-		},ApprovalTrackerId:            "testing232",
+		},AmountTrackerId:            "testing232",
+		ChallengeTrackerId: "testing232",
 		ApprovalId: "asadsdas",
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -2347,10 +2358,11 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne() {
 				
 				OverridesFromOutgoingApprovals: true,
 				OverridesToIncomingApprovals:   true,
-		},ApprovalTrackerId:            "testing232",
+		},AmountTrackerId:            "testing232",
+		ChallengeTrackerId: "testing232",
 		ApprovalId: "asadsdas",	
 		
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -2416,10 +2428,11 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne2() {
 				
 				OverridesFromOutgoingApprovals: true,
 				OverridesToIncomingApprovals:   true,
-		},ApprovalTrackerId:            "testing232",
+		},AmountTrackerId:            "testing232",
+		ChallengeTrackerId: "testing232",
 		ApprovalId: "asadsdas",	
 		
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -2488,10 +2501,11 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 				OverridesFromOutgoingApprovals: true,
 		OverridesToIncomingApprovals:   true,
 		},
-		ApprovalTrackerId:            "testing232",
+		AmountTrackerId:            "testing232",
+		ChallengeTrackerId: "testing232",
 		ApprovalId: "asadsdas",
 		
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -2555,10 +2569,11 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 				
 				OverridesFromOutgoingApprovals: true,
 				OverridesToIncomingApprovals:   true,
-		},ApprovalTrackerId:            "testing232",
+		},AmountTrackerId:            "testing232",
+		ChallengeTrackerId: "testing232",
 		ApprovalId: "asadsdas",	
 		
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -2645,10 +2660,11 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 				OverridesFromOutgoingApprovals: true,
 		OverridesToIncomingApprovals:   true,
 		},
-		ApprovalTrackerId:            "testing232",
+		AmountTrackerId:            "testing232",
+		ChallengeTrackerId: "testing232",
 		ApprovalId: "asadsdas",
 		
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -2731,7 +2747,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 
 	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &deepCopy)
 
-	collectionsToCreate[0].CollectionApprovals[2].ApprovalTrackerId = "test2"
+	collectionsToCreate[0].CollectionApprovals[2].AmountTrackerId = "test2"
 	collectionsToCreate[0].CollectionApprovals[2].ApprovalId = "fasdfasdf"
 	collectionsToCreate[0].CollectionApprovals[2].ApprovalCriteria = &types.ApprovalCriteria{
 		MaxNumTransfers: &types.MaxNumTransfers{
@@ -2771,10 +2787,11 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 				
 				OverridesFromOutgoingApprovals: true,
 				OverridesToIncomingApprovals:   true,
-		},ApprovalTrackerId:            "testing232",
+		},AmountTrackerId:            "testing232",
+		ChallengeTrackerId: "testing232",
 		ApprovalId: "asadsdas",	
 		
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
@@ -2858,9 +2875,10 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 			FromMappingId: 			"AllWithoutMint",
 			ToMappingId: 			"AllWithoutMint",
 			InitiatedByMappingId: 	"AllWithoutMint",
-			ApprovalTrackerId:            "testing232",
+			AmountTrackerId:            "testing232",
+			ChallengeTrackerId: "testing232",
 			ApprovalId: "asadsdas",
-			IsApproved: true,
+			
 			TransferTimes:        GetFullUintRanges(),
 			BadgeIds:             GetFullUintRanges(),
 			OwnershipTimes:       GetFullUintRanges(),
@@ -2890,9 +2908,10 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 			FromMappingId: 			"AllWithoutMint",
 			ToMappingId: 			"AllWithoutMint",
 			InitiatedByMappingId: 	"AllWithoutMint",
-			ApprovalTrackerId:            "testing232",
+			AmountTrackerId:            "testing232",
+			ChallengeTrackerId: "testing232",
 			ApprovalId: "target approval",
-			IsApproved: true,
+			
 			TransferTimes:        GetFullUintRanges(),
 			BadgeIds:             GetFullUintRanges(),
 			OwnershipTimes:       GetFullUintRanges(),
@@ -2977,9 +2996,10 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 			FromMappingId: 			"AllWithoutMint",
 			ToMappingId: 			"AllWithoutMint",
 			InitiatedByMappingId: 	"AllWithoutMint",
-			ApprovalTrackerId:            "testing232",
+			AmountTrackerId:            "testing232",
+			ChallengeTrackerId: "testing232",
 			ApprovalId: "asadsdas",
-			IsApproved: true,
+			
 			TransferTimes:        GetFullUintRanges(),
 			BadgeIds:             GetFullUintRanges(),
 			OwnershipTimes:       GetFullUintRanges(),
@@ -3009,9 +3029,10 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 			FromMappingId: 			"AllWithoutMint",
 			ToMappingId: 			"AllWithoutMint",
 			InitiatedByMappingId: 	"AllWithoutMint",
-			ApprovalTrackerId:            "testing232",
+			AmountTrackerId:            "testing232",
+			ChallengeTrackerId: "testing232",
 			ApprovalId: "target approval",
-			IsApproved: true,
+			
 			TransferTimes:        GetFullUintRanges(),
 			BadgeIds:             GetFullUintRanges(),
 			OwnershipTimes:       GetFullUintRanges(),
@@ -3112,7 +3133,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 
 
 
-func (suite *TestSuite) TestMultipleApprovalCriteriaSameApprovalTrackerId() {
+func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 
@@ -3142,7 +3163,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameApprovalTrackerId() {
 	deepCopy := *collectionsToCreate[0].CollectionApprovals[1]
 	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &deepCopy)
 
-	collectionsToCreate[0].CollectionApprovals[2].ApprovalTrackerId = "test2"
+	collectionsToCreate[0].CollectionApprovals[2].AmountTrackerId = "test2"
 	collectionsToCreate[0].CollectionApprovals[2].ApprovalId = "asadsdasfghaaadsd"
 	
 	collectionsToCreate[0].CollectionApprovals[2].ApprovalCriteria = &types.ApprovalCriteria{
@@ -3186,10 +3207,11 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameApprovalTrackerId() {
 				OverridesToIncomingApprovals:   true,
 		},
 		
-		ApprovalTrackerId:            "testing232",
+		AmountTrackerId:            "testing232",
+		ChallengeTrackerId: "testing232",
 		ApprovalId: "asadsdasfghd",	
 		
-		IsApproved: true,
+		
 	
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),

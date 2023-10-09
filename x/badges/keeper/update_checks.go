@@ -26,8 +26,7 @@ func GetUpdateCombinationsToCheck(
 	firstMatchesForOld []*types.UniversalPermissionDetails,
 	firstMatchesForNew []*types.UniversalPermissionDetails,
 	emptyValue interface{},
-	managerAddress string,
-	compareAndGetUpdateCombosToCheck func(ctx sdk.Context, oldValue interface{}, newValue interface{}, managerAddress string) ([]*types.UniversalPermissionDetails, error),
+	compareAndGetUpdateCombosToCheck func(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error),
 ) ([]*types.UniversalPermissionDetails, error) {
 	detailsToCheck := []*types.UniversalPermissionDetails{}
 
@@ -35,7 +34,7 @@ func GetUpdateCombinationsToCheck(
 
 	//Handle all old combinations that are not in the new (by comparing to empty value)
 	for _, detail := range inOldButNotNew {
-		detailsToAdd, err := compareAndGetUpdateCombosToCheck(ctx, detail.ArbitraryValue, emptyValue, managerAddress)
+		detailsToAdd, err := compareAndGetUpdateCombosToCheck(ctx, detail.ArbitraryValue, emptyValue)
 		if err != nil {
 			return nil, err
 		}
@@ -48,7 +47,7 @@ func GetUpdateCombinationsToCheck(
 				ToMapping:          detailToAdd.ToMapping,
 				FromMapping:        detailToAdd.FromMapping,
 				InitiatedByMapping: detailToAdd.InitiatedByMapping,
-				ApprovalTrackerIdMapping: detailToAdd.ApprovalTrackerIdMapping,
+				AmountTrackerIdMapping: detailToAdd.AmountTrackerIdMapping,
 				ChallengeTrackerIdMapping: detailToAdd.ChallengeTrackerIdMapping,
 			})
 		}
@@ -56,7 +55,7 @@ func GetUpdateCombinationsToCheck(
 
 	//Handle all new combinations that are not in the old (by comparing to empty value)
 	for _, detail := range inNewButNotOld {
-		detailsToAdd, err := compareAndGetUpdateCombosToCheck(ctx, detail.ArbitraryValue, emptyValue, managerAddress)
+		detailsToAdd, err := compareAndGetUpdateCombosToCheck(ctx, detail.ArbitraryValue, emptyValue)
 		if err != nil {
 			return nil, err
 		}
@@ -69,7 +68,7 @@ func GetUpdateCombinationsToCheck(
 				ToMapping:          detailToAdd.ToMapping,
 				FromMapping:        detailToAdd.FromMapping,
 				InitiatedByMapping: detailToAdd.InitiatedByMapping,
-				ApprovalTrackerIdMapping: detailToAdd.ApprovalTrackerIdMapping,
+				AmountTrackerIdMapping: detailToAdd.AmountTrackerIdMapping,
 				ChallengeTrackerIdMapping: detailToAdd.ChallengeTrackerIdMapping,
 			})
 		}
@@ -80,7 +79,7 @@ func GetUpdateCombinationsToCheck(
 		overlap := overlapObj.Overlap
 		oldDetails := overlapObj.FirstDetails
 		newDetails := overlapObj.SecondDetails
-		detailsToAdd, err := compareAndGetUpdateCombosToCheck(ctx, oldDetails.ArbitraryValue, newDetails.ArbitraryValue, managerAddress)
+		detailsToAdd, err := compareAndGetUpdateCombosToCheck(ctx, oldDetails.ArbitraryValue, newDetails.ArbitraryValue)
 		if err != nil {
 			return nil, err
 		}
@@ -93,7 +92,7 @@ func GetUpdateCombinationsToCheck(
 				ToMapping:          detailToAdd.ToMapping,
 				FromMapping:        detailToAdd.FromMapping,
 				InitiatedByMapping: detailToAdd.InitiatedByMapping,
-				ApprovalTrackerIdMapping: detailToAdd.ApprovalTrackerIdMapping,
+				AmountTrackerIdMapping: detailToAdd.AmountTrackerIdMapping,
 				ChallengeTrackerIdMapping: detailToAdd.ChallengeTrackerIdMapping,
 			})
 		}
@@ -165,8 +164,8 @@ func (k Keeper) CheckTimedUpdateWithBadgeIdsPermission(ctx sdk.Context, detailsT
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
 
-func (k Keeper) CheckCollectionApprovalPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.CollectionApprovalPermission, managerAddress string, permissionStr string) error {
-	castedPermissions, err := k.CastCollectionApprovalPermissionToUniversalPermission(ctx, managerAddress, permissions)
+func (k Keeper) CheckCollectionApprovalPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.CollectionApprovalPermission, permissionStr string) error {
+	castedPermissions, err := k.CastCollectionApprovalPermissionToUniversalPermission(ctx, permissions)
 	if err != nil {
 		return err
 	}
@@ -176,8 +175,8 @@ func (k Keeper) CheckCollectionApprovalPermission(ctx sdk.Context, detailsToChec
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
 
-func (k Keeper) CheckUserOutgoingApprovalPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.UserOutgoingApprovalPermission, managerAddress string, permissionStr string) error {
-	castedPermissions, err := k.CastUserOutgoingApprovalPermissionToUniversalPermission(ctx, managerAddress, permissions)
+func (k Keeper) CheckUserOutgoingApprovalPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.UserOutgoingApprovalPermission, permissionStr string) error {
+	castedPermissions, err := k.CastUserOutgoingApprovalPermissionToUniversalPermission(ctx, permissions)
 	if err != nil {
 		return err
 	}
@@ -187,8 +186,8 @@ func (k Keeper) CheckUserOutgoingApprovalPermission(ctx sdk.Context, detailsToCh
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
 
-func (k Keeper) CheckUserIncomingApprovalPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.UserIncomingApprovalPermission, managerAddress string, permissionStr string) error {
-	castedPermissions, err := k.CastUserIncomingApprovalPermissionToUniversalPermission(ctx, managerAddress, permissions)
+func (k Keeper) CheckUserIncomingApprovalPermission(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.UserIncomingApprovalPermission, permissionStr string) error {
+	castedPermissions, err := k.CastUserIncomingApprovalPermissionToUniversalPermission(ctx, permissions)
 	if err != nil {
 		return err
 	}
@@ -217,8 +216,8 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 			detailToCheck.OwnershipTime = &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)} //dummy range
 		}
 
-		if detailToCheck.ApprovalTrackerIdMapping == nil {
-			detailToCheck.ApprovalTrackerIdMapping = &types.AddressMapping{Addresses: []string{}, IncludeAddresses: false}
+		if detailToCheck.AmountTrackerIdMapping == nil {
+			detailToCheck.AmountTrackerIdMapping = &types.AddressMapping{Addresses: []string{}, IncludeAddresses: false}
 		}
 
 		if detailToCheck.ChallengeTrackerIdMapping == nil {

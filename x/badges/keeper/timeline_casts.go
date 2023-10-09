@@ -37,33 +37,33 @@ func (k Keeper) CastBadgeMetadataToUniversalPermission(badgeMetadata []*types.Ba
 	return castedPermissions
 }
 
-func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, approvals []*types.CollectionApproval, managerAddress string) ([]*types.UniversalPermission, error) {
+func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, approvals []*types.CollectionApproval) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, approval := range approvals {
-		fromMapping, err := k.GetAddressMappingById(ctx, approval.FromMappingId, managerAddress)
+		fromMapping, err := k.GetAddressMappingById(ctx, approval.FromMappingId)
 		if err != nil {
 			return nil, err
 		}
 
-		initiatedByMapping, err := k.GetAddressMappingById(ctx, approval.InitiatedByMappingId, managerAddress)
+		initiatedByMapping, err := k.GetAddressMappingById(ctx, approval.InitiatedByMappingId)
 		if err != nil {
 			return nil, err
 		}
 
-		toMapping, err := k.GetAddressMappingById(ctx, approval.ToMappingId, managerAddress)
+		toMapping, err := k.GetAddressMappingById(ctx, approval.ToMappingId)
 		if err != nil {
 			return nil, err
 		}
 
 		approvalTrackerMapping := &types.AddressMapping{}
-		if approval.ApprovalTrackerId == "All" {
+		if approval.AmountTrackerId == "All" {
 			approvalTrackerMapping = &types.AddressMapping{
 				Addresses: []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{approval.ApprovalTrackerId},
+				Addresses: []string{approval.AmountTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -90,7 +90,7 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 				FromMapping:            fromMapping,
 				ToMapping:              toMapping,
 				InitiatedByMapping:     initiatedByMapping,
-				ApprovalTrackerIdMapping: approvalTrackerMapping,
+				AmountTrackerIdMapping: approvalTrackerMapping,
 				ChallengeTrackerIdMapping: challengeTrackerMapping,
 				UsesBadgeIds:           true,
 				UsesTransferTimes:      true,
@@ -98,7 +98,7 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 				UsesFromMapping:        true,
 				UsesInitiatedByMapping: true,
 				UsesOwnershipTimes: 	 	true,
-				UsesApprovalTrackerId: 	true,
+				UsesAmountTrackerId: 	true,
 				UsesChallengeTrackerId: true,
 				ArbitraryValue:         approval,
 		})
@@ -106,28 +106,28 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 	return castedPermissions, nil
 }
 
-func (k Keeper) CastUserOutgoingApprovalToUniversalPermission(ctx sdk.Context, approvals []*types.UserOutgoingApproval, managerAddress string) ([]*types.UniversalPermission, error) {
+func (k Keeper) CastUserOutgoingApprovalToUniversalPermission(ctx sdk.Context, approvals []*types.UserOutgoingApproval) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, approval := range approvals {
-		initiatedByMapping, err := k.GetAddressMappingById(ctx, approval.InitiatedByMappingId, managerAddress)
+		initiatedByMapping, err := k.GetAddressMappingById(ctx, approval.InitiatedByMappingId)
 		if err != nil {
 			return nil, err
 		}
 
-		toMapping, err := k.GetAddressMappingById(ctx, approval.ToMappingId, managerAddress)
+		toMapping, err := k.GetAddressMappingById(ctx, approval.ToMappingId)
 		if err != nil {
 			return nil, err
 		}
 
 		approvalTrackerMapping := &types.AddressMapping{}
-		if approval.ApprovalTrackerId == "All" {
+		if approval.AmountTrackerId == "All" {
 			approvalTrackerMapping = &types.AddressMapping{
 				Addresses: []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{approval.ApprovalTrackerId},
+				Addresses: []string{approval.AmountTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -152,9 +152,9 @@ func (k Keeper) CastUserOutgoingApprovalToUniversalPermission(ctx sdk.Context, a
 				OwnershipTimes: 			 	approval.OwnershipTimes,
 				ToMapping:              toMapping,
 				InitiatedByMapping:     initiatedByMapping,
-				ApprovalTrackerIdMapping: approvalTrackerMapping,
+				AmountTrackerIdMapping: approvalTrackerMapping,
 				ChallengeTrackerIdMapping: challengeTrackerMapping,
-				UsesApprovalTrackerId: 	true,
+				UsesAmountTrackerId: 	true,
 				UsesChallengeTrackerId: true,
 				UsesBadgeIds:           true,
 				UsesTransferTimes:      true,
@@ -167,29 +167,29 @@ func (k Keeper) CastUserOutgoingApprovalToUniversalPermission(ctx sdk.Context, a
 	return castedPermissions, nil
 }
 
-func (k Keeper) CastUserIncomingApprovalToUniversalPermission(ctx sdk.Context, approvals []*types.UserIncomingApproval, managerAddress string) ([]*types.UniversalPermission, error) {
+func (k Keeper) CastUserIncomingApprovalToUniversalPermission(ctx sdk.Context, approvals []*types.UserIncomingApproval) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, approval := range approvals {
 
-		fromMapping, err := k.GetAddressMappingById(ctx, approval.FromMappingId, managerAddress)
+		fromMapping, err := k.GetAddressMappingById(ctx, approval.FromMappingId)
 		if err != nil {
 			return nil, err
 		}
 
-		initiatedByMapping, err := k.GetAddressMappingById(ctx, approval.InitiatedByMappingId, managerAddress)
+		initiatedByMapping, err := k.GetAddressMappingById(ctx, approval.InitiatedByMappingId)
 		if err != nil {
 			return nil, err
 		}
 
 		approvalTrackerMapping := &types.AddressMapping{}
-		if approval.ApprovalTrackerId == "All" {
+		if approval.AmountTrackerId == "All" {
 			approvalTrackerMapping = &types.AddressMapping{
 				Addresses: []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{approval.ApprovalTrackerId},
+				Addresses: []string{approval.AmountTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -213,9 +213,9 @@ func (k Keeper) CastUserIncomingApprovalToUniversalPermission(ctx sdk.Context, a
 				OwnershipTimes: 			 			approval.OwnershipTimes,
 				FromMapping:            fromMapping,
 				InitiatedByMapping:     initiatedByMapping,
-				ApprovalTrackerIdMapping: approvalTrackerMapping,
+				AmountTrackerIdMapping: approvalTrackerMapping,
 				ChallengeTrackerIdMapping: challengeTrackerMapping,
-				UsesApprovalTrackerId: 	true,
+				UsesAmountTrackerId: 	true,
 				UsesChallengeTrackerId: true,
 				UsesBadgeIds:           true,
 				UsesTransferTimes:      true,

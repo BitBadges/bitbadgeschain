@@ -16,7 +16,7 @@ func (k Keeper) GetApprovalsTracker(goCtx context.Context, req *types.QueryGetAp
 
 	// ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// address, found := k.GetApprovalsTrackerFromStore(ctx, req.CollectionId, req.ApprovalTrackerId, req.Level, req.Depth, req.Address)
+	// address, found := k.GetApprovalsTrackerFromStore(ctx, req.CollectionId, req.AmountTrackerId, req.Level, req.Depth, req.Address)
 	// if !found {
 	// 	return nil, status.Error(codes.InvalidArgument, "invalid request")
 	// }

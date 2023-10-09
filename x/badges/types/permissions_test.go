@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	math "math"
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
@@ -239,14 +240,13 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	require.Error(t, err)
 
 	newActionPermission = &types.BalancesActionPermission{
-		BadgeIdsOptions: &types.ValueOptions{InvertDefault: true},
 		
-			BadgeIds: []*types.UintRange{
+			BadgeIds: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(80),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			OwnershipTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -276,15 +276,12 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	require.Error(t, err)
 
 	newActionPermission = &types.BalancesActionPermission{
-		BadgeIdsOptions: &types.ValueOptions{InvertDefault: true},
-		
-
-			BadgeIds: []*types.UintRange{
+			BadgeIds: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			OwnershipTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -468,7 +465,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	//copy newActionPermission to newActionPermission2
 	newActionPermission2 := &types.BalancesActionPermission{}
 	*newActionPermission2 = *newActionPermission
-	newActionPermission2.BadgeIdsOptions = &types.ValueOptions{InvertDefault: true}
+	newActionPermission2.BadgeIds = types.InvertUintRanges(newActionPermission2.BadgeIds, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64))
 	//Everything else from newActionPermission
 
 
@@ -591,63 +588,59 @@ func TestTimedUpdatePermission(t *testing.T) {
 	require.Error(t, err)
 
 	newActionPermission = &types.TimedUpdatePermission{
-		TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
-		
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(1),
-					End:   sdkmath.NewUint(80),
-				},
+		TimelineTimes: types.InvertUintRanges([]*types.UintRange{
+			{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(80),
 			},
-			PermittedTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(1),
-					End:   sdkmath.NewUint(100),
-				},
-				{
-					Start: sdkmath.NewUint(200),
-					End:   sdkmath.NewUint(300),
-				},
+		}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
+		PermittedTimes: []*types.UintRange{
+			{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(100),
 			},
-			ForbiddenTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(101),
-					End:   sdkmath.NewUint(199),
-				},
+			{
+				Start: sdkmath.NewUint(200),
+				End:   sdkmath.NewUint(300),
 			},
-		
+		},
+		ForbiddenTimes: []*types.UintRange{
+			{
+				Start: sdkmath.NewUint(101),
+				End:   sdkmath.NewUint(199),
+			},
+		},
 	}
+	
 
 	err = keeper.ValidateTimedUpdatePermissionUpdate([]*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
 	require.Error(t, err)
 
 	newActionPermission = &types.TimedUpdatePermission{
-		TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
-		
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(1),
-					End:   sdkmath.NewUint(100),
-				},
+		TimelineTimes: types.InvertUintRanges([]*types.UintRange{
+			{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(100),
 			},
-			PermittedTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(1),
-					End:   sdkmath.NewUint(100),
-				},
-				{
-					Start: sdkmath.NewUint(200),
-					End:   sdkmath.NewUint(300),
-				},
+		}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
+		PermittedTimes: []*types.UintRange{
+			{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(100),
 			},
-			ForbiddenTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(101),
-					End:   sdkmath.NewUint(199),
-				},
+			{
+				Start: sdkmath.NewUint(200),
+				End:   sdkmath.NewUint(300),
 			},
-		
+		},
+		ForbiddenTimes: []*types.UintRange{
+			{
+				Start: sdkmath.NewUint(101),
+				End:   sdkmath.NewUint(199),
+			},
+		},
 	}
+	
 
 	err = keeper.ValidateTimedUpdatePermissionUpdate([]*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
 	require.Error(t, err)
@@ -778,7 +771,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 	//copy newActionPermission to newActionPermission2
 	newActionPermission2 := &types.TimedUpdatePermission{}
 	*newActionPermission2 = *newActionPermission
-	newActionPermission2.TimelineTimesOptions = &types.ValueOptions{InvertDefault: true}
+	newActionPermission2.TimelineTimes = types.InvertUintRanges(newActionPermission2.TimelineTimes, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64))
 
 	err = keeper.ValidateTimedUpdatePermissionUpdate([]*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission, newActionPermission2})
 	require.NoError(t, err)
@@ -926,14 +919,12 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
 		{
-			TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
-		
-			TimelineTimes: []*types.UintRange{
+			TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(80),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -965,14 +956,13 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
 		{
-			TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
 		
-			TimelineTimes: []*types.UintRange{
+			TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1152,13 +1142,12 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 			},
 		},
 		{
-			TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
-			TimelineTimes: []*types.UintRange{
+			TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1218,13 +1207,12 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 			},
 		
 	}, {
-		TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
-		TimelineTimes: []*types.UintRange{
+		TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
 			},
-		},
+		} , sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 		BadgeIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -1291,9 +1279,9 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 			},
 		},
 		{
-		TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
 		
-			TimelineTimes: []*types.UintRange{
+		
+			TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(60),
@@ -1302,7 +1290,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					Start: sdkmath.NewUint(61),
 					End:   sdkmath.NewUint(100),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1376,9 +1364,8 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 			},
 		},
 		{
-			TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
 		
-			TimelineTimes: []*types.UintRange{
+			TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(60),
@@ -1387,7 +1374,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					Start: sdkmath.NewUint(61),
 					End:   sdkmath.NewUint(100),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1452,14 +1439,14 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 				},
 			},
 		},{
-			TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
+			
 		
-			TimelineTimes: []*types.UintRange{
+			TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(61),
 					End:   sdkmath.NewUint(100),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(61),
@@ -1517,14 +1504,14 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 			},
 		},
 		{
-			TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
 			
-				TimelineTimes: []*types.UintRange{
+			
+				TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(100),
 					},
-				},
+				}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 				BadgeIds: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
@@ -1585,14 +1572,14 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 			},
 		
 	},{
-		TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
 		
-			TimelineTimes: []*types.UintRange{
+		
+			TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1651,14 +1638,13 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 			},
 		},
 		{
-			TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
-		
-			TimelineTimes: []*types.UintRange{
+			
+			TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
 					End:   sdkmath.NewUint(50),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
@@ -1717,14 +1703,14 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 			},
 		},
 		{
-			TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
 			
-				TimelineTimes: []*types.UintRange{
+			
+				TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(100),
 					},
-				},
+				}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 				BadgeIds: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(10),
@@ -1791,14 +1777,14 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 			
 		},
 	},{
-		TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
 		
-			TimelineTimes: []*types.UintRange{
+		
+			TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1855,14 +1841,14 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(199),
 				},
 			},	},
-			{TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
+			{
 		
-			TimelineTimes: []*types.UintRange{
+			TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
 					End:   sdkmath.NewUint(50),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
@@ -1923,14 +1909,13 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 				},
 			},
 	},{
-		TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
 		
-			TimelineTimes: []*types.UintRange{
+			TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -1998,14 +1983,14 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(199),
 				},
 			},
-		},{TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
+		},{
 		
-		TimelineTimes: []*types.UintRange{
+		TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 			{
 				Start: sdkmath.NewUint(20),
 				End:   sdkmath.NewUint(100),
 			},
-		},
+		}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 		BadgeIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2062,14 +2047,14 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(199),
 				},
 			},
-		},{TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
+		},{
 		
-		TimelineTimes: []*types.UintRange{
+		TimelineTimes:  types.InvertUintRanges([]*types.UintRange{
 			{
 				Start: sdkmath.NewUint(10),
 				End:   sdkmath.NewUint(50),
 			},
-		},
+		}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 		BadgeIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(10),
@@ -2131,14 +2116,12 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 				},
 			},
 		},{
-			TimelineTimesOptions: &types.ValueOptions{InvertDefault: true},
-			
-				TimelineTimes: []*types.UintRange{
+				TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(100),
 					},
-				},
+				}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 				BadgeIds: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
@@ -2198,8 +2181,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			},
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: "Manager",
-			ApprovalTrackerId: "All",
+			InitiatedByMappingId: alice,
+			AmountTrackerId: "All",
 			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
@@ -2218,7 +2201,6 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				},
 			},
 	},{
-		TransferTimesOptions: &types.ValueOptions{InvertDefault: true},
 		
 			BadgeIds: []*types.UintRange{
 				{
@@ -2226,12 +2208,12 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			TransferTimes: []*types.UintRange{
+			TransferTimes: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			OwnershipTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2240,8 +2222,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			},
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: "Manager",
-			ApprovalTrackerId: "All",
+			InitiatedByMappingId: alice,
+			AmountTrackerId: "All",
 			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
@@ -2284,8 +2266,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			},
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: "Manager",
-			ApprovalTrackerId: "All",
+			InitiatedByMappingId: alice,
+			AmountTrackerId: "All",
 			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
@@ -2304,7 +2286,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				},
 			},},
 			{
-				TransferTimesOptions: &types.ValueOptions{InvertDefault: true},
+				
 				
 					BadgeIds: []*types.UintRange{
 						{
@@ -2312,12 +2294,12 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 							End:   sdkmath.NewUint(50),
 						},
 					},
-					TransferTimes: []*types.UintRange{
+					TransferTimes: types.InvertUintRanges([]*types.UintRange{
 						{
 							Start: sdkmath.NewUint(1),
 							End:   sdkmath.NewUint(100),
 						},
-					},
+					}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 					OwnershipTimes: []*types.UintRange{
 						{
 							Start: sdkmath.NewUint(1),
@@ -2326,8 +2308,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					},
 					ToMappingId:          "AllWithoutMint",
 					FromMappingId:        "AllWithoutMint",
-					InitiatedByMappingId: "Manager",
-					ApprovalTrackerId: "All",
+					InitiatedByMappingId: alice,
+					AmountTrackerId: "All",
 					ChallengeTrackerId: "All",
 					PermittedTimes: []*types.UintRange{
 						{
@@ -2374,8 +2356,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			},
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: "Manager",
-			ApprovalTrackerId: "All",
+			InitiatedByMappingId: alice,
+			AmountTrackerId: "All",
 			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
@@ -2395,7 +2377,6 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			},
 		},
 		{
-			TransferTimesOptions: &types.ValueOptions{InvertDefault: true},
 			
 				BadgeIds: []*types.UintRange{
 					{
@@ -2407,12 +2388,12 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 						End:   sdkmath.NewUint(100),
 					},
 				},
-				TransferTimes: []*types.UintRange{
+				TransferTimes: types.InvertUintRanges([]*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(100),
 					},
-				},
+				}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 				OwnershipTimes: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
@@ -2421,8 +2402,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				},
 				ToMappingId:          "AllWithoutMint",
 				FromMappingId:        "AllWithoutMint",
-				InitiatedByMappingId: "Manager",
-				ApprovalTrackerId: "All",
+				InitiatedByMappingId: alice,
+				AmountTrackerId: "All",
 				ChallengeTrackerId: "All",
 				PermittedTimes: []*types.UintRange{
 					{
@@ -2445,7 +2426,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 
 	keeper, ctx := keeper.BadgesKeeper(t)
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
-	err := keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions, "")
+	err := keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions)
 	require.NoError(t, err)
 
 	newActionPermissions = []*types.CollectionApprovalPermission{
@@ -2471,8 +2452,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			},
 			ToMappingId:          "x",
 			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: "Manager",
-			ApprovalTrackerId: "All",
+			InitiatedByMappingId: alice,
+			AmountTrackerId: "All",
 			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
@@ -2492,20 +2473,18 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			},
 	}, 
 	{
-		TransferTimesOptions: &types.ValueOptions{InvertDefault: true},
-		
 			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			TransferTimes: []*types.UintRange{
+			TransferTimes:  types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			OwnershipTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2514,8 +2493,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			},
 			ToMappingId:          "x",
 			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: "Manager",
-			ApprovalTrackerId: "All",
+			InitiatedByMappingId: alice,
+			AmountTrackerId: "All",
 			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
@@ -2562,8 +2541,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			},
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: "Manager",
-			ApprovalTrackerId: "All",
+			InitiatedByMappingId: alice,
+			AmountTrackerId: "All",
 			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
@@ -2583,7 +2562,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			},
 	},
 	{
-		TransferTimesOptions: &types.ValueOptions{InvertDefault: true},
+		
 		
 			BadgeIds: []*types.UintRange{
 				{
@@ -2595,12 +2574,12 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			TransferTimes: []*types.UintRange{
+			TransferTimes: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
 				},
-			},
+			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 			OwnershipTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2609,8 +2588,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			},
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: "Manager",
-			ApprovalTrackerId: "All",
+			InitiatedByMappingId: alice,
+			AmountTrackerId: "All",
 			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
@@ -2631,7 +2610,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 	},
 	}
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
-	err = keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions, "")
+	err = keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions)
 	require.Error(t, err)
 }
 
@@ -2659,8 +2638,8 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 			},
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: "Manager",
-			ApprovalTrackerId: "All",
+			InitiatedByMappingId: alice,
+			AmountTrackerId: "All",
 			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
@@ -2680,15 +2659,15 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 			},
 		},
 		{
-			BadgeIdsOptions: &types.ValueOptions{InvertDefault: true},
+			
 			
 				
-				BadgeIds: []*types.UintRange{
+				BadgeIds: types.InvertUintRanges([]*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(100),
 					},
-				},
+				}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 				TransferTimes: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
@@ -2703,8 +2682,8 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 				},
 				ToMappingId:          "AllWithoutMint",
 				FromMappingId:        "AllWithoutMint",
-				InitiatedByMappingId: "Manager",
-				ApprovalTrackerId: "All",
+				InitiatedByMappingId: alice,
+				AmountTrackerId: "All",
 				ChallengeTrackerId: "All",
 				PermittedTimes: []*types.UintRange{
 					{
@@ -2747,8 +2726,8 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 			},
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: "Manager",
-			ApprovalTrackerId: "All",
+			InitiatedByMappingId: alice,
+			AmountTrackerId: "All",
 			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
@@ -2767,14 +2746,12 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 				},
 			},
 		},{
-			BadgeIdsOptions: &types.ValueOptions{InvertDefault: true},
-			
-				BadgeIds: []*types.UintRange{
+				BadgeIds: types.InvertUintRanges([]*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(100),
 					},
-				},
+				}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 				TransferTimes: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
@@ -2789,8 +2766,8 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 				},
 				ToMappingId:          "AllWithoutMint",
 				FromMappingId:        "AllWithoutMint",
-				InitiatedByMappingId: "Manager",
-				ApprovalTrackerId: "All",
+				InitiatedByMappingId: alice,
+				AmountTrackerId: "All",
 				ChallengeTrackerId: "All",
 				PermittedTimes: []*types.UintRange{
 					{
@@ -2812,7 +2789,7 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 	}
 
 	keeper, ctx := keeper.BadgesKeeper(t)
-	err := keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions, "")
+	err := keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions)
 	require.Error(t, err)
 }
 
@@ -2862,7 +2839,7 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 			ToMappingId:          "ABC",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "AllWithoutMint",
-			ApprovalTrackerId: "All",
+			AmountTrackerId: "All",
 			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
@@ -2881,7 +2858,7 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 				},
 			},
 		},{
-			TransferTimesOptions: &types.ValueOptions{InvertDefault: true},
+			
 			
 				BadgeIds: []*types.UintRange{
 					{
@@ -2889,12 +2866,12 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 						End:   sdkmath.NewUint(100),
 					},
 				},
-				TransferTimes: []*types.UintRange{
+				TransferTimes:  types.InvertUintRanges([]*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(100),
 					},
-				},
+				}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 				OwnershipTimes: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
@@ -2904,7 +2881,7 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 				ToMappingId:          "ABC",
 				FromMappingId:        "AllWithoutMint",
 				InitiatedByMappingId: "AllWithoutMint",
-				ApprovalTrackerId: "All",
+				AmountTrackerId: "All",
 				ChallengeTrackerId: "All",
 				PermittedTimes: []*types.UintRange{
 					{
@@ -2948,7 +2925,7 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 			ToMappingId:          "AllWithoutMint",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "AllWithoutMint",
-			ApprovalTrackerId: "All",
+			AmountTrackerId: "All",
 			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
@@ -2968,7 +2945,6 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 			},
 		},
 		{
-			TransferTimesOptions: &types.ValueOptions{InvertDefault: true},
 			
 				BadgeIds: []*types.UintRange{
 					{
@@ -2976,12 +2952,12 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 						End:   sdkmath.NewUint(100),
 					},
 				},
-				TransferTimes: []*types.UintRange{
+				TransferTimes: types.InvertUintRanges([]*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(100),
 					},
-				},
+				}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 				OwnershipTimes: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
@@ -2991,7 +2967,7 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 				ToMappingId:          "AllWithoutMint",
 				FromMappingId:        "AllWithoutMint",
 				InitiatedByMappingId: "AllWithoutMint",
-				ApprovalTrackerId: "All",
+				AmountTrackerId: "All",
 				ChallengeTrackerId: "All",
 				PermittedTimes: []*types.UintRange{
 					{
@@ -3012,7 +2988,7 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 			},
 	}
 
-	err = keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions, "")
+	err = keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions)
 	require.NoError(t, err)
 }
 
@@ -3062,7 +3038,7 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 			ToMappingId:          "ABC",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "AllWithoutMint",
-			ApprovalTrackerId: "All",
+			AmountTrackerId: "All",
 			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
@@ -3082,20 +3058,18 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 			},
 		},
 		{
-			TransferTimesOptions: &types.ValueOptions{InvertDefault: true},
-			
 				BadgeIds: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(100),
 					},
 				},
-				TransferTimes: []*types.UintRange{
+				TransferTimes:  types.InvertUintRanges([]*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(100),
 					},
-				},
+				}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 				OwnershipTimes: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
@@ -3105,7 +3079,7 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 				ToMappingId:          "ABC",
 				FromMappingId:        "AllWithoutMint",
 				InitiatedByMappingId: "AllWithoutMint",
-				ApprovalTrackerId: "All",
+				AmountTrackerId: "All",
 				ChallengeTrackerId: "All",
 				PermittedTimes: []*types.UintRange{
 					{
@@ -3149,7 +3123,7 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 			ToMappingId:          "BobCharlie",
 			FromMappingId:        "AllWithoutMint",
 			InitiatedByMappingId: "AllWithoutMint",
-			ApprovalTrackerId: "All",
+			AmountTrackerId: "All",
 			ChallengeTrackerId: "All",
 			PermittedTimes: []*types.UintRange{
 				{
@@ -3168,20 +3142,18 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 				},
 			},
 		},{
-			TransferTimesOptions: &types.ValueOptions{InvertDefault: true},
-			
 				BadgeIds: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(100),
 					},
 				},
-				TransferTimes: []*types.UintRange{
+				TransferTimes: types.InvertUintRanges([]*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(100),
 					},
-				},
+				}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
 				OwnershipTimes: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
@@ -3191,7 +3163,7 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 				ToMappingId:          "BobCharlie",
 				FromMappingId:        "AllWithoutMint",
 				InitiatedByMappingId: "AllWithoutMint",
-				ApprovalTrackerId: "All",
+				AmountTrackerId: "All",
 				ChallengeTrackerId: "All",
 				PermittedTimes: []*types.UintRange{
 					{
@@ -3212,6 +3184,6 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 			},
 	}
 
-	err = keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions, "")
+	err = keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions)
 	require.Error(t, err)
 }

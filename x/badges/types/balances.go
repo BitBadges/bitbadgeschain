@@ -97,24 +97,27 @@ func DeepCopyBalances(balances []*Balance) []*Balance {
 // We handle the following cases:
 // 1) {amount: 1, badgeIds: [1 to 10, 5 to 20]} -> {amount: 1, badgeIds: [1 to 4, 11 to 20]}, {amount: 2: badgeIds: [5 to 10]}
 // 2) {amount: 1, badgeIds: [5 to 10]}, {amount: 2: badgeIds: [5 to 10]} -> {amount: 3: badgeIds: [5 to 10]}
-func HandleDuplicateBadgeIds(balances []*Balance) ([]*Balance, error) {
-	//TODO: commented out bc it messes up EIP712 since we change Msg from what was signed
-	// newBalances := []*Balance{}
-	// err := *new(error)
-	// for _, balance := range balances {
-	// 	for _, badgeId := range balance.BadgeIds {
-	// 		for _, time := range balance.OwnershipTimes {
-	// 			newBalances, err = AddBalance(newBalances, &Balance{
-	// 				Amount:         balance.Amount,
-	// 				BadgeIds:       []*UintRange{badgeId},
-	// 				OwnershipTimes: []*UintRange{time},
-	// 			})
-	// 			if err != nil {
-	// 				return []*Balance{}, err
-	// 			}
-	// 		}
-	// 	}
-	// }
+func HandleDuplicateBadgeIds(balances []*Balance, canChangeValues bool) ([]*Balance, error) {
+	if !canChangeValues {
+		return balances, nil
+	}
+
+	newBalances := []*Balance{}
+	err := *new(error)
+	for _, balance := range balances {
+		for _, badgeId := range balance.BadgeIds {
+			for _, time := range balance.OwnershipTimes {
+				newBalances, err = AddBalance(newBalances, &Balance{
+					Amount:         balance.Amount,
+					BadgeIds:       []*UintRange{badgeId},
+					OwnershipTimes: []*UintRange{time},
+				})
+				if err != nil {
+					return []*Balance{}, err
+				}
+			}
+		}
+	}
 
 	return balances, nil
 }
@@ -169,7 +172,7 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 					ToMapping:          &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 					FromMapping:        &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 					InitiatedByMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
-					ApprovalTrackerIdMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+					AmountTrackerIdMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 					ChallengeTrackerIdMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 					ArbitraryValue:     balanceObj.Amount,
 				})
@@ -188,7 +191,7 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 				ToMapping:          &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 				FromMapping:        &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 				InitiatedByMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
-				ApprovalTrackerIdMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+				AmountTrackerIdMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 				ChallengeTrackerIdMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 			},
 			)
@@ -351,7 +354,7 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 					ToMapping:          &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 					FromMapping:        &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 					InitiatedByMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
-					ApprovalTrackerIdMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+					AmountTrackerIdMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 					ChallengeTrackerIdMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 				})
 			}
@@ -367,7 +370,7 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 					TimelineTime: 		 &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
 					ToMapping:          &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 					FromMapping:        &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
-					ApprovalTrackerIdMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
+					AmountTrackerIdMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 					ChallengeTrackerIdMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 					InitiatedByMapping: &AddressMapping{Addresses: []string{}, IncludeAddresses: false},
 				},

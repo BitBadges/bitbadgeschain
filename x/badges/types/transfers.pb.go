@@ -202,26 +202,18 @@ func (m *MerkleChallenge) GetCustomData() string {
 // UserOutgoingApproval defines the rules for the approval of an outgoing transfer from a user.
 // See CollectionApproval for more details. This is the same minus a few fields.
 type UserOutgoingApproval struct {
-	ToMappingId               string        `protobuf:"bytes,1,opt,name=toMappingId,proto3" json:"toMappingId,omitempty"`
-	InitiatedByMappingId      string        `protobuf:"bytes,2,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
-	TransferTimes             []*UintRange  `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	BadgeIds                  []*UintRange  `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	OwnershipTimes            []*UintRange  `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
-	ApprovalTrackerId         string        `protobuf:"bytes,6,opt,name=approvalTrackerId,proto3" json:"approvalTrackerId,omitempty"`
-	ChallengeTrackerId        string        `protobuf:"bytes,7,opt,name=challengeTrackerId,proto3" json:"challengeTrackerId,omitempty"`
-	ToMappingOptions          *ValueOptions `protobuf:"bytes,8,opt,name=toMappingOptions,proto3" json:"toMappingOptions,omitempty"`
-	InitiatedByMappingOptions *ValueOptions `protobuf:"bytes,9,opt,name=initiatedByMappingOptions,proto3" json:"initiatedByMappingOptions,omitempty"`
-	TransferTimesOptions      *ValueOptions `protobuf:"bytes,10,opt,name=transferTimesOptions,proto3" json:"transferTimesOptions,omitempty"`
-	BadgeIdsOptions           *ValueOptions `protobuf:"bytes,11,opt,name=badgeIdsOptions,proto3" json:"badgeIdsOptions,omitempty"`
-	OwnershipTimesOptions     *ValueOptions `protobuf:"bytes,12,opt,name=ownershipTimesOptions,proto3" json:"ownershipTimesOptions,omitempty"`
-	ApprovalTrackerIdOptions  *ValueOptions `protobuf:"bytes,13,opt,name=approvalTrackerIdOptions,proto3" json:"approvalTrackerIdOptions,omitempty"`
-	ChallengeTrackerIdOptions *ValueOptions `protobuf:"bytes,14,opt,name=challengeTrackerIdOptions,proto3" json:"challengeTrackerIdOptions,omitempty"`
-	IsApproved                bool          `protobuf:"varint,15,opt,name=isApproved,proto3" json:"isApproved,omitempty"`
+	ToMappingId          string       `protobuf:"bytes,1,opt,name=toMappingId,proto3" json:"toMappingId,omitempty"`
+	InitiatedByMappingId string       `protobuf:"bytes,2,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
+	TransferTimes        []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
+	BadgeIds             []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	OwnershipTimes       []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
+	AmountTrackerId      string       `protobuf:"bytes,6,opt,name=amountTrackerId,proto3" json:"amountTrackerId,omitempty"`
+	ChallengeTrackerId   string       `protobuf:"bytes,7,opt,name=challengeTrackerId,proto3" json:"challengeTrackerId,omitempty"`
 	//if approved, we use these. if not, these are ignored
-	Uri              string                    `protobuf:"bytes,16,opt,name=uri,proto3" json:"uri,omitempty"`
-	CustomData       string                    `protobuf:"bytes,17,opt,name=customData,proto3" json:"customData,omitempty"`
-	ApprovalId       string                    `protobuf:"bytes,18,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
-	ApprovalCriteria *OutgoingApprovalCriteria `protobuf:"bytes,19,opt,name=approvalCriteria,proto3" json:"approvalCriteria,omitempty"`
+	Uri              string                    `protobuf:"bytes,8,opt,name=uri,proto3" json:"uri,omitempty"`
+	CustomData       string                    `protobuf:"bytes,9,opt,name=customData,proto3" json:"customData,omitempty"`
+	ApprovalId       string                    `protobuf:"bytes,10,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
+	ApprovalCriteria *OutgoingApprovalCriteria `protobuf:"bytes,11,opt,name=approvalCriteria,proto3" json:"approvalCriteria,omitempty"`
 }
 
 func (m *UserOutgoingApproval) Reset()         { *m = UserOutgoingApproval{} }
@@ -292,9 +284,9 @@ func (m *UserOutgoingApproval) GetOwnershipTimes() []*UintRange {
 	return nil
 }
 
-func (m *UserOutgoingApproval) GetApprovalTrackerId() string {
+func (m *UserOutgoingApproval) GetAmountTrackerId() string {
 	if m != nil {
-		return m.ApprovalTrackerId
+		return m.AmountTrackerId
 	}
 	return ""
 }
@@ -304,62 +296,6 @@ func (m *UserOutgoingApproval) GetChallengeTrackerId() string {
 		return m.ChallengeTrackerId
 	}
 	return ""
-}
-
-func (m *UserOutgoingApproval) GetToMappingOptions() *ValueOptions {
-	if m != nil {
-		return m.ToMappingOptions
-	}
-	return nil
-}
-
-func (m *UserOutgoingApproval) GetInitiatedByMappingOptions() *ValueOptions {
-	if m != nil {
-		return m.InitiatedByMappingOptions
-	}
-	return nil
-}
-
-func (m *UserOutgoingApproval) GetTransferTimesOptions() *ValueOptions {
-	if m != nil {
-		return m.TransferTimesOptions
-	}
-	return nil
-}
-
-func (m *UserOutgoingApproval) GetBadgeIdsOptions() *ValueOptions {
-	if m != nil {
-		return m.BadgeIdsOptions
-	}
-	return nil
-}
-
-func (m *UserOutgoingApproval) GetOwnershipTimesOptions() *ValueOptions {
-	if m != nil {
-		return m.OwnershipTimesOptions
-	}
-	return nil
-}
-
-func (m *UserOutgoingApproval) GetApprovalTrackerIdOptions() *ValueOptions {
-	if m != nil {
-		return m.ApprovalTrackerIdOptions
-	}
-	return nil
-}
-
-func (m *UserOutgoingApproval) GetChallengeTrackerIdOptions() *ValueOptions {
-	if m != nil {
-		return m.ChallengeTrackerIdOptions
-	}
-	return nil
-}
-
-func (m *UserOutgoingApproval) GetIsApproved() bool {
-	if m != nil {
-		return m.IsApproved
-	}
-	return false
 }
 
 func (m *UserOutgoingApproval) GetUri() string {
@@ -393,25 +329,17 @@ func (m *UserOutgoingApproval) GetApprovalCriteria() *OutgoingApprovalCriteria {
 // UserIncomingApproval defines the rules for the approval of an incoming transfer to a user.
 // See CollectionApproval for more details. This is the same minus a few fields.
 type UserIncomingApproval struct {
-	FromMappingId             string                    `protobuf:"bytes,1,opt,name=fromMappingId,proto3" json:"fromMappingId,omitempty"`
-	InitiatedByMappingId      string                    `protobuf:"bytes,2,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
-	TransferTimes             []*UintRange              `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	BadgeIds                  []*UintRange              `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	OwnershipTimes            []*UintRange              `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
-	ApprovalTrackerId         string                    `protobuf:"bytes,6,opt,name=approvalTrackerId,proto3" json:"approvalTrackerId,omitempty"`
-	ChallengeTrackerId        string                    `protobuf:"bytes,7,opt,name=challengeTrackerId,proto3" json:"challengeTrackerId,omitempty"`
-	FromMappingOptions        *ValueOptions             `protobuf:"bytes,8,opt,name=fromMappingOptions,proto3" json:"fromMappingOptions,omitempty"`
-	InitiatedByMappingOptions *ValueOptions             `protobuf:"bytes,9,opt,name=initiatedByMappingOptions,proto3" json:"initiatedByMappingOptions,omitempty"`
-	TransferTimesOptions      *ValueOptions             `protobuf:"bytes,10,opt,name=transferTimesOptions,proto3" json:"transferTimesOptions,omitempty"`
-	BadgeIdsOptions           *ValueOptions             `protobuf:"bytes,11,opt,name=badgeIdsOptions,proto3" json:"badgeIdsOptions,omitempty"`
-	OwnershipTimesOptions     *ValueOptions             `protobuf:"bytes,12,opt,name=ownershipTimesOptions,proto3" json:"ownershipTimesOptions,omitempty"`
-	ApprovalTrackerIdOptions  *ValueOptions             `protobuf:"bytes,13,opt,name=approvalTrackerIdOptions,proto3" json:"approvalTrackerIdOptions,omitempty"`
-	ChallengeTrackerIdOptions *ValueOptions             `protobuf:"bytes,14,opt,name=challengeTrackerIdOptions,proto3" json:"challengeTrackerIdOptions,omitempty"`
-	IsApproved                bool                      `protobuf:"varint,15,opt,name=isApproved,proto3" json:"isApproved,omitempty"`
-	Uri                       string                    `protobuf:"bytes,16,opt,name=uri,proto3" json:"uri,omitempty"`
-	CustomData                string                    `protobuf:"bytes,17,opt,name=customData,proto3" json:"customData,omitempty"`
-	ApprovalId                string                    `protobuf:"bytes,18,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
-	ApprovalCriteria          *IncomingApprovalCriteria `protobuf:"bytes,19,opt,name=approvalCriteria,proto3" json:"approvalCriteria,omitempty"`
+	FromMappingId        string                    `protobuf:"bytes,1,opt,name=fromMappingId,proto3" json:"fromMappingId,omitempty"`
+	InitiatedByMappingId string                    `protobuf:"bytes,2,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
+	TransferTimes        []*UintRange              `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
+	BadgeIds             []*UintRange              `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	OwnershipTimes       []*UintRange              `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
+	AmountTrackerId      string                    `protobuf:"bytes,6,opt,name=amountTrackerId,proto3" json:"amountTrackerId,omitempty"`
+	ChallengeTrackerId   string                    `protobuf:"bytes,7,opt,name=challengeTrackerId,proto3" json:"challengeTrackerId,omitempty"`
+	Uri                  string                    `protobuf:"bytes,8,opt,name=uri,proto3" json:"uri,omitempty"`
+	CustomData           string                    `protobuf:"bytes,9,opt,name=customData,proto3" json:"customData,omitempty"`
+	ApprovalId           string                    `protobuf:"bytes,10,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
+	ApprovalCriteria     *IncomingApprovalCriteria `protobuf:"bytes,11,opt,name=approvalCriteria,proto3" json:"approvalCriteria,omitempty"`
 }
 
 func (m *UserIncomingApproval) Reset()         { *m = UserIncomingApproval{} }
@@ -482,9 +410,9 @@ func (m *UserIncomingApproval) GetOwnershipTimes() []*UintRange {
 	return nil
 }
 
-func (m *UserIncomingApproval) GetApprovalTrackerId() string {
+func (m *UserIncomingApproval) GetAmountTrackerId() string {
 	if m != nil {
-		return m.ApprovalTrackerId
+		return m.AmountTrackerId
 	}
 	return ""
 }
@@ -494,62 +422,6 @@ func (m *UserIncomingApproval) GetChallengeTrackerId() string {
 		return m.ChallengeTrackerId
 	}
 	return ""
-}
-
-func (m *UserIncomingApproval) GetFromMappingOptions() *ValueOptions {
-	if m != nil {
-		return m.FromMappingOptions
-	}
-	return nil
-}
-
-func (m *UserIncomingApproval) GetInitiatedByMappingOptions() *ValueOptions {
-	if m != nil {
-		return m.InitiatedByMappingOptions
-	}
-	return nil
-}
-
-func (m *UserIncomingApproval) GetTransferTimesOptions() *ValueOptions {
-	if m != nil {
-		return m.TransferTimesOptions
-	}
-	return nil
-}
-
-func (m *UserIncomingApproval) GetBadgeIdsOptions() *ValueOptions {
-	if m != nil {
-		return m.BadgeIdsOptions
-	}
-	return nil
-}
-
-func (m *UserIncomingApproval) GetOwnershipTimesOptions() *ValueOptions {
-	if m != nil {
-		return m.OwnershipTimesOptions
-	}
-	return nil
-}
-
-func (m *UserIncomingApproval) GetApprovalTrackerIdOptions() *ValueOptions {
-	if m != nil {
-		return m.ApprovalTrackerIdOptions
-	}
-	return nil
-}
-
-func (m *UserIncomingApproval) GetChallengeTrackerIdOptions() *ValueOptions {
-	if m != nil {
-		return m.ChallengeTrackerIdOptions
-	}
-	return nil
-}
-
-func (m *UserIncomingApproval) GetIsApproved() bool {
-	if m != nil {
-		return m.IsApproved
-	}
-	return false
 }
 
 func (m *UserIncomingApproval) GetUri() string {
@@ -1242,27 +1114,18 @@ func (m *IncomingApprovalCriteria) GetRequireFromDoesNotEqualInitiatedBy() bool 
 
 type CollectionApproval struct {
 	// Match Criteria
-	FromMappingId             string            `protobuf:"bytes,1,opt,name=fromMappingId,proto3" json:"fromMappingId,omitempty"`
-	ToMappingId               string            `protobuf:"bytes,2,opt,name=toMappingId,proto3" json:"toMappingId,omitempty"`
-	InitiatedByMappingId      string            `protobuf:"bytes,3,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
-	TransferTimes             []*UintRange      `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	BadgeIds                  []*UintRange      `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	OwnershipTimes            []*UintRange      `protobuf:"bytes,6,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
-	ApprovalTrackerId         string            `protobuf:"bytes,7,opt,name=approvalTrackerId,proto3" json:"approvalTrackerId,omitempty"`
-	ChallengeTrackerId        string            `protobuf:"bytes,8,opt,name=challengeTrackerId,proto3" json:"challengeTrackerId,omitempty"`
-	FromMappingOptions        *ValueOptions     `protobuf:"bytes,9,opt,name=fromMappingOptions,proto3" json:"fromMappingOptions,omitempty"`
-	ToMappingOptions          *ValueOptions     `protobuf:"bytes,10,opt,name=toMappingOptions,proto3" json:"toMappingOptions,omitempty"`
-	InitiatedByMappingOptions *ValueOptions     `protobuf:"bytes,11,opt,name=initiatedByMappingOptions,proto3" json:"initiatedByMappingOptions,omitempty"`
-	TransferTimesOptions      *ValueOptions     `protobuf:"bytes,12,opt,name=transferTimesOptions,proto3" json:"transferTimesOptions,omitempty"`
-	BadgeIdsOptions           *ValueOptions     `protobuf:"bytes,13,opt,name=badgeIdsOptions,proto3" json:"badgeIdsOptions,omitempty"`
-	OwnershipTimesOptions     *ValueOptions     `protobuf:"bytes,14,opt,name=ownershipTimesOptions,proto3" json:"ownershipTimesOptions,omitempty"`
-	ApprovalTrackerIdOptions  *ValueOptions     `protobuf:"bytes,15,opt,name=approvalTrackerIdOptions,proto3" json:"approvalTrackerIdOptions,omitempty"`
-	ChallengeTrackerIdOptions *ValueOptions     `protobuf:"bytes,16,opt,name=challengeTrackerIdOptions,proto3" json:"challengeTrackerIdOptions,omitempty"`
-	IsApproved                bool              `protobuf:"varint,17,opt,name=isApproved,proto3" json:"isApproved,omitempty"`
-	Uri                       string            `protobuf:"bytes,18,opt,name=uri,proto3" json:"uri,omitempty"`
-	CustomData                string            `protobuf:"bytes,19,opt,name=customData,proto3" json:"customData,omitempty"`
-	ApprovalId                string            `protobuf:"bytes,20,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
-	ApprovalCriteria          *ApprovalCriteria `protobuf:"bytes,21,opt,name=approvalCriteria,proto3" json:"approvalCriteria,omitempty"`
+	FromMappingId        string            `protobuf:"bytes,1,opt,name=fromMappingId,proto3" json:"fromMappingId,omitempty"`
+	ToMappingId          string            `protobuf:"bytes,2,opt,name=toMappingId,proto3" json:"toMappingId,omitempty"`
+	InitiatedByMappingId string            `protobuf:"bytes,3,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
+	TransferTimes        []*UintRange      `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
+	BadgeIds             []*UintRange      `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	OwnershipTimes       []*UintRange      `protobuf:"bytes,6,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
+	AmountTrackerId      string            `protobuf:"bytes,7,opt,name=amountTrackerId,proto3" json:"amountTrackerId,omitempty"`
+	ChallengeTrackerId   string            `protobuf:"bytes,8,opt,name=challengeTrackerId,proto3" json:"challengeTrackerId,omitempty"`
+	Uri                  string            `protobuf:"bytes,9,opt,name=uri,proto3" json:"uri,omitempty"`
+	CustomData           string            `protobuf:"bytes,10,opt,name=customData,proto3" json:"customData,omitempty"`
+	ApprovalId           string            `protobuf:"bytes,11,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
+	ApprovalCriteria     *ApprovalCriteria `protobuf:"bytes,12,opt,name=approvalCriteria,proto3" json:"approvalCriteria,omitempty"`
 }
 
 func (m *CollectionApproval) Reset()         { *m = CollectionApproval{} }
@@ -1340,9 +1203,9 @@ func (m *CollectionApproval) GetOwnershipTimes() []*UintRange {
 	return nil
 }
 
-func (m *CollectionApproval) GetApprovalTrackerId() string {
+func (m *CollectionApproval) GetAmountTrackerId() string {
 	if m != nil {
-		return m.ApprovalTrackerId
+		return m.AmountTrackerId
 	}
 	return ""
 }
@@ -1352,69 +1215,6 @@ func (m *CollectionApproval) GetChallengeTrackerId() string {
 		return m.ChallengeTrackerId
 	}
 	return ""
-}
-
-func (m *CollectionApproval) GetFromMappingOptions() *ValueOptions {
-	if m != nil {
-		return m.FromMappingOptions
-	}
-	return nil
-}
-
-func (m *CollectionApproval) GetToMappingOptions() *ValueOptions {
-	if m != nil {
-		return m.ToMappingOptions
-	}
-	return nil
-}
-
-func (m *CollectionApproval) GetInitiatedByMappingOptions() *ValueOptions {
-	if m != nil {
-		return m.InitiatedByMappingOptions
-	}
-	return nil
-}
-
-func (m *CollectionApproval) GetTransferTimesOptions() *ValueOptions {
-	if m != nil {
-		return m.TransferTimesOptions
-	}
-	return nil
-}
-
-func (m *CollectionApproval) GetBadgeIdsOptions() *ValueOptions {
-	if m != nil {
-		return m.BadgeIdsOptions
-	}
-	return nil
-}
-
-func (m *CollectionApproval) GetOwnershipTimesOptions() *ValueOptions {
-	if m != nil {
-		return m.OwnershipTimesOptions
-	}
-	return nil
-}
-
-func (m *CollectionApproval) GetApprovalTrackerIdOptions() *ValueOptions {
-	if m != nil {
-		return m.ApprovalTrackerIdOptions
-	}
-	return nil
-}
-
-func (m *CollectionApproval) GetChallengeTrackerIdOptions() *ValueOptions {
-	if m != nil {
-		return m.ChallengeTrackerIdOptions
-	}
-	return nil
-}
-
-func (m *CollectionApproval) GetIsApproved() bool {
-	if m != nil {
-		return m.IsApproved
-	}
-	return false
 }
 
 func (m *CollectionApproval) GetUri() string {
@@ -1735,121 +1535,109 @@ func init() {
 func init() { proto.RegisterFile("badges/transfers.proto", fileDescriptor_db7d8388ebf2a03f) }
 
 var fileDescriptor_db7d8388ebf2a03f = []byte{
-	// 1818 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x5a, 0xdd, 0x6e, 0x23, 0x49,
-	0x15, 0x8e, 0x1d, 0x67, 0xe2, 0x39, 0x8e, 0x63, 0xa7, 0xf2, 0x43, 0x6f, 0x76, 0xe3, 0x89, 0x7a,
-	0x73, 0x11, 0xad, 0x16, 0x7b, 0x09, 0xb0, 0x02, 0x2e, 0x46, 0xc4, 0xc9, 0x8e, 0xe4, 0x55, 0x7e,
-	0xac, 0x26, 0xb3, 0x2b, 0x46, 0x5a, 0xa0, 0xe2, 0xae, 0xd8, 0xad, 0x74, 0x77, 0xf5, 0x56, 0x77,
-	0x0f, 0x09, 0xe2, 0x7a, 0x85, 0xc4, 0x0d, 0x57, 0xbc, 0x04, 0x2f, 0xb2, 0x37, 0x48, 0x23, 0x24,
-	0x10, 0x1a, 0x89, 0x11, 0x9a, 0x79, 0x02, 0xae, 0x11, 0x23, 0xd4, 0xd5, 0x55, 0xb6, 0xbb, 0xdc,
-	0xfe, 0x9d, 0x24, 0x48, 0x28, 0x77, 0xed, 0xaa, 0x73, 0xbe, 0x53, 0x75, 0xea, 0xd4, 0x57, 0x5d,
-	0x9f, 0x1b, 0x36, 0xce, 0xb1, 0xd9, 0x26, 0x7e, 0x2d, 0x60, 0xd8, 0xf5, 0x2f, 0x08, 0xf3, 0xab,
-	0x1e, 0xa3, 0x01, 0x45, 0x8f, 0xce, 0xad, 0x20, 0xee, 0xaa, 0x76, 0x9f, 0x5a, 0x1d, 0x6c, 0xb9,
-	0xd5, 0xf8, 0x79, 0x73, 0xad, 0x4d, 0xdb, 0x94, 0xdb, 0xd6, 0xa2, 0xa7, 0xd8, 0x6d, 0x53, 0x13,
-	0x70, 0x1e, 0x61, 0x8e, 0xe5, 0xfb, 0x16, 0x75, 0x05, 0xe0, 0xe6, 0x96, 0xe8, 0xc1, 0xa6, 0xc9,
-	0x88, 0xef, 0xff, 0xd2, 0xc1, 0x9e, 0x67, 0xb9, 0x6d, 0xd9, 0xbd, 0x2e, 0xba, 0xcf, 0xb1, 0x8d,
-	0xdd, 0x16, 0x11, 0xcd, 0xfa, 0xdb, 0x2c, 0x94, 0x9f, 0xfa, 0x84, 0xd5, 0xe3, 0xe6, 0x9f, 0x05,
-	0x94, 0x11, 0x74, 0x08, 0x79, 0x69, 0xa6, 0x65, 0xb6, 0xe7, 0x77, 0x0b, 0x7b, 0xbb, 0xd5, 0x31,
-	0xc3, 0xad, 0x0a, 0x00, 0xa3, 0xeb, 0x89, 0x5a, 0xb0, 0x42, 0xc3, 0xa0, 0x4d, 0x2d, 0xb7, 0xbd,
-	0xef, 0x79, 0x8c, 0x3e, 0xc7, 0xb6, 0xaf, 0x65, 0x39, 0xdc, 0x0f, 0xc7, 0xc2, 0x45, 0x63, 0x3a,
-	0x55, 0xbc, 0x8d, 0x41, 0xbc, 0x28, 0x88, 0xe5, 0xb6, 0xa8, 0x93, 0x08, 0x32, 0x3f, 0x45, 0x90,
-	0x86, 0xe2, 0x6d, 0x0c, 0xe2, 0xa1, 0x67, 0x50, 0x0a, 0x7d, 0xc2, 0x9a, 0xbd, 0x9c, 0x6b, 0xb9,
-	0xed, 0xcc, 0x6e, 0x61, 0xef, 0x93, 0x89, 0x42, 0xf4, 0xf9, 0x19, 0x2a, 0x90, 0xfe, 0x9f, 0x0c,
-	0x94, 0x8e, 0x09, 0xbb, 0xb4, 0xc9, 0x41, 0x07, 0xdb, 0x36, 0x71, 0xdb, 0x04, 0x21, 0xc8, 0x31,
-	0x4a, 0x03, 0x2d, 0xb3, 0x9d, 0xd9, 0x7d, 0x68, 0xf0, 0x67, 0xf4, 0x18, 0x56, 0xc9, 0x95, 0x47,
-	0x5a, 0x01, 0x31, 0x9b, 0x8c, 0xd2, 0x8b, 0x23, 0xe2, 0xb6, 0x83, 0x8e, 0x96, 0x8d, 0x4c, 0xea,
-	0x4b, 0xdf, 0xbe, 0x7a, 0x34, 0xf7, 0xf2, 0xd5, 0xa3, 0xdc, 0x53, 0xcb, 0x0d, 0x8c, 0x34, 0x43,
-	0xf4, 0x23, 0xf8, 0x4e, 0xe8, 0x93, 0x03, 0x46, 0x70, 0x40, 0xd9, 0x7e, 0x5c, 0x23, 0xfb, 0xfe,
-	0x11, 0xc1, 0x17, 0xda, 0xfc, 0x76, 0x66, 0x37, 0x6f, 0x0c, 0xeb, 0x46, 0x1f, 0x41, 0xd9, 0xc1,
-	0x57, 0xa7, 0x2e, 0x79, 0xea, 0x93, 0x26, 0x61, 0xdc, 0x25, 0xc7, 0x5d, 0x06, 0xda, 0x51, 0x19,
-	0xe6, 0x43, 0x66, 0x69, 0x0f, 0xf8, 0xc0, 0xa3, 0x47, 0x54, 0x01, 0x68, 0x85, 0x7e, 0x40, 0x9d,
-	0x43, 0x1c, 0x60, 0x6d, 0x91, 0x77, 0xf4, 0xb5, 0xe8, 0x7f, 0x01, 0x58, 0x4b, 0x5b, 0x6c, 0xb4,
-	0x0d, 0x85, 0x80, 0x1e, 0xc7, 0x45, 0xdc, 0x30, 0x45, 0x2e, 0xfa, 0x9b, 0xd0, 0x1e, 0xac, 0x59,
-	0xae, 0x15, 0x58, 0x38, 0x20, 0x66, 0xfd, 0xba, 0x67, 0xca, 0x73, 0x62, 0xa4, 0xf6, 0xa1, 0x26,
-	0x14, 0xe5, 0x4e, 0x3c, 0xb3, 0x1c, 0x22, 0x6b, 0xe5, 0xa3, 0xf1, 0x0b, 0x19, 0x65, 0x16, 0xbb,
-	0x6d, 0x62, 0x24, 0x01, 0xd0, 0x93, 0x68, 0xb3, 0x98, 0x6d, 0xd2, 0x30, 0xa3, 0xaa, 0x98, 0x16,
-	0xac, 0xeb, 0x8b, 0x0c, 0x58, 0xa6, 0xbf, 0x76, 0x09, 0xf3, 0x3b, 0x96, 0x17, 0x0f, 0x6d, 0x61,
-	0x6a, 0x34, 0x05, 0x01, 0x7d, 0x0c, 0x2b, 0x58, 0xe4, 0xf3, 0x8c, 0xe1, 0xd6, 0x25, 0x61, 0x0d,
-	0x53, 0x2c, 0xce, 0x60, 0x07, 0xaa, 0x02, 0x6a, 0xc9, 0x1a, 0xec, 0x99, 0xc7, 0x4b, 0x96, 0xd2,
-	0x83, 0x7e, 0x0e, 0xe5, 0xee, 0x72, 0x9c, 0x7a, 0x01, 0xdf, 0x17, 0x79, 0xbe, 0x2f, 0xbe, 0x3b,
-	0x76, 0xcc, 0x5f, 0x60, 0x3b, 0x24, 0xc2, 0xc9, 0x18, 0x80, 0x41, 0x97, 0xf0, 0xde, 0xe0, 0xf2,
-	0xc9, 0x18, 0x0f, 0x67, 0x89, 0x31, 0x1c, 0x0f, 0x61, 0x58, 0x4b, 0x2c, 0xa9, 0x8c, 0x03, 0xb3,
-	0xc4, 0x49, 0x85, 0x42, 0x5f, 0x42, 0x49, 0x2e, 0xb4, 0x44, 0x2f, 0xcc, 0x82, 0xae, 0xa2, 0xa0,
-	0x16, 0xac, 0x27, 0xd7, 0x5c, 0xc2, 0x2f, 0xcd, 0x02, 0x9f, 0x8e, 0x85, 0x2c, 0xd0, 0x06, 0xaa,
-	0x45, 0xc6, 0x29, 0xce, 0x12, 0x67, 0x28, 0x5c, 0xb4, 0xf0, 0x83, 0x95, 0x26, 0x63, 0x2d, 0xcf,
-	0xb4, 0xf0, 0x43, 0xf1, 0x22, 0x6e, 0xb2, 0xfc, 0x98, 0x70, 0x88, 0xa9, 0x95, 0x38, 0xa7, 0xf5,
-	0xb5, 0x48, 0x36, 0x2b, 0x0f, 0x63, 0xb3, 0x15, 0x95, 0xcd, 0xa2, 0x7e, 0x39, 0xb5, 0x86, 0xa9,
-	0xa1, 0xb8, 0xbf, 0xd7, 0x82, 0x08, 0x94, 0xe5, 0xaf, 0x03, 0x66, 0x05, 0x84, 0x59, 0x58, 0x5b,
-	0xe5, 0xb3, 0xfa, 0xf1, 0xd8, 0x59, 0xa9, 0x0c, 0x29, 0x01, 0x8c, 0x01, 0x48, 0xfd, 0xa5, 0x20,
-	0x55, 0xf5, 0x70, 0x43, 0x3b, 0x50, 0xbc, 0x60, 0xd4, 0x51, 0x69, 0x35, 0xd9, 0x78, 0x4f, 0xac,
-	0xff, 0x63, 0x62, 0xfd, 0x0a, 0x50, 0xdf, 0x82, 0xbc, 0x13, 0xb5, 0xa6, 0x00, 0xdd, 0x93, 0xeb,
-	0x3d, 0xb9, 0xde, 0x93, 0xab, 0x32, 0x2b, 0x95, 0x29, 0x47, 0x90, 0xeb, 0x17, 0xb0, 0x7c, 0x8c,
-	0xdd, 0x10, 0xdb, 0x75, 0x79, 0xd3, 0xb9, 0x91, 0xfb, 0x92, 0xfe, 0xaf, 0x0c, 0xac, 0x36, 0xdc,
-	0x16, 0x23, 0x0e, 0x71, 0xa3, 0x9d, 0x24, 0xd1, 0x4f, 0xa0, 0xe8, 0x07, 0x98, 0x05, 0xf5, 0x59,
-	0x43, 0x24, 0xdd, 0xa3, 0x9b, 0x84, 0x25, 0xc3, 0xd4, 0x45, 0xc5, 0xd7, 0xaf, 0xd3, 0x6f, 0x12,
-	0x29, 0x86, 0xe8, 0xf3, 0x88, 0x3e, 0x44, 0xf3, 0x69, 0xa2, 0xa4, 0xeb, 0xd7, 0xfc, 0x2e, 0xa1,
-	0xa2, 0x0c, 0x37, 0xd7, 0xff, 0x9d, 0x85, 0x0f, 0x9b, 0x8c, 0x98, 0x24, 0x88, 0xae, 0x44, 0x2e,
-	0x31, 0x4f, 0x99, 0x49, 0xd8, 0x01, 0xb6, 0x5b, 0xa1, 0x8d, 0xa3, 0x3a, 0x3a, 0x26, 0x41, 0x87,
-	0x9a, 0xe8, 0x53, 0xd8, 0x08, 0x7d, 0x72, 0xfa, 0x9c, 0x30, 0x6c, 0xdb, 0x27, 0xa1, 0x73, 0x26,
-	0x6f, 0xd3, 0xfc, 0x00, 0xcb, 0x1b, 0x43, 0x7a, 0xd1, 0x4f, 0xe1, 0xfd, 0x90, 0xdf, 0x4e, 0xce,
-	0xa8, 0xb8, 0xd4, 0x24, 0x9c, 0xb3, 0xdc, 0x79, 0x94, 0x09, 0x3a, 0x84, 0xad, 0xb8, 0xfb, 0x09,
-	0xa3, 0x4e, 0x1a, 0x46, 0x7c, 0x7b, 0x1a, 0x6d, 0x84, 0x0c, 0xd8, 0x89, 0x0d, 0x1a, 0x3d, 0xa2,
-	0x4c, 0x03, 0x8b, 0xef, 0x55, 0x13, 0xd9, 0x8a, 0xb9, 0x29, 0x77, 0xc7, 0xe8, 0x16, 0xd6, 0x70,
-	0x4d, 0x72, 0xa5, 0x2d, 0x74, 0xe7, 0x36, 0xcc, 0x44, 0xff, 0x5b, 0x16, 0xd6, 0x13, 0xd9, 0xef,
-	0xd6, 0xc8, 0x97, 0xb0, 0xec, 0x24, 0x6a, 0x5c, 0x14, 0x5d, 0x6d, 0x6c, 0xd1, 0x25, 0xb7, 0x86,
-	0xa1, 0xc0, 0xa0, 0x8b, 0xbe, 0xe2, 0xeb, 0xc5, 0xe3, 0x0b, 0x51, 0xd8, 0xfb, 0xc1, 0x24, 0xdb,
-	0x54, 0xf5, 0x35, 0xd2, 0x00, 0xd1, 0x6f, 0x61, 0x83, 0xa6, 0x96, 0x12, 0x5f, 0xaf, 0xc2, 0xde,
-	0xe1, 0xd8, 0x50, 0x13, 0x94, 0xa5, 0x31, 0x24, 0x86, 0xfe, 0xd7, 0x2c, 0x94, 0x24, 0x93, 0xec,
-	0x3b, 0x34, 0x74, 0x03, 0x1f, 0xd5, 0x61, 0x9d, 0xc6, 0x15, 0x9a, 0xec, 0x89, 0x5f, 0xc1, 0x94,
-	0x2d, 0x93, 0x6e, 0x8a, 0x8e, 0x60, 0xd3, 0xeb, 0x2b, 0x54, 0x05, 0x28, 0x6d, 0x07, 0x8f, 0xb0,
-	0x47, 0x4d, 0xf8, 0xc0, 0x4b, 0x94, 0xac, 0x82, 0x97, 0xb6, 0x97, 0x47, 0x7a, 0xa0, 0x5f, 0xc0,
-	0x87, 0x5e, 0x5a, 0xdd, 0x2a, 0xc0, 0xb9, 0x14, 0xe0, 0x49, 0x1c, 0xf5, 0x7f, 0x64, 0xa1, 0x74,
-	0x8c, 0xaf, 0x94, 0x0d, 0xba, 0x21, 0x92, 0xa5, 0xf4, 0xa4, 0x26, 0x76, 0x88, 0x2d, 0x3a, 0x81,
-	0xf7, 0xfb, 0x33, 0xa5, 0x42, 0xa5, 0xa5, 0x76, 0x94, 0x03, 0x32, 0x60, 0x2b, 0x99, 0x29, 0x15,
-	0x31, 0x2d, 0xb9, 0xa3, 0x5d, 0xd0, 0xaf, 0x60, 0x27, 0x35, 0x49, 0x2a, 0x74, 0x5a, 0x7a, 0x27,
-	0xf2, 0xd4, 0x7f, 0x97, 0x81, 0x72, 0x57, 0xf6, 0x12, 0x27, 0x3a, 0xfa, 0x04, 0x96, 0xdc, 0x71,
-	0x69, 0x4d, 0x58, 0xa0, 0x3a, 0x2c, 0xe2, 0xb8, 0xea, 0x85, 0xde, 0x37, 0xf9, 0x59, 0x25, 0x1d,
-	0xf5, 0x3f, 0x2e, 0xf6, 0x86, 0x22, 0x8f, 0x5e, 0x74, 0x06, 0x45, 0x27, 0xf4, 0xa3, 0x63, 0x84,
-	0x9f, 0x47, 0x92, 0x95, 0xaa, 0xe3, 0x59, 0xa9, 0xdf, 0xcb, 0x48, 0x82, 0xa0, 0x67, 0x50, 0x72,
-	0x92, 0x14, 0x29, 0xf8, 0x68, 0xbc, 0xbc, 0xa7, 0x50, 0xab, 0xa1, 0x02, 0x21, 0x1b, 0xd6, 0xbd,
-	0x34, 0x86, 0x15, 0x34, 0xf4, 0xe9, 0x74, 0x34, 0xd4, 0xe5, 0xbc, 0x74, 0xd0, 0x68, 0x26, 0x38,
-	0x49, 0x3b, 0x13, 0x0b, 0x95, 0x0a, 0x5d, 0x19, 0x2a, 0x10, 0xcf, 0x92, 0x52, 0x68, 0x0b, 0x93,
-	0x66, 0x29, 0xe9, 0x67, 0xa8, 0x40, 0xe8, 0x31, 0x6c, 0x32, 0xf2, 0x75, 0x68, 0x31, 0x72, 0x46,
-	0x3f, 0xfb, 0x3a, 0xc4, 0xb6, 0xdf, 0x57, 0xab, 0xfc, 0x4a, 0x92, 0x37, 0x46, 0x58, 0xa0, 0x3a,
-	0x7c, 0x20, 0x7a, 0xa3, 0xed, 0x33, 0x88, 0x00, 0x1c, 0x61, 0xa4, 0x0d, 0xfa, 0x1c, 0xb6, 0xbb,
-	0x11, 0x0e, 0x29, 0xf1, 0x4f, 0x68, 0xc0, 0x8d, 0xfa, 0x71, 0x0a, 0x1c, 0x67, 0xac, 0x1d, 0x3a,
-	0x01, 0xbd, 0x2f, 0xd6, 0x30, 0xb4, 0x25, 0x8e, 0x36, 0x81, 0x25, 0x7a, 0x02, 0x95, 0x88, 0xb7,
-	0x98, 0x65, 0x12, 0x3f, 0xb2, 0x3b, 0x1d, 0xd0, 0xd5, 0x8b, 0x1c, 0x6b, 0x8c, 0x55, 0x94, 0xa7,
-	0xae, 0xc5, 0x19, 0x6d, 0x0c, 0x08, 0xe7, 0xcb, 0x71, 0x9e, 0x46, 0xd9, 0xe8, 0x6f, 0x73, 0xa0,
-	0x0d, 0x93, 0x22, 0xee, 0x37, 0xe8, 0xfd, 0x06, 0x4d, 0xdd, 0xa0, 0x37, 0xb8, 0xb9, 0xf4, 0x6f,
-	0x16, 0x40, 0x1b, 0x76, 0x5d, 0xbb, 0x2f, 0xc0, 0xff, 0xd3, 0x02, 0xbc, 0x09, 0x86, 0xbf, 0x61,
-	0x56, 0xd6, 0xff, 0x5c, 0x00, 0x74, 0x40, 0x6d, 0x9b, 0xb4, 0xa2, 0x57, 0xff, 0x29, 0x35, 0x56,
-	0xe5, 0xef, 0xad, 0xec, 0xe4, 0x7f, 0x6f, 0xcd, 0x4f, 0xa3, 0xc2, 0xe6, 0x6e, 0x52, 0x85, 0x5d,
-	0xb8, 0x51, 0x15, 0xf6, 0xc1, 0xed, 0xa8, 0xb0, 0x8b, 0xd3, 0xa9, 0xb0, 0xf9, 0x29, 0x55, 0xd8,
-	0x87, 0x37, 0xa5, 0xc2, 0xa6, 0xfd, 0x7b, 0x06, 0x77, 0xf0, 0xef, 0x59, 0xe1, 0x8e, 0x04, 0xde,
-	0xa5, 0x5b, 0x15, 0x78, 0x8b, 0xb7, 0x2b, 0xf0, 0x2e, 0xdf, 0x91, 0xc0, 0x5b, 0xba, 0x43, 0x81,
-	0xb7, 0x7c, 0xab, 0x02, 0xef, 0xca, 0x30, 0x81, 0x17, 0x0d, 0x13, 0x78, 0x57, 0xc7, 0x08, 0xbc,
-	0x6b, 0x03, 0x02, 0xef, 0x57, 0x29, 0x02, 0xef, 0x3a, 0x9f, 0xd5, 0xf7, 0x26, 0x3e, 0xbd, 0x46,
-	0x08, 0xbb, 0xbf, 0xcf, 0xc0, 0x7b, 0xfb, 0xdd, 0x68, 0xc4, 0x0d, 0xac, 0x0b, 0x8b, 0xb0, 0x43,
-	0x12, 0x60, 0xcb, 0xf6, 0x95, 0xc1, 0x65, 0x06, 0x06, 0xb7, 0x03, 0x45, 0xf9, 0xeb, 0x88, 0x3c,
-	0x27, 0xb6, 0xa0, 0xf4, 0x64, 0x23, 0xda, 0x95, 0xe7, 0x2f, 0x91, 0x5f, 0x59, 0x08, 0x3e, 0x57,
-	0x9b, 0xf5, 0x3f, 0xe5, 0x20, 0x2f, 0xcf, 0x3f, 0x84, 0x20, 0x17, 0x51, 0x88, 0xfc, 0x22, 0x24,
-	0x7a, 0x8e, 0x4f, 0x10, 0x61, 0x4d, 0xe2, 0x9b, 0x36, 0x3f, 0x41, 0xba, 0x4d, 0x09, 0x5d, 0x7a,
-	0x7e, 0xe6, 0xef, 0x78, 0xbe, 0xc9, 0xc0, 0xb6, 0xc7, 0x48, 0x4b, 0xa8, 0x5c, 0x44, 0xbe, 0x4b,
-	0x70, 0xa5, 0x42, 0x4c, 0x4e, 0xbc, 0x44, 0xfc, 0x64, 0xe2, 0x65, 0x18, 0xc8, 0xaf, 0x31, 0x36,
-	0x06, 0x6a, 0xc2, 0x52, 0xfc, 0xf2, 0xc4, 0xbf, 0x6b, 0x91, 0xc7, 0xd1, 0xc7, 0x13, 0xbe, 0x82,
-	0x71, 0x27, 0x23, 0x81, 0x10, 0xa5, 0xd5, 0x21, 0x0e, 0x15, 0xff, 0xdc, 0xf1, 0x67, 0xe4, 0xc2,
-	0x9a, 0xc7, 0x2c, 0xca, 0xac, 0xc0, 0xfa, 0x0d, 0x31, 0x7b, 0x77, 0xa3, 0x45, 0x1e, 0xed, 0x5d,
-	0x66, 0x98, 0x8a, 0x8b, 0x0e, 0x61, 0x8b, 0xba, 0xf6, 0xf5, 0x41, 0x87, 0xb4, 0x2e, 0x9b, 0x69,
-	0x81, 0xf3, 0xb1, 0xc0, 0x3c, 0xd2, 0x48, 0x7f, 0x0c, 0xcb, 0x62, 0x9a, 0x38, 0xe8, 0x34, 0x02,
-	0xe2, 0x44, 0x73, 0xc3, 0x5d, 0x79, 0xd1, 0xe0, 0xcf, 0x48, 0x83, 0x45, 0xea, 0x1a, 0x56, 0xbb,
-	0x13, 0x08, 0xe9, 0x5b, 0xfe, 0xd4, 0x3b, 0x50, 0xe8, 0x4b, 0x53, 0xe4, 0x6c, 0x13, 0x7c, 0x21,
-	0x9d, 0xa3, 0x67, 0xf4, 0x19, 0x2c, 0xe0, 0x3e, 0x4d, 0xa7, 0x36, 0x69, 0xde, 0xc5, 0x80, 0x8c,
-	0xd8, 0xbb, 0x7e, 0xf4, 0xed, 0xeb, 0x4a, 0xe6, 0xc5, 0xeb, 0x4a, 0xe6, 0x9f, 0xaf, 0x2b, 0x99,
-	0x3f, 0xbc, 0xa9, 0xcc, 0xbd, 0x78, 0x53, 0x99, 0xfb, 0xfb, 0x9b, 0xca, 0xdc, 0xb3, 0xbd, 0xb6,
-	0x15, 0x74, 0xc2, 0xf3, 0x6a, 0x8b, 0x3a, 0xb5, 0x2e, 0x62, 0x2d, 0x89, 0x5d, 0xbb, 0xaa, 0xc9,
-	0x0f, 0xea, 0xae, 0x3d, 0xe2, 0x9f, 0x3f, 0xe0, 0x9f, 0xb1, 0x7d, 0xff, 0xbf, 0x01, 0x00, 0x00,
-	0xff, 0xff, 0x98, 0x79, 0x2e, 0xa1, 0x67, 0x27, 0x00, 0x00,
+	// 1629 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x59, 0xcd, 0x6f, 0xdb, 0x46,
+	0x16, 0xb7, 0x64, 0x39, 0x56, 0x9e, 0xfc, 0xb5, 0x13, 0xdb, 0xab, 0x38, 0xb1, 0x62, 0x30, 0x3e,
+	0x18, 0xc1, 0x42, 0xca, 0x7a, 0x77, 0x83, 0xdd, 0x3d, 0x04, 0x6b, 0xd9, 0x09, 0xa0, 0xc0, 0x1f,
+	0x02, 0xd7, 0x69, 0x81, 0x00, 0xfd, 0x18, 0x8b, 0xcf, 0x12, 0x11, 0x92, 0xa3, 0x0c, 0x47, 0xa9,
+	0x5d, 0xf4, 0x1c, 0xb4, 0xe8, 0xa5, 0xa7, 0xfe, 0x13, 0xfd, 0x47, 0x72, 0xcc, 0xa5, 0x45, 0x51,
+	0xa0, 0x41, 0x91, 0x9c, 0x7b, 0xc8, 0xb9, 0x68, 0x50, 0x70, 0x38, 0x94, 0xc4, 0x11, 0x25, 0xd1,
+	0xa9, 0x7b, 0x29, 0x7c, 0x1b, 0xce, 0xbc, 0xf7, 0x7b, 0xc3, 0x37, 0xbf, 0xf7, 0x1e, 0xe7, 0x11,
+	0x96, 0x8f, 0xa8, 0xd5, 0x44, 0xbf, 0x22, 0x38, 0xf5, 0xfc, 0x63, 0xe4, 0x7e, 0xb9, 0xcd, 0x99,
+	0x60, 0xe4, 0xc6, 0x91, 0x2d, 0xc2, 0xa5, 0x72, 0x77, 0xd4, 0x68, 0x51, 0xdb, 0x2b, 0x87, 0xe3,
+	0x95, 0xc5, 0x26, 0x6b, 0x32, 0x29, 0x5b, 0x09, 0x46, 0xa1, 0xda, 0x4a, 0x51, 0xc1, 0xb5, 0x91,
+	0xbb, 0xb6, 0xef, 0xdb, 0xcc, 0x53, 0x80, 0x2b, 0xab, 0x6a, 0x85, 0x5a, 0x16, 0x47, 0xdf, 0xff,
+	0xc8, 0xa5, 0xed, 0xb6, 0xed, 0x35, 0xa3, 0xe5, 0x25, 0xb5, 0x7c, 0x44, 0x1d, 0xea, 0x35, 0x50,
+	0x4d, 0x1b, 0x6f, 0xb3, 0xb0, 0xf0, 0xd0, 0x47, 0x5e, 0x0d, 0xa7, 0xff, 0x2f, 0x18, 0x47, 0xb2,
+	0x03, 0xf9, 0x48, 0xac, 0x98, 0x59, 0x9b, 0xdc, 0x28, 0x6c, 0x6e, 0x94, 0xc7, 0x6c, 0xb7, 0xac,
+	0x00, 0xcc, 0xae, 0x26, 0x69, 0xc0, 0x5f, 0x58, 0x47, 0x34, 0x99, 0xed, 0x35, 0xb7, 0xda, 0x6d,
+	0xce, 0x9e, 0x52, 0xc7, 0x2f, 0x66, 0x25, 0xdc, 0xbf, 0xc6, 0xc2, 0x05, 0x7b, 0x3a, 0xd0, 0xb4,
+	0xcd, 0x41, 0xbc, 0xc0, 0x88, 0xed, 0x35, 0x98, 0x1b, 0x33, 0x32, 0x79, 0x06, 0x23, 0x35, 0x4d,
+	0xdb, 0x1c, 0xc4, 0x23, 0x8f, 0x60, 0xbe, 0xe3, 0x23, 0xaf, 0xf7, 0x7c, 0x5e, 0xcc, 0xad, 0x65,
+	0x36, 0x0a, 0x9b, 0xb7, 0x53, 0x99, 0xe8, 0xd3, 0x33, 0x75, 0x20, 0xe3, 0xd7, 0x0c, 0xcc, 0xef,
+	0x21, 0x7f, 0xec, 0xe0, 0x76, 0x8b, 0x3a, 0x0e, 0x7a, 0x4d, 0x24, 0x04, 0x72, 0x9c, 0x31, 0x51,
+	0xcc, 0xac, 0x65, 0x36, 0x2e, 0x9b, 0x72, 0x4c, 0xee, 0xc2, 0x15, 0x3c, 0x69, 0x63, 0x43, 0xa0,
+	0x55, 0xe7, 0x8c, 0x1d, 0xef, 0xa2, 0xd7, 0x14, 0xad, 0x62, 0x36, 0x10, 0xa9, 0xce, 0x3c, 0x7f,
+	0x79, 0x63, 0xe2, 0x87, 0x97, 0x37, 0x72, 0x0f, 0x6d, 0x4f, 0x98, 0x49, 0x82, 0xe4, 0xdf, 0xf0,
+	0xd7, 0x8e, 0x8f, 0xdb, 0x1c, 0xa9, 0x60, 0x7c, 0x2b, 0xe4, 0xc8, 0x96, 0xbf, 0x8b, 0xf4, 0xb8,
+	0x38, 0xb9, 0x96, 0xd9, 0xc8, 0x9b, 0xc3, 0x96, 0xc9, 0x2d, 0x58, 0x70, 0xe9, 0xc9, 0x81, 0x87,
+	0x0f, 0x7d, 0xac, 0x23, 0x97, 0x2a, 0x39, 0xa9, 0x32, 0x30, 0x4f, 0x16, 0x60, 0xb2, 0xc3, 0xed,
+	0xe2, 0x25, 0xb9, 0xf1, 0x60, 0x48, 0x4a, 0x00, 0x8d, 0x8e, 0x2f, 0x98, 0xbb, 0x43, 0x05, 0x2d,
+	0x4e, 0xcb, 0x85, 0xbe, 0x19, 0xe3, 0xe7, 0x1c, 0x2c, 0x26, 0x1d, 0x36, 0x59, 0x83, 0x82, 0x60,
+	0x7b, 0x21, 0x89, 0x6b, 0x96, 0xf2, 0x45, 0xff, 0x14, 0xd9, 0x84, 0x45, 0xdb, 0xb3, 0x85, 0x4d,
+	0x05, 0x5a, 0xd5, 0xd3, 0x9e, 0xa8, 0xf4, 0x89, 0x99, 0xb8, 0x46, 0xea, 0x30, 0x1b, 0x45, 0xe2,
+	0xa1, 0xed, 0x62, 0xc4, 0x95, 0x5b, 0xe3, 0x0f, 0x32, 0xf0, 0x2c, 0xf5, 0x9a, 0x68, 0xc6, 0x01,
+	0xc8, 0xfd, 0x20, 0x58, 0xac, 0x26, 0xd6, 0xac, 0x80, 0x15, 0x67, 0x05, 0xeb, 0xea, 0x12, 0x13,
+	0xe6, 0xd8, 0x27, 0x1e, 0x72, 0xbf, 0x65, 0xb7, 0xc3, 0xad, 0x4d, 0x9d, 0x19, 0x4d, 0x43, 0x20,
+	0x1b, 0x30, 0x4f, 0x5d, 0xd6, 0xf1, 0xc4, 0x21, 0xa7, 0x8d, 0xc7, 0xc8, 0x6b, 0x96, 0x3a, 0x1a,
+	0x7d, 0x9a, 0x94, 0x81, 0x34, 0x22, 0xfe, 0xf5, 0x84, 0xc3, 0xe3, 0x4a, 0x58, 0x89, 0x0e, 0x3a,
+	0x3f, 0xec, 0xa0, 0x2f, 0xeb, 0x07, 0x1d, 0xac, 0x53, 0x75, 0xb6, 0x35, 0xab, 0x08, 0xe1, 0x7a,
+	0x6f, 0x86, 0x20, 0x2c, 0x44, 0x4f, 0xdb, 0xdc, 0x16, 0xc8, 0x6d, 0x5a, 0x2c, 0xc8, 0x28, 0xfb,
+	0xcf, 0x58, 0x0f, 0xe8, 0xe4, 0x89, 0x00, 0xcc, 0x01, 0x48, 0xe3, 0x8d, 0xe2, 0x9b, 0x1e, 0xf7,
+	0x64, 0x1d, 0x66, 0x8f, 0x39, 0x73, 0x75, 0xc6, 0xc5, 0x27, 0x2f, 0x38, 0x77, 0xc1, 0x39, 0x35,
+	0xab, 0x13, 0x68, 0x04, 0xe7, 0xde, 0x83, 0xb9, 0x3d, 0xea, 0x75, 0xa8, 0x53, 0x8d, 0x6a, 0xe3,
+	0xb9, 0x54, 0x58, 0xe3, 0x4d, 0x06, 0xae, 0xd4, 0xbc, 0x06, 0x47, 0x17, 0xbd, 0x80, 0x73, 0x11,
+	0xfa, 0x3e, 0xcc, 0xfa, 0x82, 0x72, 0x51, 0x7d, 0x57, 0x13, 0x71, 0xf5, 0xa0, 0xf6, 0xd8, 0x91,
+	0x99, 0xaa, 0xe2, 0x4e, 0xf5, 0x34, 0xb9, 0xf6, 0x24, 0x08, 0x92, 0x07, 0x70, 0xb5, 0x3b, 0x7d,
+	0x10, 0x63, 0x4b, 0xf5, 0x54, 0x56, 0x1f, 0x1d, 0x65, 0xb8, 0xb8, 0xf1, 0x4b, 0x16, 0x6e, 0xd6,
+	0x39, 0x5a, 0x28, 0x82, 0x22, 0xea, 0xa1, 0x75, 0xc0, 0x2d, 0xe4, 0xdb, 0xd4, 0x69, 0x74, 0x1c,
+	0x2a, 0x6c, 0xe6, 0xed, 0xa1, 0x68, 0x31, 0x8b, 0xdc, 0x81, 0xe5, 0x8e, 0x8f, 0x07, 0x4f, 0x91,
+	0x53, 0xc7, 0xd9, 0xef, 0xb8, 0x87, 0xd1, 0xf7, 0x97, 0x8c, 0xeb, 0xbc, 0x39, 0x64, 0x95, 0xfc,
+	0x0f, 0xae, 0x75, 0x64, 0x3d, 0x3b, 0x64, 0xaa, 0x0c, 0xc6, 0x94, 0xb3, 0x52, 0x79, 0x94, 0x08,
+	0xd9, 0x81, 0xd5, 0x70, 0xf9, 0x3e, 0x67, 0x6e, 0x12, 0x46, 0x58, 0x6f, 0x47, 0x0b, 0x11, 0x13,
+	0xd6, 0x43, 0x81, 0x5a, 0x2f, 0xa5, 0x24, 0x81, 0x85, 0x95, 0x38, 0x95, 0xac, 0x7a, 0x37, 0xed,
+	0x6b, 0x23, 0xa8, 0xdb, 0x35, 0xcf, 0xc2, 0x93, 0xe2, 0x54, 0xf7, 0xdd, 0x86, 0x89, 0x18, 0xdf,
+	0x65, 0x61, 0x29, 0xe6, 0xfd, 0x2e, 0x47, 0xde, 0x87, 0x39, 0x37, 0xc6, 0x71, 0x45, 0xba, 0xca,
+	0x58, 0xd2, 0xc5, 0x43, 0xc3, 0xd4, 0x60, 0xc8, 0x71, 0x1f, 0xf9, 0x7a, 0xf6, 0xe4, 0x41, 0x14,
+	0x36, 0xff, 0x99, 0x26, 0x4c, 0x75, 0x5d, 0x33, 0x09, 0x90, 0x7c, 0x06, 0xcb, 0x2c, 0x91, 0x4a,
+	0xf2, 0xbc, 0x0a, 0x9b, 0x3b, 0x63, 0x4d, 0xa5, 0xa0, 0xa5, 0x39, 0xc4, 0x86, 0xf1, 0x6d, 0x16,
+	0xe6, 0xa3, 0x4c, 0xb2, 0x25, 0xf3, 0xa4, 0x4f, 0xaa, 0xb0, 0xc4, 0x42, 0x86, 0xc6, 0x57, 0xc2,
+	0xca, 0xa4, 0x85, 0x4c, 0xb2, 0x28, 0xd9, 0x85, 0x95, 0x76, 0x1f, 0x51, 0x35, 0xa0, 0xa4, 0x08,
+	0x1e, 0x21, 0x4f, 0xea, 0x70, 0xbd, 0x1d, 0xa3, 0xac, 0x86, 0x97, 0x14, 0xcb, 0x23, 0x35, 0xc8,
+	0x87, 0x70, 0xb3, 0x9d, 0xc4, 0x5b, 0x0d, 0x38, 0x97, 0x00, 0x9c, 0x46, 0xd1, 0xf8, 0x31, 0x0b,
+	0xf3, 0x7b, 0xf4, 0x44, 0x0b, 0xd0, 0x65, 0xe5, 0x2c, 0x6d, 0x25, 0xd1, 0xb1, 0x43, 0x64, 0xc9,
+	0x3e, 0x5c, 0xeb, 0xf7, 0x94, 0x0e, 0x95, 0xe4, 0xda, 0x51, 0x0a, 0xc4, 0x84, 0xd5, 0xb8, 0xa7,
+	0x74, 0xc4, 0x24, 0xe7, 0x8e, 0x56, 0x21, 0x1f, 0xc3, 0x7a, 0xa2, 0x93, 0x74, 0xe8, 0x24, 0xf7,
+	0xa6, 0xd2, 0x34, 0x3e, 0xcf, 0xc0, 0x42, 0xf7, 0xa2, 0xa4, 0x4a, 0x35, 0xb9, 0x0d, 0x33, 0xde,
+	0x38, 0xb7, 0xc6, 0x24, 0x48, 0x15, 0xa6, 0xc3, 0xaf, 0x83, 0xe8, 0x86, 0x98, 0xbe, 0x56, 0x45,
+	0x8a, 0xc6, 0xd7, 0xd3, 0xbd, 0xad, 0x44, 0xa5, 0x97, 0x1c, 0xc2, 0xac, 0xdb, 0xf1, 0x83, 0x32,
+	0x22, 0xeb, 0x51, 0x94, 0x95, 0xca, 0xe3, 0xb3, 0x52, 0xbf, 0x96, 0x19, 0x07, 0x09, 0x2e, 0x84,
+	0x6e, 0x3c, 0x45, 0xaa, 0x7c, 0x34, 0xfe, 0x42, 0xa8, 0xa5, 0x56, 0x53, 0x07, 0x22, 0x0e, 0x2c,
+	0xb5, 0x93, 0x32, 0xac, 0x4a, 0x43, 0x77, 0xce, 0x96, 0x86, 0xba, 0x39, 0x2f, 0x19, 0x34, 0x78,
+	0x13, 0x1a, 0x4f, 0x3b, 0xa9, 0xaf, 0xb6, 0x5a, 0xba, 0x32, 0x75, 0x20, 0xe9, 0x25, 0x8d, 0x68,
+	0x53, 0x69, 0xbd, 0x14, 0xd7, 0x33, 0x75, 0x20, 0x72, 0x17, 0x56, 0x38, 0x3e, 0xe9, 0xd8, 0x1c,
+	0x0f, 0xd9, 0xbd, 0x27, 0x1d, 0xea, 0xf8, 0x7d, 0x5c, 0x95, 0x5f, 0x82, 0x79, 0x73, 0x84, 0x04,
+	0xa9, 0xc2, 0x75, 0xb5, 0x1a, 0x84, 0xcf, 0x20, 0x02, 0x48, 0x84, 0x91, 0x32, 0xe4, 0x01, 0xac,
+	0x75, 0x2d, 0xec, 0x30, 0xf4, 0xf7, 0x99, 0x90, 0x42, 0xfd, 0x38, 0x05, 0x89, 0x33, 0x56, 0x8e,
+	0xec, 0x83, 0xd1, 0x67, 0x6b, 0x18, 0xda, 0x8c, 0x44, 0x4b, 0x21, 0x49, 0xee, 0x43, 0x29, 0xc8,
+	0x5b, 0xdc, 0xb6, 0xd0, 0x0f, 0xe4, 0x0e, 0x06, 0x3a, 0x31, 0xb3, 0x12, 0x6b, 0x8c, 0x54, 0xe0,
+	0xa7, 0xae, 0xc4, 0x21, 0xab, 0x0d, 0xb4, 0x5a, 0xe6, 0x42, 0x3f, 0x8d, 0x92, 0x31, 0xde, 0xe6,
+	0xa0, 0x38, 0xec, 0x86, 0x76, 0x11, 0xa0, 0x17, 0x01, 0x9a, 0x18, 0xa0, 0xe7, 0x18, 0x5c, 0xc6,
+	0xb3, 0x29, 0x28, 0x0e, 0xbb, 0xae, 0x5d, 0x10, 0xf0, 0x4f, 0x4a, 0xc0, 0xf3, 0xc8, 0xf0, 0xe7,
+	0x9c, 0x95, 0x8d, 0x2f, 0xa6, 0x80, 0x6c, 0x33, 0xc7, 0xc1, 0x46, 0xf0, 0xe9, 0x7f, 0xc6, 0xd6,
+	0x93, 0xd6, 0x10, 0xcd, 0xa6, 0x6f, 0x88, 0x4e, 0x9e, 0xa5, 0x39, 0x95, 0x3b, 0xcf, 0xe6, 0xd4,
+	0xd4, 0xb9, 0x36, 0xa7, 0x2e, 0xfd, 0x11, 0xcd, 0xa9, 0xe9, 0xb3, 0x34, 0xa7, 0xf2, 0xe3, 0x9a,
+	0x53, 0x97, 0x87, 0x35, 0xa7, 0x60, 0x4c, 0x73, 0xaa, 0x30, 0xd0, 0x9c, 0xfa, 0x20, 0xa1, 0x39,
+	0x35, 0x23, 0xa3, 0xe3, 0xef, 0xa9, 0x23, 0x6f, 0x44, 0x53, 0xea, 0xcb, 0x0c, 0x5c, 0xdd, 0xea,
+	0x5a, 0x43, 0x4f, 0xd8, 0xc7, 0x36, 0xf2, 0x1d, 0x14, 0xd4, 0x76, 0x7c, 0x6d, 0x73, 0x99, 0x81,
+	0xcd, 0xad, 0xc3, 0x6c, 0xf4, 0xb4, 0x8b, 0x4f, 0xd1, 0x51, 0x74, 0x8c, 0x4f, 0x4a, 0x77, 0xcb,
+	0x09, 0x8c, 0xfe, 0x29, 0x28, 0x2e, 0xea, 0xd3, 0xc6, 0x37, 0x39, 0xc8, 0x47, 0xb1, 0x4b, 0x08,
+	0xe4, 0x02, 0xea, 0x47, 0xff, 0x3f, 0x82, 0x71, 0xc8, 0x7e, 0x25, 0x8d, 0xe1, 0x2d, 0x41, 0xb2,
+	0xbf, 0x3b, 0x15, 0xeb, 0xa9, 0x4d, 0xbe, 0xf3, 0x5f, 0xab, 0x67, 0x19, 0x58, 0x6b, 0x73, 0x6c,
+	0xa8, 0x1b, 0x3a, 0x46, 0x79, 0x50, 0xde, 0xb2, 0xd4, 0xcb, 0xa9, 0x04, 0xf8, 0xdf, 0xd4, 0xc7,
+	0x30, 0xe0, 0x5f, 0x73, 0xac, 0x0d, 0x52, 0x87, 0x99, 0x30, 0xf1, 0xcb, 0xbf, 0x38, 0x51, 0x28,
+	0xfd, 0x2d, 0x65, 0xf9, 0x90, 0x4a, 0x66, 0x0c, 0x21, 0x70, 0xab, 0x8b, 0x2e, 0x53, 0xed, 0x58,
+	0x39, 0x26, 0x1e, 0x2c, 0xb6, 0xb9, 0xcd, 0xb8, 0x2d, 0xec, 0x4f, 0xd1, 0xea, 0x7d, 0xd7, 0x4d,
+	0x4b, 0x6b, 0xbf, 0xe7, 0x0d, 0x13, 0x71, 0xc9, 0x0e, 0xac, 0x32, 0xcf, 0x39, 0xdd, 0x6e, 0x61,
+	0xe3, 0x71, 0x3d, 0xc9, 0x70, 0x3e, 0x6c, 0x8e, 0x8d, 0x14, 0x32, 0xee, 0xc2, 0x9c, 0x7a, 0x4d,
+	0x2a, 0x5a, 0x35, 0x81, 0x6e, 0xf0, 0x6e, 0xb4, 0xdb, 0x1a, 0x31, 0xe5, 0x98, 0x14, 0x61, 0x9a,
+	0x79, 0xa6, 0xdd, 0x6c, 0x09, 0xd5, 0xb6, 0x8b, 0x1e, 0x8d, 0x16, 0x14, 0xfa, 0xdc, 0x14, 0x28,
+	0x3b, 0x48, 0x8f, 0x23, 0xe5, 0x60, 0x4c, 0xee, 0xc1, 0x14, 0xed, 0xbb, 0x8f, 0x56, 0xd2, 0xfa,
+	0x5d, 0x6d, 0xc8, 0x0c, 0xb5, 0xab, 0xbb, 0xcf, 0x5f, 0x95, 0x32, 0x2f, 0x5e, 0x95, 0x32, 0x3f,
+	0xbd, 0x2a, 0x65, 0xbe, 0x7a, 0x5d, 0x9a, 0x78, 0xf1, 0xba, 0x34, 0xf1, 0xfd, 0xeb, 0xd2, 0xc4,
+	0xa3, 0xcd, 0xa6, 0x2d, 0x5a, 0x9d, 0xa3, 0x72, 0x83, 0xb9, 0x95, 0x2e, 0x62, 0x25, 0x8e, 0x5d,
+	0x39, 0xa9, 0x44, 0xbf, 0x8f, 0x4f, 0xdb, 0xe8, 0x1f, 0x5d, 0x92, 0x3f, 0x6d, 0xff, 0xf1, 0x5b,
+	0x00, 0x00, 0x00, 0xff, 0xff, 0x1a, 0x5c, 0xcf, 0x96, 0x55, 0x1e, 0x00, 0x00,
 }
 
 func (m *UserBalanceStore) Marshal() (dAtA []byte, err error) {
@@ -2033,128 +1821,26 @@ func (m *UserOutgoingApproval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintTransfers(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x9a
+		dAtA[i] = 0x5a
 	}
 	if len(m.ApprovalId) > 0 {
 		i -= len(m.ApprovalId)
 		copy(dAtA[i:], m.ApprovalId)
 		i = encodeVarintTransfers(dAtA, i, uint64(len(m.ApprovalId)))
 		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x92
+		dAtA[i] = 0x52
 	}
 	if len(m.CustomData) > 0 {
 		i -= len(m.CustomData)
 		copy(dAtA[i:], m.CustomData)
 		i = encodeVarintTransfers(dAtA, i, uint64(len(m.CustomData)))
 		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x8a
+		dAtA[i] = 0x4a
 	}
 	if len(m.Uri) > 0 {
 		i -= len(m.Uri)
 		copy(dAtA[i:], m.Uri)
 		i = encodeVarintTransfers(dAtA, i, uint64(len(m.Uri)))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x82
-	}
-	if m.IsApproved {
-		i--
-		if m.IsApproved {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x78
-	}
-	if m.ChallengeTrackerIdOptions != nil {
-		{
-			size, err := m.ChallengeTrackerIdOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x72
-	}
-	if m.ApprovalTrackerIdOptions != nil {
-		{
-			size, err := m.ApprovalTrackerIdOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x6a
-	}
-	if m.OwnershipTimesOptions != nil {
-		{
-			size, err := m.OwnershipTimesOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x62
-	}
-	if m.BadgeIdsOptions != nil {
-		{
-			size, err := m.BadgeIdsOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x5a
-	}
-	if m.TransferTimesOptions != nil {
-		{
-			size, err := m.TransferTimesOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x52
-	}
-	if m.InitiatedByMappingOptions != nil {
-		{
-			size, err := m.InitiatedByMappingOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x4a
-	}
-	if m.ToMappingOptions != nil {
-		{
-			size, err := m.ToMappingOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
 		i--
 		dAtA[i] = 0x42
 	}
@@ -2165,10 +1851,10 @@ func (m *UserOutgoingApproval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x3a
 	}
-	if len(m.ApprovalTrackerId) > 0 {
-		i -= len(m.ApprovalTrackerId)
-		copy(dAtA[i:], m.ApprovalTrackerId)
-		i = encodeVarintTransfers(dAtA, i, uint64(len(m.ApprovalTrackerId)))
+	if len(m.AmountTrackerId) > 0 {
+		i -= len(m.AmountTrackerId)
+		copy(dAtA[i:], m.AmountTrackerId)
+		i = encodeVarintTransfers(dAtA, i, uint64(len(m.AmountTrackerId)))
 		i--
 		dAtA[i] = 0x32
 	}
@@ -2261,128 +1947,26 @@ func (m *UserIncomingApproval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintTransfers(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x9a
+		dAtA[i] = 0x5a
 	}
 	if len(m.ApprovalId) > 0 {
 		i -= len(m.ApprovalId)
 		copy(dAtA[i:], m.ApprovalId)
 		i = encodeVarintTransfers(dAtA, i, uint64(len(m.ApprovalId)))
 		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x92
+		dAtA[i] = 0x52
 	}
 	if len(m.CustomData) > 0 {
 		i -= len(m.CustomData)
 		copy(dAtA[i:], m.CustomData)
 		i = encodeVarintTransfers(dAtA, i, uint64(len(m.CustomData)))
 		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x8a
+		dAtA[i] = 0x4a
 	}
 	if len(m.Uri) > 0 {
 		i -= len(m.Uri)
 		copy(dAtA[i:], m.Uri)
 		i = encodeVarintTransfers(dAtA, i, uint64(len(m.Uri)))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x82
-	}
-	if m.IsApproved {
-		i--
-		if m.IsApproved {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x78
-	}
-	if m.ChallengeTrackerIdOptions != nil {
-		{
-			size, err := m.ChallengeTrackerIdOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x72
-	}
-	if m.ApprovalTrackerIdOptions != nil {
-		{
-			size, err := m.ApprovalTrackerIdOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x6a
-	}
-	if m.OwnershipTimesOptions != nil {
-		{
-			size, err := m.OwnershipTimesOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x62
-	}
-	if m.BadgeIdsOptions != nil {
-		{
-			size, err := m.BadgeIdsOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x5a
-	}
-	if m.TransferTimesOptions != nil {
-		{
-			size, err := m.TransferTimesOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x52
-	}
-	if m.InitiatedByMappingOptions != nil {
-		{
-			size, err := m.InitiatedByMappingOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x4a
-	}
-	if m.FromMappingOptions != nil {
-		{
-			size, err := m.FromMappingOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
 		i--
 		dAtA[i] = 0x42
 	}
@@ -2393,10 +1977,10 @@ func (m *UserIncomingApproval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x3a
 	}
-	if len(m.ApprovalTrackerId) > 0 {
-		i -= len(m.ApprovalTrackerId)
-		copy(dAtA[i:], m.ApprovalTrackerId)
-		i = encodeVarintTransfers(dAtA, i, uint64(len(m.ApprovalTrackerId)))
+	if len(m.AmountTrackerId) > 0 {
+		i -= len(m.AmountTrackerId)
+		copy(dAtA[i:], m.AmountTrackerId)
+		i = encodeVarintTransfers(dAtA, i, uint64(len(m.AmountTrackerId)))
 		i--
 		dAtA[i] = 0x32
 	}
@@ -3245,144 +2829,26 @@ func (m *CollectionApproval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintTransfers(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xaa
+		dAtA[i] = 0x62
 	}
 	if len(m.ApprovalId) > 0 {
 		i -= len(m.ApprovalId)
 		copy(dAtA[i:], m.ApprovalId)
 		i = encodeVarintTransfers(dAtA, i, uint64(len(m.ApprovalId)))
 		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xa2
+		dAtA[i] = 0x5a
 	}
 	if len(m.CustomData) > 0 {
 		i -= len(m.CustomData)
 		copy(dAtA[i:], m.CustomData)
 		i = encodeVarintTransfers(dAtA, i, uint64(len(m.CustomData)))
 		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x9a
+		dAtA[i] = 0x52
 	}
 	if len(m.Uri) > 0 {
 		i -= len(m.Uri)
 		copy(dAtA[i:], m.Uri)
 		i = encodeVarintTransfers(dAtA, i, uint64(len(m.Uri)))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x92
-	}
-	if m.IsApproved {
-		i--
-		if m.IsApproved {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x88
-	}
-	if m.ChallengeTrackerIdOptions != nil {
-		{
-			size, err := m.ChallengeTrackerIdOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x82
-	}
-	if m.ApprovalTrackerIdOptions != nil {
-		{
-			size, err := m.ApprovalTrackerIdOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x7a
-	}
-	if m.OwnershipTimesOptions != nil {
-		{
-			size, err := m.OwnershipTimesOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x72
-	}
-	if m.BadgeIdsOptions != nil {
-		{
-			size, err := m.BadgeIdsOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x6a
-	}
-	if m.TransferTimesOptions != nil {
-		{
-			size, err := m.TransferTimesOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x62
-	}
-	if m.InitiatedByMappingOptions != nil {
-		{
-			size, err := m.InitiatedByMappingOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x5a
-	}
-	if m.ToMappingOptions != nil {
-		{
-			size, err := m.ToMappingOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x52
-	}
-	if m.FromMappingOptions != nil {
-		{
-			size, err := m.FromMappingOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
 		i--
 		dAtA[i] = 0x4a
 	}
@@ -3393,10 +2859,10 @@ func (m *CollectionApproval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x42
 	}
-	if len(m.ApprovalTrackerId) > 0 {
-		i -= len(m.ApprovalTrackerId)
-		copy(dAtA[i:], m.ApprovalTrackerId)
-		i = encodeVarintTransfers(dAtA, i, uint64(len(m.ApprovalTrackerId)))
+	if len(m.AmountTrackerId) > 0 {
+		i -= len(m.AmountTrackerId)
+		copy(dAtA[i:], m.AmountTrackerId)
+		i = encodeVarintTransfers(dAtA, i, uint64(len(m.AmountTrackerId)))
 		i--
 		dAtA[i] = 0x3a
 	}
@@ -3807,7 +3273,7 @@ func (m *UserOutgoingApproval) Size() (n int) {
 			n += 1 + l + sovTransfers(uint64(l))
 		}
 	}
-	l = len(m.ApprovalTrackerId)
+	l = len(m.AmountTrackerId)
 	if l > 0 {
 		n += 1 + l + sovTransfers(uint64(l))
 	}
@@ -3815,52 +3281,21 @@ func (m *UserOutgoingApproval) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTransfers(uint64(l))
 	}
-	if m.ToMappingOptions != nil {
-		l = m.ToMappingOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.InitiatedByMappingOptions != nil {
-		l = m.InitiatedByMappingOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.TransferTimesOptions != nil {
-		l = m.TransferTimesOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.BadgeIdsOptions != nil {
-		l = m.BadgeIdsOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.OwnershipTimesOptions != nil {
-		l = m.OwnershipTimesOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.ApprovalTrackerIdOptions != nil {
-		l = m.ApprovalTrackerIdOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.ChallengeTrackerIdOptions != nil {
-		l = m.ChallengeTrackerIdOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.IsApproved {
-		n += 2
-	}
 	l = len(m.Uri)
 	if l > 0 {
-		n += 2 + l + sovTransfers(uint64(l))
+		n += 1 + l + sovTransfers(uint64(l))
 	}
 	l = len(m.CustomData)
 	if l > 0 {
-		n += 2 + l + sovTransfers(uint64(l))
+		n += 1 + l + sovTransfers(uint64(l))
 	}
 	l = len(m.ApprovalId)
 	if l > 0 {
-		n += 2 + l + sovTransfers(uint64(l))
+		n += 1 + l + sovTransfers(uint64(l))
 	}
 	if m.ApprovalCriteria != nil {
 		l = m.ApprovalCriteria.Size()
-		n += 2 + l + sovTransfers(uint64(l))
+		n += 1 + l + sovTransfers(uint64(l))
 	}
 	return n
 }
@@ -3897,7 +3332,7 @@ func (m *UserIncomingApproval) Size() (n int) {
 			n += 1 + l + sovTransfers(uint64(l))
 		}
 	}
-	l = len(m.ApprovalTrackerId)
+	l = len(m.AmountTrackerId)
 	if l > 0 {
 		n += 1 + l + sovTransfers(uint64(l))
 	}
@@ -3905,52 +3340,21 @@ func (m *UserIncomingApproval) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTransfers(uint64(l))
 	}
-	if m.FromMappingOptions != nil {
-		l = m.FromMappingOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.InitiatedByMappingOptions != nil {
-		l = m.InitiatedByMappingOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.TransferTimesOptions != nil {
-		l = m.TransferTimesOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.BadgeIdsOptions != nil {
-		l = m.BadgeIdsOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.OwnershipTimesOptions != nil {
-		l = m.OwnershipTimesOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.ApprovalTrackerIdOptions != nil {
-		l = m.ApprovalTrackerIdOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.ChallengeTrackerIdOptions != nil {
-		l = m.ChallengeTrackerIdOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.IsApproved {
-		n += 2
-	}
 	l = len(m.Uri)
 	if l > 0 {
-		n += 2 + l + sovTransfers(uint64(l))
+		n += 1 + l + sovTransfers(uint64(l))
 	}
 	l = len(m.CustomData)
 	if l > 0 {
-		n += 2 + l + sovTransfers(uint64(l))
+		n += 1 + l + sovTransfers(uint64(l))
 	}
 	l = len(m.ApprovalId)
 	if l > 0 {
-		n += 2 + l + sovTransfers(uint64(l))
+		n += 1 + l + sovTransfers(uint64(l))
 	}
 	if m.ApprovalCriteria != nil {
 		l = m.ApprovalCriteria.Size()
-		n += 2 + l + sovTransfers(uint64(l))
+		n += 1 + l + sovTransfers(uint64(l))
 	}
 	return n
 }
@@ -4246,7 +3650,7 @@ func (m *CollectionApproval) Size() (n int) {
 			n += 1 + l + sovTransfers(uint64(l))
 		}
 	}
-	l = len(m.ApprovalTrackerId)
+	l = len(m.AmountTrackerId)
 	if l > 0 {
 		n += 1 + l + sovTransfers(uint64(l))
 	}
@@ -4254,56 +3658,21 @@ func (m *CollectionApproval) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTransfers(uint64(l))
 	}
-	if m.FromMappingOptions != nil {
-		l = m.FromMappingOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.ToMappingOptions != nil {
-		l = m.ToMappingOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.InitiatedByMappingOptions != nil {
-		l = m.InitiatedByMappingOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.TransferTimesOptions != nil {
-		l = m.TransferTimesOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.BadgeIdsOptions != nil {
-		l = m.BadgeIdsOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.OwnershipTimesOptions != nil {
-		l = m.OwnershipTimesOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.ApprovalTrackerIdOptions != nil {
-		l = m.ApprovalTrackerIdOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if m.ChallengeTrackerIdOptions != nil {
-		l = m.ChallengeTrackerIdOptions.Size()
-		n += 2 + l + sovTransfers(uint64(l))
-	}
-	if m.IsApproved {
-		n += 3
-	}
 	l = len(m.Uri)
 	if l > 0 {
-		n += 2 + l + sovTransfers(uint64(l))
+		n += 1 + l + sovTransfers(uint64(l))
 	}
 	l = len(m.CustomData)
 	if l > 0 {
-		n += 2 + l + sovTransfers(uint64(l))
+		n += 1 + l + sovTransfers(uint64(l))
 	}
 	l = len(m.ApprovalId)
 	if l > 0 {
-		n += 2 + l + sovTransfers(uint64(l))
+		n += 1 + l + sovTransfers(uint64(l))
 	}
 	if m.ApprovalCriteria != nil {
 		l = m.ApprovalCriteria.Size()
-		n += 2 + l + sovTransfers(uint64(l))
+		n += 1 + l + sovTransfers(uint64(l))
 	}
 	return n
 }
@@ -5023,7 +4392,7 @@ func (m *UserOutgoingApproval) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalTrackerId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountTrackerId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5051,7 +4420,7 @@ func (m *UserOutgoingApproval) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ApprovalTrackerId = string(dAtA[iNdEx:postIndex])
+			m.AmountTrackerId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
@@ -5087,278 +4456,6 @@ func (m *UserOutgoingApproval) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ToMappingOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ToMappingOptions == nil {
-				m.ToMappingOptions = &ValueOptions{}
-			}
-			if err := m.ToMappingOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field InitiatedByMappingOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.InitiatedByMappingOptions == nil {
-				m.InitiatedByMappingOptions = &ValueOptions{}
-			}
-			if err := m.InitiatedByMappingOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TransferTimesOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.TransferTimesOptions == nil {
-				m.TransferTimesOptions = &ValueOptions{}
-			}
-			if err := m.TransferTimesOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIdsOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.BadgeIdsOptions == nil {
-				m.BadgeIdsOptions = &ValueOptions{}
-			}
-			if err := m.BadgeIdsOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 12:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OwnershipTimesOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.OwnershipTimesOptions == nil {
-				m.OwnershipTimesOptions = &ValueOptions{}
-			}
-			if err := m.OwnershipTimesOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 13:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalTrackerIdOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ApprovalTrackerIdOptions == nil {
-				m.ApprovalTrackerIdOptions = &ValueOptions{}
-			}
-			if err := m.ApprovalTrackerIdOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 14:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ChallengeTrackerIdOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ChallengeTrackerIdOptions == nil {
-				m.ChallengeTrackerIdOptions = &ValueOptions{}
-			}
-			if err := m.ChallengeTrackerIdOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 15:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IsApproved", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.IsApproved = bool(v != 0)
-		case 16:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
 			}
 			var stringLen uint64
@@ -5389,7 +4486,7 @@ func (m *UserOutgoingApproval) Unmarshal(dAtA []byte) error {
 			}
 			m.Uri = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 17:
+		case 9:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CustomData", wireType)
 			}
@@ -5421,7 +4518,7 @@ func (m *UserOutgoingApproval) Unmarshal(dAtA []byte) error {
 			}
 			m.CustomData = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 18:
+		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalId", wireType)
 			}
@@ -5453,7 +4550,7 @@ func (m *UserOutgoingApproval) Unmarshal(dAtA []byte) error {
 			}
 			m.ApprovalId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 19:
+		case 11:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalCriteria", wireType)
 			}
@@ -5707,7 +4804,7 @@ func (m *UserIncomingApproval) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalTrackerId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountTrackerId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5735,7 +4832,7 @@ func (m *UserIncomingApproval) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ApprovalTrackerId = string(dAtA[iNdEx:postIndex])
+			m.AmountTrackerId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
@@ -5771,278 +4868,6 @@ func (m *UserIncomingApproval) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FromMappingOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.FromMappingOptions == nil {
-				m.FromMappingOptions = &ValueOptions{}
-			}
-			if err := m.FromMappingOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field InitiatedByMappingOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.InitiatedByMappingOptions == nil {
-				m.InitiatedByMappingOptions = &ValueOptions{}
-			}
-			if err := m.InitiatedByMappingOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TransferTimesOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.TransferTimesOptions == nil {
-				m.TransferTimesOptions = &ValueOptions{}
-			}
-			if err := m.TransferTimesOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIdsOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.BadgeIdsOptions == nil {
-				m.BadgeIdsOptions = &ValueOptions{}
-			}
-			if err := m.BadgeIdsOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 12:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OwnershipTimesOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.OwnershipTimesOptions == nil {
-				m.OwnershipTimesOptions = &ValueOptions{}
-			}
-			if err := m.OwnershipTimesOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 13:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalTrackerIdOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ApprovalTrackerIdOptions == nil {
-				m.ApprovalTrackerIdOptions = &ValueOptions{}
-			}
-			if err := m.ApprovalTrackerIdOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 14:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ChallengeTrackerIdOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ChallengeTrackerIdOptions == nil {
-				m.ChallengeTrackerIdOptions = &ValueOptions{}
-			}
-			if err := m.ChallengeTrackerIdOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 15:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IsApproved", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.IsApproved = bool(v != 0)
-		case 16:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
 			}
 			var stringLen uint64
@@ -6073,7 +4898,7 @@ func (m *UserIncomingApproval) Unmarshal(dAtA []byte) error {
 			}
 			m.Uri = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 17:
+		case 9:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CustomData", wireType)
 			}
@@ -6105,7 +4930,7 @@ func (m *UserIncomingApproval) Unmarshal(dAtA []byte) error {
 			}
 			m.CustomData = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 18:
+		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalId", wireType)
 			}
@@ -6137,7 +4962,7 @@ func (m *UserIncomingApproval) Unmarshal(dAtA []byte) error {
 			}
 			m.ApprovalId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 19:
+		case 11:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalCriteria", wireType)
 			}
@@ -8339,7 +7164,7 @@ func (m *CollectionApproval) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalTrackerId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountTrackerId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -8367,7 +7192,7 @@ func (m *CollectionApproval) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ApprovalTrackerId = string(dAtA[iNdEx:postIndex])
+			m.AmountTrackerId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
@@ -8403,314 +7228,6 @@ func (m *CollectionApproval) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 9:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FromMappingOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.FromMappingOptions == nil {
-				m.FromMappingOptions = &ValueOptions{}
-			}
-			if err := m.FromMappingOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ToMappingOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ToMappingOptions == nil {
-				m.ToMappingOptions = &ValueOptions{}
-			}
-			if err := m.ToMappingOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field InitiatedByMappingOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.InitiatedByMappingOptions == nil {
-				m.InitiatedByMappingOptions = &ValueOptions{}
-			}
-			if err := m.InitiatedByMappingOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 12:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TransferTimesOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.TransferTimesOptions == nil {
-				m.TransferTimesOptions = &ValueOptions{}
-			}
-			if err := m.TransferTimesOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 13:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIdsOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.BadgeIdsOptions == nil {
-				m.BadgeIdsOptions = &ValueOptions{}
-			}
-			if err := m.BadgeIdsOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 14:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OwnershipTimesOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.OwnershipTimesOptions == nil {
-				m.OwnershipTimesOptions = &ValueOptions{}
-			}
-			if err := m.OwnershipTimesOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 15:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalTrackerIdOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ApprovalTrackerIdOptions == nil {
-				m.ApprovalTrackerIdOptions = &ValueOptions{}
-			}
-			if err := m.ApprovalTrackerIdOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 16:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ChallengeTrackerIdOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ChallengeTrackerIdOptions == nil {
-				m.ChallengeTrackerIdOptions = &ValueOptions{}
-			}
-			if err := m.ChallengeTrackerIdOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 17:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IsApproved", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.IsApproved = bool(v != 0)
-		case 18:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
 			}
 			var stringLen uint64
@@ -8741,7 +7258,7 @@ func (m *CollectionApproval) Unmarshal(dAtA []byte) error {
 			}
 			m.Uri = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 19:
+		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CustomData", wireType)
 			}
@@ -8773,7 +7290,7 @@ func (m *CollectionApproval) Unmarshal(dAtA []byte) error {
 			}
 			m.CustomData = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 20:
+		case 11:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalId", wireType)
 			}
@@ -8805,7 +7322,7 @@ func (m *CollectionApproval) Unmarshal(dAtA []byte) error {
 			}
 			m.ApprovalId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 21:
+		case 12:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalCriteria", wireType)
 			}

@@ -56,11 +56,11 @@ func GetAddressMapping(suite *TestSuite, ctx context.Context, mappingId string) 
 // 	return res.NumUsed, nil
 // }
 
-// func GetApprovalsTracker(suite *TestSuite, ctx context.Context, collectionId sdkmath.Uint, address string, approvalTrackerId string, level string, trackerType string) (*types.ApprovalsTracker, error) {
+// func GetApprovalsTracker(suite *TestSuite, ctx context.Context, collectionId sdkmath.Uint, address string, amountTrackerId string, level string, trackerType string) (*types.ApprovalsTracker, error) {
 // 	res, err := suite.app.BadgesKeeper.GetApprovalsTracker(ctx, &types.QueryGetApprovalsTrackerRequest{
 // 		CollectionId: sdkmath.Uint(collectionId),
 // 		Address:      address,
-// 		ApprovalTrackerId:    approvalTrackerId,
+// 		AmountTrackerId:    amountTrackerId,
 // 		Level:        level,
 // 		Depth:        depth,
 // 	})
@@ -232,11 +232,13 @@ func MintAndDistributeBadges(suite *TestSuite, ctx context.Context, msg *types.M
 		return err 
 	}
 
-	_, err = suite.msgServer.TransferBadges(ctx, &types.MsgTransferBadges{
-		Creator: bob,
-		CollectionId: msg.CollectionId,
-		Transfers: msg.Transfers,
-	})
+	if len(msg.Transfers) > 0 {
+		_, err = suite.msgServer.TransferBadges(ctx, &types.MsgTransferBadges{
+			Creator: bob,
+			CollectionId: msg.CollectionId,
+			Transfers: msg.Transfers,
+		})
+	}
 	return err
 }
 

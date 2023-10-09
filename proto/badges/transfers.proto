@@ -64,24 +64,14 @@ message UserOutgoingApproval {
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
   repeated UintRange ownershipTimes = 5;
-  string approvalTrackerId = 6; 
+  string amountTrackerId = 6; 
   string challengeTrackerId = 7; 
 
-  ValueOptions toMappingOptions = 8;
-  ValueOptions initiatedByMappingOptions = 9;
-  ValueOptions transferTimesOptions = 10;
-  ValueOptions badgeIdsOptions = 11;
-  ValueOptions ownershipTimesOptions = 12;
-  ValueOptions approvalTrackerIdOptions = 13;
-  ValueOptions challengeTrackerIdOptions = 14;
-
-  bool isApproved = 15;
-
   //if approved, we use these. if not, these are ignored
-  string uri = 16;
-  string customData = 17;
-  string approvalId = 18; 
-  OutgoingApprovalCriteria approvalCriteria = 19;
+  string uri = 8;
+  string customData = 9;
+  string approvalId = 10; 
+  OutgoingApprovalCriteria approvalCriteria = 11;
 }
 
 // UserIncomingApproval defines the rules for the approval of an incoming transfer to a user.
@@ -92,23 +82,13 @@ message UserIncomingApproval {
   repeated UintRange transferTimes = 3;
   repeated UintRange badgeIds = 4;
   repeated UintRange ownershipTimes = 5;
-  string approvalTrackerId = 6; // if applicable
+  string amountTrackerId = 6; // if applicable
   string challengeTrackerId = 7; // if applicable
 
-  ValueOptions fromMappingOptions = 8;
-  ValueOptions initiatedByMappingOptions = 9;
-  ValueOptions transferTimesOptions = 10;
-  ValueOptions badgeIdsOptions = 11;
-  ValueOptions ownershipTimesOptions = 12;
-  ValueOptions approvalTrackerIdOptions = 13;
-  ValueOptions challengeTrackerIdOptions = 14;
-
-  bool isApproved = 15;
-
-  string uri = 16;
-  string customData = 17;
-  string approvalId = 18; // if applicable
-  IncomingApprovalCriteria approvalCriteria = 19;
+  string uri = 8;
+  string customData = 9;
+  string approvalId = 10; // if applicable
+  IncomingApprovalCriteria approvalCriteria = 11;
 }
 
 
@@ -241,24 +221,13 @@ message CollectionApproval {
   repeated UintRange transferTimes = 4;
   repeated UintRange badgeIds = 5;
   repeated UintRange ownershipTimes = 6;
-  string approvalTrackerId = 7; // if applicable
+  string amountTrackerId = 7; // if applicable
   string challengeTrackerId = 8; // if applicable
 
-  ValueOptions fromMappingOptions = 9;
-  ValueOptions toMappingOptions = 10;
-  ValueOptions initiatedByMappingOptions = 11;
-  ValueOptions transferTimesOptions = 12;
-  ValueOptions badgeIdsOptions = 13;
-  ValueOptions ownershipTimesOptions = 14;
-  ValueOptions approvalTrackerIdOptions = 15;
-  ValueOptions challengeTrackerIdOptions = 16;
-
-  bool isApproved = 17;
-
-  string uri = 18;
-  string customData = 19;
-  string approvalId = 20; // if applicable
-  ApprovalCriteria approvalCriteria = 21;
+  string uri = 9;
+  string customData = 10;
+  string approvalId = 11; // if applicable
+  ApprovalCriteria approvalCriteria = 12;
 }
 
 

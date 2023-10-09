@@ -37,6 +37,10 @@ func (msg *MsgUpdateCollection) GetSignBytes() []byte {
 }
 
 func (msg *MsgUpdateCollection) ValidateBasic() error {
+	return msg.CheckAndCleanMsg(false)
+}
+
+func (msg *MsgUpdateCollection) CheckAndCleanMsg(canChangeValues bool) error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
@@ -47,7 +51,7 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 	}
 
 	if msg.BadgesToCreate != nil {
-		msg.BadgesToCreate, err = ValidateBalances(msg.BadgesToCreate)
+		msg.BadgesToCreate, err = ValidateBalances(msg.BadgesToCreate, canChangeValues)
 		if err != nil {
 			return err
 		}
@@ -61,7 +65,7 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline); err != nil {
+	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline, canChangeValues); err != nil {
 		return err
 	}
 
@@ -69,7 +73,7 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateCollectionApprovals(msg.CollectionApprovals); err != nil {
+	if err := ValidateCollectionApprovals(msg.CollectionApprovals, canChangeValues); err != nil {
 		return err
 	}
 
@@ -79,7 +83,7 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline); err != nil {
+	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline, canChangeValues); err != nil {
 		return err
 	}
 
@@ -103,15 +107,15 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		msg.CollectionPermissions = &CollectionPermissions{}
 	}
 
-	if err := ValidatePermissions(msg.CollectionPermissions); err != nil {
+	if err := ValidatePermissions(msg.CollectionPermissions, canChangeValues); err != nil {
 		return err
 	}
 
-	if err := ValidateUserIncomingApprovals(msg.DefaultIncomingApprovals, msg.Creator); err != nil {
+	if err := ValidateUserIncomingApprovals(msg.DefaultIncomingApprovals, msg.Creator, canChangeValues); err != nil {
 		return err
 	}
 
-	if err := ValidateUserOutgoingApprovals(msg.DefaultOutgoingApprovals, msg.Creator); err != nil {
+	if err := ValidateUserOutgoingApprovals(msg.DefaultOutgoingApprovals, msg.Creator, canChangeValues); err != nil {
 		return err
 	}
 
@@ -122,7 +126,7 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		}
 	}
 
-	if err := ValidateUserPermissions(msg.DefaultUserPermissions); err != nil {
+	if err := ValidateUserPermissions(msg.DefaultUserPermissions, canChangeValues); err != nil {
 		return err
 	}
 
@@ -130,7 +134,7 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline); err != nil {
+	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline, canChangeValues); err != nil {
 		return err
 	}
 
@@ -154,30 +158,29 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		if msg.BalancesType != "Standard" && msg.BalancesType != "Inherited" && msg.BalancesType != "Off-Chain" {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "balances type must be Standard, Inherited, or Off-Chain")
 		}
-	}
 
-	if msg.BalancesType != "Standard" {
-		if len(msg.CollectionApprovals) > 0 {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but claims and/or transfers are set")
+		if msg.BalancesType != "Standard" {
+			if len(msg.CollectionApprovals) > 0 {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but claims and/or transfers are set")
+			}
+
+			if len(msg.DefaultIncomingApprovals) > 0 {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default approvals are set")
+			}
+
+			if len(msg.DefaultOutgoingApprovals) > 0 {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default approvals are set")
+			}
+
+			if len(msg.DefaultUserPermissions.CanUpdateIncomingApprovals) > 0 {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
+			}
+
+			if len(msg.DefaultUserPermissions.CanUpdateOutgoingApprovals) > 0 {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
+			}
 		}
-
-		if len(msg.DefaultIncomingApprovals) > 0 {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default approvals are set")
-		}
-
-		if len(msg.DefaultOutgoingApprovals) > 0 {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default approvals are set")
-		}
-
-		if len(msg.DefaultUserPermissions.CanUpdateIncomingApprovals) > 0 {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
-		}
-
-		if len(msg.DefaultUserPermissions.CanUpdateOutgoingApprovals) > 0 {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
-		}
-	}
-
+	
 	if msg.BalancesType != "Off-Chain" {
 		if len(msg.OffChainBalancesMetadataTimeline) > 0 {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes on-chain balances but off-chain balances are set")
@@ -192,6 +195,7 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		if msg.BadgesToCreate != nil && len(msg.BadgesToCreate) > 0 {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "badges are inherited from parent so you should not specify to create any badges")
 		}
+	}
 	}
 
 	if len(msg.CollectionApprovals) > 0 {

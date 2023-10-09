@@ -9,6 +9,12 @@ import (
 )
 
 func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferBadges) (*types.MsgTransferBadgesResponse, error) {
+	err := msg.CheckAndCleanMsg(true)
+	if err != nil {
+		return nil, err
+	}
+
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)

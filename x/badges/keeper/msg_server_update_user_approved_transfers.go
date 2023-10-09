@@ -8,6 +8,12 @@ import (
 )
 
 func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpdateUserApprovals) (*types.MsgUpdateUserApprovalsResponse, error) {
+	err := msg.CheckAndCleanMsg(true)
+	if err != nil {
+		return nil, err
+	}
+
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
@@ -34,24 +40,22 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		userBalance.UserPermissions = &types.UserPermissions{}
 	}
 
-	manager := types.GetCurrentManager(ctx, collection)
-
 	if msg.UpdateOutgoingApprovals {
-		if err := k.ValidateUserOutgoingApprovalsUpdate(ctx, collection, userBalance.OutgoingApprovals, msg.OutgoingApprovals, userBalance.UserPermissions.CanUpdateOutgoingApprovals, manager, msg.Creator); err != nil {
+		if err := k.ValidateUserOutgoingApprovalsUpdate(ctx, collection, userBalance.OutgoingApprovals, msg.OutgoingApprovals, userBalance.UserPermissions.CanUpdateOutgoingApprovals, msg.Creator); err != nil {
 			return nil, err
 		}
 		userBalance.OutgoingApprovals = msg.OutgoingApprovals
 	}
 
 	if msg.UpdateIncomingApprovals {
-		if err := k.ValidateUserIncomingApprovalsUpdate(ctx, collection,  userBalance.IncomingApprovals, msg.IncomingApprovals, userBalance.UserPermissions.CanUpdateIncomingApprovals, manager, msg.Creator); err != nil {
+		if err := k.ValidateUserIncomingApprovalsUpdate(ctx, collection,  userBalance.IncomingApprovals, msg.IncomingApprovals, userBalance.UserPermissions.CanUpdateIncomingApprovals, msg.Creator); err != nil {
 			return nil, err
 		}
 		userBalance.IncomingApprovals = msg.IncomingApprovals
 	}
 
 	if msg.UpdateUserPermissions {
-		err := k.ValidateUserPermissionsUpdate(ctx, userBalance.UserPermissions, msg.UserPermissions, manager)
+		err := k.ValidateUserPermissionsUpdate(ctx, userBalance.UserPermissions, msg.UserPermissions)
 		if err != nil {
 			return nil, err
 		}
@@ -70,7 +74,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 
 
 
-	err := k.SetUserBalanceInStore(ctx, balanceKey, userBalance)
+	err = k.SetUserBalanceInStore(ctx, balanceKey, userBalance)
 	if err != nil {
 		return nil, err
 	}

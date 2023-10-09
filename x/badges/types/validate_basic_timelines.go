@@ -17,10 +17,10 @@ func ValidateTimelineTimesDoNotOverlap(times [][]*UintRange) error {
 	return nil
 }
 
-func ValidateApprovalTimeline(timeline []*CollectionApprovalTimeline) error {
+func ValidateApprovalTimeline(timeline []*CollectionApprovalTimeline, canChangeValues bool) error {
 	err := *new(error)
 	for _, timelineVal := range timeline {
-		err = ValidateCollectionApprovals(timelineVal.CollectionApprovals)
+		err = ValidateCollectionApprovals(timelineVal.CollectionApprovals, canChangeValues)
 		if err != nil {
 			return err
 		}
@@ -52,9 +52,9 @@ func ValidateOffChainBalancesMetadataTimeline(timeline []*OffChainBalancesMetada
 	return nil
 }
 
-func ValidateBadgeMetadataTimeline(timeline []*BadgeMetadataTimeline) error {
+func ValidateBadgeMetadataTimeline(timeline []*BadgeMetadataTimeline, canChangeValues bool) error {
 	for _, timelineVal := range timeline {
-		err := ValidateBadgeMetadata(timelineVal.BadgeMetadata)
+		err := ValidateBadgeMetadata(timelineVal.BadgeMetadata, canChangeValues)
 		if err != nil {
 			return err
 		}
@@ -86,22 +86,22 @@ func ValidateCollectionMetadataTimeline(timeline []*CollectionMetadataTimeline) 
 	return nil
 }
 
-func ValidateInheritedBalancesTimeline(timeline []*InheritedBalancesTimeline) error {
-	for _, timelineVal := range timeline {
-		err := ValidateInheritedBalances(timelineVal.InheritedBalances)
-		if err != nil {
-			return err
-		}
-	}
+// func ValidateInheritedBalancesTimeline(timeline []*InheritedBalancesTimeline) error {
+// 	for _, timelineVal := range timeline {
+// 		err := ValidateInheritedBalances(timelineVal.InheritedBalances)
+// 		if err != nil {
+// 			return err
+// 		}
+// 	}
 
-	times, _ := GetInheritedBalancesTimesAndValues(timeline)
-	err := ValidateTimelineTimesDoNotOverlap(times)
-	if err != nil {
-		return err
-	}
+// 	times, _ := GetInheritedBalancesTimesAndValues(timeline)
+// 	err := ValidateTimelineTimesDoNotOverlap(times)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 func ValidateStandardsTimeline(timeline []*StandardsTimeline) error {
 	times, _ := GetStandardsTimesAndValues(timeline)
@@ -153,9 +153,9 @@ func ValidateIsArchivedTimeline(timeline []*IsArchivedTimeline) error {
 	return nil
 }
 
-func ValidateUserOutgoingApprovalTimeline(timeline []*UserOutgoingApprovalTimeline, address string) error {
+func ValidateUserOutgoingApprovalTimeline(timeline []*UserOutgoingApprovalTimeline, address string, canChangeValues bool) error {
 	for _, timelineVal := range timeline {
-		err := ValidateUserOutgoingApprovals(timelineVal.OutgoingApprovals, address)
+		err := ValidateUserOutgoingApprovals(timelineVal.OutgoingApprovals, address, canChangeValues)
 		if err != nil {
 			return err
 		}
@@ -170,9 +170,9 @@ func ValidateUserOutgoingApprovalTimeline(timeline []*UserOutgoingApprovalTimeli
 	return nil
 }
 
-func ValidateUserIncomingApprovalTimeline(timeline []*UserIncomingApprovalTimeline, address string) error {
+func ValidateUserIncomingApprovalTimeline(timeline []*UserIncomingApprovalTimeline, address string, canChangeValues bool) error {
 	for _, timelineVal := range timeline {
-		err := ValidateUserIncomingApprovals(timelineVal.IncomingApprovals, address)
+		err := ValidateUserIncomingApprovals(timelineVal.IncomingApprovals, address, canChangeValues)
 		if err != nil {
 			return err
 		}

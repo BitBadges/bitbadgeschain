@@ -11,6 +11,11 @@ import (
 )
 
 func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateCollection) (*types.MsgUpdateCollectionResponse, error) {
+	err := msg.CheckAndCleanMsg(true)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	collection := &types.BadgeCollection{}
@@ -53,7 +58,7 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 	}
 
 	//Check must be manager
-	err := k.UniversalValidate(ctx, collection, UniversalValidationParams{
+	err = k.UniversalValidate(ctx, collection, UniversalValidationParams{
 		Creator:       msg.Creator,
 		MustBeManager: true,
 	})
@@ -80,7 +85,7 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 
 
 	if msg.UpdateCollectionApprovals {
-		if err := k.ValidateCollectionApprovalsUpdate(ctx, collection, collection.CollectionApprovals, msg.CollectionApprovals, collection.CollectionPermissions.CanUpdateCollectionApprovals, msg.Creator); err != nil {
+		if err := k.ValidateCollectionApprovalsUpdate(ctx, collection, collection.CollectionApprovals, msg.CollectionApprovals, collection.CollectionPermissions.CanUpdateCollectionApprovals); err != nil {
 			return nil, err
 		}
 		collection.CollectionApprovals = msg.CollectionApprovals
@@ -143,7 +148,7 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 	}
 
 	if msg.UpdateCollectionPermissions {
-		err = k.ValidatePermissionsUpdate(ctx, collection.CollectionPermissions, msg.CollectionPermissions, msg.Creator)
+		err = k.ValidatePermissionsUpdate(ctx, collection.CollectionPermissions, msg.CollectionPermissions)
 		if err != nil {
 			return nil, err
 		}

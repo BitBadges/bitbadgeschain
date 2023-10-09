@@ -89,9 +89,9 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 					TransferTimes:        GetFullUintRanges(),
 					OwnershipTimes: GetFullUintRanges(),
 					BadgeIds:             GetFullUintRanges(),
-					IsApproved: true,
 					ApprovalId: "test",
-					ApprovalTrackerId:                 "test",
+					AmountTrackerId:                 "test",
+					ChallengeTrackerId: 						"test",
 					ApprovalCriteria: &types.ApprovalCriteria{
 							MaxNumTransfers: &types.MaxNumTransfers{
 								OverallMaxNumTransfers: sdkmath.NewUint(1000),
@@ -109,9 +109,10 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 							TransferTimes:        GetFullUintRanges(),
 							OwnershipTimes: 			GetFullUintRanges(),
 							BadgeIds:             GetFullUintRanges(),
-							IsApproved: true,
+	
 							ApprovalId: "test",
-							ApprovalTrackerId:                 "test",
+							AmountTrackerId:                 "test",
+							ChallengeTrackerId: 						"test",
 							ApprovalCriteria: &types.IncomingApprovalCriteria{
 								
 									
@@ -133,9 +134,10 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 							TransferTimes:        GetFullUintRanges(),
 							OwnershipTimes: GetFullUintRanges(),
 							BadgeIds:             GetFullUintRanges(),
-							IsApproved: true,
+	
 							ApprovalId: "test",
-							ApprovalTrackerId:                 		"test",
+							AmountTrackerId:                 		"test",
+							ChallengeTrackerId: 						"test",
 							ApprovalCriteria: &types.OutgoingApprovalCriteria{
 								MaxNumTransfers: &types.MaxNumTransfers{
 									OverallMaxNumTransfers: sdkmath.NewUint(1000),
@@ -189,9 +191,9 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*type
 		TransferTimes:                          GetFullUintRanges(),
 		BadgeIds:                               GetFullUintRanges(),
 		OwnershipTimes: GetFullUintRanges(),
-		IsApproved: true,
 		ApprovalId: "mint-test",
-		ApprovalTrackerId:                 "mint-test",
+		AmountTrackerId:                 "mint-test",
+		ChallengeTrackerId: 						"mint-test",
 		ApprovalCriteria: &types.ApprovalCriteria{
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(1000),

@@ -292,7 +292,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 						ToMappingId:          "AllWithoutMint",
 						ForbiddenTimes:       GetFullUintRanges(),
 						InitiatedByMappingId: "AllWithoutMint",
-						ApprovalTrackerId: 		"All",
+						AmountTrackerId: 		  "All",
 						ChallengeTrackerId:	  "All",
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
@@ -316,7 +316,8 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalTrackerId:                      "test",
+				ChallengeTrackerId: "test",
+				AmountTrackerId:                      "test",
 				ApprovalId: 													  "test",
 				ApprovalCriteria: &types.ApprovalCriteria{
 					RequireToEqualsInitiatedBy:             true,
@@ -353,7 +354,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
+				ApprovalId: "testasdfas",
 				ApprovalCriteria: 												&types.ApprovalCriteria{},
 				
 			},
@@ -364,9 +365,8 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
+				ApprovalId: "testasdfasdfasfd",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				
 			},
 		},
 	})
@@ -396,7 +396,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
+				ApprovalId: "testafdasdf",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
 				
 			},
@@ -407,7 +407,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
+				ApprovalId: "testasdfasdf",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
 				
 			},
@@ -429,9 +429,10 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
 				ApprovalId: "test",
-				ApprovalTrackerId: 										"test",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			{
 				FromMappingId:                          "!" + alice,
@@ -440,10 +441,11 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
-				ApprovalTrackerId: 										"test",
+				ApprovalId: "testdfgh",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			
 		},
@@ -464,7 +466,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				OwnershipTimes: 		 										GetFullUintRanges(),
 				ApprovalId: "test",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: false,
+				ChallengeTrackerId: "something different",
 			},
 			{
 				FromMappingId:                          "!" + alice,
@@ -473,9 +475,9 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
+				ApprovalId: "testhdfgjhdf",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: true,
+				ChallengeTrackerId: "test",
 			},
 			
 		},
@@ -512,8 +514,9 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 			BadgeIds:                               GetFullUintRanges(),
 			TransferTimes:                          GetFullUintRanges(),
 			OwnershipTimes: 		 										GetFullUintRanges(),
-			ApprovalId: "test",
-			ApprovalTrackerId:                      "test",
+			ApprovalId: "test2",
+			ChallengeTrackerId: "test2",
+			AmountTrackerId:                      "test2",
 			
 			ApprovalCriteria: &types.ApprovalCriteria{
 				
@@ -537,7 +540,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 }
 
 
-func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIds() {
+func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIds() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -556,7 +559,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIds() {
 						ToMappingId:          "AllWithoutMint",
 						ForbiddenTimes:       GetFullUintRanges(),
 						InitiatedByMappingId: "AllWithoutMint",
-						ApprovalTrackerId: 		"All",
+						AmountTrackerId: 		"All",
 						ChallengeTrackerId:	  "All",
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
@@ -582,9 +585,9 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIds() {
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
 				ApprovalId: 													"test",
-				ApprovalTrackerId: 										"something that is not the same",
+				AmountTrackerId: 										"something that is not the same",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			{
 				FromMappingId:                          "!" + alice,
@@ -593,10 +596,11 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIds() {
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
-				ApprovalTrackerId: 										"test",
+				ApprovalId: "tesfasdft",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			
 		},
@@ -616,9 +620,10 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIds() {
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
 				ApprovalId: 													"test",
-				ApprovalTrackerId: 										"test",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			{
 				FromMappingId:                          "!" + alice,
@@ -627,10 +632,11 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIds() {
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
-				ApprovalTrackerId: 										"test",
+				ApprovalId: "testadsfasdf",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			
 		},
@@ -638,7 +644,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIds() {
 	suite.Require().Nil(err, "Error updating collection approved transfers")
 }
 
-func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIdsSpecificIdLocked() {
+func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecificIdLocked() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -657,7 +663,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIdsSpeci
 						ToMappingId:          "AllWithoutMint",
 						ForbiddenTimes:       GetFullUintRanges(),
 						InitiatedByMappingId: "AllWithoutMint",
-						ApprovalTrackerId: 		"test",
+						AmountTrackerId: 			"test",
 						ChallengeTrackerId:	  "All",
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
@@ -682,10 +688,12 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIdsSpeci
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: 													"test",
-				ApprovalTrackerId: 										"test",
+				ApprovalId: 														"test",
+				AmountTrackerId: 												"test",
+				ChallengeTrackerId: "something different",
+				
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: false,
+				
 			},
 			{
 				FromMappingId:                          "!" + alice,
@@ -694,10 +702,11 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIdsSpeci
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
-				ApprovalTrackerId: 										"test",
+				ApprovalId: "testafdsasdf",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			
 		},
@@ -717,9 +726,9 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIdsSpeci
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
 				ApprovalId: 													"test",
-				ApprovalTrackerId: 										"test",
+				AmountTrackerId: 										"test",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: false,
+				ChallengeTrackerId: "something different",
 			},
 			{
 				FromMappingId:                          "!" + alice,
@@ -728,10 +737,10 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIdsSpeci
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
-				ApprovalTrackerId: 										"test",
+				ApprovalId: "testasdfas",
+				AmountTrackerId: 										"test",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: true,
+				ChallengeTrackerId: "test",
 			},
 			
 		},
@@ -751,9 +760,10 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIdsSpeci
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
 				ApprovalId: 														"test",
-				ApprovalTrackerId: 											"test",
+				AmountTrackerId: 											"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			{
 				FromMappingId:                          alice,
@@ -762,10 +772,11 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIdsSpeci
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: 													"test",
-				ApprovalTrackerId: 										"asdffdafs",
+				ApprovalId: 													"tesadsft",
+				AmountTrackerId: 										"asdffdafs",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			{
 				FromMappingId:                          "!" + alice,
@@ -774,10 +785,11 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateApprovalTrackerIdsSpeci
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
-				ApprovalTrackerId: 										"test",
+				ApprovalId: "testasdfasd",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			
 		},
@@ -809,7 +821,7 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
 						OwnershipTimes: 		 GetFullUintRanges(),
-						ApprovalTrackerId: "All",
+						AmountTrackerId: "All",
 						ChallengeTrackerId: "All",
 					
 
@@ -825,7 +837,7 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
 						OwnershipTimes: 		 GetFullUintRanges(),
-						ApprovalTrackerId: "All",
+						AmountTrackerId: "All",
 						ChallengeTrackerId: "All",
 					
 					
@@ -848,7 +860,8 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 				TransferTimes:              GetFullUintRanges(),
 				OwnershipTimes: 		 GetFullUintRanges(),
 				ApprovalId: "test",
-				ApprovalTrackerId:                  "test",
+				ChallengeTrackerId: "test",
+				AmountTrackerId:                  "test",
 				ApprovalCriteria: 					&types.OutgoingApprovalCriteria{
 					
 						RequireToEqualsInitiatedBy: true,
@@ -856,7 +869,7 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 						ApprovalAmounts: &types.ApprovalAmounts{},
 					
 				},
-				IsApproved: true,
+				
 
 			},
 		},
@@ -868,8 +881,9 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 				TransferTimes:        GetFullUintRanges(),
 				OwnershipTimes: 		 GetFullUintRanges(),
 				ApprovalId: "test",
-				ApprovalTrackerId:                 "test",
-					IsApproved: true,
+				ChallengeTrackerId: "test",
+				AmountTrackerId:                 "test",
+					
 			},
 		},
 	})
@@ -888,7 +902,8 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 				TransferTimes:              GetFullUintRanges(),
 				OwnershipTimes: 		 GetFullUintRanges(),
 				ApprovalId: "test",
-				ApprovalTrackerId:                  "test",
+				ChallengeTrackerId: "test",
+				AmountTrackerId:                  "test",
 				ApprovalCriteria: &types.OutgoingApprovalCriteria{
 					
 						RequireToEqualsInitiatedBy: true,
@@ -906,7 +921,8 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 				TransferTimes:                GetFullUintRanges(),
 				OwnershipTimes: 		 GetFullUintRanges(),
 				ApprovalId: "test",
-				ApprovalTrackerId:                 "test",
+				ChallengeTrackerId: "test",
+				AmountTrackerId:                 "test",
 				ApprovalCriteria: &types.IncomingApprovalCriteria{
 					
 						RequireFromEqualsInitiatedBy: true,
@@ -947,7 +963,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentBaseCaseNoSplit() {
 						BadgeIds:             GetFullUintRanges(),
 						TransferTimes:        GetFullUintRanges(),
 						OwnershipTimes: 		 	GetFullUintRanges(),
-						ApprovalTrackerId: 		"All",
+						AmountTrackerId: 		"All",
 						ChallengeTrackerId: 	"All",
 					
 					
@@ -956,20 +972,6 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentBaseCaseNoSplit() {
 		},
 	})
 	suite.Require().Nil(err, "Error updating collection permissions")
-
-	// 	ApprovalCriteria: &types.ApprovalCriteria{
-	// 		{
-	// 			MerkleChallenges:                []*types.MerkleChallenge{},
-	// 			ApprovalTrackerId:                 "test",
-	// 			MaxNumTransfers: &types.MaxNumTransfers{
-	// 				OverallMaxNumTransfers: sdkmath.NewUint(1000),
-	// 			},
-	// 			ApprovalAmounts: &types.ApprovalAmounts{
-	// 				PerFromAddressApprovalAmount: sdkmath.NewUint(1), //potentially unlimited
-	// 			},
-	// 		},
-	// 	},
-	// }},
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:        bob,
@@ -1015,8 +1017,10 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
 				ApprovalId: "test",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												newApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			{
 				FromMappingId:                          "!" + bob,
@@ -1025,28 +1029,16 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
+				ApprovalId: "testgfag",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												newApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			
 		},
 	})
 	suite.Require().Nil(err, "Error updating collection approved transfers")
-
-	// 	ApprovalCriteria: &types.ApprovalCriteria{
-	// 		{
-	// 			MerkleChallenges:                []*types.MerkleChallenge{},
-	// 			ApprovalTrackerId:                 "test",
-	// 			MaxNumTransfers: &types.MaxNumTransfers{
-	// 				OverallMaxNumTransfers: sdkmath.NewUint(1000),
-	// 			},
-	// 			ApprovalAmounts: &types.ApprovalAmounts{
-	// 				PerFromAddressApprovalAmount: sdkmath.NewUint(1), //potentially unlimited
-	// 			},
-	// 		},
-	// 	},
-	// }},
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:        bob,
@@ -1111,8 +1103,10 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalances() 
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
 				ApprovalId: "test",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												newApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			{
 				FromMappingId:                          "!" + bob,
@@ -1121,28 +1115,16 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalances() 
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
+				ApprovalId: "testagdf",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												newApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			
 		},
 	})
 	suite.Require().Nil(err, "Error updating collection approved transfers")
-
-	// 	ApprovalCriteria: &types.ApprovalCriteria{
-	// 		{
-	// 			MerkleChallenges:                []*types.MerkleChallenge{},
-	// 			ApprovalTrackerId:                 "test",
-	// 			MaxNumTransfers: &types.MaxNumTransfers{
-	// 				OverallMaxNumTransfers: sdkmath.NewUint(1000),
-	// 			},
-	// 			ApprovalAmounts: &types.ApprovalAmounts{
-	// 				PerFromAddressApprovalAmount: sdkmath.NewUint(1), //potentially unlimited
-	// 			},
-	// 		},
-	// 	},
-	// }},
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:        bob,
@@ -1194,8 +1176,10 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
 				ApprovalId: "test",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												newApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			{
 				FromMappingId:                          "!" + bob,
@@ -1204,28 +1188,16 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
+				ApprovalId: "testadfgsd",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												newApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			
 		},
 	})
 	suite.Require().Nil(err, "Error updating collection approved transfers")
-
-	// 	ApprovalCriteria: &types.ApprovalCriteria{
-	// 		{
-	// 			MerkleChallenges:                []*types.MerkleChallenge{},
-	// 			ApprovalTrackerId:                 "test",
-	// 			MaxNumTransfers: &types.MaxNumTransfers{
-	// 				OverallMaxNumTransfers: sdkmath.NewUint(1000),
-	// 			},
-	// 			ApprovalAmounts: &types.ApprovalAmounts{
-	// 				PerFromAddressApprovalAmount: sdkmath.NewUint(1), //potentially unlimited
-	// 			},
-	// 		},
-	// 	},
-	// }},
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:        bob,
@@ -1306,8 +1278,10 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
 				ApprovalId: "test",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												newApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			{
 				FromMappingId:                          bob,
@@ -1316,9 +1290,11 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 				BadgeIds:                               GetTopHalfUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
+				ApprovalId: "testsgdfs",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												newApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			
 		},
@@ -1405,8 +1381,10 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
 				ApprovalId: "test",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												newApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			{
 				FromMappingId:                          bob,
@@ -1415,9 +1393,11 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 				BadgeIds:                               GetTopHalfUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
+				ApprovalId: "testsdfgsdf",
+				AmountTrackerId: 										"test",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												newApprovalCriteria,
-				IsApproved: true,
+				
 			},
 			
 		},
@@ -1461,8 +1441,10 @@ func (suite *TestSuite) TestGetMaxPossible() {
 			TransferTimes:        GetFullUintRanges(),
 			OwnershipTimes: 			GetFullUintRanges(),
 			ApprovalId: "test",
+			AmountTrackerId: "test",
+			ChallengeTrackerId: "test",
 			BadgeIds:             GetFullUintRanges(),
-			IsApproved: true,
+			
 		},
 	}
 	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
@@ -1490,7 +1472,8 @@ func (suite *TestSuite) TestGetMaxPossible() {
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
 				ApprovalId: "test",
-				ApprovalTrackerId: "adsfhjals",
+				AmountTrackerId: "adsfhjals",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												&types.ApprovalCriteria{
 					
 						
@@ -1500,7 +1483,7 @@ func (suite *TestSuite) TestGetMaxPossible() {
 						
 						MaxNumTransfers: &types.MaxNumTransfers{},
 					},
-				IsApproved: true,
+				
 			},
 			{
 				FromMappingId:                          bob,
@@ -1509,8 +1492,9 @@ func (suite *TestSuite) TestGetMaxPossible() {
 				BadgeIds:                               GetFullUintRanges(),
 				TransferTimes:                          GetFullUintRanges(),
 				OwnershipTimes: 		 										GetFullUintRanges(),
-				ApprovalId: "test",
-				ApprovalTrackerId: "adsfhjaladsfasdf",
+				ApprovalId: "tessdgfst",
+				AmountTrackerId: "adsfhjaladsfasdf",
+				ChallengeTrackerId: "test",
 				ApprovalCriteria: 												&types.ApprovalCriteria{
 					
 					ApprovalAmounts: &types.ApprovalAmounts{
@@ -1518,7 +1502,7 @@ func (suite *TestSuite) TestGetMaxPossible() {
 					},
 					MaxNumTransfers: &types.MaxNumTransfers{},
 				},
-				IsApproved: true,
+				
 			},
 		},
 	})

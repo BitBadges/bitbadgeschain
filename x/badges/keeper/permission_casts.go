@@ -7,18 +7,18 @@ import (
 
 //HACK: We cast the permissions to their UniversalPermission equivalents, so we can reuse the UniversalPermission functions
 
-func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.Context, managerAddress string, permissions []*types.UserIncomingApprovalPermission) ([]*types.UniversalPermission, error) {
+func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.Context, permissions []*types.UserIncomingApprovalPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, permission := range permissions {
 		approvalTrackerMapping := &types.AddressMapping{}
-		if permission.ApprovalTrackerId == "All" {
+		if permission.AmountTrackerId == "All" {
 			approvalTrackerMapping = &types.AddressMapping{
 				Addresses: []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{permission.ApprovalTrackerId},
+				Addresses: []string{permission.AmountTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -36,12 +36,12 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 			}
 		}
 
-		fromMapping, err := k.GetAddressMappingById(ctx, permission.FromMappingId, managerAddress)
+		fromMapping, err := k.GetAddressMappingById(ctx, permission.FromMappingId)
 		if err != nil {
 			return nil, err
 		}
 
-		initiatedByMapping, err := k.GetAddressMappingById(ctx, permission.InitiatedByMappingId, managerAddress)
+		initiatedByMapping, err := k.GetAddressMappingById(ctx, permission.InitiatedByMappingId)
 		if err != nil {
 			return nil, err
 		}
@@ -52,7 +52,7 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 			OwnershipTimes: 				permission.OwnershipTimes,
 			FromMapping:            fromMapping,
 			InitiatedByMapping:     initiatedByMapping,
-			ApprovalTrackerIdMapping: approvalTrackerMapping,
+			AmountTrackerIdMapping: approvalTrackerMapping,
 			ChallengeTrackerIdMapping: challengeTrackerMapping,
 			
 			UsesBadgeIds:           true,
@@ -60,38 +60,27 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 			UsesOwnershipTimes: 		true,
 			UsesFromMapping:        true,
 			UsesInitiatedByMapping: true,
-			UsesApprovalTrackerId: 	true,
+			UsesAmountTrackerId: 	true,
 			UsesChallengeTrackerId: true,
 			PermittedTimes:         permission.PermittedTimes,
 			ForbiddenTimes:         permission.ForbiddenTimes,
-
-			BadgeIdsOptions:           permission.BadgeIdsOptions,
-			PermittedTimesOptions:     permission.PermittedTimesOptions,
-			ForbiddenTimesOptions:     permission.ForbiddenTimesOptions,
-			TransferTimesOptions:      permission.TransferTimesOptions,
-			OwnershipTimesOptions: 	 permission.OwnershipTimesOptions,
-			FromMappingOptions:        permission.FromMappingOptions,
-			InitiatedByMappingOptions: permission.InitiatedByMappingOptions,
-			
-			ApprovalTrackerIdOptions: permission.ApprovalTrackerIdOptions,
-			ChallengeTrackerIdOptions: permission.ChallengeTrackerIdOptions,
 		})
 	}
 	return castedPermissions, nil
 }
 
-func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.Context, managerAddress string, permissions []*types.UserOutgoingApprovalPermission) ([]*types.UniversalPermission, error) {
+func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.Context, permissions []*types.UserOutgoingApprovalPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, permission := range permissions {
 		approvalTrackerMapping := &types.AddressMapping{}
-		if permission.ApprovalTrackerId == "All" {
+		if permission.AmountTrackerId == "All" {
 			approvalTrackerMapping = &types.AddressMapping{
 				Addresses: []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{permission.ApprovalTrackerId},
+				Addresses: []string{permission.AmountTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -108,12 +97,12 @@ func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.
 				IncludeAddresses: true,
 			}
 		}
-		initiatedByMapping, err := k.GetAddressMappingById(ctx, permission.InitiatedByMappingId, managerAddress)
+		initiatedByMapping, err := k.GetAddressMappingById(ctx, permission.InitiatedByMappingId)
 		if err != nil {
 			return nil, err
 		}
 
-		toMapping, err := k.GetAddressMappingById(ctx, permission.ToMappingId, managerAddress)
+		toMapping, err := k.GetAddressMappingById(ctx, permission.ToMappingId)
 		if err != nil {
 			return nil, err
 		}
@@ -124,9 +113,9 @@ func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.
 				OwnershipTimes: 				permission.OwnershipTimes,
 				ToMapping:              toMapping,
 				InitiatedByMapping:     initiatedByMapping,
-				ApprovalTrackerIdMapping: approvalTrackerMapping,
+				AmountTrackerIdMapping: approvalTrackerMapping,
 				ChallengeTrackerIdMapping: challengeTrackerMapping,
-				UsesApprovalTrackerId: 	true,
+				UsesAmountTrackerId: 	true,
 				UsesChallengeTrackerId: true,
 				UsesBadgeIds:           true,
 				UsesTransferTimes:      true,
@@ -136,15 +125,6 @@ func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.
 				PermittedTimes:         permission.PermittedTimes,
 				ForbiddenTimes:         permission.ForbiddenTimes,
 
-				BadgeIdsOptions:           permission.BadgeIdsOptions,
-				PermittedTimesOptions:     permission.PermittedTimesOptions,
-				ForbiddenTimesOptions:     permission.ForbiddenTimesOptions,
-				TransferTimesOptions:      permission.TransferTimesOptions,
-				OwnershipTimesOptions: 	 permission.OwnershipTimesOptions,
-				ToMappingOptions:          permission.ToMappingOptions,
-				InitiatedByMappingOptions: permission.InitiatedByMappingOptions,
-				ApprovalTrackerIdOptions: permission.ApprovalTrackerIdOptions,
-				ChallengeTrackerIdOptions: permission.ChallengeTrackerIdOptions,
 		})
 	}
 	return castedPermissions, nil
@@ -158,25 +138,23 @@ func (k Keeper) CastActionPermissionToUniversalPermission(actionPermission []*ty
 			
 				PermittedTimes: actionPermission.PermittedTimes,
 				ForbiddenTimes: actionPermission.ForbiddenTimes,
-				PermittedTimesOptions: actionPermission.PermittedTimesOptions,
-				ForbiddenTimesOptions: actionPermission.ForbiddenTimesOptions,
 		})
 	}
 	return castedPermissions, nil
 }
 
-func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Context, managerAddress string, collectionUpdatePermission []*types.CollectionApprovalPermission) ([]*types.UniversalPermission, error) {
+func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Context, collectionUpdatePermission []*types.CollectionApprovalPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, collectionUpdatePermission := range collectionUpdatePermission {
 		approvalTrackerMapping := &types.AddressMapping{}
-		if collectionUpdatePermission.ApprovalTrackerId == "All" {
+		if collectionUpdatePermission.AmountTrackerId == "All" {
 			approvalTrackerMapping = &types.AddressMapping{
 				Addresses: []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{collectionUpdatePermission.ApprovalTrackerId},
+				Addresses: []string{collectionUpdatePermission.AmountTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -194,17 +172,17 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 			}
 		}
 
-		fromMapping, err := k.GetAddressMappingById(ctx, collectionUpdatePermission.FromMappingId, managerAddress)
+		fromMapping, err := k.GetAddressMappingById(ctx, collectionUpdatePermission.FromMappingId)
 		if err != nil {
 			return nil, err
 		}
 
-		initiatedByMapping, err := k.GetAddressMappingById(ctx, collectionUpdatePermission.InitiatedByMappingId, managerAddress)
+		initiatedByMapping, err := k.GetAddressMappingById(ctx, collectionUpdatePermission.InitiatedByMappingId)
 		if err != nil {
 			return nil, err
 		}
 
-		toMapping, err := k.GetAddressMappingById(ctx, collectionUpdatePermission.ToMappingId, managerAddress)
+		toMapping, err := k.GetAddressMappingById(ctx, collectionUpdatePermission.ToMappingId)
 		if err != nil {
 			return nil, err
 		}
@@ -217,10 +195,10 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 				FromMapping:            fromMapping,
 				InitiatedByMapping:     initiatedByMapping,
 				BadgeIds:               collectionUpdatePermission.BadgeIds,
-				ApprovalTrackerIdMapping: approvalTrackerMapping,
+				AmountTrackerIdMapping: approvalTrackerMapping,
 				ChallengeTrackerIdMapping: challengeTrackerMapping,
 
-				UsesApprovalTrackerId: 	true,
+				UsesAmountTrackerId: 	true,
 				UsesChallengeTrackerId: true,
 				UsesBadgeIds:           true,
 				UsesTransferTimes:      true,
@@ -230,17 +208,6 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 				UsesInitiatedByMapping: true,
 				PermittedTimes:         collectionUpdatePermission.PermittedTimes,
 				ForbiddenTimes:         collectionUpdatePermission.ForbiddenTimes,
-
-				PermittedTimesOptions:     collectionUpdatePermission.PermittedTimesOptions,
-				ForbiddenTimesOptions:     collectionUpdatePermission.ForbiddenTimesOptions,
-				TransferTimesOptions:      collectionUpdatePermission.TransferTimesOptions,
-				OwnershipTimesOptions: 	 collectionUpdatePermission.OwnershipTimesOptions,
-				ToMappingOptions:          collectionUpdatePermission.ToMappingOptions,
-				FromMappingOptions:        collectionUpdatePermission.FromMappingOptions,
-				InitiatedByMappingOptions: collectionUpdatePermission.InitiatedByMappingOptions,
-				BadgeIdsOptions:           collectionUpdatePermission.BadgeIdsOptions,
-				ApprovalTrackerIdOptions: collectionUpdatePermission.ApprovalTrackerIdOptions,
-				ChallengeTrackerIdOptions: collectionUpdatePermission.ChallengeTrackerIdOptions,
 		})
 	}
 	return castedPermissions, nil
@@ -258,11 +225,6 @@ func (k Keeper) CastTimedUpdateWithBadgeIdsPermissionToUniversalPermission(timed
 				UsesBadgeIds:      true,
 				PermittedTimes:    timedUpdateWithBadgeIdsPermission.PermittedTimes,
 				ForbiddenTimes:    timedUpdateWithBadgeIdsPermission.ForbiddenTimes,
-
-				BadgeIdsOptions:       timedUpdateWithBadgeIdsPermission.BadgeIdsOptions,
-				PermittedTimesOptions: timedUpdateWithBadgeIdsPermission.PermittedTimesOptions,
-				ForbiddenTimesOptions: timedUpdateWithBadgeIdsPermission.ForbiddenTimesOptions,
-				TimelineTimesOptions:  timedUpdateWithBadgeIdsPermission.TimelineTimesOptions,
 		})
 	}
 	return castedPermissions, nil
@@ -278,10 +240,6 @@ func (k Keeper) CastTimedUpdatePermissionToUniversalPermission(timedUpdatePermis
 				UsesTimelineTimes: true,
 				PermittedTimes:    timedUpdatePermission.PermittedTimes,
 				ForbiddenTimes:    timedUpdatePermission.ForbiddenTimes,
-
-				PermittedTimesOptions: timedUpdatePermission.PermittedTimesOptions,
-				ForbiddenTimesOptions: timedUpdatePermission.ForbiddenTimesOptions,
-				TimelineTimesOptions:  timedUpdatePermission.TimelineTimesOptions,
 		})
 	}
 	return castedPermissions, nil
@@ -298,11 +256,6 @@ func (k Keeper) CastBalancesActionPermissionToUniversalPermission(BalancesAction
 				UsesOwnershipTimes: true,
 				PermittedTimes:    BalancesActionPermission.PermittedTimes,
 				ForbiddenTimes:    BalancesActionPermission.ForbiddenTimes,
-
-				BadgeIdsOptions:       BalancesActionPermission.BadgeIdsOptions,
-				OwnershipTimesOptions:  BalancesActionPermission.OwnershipTimesOptions, 
-				PermittedTimesOptions: BalancesActionPermission.PermittedTimesOptions,
-				ForbiddenTimesOptions: BalancesActionPermission.ForbiddenTimesOptions,
 		})
 	}
 	return castedPermissions, nil

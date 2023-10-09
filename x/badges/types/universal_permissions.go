@@ -28,7 +28,7 @@ type UniversalPermission struct {
 	FromMapping        *AddressMapping
 	InitiatedByMapping *AddressMapping
 
-	ApprovalTrackerIdMapping *AddressMapping
+	AmountTrackerIdMapping *AddressMapping
 	ChallengeTrackerIdMapping *AddressMapping
 
 	PermittedTimes []*UintRange
@@ -42,25 +42,10 @@ type UniversalPermission struct {
 	UsesInitiatedByMapping bool
 	UsesOwnershipTimes     bool
 
-	UsesApprovalTrackerId bool
+	UsesAmountTrackerId bool
 	UsesChallengeTrackerId bool
 
 	ArbitraryValue interface{}
-	
-	TimelineTimesOptions *ValueOptions
-
-	FromMappingOptions        *ValueOptions
-	ToMappingOptions          *ValueOptions
-	InitiatedByMappingOptions *ValueOptions
-	TransferTimesOptions      *ValueOptions
-	BadgeIdsOptions           *ValueOptions
-	OwnershipTimesOptions     *ValueOptions
-
-	ApprovalTrackerIdOptions *ValueOptions
-	ChallengeTrackerIdOptions *ValueOptions
-
-	PermittedTimesOptions *ValueOptions
-	ForbiddenTimesOptions *ValueOptions
 }
 
 type UniversalPermissionDetails struct {
@@ -72,7 +57,7 @@ type UniversalPermissionDetails struct {
 	FromMapping        *AddressMapping
 	InitiatedByMapping *AddressMapping
 
-	ApprovalTrackerIdMapping *AddressMapping
+	AmountTrackerIdMapping *AddressMapping
 	ChallengeTrackerIdMapping *AddressMapping
 
 	//These fields are not actually used in the overlapping logic.
@@ -141,14 +126,14 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 	toMappingAfterRemoval, removedToMapping := RemoveAddressMappingFromAddressMapping(handled.ToMapping, valueToCheck.ToMapping)
 	fromMappingAfterRemoval, removedFromMapping := RemoveAddressMappingFromAddressMapping(handled.FromMapping, valueToCheck.FromMapping)
 	initiatedByMappingAfterRemoval, removedInitiatedByMapping := RemoveAddressMappingFromAddressMapping(handled.InitiatedByMapping, valueToCheck.InitiatedByMapping)
-	approvalTrackerIdAfterRemoval, removedApprovalTrackerId := RemoveAddressMappingFromAddressMapping(handled.ApprovalTrackerIdMapping, valueToCheck.ApprovalTrackerIdMapping)
+	amountTrackerIdAfterRemoval, removedAmountTrackerId := RemoveAddressMappingFromAddressMapping(handled.AmountTrackerIdMapping, valueToCheck.AmountTrackerIdMapping)
 	challengeTrackerIdAfterRemoval, removedChallengeTrackerId := RemoveAddressMappingFromAddressMapping(handled.ChallengeTrackerIdMapping, valueToCheck.ChallengeTrackerIdMapping)
 
 
 	toMappingRemoved := !IsAddressMappingEmpty(removedToMapping)
 	fromMappingRemoved := !IsAddressMappingEmpty(removedFromMapping)
 	initiatedByMappingRemoved := !IsAddressMappingEmpty(removedInitiatedByMapping)
-	approvalTrackerIdRemoved := !IsAddressMappingEmpty(removedApprovalTrackerId)
+	amountTrackerIdRemoved := !IsAddressMappingEmpty(removedAmountTrackerId)
 	challengeTrackerIdRemoved := !IsAddressMappingEmpty(removedChallengeTrackerId)
 
 	//Approach: Iterate through each field one by one. Attempt to remove the overlap. We'll call each field by an ID number corresponding to its order
@@ -174,7 +159,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 
 	//If some field does not overlap, we simply end up with the original values because it is only considered an overlap if all fields overlap.
 	//The function would work fine without this but it makes it more efficient and less complicated because it will not get broken down further
-	if len(removedTimelineTimes) == 0 || len(removedBadges) == 0 || len(removedTransferTimes) == 0 || len(removedOwnershipTimes) == 0 || !toMappingRemoved || !fromMappingRemoved || !initiatedByMappingRemoved || !approvalTrackerIdRemoved || !challengeTrackerIdRemoved {
+	if len(removedTimelineTimes) == 0 || len(removedBadges) == 0 || len(removedTransferTimes) == 0 || len(removedOwnershipTimes) == 0 || !toMappingRemoved || !fromMappingRemoved || !initiatedByMappingRemoved || !amountTrackerIdRemoved || !challengeTrackerIdRemoved {
 		remaining = append(remaining, valueToCheck)
 		return remaining, []*UniversalPermissionDetails{}
 	}
@@ -190,7 +175,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          valueToCheck.ToMapping,
 			FromMapping:        valueToCheck.FromMapping,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
-			ApprovalTrackerIdMapping: valueToCheck.ApprovalTrackerIdMapping,
+			AmountTrackerIdMapping: valueToCheck.AmountTrackerIdMapping,
 			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
@@ -206,7 +191,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          valueToCheck.ToMapping,
 			FromMapping:        valueToCheck.FromMapping,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
-			ApprovalTrackerIdMapping: valueToCheck.ApprovalTrackerIdMapping,
+			AmountTrackerIdMapping: valueToCheck.AmountTrackerIdMapping,
 			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
@@ -222,7 +207,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          valueToCheck.ToMapping,
 			FromMapping:        valueToCheck.FromMapping,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
-			ApprovalTrackerIdMapping: valueToCheck.ApprovalTrackerIdMapping,
+			AmountTrackerIdMapping: valueToCheck.AmountTrackerIdMapping,
 			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
@@ -238,7 +223,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          valueToCheck.ToMapping,
 			FromMapping:        valueToCheck.FromMapping,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
-			ApprovalTrackerIdMapping: valueToCheck.ApprovalTrackerIdMapping,
+			AmountTrackerIdMapping: valueToCheck.AmountTrackerIdMapping,
 			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
 
 
@@ -255,7 +240,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          toMappingAfterRemoval,
 			FromMapping:        valueToCheck.FromMapping,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
-			ApprovalTrackerIdMapping: valueToCheck.ApprovalTrackerIdMapping,
+			AmountTrackerIdMapping: valueToCheck.AmountTrackerIdMapping,
 			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
@@ -271,7 +256,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          removedToMapping,
 			FromMapping:        fromMappingAfterRemoval,
 			InitiatedByMapping: valueToCheck.InitiatedByMapping,
-			ApprovalTrackerIdMapping: valueToCheck.ApprovalTrackerIdMapping,
+			AmountTrackerIdMapping: valueToCheck.AmountTrackerIdMapping,
 			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
@@ -287,7 +272,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          removedToMapping,
 			FromMapping:        removedFromMapping,
 			InitiatedByMapping: initiatedByMappingAfterRemoval,
-			ApprovalTrackerIdMapping: valueToCheck.ApprovalTrackerIdMapping,
+			AmountTrackerIdMapping: valueToCheck.AmountTrackerIdMapping,
 			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
@@ -295,7 +280,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 	}
 
 	
-	if !IsAddressMappingEmpty(approvalTrackerIdAfterRemoval) {
+	if !IsAddressMappingEmpty(amountTrackerIdAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:       removedTimelineTimes[0],
 			BadgeId:            removedBadges[0],
@@ -304,7 +289,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          removedToMapping,
 			FromMapping:        removedFromMapping,
 			InitiatedByMapping: removedInitiatedByMapping,
-			ApprovalTrackerIdMapping: approvalTrackerIdAfterRemoval,
+			AmountTrackerIdMapping: amountTrackerIdAfterRemoval,
 			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
@@ -320,7 +305,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			ToMapping:          removedToMapping,
 			FromMapping:        removedFromMapping,
 			InitiatedByMapping: removedInitiatedByMapping,
-			ApprovalTrackerIdMapping: removedApprovalTrackerId,
+			AmountTrackerIdMapping: removedAmountTrackerId,
 			ChallengeTrackerIdMapping: challengeTrackerIdAfterRemoval,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
@@ -340,7 +325,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 						ToMapping:          removedToMapping,
 						FromMapping:        removedFromMapping,
 						InitiatedByMapping: removedInitiatedByMapping,
-						ApprovalTrackerIdMapping: removedApprovalTrackerId,
+						AmountTrackerIdMapping: removedAmountTrackerId,
 						ChallengeTrackerIdMapping: removedChallengeTrackerId,
 
 						ArbitraryValue: valueToCheck.ArbitraryValue,
@@ -353,74 +338,27 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 	return remaining, removedDetails
 }
 
-func GetUintRangesWithOptions(ranges []*UintRange, options *ValueOptions, uses bool) []*UintRange {
+func GetUintRangesWithOptions(ranges []*UintRange, uses bool) []*UintRange {
 	if !uses {
 		ranges = []*UintRange{{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}} //dummy range
 		return ranges
-	}
-
-	if options == nil {
+	} else {
 		return ranges
 	}
-
-	if options.AllValues {
-		ranges = []*UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}}
-	}
-
-	if options.InvertDefault {
-		ranges = InvertUintRanges(ranges, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64))
-	}
-
-	if options.NoValues {
-		ranges = []*UintRange{}
-	}
-
-	return ranges
 }
 
-func GetMappingIdWithOptions(mappingId string, options *ValueOptions, uses bool) string {
+func GetMappingIdWithOptions(mappingId string, uses bool) string {
 	if !uses {
 		mappingId = "All"
-	}
-
-	if options == nil {
+		return mappingId
+	} else {
 		return mappingId
 	}
-
-	if options.AllValues {
-		mappingId = "All"
-	}
-
-	if options.InvertDefault {
-		mappingId = "!" + mappingId
-	}
-
-	if options.NoValues {
-		mappingId = "None"
-	}
-
-	return mappingId
 }
 
-func GetMappingWithOptions(mapping *AddressMapping, options *ValueOptions, uses bool) *AddressMapping {
+func GetMappingWithOptions(mapping *AddressMapping, uses bool) *AddressMapping {
 	if !uses {
 		mapping = &AddressMapping{Addresses: []string{}, IncludeAddresses: false} //All addresses
-	}
-
-	if options == nil {
-		return mapping
-	}
-
-	if options.AllValues {
-		mapping = &AddressMapping{Addresses: []string{}, IncludeAddresses: false} //All addresses
-	}
-
-	if options.InvertDefault {
-		mapping = &AddressMapping{Addresses: mapping.Addresses, IncludeAddresses: !mapping.IncludeAddresses} //Invert
-	}
-
-	if options.NoValues {
-		mapping = &AddressMapping{Addresses: []string{}, IncludeAddresses: true} //No addresses
 	}
 
 	return mapping
@@ -429,20 +367,20 @@ func GetMappingWithOptions(mapping *AddressMapping, options *ValueOptions, uses 
 func ApplyManipulations(permissions []*UniversalPermission) []*UniversalPermissionDetails {
 	handled := []*UniversalPermissionDetails{}
 	for _, permission := range permissions {
-			badgeIds := GetUintRangesWithOptions(permission.BadgeIds, permission.BadgeIdsOptions, permission.UsesBadgeIds)
-			timelineTimes := GetUintRangesWithOptions(permission.TimelineTimes, permission.TimelineTimesOptions, permission.UsesTimelineTimes)
-			transferTimes := GetUintRangesWithOptions(permission.TransferTimes, permission.TransferTimesOptions, permission.UsesTransferTimes)
-			ownershipTimes := GetUintRangesWithOptions(permission.OwnershipTimes, permission.OwnershipTimesOptions, permission.UsesOwnershipTimes)
-			permittedTimes := GetUintRangesWithOptions(permission.PermittedTimes, permission.PermittedTimesOptions, true)
-			forbiddenTimes := GetUintRangesWithOptions(permission.ForbiddenTimes, permission.ForbiddenTimesOptions, true)
+			badgeIds := GetUintRangesWithOptions(permission.BadgeIds, permission.UsesBadgeIds)
+			timelineTimes := GetUintRangesWithOptions(permission.TimelineTimes, permission.UsesTimelineTimes)
+			transferTimes := GetUintRangesWithOptions(permission.TransferTimes,  permission.UsesTransferTimes)
+			ownershipTimes := GetUintRangesWithOptions(permission.OwnershipTimes,  permission.UsesOwnershipTimes)
+			permittedTimes := GetUintRangesWithOptions(permission.PermittedTimes,  true)
+			forbiddenTimes := GetUintRangesWithOptions(permission.ForbiddenTimes,  true)
 			arbitraryValue := permission.ArbitraryValue
 
-			toMapping := GetMappingWithOptions(permission.ToMapping, permission.ToMappingOptions, permission.UsesToMapping)
-			fromMapping := GetMappingWithOptions(permission.FromMapping, permission.FromMappingOptions, permission.UsesFromMapping)
-			initiatedByMapping := GetMappingWithOptions(permission.InitiatedByMapping, permission.InitiatedByMappingOptions, permission.UsesInitiatedByMapping)
+			toMapping := GetMappingWithOptions(permission.ToMapping, permission.UsesToMapping)
+			fromMapping := GetMappingWithOptions(permission.FromMapping, permission.UsesFromMapping)
+			initiatedByMapping := GetMappingWithOptions(permission.InitiatedByMapping, permission.UsesInitiatedByMapping)
 
-			approvalTrackerIdMapping := GetMappingWithOptions(permission.ApprovalTrackerIdMapping, permission.ApprovalTrackerIdOptions, permission.UsesApprovalTrackerId)
-			challengeTrackerIdMapping := GetMappingWithOptions(permission.ChallengeTrackerIdMapping, permission.ChallengeTrackerIdOptions, permission.UsesChallengeTrackerId)
+			amountTrackerIdMapping := GetMappingWithOptions(permission.AmountTrackerIdMapping,  permission.UsesAmountTrackerId)
+			challengeTrackerIdMapping := GetMappingWithOptions(permission.ChallengeTrackerIdMapping,  permission.UsesChallengeTrackerId)
 
 
 			for _, badgeId := range badgeIds {
@@ -458,7 +396,7 @@ func ApplyManipulations(permissions []*UniversalPermission) []*UniversalPermissi
 									ToMapping:          toMapping,
 									FromMapping:        fromMapping,
 									InitiatedByMapping: initiatedByMapping,
-									ApprovalTrackerIdMapping: approvalTrackerIdMapping,
+									AmountTrackerIdMapping: amountTrackerIdMapping,
 									ChallengeTrackerIdMapping: challengeTrackerIdMapping,
 
 									//Appended for future lookups (not involved in overlap logic)
@@ -483,20 +421,20 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissio
 	handled := []*UniversalPermissionDetails{}
 	for _, permission := range permissions {
 		
-			badgeIds := GetUintRangesWithOptions(permission.BadgeIds, permission.BadgeIdsOptions, permission.UsesBadgeIds)
-			timelineTimes := GetUintRangesWithOptions(permission.TimelineTimes, permission.TimelineTimesOptions, permission.UsesTimelineTimes)
-			transferTimes := GetUintRangesWithOptions(permission.TransferTimes, permission.TransferTimesOptions, permission.UsesTransferTimes)
-			ownershipTimes := GetUintRangesWithOptions(permission.OwnershipTimes, permission.OwnershipTimesOptions, permission.UsesOwnershipTimes)
-			permittedTimes := GetUintRangesWithOptions(permission.PermittedTimes, permission.PermittedTimesOptions, true)
-			forbiddenTimes := GetUintRangesWithOptions(permission.ForbiddenTimes, permission.ForbiddenTimesOptions, true)
+			badgeIds := GetUintRangesWithOptions(permission.BadgeIds,  permission.UsesBadgeIds)
+			timelineTimes := GetUintRangesWithOptions(permission.TimelineTimes, permission.UsesTimelineTimes)
+			transferTimes := GetUintRangesWithOptions(permission.TransferTimes,  permission.UsesTransferTimes)
+			ownershipTimes := GetUintRangesWithOptions(permission.OwnershipTimes, permission.UsesOwnershipTimes)
+			permittedTimes := GetUintRangesWithOptions(permission.PermittedTimes,  true)
+			forbiddenTimes := GetUintRangesWithOptions(permission.ForbiddenTimes,  true)
 			arbitraryValue := permission.ArbitraryValue
 
-			toMapping := GetMappingWithOptions(permission.ToMapping, permission.ToMappingOptions, permission.UsesToMapping)
-			fromMapping := GetMappingWithOptions(permission.FromMapping, permission.FromMappingOptions, permission.UsesFromMapping)
-			initiatedByMapping := GetMappingWithOptions(permission.InitiatedByMapping, permission.InitiatedByMappingOptions, permission.UsesInitiatedByMapping)
+			toMapping := GetMappingWithOptions(permission.ToMapping, permission.UsesToMapping)
+			fromMapping := GetMappingWithOptions(permission.FromMapping, permission.UsesFromMapping)
+			initiatedByMapping := GetMappingWithOptions(permission.InitiatedByMapping, permission.UsesInitiatedByMapping)
 
-			approvalTrackerIdMapping := GetMappingWithOptions(permission.ApprovalTrackerIdMapping, permission.ApprovalTrackerIdOptions, permission.UsesApprovalTrackerId)
-			challengeTrackerIdMapping := GetMappingWithOptions(permission.ChallengeTrackerIdMapping, permission.ChallengeTrackerIdOptions, permission.UsesChallengeTrackerId)
+			amountTrackerIdMapping := GetMappingWithOptions(permission.AmountTrackerIdMapping, permission.UsesAmountTrackerId)
+			challengeTrackerIdMapping := GetMappingWithOptions(permission.ChallengeTrackerIdMapping, permission.UsesChallengeTrackerId)
 
 			for _, badgeId := range badgeIds {
 				for _, timelineTime := range timelineTimes {
@@ -511,7 +449,7 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissio
 									ToMapping:          toMapping,
 									FromMapping:        fromMapping,
 									InitiatedByMapping: initiatedByMapping,
-									ApprovalTrackerIdMapping: approvalTrackerIdMapping,
+									AmountTrackerIdMapping: amountTrackerIdMapping,
 									ChallengeTrackerIdMapping: challengeTrackerIdMapping,
 								},
 							}
@@ -526,7 +464,7 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissio
 									ToMapping:          remaining.ToMapping,
 									FromMapping:        remaining.FromMapping,
 									InitiatedByMapping: remaining.InitiatedByMapping,
-									ApprovalTrackerIdMapping: remaining.ApprovalTrackerIdMapping,
+									AmountTrackerIdMapping: remaining.AmountTrackerIdMapping,
 									ChallengeTrackerIdMapping: remaining.ChallengeTrackerIdMapping,
 
 									//Appended for future lookups (not involved in overlap logic)

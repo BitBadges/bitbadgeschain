@@ -249,172 +249,203 @@ func (suite *TestSuite) TestDefaults() {
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 }
 
-func (suite *TestSuite) TestFirstMatchOnly() {
-	wctx := sdk.WrapSDKContext(suite.ctx)
+// func (suite *TestSuite) TestFirstMatchOnly() {
+// 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].DefaultOutgoingApprovals[0].InitiatedByMappingId = alice
-	newOutgoingTimeline := []*types.UserOutgoingApproval{
-			{
-				ToMappingId:          "AllWithoutMint",
-				InitiatedByMappingId: alice,
-				TransferTimes:        GetFullUintRanges(),
-				BadgeIds: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(1),
-					},
-				},
-				OwnershipTimes: GetFullUintRanges(),
-				IsApproved: false,
-			},
-			collectionsToCreate[0].DefaultOutgoingApprovals[0],
-	}
-	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
+// 	collectionsToCreate := GetCollectionsToCreate()
+// 	collectionsToCreate[0].DefaultOutgoingApprovals[0].InitiatedByMappingId = alice
+// 	newOutgoingTimeline := []*types.UserOutgoingApproval{
+// 			{
+// 				ToMappingId:          "AllWithoutMint",
+// 				InitiatedByMappingId: alice,
+// 				TransferTimes:        GetFullUintRanges(),
+// 				BadgeIds: []*types.UintRange{
+// 					{
+// 						Start: sdkmath.NewUint(1),
+// 						End:   sdkmath.NewUint(1),
+// 					},
+// 				},
+// 				OwnershipTimes: GetFullUintRanges(),
+// 				IsApproved: false,
+// 			},
+// 			collectionsToCreate[0].DefaultOutgoingApprovals[0],
+// 	}
+// 	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
 
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+// 	err := CreateCollections(suite, wctx, collectionsToCreate)
+// 	suite.Require().Nil(err, "error creating badges")
 
-	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
+// 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+// 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
-	suite.Require().Error(err, "Error deducting outgoing approvals")
+// 	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
+// 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
-	suite.Require().Nil(err, "Error deducting outgoing approvals")
-}
+// 	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
+// 	suite.Require().Nil(err, "Error deducting outgoing approvals")
+// }
 
-func (suite *TestSuite) TestFirstMatchOnlyWrongTime() {
-	wctx := sdk.WrapSDKContext(suite.ctx)
+// func (suite *TestSuite) TestFirstMatchOnlyWrongTime() {
+// 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	collectionsToCreate := GetCollectionsToCreate()
+// 	collectionsToCreate := GetCollectionsToCreate()
 
-	newOutgoingTimeline := []*types.UserOutgoingApproval{
-		{
-			ToMappingId:          "AllWithoutMint",
-			InitiatedByMappingId: alice,
-			TransferTimes:        []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-			BadgeIds:             GetFullUintRanges(),
-			OwnershipTimes: GetFullUintRanges(),
-			IsApproved: false,
+// 	newOutgoingTimeline := []*types.UserOutgoingApproval{
+// 		{
+// 			ToMappingId:          "AllWithoutMint",
+// 			InitiatedByMappingId: alice,
+// 			TransferTimes:        []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+// 			BadgeIds:             GetFullUintRanges(),
+// 			OwnershipTimes: GetFullUintRanges(),
+// 			IsApproved: false,
 			
 
-		},
-		collectionsToCreate[0].DefaultOutgoingApprovals[0],
-	}
+// 		},
+// 		collectionsToCreate[0].DefaultOutgoingApprovals[0],
+// 	}
 	
-	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
+// 	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
 
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+// 	err := CreateCollections(suite, wctx, collectionsToCreate)
+// 	suite.Require().Nil(err, "error creating badges")
 
-	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
+// 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+// 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
-	suite.Require().Nil(err, "Error deducting outgoing approvals")
-}
+// 	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
+// 	suite.Require().Nil(err, "Error deducting outgoing approvals")
+// }
 
-func (suite *TestSuite) TestCombinations() {
-	wctx := sdk.WrapSDKContext(suite.ctx)
+// func (suite *TestSuite) TestCombinations() {
+// 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	collectionsToCreate := GetCollectionsToCreate()
+// 	collectionsToCreate := GetCollectionsToCreate()
 
-	newOutgoingTimeline :=  []*types.UserOutgoingApproval{
-			{
-				ToMappingId:          "AllWithoutMint",
-				InitiatedByMappingId: alice,
-				TransferTimes:        GetFullUintRanges(),
-				OwnershipTimes: 			GetFullUintRanges(),
-				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-				IsApproved: true,
-				ApprovalId: "test",
-				ApprovalTrackerId:                 "test",
-				ApprovalCriteria: &types.OutgoingApprovalCriteria{
+// 	newOutgoingTimeline :=  []*types.UserOutgoingApproval{
+// 			{
+// 				ToMappingId:          "AllWithoutMint",
+// 				InitiatedByMappingId: alice,
+// 				TransferTimes:        GetFullUintRanges(),
+// 				OwnershipTimes: 			GetFullUintRanges(),
+// 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+				
+// 				ApprovalId: "test",
+// 				AmountTrackerId:                 "test",
+// 				ApprovalCriteria: &types.OutgoingApprovalCriteria{
 					
-					MaxNumTransfers: &types.MaxNumTransfers{
-						OverallMaxNumTransfers: sdkmath.NewUint(1000),
-					},
-					ApprovalAmounts: &types.ApprovalAmounts{
-						PerFromAddressApprovalAmount: sdkmath.NewUint(1),
-					},
-				},
-			},
-			{
-				ToMappingId:          "AllWithoutMint",
-				InitiatedByMappingId: alice,
-				TransferTimes:        GetFullUintRanges(),
-				OwnershipTimes: 			GetFullUintRanges(),
-				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-				BadgeIdsOptions: &types.ValueOptions{ InvertDefault: true },
-				IsApproved:      false,
-			},
-	}
-	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
+// 					MaxNumTransfers: &types.MaxNumTransfers{
+// 						OverallMaxNumTransfers: sdkmath.NewUint(1000),
+// 					},
+// 					ApprovalAmounts: &types.ApprovalAmounts{
+// 						PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+// 					},
+// 				},
+// 			},
+// 			{
+// 				ToMappingId:          "AllWithoutMint",
+// 				InitiatedByMappingId: alice,
+// 				TransferTimes:        GetFullUintRanges(),
+// 				OwnershipTimes: 			GetFullUintRanges(),
+// 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+// 				BadgeIdsOptions: &types.ValueOptions{ InvertDefault: true },
+// 				IsApproved:      false,
+// 			},
+// 	}
+// 	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
 
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+// 	err := CreateCollections(suite, wctx, collectionsToCreate)
+// 	suite.Require().Nil(err, "error creating badges")
 
-	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
+// 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+// 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetOneUintRange(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
-	suite.Require().Nil(err, "Error deducting outgoing approvals")
+// 	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetOneUintRange(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
+// 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
-	suite.Require().Error(err, "Error deducting outgoing approvals")
-}
+// 	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
+// 	suite.Require().Error(err, "Error deducting outgoing approvals")
+// }
 
-func (suite *TestSuite) TestCombinationsOrder() {
-	wctx := sdk.WrapSDKContext(suite.ctx)
+// func (suite *TestSuite) TestCombinationsOrder() {
+// 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	collectionsToCreate := GetCollectionsToCreate()
+// 	collectionsToCreate := GetCollectionsToCreate()
 
-	newOutgoingTimeline := []*types.UserOutgoingApproval{
-			{
-				ToMappingId:          "AllWithoutMint",
-				InitiatedByMappingId: alice,
-				TransferTimes:        GetFullUintRanges(),
-				OwnershipTimes: GetFullUintRanges(),
-				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-				IsApproved: false,
+// 	newOutgoingTimeline := []*types.UserOutgoingApproval{
+// 			{
+// 				ToMappingId:          "AllWithoutMint",
+// 				InitiatedByMappingId: alice,
+// 				TransferTimes:        GetFullUintRanges(),
+// 				OwnershipTimes: GetFullUintRanges(),
+// 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+// 				IsApproved: false,
 				
-			},
-			{
-					ToMappingId:          "AllWithoutMint",
-					InitiatedByMappingId: alice,
-					TransferTimes:        GetFullUintRanges(),
-					OwnershipTimes: GetFullUintRanges(),
-					BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-					InitiatedByMappingOptions: &types.ValueOptions{ InvertDefault: true },
-					IsApproved:         true,
-					ApprovalId: "test",
-					ApprovalTrackerId:                 "test",
-					ApprovalCriteria: &types.OutgoingApprovalCriteria{
-							MaxNumTransfers: &types.MaxNumTransfers{
-								OverallMaxNumTransfers: sdkmath.NewUint(1000),
-							},
-							ApprovalAmounts: &types.ApprovalAmounts{
-								PerFromAddressApprovalAmount: sdkmath.NewUint(1),
-							},
-						},
-					},
+// 			},
+// 			{
+// 					ToMappingId:          "AllWithoutMint",
+// 					InitiatedByMappingId: alice,
+// 					TransferTimes:        GetFullUintRanges(),
+// 					OwnershipTimes: GetFullUintRanges(),
+// 					BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+// 					InitiatedByMappingOptions: &types.ValueOptions{ InvertDefault: true },
+// 					IsApproved:         true,
+// 					ApprovalId: "test",
+// 					AmountTrackerId:                 "test",
+// 					ApprovalCriteria: &types.OutgoingApprovalCriteria{
+// 							MaxNumTransfers: &types.MaxNumTransfers{
+// 								OverallMaxNumTransfers: sdkmath.NewUint(1000),
+// 							},
+// 							ApprovalAmounts: &types.ApprovalAmounts{
+// 								PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+// 							},
+// 						},
+// 					},
 				
 			
-		}
+// 		}
 	
-	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
+// 	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
 
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+// 	err := CreateCollections(suite, wctx, collectionsToCreate)
+// 	suite.Require().Nil(err, "error creating badges")
 
-	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
+// 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+// 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetOneUintRange(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
-	suite.Require().Error(err, "Error deducting outgoing approvals")
-}
+// 	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetOneUintRange(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
+// 	suite.Require().Error(err, "Error deducting outgoing approvals")
+// }
+
+
+
+// func (suite *TestSuite) TestExplicitlyDisallowed() {
+// 	wctx := sdk.WrapSDKContext(suite.ctx)
+
+// 	collectionsToCreate := GetCollectionsToCreate()
+// 	collectionsToCreate[0].DefaultOutgoingApprovals[0].InitiatedByMappingId = alice
+// 	newOutgoingTimeline := []*types.UserOutgoingApproval{
+// 			collectionsToCreate[0].DefaultOutgoingApprovals[0],
+// 	}
+// 	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
+// 	collectionsToCreate[0].DefaultOutgoingApprovals = append(collectionsToCreate[0].DefaultOutgoingApprovals, &types.UserOutgoingApproval{
+		
+// 			ToMappingId:          "AllWithoutMint",
+// 			InitiatedByMappingId: "AllWithoutMint",
+// 			TransferTimes:        GetFullUintRanges(),
+// 			OwnershipTimes: GetFullUintRanges(),
+// 			BadgeIds:             GetFullUintRanges(),
+// 			IsApproved: false,
+// 	})
+
+// 	err := CreateCollections(suite, wctx, collectionsToCreate)
+// 	suite.Require().Nil(err, "error creating badges")
+
+// 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+// 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
+
+// 	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
+// 	suite.Require().Error(err, "Error deducting outgoing approvals")
+// }
 
 func (suite *TestSuite) TestNotExplicitlyDefined() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -428,9 +459,10 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 				TransferTimes:        GetFullUintRanges(),
 				OwnershipTimes: GetFullUintRanges(),
 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-				IsApproved: true,
+				
 				ApprovalId: "test",
-				ApprovalTrackerId:                 "test",
+				AmountTrackerId:                 "test",
+				ChallengeTrackerId: 							 "test",
 				ApprovalCriteria: &types.OutgoingApprovalCriteria{
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
@@ -453,37 +485,6 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 }
-
-func (suite *TestSuite) TestExplicitlyDisallowed() {
-	wctx := sdk.WrapSDKContext(suite.ctx)
-
-	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].DefaultOutgoingApprovals[0].InitiatedByMappingId = alice
-	newOutgoingTimeline := []*types.UserOutgoingApproval{
-			collectionsToCreate[0].DefaultOutgoingApprovals[0],
-	}
-	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
-	collectionsToCreate[0].DefaultOutgoingApprovals = append(collectionsToCreate[0].DefaultOutgoingApprovals, &types.UserOutgoingApproval{
-		
-			ToMappingId:          "AllWithoutMint",
-			InitiatedByMappingId: "AllWithoutMint",
-			TransferTimes:        GetFullUintRanges(),
-			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds:             GetFullUintRanges(),
-			IsApproved: false,
-		
-	})
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
-
-	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
-
-	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
-	suite.Require().Error(err, "Error deducting outgoing approvals")
-}
-
 
 func (suite *TestSuite) TestUserApprovalsReturned() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -555,3 +556,48 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 
 
 //TODO: Test transfer tracker ID after update approved transfers
+
+// func (suite *TestSuite) TestAllowingButManipulatingTrackerIDs() {
+// 	wctx := sdk.WrapSDKContext(suite.ctx)
+
+// 	collectionsToCreate := GetCollectionsToCreate()
+// 	collectionsToCreate[0].CollectionApprovals = []*types.CollectionApproval{
+// 		{
+// 			FromMappingId: "AllWithMint",
+// 			ToMappingId:   "AllWithMint",
+// 			InitiatedByMappingId: "AllWithMint",
+// 			BadgeIds: 					 GetFullUintRanges(),
+// 			TransferTimes:        GetFullUintRanges(),
+// 			OwnershipTimes: GetFullUintRanges(),
+// 			
+// 			ApprovalId: "test",
+// 			AmountTrackerId: 							 "test",
+// 			ChallengeTrackerId: "test",
+// 			AmountTrackerIdOptions: &types.ValueOptions{ InvertDefault: true },
+// 			ApprovalCriteria: &types.ApprovalCriteria{
+// 				MaxNumTransfers: &types.MaxNumTransfers{
+// 					OverallMaxNumTransfers: sdkmath.NewUint(1000),
+// 				},
+// 				ApprovalAmounts: &types.ApprovalAmounts{	
+// 					PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+// 				},
+// 			},
+// 		},
+// 	}
+
+// 	err := CreateCollections(suite, wctx, collectionsToCreate)
+// 	suite.Require().Nil(err, "error creating badges")
+
+// 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+
+// 	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(
+// 		suite.ctx, 
+// 		[]*types.Balance{}, 
+// 		collection, 
+// 		GetFullUintRanges(),
+// 		GetFullUintRanges(),
+// 		bob, alice, alice, 
+// 		sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
+// 	suite.Require().Error(err, "Error deducting outgoing approvals")
+// }

@@ -31,7 +31,7 @@ service Query {
   }
 
   rpc GetApprovalsTracker(QueryGetApprovalsTrackerRequest) returns (QueryGetApprovalsTrackerResponse) {
-    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_approvals_tracker/{collectionId}/{approvalLevel}/{approverAddress}/{approvalTrackerId}/{trackerType}/{approvedAddress}";
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_approvals_tracker/{collectionId}/{approvalLevel}/{approverAddress}/{amountTrackerId}/{trackerType}/{approvedAddress}";
   }
 
   rpc GetNumUsedForMerkleChallenge(QueryGetNumUsedForMerkleChallengeRequest) returns (QueryGetNumUsedForMerkleChallengeResponse) {
@@ -84,7 +84,7 @@ message QueryGetApprovalsTrackerRequest {
   string collectionId = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   string approvalLevel = 2; //"collection" or "incoming" or "outgoing"
   string approverAddress = 3; //if approvalLevel is "collection", leave blank
-  string approvalTrackerId = 1; 
+  string amountTrackerId = 1; 
   string trackerType = 4;; //"overall", "to", "from", "initiatedBy"
   string approvedAddress = 6; //if trackerType is "overall", leave blank
 }

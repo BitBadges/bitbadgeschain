@@ -65,13 +65,6 @@ message UserPermissions {
   repeated UserIncomingApprovalPermission canUpdateIncomingApprovals = 2;
 }
 
-// ValueOptions defines how we manipulate the default values.
-message ValueOptions {
-  bool invertDefault = 1;
-  bool allValues = 2; //Override default values with all possible values
-  bool noValues = 3; //Override default values with no values
-}
-
 // CollectionApprovalPermission defines what collection approved transfers can be updated vs are locked.
 //
 // Each transfer is broken down to a (from, to, initiatedBy, transferTime, badgeId) tuple.
@@ -96,23 +89,11 @@ message CollectionApprovalPermission {
   repeated UintRange badgeIds = 5;
   repeated UintRange ownershipTimes = 6;
 
-  string approvalTrackerId = 7;
+  string amountTrackerId = 7;
   string challengeTrackerId = 8;
 
   repeated UintRange permittedTimes = 9;
   repeated UintRange forbiddenTimes = 10;
-
-  ValueOptions fromMappingOptions = 11;
-  ValueOptions toMappingOptions = 12;
-  ValueOptions initiatedByMappingOptions = 13;
-  ValueOptions transferTimesOptions = 14;
-  ValueOptions badgeIdsOptions = 15;
-  ValueOptions ownershipTimesOptions = 16;
-  ValueOptions approvalTrackerIdOptions = 17;
-  ValueOptions challengeTrackerIdOptions = 18;
-
-  ValueOptions permittedTimesOptions = 19;
-  ValueOptions forbiddenTimesOptions = 20;
 }
 
 // UserOutgoingApprovalPermission defines the permissions for updating the user's approved outgoing transfers.
@@ -124,23 +105,11 @@ message UserOutgoingApprovalPermission {
   repeated UintRange badgeIds = 4;
   repeated UintRange ownershipTimes = 5;
 
-  string approvalTrackerId = 6;
+  string amountTrackerId = 6;
   string challengeTrackerId = 7;
 
   repeated UintRange permittedTimes = 8;
   repeated UintRange forbiddenTimes = 9;
-
-  ValueOptions toMappingOptions = 10;
-  ValueOptions initiatedByMappingOptions = 11;
-  ValueOptions transferTimesOptions = 12;
-  ValueOptions badgeIdsOptions = 13;
-  ValueOptions ownershipTimesOptions = 14;
-
-  ValueOptions approvalTrackerIdOptions = 15;
-  ValueOptions challengeTrackerIdOptions = 16;
-
-  ValueOptions permittedTimesOptions = 17;
-  ValueOptions forbiddenTimesOptions = 18;
 }
 
 // UserIncomingApprovalPermission defines the permissions for updating the user's approved incoming transfers.
@@ -152,23 +121,11 @@ message UserIncomingApprovalPermission {
   repeated UintRange badgeIds = 4;
   repeated UintRange ownershipTimes = 5;
 
-  string approvalTrackerId = 6;
+  string amountTrackerId = 6;
   string challengeTrackerId = 7;
 
   repeated UintRange permittedTimes = 8;
   repeated UintRange forbiddenTimes = 9;
-
-  ValueOptions fromMappingOptions = 10;
-  ValueOptions initiatedByMappingOptions = 11;
-  ValueOptions transferTimesOptions = 12;
-  ValueOptions badgeIdsOptions = 13;
-  ValueOptions ownershipTimesOptions = 14;
-
-  ValueOptions approvalTrackerIdOptions = 15;
-  ValueOptions challengeTrackerIdOptions = 16;
-
-  ValueOptions permittedTimesOptions = 17;
-  ValueOptions forbiddenTimesOptions = 18;
 }
 
 
@@ -183,12 +140,6 @@ message BalancesActionPermission {
 
   repeated UintRange permittedTimes = 3;
   repeated UintRange forbiddenTimes = 4;
-
-  ValueOptions badgeIdsOptions = 5;
-  ValueOptions ownershipTimesOptions = 6;
-
-  ValueOptions permittedTimesOptions = 7;
-  ValueOptions forbiddenTimesOptions = 8;
 }
 
 
@@ -198,9 +149,6 @@ message BalancesActionPermission {
 message ActionPermission {
   repeated UintRange permittedTimes = 1;
   repeated UintRange forbiddenTimes = 2;
-  
-  ValueOptions permittedTimesOptions = 3;
-  ValueOptions forbiddenTimesOptions = 4;
 }
 
 // TimedUpdatePermission defines the permissions for updating a timeline-based field.
@@ -212,11 +160,6 @@ message TimedUpdatePermission {
 
   repeated UintRange permittedTimes = 2;
   repeated UintRange forbiddenTimes = 3;
-
-  ValueOptions timelineTimesOptions = 4;
-
-  ValueOptions permittedTimesOptions = 5;
-  ValueOptions forbiddenTimesOptions = 6;
 }
 
 // TimedUpdateWithBadgeIdsPermission defines the permissions for updating a timeline-based field for specific badges.
@@ -228,8 +171,4 @@ message TimedUpdateWithBadgeIdsPermission {
   repeated UintRange timelineTimes = 2;
   repeated UintRange permittedTimes = 3;
   repeated UintRange forbiddenTimes = 4;
-  ValueOptions timelineTimesOptions = 5;
-  ValueOptions badgeIdsOptions = 6;
-  ValueOptions permittedTimesOptions = 7;
-  ValueOptions forbiddenTimesOptions = 8;
 }

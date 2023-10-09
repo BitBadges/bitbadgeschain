@@ -10,31 +10,9 @@ import (
 // Little hack to make AllowedCombinations a 1-element array so we know if disallowed/allowed for ArbitraryValue
 func ExpandCollectionApprovals(approvals []*types.CollectionApproval) []*types.CollectionApproval {
 	newCurrApprovals := []*types.CollectionApproval{}
+	//TODO: delete this; relic of old interface design
 	for _, approval := range approvals {
-		badgeIds := types.GetUintRangesWithOptions(approval.BadgeIds, approval.BadgeIdsOptions, true)
-		ownershipTimes := types.GetUintRangesWithOptions(approval.OwnershipTimes, approval.OwnershipTimesOptions, true)
-		times := types.GetUintRangesWithOptions(approval.TransferTimes, approval.TransferTimesOptions, true)
-		toMappingId := types.GetMappingIdWithOptions(approval.ToMappingId, approval.ToMappingOptions, true)
-		fromMappingId := types.GetMappingIdWithOptions(approval.FromMappingId, approval.FromMappingOptions, true)
-		initiatedByMappingId := types.GetMappingIdWithOptions(approval.InitiatedByMappingId, approval.InitiatedByMappingOptions, true)
-		
-		newCurrApprovals = append(newCurrApprovals, &types.CollectionApproval{
-			ToMappingId:          toMappingId,
-			FromMappingId:        fromMappingId,
-			InitiatedByMappingId: initiatedByMappingId,
-			TransferTimes:        times,
-			BadgeIds:             badgeIds,
-			OwnershipTimes: 		 	ownershipTimes,
-			IsApproved: approval.IsApproved,
-			Uri: approval.Uri,
-			CustomData: approval.CustomData,
-			ApprovalCriteria: approval.ApprovalCriteria,
-			ApprovalId: approval.ApprovalId,
-			ApprovalTrackerId: approval.ApprovalTrackerId,
-			ChallengeTrackerId: approval.ChallengeTrackerId,
-
-			//Leave all options nil bc we applied them already
-		})
+		newCurrApprovals = append(newCurrApprovals, approval)
 	}
 
 	return newCurrApprovals
@@ -64,7 +42,6 @@ func AppendDefaultForIncoming(currApprovals []*types.UserIncomingApproval, userA
 				End:   sdkmath.NewUint(math.MaxUint64),
 			},
 		},
-		IsApproved: true,
 	}	}, currApprovals...)
 
 	return currApprovals
@@ -95,7 +72,6 @@ func AppendDefaultForOutgoing(currApprovals []*types.UserOutgoingApproval, userA
 				End:   sdkmath.NewUint(math.MaxUint64),
 			},
 		},
-		IsApproved: true,
 	}}, currApprovals...)
 
 

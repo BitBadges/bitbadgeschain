@@ -48,7 +48,6 @@ func SimulateMsgUpdateCollection(
 					TransferTimes:        GetTimelineTimes(r, 100),
 					OwnershipTimes: 		 GetTimelineTimes(r, 100),
 					BadgeIds:             GetTimelineTimes(r, 3),
-					IsApproved: r.Int63n(2) == 0,
 				},
 			},
 			ManagerTimeline: []*types.ManagerTimeline{

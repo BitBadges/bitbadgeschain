@@ -30,19 +30,10 @@ func CastOutgoingTransferToCollectionTransfer(transfer *UserOutgoingApproval, fr
 		OwnershipTimes: 								  transfer.OwnershipTimes,
 		ApprovalCriteria: 								approvalCriteria,
 		ApprovalId: transfer.ApprovalId,
-		ApprovalTrackerId: transfer.ApprovalTrackerId,
+		AmountTrackerId: transfer.AmountTrackerId,
 		ChallengeTrackerId: transfer.ChallengeTrackerId,
 		Uri: transfer.Uri,
 		CustomData: transfer.CustomData,
-
-		IsApproved:           transfer.IsApproved,
-		BadgeIdsOptions:      transfer.BadgeIdsOptions,
-		TransferTimesOptions: transfer.TransferTimesOptions,
-		ToMappingOptions:            transfer.ToMappingOptions,
-		InitiatedByMappingOptions:   transfer.InitiatedByMappingOptions,
-		OwnershipTimesOptions: transfer.OwnershipTimesOptions,
-		ApprovalTrackerIdOptions: transfer.ApprovalTrackerIdOptions,
-		ChallengeTrackerIdOptions: transfer.ChallengeTrackerIdOptions,
 	}
 }
 
@@ -58,19 +49,10 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApproval) 
 		OwnershipTimes: 								  transfer.OwnershipTimes,
 		ApprovalCriteria: 								approvalCriteria,
 		ApprovalId: transfer.ApprovalId,
-		ApprovalTrackerId: transfer.ApprovalTrackerId,
+		AmountTrackerId: transfer.AmountTrackerId,
 		ChallengeTrackerId: transfer.ChallengeTrackerId,
 		Uri: transfer.Uri,
 		CustomData: transfer.CustomData,
-
-		IsApproved:           transfer.IsApproved,
-		BadgeIdsOptions:      transfer.BadgeIdsOptions,
-		TransferTimesOptions: transfer.TransferTimesOptions,
-		ToMappingOptions:            transfer.ToMappingOptions,
-		InitiatedByMappingOptions:   transfer.InitiatedByMappingOptions,
-		OwnershipTimesOptions: transfer.OwnershipTimesOptions,
-		ApprovalTrackerIdOptions: transfer.ApprovalTrackerIdOptions,
-		ChallengeTrackerIdOptions: transfer.ChallengeTrackerIdOptions,
 	}
 }
 
@@ -88,19 +70,10 @@ func CastIncomingTransferToCollectionTransfer(transfer *UserIncomingApproval, to
 		OwnershipTimes: 								  	transfer.OwnershipTimes,
 		ApprovalCriteria:                    approvalCriteria,
 		ApprovalId: transfer.ApprovalId,
-		ApprovalTrackerId: transfer.ApprovalTrackerId,
+		AmountTrackerId: transfer.AmountTrackerId,
 		ChallengeTrackerId: transfer.ChallengeTrackerId,
 		Uri: transfer.Uri,
 		CustomData: transfer.CustomData,
-
-		IsApproved:           transfer.IsApproved,
-		BadgeIdsOptions:      transfer.BadgeIdsOptions,
-		TransferTimesOptions: transfer.TransferTimesOptions,
-		FromMappingOptions:            transfer.FromMappingOptions,
-		InitiatedByMappingOptions:   transfer.InitiatedByMappingOptions,
-		OwnershipTimesOptions: transfer.OwnershipTimesOptions,
-		ApprovalTrackerIdOptions: transfer.ApprovalTrackerIdOptions,
-		ChallengeTrackerIdOptions: transfer.ChallengeTrackerIdOptions,
 	}
 }
 
@@ -116,19 +89,10 @@ func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApproval) 
 		OwnershipTimes: 								  			transfer.OwnershipTimes,
 		ApprovalCriteria:                    approvalCriteria,
 		ApprovalId: transfer.ApprovalId,
-		ApprovalTrackerId: transfer.ApprovalTrackerId,
+		AmountTrackerId: transfer.AmountTrackerId,
 		ChallengeTrackerId: transfer.ChallengeTrackerId,
 		Uri: transfer.Uri,
 		CustomData: transfer.CustomData,
-
-		IsApproved:           transfer.IsApproved,
-		BadgeIdsOptions:      transfer.BadgeIdsOptions,
-		TransferTimesOptions: transfer.TransferTimesOptions,
-		FromMappingOptions:          transfer.FromMappingOptions,
-		InitiatedByMappingOptions:   transfer.InitiatedByMappingOptions,
-		OwnershipTimesOptions: transfer.OwnershipTimesOptions,
-		ApprovalTrackerIdOptions: transfer.ApprovalTrackerIdOptions,
-		ChallengeTrackerIdOptions: transfer.ChallengeTrackerIdOptions,
 	}
 }
 
