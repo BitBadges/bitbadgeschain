@@ -20,3 +20,6 @@ jobs:
 
       - name: Build BitBadgesChain
         run: go build ./cmd/bitbadgeschaind/main.go
+
+      - name: Run Test Suite
+        run: go test ./...
