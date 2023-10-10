@@ -26,8 +26,11 @@ message UserBalanceStore {
   repeated Balance balances = 1;
   repeated UserOutgoingApproval outgoingApprovals = 2;
   repeated UserIncomingApproval incomingApprovals = 3;
-  UserPermissions userPermissions = 4;
+  bool autoApproveSelfInitiatedOutgoingTransfers = 4;
+  bool autoApproveSelfInitiatedIncomingTransfers = 5;
+  UserPermissions userPermissions = 6;
 }
+
 
 // Challenges define the rules for the approval.
 // If all challenge are not met with valid solutions, then the transfer is not approved.

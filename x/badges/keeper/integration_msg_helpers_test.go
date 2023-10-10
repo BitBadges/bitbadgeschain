@@ -186,6 +186,9 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			UpdateCollectionApprovals: true,
 			UpdateStandardsTimeline: true,
 			// UpdateIsArchivedTimeline: true,
+
+			DefaultAutoApproveSelfInitiatedOutgoingTransfers: !collectionToCreate.DefaultDisapproveSelfInitiated,
+			DefaultAutoApproveSelfInitiatedIncomingTransfers: !collectionToCreate.DefaultDisapproveSelfInitiated,
 		})
 		if err != nil {
 			return err

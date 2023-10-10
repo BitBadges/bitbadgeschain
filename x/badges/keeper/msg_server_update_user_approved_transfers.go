@@ -32,6 +32,8 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 			Balances:                          []*types.Balance{},
 			OutgoingApprovals: collection.DefaultUserOutgoingApprovals,
 			IncomingApprovals: collection.DefaultUserIncomingApprovals,
+			AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultAutoApproveSelfInitiatedOutgoingTransfers,
+			AutoApproveSelfInitiatedIncomingTransfers: collection.DefaultAutoApproveSelfInitiatedIncomingTransfers,
 			UserPermissions:                   collection.DefaultUserPermissions,
 		}
 	}
@@ -54,19 +56,28 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		userBalance.IncomingApprovals = msg.IncomingApprovals
 	}
 
+	if msg.UpdateAutoApproveSelfInitiatedIncomingTransfers && userBalance.AutoApproveSelfInitiatedIncomingTransfers != msg.AutoApproveSelfInitiatedIncomingTransfers {
+		//Check permission is valid for current time
+		err = k.CheckActionPermission(ctx, userBalance.UserPermissions.CanUpdateAutoApproveSelfInitiatedIncomingTransfers, "can update auto approve self initiated incoming transfers")
+		if err != nil {
+			return nil, err
+		}
+		userBalance.AutoApproveSelfInitiatedIncomingTransfers = msg.AutoApproveSelfInitiatedIncomingTransfers
+	}
+
+	if msg.UpdateAutoApproveSelfInitiatedOutgoingTransfers && userBalance.AutoApproveSelfInitiatedOutgoingTransfers != msg.AutoApproveSelfInitiatedOutgoingTransfers {
+		//Check permission is valid for current time
+		err = k.CheckActionPermission(ctx, userBalance.UserPermissions.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers, "can update auto approve self initiated outgoing transfers")
+		if err != nil {
+			return nil, err
+		}
+		userBalance.AutoApproveSelfInitiatedOutgoingTransfers = msg.AutoApproveSelfInitiatedOutgoingTransfers
+	}
+
 	if msg.UpdateUserPermissions {
 		err := k.ValidateUserPermissionsUpdate(ctx, userBalance.UserPermissions, msg.UserPermissions)
 		if err != nil {
 			return nil, err
-		}
-
-		//iterate through the non-nil values
-		if msg.UserPermissions.CanUpdateIncomingApprovals != nil {
-			userBalance.UserPermissions.CanUpdateIncomingApprovals = msg.UserPermissions.CanUpdateIncomingApprovals
-		}
-
-		if msg.UserPermissions.CanUpdateOutgoingApprovals != nil {
-			userBalance.UserPermissions.CanUpdateOutgoingApprovals = msg.UserPermissions.CanUpdateOutgoingApprovals
 		}
 
 		userBalance.UserPermissions = msg.UserPermissions

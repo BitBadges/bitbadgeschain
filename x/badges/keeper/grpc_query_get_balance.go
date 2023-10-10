@@ -67,6 +67,8 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 			Balances:                          []*types.Balance{},
 			OutgoingApprovals: currCollection.DefaultUserOutgoingApprovals,
 			IncomingApprovals: currCollection.DefaultUserIncomingApprovals,
+			AutoApproveSelfInitiatedOutgoingTransfers: currCollection.DefaultAutoApproveSelfInitiatedOutgoingTransfers,
+			AutoApproveSelfInitiatedIncomingTransfers: currCollection.DefaultAutoApproveSelfInitiatedIncomingTransfers,
 			UserPermissions:                   currCollection.DefaultUserPermissions,
 		}
 		return &types.QueryGetBalanceResponse{

@@ -109,6 +109,8 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 	UserPermissionsTypes := []apitypes.Type{
 		{Name: "canUpdateOutgoingApprovals", Type: "UserOutgoingApprovalPermission[]"},
 		{Name: "canUpdateIncomingApprovals", Type: "UserIncomingApprovalPermission[]"},
+		{Name: "canUpdateAutoApproveSelfInitiatedOutgoingTransfers", Type: "ActionPermission[]"},
+		{Name: "canUpdateAutoApproveSelfInitiatedIncomingTransfers", Type: "ActionPermission[]"},
 	}
 	UserOutgoingApprovalTypes := []apitypes.Type{
 		{Name: "toMappingId", Type: "string"},
@@ -293,6 +295,10 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "outgoingApprovals", Type: "UserOutgoingApproval[]"},
 				{Name: "updateIncomingApprovals", Type: "bool"},
 				{Name: "incomingApprovals", Type: "UserIncomingApproval[]"},
+				{Name: "updateAutoApproveSelfInitiatedOutgoingTransfers", Type: "bool"},
+				{Name: "autoApproveSelfInitiatedOutgoingTransfers", Type: "bool"},
+				{Name: "updateAutoApproveSelfInitiatedIncomingTransfers", Type: "bool"},
+				{Name: "autoApproveSelfInitiatedIncomingTransfers", Type: "bool"},
 				{Name: "updateUserPermissions", Type: "bool"},
 				{Name: "userPermissions", Type: "UserPermissions"},
 			},
@@ -324,6 +330,8 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "balancesType", Type: "string"},
 				{Name: "defaultOutgoingApprovals", Type: "UserOutgoingApproval[]"},
 				{Name: "defaultIncomingApprovals", Type: "UserIncomingApproval[]"},
+				{Name: "defaultAutoApproveSelfInitiatedOutgoingTransfers", Type: "bool"},
+				{Name: "defaultAutoApproveSelfInitiatedIncomingTransfers", Type: "bool"},
 				{Name: "defaultUserPermissions", Type: "UserPermissions"},
 				{Name: "badgesToCreate", Type: "Balance[]"},
 				{Name: "updateCollectionPermissions", Type: "bool"},
@@ -441,9 +449,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "ownershipTimes", Type: "UintRange[]"},
 				{Name: "permittedTimes", Type: "UintRange[]"},
 				{Name: "forbiddenTimes", Type: "UintRange[]"},
-				
-
-				
 			},
 			"ActionPermission": {	
 				{Name: "permittedTimes", Type: "UintRange[]"},

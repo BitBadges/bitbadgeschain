@@ -73,8 +73,10 @@ message BadgeCollection {
   //
   // Ex: Set this to disallow all incoming transfers by default, making the user have to opt-in to receiving the badge.
   repeated UserIncomingApproval defaultUserIncomingApprovals = 15;
-
+  
   UserPermissions defaultUserPermissions = 16;
+  bool defaultAutoApproveSelfInitiatedOutgoingTransfers = 17;
+  bool defaultAutoApproveSelfInitiatedIncomingTransfers = 18;
 
-  string createdBy = 17;
+  string createdBy = 19;
 }

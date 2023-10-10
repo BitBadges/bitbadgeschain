@@ -63,6 +63,8 @@ message CollectionPermissions {
 message UserPermissions {
   repeated UserOutgoingApprovalPermission canUpdateOutgoingApprovals = 1;
   repeated UserIncomingApprovalPermission canUpdateIncomingApprovals = 2;
+  repeated ActionPermission canUpdateAutoApproveSelfInitiatedOutgoingTransfers = 3;
+  repeated ActionPermission canUpdateAutoApproveSelfInitiatedIncomingTransfers = 4;
 }
 
 // CollectionApprovalPermission defines what collection approved transfers can be updated vs are locked.

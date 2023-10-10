@@ -249,6 +249,27 @@ func (suite *TestSuite) TestDefaults() {
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 }
 
+func (suite *TestSuite) TestDefaultsNotAutoApplies() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].DefaultOutgoingApprovals = []*types.UserOutgoingApproval{}
+	collectionsToCreate[0].DefaultIncomingApprovals = []*types.UserIncomingApproval{}
+	collectionsToCreate[0].DefaultDisapproveSelfInitiated = true
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating badges")
+
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
+
+	err = suite.app.BadgesKeeper.DeductUserIncomingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
+	suite.Require().Error(err, "Error deducting outgoing approvals")
+
+	err = suite.app.BadgesKeeper.DeductUserOutgoingApprovals(suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
+	suite.Require().Error(err, "Error deducting outgoing approvals")
+}
+
 // func (suite *TestSuite) TestFirstMatchOnly() {
 // 	wctx := sdk.WrapSDKContext(suite.ctx)
 

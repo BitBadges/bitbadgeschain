@@ -28,6 +28,8 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 					Balances:                          []*types.Balance{},
 					OutgoingApprovals: collection.DefaultUserOutgoingApprovals,
 					IncomingApprovals: collection.DefaultUserIncomingApprovals,
+					AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultAutoApproveSelfInitiatedOutgoingTransfers,
+					AutoApproveSelfInitiatedIncomingTransfers: collection.DefaultAutoApproveSelfInitiatedIncomingTransfers,
 					UserPermissions: 								   collection.DefaultUserPermissions,
 				}
 			}

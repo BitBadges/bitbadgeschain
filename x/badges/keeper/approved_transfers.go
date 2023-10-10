@@ -22,7 +22,9 @@ type UserApprovalsToCheck struct {
 // DeductUserOutgoingApprovals will check if the current transfer is approved from the from's outgoing approvals and handle the approval tallying accordingly
 func (k Keeper) DeductUserOutgoingApprovals(ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.MerkleProof, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string, prioritizedApprovals []*types.ApprovalIdentifierDetails, onlyCheckPrioritized bool) error {
 	currApprovals := userBalance.OutgoingApprovals
-	currApprovals = AppendDefaultForOutgoing(currApprovals, from)
+	if userBalance.AutoApproveSelfInitiatedOutgoingTransfers {
+		currApprovals = AppendDefaultForOutgoing(currApprovals, from)
+	}
 
 	//Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
 	castedTransfers := types.CastOutgoingTransfersToCollectionTransfers(currApprovals, from)
@@ -33,7 +35,9 @@ func (k Keeper) DeductUserOutgoingApprovals(ctx sdk.Context, overallTransferBala
 // DeductUserIncomingApprovals will check if the current transfer is approved from the to's outgoing approvals and handle the approval tallying accordingly
 func (k Keeper) DeductUserIncomingApprovals(ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.MerkleProof, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string, prioritizedApprovals []*types.ApprovalIdentifierDetails, onlyCheckPrioritized bool) error {
 	currApprovals := userBalance.IncomingApprovals
-	currApprovals = AppendDefaultForIncoming(currApprovals, to)
+	if userBalance.AutoApproveSelfInitiatedIncomingTransfers {
+		currApprovals = AppendDefaultForIncoming(currApprovals, to)
+	}
 
 	//Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
 	castedTransfers := types.CastIncomingTransfersToCollectionTransfers(currApprovals, to)

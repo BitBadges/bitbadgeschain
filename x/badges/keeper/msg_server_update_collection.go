@@ -30,6 +30,8 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 			BalancesType:                     msg.BalancesType,
 			DefaultUserOutgoingApprovals: msg.DefaultOutgoingApprovals,
 			DefaultUserIncomingApprovals: msg.DefaultIncomingApprovals,
+			DefaultAutoApproveSelfInitiatedOutgoingTransfers: msg.DefaultAutoApproveSelfInitiatedOutgoingTransfers,
+			DefaultAutoApproveSelfInitiatedIncomingTransfers: msg.DefaultAutoApproveSelfInitiatedIncomingTransfers,
 			DefaultUserPermissions: 				msg.DefaultUserPermissions,
 			CreatedBy: 											msg.Creator,
 			ManagerTimeline: []*types.ManagerTimeline{
@@ -151,51 +153,6 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 		err = k.ValidatePermissionsUpdate(ctx, collection.CollectionPermissions, msg.CollectionPermissions)
 		if err != nil {
 			return nil, err
-		}
-
-		//iterate through the non-nil values
-		if msg.CollectionPermissions.CanDeleteCollection != nil {
-			collection.CollectionPermissions.CanDeleteCollection = msg.CollectionPermissions.CanDeleteCollection
-		}
-
-		if msg.CollectionPermissions.CanArchiveCollection != nil {
-			collection.CollectionPermissions.CanArchiveCollection = msg.CollectionPermissions.CanArchiveCollection
-		}
-
-		if msg.CollectionPermissions.CanUpdateContractAddress != nil {
-			collection.CollectionPermissions.CanUpdateContractAddress = msg.CollectionPermissions.CanUpdateContractAddress
-		}
-
-		if msg.CollectionPermissions.CanUpdateOffChainBalancesMetadata != nil {
-			collection.CollectionPermissions.CanUpdateOffChainBalancesMetadata = msg.CollectionPermissions.CanUpdateOffChainBalancesMetadata
-		}
-
-		if msg.CollectionPermissions.CanUpdateCustomData != nil {
-			collection.CollectionPermissions.CanUpdateCustomData = msg.CollectionPermissions.CanUpdateCustomData
-		}
-
-		if msg.CollectionPermissions.CanUpdateStandards != nil {
-			collection.CollectionPermissions.CanUpdateStandards = msg.CollectionPermissions.CanUpdateStandards
-		}
-
-		if msg.CollectionPermissions.CanUpdateManager != nil {
-			collection.CollectionPermissions.CanUpdateManager = msg.CollectionPermissions.CanUpdateManager
-		}
-
-		if msg.CollectionPermissions.CanUpdateCollectionMetadata != nil {
-			collection.CollectionPermissions.CanUpdateCollectionMetadata = msg.CollectionPermissions.CanUpdateCollectionMetadata
-		}
-
-		if msg.CollectionPermissions.CanCreateMoreBadges != nil {
-			collection.CollectionPermissions.CanCreateMoreBadges = msg.CollectionPermissions.CanCreateMoreBadges
-		}
-
-		if msg.CollectionPermissions.CanUpdateBadgeMetadata != nil {
-			collection.CollectionPermissions.CanUpdateBadgeMetadata = msg.CollectionPermissions.CanUpdateBadgeMetadata
-		}
-
-		if msg.CollectionPermissions.CanUpdateCollectionApprovals != nil {
-			collection.CollectionPermissions.CanUpdateCollectionApprovals = msg.CollectionPermissions.CanUpdateCollectionApprovals
 		}
 
 		collection.CollectionPermissions = msg.CollectionPermissions

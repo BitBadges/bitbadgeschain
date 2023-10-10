@@ -149,6 +149,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 						},
 					
 			},
+			
 			BadgesToCreate: []*types.Balance{
 				{
 					Amount:         sdkmath.NewUint(1),
