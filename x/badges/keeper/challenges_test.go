@@ -99,7 +99,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 						
 						Root:                hex.EncodeToString(rootHash),
 						ExpectedProofLength: sdk.NewUint(2),
-						MaxOneUsePerLeaf:    true,
+						MaxUsesPerLeaf: sdk.NewUint(1),
 				},
 				
 				OverridesFromOutgoingApprovals: true,
@@ -270,7 +270,7 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 						
 						Root:                    hex.EncodeToString(rootHash),
 						ExpectedProofLength:     sdk.NewUint(2),
-						MaxOneUsePerLeaf:        true,
+						MaxUsesPerLeaf: sdk.NewUint(1),
 						UseCreatorAddressAsLeaf: true,
 				},
 				
@@ -370,13 +370,10 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 			
 				
 				MerkleChallenge: &types.MerkleChallenge{
-					
-						
 						Root:                hex.EncodeToString(rootHash),
 						ExpectedProofLength: sdk.NewUint(5),
-						MaxOneUsePerLeaf:    true,
+						MaxUsesPerLeaf: sdk.NewUint(1),
 				},
-				
 				OverridesFromOutgoingApprovals: true,
 		OverridesToIncomingApprovals:   true,
 		},
@@ -384,7 +381,6 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 		AmountTrackerId:            "testing232",
 		
 		ApprovalId: "asadsdas",
-		
 	
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes: GetFullUintRanges(),
@@ -503,7 +499,7 @@ func (suite *TestSuite) TestIncrements() {
 						
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
-						MaxOneUsePerLeaf:                 true,
+						MaxUsesPerLeaf: sdk.NewUint(1),
 						
 				},
 				OverridesFromOutgoingApprovals: true,
@@ -658,7 +654,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 						
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
-						MaxOneUsePerLeaf:                 true,
+						MaxUsesPerLeaf: sdk.NewUint(1),
 						
 				},
 				OverridesFromOutgoingApprovals: true,
@@ -790,7 +786,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 						
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
-						MaxOneUsePerLeaf:                 true,
+						MaxUsesPerLeaf: sdk.NewUint(1),
 				},
 				OverridesFromOutgoingApprovals: true,
 		OverridesToIncomingApprovals:   true,
@@ -972,7 +968,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 						
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
-						MaxOneUsePerLeaf:                 true,
+						MaxUsesPerLeaf: sdk.NewUint(1),
 						
 				},OverridesFromOutgoingApprovals: true,
 		OverridesToIncomingApprovals:   true,
@@ -1102,7 +1098,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 						
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
-						MaxOneUsePerLeaf:                 true,
+						MaxUsesPerLeaf: sdk.NewUint(1),
 						
 				},
 				OverridesFromOutgoingApprovals: true,
@@ -1273,7 +1269,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 				MerkleChallenge: &types.MerkleChallenge{
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
-						MaxOneUsePerLeaf:                 true,
+						MaxUsesPerLeaf: sdk.NewUint(1),
 				},
 				OverridesFromOutgoingApprovals: true,
 		OverridesToIncomingApprovals:   true,
@@ -1433,7 +1429,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 		MerkleChallenge: &types.MerkleChallenge{
 				Root:                             hex.EncodeToString(rootHash),
 				ExpectedProofLength:              sdk.NewUint(2),
-				MaxOneUsePerLeaf:                 true,
+				MaxUsesPerLeaf: sdk.NewUint(1),
 		},
 			OverridesFromOutgoingApprovals: true,
 			OverridesToIncomingApprovals:   true,
@@ -1593,7 +1589,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 						
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
-						MaxOneUsePerLeaf:                 true,
+						MaxUsesPerLeaf: sdk.NewUint(1),
 						
 				},
 				
@@ -1764,7 +1760,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 						
 						Root:                             hex.EncodeToString(rootHash),
 						ExpectedProofLength:              sdk.NewUint(2),
-						MaxOneUsePerLeaf:                 true,
+						MaxUsesPerLeaf: sdk.NewUint(1),
 						
 				},
 				OverridesFromOutgoingApprovals: true,
@@ -1922,7 +1918,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 			MerkleChallenge: &types.MerkleChallenge{
 					Root:                             hex.EncodeToString(rootHash),
 					ExpectedProofLength:              sdk.NewUint(2),
-					MaxOneUsePerLeaf:                 true,
+					MaxUsesPerLeaf: sdk.NewUint(1),
 					
 				},
 			

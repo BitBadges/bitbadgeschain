@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"strings"
+
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -13,6 +15,11 @@ func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.Addr
 	//Validate ID
 	if id == "Mint" || id == "Manager" || id == "AllWithoutMint" || id == "None" || id == "AllWithMint" || id == "All" {
 		return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot be %s", id)
+	}
+
+	//if starts with "AllWithout"
+	if len(id) > 11 && id[0:11] == "AllWithout" {
+		return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot start with AllWithout")
 	}
 
 	//if starts with !
@@ -59,20 +66,33 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) 
 		handled = true
 	}
 
-	if addressMappingId == "AllWithoutMint" {
+	//If starts with AllWithout, we create a mapping with all addresses except the ones specified delimited by :
+	if len(addressMappingId) > 10 && addressMappingId[0:10] == "AllWithout" {
+		addresses := addressMappingId[10:]
 		addressMapping = &types.AddressMapping{
-			MappingId:        "AllWithoutMint",
-			Addresses:        []string{"Mint"},
+			MappingId:        addressMappingId,
+			Addresses:        []string{},
 			IncludeAddresses: false,
 			Uri:              "",
 			CustomData:       "",
 		}
+
+		//split by :
+		splitAdresses := strings.Split(addresses, ":")
+		for _, address := range splitAdresses {
+			addressMapping.Addresses = append(addressMapping.Addresses, address)
+			
+			if err := types.ValidateAddress(address, true); err != nil {
+				return nil, sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping cannot contain invalid addresses")
+			}
+		}
+
 		handled = true
 	}
 
 	if addressMappingId == "All" {
 		addressMapping = &types.AddressMapping{
-			MappingId:        "AllWithMint",
+			MappingId:        "All",
 			Addresses:        []string{},
 			IncludeAddresses: false,
 			Uri:              "",
@@ -103,16 +123,26 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) 
 		handled = true
 	}
 
-	if types.ValidateAddress(addressMappingId, false) == nil {
+	//Split by :
+	addresses := strings.Split(addressMappingId, ":")
+	allAreValid := true
+	for _, address := range addresses {
+		if err := types.ValidateAddress(address, true); err != nil {
+			allAreValid = false
+		}
+	}
+
+	if allAreValid {
 		addressMapping = &types.AddressMapping{
 			MappingId:        addressMappingId,
-			Addresses:        []string{addressMappingId},
+			Addresses:        addresses,
 			IncludeAddresses: true,
 			Uri:              "",
 			CustomData:       "",
 		}
 		handled = true
 	}
+
 
 	if !handled {
 		addressMappingFetched, found := k.GetAddressMappingFromStore(ctx, addressMappingId)

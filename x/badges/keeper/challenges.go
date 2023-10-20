@@ -72,7 +72,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 				}
 
 				newNumUsed := sdk.NewUint(0)
-				if challenge.MaxOneUsePerLeaf {
+				if !challenge.MaxUsesPerLeaf.IsNil() && challenge.MaxUsesPerLeaf.GT(sdkmath.NewUint(0)) {
 					
 					numUsed, err := k.GetNumUsedForMerkleChallengeFromStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex)
 					if err != nil {
@@ -81,7 +81,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 					}
 					numUsed = numUsed.Add(sdkmath.NewUint(1))
 
-					maxUses := sdkmath.NewUint(1)
+					maxUses := challenge.MaxUsesPerLeaf
 					if numUsed.GT(maxUses) {
 						additionalDetailsErrorStr = "exceeded max number of uses"
 						continue

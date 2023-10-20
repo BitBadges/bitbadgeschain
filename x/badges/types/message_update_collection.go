@@ -189,7 +189,6 @@ func (msg *MsgUpdateCollection) CheckAndCleanMsg(canChangeValues bool) error {
 			if len(msg.DefaultUserPermissions.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers) > 0 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
 			}
-			
 		}
 	
 	if msg.BalancesType != "Off-Chain" {

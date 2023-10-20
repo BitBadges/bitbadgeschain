@@ -53,7 +53,7 @@ message MerkleChallenge {
   string root = 1;
   string expectedProofLength = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   bool useCreatorAddressAsLeaf = 3;
-  bool maxOneUsePerLeaf = 4;
+  string maxUsesPerLeaf = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
   string uri = 6;
   string customData = 7;

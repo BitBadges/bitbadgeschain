@@ -271,9 +271,10 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 				return sdkerrors.Wrapf(err, "invalid challenges")
 			}
 
+			if approvalCriteria.MustOwnBadges == nil {
+				approvalCriteria.MustOwnBadges = []*MustOwnBadges{}
+			}
 
-
-			
 			for _, mustOwnBadgeBalance := range approvalCriteria.MustOwnBadges {
 				if mustOwnBadgeBalance == nil {
 					return sdkerrors.Wrapf(ErrInvalidRequest, "mustOwnBadges balance is nil")
@@ -296,7 +297,47 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 				}
 			}
 			
+			if approvalCriteria.ApprovalAmounts == nil {
+				approvalCriteria.ApprovalAmounts = &ApprovalAmounts{}
+			}
 			
+			if approvalCriteria.ApprovalAmounts.OverallApprovalAmount.IsNil() {
+				approvalCriteria.ApprovalAmounts.OverallApprovalAmount = sdkmath.NewUint(0)
+			}
+			
+			if approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount.IsNil() {
+				approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount = sdkmath.NewUint(0)
+			}
+			
+			if approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount.IsNil() {
+				approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(0)
+			}
+			
+			if approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount.IsNil() {
+				approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount = sdkmath.NewUint(0)
+			}
+			
+			if approvalCriteria.MaxNumTransfers == nil {
+				approvalCriteria.MaxNumTransfers = &MaxNumTransfers{}
+			}
+			
+			if approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsNil() {
+				approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers = sdkmath.NewUint(0)
+			}
+			
+			if approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers.IsNil() {
+				approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers = sdkmath.NewUint(0)
+			}
+			
+			if approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers.IsNil() {
+				approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(0)
+			}
+			
+			if approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsNil() {
+				approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers = sdkmath.NewUint(0)
+			}
+			
+
 	
 			if approvalCriteria.PredeterminedBalances != nil {
 				orderCalculationMethodIsBasicallyNil := !approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex &&
@@ -374,18 +415,12 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 					}
 				}
 
-				if approvalCriteria.ApprovalAmounts == nil {
-					return sdkerrors.Wrapf(ErrInvalidRequest, "approval amounts is uninitialized")
-				}
-
-
-				if approvalCriteria.MaxNumTransfers == nil {
-					return sdkerrors.Wrapf(ErrInvalidRequest, "max num transfers must not be nil")
-				}
-
+			
 			} else {
 				approvalCriteria.PredeterminedBalances = nil
 			}
+		} else {
+			approvalCriteria = &ApprovalCriteria{}
 		}
 	}
 
@@ -395,6 +430,7 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 
 func ValidateMerkleChallenge(challenge *MerkleChallenge, challengeId string, usingLeafIndexForTransferOrder bool) error {
 	if challenge == nil || challenge.Root == "" {
+		challenge = &MerkleChallenge{}
 		return nil
 	}
 
@@ -402,12 +438,18 @@ func ValidateMerkleChallenge(challenge *MerkleChallenge, challengeId string, usi
 		return sdkerrors.Wrapf(ErrUintUnititialized, "expected proof length is uninitialized")
 	}
 
-	if !challenge.MaxOneUsePerLeaf && usingLeafIndexForTransferOrder {
+	if challenge.MaxUsesPerLeaf.IsNil() {
+		return sdkerrors.Wrapf(ErrUintUnititialized, "max uses per leaf is uninitialized")
+	}
+	
+	maxOneUsePerLeaf := challenge.MaxUsesPerLeaf.Equal(sdkmath.NewUint(1))
+
+	if !maxOneUsePerLeaf && usingLeafIndexForTransferOrder {
 		return ErrPrimaryChallengeMustBeOneUsePerLeaf
 	}
 
 	//For non-whitelist trees, we can only use max one use per leaf (bc as soon as we use a leaf, the merkle path is public so anyone can use it)
-	if !challenge.MaxOneUsePerLeaf && !challenge.UseCreatorAddressAsLeaf {
+	if !maxOneUsePerLeaf && !challenge.UseCreatorAddressAsLeaf {
 		return ErrCanOnlyUseMaxOneUsePerLeafWithWhitelistTree
 	}
 

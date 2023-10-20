@@ -403,6 +403,9 @@ func SortAndMergeBalances(balances []*Balance) []*Balance {
 
 	for _, balance := range balances {
 		found := false
+		balance.OwnershipTimes = SortAndMergeOverlapping(balance.OwnershipTimes)
+		balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
+
 		for _, newBalance := range newBalances {
 			if newBalance.Amount.Equal(balance.Amount) {
 				if compareSlices(newBalance.OwnershipTimes, balance.OwnershipTimes) {
@@ -431,7 +434,8 @@ func SortAndMergeBalances(balances []*Balance) []*Balance {
 }
 
 
-// Sets the balance for a specific id. Precondition: assumes balance does not exist.
+// Sets the balance for a specific id. 
+// Important precondition: assumes balance does not exist.
 func SetBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error) {
 	if newBalance.Amount.IsZero() {
 		return balances, nil

@@ -164,6 +164,10 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "permittedTimes", Type: "UintRange[]"},
 		{Name: "forbiddenTimes", Type: "UintRange[]"},
 	}
+	ActionPermissionTypes := []apitypes.Type{
+		{Name: "permittedTimes", Type: "UintRange[]"},
+		{Name: "forbiddenTimes", Type: "UintRange[]"},
+	}
 	OutgoingApprovalCriteriaTypes := []apitypes.Type{
 		{Name: "mustOwnBadges", Type: "MustOwnBadges[]"},
 		{Name: "merkleChallenge", Type: "MerkleChallenge"},
@@ -196,7 +200,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 		{Name: "root", Type: "string"},
 		{Name: "expectedProofLength", Type: "string"},
 		{Name: "useCreatorAddressAsLeaf", Type: "bool"},
-		{Name: "maxOneUsePerLeaf", Type: "bool"},
+		{Name: "maxUsesPerLeaf", Type: "string"},
 		{Name: "uri", Type: "string"},
 		{Name: "customData", Type: "string"},
 	}
@@ -307,6 +311,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			"UserIncomingApproval": UserIncomingApprovalTypes,
 			"UserOutgoingApprovalPermission": UserOutgoingApprovalPermissionTypes,
 			"UserIncomingApprovalPermission": UserIncomingApprovalPermissionTypes,
+			"ActionPermission": ActionPermissionTypes,
 			"Balance": balanceTypes,
 			"UintRange": uintRangeTypes,
 			"OutgoingApprovalCriteria": OutgoingApprovalCriteriaTypes,
@@ -450,10 +455,7 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "permittedTimes", Type: "UintRange[]"},
 				{Name: "forbiddenTimes", Type: "UintRange[]"},
 			},
-			"ActionPermission": {	
-				{Name: "permittedTimes", Type: "UintRange[]"},
-				{Name: "forbiddenTimes", Type: "UintRange[]"},
-			},
+			"ActionPermission": ActionPermissionTypes,
 			"TimedUpdatePermission": {
 				{Name: "timelineTimes", Type: "UintRange[]"},
 				{Name: "permittedTimes", Type: "UintRange[]"},

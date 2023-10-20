@@ -12,7 +12,7 @@ func (suite *TestSuite) TestReservedIds() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	toCheck := []string{"Mint", "!dadsf", "1asdsdfa:1234", "All", "AllWithoutMint", "None", alice, bob, charlie} //"122:323",
+	toCheck := []string{"Mint", "!dadsf", "1asdsdfa:1234", "All", "AllWithoutMint", "AllWithoutMint:" + alice, "None", alice, bob, charlie} //"122:323",
 	for _, check := range toCheck {
 		err := suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 			MappingId: check,
@@ -39,6 +39,34 @@ func (suite *TestSuite) TestReservedIds() {
 	found, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, "Mint", alice,)
 	suite.Require().False(found, "Error checking mapping addresses: %s", "Mint")
 	suite.Require().Nil(err, "Error checking mapping addresses: %s", "Mint")
+
+	found, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, "AllWithoutMint:" + alice, alice,)
+	suite.Require().False(found, "Error checking mapping addresses: %s", "Mint")
+	suite.Require().Nil(err, "Error checking mapping addresses: %s", "Mint")
+
+	found, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, "AllWithoutMint:" + alice, bob,)
+	suite.Require().True(found, "Error checking mapping addresses: %s", "Mint")
+	suite.Require().Nil(err, "Error checking mapping addresses: %s", "Mint")
+
+	found, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, "AllWithoutMint:" + alice, "Mint",)
+	suite.Require().False(found, "Error checking mapping addresses: %s", "Mint")
+	suite.Require().Nil(err, "Error checking mapping addresses: %s", "Mint")
+
+
+	found, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, bob + ":" + alice, alice,)
+	suite.Require().True(found, "Error checking mapping addresses: %s", "Mint")
+	suite.Require().Nil(err, "Error checking mapping addresses: %s", "Mint")
+
+	found, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, bob + ":" + alice, bob,)
+	suite.Require().True(found, "Error checking mapping addresses: %s", "Mint")
+	suite.Require().Nil(err, "Error checking mapping addresses: %s", "Mint")
+
+	found, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, bob + ":" + alice, "Mint",)
+	suite.Require().False(found, "Error checking mapping addresses: %s", "Mint")
+	suite.Require().Nil(err, "Error checking mapping addresses: %s", "Mint")
+
+
+
 
 	// found, err = suite.app.BadgesKeeper.CheckMappingAddresses(suite.ctx, "Manager", alice,)
 	// suite.Require().True(found, "Error checking mapping addresses: %s", "Manager")

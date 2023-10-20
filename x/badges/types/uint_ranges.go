@@ -205,6 +205,10 @@ func SortAndMergeOverlapping(ids []*UintRange) []*UintRange {
 			//Note: If currRange.End <= prevInsertedRange.End, it is already fully contained within the previous. We can just continue.
 			// }
 		}
+
+		
+
+
 		return newUintRanges
 	} else {
 		return ids
