@@ -17,7 +17,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 		fromBalanceKey := ConstructBalanceKey(transfer.From, collection.CollectionId)
 		fromUserBalance, found := k.GetUserBalanceFromStore(ctx, fromBalanceKey)
 		if !found {
-			return sdkerrors.Wrapf(ErrUserBalanceNotExists, "from user balance for %s does not exist", transfer.From)
+			return sdkerrors.Wrapf(ErrUserBalanceNotExists, "sender user balance for %s is empty or does not exist", transfer.From)
 		}
 
 		for _, to := range transfer.ToAddresses {

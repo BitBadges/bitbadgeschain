@@ -10,8 +10,8 @@ func GetCurrentManager(ctx sdk.Context, collection *BadgeCollection) string {
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	managerTimeline := collection.ManagerTimeline
 	for _, managerTimelineVal := range managerTimeline {
-		found := SearchUintRangesForUint(blockTime, managerTimelineVal.TimelineTimes)
-		if found {
+		found, err := SearchUintRangesForUint(blockTime, managerTimelineVal.TimelineTimes)
+		if found || err != nil {
 			return managerTimelineVal.Manager
 		}
 	}
@@ -23,8 +23,8 @@ func GetIsArchived(ctx sdk.Context, collection *BadgeCollection) bool {
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	isArchivedTimeline := collection.IsArchivedTimeline
 	for _, isArchivedTimelineVal := range isArchivedTimeline {
-		found := SearchUintRangesForUint(blockTime, isArchivedTimelineVal.TimelineTimes)
-		if found {
+		found, err := SearchUintRangesForUint(blockTime, isArchivedTimelineVal.TimelineTimes)
+		if found || err != nil {
 			return isArchivedTimelineVal.IsArchived
 		}
 	}

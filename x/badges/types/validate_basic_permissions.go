@@ -72,12 +72,12 @@ func ValidateCollectionApprovalPermissions(permissions []*CollectionApprovalPerm
 		}
 
 		if canChangeValues {
-			permission.TransferTimes = SortAndMergeOverlapping(permission.TransferTimes)
-			permission.OwnershipTimes = SortAndMergeOverlapping(permission.OwnershipTimes)
-			permission.BadgeIds = SortAndMergeOverlapping(permission.BadgeIds)
+			permission.TransferTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TransferTimes)
+			permission.OwnershipTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.OwnershipTimes)
+			permission.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.BadgeIds)
 
-			permission.PermittedTimes = SortAndMergeOverlapping(permission.PermittedTimes)
-			permission.ForbiddenTimes = SortAndMergeOverlapping(permission.ForbiddenTimes)
+			permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
+			permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
 		}
 	}
 
@@ -113,11 +113,11 @@ func ValidateUserOutgoingApprovalPermissions(permissions []*UserOutgoingApproval
 		}
 
 		if canChangeValues {
-		permission.OwnershipTimes = SortAndMergeOverlapping(permission.OwnershipTimes)
-		permission.TransferTimes = SortAndMergeOverlapping(permission.TransferTimes)
-		permission.BadgeIds = SortAndMergeOverlapping(permission.BadgeIds)
-		permission.PermittedTimes = SortAndMergeOverlapping(permission.PermittedTimes)
-		permission.ForbiddenTimes = SortAndMergeOverlapping(permission.ForbiddenTimes)
+		permission.OwnershipTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.OwnershipTimes)
+		permission.TransferTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TransferTimes)
+		permission.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.BadgeIds)
+		permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
+		permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
 		}
 	}
 
@@ -153,12 +153,12 @@ func ValidateUserIncomingApprovalPermissions(permissions []*UserIncomingApproval
 		}
 
 		if canChangeValues {
-		permission.OwnershipTimes = SortAndMergeOverlapping(permission.OwnershipTimes)
-		permission.TransferTimes = SortAndMergeOverlapping(permission.TransferTimes)
-		permission.BadgeIds = SortAndMergeOverlapping(permission.BadgeIds)
+		permission.OwnershipTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.OwnershipTimes)
+		permission.TransferTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TransferTimes)
+		permission.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.BadgeIds)
 
-		permission.PermittedTimes = SortAndMergeOverlapping(permission.PermittedTimes)
-		permission.ForbiddenTimes = SortAndMergeOverlapping(permission.ForbiddenTimes)
+		permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
+		permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
 		}
 
 	}
@@ -190,11 +190,11 @@ func ValidateTimedUpdateWithBadgeIdsPermission(permissions []*TimedUpdateWithBad
 			}
 
 			if canChangeValues {
-				permission.TimelineTimes = SortAndMergeOverlapping(permission.TimelineTimes)
-				permission.BadgeIds = SortAndMergeOverlapping(permission.BadgeIds)
+				permission.TimelineTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TimelineTimes)
+				permission.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.BadgeIds)
 		
-				permission.PermittedTimes = SortAndMergeOverlapping(permission.PermittedTimes)
-				permission.ForbiddenTimes = SortAndMergeOverlapping(permission.ForbiddenTimes)
+				permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
+				permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
 			}
 		
 
@@ -232,10 +232,10 @@ func ValidateBalancesActionPermission(permissions []*BalancesActionPermission, c
 			}
 
 			if canChangeValues {
-				permission.OwnershipTimes = SortAndMergeOverlapping(permission.OwnershipTimes)
-				permission.BadgeIds = SortAndMergeOverlapping(permission.BadgeIds)
-				permission.PermittedTimes = SortAndMergeOverlapping(permission.PermittedTimes)
-				permission.ForbiddenTimes = SortAndMergeOverlapping(permission.ForbiddenTimes)
+				permission.OwnershipTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.OwnershipTimes)
+				permission.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.BadgeIds)
+				permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
+				permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
 			}
 		
 	}
@@ -264,10 +264,10 @@ func ValidateTimedUpdatePermission(permissions []*TimedUpdatePermission, canChan
 			}
 
 			if canChangeValues {
-			permission.TimelineTimes = SortAndMergeOverlapping(permission.TimelineTimes)
+			permission.TimelineTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TimelineTimes)
 
-			permission.PermittedTimes = SortAndMergeOverlapping(permission.PermittedTimes)
-			permission.ForbiddenTimes = SortAndMergeOverlapping(permission.ForbiddenTimes)
+			permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
+			permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
 			}
 		
 	}
@@ -287,8 +287,8 @@ func ValidateActionPermission(permissions []*ActionPermission, canChangeValues b
 		}
 
 		if canChangeValues {
-		permission.PermittedTimes = SortAndMergeOverlapping(permission.PermittedTimes)
-		permission.ForbiddenTimes = SortAndMergeOverlapping(permission.ForbiddenTimes)
+		permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
+		permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
 		}
 	}
 

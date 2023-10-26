@@ -141,7 +141,7 @@ func HandleDuplicateBadgeIds(balances []*Balance, canChangeValues bool) ([]*Bala
 // Updates the balance for a specific ids from what it currently is to newAmount. No add/subtract logic. Just set it.
 func UpdateBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error) {
 	//Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
-	// ranges = SortAndMergeOverlapping(ranges)
+	// ranges = SortUintRangesAndMerge(ranges)
 	err := *new(error)
 	balances, err = DeleteBalances(newBalance.BadgeIds, newBalance.OwnershipTimes, balances)
 	if err != nil {
@@ -391,49 +391,6 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 	return newBalances, nil
 }
 
-
-func SortAndMergeBalances(balances []*Balance) []*Balance {
-	//Sort by amount in increasing order
-	sort.Slice(balances, func(i, j int) bool {
-		return balances[i].Amount.LT(balances[j].Amount)
-	})
-
-	//Merge those which have same amount and ownership times or amount and badge ids
-	newBalances := []*Balance{}
-
-	for _, balance := range balances {
-		found := false
-		balance.OwnershipTimes = SortAndMergeOverlapping(balance.OwnershipTimes)
-		balance.BadgeIds = SortAndMergeOverlapping(balance.BadgeIds)
-
-		for _, newBalance := range newBalances {
-			if newBalance.Amount.Equal(balance.Amount) {
-				if compareSlices(newBalance.OwnershipTimes, balance.OwnershipTimes) {
-					newBalance.BadgeIds = append(newBalance.BadgeIds, balance.BadgeIds...)
-					newBalance.BadgeIds = SortAndMergeOverlapping(newBalance.BadgeIds)
-					found = true
-					break
-				} else if compareSlices(newBalance.BadgeIds, balance.BadgeIds) {
-					newBalance.OwnershipTimes = append(newBalance.OwnershipTimes, balance.OwnershipTimes...)
-					newBalance.OwnershipTimes = SortAndMergeOverlapping(newBalance.OwnershipTimes)
-					found = true
-					break
-				}
-			} else if newBalance.Amount.GT(balance.Amount) {
-				//We are past the point where we can find a match since it is sorted
-				break
-			}
-		}
-
-		if !found {
-			newBalances = append(newBalances, balance)
-		}
-	}
-
-	return newBalances
-}
-
-
 // Sets the balance for a specific id. 
 // Important precondition: assumes balance does not exist.
 func SetBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error) {
@@ -442,7 +399,27 @@ func SetBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error) {
 	}
 
 	balances = append(balances, newBalance)
-	return SortAndMergeBalances(balances), nil
+	err := *new(error)
+
+	//Little clean up to start. We sort and if we have adjacent (note not intersecting), we  merge them
+	for _, balance := range balances {
+		balance.OwnershipTimes, err = SortUintRangesAndMerge(balance.OwnershipTimes, false)
+		if err != nil {
+			return balances, nil
+		}
+		balance.BadgeIds, err = SortUintRangesAndMerge(balance.BadgeIds, false)
+		if err != nil {
+			return balances, nil
+		}
+	}
+
+	//Sort by amount in increasing order
+	sort.Slice(balances, func(i, j int) bool {
+		return balances[i].Amount.LT(balances[j].Amount)
+	})
+
+
+	return balances, err
 }
 
 

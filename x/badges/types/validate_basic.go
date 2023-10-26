@@ -551,14 +551,14 @@ func ValidateBadgeMetadata(badgeMetadata []*BadgeMetadata, canChangeValues bool)
 				return sdkerrors.Wrapf(ErrInvalidRequest, "invalid badgeIds")
 			}
 
-			if err := AssertRangesDoNotOverlapAtAll(handledBadgeIds, SortAndMergeOverlapping(badgeMetadata.BadgeIds)); err != nil {
+			if err := AssertRangesDoNotOverlapAtAll(handledBadgeIds,badgeMetadata.BadgeIds); err != nil {
 				return sdkerrors.Wrapf(err, "badge metadata has duplicate badge ids")
 			}
 
-			handledBadgeIds = append(handledBadgeIds, SortAndMergeOverlapping(badgeMetadata.BadgeIds)...)
+			handledBadgeIds = append(handledBadgeIds, SortUintRangesAndMergeAdjacentAndIntersecting(badgeMetadata.BadgeIds)...)
 
 			if canChangeValues {
-				badgeMetadata.BadgeIds = SortAndMergeOverlapping(badgeMetadata.BadgeIds)
+				badgeMetadata.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(badgeMetadata.BadgeIds)
 			}
 		}
 	}

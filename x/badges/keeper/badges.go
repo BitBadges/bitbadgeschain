@@ -58,7 +58,11 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		allBadgeIds = append(allBadgeIds, balance.BadgeIds...)
 	}
 
-	allBadgeIds = types.SortAndMergeOverlapping(allBadgeIds)
+	allBadgeIds, err = types.SortUintRangesAndMerge(allBadgeIds, true)
+	if err != nil {
+		return &types.BadgeCollection{}, err
+	}
+
 	if len(allBadgeIds) > 1 || (len(allBadgeIds) == 1 && !allBadgeIds[0].Start.Equal(sdkmath.NewUint(1))) {
 		return &types.BadgeCollection{}, sdkerrors.Wrapf(types.ErrNotSupported, "Badge Ids must be sequential starting from 1")
 	}

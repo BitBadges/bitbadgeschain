@@ -51,17 +51,18 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 
 				leafIndex := GetLeafIndex(proof.Aunts)
 
+				//Get leftmost leaf index for layer === challenge.ExpectedProofLength
+				leftmostLeafIndex := sdkmath.NewUint(1)
+				for i := sdkmath.NewUint(0); i.LT(challenge.ExpectedProofLength); i = i.Add(sdkmath.NewUint(1)) {
+					leftmostLeafIndex = leftmostLeafIndex.Mul(sdkmath.NewUint(2))
+				}
+
 				useLeafIndexForTransferOrder := false
 				if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.PredeterminedBalances != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
 					useLeafIndexForTransferOrder = true
 				}
-				if useLeafIndexForTransferOrder {
-					//Get leftmost leaf index for layer === challenge.ExpectedProofLength
-					leftmostLeafIndex := sdkmath.NewUint(1)
-					for i := sdkmath.NewUint(0); i.LT(challenge.ExpectedProofLength); i = i.Add(sdkmath.NewUint(1)) {
-						leftmostLeafIndex = leftmostLeafIndex.Mul(sdkmath.NewUint(2))
-					}
 
+				if useLeafIndexForTransferOrder {
 					numIncrements = leafIndex.Sub(leftmostLeafIndex)
 				}
 
@@ -110,7 +111,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 									sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 									sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 									sdk.NewAttribute("challengeId", fmt.Sprint(challengeId)),
-									sdk.NewAttribute("leafIndex", fmt.Sprint(numIncrements)),
+									sdk.NewAttribute("leafIndex", fmt.Sprint(leafIndex.Sub(leftmostLeafIndex))),
 									sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
 									sdk.NewAttribute("challengeLevel", fmt.Sprint(challengeLevel)),
 									sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),

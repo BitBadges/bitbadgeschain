@@ -8,7 +8,7 @@ import (
 var (
 	ErrCollectionNotExists         = sdkerrors.Register(types.ModuleName, 4, "collection does not exist")
 	ErrForbiddenTime               = sdkerrors.Register(types.ModuleName, 5, "this permission is forbidden at this time")
-	ErrUserBalanceNotExists        = sdkerrors.Register(types.ModuleName, 8, "user balance does not exist")
+	ErrUserBalanceNotExists        = sdkerrors.Register(types.ModuleName, 8, "user balance is empty or does not exist")
 	ErrSupplyEqualsZero            = sdkerrors.Register(types.ModuleName, 13, "can't create a badge with zero supply")
 	ErrSenderIsNotManager          = sdkerrors.Register(types.ModuleName, 14, "sender of tx is not the manager of the badge. must be manager to access this privilege")
 	ErrAccountCanNotEqualCreator   = sdkerrors.Register(types.ModuleName, 35, "account can not equal creator")

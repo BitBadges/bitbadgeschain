@@ -104,8 +104,8 @@ func GetUpdateCombinationsToCheck(
 func CheckNotForbidden(ctx sdk.Context, permission *types.UniversalPermissionDetails, permissionStr string) error {
 	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 
-	found := types.SearchUintRangesForUint(blockTime, permission.ForbiddenTimes)
-	if found {
+	found, err := types.SearchUintRangesForUint(blockTime, permission.ForbiddenTimes)
+	if found || err != nil {
 		return sdkerrors.Wrapf(ErrForbiddenTime, "current time %s is forbidden for permission %s", blockTime.String(), permissionStr)
 	}
 

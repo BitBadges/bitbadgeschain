@@ -127,8 +127,8 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 		}
 
 		currTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-		currTimeFound := types.SearchUintRangesForUint(currTime, transferVal.TransferTimes)
-		if !currTimeFound {
+		currTimeFound, err := types.SearchUintRangesForUint(currTime, transferVal.TransferTimes)
+		if !currTimeFound  || err != nil {
 			continue
 		}
 
@@ -410,9 +410,11 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 
 	//If we didn't find a successful approval, we throw
 	if len(remainingBalances) > 0 {
-		transferStr := "(from: " + fromAddress + ", to: " + toAddress + ", initiatedBy: " + initiatedBy + ", badgeId: " + remainingBalances[0].BadgeIds[0].Start.String() + ", ownershipTime (unix milliseconds): " + remainingBalances[0].OwnershipTimes[0].Start.String() + ")"
+		return []*UserApprovalsToCheck{}, ErrInadequateApprovals
+		
+		// transferStr := "(from: " + fromAddress + ", to: " + toAddress + ", initiatedBy: " + initiatedBy + ", badgeId: " + remainingBalances[0].BadgeIds[0].Start.String() + ", ownershipTime (unix milliseconds): " + remainingBalances[0].OwnershipTimes[0].Start.String() + ")"
 
-		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval found: %s", transferStr)
+		// return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval found: %s", transferStr)
 	}
 
 	return userApprovalsToCheck, nil

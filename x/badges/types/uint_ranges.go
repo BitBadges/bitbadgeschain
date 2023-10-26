@@ -1,6 +1,7 @@
 package types
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 )
 
@@ -21,9 +22,12 @@ func DeepCopyRanges(ranges []*UintRange) []*UintRange {
 }
 
 // Search ID ranges for a specific ID. Return (true) if found. And (false) if not.
-func SearchUintRangesForUint(id sdkmath.Uint, uintRanges []*UintRange) bool {
+func SearchUintRangesForUint(id sdkmath.Uint, uintRanges []*UintRange) (bool, error) {
 	ranges := DeepCopyRanges(uintRanges)
-	ranges = SortAndMergeOverlapping(ranges)
+	ranges, err := SortUintRangesAndMerge(ranges, false)
+	if err != nil {
+		return false, err
+	}
 
 	//Binary search because ID ranges will be sorted
 	low := 0
@@ -34,7 +38,7 @@ func SearchUintRangesForUint(id sdkmath.Uint, uintRanges []*UintRange) bool {
 		currRange := ranges[median]
 
 		if currRange.Start.LTE(id) && currRange.End.GTE(id) {
-			return true
+			return true, nil
 		} else if currRange.Start.GT(id) {
 			high = median - 1
 		} else {
@@ -42,7 +46,7 @@ func SearchUintRangesForUint(id sdkmath.Uint, uintRanges []*UintRange) bool {
 		}
 	}
 
-	return false
+	return false, nil
 }
 
 func InvertUintRanges(uintRanges []*UintRange, minId sdkmath.Uint, maxId sdkmath.Uint) []*UintRange {
@@ -160,8 +164,15 @@ func AssertRangesDoNotOverlapAtAll(rangeToCheck []*UintRange, overlappingRange [
 	return nil
 }
 
+
+func SortUintRangesAndMergeAdjacentAndIntersecting(ids []*UintRange)( []*UintRange) {
+	sorted, _ := SortUintRangesAndMerge(ids, true)
+	return sorted
+}
+
 // Will sort the ID ranges in order and merge overlapping IDs if we can
-func SortAndMergeOverlapping(ids []*UintRange) []*UintRange {
+// If mergeIntersecting is true, we will merge intersecting ranges. If false, we will panic if any intersect and only sort and merge adjacent ranges (i.e. [1-5], [6-10])
+func SortUintRangesAndMerge(ids []*UintRange, mergeIntersecting bool)( []*UintRange, error) {
 	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
 	var n = len(ids)
 	for i := 1; i < n; i++ {
@@ -175,6 +186,16 @@ func SortAndMergeOverlapping(ids []*UintRange) []*UintRange {
 			j = j - 1
 		}
 	}
+
+	if !mergeIntersecting {
+		//We don't want to merge intersecting ranges, so we panic if any interesect
+		for i := 1; i < n; i++ {
+			if ids[i-1].End.GTE(ids[i].Start) {
+				return nil, sdkerrors.Wrap(ErrRangesOverlap, "ranges overlap but mergeIntersecting is not allowed")
+			}
+		}
+	}
+
 
 	//Merge overlapping ranges
 	if n > 0 {
@@ -209,8 +230,8 @@ func SortAndMergeOverlapping(ids []*UintRange) []*UintRange {
 		
 
 
-		return newUintRanges
+		return newUintRanges, nil
 	} else {
-		return ids
+		return ids, nil
 	}
 }
