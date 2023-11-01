@@ -61,9 +61,6 @@ message BadgeCollection {
   // When a collection is archived, it is read-only and no transactions can be processed.
   repeated IsArchivedTimeline isArchivedTimeline = 12;
 
-  // The contractAddressTimeline defines the contract address for the collection (if it has a corresponding contract).
-  repeated ContractAddressTimeline contractAddressTimeline = 13;
-
   // The defaultUserOutgoingApprovals defines the default user approved outgoing transfers for an uninitialized user balance. 
   // The user can change this value at any time.
   repeated UserOutgoingApproval defaultUserOutgoingApprovals = 14;

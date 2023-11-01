@@ -356,8 +356,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "collectionApprovals", Type: "CollectionApproval[]"},
 				{Name: "updateStandardsTimeline", Type: "bool"},
 				{Name: "standardsTimeline", Type: "StandardsTimeline[]"},
-				{Name: "updateContractAddressTimeline", Type: "bool"},
-				{Name: "contractAddressTimeline", Type: "ContractAddressTimeline[]"},
 				{Name: "updateIsArchivedTimeline", Type: "bool"},
 				{Name: "isArchivedTimeline", Type: "IsArchivedTimeline[]"},
 			},
@@ -365,7 +363,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			"CollectionPermissions": {
 				{Name: "canDeleteCollection", Type: "ActionPermission[]"},
 				{Name: "canArchiveCollection", Type: "TimedUpdatePermission[]"},
-				{Name: "canUpdateContractAddress", Type: "TimedUpdatePermission[]"},
 				{Name: "canUpdateOffChainBalancesMetadata", Type: "TimedUpdatePermission[]"},
 				{Name: "canUpdateStandards", Type: "TimedUpdatePermission[]"},
 				{Name: "canUpdateCustomData", Type: "TimedUpdatePermission[]"},
@@ -397,10 +394,6 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			},
 			"StandardsTimeline": {
 				{Name: "standards", Type: "string[]"},
-				{Name: "timelineTimes", Type: "UintRange[]"},
-			},
-			"ContractAddressTimeline": {
-				{Name: "contractAddress", Type: "string"},
 				{Name: "timelineTimes", Type: "UintRange[]"},
 			},
 			"IsArchivedTimeline": {

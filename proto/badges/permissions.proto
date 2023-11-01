@@ -40,19 +40,18 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 message CollectionPermissions {
   repeated ActionPermission canDeleteCollection = 1;
   repeated TimedUpdatePermission canArchiveCollection = 2;
-  repeated TimedUpdatePermission canUpdateContractAddress = 3;
-  repeated TimedUpdatePermission canUpdateOffChainBalancesMetadata = 4;
-  repeated TimedUpdatePermission canUpdateStandards = 5;
+  repeated TimedUpdatePermission canUpdateOffChainBalancesMetadata = 3;
+  repeated TimedUpdatePermission canUpdateStandards = 4;
   
-  repeated TimedUpdatePermission canUpdateCustomData = 6;
-  repeated TimedUpdatePermission canUpdateManager = 7;
-  repeated TimedUpdatePermission canUpdateCollectionMetadata = 8;
+  repeated TimedUpdatePermission canUpdateCustomData = 5;
+  repeated TimedUpdatePermission canUpdateManager = 6;
+  repeated TimedUpdatePermission canUpdateCollectionMetadata = 7;
 
-  repeated BalancesActionPermission canCreateMoreBadges = 9;
+  repeated BalancesActionPermission canCreateMoreBadges = 8;
 
-  repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 10;
+  repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 9;
 
-  repeated CollectionApprovalPermission canUpdateCollectionApprovals = 12;
+  repeated CollectionApprovalPermission canUpdateCollectionApprovals = 10;
 }
 
 // UserPermissions defines the permissions for the user (i.e. what the user can and cannot do).

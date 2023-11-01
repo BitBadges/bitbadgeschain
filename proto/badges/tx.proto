@@ -74,9 +74,6 @@ message MsgUpdateCollection {
   bool updateStandardsTimeline = 23;
   repeated StandardsTimeline standardsTimeline = 24;
 
-  bool updateContractAddressTimeline = 25;
-  repeated ContractAddressTimeline contractAddressTimeline = 26;
-
   bool updateIsArchivedTimeline = 27;
   repeated IsArchivedTimeline isArchivedTimeline = 28;  
 }

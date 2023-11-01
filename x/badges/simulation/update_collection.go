@@ -30,7 +30,6 @@ func SimulateMsgUpdateCollection(
 			UpdateCustomDataTimeline: r.Int63n(2) == 0,
 			UpdateCollectionApprovals: r.Int63n(2) == 0,
 			UpdateStandardsTimeline: r.Int63n(2) == 0,
-			UpdateContractAddressTimeline: r.Int63n(2) == 0,
 
 			CollectionId: sdkmath.NewUint(uint64(r.Int63n(5))),
 			IsArchivedTimeline: []*types.IsArchivedTimeline{

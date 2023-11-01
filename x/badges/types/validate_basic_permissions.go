@@ -353,10 +353,6 @@ func ValidatePermissions(permissions *CollectionPermissions, canChangeValues boo
 		return err
 	}
 
-	if err := ValidateTimedUpdatePermission(permissions.CanUpdateContractAddress, canChangeValues); err != nil {
-		return err
-	}
-
 	if err := ValidateTimedUpdatePermission(permissions.CanArchiveCollection, canChangeValues); err != nil {
 		return err
 	}

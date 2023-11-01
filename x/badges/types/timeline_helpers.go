@@ -123,16 +123,6 @@ func GetManagerTimesAndValues(managerTimeline []*ManagerTimeline) ([][]*UintRang
 	return times, values
 }
 
-func GetContractAddressTimesAndValues(contractAddressTimeline []*ContractAddressTimeline) ([][]*UintRange, []interface{}) {
-	times := [][]*UintRange{}
-	values := []interface{}{}
-	for _, timelineVal := range contractAddressTimeline {
-		times = append(times, timelineVal.TimelineTimes)
-		values = append(values, timelineVal.ContractAddress)
-	}
-	return times, values
-}
-
 func GetCustomDataTimesAndValues(customDataTimeline []*CustomDataTimeline) ([][]*UintRange, []interface{}) {
 	times := [][]*UintRange{}
 	values := []interface{}{}

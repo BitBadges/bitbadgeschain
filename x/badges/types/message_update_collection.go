@@ -91,10 +91,6 @@ func (msg *MsgUpdateCollection) CheckAndCleanMsg(canChangeValues bool) error {
 		return err
 	}
 
-	if err := ValidateContractAddressTimeline(msg.ContractAddressTimeline); err != nil {
-		return err
-	}
-
 	if err := ValidateCustomDataTimeline(msg.CustomDataTimeline); err != nil {
 		return err
 	}
@@ -141,10 +137,6 @@ func (msg *MsgUpdateCollection) CheckAndCleanMsg(canChangeValues bool) error {
 	}
 
 	if err := ValidateCollectionMetadataTimeline(msg.CollectionMetadataTimeline); err != nil {
-		return err
-	}
-
-	if err := ValidateContractAddressTimeline(msg.ContractAddressTimeline); err != nil {
 		return err
 	}
 

@@ -123,13 +123,6 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 		collection.ManagerTimeline = msg.ManagerTimeline
 	}
 
-	if msg.UpdateContractAddressTimeline {
-		if err := k.ValidateContractAddressUpdate(ctx, collection.ContractAddressTimeline, msg.ContractAddressTimeline, collection.CollectionPermissions.CanUpdateContractAddress); err != nil {
-			return nil, err
-		}
-		collection.ContractAddressTimeline = msg.ContractAddressTimeline
-	}
-
 	if msg.UpdateStandardsTimeline {
 		if err := k.ValidateStandardsUpdate(ctx, collection.StandardsTimeline, msg.StandardsTimeline, collection.CollectionPermissions.CanUpdateStandards); err != nil {
 			return nil, err

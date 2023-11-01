@@ -159,7 +159,6 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 			},
 			Permissions: &types.CollectionPermissions{
 				CanArchiveCollection:                           []*types.TimedUpdatePermission{},
-				CanUpdateContractAddress:             []*types.TimedUpdatePermission{},
 				CanUpdateOffChainBalancesMetadata:    []*types.TimedUpdatePermission{},
 				CanUpdateStandards:                   []*types.TimedUpdatePermission{},
 				CanUpdateCustomData:                  []*types.TimedUpdatePermission{},

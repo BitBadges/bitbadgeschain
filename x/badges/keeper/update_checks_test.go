@@ -18,7 +18,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermission() {
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanUpdateContractAddress: []*types.TimedUpdatePermission{
+			CanUpdateStandards: []*types.TimedUpdatePermission{
 				{
 					
 						PermittedTimes: GetFullUintRanges(),
@@ -33,10 +33,10 @@ func (suite *TestSuite) TestCheckTimedUpdatePermission() {
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		ContractAddressTimeline: []*types.ContractAddressTimeline{
+		StandardsTimeline: []*types.StandardsTimeline{
 			{
 				TimelineTimes:   GetFullUintRanges(),
-				ContractAddress: "0x123",
+				Standards: []string{"0x123"},
 			},
 		},
 	})
@@ -55,7 +55,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionDefaultAllowed() {
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanUpdateContractAddress: []*types.TimedUpdatePermission{},
+			CanUpdateStandards: []*types.TimedUpdatePermission{},
 		},
 	})
 	suite.Require().Nil(err, "Error updating collection permissions")
@@ -63,10 +63,10 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionDefaultAllowed() {
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		ContractAddressTimeline: []*types.ContractAddressTimeline{
+		StandardsTimeline: []*types.StandardsTimeline{
 			{
 				TimelineTimes:   GetFullUintRanges(),
-				ContractAddress: "0x123",
+				Standards: []string{"0x123"},
 			},
 		},
 	})
@@ -85,7 +85,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanUpdateContractAddress: []*types.TimedUpdatePermission{
+			CanUpdateStandards: []*types.TimedUpdatePermission{
 				{
 					
 						PermittedTimes: GetFullUintRanges(),
@@ -106,10 +106,10 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		ContractAddressTimeline: []*types.ContractAddressTimeline{
+		StandardsTimeline: []*types.StandardsTimeline{
 			{
 				TimelineTimes:   GetFullUintRanges(),
-				ContractAddress: "0x123",
+				Standards: []string{"0x123"},
 			},
 		},
 	})
@@ -118,10 +118,10 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		ContractAddressTimeline: []*types.ContractAddressTimeline{
+		StandardsTimeline: []*types.StandardsTimeline{
 			{
 				TimelineTimes:   GetOneUintRange(),
-				ContractAddress: "0x123",
+				Standards: []string{"0x123"},
 			},
 		},
 	})

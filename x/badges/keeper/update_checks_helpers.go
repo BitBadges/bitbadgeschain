@@ -522,7 +522,7 @@ func (k Keeper) ValidateStandardsUpdate(ctx sdk.Context, oldStandards []*types.S
 	newTimes, newValues := types.GetStandardsTimesAndValues(newStandards)
 	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
 
-	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, "", func(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
+	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []string{}, func(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
 		if (oldValue == nil && newValue != nil) || (oldValue != nil && newValue == nil) {
 			return []*types.UniversalPermissionDetails{{}}, nil
 		} else {
@@ -547,25 +547,6 @@ func (k Keeper) ValidateStandardsUpdate(ctx sdk.Context, oldStandards []*types.S
 	}
 
 	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateStandards, "update standards"); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (k Keeper) ValidateContractAddressUpdate(ctx sdk.Context, oldContractAddress []*types.ContractAddressTimeline, newContractAddress []*types.ContractAddressTimeline, canUpdateContractAddress []*types.TimedUpdatePermission) error {
-	oldTimes, oldValues := types.GetContractAddressTimesAndValues(oldContractAddress)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
-
-	newTimes, newValues := types.GetContractAddressTimesAndValues(newContractAddress)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
-
-	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, "", GetUpdatedStringCombinations)
-	if err != nil {
-		return err
-	}
-
-	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateContractAddress, "update contract address"); err != nil {
 		return err
 	}
 

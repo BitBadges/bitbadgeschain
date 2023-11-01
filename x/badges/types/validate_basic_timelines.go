@@ -123,16 +123,6 @@ func ValidateCustomDataTimeline(timeline []*CustomDataTimeline) error {
 	return nil
 }
 
-func ValidateContractAddressTimeline(timeline []*ContractAddressTimeline) error {
-	times, _ := GetContractAddressTimesAndValues(timeline)
-	err := ValidateTimelineTimesDoNotOverlap(times)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func ValidateManagerTimeline(timeline []*ManagerTimeline) error {
 	times, _ := GetManagerTimesAndValues(timeline)
 	err := ValidateTimelineTimesDoNotOverlap(times)

@@ -270,10 +270,6 @@ func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types
 			return err
 	}
 
-	if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateContractAddress, newPermissions.CanUpdateContractAddress); err != nil {
-			return err
-	}
-
 	if err := k.ValidateBalancesActionPermissionUpdate(oldPermissions.CanCreateMoreBadges, newPermissions.CanCreateMoreBadges); err != nil {
 			return err
 	}

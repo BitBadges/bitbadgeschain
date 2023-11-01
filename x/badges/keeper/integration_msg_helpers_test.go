@@ -168,7 +168,6 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			OffChainBalancesMetadataTimeline: collectionToCreate.OffChainBalancesMetadataTimeline,
 			// InheritedCollectionId: collectionToCreate.InheritedCollectionId,
 			CustomDataTimeline: collectionToCreate.CustomDataTimeline,
-			ContractAddressTimeline: collectionToCreate.ContractAddressTimeline,
 			StandardsTimeline: collectionToCreate.StandardsTimeline,
 			BadgesToCreate: collectionToCreate.BadgesToCreate,
 			// IsArchivedTimeline: collectionToCreate.IsArchivedTimeline,
@@ -182,7 +181,6 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			UpdateOffChainBalancesMetadataTimeline: true,
 			
 			UpdateCustomDataTimeline: true,
-			UpdateContractAddressTimeline: true,
 			UpdateCollectionApprovals: true,
 			UpdateStandardsTimeline: true,
 			// UpdateIsArchivedTimeline: true,
@@ -287,8 +285,6 @@ func UpdateMetadata(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateM
 		UpdateOffChainBalancesMetadataTimeline: true,
 		StandardsTimeline: msg.StandardsTimeline,
 		UpdateStandardsTimeline: true,
-		ContractAddressTimeline: msg.ContractAddressTimeline,
-		UpdateContractAddressTimeline: true,
 		CustomDataTimeline: msg.CustomDataTimeline,
 		UpdateCustomDataTimeline: true,
 	})
