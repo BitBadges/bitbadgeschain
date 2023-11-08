@@ -2,6 +2,8 @@ module github.com/bitbadges/bitbadgeschain
 
 go 1.21
 
+//golang.org/x/exp has been a problem dependency for 0.47 (see https://github.com/cosmos/cosmos-sdk/issues/18415)
+
 require (
 	cosmossdk.io/api v0.3.1
 	cosmossdk.io/errors v1.0.0
@@ -13,7 +15,6 @@ require (
 	github.com/cosmos/gogoproto v1.4.10
 	github.com/cosmos/ibc-go/v7 v7.3.0
 	github.com/ethereum/go-ethereum v1.11.5
-	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.3
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
@@ -31,8 +32,9 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20231106174013-bbf56f31fb17
 	google.golang.org/grpc v1.59.0
 	gopkg.in/yaml.v2 v2.4.0
-
 )
+
+require github.com/gogo/protobuf v1.3.2
 
 require (
 	cloud.google.com/go v0.110.9 // indirect
@@ -195,8 +197,6 @@ require (
 	pgregory.net/rapid v0.5.5 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
-
-replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
 // replace broken goleveldb
 replace github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
