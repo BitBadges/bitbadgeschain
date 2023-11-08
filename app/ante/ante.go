@@ -5,7 +5,7 @@ import (
 	"runtime/debug"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	tmlog "github.com/tendermint/tendermint/libs/log"
+	tmlog "github.com/cometbft/cometbft/libs/log"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"

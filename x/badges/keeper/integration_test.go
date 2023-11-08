@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -15,9 +15,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	bitbadgesapp "github.com/bitbadges/bitbadgeschain/app"
-
-	abci "github.com/tendermint/tendermint/abci/types"
-	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 const (
@@ -27,22 +24,22 @@ const (
 	charlie = "cosmos1xyxs3skf3f4jfqeuv89yyaqvjc6lffavxqhc8g"
 )
 
-var DefaultConsensusParams = &abci.ConsensusParams{
-	Block: &abci.BlockParams{
-		MaxBytes: 200000,
-		MaxGas:   2000000,
-	},
-	Evidence: &tmproto.EvidenceParams{
-		MaxAgeNumBlocks: 302400,
-		MaxAgeDuration:  504 * time.Hour, // 3 weeks is the max duration
-		MaxBytes:        10000,
-	},
-	Validator: &tmproto.ValidatorParams{
-		PubKeyTypes: []string{
-			tmtypes.ABCIPubKeyTypeEd25519,
-		},
-	},
-}
+// var DefaultConsensusParams = &abci.ConsensusParams{
+// 	Block: &abci.BlockParams{
+// 		MaxBytes: 200000,
+// 		MaxGas:   2000000,
+// 	},
+// 	Evidence: &tmproto.EvidenceParams{
+// 		MaxAgeNumBlocks: 302400,
+// 		MaxAgeDuration:  504 * time.Hour, // 3 weeks is the max duration
+// 		MaxBytes:        10000,
+// 	},
+// 	Validator: &tmproto.ValidatorParams{
+// 		PubKeyTypes: []string{
+// 			tmtypes.ABCIPubKeyTypeEd25519,
+// 		},
+// 	},
+// }
 
 type TestSuite struct {
 	suite.Suite

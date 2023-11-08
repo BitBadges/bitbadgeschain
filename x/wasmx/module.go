@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	// "github.com/tendermint/tendermint/libs/rand"
+	// "github.com/cometbft/cometbft/libs/rand"
 	"math/rand"
 
+	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -19,7 +20,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
-	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/bitbadges/bitbadgeschain/x/wasmx/client/cli"
 	wasmxkeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"

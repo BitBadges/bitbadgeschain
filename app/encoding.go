@@ -10,7 +10,7 @@ func MakeEncodingConfig() params.EncodingConfig {
 	encodingConfig := encoding.MakeConfig(ModuleBasics)
 	return params.EncodingConfig{
 		InterfaceRegistry: encodingConfig.InterfaceRegistry,
-		Marshaler:         encodingConfig.Codec,
+		Marshaler:         encodingConfig.Marshaler,
 		TxConfig:          encodingConfig.TxConfig,
 		Amino:             encodingConfig.Amino,
 	}
