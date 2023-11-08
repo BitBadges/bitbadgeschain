@@ -56,7 +56,7 @@ type TestSuite struct {
 // Bunch of weird config stuff to setup the app. Inherited most from Cosmos SDK tutorials and existing Cosmos SDK modules.
 func (suite *TestSuite) SetupTest() {
 	app := bitbadgesapp.Setup(
-		false, nil,
+		false,
 	)
 
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})

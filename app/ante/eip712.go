@@ -9,6 +9,7 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
@@ -16,10 +17,11 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
-	"github.com/evmos/ethermint/crypto/ethsecp256k1"
-	"github.com/evmos/ethermint/ethereum/eip712"
-	ethermint "github.com/evmos/ethermint/types"
-	evmtypes "github.com/evmos/ethermint/x/evm/types"
+
+	"github.com/bitbadges/bitbadgeschain/x/ethermint/crypto/ethsecp256k1"
+	"github.com/bitbadges/bitbadgeschain/x/ethermint/ethereum/eip712"
+	etherminttypes "github.com/bitbadges/bitbadgeschain/x/ethermint/types"
+	ethermint "github.com/bitbadges/bitbadgeschain/x/ethermint/utils"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	badges "github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -41,12 +43,12 @@ func init() {
 // CONTRACT: Pubkeys are set in context for all signers before this decorator runs
 // CONTRACT: Tx must implement SigVerifiableTx interface
 type Eip712SigVerificationDecorator struct {
-	ak              evmtypes.AccountKeeper
+	ak              ante.AccountKeeper
 	signModeHandler authsigning.SignModeHandler
 }
 
 // NewEip712SigVerificationDecorator creates a new Eip712SigVerificationDecorator
-func NewEip712SigVerificationDecorator(ak evmtypes.AccountKeeper, signModeHandler authsigning.SignModeHandler) Eip712SigVerificationDecorator {
+func NewEip712SigVerificationDecorator(ak ante.AccountKeeper, signModeHandler authsigning.SignModeHandler) Eip712SigVerificationDecorator {
 	return Eip712SigVerificationDecorator{
 		ak:              ak,
 		signModeHandler: signModeHandler,
@@ -198,7 +200,7 @@ func VerifySignature(
 			return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "tx doesnt contain expected amount of extension options")
 		}
 
-		extOpt, ok := opts[0].GetCachedValue().(*ethermint.ExtensionOptionsWeb3Tx)
+		extOpt, ok := opts[0].GetCachedValue().(*etherminttypes.ExtensionOptionsWeb3Tx)
 		if !ok {
 			return sdkerrors.Wrap(types.ErrInvalidChainID, "unknown extension option")
 		}
@@ -221,7 +223,8 @@ func VerifySignature(
 
 		firstMsg := msgs[0] //since EIP712 doesn't support multiple types in same array so all must be same message type
 
-		typedData, err := eip712.WrapTxToTypedData(ethermintCodec, extOpt.TypedDataChainID, firstMsg, txBytes, feeDelegation)
+		typedData, err := eip712.LegacyWrapTxToTypedData(ethermintCodec, extOpt.TypedDataChainID, firstMsg, txBytes, feeDelegation)
+		// typedData, err := eip712.WrapTxToTypedData(extOpt.TypedDataChainID, txBytes)
 		if err != nil {
 			return sdkerrors.Wrap(err, "failed to pack tx data in EIP712 object")
 		}

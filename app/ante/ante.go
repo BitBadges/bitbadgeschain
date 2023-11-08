@@ -13,7 +13,7 @@ import (
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/evmos/ethermint/crypto/ethsecp256k1"
+	"github.com/bitbadges/bitbadgeschain/x/ethermint/crypto/ethsecp256k1"
 )
 
 const (
@@ -37,9 +37,6 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 			opts := txWithExtensions.GetExtensionOptions()
 			if len(opts) > 0 {
 				switch typeURL := opts[0].GetTypeUrl(); typeURL {
-				// case "/ethermint.evm.v1.ExtensionOptionsEthereumTx":
-				// 	// handle as *evmtypes.MsgEthereumTx
-				// 	anteHandler = newEthAnteHandler(options)
 				case "/ethermint.types.v1.ExtensionOptionsWeb3Tx":
 					// handle as normal Cosmos SDK tx, except signature is checked for EIP712 representation
 					anteHandler = newCosmosAnteHandlerEip712(options)

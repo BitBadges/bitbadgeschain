@@ -11,15 +11,13 @@ import (
 
 	ibcante "github.com/cosmos/ibc-go/v5/modules/core/ante"
 	ibckeeper "github.com/cosmos/ibc-go/v5/modules/core/keeper"
-
-	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
 // HandlerOptions extend the SDK's AnteHandler options by requiring the IBC
 // channel keeper, EVM Keeper and Fee Market Keeper.
 type HandlerOptions struct {
-	AccountKeeper   evmtypes.AccountKeeper
-	BankKeeper      evmtypes.BankKeeper
+	AccountKeeper   ante.AccountKeeper
+	BankKeeper      authtypes.BankKeeper
 	IBCKeeper       *ibckeeper.Keeper
 	FeegrantKeeper  ante.FeegrantKeeper
 	SignModeHandler authsigning.SignModeHandler

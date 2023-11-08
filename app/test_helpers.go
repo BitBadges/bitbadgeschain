@@ -21,8 +21,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-
-	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 )
 
 // func init() {
@@ -60,7 +58,6 @@ func init() {
 // Setup initializes a new app.
 func Setup(
 	isCheckTx bool,
-	feemarketGenesis *feemarkettypes.GenesisState,
 ) *App {
 	privVal := mock.NewPV()
 	pubKey, _ := privVal.GetPubKey()
@@ -85,13 +82,6 @@ func Setup(
 
 		genesisState = GenesisStateWithValSet(app, genesisState, valSet, []authtypes.GenesisAccount{acc}, balance)
 
-		// Verify feeMarket genesis
-		if feemarketGenesis != nil {
-			if err := feemarketGenesis.Validate(); err != nil {
-				panic(err)
-			}
-			genesisState[feemarkettypes.ModuleName] = app.AppCodec().MustMarshalJSON(feemarketGenesis)
-		}
 
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 		if err != nil {
