@@ -1,5 +1,5 @@
 syntax = "proto3";
-package bitbadges.bitbadgeschain.wasmx;
+package wasmx;
 
 import "gogoproto/gogo.proto";
 

@@ -19,17 +19,9 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgTransferBadges{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgDeleteCollection{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgUpdateUserApprovals{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgUpdateCollection{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateAddressMappings{},
 	)
 	// this line is used by starport scaffolding # 3

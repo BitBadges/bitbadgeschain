@@ -1,5 +1,5 @@
 syntax = "proto3";
-package bitbadges.bitbadgeschain.wasmx;
+package wasmx;
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/wasmx/types";
 

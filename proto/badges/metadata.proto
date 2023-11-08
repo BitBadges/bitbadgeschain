@@ -1,5 +1,5 @@
 syntax = "proto3";
-package bitbadges.bitbadgeschain.badges;
+package badges;
 
 import "google/protobuf/any.proto";
 import "badges/balances.proto";
