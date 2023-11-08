@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
-	"github.com/cosmos/cosmos-sdk/simapp"
+	simapp "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/ibc-go/v5/testing/mock"
 	abci "github.com/tendermint/tendermint/abci/types"
