@@ -36,6 +36,8 @@ require (
 
 require github.com/gogo/protobuf v1.3.2
 
+require github.com/xlab/closer v1.0.0 // indirect
+
 require (
 	cloud.google.com/go v0.110.9 // indirect
 	cloud.google.com/go/compute v1.23.2 // indirect
@@ -175,6 +177,7 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/ulikunitz/xz v0.5.11 // indirect
+	github.com/xlab/suplog v1.4.4
 	github.com/zondax/hid v0.9.2 // indirect
 	github.com/zondax/ledger-go v0.14.3 // indirect
 	go.etcd.io/bbolt v1.3.7 // indirect
@@ -200,3 +203,5 @@ require (
 
 // replace broken goleveldb
 replace github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
+
+replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1

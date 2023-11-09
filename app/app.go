@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -12,7 +13,9 @@ import (
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/log"
+
 	tmos "github.com/cometbft/cometbft/libs/os"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
@@ -95,6 +98,9 @@ import (
 	icahostkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/keeper"
 	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
 	icatypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/types"
+	ibcfee "github.com/cosmos/ibc-go/v7/modules/apps/29-fee"
+	ibcfeekeeper "github.com/cosmos/ibc-go/v7/modules/apps/29-fee/keeper"
+	ibcfeetypes "github.com/cosmos/ibc-go/v7/modules/apps/29-fee/types"
 	"github.com/cosmos/ibc-go/v7/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v7/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
@@ -112,6 +118,14 @@ import (
 	badgesmodule "github.com/bitbadges/bitbadgeschain/x/badges"
 	badgesmodulekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	badgesmoduletypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
+	"github.com/bitbadges/bitbadgeschain/x/wasmx"
+	wasmxkeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
+	wasmxtypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
@@ -172,9 +186,12 @@ var (
 		transfer.AppModuleBasic{},
 		ica.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		ibcfee.AppModuleBasic{},
 		consensus.AppModuleBasic{},
 		badgesmodule.AppModuleBasic{},
-		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		wasm.AppModuleBasic{},
+		wasmx.AppModuleBasic{},
+// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
 	// module account permissions
@@ -187,6 +204,9 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		wasmtypes.ModuleName:                {authtypes.Burner},
+		wasmxtypes.ModuleName:          {authtypes.Burner},
+		ibcfeetypes.ModuleName:         nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -238,19 +258,25 @@ type App struct {
 	ParamsKeeper          paramskeeper.Keeper
 	IBCKeeper             *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	EvidenceKeeper        evidencekeeper.Keeper
+	IBCFeeKeeper        ibcfeekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
 	ICAHostKeeper         icahostkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
+	WasmKeeper       wasm.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
+	ScopedIBCFeeKeeper        capabilitykeeper.ScopedKeeper
 
 	ScopedBadgesKeeper capabilitykeeper.ScopedKeeper
 	BadgesKeeper       badgesmodulekeeper.Keeper
+
+	ScopedWasmKeeper   capabilitykeeper.ScopedKeeper
+	WasmxKeeper wasmxkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -298,7 +324,10 @@ func New(
 		feegrant.StoreKey, evidencetypes.StoreKey, ibctransfertypes.StoreKey, icahosttypes.StoreKey,
 		capabilitytypes.StoreKey, group.StoreKey, icacontrollertypes.StoreKey, consensusparamtypes.StoreKey,
 		badgesmoduletypes.StoreKey,
-		// this line is used by starport scaffolding # stargate/app/storeKey
+		wasmtypes.StoreKey,
+		wasmxtypes.StoreKey,
+		ibcfeetypes.StoreKey,
+// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -449,6 +478,14 @@ func New(
 		scopedIBCKeeper,
 	)
 
+	app.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
+		appCodec, keys[ibcfeetypes.StoreKey],
+		app.IBCKeeper.ChannelKeeper, // may be replaced with IBC middleware
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper, app.AccountKeeper, app.BankKeeper,
+	)
+
+
 	// Create Transfer Keepers
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec,
@@ -532,11 +569,61 @@ func New(
 		scopedBadgesKeeper,
 	)
 	badgesModule := badgesmodule.NewAppModule(appCodec, app.BadgesKeeper, app.AccountKeeper, app.BankKeeper)
+	scopedWasmKeeper := app.CapabilityKeeper.ScopeToModule(wasmtypes.ModuleName)
+	app.ScopedWasmKeeper = scopedWasmKeeper
+	
+	wasmDir := filepath.Join(homePath, "wasm")
+	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
+	if err != nil {
+		panic(fmt.Sprintf("error while reading wasm config: %s", err))
+	}
+
+	customEncoderOptions := GetCustomMsgEncodersOptions()
+	customQueryOptions := GetCustomMsgQueryOptions(app.BadgesKeeper)
+	wasmOpts := append(customEncoderOptions, customQueryOptions...)
+	availableCapabilities := "iterator,staking,stargate,cosmwasm_1_1,cosmwasm_1_2,bitbadges"
+	
+	app.WasmKeeper = wasmkeeper.NewKeeper(
+		appCodec,
+		keys[wasmtypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.StakingKeeper,
+		distrkeeper.NewQuerier(app.DistrKeeper),
+		app.IBCFeeKeeper, // ISC4 Wrapper: fee IBC middleware
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedWasmKeeper,
+		app.TransferKeeper,
+		app.MsgServiceRouter(),
+		app.GRPCQueryRouter(),
+		wasmDir,
+		wasmConfig,
+		availableCapabilities,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		wasmOpts...,
+	)
+	app.WasmxKeeper.SetWasmKeeper(app.WasmKeeper)
+
+	app.WasmxKeeper = wasmxkeeper.NewKeeper(
+		appCodec,
+		keys[wasmxtypes.StoreKey],
+		app.GetSubspace(wasmxtypes.ModuleName),
+		app.AccountKeeper,
+		app.BankKeeper,
+	)
 
 	badgesIBCModule := badgesmodule.NewIBCModule(app.BadgesKeeper)
+	
+	wasmxModule := wasmx.NewAppModule(app.WasmxKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	/**** IBC Routing ****/
+	// Create fee enabled wasm ibc Stack
+	var wasmStack ibcporttypes.IBCModule
+	wasmStack = wasm.NewIBCHandler(app.WasmKeeper, app.IBCKeeper.ChannelKeeper, app.IBCFeeKeeper)
+	wasmStack = ibcfee.NewIBCMiddleware(wasmStack, app.IBCFeeKeeper)
 
 	// Sealing prevents other modules from creating scoped sub-keepers
 	app.CapabilityKeeper.Seal()
@@ -546,8 +633,12 @@ func New(
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
 	ibcRouter.AddRoute(badgesmoduletypes.ModuleName, badgesIBCModule)
-	// this line is used by starport scaffolding # ibc/app/router
+	ibcRouter.AddRoute(wasmtypes.ModuleName, wasmStack)
+
 	app.IBCKeeper.SetRouter(ibcRouter)
+
+	// this line is used by starport scaffolding # ibc/app/router
+
 
 	/**** Module Hooks ****/
 
@@ -594,10 +685,17 @@ func New(
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
+		wasmx.NewAppModule(
+			app.WasmxKeeper,
+			app.AccountKeeper,
+			app.BankKeeper,
+		),
 		transferModule,
 		icaModule,
 		badgesModule,
-		// this line is used by starport scaffolding # stargate/app/appModule
+		wasmxModule,
+// this line is used by starport scaffolding # stargate/app/appModule
 
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
 	)
@@ -630,7 +728,9 @@ func New(
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		badgesmoduletypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/beginBlockers
+		wasmtypes.ModuleName,
+		wasmxtypes.ModuleName,
+// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -656,7 +756,9 @@ func New(
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		badgesmoduletypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/endBlockers
+		wasmtypes.ModuleName,
+		wasmxtypes.ModuleName,
+// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -687,6 +789,8 @@ func New(
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		badgesmoduletypes.ModuleName,
+		wasmtypes.ModuleName,
+		wasmxtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)
@@ -744,14 +848,32 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
+	if manager := app.SnapshotManager(); manager != nil {
+		err := manager.RegisterExtensions(
+			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), &app.WasmKeeper),
+		)
+		if err != nil {
+			panic(fmt.Errorf("failed to register snapshot extension: %s", err))
+		}
+	}
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
 		}
+	
+		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
+
+		// Initialize pinned codes in wasmvm as they are not persisted there
+		if err := app.WasmKeeper.InitializePinnedCodes(ctx); err != nil {
+			tmos.Exit(fmt.Sprintf("failed initialize pinned codes %s", err))
+		}
 	}
+
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
+	app.ScopedWasmKeeper = scopedWasmKeeper
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 
 	return app
@@ -919,7 +1041,9 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(badgesmoduletypes.ModuleName)
-	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(wasmtypes.ModuleName)
+	paramsKeeper.Subspace(wasmxtypes.ModuleName)
+// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
 }
