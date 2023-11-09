@@ -28,9 +28,9 @@ import (
 // codec.
 func RegisterCrypto(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&ethsecp256k1.PubKey{},
-		ethsecp256k1.PubKeyName, nil)
+		"ethermint/PubKey", nil)
 	cdc.RegisterConcrete(&ethsecp256k1.PrivKey{},
-		ethsecp256k1.PrivKeyName, nil)
+		"ethermint/PrivKey", nil)
 
 	keyring.RegisterLegacyAminoCodec(cdc)
 	cryptocodec.RegisterCrypto(cdc)

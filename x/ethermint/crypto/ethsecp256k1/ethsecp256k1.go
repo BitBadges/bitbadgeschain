@@ -42,10 +42,10 @@ const (
 
 // Amino encoding names
 const (
-	// PrivKeyName defines the amino encoding name for the EthSecp256k1 private key
-	PrivKeyName = "ethermint/PrivKeyEthSecp256k1"
-	// PubKeyName defines the amino encoding name for the EthSecp256k1 public key
-	PubKeyName = "ethermint/PubKeyEthSecp256k1"
+	// // PrivKeyName defines the amino encoding name for the EthSecp256k1 private key
+	// PrivKeyName = "ethermint/PrivKeyEthSecp256k1"
+	// // PubKeyName defines the amino encoding name for the EthSecp256k1 public key
+	// PubKeyName = "ethermint/PubKeyEthSecp256k1"
 )
 
 // ----------------------------------------------------------------------------
@@ -176,10 +176,10 @@ func (pubKey PubKey) Bytes() []byte {
 	return bz
 }
 
-// String implements the fmt.Stringer interface.
-func (pubKey PubKey) String() string {
-	return fmt.Sprintf("EthPubKeySecp256k1{%X}", pubKey.Key)
-}
+// // String implements the fmt.Stringer interface.
+// func (pubKey PubKey) String() string {
+// 	return fmt.Sprintf("EthPubKeySecp256k1{%X}", pubKey.Key)
+// }
 
 // Type returns eth_secp256k1
 func (pubKey PubKey) Type() string {
