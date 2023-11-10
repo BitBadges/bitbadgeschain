@@ -53,10 +53,30 @@ func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Typ
 }
 
 // Certain fields are omitted (when uint64 is 0, bool is false, etc) when serialized with Proto and Amino. EIP712 doesn't support optional fields, so we add the omitted empty values back in here.
-func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (apitypes.TypedData, error) {
-	typesMap := GetMsgValueTypes(msgType)
+func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string, msgKey string) (apitypes.TypedData, error) {
+	typesMap, msgType := GetMsgValueTypes(msgType)
 	for key, value := range typesMap {
 		typedData.Types[key] = value
+	}
+
+	//get suffix key from msgKey
+	//msg0 -> 0
+	msgKeySuffix := msgKey[3:] //remove "msg"
+	
+
+	newTxTypes := []apitypes.Type{}
+	for _, value := range typedData.Types["Tx"] {
+		if value.Name == msgKey {
+			value.Type = "MsgValue" + msgKeySuffix
+			newTxTypes = append(newTxTypes, value)
+		} else {
+			newTxTypes = append(newTxTypes, value)
+		}
+	}
+	typedData.Types["Tx"] = newTxTypes
+	typedData.Types["MsgValue" + msgKeySuffix] = []apitypes.Type{
+		{ Name: "type", Type: "string" },
+		{ Name: "value", Type: msgType },
 	}
 
 	//Remove the types in typedData.Types that begin with the prefix Type
@@ -69,23 +89,23 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData, msgType string) (api
 		}
 	}
 
-	msgValue, ok := typedData.Message["msgs"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})
+	msgValue, ok := typedData.Message[msgKey].(map[string]interface{})["value"].(map[string]interface{})
 	if !ok {
 		return typedData, sdkerrors.Wrap(ErrInvalidTypedData, "message is not a map[string]interface{}")
 	}
 
-	normalizedMsgValue, err := NormalizeEmptyTypes(typedData, typedData.Types["MsgValue"], msgValue)
+	normalizedMsgValue, err := NormalizeEmptyTypes(typedData, typedData.Types[msgType], msgValue)
 	if err != nil {
 		return typedData, err
 	}
 
-	typedData.Message["msgs"].([]interface{})[0].(map[string]interface{})["value"] = normalizedMsgValue
+	typedData.Message[msgKey].(map[string]interface{})["value"] = normalizedMsgValue
 
 	return typedData, nil
 }
 
 // first bool is if URI is needed, second is if ID Range is needed
-func GetMsgValueTypes(route string) map[string][]apitypes.Type {
+func GetMsgValueTypes(route string) (map[string][]apitypes.Type, string) {
 	uintRangeTypes := []apitypes.Type{
 		{Name: "start", Type: "string"},
 		{Name: "end", Type: "string"},
@@ -241,15 +261,15 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 
 	case TypeMsgDeleteCollection:
 		return map[string][]apitypes.Type{
-			"MsgValue": {
+			"MsgDeleteCollection" : {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "string"},
 			},
-		}
+		}, "MsgDeleteCollection"
 		
 	case TypeMsgCreateAddressMappings:
 		return map[string][]apitypes.Type{
-			"MsgValue": {
+			"MsgCreateAddressMappings" : {
 				{Name: "creator", Type: "string"},
 				{Name: "addressMappings", Type: "AddressMapping[]"},
 			},
@@ -260,10 +280,10 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 				{Name: "uri", Type: "string"},
 				{Name: "customData", Type: "string"},
 			},
-		}
+		}, "MsgCreateAddressMappings"
 	case TypeMsgTransferBadges:
 		return map[string][]apitypes.Type{
-			"MsgValue": {
+			"MsgTransferBadges" : {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "string"},
 				{Name: "transfers", Type: "Transfer[]"},
@@ -288,11 +308,11 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			},
 			"MerkleProof": proofTypes,
 			"MerklePathItem": proofItemTypes,
-		}
+		}, "MsgTransferBadges"
 
 	case TypeMsgUpdateUserApprovals:
 		return map[string][]apitypes.Type{
-			"MsgValue": {
+			"MsgUpdateUserApprovals" : {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "string"},
 				{Name: "updateOutgoingApprovals", Type: "bool"},
@@ -324,12 +344,12 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			"ManualBalances":  ManualBalancesTypes,
 			"IncrementedBalances": IncrementedBalancesTypes,
 			"PredeterminedOrderCalculationMethod": PredeterminedOrderCalculationMethodTypes,
-		}
+		}, "MsgUpdateUserApprovals"
 	
 	
 	case TypeMsgUpdateCollection:
 		return map[string][]apitypes.Type{
-			"MsgValue": {
+			"MsgUpdateCollection" : {
 				{Name: "creator", Type: "string"},
 				{Name: "collectionId", Type: "string"},
 				{Name: "balancesType", Type: "string"},
@@ -488,8 +508,8 @@ func GetMsgValueTypes(route string) map[string][]apitypes.Type {
 			"ManualBalances":  ManualBalancesTypes,
 			"IncrementedBalances": IncrementedBalancesTypes,
 			"PredeterminedOrderCalculationMethod": PredeterminedOrderCalculationMethodTypes,
-		}
+		}, "MsgUpdateCollection"
 	default:
-		return map[string][]apitypes.Type{}
+		return map[string][]apitypes.Type{}, ""
 	}
 }

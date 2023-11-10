@@ -157,7 +157,7 @@ func VerifySignature(
 			return sdkerrors.Wrapf(types.ErrNotSupported, "unexpected SignatureData %T: wrong SignMode", sigData)
 		}
 
-		// Note: this prevents the user from sending thrash data in the signature field
+		// Note: this prevents the user from sending trash data in the signature field
 		if len(data.Signature) != 0 {
 			return sdkerrors.Wrap(types.ErrTooManySignatures, "invalid signature value; EIP712 must have the cosmos transaction signature empty")
 		}
@@ -169,9 +169,7 @@ func VerifySignature(
 		if len(msgs) == 0 {
 			return sdkerrors.Wrap(types.ErrNoSignatures, "tx doesn't contain any msgs to verify signature")
 		}
-
-		// return sdkerrors.Wrapf(types.ErrNoSignatures, "%s tx doesn't contain any msgs to verify signature", msgs)
-
+		
 		txBytes := legacytx.StdSignBytes(
 			signerData.ChainID,
 			signerData.AccountNumber,
@@ -181,20 +179,18 @@ func VerifySignature(
 				Amount: tx.GetFee(),
 				Gas:    tx.GetGas(),
 			},
-			msgs, tx.GetMemo(),
-			nil,
+			msgs, tx.GetMemo(), tx.GetTip(),
 		)
 
 		signerChainID, err := ethermint.ParseChainID(signerData.ChainID)
 		if err != nil {
-			return sdkerrors.Wrapf(err, "failed to parse chainID: %s", signerData.ChainID)
+			return sdkerrors.Wrapf(err, "failed to parse chain-id: %s", signerData.ChainID)
 		}
 
 		txWithExtensions, ok := tx.(authante.HasExtensionOptionsTx)
 		if !ok {
 			return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "tx doesnt contain any extensions")
 		}
-
 		opts := txWithExtensions.GetExtensionOptions()
 		if len(opts) != 1 {
 			return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "tx doesnt contain expected amount of extension options")
@@ -202,11 +198,11 @@ func VerifySignature(
 
 		extOpt, ok := opts[0].GetCachedValue().(*etherminttypes.ExtensionOptionsWeb3Tx)
 		if !ok {
-			return sdkerrors.Wrap(types.ErrInvalidChainID, "unknown extension option")
+			return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "unknown extension option")
 		}
 
 		if extOpt.TypedDataChainID != signerChainID.Uint64() {
-			return sdkerrors.Wrapf(types.ErrInvalidChainID, "invalid chainID: %d vs. %d", extOpt.TypedDataChainID, signerChainID.Uint64())
+			return sdkerrors.Wrap(types.ErrInvalidChainID, "invalid chain-id")
 		}
 
 		if len(extOpt.FeePayer) == 0 {
@@ -217,14 +213,7 @@ func VerifySignature(
 			return sdkerrors.Wrap(err, "failed to parse feePayer from ExtensionOptionsWeb3Tx")
 		}
 
-		feeDelegation := &eip712.FeeDelegationOptions{
-			FeePayer: feePayer,
-		}
-
-		firstMsg := msgs[0] //since EIP712 doesn't support multiple types in same array so all must be same message type
-
-		typedData, err := eip712.LegacyWrapTxToTypedData(ethermintCodec, extOpt.TypedDataChainID, firstMsg, txBytes, feeDelegation)
-		// typedData, err := eip712.WrapTxToTypedData(extOpt.TypedDataChainID, txBytes)
+		typedData, err := eip712.WrapTxToTypedData(extOpt.TypedDataChainID, txBytes)
 		if err != nil {
 			return sdkerrors.Wrap(err, "failed to pack tx data in EIP712 object")
 		}
@@ -262,20 +251,21 @@ func VerifySignature(
 		//Normalize the typedData to handle empty (0, "", false), nested objects, and arrays.
 		//Also, add in any missing types for the EIP712 typedData specific to our badges module.
 		//Only check first message because eip712 only supports one message per tx
-		wrappedFirstMsg, ok := firstMsg.(legacytx.LegacyMsg)
-		if ok {
-			if wrappedFirstMsg.Route() == "badges" {
-				typedData, err = badges.NormalizeEIP712TypedData(typedData, wrappedFirstMsg.Type())
-				// return sdkerrors.Wrapf(types.ErrInvalidChainID, "typedData : %s", typedData)
-				if err != nil {
-					return sdkerrors.Wrap(err, "failed to normalize EIP712 typed data for badges module %s")
+		for i, msg := range msgs {
+			wrappedMsg, ok := msg.(legacytx.LegacyMsg)
+			if ok {
+				if wrappedMsg.Route() == "badges" {
+					typedData, err = badges.NormalizeEIP712TypedData(typedData, wrappedMsg.Type(), "msg" + fmt.Sprintf("%d", i))
+					if err != nil {
+						return sdkerrors.Wrap(err, "failed to normalize EIP712 typed data for badges module")
+					}
 				}
 			}
 		}
 
 		sigHash, _, err := apitypes.TypedDataAndHash(typedData)
 		if err != nil {
-			return sdkerrors.Wrapf(err, "%v failed to compute typed data hash", typedData)
+			return sdkerrors.Wrapf(err, "failed to compute typed data hash")
 		}
 
 		// return sdkerrors.Wrapf(types.ErrInvalidChainID, "%s %s", typedData, sigHash)
