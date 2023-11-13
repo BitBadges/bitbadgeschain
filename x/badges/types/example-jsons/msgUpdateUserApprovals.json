@@ -1,0 +1,378 @@
+{
+  "type": "badges/UpdateUserApprovals",
+  "value": {
+    "creator": "",
+    "collectionId": "",
+    "updateOutgoingApprovals": false,
+    "outgoingApprovals": [
+      {
+        "toMappingId": "",
+        "initiatedByMappingId": "",
+        "transferTimes": [
+          {
+            "start": "",
+            "end": ""
+          }
+        ],
+        "badgeIds": [
+          {
+            "start": "",
+            "end": ""
+          }
+        ],
+        "ownershipTimes": [
+          {
+            "start": "",
+            "end": ""
+          }
+        ],
+        "amountTrackerId": "",
+        "challengeTrackerId": "",
+        "uri": "",
+        "customData": "",
+        "approvalId": "",
+        "approvalCriteria": {
+          "mustOwnBadges": [
+            {
+              "collectionId": "",
+              "amountRange": {
+                "start": "",
+                "end": ""
+              },
+              "ownershipTimes": [
+                {
+                  "start": "",
+                  "end": ""
+                }
+              ],
+              "badgeIds": [
+                {
+                  "start": "",
+                  "end": ""
+                }
+              ],
+              "overrideWithCurrentTime": false,
+              "mustOwnAll": false
+            }
+          ],
+          "merkleChallenge": {
+            "root": "",
+            "expectedProofLength": "",
+            "useCreatorAddressAsLeaf": false,
+            "maxUsesPerLeaf": "",
+            "uri": "",
+            "customData": ""
+          },
+          "predeterminedBalances": {
+            "manualBalances": [
+              {
+                "balances": [
+                  {
+                    "amount": "",
+                    "ownershipTimes": [
+                      {
+                        "start": "",
+                        "end": ""
+                      }
+                    ],
+                    "badgeIds": [
+                      {
+                        "start": "",
+                        "end": ""
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "incrementedBalances": {
+              "startBalances": [
+                {
+                  "amount": "",
+                  "ownershipTimes": [
+                    {
+                      "start": "",
+                      "end": ""
+                    }
+                  ],
+                  "badgeIds": [
+                    {
+                      "start": "",
+                      "end": ""
+                    }
+                  ]
+                }
+              ],
+              "incrementBadgeIdsBy": "",
+              "incrementOwnershipTimesBy": ""
+            },
+            "orderCalculationMethod": {
+              "useOverallNumTransfers": false,
+              "usePerToAddressNumTransfers": false,
+              "usePerFromAddressNumTransfers": false,
+              "usePerInitiatedByAddressNumTransfers": false,
+              "useMerkleChallengeLeafIndex": false
+            }
+          },
+          "approvalAmounts": {
+            "overallApprovalAmount": "",
+            "perToAddressApprovalAmount": "",
+            "perFromAddressApprovalAmount": "",
+            "perInitiatedByAddressApprovalAmount": ""
+          },
+          "maxNumTransfers": {
+            "overallMaxNumTransfers": "",
+            "perToAddressMaxNumTransfers": "",
+            "perFromAddressMaxNumTransfers": "",
+            "perInitiatedByAddressMaxNumTransfers": ""
+          },
+          "requireToEqualsInitiatedBy": false,
+          "requireToDoesNotEqualInitiatedBy": false
+        }
+      }
+    ],
+    "updateIncomingApprovals": false,
+    "incomingApprovals": [
+      {
+        "fromMappingId": "",
+        "initiatedByMappingId": "",
+        "transferTimes": [
+          {
+            "start": "",
+            "end": ""
+          }
+        ],
+        "badgeIds": [
+          {
+            "start": "",
+            "end": ""
+          }
+        ],
+        "ownershipTimes": [
+          {
+            "start": "",
+            "end": ""
+          }
+        ],
+        "amountTrackerId": "",
+        "challengeTrackerId": "",
+        "uri": "",
+        "customData": "",
+        "approvalId": "",
+        "approvalCriteria": {
+          "mustOwnBadges": [
+            {
+              "collectionId": "",
+              "amountRange": {
+                "start": "",
+                "end": ""
+              },
+              "ownershipTimes": [
+                {
+                  "start": "",
+                  "end": ""
+                }
+              ],
+              "badgeIds": [
+                {
+                  "start": "",
+                  "end": ""
+                }
+              ],
+              "overrideWithCurrentTime": false,
+              "mustOwnAll": false
+            }
+          ],
+          "merkleChallenge": {
+            "root": "",
+            "expectedProofLength": "",
+            "useCreatorAddressAsLeaf": false,
+            "maxUsesPerLeaf": "",
+            "uri": "",
+            "customData": ""
+          },
+          "predeterminedBalances": {
+            "manualBalances": [
+              {
+                "balances": [
+                  {
+                    "amount": "",
+                    "ownershipTimes": [
+                      {
+                        "start": "",
+                        "end": ""
+                      }
+                    ],
+                    "badgeIds": [
+                      {
+                        "start": "",
+                        "end": ""
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "incrementedBalances": {
+              "startBalances": [
+                {
+                  "amount": "",
+                  "ownershipTimes": [
+                    {
+                      "start": "",
+                      "end": ""
+                    }
+                  ],
+                  "badgeIds": [
+                    {
+                      "start": "",
+                      "end": ""
+                    }
+                  ]
+                }
+              ],
+              "incrementBadgeIdsBy": "",
+              "incrementOwnershipTimesBy": ""
+            },
+            "orderCalculationMethod": {
+              "useOverallNumTransfers": false,
+              "usePerToAddressNumTransfers": false,
+              "usePerFromAddressNumTransfers": false,
+              "usePerInitiatedByAddressNumTransfers": false,
+              "useMerkleChallengeLeafIndex": false
+            }
+          },
+          "approvalAmounts": {
+            "overallApprovalAmount": "",
+            "perToAddressApprovalAmount": "",
+            "perFromAddressApprovalAmount": "",
+            "perInitiatedByAddressApprovalAmount": ""
+          },
+          "maxNumTransfers": {
+            "overallMaxNumTransfers": "",
+            "perToAddressMaxNumTransfers": "",
+            "perFromAddressMaxNumTransfers": "",
+            "perInitiatedByAddressMaxNumTransfers": ""
+          },
+          "requireFromEqualsInitiatedBy": false,
+          "requireFromDoesNotEqualInitiatedBy": false
+        }
+      }
+    ],
+    "updateAutoApproveSelfInitiatedOutgoingTransfers": false,
+    "autoApproveSelfInitiatedOutgoingTransfers": false,
+    "updateAutoApproveSelfInitiatedIncomingTransfers": false,
+    "autoApproveSelfInitiatedIncomingTransfers": false,
+    "updateUserPermissions": false,
+    "userPermissions": {
+      "canUpdateOutgoingApprovals": [
+        {
+          "toMappingId": "",
+          "initiatedByMappingId": "",
+          "transferTimes": [
+            {
+              "start": "",
+              "end": ""
+            }
+          ],
+          "badgeIds": [
+            {
+              "start": "",
+              "end": ""
+            }
+          ],
+          "ownershipTimes": [
+            {
+              "start": "",
+              "end": ""
+            }
+          ],
+          "amountTrackerId": "",
+          "challengeTrackerId": "",
+          "permittedTimes": [
+            {
+              "start": "",
+              "end": ""
+            }
+          ],
+          "forbiddenTimes": [
+            {
+              "start": "",
+              "end": ""
+            }
+          ]
+        }
+      ],
+      "canUpdateIncomingApprovals": [
+        {
+          "fromMappingId": "",
+          "initiatedByMappingId": "",
+          "transferTimes": [
+            {
+              "start": "",
+              "end": ""
+            }
+          ],
+          "badgeIds": [
+            {
+              "start": "",
+              "end": ""
+            }
+          ],
+          "ownershipTimes": [
+            {
+              "start": "",
+              "end": ""
+            }
+          ],
+          "amountTrackerId": "",
+          "challengeTrackerId": "",
+          "permittedTimes": [
+            {
+              "start": "",
+              "end": ""
+            }
+          ],
+          "forbiddenTimes": [
+            {
+              "start": "",
+              "end": ""
+            }
+          ]
+        }
+      ],
+      "canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [
+        {
+          "permittedTimes": [
+            {
+              "start": "",
+              "end": ""
+            }
+          ],
+          "forbiddenTimes": [
+            {
+              "start": "",
+              "end": ""
+            }
+          ]
+        }
+      ],
+      "canUpdateAutoApproveSelfInitiatedIncomingTransfers": [
+        {
+          "permittedTimes": [
+            {
+              "start": "",
+              "end": ""
+            }
+          ],
+          "forbiddenTimes": [
+            {
+              "start": "",
+              "end": ""
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

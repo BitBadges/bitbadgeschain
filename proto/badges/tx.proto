@@ -36,7 +36,6 @@ message BadgeCustomMsgType {
 message MsgUpdateCollection {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; //0 for new collection
-
   //The following section of fields are only allowed to be set upon creation of a new collection.
   string balancesType = 3;
 

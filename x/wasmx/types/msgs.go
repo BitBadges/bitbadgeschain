@@ -42,6 +42,7 @@ func (msg MsgExecuteContractCompat) ValidateBasic() error {
 	return nil
 }
 
+//Note ModuleCdc is Amino (see codec.go)
 func (msg MsgExecuteContractCompat) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }

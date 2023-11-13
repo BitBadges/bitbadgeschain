@@ -14,7 +14,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 
-	"github.com/ethereum/go-ethereum/common/math"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 
@@ -24,7 +23,6 @@ import (
 	ethermint "github.com/bitbadges/bitbadgeschain/x/ethermint/utils"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	badges "github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 )
@@ -213,62 +211,27 @@ func VerifySignature(
 			return sdkerrors.Wrap(err, "failed to parse feePayer from ExtensionOptionsWeb3Tx")
 		}
 
+		//This uses the new EIP712 wrapper, not legacy
+		//This accounts for multiple msgs, not just one
 		typedData, err := eip712.WrapTxToTypedData(extOpt.TypedDataChainID, txBytes)
 		if err != nil {
 			return sdkerrors.Wrap(err, "failed to pack tx data in EIP712 object")
 		}
-		typedData.Domain = apitypes.TypedDataDomain{
-			Name:              "BitBadges",
-			Version:           "1.0.0",
-			ChainId:           math.NewHexOrDecimal256(int64(extOpt.TypedDataChainID)),
-			VerifyingContract: "0x1a16c87927570239fecd343ad2654fd81682725e",
-			Salt:              "0x5d1e2c0e9b8a5c395979525d5f6d5f0c595d5a5c5e5e5b5d5ecd5a5e5d2e5412",
+		
+		//Within the wrapping proess, we added types for values that may not be in the message payload
+		//but are expectd by the EIP712 typedData.  We need to add the empty values ("", false, 0) to the
+		//message payload
+		typedData, err = eip712.NormalizeEIP712TypedData(typedData)
+		if err != nil {
+			return sdkerrors.Wrap(err, "failed to normalize EIP712 typed data for badges module")
 		}
 
-		typedData.Types["EIP712Domain"] = []apitypes.Type{
-			{
-				Name: "name",
-				Type: "string",
-			},
-			{
-				Name: "version",
-				Type: "string",
-			},
-			{
-				Name: "chainId",
-				Type: "uint256",
-			},
-			{
-				Name: "verifyingContract",
-				Type: "address",
-			},
-			{
-				Name: "salt",
-				Type: "bytes32",
-			},
-		}
-
-		//Normalize the typedData to handle empty (0, "", false), nested objects, and arrays.
-		//Also, add in any missing types for the EIP712 typedData specific to our badges module.
-		//Only check first message because eip712 only supports one message per tx
-		for i, msg := range msgs {
-			wrappedMsg, ok := msg.(legacytx.LegacyMsg)
-			if ok {
-				if wrappedMsg.Route() == "badges" {
-					typedData, err = badges.NormalizeEIP712TypedData(typedData, wrappedMsg.Type(), "msg" + fmt.Sprintf("%d", i))
-					if err != nil {
-						return sdkerrors.Wrap(err, "failed to normalize EIP712 typed data for badges module")
-					}
-				}
-			}
-		}
+		// return sdkerrors.Wrapf(types.ErrInvalidChainID, "%s", typedData)
 
 		sigHash, _, err := apitypes.TypedDataAndHash(typedData)
 		if err != nil {
 			return sdkerrors.Wrapf(err, "failed to compute typed data hash")
 		}
-
-		// return sdkerrors.Wrapf(types.ErrInvalidChainID, "%s %s", typedData, sigHash)
 
 		feePayerSig := extOpt.FeePayerSig
 		if len(feePayerSig) != ethcrypto.SignatureLength {

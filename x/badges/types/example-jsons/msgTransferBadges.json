@@ -1,0 +1,55 @@
+{
+  "type": "badges/TransferBadges",
+  "value": {
+    "creator": "",
+    "collectionId": "",
+    "transfers": [
+      {
+        "from": "",
+        "toAddresses": [],
+        "balances": [
+          {
+            "amount": "",
+            "ownershipTimes": [
+              {
+                "start": "",
+                "end": ""
+              }
+            ],
+            "badgeIds": [
+              {
+                "start": "",
+                "end": ""
+              }
+            ]
+          }
+        ],
+        "precalculateBalancesFromApproval": {
+          "approvalId": "",
+          "approvalLevel": "",
+          "approverAddress": ""
+        },
+        "merkleProofs": [
+          {
+            "leaf": "",
+            "aunts": [
+              {
+                "aunt": "",
+                "onRight": false
+              }
+            ]
+          }
+        ],
+        "memo": "",
+        "prioritizedApprovals": [
+          {
+            "approvalId": "",
+            "approvalLevel": "",
+            "approverAddress": ""
+          }
+        ],
+        "onlyCheckPrioritizedApprovals": false
+      }
+    ]
+  }
+}

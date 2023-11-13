@@ -20,5 +20,6 @@ message AddressMapping {
 
   string uri = 4;
   string customData = 5;
+  
   string createdBy = 6;
 }
