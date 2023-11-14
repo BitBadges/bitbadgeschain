@@ -35,7 +35,7 @@ func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Typ
 		} else if typeStr == "string" && value == nil {
 			mapObject[typeObj.Name] = ""
 		} else if typeStr == "uint64" && value == nil {
-			mapObject[typeObj.Name] = "0" //TODO: not sure this is correct, but we on't use uint64s
+			mapObject[typeObj.Name] = "0" //TODO: not sure this is correct, but we don't use uint64s
 		} else if typeStr == "bool" && value == nil {
 			mapObject[typeObj.Name] = false
 		} else {

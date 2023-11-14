@@ -297,46 +297,53 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 				}
 			}
 			
-			if approvalCriteria.ApprovalAmounts == nil {
-				approvalCriteria.ApprovalAmounts = &ApprovalAmounts{}
+			
+			
+			if canChangeValues {
+				if approvalCriteria.ApprovalAmounts == nil {
+					approvalCriteria.ApprovalAmounts = &ApprovalAmounts{}
+				}
+
+				if approvalCriteria.ApprovalAmounts.OverallApprovalAmount.IsNil() {
+					approvalCriteria.ApprovalAmounts.OverallApprovalAmount = sdkmath.NewUint(0)
+				}
+				
+				if approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount.IsNil() {
+					approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount = sdkmath.NewUint(0)
+				}
+				
+				if approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount.IsNil() {
+					approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(0)
+				}
+				
+				if approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount.IsNil() {
+					approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount = sdkmath.NewUint(0)
+				}
 			}
 			
-			if approvalCriteria.ApprovalAmounts.OverallApprovalAmount.IsNil() {
-				approvalCriteria.ApprovalAmounts.OverallApprovalAmount = sdkmath.NewUint(0)
-			}
+		
 			
-			if approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount.IsNil() {
-				approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount = sdkmath.NewUint(0)
+			if canChangeValues {
+				if approvalCriteria.MaxNumTransfers == nil {
+					approvalCriteria.MaxNumTransfers = &MaxNumTransfers{}
+				}
+				
+				if approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsNil() {
+					approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers = sdkmath.NewUint(0)
+				}
+				
+				if approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers.IsNil() {
+					approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers = sdkmath.NewUint(0)
+				}
+				
+				if approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers.IsNil() {
+					approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(0)
+				}
+				
+				if approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsNil() {
+					approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers = sdkmath.NewUint(0)
+				}
 			}
-			
-			if approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount.IsNil() {
-				approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(0)
-			}
-			
-			if approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount.IsNil() {
-				approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount = sdkmath.NewUint(0)
-			}
-			
-			if approvalCriteria.MaxNumTransfers == nil {
-				approvalCriteria.MaxNumTransfers = &MaxNumTransfers{}
-			}
-			
-			if approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsNil() {
-				approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers = sdkmath.NewUint(0)
-			}
-			
-			if approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers.IsNil() {
-				approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers = sdkmath.NewUint(0)
-			}
-			
-			if approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers.IsNil() {
-				approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(0)
-			}
-			
-			if approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsNil() {
-				approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers = sdkmath.NewUint(0)
-			}
-			
 
 	
 			if approvalCriteria.PredeterminedBalances != nil {
@@ -346,11 +353,14 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers &&
 					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers
 
-				sequentialTransferIsBasicallyNil :=
-				approvalCriteria.PredeterminedBalances.IncrementedBalances == nil || (approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances == nil &&
-					approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsZero() &&
-					approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy.IsZero())
-
+				sequentialTransferIsBasicallyNil := approvalCriteria.PredeterminedBalances.IncrementedBalances == nil || (approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances == nil &&
+					(
+						approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsNil() ||
+						approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsZero()) &&
+					(
+						approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy.IsNil() ||
+						approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy.IsZero()))
+						
 
 					manualBalancesIsBasicallyNil := approvalCriteria.PredeterminedBalances.ManualBalances == nil
 
