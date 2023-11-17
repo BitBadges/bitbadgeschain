@@ -418,8 +418,34 @@ func SetBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error) {
 		return balances[i].Amount.LT(balances[j].Amount)
 	})
 
+	//See if we can merge on a cross-balance level
+	newBalances := []*Balance{}
+	for i := 0; i < len(balances); i++ {
+		currBalance := balances[i]
 
-	return balances, err
+		merged := false
+		for _, existingBalance := range newBalances {
+			if currBalance.Amount.Equal(existingBalance.Amount) {
+				if compareSlices(currBalance.BadgeIds, existingBalance.BadgeIds) {
+					existingBalance.OwnershipTimes = append(existingBalance.OwnershipTimes, currBalance.OwnershipTimes...)
+					existingBalance.OwnershipTimes = SortUintRangesAndMergeAdjacentAndIntersecting(existingBalance.OwnershipTimes)
+					merged = true
+				} else if compareSlices(currBalance.OwnershipTimes, existingBalance.OwnershipTimes) {
+					existingBalance.BadgeIds = append(existingBalance.BadgeIds, currBalance.BadgeIds...)
+					existingBalance.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(existingBalance.BadgeIds)
+					merged = true
+				}
+			}
+		}
+
+		if !merged {
+			newBalances = append(newBalances, currBalance)
+		}
+	}
+
+
+
+	return newBalances, err
 }
 
 

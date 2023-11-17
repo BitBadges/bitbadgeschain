@@ -11,3 +11,5 @@ x/badges/keeper/coverage*
 cover.*
 
 commands.txt
+
+build/
