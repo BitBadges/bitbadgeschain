@@ -73,23 +73,23 @@ func GetAddressMapping(suite *TestSuite, ctx context.Context, mappingId string) 
 
 // /* Msg helpers */
 
-func UpdateCollection(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateCollection) error {
+func UpdateCollection(suite *TestSuite, ctx context.Context, msg *types.MsgUniversalUpdateCollection) error {
 	err := msg.ValidateBasic()
 	if err != nil {
 		return err
 	}
 
-	_, err = suite.msgServer.UpdateCollection(ctx, msg)
+	_, err = suite.msgServer.UniversalUpdateCollection(ctx, msg)
 	return err
 }
 
-func UpdateCollectionWithRes(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateCollection) (*types.MsgUpdateCollectionResponse, error) {
+func UpdateCollectionWithRes(suite *TestSuite, ctx context.Context, msg *types.MsgUniversalUpdateCollection) (*types.MsgUniversalUpdateCollectionResponse, error) {
 	err := msg.ValidateBasic()
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := suite.msgServer.UpdateCollection(ctx, msg)
+	res, err := suite.msgServer.UniversalUpdateCollection(ctx, msg)
 	return res, err
 }
 
@@ -133,7 +133,6 @@ func CreateAddressMappings(suite *TestSuite, ctx context.Context, msg *types.Msg
 	return err
 }
 
-
 /** Legacy casts for test compatibility */
 
 func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreate []*types.MsgNewCollection) error {
@@ -149,12 +148,12 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			return sdkerrors.Wrapf(types.ErrInvalidCollectionID, "Balances type %s not supported", collectionToCreate.BalancesType)
 		}
 
-		collectionRes, err := UpdateCollectionWithRes(suite, ctx, &types.MsgUpdateCollection{
-			CollectionId: sdkmath.NewUint(0),
-			Creator:      bob,
-			BalancesType: balancesType,
-			CollectionPermissions: collectionToCreate.Permissions,
-			CollectionApprovals: collectionToCreate.CollectionApprovals,
+		collectionRes, err := UpdateCollectionWithRes(suite, ctx, &types.MsgUniversalUpdateCollection{
+			CollectionId:             sdkmath.NewUint(0),
+			Creator:                  bob,
+			BalancesType:             balancesType,
+			CollectionPermissions:    collectionToCreate.Permissions,
+			CollectionApprovals:      collectionToCreate.CollectionApprovals,
 			DefaultOutgoingApprovals: collectionToCreate.DefaultOutgoingApprovals,
 			DefaultIncomingApprovals: collectionToCreate.DefaultIncomingApprovals,
 			// ManagerTimeline: []*types.ManagerTimeline{
@@ -163,26 +162,25 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			// 		TimelineTimes: GetFullUintRanges(),
 			// 	},
 			// },
-			CollectionMetadataTimeline: collectionToCreate.CollectionMetadataTimeline,
-			BadgeMetadataTimeline: collectionToCreate.BadgeMetadataTimeline,
+			CollectionMetadataTimeline:       collectionToCreate.CollectionMetadataTimeline,
+			BadgeMetadataTimeline:            collectionToCreate.BadgeMetadataTimeline,
 			OffChainBalancesMetadataTimeline: collectionToCreate.OffChainBalancesMetadataTimeline,
 			// InheritedCollectionId: collectionToCreate.InheritedCollectionId,
 			CustomDataTimeline: collectionToCreate.CustomDataTimeline,
-			StandardsTimeline: collectionToCreate.StandardsTimeline,
-			BadgesToCreate: collectionToCreate.BadgesToCreate,
+			StandardsTimeline:  collectionToCreate.StandardsTimeline,
+			BadgesToCreate:     collectionToCreate.BadgesToCreate,
 			// IsArchivedTimeline: collectionToCreate.IsArchivedTimeline,
-
 
 			// ManagerTimeline: collectionToCreate.ManagerTimeline,
 			UpdateCollectionPermissions: true,
 			// UpdateManagerTimeline: true,
-			UpdateCollectionMetadataTimeline: true,
-			UpdateBadgeMetadataTimeline: true,
+			UpdateCollectionMetadataTimeline:       true,
+			UpdateBadgeMetadataTimeline:            true,
 			UpdateOffChainBalancesMetadataTimeline: true,
-			
-			UpdateCustomDataTimeline: true,
+
+			UpdateCustomDataTimeline:  true,
 			UpdateCollectionApprovals: true,
-			UpdateStandardsTimeline: true,
+			UpdateStandardsTimeline:   true,
 			// UpdateIsArchivedTimeline: true,
 
 			DefaultAutoApproveSelfInitiatedOutgoingTransfers: !collectionToCreate.DefaultDisapproveSelfInitiated,
@@ -194,9 +192,9 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 
 		if len(collectionToCreate.Transfers) > 0 {
 			err = TransferBadges(suite, ctx, &types.MsgTransferBadges{
-				Creator: bob,
+				Creator:      bob,
 				CollectionId: collectionRes.CollectionId,
-				Transfers: collectionToCreate.Transfers,
+				Transfers:    collectionToCreate.Transfers,
 			})
 			if err != nil {
 				return err
@@ -204,113 +202,112 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 		}
 
 		err = CreateAddressMappings(suite, ctx, &types.MsgCreateAddressMappings{
-			Creator: bob,
+			Creator:         bob,
 			AddressMappings: collectionToCreate.AddressMappings,
 		})
 		if err != nil {
 			return err
 		}
-	
+
 	}
 	return nil
 }
 
 func MintAndDistributeBadges(suite *TestSuite, ctx context.Context, msg *types.MsgMintAndDistributeBadges) error {
-	_, err := suite.msgServer.UpdateCollection(ctx, &types.MsgUpdateCollection{
-		Creator: bob,
-		CollectionId: msg.CollectionId,
-		BadgesToCreate: msg.BadgesToCreate,
-		CollectionMetadataTimeline: msg.CollectionMetadataTimeline,
-		UpdateCollectionMetadataTimeline: true,
-		BadgeMetadataTimeline: msg.BadgeMetadataTimeline,
-		UpdateBadgeMetadataTimeline: true,
-		OffChainBalancesMetadataTimeline: msg.OffChainBalancesMetadataTimeline,
+	_, err := suite.msgServer.UniversalUpdateCollection(ctx, &types.MsgUniversalUpdateCollection{
+		Creator:                                bob,
+		CollectionId:                           msg.CollectionId,
+		BadgesToCreate:                         msg.BadgesToCreate,
+		CollectionMetadataTimeline:             msg.CollectionMetadataTimeline,
+		UpdateCollectionMetadataTimeline:       true,
+		BadgeMetadataTimeline:                  msg.BadgeMetadataTimeline,
+		UpdateBadgeMetadataTimeline:            true,
+		OffChainBalancesMetadataTimeline:       msg.OffChainBalancesMetadataTimeline,
 		UpdateOffChainBalancesMetadataTimeline: true,
-		CollectionApprovals: msg.CollectionApprovals,
-		UpdateCollectionApprovals: true,
+		CollectionApprovals:                    msg.CollectionApprovals,
+		UpdateCollectionApprovals:              true,
 	})
 	if err != nil {
-		return err 
+		return err
 	}
 
 	if len(msg.Transfers) > 0 {
 		_, err = suite.msgServer.TransferBadges(ctx, &types.MsgTransferBadges{
-			Creator: bob,
+			Creator:      bob,
 			CollectionId: msg.CollectionId,
-			Transfers: msg.Transfers,
+			Transfers:    msg.Transfers,
 		})
 	}
 	return err
 }
 
-func UpdateCollectionApprovals(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateCollectionApprovals) error {
-	_, err := suite.msgServer.UpdateCollection(ctx, &types.MsgUpdateCollection{
-		Creator: bob,
-		CollectionId: msg.CollectionId,
-		CollectionApprovals: msg.CollectionApprovals,
+func UpdateCollectionApprovals(suite *TestSuite, ctx context.Context, msg *types.MsgUniversalUpdateCollectionApprovals) error {
+	_, err := suite.msgServer.UniversalUpdateCollection(ctx, &types.MsgUniversalUpdateCollection{
+		Creator:                   bob,
+		CollectionId:              msg.CollectionId,
+		CollectionApprovals:       msg.CollectionApprovals,
 		UpdateCollectionApprovals: true,
 	})
 	return err
 }
 
 func ArchiveCollection(suite *TestSuite, ctx context.Context, msg *types.MsgArchiveCollection) error {
-	_, err := suite.msgServer.UpdateCollection(ctx, &types.MsgUpdateCollection{
-		Creator: bob,
-		CollectionId: msg.CollectionId,
-		IsArchivedTimeline: msg.IsArchivedTimeline,
+	_, err := suite.msgServer.UniversalUpdateCollection(ctx, &types.MsgUniversalUpdateCollection{
+		Creator:                  bob,
+		CollectionId:             msg.CollectionId,
+		IsArchivedTimeline:       msg.IsArchivedTimeline,
 		UpdateIsArchivedTimeline: true,
 	})
 	return err
 }
 
 func UpdateManager(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateManager) error {
-	_, err := suite.msgServer.UpdateCollection(ctx, &types.MsgUpdateCollection{
-		Creator: bob,
-		CollectionId: msg.CollectionId,
-		ManagerTimeline: msg.ManagerTimeline,
+	_, err := suite.msgServer.UniversalUpdateCollection(ctx, &types.MsgUniversalUpdateCollection{
+		Creator:               bob,
+		CollectionId:          msg.CollectionId,
+		ManagerTimeline:       msg.ManagerTimeline,
 		UpdateManagerTimeline: true,
 	})
 	return err
 }
 
 func UpdateMetadata(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateMetadata) error {
-	_, err := suite.msgServer.UpdateCollection(ctx, &types.MsgUpdateCollection{
-		Creator: bob,
-		CollectionId: msg.CollectionId,
-		CollectionMetadataTimeline: msg.CollectionMetadataTimeline,
-		UpdateCollectionMetadataTimeline: true,
-		BadgeMetadataTimeline: msg.BadgeMetadataTimeline,
-		UpdateBadgeMetadataTimeline: true,
-		OffChainBalancesMetadataTimeline: msg.OffChainBalancesMetadataTimeline,
+	_, err := suite.msgServer.UniversalUpdateCollection(ctx, &types.MsgUniversalUpdateCollection{
+		Creator:                                bob,
+		CollectionId:                           msg.CollectionId,
+		CollectionMetadataTimeline:             msg.CollectionMetadataTimeline,
+		UpdateCollectionMetadataTimeline:       true,
+		BadgeMetadataTimeline:                  msg.BadgeMetadataTimeline,
+		UpdateBadgeMetadataTimeline:            true,
+		OffChainBalancesMetadataTimeline:       msg.OffChainBalancesMetadataTimeline,
 		UpdateOffChainBalancesMetadataTimeline: true,
-		StandardsTimeline: msg.StandardsTimeline,
-		UpdateStandardsTimeline: true,
-		CustomDataTimeline: msg.CustomDataTimeline,
-		UpdateCustomDataTimeline: true,
+		StandardsTimeline:                      msg.StandardsTimeline,
+		UpdateStandardsTimeline:                true,
+		CustomDataTimeline:                     msg.CustomDataTimeline,
+		UpdateCustomDataTimeline:               true,
 	})
 	if err != nil {
-		return err 
+		return err
 	}
 
 	return nil
 }
 
-func UpdateCollectionPermissions(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateCollectionPermissions) error {
-	_, err := suite.msgServer.UpdateCollection(ctx, &types.MsgUpdateCollection{
-		Creator: bob,
-		CollectionId: msg.CollectionId,
-		CollectionPermissions: msg.Permissions,
+func UpdateCollectionPermissions(suite *TestSuite, ctx context.Context, msg *types.MsgUniversalUpdateCollectionPermissions) error {
+	_, err := suite.msgServer.UniversalUpdateCollection(ctx, &types.MsgUniversalUpdateCollection{
+		Creator:                     bob,
+		CollectionId:                msg.CollectionId,
+		CollectionPermissions:       msg.Permissions,
 		UpdateCollectionPermissions: true,
 	})
 	return err
 }
 
-
 func UpdateUserPermissions(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateUserPermissions) error {
 	_, err := suite.msgServer.UpdateUserApprovals(ctx, &types.MsgUpdateUserApprovals{
-		Creator: bob,
-		CollectionId: msg.CollectionId,
-		UserPermissions: msg.Permissions,
+		Creator:               bob,
+		CollectionId:          msg.CollectionId,
+		UserPermissions:       msg.Permissions,
 		UpdateUserPermissions: true,
 	})
 	return err

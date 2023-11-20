@@ -29,7 +29,7 @@ func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.Addr
 
 	//if any char is a :
 	for _, char := range id {
-		if char == ':'  || char == '_' {
+		if char == ':' || char == '_' {
 			return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot contain : or _")
 		}
 	}
@@ -81,7 +81,7 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) 
 		splitAdresses := strings.Split(addresses, ":")
 		for _, address := range splitAdresses {
 			addressMapping.Addresses = append(addressMapping.Addresses, address)
-			
+
 			if err := types.ValidateAddress(address, true); err != nil {
 				return nil, sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping cannot contain invalid addresses")
 			}
@@ -142,7 +142,6 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) 
 		}
 		handled = true
 	}
-
 
 	if !handled {
 		addressMappingFetched, found := k.GetAddressMappingFromStore(ctx, addressMappingId)

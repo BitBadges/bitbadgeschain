@@ -13,12 +13,12 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 		approvalTrackerMapping := &types.AddressMapping{}
 		if permission.AmountTrackerId == "All" {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{},
+				Addresses:        []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{permission.AmountTrackerId},
+				Addresses:        []string{permission.AmountTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -26,12 +26,12 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 		challengeTrackerMapping := &types.AddressMapping{}
 		if permission.ChallengeTrackerId == "All" {
 			challengeTrackerMapping = &types.AddressMapping{
-				Addresses: []string{},
+				Addresses:        []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			challengeTrackerMapping = &types.AddressMapping{
-				Addresses: []string{permission.ChallengeTrackerId},
+				Addresses:        []string{permission.ChallengeTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -47,20 +47,20 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			BadgeIds:               permission.BadgeIds,
-			TransferTimes:          permission.TransferTimes,
-			OwnershipTimes: 				permission.OwnershipTimes,
-			FromMapping:            fromMapping,
-			InitiatedByMapping:     initiatedByMapping,
-			AmountTrackerIdMapping: approvalTrackerMapping,
+			BadgeIds:                  permission.BadgeIds,
+			TransferTimes:             permission.TransferTimes,
+			OwnershipTimes:            permission.OwnershipTimes,
+			FromMapping:               fromMapping,
+			InitiatedByMapping:        initiatedByMapping,
+			AmountTrackerIdMapping:    approvalTrackerMapping,
 			ChallengeTrackerIdMapping: challengeTrackerMapping,
-			
+
 			UsesBadgeIds:           true,
 			UsesTransferTimes:      true,
-			UsesOwnershipTimes: 		true,
+			UsesOwnershipTimes:     true,
 			UsesFromMapping:        true,
 			UsesInitiatedByMapping: true,
-			UsesAmountTrackerId: 	true,
+			UsesAmountTrackerId:    true,
 			UsesChallengeTrackerId: true,
 			PermittedTimes:         permission.PermittedTimes,
 			ForbiddenTimes:         permission.ForbiddenTimes,
@@ -75,12 +75,12 @@ func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.
 		approvalTrackerMapping := &types.AddressMapping{}
 		if permission.AmountTrackerId == "All" {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{},
+				Addresses:        []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{permission.AmountTrackerId},
+				Addresses:        []string{permission.AmountTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -88,12 +88,12 @@ func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.
 		challengeTrackerMapping := &types.AddressMapping{}
 		if permission.ChallengeTrackerId == "All" {
 			challengeTrackerMapping = &types.AddressMapping{
-				Addresses: []string{},
+				Addresses:        []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			challengeTrackerMapping = &types.AddressMapping{
-				Addresses: []string{permission.ChallengeTrackerId},
+				Addresses:        []string{permission.ChallengeTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -108,23 +108,22 @@ func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-				BadgeIds:               permission.BadgeIds,
-				TransferTimes:          permission.TransferTimes,
-				OwnershipTimes: 				permission.OwnershipTimes,
-				ToMapping:              toMapping,
-				InitiatedByMapping:     initiatedByMapping,
-				AmountTrackerIdMapping: approvalTrackerMapping,
-				ChallengeTrackerIdMapping: challengeTrackerMapping,
-				UsesAmountTrackerId: 	true,
-				UsesChallengeTrackerId: true,
-				UsesBadgeIds:           true,
-				UsesTransferTimes:      true,
-				UsesOwnershipTimes: 		true,
-				UsesToMapping:          true,
-				UsesInitiatedByMapping: true,
-				PermittedTimes:         permission.PermittedTimes,
-				ForbiddenTimes:         permission.ForbiddenTimes,
-
+			BadgeIds:                  permission.BadgeIds,
+			TransferTimes:             permission.TransferTimes,
+			OwnershipTimes:            permission.OwnershipTimes,
+			ToMapping:                 toMapping,
+			InitiatedByMapping:        initiatedByMapping,
+			AmountTrackerIdMapping:    approvalTrackerMapping,
+			ChallengeTrackerIdMapping: challengeTrackerMapping,
+			UsesAmountTrackerId:       true,
+			UsesChallengeTrackerId:    true,
+			UsesBadgeIds:              true,
+			UsesTransferTimes:         true,
+			UsesOwnershipTimes:        true,
+			UsesToMapping:             true,
+			UsesInitiatedByMapping:    true,
+			PermittedTimes:            permission.PermittedTimes,
+			ForbiddenTimes:            permission.ForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil
@@ -135,9 +134,9 @@ func (k Keeper) CastActionPermissionToUniversalPermission(actionPermission []*ty
 	for _, actionPermission := range actionPermission {
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			
-				PermittedTimes: actionPermission.PermittedTimes,
-				ForbiddenTimes: actionPermission.ForbiddenTimes,
+
+			PermittedTimes: actionPermission.PermittedTimes,
+			ForbiddenTimes: actionPermission.ForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil
@@ -149,12 +148,12 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 		approvalTrackerMapping := &types.AddressMapping{}
 		if collectionUpdatePermission.AmountTrackerId == "All" {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{},
+				Addresses:        []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{collectionUpdatePermission.AmountTrackerId},
+				Addresses:        []string{collectionUpdatePermission.AmountTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -162,12 +161,12 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 		challengeTrackerMapping := &types.AddressMapping{}
 		if collectionUpdatePermission.ChallengeTrackerId == "All" {
 			challengeTrackerMapping = &types.AddressMapping{
-				Addresses: []string{},
+				Addresses:        []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			challengeTrackerMapping = &types.AddressMapping{
-				Addresses: []string{collectionUpdatePermission.ChallengeTrackerId},
+				Addresses:        []string{collectionUpdatePermission.ChallengeTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -188,26 +187,26 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			
-				TransferTimes:          collectionUpdatePermission.TransferTimes,
-				OwnershipTimes: 				collectionUpdatePermission.OwnershipTimes,
-				ToMapping:              toMapping,
-				FromMapping:            fromMapping,
-				InitiatedByMapping:     initiatedByMapping,
-				BadgeIds:               collectionUpdatePermission.BadgeIds,
-				AmountTrackerIdMapping: approvalTrackerMapping,
-				ChallengeTrackerIdMapping: challengeTrackerMapping,
 
-				UsesAmountTrackerId: 	true,
-				UsesChallengeTrackerId: true,
-				UsesBadgeIds:           true,
-				UsesTransferTimes:      true,
-				UsesOwnershipTimes: 		true,
-				UsesToMapping:          true,
-				UsesFromMapping:        true,
-				UsesInitiatedByMapping: true,
-				PermittedTimes:         collectionUpdatePermission.PermittedTimes,
-				ForbiddenTimes:         collectionUpdatePermission.ForbiddenTimes,
+			TransferTimes:             collectionUpdatePermission.TransferTimes,
+			OwnershipTimes:            collectionUpdatePermission.OwnershipTimes,
+			ToMapping:                 toMapping,
+			FromMapping:               fromMapping,
+			InitiatedByMapping:        initiatedByMapping,
+			BadgeIds:                  collectionUpdatePermission.BadgeIds,
+			AmountTrackerIdMapping:    approvalTrackerMapping,
+			ChallengeTrackerIdMapping: challengeTrackerMapping,
+
+			UsesAmountTrackerId:    true,
+			UsesChallengeTrackerId: true,
+			UsesBadgeIds:           true,
+			UsesTransferTimes:      true,
+			UsesOwnershipTimes:     true,
+			UsesToMapping:          true,
+			UsesFromMapping:        true,
+			UsesInitiatedByMapping: true,
+			PermittedTimes:         collectionUpdatePermission.PermittedTimes,
+			ForbiddenTimes:         collectionUpdatePermission.ForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil
@@ -218,13 +217,13 @@ func (k Keeper) CastTimedUpdateWithBadgeIdsPermissionToUniversalPermission(timed
 	for _, timedUpdateWithBadgeIdsPermission := range timedUpdateWithBadgeIdsPermission {
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			
-				TimelineTimes:     timedUpdateWithBadgeIdsPermission.TimelineTimes,
-				BadgeIds:          timedUpdateWithBadgeIdsPermission.BadgeIds,
-				UsesTimelineTimes: true,
-				UsesBadgeIds:      true,
-				PermittedTimes:    timedUpdateWithBadgeIdsPermission.PermittedTimes,
-				ForbiddenTimes:    timedUpdateWithBadgeIdsPermission.ForbiddenTimes,
+
+			TimelineTimes:     timedUpdateWithBadgeIdsPermission.TimelineTimes,
+			BadgeIds:          timedUpdateWithBadgeIdsPermission.BadgeIds,
+			UsesTimelineTimes: true,
+			UsesBadgeIds:      true,
+			PermittedTimes:    timedUpdateWithBadgeIdsPermission.PermittedTimes,
+			ForbiddenTimes:    timedUpdateWithBadgeIdsPermission.ForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil
@@ -235,11 +234,11 @@ func (k Keeper) CastTimedUpdatePermissionToUniversalPermission(timedUpdatePermis
 	for _, timedUpdatePermission := range timedUpdatePermission {
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			
-				TimelineTimes:     timedUpdatePermission.TimelineTimes,
-				UsesTimelineTimes: true,
-				PermittedTimes:    timedUpdatePermission.PermittedTimes,
-				ForbiddenTimes:    timedUpdatePermission.ForbiddenTimes,
+
+			TimelineTimes:     timedUpdatePermission.TimelineTimes,
+			UsesTimelineTimes: true,
+			PermittedTimes:    timedUpdatePermission.PermittedTimes,
+			ForbiddenTimes:    timedUpdatePermission.ForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil
@@ -249,13 +248,13 @@ func (k Keeper) CastBalancesActionPermissionToUniversalPermission(BalancesAction
 	castedPermissions := []*types.UniversalPermission{}
 	for _, BalancesActionPermission := range BalancesActionPermission {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			
-				BadgeIds:          BalancesActionPermission.BadgeIds,
-				OwnershipTimes:     BalancesActionPermission.OwnershipTimes,
-				UsesBadgeIds:      true,
-				UsesOwnershipTimes: true,
-				PermittedTimes:    BalancesActionPermission.PermittedTimes,
-				ForbiddenTimes:    BalancesActionPermission.ForbiddenTimes,
+
+			BadgeIds:           BalancesActionPermission.BadgeIds,
+			OwnershipTimes:     BalancesActionPermission.OwnershipTimes,
+			UsesBadgeIds:       true,
+			UsesOwnershipTimes: true,
+			PermittedTimes:     BalancesActionPermission.PermittedTimes,
+			ForbiddenTimes:     BalancesActionPermission.ForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil

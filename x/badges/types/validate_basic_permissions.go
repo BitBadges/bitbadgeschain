@@ -39,7 +39,7 @@ func ValidateCollectionApprovalPermissions(permissions []*CollectionApprovalPerm
 		if err != nil {
 			return err
 		}
-		
+
 		err = ValidateRangesAreValid(permission.OwnershipTimes, false, false)
 		if err != nil {
 			return err
@@ -64,8 +64,7 @@ func ValidateCollectionApprovalPermissions(permissions []*CollectionApprovalPerm
 		if permission.InitiatedByMappingId == "" {
 			return sdkerrors.Wrap(ErrInvalidRequest, "initiatedByMappingId is nil")
 		}
-		
-		
+
 		err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
 		if err != nil {
 			return err
@@ -105,19 +104,17 @@ func ValidateUserOutgoingApprovalPermissions(permissions []*UserOutgoingApproval
 			return err
 		}
 
-		
-
 		err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
 		if err != nil {
 			return err
 		}
 
 		if canChangeValues {
-		permission.OwnershipTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.OwnershipTimes)
-		permission.TransferTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TransferTimes)
-		permission.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.BadgeIds)
-		permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
-		permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
+			permission.OwnershipTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.OwnershipTimes)
+			permission.TransferTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TransferTimes)
+			permission.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.BadgeIds)
+			permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
+			permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
 		}
 	}
 
@@ -145,20 +142,18 @@ func ValidateUserIncomingApprovalPermissions(permissions []*UserIncomingApproval
 			return err
 		}
 
-		
-
 		err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
 		if err != nil {
 			return err
 		}
 
 		if canChangeValues {
-		permission.OwnershipTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.OwnershipTimes)
-		permission.TransferTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TransferTimes)
-		permission.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.BadgeIds)
+			permission.OwnershipTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.OwnershipTimes)
+			permission.TransferTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TransferTimes)
+			permission.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.BadgeIds)
 
-		permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
-		permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
+			permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
+			permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
 		}
 
 	}
@@ -182,21 +177,18 @@ func ValidateTimedUpdateWithBadgeIdsPermission(permissions []*TimedUpdateWithBad
 			return err
 		}
 
-		
+		err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
+		if err != nil {
+			return err
+		}
 
-			err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
-			if err != nil {
-				return err
-			}
+		if canChangeValues {
+			permission.TimelineTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TimelineTimes)
+			permission.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.BadgeIds)
 
-			if canChangeValues {
-				permission.TimelineTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TimelineTimes)
-				permission.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.BadgeIds)
-		
-				permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
-				permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
-			}
-		
+			permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
+			permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
+		}
 
 		//Note we can check overlap here with other badgeIds but
 		//that would take away from the flexibility of the BadgeIdsOptions.
@@ -223,21 +215,18 @@ func ValidateBalancesActionPermission(permissions []*BalancesActionPermission, c
 			return err
 		}
 
-		
+		err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
+		if err != nil {
+			return err
+		}
 
+		if canChangeValues {
+			permission.OwnershipTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.OwnershipTimes)
+			permission.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.BadgeIds)
+			permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
+			permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
+		}
 
-			err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
-			if err != nil {
-				return err
-			}
-
-			if canChangeValues {
-				permission.OwnershipTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.OwnershipTimes)
-				permission.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.BadgeIds)
-				permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
-				permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
-			}
-		
 	}
 
 	return nil
@@ -254,22 +243,18 @@ func ValidateTimedUpdatePermission(permissions []*TimedUpdatePermission, canChan
 			return err
 		}
 
-		
+		err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
+		if err != nil {
+			return err
+		}
 
-		
-
-			err = ValidatePermittedTimes(permission.PermittedTimes, permission.ForbiddenTimes)
-			if err != nil {
-				return err
-			}
-
-			if canChangeValues {
+		if canChangeValues {
 			permission.TimelineTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TimelineTimes)
 
 			permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
 			permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
-			}
-		
+		}
+
 	}
 
 	return nil
@@ -287,8 +272,8 @@ func ValidateActionPermission(permissions []*ActionPermission, canChangeValues b
 		}
 
 		if canChangeValues {
-		permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
-		permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
+			permission.PermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermittedTimes)
+			permission.ForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.ForbiddenTimes)
 		}
 	}
 

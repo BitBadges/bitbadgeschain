@@ -125,7 +125,6 @@ func RemoveUintsFromUintRange(idxsToRemove *UintRange, rangeObject *UintRange) (
 
 		removedRanges = []*UintRange{idxsToRemove}
 	}
-	
 
 	return newRanges, removedRanges
 }
@@ -164,15 +163,14 @@ func AssertRangesDoNotOverlapAtAll(rangeToCheck []*UintRange, overlappingRange [
 	return nil
 }
 
-
-func SortUintRangesAndMergeAdjacentAndIntersecting(ids []*UintRange)( []*UintRange) {
+func SortUintRangesAndMergeAdjacentAndIntersecting(ids []*UintRange) []*UintRange {
 	sorted, _ := SortUintRangesAndMerge(ids, true)
 	return sorted
 }
 
 // Will sort the ID ranges in order and merge overlapping IDs if we can
 // If mergeIntersecting is true, we will merge intersecting ranges. If false, we will panic if any intersect and only sort and merge adjacent ranges (i.e. [1-5], [6-10])
-func SortUintRangesAndMerge(ids []*UintRange, mergeIntersecting bool)( []*UintRange, error) {
+func SortUintRangesAndMerge(ids []*UintRange, mergeIntersecting bool) ([]*UintRange, error) {
 	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
 	var n = len(ids)
 	for i := 1; i < n; i++ {
@@ -195,7 +193,6 @@ func SortUintRangesAndMerge(ids []*UintRange, mergeIntersecting bool)( []*UintRa
 			}
 		}
 	}
-
 
 	//Merge overlapping ranges
 	if n > 0 {
@@ -226,9 +223,6 @@ func SortUintRangesAndMerge(ids []*UintRange, mergeIntersecting bool)( []*UintRa
 			//Note: If currRange.End <= prevInsertedRange.End, it is already fully contained within the previous. We can just continue.
 			// }
 		}
-
-		
-
 
 		return newUintRanges, nil
 	} else {

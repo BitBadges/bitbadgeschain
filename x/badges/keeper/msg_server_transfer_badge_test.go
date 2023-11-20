@@ -103,9 +103,9 @@ func (suite *TestSuite) TestTransferBadgesNotApprovedCollectionLevel() {
 	suite.Require().Equal(sdkmath.NewUint(1), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUpdateCollectionApprovals{
-		Creator:      bob,
-		CollectionId: sdkmath.NewUint(1),
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		Creator:             bob,
+		CollectionId:        sdkmath.NewUint(1),
 		CollectionApprovals: []*types.CollectionApproval{},
 	})
 	suite.Require().Nil(err, "Error updating approved transfers")
@@ -145,10 +145,10 @@ func (suite *TestSuite) TestTransferBadgesNotApprovedIncoming() {
 	suite.Require().Nil(err)
 
 	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
-		Creator:      alice,
-		CollectionId: sdkmath.NewUint(1),
+		Creator:                 alice,
+		CollectionId:            sdkmath.NewUint(1),
 		UpdateIncomingApprovals: true,
-		IncomingApprovals: []*types.UserIncomingApproval{},
+		IncomingApprovals:       []*types.UserIncomingApproval{},
 	})
 	suite.Require().Nil(err, "Error updating approved transfers")
 
@@ -204,9 +204,9 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 		},
 		CollectionApprovals: collection.CollectionApprovals,
 		// InheritedBalancesTimeline: 				 collection.InheritedBalancesTimeline,
-		CollectionMetadataTimeline:          collection.CollectionMetadataTimeline,
-		BadgeMetadataTimeline:               collection.BadgeMetadataTimeline,
-		OffChainBalancesMetadataTimeline:    collection.OffChainBalancesMetadataTimeline,
+		CollectionMetadataTimeline:       collection.CollectionMetadataTimeline,
+		BadgeMetadataTimeline:            collection.BadgeMetadataTimeline,
+		OffChainBalancesMetadataTimeline: collection.OffChainBalancesMetadataTimeline,
 	})
 	suite.Require().Nil(err, "Error transferring badge")
 

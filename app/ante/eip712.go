@@ -167,7 +167,7 @@ func VerifySignature(
 		if len(msgs) == 0 {
 			return sdkerrors.Wrap(types.ErrNoSignatures, "tx doesn't contain any msgs to verify signature")
 		}
-		
+
 		txBytes := legacytx.StdSignBytes(
 			signerData.ChainID,
 			signerData.AccountNumber,
@@ -217,7 +217,7 @@ func VerifySignature(
 		if err != nil {
 			return sdkerrors.Wrap(err, "failed to pack tx data in EIP712 object")
 		}
-		
+
 		//Within the wrapping proess, we added types for values that may not be in the message payload
 		//but are expectd by the EIP712 typedData.  We need to add the empty values ("", false, 0) to the
 		//message payload

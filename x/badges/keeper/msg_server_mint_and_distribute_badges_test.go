@@ -19,7 +19,6 @@ func (suite *TestSuite) TestNewBadges() {
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting badge: %s")
 
-
 	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -131,15 +130,15 @@ func (suite *TestSuite) TestNewBadgesNotAllowed() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUpdateCollectionPermissions{
+	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
 			CanCreateMoreBadges: []*types.BalancesActionPermission{
 				{
 					ForbiddenTimes: GetFullUintRanges(),
-						BadgeIds:       GetFullUintRanges(),
-						OwnershipTimes: GetFullUintRanges(),
+					BadgeIds:       GetFullUintRanges(),
+					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
 		},
@@ -181,20 +180,20 @@ func (suite *TestSuite) TestNewBadgesPermissionIsApproved() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUpdateCollectionPermissions{
+	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
 			CanCreateMoreBadges: []*types.BalancesActionPermission{
 				{
 					PermittedTimes: GetFullUintRanges(),
-						BadgeIds:       GetOneUintRange(),
-						OwnershipTimes: GetOneUintRange(),
+					BadgeIds:       GetOneUintRange(),
+					OwnershipTimes: GetOneUintRange(),
 				},
 				{
 					ForbiddenTimes: GetFullUintRanges(),
-						BadgeIds:       GetFullUintRanges(),
-						OwnershipTimes: GetFullUintRanges(),
+					BadgeIds:       GetFullUintRanges(),
+					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
 		},

@@ -11,7 +11,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 )
 
-func SimulateMsgUpdateCollection(
+func SimulateMsgUniversalUpdateCollection(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	k keeper.Keeper,
@@ -19,17 +19,17 @@ func SimulateMsgUpdateCollection(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := &types.MsgUpdateCollection{
-			Creator: simAccount.Address.String(),
-			UpdateCollectionPermissions: r.Int63n(2) == 0,
-			UpdateIsArchivedTimeline:    r.Int63n(2) == 0,
-			UpdateManagerTimeline: 		 r.Int63n(2) == 0,
-			UpdateCollectionMetadataTimeline: r.Int63n(2) == 0,
-			UpdateBadgeMetadataTimeline: r.Int63n(2) == 0,
+		msg := &types.MsgUniversalUpdateCollection{
+			Creator:                                simAccount.Address.String(),
+			UpdateCollectionPermissions:            r.Int63n(2) == 0,
+			UpdateIsArchivedTimeline:               r.Int63n(2) == 0,
+			UpdateManagerTimeline:                  r.Int63n(2) == 0,
+			UpdateCollectionMetadataTimeline:       r.Int63n(2) == 0,
+			UpdateBadgeMetadataTimeline:            r.Int63n(2) == 0,
 			UpdateOffChainBalancesMetadataTimeline: r.Int63n(2) == 0,
-			UpdateCustomDataTimeline: r.Int63n(2) == 0,
-			UpdateCollectionApprovals: r.Int63n(2) == 0,
-			UpdateStandardsTimeline: r.Int63n(2) == 0,
+			UpdateCustomDataTimeline:               r.Int63n(2) == 0,
+			UpdateCollectionApprovals:              r.Int63n(2) == 0,
+			UpdateStandardsTimeline:                r.Int63n(2) == 0,
 
 			CollectionId: sdkmath.NewUint(uint64(r.Int63n(5))),
 			IsArchivedTimeline: []*types.IsArchivedTimeline{
@@ -45,7 +45,7 @@ func SimulateMsgUpdateCollection(
 					ToMappingId:          GetRandomAddresses(r, 1, accs)[0],
 					InitiatedByMappingId: GetRandomAddresses(r, 1, accs)[0],
 					TransferTimes:        GetTimelineTimes(r, 100),
-					OwnershipTimes: 		 GetTimelineTimes(r, 100),
+					OwnershipTimes:       GetTimelineTimes(r, 100),
 					BadgeIds:             GetTimelineTimes(r, 3),
 				},
 			},
@@ -55,7 +55,7 @@ func SimulateMsgUpdateCollection(
 					TimelineTimes: GetTimelineTimes(r, 3),
 				},
 			},
-			CollectionPermissions:  GetRandomCollectionPermissions(r, accs),
+			CollectionPermissions: GetRandomCollectionPermissions(r, accs),
 		}
 
 		// TODO: Handling the UpdateCollection simulation

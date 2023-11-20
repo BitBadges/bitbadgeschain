@@ -33,11 +33,19 @@ const (
 	opWeightMsgUpdateUserApprovals          = "op_weight_msg_update_user_approved_transfers"
 	defaultWeightMsgUpdateUserApprovals int = 100
 
-	opWeightMsgUpdateCollection = "op_weight_msg_update_collection"
-	defaultWeightMsgUpdateCollection int = 1000
+	opWeightMsgUniversalUpdateCollection          = "op_weight_msg_update_collection"
+	defaultWeightMsgUniversalUpdateCollection int = 1000
 
-	opWeightMsgCreateAddressMappings = "op_weight_msg_create_address_mappings"
+	opWeightMsgCreateAddressMappings          = "op_weight_msg_create_address_mappings"
 	defaultWeightMsgCreateAddressMappings int = 100
+
+	opWeightMsgCreateCollection = "op_weight_msg_msg_create_collection"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgCreateCollection int = 100
+
+	opWeightMsgUpdateCollection = "op_weight_msg_msg_update_collection"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgUpdateCollection int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const
 )
@@ -102,15 +110,15 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		badgessimulation.SimulateMsgUpdateUserApprovals(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgUpdateCollection int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateCollection, &weightMsgUpdateCollection, nil,
+	var weightMsgUniversalUpdateCollection int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUniversalUpdateCollection, &weightMsgUniversalUpdateCollection, nil,
 		func(_ *rand.Rand) {
-			weightMsgUpdateCollection = defaultWeightMsgUpdateCollection
+			weightMsgUniversalUpdateCollection = defaultWeightMsgUniversalUpdateCollection
 		},
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgUpdateCollection,
-		badgessimulation.SimulateMsgUpdateCollection(am.accountKeeper, am.bankKeeper, am.keeper),
+		weightMsgUniversalUpdateCollection,
+		badgessimulation.SimulateMsgUniversalUpdateCollection(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	var weightMsgCreateAddressMappings int
@@ -122,6 +130,28 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgCreateAddressMappings,
 		badgessimulation.SimulateMsgCreateAddressMappings(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgCreateCollection int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgCreateCollection, &weightMsgCreateCollection, nil,
+		func(_ *rand.Rand) {
+			weightMsgCreateCollection = defaultWeightMsgCreateCollection
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgCreateCollection,
+		badgessimulation.SimulateMsgCreateCollection(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgUpdateCollection int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateCollection, &weightMsgUpdateCollection, nil,
+		func(_ *rand.Rand) {
+			weightMsgUpdateCollection = defaultWeightMsgUpdateCollection
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgUpdateCollection,
+		badgessimulation.SimulateMsgUpdateCollection(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

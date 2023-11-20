@@ -17,8 +17,8 @@ func (k Keeper) CastInheritedBalancesToUniversalPermission(inheritedBalances []*
 	for _, inheritedBalance := range inheritedBalances {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			BadgeIds:       inheritedBalance.BadgeIds,
-				UsesBadgeIds:   true,
-				ArbitraryValue: inheritedBalance,
+			UsesBadgeIds:   true,
+			ArbitraryValue: inheritedBalance,
 		})
 	}
 
@@ -58,12 +58,12 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 		approvalTrackerMapping := &types.AddressMapping{}
 		if approval.AmountTrackerId == "All" {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{},
+				Addresses:        []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{approval.AmountTrackerId},
+				Addresses:        []string{approval.AmountTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -71,36 +71,34 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 		challengeTrackerMapping := &types.AddressMapping{}
 		if approval.ChallengeTrackerId == "All" {
 			challengeTrackerMapping = &types.AddressMapping{
-				Addresses: []string{},
+				Addresses:        []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			challengeTrackerMapping = &types.AddressMapping{
-				Addresses: []string{approval.ChallengeTrackerId},
+				Addresses:        []string{approval.ChallengeTrackerId},
 				IncludeAddresses: true,
 			}
 		}
 
-
-
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			BadgeIds:               approval.BadgeIds,
-				TransferTimes:          approval.TransferTimes,
-				OwnershipTimes: 			 	approval.OwnershipTimes,
-				FromMapping:            fromMapping,
-				ToMapping:              toMapping,
-				InitiatedByMapping:     initiatedByMapping,
-				AmountTrackerIdMapping: approvalTrackerMapping,
-				ChallengeTrackerIdMapping: challengeTrackerMapping,
-				UsesBadgeIds:           true,
-				UsesTransferTimes:      true,
-				UsesToMapping:          true,
-				UsesFromMapping:        true,
-				UsesInitiatedByMapping: true,
-				UsesOwnershipTimes: 	 	true,
-				UsesAmountTrackerId: 	true,
-				UsesChallengeTrackerId: true,
-				ArbitraryValue:         approval,
+			BadgeIds:                  approval.BadgeIds,
+			TransferTimes:             approval.TransferTimes,
+			OwnershipTimes:            approval.OwnershipTimes,
+			FromMapping:               fromMapping,
+			ToMapping:                 toMapping,
+			InitiatedByMapping:        initiatedByMapping,
+			AmountTrackerIdMapping:    approvalTrackerMapping,
+			ChallengeTrackerIdMapping: challengeTrackerMapping,
+			UsesBadgeIds:              true,
+			UsesTransferTimes:         true,
+			UsesToMapping:             true,
+			UsesFromMapping:           true,
+			UsesInitiatedByMapping:    true,
+			UsesOwnershipTimes:        true,
+			UsesAmountTrackerId:       true,
+			UsesChallengeTrackerId:    true,
+			ArbitraryValue:            approval,
 		})
 	}
 	return castedPermissions, nil
@@ -122,12 +120,12 @@ func (k Keeper) CastUserOutgoingApprovalToUniversalPermission(ctx sdk.Context, a
 		approvalTrackerMapping := &types.AddressMapping{}
 		if approval.AmountTrackerId == "All" {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{},
+				Addresses:        []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{approval.AmountTrackerId},
+				Addresses:        []string{approval.AmountTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -135,33 +133,32 @@ func (k Keeper) CastUserOutgoingApprovalToUniversalPermission(ctx sdk.Context, a
 		challengeTrackerMapping := &types.AddressMapping{}
 		if approval.ChallengeTrackerId == "All" {
 			challengeTrackerMapping = &types.AddressMapping{
-				Addresses: []string{},
+				Addresses:        []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			challengeTrackerMapping = &types.AddressMapping{
-				Addresses: []string{approval.ChallengeTrackerId},
+				Addresses:        []string{approval.ChallengeTrackerId},
 				IncludeAddresses: true,
 			}
 		}
 
-
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			BadgeIds:               approval.BadgeIds,
-				TransferTimes:          approval.TransferTimes,
-				OwnershipTimes: 			 	approval.OwnershipTimes,
-				ToMapping:              toMapping,
-				InitiatedByMapping:     initiatedByMapping,
-				AmountTrackerIdMapping: approvalTrackerMapping,
-				ChallengeTrackerIdMapping: challengeTrackerMapping,
-				UsesAmountTrackerId: 	true,
-				UsesChallengeTrackerId: true,
-				UsesBadgeIds:           true,
-				UsesTransferTimes:      true,
-				UsesOwnershipTimes: 	 true,
-				UsesToMapping:          true,
-				UsesInitiatedByMapping: true,
-				ArbitraryValue:         approval,
+			BadgeIds:                  approval.BadgeIds,
+			TransferTimes:             approval.TransferTimes,
+			OwnershipTimes:            approval.OwnershipTimes,
+			ToMapping:                 toMapping,
+			InitiatedByMapping:        initiatedByMapping,
+			AmountTrackerIdMapping:    approvalTrackerMapping,
+			ChallengeTrackerIdMapping: challengeTrackerMapping,
+			UsesAmountTrackerId:       true,
+			UsesChallengeTrackerId:    true,
+			UsesBadgeIds:              true,
+			UsesTransferTimes:         true,
+			UsesOwnershipTimes:        true,
+			UsesToMapping:             true,
+			UsesInitiatedByMapping:    true,
+			ArbitraryValue:            approval,
 		})
 	}
 	return castedPermissions, nil
@@ -184,12 +181,12 @@ func (k Keeper) CastUserIncomingApprovalToUniversalPermission(ctx sdk.Context, a
 		approvalTrackerMapping := &types.AddressMapping{}
 		if approval.AmountTrackerId == "All" {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{},
+				Addresses:        []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			approvalTrackerMapping = &types.AddressMapping{
-				Addresses: []string{approval.AmountTrackerId},
+				Addresses:        []string{approval.AmountTrackerId},
 				IncludeAddresses: true,
 			}
 		}
@@ -197,32 +194,32 @@ func (k Keeper) CastUserIncomingApprovalToUniversalPermission(ctx sdk.Context, a
 		challengeTrackerMapping := &types.AddressMapping{}
 		if approval.ChallengeTrackerId == "All" {
 			challengeTrackerMapping = &types.AddressMapping{
-				Addresses: []string{},
+				Addresses:        []string{},
 				IncludeAddresses: false,
 			}
 		} else {
 			challengeTrackerMapping = &types.AddressMapping{
-				Addresses: []string{approval.ChallengeTrackerId},
+				Addresses:        []string{approval.ChallengeTrackerId},
 				IncludeAddresses: true,
 			}
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			BadgeIds:               approval.BadgeIds,
-				TransferTimes:          approval.TransferTimes,
-				OwnershipTimes: 			 			approval.OwnershipTimes,
-				FromMapping:            fromMapping,
-				InitiatedByMapping:     initiatedByMapping,
-				AmountTrackerIdMapping: approvalTrackerMapping,
-				ChallengeTrackerIdMapping: challengeTrackerMapping,
-				UsesAmountTrackerId: 	true,
-				UsesChallengeTrackerId: true,
-				UsesBadgeIds:           true,
-				UsesTransferTimes:      true,
-				UsesOwnershipTimes: 	 			true,
-				UsesFromMapping:        true,
-				UsesInitiatedByMapping: true,
-				ArbitraryValue:         approval,
+			BadgeIds:                  approval.BadgeIds,
+			TransferTimes:             approval.TransferTimes,
+			OwnershipTimes:            approval.OwnershipTimes,
+			FromMapping:               fromMapping,
+			InitiatedByMapping:        initiatedByMapping,
+			AmountTrackerIdMapping:    approvalTrackerMapping,
+			ChallengeTrackerIdMapping: challengeTrackerMapping,
+			UsesAmountTrackerId:       true,
+			UsesChallengeTrackerId:    true,
+			UsesBadgeIds:              true,
+			UsesTransferTimes:         true,
+			UsesOwnershipTimes:        true,
+			UsesFromMapping:           true,
+			UsesInitiatedByMapping:    true,
+			ArbitraryValue:            approval,
 		})
 	}
 	return castedPermissions, nil

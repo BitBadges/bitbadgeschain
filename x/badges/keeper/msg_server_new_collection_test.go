@@ -41,7 +41,7 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Error(err, "Error creating badge: %s")
 
-	//This is fine. Just comented out bc with new MsgUpdateCollection logic, we have to set UpdateCollectionApprovals to false 
+	//This is fine. Just comented out bc with new MsgUniversalUpdateCollection logic, we have to set UpdateCollectionApprovals to false
 	//which is not possible with the way the integration helpers are written
 
 	// collectionsToCreate = GetCollectionsToCreate()

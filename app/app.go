@@ -191,7 +191,7 @@ var (
 		badgesmodule.AppModuleBasic{},
 		wasm.AppModuleBasic{},
 		wasmx.AppModuleBasic{},
-// this line is used by starport scaffolding # stargate/app/moduleBasic
+		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
 	// module account permissions
@@ -204,7 +204,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		wasmtypes.ModuleName:                {authtypes.Burner},
+		wasmtypes.ModuleName:           {authtypes.Burner},
 		wasmxtypes.ModuleName:          {authtypes.Burner},
 		ibcfeetypes.ModuleName:         nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
@@ -258,25 +258,25 @@ type App struct {
 	ParamsKeeper          paramskeeper.Keeper
 	IBCKeeper             *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	EvidenceKeeper        evidencekeeper.Keeper
-	IBCFeeKeeper        ibcfeekeeper.Keeper
+	IBCFeeKeeper          ibcfeekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
 	ICAHostKeeper         icahostkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
-	WasmKeeper       wasm.Keeper
+	WasmKeeper            wasm.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
-	ScopedIBCFeeKeeper        capabilitykeeper.ScopedKeeper
+	ScopedIBCFeeKeeper   capabilitykeeper.ScopedKeeper
 
 	ScopedBadgesKeeper capabilitykeeper.ScopedKeeper
 	BadgesKeeper       badgesmodulekeeper.Keeper
 
-	ScopedWasmKeeper   capabilitykeeper.ScopedKeeper
-	WasmxKeeper wasmxkeeper.Keeper
+	ScopedWasmKeeper capabilitykeeper.ScopedKeeper
+	WasmxKeeper      wasmxkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -327,7 +327,7 @@ func New(
 		wasmtypes.StoreKey,
 		wasmxtypes.StoreKey,
 		ibcfeetypes.StoreKey,
-// this line is used by starport scaffolding # stargate/app/storeKey
+		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -485,7 +485,6 @@ func New(
 		&app.IBCKeeper.PortKeeper, app.AccountKeeper, app.BankKeeper,
 	)
 
-
 	// Create Transfer Keepers
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec,
@@ -571,7 +570,7 @@ func New(
 	badgesModule := badgesmodule.NewAppModule(appCodec, app.BadgesKeeper, app.AccountKeeper, app.BankKeeper)
 	scopedWasmKeeper := app.CapabilityKeeper.ScopeToModule(wasmtypes.ModuleName)
 	app.ScopedWasmKeeper = scopedWasmKeeper
-	
+
 	wasmDir := filepath.Join(homePath, "wasm")
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
 	if err != nil {
@@ -582,7 +581,7 @@ func New(
 	customQueryOptions := GetCustomMsgQueryOptions(app.BadgesKeeper)
 	wasmOpts := append(customEncoderOptions, customQueryOptions...)
 	availableCapabilities := "iterator,staking,stargate,cosmwasm_1_1,cosmwasm_1_2,bitbadges"
-	
+
 	app.WasmKeeper = wasmkeeper.NewKeeper(
 		appCodec,
 		keys[wasmtypes.StoreKey],
@@ -614,7 +613,7 @@ func New(
 	)
 
 	badgesIBCModule := badgesmodule.NewIBCModule(app.BadgesKeeper)
-	
+
 	wasmxModule := wasmx.NewAppModule(app.WasmxKeeper, app.AccountKeeper, app.BankKeeper)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
@@ -638,7 +637,6 @@ func New(
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// this line is used by starport scaffolding # ibc/app/router
-
 
 	/**** Module Hooks ****/
 
@@ -695,7 +693,7 @@ func New(
 		icaModule,
 		badgesModule,
 		wasmxModule,
-// this line is used by starport scaffolding # stargate/app/appModule
+		// this line is used by starport scaffolding # stargate/app/appModule
 
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
 	)
@@ -730,7 +728,7 @@ func New(
 		badgesmoduletypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxtypes.ModuleName,
-// this line is used by starport scaffolding # stargate/app/beginBlockers
+		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -758,7 +756,7 @@ func New(
 		badgesmoduletypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxtypes.ModuleName,
-// this line is used by starport scaffolding # stargate/app/endBlockers
+		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -822,7 +820,6 @@ func New(
 	app.MountTransientStores(tkeys)
 	app.MountMemoryStores(memKeys)
 
-	
 	// use custom AnteHandler
 	options := ante.HandlerOptions{
 		AccountKeeper:   app.AccountKeeper,
@@ -861,7 +858,7 @@ func New(
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
 		}
-	
+
 		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
 
 		// Initialize pinned codes in wasmvm as they are not persisted there
@@ -869,7 +866,6 @@ func New(
 			tmos.Exit(fmt.Sprintf("failed initialize pinned codes %s", err))
 		}
 	}
-
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
@@ -1043,7 +1039,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(badgesmoduletypes.ModuleName)
 	paramsKeeper.Subspace(wasmtypes.ModuleName)
 	paramsKeeper.Subspace(wasmxtypes.ModuleName)
-// this line is used by starport scaffolding # stargate/app/paramSubspace
+	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
 }

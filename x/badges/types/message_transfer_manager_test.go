@@ -14,21 +14,21 @@ import (
 func TestMsgUpdateManager_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgUpdateCollection
+		msg  types.MsgUniversalUpdateCollection
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgUpdateCollection{
+			msg: types.MsgUniversalUpdateCollection{
 				Creator:      "invalid_address",
 				CollectionId: sdkmath.NewUint(1),
 			},
 			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgUpdateCollection{
-				Creator:      sample.AccAddress(),
-				CollectionId: sdkmath.NewUint(1),
+			msg: types.MsgUniversalUpdateCollection{
+				Creator:               sample.AccAddress(),
+				CollectionId:          sdkmath.NewUint(1),
 				UpdateManagerTimeline: true,
 				ManagerTimeline: []*types.ManagerTimeline{
 					{
@@ -45,9 +45,9 @@ func TestMsgUpdateManager_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "invalid address 2",
-			msg: types.MsgUpdateCollection{
-				Creator:      sample.AccAddress(),
-				CollectionId: sdkmath.NewUint(1),
+			msg: types.MsgUniversalUpdateCollection{
+				Creator:               sample.AccAddress(),
+				CollectionId:          sdkmath.NewUint(1),
 				UpdateManagerTimeline: true,
 				ManagerTimeline: []*types.ManagerTimeline{
 					{
@@ -65,9 +65,9 @@ func TestMsgUpdateManager_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "invalid times",
-			msg: types.MsgUpdateCollection{
-				Creator:      sample.AccAddress(),
-				CollectionId: sdkmath.NewUint(1),
+			msg: types.MsgUniversalUpdateCollection{
+				Creator:               sample.AccAddress(),
+				CollectionId:          sdkmath.NewUint(1),
 				UpdateManagerTimeline: true,
 				ManagerTimeline: []*types.ManagerTimeline{
 					{

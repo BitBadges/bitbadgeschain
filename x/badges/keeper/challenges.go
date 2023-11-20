@@ -74,7 +74,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 
 				newNumUsed := sdk.NewUint(0)
 				if !challenge.MaxUsesPerLeaf.IsNil() && challenge.MaxUsesPerLeaf.GT(sdkmath.NewUint(0)) {
-					
+
 					numUsed, err := k.GetNumUsedForMerkleChallengeFromStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex)
 					if err != nil {
 						additionalDetailsErrorStr = "error getting num processed"
@@ -107,7 +107,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 
 							//Currently added for indexer, but note that it is planned to be deprecated
 							ctx.EventManager().EmitEvent(
-								sdk.NewEvent("challenge" + fmt.Sprint(challengeId) + fmt.Sprint(challengeId) + fmt.Sprint(leafIndex) + fmt.Sprint(approverAddress) + fmt.Sprint(challengeLevel) + fmt.Sprint(newNumUsed),
+								sdk.NewEvent("challenge"+fmt.Sprint(challengeId)+fmt.Sprint(challengeId)+fmt.Sprint(leafIndex)+fmt.Sprint(approverAddress)+fmt.Sprint(challengeLevel)+fmt.Sprint(newNumUsed),
 									sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 									sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 									sdk.NewAttribute("challengeId", fmt.Sprint(challengeId)),
@@ -120,8 +120,6 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 						}
 					}
 				}
-
-				
 
 				hasValidSolution = true
 				break

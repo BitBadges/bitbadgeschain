@@ -50,7 +50,7 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 				if found {
 					balances = initiatedByBalance
 				} else {
-					isBlank = true 
+					isBlank = true
 				}
 			} else {
 				return nil, sdkerrors.Wrapf(ErrWrongBalancesType, "unsupported balances type %s", collection.BalancesType)
@@ -64,12 +64,12 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 		}, nil
 	} else {
 		blankUserBalance := &types.UserBalanceStore{
-			Balances:                          []*types.Balance{},
+			Balances:          []*types.Balance{},
 			OutgoingApprovals: currCollection.DefaultUserOutgoingApprovals,
 			IncomingApprovals: currCollection.DefaultUserIncomingApprovals,
 			AutoApproveSelfInitiatedOutgoingTransfers: currCollection.DefaultAutoApproveSelfInitiatedOutgoingTransfers,
 			AutoApproveSelfInitiatedIncomingTransfers: currCollection.DefaultAutoApproveSelfInitiatedIncomingTransfers,
-			UserPermissions:                   currCollection.DefaultUserPermissions,
+			UserPermissions: currCollection.DefaultUserPermissions,
 		}
 		return &types.QueryGetBalanceResponse{
 			Balance: blankUserBalance,

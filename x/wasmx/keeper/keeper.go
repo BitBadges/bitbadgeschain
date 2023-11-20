@@ -19,9 +19,9 @@ type Keeper struct {
 	cdc        codec.BinaryCodec
 	paramSpace paramtypes.Subspace
 
-	accountKeeper         authkeeper.AccountKeeper
-	bankKeeper            types.BankKeeper
-	wasmKeeper 						wasmkeeper.Keeper
+	accountKeeper authkeeper.AccountKeeper
+	bankKeeper    types.BankKeeper
+	wasmKeeper    wasmkeeper.Keeper
 }
 
 // NewKeeper creates new instances of the wasmx Keeper
@@ -55,7 +55,6 @@ func (k *Keeper) Logger(ctx sdk.Context) log.Logger {
 func (k *Keeper) getStore(ctx sdk.Context) sdk.KVStore {
 	return ctx.KVStore(k.storeKey)
 }
-
 
 func (k *Keeper) SetWasmKeeper(wk wasmkeeper.Keeper) {
 	k.wasmKeeper = wk

@@ -19,16 +19,16 @@ import (
 func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgUpdateCollection
+		msg  types.MsgUniversalUpdateCollection
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgUpdateCollection{
-				Creator:      "invalid_address",
-				CollectionId: sdkmath.NewUint(1),
+			msg: types.MsgUniversalUpdateCollection{
+				Creator:                          "invalid_address",
+				CollectionId:                     sdkmath.NewUint(1),
 				UpdateCollectionMetadataTimeline: true,
-				UpdateBadgeMetadataTimeline: true,
+				UpdateBadgeMetadataTimeline:      true,
 				CollectionMetadataTimeline: []*types.CollectionMetadataTimeline{
 					{
 						CollectionMetadata: &types.CollectionMetadata{
@@ -56,11 +56,11 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgUpdateCollection{
-				Creator:      sample.AccAddress(),
-				CollectionId: sdkmath.NewUint(1),
+			msg: types.MsgUniversalUpdateCollection{
+				Creator:                          sample.AccAddress(),
+				CollectionId:                     sdkmath.NewUint(1),
 				UpdateCollectionMetadataTimeline: true,
-				UpdateBadgeMetadataTimeline: true,
+				UpdateBadgeMetadataTimeline:      true,
 				CollectionMetadataTimeline: []*types.CollectionMetadataTimeline{
 					{
 						CollectionMetadata: &types.CollectionMetadata{

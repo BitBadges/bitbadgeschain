@@ -34,14 +34,12 @@ func CmdCreateAddressMappings() *cobra.Command {
 				return err
 			}
 
-			
 			// Validate the transaction data
 			if err := txData.ValidateBasic(); err != nil {
 				return err
 			}
-			
-			txData.Creator = clientCtx.GetFromAddress().String()
 
+			txData.Creator = clientCtx.GetFromAddress().String()
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &txData)
 		},

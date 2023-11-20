@@ -46,7 +46,6 @@ var DefaultConsensusParams = &tmproto.ConsensusParams{
 	},
 }
 
-
 func init() {
 	// feemarkettypes.DefaultMinGasPrice = sdk.ZeroDec()
 	// cfg := sdk.GetConfig()
@@ -80,7 +79,6 @@ func Setup(
 		genesisState := NewDefaultGenesisState(app.appCodec)
 
 		genesisState = GenesisStateWithValSet(app, genesisState, valSet, []authtypes.GenesisAccount{acc}, balance)
-
 
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 		if err != nil {

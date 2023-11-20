@@ -57,9 +57,9 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 }
 
 type badgeCustomQuery struct {
-	QueryCollection             *badgeTypes.QueryGetCollectionRequest          `json:"queryCollection,omitempty"`
-	QueryBalance                *badgeTypes.QueryGetBalanceRequest             `json:"queryBalance,omitempty"`
-	QueryAddressMapping         *badgeTypes.QueryGetAddressMappingRequest      `json:"queryAddressMapping,omitempty"`
-	QueryApprovalsTracker       *badgeTypes.QueryGetApprovalsTrackerRequest    `json:"queryApprovalsTracker,omitempty"`
+	QueryCollection                   *badgeTypes.QueryGetCollectionRequest                `json:"queryCollection,omitempty"`
+	QueryBalance                      *badgeTypes.QueryGetBalanceRequest                   `json:"queryBalance,omitempty"`
+	QueryAddressMapping               *badgeTypes.QueryGetAddressMappingRequest            `json:"queryAddressMapping,omitempty"`
+	QueryApprovalsTracker             *badgeTypes.QueryGetApprovalsTrackerRequest          `json:"queryApprovalsTracker,omitempty"`
 	QueryGetNumUsedForMerkleChallenge *badgeTypes.QueryGetNumUsedForMerkleChallengeRequest `json:"queryGetNumUsedForMerkleChallenge,omitempty"`
 }

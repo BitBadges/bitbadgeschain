@@ -44,9 +44,8 @@ func GetPotentialUpdatesForTimelineValues(times [][]*types.UintRange, values []i
 	for idx, time := range times {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			TimelineTimes:     time,
-				ArbitraryValue:    values[idx],
-				UsesTimelineTimes: true,
-
+			ArbitraryValue:    values[idx],
+			UsesTimelineTimes: true,
 		})
 	}
 
@@ -55,12 +54,12 @@ func GetPotentialUpdatesForTimelineValues(times [][]*types.UintRange, values []i
 	return firstMatches
 }
 
-//Make a struct witha  bool flag isApproved and an approval details arr
+// Make a struct witha  bool flag isApproved and an approval details arr
 type ApprovalCriteriaWithIsApproved struct {
 	ApprovalCriteria []*types.ApprovalCriteria
 }
 
-func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermission) ([]*types.UniversalPermissionDetails) {
+func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermission) []*types.UniversalPermissionDetails {
 	handled := []*types.UniversalPermissionDetails{}
 	for _, permission := range permissions {
 		badgeIds := types.GetUintRangesWithOptions(permission.BadgeIds, permission.UsesBadgeIds)
@@ -76,77 +75,76 @@ func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermiss
 
 		amountTrackerIdMapping := types.GetMappingWithOptions(permission.AmountTrackerIdMapping, permission.UsesAmountTrackerId)
 		challengeTrackerIdMapping := types.GetMappingWithOptions(permission.ChallengeTrackerIdMapping, permission.UsesChallengeTrackerId)
-		
 
-			for _, badgeId := range badgeIds {
-				for _, timelineTime := range timelineTimes {
-					for _, transferTime := range transferTimes {
-						for _, ownershipTime := range ownershipTimes {
-							approvalCriteria := 
+		for _, badgeId := range badgeIds {
+			for _, timelineTime := range timelineTimes {
+				for _, transferTime := range transferTimes {
+					for _, ownershipTime := range ownershipTimes {
+						approvalCriteria :=
 							[]*types.ApprovalCriteria{
 								permission.ArbitraryValue.(*types.CollectionApproval).ApprovalCriteria,
 							}
-							arbValue := &ApprovalCriteriaWithIsApproved{
-								ApprovalCriteria: approvalCriteria,
+						arbValue := &ApprovalCriteriaWithIsApproved{
+							ApprovalCriteria: approvalCriteria,
+						}
+
+						brokenDown := []*types.UniversalPermissionDetails{
+							{
+								BadgeId:                   badgeId,
+								TimelineTime:              timelineTime,
+								TransferTime:              transferTime,
+								OwnershipTime:             ownershipTime,
+								ToMapping:                 toMapping,
+								FromMapping:               fromMapping,
+								InitiatedByMapping:        initiatedByMapping,
+								AmountTrackerIdMapping:    amountTrackerIdMapping,
+								ChallengeTrackerIdMapping: challengeTrackerIdMapping,
+
+								ArbitraryValue: arbValue,
+							},
+						}
+
+						overlaps, inBrokenDownButNotHandled, inHandledButNotBrokenDown := types.GetOverlapsAndNonOverlaps(brokenDown, handled)
+						handled = []*types.UniversalPermissionDetails{}
+						//if no overlaps, we can just append all of them
+						handled = append(handled, inHandledButNotBrokenDown...)
+						handled = append(handled, inBrokenDownButNotHandled...)
+
+						//for overlaps, we append approval details
+						for _, overlap := range overlaps {
+							mergedApprovalCriteria := overlap.SecondDetails.ArbitraryValue.(*ApprovalCriteriaWithIsApproved).ApprovalCriteria
+
+							for _, approvalDetail := range overlap.FirstDetails.ArbitraryValue.(*ApprovalCriteriaWithIsApproved).ApprovalCriteria {
+								mergedApprovalCriteria = append(mergedApprovalCriteria, approvalDetail)
 							}
 
-							brokenDown := []*types.UniversalPermissionDetails{
-								{
-									BadgeId:            badgeId,
-									TimelineTime:       timelineTime,
-									TransferTime:       transferTime,
-									OwnershipTime:      ownershipTime,
-									ToMapping:          toMapping,
-									FromMapping:        fromMapping,
-									InitiatedByMapping: initiatedByMapping,
-									AmountTrackerIdMapping: amountTrackerIdMapping,
-									ChallengeTrackerIdMapping: challengeTrackerIdMapping,
-
-									ArbitraryValue: arbValue,
-								},
+							newArbValue := &ApprovalCriteriaWithIsApproved{
+								ApprovalCriteria: mergedApprovalCriteria,
 							}
 
-							overlaps, inBrokenDownButNotHandled, inHandledButNotBrokenDown := types.GetOverlapsAndNonOverlaps(brokenDown, handled)
-							handled = []*types.UniversalPermissionDetails{}
-							//if no overlaps, we can just append all of them
-							handled = append(handled, inHandledButNotBrokenDown...)
-							handled = append(handled, inBrokenDownButNotHandled...)
+							handled = append(handled, &types.UniversalPermissionDetails{
+								TimelineTime:       overlap.Overlap.TimelineTime,
+								BadgeId:            overlap.Overlap.BadgeId,
+								TransferTime:       overlap.Overlap.TransferTime,
+								OwnershipTime:      overlap.Overlap.OwnershipTime,
+								ToMapping:          overlap.Overlap.ToMapping,
+								FromMapping:        overlap.Overlap.FromMapping,
+								InitiatedByMapping: overlap.Overlap.InitiatedByMapping,
 
-							//for overlaps, we append approval details
-							for _, overlap := range overlaps {
-								mergedApprovalCriteria := overlap.SecondDetails.ArbitraryValue.(*ApprovalCriteriaWithIsApproved).ApprovalCriteria
+								AmountTrackerIdMapping:    overlap.Overlap.AmountTrackerIdMapping,
+								ChallengeTrackerIdMapping: overlap.Overlap.ChallengeTrackerIdMapping,
 
-								for _, approvalDetail := range overlap.FirstDetails.ArbitraryValue.(*ApprovalCriteriaWithIsApproved).ApprovalCriteria {
-									mergedApprovalCriteria = append(mergedApprovalCriteria, approvalDetail)
-								}
-
-								newArbValue := &ApprovalCriteriaWithIsApproved{
-									ApprovalCriteria: mergedApprovalCriteria,
-								}
-
-								handled = append(handled, &types.UniversalPermissionDetails{
-									TimelineTime:       overlap.Overlap.TimelineTime,
-									BadgeId:            overlap.Overlap.BadgeId,
-									TransferTime:       overlap.Overlap.TransferTime,
-									OwnershipTime:      overlap.Overlap.OwnershipTime,
-									ToMapping:          overlap.Overlap.ToMapping,
-									FromMapping:        overlap.Overlap.FromMapping,
-									InitiatedByMapping: overlap.Overlap.InitiatedByMapping,
-
-									AmountTrackerIdMapping: overlap.Overlap.AmountTrackerIdMapping,
-									ChallengeTrackerIdMapping: overlap.Overlap.ChallengeTrackerIdMapping,
-
-									//Appended for future lookups (not involved in overlap logic)
-									PermittedTimes: permittedTimes,
-									ForbiddenTimes: forbiddenTimes,
-									ArbitraryValue: newArbValue,
-								})
-							}
+								//Appended for future lookups (not involved in overlap logic)
+								PermittedTimes: permittedTimes,
+								ForbiddenTimes: forbiddenTimes,
+								ArbitraryValue: newArbValue,
+							})
 						}
 					}
 				}
 			}
-		
+		}
+
 	}
 
 	//It is first match only, so we can do this
@@ -163,7 +161,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermiss
 		copy(returnArr[idxToInsert+1:], returnArr[idxToInsert:])
 		returnArr[idxToInsert] = handledItem
 	}
-	
+
 	return handled
 }
 func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollection, oldApprovals []*types.CollectionApproval, newApprovals []*types.CollectionApproval) ([]*types.UniversalPermissionDetails, error) {
@@ -193,7 +191,7 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollec
 	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(y, []interface{}{newApprovals})
 
 	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []*types.CollectionApproval{}, func(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
-		//This is a little different from the other functions because it is not first match only 
+		//This is a little different from the other functions because it is not first match only
 
 		//Expand all collection approved transfers so that they are manipulated according to options and approvalCriteria / allowedCombinations are len 1
 		oldApprovals := ExpandCollectionApprovals(oldValue.([]*types.CollectionApproval))
@@ -215,7 +213,7 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollec
 		}
 		firstMatchesForNew := GetFirstMatchOnlyWithApprovalCriteria(newApprovalsCasted)
 
-		//Step 2: 
+		//Step 2:
 		//For every badge, we need to check if the new provided value is different in any way from the old value for each badge ID
 		//The overlapObjects from GetOverlapsAndNonOverlaps will return which badge IDs overlap
 		//Note this okay since we already converted everything to first match only in the previous step
@@ -242,7 +240,7 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollec
 				//Go one by one comparing old to new as flat array (if 2d array is empty we still treat it as an empty element
 				if len(oldVal) != len(newVal) {
 					different = true
-				}	else {
+				} else {
 
 					//Decided against allowing flexible order here because if we use a linear match approahc, chanigng order might cause unexpected behavior
 					//Even though, the user can choose which approval to select, it is still better to be consistent. Can change in the future though.

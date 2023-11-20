@@ -19,13 +19,13 @@ func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 	return func(sender sdk.AccAddress, msg json.RawMessage) ([]sdk.Msg, error) {
 
 		// Convert the RawMessage to a byte slice
-    jsonData, err := msg.MarshalJSON()
-    if err != nil {
+		jsonData, err := msg.MarshalJSON()
+		if err != nil {
 			return nil, sdkerrors.Wrap(err, err.Error())
-    }
+		}
 
-    //Create a reader from the byte slice
-    reader := bytes.NewReader(jsonData)
+		//Create a reader from the byte slice
+		reader := bytes.NewReader(jsonData)
 
 		var badgeCustomMsg badgeTypes.BadgeCustomMsgType
 		err = jsonpb.Unmarshal(reader, &badgeCustomMsg)
@@ -34,23 +34,23 @@ func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 		}
 
 		switch {
-			case badgeCustomMsg.CreateAddressMappingsMsg != nil:
-				badgeCustomMsg.CreateAddressMappingsMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.CreateAddressMappingsMsg}, nil
-			case badgeCustomMsg.UpdateCollectionMsg != nil:
-				badgeCustomMsg.UpdateCollectionMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.UpdateCollectionMsg}, nil
-			case badgeCustomMsg.DeleteCollectionMsg != nil:
-				badgeCustomMsg.DeleteCollectionMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.DeleteCollectionMsg}, nil
-			case badgeCustomMsg.TransferBadgesMsg != nil:
-				badgeCustomMsg.TransferBadgesMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.TransferBadgesMsg}, nil
-			case badgeCustomMsg.UpdateUserApprovalsMsg != nil:
-				badgeCustomMsg.UpdateUserApprovalsMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.UpdateUserApprovalsMsg}, nil
-			default:
-				return nil, sdkerrors.Wrapf(types.ErrInvalidMsg, "Unknown custom badge message variant %s", badgeCustomMsg)
-			}
+		case badgeCustomMsg.CreateAddressMappingsMsg != nil:
+			badgeCustomMsg.CreateAddressMappingsMsg.Creator = sender.String()
+			return []sdk.Msg{badgeCustomMsg.CreateAddressMappingsMsg}, nil
+		case badgeCustomMsg.UpdateCollectionMsg != nil:
+			badgeCustomMsg.UpdateCollectionMsg.Creator = sender.String()
+			return []sdk.Msg{badgeCustomMsg.UpdateCollectionMsg}, nil
+		case badgeCustomMsg.DeleteCollectionMsg != nil:
+			badgeCustomMsg.DeleteCollectionMsg.Creator = sender.String()
+			return []sdk.Msg{badgeCustomMsg.DeleteCollectionMsg}, nil
+		case badgeCustomMsg.TransferBadgesMsg != nil:
+			badgeCustomMsg.TransferBadgesMsg.Creator = sender.String()
+			return []sdk.Msg{badgeCustomMsg.TransferBadgesMsg}, nil
+		case badgeCustomMsg.UpdateUserApprovalsMsg != nil:
+			badgeCustomMsg.UpdateUserApprovalsMsg.Creator = sender.String()
+			return []sdk.Msg{badgeCustomMsg.UpdateUserApprovalsMsg}, nil
+		default:
+			return nil, sdkerrors.Wrapf(types.ErrInvalidMsg, "Unknown custom badge message variant %s", badgeCustomMsg)
+		}
 	}
 }

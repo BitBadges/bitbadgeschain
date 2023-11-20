@@ -22,9 +22,9 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 // service Msg {
 //   rpc NewCollection(MsgNewCollection) returns (MsgNewCollectionResponse);
 //   rpc MintAndDistributeBadges(MsgMintAndDistributeBadges) returns (MsgMintAndDistributeBadgesResponse);
-//   rpc UpdateCollectionApprovals(MsgUpdateCollectionApprovals) returns (MsgUpdateCollectionApprovalsResponse);
+//   rpc UpdateCollectionApprovals(MsgUniversalUpdateCollectionApprovals) returns (MsgUniversalUpdateCollectionApprovalsResponse);
 //   rpc UpdateMetadata(MsgUpdateMetadata) returns (MsgUpdateMetadataResponse);
-//   rpc UpdateCollectionPermissions(MsgUpdateCollectionPermissions) returns (MsgUpdateCollectionPermissionsResponse);
+//   rpc UpdateCollectionPermissions(MsgUniversalUpdateCollectionPermissions) returns (MsgUniversalUpdateCollectionPermissionsResponse);
 //   rpc UpdateUserPermissions (MsgUpdateUserPermissions) returns (MsgUpdateUserPermissionsResponse);
 //   rpc UpdateManager(MsgUpdateManager) returns (MsgUpdateManagerResponse);
 //   rpc ArchiveCollection(MsgArchiveCollection) returns (MsgArchiveCollectionResponse);
@@ -108,7 +108,7 @@ message MsgMintAndDistributeBadges {
 
 message MsgMintAndDistributeBadgesResponse {}
 
-message MsgUpdateCollectionApprovals {
+message MsgUniversalUpdateCollectionApprovals {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated CollectionApproval collectionApprovals = 3;
@@ -116,7 +116,7 @@ message MsgUpdateCollectionApprovals {
 }
 
 
-message MsgUpdateCollectionApprovalsResponse {}
+message MsgUniversalUpdateCollectionApprovalsResponse {}
 
 
 //Update badge Uris with new URI object, if permitted.
@@ -134,14 +134,14 @@ message MsgUpdateMetadata {
 message MsgUpdateMetadataResponse {}
 
 //Update badge permissions with new permissions, if permitted.
-message MsgUpdateCollectionPermissions {
+message MsgUniversalUpdateCollectionPermissions {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   CollectionPermissions permissions = 3;
   repeated AddressMapping addressMappings = 4;
 }
 
-message MsgUpdateCollectionPermissionsResponse {}
+message MsgUniversalUpdateCollectionPermissionsResponse {}
 
 message MsgUpdateUserPermissions {
   string creator = 1;

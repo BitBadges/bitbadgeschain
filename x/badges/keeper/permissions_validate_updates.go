@@ -227,7 +227,6 @@ func (k Keeper) ValidateUserPermissionsUpdate(ctx sdk.Context, oldPermissions *t
 	if err := k.ValidateActionPermissionUpdate(oldPermissions.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers, newPermissions.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers); err != nil {
 		return err
 	}
-	
 
 	return nil
 }
@@ -243,45 +242,44 @@ func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types
 	}
 
 	if err := k.ValidateActionPermissionUpdate(oldPermissions.CanDeleteCollection, newPermissions.CanDeleteCollection); err != nil {
-    return err
+		return err
 	}
 
 	if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateManager, newPermissions.CanUpdateManager); err != nil {
-			return err
+		return err
 	}
 
 	if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateCustomData, newPermissions.CanUpdateCustomData); err != nil {
-			return err
+		return err
 	}
 
 	if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateStandards, newPermissions.CanUpdateStandards); err != nil {
-			return err
+		return err
 	}
 
 	if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanArchiveCollection, newPermissions.CanArchiveCollection); err != nil {
-			return err
+		return err
 	}
 
 	if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateOffChainBalancesMetadata, newPermissions.CanUpdateOffChainBalancesMetadata); err != nil {
-			return err
+		return err
 	}
 
 	if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateCollectionMetadata, newPermissions.CanUpdateCollectionMetadata); err != nil {
-			return err
+		return err
 	}
 
 	if err := k.ValidateBalancesActionPermissionUpdate(oldPermissions.CanCreateMoreBadges, newPermissions.CanCreateMoreBadges); err != nil {
-			return err
+		return err
 	}
 
 	if err := k.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldPermissions.CanUpdateBadgeMetadata, newPermissions.CanUpdateBadgeMetadata); err != nil {
-			return err
+		return err
 	}
 
 	if err := k.ValidateCollectionApprovalPermissionsUpdate(ctx, oldPermissions.CanUpdateCollectionApprovals, newPermissions.CanUpdateCollectionApprovals); err != nil {
-			return err
+		return err
 	}
-
 
 	return nil
 }

@@ -52,7 +52,7 @@ func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Typ
 	return mapObject, nil
 }
 
-//Recursively iterate through message and populate empty fields with default falsy values
+// Recursively iterate through message and populate empty fields with default falsy values
 func NormalizeEIP712TypedData(typedData apitypes.TypedData) (apitypes.TypedData, error) {
 	msgValue := typedData.Message
 	normalizedMsgValue, err := NormalizeEmptyTypes(typedData, typedData.Types["Tx"], msgValue)
@@ -64,7 +64,6 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData) (apitypes.TypedData,
 
 	return typedData, nil
 }
-
 
 // GetPopulatedSchemaForMsg returns a sample JSON object for a given message type.
 func GetPopulatedSchemaForMsg(msg gjson.Result) (gjson.Result, error) {

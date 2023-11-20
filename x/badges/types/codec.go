@@ -11,8 +11,10 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgTransferBadges{}, "badges/TransferBadges", nil)
 	cdc.RegisterConcrete(&MsgDeleteCollection{}, "badges/DeleteCollection", nil)
 	cdc.RegisterConcrete(&MsgUpdateUserApprovals{}, "badges/UpdateUserApprovals", nil)
-	cdc.RegisterConcrete(&MsgUpdateCollection{}, "badges/UpdateCollection", nil)
+	cdc.RegisterConcrete(&MsgUniversalUpdateCollection{}, "badges/UpdateCollection", nil)
 	cdc.RegisterConcrete(&MsgCreateAddressMappings{}, "badges/CreateAddressMappings", nil)
+	cdc.RegisterConcrete(&MsgCreateCollection{}, "badges/MsgCreateCollection", nil)
+	cdc.RegisterConcrete(&MsgUpdateCollection{}, "badges/MsgUpdateCollection", nil)
 	// this line is used by starport scaffolding # 2
 }
 
@@ -21,10 +23,16 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgTransferBadges{},
 		&MsgDeleteCollection{},
 		&MsgUpdateUserApprovals{},
-		&MsgUpdateCollection{},
+		&MsgUniversalUpdateCollection{},
 		&MsgCreateAddressMappings{},
+		&MsgCreateCollection{},
+		&MsgUpdateCollection{},
 	)
 	// this line is used by starport scaffolding # 3
+
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
+
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

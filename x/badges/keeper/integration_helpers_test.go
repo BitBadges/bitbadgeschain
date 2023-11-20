@@ -81,75 +81,70 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 		{
 			Creator:      bob,
 			BalancesType: sdkmath.NewUint(1),
-			CollectionApprovals:  []*types.CollectionApproval{
+			CollectionApprovals: []*types.CollectionApproval{
 				{
 					ToMappingId:          "AllWithoutMint",
 					FromMappingId:        "AllWithoutMint",
 					InitiatedByMappingId: "AllWithoutMint",
 					TransferTimes:        GetFullUintRanges(),
-					OwnershipTimes: GetFullUintRanges(),
+					OwnershipTimes:       GetFullUintRanges(),
 					BadgeIds:             GetFullUintRanges(),
-					ApprovalId: "test",
-					AmountTrackerId:                 "test",
-					ChallengeTrackerId: 						"test",
+					ApprovalId:           "test",
+					AmountTrackerId:      "test",
+					ChallengeTrackerId:   "test",
 					ApprovalCriteria: &types.ApprovalCriteria{
-							MaxNumTransfers: &types.MaxNumTransfers{
-								OverallMaxNumTransfers: sdkmath.NewUint(1000),
-							},
-							ApprovalAmounts: &types.ApprovalAmounts{
-								PerFromAddressApprovalAmount: sdkmath.NewUint(1),
-							},
-						
+						MaxNumTransfers: &types.MaxNumTransfers{
+							OverallMaxNumTransfers: sdkmath.NewUint(1000),
+						},
+						ApprovalAmounts: &types.ApprovalAmounts{
+							PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+						},
 					},
 				}},
-			DefaultIncomingApprovals:[]*types.UserIncomingApproval{
-						{
-							FromMappingId:        "AllWithoutMint",
-							InitiatedByMappingId: "AllWithoutMint",
-							TransferTimes:        GetFullUintRanges(),
-							OwnershipTimes: 			GetFullUintRanges(),
-							BadgeIds:             GetFullUintRanges(),
-	
-							ApprovalId: "test",
-							AmountTrackerId:                 "test",
-							ChallengeTrackerId: 						"test",
-							ApprovalCriteria: &types.IncomingApprovalCriteria{
-								
-									
-									MaxNumTransfers: &types.MaxNumTransfers{
-										OverallMaxNumTransfers: sdkmath.NewUint(1000),
-									},
-									ApprovalAmounts: &types.ApprovalAmounts{
-										PerFromAddressApprovalAmount: sdkmath.NewUint(1),
-									},
-								
-							},
+			DefaultIncomingApprovals: []*types.UserIncomingApproval{
+				{
+					FromMappingId:        "AllWithoutMint",
+					InitiatedByMappingId: "AllWithoutMint",
+					TransferTimes:        GetFullUintRanges(),
+					OwnershipTimes:       GetFullUintRanges(),
+					BadgeIds:             GetFullUintRanges(),
+
+					ApprovalId:         "test",
+					AmountTrackerId:    "test",
+					ChallengeTrackerId: "test",
+					ApprovalCriteria: &types.IncomingApprovalCriteria{
+
+						MaxNumTransfers: &types.MaxNumTransfers{
+							OverallMaxNumTransfers: sdkmath.NewUint(1000),
 						},
-					
+						ApprovalAmounts: &types.ApprovalAmounts{
+							PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+						},
+					},
+				},
 			},
 			DefaultOutgoingApprovals: []*types.UserOutgoingApproval{
-						{
-							ToMappingId:          "AllWithoutMint",
-							InitiatedByMappingId: "AllWithoutMint",
-							TransferTimes:        GetFullUintRanges(),
-							OwnershipTimes: GetFullUintRanges(),
-							BadgeIds:             GetFullUintRanges(),
-	
-							ApprovalId: "test",
-							AmountTrackerId:                 		"test",
-							ChallengeTrackerId: 						"test",
-							ApprovalCriteria: &types.OutgoingApprovalCriteria{
-								MaxNumTransfers: &types.MaxNumTransfers{
-									OverallMaxNumTransfers: sdkmath.NewUint(1000),
-								},
-								ApprovalAmounts: &types.ApprovalAmounts{
-									PerFromAddressApprovalAmount: sdkmath.NewUint(1),
-								},
-							},
+				{
+					ToMappingId:          "AllWithoutMint",
+					InitiatedByMappingId: "AllWithoutMint",
+					TransferTimes:        GetFullUintRanges(),
+					OwnershipTimes:       GetFullUintRanges(),
+					BadgeIds:             GetFullUintRanges(),
+
+					ApprovalId:         "test",
+					AmountTrackerId:    "test",
+					ChallengeTrackerId: "test",
+					ApprovalCriteria: &types.OutgoingApprovalCriteria{
+						MaxNumTransfers: &types.MaxNumTransfers{
+							OverallMaxNumTransfers: sdkmath.NewUint(1000),
 						},
-					
+						ApprovalAmounts: &types.ApprovalAmounts{
+							PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+						},
+					},
+				},
 			},
-			
+
 			BadgesToCreate: []*types.Balance{
 				{
 					Amount:         sdkmath.NewUint(1),
@@ -158,15 +153,15 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 				},
 			},
 			Permissions: &types.CollectionPermissions{
-				CanArchiveCollection:                           []*types.TimedUpdatePermission{},
-				CanUpdateOffChainBalancesMetadata:    []*types.TimedUpdatePermission{},
-				CanUpdateStandards:                   []*types.TimedUpdatePermission{},
-				CanUpdateCustomData:                  []*types.TimedUpdatePermission{},
-				CanDeleteCollection:                  []*types.ActionPermission{},
-				CanUpdateManager:                     []*types.TimedUpdatePermission{},
-				CanUpdateCollectionMetadata:          []*types.TimedUpdatePermission{},
-				CanUpdateBadgeMetadata:               []*types.TimedUpdateWithBadgeIdsPermission{},
-				CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{},
+				CanArchiveCollection:              []*types.TimedUpdatePermission{},
+				CanUpdateOffChainBalancesMetadata: []*types.TimedUpdatePermission{},
+				CanUpdateStandards:                []*types.TimedUpdatePermission{},
+				CanUpdateCustomData:               []*types.TimedUpdatePermission{},
+				CanDeleteCollection:               []*types.ActionPermission{},
+				CanUpdateManager:                  []*types.TimedUpdatePermission{},
+				CanUpdateCollectionMetadata:       []*types.TimedUpdatePermission{},
+				CanUpdateBadgeMetadata:            []*types.TimedUpdateWithBadgeIdsPermission{},
+				CanUpdateCollectionApprovals:      []*types.CollectionApprovalPermission{},
 				CanCreateMoreBadges: []*types.BalancesActionPermission{
 					{
 						PermittedTimes: GetFullUintRanges(),
@@ -184,25 +179,25 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*type
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(uint64(math.MaxUint64))
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
 
-		ToMappingId:                            "AllWithoutMint",
-		FromMappingId:                          "Mint",
-		InitiatedByMappingId:                   "AllWithoutMint",
-		
-		TransferTimes:                          GetFullUintRanges(),
-		BadgeIds:                               GetFullUintRanges(),
-		OwnershipTimes: GetFullUintRanges(),
-		ApprovalId: "mint-test",
-		AmountTrackerId:                 "mint-test",
-		ChallengeTrackerId: 						"mint-test",
+		ToMappingId:          "AllWithoutMint",
+		FromMappingId:        "Mint",
+		InitiatedByMappingId: "AllWithoutMint",
+
+		TransferTimes:      GetFullUintRanges(),
+		BadgeIds:           GetFullUintRanges(),
+		OwnershipTimes:     GetFullUintRanges(),
+		ApprovalId:         "mint-test",
+		AmountTrackerId:    "mint-test",
+		ChallengeTrackerId: "mint-test",
 		ApprovalCriteria: &types.ApprovalCriteria{
-				MaxNumTransfers: &types.MaxNumTransfers{
-					OverallMaxNumTransfers: sdkmath.NewUint(1000),
-				},
-				ApprovalAmounts: &types.ApprovalAmounts{
-					PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
-				},
-				OverridesFromOutgoingApprovals: true,
-				OverridesToIncomingApprovals:   true,
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
 		},
 	},
 	}, collectionsToCreate[0].CollectionApprovals...,

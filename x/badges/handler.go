@@ -19,8 +19,14 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgCreateAddressMappings:
 			res, err := msgServer.CreateAddressMappings(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgUniversalUpdateCollection:
+			res, err := msgServer.UniversalUpdateCollection(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgUpdateCollection:
 			res, err := msgServer.UpdateCollection(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgCreateCollection:
+			res, err := msgServer.CreateCollection(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgTransferBadges:
 			res, err := msgServer.TransferBadges(sdk.WrapSDKContext(ctx), msg)

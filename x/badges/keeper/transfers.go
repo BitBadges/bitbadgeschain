@@ -25,12 +25,12 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 			toUserBalance, found := k.GetUserBalanceFromStore(ctx, toBalanceKey)
 			if !found {
 				toUserBalance = &types.UserBalanceStore{
-					Balances:                          []*types.Balance{},
+					Balances:          []*types.Balance{},
 					OutgoingApprovals: collection.DefaultUserOutgoingApprovals,
 					IncomingApprovals: collection.DefaultUserIncomingApprovals,
 					AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultAutoApproveSelfInitiatedOutgoingTransfers,
 					AutoApproveSelfInitiatedIncomingTransfers: collection.DefaultAutoApproveSelfInitiatedIncomingTransfers,
-					UserPermissions: 								   collection.DefaultUserPermissions,
+					UserPermissions: collection.DefaultUserPermissions,
 				}
 			}
 
@@ -109,7 +109,6 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollection, transferBalances []*types.Balance, fromUserBalance *types.UserBalanceStore, toUserBalance *types.UserBalanceStore, from string, to string, initiatedBy string, solutions []*types.MerkleProof, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string, prioritizedApprovals []*types.ApprovalIdentifierDetails, onlyCheckPrioritized bool) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
 	err := *new(error)
 
-
 	for _, balance := range transferBalances {
 		badgeIds := balance.BadgeIds
 		times := balance.OwnershipTimes
@@ -119,8 +118,6 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollectio
 			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "collection approvals not satisfied")
 		}
 
-
-		
 		if len(userApprovals) > 0 {
 			for _, userApproval := range userApprovals {
 				for _, balance := range userApproval.Balances {
@@ -151,7 +148,6 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollectio
 			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 		}
 	}
-
 
 	return fromUserBalance, toUserBalance, nil
 }

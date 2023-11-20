@@ -40,14 +40,14 @@ func GetUpdateCombinationsToCheck(
 		}
 		for _, detailToAdd := range detailsToAdd {
 			detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
-				TimelineTime:       detail.TimelineTime,
-				BadgeId:            detailToAdd.BadgeId,
-				TransferTime:       detailToAdd.TransferTime,
-				OwnershipTime: 			detailToAdd.OwnershipTime,
-				ToMapping:          detailToAdd.ToMapping,
-				FromMapping:        detailToAdd.FromMapping,
-				InitiatedByMapping: detailToAdd.InitiatedByMapping,
-				AmountTrackerIdMapping: detailToAdd.AmountTrackerIdMapping,
+				TimelineTime:              detail.TimelineTime,
+				BadgeId:                   detailToAdd.BadgeId,
+				TransferTime:              detailToAdd.TransferTime,
+				OwnershipTime:             detailToAdd.OwnershipTime,
+				ToMapping:                 detailToAdd.ToMapping,
+				FromMapping:               detailToAdd.FromMapping,
+				InitiatedByMapping:        detailToAdd.InitiatedByMapping,
+				AmountTrackerIdMapping:    detailToAdd.AmountTrackerIdMapping,
 				ChallengeTrackerIdMapping: detailToAdd.ChallengeTrackerIdMapping,
 			})
 		}
@@ -61,14 +61,14 @@ func GetUpdateCombinationsToCheck(
 		}
 		for _, detailToAdd := range detailsToAdd {
 			detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
-				TimelineTime:       detail.TimelineTime,
-				BadgeId:            detailToAdd.BadgeId,
-				TransferTime:       detailToAdd.TransferTime,
-				OwnershipTime: 			detailToAdd.OwnershipTime,
-				ToMapping:          detailToAdd.ToMapping,
-				FromMapping:        detailToAdd.FromMapping,
-				InitiatedByMapping: detailToAdd.InitiatedByMapping,
-				AmountTrackerIdMapping: detailToAdd.AmountTrackerIdMapping,
+				TimelineTime:              detail.TimelineTime,
+				BadgeId:                   detailToAdd.BadgeId,
+				TransferTime:              detailToAdd.TransferTime,
+				OwnershipTime:             detailToAdd.OwnershipTime,
+				ToMapping:                 detailToAdd.ToMapping,
+				FromMapping:               detailToAdd.FromMapping,
+				InitiatedByMapping:        detailToAdd.InitiatedByMapping,
+				AmountTrackerIdMapping:    detailToAdd.AmountTrackerIdMapping,
 				ChallengeTrackerIdMapping: detailToAdd.ChallengeTrackerIdMapping,
 			})
 		}
@@ -85,14 +85,14 @@ func GetUpdateCombinationsToCheck(
 		}
 		for _, detailToAdd := range detailsToAdd {
 			detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
-				TimelineTime:       overlap.TimelineTime,
-				BadgeId:            detailToAdd.BadgeId,
-				TransferTime:       detailToAdd.TransferTime,
-				OwnershipTime: 			detailToAdd.OwnershipTime,
-				ToMapping:          detailToAdd.ToMapping,
-				FromMapping:        detailToAdd.FromMapping,
-				InitiatedByMapping: detailToAdd.InitiatedByMapping,
-				AmountTrackerIdMapping: detailToAdd.AmountTrackerIdMapping,
+				TimelineTime:              overlap.TimelineTime,
+				BadgeId:                   detailToAdd.BadgeId,
+				TransferTime:              detailToAdd.TransferTime,
+				OwnershipTime:             detailToAdd.OwnershipTime,
+				ToMapping:                 detailToAdd.ToMapping,
+				FromMapping:               detailToAdd.FromMapping,
+				InitiatedByMapping:        detailToAdd.InitiatedByMapping,
+				AmountTrackerIdMapping:    detailToAdd.AmountTrackerIdMapping,
 				ChallengeTrackerIdMapping: detailToAdd.ChallengeTrackerIdMapping,
 			})
 		}

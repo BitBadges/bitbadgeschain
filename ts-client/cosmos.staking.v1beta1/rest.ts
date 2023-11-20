@@ -183,6 +183,15 @@ export interface Stakingv1Beta1Validator {
    * Since: cosmos-sdk 0.46
    */
   min_self_delegation?: string;
+
+  /**
+   * strictly positive if this validator's unbonding has been stopped by external modules
+   * @format int64
+   */
+  unbonding_on_hold_ref_count?: string;
+
+  /** list of unbonding ids, each uniquely identifing an unbonding of this validator */
+  unbonding_ids?: string[];
 }
 
 export interface TypesBlockID {
@@ -192,7 +201,7 @@ export interface TypesBlockID {
 }
 
 /**
- * Header defines the structure of a Tendermint block header.
+ * Header defines the structure of a block header.
  */
 export interface TypesHeader {
   /**
@@ -398,7 +407,7 @@ recent HistoricalInfo
 (`n` is set by the staking module's `historical_entries` parameter).
 */
 export interface V1Beta1HistoricalInfo {
-  /** Header defines the structure of a Tendermint block header. */
+  /** Header defines the structure of a block header. */
   header?: TypesHeader;
   valset?: Stakingv1Beta1Validator[];
 }
@@ -438,6 +447,14 @@ export interface V1Beta1MsgUndelegateResponse {
   /** @format date-time */
   completion_time?: string;
 }
+
+/**
+* MsgUpdateParamsResponse defines the response structure for executing a
+MsgUpdateParams message.
+
+Since: cosmos-sdk 0.47
+*/
+export type V1Beta1MsgUpdateParamsResponse = object;
 
 /**
 * message SomeRequest {
@@ -512,7 +529,7 @@ export interface V1Beta1PageResponse {
 }
 
 /**
- * Params defines the parameters for the staking module.
+ * Params defines the parameters for the x/staking module.
  */
 export interface V1Beta1Params {
   /** unbonding_time is the time duration of unbonding. */
@@ -723,6 +740,18 @@ export interface V1Beta1RedelegationEntry {
 
   /** shares_dst is the amount of destination-validator shares created by redelegation. */
   shares_dst?: string;
+
+  /**
+   * Incrementing id that uniquely identifies this entry
+   * @format uint64
+   */
+  unbonding_id?: string;
+
+  /**
+   * Strictly positive if this entry's unbonding has been stopped by external modules
+   * @format int64
+   */
+  unbonding_on_hold_ref_count?: string;
 }
 
 /**
@@ -790,6 +819,18 @@ export interface V1Beta1UnbondingDelegationEntry {
 
   /** balance defines the tokens to receive at completion. */
   balance?: string;
+
+  /**
+   * Incrementing id that uniquely identifies this entry
+   * @format uint64
+   */
+  unbonding_id?: string;
+
+  /**
+   * Strictly positive if this entry's unbonding has been stopped by external modules
+   * @format int64
+   */
+  unbonding_on_hold_ref_count?: string;
 }
 
 /**
@@ -931,7 +972,7 @@ export class HttpClient<SecurityDataType = unknown> {
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set.
    *
    * @tags Query
    * @name QueryDelegatorDelegations
@@ -958,7 +999,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     });
 
   /**
-   * No description
+   * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set.
    *
    * @tags Query
    * @name QueryRedelegations
@@ -987,7 +1028,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     });
 
   /**
- * No description
+ * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set.
  * 
  * @tags Query
  * @name QueryDelegatorUnbondingDelegations
@@ -1015,7 +1056,7 @@ delegator address.
     });
 
   /**
- * No description
+ * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set.
  * 
  * @tags Query
  * @name QueryDelegatorValidators
@@ -1108,7 +1149,7 @@ pair.
     });
 
   /**
-   * No description
+   * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set.
    *
    * @tags Query
    * @name QueryValidators
@@ -1151,7 +1192,7 @@ pair.
     });
 
   /**
-   * No description
+   * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set.
    *
    * @tags Query
    * @name QueryValidatorDelegations
@@ -1211,7 +1252,7 @@ pair.
     });
 
   /**
-   * No description
+   * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set.
    *
    * @tags Query
    * @name QueryValidatorUnbondingDelegations

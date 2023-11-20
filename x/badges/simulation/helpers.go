@@ -76,98 +76,88 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 	randomCollectionPermissions := &types.CollectionPermissions{
 		CanDeleteCollection: []*types.ActionPermission{
 			{
-				
-					PermittedTimes: GetTimelineTimes(r, 3),
-					ForbiddenTimes: GetTimelineTimes(r, 3),
-				
+
+				PermittedTimes: GetTimelineTimes(r, 3),
+				ForbiddenTimes: GetTimelineTimes(r, 3),
 			},
 		},
 		CanArchiveCollection: []*types.TimedUpdatePermission{
 			{
-				
-					PermittedTimes: GetTimelineTimes(r, 3),
-					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes:  GetTimelineTimes(r, 3),
-				
+
+				PermittedTimes: GetTimelineTimes(r, 3),
+				ForbiddenTimes: GetTimelineTimes(r, 3),
+				TimelineTimes:  GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateOffChainBalancesMetadata: []*types.TimedUpdatePermission{
 			{
-				
-					PermittedTimes: GetTimelineTimes(r, 3),
-					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes:  GetTimelineTimes(r, 3),
-				
+
+				PermittedTimes: GetTimelineTimes(r, 3),
+				ForbiddenTimes: GetTimelineTimes(r, 3),
+				TimelineTimes:  GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateStandards: []*types.TimedUpdatePermission{
 			{
-				
-					PermittedTimes: GetTimelineTimes(r, 3),
-					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes:  GetTimelineTimes(r, 3),
-				
+
+				PermittedTimes: GetTimelineTimes(r, 3),
+				ForbiddenTimes: GetTimelineTimes(r, 3),
+				TimelineTimes:  GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateCustomData: []*types.TimedUpdatePermission{
 			{
-				
-					PermittedTimes: GetTimelineTimes(r, 3),
-					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes:  GetTimelineTimes(r, 3),
-				
+
+				PermittedTimes: GetTimelineTimes(r, 3),
+				ForbiddenTimes: GetTimelineTimes(r, 3),
+				TimelineTimes:  GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateManager: []*types.TimedUpdatePermission{
 			{
-				
-					PermittedTimes: GetTimelineTimes(r, 3),
-					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes:  GetTimelineTimes(r, 3),
-				
+
+				PermittedTimes: GetTimelineTimes(r, 3),
+				ForbiddenTimes: GetTimelineTimes(r, 3),
+				TimelineTimes:  GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateCollectionMetadata: []*types.TimedUpdatePermission{
 			{
-				
-					PermittedTimes: GetTimelineTimes(r, 3),
-					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes:  GetTimelineTimes(r, 3),
-				
+
+				PermittedTimes: GetTimelineTimes(r, 3),
+				ForbiddenTimes: GetTimelineTimes(r, 3),
+				TimelineTimes:  GetTimelineTimes(r, 3),
 			},
 		},
 		CanCreateMoreBadges: []*types.BalancesActionPermission{
 			{
-				
-					PermittedTimes: GetTimelineTimes(r, 3),
-					ForbiddenTimes: GetTimelineTimes(r, 3),
-					OwnershipTimes: GetTimelineTimes(r, 3),
-					BadgeIds:       GetTimelineTimes(r, 3),
-				
+
+				PermittedTimes: GetTimelineTimes(r, 3),
+				ForbiddenTimes: GetTimelineTimes(r, 3),
+				OwnershipTimes: GetTimelineTimes(r, 3),
+				BadgeIds:       GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{
 			{
-				
-					PermittedTimes: GetTimelineTimes(r, 3),
-					ForbiddenTimes: GetTimelineTimes(r, 3),
-					TimelineTimes:  GetTimelineTimes(r, 3),
-					BadgeIds:       GetTimelineTimes(r, 3),
-				
+
+				PermittedTimes: GetTimelineTimes(r, 3),
+				ForbiddenTimes: GetTimelineTimes(r, 3),
+				TimelineTimes:  GetTimelineTimes(r, 3),
+				BadgeIds:       GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{
 			{
-				
-					PermittedTimes:       GetTimelineTimes(r, 3),
-					ForbiddenTimes:       GetTimelineTimes(r, 3),
-					TransferTimes:        GetTimelineTimes(r, 3),
-					OwnershipTimes: 		 GetTimelineTimes(r, 3),
-					BadgeIds:             GetTimelineTimes(r, 3),
-					ToMappingId:          GetRandomAddresses(r, 3, accs)[0],
-					FromMappingId:        GetRandomAddresses(r, 3, accs)[0],
-					InitiatedByMappingId: GetRandomAddresses(r, 3, accs)[0],
-				
+
+				PermittedTimes:       GetTimelineTimes(r, 3),
+				ForbiddenTimes:       GetTimelineTimes(r, 3),
+				TransferTimes:        GetTimelineTimes(r, 3),
+				OwnershipTimes:       GetTimelineTimes(r, 3),
+				BadgeIds:             GetTimelineTimes(r, 3),
+				ToMappingId:          GetRandomAddresses(r, 3, accs)[0],
+				FromMappingId:        GetRandomAddresses(r, 3, accs)[0],
+				InitiatedByMappingId: GetRandomAddresses(r, 3, accs)[0],
 			},
 		},
 	}

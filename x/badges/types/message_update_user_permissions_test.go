@@ -18,18 +18,18 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid address",
 			msg: types.MsgUpdateUserApprovals{
-				Creator:      "invalid_address",
-				CollectionId: sdkmath.NewUint(1),
-				UserPermissions:  &types.UserPermissions{},
+				Creator:               "invalid_address",
+				CollectionId:          sdkmath.NewUint(1),
+				UserPermissions:       &types.UserPermissions{},
 				UpdateUserPermissions: true,
 			},
 			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: types.MsgUpdateUserApprovals{
-				Creator:      sample.AccAddress(),
-				CollectionId: sdkmath.NewUint(1),
-				UserPermissions:  &types.UserPermissions{},
+				Creator:               sample.AccAddress(),
+				CollectionId:          sdkmath.NewUint(1),
+				UserPermissions:       &types.UserPermissions{},
 				UpdateUserPermissions: true,
 			},
 		},
@@ -45,8 +45,8 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 		{
 			name: "overlap times",
 			msg: types.MsgUpdateUserApprovals{
-				Creator:      sample.AccAddress(),
-				CollectionId: sdkmath.NewUint(1),
+				Creator:               sample.AccAddress(),
+				CollectionId:          sdkmath.NewUint(1),
 				UpdateUserPermissions: true,
 				UserPermissions: &types.UserPermissions{
 					CanUpdateOutgoingApprovals: []*types.UserOutgoingApprovalPermission{
@@ -62,9 +62,9 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 		{
 			name: "valid",
 			msg: types.MsgUpdateUserApprovals{
-				Creator:      sample.AccAddress(),
-				CollectionId: sdkmath.NewUint(1),
-				UserPermissions:  GetValidUserPermissions(),
+				Creator:               sample.AccAddress(),
+				CollectionId:          sdkmath.NewUint(1),
+				UserPermissions:       GetValidUserPermissions(),
 				UpdateUserPermissions: true,
 			},
 		},

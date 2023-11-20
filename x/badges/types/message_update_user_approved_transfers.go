@@ -40,7 +40,6 @@ func (msg *MsgUpdateUserApprovals) ValidateBasic() error {
 	return msg.CheckAndCleanMsg(false)
 }
 
-
 func (msg *MsgUpdateUserApprovals) CheckAndCleanMsg(canChangeValues bool) error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {

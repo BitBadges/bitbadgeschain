@@ -13,7 +13,6 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		return nil, err
 	}
 
-
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
@@ -29,12 +28,12 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 	userBalance, found := k.GetUserBalanceFromStore(ctx, balanceKey)
 	if !found {
 		userBalance = &types.UserBalanceStore{
-			Balances:                          []*types.Balance{},
+			Balances:          []*types.Balance{},
 			OutgoingApprovals: collection.DefaultUserOutgoingApprovals,
 			IncomingApprovals: collection.DefaultUserIncomingApprovals,
 			AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultAutoApproveSelfInitiatedOutgoingTransfers,
 			AutoApproveSelfInitiatedIncomingTransfers: collection.DefaultAutoApproveSelfInitiatedIncomingTransfers,
-			UserPermissions:                   collection.DefaultUserPermissions,
+			UserPermissions: collection.DefaultUserPermissions,
 		}
 	}
 
@@ -50,7 +49,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 	}
 
 	if msg.UpdateIncomingApprovals {
-		if err := k.ValidateUserIncomingApprovalsUpdate(ctx, collection,  userBalance.IncomingApprovals, msg.IncomingApprovals, userBalance.UserPermissions.CanUpdateIncomingApprovals, msg.Creator); err != nil {
+		if err := k.ValidateUserIncomingApprovalsUpdate(ctx, collection, userBalance.IncomingApprovals, msg.IncomingApprovals, userBalance.UserPermissions.CanUpdateIncomingApprovals, msg.Creator); err != nil {
 			return nil, err
 		}
 		userBalance.IncomingApprovals = msg.IncomingApprovals
@@ -82,8 +81,6 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 
 		userBalance.UserPermissions = msg.UserPermissions
 	}
-
-
 
 	err = k.SetUserBalanceInStore(ctx, balanceKey, userBalance)
 	if err != nil {

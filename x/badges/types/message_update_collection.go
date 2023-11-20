@@ -5,25 +5,25 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const TypeMsgUpdateCollection = "update_collection"
+const TypeMsgUniversalUpdateCollection = "update_collection"
 
-var _ sdk.Msg = &MsgUpdateCollection{}
+var _ sdk.Msg = &MsgUniversalUpdateCollection{}
 
-func NewMsgUpdateCollection(creator string) *MsgUpdateCollection {
-	return &MsgUpdateCollection{
+func NewMsgUniversalUpdateCollection(creator string) *MsgUniversalUpdateCollection {
+	return &MsgUniversalUpdateCollection{
 		Creator: creator,
 	}
 }
 
-func (msg *MsgUpdateCollection) Route() string {
+func (msg *MsgUniversalUpdateCollection) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgUpdateCollection) Type() string {
-	return TypeMsgUpdateCollection
+func (msg *MsgUniversalUpdateCollection) Type() string {
+	return TypeMsgUniversalUpdateCollection
 }
 
-func (msg *MsgUpdateCollection) GetSigners() []sdk.AccAddress {
+func (msg *MsgUniversalUpdateCollection) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -31,16 +31,16 @@ func (msg *MsgUpdateCollection) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgUpdateCollection) GetSignBytes() []byte {
+func (msg *MsgUniversalUpdateCollection) GetSignBytes() []byte {
 	bz := AminoCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgUpdateCollection) ValidateBasic() error {
+func (msg *MsgUniversalUpdateCollection) ValidateBasic() error {
 	return msg.CheckAndCleanMsg(false)
 }
 
-func (msg *MsgUpdateCollection) CheckAndCleanMsg(canChangeValues bool) error {
+func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(canChangeValues bool) error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
@@ -55,7 +55,7 @@ func (msg *MsgUpdateCollection) CheckAndCleanMsg(canChangeValues bool) error {
 		if err != nil {
 			return err
 		}
-	}	
+	}
 
 	if err := ValidateIsArchivedTimeline(msg.IsArchivedTimeline); err != nil {
 		return err
@@ -76,8 +76,6 @@ func (msg *MsgUpdateCollection) CheckAndCleanMsg(canChangeValues bool) error {
 	if err := ValidateCollectionApprovals(msg.CollectionApprovals, canChangeValues); err != nil {
 		return err
 	}
-
-
 
 	if err := ValidateOffChainBalancesMetadataTimeline(msg.OffChainBalancesMetadataTimeline); err != nil {
 		return err
@@ -117,8 +115,8 @@ func (msg *MsgUpdateCollection) CheckAndCleanMsg(canChangeValues bool) error {
 
 	if msg.DefaultUserPermissions == nil {
 		msg.DefaultUserPermissions = &UserPermissions{
-			CanUpdateIncomingApprovals: []*UserIncomingApprovalPermission{},
-			CanUpdateOutgoingApprovals: []*UserOutgoingApprovalPermission{},
+			CanUpdateIncomingApprovals:                         []*UserIncomingApprovalPermission{},
+			CanUpdateOutgoingApprovals:                         []*UserOutgoingApprovalPermission{},
 			CanUpdateAutoApproveSelfInitiatedOutgoingTransfers: []*ActionPermission{},
 			CanUpdateAutoApproveSelfInitiatedIncomingTransfers: []*ActionPermission{},
 		}
@@ -182,22 +180,22 @@ func (msg *MsgUpdateCollection) CheckAndCleanMsg(canChangeValues bool) error {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
 			}
 		}
-	
-	if msg.BalancesType != "Off-Chain" {
-		if len(msg.OffChainBalancesMetadataTimeline) > 0 {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes on-chain balances but off-chain balances are set")
-		}
-	}
 
-	if msg.BalancesType == "Inherited" {
-		// if msg.InheritedCollectionId.IsNil() || msg.InheritedCollectionId.IsZero() {
-		// 	return sdkerrors.Wrapf(ErrInvalidRequest, "inherited collection id must be set for inherited balances")
-		// }
-
-		if msg.BadgesToCreate != nil && len(msg.BadgesToCreate) > 0 {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "badges are inherited from parent so you should not specify to create any badges")
+		if msg.BalancesType != "Off-Chain" {
+			if len(msg.OffChainBalancesMetadataTimeline) > 0 {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes on-chain balances but off-chain balances are set")
+			}
 		}
-	}
+
+		if msg.BalancesType == "Inherited" {
+			// if msg.InheritedCollectionId.IsNil() || msg.InheritedCollectionId.IsZero() {
+			// 	return sdkerrors.Wrapf(ErrInvalidRequest, "inherited collection id must be set for inherited balances")
+			// }
+
+			if msg.BadgesToCreate != nil && len(msg.BadgesToCreate) > 0 {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "badges are inherited from parent so you should not specify to create any badges")
+			}
+		}
 	}
 
 	if len(msg.CollectionApprovals) > 0 {
@@ -220,8 +218,6 @@ func (msg *MsgUpdateCollection) CheckAndCleanMsg(canChangeValues bool) error {
 	if err := ValidateManagerTimeline(msg.ManagerTimeline); err != nil {
 		return err
 	}
-
-	
 
 	return nil
 }

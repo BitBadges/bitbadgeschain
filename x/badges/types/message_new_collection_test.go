@@ -14,45 +14,45 @@ import (
 func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgUpdateCollection
+		msg  types.MsgUniversalUpdateCollection
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgUpdateCollection{
-				Creator:                    "invalid_address",
-				CollectionId: 						 sdkmath.NewUint(0),
-				BalancesType:               "Standard",
+			msg: types.MsgUniversalUpdateCollection{
+				Creator:                          "invalid_address",
+				CollectionId:                     sdkmath.NewUint(0),
+				BalancesType:                     "Standard",
 				UpdateCollectionMetadataTimeline: true,
-				CollectionMetadataTimeline: GetValidCollectionMetadataTimeline(),
-				UpdateBadgeMetadataTimeline: true,
-				BadgeMetadataTimeline:      GetValidBadgeMetadataTimeline(),
-				UpdateCollectionPermissions: true,
-				CollectionPermissions:                &types.CollectionPermissions{},
+				CollectionMetadataTimeline:       GetValidCollectionMetadataTimeline(),
+				UpdateBadgeMetadataTimeline:      true,
+				BadgeMetadataTimeline:            GetValidBadgeMetadataTimeline(),
+				UpdateCollectionPermissions:      true,
+				CollectionPermissions:            &types.CollectionPermissions{},
 			},
 			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid state",
-			msg: types.MsgUpdateCollection{
-				Creator:                    sample.AccAddress(),
-				CollectionId: 						 sdkmath.NewUint(0),
-				BalancesType:               "Standard",
+			msg: types.MsgUniversalUpdateCollection{
+				Creator:                          sample.AccAddress(),
+				CollectionId:                     sdkmath.NewUint(0),
+				BalancesType:                     "Standard",
 				UpdateCollectionMetadataTimeline: true,
-				UpdateCollectionPermissions: true,
-				UpdateBadgeMetadataTimeline: true,
-				CollectionMetadataTimeline: GetValidCollectionMetadataTimeline(),
-				BadgeMetadataTimeline:      GetValidBadgeMetadataTimeline(),
-				CollectionPermissions:                &types.CollectionPermissions{},
+				UpdateCollectionPermissions:      true,
+				UpdateBadgeMetadataTimeline:      true,
+				CollectionMetadataTimeline:       GetValidCollectionMetadataTimeline(),
+				BadgeMetadataTimeline:            GetValidBadgeMetadataTimeline(),
+				CollectionPermissions:            &types.CollectionPermissions{},
 			},
 		}, {
 			name: "invalid URI",
-			msg: types.MsgUpdateCollection{
-				Creator:      sample.AccAddress(),
-				CollectionId: 						 sdkmath.NewUint(0),
-				BalancesType: "Standard",
+			msg: types.MsgUniversalUpdateCollection{
+				Creator:                          sample.AccAddress(),
+				CollectionId:                     sdkmath.NewUint(0),
+				BalancesType:                     "Standard",
 				UpdateCollectionMetadataTimeline: true,
-				UpdateCollectionPermissions: true,
-				UpdateBadgeMetadataTimeline: true,
+				UpdateCollectionPermissions:      true,
+				UpdateBadgeMetadataTimeline:      true,
 				CollectionMetadataTimeline: []*types.CollectionMetadataTimeline{
 					{
 						CollectionMetadata: &types.CollectionMetadata{
@@ -67,21 +67,21 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 					},
 				},
 				BadgeMetadataTimeline: GetValidBadgeMetadataTimeline(),
-				CollectionPermissions:           &types.CollectionPermissions{},
+				CollectionPermissions: &types.CollectionPermissions{},
 			},
 
 			err: types.ErrInvalidURI,
 		},
 		{
 			name: "invalid Badge URI",
-			msg: types.MsgUpdateCollection{
-				Creator:                    sample.AccAddress(),
-				CollectionId: 						 sdkmath.NewUint(0),
-				BalancesType:               "Standard",
-				CollectionMetadataTimeline: GetValidCollectionMetadataTimeline(),
+			msg: types.MsgUniversalUpdateCollection{
+				Creator:                          sample.AccAddress(),
+				CollectionId:                     sdkmath.NewUint(0),
+				BalancesType:                     "Standard",
+				CollectionMetadataTimeline:       GetValidCollectionMetadataTimeline(),
 				UpdateCollectionMetadataTimeline: true,
-				UpdateCollectionPermissions: true,
-				UpdateBadgeMetadataTimeline: true,
+				UpdateCollectionPermissions:      true,
+				UpdateBadgeMetadataTimeline:      true,
 				BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
 					{
 						BadgeMetadata: []*types.BadgeMetadata{
@@ -109,7 +109,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		},
 		// {
 		// 	name: "invalid Permissions",
-		// 	msg: types.MsgUpdateCollection{
+		// 	msg: types.MsgUniversalUpdateCollection{
 		// 		Creator:                    sample.AccAddress(),
 		// 		CollectionId: 						 sdkmath.NewUint(0),
 		// 		BalancesType:               "Standard",

@@ -45,7 +45,7 @@ func CmdUpdateCollection() *cobra.Command {
 
 			txJSON := args[0]
 
-			var txData types.MsgUpdateCollection
+			var txData types.MsgUniversalUpdateCollection
 			if err := jsonpb.UnmarshalString(txJSON, &txData); err != nil {
 				return err
 			}

@@ -5,7 +5,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-
 func GetCurrentManager(ctx sdk.Context, collection *BadgeCollection) string {
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	managerTimeline := collection.ManagerTimeline

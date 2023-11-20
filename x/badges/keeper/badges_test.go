@@ -92,7 +92,6 @@ func (suite *TestSuite) TestCreateBadges() {
 	})
 	suite.Require().Nil(err, "Error transferring badge")
 
-
 	balance, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
 

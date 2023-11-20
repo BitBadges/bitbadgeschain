@@ -23,6 +23,6 @@ var (
 	ErrCircularDependency          = sdkerrors.Register(types.ModuleName, 75, "circular dependency")
 	ErrDisallowedTransfer          = sdkerrors.Register(types.ModuleName, 76, "disallowed transfer")
 	ErrNoValidSolutionForChallenge = sdkerrors.Register(types.ModuleName, 77, "challenge failed")
-	ErrExceedsThreshold						 = sdkerrors.Register(types.ModuleName, 78, "exceeds threshold")
-	ErrCircularInheritance				 = sdkerrors.Register(types.ModuleName, 79, "circular inheritance")
+	ErrExceedsThreshold            = sdkerrors.Register(types.ModuleName, 78, "exceeds threshold")
+	ErrCircularInheritance         = sdkerrors.Register(types.ModuleName, 79, "circular inheritance")
 )

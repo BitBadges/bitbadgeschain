@@ -99,7 +99,6 @@ func ValidateRangesAreValid(badgeUintRanges []*UintRange, allowAllUints bool, er
 		if badgeUintRange.Start.GT(badgeUintRange.End) {
 			return ErrStartGreaterThanEnd
 		}
-		
 
 		if !allowAllUints {
 			if badgeUintRange.Start.IsZero() || badgeUintRange.End.IsZero() {
@@ -260,11 +259,10 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 			return sdkerrors.Wrapf(ErrIdsContainsInvalidChars, "challenge tracker id can not contain : or !")
 		}
 
-		
 		approvalCriteria := collectionApproval.ApprovalCriteria
 		if approvalCriteria != nil {
 			usingLeafIndexForTransferOrder := false
-			if (approvalCriteria.PredeterminedBalances != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex) {
+			if approvalCriteria.PredeterminedBalances != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
 				usingLeafIndexForTransferOrder = true
 			}
 			if err := ValidateMerkleChallenge(approvalCriteria.MerkleChallenge, collectionApproval.ChallengeTrackerId, usingLeafIndexForTransferOrder); err != nil {
@@ -296,9 +294,7 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 					return sdkerrors.Wrapf(ErrUintUnititialized, "collection id is uninitialized")
 				}
 			}
-			
-			
-			
+
 			if canChangeValues {
 				if approvalCriteria.ApprovalAmounts == nil {
 					approvalCriteria.ApprovalAmounts = &ApprovalAmounts{}
@@ -307,45 +303,42 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 				if approvalCriteria.ApprovalAmounts.OverallApprovalAmount.IsNil() {
 					approvalCriteria.ApprovalAmounts.OverallApprovalAmount = sdkmath.NewUint(0)
 				}
-				
+
 				if approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount.IsNil() {
 					approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount = sdkmath.NewUint(0)
 				}
-				
+
 				if approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount.IsNil() {
 					approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(0)
 				}
-				
+
 				if approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount.IsNil() {
 					approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount = sdkmath.NewUint(0)
 				}
 			}
-			
-		
-			
+
 			if canChangeValues {
 				if approvalCriteria.MaxNumTransfers == nil {
 					approvalCriteria.MaxNumTransfers = &MaxNumTransfers{}
 				}
-				
+
 				if approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsNil() {
 					approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers = sdkmath.NewUint(0)
 				}
-				
+
 				if approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers.IsNil() {
 					approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers = sdkmath.NewUint(0)
 				}
-				
+
 				if approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers.IsNil() {
 					approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(0)
 				}
-				
+
 				if approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsNil() {
 					approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers = sdkmath.NewUint(0)
 				}
 			}
 
-	
 			if approvalCriteria.PredeterminedBalances != nil {
 				orderCalculationMethodIsBasicallyNil := !approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex &&
 					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseOverallNumTransfers &&
@@ -354,66 +347,62 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers
 
 				sequentialTransferIsBasicallyNil := approvalCriteria.PredeterminedBalances.IncrementedBalances == nil || (approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances == nil &&
-					(
-						approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsNil() ||
+					(approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsNil() ||
 						approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsZero()) &&
-					(
-						approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy.IsNil() ||
+					(approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy.IsNil() ||
 						approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy.IsZero()))
-						
 
-					manualBalancesIsBasicallyNil := approvalCriteria.PredeterminedBalances.ManualBalances == nil
+				manualBalancesIsBasicallyNil := approvalCriteria.PredeterminedBalances.ManualBalances == nil
 
 				isBasicallyNil := orderCalculationMethodIsBasicallyNil && sequentialTransferIsBasicallyNil && manualBalancesIsBasicallyNil
 
-				if (!isBasicallyNil) {
+				if !isBasicallyNil {
 					orderType := approvalCriteria.PredeterminedBalances.OrderCalculationMethod
 					if orderType == nil {
 						return sdkerrors.Wrapf(ErrInvalidRequest, "order type is nil")
 					}
-		
+
 					numTrue := 0
 					if orderType.UseMerkleChallengeLeafIndex {
 						numTrue++
 					}
-		
+
 					if orderType.UseOverallNumTransfers {
 						numTrue++
 					}
-		
+
 					if orderType.UsePerToAddressNumTransfers {
 						numTrue++
 					}
-		
+
 					if orderType.UsePerFromAddressNumTransfers {
 						numTrue++
 					}
-		
+
 					if orderType.UsePerInitiatedByAddressNumTransfers {
 						numTrue++
 					}
-		
-		
+
 					if numTrue != 1 {
 						return sdkerrors.Wrapf(ErrInvalidRequest, "only one of use challenge leaf index, use overall num transfers, use per to address num transfers, use per from address num transfers, use per initiated by address num transfers can be true")
 					}
-		
+
 					err := *new(error)
-					if (manualBalancesIsBasicallyNil && !sequentialTransferIsBasicallyNil) {
-						sequentialTransfer := approvalCriteria.PredeterminedBalances.IncrementedBalances 
+					if manualBalancesIsBasicallyNil && !sequentialTransferIsBasicallyNil {
+						sequentialTransfer := approvalCriteria.PredeterminedBalances.IncrementedBalances
 						sequentialTransfer.StartBalances, err = ValidateBalances(sequentialTransfer.StartBalances, canChangeValues)
 						if err != nil {
 							return err
 						}
-		
+
 						if sequentialTransfer.IncrementBadgeIdsBy.IsNil() {
 							return sdkerrors.Wrapf(ErrUintUnititialized, "increment ids by is uninitialized")
 						}
-					
+
 						if sequentialTransfer.IncrementOwnershipTimesBy.IsNil() {
 							return sdkerrors.Wrapf(ErrUintUnititialized, "max num transfers is uninitialized")
 						}
-					} else if (!manualBalancesIsBasicallyNil && sequentialTransferIsBasicallyNil) {
+					} else if !manualBalancesIsBasicallyNil && sequentialTransferIsBasicallyNil {
 						for _, manualTransfer := range approvalCriteria.PredeterminedBalances.ManualBalances {
 							manualTransfer.Balances, err = ValidateBalances(manualTransfer.Balances, canChangeValues)
 							if err != nil {
@@ -425,7 +414,6 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 					}
 				}
 
-			
 			} else {
 				approvalCriteria.PredeterminedBalances = nil
 			}
@@ -436,7 +424,6 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 
 	return nil
 }
-
 
 func ValidateMerkleChallenge(challenge *MerkleChallenge, challengeId string, usingLeafIndexForTransferOrder bool) error {
 	if challenge == nil || challenge.Root == "" {
@@ -451,7 +438,7 @@ func ValidateMerkleChallenge(challenge *MerkleChallenge, challengeId string, usi
 	if challenge.MaxUsesPerLeaf.IsNil() {
 		return sdkerrors.Wrapf(ErrUintUnititialized, "max uses per leaf is uninitialized")
 	}
-	
+
 	maxOneUsePerLeaf := challenge.MaxUsesPerLeaf.Equal(sdkmath.NewUint(1))
 
 	if !maxOneUsePerLeaf && usingLeafIndexForTransferOrder {
@@ -481,7 +468,6 @@ func ValidateBalances(balances []*Balance, canChangeValues bool) ([]*Balance, er
 		if err != nil {
 			return balances, sdkerrors.Wrapf(err, "invalid balance badge ids")
 		}
-		
 
 		err = ValidateRangesAreValid(balance.OwnershipTimes, false, true)
 		if err != nil {
@@ -561,7 +547,7 @@ func ValidateBadgeMetadata(badgeMetadata []*BadgeMetadata, canChangeValues bool)
 				return sdkerrors.Wrapf(ErrInvalidRequest, "invalid badgeIds")
 			}
 
-			if err := AssertRangesDoNotOverlapAtAll(handledBadgeIds,badgeMetadata.BadgeIds); err != nil {
+			if err := AssertRangesDoNotOverlapAtAll(handledBadgeIds, badgeMetadata.BadgeIds); err != nil {
 				return sdkerrors.Wrapf(err, "badge metadata has duplicate badge ids")
 			}
 
@@ -572,7 +558,6 @@ func ValidateBadgeMetadata(badgeMetadata []*BadgeMetadata, canChangeValues bool)
 			}
 		}
 	}
-
 
 	return nil
 }

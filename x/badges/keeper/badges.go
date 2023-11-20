@@ -27,7 +27,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		for _, badgeIdRange := range balanceObj.BadgeIds {
 			for _, time := range balanceObj.OwnershipTimes {
 				detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
-					BadgeId:      badgeIdRange,
+					BadgeId:       badgeIdRange,
 					OwnershipTime: time,
 				})
 			}

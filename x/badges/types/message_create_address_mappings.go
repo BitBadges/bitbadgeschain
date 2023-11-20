@@ -11,7 +11,7 @@ var _ sdk.Msg = &MsgCreateAddressMappings{}
 
 func NewMsgCreateAddressMappings(creator string, addressMappings []*AddressMapping) *MsgCreateAddressMappings {
 	return &MsgCreateAddressMappings{
-		Creator: creator,
+		Creator:         creator,
 		AddressMappings: addressMappings,
 	}
 }
