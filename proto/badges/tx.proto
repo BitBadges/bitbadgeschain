@@ -179,7 +179,6 @@ message MsgDeleteCollection {
 
 message MsgDeleteCollectionResponse {}
 
-
 message MsgUpdateUserApprovals {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];

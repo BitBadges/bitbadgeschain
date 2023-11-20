@@ -34,6 +34,12 @@ func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 		}
 
 		switch {
+		case badgeCustomMsg.UniversalUpdateCollectionMsg != nil:
+			badgeCustomMsg.UniversalUpdateCollectionMsg.Creator = sender.String()
+			return []sdk.Msg{badgeCustomMsg.UniversalUpdateCollectionMsg}, nil
+		case badgeCustomMsg.CreateCollectionMsg != nil:
+			badgeCustomMsg.CreateCollectionMsg.Creator = sender.String()
+			return []sdk.Msg{badgeCustomMsg.CreateCollectionMsg}, nil
 		case badgeCustomMsg.CreateAddressMappingsMsg != nil:
 			badgeCustomMsg.CreateAddressMappingsMsg.Creator = sender.String()
 			return []sdk.Msg{badgeCustomMsg.CreateAddressMappingsMsg}, nil

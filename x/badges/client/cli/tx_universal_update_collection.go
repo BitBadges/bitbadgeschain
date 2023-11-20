@@ -34,7 +34,7 @@ your-cli-command update-collection '{
 
 func CmdUpdateCollection() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-collection [tx-json]",
+		Use:   "universal-update-collection [tx-json]",
 		Short: "Broadcast message updateCollection",
 		Args:  cobra.ExactArgs(1), // Accept exactly one argument (the JSON string)
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
