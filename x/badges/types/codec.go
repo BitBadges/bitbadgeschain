@@ -11,10 +11,10 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgTransferBadges{}, "badges/TransferBadges", nil)
 	cdc.RegisterConcrete(&MsgDeleteCollection{}, "badges/DeleteCollection", nil)
 	cdc.RegisterConcrete(&MsgUpdateUserApprovals{}, "badges/UpdateUserApprovals", nil)
-	cdc.RegisterConcrete(&MsgUniversalUpdateCollection{}, "badges/UpdateCollection", nil)
+	cdc.RegisterConcrete(&MsgUniversalUpdateCollection{}, "badges/UniversalUpdateCollection", nil)
 	cdc.RegisterConcrete(&MsgCreateAddressMappings{}, "badges/CreateAddressMappings", nil)
-	cdc.RegisterConcrete(&MsgCreateCollection{}, "badges/MsgCreateCollection", nil)
-	cdc.RegisterConcrete(&MsgUpdateCollection{}, "badges/MsgUpdateCollection", nil)
+	cdc.RegisterConcrete(&MsgCreateCollection{}, "badges/CreateCollection", nil)
+	cdc.RegisterConcrete(&MsgUpdateCollection{}, "badges/UpdateCollection", nil)
 	// this line is used by starport scaffolding # 2
 }
 
