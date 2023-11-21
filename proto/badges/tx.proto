@@ -112,44 +112,24 @@ message MsgUpdateCollectionResponse {
 
 message MsgCreateCollection {
   string creator = 1;
-  string balancesType = 3;
-
-  // Default balance options for newly initiated accounts.
-  repeated UserOutgoingApproval defaultOutgoingApprovals = 4; // The user's approved transfers for each badge ID.
-  repeated UserIncomingApproval defaultIncomingApprovals = 5; // The user's approved incoming transfers for each badge ID.
-  repeated Balance badgesToCreate = 6;
-
-  bool updateCollectionPermissions = 7;
-  CollectionPermissions collectionPermissions = 8;
-
-  bool updateManagerTimeline = 9;
-  repeated ManagerTimeline managerTimeline = 10;
-
-  bool updateCollectionMetadataTimeline = 11;
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 12;
-
-  bool updateBadgeMetadataTimeline = 13;
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 14;
-
-  bool updateOffChainBalancesMetadataTimeline = 15;
-  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 16;
-
-  bool updateCustomDataTimeline = 17;
-  repeated CustomDataTimeline customDataTimeline = 18;
-
-  bool updateCollectionApprovals = 21;
-  repeated CollectionApproval collectionApprovals = 22;
-
-  bool updateStandardsTimeline = 23;
-  repeated StandardsTimeline standardsTimeline = 24;
-
-  bool updateIsArchivedTimeline = 27;
-  repeated IsArchivedTimeline isArchivedTimeline = 28;
-
-  bool defaultAutoApproveSelfInitiatedOutgoingTransfers = 29;
-  bool defaultAutoApproveSelfInitiatedIncomingTransfers = 30;
-  UserPermissions defaultUserPermissions = 31;
+  string balancesType = 2;
+  repeated UserOutgoingApproval defaultOutgoingApprovals = 3; // The user's approved transfers for each badge ID.
+  repeated UserIncomingApproval defaultIncomingApprovals = 4; // The user's approved incoming transfers for each badge ID.
+  repeated Balance badgesToCreate = 5;
+  CollectionPermissions collectionPermissions = 6;
+  repeated ManagerTimeline managerTimeline = 7;
+  repeated CollectionMetadataTimeline collectionMetadataTimeline = 8;
+  repeated BadgeMetadataTimeline badgeMetadataTimeline = 9;
+  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 10;
+  repeated CustomDataTimeline customDataTimeline = 11;
+  repeated CollectionApproval collectionApprovals = 12;
+  repeated StandardsTimeline standardsTimeline = 13;
+  repeated IsArchivedTimeline isArchivedTimeline = 14;
+  bool defaultAutoApproveSelfInitiatedOutgoingTransfers = 15;
+  bool defaultAutoApproveSelfInitiatedIncomingTransfers = 16;
+  UserPermissions defaultUserPermissions = 17;
 }
+
 
 message MsgCreateCollectionResponse {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; // ID of badge collection
