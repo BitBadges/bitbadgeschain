@@ -6,7 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/std"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	cryptocodec "github.com/bitbadges/bitbadgeschain/x/ethermint/crypto/codec"
+	ethermintcodec "github.com/bitbadges/bitbadgeschain/x/ethermint/crypto/codec"
 	ethermint "github.com/bitbadges/bitbadgeschain/x/ethermint/utils"
 	solana "github.com/bitbadges/bitbadgeschain/x/solana/utils"
 )
@@ -14,14 +14,14 @@ import (
 // RegisterLegacyAminoCodec registers Interfaces from types, crypto, and SDK std.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	sdk.RegisterLegacyAminoCodec(cdc)
-	cryptocodec.RegisterCrypto(cdc)
+	ethermintcodec.RegisterCrypto(cdc)
 	codec.RegisterEvidences(cdc)
 }
 
 // RegisterInterfaces registers Interfaces from types, crypto, and SDK std.
 func RegisterInterfaces(interfaceRegistry codectypes.InterfaceRegistry) {
 	std.RegisterInterfaces(interfaceRegistry)
-	cryptocodec.RegisterInterfaces(interfaceRegistry)
+	ethermintcodec.RegisterInterfaces(interfaceRegistry)
 	ethermint.RegisterInterfaces(interfaceRegistry)
 	solana.RegisterInterfaces(interfaceRegistry)
 }

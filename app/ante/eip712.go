@@ -251,30 +251,17 @@ func VerifySignature(
 			}
 			sortedHex := hex.EncodeToString(sortedBytes)
 		
+			
+			//TODO: Use pubkey from parameters
+
+			//TODO: Check pubkey resolves to feePayer extension address (I honestly do not know what this does, it might be redundant)
+					// recoveredFeePayerAcc := sdk.AccAddress(pk.Address().Bytes())
+			
+					// if !recoveredFeePayerAcc.Equals(feePayer) {
+					// 	return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature", recoveredFeePayerAcc)
+					// } 
 	
-			// feePayerPubkey, err := secp256k1.RecoverPubkey(sigHash, feePayerSig)
-			// if err != nil {
-			// 	return sdkerrors.Wrap(err, "failed to recover delegated fee payer from sig")
-			// }
-	
-			// ecPubKey, err := ethcrypto.UnmarshalPubkey(feePayerPubkey)
-			// if err != nil {
-			// 	return sdkerrors.Wrap(err, "failed to unmarshal recovered fee payer pubkey")
-			// }
-	
-			// pk := &ethsecp256k1.PubKey{
-			// 	Key: ethcrypto.CompressPubkey(ecPubKey),
-			// }
-	
-			// if !pubKey.Equals(pk) {
-			// 	return sdkerrors.Wrapf(types.ErrInvalidPubKey, "feePayer pubkey %s is different from transaction pubkey %s", pubKey, pk)
-			// }
-	
-			// recoveredFeePayerAcc := sdk.AccAddress(pk.Address().Bytes())
-	
-			// if !recoveredFeePayerAcc.Equals(feePayer) {
-			// 	return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature", recoveredFeePayerAcc)
-			// }
+			return sdkerrors.Wrapf(types.ErrInvalidChainID, "%s", pubKey);
 
 			valid := ed25519.Verify(pubKeyHardcoded, sortedBytes, feePayerSig)
 			if !valid {
@@ -351,7 +338,6 @@ func VerifySignature(
 		}
 
 		recoveredFeePayerAcc := sdk.AccAddress(pk.Address().Bytes())
-
 		if !recoveredFeePayerAcc.Equals(feePayer) {
 			return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature", recoveredFeePayerAcc)
 		}
