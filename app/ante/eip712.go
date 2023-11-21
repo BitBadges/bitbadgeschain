@@ -43,13 +43,15 @@ func init() {
 type Eip712SigVerificationDecorator struct {
 	ak              ante.AccountKeeper
 	signModeHandler authsigning.SignModeHandler
+	chain string
 }
 
 // NewEip712SigVerificationDecorator creates a new Eip712SigVerificationDecorator
-func NewEip712SigVerificationDecorator(ak ante.AccountKeeper, signModeHandler authsigning.SignModeHandler) Eip712SigVerificationDecorator {
+func NewEip712SigVerificationDecorator(ak ante.AccountKeeper, signModeHandler authsigning.SignModeHandler, chain string) Eip712SigVerificationDecorator {
 	return Eip712SigVerificationDecorator{
 		ak:              ak,
 		signModeHandler: signModeHandler,
+		chain : chain,
 	}
 }
 

@@ -59,7 +59,11 @@ func newCosmosAnteHandler(options HandlerOptions) sdk.AnteHandler {
 	)
 }
 
-func newCosmosAnteHandlerEip712(options HandlerOptions) sdk.AnteHandler {
+func newCosmosAnteHandlerEip712(options HandlerOptions, chain string) sdk.AnteHandler {
+	if chain != "Ethereum" && chain != "Solana" {
+		panic("chain must be either Ethereum or Solana")
+	}
+	
 	return sdk.ChainAnteDecorators(
 		ante.NewSetUpContextDecorator(),
 		// NOTE: extensions option decorator removed
@@ -75,8 +79,10 @@ func newCosmosAnteHandlerEip712(options HandlerOptions) sdk.AnteHandler {
 		ante.NewSetPubKeyDecorator(options.AccountKeeper),
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
+
 		// Note: signature verification uses EIP instead of the cosmos signature validator
-		NewEip712SigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
+		NewEip712SigVerificationDecorator(options.AccountKeeper, options.SignModeHandler, chain),
+
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
 	)

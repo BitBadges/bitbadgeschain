@@ -39,7 +39,10 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 				switch typeURL := opts[0].GetTypeUrl(); typeURL {
 				case "/ethermint.ExtensionOptionsWeb3Tx":
 					// handle as normal Cosmos SDK tx, except signature is checked for EIP712 representation
-					anteHandler = newCosmosAnteHandlerEip712(options)
+					anteHandler = newCosmosAnteHandlerEip712(options, "Ethereum")
+				case "/solana.ExtensionOptionsWeb3TxSolana":
+					// handle as normal Cosmos SDK tx, except signature is checked for EIP712 representation
+					anteHandler = newCosmosAnteHandlerEip712(options, "Solana")
 				default:
 					return ctx, sdkerrors.Wrapf(
 						types.ErrUnknownRequest,
