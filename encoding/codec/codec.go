@@ -8,6 +8,7 @@ import (
 
 	cryptocodec "github.com/bitbadges/bitbadgeschain/x/ethermint/crypto/codec"
 	ethermint "github.com/bitbadges/bitbadgeschain/x/ethermint/utils"
+	solana "github.com/bitbadges/bitbadgeschain/x/solana/utils"
 )
 
 // RegisterLegacyAminoCodec registers Interfaces from types, crypto, and SDK std.
@@ -22,4 +23,5 @@ func RegisterInterfaces(interfaceRegistry codectypes.InterfaceRegistry) {
 	std.RegisterInterfaces(interfaceRegistry)
 	cryptocodec.RegisterInterfaces(interfaceRegistry)
 	ethermint.RegisterInterfaces(interfaceRegistry)
+	solana.RegisterInterfaces(interfaceRegistry)
 }

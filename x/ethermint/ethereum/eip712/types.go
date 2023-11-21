@@ -93,9 +93,9 @@ func createEIP712Types(messagePayload eip712MessagePayload) (apitypes.Types, err
 		},
 	}
 
-	for i := 0; i < messagePayload.numPayloadMsgs; i++ {
+	for i := 0; i < messagePayload.NumPayloadMsgs; i++ {
 		field := msgFieldForIndex(i)
-		msg := messagePayload.payload.Get(field)
+		msg := messagePayload.Payload.Get(field)
 
 		//This is new code. The original Ethermint code does not account
 		//for optional fields / empty fields.

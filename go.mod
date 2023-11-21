@@ -34,7 +34,10 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require github.com/gogo/protobuf v1.3.2
+require (
+	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
+	github.com/gogo/protobuf v1.3.2
+)
 
 require github.com/xlab/closer v1.0.0 // indirect
 

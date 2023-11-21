@@ -1,6 +1,8 @@
 package ante
 
 import (
+	"crypto/ed25519"
+	"encoding/hex"
 	"fmt"
 
 	sdkerrors "cosmossdk.io/errors"
@@ -21,18 +23,26 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/ethermint/ethereum/eip712"
 	etherminttypes "github.com/bitbadges/bitbadgeschain/x/ethermint/types"
 	ethermint "github.com/bitbadges/bitbadgeschain/x/ethermint/utils"
+	solanatypes "github.com/bitbadges/bitbadgeschain/x/solana/types"
+
+	solana "github.com/bitbadges/bitbadgeschain/x/solana/utils"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
+
+	base58 "github.com/btcsuite/btcutil/base58"
 )
 
 var ethermintCodec codec.ProtoCodecMarshaler
+var solanaCodec codec.ProtoCodecMarshaler
 
 func init() {
 	registry := codectypes.NewInterfaceRegistry()
 	ethermint.RegisterInterfaces(registry)
+	solana.RegisterInterfaces(registry)
 	ethermintCodec = codec.NewProtoCodec(registry)
+	solanaCodec = codec.NewProtoCodec(registry)
 }
 
 // Eip712SigVerificationDecorator Verify all signatures for a tx and return an error if any are invalid. Note,
@@ -134,7 +144,7 @@ func (svd Eip712SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx,
 		return next(ctx, tx, simulate)
 	}
 
-	if err := VerifySignature(pubKey, signerData, sig.Data, svd.signModeHandler, authSignTx); err != nil {
+	if err := VerifySignature(pubKey, signerData, sig.Data, svd.signModeHandler, authSignTx, svd.chain); err != nil {
 		errMsg := fmt.Errorf("signature verification failed; please verify account number (%d) and chain-id (%s): %w", accNum, chainID, err)
 		return ctx, sdkerrors.Wrap(types.ErrUnauthorized, errMsg.Error())
 	}
@@ -150,6 +160,7 @@ func VerifySignature(
 	sigData signing.SignatureData,
 	_ authsigning.SignModeHandler,
 	tx authsigning.Tx,
+	chain string,
 ) error {
 	switch data := sigData.(type) {
 	case *signing.SingleSignatureData:
@@ -191,31 +202,107 @@ func VerifySignature(
 		if !ok {
 			return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "tx doesnt contain any extensions")
 		}
+
 		opts := txWithExtensions.GetExtensionOptions()
 		if len(opts) != 1 {
 			return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "tx doesnt contain expected amount of extension options")
 		}
-
-		extOpt, ok := opts[0].GetCachedValue().(*etherminttypes.ExtensionOptionsWeb3Tx)
-		if !ok {
+	
+		typedDataChainID := uint64(0)
+		feePayerExt := ""
+		feePayerSig := []byte{}
+		
+		extOptEthereum, ok := opts[0].GetCachedValue().(*etherminttypes.ExtensionOptionsWeb3Tx)
+		if !ok && chain == "Ethereum" {
 			return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "unknown extension option")
+		} else if ok && chain == "Ethereum" {
+			typedDataChainID = extOptEthereum.TypedDataChainID
+			feePayerExt = extOptEthereum.FeePayer
+			feePayerSig = extOptEthereum.FeePayerSig
 		}
 
-		if extOpt.TypedDataChainID != signerChainID.Uint64() {
+		extOptSolana, ok := opts[0].GetCachedValue().(*solanatypes.ExtensionOptionsWeb3TxSolana)
+		if !ok && chain == "Solana" {
+			return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "unknown extension option")
+		} else if ok && chain == "Solana" {
+			typedDataChainID = extOptSolana.TypedDataChainID
+			feePayerExt = extOptSolana.FeePayer
+			feePayerSig = extOptSolana.FeePayerSig
+
+			base58PubKey := "6H2af68Yyg6j7N4XeQKmkZFocYQgv6yYoU3Xk491efa5"
+			pubKeyHardcoded := base58.Decode(base58PubKey)
+
+			hexSignature := hex.EncodeToString(feePayerSig)
+			
+			
+
+			basicPayload, err := eip712.CreateEIP712MessagePayload(txBytes, chain)
+			if err != nil {
+				return sdkerrors.Wrap(err, "failed to unmarshal tx bytes to JSON object")
+			}
+
+			jsonStr := basicPayload.Payload.Raw
+			// jsonHex := hex.EncodeToString([]byte(jsonStr))
+
+			//alphabetize the JSON
+			sortedBytes, err := sdk.SortJSON([]byte(jsonStr))
+			if err != nil {
+				return sdkerrors.Wrap(err, "failed to sort JSON")
+			}
+			sortedHex := hex.EncodeToString(sortedBytes)
+		
+	
+			// feePayerPubkey, err := secp256k1.RecoverPubkey(sigHash, feePayerSig)
+			// if err != nil {
+			// 	return sdkerrors.Wrap(err, "failed to recover delegated fee payer from sig")
+			// }
+	
+			// ecPubKey, err := ethcrypto.UnmarshalPubkey(feePayerPubkey)
+			// if err != nil {
+			// 	return sdkerrors.Wrap(err, "failed to unmarshal recovered fee payer pubkey")
+			// }
+	
+			// pk := &ethsecp256k1.PubKey{
+			// 	Key: ethcrypto.CompressPubkey(ecPubKey),
+			// }
+	
+			// if !pubKey.Equals(pk) {
+			// 	return sdkerrors.Wrapf(types.ErrInvalidPubKey, "feePayer pubkey %s is different from transaction pubkey %s", pubKey, pk)
+			// }
+	
+			// recoveredFeePayerAcc := sdk.AccAddress(pk.Address().Bytes())
+	
+			// if !recoveredFeePayerAcc.Equals(feePayer) {
+			// 	return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature", recoveredFeePayerAcc)
+			// }
+
+			valid := ed25519.Verify(pubKeyHardcoded, sortedBytes, feePayerSig)
+			if !valid {
+				return sdkerrors.Wrapf(types.ErrInvalidChainID, "%s %s %s %s %s", valid, sortedHex, feePayerExt, hexSignature, len(pubKeyHardcoded))
+			}
+
+			return nil
+		}
+		
+		
+
+		if typedDataChainID != signerChainID.Uint64() {
 			return sdkerrors.Wrap(types.ErrInvalidChainID, "invalid chain-id")
 		}
 
-		if len(extOpt.FeePayer) == 0 {
+		if len(feePayerExt) == 0 {
 			return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "no feePayer on ExtensionOptionsWeb3Tx")
 		}
-		feePayer, err := sdk.AccAddressFromBech32(extOpt.FeePayer)
+
+		feePayer, err := sdk.AccAddressFromBech32(feePayerExt)
 		if err != nil {
 			return sdkerrors.Wrap(err, "failed to parse feePayer from ExtensionOptionsWeb3Tx")
 		}
 
+		
 		//This uses the new EIP712 wrapper, not legacy
 		//This accounts for multiple msgs, not just one
-		typedData, err := eip712.WrapTxToTypedData(extOpt.TypedDataChainID, txBytes)
+		typedData, err := eip712.WrapTxToTypedData(typedDataChainID, txBytes, chain)
 		if err != nil {
 			return sdkerrors.Wrap(err, "failed to pack tx data in EIP712 object")
 		}
@@ -235,7 +322,7 @@ func VerifySignature(
 			return sdkerrors.Wrapf(err, "failed to compute typed data hash")
 		}
 
-		feePayerSig := extOpt.FeePayerSig
+		
 		if len(feePayerSig) != ethcrypto.SignatureLength {
 			return sdkerrors.Wrap(types.ErrorInvalidSigner, "signature length doesn't match typical [R||S||V] signature 65 bytes")
 		}

@@ -26,9 +26,9 @@ import (
 )
 
 type eip712MessagePayload struct {
-	payload        gjson.Result
-	numPayloadMsgs int
-	message        map[string]interface{}
+	Payload        gjson.Result
+	NumPayloadMsgs int
+	Message        map[string]interface{}
 }
 
 const (
@@ -37,12 +37,12 @@ const (
 
 // createEIP712MessagePayload generates the EIP-712 message payload
 // corresponding to the input data.
-func createEIP712MessagePayload(data []byte) (eip712MessagePayload, error) {
-	basicPayload, err := unmarshalBytesToJSONObject(data)
+func CreateEIP712MessagePayload(data []byte, chain string) (eip712MessagePayload, error) {
+	basicPayload, err := UnmarshalBytesToJSONObject(data)
 	if err != nil {
 		return eip712MessagePayload{}, err
 	}
-
+	
 	payload, numPayloadMsgs, err := FlattenPayloadMessages(basicPayload)
 	if err != nil {
 		return eip712MessagePayload{}, errorsmod.Wrap(err, "failed to flatten payload JSON messages")
@@ -54,9 +54,9 @@ func createEIP712MessagePayload(data []byte) (eip712MessagePayload, error) {
 	}
 
 	messagePayload := eip712MessagePayload{
-		payload:        payload,
-		numPayloadMsgs: numPayloadMsgs,
-		message:        message,
+		Payload:        payload,
+		NumPayloadMsgs: numPayloadMsgs,
+		Message:        message,
 	}
 
 	return messagePayload, nil
@@ -64,7 +64,7 @@ func createEIP712MessagePayload(data []byte) (eip712MessagePayload, error) {
 
 // unmarshalBytesToJSONObject converts a bytestream into
 // a JSON object, then makes sure the JSON is an object.
-func unmarshalBytesToJSONObject(data []byte) (gjson.Result, error) {
+func UnmarshalBytesToJSONObject(data []byte) (gjson.Result, error) {
 	if !gjson.ValidBytes(data) {
 		return gjson.Result{}, errorsmod.Wrap(errortypes.ErrJSONUnmarshal, "invalid JSON received")
 	}

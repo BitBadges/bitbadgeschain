@@ -124,6 +124,7 @@ func decodeAminoSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 	typedData, err := WrapTxToTypedData(
 		chainID.Uint64(),
 		signDocBytes,
+		"Ethereum",
 	)
 	if err != nil {
 		return apitypes.TypedData{}, fmt.Errorf("could not convert to EIP712 representation: %w", err)
@@ -207,6 +208,7 @@ func decodeProtobufSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 	typedData, err := WrapTxToTypedData(
 		chainID.Uint64(),
 		signBytes,
+		"Ethereum",
 	)
 	if err != nil {
 		return apitypes.TypedData{}, err

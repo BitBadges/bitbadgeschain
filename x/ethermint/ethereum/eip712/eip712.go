@@ -24,9 +24,10 @@ import (
 func WrapTxToTypedData(
 	chainID uint64,
 	data []byte,
+	chain string,
 ) (apitypes.TypedData, error) {
-	messagePayload, err := createEIP712MessagePayload(data)
-	message := messagePayload.message
+	messagePayload, err := CreateEIP712MessagePayload(data, chain)
+	message := messagePayload.Message
 	if err != nil {
 		return apitypes.TypedData{}, err
 	}
