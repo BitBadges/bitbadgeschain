@@ -38,4 +38,6 @@ var (
 
 	// ErrUnmarshalBigInt returns an error resulting from unmarshaling a big.Int from a string.
 	ErrUnmarshalBigInt = errorsmod.Register(RootCodespace, 6, "cannot unmarshal big.Int from string")
+
+	ErrInvalidEIP712Object = errorsmod.Register(RootCodespace, 7, "invalid EIP-712 object type. could not resolve type")
 )

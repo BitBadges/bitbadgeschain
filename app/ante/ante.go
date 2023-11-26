@@ -13,7 +13,7 @@ import (
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/bitbadges/bitbadgeschain/x/ethereum/crypto/ethsecp256k1"
+	"github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/crypto/ethsecp256k1"
 	ed25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 )
 

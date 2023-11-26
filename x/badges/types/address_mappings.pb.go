@@ -29,12 +29,18 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 //
 // AddressMappings are used for things like whitelists, blacklists, approvals, etc.
 type AddressMapping struct {
-	MappingId        string   `protobuf:"bytes,1,opt,name=mappingId,proto3" json:"mappingId,omitempty"`
-	Addresses        []string `protobuf:"bytes,2,rep,name=addresses,proto3" json:"addresses,omitempty"`
-	IncludeAddresses bool     `protobuf:"varint,3,opt,name=includeAddresses,proto3" json:"includeAddresses,omitempty"`
-	Uri              string   `protobuf:"bytes,4,opt,name=uri,proto3" json:"uri,omitempty"`
-	CustomData       string   `protobuf:"bytes,5,opt,name=customData,proto3" json:"customData,omitempty"`
-	CreatedBy        string   `protobuf:"bytes,6,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
+	// Unique identifier for the address mapping.
+	MappingId string `protobuf:"bytes,1,opt,name=mappingId,proto3" json:"mappingId,omitempty"`
+	// List of addresses included in the mapping.
+	Addresses []string `protobuf:"bytes,2,rep,name=addresses,proto3" json:"addresses,omitempty"`
+	// Indicates whether the mapping includes the specified addresses (true) or excludes them (false).
+	IncludeAddresses bool `protobuf:"varint,3,opt,name=includeAddresses,proto3" json:"includeAddresses,omitempty"`
+	// URI (Uniform Resource Identifier) associated with the address mapping to provide metadata, if applicable.
+	Uri string `protobuf:"bytes,4,opt,name=uri,proto3" json:"uri,omitempty"`
+	// Custom arbitrary data or additional information related to the address mapping.
+	CustomData string `protobuf:"bytes,5,opt,name=customData,proto3" json:"customData,omitempty"`
+	// The user or entity who created the address mapping.
+	CreatedBy string `protobuf:"bytes,6,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
 }
 
 func (m *AddressMapping) Reset()         { *m = AddressMapping{} }

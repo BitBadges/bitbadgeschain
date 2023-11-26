@@ -16,10 +16,21 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
   AddressMappings are used for things like whitelists, blacklists, approvals, etc.
 */
 message AddressMapping {
-  string mappingId = 1; // Unique identifier for the address mapping.
-  repeated string addresses = 2; // List of addresses included in the mapping.
-  bool includeAddresses = 3; // Indicates whether the mapping includes the specified addresses (true) or excludes them (false).
-  string uri = 4; // URI (Uniform Resource Identifier) associated with the address mapping to provide metadata, if applicable.
-  string customData = 5; // Custom arbitrary data or additional information related to the address mapping.
-  string createdBy = 6; // The user or entity who created the address mapping.
+  // Unique identifier for the address mapping.
+  string mappingId = 1;
+  
+  // List of addresses included in the mapping.
+  repeated string addresses = 2;
+  
+  // Indicates whether the mapping includes the specified addresses (true) or excludes them (false).
+  bool includeAddresses = 3;
+  
+  // URI (Uniform Resource Identifier) associated with the address mapping to provide metadata, if applicable.
+  string uri = 4;
+  
+  // Custom arbitrary data or additional information related to the address mapping.
+  string customData = 5;
+  
+  // The user or entity who created the address mapping.
+  string createdBy = 6;
 }

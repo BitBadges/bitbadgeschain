@@ -16,7 +16,7 @@
 package types
 
 import (
-	"github.com/bitbadges/bitbadgeschain/x/solana/types"
+	"github.com/bitbadges/bitbadgeschain/chain-handlers/solana/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types/tx"
 )
@@ -25,7 +25,5 @@ import (
 // implementations and interfaces.
 func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	registry.RegisterImplementations(
-		(*tx.TxExtensionOptionI)(nil),
-		&types.ExtensionOptionsWeb3TxSolana{},
-	)
+		(*tx.TxExtensionOptionI)(nil), &types.ExtensionOptionsWeb3TxSolana{})
 }

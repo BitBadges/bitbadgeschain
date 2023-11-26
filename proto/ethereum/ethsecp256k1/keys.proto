@@ -3,7 +3,7 @@ package ethereum;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/ethereum/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/crypto/ethsecp256k1";
 
 // PubKey defines a type alias for an ecdsa.PublicKey that implements
 // Tendermint's PubKey interface. It represents the 33-byte compressed public

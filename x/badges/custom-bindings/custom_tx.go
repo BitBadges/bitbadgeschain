@@ -13,8 +13,7 @@ import (
 	badgeTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
-// fromReflectRawMsg decodes msg.Data to an sdk.Msg using proto Any and json encoding.
-// this needs to be registered on the Encoders
+//WASM handler for contracts calling into the badges module
 func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 	return func(sender sdk.AccAddress, msg json.RawMessage) ([]sdk.Msg, error) {
 

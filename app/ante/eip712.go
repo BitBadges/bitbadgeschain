@@ -19,13 +19,13 @@ import (
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 
-	"github.com/bitbadges/bitbadgeschain/x/ethereum/crypto/ethsecp256k1"
-	"github.com/bitbadges/bitbadgeschain/x/ethereum/ethereum/eip712"
-	ethereumtypes "github.com/bitbadges/bitbadgeschain/x/ethereum/types"
-	ethereum "github.com/bitbadges/bitbadgeschain/x/ethereum/utils"
-	solanatypes "github.com/bitbadges/bitbadgeschain/x/solana/types"
+	"github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/crypto/ethsecp256k1"
+	"github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/ethereum/eip712"
+	ethereumtypes "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/types"
+	ethereum "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/utils"
+	solanatypes "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/types"
 
-	solana "github.com/bitbadges/bitbadgeschain/x/solana/utils"
+	solana "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/utils"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 

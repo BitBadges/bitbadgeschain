@@ -5,6 +5,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 	"github.com/tidwall/gjson"
+
+	sdkerrors "cosmossdk.io/errors"
+
+	types "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/utils"
 )
 
 // NormalizeEmptyTypes is a recursive function that adds empty values to fields that are omitted when serialized with Proto and Amino.
@@ -34,9 +38,7 @@ func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Typ
 			mapObject[typeObj.Name] = valueArr
 		} else if typeStr == "string" && value == nil {
 			mapObject[typeObj.Name] = ""
-		} else if typeStr == "uint64" && value == nil {
-			mapObject[typeObj.Name] = "0" //TODO: not sure this is correct, but we don't use uint64s
-		} else if typeStr == "bool" && value == nil {
+		}  else if typeStr == "bool" && value == nil {
 			mapObject[typeObj.Name] = false
 		} else {
 			innerMap, ok := mapObject[typeObj.Name].(map[string]interface{})
@@ -46,6 +48,9 @@ func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Typ
 					return mapObject, err
 				}
 				mapObject[typeObj.Name] = newMap
+			} else {
+				// If the field is not an object, we don't need to do anything
+				return nil, sdkerrors.Wrapf(types.ErrInvalidEIP712Object, "unexpected type %s", typeObj.Name)
 			}
 		}
 	}
@@ -65,7 +70,7 @@ func NormalizeEIP712TypedData(typedData apitypes.TypedData) (apitypes.TypedData,
 	return typedData, nil
 }
 
-// GetPopulatedSchemaForMsg returns a sample JSON object for a given message type.
+// GetPopulatedSchemaForMsg returns a sample JSON object for a given message type with all potentially optional fields populated
 func GetPopulatedSchemaForMsg(msg gjson.Result) (gjson.Result, error) {
 	//1. Iterate through the ./example-jsons directory and find the file that matches the msg type
 	//2. If a match is found, return the populated JSON object

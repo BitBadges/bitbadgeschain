@@ -1,9 +1,16 @@
 package eip712
 
-// These are used as fully populated examples to generate EIP712 types
-// We want to make sure the type generation includes all default values and empty values
-// because that is what the SDK does
-// So, we use these filled out schemas and then populate all empty types
+/*
+	These are used as fully populated examples to generate EIP712 types.
+	This is because the EIP712 type generation code expects all values to be populated an  non-optional.
+
+	We want to make sure the type generation includes all default values and empty values, even for optional fields.
+	This is because that is what the SDK does.
+*/
+
+//TODO: Store JSONs in a file directory not directly here
+
+// GetSchemas returns all the schemas for the EIP712 types
 func GetSchemas() []string {
 	schemas := make([]string, 0)
 
