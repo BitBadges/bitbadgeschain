@@ -3,7 +3,6 @@ package ed25519
 import (
 	"crypto/ed25519"
 	"crypto/subtle"
-	"encoding/hex"
 	"fmt"
 	"io"
 
@@ -165,10 +164,7 @@ var (
 // in SDK except in a tendermint validator context.
 func (pubKey *PubKey) Address() crypto.Address {
 	if len(pubKey.Key) != PubKeySize {
-		hex := hex.EncodeToString(pubKey.Key)
-		str := fmt.Sprintf("PubKey must be %d bytes, got %d bytes %s", PubKeySize, len(pubKey.Key), hex)
-		panic(str)
-		// panic("pubkey is incorrect size")
+		panic("pubkey is incorrect size")
 	}
 	// For ADR-28 compatible address we would need to
 	// return address.Hash(proto.MessageName(pubKey), pubKey.Key)

@@ -12,16 +12,6 @@ import (
 func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.AddressMapping) error {
 	id := addressMapping.MappingId
 
-	//Validate ID
-	if id == "Mint" || id == "Manager" || id == "AllWithoutMint" || id == "None" || id == "AllWithMint" || id == "All" {
-		return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot be %s", id)
-	}
-
-	//if starts with "AllWithout"
-	if len(id) > 11 && id[0:11] == "AllWithout" {
-		return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot start with AllWithout")
-	}
-
 	//if starts with !
 	if id[0] == '!' {
 		return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot start with !")
@@ -34,11 +24,12 @@ func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.Addr
 		}
 	}
 
-	if types.ValidateAddress(addressMapping.MappingId, false) == nil {
-		return sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping id cannot be a valid cosmos address")
+	_, err := k.GetAddressMappingById(ctx, id)
+	if err == nil {
+		return sdkerrors.Wrapf(ErrAddressMappingAlreadyExists, "address mapping with id %s already exists or is reserved", id)
 	}
 
-	err := k.SetAddressMappingInStore(ctx, *addressMapping)
+	err = k.SetAddressMappingInStore(ctx, *addressMapping)
 	if err != nil {
 		return err
 	}
@@ -123,24 +114,27 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) 
 		handled = true
 	}
 
-	//Split by :
-	addresses := strings.Split(addressMappingId, ":")
-	allAreValid := true
-	for _, address := range addresses {
-		if err := types.ValidateAddress(address, true); err != nil {
-			allAreValid = false
-		}
-	}
 
-	if allAreValid {
-		addressMapping = &types.AddressMapping{
-			MappingId:        addressMappingId,
-			Addresses:        addresses,
-			IncludeAddresses: true,
-			Uri:              "",
-			CustomData:       "",
+	//Split by :
+	if !handled {
+		addresses := strings.Split(addressMappingId, ":")
+		allAreValid := true
+		for _, address := range addresses {
+			if err := types.ValidateAddress(address, true); err != nil {
+				allAreValid = false
+			}
 		}
-		handled = true
+
+		if allAreValid {
+			addressMapping = &types.AddressMapping{
+				MappingId:        addressMappingId,
+				Addresses:        addresses,
+				IncludeAddresses: true,
+				Uri:              "",
+				CustomData:       "",
+			}
+			handled = true
+		}
 	}
 
 	if !handled {

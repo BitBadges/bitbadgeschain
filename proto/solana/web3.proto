@@ -24,4 +24,6 @@ message ExtensionOptionsWeb3TxSolana {
   bytes fee_payer_sig = 3 [(gogoproto.jsontag) = "feePayerSig,omitempty"];
 
   string chain = 4 [(gogoproto.jsontag) = "chain,omitempty"];
+
+  string sol_address = 5 [(gogoproto.jsontag) = "solAddress,omitempty"];
 }

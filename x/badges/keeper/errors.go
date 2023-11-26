@@ -25,4 +25,5 @@ var (
 	ErrNoValidSolutionForChallenge = sdkerrors.Register(types.ModuleName, 77, "challenge failed")
 	ErrExceedsThreshold            = sdkerrors.Register(types.ModuleName, 78, "exceeds threshold")
 	ErrCircularInheritance         = sdkerrors.Register(types.ModuleName, 79, "circular inheritance")
+	ErrAddressMappingAlreadyExists = sdkerrors.Register(types.ModuleName, 80, "address mapping already exists")
 )

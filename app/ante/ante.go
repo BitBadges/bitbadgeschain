@@ -19,6 +19,7 @@ import (
 
 const (
 	secp256k1VerifyCost uint64 = 21000
+	ed25519VerifyCost   uint64 = 21000
 )
 
 // NewAnteHandler returns an ante handler responsible for attempting to route an
@@ -33,6 +34,8 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 
 		defer Recover(ctx.Logger(), &err)
 
+		
+
 		txWithExtensions, ok := tx.(authante.HasExtensionOptionsTx)
 		if ok {
 			opts := txWithExtensions.GetExtensionOptions()
@@ -42,7 +45,7 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 					// handle as normal Cosmos SDK tx, except signature is checked for EIP712 representation
 					anteHandler = newCosmosAnteHandlerEip712(options, "Ethereum")
 				case "/solana.ExtensionOptionsWeb3TxSolana":
-					// handle as normal Cosmos SDK tx, except signature is checked for EIP712 representation
+					// handle as normal Cosmos SDK tx, except signature is checked for JSON representation signed w/ solana
 					anteHandler = newCosmosAnteHandlerEip712(options, "Solana")
 				default:
 					return ctx, sdkerrors.Wrapf(
@@ -54,6 +57,7 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 				return anteHandler(ctx, tx, sim)
 			}
 		}
+		
 
 		// handle as totally normal Cosmos SDK tx
 		switch tx.(type) {
@@ -103,7 +107,7 @@ func DefaultSigVerificationGasConsumer(
 
 	_, ok = sig.PubKey.(*solana.PubKey)
 	if ok {
-		meter.ConsumeGas(secp256k1VerifyCost, "ante verify: eth_secp256k1")
+		meter.ConsumeGas(ed25519VerifyCost, "ante verify: solana ed25519")
 		return nil
 	}
 

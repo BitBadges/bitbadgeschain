@@ -63,7 +63,6 @@ func newCosmosAnteHandlerEip712(options HandlerOptions, chain string) sdk.AnteHa
 	if chain != "Ethereum" && chain != "Solana" {
 		panic("chain must be either Ethereum or Solana")
 	}
-	
 	return sdk.ChainAnteDecorators(
 		ante.NewSetUpContextDecorator(),
 		// NOTE: extensions option decorator removed
