@@ -42,10 +42,10 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 			if len(opts) > 0 {
 				switch typeURL := opts[0].GetTypeUrl(); typeURL {
 				case "/ethereum.ExtensionOptionsWeb3Tx":
-					// handle as normal Cosmos SDK tx, except signature is checked for EIP712 representation
+					// handle as Cosmos SDK tx, except signature is checked for EIP712 representation
 					anteHandler = newCosmosAnteHandlerEip712(options, "Ethereum")
 				case "/solana.ExtensionOptionsWeb3TxSolana":
-					// handle as normal Cosmos SDK tx, except signature is checked for JSON representation signed w/ solana
+					// handle as Cosmos SDK tx, except signature is checked for JSON representation intended to be signed w/ solana (Phantom wallet)
 					anteHandler = newCosmosAnteHandlerEip712(options, "Solana")
 				default:
 					return ctx, sdkerrors.Wrapf(

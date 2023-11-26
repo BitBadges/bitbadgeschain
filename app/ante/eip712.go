@@ -210,6 +210,8 @@ func VerifySignature(
 		feePayerExt := ""
 		feePayerSig := []byte{}
 		
+		//Get details from the extension option
+		//TODO: Is feePayer really necessary in the extension? what is it used for?
 		extOptEthereum, ok := opts[0].GetCachedValue().(*ethereumtypes.ExtensionOptionsWeb3Tx)
 		if !ok && chain == "Ethereum" {
 			return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "unknown extension option")
@@ -244,12 +246,17 @@ func VerifySignature(
 
 		recoveredFeePayerAcc := sdk.AccAddress(pubKey.Address().Bytes())
 		if !recoveredFeePayerAcc.Equals(feePayer) {
-			return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature", recoveredFeePayerAcc)
+			return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to match fee payer in extension to the expected signer %s", recoveredFeePayerAcc)
 		} 
 
 		//If chain is Solana, we need to use the Solana way to verify the signature (alphabetically sorted JSON keys)
 		//Else, we use EIP712 typed signatures for Ethereum
 		if chain == "Solana" {
+			//We generate the Solana message payload using the code from generatin EIP712
+			//We only use the message field (no types or domain)
+			//Then, we sort the message field by alphabetizing the JSON keys
+
+			//Creates the EIP712 message payload
 			basicPayload, err := eip712.CreateEIP712MessagePayload(txBytes, chain)
 			if err != nil {
 				return sdkerrors.Wrap(err, "failed to unmarshal tx bytes to JSON object")
@@ -262,16 +269,18 @@ func VerifySignature(
 				return sdkerrors.Wrap(err, "failed to sort JSON")
 			}
 			
-			
-			solanaAddress := extOptSolana.SolAddress
-
 			//Match address to pubkey to make sure it's equivalent and no random address is used
+			//This is used for indexing purposes (to be able to map Solana addresses to Cosmos addresses, 
+			//you need to know the Solana address bc it takes a hash to convert, so you can't go the opposite way)
+			//
+			//Doesn't have any on-chain significance
+			solanaAddress := extOptSolana.SolAddress
 			addr := base58.Encode(pubKey.Bytes())
 			if addr != solanaAddress {
 				return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "provided solana address in extension does not match signer pubkey")
 			}
 
-			//Verify signature
+			//Verify signature w/ ed25519
 			valid := ed25519.Verify(pubKey.Bytes(), sortedBytes, feePayerSig)
 			if !valid {
 				return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature", recoveredFeePayerAcc)
