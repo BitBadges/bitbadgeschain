@@ -21,8 +21,6 @@ import (
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 
-	solana "github.com/bitbadges/bitbadgeschain/x/solana/keys"
-
 	"github.com/bitbadges/bitbadgeschain/x/ethermint/crypto/ethsecp256k1"
 )
 
@@ -33,8 +31,6 @@ func RegisterCrypto(cdc *codec.LegacyAmino) {
 		"ethermint/PubKey", nil)
 	cdc.RegisterConcrete(&ethsecp256k1.PrivKey{},
 		"ethermint/PrivKey", nil)
-
-	cdc.RegisterConcrete(&solana.PubKey{}, "solana/PubKey", nil)
 
 	keyring.RegisterLegacyAminoCodec(cdc)
 	cryptocodec.RegisterCrypto(cdc)

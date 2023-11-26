@@ -14,7 +14,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/bitbadges/bitbadgeschain/x/ethermint/crypto/ethsecp256k1"
-	solana "github.com/bitbadges/bitbadgeschain/x/solana/keys"
+	ed25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 )
 
 const (
@@ -105,7 +105,7 @@ func DefaultSigVerificationGasConsumer(
 		return nil
 	}
 
-	_, ok = sig.PubKey.(*solana.PubKey)
+	_, ok = sig.PubKey.(*ed25519.PubKey)
 	if ok {
 		meter.ConsumeGas(ed25519VerifyCost, "ante verify: solana ed25519")
 		return nil

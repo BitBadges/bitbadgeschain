@@ -20,14 +20,10 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 
 	"github.com/bitbadges/bitbadgeschain/x/ethermint/crypto/ethsecp256k1"
-
-	solana "github.com/bitbadges/bitbadgeschain/x/solana/keys"
 )
 
 // RegisterInterfaces register the Ethermint key concrete types.
 func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*cryptotypes.PubKey)(nil), &ethsecp256k1.PubKey{})
 	registry.RegisterImplementations((*cryptotypes.PrivKey)(nil), &ethsecp256k1.PrivKey{})
-
-	registry.RegisterImplementations((*cryptotypes.PubKey)(nil), &solana.PubKey{})
 }
