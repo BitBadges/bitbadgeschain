@@ -5,10 +5,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 	"github.com/tidwall/gjson"
-
-	sdkerrors "cosmossdk.io/errors"
-
-	types "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/utils"
 )
 
 // NormalizeEmptyTypes is a recursive function that adds empty values to fields that are omitted when serialized with Proto and Amino.
@@ -38,7 +34,9 @@ func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Typ
 			mapObject[typeObj.Name] = valueArr
 		} else if typeStr == "string" && value == nil {
 			mapObject[typeObj.Name] = ""
-		}  else if typeStr == "bool" && value == nil {
+		} else if typeStr == "uint64" && value == nil {
+			mapObject[typeObj.Name] = "0" //TODO: Does this really work / resolve correctly? We don't use it in any x/badges txs but it should be tested
+		} else if typeStr == "bool" && value == nil {
 			mapObject[typeObj.Name] = false
 		} else {
 			innerMap, ok := mapObject[typeObj.Name].(map[string]interface{})
@@ -48,9 +46,6 @@ func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Typ
 					return mapObject, err
 				}
 				mapObject[typeObj.Name] = newMap
-			} else {
-				// If the field is not an object, we don't need to do anything
-				return nil, sdkerrors.Wrapf(types.ErrInvalidEIP712Object, "unexpected type %s", typeObj.Name)
 			}
 		}
 	}
