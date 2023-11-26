@@ -23,7 +23,11 @@ message ExtensionOptionsWeb3TxSolana {
   // allows to perform fee delegation when using EIP712 Domain.
   bytes fee_payer_sig = 3 [(gogoproto.jsontag) = "feePayerSig,omitempty"];
 
+  // chain should be "Solana"
   string chain = 4 [(gogoproto.jsontag) = "chain,omitempty"];
 
+  // sol_address is the address of the solana account. 
+  // Used for indexing purposes because we can't natively go from a cosmos address (what is used on-chain) to a solana address
+  // without knowing the solana address in the first place. This is because conversion to cosmos requires a hash of the solana address.
   string sol_address = 5 [(gogoproto.jsontag) = "solAddress,omitempty"];
 }

@@ -24,10 +24,10 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// A BadgeCollection is the top level object for a collection of badges.
+// A BadgeCollection is the top-level object for a collection of badges.
 // It defines everything about the collection, such as the manager, metadata, etc.
 //
-// All collections are identified by a collectionId assigned by the blockchain, which is a uint64 that increments (i.e. first collection has ID 1).
+// All collections are identified by a collectionId assigned by the blockchain, which is a uint64 that increments (i.e., the first collection has ID 1).
 //
 // All collections also have a manager who is responsible for managing the collection.
 // They can be granted certain permissions, such as the ability to mint new badges.
@@ -36,47 +36,49 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // We fetch the value according to the current time.
 // For example, we may set the manager to be Alice from Time1 to Time2, and then set the manager to be Bob from Time2 to Time3.
 //
-// Collections may have different balance types: standard vs off-chain vs inherited. See documentation for differences.
+// Collections may have different balance types: standard vs. off-chain vs. inherited.
+//
+// See documentation for more details.
 type BadgeCollection struct {
-	// The collectionId is the unique identifier for this collection.
+	// The unique identifier for this collection. This is assigned by the blockchain. First collection has ID 1.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
-	// The collection metadata is the metadata for the collection itself.
+	// The metadata for the collection itself, which can vary over time.
 	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,2,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
-	// The badge metadata is the metadata for each badge in the collection.
+	// The metadata for each badge in the collection, also subject to changes over time.
 	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,3,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
-	// The balancesType is the type of balances this collection uses (standard, off-chain, or inherited).
+	// The type of balances this collection uses ("Standard", "Off-Chain", or "Inherited").
 	BalancesType string `protobuf:"bytes,4,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
-	// The off-chain balances metadata defines where to fetch the balances for collections with off-chain balances.
+	// Metadata for fetching balances for collections with off-chain balances, subject to changes over time.
 	OffChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline `protobuf:"bytes,5,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
-	// The custom data field is an arbitrary field that can be used to store any data.
+	// An arbitrary field that can store any data, subject to changes over time.
 	CustomDataTimeline []*CustomDataTimeline `protobuf:"bytes,7,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
-	// The manager is the address of the manager of this collection.
+	// The address of the manager of this collection, subject to changes over time.
 	ManagerTimeline []*ManagerTimeline `protobuf:"bytes,8,rep,name=managerTimeline,proto3" json:"managerTimeline,omitempty"`
-	// The permissions define what the manager of the collection can do or not do.
+	// Permissions that define what the manager of the collection can do or not do.
 	CollectionPermissions *CollectionPermissions `protobuf:"bytes,9,opt,name=collectionPermissions,proto3" json:"collectionPermissions,omitempty"`
-	// The approved transfers defines the transferability of the collection for collections with standard balances.
-	// This defines it on a collection-level. All transfers must be explicitly allowed on the collection-level, or else, they will fail.
-	//
-	// Collection approved transfers can optionally specify to override the user approvals for a transfer (e.g. forcefully revoke a badge).
-	// If user approvals are not overriden, then a transfer must also satisfy the From user's approved outgoing transfers and the To user's approved incoming transfers.
+	// Transferability of the collection for collections with standard balances, subject to changes over time.
+	// Overrides user approvals for a transfer if specified.
+	// Transfer must satisfy both user and collection-level approvals.
+	// Not applicable for off-chain or inherited balances.
 	CollectionApprovals []*CollectionApproval `protobuf:"bytes,10,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
-	// Standards allow us to define a standard for the collection. This lets others know how to interpret the fields of the collection.
+	// Standards that define how to interpret the fields of the collection, subject to changes over time.
 	StandardsTimeline []*StandardsTimeline `protobuf:"bytes,11,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
-	// The isArchivedTimeline defines whether the collection is archived or not.
-	// When a collection is archived, it is read-only and no transactions can be processed.
+	// Whether the collection is archived or not, subject to changes over time.
+	// When archived, it becomes read-only, and no transactions can be processed until it is unarchived.
 	IsArchivedTimeline []*IsArchivedTimeline `protobuf:"bytes,12,rep,name=isArchivedTimeline,proto3" json:"isArchivedTimeline,omitempty"`
-	// The defaultUserOutgoingApprovals defines the default user approved outgoing transfers for an uninitialized user balance.
-	// The user can change this value at any time.
+	// Default user-approved outgoing transfers for an uninitialized user balance.
 	DefaultUserOutgoingApprovals []*UserOutgoingApproval `protobuf:"bytes,14,rep,name=defaultUserOutgoingApprovals,proto3" json:"defaultUserOutgoingApprovals,omitempty"`
-	// The defaultUserIncomingApprovals defines the default user approved incoming transfers for an uninitialized user balance.
-	// The user can change this value at any time.
-	//
-	// Ex: Set this to disallow all incoming transfers by default, making the user have to opt-in to receiving the badge.
-	DefaultUserIncomingApprovals                     []*UserIncomingApproval `protobuf:"bytes,15,rep,name=defaultUserIncomingApprovals,proto3" json:"defaultUserIncomingApprovals,omitempty"`
-	DefaultUserPermissions                           *UserPermissions        `protobuf:"bytes,16,opt,name=defaultUserPermissions,proto3" json:"defaultUserPermissions,omitempty"`
-	DefaultAutoApproveSelfInitiatedOutgoingTransfers bool                    `protobuf:"varint,17,opt,name=defaultAutoApproveSelfInitiatedOutgoingTransfers,proto3" json:"defaultAutoApproveSelfInitiatedOutgoingTransfers,omitempty"`
-	DefaultAutoApproveSelfInitiatedIncomingTransfers bool                    `protobuf:"varint,18,opt,name=defaultAutoApproveSelfInitiatedIncomingTransfers,proto3" json:"defaultAutoApproveSelfInitiatedIncomingTransfers,omitempty"`
-	CreatedBy                                        string                  `protobuf:"bytes,19,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
+	// Default user-approved incoming transfers for an uninitialized user balance.
+	// Ex: Can be set to disallow all incoming transfers by default, allowing users to opt-in to receiving badges.
+	DefaultUserIncomingApprovals []*UserIncomingApproval `protobuf:"bytes,15,rep,name=defaultUserIncomingApprovals,proto3" json:"defaultUserIncomingApprovals,omitempty"`
+	// Default user permissions for an uninitialized user balance.
+	DefaultUserPermissions *UserPermissions `protobuf:"bytes,16,opt,name=defaultUserPermissions,proto3" json:"defaultUserPermissions,omitempty"`
+	// Whether self-initiated outgoing transfers are auto-approved by default.
+	DefaultAutoApproveSelfInitiatedOutgoingTransfers bool `protobuf:"varint,17,opt,name=defaultAutoApproveSelfInitiatedOutgoingTransfers,proto3" json:"defaultAutoApproveSelfInitiatedOutgoingTransfers,omitempty"`
+	// Whether self-initiated incoming transfers are auto-approved by default.
+	DefaultAutoApproveSelfInitiatedIncomingTransfers bool `protobuf:"varint,18,opt,name=defaultAutoApproveSelfInitiatedIncomingTransfers,proto3" json:"defaultAutoApproveSelfInitiatedIncomingTransfers,omitempty"`
+	// The user or entity who created the badge collection.
+	CreatedBy string `protobuf:"bytes,19,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
 }
 
 func (m *BadgeCollection) Reset()         { *m = BadgeCollection{} }

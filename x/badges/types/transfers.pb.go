@@ -23,27 +23,38 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// UserBalanceStore is the store for the user balances
-// It consists of a list of balances, a list of approved outgoing transfers, and a list of approved incoming transfers,
-// and the permissions for updating the approved incoming/outgoing transfers.
+// UserBalanceStore is the store for the user balances for a collection.
 //
-// The default approved outgoing / incoming transfers are defined by the collection.
+// It consists of a list of balances, a list of approved outgoing transfers, and a list of approved incoming transfers,
+// as well as the permissions for updating the approved incoming/outgoing transfers.
+//
+// Upon initialization, all fields (minus the balances) are set to the defaults specified by the collection.
 //
 // The outgoing transfers can be used to allow / disallow transfers which are sent from this user.
-// If a transfer has no match, then it is disallowed by default, unless from == initiatedBy (i.e. initiated by this user).
+// If a transfer has no match, then it is disallowed by default, unless from == initiatedBy (i.e. initiated by this user)
+// and autoApproveSelfInitiatedOutgoingTransfers is set to true.
 //
 // The incoming transfers can be used to allow / disallow transfers which are sent to this user.
-// If a transfer has no match, then it is disallowed by default, unless to == initiatedBy (i.e. initiated by this user).
+// If a transfer has no match, then it is disallowed by default, unless to == initiatedBy (i.e. initiated by this user)
+// and autoApproveSelfInitiatedIncomingTransfers is set to true.
 //
 // Note that the user approved transfers are only checked if the collection approved transfers do not specify to override
 // the user approved transfers.
+//
+// The permissions are used to determine whether the user can update the approved incoming/outgoing transfers and auto approvals.
 type UserBalanceStore struct {
-	Balances                                  []*Balance              `protobuf:"bytes,1,rep,name=balances,proto3" json:"balances,omitempty"`
-	OutgoingApprovals                         []*UserOutgoingApproval `protobuf:"bytes,2,rep,name=outgoingApprovals,proto3" json:"outgoingApprovals,omitempty"`
-	IncomingApprovals                         []*UserIncomingApproval `protobuf:"bytes,3,rep,name=incomingApprovals,proto3" json:"incomingApprovals,omitempty"`
-	AutoApproveSelfInitiatedOutgoingTransfers bool                    `protobuf:"varint,4,opt,name=autoApproveSelfInitiatedOutgoingTransfers,proto3" json:"autoApproveSelfInitiatedOutgoingTransfers,omitempty"`
-	AutoApproveSelfInitiatedIncomingTransfers bool                    `protobuf:"varint,5,opt,name=autoApproveSelfInitiatedIncomingTransfers,proto3" json:"autoApproveSelfInitiatedIncomingTransfers,omitempty"`
-	UserPermissions                           *UserPermissions        `protobuf:"bytes,6,opt,name=userPermissions,proto3" json:"userPermissions,omitempty"`
+	// The list of balances associated with this user.
+	Balances []*Balance `protobuf:"bytes,1,rep,name=balances,proto3" json:"balances,omitempty"`
+	// The list of approved outgoing transfers for this user.
+	OutgoingApprovals []*UserOutgoingApproval `protobuf:"bytes,2,rep,name=outgoingApprovals,proto3" json:"outgoingApprovals,omitempty"`
+	// The list of approved incoming transfers for this user.
+	IncomingApprovals []*UserIncomingApproval `protobuf:"bytes,3,rep,name=incomingApprovals,proto3" json:"incomingApprovals,omitempty"`
+	// Whether to auto-approve self-initiated outgoing transfers for this user (i.e. from == initiatedBy).
+	AutoApproveSelfInitiatedOutgoingTransfers bool `protobuf:"varint,4,opt,name=autoApproveSelfInitiatedOutgoingTransfers,proto3" json:"autoApproveSelfInitiatedOutgoingTransfers,omitempty"`
+	// Whether to auto-approve self-initiated incoming transfers for this user (i.e. to == initiatedBy).
+	AutoApproveSelfInitiatedIncomingTransfers bool `protobuf:"varint,5,opt,name=autoApproveSelfInitiatedIncomingTransfers,proto3" json:"autoApproveSelfInitiatedIncomingTransfers,omitempty"`
+	// The permissions for this user's actions and transfers.
+	UserPermissions *UserPermissions `protobuf:"bytes,6,opt,name=userPermissions,proto3" json:"userPermissions,omitempty"`
 }
 
 func (m *UserBalanceStore) Reset()         { *m = UserBalanceStore{} }
@@ -121,30 +132,29 @@ func (m *UserBalanceStore) GetUserPermissions() *UserPermissions {
 	return nil
 }
 
-// Challenges define the rules for the approval.
-// If all challenge are not met with valid solutions, then the transfer is not approved.
+// Challenges define a rule for the approval in the form of a Merkle challenge.
 //
-// Currently, we only support Merkle tree challenges where the Merkle path must be to the provided root
-// and be the expected length.
+// A Merkle challenge is a challenge where the user must provide a Merkle proof to a Merkle tree. If they provide a valid proof,
+// then the challenge is met. All challenges must be met with valid solutions for the transfer to be approved.
 //
-// We also support the following options:
-// -useCreatorAddressAsLeaf: If true, then the leaf will be set to the creator address. Used for whitelist trees.
-// -maxOneUsePerLeaf: If true, then each leaf can only be used once. If false, then the leaf can be used multiple times.
-// This is very important to be set to true if you want to prevent replay attacks.
-// -useLeafIndexForDistributionOrder: If true, we will use the leafIndex to determine the order of the distribution of badges.
-// leafIndex 0 will be the leftmost leaf of the expectedProofLength layer
+// IMPORTANT: Merkle challenges currently are limited to SHA256 hashes. See documentation for MerkleChallenge for more details and tutorials.
 //
-// IMPORTANT: We track the number of uses per leaf according to a challenge ID.
-// Please use unique challenge IDs for different challenges of the same timeline.
+// IMPORTANT: We track the number of uses per leaf according to the challengeTrackerId specified by the parent approval of this challenge.
 // If you update the challenge ID, then the used leaves tracker will reset and start a new tally.
-// It is highly recommended to avoid updating a challenge without resetting the tally via a new challenge ID.
+// We recommend using a unique challenge ID for each challenge to prevent overlap and unexpected behavior.
 type MerkleChallenge struct {
-	Root                    string `protobuf:"bytes,1,opt,name=root,proto3" json:"root,omitempty"`
-	ExpectedProofLength     Uint   `protobuf:"bytes,2,opt,name=expectedProofLength,proto3,customtype=Uint" json:"expectedProofLength"`
-	UseCreatorAddressAsLeaf bool   `protobuf:"varint,3,opt,name=useCreatorAddressAsLeaf,proto3" json:"useCreatorAddressAsLeaf,omitempty"`
-	MaxUsesPerLeaf          Uint   `protobuf:"bytes,4,opt,name=maxUsesPerLeaf,proto3,customtype=Uint" json:"maxUsesPerLeaf"`
-	Uri                     string `protobuf:"bytes,6,opt,name=uri,proto3" json:"uri,omitempty"`
-	CustomData              string `protobuf:"bytes,7,opt,name=customData,proto3" json:"customData,omitempty"`
+	// The root hash of the Merkle tree to which the Merkle path must lead for verification.
+	Root string `protobuf:"bytes,1,opt,name=root,proto3" json:"root,omitempty"`
+	// The expected length of the Merkle path for verification. Used to prevent Merkle path truncation attacks.
+	ExpectedProofLength Uint `protobuf:"bytes,2,opt,name=expectedProofLength,proto3,customtype=Uint" json:"expectedProofLength"`
+	// If true, we will override the user's leaf for their proof with their creator address. Used for whitelist trees where all leaves are valid Cosmos addresses.
+	UseCreatorAddressAsLeaf bool `protobuf:"varint,3,opt,name=useCreatorAddressAsLeaf,proto3" json:"useCreatorAddressAsLeaf,omitempty"`
+	// The maximum number of times each leaf can be used. Must be 1 if useCreatorAddressAsLeaf is false to prevent replay attacks.
+	MaxUsesPerLeaf Uint `protobuf:"bytes,4,opt,name=maxUsesPerLeaf,proto3,customtype=Uint" json:"maxUsesPerLeaf"`
+	// The URI associated with this Merkle challenge, optionally providing metadata about the challenge.
+	Uri string `protobuf:"bytes,6,opt,name=uri,proto3" json:"uri,omitempty"`
+	// Arbitrary custom data associated with this Merkle challenge.
+	CustomData string `protobuf:"bytes,7,opt,name=customData,proto3" json:"customData,omitempty"`
 }
 
 func (m *MerkleChallenge) Reset()         { *m = MerkleChallenge{} }
@@ -209,19 +219,30 @@ func (m *MerkleChallenge) GetCustomData() string {
 }
 
 // UserOutgoingApproval defines the rules for the approval of an outgoing transfer from a user.
-// See CollectionApproval for more details. This is the same minus a few fields.
 type UserOutgoingApproval struct {
-	ToMappingId          string       `protobuf:"bytes,1,opt,name=toMappingId,proto3" json:"toMappingId,omitempty"`
-	InitiatedByMappingId string       `protobuf:"bytes,2,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
-	TransferTimes        []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	BadgeIds             []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	OwnershipTimes       []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
-	AmountTrackerId      string       `protobuf:"bytes,6,opt,name=amountTrackerId,proto3" json:"amountTrackerId,omitempty"`
-	ChallengeTrackerId   string       `protobuf:"bytes,7,opt,name=challengeTrackerId,proto3" json:"challengeTrackerId,omitempty"`
-	//if approved, we use these. if not, these are ignored
-	Uri              string                    `protobuf:"bytes,8,opt,name=uri,proto3" json:"uri,omitempty"`
-	CustomData       string                    `protobuf:"bytes,9,opt,name=customData,proto3" json:"customData,omitempty"`
-	ApprovalId       string                    `protobuf:"bytes,10,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
+	// The mapping ID for the recipient of the transfer.
+	ToMappingId string `protobuf:"bytes,1,opt,name=toMappingId,proto3" json:"toMappingId,omitempty"`
+	// The mapping ID for the user who initiated the transfer.
+	InitiatedByMappingId string `protobuf:"bytes,2,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
+	// The allowed range of transfer times for approval.
+	TransferTimes []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
+	// The allowed range of badge IDs for approval.
+	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	// The allowed range of ownership times for approval.
+	OwnershipTimes []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
+	// The ID of the amount tracker associated with this approval.
+	// We use this ID to track the number of transfers and amounts transferred.
+	AmountTrackerId string `protobuf:"bytes,6,opt,name=amountTrackerId,proto3" json:"amountTrackerId,omitempty"`
+	// The ID of the challenge tracker associated with this approval.
+	// We use this ID to track the number of uses per leaf for the Merkle challenge.
+	ChallengeTrackerId string `protobuf:"bytes,7,opt,name=challengeTrackerId,proto3" json:"challengeTrackerId,omitempty"`
+	// The URI associated with this approval, optionally providing metadata about the approval.
+	Uri string `protobuf:"bytes,8,opt,name=uri,proto3" json:"uri,omitempty"`
+	// Arbitrary custom data associated with this approval.
+	CustomData string `protobuf:"bytes,9,opt,name=customData,proto3" json:"customData,omitempty"`
+	// The ID of this approval. Must be unique per level (i.e. collection, outgoing, incoming).
+	ApprovalId string `protobuf:"bytes,10,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
+	// The criteria that must be met for this approval to be considered.
 	ApprovalCriteria *OutgoingApprovalCriteria `protobuf:"bytes,11,opt,name=approvalCriteria,proto3" json:"approvalCriteria,omitempty"`
 }
 
@@ -336,19 +357,31 @@ func (m *UserOutgoingApproval) GetApprovalCriteria() *OutgoingApprovalCriteria {
 }
 
 // UserIncomingApproval defines the rules for the approval of an incoming transfer to a user.
-// See CollectionApproval for more details. This is the same minus a few fields.
 type UserIncomingApproval struct {
-	FromMappingId        string                    `protobuf:"bytes,1,opt,name=fromMappingId,proto3" json:"fromMappingId,omitempty"`
-	InitiatedByMappingId string                    `protobuf:"bytes,2,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
-	TransferTimes        []*UintRange              `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	BadgeIds             []*UintRange              `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	OwnershipTimes       []*UintRange              `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
-	AmountTrackerId      string                    `protobuf:"bytes,6,opt,name=amountTrackerId,proto3" json:"amountTrackerId,omitempty"`
-	ChallengeTrackerId   string                    `protobuf:"bytes,7,opt,name=challengeTrackerId,proto3" json:"challengeTrackerId,omitempty"`
-	Uri                  string                    `protobuf:"bytes,8,opt,name=uri,proto3" json:"uri,omitempty"`
-	CustomData           string                    `protobuf:"bytes,9,opt,name=customData,proto3" json:"customData,omitempty"`
-	ApprovalId           string                    `protobuf:"bytes,10,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
-	ApprovalCriteria     *IncomingApprovalCriteria `protobuf:"bytes,11,opt,name=approvalCriteria,proto3" json:"approvalCriteria,omitempty"`
+	// The mapping ID for the sender of the transfer.
+	FromMappingId string `protobuf:"bytes,1,opt,name=fromMappingId,proto3" json:"fromMappingId,omitempty"`
+	// The mapping ID for the user who initiated the transfer.
+	InitiatedByMappingId string `protobuf:"bytes,2,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
+	// The allowed range of transfer times for approval.
+	TransferTimes []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
+	// The allowed range of badge IDs for approval.
+	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	// The allowed range of ownership times for approval.
+	OwnershipTimes []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
+	// The ID of the amount tracker associated with this approval.
+	// We use this ID to track the number of transfers and amounts transferred.
+	AmountTrackerId string `protobuf:"bytes,6,opt,name=amountTrackerId,proto3" json:"amountTrackerId,omitempty"`
+	// The ID of the challenge tracker associated with this approval.
+	// We use this ID to track the number of uses per leaf for the Merkle challenge.
+	ChallengeTrackerId string `protobuf:"bytes,7,opt,name=challengeTrackerId,proto3" json:"challengeTrackerId,omitempty"`
+	// The URI associated with this approval, optionally providing metadata about the approval.
+	Uri string `protobuf:"bytes,8,opt,name=uri,proto3" json:"uri,omitempty"`
+	// Arbitrary custom data associated with this approval.
+	CustomData string `protobuf:"bytes,9,opt,name=customData,proto3" json:"customData,omitempty"`
+	// The ID of this approval. Must be unique per level (i.e. collection, outgoing, incoming).
+	ApprovalId string `protobuf:"bytes,10,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
+	// The criteria that must be met for this approval to be considered.
+	ApprovalCriteria *IncomingApprovalCriteria `protobuf:"bytes,11,opt,name=approvalCriteria,proto3" json:"approvalCriteria,omitempty"`
 }
 
 func (m *UserIncomingApproval) Reset()         { *m = UserIncomingApproval{} }
@@ -461,6 +494,7 @@ func (m *UserIncomingApproval) GetApprovalCriteria() *IncomingApprovalCriteria {
 	return nil
 }
 
+// ManualBalances represents a list of manual balances entered for the predetermined balances criteria. Order is calculated according to the calculation method set.
 type ManualBalances struct {
 	Balances []*Balance `protobuf:"bytes,1,rep,name=balances,proto3" json:"balances,omitempty"`
 }
@@ -505,10 +539,13 @@ func (m *ManualBalances) GetBalances() []*Balance {
 	return nil
 }
 
+// IncrementedBalances represents balances that are incremented by specific amounts, according to the order calculation method.
 type IncrementedBalances struct {
-	StartBalances             []*Balance `protobuf:"bytes,1,rep,name=startBalances,proto3" json:"startBalances,omitempty"`
-	IncrementBadgeIdsBy       Uint       `protobuf:"bytes,2,opt,name=incrementBadgeIdsBy,proto3,customtype=Uint" json:"incrementBadgeIdsBy"`
-	IncrementOwnershipTimesBy Uint       `protobuf:"bytes,3,opt,name=incrementOwnershipTimesBy,proto3,customtype=Uint" json:"incrementOwnershipTimesBy"`
+	StartBalances []*Balance `protobuf:"bytes,1,rep,name=startBalances,proto3" json:"startBalances,omitempty"`
+	// The amount by which to increment badge IDs.
+	IncrementBadgeIdsBy Uint `protobuf:"bytes,2,opt,name=incrementBadgeIdsBy,proto3,customtype=Uint" json:"incrementBadgeIdsBy"`
+	// The amount by which to increment ownership times.
+	IncrementOwnershipTimesBy Uint `protobuf:"bytes,3,opt,name=incrementOwnershipTimesBy,proto3,customtype=Uint" json:"incrementOwnershipTimesBy"`
 }
 
 func (m *IncrementedBalances) Reset()         { *m = IncrementedBalances{} }
@@ -551,12 +588,18 @@ func (m *IncrementedBalances) GetStartBalances() []*Balance {
 	return nil
 }
 
+// PredeterminedOrderCalculationMethod defines the method to calculate predetermined balances order.
 type PredeterminedOrderCalculationMethod struct {
-	UseOverallNumTransfers               bool `protobuf:"varint,1,opt,name=useOverallNumTransfers,proto3" json:"useOverallNumTransfers,omitempty"`
-	UsePerToAddressNumTransfers          bool `protobuf:"varint,2,opt,name=usePerToAddressNumTransfers,proto3" json:"usePerToAddressNumTransfers,omitempty"`
-	UsePerFromAddressNumTransfers        bool `protobuf:"varint,3,opt,name=usePerFromAddressNumTransfers,proto3" json:"usePerFromAddressNumTransfers,omitempty"`
+	// Use the overall number of transfers to calculate the order. Ex: First transfer gets the first balance, second transfer gets the second balance, etc.
+	UseOverallNumTransfers bool `protobuf:"varint,1,opt,name=useOverallNumTransfers,proto3" json:"useOverallNumTransfers,omitempty"`
+	// Use the number of transfers per "to" address to calculate the order. Ex: First transfer to address A gets the first balance, second transfer to address A gets the second balance, etc.
+	UsePerToAddressNumTransfers bool `protobuf:"varint,2,opt,name=usePerToAddressNumTransfers,proto3" json:"usePerToAddressNumTransfers,omitempty"`
+	// Use the number of transfers per "from" address to calculate the order. Ex: First transfer from address A gets the first balance, second transfer from address A gets the second balance, etc.
+	UsePerFromAddressNumTransfers bool `protobuf:"varint,3,opt,name=usePerFromAddressNumTransfers,proto3" json:"usePerFromAddressNumTransfers,omitempty"`
+	// Use the number of transfers per "initiated by" address to calculate the order. Ex: First transfer initiated by address A gets the first balance, second transfer initiated by address A gets the second balance, etc.
 	UsePerInitiatedByAddressNumTransfers bool `protobuf:"varint,4,opt,name=usePerInitiatedByAddressNumTransfers,proto3" json:"usePerInitiatedByAddressNumTransfers,omitempty"`
-	UseMerkleChallengeLeafIndex          bool `protobuf:"varint,5,opt,name=useMerkleChallengeLeafIndex,proto3" json:"useMerkleChallengeLeafIndex,omitempty"`
+	// Use the Merkle challenge leaf index to calculate the order. Ex: Transfer that uses leaf index 0 gets the first balance, transfer that uses leaf index 1 gets the second balance, etc.
+	UseMerkleChallengeLeafIndex bool `protobuf:"varint,5,opt,name=useMerkleChallengeLeafIndex,proto3" json:"useMerkleChallengeLeafIndex,omitempty"`
 }
 
 func (m *PredeterminedOrderCalculationMethod) Reset()         { *m = PredeterminedOrderCalculationMethod{} }
@@ -627,9 +670,13 @@ func (m *PredeterminedOrderCalculationMethod) GetUseMerkleChallengeLeafIndex() b
 	return false
 }
 
+// PredeterminedBalances represents balances with predetermined order calculation.
 type PredeterminedBalances struct {
-	ManualBalances         []*ManualBalances                    `protobuf:"bytes,1,rep,name=manualBalances,proto3" json:"manualBalances,omitempty"`
-	IncrementedBalances    *IncrementedBalances                 `protobuf:"bytes,2,opt,name=incrementedBalances,proto3" json:"incrementedBalances,omitempty"`
+	// Manual balances that can be entered. If this is nil, then we use the incremented balances.
+	ManualBalances []*ManualBalances `protobuf:"bytes,1,rep,name=manualBalances,proto3" json:"manualBalances,omitempty"`
+	// Balances that have a starting amount and increment. If this is nil, then we use the manual balances.
+	IncrementedBalances *IncrementedBalances `protobuf:"bytes,2,opt,name=incrementedBalances,proto3" json:"incrementedBalances,omitempty"`
+	// The method to calculate the order of predetermined balances.
 	OrderCalculationMethod *PredeterminedOrderCalculationMethod `protobuf:"bytes,3,opt,name=orderCalculationMethod,proto3" json:"orderCalculationMethod,omitempty"`
 }
 
@@ -687,11 +734,18 @@ func (m *PredeterminedBalances) GetOrderCalculationMethod() *PredeterminedOrderC
 	return nil
 }
 
-// PerAddressApprovals defines the approvals per unique from, to, and/or initiatedBy address.
+// ApprovalAmounts defines approval amounts per unique "from," "to," and/or "initiated by" address.
+// If any of these are nil or "0", we assume unlimited approvals.
+// If they are set to a value, then the running tally of the amounts transferred for the specified badge IDs and ownership times
+// must not exceed the corresponding value.
 type ApprovalAmounts struct {
-	OverallApprovalAmount               Uint `protobuf:"bytes,1,opt,name=overallApprovalAmount,proto3,customtype=Uint" json:"overallApprovalAmount"`
-	PerToAddressApprovalAmount          Uint `protobuf:"bytes,2,opt,name=perToAddressApprovalAmount,proto3,customtype=Uint" json:"perToAddressApprovalAmount"`
-	PerFromAddressApprovalAmount        Uint `protobuf:"bytes,3,opt,name=perFromAddressApprovalAmount,proto3,customtype=Uint" json:"perFromAddressApprovalAmount"`
+	// Overall approval amount.
+	OverallApprovalAmount Uint `protobuf:"bytes,1,opt,name=overallApprovalAmount,proto3,customtype=Uint" json:"overallApprovalAmount"`
+	// Approval amount per "to" address.
+	PerToAddressApprovalAmount Uint `protobuf:"bytes,2,opt,name=perToAddressApprovalAmount,proto3,customtype=Uint" json:"perToAddressApprovalAmount"`
+	// Approval amount per "from" address.
+	PerFromAddressApprovalAmount Uint `protobuf:"bytes,3,opt,name=perFromAddressApprovalAmount,proto3,customtype=Uint" json:"perFromAddressApprovalAmount"`
+	// Approval amount per "initiated by" address.
 	PerInitiatedByAddressApprovalAmount Uint `protobuf:"bytes,4,opt,name=perInitiatedByAddressApprovalAmount,proto3,customtype=Uint" json:"perInitiatedByAddressApprovalAmount"`
 }
 
@@ -728,10 +782,18 @@ func (m *ApprovalAmounts) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ApprovalAmounts proto.InternalMessageInfo
 
+// MaxNumTransfers defines the maximum number of transfers per unique "from," "to," and/or "initiated by" address.
+// If any of these are nil or "0", we assume unlimited approvals.
+// If they are set to a value, then the running tally of the number of transfers for the specified badge IDs and ownership times
+// must not exceed the corresponding value.
 type MaxNumTransfers struct {
-	OverallMaxNumTransfers               Uint `protobuf:"bytes,1,opt,name=overallMaxNumTransfers,proto3,customtype=Uint" json:"overallMaxNumTransfers"`
-	PerToAddressMaxNumTransfers          Uint `protobuf:"bytes,2,opt,name=perToAddressMaxNumTransfers,proto3,customtype=Uint" json:"perToAddressMaxNumTransfers"`
-	PerFromAddressMaxNumTransfers        Uint `protobuf:"bytes,3,opt,name=perFromAddressMaxNumTransfers,proto3,customtype=Uint" json:"perFromAddressMaxNumTransfers"`
+	// Overall maximum number of transfers.
+	OverallMaxNumTransfers Uint `protobuf:"bytes,1,opt,name=overallMaxNumTransfers,proto3,customtype=Uint" json:"overallMaxNumTransfers"`
+	// Maximum number of transfers per "to" address.
+	PerToAddressMaxNumTransfers Uint `protobuf:"bytes,2,opt,name=perToAddressMaxNumTransfers,proto3,customtype=Uint" json:"perToAddressMaxNumTransfers"`
+	// Maximum number of transfers per "from" address.
+	PerFromAddressMaxNumTransfers Uint `protobuf:"bytes,3,opt,name=perFromAddressMaxNumTransfers,proto3,customtype=Uint" json:"perFromAddressMaxNumTransfers"`
+	// Maximum number of transfers per "initiated by" address.
 	PerInitiatedByAddressMaxNumTransfers Uint `protobuf:"bytes,4,opt,name=perInitiatedByAddressMaxNumTransfers,proto3,customtype=Uint" json:"perInitiatedByAddressMaxNumTransfers"`
 }
 
@@ -768,9 +830,12 @@ func (m *MaxNumTransfers) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MaxNumTransfers proto.InternalMessageInfo
 
+// ApprovalsTracker defines the tracker for approvals. This tracks the cumulative number of transfers and associated balances transferred.
 type ApprovalsTracker struct {
-	NumTransfers Uint       `protobuf:"bytes,1,opt,name=numTransfers,proto3,customtype=Uint" json:"numTransfers"`
-	Amounts      []*Balance `protobuf:"bytes,2,rep,name=amounts,proto3" json:"amounts,omitempty"`
+	// The number of transfers that have been processed.
+	NumTransfers Uint `protobuf:"bytes,1,opt,name=numTransfers,proto3,customtype=Uint" json:"numTransfers"`
+	// Cumulative balances associated with the transfers that have been processed.
+	Amounts []*Balance `protobuf:"bytes,2,rep,name=amounts,proto3" json:"amounts,omitempty"`
 }
 
 func (m *ApprovalsTracker) Reset()         { *m = ApprovalsTracker{} }
@@ -813,18 +878,30 @@ func (m *ApprovalsTracker) GetAmounts() []*Balance {
 	return nil
 }
 
+// ApprovalCriteria defines the criteria for approving transfers.
 type ApprovalCriteria struct {
-	MustOwnBadges                      []*MustOwnBadges       `protobuf:"bytes,1,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
-	MerkleChallenge                    *MerkleChallenge       `protobuf:"bytes,2,opt,name=merkleChallenge,proto3" json:"merkleChallenge,omitempty"`
-	PredeterminedBalances              *PredeterminedBalances `protobuf:"bytes,3,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
-	ApprovalAmounts                    *ApprovalAmounts       `protobuf:"bytes,4,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
-	MaxNumTransfers                    *MaxNumTransfers       `protobuf:"bytes,5,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
-	RequireToEqualsInitiatedBy         bool                   `protobuf:"varint,9,opt,name=requireToEqualsInitiatedBy,proto3" json:"requireToEqualsInitiatedBy,omitempty"`
-	RequireFromEqualsInitiatedBy       bool                   `protobuf:"varint,10,opt,name=requireFromEqualsInitiatedBy,proto3" json:"requireFromEqualsInitiatedBy,omitempty"`
-	RequireToDoesNotEqualInitiatedBy   bool                   `protobuf:"varint,11,opt,name=requireToDoesNotEqualInitiatedBy,proto3" json:"requireToDoesNotEqualInitiatedBy,omitempty"`
-	RequireFromDoesNotEqualInitiatedBy bool                   `protobuf:"varint,12,opt,name=requireFromDoesNotEqualInitiatedBy,proto3" json:"requireFromDoesNotEqualInitiatedBy,omitempty"`
-	OverridesFromOutgoingApprovals     bool                   `protobuf:"varint,13,opt,name=overridesFromOutgoingApprovals,proto3" json:"overridesFromOutgoingApprovals,omitempty"`
-	OverridesToIncomingApprovals       bool                   `protobuf:"varint,14,opt,name=overridesToIncomingApprovals,proto3" json:"overridesToIncomingApprovals,omitempty"`
+	// List of badges that the user must own for approval.
+	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,1,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
+	// Merkle challenge that must be satisfied for approval.
+	MerkleChallenge *MerkleChallenge `protobuf:"bytes,2,opt,name=merkleChallenge,proto3" json:"merkleChallenge,omitempty"`
+	// Predetermined balances for eeach approval.
+	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,3,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
+	// Threshold limit of amounts that can be transferred using this approval.
+	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,4,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
+	// Maximum number of transfers that can be processed using this approval.
+	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,5,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
+	// Require the "to" address to be equal to the "initiated by" address for approval.
+	RequireToEqualsInitiatedBy bool `protobuf:"varint,9,opt,name=requireToEqualsInitiatedBy,proto3" json:"requireToEqualsInitiatedBy,omitempty"`
+	// Require the "from" address to be equal to the "initiated by" address for approval.
+	RequireFromEqualsInitiatedBy bool `protobuf:"varint,10,opt,name=requireFromEqualsInitiatedBy,proto3" json:"requireFromEqualsInitiatedBy,omitempty"`
+	// Require the "to" address to not be equal to the "initiated by" address for approval.
+	RequireToDoesNotEqualInitiatedBy bool `protobuf:"varint,11,opt,name=requireToDoesNotEqualInitiatedBy,proto3" json:"requireToDoesNotEqualInitiatedBy,omitempty"`
+	// Require the "from" address to not be equal to the "initiated by" address for approval.
+	RequireFromDoesNotEqualInitiatedBy bool `protobuf:"varint,12,opt,name=requireFromDoesNotEqualInitiatedBy,proto3" json:"requireFromDoesNotEqualInitiatedBy,omitempty"`
+	// Overrides the user's outgoing approvals for approval.
+	OverridesFromOutgoingApprovals bool `protobuf:"varint,13,opt,name=overridesFromOutgoingApprovals,proto3" json:"overridesFromOutgoingApprovals,omitempty"`
+	// Overrides the user's incoming approvals for approval.
+	OverridesToIncomingApprovals bool `protobuf:"varint,14,opt,name=overridesToIncomingApprovals,proto3" json:"overridesToIncomingApprovals,omitempty"`
 }
 
 func (m *ApprovalCriteria) Reset()         { *m = ApprovalCriteria{} }
@@ -937,14 +1014,22 @@ func (m *ApprovalCriteria) GetOverridesToIncomingApprovals() bool {
 	return false
 }
 
+// OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.
 type OutgoingApprovalCriteria struct {
-	MustOwnBadges                    []*MustOwnBadges       `protobuf:"bytes,1,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
-	MerkleChallenge                  *MerkleChallenge       `protobuf:"bytes,2,opt,name=merkleChallenge,proto3" json:"merkleChallenge,omitempty"`
-	PredeterminedBalances            *PredeterminedBalances `protobuf:"bytes,3,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
-	ApprovalAmounts                  *ApprovalAmounts       `protobuf:"bytes,4,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
-	MaxNumTransfers                  *MaxNumTransfers       `protobuf:"bytes,5,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
-	RequireToEqualsInitiatedBy       bool                   `protobuf:"varint,9,opt,name=requireToEqualsInitiatedBy,proto3" json:"requireToEqualsInitiatedBy,omitempty"`
-	RequireToDoesNotEqualInitiatedBy bool                   `protobuf:"varint,11,opt,name=requireToDoesNotEqualInitiatedBy,proto3" json:"requireToDoesNotEqualInitiatedBy,omitempty"`
+	// List of badges that the user must own for approval.
+	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,1,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
+	// Merkle challenge that must be satisfied for approval.
+	MerkleChallenge *MerkleChallenge `protobuf:"bytes,2,opt,name=merkleChallenge,proto3" json:"merkleChallenge,omitempty"`
+	// Predetermined balances for eeach approval.
+	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,3,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
+	// Threshold limit of amounts that can be transferred using this approval.
+	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,4,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
+	// Maximum number of transfers that can be processed using this approval.
+	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,5,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
+	// Require the "to" address to be equal to the "initiated by" address for approval.
+	RequireToEqualsInitiatedBy bool `protobuf:"varint,9,opt,name=requireToEqualsInitiatedBy,proto3" json:"requireToEqualsInitiatedBy,omitempty"`
+	// Require the "to" address to not be equal to the "initiated by" address for approval.
+	RequireToDoesNotEqualInitiatedBy bool `protobuf:"varint,11,opt,name=requireToDoesNotEqualInitiatedBy,proto3" json:"requireToDoesNotEqualInitiatedBy,omitempty"`
 }
 
 func (m *OutgoingApprovalCriteria) Reset()         { *m = OutgoingApprovalCriteria{} }
@@ -1029,14 +1114,22 @@ func (m *OutgoingApprovalCriteria) GetRequireToDoesNotEqualInitiatedBy() bool {
 	return false
 }
 
+// IncomingApprovalCriteria defines the criteria for approving incoming transfers.
 type IncomingApprovalCriteria struct {
-	MustOwnBadges                      []*MustOwnBadges       `protobuf:"bytes,1,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
-	MerkleChallenge                    *MerkleChallenge       `protobuf:"bytes,2,opt,name=merkleChallenge,proto3" json:"merkleChallenge,omitempty"`
-	PredeterminedBalances              *PredeterminedBalances `protobuf:"bytes,3,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
-	ApprovalAmounts                    *ApprovalAmounts       `protobuf:"bytes,4,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
-	MaxNumTransfers                    *MaxNumTransfers       `protobuf:"bytes,5,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
-	RequireFromEqualsInitiatedBy       bool                   `protobuf:"varint,10,opt,name=requireFromEqualsInitiatedBy,proto3" json:"requireFromEqualsInitiatedBy,omitempty"`
-	RequireFromDoesNotEqualInitiatedBy bool                   `protobuf:"varint,12,opt,name=requireFromDoesNotEqualInitiatedBy,proto3" json:"requireFromDoesNotEqualInitiatedBy,omitempty"`
+	// List of badges that the user must own for approval.
+	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,1,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
+	// Merkle challenge that must be satisfied for approval.
+	MerkleChallenge *MerkleChallenge `protobuf:"bytes,2,opt,name=merkleChallenge,proto3" json:"merkleChallenge,omitempty"`
+	// Predetermined balances for eeach approval.
+	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,3,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
+	// Threshold limit of amounts that can be transferred using this approval.
+	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,4,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
+	// Maximum number of transfers that can be processed using this approval.
+	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,5,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
+	// Require the "from" address to be equal to the "initiated by" address for approval.
+	RequireFromEqualsInitiatedBy bool `protobuf:"varint,10,opt,name=requireFromEqualsInitiatedBy,proto3" json:"requireFromEqualsInitiatedBy,omitempty"`
+	// Require the "from" address to not be equal to the "initiated by" address for approval.
+	RequireFromDoesNotEqualInitiatedBy bool `protobuf:"varint,12,opt,name=requireFromDoesNotEqualInitiatedBy,proto3" json:"requireFromDoesNotEqualInitiatedBy,omitempty"`
 }
 
 func (m *IncomingApprovalCriteria) Reset()         { *m = IncomingApprovalCriteria{} }
@@ -1121,20 +1214,34 @@ func (m *IncomingApprovalCriteria) GetRequireFromDoesNotEqualInitiatedBy() bool 
 	return false
 }
 
+// CollectionApproval defines the rules for the approval of a transfer on the collection level
 type CollectionApproval struct {
-	// Match Criteria
-	FromMappingId        string            `protobuf:"bytes,1,opt,name=fromMappingId,proto3" json:"fromMappingId,omitempty"`
-	ToMappingId          string            `protobuf:"bytes,2,opt,name=toMappingId,proto3" json:"toMappingId,omitempty"`
-	InitiatedByMappingId string            `protobuf:"bytes,3,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
-	TransferTimes        []*UintRange      `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	BadgeIds             []*UintRange      `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	OwnershipTimes       []*UintRange      `protobuf:"bytes,6,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
-	AmountTrackerId      string            `protobuf:"bytes,7,opt,name=amountTrackerId,proto3" json:"amountTrackerId,omitempty"`
-	ChallengeTrackerId   string            `protobuf:"bytes,8,opt,name=challengeTrackerId,proto3" json:"challengeTrackerId,omitempty"`
-	Uri                  string            `protobuf:"bytes,9,opt,name=uri,proto3" json:"uri,omitempty"`
-	CustomData           string            `protobuf:"bytes,10,opt,name=customData,proto3" json:"customData,omitempty"`
-	ApprovalId           string            `protobuf:"bytes,11,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
-	ApprovalCriteria     *ApprovalCriteria `protobuf:"bytes,12,opt,name=approvalCriteria,proto3" json:"approvalCriteria,omitempty"`
+	// The mapping ID for the sender of the transfer.
+	FromMappingId string `protobuf:"bytes,1,opt,name=fromMappingId,proto3" json:"fromMappingId,omitempty"`
+	// The mapping ID for the recipient of the transfer.
+	ToMappingId string `protobuf:"bytes,2,opt,name=toMappingId,proto3" json:"toMappingId,omitempty"`
+	// The mapping ID for the user who initiated the transfer.
+	InitiatedByMappingId string `protobuf:"bytes,3,opt,name=initiatedByMappingId,proto3" json:"initiatedByMappingId,omitempty"`
+	// The allowed range of transfer times for approval.
+	TransferTimes []*UintRange `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
+	// The allowed range of badge IDs for approval.
+	BadgeIds []*UintRange `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	// The allowed range of ownership times for approval.
+	OwnershipTimes []*UintRange `protobuf:"bytes,6,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
+	// The ID of the amount tracker associated with this approval.
+	// We use this ID to track the number of transfers and amounts transferred.
+	AmountTrackerId string `protobuf:"bytes,7,opt,name=amountTrackerId,proto3" json:"amountTrackerId,omitempty"`
+	// The ID of the challenge tracker associated with this approval.
+	// We use this ID to track the number of uses per leaf for the Merkle challenge.
+	ChallengeTrackerId string `protobuf:"bytes,8,opt,name=challengeTrackerId,proto3" json:"challengeTrackerId,omitempty"`
+	// The URI associated with this approval, optionally providing metadata about the approval.
+	Uri string `protobuf:"bytes,9,opt,name=uri,proto3" json:"uri,omitempty"`
+	// Arbitrary custom data associated with this approval.
+	CustomData string `protobuf:"bytes,10,opt,name=customData,proto3" json:"customData,omitempty"`
+	// The ID of this approval. Must be unique per level (i.e. collection, outgoing, incoming).
+	ApprovalId string `protobuf:"bytes,11,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
+	// The criteria that must be met for this approval to be considered.
+	ApprovalCriteria *ApprovalCriteria `protobuf:"bytes,12,opt,name=approvalCriteria,proto3" json:"approvalCriteria,omitempty"`
 }
 
 func (m *CollectionApproval) Reset()         { *m = CollectionApproval{} }
@@ -1254,9 +1361,13 @@ func (m *CollectionApproval) GetApprovalCriteria() *ApprovalCriteria {
 	return nil
 }
 
+// ApprovalIdentifierDetails defines the details to identify a specific approval.
 type ApprovalIdentifierDetails struct {
-	ApprovalId      string `protobuf:"bytes,1,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
-	ApprovalLevel   string `protobuf:"bytes,2,opt,name=approvalLevel,proto3" json:"approvalLevel,omitempty"`
+	// The ID of the approval.
+	ApprovalId string `protobuf:"bytes,1,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
+	// The level of the approval. Can be "collection", "incoming", or "outgoing".
+	ApprovalLevel string `protobuf:"bytes,2,opt,name=approvalLevel,proto3" json:"approvalLevel,omitempty"`
+	// The address of the approver. Leave blank "" if approvalLevel == "collection".
 	ApproverAddress string `protobuf:"bytes,3,opt,name=approverAddress,proto3" json:"approverAddress,omitempty"`
 }
 
@@ -1314,15 +1425,28 @@ func (m *ApprovalIdentifierDetails) GetApproverAddress() string {
 	return ""
 }
 
+// Transfer defines the details of a transfer of badges.
 type Transfer struct {
-	From                             string                       `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty"`
-	ToAddresses                      []string                     `protobuf:"bytes,2,rep,name=toAddresses,proto3" json:"toAddresses,omitempty"`
-	Balances                         []*Balance                   `protobuf:"bytes,3,rep,name=balances,proto3" json:"balances,omitempty"`
-	PrecalculateBalancesFromApproval *ApprovalIdentifierDetails   `protobuf:"bytes,4,opt,name=precalculateBalancesFromApproval,proto3" json:"precalculateBalancesFromApproval,omitempty"`
-	MerkleProofs                     []*MerkleProof               `protobuf:"bytes,5,rep,name=merkleProofs,proto3" json:"merkleProofs,omitempty"`
-	Memo                             string                       `protobuf:"bytes,6,opt,name=memo,proto3" json:"memo,omitempty"`
-	PrioritizedApprovals             []*ApprovalIdentifierDetails `protobuf:"bytes,7,rep,name=prioritizedApprovals,proto3" json:"prioritizedApprovals,omitempty"`
-	OnlyCheckPrioritizedApprovals    bool                         `protobuf:"varint,8,opt,name=onlyCheckPrioritizedApprovals,proto3" json:"onlyCheckPrioritizedApprovals,omitempty"`
+	// The address of the sender of the transfer.
+	From string `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty"`
+	// The addresses of the recipients of the transfer.
+	ToAddresses []string `protobuf:"bytes,2,rep,name=toAddresses,proto3" json:"toAddresses,omitempty"`
+	// The balances to be transferred.
+	Balances []*Balance `protobuf:"bytes,3,rep,name=balances,proto3" json:"balances,omitempty"`
+	// If defined, we will use the predeterminedBalances from the specified approval to calculate the balances at execution time.
+	// We will override the balances field with the precalculated balances. Only applicable for approvals with predeterminedBalances set.
+	PrecalculateBalancesFromApproval *ApprovalIdentifierDetails `protobuf:"bytes,4,opt,name=precalculateBalancesFromApproval,proto3" json:"precalculateBalancesFromApproval,omitempty"`
+	// The Merkle proofs / solutions for all Merkle challenges required for the transfer.
+	MerkleProofs []*MerkleProof `protobuf:"bytes,5,rep,name=merkleProofs,proto3" json:"merkleProofs,omitempty"`
+	// The memo for the transfer.
+	Memo string `protobuf:"bytes,6,opt,name=memo,proto3" json:"memo,omitempty"`
+	// The prioritized approvals for the transfer. By default, we scan linearly through the approvals and use the first match.
+	// This field can be used to prioritize specific approvals and scan through them first.
+	PrioritizedApprovals []*ApprovalIdentifierDetails `protobuf:"bytes,7,rep,name=prioritizedApprovals,proto3" json:"prioritizedApprovals,omitempty"`
+	// Whether to only check prioritized approvals for the transfer.
+	// If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
+	// If false, we will check the prioritized approvals first and then scan through the rest of the approvals.
+	OnlyCheckPrioritizedApprovals bool `protobuf:"varint,8,opt,name=onlyCheckPrioritizedApprovals,proto3" json:"onlyCheckPrioritizedApprovals,omitempty"`
 }
 
 func (m *Transfer) Reset()         { *m = Transfer{} }
@@ -1414,9 +1538,12 @@ func (m *Transfer) GetOnlyCheckPrioritizedApprovals() bool {
 	return false
 }
 
+// MerklePathItem represents an item in a Merkle path.
 type MerklePathItem struct {
-	Aunt    string `protobuf:"bytes,1,opt,name=aunt,proto3" json:"aunt,omitempty"`
-	OnRight bool   `protobuf:"varint,2,opt,name=onRight,proto3" json:"onRight,omitempty"`
+	// The hash of the sibling node (aunt) in the Merkle path.
+	Aunt string `protobuf:"bytes,1,opt,name=aunt,proto3" json:"aunt,omitempty"`
+	// Indicates whether the aunt node is on the right side of the path.
+	OnRight bool `protobuf:"varint,2,opt,name=onRight,proto3" json:"onRight,omitempty"`
 }
 
 func (m *MerklePathItem) Reset()         { *m = MerklePathItem{} }
@@ -1466,9 +1593,11 @@ func (m *MerklePathItem) GetOnRight() bool {
 	return false
 }
 
-// Consistent with tendermint/crypto merkle tree
+// MerkleProof represents a Merkle proof, consistent with Tendermint/Crypto Merkle tree.
 type MerkleProof struct {
-	Leaf  string            `protobuf:"bytes,1,opt,name=leaf,proto3" json:"leaf,omitempty"`
+	// The hash of the leaf node for which the proof is generated.
+	Leaf string `protobuf:"bytes,1,opt,name=leaf,proto3" json:"leaf,omitempty"`
+	// List of Merkle path items (aunts) that make up the proof.
 	Aunts []*MerklePathItem `protobuf:"bytes,2,rep,name=aunts,proto3" json:"aunts,omitempty"`
 }
 

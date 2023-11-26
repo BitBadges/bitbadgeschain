@@ -121,36 +121,42 @@ func (m *BadgeCustomMsgType) GetCreateCollectionMsg() *MsgCreateCollection {
 	return nil
 }
 
-// The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
+// MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the badges module.
+// It is a universal interface that can be used for both creating and updating collections.
+// We have it defined for legacy purposes, but it is recommended to use MsgCreateCollection and MsgUpdateCollection instead.
 type MsgUniversalUpdateCollection struct {
 	Creator      string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId Uint   `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 	BalancesType string `protobuf:"bytes,3,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
-	// Default balance options for newly initiated accounts.
-	DefaultOutgoingApprovals                         []*UserOutgoingApproval             `protobuf:"bytes,4,rep,name=defaultOutgoingApprovals,proto3" json:"defaultOutgoingApprovals,omitempty"`
-	DefaultIncomingApprovals                         []*UserIncomingApproval             `protobuf:"bytes,5,rep,name=defaultIncomingApprovals,proto3" json:"defaultIncomingApprovals,omitempty"`
-	BadgesToCreate                                   []*Balance                          `protobuf:"bytes,6,rep,name=badgesToCreate,proto3" json:"badgesToCreate,omitempty"`
-	UpdateCollectionPermissions                      bool                                `protobuf:"varint,7,opt,name=updateCollectionPermissions,proto3" json:"updateCollectionPermissions,omitempty"`
-	CollectionPermissions                            *CollectionPermissions              `protobuf:"bytes,8,opt,name=collectionPermissions,proto3" json:"collectionPermissions,omitempty"`
-	UpdateManagerTimeline                            bool                                `protobuf:"varint,9,opt,name=updateManagerTimeline,proto3" json:"updateManagerTimeline,omitempty"`
-	ManagerTimeline                                  []*ManagerTimeline                  `protobuf:"bytes,10,rep,name=managerTimeline,proto3" json:"managerTimeline,omitempty"`
-	UpdateCollectionMetadataTimeline                 bool                                `protobuf:"varint,11,opt,name=updateCollectionMetadataTimeline,proto3" json:"updateCollectionMetadataTimeline,omitempty"`
-	CollectionMetadataTimeline                       []*CollectionMetadataTimeline       `protobuf:"bytes,12,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
-	UpdateBadgeMetadataTimeline                      bool                                `protobuf:"varint,13,opt,name=updateBadgeMetadataTimeline,proto3" json:"updateBadgeMetadataTimeline,omitempty"`
-	BadgeMetadataTimeline                            []*BadgeMetadataTimeline            `protobuf:"bytes,14,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
-	UpdateOffChainBalancesMetadataTimeline           bool                                `protobuf:"varint,15,opt,name=updateOffChainBalancesMetadataTimeline,proto3" json:"updateOffChainBalancesMetadataTimeline,omitempty"`
-	OffChainBalancesMetadataTimeline                 []*OffChainBalancesMetadataTimeline `protobuf:"bytes,16,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
-	UpdateCustomDataTimeline                         bool                                `protobuf:"varint,17,opt,name=updateCustomDataTimeline,proto3" json:"updateCustomDataTimeline,omitempty"`
-	CustomDataTimeline                               []*CustomDataTimeline               `protobuf:"bytes,18,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
-	UpdateCollectionApprovals                        bool                                `protobuf:"varint,21,opt,name=updateCollectionApprovals,proto3" json:"updateCollectionApprovals,omitempty"`
-	CollectionApprovals                              []*CollectionApproval               `protobuf:"bytes,22,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
-	UpdateStandardsTimeline                          bool                                `protobuf:"varint,23,opt,name=updateStandardsTimeline,proto3" json:"updateStandardsTimeline,omitempty"`
-	StandardsTimeline                                []*StandardsTimeline                `protobuf:"bytes,24,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
-	UpdateIsArchivedTimeline                         bool                                `protobuf:"varint,27,opt,name=updateIsArchivedTimeline,proto3" json:"updateIsArchivedTimeline,omitempty"`
-	IsArchivedTimeline                               []*IsArchivedTimeline               `protobuf:"bytes,28,rep,name=isArchivedTimeline,proto3" json:"isArchivedTimeline,omitempty"`
-	DefaultAutoApproveSelfInitiatedOutgoingTransfers bool                                `protobuf:"varint,29,opt,name=defaultAutoApproveSelfInitiatedOutgoingTransfers,proto3" json:"defaultAutoApproveSelfInitiatedOutgoingTransfers,omitempty"`
-	DefaultAutoApproveSelfInitiatedIncomingTransfers bool                                `protobuf:"varint,30,opt,name=defaultAutoApproveSelfInitiatedIncomingTransfers,proto3" json:"defaultAutoApproveSelfInitiatedIncomingTransfers,omitempty"`
-	DefaultUserPermissions                           *UserPermissions                    `protobuf:"bytes,31,opt,name=defaultUserPermissions,proto3" json:"defaultUserPermissions,omitempty"`
+	// Default incoming approvals for newly initiated accounts.
+	DefaultOutgoingApprovals []*UserOutgoingApproval `protobuf:"bytes,4,rep,name=defaultOutgoingApprovals,proto3" json:"defaultOutgoingApprovals,omitempty"`
+	// Default outgoing approvals for newly initiated accounts.
+	DefaultIncomingApprovals               []*UserIncomingApproval             `protobuf:"bytes,5,rep,name=defaultIncomingApprovals,proto3" json:"defaultIncomingApprovals,omitempty"`
+	BadgesToCreate                         []*Balance                          `protobuf:"bytes,6,rep,name=badgesToCreate,proto3" json:"badgesToCreate,omitempty"`
+	UpdateCollectionPermissions            bool                                `protobuf:"varint,7,opt,name=updateCollectionPermissions,proto3" json:"updateCollectionPermissions,omitempty"`
+	CollectionPermissions                  *CollectionPermissions              `protobuf:"bytes,8,opt,name=collectionPermissions,proto3" json:"collectionPermissions,omitempty"`
+	UpdateManagerTimeline                  bool                                `protobuf:"varint,9,opt,name=updateManagerTimeline,proto3" json:"updateManagerTimeline,omitempty"`
+	ManagerTimeline                        []*ManagerTimeline                  `protobuf:"bytes,10,rep,name=managerTimeline,proto3" json:"managerTimeline,omitempty"`
+	UpdateCollectionMetadataTimeline       bool                                `protobuf:"varint,11,opt,name=updateCollectionMetadataTimeline,proto3" json:"updateCollectionMetadataTimeline,omitempty"`
+	CollectionMetadataTimeline             []*CollectionMetadataTimeline       `protobuf:"bytes,12,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
+	UpdateBadgeMetadataTimeline            bool                                `protobuf:"varint,13,opt,name=updateBadgeMetadataTimeline,proto3" json:"updateBadgeMetadataTimeline,omitempty"`
+	BadgeMetadataTimeline                  []*BadgeMetadataTimeline            `protobuf:"bytes,14,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
+	UpdateOffChainBalancesMetadataTimeline bool                                `protobuf:"varint,15,opt,name=updateOffChainBalancesMetadataTimeline,proto3" json:"updateOffChainBalancesMetadataTimeline,omitempty"`
+	OffChainBalancesMetadataTimeline       []*OffChainBalancesMetadataTimeline `protobuf:"bytes,16,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
+	UpdateCustomDataTimeline               bool                                `protobuf:"varint,17,opt,name=updateCustomDataTimeline,proto3" json:"updateCustomDataTimeline,omitempty"`
+	CustomDataTimeline                     []*CustomDataTimeline               `protobuf:"bytes,18,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
+	UpdateCollectionApprovals              bool                                `protobuf:"varint,21,opt,name=updateCollectionApprovals,proto3" json:"updateCollectionApprovals,omitempty"`
+	CollectionApprovals                    []*CollectionApproval               `protobuf:"bytes,22,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
+	UpdateStandardsTimeline                bool                                `protobuf:"varint,23,opt,name=updateStandardsTimeline,proto3" json:"updateStandardsTimeline,omitempty"`
+	StandardsTimeline                      []*StandardsTimeline                `protobuf:"bytes,24,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
+	UpdateIsArchivedTimeline               bool                                `protobuf:"varint,27,opt,name=updateIsArchivedTimeline,proto3" json:"updateIsArchivedTimeline,omitempty"`
+	IsArchivedTimeline                     []*IsArchivedTimeline               `protobuf:"bytes,28,rep,name=isArchivedTimeline,proto3" json:"isArchivedTimeline,omitempty"`
+	// Default auto-approve setting for self-initiated outgoing transfers for newly initiated accounts.
+	DefaultAutoApproveSelfInitiatedOutgoingTransfers bool `protobuf:"varint,29,opt,name=defaultAutoApproveSelfInitiatedOutgoingTransfers,proto3" json:"defaultAutoApproveSelfInitiatedOutgoingTransfers,omitempty"`
+	// Default auto-approve setting for self-initiated incoming transfers for newly initiated accounts.
+	DefaultAutoApproveSelfInitiatedIncomingTransfers bool `protobuf:"varint,30,opt,name=defaultAutoApproveSelfInitiatedIncomingTransfers,proto3" json:"defaultAutoApproveSelfInitiatedIncomingTransfers,omitempty"`
+	// Default user permissions for newly initiated accounts.
+	DefaultUserPermissions *UserPermissions `protobuf:"bytes,31,opt,name=defaultUserPermissions,proto3" json:"defaultUserPermissions,omitempty"`
 }
 
 func (m *MsgUniversalUpdateCollection) Reset()         { *m = MsgUniversalUpdateCollection{} }
@@ -368,6 +374,7 @@ func (m *MsgUniversalUpdateCollection) GetDefaultUserPermissions() *UserPermissi
 	return nil
 }
 
+// MsgUniversalUpdateCollectionResponse is the response to MsgUniversalUpdateCollection.
 type MsgUniversalUpdateCollectionResponse struct {
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
@@ -405,6 +412,7 @@ func (m *MsgUniversalUpdateCollectionResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUniversalUpdateCollectionResponse proto.InternalMessageInfo
 
+// MsgUpdateCollection is used to update a collection.
 type MsgUpdateCollection struct {
 	Creator                                string                              `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId                           Uint                                `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
@@ -602,6 +610,7 @@ func (m *MsgUpdateCollection) GetIsArchivedTimeline() []*IsArchivedTimeline {
 	return nil
 }
 
+// MsgUpdateCollectionResponse is the response to MsgUpdateCollection.
 type MsgUpdateCollectionResponse struct {
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
@@ -639,6 +648,7 @@ func (m *MsgUpdateCollectionResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateCollectionResponse proto.InternalMessageInfo
 
+// MsgCreateCollection is used to create a new collection.
 type MsgCreateCollection struct {
 	Creator                                          string                              `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	BalancesType                                     string                              `protobuf:"bytes,2,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
@@ -811,6 +821,7 @@ func (m *MsgCreateCollection) GetDefaultUserPermissions() *UserPermissions {
 	return nil
 }
 
+// MsgCreateCollectionResponse is the response to MsgCreateCollection.
 type MsgCreateCollectionResponse struct {
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
@@ -848,6 +859,7 @@ func (m *MsgCreateCollectionResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateCollectionResponse proto.InternalMessageInfo
 
+// MsgCreateAddressMappings is used to create address mappings.
 type MsgCreateAddressMappings struct {
 	Creator         string            `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	AddressMappings []*AddressMapping `protobuf:"bytes,2,rep,name=addressMappings,proto3" json:"addressMappings,omitempty"`
@@ -900,6 +912,7 @@ func (m *MsgCreateAddressMappings) GetAddressMappings() []*AddressMapping {
 	return nil
 }
 
+// MsgCreateAddressMappingsResponse is the response to MsgCreateAddressMappings.
 type MsgCreateAddressMappingsResponse struct {
 }
 
@@ -936,7 +949,7 @@ func (m *MsgCreateAddressMappingsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateAddressMappingsResponse proto.InternalMessageInfo
 
-// For each amount, for each toAddress, we will attempt to transfer all the badgeIds for the badge with ID badgeId.
+// MsgTransferBadges is used to transfer badges.
 type MsgTransferBadges struct {
 	Creator      string      `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId Uint        `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
@@ -990,6 +1003,7 @@ func (m *MsgTransferBadges) GetTransfers() []*Transfer {
 	return nil
 }
 
+// MsgTransferBadgesResponse is the response to MsgTransferBadges.
 type MsgTransferBadgesResponse struct {
 }
 
@@ -1026,6 +1040,7 @@ func (m *MsgTransferBadgesResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgTransferBadgesResponse proto.InternalMessageInfo
 
+// MsgDeleteCollection is used to delete a collection.
 type MsgDeleteCollection struct {
 	Creator      string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId Uint   `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
@@ -1071,6 +1086,7 @@ func (m *MsgDeleteCollection) GetCreator() string {
 	return ""
 }
 
+// MsgDeleteCollectionResponse is the response to MsgDeleteCollection.
 type MsgDeleteCollectionResponse struct {
 }
 
@@ -1107,6 +1123,7 @@ func (m *MsgDeleteCollectionResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDeleteCollectionResponse proto.InternalMessageInfo
 
+// MsgUpdateUserApprovals is used to update user approvals.
 type MsgUpdateUserApprovals struct {
 	Creator                                         string                  `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId                                    Uint                    `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
@@ -1232,6 +1249,7 @@ func (m *MsgUpdateUserApprovals) GetUserPermissions() *UserPermissions {
 	return nil
 }
 
+// MsgUpdateUserApprovalsResponse is the response to MsgUpdateUserApprovals.
 type MsgUpdateUserApprovalsResponse struct {
 }
 

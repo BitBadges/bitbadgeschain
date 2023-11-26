@@ -692,8 +692,11 @@ type QueryClient interface {
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 	// Queries a badge collection by ID.
 	GetCollection(ctx context.Context, in *QueryGetCollectionRequest, opts ...grpc.CallOption) (*QueryGetCollectionResponse, error)
+	// Queries an address mapping by ID.
 	GetAddressMapping(ctx context.Context, in *QueryGetAddressMappingRequest, opts ...grpc.CallOption) (*QueryGetAddressMappingResponse, error)
+	// Queries an approvals tracker by ID.
 	GetApprovalsTracker(ctx context.Context, in *QueryGetApprovalsTrackerRequest, opts ...grpc.CallOption) (*QueryGetApprovalsTrackerResponse, error)
+	// Queries the number of times a given leaf has been used for a given merkle challenge.
 	GetNumUsedForMerkleChallenge(ctx context.Context, in *QueryGetNumUsedForMerkleChallengeRequest, opts ...grpc.CallOption) (*QueryGetNumUsedForMerkleChallengeResponse, error)
 	// Queries an addresses balance for a badge collection, specified by its ID.
 	GetBalance(ctx context.Context, in *QueryGetBalanceRequest, opts ...grpc.CallOption) (*QueryGetBalanceResponse, error)
@@ -767,8 +770,11 @@ type QueryServer interface {
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 	// Queries a badge collection by ID.
 	GetCollection(context.Context, *QueryGetCollectionRequest) (*QueryGetCollectionResponse, error)
+	// Queries an address mapping by ID.
 	GetAddressMapping(context.Context, *QueryGetAddressMappingRequest) (*QueryGetAddressMappingResponse, error)
+	// Queries an approvals tracker by ID.
 	GetApprovalsTracker(context.Context, *QueryGetApprovalsTrackerRequest) (*QueryGetApprovalsTrackerResponse, error)
+	// Queries the number of times a given leaf has been used for a given merkle challenge.
 	GetNumUsedForMerkleChallenge(context.Context, *QueryGetNumUsedForMerkleChallengeRequest) (*QueryGetNumUsedForMerkleChallengeResponse, error)
 	// Queries an addresses balance for a badge collection, specified by its ID.
 	GetBalance(context.Context, *QueryGetBalanceRequest) (*QueryGetBalanceResponse, error)

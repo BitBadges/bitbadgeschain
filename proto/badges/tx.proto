@@ -35,150 +35,166 @@ message BadgeCustomMsgType {
   MsgUpdateCollection updateCollectionMsg = 6;
   MsgCreateCollection createCollectionMsg = 7;
 }
-// The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
+
+// MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the badges module.
+// It is a universal interface that can be used for both creating and updating collections.
+// We have it defined for legacy purposes, but it is recommended to use MsgCreateCollection and MsgUpdateCollection instead.
 message MsgUniversalUpdateCollection {
-  string creator = 1;
-  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; // 0 for new collection
-  string balancesType = 3;
+  string creator = 1; // Address of the creator.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; // ID of the collection (0 for new collection).
+  string balancesType = 3; // Type of balances "Standard" or "Off-Chain".
 
-  // Default balance options for newly initiated accounts.
-  repeated UserOutgoingApproval defaultOutgoingApprovals = 4; // The user's approved transfers for each badge ID.
-  repeated UserIncomingApproval defaultIncomingApprovals = 5; // The user's approved incoming transfers for each badge ID.
-  repeated Balance badgesToCreate = 6;
+  // Default incoming approvals for newly initiated accounts.
+  repeated UserOutgoingApproval defaultOutgoingApprovals = 4; 
+  
+  // Default outgoing approvals for newly initiated accounts.
+  repeated UserIncomingApproval defaultIncomingApprovals = 5; 
 
-  bool updateCollectionPermissions = 7;
-  CollectionPermissions collectionPermissions = 8;
+  repeated Balance badgesToCreate = 6; // Balances to create for the collection. Will be sent to the "Mint" address.
 
-  bool updateManagerTimeline = 9;
-  repeated ManagerTimeline managerTimeline = 10;
+  bool updateCollectionPermissions = 7; // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  CollectionPermissions collectionPermissions = 8; // New collection permissions to set.
 
-  bool updateCollectionMetadataTimeline = 11;
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 12;
+  bool updateManagerTimeline = 9; // Indicates if the manager timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated ManagerTimeline managerTimeline = 10; // New manager timeline to set.
 
-  bool updateBadgeMetadataTimeline = 13;
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 14;
+  bool updateCollectionMetadataTimeline = 11; // Indicates if the collection metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated CollectionMetadataTimeline collectionMetadataTimeline = 12; // New collection metadata timeline to set.
 
-  bool updateOffChainBalancesMetadataTimeline = 15;
-  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 16;
+  bool updateBadgeMetadataTimeline = 13; // Indicates if the badge metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated BadgeMetadataTimeline badgeMetadataTimeline = 14; // New badge metadata timeline to set.
 
-  bool updateCustomDataTimeline = 17;
-  repeated CustomDataTimeline customDataTimeline = 18;
+  bool updateOffChainBalancesMetadataTimeline = 15; // Indicates if the off-chain balances metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 16; // New off-chain balances metadata timeline to set.
 
-  bool updateCollectionApprovals = 21;
-  repeated CollectionApproval collectionApprovals = 22;
+  bool updateCustomDataTimeline = 17; // Indicates if the custom data timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated CustomDataTimeline customDataTimeline = 18; // New custom data timeline to set.
 
-  bool updateStandardsTimeline = 23;
-  repeated StandardsTimeline standardsTimeline = 24;
+  bool updateCollectionApprovals = 21; // Indicates if collection approvals should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated CollectionApproval collectionApprovals = 22; // Mew collection approvals to set.
 
-  bool updateIsArchivedTimeline = 27;
-  repeated IsArchivedTimeline isArchivedTimeline = 28;
+  bool updateStandardsTimeline = 23; // Indicates if the standards timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated StandardsTimeline standardsTimeline = 24; // New standards timeline to set.
 
-  bool defaultAutoApproveSelfInitiatedOutgoingTransfers = 29;
-  bool defaultAutoApproveSelfInitiatedIncomingTransfers = 30;
+  bool updateIsArchivedTimeline = 27; // Indicates if the isArchived timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated IsArchivedTimeline isArchivedTimeline = 28; // New isArchived timeline to set.
+
+  // Default auto-approve setting for self-initiated outgoing transfers for newly initiated accounts.
+  bool defaultAutoApproveSelfInitiatedOutgoingTransfers = 29; 
+
+  // Default auto-approve setting for self-initiated incoming transfers for newly initiated accounts.
+  bool defaultAutoApproveSelfInitiatedIncomingTransfers = 30; 
+
+  // Default user permissions for newly initiated accounts.
   UserPermissions defaultUserPermissions = 31;
 }
 
+// MsgUniversalUpdateCollectionResponse is the response to MsgUniversalUpdateCollection.
 message MsgUniversalUpdateCollectionResponse {
-  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; // ID of badge collection
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; // ID of the badge collection.
 }
 
+// MsgUpdateCollection is used to update a collection.
 message MsgUpdateCollection {
-  string creator = 1;
-  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; // 0 for new collection
-  repeated Balance badgesToCreate = 6;
-  bool updateCollectionPermissions = 7;
-  CollectionPermissions collectionPermissions = 8;
-  bool updateManagerTimeline = 9;
-  repeated ManagerTimeline managerTimeline = 10;
-  bool updateCollectionMetadataTimeline = 11;
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 12;
-  bool updateBadgeMetadataTimeline = 13;
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 14;
-  bool updateOffChainBalancesMetadataTimeline = 15;
-  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 16;
-  bool updateCustomDataTimeline = 17;
-  repeated CustomDataTimeline customDataTimeline = 18;
-  bool updateCollectionApprovals = 21;
-  repeated CollectionApproval collectionApprovals = 22;
-  bool updateStandardsTimeline = 23;
-  repeated StandardsTimeline standardsTimeline = 24;
-  bool updateIsArchivedTimeline = 27;
-  repeated IsArchivedTimeline isArchivedTimeline = 28;
+  string creator = 1; // Address of the creator.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; // ID of the collection (0 for new collection).
+  repeated Balance badgesToCreate = 6; // Balances to create for the collection. Will be sent to the "Mint" address.
+  bool updateCollectionPermissions = 7; // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  CollectionPermissions collectionPermissions = 8; // New collection permissions to set.
+  bool updateManagerTimeline = 9; // Indicates if the manager timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated ManagerTimeline managerTimeline = 10; // New manager timeline to set.
+  bool updateCollectionMetadataTimeline = 11; // Indicates if the collection metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated CollectionMetadataTimeline collectionMetadataTimeline = 12; // New collection metadata timeline to set.
+  bool updateBadgeMetadataTimeline = 13; // Indicates if the badge metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated BadgeMetadataTimeline badgeMetadataTimeline = 14; // New badge metadata timeline to set.
+  bool updateOffChainBalancesMetadataTimeline = 15; // Indicates if the off-chain balances metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 16; // New off-chain balances metadata timeline to set.
+  bool updateCustomDataTimeline = 17; // Indicates if the custom data timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated CustomDataTimeline customDataTimeline = 18; // New custom data timeline to set.
+  bool updateCollectionApprovals = 21; // Indicates if collection approvals should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated CollectionApproval collectionApprovals = 22; // New collection approvals to set.
+  bool updateStandardsTimeline = 23; // Indicates if the standards timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated StandardsTimeline standardsTimeline = 24; // New standards timeline to set.
+  bool updateIsArchivedTimeline = 27; // Indicates if the isArchived timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated IsArchivedTimeline isArchivedTimeline = 28; // New isArchived timeline to set.
 }
 
+// MsgUpdateCollectionResponse is the response to MsgUpdateCollection.
 message MsgUpdateCollectionResponse {
-  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; // ID of badge collection
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; // ID of the badge collection.
 }
 
+// MsgCreateCollection is used to create a new collection.
 message MsgCreateCollection {
-  string creator = 1;
-  string balancesType = 2;
-  repeated UserOutgoingApproval defaultOutgoingApprovals = 3; // The user's approved transfers for each badge ID.
-  repeated UserIncomingApproval defaultIncomingApprovals = 4; // The user's approved incoming transfers for each badge ID.
-  repeated Balance badgesToCreate = 5;
-  CollectionPermissions collectionPermissions = 6;
-  repeated ManagerTimeline managerTimeline = 7;
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 8;
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 9;
-  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 10;
-  repeated CustomDataTimeline customDataTimeline = 11;
-  repeated CollectionApproval collectionApprovals = 12;
-  repeated StandardsTimeline standardsTimeline = 13;
-  repeated IsArchivedTimeline isArchivedTimeline = 14;
-  bool defaultAutoApproveSelfInitiatedOutgoingTransfers = 15;
-  bool defaultAutoApproveSelfInitiatedIncomingTransfers = 16;
-  UserPermissions defaultUserPermissions = 17;
+  string creator = 1; // Address of the creator.
+  string balancesType = 2; // Type of balances "Standard" or "Off-Chain".
+  repeated UserOutgoingApproval defaultOutgoingApprovals = 3; // User's approved transfers for each badge ID.
+  repeated UserIncomingApproval defaultIncomingApprovals = 4; // User's approved incoming transfers for each badge ID.
+  repeated Balance badgesToCreate = 5; // Balances to create for the collection. Will be sent to the "Mint" address.
+  CollectionPermissions collectionPermissions = 6; // Collection permissions.
+  repeated ManagerTimeline managerTimeline = 7; // Manager timeline entries.
+  repeated CollectionMetadataTimeline collectionMetadataTimeline = 8; // Collection metadata timeline entries.
+  repeated BadgeMetadataTimeline badgeMetadataTimeline = 9; // Badge metadata timeline entries.
+  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 10; // Off-chain balances metadata timeline entries.
+  repeated CustomDataTimeline customDataTimeline = 11; // Custom data timeline entries.
+  repeated CollectionApproval collectionApprovals = 12; // Collection approvals.
+  repeated StandardsTimeline standardsTimeline = 13; // Standards timeline entries.
+  repeated IsArchivedTimeline isArchivedTimeline = 14; // isArchived timeline entries.
+  bool defaultAutoApproveSelfInitiatedOutgoingTransfers = 15; // Default auto-approve setting for self-initiated outgoing transfers.
+  bool defaultAutoApproveSelfInitiatedIncomingTransfers = 16; // Default auto-approve setting for self-initiated incoming transfers.
+  UserPermissions defaultUserPermissions = 17; // Default user permissions.
 }
 
-
+// MsgCreateCollectionResponse is the response to MsgCreateCollection.
 message MsgCreateCollectionResponse {
-  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; // ID of badge collection
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; // ID of the badge collection.
 }
 
-
+// MsgCreateAddressMappings is used to create address mappings.
 message MsgCreateAddressMappings {
-  string creator = 1;
-  repeated AddressMapping addressMappings = 2;
+  string creator = 1; // Address of the creator.
+  repeated AddressMapping addressMappings = 2; // Address mappings to create.
 }
 
+// MsgCreateAddressMappingsResponse is the response to MsgCreateAddressMappings.
 message MsgCreateAddressMappingsResponse {}
 
-
-//For each amount, for each toAddress, we will attempt to transfer all the badgeIds for the badge with ID badgeId.
+// MsgTransferBadges is used to transfer badges.
 message MsgTransferBadges {
-  string creator = 1;
-  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  repeated Transfer transfers = 3;
+  string creator = 1; // Address of the creator.
+  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; // ID of the collection.
+  repeated Transfer transfers = 3; // Transfers to execute.
 }
+
+// MsgTransferBadgesResponse is the response to MsgTransferBadges.
 message MsgTransferBadgesResponse {}
 
+// MsgDeleteCollection is used to delete a collection.
 message MsgDeleteCollection {
-  string creator = 1;
-  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string creator = 1; // Address of the creator.
+  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; // ID of the collection.
 }
 
+// MsgDeleteCollectionResponse is the response to MsgDeleteCollection.
 message MsgDeleteCollectionResponse {}
 
+// MsgUpdateUserApprovals is used to update user approvals.
 message MsgUpdateUserApprovals {
-  string creator = 1;
-  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-
-  bool updateOutgoingApprovals = 3;
-  repeated UserOutgoingApproval outgoingApprovals = 4;
-
-  bool updateIncomingApprovals = 5;
-  repeated UserIncomingApproval incomingApprovals = 6;
-  
-  bool updateAutoApproveSelfInitiatedOutgoingTransfers = 7;
-  bool autoApproveSelfInitiatedOutgoingTransfers = 8;
-
-  bool updateAutoApproveSelfInitiatedIncomingTransfers = 9;
-  bool autoApproveSelfInitiatedIncomingTransfers = 10;
-
-  bool updateUserPermissions = 11;
-  UserPermissions userPermissions = 12;
+  string creator = 1; // Address of the creator.
+  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; // ID of the collection.
+  bool updateOutgoingApprovals = 3; // Indicates if outgoing approvals should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated UserOutgoingApproval outgoingApprovals = 4; // New outgoing approvals to set. 
+  bool updateIncomingApprovals = 5; // Indicates if incoming approvals should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  repeated UserIncomingApproval incomingApprovals = 6; // New incoming approvals to set.
+  bool updateAutoApproveSelfInitiatedOutgoingTransfers = 7; // Indicates if auto-approve settings for self-initiated outgoing transfers should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool autoApproveSelfInitiatedOutgoingTransfers = 8; // Auto-approve setting for self-initiated outgoing transfers.
+  bool updateAutoApproveSelfInitiatedIncomingTransfers = 9; // Indicates if auto-approve settings for self-initiated incoming transfers should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool autoApproveSelfInitiatedIncomingTransfers = 10; // Auto-approve setting for self-initiated incoming transfers.
+  bool updateUserPermissions = 11; // Indicates if user permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  UserPermissions userPermissions = 12; // New user permissions to set.
 }
 
+// MsgUpdateUserApprovalsResponse is the response to MsgUpdateUserApprovals.
 message MsgUpdateUserApprovalsResponse {}
 
 // this line is used by starport scaffolding # proto/tx/message

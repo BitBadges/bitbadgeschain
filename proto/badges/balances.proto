@@ -7,49 +7,72 @@ import "badges/params.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
-// uintRange is a range of IDs from some start to some end (inclusive).
-// 
-// uintRanges are one of the core types used in the BitBadgesChain module.
-// They are used for evrything from badge IDs to time ranges to min / max balance amounts.
+/* 
+  uintRange is a range of IDs from some start to some end (inclusive).
+
+  uintRanges are one of the core types used in the BitBadgesChain module.
+  They are used for everything from badge IDs to time ranges to min/max balance amounts.
+
+  See the BitBadges documentation for more information.
+*/
 message UintRange {
+  // The starting value of the range (inclusive).
   string start = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  // The ending value of the range (inclusive).
   string end = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
-// Balance represents the balance of a badge for a specific user.
-// The user amounts xAmount of a badge for the badgeID specified for the time ranges specified.
-//
-// Ex: User A owns x10 of badge IDs 1-10 from 1/1/2020 to 1/1/2021.
-// 
-// If times or badgeIDs have len > 1, then the user owns all badge IDs specified for all time ranges specified.
+
+/* 
+  Balance represents the balance of a badge for a specific user.
+  The user amounts xAmount of a badge for the badgeID specified for the time ranges specified.
+
+  Example: User A owns x10 of badge IDs 1-10 from 1/1/2020 to 1/1/2021.
+  
+  If times or badgeIDs have len > 1, then the user owns all badge IDs specified for all time ranges specified.
+
+  See the BitBadges documentation for more information.
+*/
 message Balance {
-  string amount = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The amount of the badge owned by the user.
+  string amount = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  // The time ranges during which the user owns the badge.
   repeated UintRange ownershipTimes = 2;
+
+  // The badge IDs for which the user owns the badge.
   repeated UintRange badgeIds = 3;
 }
 
+
+/* 
+  MustOwnBadges represents a condition where a user must own specific badges
+  to be approved to transfer.
+
+  - collectionId: The ID of the badge collection for the badges that must be owned
+  - amountRange: The range of badge amounts the user must own (min to max)
+  - ownershipTimes: The time ranges during which the user must own the badges.
+  - badgeIds: The badge IDs the user must own.
+  - overrideWithCurrentTime: If true, auto override ownershipTimes with the current time.
+  - mustOwnAll: If true, the user must own all specified badges; otherwise, owning any one for >= 1 millisecond is sufficient.
+*/
 message MustOwnBadges {
+  // The ID of the badge collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
+  // The range of badge amounts the user must own (min to max).
   UintRange amountRange = 2;
+
+  // The time ranges during which the user must own the badges.
   repeated UintRange ownershipTimes = 3;
+
+  // The badge IDs the user must own.
   repeated UintRange badgeIds = 4;
 
+  // If true, override ownershipTimes with the current time.
   bool overrideWithCurrentTime = 5;
+
+  // If true, the user must own all specified badges; otherwise, owning any is sufficient (>= 1 millisecond).
   bool mustOwnAll = 6;
-}
-
-// InheritedBalances are a powerful feature of the BitBadges module.
-// They allow a colllection to inherit the balances from another collection.
-// Ex: Badges from Collection A inherits the balances from badges from Collection B.
-//
-// The badgeIds specified will inherit the balances from the parent collection and badges specified.
-// If the total number of parent badges == 1, then all the badgeIds will inherit the balance from that parent badge.
-// Otherwise, the total number of parent badges must equal the total number of badgeIds specified.
-// By total number, we mean the sum of the number of badgeIds in each UintRange.
-message InheritedBalance {
-  repeated UintRange badgeIds = 1;
-
-  string parentCollectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  repeated UintRange parentBadgeIds = 3;
 }

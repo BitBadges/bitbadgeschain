@@ -24,9 +24,12 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// CollectionMetadataTimeline defines the metadata for a collection at different timeline times.
 type CollectionMetadataTimeline struct {
+	// The collection metadata for a specific timeline element.
 	CollectionMetadata *CollectionMetadata `protobuf:"bytes,1,opt,name=collectionMetadata,proto3" json:"collectionMetadata,omitempty"`
-	TimelineTimes      []*UintRange        `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	// The timeline times when the collection metadata is valid. Can not overlap with other timeline elements in same array.
+	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *CollectionMetadataTimeline) Reset()         { *m = CollectionMetadataTimeline{} }
@@ -76,9 +79,12 @@ func (m *CollectionMetadataTimeline) GetTimelineTimes() []*UintRange {
 	return nil
 }
 
+// BadgeMetadataTimeline defines the metadata for badges at different timeline times.
 type BadgeMetadataTimeline struct {
+	// The badge metadata for a specific timeline element.
 	BadgeMetadata []*BadgeMetadata `protobuf:"bytes,1,rep,name=badgeMetadata,proto3" json:"badgeMetadata,omitempty"`
-	TimelineTimes []*UintRange     `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	// The timeline times when the badge metadata is valid. Can not overlap with other timeline elements in same array.
+	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *BadgeMetadataTimeline) Reset()         { *m = BadgeMetadataTimeline{} }
@@ -128,9 +134,12 @@ func (m *BadgeMetadataTimeline) GetTimelineTimes() []*UintRange {
 	return nil
 }
 
+// OffChainBalancesMetadataTimeline defines the metadata for off-chain balances at different timeline times.
 type OffChainBalancesMetadataTimeline struct {
+	// The off-chain balances metadata for a specific timeline element.
 	OffChainBalancesMetadata *OffChainBalancesMetadata `protobuf:"bytes,1,opt,name=offChainBalancesMetadata,proto3" json:"offChainBalancesMetadata,omitempty"`
-	TimelineTimes            []*UintRange              `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	// The timeline times when the off-chain balances metadata is valid. Can not overlap with other timeline elements in same array.
+	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *OffChainBalancesMetadataTimeline) Reset()         { *m = OffChainBalancesMetadataTimeline{} }
@@ -180,60 +189,11 @@ func (m *OffChainBalancesMetadataTimeline) GetTimelineTimes() []*UintRange {
 	return nil
 }
 
-type InheritedBalancesTimeline struct {
-	InheritedBalances []*InheritedBalance `protobuf:"bytes,1,rep,name=inheritedBalances,proto3" json:"inheritedBalances,omitempty"`
-	TimelineTimes     []*UintRange        `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
-}
-
-func (m *InheritedBalancesTimeline) Reset()         { *m = InheritedBalancesTimeline{} }
-func (m *InheritedBalancesTimeline) String() string { return proto.CompactTextString(m) }
-func (*InheritedBalancesTimeline) ProtoMessage()    {}
-func (*InheritedBalancesTimeline) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6acaeede2b65317a, []int{3}
-}
-func (m *InheritedBalancesTimeline) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *InheritedBalancesTimeline) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_InheritedBalancesTimeline.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *InheritedBalancesTimeline) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_InheritedBalancesTimeline.Merge(m, src)
-}
-func (m *InheritedBalancesTimeline) XXX_Size() int {
-	return m.Size()
-}
-func (m *InheritedBalancesTimeline) XXX_DiscardUnknown() {
-	xxx_messageInfo_InheritedBalancesTimeline.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_InheritedBalancesTimeline proto.InternalMessageInfo
-
-func (m *InheritedBalancesTimeline) GetInheritedBalances() []*InheritedBalance {
-	if m != nil {
-		return m.InheritedBalances
-	}
-	return nil
-}
-
-func (m *InheritedBalancesTimeline) GetTimelineTimes() []*UintRange {
-	if m != nil {
-		return m.TimelineTimes
-	}
-	return nil
-}
-
+// CustomDataTimeline defines custom data at different timeline times.
 type CustomDataTimeline struct {
-	CustomData    string       `protobuf:"bytes,1,opt,name=customData,proto3" json:"customData,omitempty"`
+	// The custom data for a specific timeline element.
+	CustomData string `protobuf:"bytes,1,opt,name=customData,proto3" json:"customData,omitempty"`
+	// The timeline times when the custom data is valid. Can not overlap with other timeline elements in same array.
 	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
@@ -241,7 +201,7 @@ func (m *CustomDataTimeline) Reset()         { *m = CustomDataTimeline{} }
 func (m *CustomDataTimeline) String() string { return proto.CompactTextString(m) }
 func (*CustomDataTimeline) ProtoMessage()    {}
 func (*CustomDataTimeline) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6acaeede2b65317a, []int{4}
+	return fileDescriptor_6acaeede2b65317a, []int{3}
 }
 func (m *CustomDataTimeline) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -284,8 +244,11 @@ func (m *CustomDataTimeline) GetTimelineTimes() []*UintRange {
 	return nil
 }
 
+// ManagerTimeline defines the manager address at different timeline times.
 type ManagerTimeline struct {
-	Manager       string       `protobuf:"bytes,1,opt,name=manager,proto3" json:"manager,omitempty"`
+	// The manager address for a specific timeline element.
+	Manager string `protobuf:"bytes,1,opt,name=manager,proto3" json:"manager,omitempty"`
+	// The timeline times when the manager address is valid. Can not overlap with other timeline elements in same array.
 	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
@@ -293,7 +256,7 @@ func (m *ManagerTimeline) Reset()         { *m = ManagerTimeline{} }
 func (m *ManagerTimeline) String() string { return proto.CompactTextString(m) }
 func (*ManagerTimeline) ProtoMessage()    {}
 func (*ManagerTimeline) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6acaeede2b65317a, []int{5}
+	return fileDescriptor_6acaeede2b65317a, []int{4}
 }
 func (m *ManagerTimeline) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -336,8 +299,11 @@ func (m *ManagerTimeline) GetTimelineTimes() []*UintRange {
 	return nil
 }
 
+// IsArchivedTimeline defines whether a collection is archived at different timeline times.
 type IsArchivedTimeline struct {
-	IsArchived    bool         `protobuf:"varint,1,opt,name=isArchived,proto3" json:"isArchived,omitempty"`
+	// Indicates whether the collection is archived for a specific timeline element.
+	IsArchived bool `protobuf:"varint,1,opt,name=isArchived,proto3" json:"isArchived,omitempty"`
+	// The timeline times when the archived status is valid. Can not overlap with other timeline elements in same array.
 	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
@@ -345,7 +311,7 @@ func (m *IsArchivedTimeline) Reset()         { *m = IsArchivedTimeline{} }
 func (m *IsArchivedTimeline) String() string { return proto.CompactTextString(m) }
 func (*IsArchivedTimeline) ProtoMessage()    {}
 func (*IsArchivedTimeline) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6acaeede2b65317a, []int{6}
+	return fileDescriptor_6acaeede2b65317a, []int{5}
 }
 func (m *IsArchivedTimeline) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -388,16 +354,19 @@ func (m *IsArchivedTimeline) GetTimelineTimes() []*UintRange {
 	return nil
 }
 
+// ContractAddressTimeline defines the contract address at different timeline times.
 type ContractAddressTimeline struct {
-	ContractAddress string       `protobuf:"bytes,1,opt,name=contractAddress,proto3" json:"contractAddress,omitempty"`
-	TimelineTimes   []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
+	// The contract address for a specific timeline element.
+	ContractAddress string `protobuf:"bytes,1,opt,name=contractAddress,proto3" json:"contractAddress,omitempty"`
+	// The timeline times when the contract address is valid. Can not overlap with other timeline elements in same array.
+	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
 func (m *ContractAddressTimeline) Reset()         { *m = ContractAddressTimeline{} }
 func (m *ContractAddressTimeline) String() string { return proto.CompactTextString(m) }
 func (*ContractAddressTimeline) ProtoMessage()    {}
 func (*ContractAddressTimeline) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6acaeede2b65317a, []int{7}
+	return fileDescriptor_6acaeede2b65317a, []int{6}
 }
 func (m *ContractAddressTimeline) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -440,8 +409,11 @@ func (m *ContractAddressTimeline) GetTimelineTimes() []*UintRange {
 	return nil
 }
 
+// StandardsTimeline defines the standards used for a collection at different timeline times.
 type StandardsTimeline struct {
-	Standards     []string     `protobuf:"bytes,1,rep,name=standards,proto3" json:"standards,omitempty"`
+	// The standards applied to the collection for a specific timeline element.
+	Standards []string `protobuf:"bytes,1,rep,name=standards,proto3" json:"standards,omitempty"`
+	// The timeline times when the standards are valid. Can not overlap with other timeline elements in same array.
 	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
@@ -449,7 +421,7 @@ func (m *StandardsTimeline) Reset()         { *m = StandardsTimeline{} }
 func (m *StandardsTimeline) String() string { return proto.CompactTextString(m) }
 func (*StandardsTimeline) ProtoMessage()    {}
 func (*StandardsTimeline) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6acaeede2b65317a, []int{8}
+	return fileDescriptor_6acaeede2b65317a, []int{7}
 }
 func (m *StandardsTimeline) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -496,7 +468,6 @@ func init() {
 	proto.RegisterType((*CollectionMetadataTimeline)(nil), "badges.CollectionMetadataTimeline")
 	proto.RegisterType((*BadgeMetadataTimeline)(nil), "badges.BadgeMetadataTimeline")
 	proto.RegisterType((*OffChainBalancesMetadataTimeline)(nil), "badges.OffChainBalancesMetadataTimeline")
-	proto.RegisterType((*InheritedBalancesTimeline)(nil), "badges.InheritedBalancesTimeline")
 	proto.RegisterType((*CustomDataTimeline)(nil), "badges.CustomDataTimeline")
 	proto.RegisterType((*ManagerTimeline)(nil), "badges.ManagerTimeline")
 	proto.RegisterType((*IsArchivedTimeline)(nil), "badges.IsArchivedTimeline")
@@ -507,38 +478,36 @@ func init() {
 func init() { proto.RegisterFile("badges/timelines.proto", fileDescriptor_6acaeede2b65317a) }
 
 var fileDescriptor_6acaeede2b65317a = []byte{
-	// 495 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x94, 0xb1, 0x8e, 0xd3, 0x30,
-	0x18, 0xc7, 0x6b, 0x90, 0x0e, 0xfa, 0x9d, 0x4e, 0xa7, 0x46, 0x14, 0x72, 0x11, 0x8a, 0xaa, 0x9b,
-	0x3a, 0x35, 0x52, 0x19, 0x18, 0x98, 0xae, 0x45, 0x48, 0x87, 0x38, 0x21, 0x05, 0x58, 0x10, 0x8b,
-	0x63, 0xbb, 0xa9, 0x51, 0x62, 0x57, 0xb6, 0x8b, 0x38, 0x89, 0x57, 0x40, 0xe2, 0x01, 0x58, 0x78,
-	0x0c, 0xde, 0x80, 0xb1, 0x23, 0x23, 0x6a, 0x5f, 0x04, 0x35, 0xb1, 0xd3, 0xb4, 0xa1, 0x4b, 0xd8,
-	0xdc, 0x9f, 0xbf, 0xff, 0xff, 0xff, 0xf9, 0x73, 0x63, 0x78, 0x98, 0x60, 0x9a, 0x32, 0x1d, 0x19,
-	0x9e, 0xb3, 0x8c, 0x0b, 0xa6, 0x47, 0x0b, 0x25, 0x8d, 0xf4, 0x4e, 0x4a, 0x1e, 0x5c, 0xa4, 0x52,
-	0xa6, 0x19, 0x8b, 0x0a, 0x9a, 0x2c, 0x67, 0x11, 0x16, 0xb7, 0x65, 0x49, 0x50, 0x49, 0x15, 0x16,
-	0x7a, 0xc6, 0x94, 0x95, 0x06, 0x7d, 0xcb, 0x13, 0x9c, 0x61, 0x41, 0x9c, 0x63, 0xe0, 0x5b, 0xbc,
-	0x60, 0x2a, 0xe7, 0x5a, 0x73, 0x29, 0x0e, 0x05, 0x39, 0x33, 0x98, 0x62, 0x83, 0x2d, 0x7e, 0x90,
-	0xca, 0x54, 0x16, 0xcb, 0x68, 0xbb, 0x2a, 0xe9, 0xe5, 0x0f, 0x04, 0xc1, 0x54, 0x66, 0x19, 0x23,
-	0x86, 0x4b, 0x71, 0x63, 0x25, 0x6f, 0x6d, 0xfb, 0xde, 0x4b, 0xf0, 0x48, 0x63, 0xd7, 0x47, 0x03,
-	0x34, 0x3c, 0x1d, 0x07, 0xa3, 0x32, 0x68, 0xd4, 0xd4, 0xc7, 0xff, 0x50, 0x79, 0x4f, 0xe1, 0xcc,
-	0x8d, 0x65, 0xeb, 0xaf, 0xfd, 0x3b, 0x83, 0xbb, 0xc3, 0xd3, 0x71, 0xcf, 0xd9, 0xbc, 0xe3, 0xc2,
-	0xc4, 0x58, 0xa4, 0x2c, 0xde, 0xaf, 0xbb, 0xfc, 0x8a, 0xa0, 0x3f, 0xd9, 0xd6, 0x34, 0xda, 0x7b,
-	0x06, 0x67, 0x49, 0x7d, 0xc3, 0x47, 0x85, 0x65, 0xdf, 0x59, 0xee, 0xa9, 0xe2, 0xfd, 0xda, 0xf6,
-	0xfd, 0xfc, 0x44, 0x30, 0x78, 0x3d, 0x9b, 0x4d, 0xe7, 0x98, 0x8b, 0x89, 0xbd, 0x95, 0x46, 0x6b,
-	0x1f, 0xc0, 0x97, 0x47, 0x6a, 0xec, 0xfc, 0x06, 0x2e, 0xe8, 0x98, 0x57, 0x7c, 0xd4, 0xa1, 0x7d,
-	0xef, 0xdf, 0x11, 0x5c, 0x5c, 0x8b, 0x39, 0x53, 0xdc, 0x30, 0xea, 0x6c, 0xab, 0xa6, 0x5f, 0x40,
-	0x8f, 0x1f, 0x6e, 0xda, 0x99, 0xfa, 0xce, 0xfa, 0x50, 0x1d, 0x37, 0x25, 0xed, 0xdb, 0xcb, 0xc1,
-	0x9b, 0x2e, 0xb5, 0x91, 0xf9, 0xf3, 0xfa, 0x2c, 0x43, 0x00, 0x52, 0xd1, 0x62, 0x7a, 0xdd, 0xb8,
-	0x46, 0xda, 0xc7, 0x51, 0x38, 0xbf, 0xc1, 0x02, 0xa7, 0x4c, 0x55, 0x59, 0x3e, 0xdc, 0xcb, 0x4b,
-	0x64, 0x83, 0xdc, 0xcf, 0xff, 0x3a, 0xd4, 0xb5, 0xbe, 0x52, 0x64, 0xce, 0x3f, 0x31, 0x5a, 0x3f,
-	0x14, 0xaf, 0x68, 0x91, 0x75, 0x3f, 0xae, 0x91, 0xf6, 0x71, 0x5f, 0xe0, 0xd1, 0x54, 0x0a, 0xa3,
-	0x30, 0x31, 0x57, 0x94, 0x2a, 0xa6, 0x77, 0xf7, 0x3b, 0x84, 0x73, 0xb2, 0xbf, 0x65, 0x0f, 0x79,
-	0x88, 0xdb, 0xa7, 0x7f, 0x84, 0xde, 0x1b, 0x83, 0x05, 0xc5, 0x8a, 0xee, 0x72, 0x1f, 0x43, 0x57,
-	0x3b, 0x58, 0xfc, 0x9f, 0xba, 0xf1, 0x0e, 0xb4, 0xce, 0x9a, 0xbc, 0xfa, 0xb5, 0x0e, 0xd1, 0x6a,
-	0x1d, 0xa2, 0x3f, 0xeb, 0x10, 0x7d, 0xdb, 0x84, 0x9d, 0xd5, 0x26, 0xec, 0xfc, 0xde, 0x84, 0x9d,
-	0xf7, 0xe3, 0x94, 0x9b, 0xf9, 0x32, 0x19, 0x11, 0x99, 0x47, 0x09, 0x37, 0xee, 0x09, 0x75, 0x2b,
-	0xb2, 0xfd, 0xa8, 0xa2, 0xcf, 0x91, 0x7b, 0x72, 0x6f, 0x17, 0x4c, 0x27, 0x27, 0xc5, 0x8b, 0xf8,
-	0xe4, 0x6f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x6d, 0x6b, 0x05, 0x2d, 0xc4, 0x05, 0x00, 0x00,
+	// 461 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x94, 0xcf, 0x8a, 0x13, 0x31,
+	0x1c, 0xc7, 0x1b, 0x85, 0xd5, 0xfe, 0x96, 0x65, 0xd9, 0xc1, 0xea, 0x38, 0xc8, 0x50, 0xf6, 0xd4,
+	0x53, 0x07, 0xea, 0xc1, 0x83, 0xa7, 0x6d, 0xbd, 0x28, 0x2e, 0x42, 0xd4, 0x8b, 0x78, 0xc9, 0x24,
+	0x69, 0x1a, 0x99, 0x49, 0x4a, 0x92, 0x8a, 0x0b, 0xbe, 0x82, 0xe0, 0x2b, 0xf8, 0x18, 0xbe, 0x81,
+	0xc7, 0x3d, 0x7a, 0x94, 0xf6, 0x45, 0xa4, 0x33, 0xc9, 0xec, 0x74, 0x6b, 0x2f, 0xe3, 0x2d, 0xfd,
+	0xe4, 0xf7, 0xfd, 0x93, 0xb4, 0x0d, 0x3c, 0xcc, 0x09, 0x13, 0xdc, 0x66, 0x4e, 0x96, 0xbc, 0x90,
+	0x8a, 0xdb, 0xf1, 0xd2, 0x68, 0xa7, 0xa3, 0xa3, 0x9a, 0x27, 0x8f, 0x85, 0xd6, 0xa2, 0xe0, 0x59,
+	0x45, 0xf3, 0xd5, 0x3c, 0x23, 0xea, 0xaa, 0x1e, 0x49, 0x1a, 0xa9, 0x21, 0xca, 0xce, 0xb9, 0xf1,
+	0xd2, 0x64, 0xe0, 0x79, 0x4e, 0x0a, 0xa2, 0x68, 0x70, 0x4c, 0x62, 0x8f, 0x97, 0xdc, 0x94, 0xd2,
+	0x5a, 0xa9, 0xd5, 0x6d, 0x41, 0xc9, 0x1d, 0x61, 0xc4, 0x11, 0x8f, 0x1f, 0x08, 0x2d, 0x74, 0xb5,
+	0xcc, 0xb6, 0xab, 0x9a, 0x9e, 0xff, 0x40, 0x90, 0xcc, 0x74, 0x51, 0x70, 0xea, 0xa4, 0x56, 0x97,
+	0x5e, 0xf2, 0xce, 0xd7, 0x8f, 0x5e, 0x41, 0x44, 0xf7, 0x76, 0x63, 0x34, 0x44, 0xa3, 0xe3, 0x49,
+	0x32, 0xae, 0x83, 0xc6, 0xfb, 0x7a, 0xfc, 0x0f, 0x55, 0xf4, 0x0c, 0x4e, 0xc2, 0xb5, 0x6c, 0xfd,
+	0x6d, 0x7c, 0x67, 0x78, 0x77, 0x74, 0x3c, 0x39, 0x0b, 0x36, 0xef, 0xa5, 0x72, 0x98, 0x28, 0xc1,
+	0xf1, 0xee, 0xdc, 0xf9, 0x37, 0x04, 0x83, 0xe9, 0x76, 0x66, 0xaf, 0xde, 0x73, 0x38, 0xc9, 0xdb,
+	0x1b, 0x31, 0xaa, 0x2c, 0x07, 0xc1, 0x72, 0x47, 0x85, 0x77, 0x67, 0xbb, 0xf7, 0xf9, 0x89, 0x60,
+	0xf8, 0x66, 0x3e, 0x9f, 0x2d, 0x88, 0x54, 0x53, 0xff, 0xad, 0xec, 0x55, 0xfb, 0x08, 0xb1, 0x3e,
+	0x30, 0xe3, 0xef, 0x6f, 0x18, 0x82, 0x0e, 0x79, 0xe1, 0x83, 0x0e, 0xdd, 0xbb, 0x97, 0x10, 0xcd,
+	0x56, 0xd6, 0xe9, 0xf2, 0x45, 0xbb, 0x6c, 0x0a, 0x40, 0x1b, 0x5a, 0xd5, 0xeb, 0xe3, 0x16, 0xe9,
+	0x1e, 0xc7, 0xe0, 0xf4, 0x92, 0x28, 0x22, 0xb8, 0x69, 0xb2, 0x62, 0xb8, 0x57, 0xd6, 0xc8, 0x07,
+	0x85, 0x8f, 0xff, 0x75, 0xa8, 0x97, 0xf6, 0xc2, 0xd0, 0x85, 0xfc, 0xcc, 0x59, 0xfb, 0x50, 0xb2,
+	0xa1, 0x55, 0xd6, 0x7d, 0xdc, 0x22, 0xdd, 0xe3, 0xbe, 0xc2, 0xa3, 0x99, 0x56, 0xce, 0x10, 0xea,
+	0x2e, 0x18, 0x33, 0xdc, 0xda, 0x26, 0x73, 0x04, 0xa7, 0x74, 0x77, 0xcb, 0x1f, 0xf2, 0x36, 0xee,
+	0x9e, 0xfe, 0x09, 0xce, 0xde, 0x3a, 0xa2, 0x18, 0x31, 0xec, 0x26, 0xf7, 0x09, 0xf4, 0x6d, 0x80,
+	0xd5, 0x9f, 0xa0, 0x8f, 0x6f, 0x40, 0xe7, 0xac, 0xe9, 0xeb, 0x5f, 0xeb, 0x14, 0x5d, 0xaf, 0x53,
+	0xf4, 0x67, 0x9d, 0xa2, 0xef, 0x9b, 0xb4, 0x77, 0xbd, 0x49, 0x7b, 0xbf, 0x37, 0x69, 0xef, 0xc3,
+	0x44, 0x48, 0xb7, 0x58, 0xe5, 0x63, 0xaa, 0xcb, 0x2c, 0x97, 0x2e, 0xbc, 0x51, 0x61, 0x45, 0xb7,
+	0xbf, 0xda, 0xec, 0x4b, 0x16, 0xde, 0xb4, 0xab, 0x25, 0xb7, 0xf9, 0x51, 0xf5, 0xe4, 0x3c, 0xfd,
+	0x1b, 0x00, 0x00, 0xff, 0xff, 0xc8, 0xc7, 0x71, 0x0d, 0x25, 0x05, 0x00, 0x00,
 }
 
 func (m *CollectionMetadataTimeline) Marshal() (dAtA []byte, err error) {
@@ -686,57 +655,6 @@ func (m *OffChainBalancesMetadataTimeline) MarshalToSizedBuffer(dAtA []byte) (in
 		}
 		i--
 		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *InheritedBalancesTimeline) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *InheritedBalancesTimeline) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *InheritedBalancesTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.TimelineTimes) > 0 {
-		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTimelines(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x12
-		}
-	}
-	if len(m.InheritedBalances) > 0 {
-		for iNdEx := len(m.InheritedBalances) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.InheritedBalances[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTimelines(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
 	}
 	return len(dAtA) - i, nil
 }
@@ -1026,27 +944,6 @@ func (m *OffChainBalancesMetadataTimeline) Size() (n int) {
 	if m.OffChainBalancesMetadata != nil {
 		l = m.OffChainBalancesMetadata.Size()
 		n += 1 + l + sovTimelines(uint64(l))
-	}
-	if len(m.TimelineTimes) > 0 {
-		for _, e := range m.TimelineTimes {
-			l = e.Size()
-			n += 1 + l + sovTimelines(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *InheritedBalancesTimeline) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.InheritedBalances) > 0 {
-		for _, e := range m.InheritedBalances {
-			l = e.Size()
-			n += 1 + l + sovTimelines(uint64(l))
-		}
 	}
 	if len(m.TimelineTimes) > 0 {
 		for _, e := range m.TimelineTimes {
@@ -1459,124 +1356,6 @@ func (m *OffChainBalancesMetadataTimeline) Unmarshal(dAtA []byte) error {
 				m.OffChainBalancesMetadata = &OffChainBalancesMetadata{}
 			}
 			if err := m.OffChainBalancesMetadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTimelines
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTimelines
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTimelines
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
-			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTimelines(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTimelines
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *InheritedBalancesTimeline) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTimelines
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: InheritedBalancesTimeline: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: InheritedBalancesTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field InheritedBalances", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTimelines
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTimelines
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTimelines
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.InheritedBalances = append(m.InheritedBalances, &InheritedBalance{})
-			if err := m.InheritedBalances[len(m.InheritedBalances)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

@@ -12,19 +12,6 @@ import (
 //HACK: We use the ArbitraryValue field to store the original value, so we can cast it back later
 //HACK: We cast to a UniversalPermission for reusable code.
 
-func (k Keeper) CastInheritedBalancesToUniversalPermission(inheritedBalances []*types.InheritedBalance) []*types.UniversalPermission {
-	castedPermissions := []*types.UniversalPermission{}
-	for _, inheritedBalance := range inheritedBalances {
-		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			BadgeIds:       inheritedBalance.BadgeIds,
-			UsesBadgeIds:   true,
-			ArbitraryValue: inheritedBalance,
-		})
-	}
-
-	return castedPermissions
-}
-
 func (k Keeper) CastBadgeMetadataToUniversalPermission(badgeMetadata []*types.BadgeMetadata) []*types.UniversalPermission {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, badgeMetadata := range badgeMetadata {

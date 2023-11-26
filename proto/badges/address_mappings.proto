@@ -8,18 +8,18 @@ import "badges/balances.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
-// An AddressMapping is a permanent list of addresses that are referenced by a mapping ID.
-// The mapping may include only the specified addresses, or it may include all addresses but
-// the specified addresses (depending on if includeAddresses is true or false).
-//
-// AddressMappings are used for things like whitelists, blacklists, approvals, etc.
-message AddressMapping {
-  string mappingId = 1;
-  repeated string addresses = 2;
-  bool includeAddresses = 3;
-
-  string uri = 4;
-  string customData = 5;
+/* 
+  An AddressMapping is a permanent list of addresses that are referenced by a mapping ID.
+  The mapping may include only the specified addresses, or it may include all addresses but
+  the specified addresses (depending on if includeAddresses is true (whitelist) or false (blacklist)).
   
-  string createdBy = 6;
+  AddressMappings are used for things like whitelists, blacklists, approvals, etc.
+*/
+message AddressMapping {
+  string mappingId = 1; // Unique identifier for the address mapping.
+  repeated string addresses = 2; // List of addresses included in the mapping.
+  bool includeAddresses = 3; // Indicates whether the mapping includes the specified addresses (true) or excludes them (false).
+  string uri = 4; // URI (Uniform Resource Identifier) associated with the address mapping to provide metadata, if applicable.
+  string customData = 5; // Custom arbitrary data or additional information related to the address mapping.
+  string createdBy = 6; // The user or entity who created the address mapping.
 }

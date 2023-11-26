@@ -35,8 +35,12 @@ type ExtensionOptionsWeb3TxSolana struct {
 	// fee_payer_sig is a signature data from the fee paying account,
 	// allows to perform fee delegation when using EIP712 Domain.
 	FeePayerSig []byte `protobuf:"bytes,3,opt,name=fee_payer_sig,json=feePayerSig,proto3" json:"feePayerSig,omitempty"`
-	Chain       string `protobuf:"bytes,4,opt,name=chain,proto3" json:"chain,omitempty"`
-	SolAddress  string `protobuf:"bytes,5,opt,name=sol_address,json=solAddress,proto3" json:"solAddress,omitempty"`
+	// chain should be "Solana"
+	Chain string `protobuf:"bytes,4,opt,name=chain,proto3" json:"chain,omitempty"`
+	// sol_address is the address of the solana account.
+	// Used for indexing purposes because we can't natively go from a cosmos address (what is used on-chain) to a solana address
+	// without knowing the solana address in the first place. This is because conversion to cosmos requires a hash of the solana address.
+	SolAddress string `protobuf:"bytes,5,opt,name=sol_address,json=solAddress,proto3" json:"solAddress,omitempty"`
 }
 
 func (m *ExtensionOptionsWeb3TxSolana) Reset()         { *m = ExtensionOptionsWeb3TxSolana{} }

@@ -25,7 +25,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // An AddressMapping is a permanent list of addresses that are referenced by a mapping ID.
 // The mapping may include only the specified addresses, or it may include all addresses but
-// the specified addresses (depending on if includeAddresses is true or false).
+// the specified addresses (depending on if includeAddresses is true (whitelist) or false (blacklist)).
 //
 // AddressMappings are used for things like whitelists, blacklists, approvals, etc.
 type AddressMapping struct {

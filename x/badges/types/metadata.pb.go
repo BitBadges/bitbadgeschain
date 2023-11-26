@@ -24,12 +24,15 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// This defines the metadata for specific badge IDs.
-// This should be interpreted according to the collection standard.
+// This message defines the metadata for specific badge IDs.
+// The interpretation of this metadata should follow the collection standard.
 type BadgeMetadata struct {
-	Uri        string       `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
-	CustomData string       `protobuf:"bytes,2,opt,name=customData,proto3" json:"customData,omitempty"`
-	BadgeIds   []*UintRange `protobuf:"bytes,3,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	// The URI (Uniform Resource Identifier) associated with the badge metadata.
+	Uri string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
+	// Custom data or additional information related to the badge metadata.
+	CustomData string `protobuf:"bytes,2,opt,name=customData,proto3" json:"customData,omitempty"`
+	// The badge IDs to which this metadata applies.
+	BadgeIds []*UintRange `protobuf:"bytes,3,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 }
 
 func (m *BadgeMetadata) Reset()         { *m = BadgeMetadata{} }
@@ -86,10 +89,12 @@ func (m *BadgeMetadata) GetBadgeIds() []*UintRange {
 	return nil
 }
 
-// This defines the metadata for the collection.
-// This should be interpreted according to the collection standard.
+// This message defines the metadata for the collection.
+// The interpretation of this metadata should follow the collection standard.
 type CollectionMetadata struct {
-	Uri        string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
+	// The URI (Uniform Resource Identifier) associated with the collection metadata.
+	Uri string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
+	// Custom data or additional information related to the collection metadata.
 	CustomData string `protobuf:"bytes,2,opt,name=customData,proto3" json:"customData,omitempty"`
 }
 
@@ -140,10 +145,12 @@ func (m *CollectionMetadata) GetCustomData() string {
 	return ""
 }
 
-// This defines the metadata for the off-chain balances (if using this balances type).
-// This should be interpreted according to the collection standard.
+// This message defines the metadata for off-chain balances (if using this balances type).
+// The interpretation of this metadata should follow the collection standard.
 type OffChainBalancesMetadata struct {
-	Uri        string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
+	// The URI (Uniform Resource Identifier) associated with the off-chain balances metadata.
+	Uri string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
+	// Custom data or additional information related to the off-chain balances metadata.
 	CustomData string `protobuf:"bytes,2,opt,name=customData,proto3" json:"customData,omitempty"`
 }
 
