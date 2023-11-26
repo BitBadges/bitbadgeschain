@@ -19,10 +19,10 @@ import (
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 
-	"github.com/bitbadges/bitbadgeschain/x/ethermint/crypto/ethsecp256k1"
-	"github.com/bitbadges/bitbadgeschain/x/ethermint/ethereum/eip712"
-	etherminttypes "github.com/bitbadges/bitbadgeschain/x/ethermint/types"
-	ethermint "github.com/bitbadges/bitbadgeschain/x/ethermint/utils"
+	"github.com/bitbadges/bitbadgeschain/x/ethereum/crypto/ethsecp256k1"
+	"github.com/bitbadges/bitbadgeschain/x/ethereum/ethereum/eip712"
+	ethereumtypes "github.com/bitbadges/bitbadgeschain/x/ethereum/types"
+	ethereum "github.com/bitbadges/bitbadgeschain/x/ethereum/utils"
 	solanatypes "github.com/bitbadges/bitbadgeschain/x/solana/types"
 
 	solana "github.com/bitbadges/bitbadgeschain/x/solana/utils"
@@ -32,14 +32,14 @@ import (
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 )
 
-var ethermintCodec codec.ProtoCodecMarshaler
+var ethereumCodec codec.ProtoCodecMarshaler
 var solanaCodec codec.ProtoCodecMarshaler
 
 func init() {
 	registry := codectypes.NewInterfaceRegistry()
-	ethermint.RegisterInterfaces(registry)
+	ethereum.RegisterInterfaces(registry)
 	solana.RegisterInterfaces(registry)
-	ethermintCodec = codec.NewProtoCodec(registry)
+	ethereumCodec = codec.NewProtoCodec(registry)
 	solanaCodec = codec.NewProtoCodec(registry)
 }
 
@@ -191,7 +191,7 @@ func VerifySignature(
 			msgs, tx.GetMemo(), tx.GetTip(),
 		)
 
-		signerChainID, err := ethermint.ParseChainID(signerData.ChainID)
+		signerChainID, err := ethereum.ParseChainID(signerData.ChainID)
 		if err != nil {
 			return sdkerrors.Wrapf(err, "failed to parse chain-id: %s", signerData.ChainID)
 		}
@@ -210,7 +210,7 @@ func VerifySignature(
 		feePayerExt := ""
 		feePayerSig := []byte{}
 		
-		extOptEthereum, ok := opts[0].GetCachedValue().(*etherminttypes.ExtensionOptionsWeb3Tx)
+		extOptEthereum, ok := opts[0].GetCachedValue().(*ethereumtypes.ExtensionOptionsWeb3Tx)
 		if !ok && chain == "Ethereum" {
 			return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "unknown extension option")
 		} else if ok && chain == "Ethereum" {

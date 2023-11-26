@@ -1,7 +1,5 @@
 package app
 
-//Completely scrapped together from various cosmos-sdk modules and the ethermint app. It works though :)
-
 import (
 	"encoding/json"
 	"time"

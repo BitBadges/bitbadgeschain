@@ -1,18 +1,18 @@
 // Copyright 2021 Evmos Foundation
-// This file is part of Evmos' Ethermint library.
+// This file is part of Evmos' ethereum library.
 //
-// The Ethermint library is free software: you can redistribute it and/or modify
+// The ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The Ethermint library is distributed in the hope that it will be useful,
+// The ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the Ethermint library. If not, see https://github.com/bitbadges/bitbadgeschain/x/blob/main/LICENSE
+// along with the ethereum library. If not, see https://github.com/bitbadges/bitbadgeschain/x/blob/main/LICENSE
 package codec
 
 import (
@@ -21,16 +21,16 @@ import (
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 
-	"github.com/bitbadges/bitbadgeschain/x/ethermint/crypto/ethsecp256k1"
+	"github.com/bitbadges/bitbadgeschain/x/ethereum/crypto/ethsecp256k1"
 )
 
 // RegisterCrypto registers all crypto dependency types with the provided Amino
 // codec.
 func RegisterCrypto(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&ethsecp256k1.PubKey{},
-		"ethermint/PubKey", nil)
+		"ethereum/PubKey", nil)
 	cdc.RegisterConcrete(&ethsecp256k1.PrivKey{},
-		"ethermint/PrivKey", nil)
+		"ethereum/PrivKey", nil)
 
 	keyring.RegisterLegacyAminoCodec(cdc)
 	cryptocodec.RegisterCrypto(cdc)

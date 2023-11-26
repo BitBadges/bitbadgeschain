@@ -25,7 +25,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	txTypes "github.com/cosmos/cosmos-sdk/types/tx"
 
-	types "github.com/bitbadges/bitbadgeschain/x/ethermint/utils"
+	types "github.com/bitbadges/bitbadgeschain/x/ethereum/utils"
 	apitypes "github.com/ethereum/go-ethereum/signer/core/apitypes"
 
 	"github.com/cosmos/cosmos-sdk/codec"

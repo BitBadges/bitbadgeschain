@@ -1,18 +1,18 @@
 // Copyright 2021 Evmos Foundation
-// This file is part of Evmos' Ethermint library.
+// This file is part of Evmos' ethereum library.
 //
-// The Ethermint library is free software: you can redistribute it and/or modify
+// The ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The Ethermint library is distributed in the hope that it will be useful,
+// The ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the Ethermint library. If not, see https://github.com/bitbadges/bitbadgeschain/x/blob/main/LICENSE
+// along with the ethereum library. If not, see https://github.com/bitbadges/bitbadgeschain/x/blob/main/LICENSE
 package ethsecp256k1
 
 import (
@@ -22,7 +22,7 @@ import (
 	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
-	"github.com/bitbadges/bitbadgeschain/x/ethermint/ethereum/eip712"
+	"github.com/bitbadges/bitbadgeschain/x/ethereum/ethereum/eip712"
 
 	tmcrypto "github.com/cometbft/cometbft/crypto"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -43,9 +43,9 @@ const (
 // Amino encoding names
 const (
 // // PrivKeyName defines the amino encoding name for the EthSecp256k1 private key
-// PrivKeyName = "ethermint/PrivKeyEthSecp256k1"
+// PrivKeyName = "ethereum/PrivKeyEthSecp256k1"
 // // PubKeyName defines the amino encoding name for the EthSecp256k1 public key
-// PubKeyName = "ethermint/PubKeyEthSecp256k1"
+// PubKeyName = "ethereum/PubKeyEthSecp256k1"
 )
 
 // ----------------------------------------------------------------------------

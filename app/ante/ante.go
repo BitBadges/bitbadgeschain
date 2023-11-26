@@ -13,7 +13,7 @@ import (
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/bitbadges/bitbadgeschain/x/ethermint/crypto/ethsecp256k1"
+	"github.com/bitbadges/bitbadgeschain/x/ethereum/crypto/ethsecp256k1"
 	ed25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 )
 
@@ -41,7 +41,7 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 			opts := txWithExtensions.GetExtensionOptions()
 			if len(opts) > 0 {
 				switch typeURL := opts[0].GetTypeUrl(); typeURL {
-				case "/ethermint.ExtensionOptionsWeb3Tx":
+				case "/ethereum.ExtensionOptionsWeb3Tx":
 					// handle as normal Cosmos SDK tx, except signature is checked for EIP712 representation
 					anteHandler = newCosmosAnteHandlerEip712(options, "Ethereum")
 				case "/solana.ExtensionOptionsWeb3TxSolana":
