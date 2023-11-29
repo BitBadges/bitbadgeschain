@@ -2,6 +2,7 @@ package ante
 
 import (
 	"crypto/ed25519"
+	"encoding/json"
 	"fmt"
 
 	sdkerrors "cosmossdk.io/errors"
@@ -15,6 +16,7 @@ import (
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
+	"github.com/tidwall/gjson"
 
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
@@ -249,6 +251,22 @@ func VerifySignature(
 			return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to match fee payer in extension to the expected signer %s", recoveredFeePayerAcc)
 		} 
 
+		//This uses the new EIP712 wrapper, not legacy
+		//This also accounts for multiple msgs, not just one
+		typedData, err := eip712.WrapTxToTypedData(typedDataChainID, txBytes, chain)
+		if err != nil {
+			return sdkerrors.Wrap(err, "failed to pack tx data in EIP712 object")
+		}
+
+		//Within the wrapping proess, we added types for values that may not be in the message payload
+		//but are expectd by the EIP712 typedData.  We need to add the empty values ("", false, 0) to the
+		//message payload
+		typedData, err = eip712.NormalizeEIP712TypedData(typedData)
+		if err != nil {
+			return sdkerrors.Wrap(err, "failed to normalize EIP712 typed data for badges module")
+		}
+
+
 		//If chain is Solana, we need to use the Solana way to verify the signature (alphabetically sorted JSON keys)
 		//Else, we use EIP712 typed signatures for Ethereum
 		if chain == "Solana" {
@@ -257,13 +275,16 @@ func VerifySignature(
 			//Then, we sort the message field by alphabetizing the JSON keys
 
 			//Creates the EIP712 message payload
-			basicPayload, err := eip712.CreateEIP712MessagePayload(txBytes, chain)
+			eip712Message := typedData.Message //map[string]interface{}
+			// Marshal the map to JSON
+			jsonData, err := json.Marshal(eip712Message)
 			if err != nil {
-				return sdkerrors.Wrap(err, "failed to unmarshal tx bytes to JSON object")
+				return sdkerrors.Wrap(err, "failed to marshal json")
 			}
-			
-			//alphabetize the JSON
-			jsonStr := basicPayload.Payload.Raw
+
+
+			// convert to gson and alphabetize the JSON
+			jsonStr := gjson.ParseBytes(jsonData).String()
 			sortedBytes, err := sdk.SortJSON([]byte(jsonStr))
 			if err != nil {
 				return sdkerrors.Wrap(err, "failed to sort JSON")
@@ -283,26 +304,12 @@ func VerifySignature(
 			//Verify signature w/ ed25519
 			valid := ed25519.Verify(pubKey.Bytes(), sortedBytes, feePayerSig)
 			if !valid {
-				return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature", recoveredFeePayerAcc)
+				return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature %s", recoveredFeePayerAcc, jsonStr)
 			}
 
 			return nil
 		} else {
-			//This uses the new EIP712 wrapper, not legacy
-			//This also accounts for multiple msgs, not just one
-			typedData, err := eip712.WrapTxToTypedData(typedDataChainID, txBytes, chain)
-			if err != nil {
-				return sdkerrors.Wrap(err, "failed to pack tx data in EIP712 object")
-			}
-
-			//Within the wrapping proess, we added types for values that may not be in the message payload
-			//but are expectd by the EIP712 typedData.  We need to add the empty values ("", false, 0) to the
-			//message payload
-			typedData, err = eip712.NormalizeEIP712TypedData(typedData)
-			if err != nil {
-				return sdkerrors.Wrap(err, "failed to normalize EIP712 typed data for badges module")
-			}
-
+			
 			// return sdkerrors.Wrapf(types.ErrInvalidChainID, "%s", typedData)
 
 			sigHash, _, err := apitypes.TypedDataAndHash(typedData)
@@ -350,3 +357,6 @@ func VerifySignature(
 		return sdkerrors.Wrapf(types.ErrTooManySignatures, "unexpected SignatureData %T", sigData)
 	}
 }
+
+
+

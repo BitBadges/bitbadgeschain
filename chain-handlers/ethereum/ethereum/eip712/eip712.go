@@ -17,12 +17,12 @@ func WrapTxToTypedData(
 		return apitypes.TypedData{}, err
 	}
 
-	types, err := createEIP712Types(messagePayload)
+	types, err := CreateEIP712Types(messagePayload)
 	if err != nil {
 		return apitypes.TypedData{}, err
 	}
 
-	domain := createEIP712Domain(chainID)
+	domain := CreateEIP712Domain(chainID)
 
 	typedData := apitypes.TypedData{
 		Types:       types,

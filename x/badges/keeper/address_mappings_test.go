@@ -108,6 +108,27 @@ func (suite *TestSuite) TestStoreAddressMappings() {
 	suite.Require().Equal(mapping.MappingId, "test1asdasfda", "Error getting address mapping: %s", "test1asdasfda")
 }
 
+func (suite *TestSuite) TestDuplicateStoreAddressMappings() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].AddressMappings = []*types.AddressMapping{
+		{
+			MappingId: "test1asdasfda",
+			Addresses: []string{alice},
+		},
+	}
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating badge: %s")
+
+	err = CreateAddressMappings(suite, wctx, &types.MsgCreateAddressMappings{
+		Creator: alice,
+		AddressMappings:collectionsToCreate[0].AddressMappings,
+	})
+	suite.Require().Error(err, "Error creating badge: %s")
+}
+
 // func (suite *TestSuite) TestAddressMappingsManagerOf() {
 // 	wctx := sdk.WrapSDKContext(suite.ctx)
 
