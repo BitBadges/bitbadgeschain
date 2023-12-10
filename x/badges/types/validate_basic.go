@@ -31,6 +31,10 @@ func duplicateInStringArray(arr []string) bool {
 
 // Validate uri and subasset uri returns whether both the uri and subasset uri is valid. Max 100 characters each.
 func ValidateURI(uri string) error {
+	if uri == "" {
+		return nil
+	}
+
 	regexMatch := reUri.MatchString(uri)
 	if !regexMatch {
 		return sdkerrors.Wrapf(ErrInvalidURI, "invalid uri: %s", uri)
