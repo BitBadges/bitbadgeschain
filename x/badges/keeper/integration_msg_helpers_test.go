@@ -141,9 +141,11 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 		if collectionToCreate.BalancesType.Equal(sdkmath.NewUint(1)) {
 			balancesType = "Standard"
 		} else if collectionToCreate.BalancesType.Equal(sdkmath.NewUint(2)) {
-			balancesType = "Off-Chain"
+			balancesType = "Off-Chain - Indexed"
 		} else if collectionToCreate.BalancesType.Equal(sdkmath.NewUint(3)) {
 			balancesType = "Inherited"
+		} else if collectionToCreate.BalancesType.Equal(sdkmath.NewUint(4)) {
+			balancesType = "Off-Chain - Non-Indexed"
 		} else {
 			return sdkerrors.Wrapf(types.ErrInvalidCollectionID, "Balances type %s not supported", collectionToCreate.BalancesType)
 		}

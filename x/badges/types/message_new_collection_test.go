@@ -56,7 +56,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 				CollectionMetadataTimeline: []*types.CollectionMetadataTimeline{
 					{
 						CollectionMetadata: &types.CollectionMetadata{
-							Uri: "",
+							Uri: "asdfasdfasdf",
 						},
 						TimelineTimes: []*types.UintRange{
 							{
@@ -86,7 +86,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 					{
 						BadgeMetadata: []*types.BadgeMetadata{
 							{
-								Uri: "",
+								Uri: "asdfasdfas",
 								BadgeIds: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),

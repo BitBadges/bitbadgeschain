@@ -1,6 +1,8 @@
 package types
 
 import (
+	"strings"
+
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -147,8 +149,8 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(canChangeValues bool) 
 	}
 
 	if msg.CollectionId.IsZero() {
-		if msg.BalancesType != "Standard" && msg.BalancesType != "Inherited" && msg.BalancesType != "Off-Chain" {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "balances type must be Standard, Inherited, or Off-Chain")
+		if msg.BalancesType != "Standard" && msg.BalancesType != "Inherited" && msg.BalancesType != "Off-Chain - Indexed" && msg.BalancesType != "Off-Chain - Non-Indexed" {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "balances type must be Standard, Inherited, Off-Chain - Indexed, or Off-Chain - Non-Indexed")
 		}
 
 		if msg.BalancesType != "Standard" {
@@ -181,7 +183,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(canChangeValues bool) 
 			}
 		}
 
-		if msg.BalancesType != "Off-Chain" {
+		if msg.BalancesType != "Off-Chain - Indexed"  && msg.BalancesType != "Off-Chain - Non-Indexed" {
 			if len(msg.OffChainBalancesMetadataTimeline) > 0 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes on-chain balances but off-chain balances are set")
 			}
@@ -194,6 +196,15 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(canChangeValues bool) 
 
 			if msg.BadgesToCreate != nil && len(msg.BadgesToCreate) > 0 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "badges are inherited from parent so you should not specify to create any badges")
+			}
+		}
+
+		if msg.BalancesType == "Off-Chain - Non-Indexed" {
+			for _, offChainUriObj := range msg.OffChainBalancesMetadataTimeline {
+				//must contain "{address}" in uri
+				if strings.Contains(offChainUriObj.OffChainBalancesMetadata.Uri, "{address}") == false {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "balances type is non-indexed but uri does not contain {address} in uri")
+				}
 			}
 		}
 	}

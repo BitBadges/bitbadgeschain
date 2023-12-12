@@ -9,9 +9,13 @@ func IsStandardBalances(collection *types.BadgeCollection) bool {
 }
 
 func IsOffChainBalances(collection *types.BadgeCollection) bool {
-	return collection.BalancesType == "Off-Chain"
+	return collection.BalancesType == "Off-Chain - Indexed"
 }
 
 func IsInheritedBalances(collection *types.BadgeCollection) bool {
 	return collection.BalancesType == "Inherited"
+}
+
+func IsNonIndexedBalances(collection *types.BadgeCollection) bool {
+	return collection.BalancesType == "Off-Chain - Non-Indexed"
 }

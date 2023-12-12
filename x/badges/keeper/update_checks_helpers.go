@@ -408,7 +408,7 @@ func (k Keeper) ValidateCollectionMetadataUpdate(ctx sdk.Context, oldCollectionM
 }
 
 func (k Keeper) ValidateOffChainBalancesMetadataUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldOffChainBalancesMetadata []*types.OffChainBalancesMetadataTimeline, newOffChainBalancesMetadata []*types.OffChainBalancesMetadataTimeline, canUpdateOffChainBalancesMetadata []*types.TimedUpdatePermission) error {
-	if !IsOffChainBalances(collection) {
+	if !IsOffChainBalances(collection) && !IsNonIndexedBalances(collection) {
 		if len(oldOffChainBalancesMetadata) > 0 || len(newOffChainBalancesMetadata) > 0 {
 			return sdkerrors.Wrapf(ErrWrongBalancesType, "off chain balances are being set but collection %s does not have off chain balances", collection.CollectionId)
 		}

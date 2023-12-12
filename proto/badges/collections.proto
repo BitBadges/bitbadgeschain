@@ -24,7 +24,7 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
   We fetch the value according to the current time.
   For example, we may set the manager to be Alice from Time1 to Time2, and then set the manager to be Bob from Time2 to Time3.
 
-  Collections may have different balance types: standard vs. off-chain vs. inherited. 
+  Collections may have different balance types: standard vs. off-chain - indexed vs. inherited.vs off-chain - non-indexed.
   
   See documentation for more details.
 */
@@ -38,7 +38,7 @@ message BadgeCollection {
   // The metadata for each badge in the collection, also subject to changes over time.
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
   
-  // The type of balances this collection uses ("Standard", "Off-Chain", or "Inherited").
+  // The type of balances this collection uses ("Standard", "Off-Chain - Indexed", "Off-Chain - Non-Indexed", or "Inherited").
   string balancesType = 4;
   
   // Metadata for fetching balances for collections with off-chain balances, subject to changes over time.
@@ -56,7 +56,7 @@ message BadgeCollection {
   // Transferability of the collection for collections with standard balances, subject to changes over time.
   // Overrides user approvals for a transfer if specified.
   // Transfer must satisfy both user and collection-level approvals.
-  // Not applicable for off-chain or inherited balances.
+  // Only applicable to on-chain balances.
   repeated CollectionApproval collectionApprovals = 10;
   
   // Standards that define how to interpret the fields of the collection, subject to changes over time.

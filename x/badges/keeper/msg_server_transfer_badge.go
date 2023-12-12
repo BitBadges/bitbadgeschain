@@ -14,11 +14,18 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 		return nil, err
 	}
 
+	
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
 	if !found {
 		return nil, ErrCollectionNotExists
+	}
+
+	isArchived := types.GetIsArchived(ctx, collection)
+	if isArchived {
+		return nil, ErrCollectionIsArchived
 	}
 
 	if !IsStandardBalances(collection) {

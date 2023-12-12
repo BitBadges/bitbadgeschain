@@ -20,6 +20,11 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		return nil, ErrCollectionNotExists
 	}
 
+	isArchived := types.GetIsArchived(ctx, collection)
+	if isArchived {
+		return nil, ErrCollectionIsArchived
+	}
+
 	if !IsStandardBalances(collection) {
 		return nil, ErrWrongBalancesType
 	}

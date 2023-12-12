@@ -46,7 +46,7 @@ message MsgUniversalUpdateCollection {
   // ID of the collection (0 for new collection).
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
-  // Type of balances "Standard" or "Off-Chain".
+  // Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed".
   string balancesType = 3;
   
   // Default incoming approvals for newly initiated accounts.
@@ -205,7 +205,7 @@ message MsgCreateCollection {
   // Address of the creator.
   string creator = 1;
   
-  // Type of balances "Standard" or "Off-Chain".
+  // Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed".
   string balancesType = 2;
   
   // User's approved transfers for each badge ID.
