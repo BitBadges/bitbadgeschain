@@ -100,7 +100,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 
 						if !alreadyIncremented {
 							*challengeIdsIncremented = append(*challengeIdsIncremented, incrementId)
-							newNumUsed, err = k.IncrementNumUsedForMerkleChallengeInStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex)
+							newNumUsed, err = k.IncrementNumUsedForMerkleChallengeInStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex.Sub(leftmostLeafIndex))
 							if err != nil {
 								continue
 							}

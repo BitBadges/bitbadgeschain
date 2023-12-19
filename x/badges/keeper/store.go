@@ -112,7 +112,7 @@ func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.Use
 		k.cdc.MustUnmarshal(iterator.Value(), &UserBalance)
 		balances = append(balances, &UserBalance)
 
-		balanceKeyDetails := GetDetailsFromBalanceKey(string(iterator.Key()))
+		balanceKeyDetails := GetDetailsFromBalanceKey(string(iterator.Key()[1:]))
 		ids = append(ids, balanceKeyDetails.collectionId)
 		addresses = append(addresses, balanceKeyDetails.address)
 	}
@@ -126,7 +126,7 @@ func (k Keeper) GetUserBalanceIdsFromStore(ctx sdk.Context) (ids []string) {
 	iterator := sdk.KVStorePrefixIterator(store, UserBalanceKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		ids = append(ids, string(iterator.Key()))
+		ids = append(ids, string(iterator.Key()[1:]))
 	}
 	return
 }
@@ -208,9 +208,15 @@ func (k Keeper) GetNumUsedForMerkleChallengesFromStore(ctx sdk.Context) (numUsed
 			panic("Failed to parse num used")
 		}
 		numUsed = append(numUsed, sdkmath.NewUint(curr))
-		ids = append(ids, string(iterator.Key()))
+		ids = append(ids, string(iterator.Key()[1:]))
 	}
 	return
+}
+
+func (k Keeper) SetNumUsedForMerkleChallengeInStore(ctx sdk.Context, key string, numUsed sdkmath.Uint) error {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(usedClaimChallengeStoreKey(key), []byte(numUsed.String()))
+	return nil
 }
 
 /****************************************ADDRESS MAPPINGS****************************************/
@@ -273,6 +279,17 @@ func (k Keeper) SetApprovalsTrackerInStore(ctx sdk.Context, collectionId sdkmath
 	return nil
 }
 
+func (k Keeper) SetApprovalsTrackerInStoreViaKey(ctx sdk.Context, key string, approvalsTracker types.ApprovalsTracker) error {
+	marshaled_transfer_tracker, err := k.cdc.Marshal(&approvalsTracker)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Marshal types.ApprovalsTracker failed")
+	}
+
+	store := ctx.KVStore(k.storeKey)
+	store.Set(approvalsTrackerStoreKey(key), marshaled_transfer_tracker)
+	return nil
+}
+
 func (k Keeper) GetApprovalsTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForApproval string, amountTrackerId string, level string, trackerType string, address string) (types.ApprovalsTracker, bool) {
 	store := ctx.KVStore(k.storeKey)
 	marshaled_transfer_tracker := store.Get(approvalsTrackerStoreKey(ConstructApprovalsTrackerKey(collectionId, addressForApproval, amountTrackerId, level, trackerType, address)))
@@ -294,7 +311,7 @@ func (k Keeper) GetApprovalsTrackersFromStore(ctx sdk.Context) (approvalsTracker
 		k.cdc.MustUnmarshal(iterator.Value(), &approvalsTracker)
 		approvalsTrackers = append(approvalsTrackers, &approvalsTracker)
 
-		ids = append(ids, string(iterator.Key()))
+		ids = append(ids, string(iterator.Key()[1:]))
 	}
 	return
 }

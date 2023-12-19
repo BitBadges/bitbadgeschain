@@ -44,6 +44,24 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		}
 	}
 
+	for idx, numUsed := range genState.NumUsedForMerkleChallenges {
+		if err := k.SetNumUsedForMerkleChallengeInStore(ctx, genState.NumUsedForMerkleChallengesStoreKeys[idx], numUsed); err != nil {
+			panic(err)
+		}
+	}
+
+	for _, addressMapping := range genState.AddressMappings {
+		if err := k.SetAddressMappingInStore(ctx, *addressMapping); err != nil {
+			panic(err)
+		}
+	}
+
+	for idx, approvalsTracker := range genState.ApprovalsTrackers {
+		if err := k.SetApprovalsTrackerInStoreViaKey(ctx, genState.ApprovalsTrackerStoreKeys[idx], *approvalsTracker); err != nil {
+			panic(err)
+		}
+	}
+
 	k.SetParams(ctx, genState.Params)
 }
 
@@ -60,8 +78,8 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	balanceIds := []sdkmath.Uint{}
 	genesis.Balances, addresses, balanceIds = k.GetUserBalancesFromStore(ctx)
 
-	for i, addresses := range addresses {
-		genesis.BalanceStoreKeys = append(genesis.BalanceStoreKeys, keeper.ConstructBalanceKey(addresses, balanceIds[i]))
+	for i, address := range addresses {
+		genesis.BalanceStoreKeys = append(genesis.BalanceStoreKeys, keeper.ConstructBalanceKey(address, balanceIds[i]))
 	}
 
 	genesis.NumUsedForMerkleChallenges, genesis.NumUsedForMerkleChallengesStoreKeys = k.GetNumUsedForMerkleChallengesFromStore(ctx)
