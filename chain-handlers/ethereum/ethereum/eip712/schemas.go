@@ -10,64 +10,6 @@ package eip712
 
 //TODO: Store JSONs in a file directory not directly here
 
-syntax = "proto3";
-
-package protocols;
-
-import "gogoproto/gogo.proto";
-
-option go_package = "github.com/bitbadges/bitbadgeschain/x/protocols/types";
-
-// Msg defines the Msg service.
-service Msg {
-  rpc CreateProtocol           (MsgCreateProtocol          ) returns (MsgCreateProtocolResponse          );
-  rpc UpdateProtocol           (MsgUpdateProtocol          ) returns (MsgUpdateProtocolResponse          );
-  rpc DeleteProtocol           (MsgDeleteProtocol          ) returns (MsgDeleteProtocolResponse          );
-  rpc SetCollectionForProtocol (MsgSetCollectionForProtocol) returns (MsgSetCollectionForProtocolResponse);
-}
-
-message Protocol {
-  string name = 1;
-  string uri = 2;
-  string customData = 3;
-}
-
-message MsgCreateProtocol {
-  string creator = 1;
-  string name = 2;
-  string uri = 3;
-  string customData = 4;
-}
-
-message MsgCreateProtocolResponse {}
-
-message MsgUpdateProtocol {
-  string creator = 1;
-  string name = 2;
-  string uri = 3;
-  string customData = 4;
-}
-
-message MsgUpdateProtocolResponse {}
-
-message MsgDeleteProtocol {
-  string creator = 1;
-  string name = 2;
-}
-
-message MsgDeleteProtocolResponse {}
-
-message MsgSetCollectionForProtocol {
-  string creator = 1;
-  string name = 2;
-  string collectionId = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-}
-
-message MsgSetCollectionForProtocolResponse {}
-
-
-
-
 // GetSchemas returns all the schemas for the EIP712 types
 func GetSchemas() []string {
 	schemas := make([]string, 0)

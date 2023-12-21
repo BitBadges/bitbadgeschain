@@ -15,7 +15,7 @@ func CmdGetCollectionIdForProtocol() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get-collection-id-for-protocol [name] [address]",
 		Short: "Query getCollectionIdForProtocol",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -28,16 +28,17 @@ func CmdGetCollectionIdForProtocol() *cobra.Command {
 			params := &types.QueryGetCollectionIdForProtocolRequest{
 								Name: args[0],
 								Address: args[1],	
-    	}
+			}
 
             
 
 			res, err := queryClient.GetCollectionIdForProtocol(cmd.Context(), params)
-            if err != nil {
-                return err
-            }
+			if err != nil {
 
-            return clientCtx.PrintProto(res)
+					return err
+			}
+
+			return clientCtx.PrintProto(res)
 		},
 	}
 

@@ -16,7 +16,7 @@ func CmdUpdateProtocol() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-protocol [name] [uri] [customData]",
 		Short: "Broadcast message updateProtocol",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			clientCtx, err := client.GetClientTxContext(cmd)

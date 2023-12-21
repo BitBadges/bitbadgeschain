@@ -17,7 +17,7 @@ func CmdSetCollectionForProtocol() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set-collection-for-protocol [name] [collectionId]",
 		Short: "Broadcast message setCollectionForProtocol",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			clientCtx, err := client.GetClientTxContext(cmd)

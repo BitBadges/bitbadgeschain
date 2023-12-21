@@ -16,7 +16,7 @@ func CmdDeleteProtocol() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-protocol [name]",
 		Short: "Broadcast message deleteProtocol",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			clientCtx, err := client.GetClientTxContext(cmd)

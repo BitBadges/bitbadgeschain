@@ -16,7 +16,7 @@ func CmdCreateProtocol() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-protocol [name] [uri] [customData]",
 		Short: "Broadcast message createProtocol",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			clientCtx, err := client.GetClientTxContext(cmd)

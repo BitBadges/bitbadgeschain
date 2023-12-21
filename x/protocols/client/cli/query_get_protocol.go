@@ -15,7 +15,7 @@ func CmdGetProtocol() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get-protocol [name]",
 		Short: "Query getProtocol",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			
 			clientCtx, err := client.GetClientQueryContext(cmd)

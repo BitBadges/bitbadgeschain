@@ -87,12 +87,12 @@ func (k Keeper) DeleteProtocolCollectionFromStore(ctx sdk.Context, protocolName 
 // GetProtocolsFromStore defines a method for returning all badges information by key.
 func (k Keeper) GetProtocolCollectionsFromStore(ctx sdk.Context) (names []string, addresses []string, collectionIds []sdkmath.Uint) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, ProtocolKey)
+	iterator := sdk.KVStorePrefixIterator(store, CollectionIdKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		collectionIds = append(collectionIds, sdkmath.NewUintFromString(string(iterator.Value())))
-
-		name, address := GetDetailsFromKey(string(iterator.Key()))
+		
+		name, address := GetDetailsFromKey(string(iterator.Key()[1:]))
 		names = append(names, name)
 		addresses = append(addresses, address)
 	}
