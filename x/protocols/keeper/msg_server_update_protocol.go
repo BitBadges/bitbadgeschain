@@ -14,15 +14,21 @@ func (k msgServer) UpdateProtocol(goCtx context.Context, msg *types.MsgUpdatePro
 
 	protocolName := msg.Name
 
-	//Check if protocol exists
-	if !k.StoreHasProtocolID(ctx, protocolName) {
+	currProtocol, found := k.GetProtocolFromStore(ctx, protocolName)
+	if !found {
 		return nil, sdkerrors.Wrap(ErrProtocolDoesNotExist, "Protocol does not exist")
+	}
+
+	//Check if user is creator of protocol
+	if currProtocol.CreatedBy != msg.Creator {
+		return nil, sdkerrors.Wrap(ErrNotProtocolCreator, "Not protocol creator")
 	}
 
 	newProtocol := types.Protocol{
 		Name:    		msg.Name,
 		Uri: 	 			msg.Uri,
 		CustomData: msg.CustomData,
+		CreatedBy: 	msg.Creator,
 	}
 
 	//Update protocol in store
