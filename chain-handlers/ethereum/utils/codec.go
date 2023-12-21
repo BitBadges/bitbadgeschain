@@ -10,6 +10,6 @@ import (
 // implementations and interfaces.
 func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	registry.RegisterImplementations(
-		(*tx.TxExtensionOptionI)(nil),		&types.ExtensionOptionsWeb3Tx{},
+		(*tx.TxExtensionOptionI)(nil), &types.ExtensionOptionsWeb3Tx{},
 	)
 }

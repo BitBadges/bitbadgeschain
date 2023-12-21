@@ -127,6 +127,9 @@ import (
 	wasmxkeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
 	wasmxtypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 
+	protocolsmodule "github.com/bitbadges/bitbadgeschain/x/protocols"
+	protocolsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/protocols/keeper"
+	protocolsmoduletypes "github.com/bitbadges/bitbadgeschain/x/protocols/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
@@ -191,6 +194,7 @@ var (
 		badgesmodule.AppModuleBasic{},
 		wasm.AppModuleBasic{},
 		wasmx.AppModuleBasic{},
+		protocolsmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -275,8 +279,10 @@ type App struct {
 	ScopedBadgesKeeper capabilitykeeper.ScopedKeeper
 	BadgesKeeper       badgesmodulekeeper.Keeper
 
-	ScopedWasmKeeper capabilitykeeper.ScopedKeeper
-	WasmxKeeper      wasmxkeeper.Keeper
+	ScopedWasmKeeper      capabilitykeeper.ScopedKeeper
+	WasmxKeeper           wasmxkeeper.Keeper
+	ScopedProtocolsKeeper capabilitykeeper.ScopedKeeper
+	ProtocolsKeeper       protocolsmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -327,6 +333,7 @@ func New(
 		wasmtypes.StoreKey,
 		wasmxtypes.StoreKey,
 		ibcfeetypes.StoreKey,
+		protocolsmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -616,6 +623,20 @@ func New(
 
 	wasmxModule := wasmx.NewAppModule(app.WasmxKeeper, app.AccountKeeper, app.BankKeeper)
 
+	scopedProtocolsKeeper := app.CapabilityKeeper.ScopeToModule(protocolsmoduletypes.ModuleName)
+	app.ScopedProtocolsKeeper = scopedProtocolsKeeper
+	app.ProtocolsKeeper = *protocolsmodulekeeper.NewKeeper(
+		appCodec,
+		keys[protocolsmoduletypes.StoreKey],
+		keys[protocolsmoduletypes.MemStoreKey],
+		app.GetSubspace(protocolsmoduletypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedProtocolsKeeper,
+	)
+	protocolsModule := protocolsmodule.NewAppModule(appCodec, app.ProtocolsKeeper, app.AccountKeeper, app.BankKeeper)
+
+	protocolsIBCModule := protocolsmodule.NewIBCModule(app.ProtocolsKeeper)
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	/**** IBC Routing ****/
@@ -633,7 +654,8 @@ func New(
 		AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
 	ibcRouter.AddRoute(badgesmoduletypes.ModuleName, badgesIBCModule)
 	ibcRouter.AddRoute(wasmtypes.ModuleName, wasmStack)
-
+	ibcRouter.AddRoute(protocolsmoduletypes.ModuleName, protocolsIBCModule)
+	
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// this line is used by starport scaffolding # ibc/app/router
@@ -693,6 +715,7 @@ func New(
 		icaModule,
 		badgesModule,
 		wasmxModule,
+		protocolsModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
@@ -728,6 +751,7 @@ func New(
 		badgesmoduletypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxtypes.ModuleName,
+		protocolsmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -756,6 +780,7 @@ func New(
 		badgesmoduletypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxtypes.ModuleName,
+		protocolsmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -789,6 +814,7 @@ func New(
 		badgesmoduletypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxtypes.ModuleName,
+		protocolsmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)
@@ -1039,6 +1065,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(badgesmoduletypes.ModuleName)
 	paramsKeeper.Subspace(wasmtypes.ModuleName)
 	paramsKeeper.Subspace(wasmxtypes.ModuleName)
+	paramsKeeper.Subspace(protocolsmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper

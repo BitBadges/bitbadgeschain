@@ -183,7 +183,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(canChangeValues bool) 
 			}
 		}
 
-		if msg.BalancesType != "Off-Chain - Indexed"  && msg.BalancesType != "Off-Chain - Non-Indexed" {
+		if msg.BalancesType != "Off-Chain - Indexed" && msg.BalancesType != "Off-Chain - Non-Indexed" {
 			if len(msg.OffChainBalancesMetadataTimeline) > 0 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes on-chain balances but off-chain balances are set")
 			}

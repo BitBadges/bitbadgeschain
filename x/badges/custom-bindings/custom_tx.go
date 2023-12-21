@@ -13,7 +13,7 @@ import (
 	badgeTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
-//WASM handler for contracts calling into the badges module
+// WASM handler for contracts calling into the badges module
 func EncodeBadgeMessage() wasmKeeper.CustomEncoder {
 	return func(sender sdk.AccAddress, msg json.RawMessage) ([]sdk.Msg, error) {
 

@@ -24,4 +24,5 @@ func RegisterInterfaces(interfaceRegistry codectypes.InterfaceRegistry) {
 	ethereumcodec.RegisterInterfaces(interfaceRegistry)
 	ethereum.RegisterInterfaces(interfaceRegistry)
 	solana.RegisterInterfaces(interfaceRegistry)
+	
 }

@@ -24,7 +24,6 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 	currCollectionId := req.CollectionId
 	currCollection := &types.BadgeCollection{}
 
-
 	//Check if the collection has inherited balances
 	collection, found := k.GetCollectionFromStore(ctx, currCollectionId)
 	if !found {
@@ -32,7 +31,7 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 	} else {
 		currCollection = collection
 		isStandardBalances := collection.BalancesType == "Standard"
-		if isStandardBalances  || req.Address == "Mint"  || req.Address == "Total" {
+		if isStandardBalances || req.Address == "Mint" || req.Address == "Total" {
 			initiatedByBalanceKey := ConstructBalanceKey(req.Address, currCollectionId)
 			initiatedByBalance, found := k.GetUserBalanceFromStore(ctx, initiatedByBalanceKey)
 			if found {

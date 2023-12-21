@@ -53,7 +53,7 @@ func init() {
 type Eip712SigVerificationDecorator struct {
 	ak              ante.AccountKeeper
 	signModeHandler authsigning.SignModeHandler
-	chain string
+	chain           string
 }
 
 // NewEip712SigVerificationDecorator creates a new Eip712SigVerificationDecorator
@@ -61,7 +61,7 @@ func NewEip712SigVerificationDecorator(ak ante.AccountKeeper, signModeHandler au
 	return Eip712SigVerificationDecorator{
 		ak:              ak,
 		signModeHandler: signModeHandler,
-		chain : chain,
+		chain:           chain,
 	}
 }
 
@@ -207,11 +207,11 @@ func VerifySignature(
 		if len(opts) != 1 {
 			return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "tx doesnt contain expected amount of extension options")
 		}
-	
+
 		typedDataChainID := uint64(0)
 		feePayerExt := ""
 		feePayerSig := []byte{}
-		
+
 		//Get details from the extension option
 		//TODO: Is feePayer really necessary in the extension? what is it used for?
 		extOptEthereum, ok := opts[0].GetCachedValue().(*ethereumtypes.ExtensionOptionsWeb3Tx)
@@ -232,7 +232,6 @@ func VerifySignature(
 			feePayerSig = extOptSolana.FeePayerSig
 		}
 
-
 		if typedDataChainID != signerChainID.Uint64() {
 			return sdkerrors.Wrap(types.ErrInvalidChainID, "invalid chain-id")
 		}
@@ -249,7 +248,7 @@ func VerifySignature(
 		recoveredFeePayerAcc := sdk.AccAddress(pubKey.Address().Bytes())
 		if !recoveredFeePayerAcc.Equals(feePayer) {
 			return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to match fee payer in extension to the expected signer %s", recoveredFeePayerAcc)
-		} 
+		}
 
 		//This uses the new EIP712 wrapper, not legacy
 		//This also accounts for multiple msgs, not just one
@@ -266,7 +265,6 @@ func VerifySignature(
 			return sdkerrors.Wrap(err, "failed to normalize EIP712 typed data for badges module")
 		}
 
-
 		//If chain is Solana, we need to use the Solana way to verify the signature (alphabetically sorted JSON keys)
 		//Else, we use EIP712 typed signatures for Ethereum
 		if chain == "Solana" {
@@ -282,16 +280,15 @@ func VerifySignature(
 				return sdkerrors.Wrap(err, "failed to marshal json")
 			}
 
-
 			// convert to gson and alphabetize the JSON
 			jsonStr := gjson.ParseBytes(jsonData).String()
 			sortedBytes, err := sdk.SortJSON([]byte(jsonStr))
 			if err != nil {
 				return sdkerrors.Wrap(err, "failed to sort JSON")
 			}
-			
+
 			//Match address to pubkey to make sure it's equivalent and no random address is used
-			//This is used for indexing purposes (to be able to map Solana addresses to Cosmos addresses, 
+			//This is used for indexing purposes (to be able to map Solana addresses to Cosmos addresses,
 			//you need to know the Solana address bc it takes a hash to convert, so you can't go the opposite way)
 			//
 			//Doesn't have any on-chain significance
@@ -309,7 +306,7 @@ func VerifySignature(
 
 			return nil
 		} else {
-			
+
 			// return sdkerrors.Wrapf(types.ErrInvalidChainID, "%s", typedData)
 
 			sigHash, _, err := apitypes.TypedDataAndHash(typedData)
@@ -317,7 +314,6 @@ func VerifySignature(
 				return sdkerrors.Wrapf(err, "failed to compute typed data hash")
 			}
 
-			
 			if len(feePayerSig) != ethcrypto.SignatureLength {
 				return sdkerrors.Wrap(types.ErrorInvalidSigner, "signature length doesn't match typical [R||S||V] signature 65 bytes")
 			}
@@ -357,6 +353,3 @@ func VerifySignature(
 		return sdkerrors.Wrapf(types.ErrTooManySignatures, "unexpected SignatureData %T", sigData)
 	}
 }
-
-
-

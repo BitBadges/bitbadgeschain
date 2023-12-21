@@ -145,7 +145,7 @@ func (m *CollectionMetadata) GetCustomData() string {
 	return ""
 }
 
-// This message defines the metadata for off-chain balances (if using this balances type).
+// This message defines the metadata for off-chain balances (if using an off-chain balances type).
 // The interpretation of this metadata should follow the collection standard.
 type OffChainBalancesMetadata struct {
 	// The URI (Uniform Resource Identifier) associated with the off-chain balances metadata.

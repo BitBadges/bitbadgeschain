@@ -114,7 +114,6 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) 
 		handled = true
 	}
 
-
 	//Split by :
 	if !handled {
 		addresses := strings.Split(addressMappingId, ":")

@@ -26,11 +26,11 @@ func CmdGetApprovalsTrackers() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryGetApprovalsTrackerRequest{
-				CollectionId: types.NewUintFromString(args[0]),
-				ApprovalLevel: args[1],
+				CollectionId:    types.NewUintFromString(args[0]),
+				ApprovalLevel:   args[1],
 				ApproverAddress: args[2],
 				AmountTrackerId: args[3],
-				TrackerType: args[4],
+				TrackerType:     args[4],
 				ApprovedAddress: args[5],
 			}
 

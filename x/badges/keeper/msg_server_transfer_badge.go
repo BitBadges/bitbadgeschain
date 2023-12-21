@@ -14,8 +14,6 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 		return nil, err
 	}
 
-	
-
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)

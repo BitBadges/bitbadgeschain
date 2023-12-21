@@ -2884,7 +2884,8 @@ paths:
                     type: string
                     description: >-
                       The type of balances this collection uses ("Standard",
-                      "Off-Chain", or "Inherited").
+                      "Off-Chain - Indexed", "Off-Chain - Non-Indexed", or
+                      "Inherited").
                   offChainBalancesMetadataTimeline:
                     type: array
                     items:
@@ -4942,7 +4943,7 @@ paths:
                       Transfer must satisfy both user and collection-level
                       approvals.
 
-                      Not applicable for off-chain or inherited balances.
+                      Only applicable to on-chain balances.
                   standardsTimeline:
                     type: array
                     items:
@@ -6895,7 +6896,7 @@ paths:
 
 
                   Collections may have different balance types: standard vs.
-                  off-chain vs. inherited. 
+                  off-chain - indexed vs. inherited.vs off-chain - non-indexed.
 
 
                   See documentation for more details.
@@ -59688,6 +59689,42 @@ paths:
                         }
       tags:
         - Query
+  /bitbadges/bitbadgeschain/protocols/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: ProtocolsParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
   /bitbadges/bitbadgeschain/wasmx/v1/module_state:
     get:
       summary: Retrieves the entire wasmx module's state
@@ -60603,8 +60640,8 @@ definitions:
       balancesType:
         type: string
         description: >-
-          The type of balances this collection uses ("Standard", "Off-Chain", or
-          "Inherited").
+          The type of balances this collection uses ("Standard", "Off-Chain -
+          Indexed", "Off-Chain - Non-Indexed", or "Inherited").
       offChainBalancesMetadataTimeline:
         type: array
         items:
@@ -62454,7 +62491,7 @@ definitions:
 
           Transfer must satisfy both user and collection-level approvals.
 
-          Not applicable for off-chain or inherited balances.
+          Only applicable to on-chain balances.
       standardsTimeline:
         type: array
         items:
@@ -64231,8 +64268,8 @@ definitions:
       then set the manager to be Bob from Time2 to Time3.
 
 
-      Collections may have different balance types: standard vs. off-chain vs.
-      inherited. 
+      Collections may have different balance types: standard vs. off-chain -
+      indexed vs. inherited.vs off-chain - non-indexed.
 
 
       See documentation for more details.
@@ -67434,8 +67471,8 @@ definitions:
           Custom data or additional information related to the off-chain
           balances metadata.
     description: >-
-      This message defines the metadata for off-chain balances (if using this
-      balances type).
+      This message defines the metadata for off-chain balances (if using an
+      off-chain balances type).
 
       The interpretation of this metadata should follow the collection standard.
   badges.OffChainBalancesMetadataTimeline:
@@ -70220,8 +70257,8 @@ definitions:
           balancesType:
             type: string
             description: >-
-              The type of balances this collection uses ("Standard",
-              "Off-Chain", or "Inherited").
+              The type of balances this collection uses ("Standard", "Off-Chain
+              - Indexed", "Off-Chain - Non-Indexed", or "Inherited").
           offChainBalancesMetadataTimeline:
             type: array
             items:
@@ -72100,7 +72137,7 @@ definitions:
 
               Transfer must satisfy both user and collection-level approvals.
 
-              Not applicable for off-chain or inherited balances.
+              Only applicable to on-chain balances.
           standardsTimeline:
             type: array
             items:
@@ -73909,8 +73946,8 @@ definitions:
           and then set the manager to be Bob from Time2 to Time3.
 
 
-          Collections may have different balance types: standard vs. off-chain
-          vs. inherited. 
+          Collections may have different balance types: standard vs. off-chain -
+          indexed vs. inherited.vs off-chain - non-indexed.
 
 
           See documentation for more details.
@@ -78325,6 +78362,14 @@ definitions:
                   "@type": "type.googleapis.com/google.protobuf.Duration",
                   "value": "1.212s"
                 }
+  bitbadgeschain.protocols.MsgCreateProtocolResponse:
+    type: object
+  bitbadgeschain.protocols.MsgDeleteProtocolResponse:
+    type: object
+  bitbadgeschain.protocols.MsgSetCollectionForProtocolResponse:
+    type: object
+  bitbadgeschain.protocols.MsgUpdateProtocolResponse:
+    type: object
   cosmos.auth.v1beta1.AddressBytesToStringResponse:
     type: object
     properties:
@@ -108367,6 +108412,16 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
+  protocols.Params:
+    type: object
+    description: Params defines the parameters for the module.
+  protocols.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
   wasmx.GenesisState:
     type: object
     properties:

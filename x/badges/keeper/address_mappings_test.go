@@ -123,8 +123,8 @@ func (suite *TestSuite) TestDuplicateStoreAddressMappings() {
 	suite.Require().Nil(err, "Error creating badge: %s")
 
 	err = CreateAddressMappings(suite, wctx, &types.MsgCreateAddressMappings{
-		Creator: alice,
-		AddressMappings:collectionsToCreate[0].AddressMappings,
+		Creator:         alice,
+		AddressMappings: collectionsToCreate[0].AddressMappings,
 	})
 	suite.Require().Error(err, "Error creating badge: %s")
 }

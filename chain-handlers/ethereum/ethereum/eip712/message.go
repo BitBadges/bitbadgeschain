@@ -27,7 +27,7 @@ func CreateEIP712MessagePayload(data []byte, chain string) (eip712MessagePayload
 	if err != nil {
 		return eip712MessagePayload{}, err
 	}
-	
+
 	payload, numPayloadMsgs, err := FlattenPayloadMessages(basicPayload)
 	if err != nil {
 		return eip712MessagePayload{}, errorsmod.Wrap(err, "failed to flatten payload JSON messages")

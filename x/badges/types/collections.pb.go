@@ -36,7 +36,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // We fetch the value according to the current time.
 // For example, we may set the manager to be Alice from Time1 to Time2, and then set the manager to be Bob from Time2 to Time3.
 //
-// Collections may have different balance types: standard vs. off-chain vs. inherited.
+// Collections may have different balance types: standard vs. off-chain - indexed vs. inherited.vs off-chain - non-indexed.
 //
 // See documentation for more details.
 type BadgeCollection struct {
@@ -46,7 +46,7 @@ type BadgeCollection struct {
 	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,2,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
 	// The metadata for each badge in the collection, also subject to changes over time.
 	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,3,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
-	// The type of balances this collection uses ("Standard", "Off-Chain", or "Inherited").
+	// The type of balances this collection uses ("Standard", "Off-Chain - Indexed", "Off-Chain - Non-Indexed", or "Inherited").
 	BalancesType string `protobuf:"bytes,4,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
 	// Metadata for fetching balances for collections with off-chain balances, subject to changes over time.
 	OffChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline `protobuf:"bytes,5,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
@@ -59,7 +59,7 @@ type BadgeCollection struct {
 	// Transferability of the collection for collections with standard balances, subject to changes over time.
 	// Overrides user approvals for a transfer if specified.
 	// Transfer must satisfy both user and collection-level approvals.
-	// Not applicable for off-chain or inherited balances.
+	// Only applicable to on-chain balances.
 	CollectionApprovals []*CollectionApproval `protobuf:"bytes,10,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
 	// Standards that define how to interpret the fields of the collection, subject to changes over time.
 	StandardsTimeline []*StandardsTimeline `protobuf:"bytes,11,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`

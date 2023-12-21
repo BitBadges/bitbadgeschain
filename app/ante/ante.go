@@ -34,8 +34,6 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 
 		defer Recover(ctx.Logger(), &err)
 
-		
-
 		txWithExtensions, ok := tx.(authante.HasExtensionOptionsTx)
 		if ok {
 			opts := txWithExtensions.GetExtensionOptions()
@@ -57,7 +55,6 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 				return anteHandler(ctx, tx, sim)
 			}
 		}
-		
 
 		// handle as totally normal Cosmos SDK tx
 		switch tx.(type) {
@@ -110,7 +107,6 @@ func DefaultSigVerificationGasConsumer(
 		meter.ConsumeGas(ed25519VerifyCost, "ante verify: solana ed25519")
 		return nil
 	}
-
 
 	return authante.DefaultSigVerificationGasConsumer(meter, sig, params)
 }

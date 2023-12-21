@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package protocols;
+
+import "gogoproto/gogo.proto";
+import "protocols/tx.proto";
+import "protocols/params.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/protocols/types";
+
+// GenesisState defines the protocols module's genesis state.
+message GenesisState {
+  Params params  = 1 [(gogoproto.nullable) = false];
+  string port_id = 2;
+
+  repeated Protocol protocols = 3;
+  repeated string collection_ids_for_protocols_keys = 4;
+  repeated string collection_ids_for_protocols = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+

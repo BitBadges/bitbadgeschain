@@ -15,7 +15,6 @@ var _ = strconv.Itoa(0)
 
 func CmdMsgUpdateCollection() *cobra.Command {
 
-
 	cmd := &cobra.Command{
 		Use:   "update-collection [tx-json]",
 		Short: "Broadcast message updateCollection",
