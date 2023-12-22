@@ -45,6 +45,9 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 				case "/solana.ExtensionOptionsWeb3TxSolana":
 					// handle as Cosmos SDK tx, except signature is checked for JSON representation intended to be signed w/ solana (Phantom wallet)
 					anteHandler = newCosmosAnteHandlerEip712(options, "Solana")
+				case "/bitcoin.ExtensionOptionsWeb3TxBitcoin":
+					// handle as Cosmos SDK tx, except signature is checked for JSON representation intended to be signed w/ bitcoin (Ledger wallet)
+					anteHandler = newCosmosAnteHandlerEip712(options, "Bitcoin")
 				default:
 					return ctx, sdkerrors.Wrapf(
 						types.ErrUnknownRequest,

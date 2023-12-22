@@ -60,7 +60,7 @@ func newCosmosAnteHandler(options HandlerOptions) sdk.AnteHandler {
 }
 
 func newCosmosAnteHandlerEip712(options HandlerOptions, chain string) sdk.AnteHandler {
-	if chain != "Ethereum" && chain != "Solana" {
+	if chain != "Ethereum" && chain != "Solana" && chain != "Bitcoin" {
 		panic("chain must be either Ethereum or Solana")
 	}
 	return sdk.ChainAnteDecorators(

@@ -27,6 +27,8 @@ import (
 	ethereum "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/utils"
 	solanatypes "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/types"
 
+	bitcointypes "github.com/bitbadges/bitbadgeschain/chain-handlers/bitcoin/types"
+
 	solana "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/utils"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -232,6 +234,15 @@ func VerifySignature(
 			feePayerSig = extOptSolana.FeePayerSig
 		}
 
+		extOptBitcoin, ok := opts[0].GetCachedValue().(*bitcointypes.ExtensionOptionsWeb3TxBitcoin)
+		if !ok && chain == "Bitcoin" {
+			return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "unknown extension option")
+		} else if ok && chain == "Bitcoin" {
+			typedDataChainID = extOptBitcoin.TypedDataChainID
+			feePayerExt = extOptBitcoin.FeePayer
+			feePayerSig = extOptBitcoin.FeePayerSig
+		}
+
 		if typedDataChainID != signerChainID.Uint64() {
 			return sdkerrors.Wrap(types.ErrInvalidChainID, "invalid chain-id")
 		}
@@ -267,7 +278,7 @@ func VerifySignature(
 
 		//If chain is Solana, we need to use the Solana way to verify the signature (alphabetically sorted JSON keys)
 		//Else, we use EIP712 typed signatures for Ethereum
-		if chain == "Solana" {
+		if chain == "Solana" || chain == "Bitcoin" {
 			//We generate the Solana message payload using the code from generatin EIP712
 			//We only use the message field (no types or domain)
 			//Then, we sort the message field by alphabetizing the JSON keys
@@ -292,16 +303,23 @@ func VerifySignature(
 			//you need to know the Solana address bc it takes a hash to convert, so you can't go the opposite way)
 			//
 			//Doesn't have any on-chain significance
-			solanaAddress := extOptSolana.SolAddress
-			addr := base58.Encode(pubKey.Bytes())
-			if addr != solanaAddress {
-				return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "provided solana address in extension does not match signer pubkey")
-			}
 
-			//Verify signature w/ ed25519
-			valid := ed25519.Verify(pubKey.Bytes(), sortedBytes, feePayerSig)
-			if !valid {
-				return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature %s", recoveredFeePayerAcc, jsonStr)
+			if chain == "Solana" {
+				solanaAddress := extOptSolana.SolAddress
+				addr := base58.Encode(pubKey.Bytes())
+				if addr != solanaAddress {
+					return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "provided solana address in extension does not match signer pubkey")
+				}
+
+				//Verify signature w/ ed25519
+				valid := ed25519.Verify(pubKey.Bytes(), sortedBytes, feePayerSig)
+				if !valid {
+					return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature %s", recoveredFeePayerAcc, jsonStr)
+				}
+			} else if chain == "Bitcoin" {
+				if !secp256k1.VerifySignature(pubKey.Bytes(), sortedBytes, feePayerSig) {
+					return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify signer signature of Bitcoin signature")
+				}
 			}
 
 			return nil
