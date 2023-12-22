@@ -164,6 +164,27 @@ func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) {
 	k.SetNextCollectionId(ctx, nextID.AddUint64(1)) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
 }
 
+/****************************************NEXT MAPPING ID****************************************/
+
+// Gets the next collection ID.
+func (k Keeper) GetNextAddressMappingCounter(ctx sdk.Context) sdkmath.Uint {
+	store := ctx.KVStore(k.storeKey)
+	nextID := types.NewUintFromString(string((store.Get(nextAddressMappingCounterKey()))))
+	return nextID
+}
+
+// Sets the next asset ID. Should only be used in InitGenesis. Everything else should call IncrementNextAssetID()
+func (k Keeper) SetNextAddressMappingCounter(ctx sdk.Context, nextID sdkmath.Uint) {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(nextAddressMappingCounterKey(), []byte(nextID.String()))
+}
+
+// Increments the next collection ID by 1.
+func (k Keeper) IncrementNextAddressMappingCounter(ctx sdk.Context) {
+	nextID := k.GetNextAddressMappingCounter(ctx)
+	k.SetNextAddressMappingCounter(ctx, nextID.AddUint64(1)) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
+}
+
 /********************************************************************************/
 // Sets a usedClaimData in the store using UsedClaimDataKey ([]byte{0x07}) as the prefix. No check if store has key already.
 func (k Keeper) IncrementNumUsedForMerkleChallengeInStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForChallenge string, challengeLevel string, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {

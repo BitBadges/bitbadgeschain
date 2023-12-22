@@ -8,6 +8,10 @@ import (
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"encoding/binary"
+
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.MsgUniversalUpdateCollection) (*types.MsgUniversalUpdateCollectionResponse, error) {
@@ -23,9 +27,27 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		nextCollectionId := k.GetNextCollectionId(ctx)
 		k.IncrementNextCollectionId(ctx)
 
+		// From cosmos SDK x/group module
+		// Generate account address of collection
+		var accountAddr sdk.AccAddress
+		// loop here in the rare case where a ADR-028-derived address creates a
+		// collision with an existing address.
+		for {
+			derivationKey := make([]byte, 8)
+			binary.BigEndian.PutUint64(derivationKey, nextCollectionId.Uint64())
+	
+			ac, err := authtypes.NewModuleCredential(types.ModuleName, AccountGenerationPrefix, derivationKey)
+			if err != nil {
+				return nil, err
+			}
+			//generate the address from the credential
+			accountAddr = sdk.AccAddress(ac.Address())
+			
+			break
+		}
+
 		collection = &types.BadgeCollection{
 			CollectionId: nextCollectionId,
-			// InheritedCollectionId: 					 	msg.InheritedCollectionId,
 			CollectionPermissions:                            &types.CollectionPermissions{},
 			BalancesType:                                     msg.BalancesType,
 			DefaultUserOutgoingApprovals:                     msg.DefaultOutgoingApprovals,
@@ -34,6 +56,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			DefaultAutoApproveSelfInitiatedIncomingTransfers: msg.DefaultAutoApproveSelfInitiatedIncomingTransfers,
 			DefaultUserPermissions:                           msg.DefaultUserPermissions,
 			CreatedBy:                                        msg.Creator,
+			AliasAddress: 																		accountAddr.String(),
 			ManagerTimeline: []*types.ManagerTimeline{
 				{
 					Manager: msg.Creator,

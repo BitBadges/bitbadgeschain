@@ -17,6 +17,11 @@ var (
 	AddressMappingKey     = []byte{0x06}
 	ApprovalsTrackerKey   = []byte{0x07}
 
+	AccountGenerationPrefix = []byte{0x08}
+	AddressGenerationPrefix = []byte{0x09}
+
+	NextAddressMappingIdKey = []byte{0x0A}
+
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}
 
@@ -109,6 +114,10 @@ func usedClaimChallengeStoreKey(usedClaimChallengeKey string) []byte {
 func nextCollectionIdKey() []byte {
 	return NextCollectionIdKey
 }
+func nextAddressMappingCounterKey() []byte {
+	return NextAddressMappingIdKey
+}
+
 
 func addressMappingStoreKey(addressMappingKey string) []byte {
 	key := make([]byte, len(AddressMappingKey)+len(addressMappingKey))

@@ -1,10 +1,12 @@
 package keeper
 
 import (
+	"encoding/binary"
 	"strings"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	sdkerrors "cosmossdk.io/errors"
 )
@@ -29,10 +31,35 @@ func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.Addr
 		return sdkerrors.Wrapf(ErrAddressMappingAlreadyExists, "address mapping with id %s already exists or is reserved", id)
 	}
 
+
+	// From cosmos SDK x/group module
+	// Generate account address for mapping
+	var accountAddr sdk.AccAddress
+	// loop here in the rare case where a ADR-028-derived address creates a
+	// collision with an existing address.
+	for {
+		derivationKey := make([]byte, 8)
+		nextId := k.GetNextAddressMappingCounter(ctx)
+		binary.BigEndian.PutUint64(derivationKey, nextId.Uint64())
+
+		ac, err := authtypes.NewModuleCredential(types.ModuleName, AddressGenerationPrefix, derivationKey)
+		if err != nil {
+			return err
+		}
+		//generate the address from the credential
+		accountAddr = sdk.AccAddress(ac.Address())
+		
+		break
+	}
+
+	addressMapping.AliasAddress = accountAddr.String()
+
 	err = k.SetAddressMappingInStore(ctx, *addressMapping)
 	if err != nil {
 		return err
 	}
+
+	k.IncrementNextAddressMappingCounter(ctx)
 
 	return nil
 }

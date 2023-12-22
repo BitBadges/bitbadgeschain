@@ -33,4 +33,7 @@ message AddressMapping {
   
   // The user or entity who created the address mapping.
   string createdBy = 6;
+
+  // The alias cosmos address for the mapping.
+  string aliasAddress = 7;
 }
