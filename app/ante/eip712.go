@@ -317,9 +317,12 @@ func VerifySignature(
 					return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature %s", recoveredFeePayerAcc, jsonStr)
 				}
 			} else if chain == "Bitcoin" {
-				if !secp256k1.VerifySignature(pubKey.Bytes(), sortedBytes, feePayerSig) {
-					return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify signer signature of Bitcoin signature")
-				}
+				//verify bitcoin bip322 signature
+
+				//TODO:
+				
+				return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify signer signature of Bitcoin signature: not implemented")
+				
 			}
 
 			return nil
