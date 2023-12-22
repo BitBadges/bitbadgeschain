@@ -13,9 +13,9 @@ var _ sdk.Msg = &MsgUpdateProtocol{}
 
 func NewMsgUpdateProtocol(creator string, name string, uri string, customData string) *MsgUpdateProtocol {
 	return &MsgUpdateProtocol{
-		Creator: creator,
-		Name: name,
-		Uri: uri,
+		Creator:    creator,
+		Name:       name,
+		Uri:        uri,
 		CustomData: customData,
 	}
 }
@@ -54,7 +54,6 @@ func (msg *MsgUpdateProtocol) ValidateBasic() error {
 	if badgetypes.ValidateURI(msg.Uri) != nil {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "uri cannot be invalid")
 	}
-
 
 	return nil
 }

@@ -130,6 +130,7 @@ import (
 	protocolsmodule "github.com/bitbadges/bitbadgeschain/x/protocols"
 	protocolsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/protocols/keeper"
 	protocolsmoduletypes "github.com/bitbadges/bitbadgeschain/x/protocols/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
@@ -633,6 +634,7 @@ func New(
 		app.IBCKeeper.ChannelKeeper,
 		&app.IBCKeeper.PortKeeper,
 		scopedProtocolsKeeper,
+		app.BadgesKeeper,
 	)
 	protocolsModule := protocolsmodule.NewAppModule(appCodec, app.ProtocolsKeeper, app.AccountKeeper, app.BankKeeper)
 
@@ -655,7 +657,7 @@ func New(
 	ibcRouter.AddRoute(badgesmoduletypes.ModuleName, badgesIBCModule)
 	ibcRouter.AddRoute(wasmtypes.ModuleName, wasmStack)
 	ibcRouter.AddRoute(protocolsmoduletypes.ModuleName, protocolsIBCModule)
-	
+
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// this line is used by starport scaffolding # ibc/app/router

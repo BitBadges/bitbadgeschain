@@ -8,39 +8,24 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMsgUpdateProtocol_ValidateBasic(t *testing.T) {
+func TestMsgUnsetCollectionForProtocol_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgUpdateProtocol
+		msg  MsgUnsetCollectionForProtocol
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgUpdateProtocol{
+			msg: MsgUnsetCollectionForProtocol{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgUpdateProtocol{
+			msg: MsgUnsetCollectionForProtocol{
 				Creator: sample.AccAddress(),
-				Name:    "hjdsafkjal",
+				Name: "fdjhsajhksfd",
 			},
-		}, {
-			name: "empty name",
-			msg: MsgUpdateProtocol{
-				Creator: sample.AccAddress(),
-				Name:    "",
-			},
-			err: sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "name cannot be empty"),
-		}, {
-			name: "invalid uri",
-			msg: MsgUpdateProtocol{
-				Creator: sample.AccAddress(),
-				Name:    "hjdsafkjal",
-				Uri:     "invalid_uri",
-			},
-			err: sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "uri cannot be invalid"),
 		},
 	}
 	for _, tt := range tests {

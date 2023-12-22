@@ -25,10 +25,10 @@ func (k msgServer) UpdateProtocol(goCtx context.Context, msg *types.MsgUpdatePro
 	}
 
 	newProtocol := types.Protocol{
-		Name:    		msg.Name,
-		Uri: 	 			msg.Uri,
+		Name:       msg.Name,
+		Uri:        msg.Uri,
 		CustomData: msg.CustomData,
-		CreatedBy: 	msg.Creator,
+		CreatedBy:  msg.Creator,
 	}
 
 	//Update protocol in store

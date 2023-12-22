@@ -481,6 +481,94 @@ func (m *MsgSetCollectionForProtocolResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetCollectionForProtocolResponse proto.InternalMessageInfo
 
+type MsgUnsetCollectionForProtocol struct {
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Name    string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+}
+
+func (m *MsgUnsetCollectionForProtocol) Reset()         { *m = MsgUnsetCollectionForProtocol{} }
+func (m *MsgUnsetCollectionForProtocol) String() string { return proto.CompactTextString(m) }
+func (*MsgUnsetCollectionForProtocol) ProtoMessage()    {}
+func (*MsgUnsetCollectionForProtocol) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5ff1a8407b9f1218, []int{9}
+}
+func (m *MsgUnsetCollectionForProtocol) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUnsetCollectionForProtocol) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUnsetCollectionForProtocol.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUnsetCollectionForProtocol) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUnsetCollectionForProtocol.Merge(m, src)
+}
+func (m *MsgUnsetCollectionForProtocol) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUnsetCollectionForProtocol) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUnsetCollectionForProtocol.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUnsetCollectionForProtocol proto.InternalMessageInfo
+
+func (m *MsgUnsetCollectionForProtocol) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgUnsetCollectionForProtocol) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type MsgUnsetCollectionForProtocolResponse struct {
+}
+
+func (m *MsgUnsetCollectionForProtocolResponse) Reset()         { *m = MsgUnsetCollectionForProtocolResponse{} }
+func (m *MsgUnsetCollectionForProtocolResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUnsetCollectionForProtocolResponse) ProtoMessage()    {}
+func (*MsgUnsetCollectionForProtocolResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5ff1a8407b9f1218, []int{10}
+}
+func (m *MsgUnsetCollectionForProtocolResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUnsetCollectionForProtocolResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUnsetCollectionForProtocolResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUnsetCollectionForProtocolResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUnsetCollectionForProtocolResponse.Merge(m, src)
+}
+func (m *MsgUnsetCollectionForProtocolResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUnsetCollectionForProtocolResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUnsetCollectionForProtocolResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUnsetCollectionForProtocolResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*Protocol)(nil), "protocols.Protocol")
 	proto.RegisterType((*MsgCreateProtocol)(nil), "protocols.MsgCreateProtocol")
@@ -491,38 +579,42 @@ func init() {
 	proto.RegisterType((*MsgDeleteProtocolResponse)(nil), "protocols.MsgDeleteProtocolResponse")
 	proto.RegisterType((*MsgSetCollectionForProtocol)(nil), "protocols.MsgSetCollectionForProtocol")
 	proto.RegisterType((*MsgSetCollectionForProtocolResponse)(nil), "protocols.MsgSetCollectionForProtocolResponse")
+	proto.RegisterType((*MsgUnsetCollectionForProtocol)(nil), "protocols.MsgUnsetCollectionForProtocol")
+	proto.RegisterType((*MsgUnsetCollectionForProtocolResponse)(nil), "protocols.MsgUnsetCollectionForProtocolResponse")
 }
 
 func init() { proto.RegisterFile("protocols/tx.proto", fileDescriptor_5ff1a8407b9f1218) }
 
 var fileDescriptor_5ff1a8407b9f1218 = []byte{
-	// 414 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x94, 0x4d, 0x6b, 0xe2, 0x40,
-	0x1c, 0xc6, 0x13, 0x13, 0x76, 0xd7, 0x3f, 0xb2, 0xec, 0x0e, 0x7b, 0xc8, 0xaa, 0xc4, 0x25, 0xfb,
-	0xc2, 0x9e, 0x92, 0x65, 0x97, 0xfd, 0x00, 0x55, 0x29, 0xf4, 0x20, 0x2d, 0xb6, 0x5e, 0x7a, 0xcb,
-	0xcb, 0x10, 0x03, 0x31, 0x13, 0x32, 0x23, 0xe8, 0xa1, 0xdf, 0xa1, 0x1f, 0xcb, 0xa3, 0xc7, 0xd2,
-	0x83, 0x14, 0xfd, 0x18, 0xbd, 0x94, 0x8c, 0x49, 0x34, 0xe3, 0x0b, 0xc5, 0x43, 0x6f, 0xff, 0x37,
-	0x7e, 0xcf, 0xa3, 0xcf, 0x10, 0x40, 0x71, 0x42, 0x18, 0x71, 0x49, 0x48, 0x2d, 0x36, 0x31, 0x79,
-	0x83, 0xaa, 0xc5, 0xac, 0xfe, 0xc5, 0x27, 0x3e, 0xe1, 0xad, 0x95, 0x56, 0xeb, 0x03, 0x23, 0x82,
-	0x0f, 0x57, 0xd9, 0x09, 0x42, 0xa0, 0x46, 0xf6, 0x08, 0x6b, 0xf2, 0x37, 0xf9, 0x77, 0xb5, 0xcf,
-	0x6b, 0xf4, 0x09, 0x94, 0x71, 0x12, 0x68, 0x15, 0x3e, 0x4a, 0x4b, 0xa4, 0x03, 0xb8, 0x63, 0xca,
-	0xc8, 0xa8, 0x6b, 0x33, 0x5b, 0x53, 0xf8, 0x62, 0x6b, 0x82, 0x9a, 0x50, 0x75, 0x13, 0x6c, 0x33,
-	0xec, 0xb5, 0xa7, 0x9a, 0xca, 0xd7, 0x9b, 0x81, 0x41, 0xe1, 0x73, 0x8f, 0xfa, 0x1d, 0xde, 0x17,
-	0xc2, 0x1a, 0xbc, 0xe7, 0x17, 0x24, 0xc9, 0xb4, 0xf3, 0xb6, 0xb0, 0x54, 0xd9, 0xb5, 0xa4, 0x1c,
-	0xb2, 0xa4, 0x8a, 0x96, 0x8c, 0x06, 0x7c, 0xdd, 0x11, 0xed, 0x63, 0x1a, 0x93, 0x88, 0xe2, 0xcc,
-	0xd1, 0x20, 0xf6, 0xde, 0xde, 0x51, 0x59, 0xb4, 0x70, 0x74, 0xc6, 0x1d, 0x75, 0x71, 0x88, 0x4f,
-	0x75, 0x94, 0xf1, 0xcb, 0x88, 0x82, 0x7f, 0x07, 0x8d, 0x1e, 0xf5, 0xaf, 0x31, 0xeb, 0x90, 0x30,
-	0xc4, 0x2e, 0x0b, 0x48, 0x74, 0x4e, 0x92, 0x13, 0x7f, 0xfb, 0x1f, 0xa8, 0xb9, 0x05, 0xe6, 0xc2,
-	0x5b, 0xff, 0x09, 0xed, 0xda, 0x6c, 0xd1, 0x92, 0x1e, 0x17, 0x2d, 0x75, 0x10, 0x44, 0xac, 0x5f,
-	0xba, 0x30, 0x7e, 0xc2, 0xf7, 0x23, 0xf2, 0xb9, 0xcb, 0xbf, 0xcf, 0x15, 0x50, 0x7a, 0xd4, 0x47,
-	0x37, 0xf0, 0x51, 0x78, 0x2e, 0x4d, 0xb3, 0x78, 0xd5, 0xe6, 0x4e, 0xae, 0xf5, 0x1f, 0xc7, 0xb6,
-	0x39, 0x3d, 0xa5, 0x0a, 0x91, 0x0b, 0xd4, 0xf2, 0x56, 0xa4, 0xee, 0x4f, 0x2e, 0xa5, 0x0a, 0xb1,
-	0x09, 0xd4, 0xf2, 0x56, 0xa4, 0xee, 0xcf, 0x0b, 0x25, 0xa0, 0x1d, 0x0c, 0xeb, 0x57, 0x99, 0x70,
-	0xe8, 0xae, 0x6e, 0xbe, 0xee, 0x2e, 0xd7, 0x6c, 0x5f, 0xce, 0x96, 0xba, 0x3c, 0x5f, 0xea, 0xf2,
-	0xd3, 0x52, 0x97, 0xef, 0x57, 0xba, 0x34, 0x5f, 0xe9, 0xd2, 0xc3, 0x4a, 0x97, 0x6e, 0xff, 0xfb,
-	0x01, 0x1b, 0x8e, 0x1d, 0xd3, 0x25, 0x23, 0xcb, 0x09, 0x98, 0x63, 0x7b, 0x3e, 0xa6, 0x9b, 0xca,
-	0x1d, 0xda, 0x41, 0x64, 0x4d, 0xac, 0xad, 0x8f, 0xd1, 0x34, 0xc6, 0xd4, 0x79, 0xc7, 0x07, 0xff,
-	0x5e, 0x02, 0x00, 0x00, 0xff, 0xff, 0x22, 0x9f, 0x22, 0xd2, 0xa6, 0x04, 0x00, 0x00,
+	// 446 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x54, 0xcd, 0x8e, 0x93, 0x50,
+	0x18, 0x85, 0x81, 0xa8, 0xfd, 0x32, 0x31, 0x7a, 0xe3, 0x02, 0x99, 0x91, 0x31, 0xe8, 0xe8, 0xac,
+	0x60, 0xa2, 0xf1, 0x01, 0xec, 0x4c, 0x4c, 0x5c, 0x10, 0x4d, 0x75, 0x36, 0xee, 0xf8, 0xb9, 0xa1,
+	0x24, 0x94, 0x4b, 0xb8, 0xb7, 0x49, 0xbb, 0xf0, 0x1d, 0x7c, 0xac, 0x2e, 0xbb, 0x34, 0x2e, 0x1a,
+	0xd3, 0x3e, 0x83, 0x7b, 0xc3, 0x2d, 0xdc, 0x96, 0xdb, 0x42, 0x9a, 0xc6, 0xb8, 0xfb, 0x7e, 0x4e,
+	0xce, 0x39, 0x7c, 0x1c, 0x00, 0x94, 0x17, 0x84, 0x91, 0x90, 0xa4, 0xd4, 0x65, 0x13, 0x87, 0x37,
+	0xa8, 0x27, 0x66, 0xe6, 0x93, 0x98, 0xc4, 0x84, 0xb7, 0x6e, 0x59, 0xad, 0x01, 0x76, 0x06, 0x0f,
+	0x3e, 0x57, 0x10, 0x84, 0x40, 0xcf, 0xfc, 0x11, 0x36, 0xd4, 0xe7, 0xea, 0x55, 0x6f, 0xc0, 0x6b,
+	0xf4, 0x08, 0xb4, 0x71, 0x91, 0x18, 0x27, 0x7c, 0x54, 0x96, 0xc8, 0x02, 0x08, 0xc7, 0x94, 0x91,
+	0xd1, 0xad, 0xcf, 0x7c, 0x43, 0xe3, 0x8b, 0xad, 0x09, 0x3a, 0x87, 0x5e, 0x58, 0x60, 0x9f, 0xe1,
+	0xa8, 0x3f, 0x35, 0x74, 0xbe, 0xde, 0x0c, 0x6c, 0x0a, 0x8f, 0x3d, 0x1a, 0xdf, 0xf0, 0x5e, 0x08,
+	0x1b, 0x70, 0x9f, 0x23, 0x48, 0x51, 0x69, 0xd7, 0xad, 0xb0, 0x74, 0xb2, 0x6b, 0x49, 0x6b, 0xb3,
+	0xa4, 0xcb, 0x96, 0xec, 0x33, 0x78, 0xba, 0x23, 0x3a, 0xc0, 0x34, 0x27, 0x19, 0xc5, 0x95, 0xa3,
+	0xbb, 0x3c, 0xfa, 0xff, 0x8e, 0x9a, 0xa2, 0xc2, 0xd1, 0x7b, 0xee, 0xe8, 0x16, 0xa7, 0xf8, 0x58,
+	0x47, 0x15, 0x7f, 0x93, 0x42, 0xf0, 0x7f, 0x87, 0x33, 0x8f, 0xc6, 0x5f, 0x30, 0xbb, 0x21, 0x69,
+	0x8a, 0x43, 0x96, 0x90, 0xec, 0x03, 0x29, 0x8e, 0x7c, 0xf6, 0x6b, 0x38, 0x0d, 0x05, 0xcd, 0xc7,
+	0x68, 0x7d, 0x84, 0xfe, 0xe9, 0x6c, 0x71, 0xa1, 0xfc, 0x5a, 0x5c, 0xe8, 0x77, 0x49, 0xc6, 0x06,
+	0x0d, 0x84, 0x7d, 0x09, 0x2f, 0x3a, 0xe4, 0x85, 0x4b, 0x0f, 0x9e, 0x95, 0x27, 0xca, 0xe8, 0x3f,
+	0xf1, 0x69, 0xbf, 0x86, 0xcb, 0x4e, 0xba, 0x5a, 0xf7, 0xcd, 0x1f, 0x0d, 0x34, 0x8f, 0xc6, 0xe8,
+	0x2b, 0x3c, 0x94, 0x62, 0x7a, 0xee, 0x88, 0xaf, 0xc9, 0xd9, 0xc9, 0x93, 0xf9, 0xb2, 0x6b, 0x5b,
+	0xb3, 0x97, 0xac, 0x52, 0xd4, 0x24, 0xd6, 0xe6, 0x56, 0x66, 0xdd, 0x9f, 0x98, 0x92, 0x55, 0x8a,
+	0x8b, 0xc4, 0xda, 0xdc, 0xca, 0xac, 0xfb, 0x73, 0x82, 0x0a, 0x30, 0x5a, 0x43, 0xf2, 0xaa, 0xc9,
+	0xd0, 0x86, 0x33, 0x9d, 0xc3, 0x70, 0x42, 0x73, 0x02, 0x66, 0xc7, 0x2b, 0xbf, 0x92, 0xae, 0xd1,
+	0x8a, 0x34, 0xaf, 0x0f, 0x45, 0xd6, 0xca, 0xfd, 0x4f, 0xb3, 0xa5, 0xa5, 0xce, 0x97, 0x96, 0xfa,
+	0x7b, 0x69, 0xa9, 0x3f, 0x56, 0x96, 0x32, 0x5f, 0x59, 0xca, 0xcf, 0x95, 0xa5, 0x7c, 0x7b, 0x17,
+	0x27, 0x6c, 0x38, 0x0e, 0x9c, 0x90, 0x8c, 0xdc, 0x20, 0x61, 0x81, 0x1f, 0xc5, 0x98, 0x6e, 0xaa,
+	0x70, 0xe8, 0x27, 0x99, 0x3b, 0x71, 0xb7, 0x7e, 0xbf, 0xd3, 0x1c, 0xd3, 0xe0, 0x1e, 0x1f, 0xbc,
+	0xfd, 0x1b, 0x00, 0x00, 0xff, 0xff, 0xb3, 0x78, 0x5f, 0xa4, 0x98, 0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -541,6 +633,7 @@ type MsgClient interface {
 	UpdateProtocol(ctx context.Context, in *MsgUpdateProtocol, opts ...grpc.CallOption) (*MsgUpdateProtocolResponse, error)
 	DeleteProtocol(ctx context.Context, in *MsgDeleteProtocol, opts ...grpc.CallOption) (*MsgDeleteProtocolResponse, error)
 	SetCollectionForProtocol(ctx context.Context, in *MsgSetCollectionForProtocol, opts ...grpc.CallOption) (*MsgSetCollectionForProtocolResponse, error)
+	UnsetCollectionForProtocol(ctx context.Context, in *MsgUnsetCollectionForProtocol, opts ...grpc.CallOption) (*MsgUnsetCollectionForProtocolResponse, error)
 }
 
 type msgClient struct {
@@ -587,12 +680,22 @@ func (c *msgClient) SetCollectionForProtocol(ctx context.Context, in *MsgSetColl
 	return out, nil
 }
 
+func (c *msgClient) UnsetCollectionForProtocol(ctx context.Context, in *MsgUnsetCollectionForProtocol, opts ...grpc.CallOption) (*MsgUnsetCollectionForProtocolResponse, error) {
+	out := new(MsgUnsetCollectionForProtocolResponse)
+	err := c.cc.Invoke(ctx, "/protocols.Msg/UnsetCollectionForProtocol", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	CreateProtocol(context.Context, *MsgCreateProtocol) (*MsgCreateProtocolResponse, error)
 	UpdateProtocol(context.Context, *MsgUpdateProtocol) (*MsgUpdateProtocolResponse, error)
 	DeleteProtocol(context.Context, *MsgDeleteProtocol) (*MsgDeleteProtocolResponse, error)
 	SetCollectionForProtocol(context.Context, *MsgSetCollectionForProtocol) (*MsgSetCollectionForProtocolResponse, error)
+	UnsetCollectionForProtocol(context.Context, *MsgUnsetCollectionForProtocol) (*MsgUnsetCollectionForProtocolResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -610,6 +713,9 @@ func (*UnimplementedMsgServer) DeleteProtocol(ctx context.Context, req *MsgDelet
 }
 func (*UnimplementedMsgServer) SetCollectionForProtocol(ctx context.Context, req *MsgSetCollectionForProtocol) (*MsgSetCollectionForProtocolResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetCollectionForProtocol not implemented")
+}
+func (*UnimplementedMsgServer) UnsetCollectionForProtocol(ctx context.Context, req *MsgUnsetCollectionForProtocol) (*MsgUnsetCollectionForProtocolResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnsetCollectionForProtocol not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -688,6 +794,24 @@ func _Msg_SetCollectionForProtocol_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_UnsetCollectionForProtocol_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUnsetCollectionForProtocol)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UnsetCollectionForProtocol(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protocols.Msg/UnsetCollectionForProtocol",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UnsetCollectionForProtocol(ctx, req.(*MsgUnsetCollectionForProtocol))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "protocols.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -707,6 +831,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetCollectionForProtocol",
 			Handler:    _Msg_SetCollectionForProtocol_Handler,
+		},
+		{
+			MethodName: "UnsetCollectionForProtocol",
+			Handler:    _Msg_UnsetCollectionForProtocol_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1042,6 +1170,66 @@ func (m *MsgSetCollectionForProtocolResponse) MarshalToSizedBuffer(dAtA []byte) 
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgUnsetCollectionForProtocol) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUnsetCollectionForProtocol) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUnsetCollectionForProtocol) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUnsetCollectionForProtocolResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUnsetCollectionForProtocolResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUnsetCollectionForProtocolResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -1192,6 +1380,32 @@ func (m *MsgSetCollectionForProtocol) Size() (n int) {
 }
 
 func (m *MsgSetCollectionForProtocolResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgUnsetCollectionForProtocol) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgUnsetCollectionForProtocolResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2179,6 +2393,170 @@ func (m *MsgSetCollectionForProtocolResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgSetCollectionForProtocolResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUnsetCollectionForProtocol) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUnsetCollectionForProtocol: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUnsetCollectionForProtocol: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUnsetCollectionForProtocolResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUnsetCollectionForProtocolResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUnsetCollectionForProtocolResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

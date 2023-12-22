@@ -5,8 +5,8 @@ import (
 )
 
 var (
-	ProtocolKey         = []byte{0x01}
-	CollectionIdKey     = []byte{0x02}
+	ProtocolKey     = []byte{0x01}
+	CollectionIdKey = []byte{0x02}
 
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}
@@ -39,5 +39,3 @@ func collectionIdForProtocolStoreKey(constructedKey string) []byte {
 	copy(key[len(CollectionIdKey):], []byte(constructedKey))
 	return key
 }
-
-

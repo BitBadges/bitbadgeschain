@@ -12,7 +12,7 @@ var _ sdk.Msg = &MsgDeleteProtocol{}
 func NewMsgDeleteProtocol(creator string, name string) *MsgDeleteProtocol {
 	return &MsgDeleteProtocol{
 		Creator: creator,
-		Name: name,
+		Name:    name,
 	}
 }
 
@@ -46,6 +46,6 @@ func (msg *MsgDeleteProtocol) ValidateBasic() error {
 	if len(msg.Name) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "name cannot be empty")
 	}
-	
+
 	return nil
 }

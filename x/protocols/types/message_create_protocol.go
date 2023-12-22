@@ -13,9 +13,9 @@ var _ sdk.Msg = &MsgCreateProtocol{}
 
 func NewMsgCreateProtocol(creator string, name string, uri string, customData string) *MsgCreateProtocol {
 	return &MsgCreateProtocol{
-		Creator: creator,
-		Name: name,
-		Uri: uri,
+		Creator:    creator,
+		Name:       name,
+		Uri:        uri,
 		CustomData: customData,
 	}
 }
@@ -55,6 +55,5 @@ func (msg *MsgCreateProtocol) ValidateBasic() error {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "uri cannot be invalid")
 	}
 
-	
 	return nil
 }

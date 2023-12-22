@@ -24,7 +24,7 @@ func TestMsgDeleteProtocol_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: MsgDeleteProtocol{
 				Creator: sample.AccAddress(),
-				Name: "non-empty",
+				Name:    "non-empty",
 			},
 		},
 	}

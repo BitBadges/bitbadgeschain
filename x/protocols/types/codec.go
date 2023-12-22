@@ -12,6 +12,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgUpdateProtocol{}, "protocols/UpdateProtocol", nil)
 	cdc.RegisterConcrete(&MsgDeleteProtocol{}, "protocols/DeleteProtocol", nil)
 	cdc.RegisterConcrete(&MsgSetCollectionForProtocol{}, "protocols/SetCollectionForProtocol", nil)
+	cdc.RegisterConcrete(&MsgUnsetCollectionForProtocol{}, "protocols/UnsetCollectionForProtocol", nil)
 	// this line is used by starport scaffolding # 2
 }
 
@@ -28,7 +29,12 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgSetCollectionForProtocol{},
 	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgUnsetCollectionForProtocol{},
+	)
 	// this line is used by starport scaffolding # 3
+
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

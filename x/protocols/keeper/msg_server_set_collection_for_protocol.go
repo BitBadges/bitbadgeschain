@@ -20,9 +20,15 @@ func (k msgServer) SetCollectionForProtocol(goCtx context.Context, msg *types.Ms
 	}
 
 	collectionId := msg.CollectionId
-	if (collectionId.Equal(sdk.NewUint(0))) {
-		//delete collection
-		k.DeleteProtocolCollectionFromStore(ctx, protocolName, address)
+	if collectionId.Equal(sdk.NewUint(0)) {
+		//Get next collection id - 1 from badges keeper
+		nextCollectionId := k.badgesKeeper.GetNextCollectionId(ctx)
+
+		collectionId = nextCollectionId.Sub(sdk.NewUint(1))
+		err := k.SetProtocolCollectionInStore(ctx, protocolName, address, collectionId)
+		if err != nil {
+			return nil, sdkerrors.Wrap(err, "Failed to set protocol collection in store")
+		}
 	} else {
 		//Update protocol collection in store
 		err := k.SetProtocolCollectionInStore(ctx, protocolName, address, collectionId)

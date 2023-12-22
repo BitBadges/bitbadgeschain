@@ -21,6 +21,6 @@ func (k msgServer) DeleteProtocol(goCtx context.Context, msg *types.MsgDeletePro
 
 	//Delete protocol from store
 	k.DeleteProtocolFromStore(ctx, protocolName)
-	
+
 	return &types.MsgDeleteProtocolResponse{}, nil
 }

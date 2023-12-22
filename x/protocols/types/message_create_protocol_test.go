@@ -24,7 +24,7 @@ func TestMsgCreateProtocol_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: MsgCreateProtocol{
 				Creator: sample.AccAddress(),
-				Name: "non-empty",
+				Name:    "non-empty",
 			},
 		},
 	}

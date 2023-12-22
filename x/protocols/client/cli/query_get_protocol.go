@@ -17,7 +17,7 @@ func CmdGetProtocol() *cobra.Command {
 		Short: "Query getProtocol",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			
+
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
@@ -26,21 +26,19 @@ func CmdGetProtocol() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryGetProtocolRequest{
-								Name: args[0],
-            }
-
-            
+				Name: args[0],
+			}
 
 			res, err := queryClient.GetProtocol(cmd.Context(), params)
-            if err != nil {
-                return err
-            }
+			if err != nil {
+				return err
+			}
 
-            return clientCtx.PrintProto(res)
+			return clientCtx.PrintProto(res)
 		},
 	}
 
 	flags.AddQueryFlagsToCmd(cmd)
 
-    return cmd
+	return cmd
 }

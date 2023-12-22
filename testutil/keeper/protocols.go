@@ -72,6 +72,8 @@ func ProtocolsKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 	appCodec := codec.NewProtoCodec(registry)
 	capabilityKeeper := capabilitykeeper.NewKeeper(appCodec, storeKey, memStoreKey)
 
+	badgesKeeper, _ := BadgesKeeper(t)
+
 	paramsSubspace := typesparams.NewSubspace(appCodec,
 		types.Amino,
 		storeKey,
@@ -86,6 +88,7 @@ func ProtocolsKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 		protocolsChannelKeeper{},
 		protocolsPortKeeper{},
 		capabilityKeeper.ScopeToModule("ProtocolsScopedKeeper"),
+		badgesKeeper,
 	)
 
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, logger)

@@ -12,6 +12,7 @@ service Msg {
   rpc UpdateProtocol           (MsgUpdateProtocol          ) returns (MsgUpdateProtocolResponse          );
   rpc DeleteProtocol           (MsgDeleteProtocol          ) returns (MsgDeleteProtocolResponse          );
   rpc SetCollectionForProtocol (MsgSetCollectionForProtocol) returns (MsgSetCollectionForProtocolResponse);
+  rpc UnsetCollectionForProtocol (MsgUnsetCollectionForProtocol) returns (MsgUnsetCollectionForProtocolResponse);
 }
 
 message Protocol {
@@ -54,3 +55,9 @@ message MsgSetCollectionForProtocol {
 
 message MsgSetCollectionForProtocolResponse {}
 
+message MsgUnsetCollectionForProtocol {
+  string creator = 1;
+  string name = 2;
+}
+
+message MsgUnsetCollectionForProtocolResponse {}

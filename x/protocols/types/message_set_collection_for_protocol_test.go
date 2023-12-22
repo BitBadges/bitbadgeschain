@@ -25,8 +25,8 @@ func TestMsgSetCollectionForProtocol_ValidateBasic(t *testing.T) {
 		}, {
 			name: "valid address",
 			msg: MsgSetCollectionForProtocol{
-				Creator: sample.AccAddress(),
-				Name: "non-empty",
+				Creator:      sample.AccAddress(),
+				Name:         "non-empty",
 				CollectionId: sdkmath.NewUintFromString("1"),
 			},
 		},

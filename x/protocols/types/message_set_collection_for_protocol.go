@@ -11,8 +11,8 @@ var _ sdk.Msg = &MsgSetCollectionForProtocol{}
 
 func NewMsgSetCollectionForProtocol(creator string, name string, collectionId sdk.Uint) *MsgSetCollectionForProtocol {
 	return &MsgSetCollectionForProtocol{
-		Creator: creator,
-		Name: name,
+		Creator:      creator,
+		Name:         name,
 		CollectionId: collectionId,
 	}
 }

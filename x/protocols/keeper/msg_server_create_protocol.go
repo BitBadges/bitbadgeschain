@@ -15,10 +15,10 @@ func (k msgServer) CreateProtocol(goCtx context.Context, msg *types.MsgCreatePro
 	_ = ctx
 
 	protocolToAdd := types.Protocol{
-		Name:    msg.Name,
-		Uri: 	 msg.Uri,
+		Name:       msg.Name,
+		Uri:        msg.Uri,
 		CustomData: msg.CustomData,
-		CreatedBy: msg.Creator,
+		CreatedBy:  msg.Creator,
 	}
 
 	//Check if protocol already exists

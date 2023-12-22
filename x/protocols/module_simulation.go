@@ -39,6 +39,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgSetCollectionForProtocol int = 100
 
+	opWeightMsgUnsetCollectionForProtocol = "op_weight_msg_unset_collection_for_protocol"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgUnsetCollectionForProtocol int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -112,6 +116,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		protocolssimulation.SimulateMsgSetCollectionForProtocol(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
+	var weightMsgUnsetCollectionForProtocol int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUnsetCollectionForProtocol, &weightMsgUnsetCollectionForProtocol, nil,
+		func(_ *rand.Rand) {
+			weightMsgUnsetCollectionForProtocol = defaultWeightMsgUnsetCollectionForProtocol
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgUnsetCollectionForProtocol,
+		protocolssimulation.SimulateMsgUnsetCollectionForProtocol(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
 	// this line is used by starport scaffolding # simapp/module/operation
 
 	return operations
@@ -149,6 +164,14 @@ func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Wei
 			defaultWeightMsgSetCollectionForProtocol,
 			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
 				protocolssimulation.SimulateMsgSetCollectionForProtocol(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgUnsetCollectionForProtocol,
+			defaultWeightMsgUnsetCollectionForProtocol,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				protocolssimulation.SimulateMsgUnsetCollectionForProtocol(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
 		),

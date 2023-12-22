@@ -52,7 +52,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	}
 
 	genesis.CollectionIdsForProtocols = collectionIds
-	
+
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

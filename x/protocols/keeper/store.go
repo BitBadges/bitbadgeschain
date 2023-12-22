@@ -10,7 +10,6 @@ import (
 	sdkmath "cosmossdk.io/math"
 )
 
-
 func (k Keeper) SetProtocolInStore(ctx sdk.Context, protocol *types.Protocol) error {
 	marshaled_badge, err := k.cdc.Marshal(protocol)
 	if err != nil {
@@ -60,14 +59,11 @@ func (k Keeper) DeleteProtocolFromStore(ctx sdk.Context, protocolName string) {
 	store.Delete(protocolStoreKey(protocolName))
 }
 
-
-
-
 func (k Keeper) SetProtocolCollectionInStore(ctx sdk.Context, protocolName string, address string, collectionId sdkmath.Uint) error {
 	store := ctx.KVStore(k.storeKey)
 	collection_id_str := collectionId.String()
 
-	store.Set(collectionIdForProtocolStoreKey(ConstructCollectionIdForProtocolKey(protocolName, address)),  []byte(collection_id_str))
+	store.Set(collectionIdForProtocolStoreKey(ConstructCollectionIdForProtocolKey(protocolName, address)), []byte(collection_id_str))
 	return nil
 }
 
@@ -75,6 +71,9 @@ func (k Keeper) SetProtocolCollectionInStore(ctx sdk.Context, protocolName strin
 func (k Keeper) GetProtocolCollectionFromStore(ctx sdk.Context, protocolName string, address string) sdkmath.Uint {
 	store := ctx.KVStore(k.storeKey)
 	collection_id_str := string(store.Get(collectionIdForProtocolStoreKey(ConstructCollectionIdForProtocolKey(protocolName, address))))
+	if len(collection_id_str) == 0 {
+		return sdkmath.NewUintFromString("0")
+	}
 	return sdkmath.NewUintFromString(collection_id_str)
 }
 
@@ -91,7 +90,7 @@ func (k Keeper) GetProtocolCollectionsFromStore(ctx sdk.Context) (names []string
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		collectionIds = append(collectionIds, sdkmath.NewUintFromString(string(iterator.Value())))
-		
+
 		name, address := GetDetailsFromKey(string(iterator.Key()[1:]))
 		names = append(names, name)
 		addresses = append(addresses, address)
@@ -99,13 +98,11 @@ func (k Keeper) GetProtocolCollectionsFromStore(ctx sdk.Context) (names []string
 	return
 }
 
-
-
 func GetDetailsFromKey(id string) (string, string) {
 	result := strings.Split(id, BalanceKeyDelimiter)
 	address := result[1]
 	name := result[0]
 
 	return name, address
-	
+
 }
