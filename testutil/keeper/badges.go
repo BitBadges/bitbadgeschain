@@ -20,6 +20,8 @@ import (
 	clienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/v7/modules/core/04-channel/types"
 	"github.com/stretchr/testify/require"
+
+	accountkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 )
 
 // badgesChannelKeeper is a stub of cosmosibckeeper.ChannelKeeper.
@@ -86,6 +88,8 @@ func BadgesKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 		badgesChannelKeeper{},
 		badgesPortKeeper{},
 		capabilityKeeper.ScopeToModule("BadgesScopedKeeper"),
+		//accountKeeper,
+		accountkeeper.AccountKeeper{},
 	)
 
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, logger)

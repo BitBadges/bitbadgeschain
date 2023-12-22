@@ -26,5 +26,4 @@ func RegisterInterfaces(interfaceRegistry codectypes.InterfaceRegistry) {
 	ethereum.RegisterInterfaces(interfaceRegistry)
 	solana.RegisterInterfaces(interfaceRegistry)
 	bitcoin.RegisterInterfaces(interfaceRegistry)
-
 }

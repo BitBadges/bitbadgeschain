@@ -84,4 +84,7 @@ message BadgeCollection {
 
   // The user or entity who created the badge collection.
   string createdBy = 19;
+
+  //The generated address of the badge collection.
+  string aliasAddress = 20;
 }

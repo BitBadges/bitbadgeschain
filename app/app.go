@@ -574,6 +574,7 @@ func New(
 		app.IBCKeeper.ChannelKeeper,
 		&app.IBCKeeper.PortKeeper,
 		scopedBadgesKeeper,
+		app.AccountKeeper,
 	)
 	badgesModule := badgesmodule.NewAppModule(appCodec, app.BadgesKeeper, app.AccountKeeper, app.BankKeeper)
 	scopedWasmKeeper := app.CapabilityKeeper.ScopeToModule(wasmtypes.ModuleName)
