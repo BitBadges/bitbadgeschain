@@ -33,12 +33,12 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 	userBalance, found := k.GetUserBalanceFromStore(ctx, balanceKey)
 	if !found {
 		userBalance = &types.UserBalanceStore{
-			Balances:          []*types.Balance{},
-			OutgoingApprovals: collection.DefaultUserOutgoingApprovals,
-			IncomingApprovals: collection.DefaultUserIncomingApprovals,
-			AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultAutoApproveSelfInitiatedOutgoingTransfers,
-			AutoApproveSelfInitiatedIncomingTransfers: collection.DefaultAutoApproveSelfInitiatedIncomingTransfers,
-			UserPermissions: collection.DefaultUserPermissions,
+			Balances:         collection.DefaultBalances.Balances,
+			OutgoingApprovals: collection.DefaultBalances.OutgoingApprovals,
+			IncomingApprovals: collection.DefaultBalances.IncomingApprovals,
+			AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedOutgoingTransfers,
+			AutoApproveSelfInitiatedIncomingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedIncomingTransfers,
+			UserPermissions: collection.DefaultBalances.UserPermissions,
 		}
 	}
 

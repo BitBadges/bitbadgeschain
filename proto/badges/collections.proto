@@ -66,25 +66,12 @@ message BadgeCollection {
   // When archived, it becomes read-only, and no transactions can be processed until it is unarchived.
   repeated IsArchivedTimeline isArchivedTimeline = 12;
 
-  // Default user-approved outgoing transfers for an uninitialized user balance.
-  repeated UserOutgoingApproval defaultUserOutgoingApprovals = 14;
-
-  // Default user-approved incoming transfers for an uninitialized user balance.
-  // Ex: Can be set to disallow all incoming transfers by default, allowing users to opt-in to receiving badges.
-  repeated UserIncomingApproval defaultUserIncomingApprovals = 15;
-  
-  // Default user permissions for an uninitialized user balance.
-  UserPermissions defaultUserPermissions = 16;
-  
-  // Whether self-initiated outgoing transfers are auto-approved by default.
-  bool defaultAutoApproveSelfInitiatedOutgoingTransfers = 17;
-  
-  // Whether self-initiated incoming transfers are auto-approved by default.
-  bool defaultAutoApproveSelfInitiatedIncomingTransfers = 18;
+  // The default store of a balance for a user, upon genesis.
+  UserBalanceStore defaultBalances = 13;
 
   // The user or entity who created the badge collection.
-  string createdBy = 19;
+  string createdBy = 14;
 
   //The generated address of the badge collection.
-  string aliasAddress = 20;
+  string aliasAddress = 15;
 }

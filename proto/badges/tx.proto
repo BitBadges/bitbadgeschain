@@ -48,12 +48,9 @@ message MsgUniversalUpdateCollection {
   
   // Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed".
   string balancesType = 3;
-  
-  // Default incoming approvals for newly initiated accounts.
-  repeated UserOutgoingApproval defaultOutgoingApprovals = 4; 
-  
-  // Default outgoing approvals for newly initiated accounts.
-  repeated UserIncomingApproval defaultIncomingApprovals = 5; 
+
+  //The default balances for the user
+  UserBalanceStore defaultBalances = 4;
 
   // Balances to create for the collection. Will be sent to the "Mint" address.
   repeated Balance badgesToCreate = 6; 
@@ -107,19 +104,10 @@ message MsgUniversalUpdateCollection {
   repeated StandardsTimeline standardsTimeline = 24;
   
   // Indicates if the isArchived timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateIsArchivedTimeline = 27;
+  bool updateIsArchivedTimeline = 25;
   
   // New isArchived timeline to set.
-  repeated IsArchivedTimeline isArchivedTimeline = 28;
-  
-  // Default auto-approve setting for self-initiated outgoing transfers for newly initiated accounts.
-  bool defaultAutoApproveSelfInitiatedOutgoingTransfers = 29; 
-  
-  // Default auto-approve setting for self-initiated incoming transfers for newly initiated accounts.
-  bool defaultAutoApproveSelfInitiatedIncomingTransfers = 30; 
-  
-  // Default user permissions for newly initiated accounts.
-  UserPermissions defaultUserPermissions = 31;
+  repeated IsArchivedTimeline isArchivedTimeline = 26;
 }
 
 // MsgUniversalUpdateCollectionResponse is the response to MsgUniversalUpdateCollection.
@@ -208,11 +196,8 @@ message MsgCreateCollection {
   // Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed".
   string balancesType = 2;
   
-  // User's approved transfers for each badge ID.
-  repeated UserOutgoingApproval defaultOutgoingApprovals = 3;
-  
-  // User's approved incoming transfers for each badge ID.
-  repeated UserIncomingApproval defaultIncomingApprovals = 4;
+  //The default balances for the user
+  UserBalanceStore defaultBalances = 4;
   
   // Balances to create for the collection. Will be sent to the "Mint" address.
   repeated Balance badgesToCreate = 5;
@@ -243,15 +228,6 @@ message MsgCreateCollection {
   
   // isArchived timeline entries.
   repeated IsArchivedTimeline isArchivedTimeline = 14;
-  
-  // Default auto-approve setting for self-initiated outgoing transfers.
-  bool defaultAutoApproveSelfInitiatedOutgoingTransfers = 15;
-  
-  // Default auto-approve setting for self-initiated incoming transfers.
-  bool defaultAutoApproveSelfInitiatedIncomingTransfers = 16;
-  
-  // Default user permissions.
-  UserPermissions defaultUserPermissions = 17;
 }
 
 // MsgCreateCollectionResponse is the response to MsgCreateCollection.

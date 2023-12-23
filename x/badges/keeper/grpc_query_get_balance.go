@@ -22,14 +22,12 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 	isBlank := false
 
 	currCollectionId := req.CollectionId
-	currCollection := &types.BadgeCollection{}
 
 	//Check if the collection has inherited balances
 	collection, found := k.GetCollectionFromStore(ctx, currCollectionId)
 	if !found {
 		isBlank = true
 	} else {
-		currCollection = collection
 		isStandardBalances := collection.BalancesType == "Standard"
 		if isStandardBalances || req.Address == "Mint" || req.Address == "Total" {
 			initiatedByBalanceKey := ConstructBalanceKey(req.Address, currCollectionId)
@@ -50,12 +48,12 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 		}, nil
 	} else {
 		blankUserBalance := &types.UserBalanceStore{
-			Balances:          []*types.Balance{},
-			OutgoingApprovals: currCollection.DefaultUserOutgoingApprovals,
-			IncomingApprovals: currCollection.DefaultUserIncomingApprovals,
-			AutoApproveSelfInitiatedOutgoingTransfers: currCollection.DefaultAutoApproveSelfInitiatedOutgoingTransfers,
-			AutoApproveSelfInitiatedIncomingTransfers: currCollection.DefaultAutoApproveSelfInitiatedIncomingTransfers,
-			UserPermissions: currCollection.DefaultUserPermissions,
+			Balances:         collection.DefaultBalances.Balances,
+			OutgoingApprovals: collection.DefaultBalances.OutgoingApprovals,
+			IncomingApprovals: collection.DefaultBalances.IncomingApprovals,
+			AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedOutgoingTransfers,
+			AutoApproveSelfInitiatedIncomingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedIncomingTransfers,
+			UserPermissions: collection.DefaultBalances.UserPermissions,
 		}
 		return &types.QueryGetBalanceResponse{
 			Balance: blankUserBalance,

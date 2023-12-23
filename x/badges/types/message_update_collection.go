@@ -107,16 +107,25 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(canChangeValues bool) 
 		return err
 	}
 
-	if err := ValidateUserIncomingApprovals(msg.DefaultIncomingApprovals, msg.Creator, canChangeValues); err != nil {
+	if msg.DefaultBalances == nil {
+		msg.DefaultBalances = &UserBalanceStore{}
+	}
+
+
+	if _, err := ValidateBalances(msg.DefaultBalances.Balances, canChangeValues); err != nil {
 		return err
 	}
 
-	if err := ValidateUserOutgoingApprovals(msg.DefaultOutgoingApprovals, msg.Creator, canChangeValues); err != nil {
+	if err := ValidateUserIncomingApprovals(msg.DefaultBalances.IncomingApprovals, msg.Creator, canChangeValues); err != nil {
 		return err
 	}
 
-	if msg.DefaultUserPermissions == nil {
-		msg.DefaultUserPermissions = &UserPermissions{
+	if err := ValidateUserOutgoingApprovals(msg.DefaultBalances.OutgoingApprovals, msg.Creator, canChangeValues); err != nil {
+		return err
+	}
+
+	if msg.DefaultBalances.UserPermissions == nil {
+		msg.DefaultBalances.UserPermissions = &UserPermissions{
 			CanUpdateIncomingApprovals:                         []*UserIncomingApprovalPermission{},
 			CanUpdateOutgoingApprovals:                         []*UserOutgoingApprovalPermission{},
 			CanUpdateAutoApproveSelfInitiatedOutgoingTransfers: []*ActionPermission{},
@@ -124,7 +133,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(canChangeValues bool) 
 		}
 	}
 
-	if err := ValidateUserPermissions(msg.DefaultUserPermissions, canChangeValues); err != nil {
+	if err := ValidateUserPermissions(msg.DefaultBalances.UserPermissions, canChangeValues); err != nil {
 		return err
 	}
 
@@ -158,27 +167,31 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(canChangeValues bool) 
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but claims and/or transfers are set")
 			}
 
-			if len(msg.DefaultIncomingApprovals) > 0 {
+			if len(msg.DefaultBalances.IncomingApprovals) > 0 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default approvals are set")
 			}
 
-			if len(msg.DefaultOutgoingApprovals) > 0 {
+			if len(msg.DefaultBalances.OutgoingApprovals) > 0 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default approvals are set")
 			}
 
-			if len(msg.DefaultUserPermissions.CanUpdateIncomingApprovals) > 0 {
+			if (len(msg.DefaultBalances.Balances) > 0) {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default balances are set")
+			}
+
+			if len(msg.DefaultBalances.UserPermissions.CanUpdateIncomingApprovals) > 0 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
 			}
 
-			if len(msg.DefaultUserPermissions.CanUpdateOutgoingApprovals) > 0 {
+			if len(msg.DefaultBalances.UserPermissions.CanUpdateOutgoingApprovals) > 0 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
 			}
 
-			if len(msg.DefaultUserPermissions.CanUpdateAutoApproveSelfInitiatedIncomingTransfers) > 0 {
+			if len(msg.DefaultBalances.UserPermissions.CanUpdateAutoApproveSelfInitiatedIncomingTransfers) > 0 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
 			}
 
-			if len(msg.DefaultUserPermissions.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers) > 0 {
+			if len(msg.DefaultBalances.UserPermissions.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers) > 0 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
 			}
 		}

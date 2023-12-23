@@ -50,11 +50,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			CollectionId: nextCollectionId,
 			CollectionPermissions:                            &types.CollectionPermissions{},
 			BalancesType:                                     msg.BalancesType,
-			DefaultUserOutgoingApprovals:                     msg.DefaultOutgoingApprovals,
-			DefaultUserIncomingApprovals:                     msg.DefaultIncomingApprovals,
-			DefaultAutoApproveSelfInitiatedOutgoingTransfers: msg.DefaultAutoApproveSelfInitiatedOutgoingTransfers,
-			DefaultAutoApproveSelfInitiatedIncomingTransfers: msg.DefaultAutoApproveSelfInitiatedIncomingTransfers,
-			DefaultUserPermissions:                           msg.DefaultUserPermissions,
+			DefaultBalances: 																	msg.DefaultBalances,
 			CreatedBy:                                        msg.Creator,
 			AliasAddress: 																		accountAddr.String(),
 			ManagerTimeline: []*types.ManagerTimeline{

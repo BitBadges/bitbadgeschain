@@ -16,11 +16,7 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 
 		//Exclusive to collection creations
 		BalancesType:             msg.BalancesType,
-		DefaultOutgoingApprovals: msg.DefaultOutgoingApprovals,
-		DefaultIncomingApprovals: msg.DefaultIncomingApprovals,
-		DefaultAutoApproveSelfInitiatedOutgoingTransfers: msg.DefaultAutoApproveSelfInitiatedOutgoingTransfers,
-		DefaultAutoApproveSelfInitiatedIncomingTransfers: msg.DefaultAutoApproveSelfInitiatedIncomingTransfers,
-		DefaultUserPermissions:                           msg.DefaultUserPermissions,
+		DefaultBalances: 					msg.DefaultBalances,
 
 		//Applicable to creations and updates
 		BadgesToCreate:                         msg.BadgesToCreate,

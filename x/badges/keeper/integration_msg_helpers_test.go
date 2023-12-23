@@ -156,8 +156,15 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			BalancesType:             balancesType,
 			CollectionPermissions:    collectionToCreate.Permissions,
 			CollectionApprovals:      collectionToCreate.CollectionApprovals,
-			DefaultOutgoingApprovals: collectionToCreate.DefaultOutgoingApprovals,
-			DefaultIncomingApprovals: collectionToCreate.DefaultIncomingApprovals,
+			DefaultBalances: 				  &types.UserBalanceStore{
+				Balances:  []*types.Balance{},
+				OutgoingApprovals: collectionToCreate.DefaultOutgoingApprovals,
+				IncomingApprovals: collectionToCreate.DefaultIncomingApprovals,
+				AutoApproveSelfInitiatedOutgoingTransfers: !collectionToCreate.DefaultDisapproveSelfInitiated,
+				AutoApproveSelfInitiatedIncomingTransfers: !collectionToCreate.DefaultDisapproveSelfInitiated,
+				UserPermissions: &types.UserPermissions{},
+			},
+
 			// ManagerTimeline: []*types.ManagerTimeline{
 			// 	{
 			// 		Manager: collectionToCreate.Creator,
@@ -184,9 +191,6 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			UpdateCollectionApprovals: true,
 			UpdateStandardsTimeline:   true,
 			// UpdateIsArchivedTimeline: true,
-
-			DefaultAutoApproveSelfInitiatedOutgoingTransfers: !collectionToCreate.DefaultDisapproveSelfInitiated,
-			DefaultAutoApproveSelfInitiatedIncomingTransfers: !collectionToCreate.DefaultDisapproveSelfInitiated,
 		})
 		if err != nil {
 			return err
@@ -228,6 +232,7 @@ func MintAndDistributeBadges(suite *TestSuite, ctx context.Context, msg *types.M
 		UpdateOffChainBalancesMetadataTimeline: true,
 		CollectionApprovals:                    msg.CollectionApprovals,
 		UpdateCollectionApprovals:              true,
+		DefaultBalances: 											  &types.UserBalanceStore{},
 	})
 	if err != nil {
 		return err

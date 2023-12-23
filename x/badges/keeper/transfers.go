@@ -25,12 +25,12 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 			toUserBalance, found := k.GetUserBalanceFromStore(ctx, toBalanceKey)
 			if !found {
 				toUserBalance = &types.UserBalanceStore{
-					Balances:          []*types.Balance{},
-					OutgoingApprovals: collection.DefaultUserOutgoingApprovals,
-					IncomingApprovals: collection.DefaultUserIncomingApprovals,
-					AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultAutoApproveSelfInitiatedOutgoingTransfers,
-					AutoApproveSelfInitiatedIncomingTransfers: collection.DefaultAutoApproveSelfInitiatedIncomingTransfers,
-					UserPermissions: collection.DefaultUserPermissions,
+					Balances:         collection.DefaultBalances.Balances,
+					OutgoingApprovals: collection.DefaultBalances.OutgoingApprovals,
+					IncomingApprovals: collection.DefaultBalances.IncomingApprovals,
+					AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedOutgoingTransfers,
+					AutoApproveSelfInitiatedIncomingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedIncomingTransfers,
+					UserPermissions: collection.DefaultBalances.UserPermissions,
 				}
 			}
 
