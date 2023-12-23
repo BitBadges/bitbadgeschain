@@ -62,7 +62,8 @@ func GetSchemas() []string {
 					"includeAddresses": false,
 					"uri": "",
 					"customData": "",
-					"createdBy": ""
+					"createdBy": "",
+					"aliasAddress": ""
 				}
 			]
 		}

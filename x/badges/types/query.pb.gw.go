@@ -22,6 +22,8 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+
+	sdkmath "cosmossdk.io/math"
 )
 
 // Suppress "imported and not used" errors
@@ -67,7 +69,8 @@ func request_Query_GetCollection_0(ctx context.Context, marshaler runtime.Marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -94,7 +97,8 @@ func local_request_Query_GetCollection_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -175,7 +179,8 @@ func request_Query_GetApprovalsTracker_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -257,7 +262,8 @@ func local_request_Query_GetApprovalsTracker_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -339,7 +345,8 @@ func request_Query_GetNumUsedForMerkleChallenge_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -383,7 +390,8 @@ func request_Query_GetNumUsedForMerkleChallenge_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "leafIndex")
 	}
 
-	protoReq.LeafIndex, err = runtime.String(val)
+	str, err = runtime.String(val)
+	protoReq.LeafIndex = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "leafIndex", err)
@@ -410,7 +418,8 @@ func local_request_Query_GetNumUsedForMerkleChallenge_0(ctx context.Context, mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -454,7 +463,8 @@ func local_request_Query_GetNumUsedForMerkleChallenge_0(ctx context.Context, mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "leafIndex")
 	}
 
-	protoReq.LeafIndex, err = runtime.String(val)
+	str, err = runtime.String(val)
+	protoReq.LeafIndex = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "leafIndex", err)
@@ -481,7 +491,8 @@ func request_Query_GetBalance_0(ctx context.Context, marshaler runtime.Marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
@@ -519,7 +530,8 @@ func local_request_Query_GetBalance_0(ctx context.Context, marshaler runtime.Mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "collectionId")
 	}
 
-	protoReq.CollectionId, err = runtime.String(val)
+	str, err := runtime.String(val)
+	protoReq.CollectionId = sdkmath.NewUintFromString(str)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
