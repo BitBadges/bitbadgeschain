@@ -20,7 +20,8 @@ func GetSchemas() []string {
 			"creator": "",
 			"name": "",
 			"uri": "",
-			"customData": ""
+			"customData": "",
+			"isFrozen": false
 		}
 	}`)
 
@@ -47,7 +48,8 @@ func GetSchemas() []string {
 			"creator": "",
 			"name": "",
 			"uri": "",
-			"customData": ""
+			"customData": "",
+			"isFrozen": false
 		}
 	}`)
 

@@ -11,12 +11,13 @@ const TypeMsgCreateProtocol = "create_protocol"
 
 var _ sdk.Msg = &MsgCreateProtocol{}
 
-func NewMsgCreateProtocol(creator string, name string, uri string, customData string) *MsgCreateProtocol {
+func NewMsgCreateProtocol(creator string, name string, uri string, customData string, isFrozen bool) *MsgCreateProtocol {
 	return &MsgCreateProtocol{
 		Creator:    creator,
 		Name:       name,
 		Uri:        uri,
 		CustomData: customData,
+		IsFrozen:   isFrozen,
 	}
 }
 

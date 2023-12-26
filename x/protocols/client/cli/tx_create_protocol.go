@@ -14,9 +14,9 @@ var _ = strconv.Itoa(0)
 
 func CmdCreateProtocol() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-protocol [name] [uri] [customData]",
+		Use:   "create-protocol [name] [uri] [customData] [isFrozen]",
 		Short: "Broadcast message createProtocol",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -24,11 +24,18 @@ func CmdCreateProtocol() *cobra.Command {
 				return err
 			}
 
+			//parse args[3] to bool
+			isFrozen := false
+			if args[3] == "true" {
+				isFrozen = true
+			}
+
 			msg := types.NewMsgCreateProtocol(
 				clientCtx.GetFromAddress().String(),
 				args[0],
 				args[1],
 				args[2],
+				isFrozen,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

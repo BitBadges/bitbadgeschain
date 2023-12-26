@@ -312,6 +312,37 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 	})
 }
 
+func (suite *TestSuite) TestDefaultBalances() {
+	err := UpdateCollection(suite, suite.ctx, &types.MsgUniversalUpdateCollection{
+		CollectionId: sdkmath.NewUint(0),
+		Creator:      alice,
+		ManagerTimeline: []*types.ManagerTimeline{},
+		BalancesType: "Standard",
+		DefaultBalances: &types.UserBalanceStore{
+			Balances: []*types.Balance{
+				{
+					Amount: 			 sdkmath.NewUint(1),
+					OwnershipTimes: GetFullUintRanges(),
+					BadgeIds: GetFullUintRanges(),
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection: %s")
+
+	bal, err := GetUserBalance(suite, suite.ctx, sdkmath.NewUint(1), "address1")
+	suite.Require().Nil(err, "Error getting user balance: %s")
+
+	AssertBalancesEqual(suite, bal.Balances, []*types.Balance{
+		{
+			Amount: 			 sdkmath.NewUint(1),
+			OwnershipTimes: GetFullUintRanges(),
+			BadgeIds: GetFullUintRanges(),
+		},
+	})
+}
+
+
 // Adjust these values to test more or less
 const NUM_RUNS = 1
 const NUM_IDS = 10
@@ -412,6 +443,9 @@ func (suite *TestSuite) TestBalancesFuzz() {
 		}
 	}
 }
+
+
+
 
 /* --------------------------------------START TESTING WITH TIMES-------------------------------------- */
 //Previously, everything was just FullUintRanges() for times
@@ -546,3 +580,4 @@ func (suite *TestSuite) TestBalancesWithTimesFuzz() {
 		}
 	}
 }
+

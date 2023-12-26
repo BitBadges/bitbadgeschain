@@ -11,12 +11,13 @@ const TypeMsgUpdateProtocol = "update_protocol"
 
 var _ sdk.Msg = &MsgUpdateProtocol{}
 
-func NewMsgUpdateProtocol(creator string, name string, uri string, customData string) *MsgUpdateProtocol {
+func NewMsgUpdateProtocol(creator string, name string, uri string, customData string, isFrozen bool) *MsgUpdateProtocol {
 	return &MsgUpdateProtocol{
 		Creator:    creator,
 		Name:       name,
 		Uri:        uri,
 		CustomData: customData,
+		IsFrozen:  isFrozen,
 	}
 }
 

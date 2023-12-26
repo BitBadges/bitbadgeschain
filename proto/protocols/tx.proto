@@ -20,6 +20,7 @@ message Protocol {
   string uri = 2;
   string customData = 3;
   string createdBy = 4;
+  bool isFrozen = 5;
 }
 
 message MsgCreateProtocol {
@@ -27,6 +28,7 @@ message MsgCreateProtocol {
   string name = 2;
   string uri = 3;
   string customData = 4;
+  bool isFrozen = 5;
 }
 
 message MsgCreateProtocolResponse {}
@@ -36,6 +38,7 @@ message MsgUpdateProtocol {
   string name = 2;
   string uri = 3;
   string customData = 4;
+  bool isFrozen = 5;
 }
 
 message MsgUpdateProtocolResponse {}
