@@ -64,14 +64,9 @@ func (k Keeper) CreateAddressMapping(ctx sdk.Context, addressMapping *types.Addr
 	return nil
 }
 
-func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) (*types.AddressMapping, error) {
-	inverted := false
+func getReservedMappingById(addressMappingId string, allowAliases bool) (*types.AddressMapping, bool, error) {
 	handled := false
 	addressMapping := &types.AddressMapping{}
-	if addressMappingId[0] == '!' {
-		inverted = true
-		addressMappingId = addressMappingId[1:]
-	}
 
 	if addressMappingId == "Mint" {
 		addressMapping = &types.AddressMapping{
@@ -82,10 +77,8 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) 
 			CustomData:       "",
 		}
 		handled = true
-	}
-
-	//If starts with AllWithout, we create a mapping with all addresses except the ones specified delimited by :
-	if len(addressMappingId) > 10 && addressMappingId[0:10] == "AllWithout" {
+	} else if len(addressMappingId) > 10 && addressMappingId[0:10] == "AllWithout" {
+		//If starts with AllWithout, we create a mapping with all addresses except the ones specified delimited by :
 		addresses := addressMappingId[10:]
 		addressMapping = &types.AddressMapping{
 			MappingId:        addressMappingId,
@@ -101,14 +94,12 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) 
 			addressMapping.Addresses = append(addressMapping.Addresses, address)
 
 			if err := types.ValidateAddress(address, true); err != nil {
-				return nil, sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping cannot contain invalid addresses")
+				return nil, false, sdkerrors.Wrapf(ErrInvalidAddressMappingId, "address mapping cannot contain invalid addresses")
 			}
 		}
 
 		handled = true
-	}
-
-	if addressMappingId == "All" {
+	} else if addressMappingId == "All" {
 		addressMapping = &types.AddressMapping{
 			MappingId:        "All",
 			Addresses:        []string{},
@@ -117,9 +108,7 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) 
 			CustomData:       "",
 		}
 		handled = true
-	}
-
-	if addressMappingId == "AllWithMint" {
+	} else if addressMappingId == "AllWithMint" {
 		addressMapping = &types.AddressMapping{
 			MappingId:        "AllWithMint",
 			Addresses:        []string{},
@@ -128,9 +117,7 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) 
 			CustomData:       "",
 		}
 		handled = true
-	}
-
-	if addressMappingId == "None" {
+	} else if addressMappingId == "None" {
 		addressMapping = &types.AddressMapping{
 			MappingId:        "None",
 			Addresses:        []string{},
@@ -145,9 +132,11 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) 
 	if !handled {
 		addresses := strings.Split(addressMappingId, ":")
 		allAreValid := true
-		for _, address := range addresses {
-			if err := types.ValidateAddress(address, true); err != nil {
-				allAreValid = false
+		if !allowAliases {
+			for _, address := range addresses {
+				if err := types.ValidateAddress(address, true); err != nil {
+					allAreValid = false
+				}
 			}
 		}
 
@@ -162,6 +151,48 @@ func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) 
 			handled = true
 		}
 	}
+
+	return addressMapping, handled, nil
+}
+
+func (k Keeper) GetTrackerMappingById(ctx sdk.Context, trackerMappingId string) (*types.AddressMapping, error) {
+	inverted := false
+	addressMapping := &types.AddressMapping{}
+	if trackerMappingId[0] == '!' {
+		inverted = true
+		trackerMappingId = trackerMappingId[1:]
+	}
+
+	//Tracker mappings do not allow aliases and are only reserved IDs
+	addressMapping, handled, err := getReservedMappingById(trackerMappingId, true)
+	if err != nil {
+		return nil, err
+	}
+
+	if !handled {
+		return nil, sdkerrors.Wrapf(ErrAddressMappingNotFound, "tracker mapping with id %s not a reserved ID", trackerMappingId)
+	}
+
+	if inverted {
+		addressMapping.IncludeAddresses = !addressMapping.IncludeAddresses
+	}
+
+	return addressMapping, nil
+}
+
+func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) (*types.AddressMapping, error) {
+	inverted := false
+	addressMapping := &types.AddressMapping{}
+	if addressMappingId[0] == '!' {
+		inverted = true
+		addressMappingId = addressMappingId[1:]
+	}
+
+	addressMapping, handled, err := getReservedMappingById(addressMappingId, false)
+	if err != nil {
+		return nil, err
+	}
+
 
 	if !handled {
 		addressMappingFetched, found := k.GetAddressMappingFromStore(ctx, addressMappingId)

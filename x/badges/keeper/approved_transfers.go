@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"time"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -148,7 +149,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 
 			remainingBalances, err = types.SubtractBalances(allBalancesForIdsAndTimes, remainingBalances)
 			if err != nil {
-				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "transfer disallowed: err subtracting balances for transfer: %s", transferStr)
+				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "transfer disallowed: underflow error subtracting balances for transfer: %s", transferStr)
 			}
 		}
 
@@ -405,11 +406,15 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 
 	//If we didn't find a successful approval, we throw
 	if len(remainingBalances) > 0 {
-		return []*UserApprovalsToCheck{}, ErrInadequateApprovals
+		// return []*UserApprovalsToCheck{}, ErrInadequateApprovals
+		//convert ownership time unix milliseconds number to string
+		timeToConvert := remainingBalances[0].OwnershipTimes[0].Start //unix milliseconds
+		//convert timeToConvert to human readable date
+		dateStr := time.Unix(0, int64(timeToConvert.Uint64())).Format(time.UnixDate)
 
-		// transferStr := "(from: " + fromAddress + ", to: " + toAddress + ", initiatedBy: " + initiatedBy + ", badgeId: " + remainingBalances[0].BadgeIds[0].Start.String() + ", ownershipTime (unix milliseconds): " + remainingBalances[0].OwnershipTimes[0].Start.String() + ")"
+		transferStr := "(from: " + fromAddress + ", to: " + toAddress + ", initiatedBy: " + initiatedBy + ", badgeId: " + remainingBalances[0].BadgeIds[0].Start.String() + ", ownership time: " + dateStr + ")"
 
-		// return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval found: %s", transferStr)
+		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval found for transfer: %s", transferStr)
 	}
 
 	return userApprovalsToCheck, nil

@@ -10,30 +10,14 @@ import (
 func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.Context, permissions []*types.UserIncomingApprovalPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, permission := range permissions {
-		approvalTrackerMapping := &types.AddressMapping{}
-		if permission.AmountTrackerId == "All" {
-			approvalTrackerMapping = &types.AddressMapping{
-				Addresses:        []string{},
-				IncludeAddresses: false,
-			}
-		} else {
-			approvalTrackerMapping = &types.AddressMapping{
-				Addresses:        []string{permission.AmountTrackerId},
-				IncludeAddresses: true,
-			}
+		approvalTrackerMapping, err := k.GetTrackerMappingById(ctx, permission.AmountTrackerId)
+		if err != nil {
+			return nil, err
 		}
 
-		challengeTrackerMapping := &types.AddressMapping{}
-		if permission.ChallengeTrackerId == "All" {
-			challengeTrackerMapping = &types.AddressMapping{
-				Addresses:        []string{},
-				IncludeAddresses: false,
-			}
-		} else {
-			challengeTrackerMapping = &types.AddressMapping{
-				Addresses:        []string{permission.ChallengeTrackerId},
-				IncludeAddresses: true,
-			}
+		challengeTrackerMapping, err := k.GetTrackerMappingById(ctx, permission.ChallengeTrackerId)
+		if err != nil {
+			return nil, err
 		}
 
 		fromMapping, err := k.GetAddressMappingById(ctx, permission.FromMappingId)
@@ -72,30 +56,14 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.Context, permissions []*types.UserOutgoingApprovalPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, permission := range permissions {
-		approvalTrackerMapping := &types.AddressMapping{}
-		if permission.AmountTrackerId == "All" {
-			approvalTrackerMapping = &types.AddressMapping{
-				Addresses:        []string{},
-				IncludeAddresses: false,
-			}
-		} else {
-			approvalTrackerMapping = &types.AddressMapping{
-				Addresses:        []string{permission.AmountTrackerId},
-				IncludeAddresses: true,
-			}
+		approvalTrackerMapping, err := k.GetTrackerMappingById(ctx, permission.AmountTrackerId)
+		if err != nil {
+			return nil, err
 		}
 
-		challengeTrackerMapping := &types.AddressMapping{}
-		if permission.ChallengeTrackerId == "All" {
-			challengeTrackerMapping = &types.AddressMapping{
-				Addresses:        []string{},
-				IncludeAddresses: false,
-			}
-		} else {
-			challengeTrackerMapping = &types.AddressMapping{
-				Addresses:        []string{permission.ChallengeTrackerId},
-				IncludeAddresses: true,
-			}
+		challengeTrackerMapping, err := k.GetTrackerMappingById(ctx, permission.ChallengeTrackerId)
+		if err != nil {
+			return nil, err
 		}
 		initiatedByMapping, err := k.GetAddressMappingById(ctx, permission.InitiatedByMappingId)
 		if err != nil {
@@ -145,31 +113,16 @@ func (k Keeper) CastActionPermissionToUniversalPermission(actionPermission []*ty
 func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Context, collectionUpdatePermission []*types.CollectionApprovalPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, collectionUpdatePermission := range collectionUpdatePermission {
-		approvalTrackerMapping := &types.AddressMapping{}
-		if collectionUpdatePermission.AmountTrackerId == "All" {
-			approvalTrackerMapping = &types.AddressMapping{
-				Addresses:        []string{},
-				IncludeAddresses: false,
-			}
-		} else {
-			approvalTrackerMapping = &types.AddressMapping{
-				Addresses:        []string{collectionUpdatePermission.AmountTrackerId},
-				IncludeAddresses: true,
-			}
+		approvalTrackerMapping, err := k.GetTrackerMappingById(ctx, collectionUpdatePermission.AmountTrackerId)
+		if err != nil {
+			return nil, err
 		}
 
-		challengeTrackerMapping := &types.AddressMapping{}
-		if collectionUpdatePermission.ChallengeTrackerId == "All" {
-			challengeTrackerMapping = &types.AddressMapping{
-				Addresses:        []string{},
-				IncludeAddresses: false,
-			}
-		} else {
-			challengeTrackerMapping = &types.AddressMapping{
-				Addresses:        []string{collectionUpdatePermission.ChallengeTrackerId},
-				IncludeAddresses: true,
-			}
+		challengeTrackerMapping, err := k.GetTrackerMappingById(ctx, collectionUpdatePermission.ChallengeTrackerId)
+		if err != nil {
+			return nil, err
 		}
+
 
 		fromMapping, err := k.GetAddressMappingById(ctx, collectionUpdatePermission.FromMappingId)
 		if err != nil {

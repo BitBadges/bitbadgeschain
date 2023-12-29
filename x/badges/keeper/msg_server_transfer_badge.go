@@ -16,7 +16,15 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
+	collectionId := msg.CollectionId
+	if collectionId.Equal(sdk.NewUint(0)) {
+		//Get next collection id - 1 from badges keeper
+		nextCollectionId := k.GetNextCollectionId(ctx)
+
+		collectionId = nextCollectionId.Sub(sdk.NewUint(1))
+	}
+
+	collection, found := k.GetCollectionFromStore(ctx, collectionId)
 	if !found {
 		return nil, ErrCollectionNotExists
 	}
@@ -37,7 +45,7 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute("collection_id", fmt.Sprint(msg.CollectionId)),
+			sdk.NewAttribute("collection_id", fmt.Sprint(collectionId)),
 		),
 	)
 
