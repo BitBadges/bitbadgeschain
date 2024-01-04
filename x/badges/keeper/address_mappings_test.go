@@ -12,7 +12,7 @@ func (suite *TestSuite) TestReservedIds() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	toCheck := []string{"Mint", "!dadsf", "1asdsdfa:1234", "All", "AllWithoutMint", "AllWithoutMint:" + alice, "None", alice, bob, charlie} //"122:323",
+	toCheck := []string{"Mint", "!dadsf", "1asdsdfa:1234", "All", "AllWithoutMint", "!(Mint)", "AllWithoutMint:" + alice, "None", alice, bob, charlie} //"122:323",
 	for _, check := range toCheck {
 		err := suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 			MappingId: check,
@@ -20,7 +20,7 @@ func (suite *TestSuite) TestReservedIds() {
 		suite.Require().Error(err, "Error creating address mapping: %s", check)
 	}
 
-	autoFetched := []string{"Mint", "AllWithoutMint", "None", alice, bob, charlie} //"122:323",
+	autoFetched := []string{"Mint", "AllWithoutMint", "!(Mint)" , "None", alice, bob, charlie} //"122:323",
 	for _, check := range autoFetched {
 		err := suite.app.BadgesKeeper.CreateAddressMapping(suite.ctx, &types.AddressMapping{
 			MappingId: check,

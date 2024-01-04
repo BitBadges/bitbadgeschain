@@ -183,10 +183,14 @@ func (k Keeper) GetTrackerMappingById(ctx sdk.Context, trackerMappingId string) 
 func (k Keeper) GetAddressMappingById(ctx sdk.Context, addressMappingId string) (*types.AddressMapping, error) {
 	inverted := false
 	addressMapping := &types.AddressMapping{}
-	if addressMappingId[0] == '!' {
+	if addressMappingId[0] == '!' && len(addressMappingId) > 1 && addressMappingId[len(addressMappingId)-1] != ')' {
 		inverted = true
 		addressMappingId = addressMappingId[1:]
+	} else if  len(addressMappingId) > 3 && addressMappingId[0:2] == "!(" && addressMappingId[len(addressMappingId)-1] == ')' {
+		inverted = true
+		addressMappingId = addressMappingId[2:len(addressMappingId)-1]
 	}
+
 
 	addressMapping, handled, err := getReservedMappingById(addressMappingId, false)
 	if err != nil {
