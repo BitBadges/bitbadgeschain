@@ -85,7 +85,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 
 	//HACK: We first expand all transfers to have just a len == 1 AllowedCombination[] so that we can easily check IsApproved later
 	//		  This is because GetFirstMatchOnly will break down the transfers into smaller parts and without expansion, fetching if a certain transfer is allowed is impossible.
-	expandedApprovals := ExpandCollectionApprovals(approvals)
+	expandedApprovals := approvals
 	unhandled := []*types.UniversalPermissionDetails{}
 	for _, badgeId := range badgeIds {
 		for _, time := range times {

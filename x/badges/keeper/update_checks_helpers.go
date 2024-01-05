@@ -194,8 +194,8 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollec
 		//This is a little different from the other functions because it is not first match only
 
 		//Expand all collection approved transfers so that they are manipulated according to options and approvalCriteria / allowedCombinations are len 1
-		oldApprovals := ExpandCollectionApprovals(oldValue.([]*types.CollectionApproval))
-		newApprovals := ExpandCollectionApprovals(newValue.([]*types.CollectionApproval))
+		oldApprovals := oldValue.([]*types.CollectionApproval)
+		newApprovals := newValue.([]*types.CollectionApproval)
 
 		//Step 1: Merge so we get approvalCriteria arrays of proper length such that it is first match and each (to, from, init, time, ids, ownershipTimes) is only seen once
 		//Step 2: Compare as we had previously

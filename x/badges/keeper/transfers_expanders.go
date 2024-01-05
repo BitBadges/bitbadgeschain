@@ -7,17 +7,6 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
-// Little hack to make AllowedCombinations a 1-element array so we know if disallowed/allowed for ArbitraryValue
-func ExpandCollectionApprovals(approvals []*types.CollectionApproval) []*types.CollectionApproval {
-	newCurrApprovals := []*types.CollectionApproval{}
-	//TODO: delete this; relic of old interface design
-	for _, approval := range approvals {
-		newCurrApprovals = append(newCurrApprovals, approval)
-	}
-
-	return newCurrApprovals
-}
-
 // By default, we approve all transfers if to === initiatedBy
 func AppendDefaultForIncoming(currApprovals []*types.UserIncomingApproval, userAddress string) []*types.UserIncomingApproval {
 	currApprovals = append([]*types.UserIncomingApproval{
