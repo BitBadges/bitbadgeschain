@@ -6,6 +6,7 @@ import "badges/balances.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
+
 /* 
   This message defines the metadata for specific badge IDs.
   The interpretation of this metadata should follow the collection standard.

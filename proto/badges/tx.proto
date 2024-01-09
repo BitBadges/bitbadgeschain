@@ -8,7 +8,7 @@ import "badges/permissions.proto";
 import "badges/metadata.proto";
 import "badges/collections.proto";
 import "gogoproto/gogo.proto";
-import "badges/address_mappings.proto";
+import "badges/address_lists.proto";
 import "badges/timelines.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
@@ -16,7 +16,7 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 // Msg defines the Msg service.
 service Msg {
   rpc UniversalUpdateCollection      (MsgUniversalUpdateCollection) returns (MsgUniversalUpdateCollectionResponse);
-  rpc CreateAddressMappings (MsgCreateAddressMappings) returns (MsgCreateAddressMappingsResponse);
+  rpc CreateAddressLists (MsgCreateAddressLists) returns (MsgCreateAddressListsResponse);
   rpc TransferBadges(MsgTransferBadges) returns (MsgTransferBadgesResponse);
   rpc UpdateUserApprovals(MsgUpdateUserApprovals) returns (MsgUpdateUserApprovalsResponse);
   rpc DeleteCollection(MsgDeleteCollection) returns (MsgDeleteCollectionResponse);
@@ -27,7 +27,7 @@ service Msg {
 
 //Used for WASM bindings and JSON parsing
 message BadgeCustomMsgType {
-  MsgCreateAddressMappings createAddressMappingsMsg = 1;
+  MsgCreateAddressLists createAddressListsMsg = 1;
   MsgUniversalUpdateCollection universalUpdateCollectionMsg = 2;
   MsgDeleteCollection deleteCollectionMsg = 3;
   MsgTransferBadges transferBadgesMsg = 4;
@@ -236,17 +236,17 @@ message MsgCreateCollectionResponse {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
-// MsgCreateAddressMappings is used to create address mappings.
-message MsgCreateAddressMappings {
+// MsgCreateAddressLists is used to create address lists.
+message MsgCreateAddressLists {
   // Address of the creator.
   string creator = 1;
   
-  // Address mappings to create.
-  repeated AddressMapping addressMappings = 2;
+  // Address lists to create.
+  repeated AddressList addressLists = 2;
 }
 
-// MsgCreateAddressMappingsResponse is the response to MsgCreateAddressMappings.
-message MsgCreateAddressMappingsResponse {}
+// MsgCreateAddressListsResponse is the response to MsgCreateAddressLists.
+message MsgCreateAddressListsResponse {}
 
 // MsgTransferBadges is used to transfer badges.
 message MsgTransferBadges {

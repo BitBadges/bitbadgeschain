@@ -23,22 +23,22 @@ type UniversalPermission struct {
 	TimelineTimes      []*UintRange
 	TransferTimes      []*UintRange
 	OwnershipTimes     []*UintRange
-	ToMapping          *AddressMapping
-	FromMapping        *AddressMapping
-	InitiatedByMapping *AddressMapping
+	ToList          *AddressList
+	FromList        *AddressList
+	InitiatedByList *AddressList
 
-	AmountTrackerIdMapping    *AddressMapping
-	ChallengeTrackerIdMapping *AddressMapping
+	AmountTrackerIdList    *AddressList
+	ChallengeTrackerIdList *AddressList
 
-	PermittedTimes []*UintRange
-	ForbiddenTimes []*UintRange
+	PermanentlyPermittedTimes []*UintRange
+	PermanentlyForbiddenTimes []*UintRange
 
 	UsesBadgeIds           bool
 	UsesTimelineTimes      bool
 	UsesTransferTimes      bool
-	UsesToMapping          bool
-	UsesFromMapping        bool
-	UsesInitiatedByMapping bool
+	UsesToList          bool
+	UsesFromList        bool
+	UsesInitiatedByList bool
 	UsesOwnershipTimes     bool
 
 	UsesAmountTrackerId    bool
@@ -52,17 +52,17 @@ type UniversalPermissionDetails struct {
 	TimelineTime       *UintRange
 	TransferTime       *UintRange
 	OwnershipTime      *UintRange
-	ToMapping          *AddressMapping
-	FromMapping        *AddressMapping
-	InitiatedByMapping *AddressMapping
+	ToList          *AddressList
+	FromList        *AddressList
+	InitiatedByList *AddressList
 
-	AmountTrackerIdMapping    *AddressMapping
-	ChallengeTrackerIdMapping *AddressMapping
+	AmountTrackerIdList    *AddressList
+	ChallengeTrackerIdList *AddressList
 
 	//These fields are not actually used in the overlapping logic.
 	//They are just along for the ride and used later for lookups
-	PermittedTimes []*UintRange
-	ForbiddenTimes []*UintRange
+	PermanentlyPermittedTimes []*UintRange
+	PermanentlyForbiddenTimes []*UintRange
 
 	ArbitraryValue interface{}
 }
@@ -112,8 +112,8 @@ func UniversalRemoveOverlapFromValues(handled *UniversalPermissionDetails, value
 	return newValuesToCheck, removed
 }
 
-func IsAddressMappingEmpty(mapping *AddressMapping) bool {
-	return len(mapping.Addresses) == 0 && mapping.IncludeAddresses
+func IsAddressListEmpty(list *AddressList) bool {
+	return len(list.Addresses) == 0 && list.Allowlist
 }
 
 func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
@@ -122,17 +122,17 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 	transferTimesAfterRemoval, removedTransferTimes := RemoveUintsFromUintRange(handled.TransferTime, valueToCheck.TransferTime)
 	ownershipTimesAfterRemoval, removedOwnershipTimes := RemoveUintsFromUintRange(handled.OwnershipTime, valueToCheck.OwnershipTime)
 
-	toMappingAfterRemoval, removedToMapping := RemoveAddressMappingFromAddressMapping(handled.ToMapping, valueToCheck.ToMapping)
-	fromMappingAfterRemoval, removedFromMapping := RemoveAddressMappingFromAddressMapping(handled.FromMapping, valueToCheck.FromMapping)
-	initiatedByMappingAfterRemoval, removedInitiatedByMapping := RemoveAddressMappingFromAddressMapping(handled.InitiatedByMapping, valueToCheck.InitiatedByMapping)
-	amountTrackerIdAfterRemoval, removedAmountTrackerId := RemoveAddressMappingFromAddressMapping(handled.AmountTrackerIdMapping, valueToCheck.AmountTrackerIdMapping)
-	challengeTrackerIdAfterRemoval, removedChallengeTrackerId := RemoveAddressMappingFromAddressMapping(handled.ChallengeTrackerIdMapping, valueToCheck.ChallengeTrackerIdMapping)
+	toListAfterRemoval, removedToList := RemoveAddressListFromAddressList(handled.ToList, valueToCheck.ToList)
+	fromListAfterRemoval, removedFromList := RemoveAddressListFromAddressList(handled.FromList, valueToCheck.FromList)
+	initiatedByListAfterRemoval, removedInitiatedByList := RemoveAddressListFromAddressList(handled.InitiatedByList, valueToCheck.InitiatedByList)
+	amountTrackerIdAfterRemoval, removedAmountTrackerId := RemoveAddressListFromAddressList(handled.AmountTrackerIdList, valueToCheck.AmountTrackerIdList)
+	challengeTrackerIdAfterRemoval, removedChallengeTrackerId := RemoveAddressListFromAddressList(handled.ChallengeTrackerIdList, valueToCheck.ChallengeTrackerIdList)
 
-	toMappingRemoved := !IsAddressMappingEmpty(removedToMapping)
-	fromMappingRemoved := !IsAddressMappingEmpty(removedFromMapping)
-	initiatedByMappingRemoved := !IsAddressMappingEmpty(removedInitiatedByMapping)
-	amountTrackerIdRemoved := !IsAddressMappingEmpty(removedAmountTrackerId)
-	challengeTrackerIdRemoved := !IsAddressMappingEmpty(removedChallengeTrackerId)
+	toListRemoved := !IsAddressListEmpty(removedToList)
+	fromListRemoved := !IsAddressListEmpty(removedFromList)
+	initiatedByListRemoved := !IsAddressListEmpty(removedInitiatedByList)
+	amountTrackerIdRemoved := !IsAddressListEmpty(removedAmountTrackerId)
+	challengeTrackerIdRemoved := !IsAddressListEmpty(removedChallengeTrackerId)
 
 	//Approach: Iterate through each field one by one. Attempt to remove the overlap. We'll call each field by an ID number corresponding to its order
 	//					Order doesn't matter as long as all fields are handled
@@ -157,7 +157,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 
 	//If some field does not overlap, we simply end up with the original values because it is only considered an overlap if all fields overlap.
 	//The function would work fine without this but it makes it more efficient and less complicated because it will not get broken down further
-	if len(removedTimelineTimes) == 0 || len(removedBadges) == 0 || len(removedTransferTimes) == 0 || len(removedOwnershipTimes) == 0 || !toMappingRemoved || !fromMappingRemoved || !initiatedByMappingRemoved || !amountTrackerIdRemoved || !challengeTrackerIdRemoved {
+	if len(removedTimelineTimes) == 0 || len(removedBadges) == 0 || len(removedTransferTimes) == 0 || len(removedOwnershipTimes) == 0 || !toListRemoved || !fromListRemoved || !initiatedByListRemoved || !amountTrackerIdRemoved || !challengeTrackerIdRemoved {
 		remaining = append(remaining, valueToCheck)
 		return remaining, []*UniversalPermissionDetails{}
 	}
@@ -168,11 +168,11 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			BadgeId:                   valueToCheck.BadgeId,
 			TransferTime:              valueToCheck.TransferTime,
 			OwnershipTime:             valueToCheck.OwnershipTime,
-			ToMapping:                 valueToCheck.ToMapping,
-			FromMapping:               valueToCheck.FromMapping,
-			InitiatedByMapping:        valueToCheck.InitiatedByMapping,
-			AmountTrackerIdMapping:    valueToCheck.AmountTrackerIdMapping,
-			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
+			ToList:                 valueToCheck.ToList,
+			FromList:               valueToCheck.FromList,
+			InitiatedByList:        valueToCheck.InitiatedByList,
+			AmountTrackerIdList:    valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList: valueToCheck.ChallengeTrackerIdList,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
@@ -184,11 +184,11 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			BadgeId:                   badgeAfterRemoval,
 			TransferTime:              valueToCheck.TransferTime,
 			OwnershipTime:             valueToCheck.OwnershipTime,
-			ToMapping:                 valueToCheck.ToMapping,
-			FromMapping:               valueToCheck.FromMapping,
-			InitiatedByMapping:        valueToCheck.InitiatedByMapping,
-			AmountTrackerIdMapping:    valueToCheck.AmountTrackerIdMapping,
-			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
+			ToList:                 valueToCheck.ToList,
+			FromList:               valueToCheck.FromList,
+			InitiatedByList:        valueToCheck.InitiatedByList,
+			AmountTrackerIdList:    valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList: valueToCheck.ChallengeTrackerIdList,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
@@ -200,11 +200,11 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			BadgeId:                   removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
 			TransferTime:              transferTimeAfterRemoval,
 			OwnershipTime:             valueToCheck.OwnershipTime,
-			ToMapping:                 valueToCheck.ToMapping,
-			FromMapping:               valueToCheck.FromMapping,
-			InitiatedByMapping:        valueToCheck.InitiatedByMapping,
-			AmountTrackerIdMapping:    valueToCheck.AmountTrackerIdMapping,
-			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
+			ToList:                 valueToCheck.ToList,
+			FromList:               valueToCheck.FromList,
+			InitiatedByList:        valueToCheck.InitiatedByList,
+			AmountTrackerIdList:    valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList: valueToCheck.ChallengeTrackerIdList,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
@@ -216,91 +216,91 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			BadgeId:                   removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
 			TransferTime:              removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			OwnershipTime:             ownershipTimeAfterRemoval,
-			ToMapping:                 valueToCheck.ToMapping,
-			FromMapping:               valueToCheck.FromMapping,
-			InitiatedByMapping:        valueToCheck.InitiatedByMapping,
-			AmountTrackerIdMapping:    valueToCheck.AmountTrackerIdMapping,
-			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
+			ToList:                 valueToCheck.ToList,
+			FromList:               valueToCheck.FromList,
+			InitiatedByList:        valueToCheck.InitiatedByList,
+			AmountTrackerIdList:    valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList: valueToCheck.ChallengeTrackerIdList,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
 
-	if !IsAddressMappingEmpty(toMappingAfterRemoval) {
+	if !IsAddressListEmpty(toListAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:              removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			BadgeId:                   removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
 			TransferTime:              removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			OwnershipTime:             removedOwnershipTimes[0],
-			ToMapping:                 toMappingAfterRemoval,
-			FromMapping:               valueToCheck.FromMapping,
-			InitiatedByMapping:        valueToCheck.InitiatedByMapping,
-			AmountTrackerIdMapping:    valueToCheck.AmountTrackerIdMapping,
-			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
+			ToList:                 toListAfterRemoval,
+			FromList:               valueToCheck.FromList,
+			InitiatedByList:        valueToCheck.InitiatedByList,
+			AmountTrackerIdList:    valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList: valueToCheck.ChallengeTrackerIdList,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
 
-	if !IsAddressMappingEmpty(fromMappingAfterRemoval) {
+	if !IsAddressListEmpty(fromListAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:              removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			BadgeId:                   removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
 			TransferTime:              removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			OwnershipTime:             removedOwnershipTimes[0],
-			ToMapping:                 removedToMapping,
-			FromMapping:               fromMappingAfterRemoval,
-			InitiatedByMapping:        valueToCheck.InitiatedByMapping,
-			AmountTrackerIdMapping:    valueToCheck.AmountTrackerIdMapping,
-			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
+			ToList:                 removedToList,
+			FromList:               fromListAfterRemoval,
+			InitiatedByList:        valueToCheck.InitiatedByList,
+			AmountTrackerIdList:    valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList: valueToCheck.ChallengeTrackerIdList,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
 
-	if !IsAddressMappingEmpty(initiatedByMappingAfterRemoval) {
+	if !IsAddressListEmpty(initiatedByListAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:              removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			BadgeId:                   removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
 			TransferTime:              removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			OwnershipTime:             removedOwnershipTimes[0],
-			ToMapping:                 removedToMapping,
-			FromMapping:               removedFromMapping,
-			InitiatedByMapping:        initiatedByMappingAfterRemoval,
-			AmountTrackerIdMapping:    valueToCheck.AmountTrackerIdMapping,
-			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
+			ToList:                 removedToList,
+			FromList:               removedFromList,
+			InitiatedByList:        initiatedByListAfterRemoval,
+			AmountTrackerIdList:    valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList: valueToCheck.ChallengeTrackerIdList,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
 
-	if !IsAddressMappingEmpty(amountTrackerIdAfterRemoval) {
+	if !IsAddressListEmpty(amountTrackerIdAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:              removedTimelineTimes[0],
 			BadgeId:                   removedBadges[0],
 			TransferTime:              removedTransferTimes[0],
 			OwnershipTime:             removedOwnershipTimes[0],
-			ToMapping:                 removedToMapping,
-			FromMapping:               removedFromMapping,
-			InitiatedByMapping:        removedInitiatedByMapping,
-			AmountTrackerIdMapping:    amountTrackerIdAfterRemoval,
-			ChallengeTrackerIdMapping: valueToCheck.ChallengeTrackerIdMapping,
+			ToList:                 removedToList,
+			FromList:               removedFromList,
+			InitiatedByList:        removedInitiatedByList,
+			AmountTrackerIdList:    amountTrackerIdAfterRemoval,
+			ChallengeTrackerIdList: valueToCheck.ChallengeTrackerIdList,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
 
-	if !IsAddressMappingEmpty(challengeTrackerIdAfterRemoval) {
+	if !IsAddressListEmpty(challengeTrackerIdAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:              removedTimelineTimes[0],
 			BadgeId:                   removedBadges[0],
 			TransferTime:              removedTransferTimes[0],
 			OwnershipTime:             removedOwnershipTimes[0],
-			ToMapping:                 removedToMapping,
-			FromMapping:               removedFromMapping,
-			InitiatedByMapping:        removedInitiatedByMapping,
-			AmountTrackerIdMapping:    removedAmountTrackerId,
-			ChallengeTrackerIdMapping: challengeTrackerIdAfterRemoval,
+			ToList:                 removedToList,
+			FromList:               removedFromList,
+			InitiatedByList:        removedInitiatedByList,
+			AmountTrackerIdList:    removedAmountTrackerId,
+			ChallengeTrackerIdList: challengeTrackerIdAfterRemoval,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
@@ -316,11 +316,11 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 						BadgeId:                   removedBadge,
 						TransferTime:              removedTransferTime,
 						OwnershipTime:             removedOwnershipTime,
-						ToMapping:                 removedToMapping,
-						FromMapping:               removedFromMapping,
-						InitiatedByMapping:        removedInitiatedByMapping,
-						AmountTrackerIdMapping:    removedAmountTrackerId,
-						ChallengeTrackerIdMapping: removedChallengeTrackerId,
+						ToList:                 removedToList,
+						FromList:               removedFromList,
+						InitiatedByList:        removedInitiatedByList,
+						AmountTrackerIdList:    removedAmountTrackerId,
+						ChallengeTrackerIdList: removedChallengeTrackerId,
 
 						ArbitraryValue: valueToCheck.ArbitraryValue,
 					})
@@ -341,21 +341,21 @@ func GetUintRangesWithOptions(ranges []*UintRange, uses bool) []*UintRange {
 	}
 }
 
-func GetMappingIdWithOptions(mappingId string, uses bool) string {
+func GetListIdWithOptions(listId string, uses bool) string {
 	if !uses {
-		mappingId = "All"
-		return mappingId
+		listId = "All"
+		return listId
 	} else {
-		return mappingId
+		return listId
 	}
 }
 
-func GetMappingWithOptions(mapping *AddressMapping, uses bool) *AddressMapping {
+func GetListWithOptions(list *AddressList, uses bool) *AddressList {
 	if !uses {
-		mapping = &AddressMapping{Addresses: []string{}, IncludeAddresses: false} //All addresses
+		list = &AddressList{Addresses: []string{}, Allowlist: false} //All addresses
 	}
 
-	return mapping
+	return list
 }
 
 func ApplyManipulations(permissions []*UniversalPermission) []*UniversalPermissionDetails {
@@ -365,16 +365,16 @@ func ApplyManipulations(permissions []*UniversalPermission) []*UniversalPermissi
 		timelineTimes := GetUintRangesWithOptions(permission.TimelineTimes, permission.UsesTimelineTimes)
 		transferTimes := GetUintRangesWithOptions(permission.TransferTimes, permission.UsesTransferTimes)
 		ownershipTimes := GetUintRangesWithOptions(permission.OwnershipTimes, permission.UsesOwnershipTimes)
-		permittedTimes := GetUintRangesWithOptions(permission.PermittedTimes, true)
-		forbiddenTimes := GetUintRangesWithOptions(permission.ForbiddenTimes, true)
+		permanentlyPermittedTimes := GetUintRangesWithOptions(permission.PermanentlyPermittedTimes, true)
+		permanentlyForbiddenTimes := GetUintRangesWithOptions(permission.PermanentlyForbiddenTimes, true)
 		arbitraryValue := permission.ArbitraryValue
 
-		toMapping := GetMappingWithOptions(permission.ToMapping, permission.UsesToMapping)
-		fromMapping := GetMappingWithOptions(permission.FromMapping, permission.UsesFromMapping)
-		initiatedByMapping := GetMappingWithOptions(permission.InitiatedByMapping, permission.UsesInitiatedByMapping)
+		toList := GetListWithOptions(permission.ToList, permission.UsesToList)
+		fromList := GetListWithOptions(permission.FromList, permission.UsesFromList)
+		initiatedByList := GetListWithOptions(permission.InitiatedByList, permission.UsesInitiatedByList)
 
-		amountTrackerIdMapping := GetMappingWithOptions(permission.AmountTrackerIdMapping, permission.UsesAmountTrackerId)
-		challengeTrackerIdMapping := GetMappingWithOptions(permission.ChallengeTrackerIdMapping, permission.UsesChallengeTrackerId)
+		amountTrackerIdList := GetListWithOptions(permission.AmountTrackerIdList, permission.UsesAmountTrackerId)
+		challengeTrackerIdList := GetListWithOptions(permission.ChallengeTrackerIdList, permission.UsesChallengeTrackerId)
 
 		for _, badgeId := range badgeIds {
 			for _, timelineTime := range timelineTimes {
@@ -386,15 +386,15 @@ func ApplyManipulations(permissions []*UniversalPermission) []*UniversalPermissi
 								TimelineTime:              timelineTime,
 								TransferTime:              transferTime,
 								OwnershipTime:             ownershipTime,
-								ToMapping:                 toMapping,
-								FromMapping:               fromMapping,
-								InitiatedByMapping:        initiatedByMapping,
-								AmountTrackerIdMapping:    amountTrackerIdMapping,
-								ChallengeTrackerIdMapping: challengeTrackerIdMapping,
+								ToList:                 toList,
+								FromList:               fromList,
+								InitiatedByList:        initiatedByList,
+								AmountTrackerIdList:    amountTrackerIdList,
+								ChallengeTrackerIdList: challengeTrackerIdList,
 
 								//Appended for future lookups (not involved in overlap logic)
-								PermittedTimes: permittedTimes,
-								ForbiddenTimes: forbiddenTimes,
+								PermanentlyPermittedTimes: permanentlyPermittedTimes,
+								PermanentlyForbiddenTimes: permanentlyForbiddenTimes,
 								ArbitraryValue: arbitraryValue,
 							},
 						}
@@ -418,16 +418,16 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissio
 		timelineTimes := GetUintRangesWithOptions(permission.TimelineTimes, permission.UsesTimelineTimes)
 		transferTimes := GetUintRangesWithOptions(permission.TransferTimes, permission.UsesTransferTimes)
 		ownershipTimes := GetUintRangesWithOptions(permission.OwnershipTimes, permission.UsesOwnershipTimes)
-		permittedTimes := GetUintRangesWithOptions(permission.PermittedTimes, true)
-		forbiddenTimes := GetUintRangesWithOptions(permission.ForbiddenTimes, true)
+		permanentlyPermittedTimes := GetUintRangesWithOptions(permission.PermanentlyPermittedTimes, true)
+		permanentlyForbiddenTimes := GetUintRangesWithOptions(permission.PermanentlyForbiddenTimes, true)
 		arbitraryValue := permission.ArbitraryValue
 
-		toMapping := GetMappingWithOptions(permission.ToMapping, permission.UsesToMapping)
-		fromMapping := GetMappingWithOptions(permission.FromMapping, permission.UsesFromMapping)
-		initiatedByMapping := GetMappingWithOptions(permission.InitiatedByMapping, permission.UsesInitiatedByMapping)
+		toList := GetListWithOptions(permission.ToList, permission.UsesToList)
+		fromList := GetListWithOptions(permission.FromList, permission.UsesFromList)
+		initiatedByList := GetListWithOptions(permission.InitiatedByList, permission.UsesInitiatedByList)
 
-		amountTrackerIdMapping := GetMappingWithOptions(permission.AmountTrackerIdMapping, permission.UsesAmountTrackerId)
-		challengeTrackerIdMapping := GetMappingWithOptions(permission.ChallengeTrackerIdMapping, permission.UsesChallengeTrackerId)
+		amountTrackerIdList := GetListWithOptions(permission.AmountTrackerIdList, permission.UsesAmountTrackerId)
+		challengeTrackerIdList := GetListWithOptions(permission.ChallengeTrackerIdList, permission.UsesChallengeTrackerId)
 
 		for _, badgeId := range badgeIds {
 			for _, timelineTime := range timelineTimes {
@@ -439,11 +439,11 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissio
 								TimelineTime:              timelineTime,
 								TransferTime:              transferTime,
 								OwnershipTime:             ownershipTime,
-								ToMapping:                 toMapping,
-								FromMapping:               fromMapping,
-								InitiatedByMapping:        initiatedByMapping,
-								AmountTrackerIdMapping:    amountTrackerIdMapping,
-								ChallengeTrackerIdMapping: challengeTrackerIdMapping,
+								ToList:                 toList,
+								FromList:               fromList,
+								InitiatedByList:        initiatedByList,
+								AmountTrackerIdList:    amountTrackerIdList,
+								ChallengeTrackerIdList: challengeTrackerIdList,
 							},
 						}
 
@@ -454,15 +454,15 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissio
 								BadgeId:                   remaining.BadgeId,
 								TransferTime:              remaining.TransferTime,
 								OwnershipTime:             remaining.OwnershipTime,
-								ToMapping:                 remaining.ToMapping,
-								FromMapping:               remaining.FromMapping,
-								InitiatedByMapping:        remaining.InitiatedByMapping,
-								AmountTrackerIdMapping:    remaining.AmountTrackerIdMapping,
-								ChallengeTrackerIdMapping: remaining.ChallengeTrackerIdMapping,
+								ToList:                 remaining.ToList,
+								FromList:               remaining.FromList,
+								InitiatedByList:        remaining.InitiatedByList,
+								AmountTrackerIdList:    remaining.AmountTrackerIdList,
+								ChallengeTrackerIdList: remaining.ChallengeTrackerIdList,
 
 								//Appended for future lookups (not involved in overlap logic)
-								PermittedTimes: permittedTimes,
-								ForbiddenTimes: forbiddenTimes,
+								PermanentlyPermittedTimes: permanentlyPermittedTimes,
+								PermanentlyForbiddenTimes: permanentlyForbiddenTimes,
 								ArbitraryValue: arbitraryValue,
 							})
 						}
@@ -494,51 +494,51 @@ func GetPermissionString(permission *UniversalPermissionDetails) string {
 		str += "ownershipTime: " + permission.OwnershipTime.Start.String() + " "
 	}
 
-	if permission.ToMapping != nil {
-		str += "toMapping: "
-		if !permission.ToMapping.IncludeAddresses {
-			str += fmt.Sprint(len(permission.ToMapping.Addresses)) + " addresses "
+	if permission.ToList != nil {
+		str += "toList: "
+		if !permission.ToList.Allowlist {
+			str += fmt.Sprint(len(permission.ToList.Addresses)) + " addresses "
 		} else {
-			str += "all except " + fmt.Sprint(len(permission.ToMapping.Addresses)) + " addresses "
+			str += "all except " + fmt.Sprint(len(permission.ToList.Addresses)) + " addresses "
 		}
 
-		if len(permission.ToMapping.Addresses) > 0 && len(permission.ToMapping.Addresses) <= 5 {
+		if len(permission.ToList.Addresses) > 0 && len(permission.ToList.Addresses) <= 5 {
 			str += "("
-			for _, address := range permission.ToMapping.Addresses {
+			for _, address := range permission.ToList.Addresses {
 				str += address + " "
 			}
 			str += ")"
 		}
 	}
 
-	if permission.FromMapping != nil {
-		str += "fromMapping: "
-		if !permission.FromMapping.IncludeAddresses {
-			str += fmt.Sprint(len(permission.FromMapping.Addresses)) + " addresses "
+	if permission.FromList != nil {
+		str += "fromList: "
+		if !permission.FromList.Allowlist {
+			str += fmt.Sprint(len(permission.FromList.Addresses)) + " addresses "
 		} else {
-			str += "all except " + fmt.Sprint(len(permission.FromMapping.Addresses)) + " addresses "
+			str += "all except " + fmt.Sprint(len(permission.FromList.Addresses)) + " addresses "
 		}
 
-		if len(permission.FromMapping.Addresses) > 0 && len(permission.FromMapping.Addresses) <= 5 {
+		if len(permission.FromList.Addresses) > 0 && len(permission.FromList.Addresses) <= 5 {
 			str += "("
-			for _, address := range permission.FromMapping.Addresses {
+			for _, address := range permission.FromList.Addresses {
 				str += address + " "
 			}
 			str += ")"
 		}
 	}
 
-	if permission.InitiatedByMapping != nil {
-		str += "initiatedByMapping: "
-		if !permission.InitiatedByMapping.IncludeAddresses {
-			str += fmt.Sprint(len(permission.InitiatedByMapping.Addresses)) + " addresses "
+	if permission.InitiatedByList != nil {
+		str += "initiatedByList: "
+		if !permission.InitiatedByList.Allowlist {
+			str += fmt.Sprint(len(permission.InitiatedByList.Addresses)) + " addresses "
 		} else {
-			str += "all except " + fmt.Sprint(len(permission.InitiatedByMapping.Addresses)) + " addresses "
+			str += "all except " + fmt.Sprint(len(permission.InitiatedByList.Addresses)) + " addresses "
 		}
 
-		if len(permission.InitiatedByMapping.Addresses) > 0 && len(permission.InitiatedByMapping.Addresses) <= 5 {
+		if len(permission.InitiatedByList.Addresses) > 0 && len(permission.InitiatedByList.Addresses) <= 5 {
 			str += "("
-			for _, address := range permission.InitiatedByMapping.Addresses {
+			for _, address := range permission.InitiatedByList.Addresses {
 				str += address + " "
 			}
 			str += ")"
@@ -571,26 +571,26 @@ func ValidateUniversalPermissionUpdate(oldPermissions []*UniversalPermissionDeta
 		oldPermission := overlapObj.FirstDetails
 		newPermission := overlapObj.SecondDetails
 
-		leftoverPermittedTimes, _ := RemoveUintRangeFromUintRange(newPermission.PermittedTimes, oldPermission.PermittedTimes)
-		leftoverForbiddenTimes, _ := RemoveUintRangeFromUintRange(newPermission.ForbiddenTimes, oldPermission.ForbiddenTimes)
+		leftoverPermanentlyPermittedTimes, _ := RemoveUintRangeFromUintRange(newPermission.PermanentlyPermittedTimes, oldPermission.PermanentlyPermittedTimes)
+		leftoverPermanentlyForbiddenTimes, _ := RemoveUintRangeFromUintRange(newPermission.PermanentlyForbiddenTimes, oldPermission.PermanentlyForbiddenTimes)
 
-		if len(leftoverPermittedTimes) > 0 || len(leftoverForbiddenTimes) > 0 {
+		if len(leftoverPermanentlyPermittedTimes) > 0 || len(leftoverPermanentlyForbiddenTimes) > 0 {
 			errMsg := "permission "
 			errMsg += GetPermissionString(oldPermission)
 			errMsg += "found in both new and old permissions but "
-			if len(leftoverPermittedTimes) > 0 {
+			if len(leftoverPermanentlyPermittedTimes) > 0 {
 				errMsg += "previously explicitly allowed the times ( "
-				for _, oldPermittedTime := range leftoverPermittedTimes {
+				for _, oldPermittedTime := range leftoverPermanentlyPermittedTimes {
 					errMsg += oldPermittedTime.Start.String() + "-" + oldPermittedTime.End.String() + " "
 				}
 				errMsg += ") which are now set to disallowed"
 			}
-			if len(leftoverForbiddenTimes) > 0 && len(leftoverPermittedTimes) > 0 {
+			if len(leftoverPermanentlyForbiddenTimes) > 0 && len(leftoverPermanentlyPermittedTimes) > 0 {
 				errMsg += " and"
 			}
-			if len(leftoverForbiddenTimes) > 0 {
+			if len(leftoverPermanentlyForbiddenTimes) > 0 {
 				errMsg += " previously explicitly disallowed the times ( "
-				for _, oldForbiddenTime := range leftoverForbiddenTimes {
+				for _, oldForbiddenTime := range leftoverPermanentlyForbiddenTimes {
 					errMsg += oldForbiddenTime.Start.String() + "-" + oldForbiddenTime.End.String() + " "
 				}
 				errMsg += ") which are now set to allowed."

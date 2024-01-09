@@ -204,8 +204,8 @@ func (suite *TestSuite) TestSpecificApproved() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].DefaultOutgoingApprovals[0].InitiatedByMappingId = alice
-	collectionsToCreate[0].DefaultIncomingApprovals[0].InitiatedByMappingId = alice
+	collectionsToCreate[0].DefaultOutgoingApprovals[0].InitiatedByListId = alice
+	collectionsToCreate[0].DefaultIncomingApprovals[0].InitiatedByListId = alice
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -231,8 +231,8 @@ func (suite *TestSuite) TestDefaults() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].DefaultOutgoingApprovals[0].InitiatedByMappingId = alice
-	collectionsToCreate[0].DefaultIncomingApprovals[0].InitiatedByMappingId = alice
+	collectionsToCreate[0].DefaultOutgoingApprovals[0].InitiatedByListId = alice
+	collectionsToCreate[0].DefaultIncomingApprovals[0].InitiatedByListId = alice
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating badges")
@@ -272,11 +272,11 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 // 	collectionsToCreate := GetCollectionsToCreate()
-// 	collectionsToCreate[0].DefaultOutgoingApprovals[0].InitiatedByMappingId = alice
+// 	collectionsToCreate[0].DefaultOutgoingApprovals[0].InitiatedByListId = alice
 // 	newOutgoingTimeline := []*types.UserOutgoingApproval{
 // 			{
-// 				ToMappingId:          "AllWithoutMint",
-// 				InitiatedByMappingId: alice,
+// 				ToListId:          "AllWithoutMint",
+// 				InitiatedByListId: alice,
 // 				TransferTimes:        GetFullUintRanges(),
 // 				BadgeIds: []*types.UintRange{
 // 					{
@@ -311,8 +311,8 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 
 // 	newOutgoingTimeline := []*types.UserOutgoingApproval{
 // 		{
-// 			ToMappingId:          "AllWithoutMint",
-// 			InitiatedByMappingId: alice,
+// 			ToListId:          "AllWithoutMint",
+// 			InitiatedByListId: alice,
 // 			TransferTimes:        []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 			BadgeIds:             GetFullUintRanges(),
 // 			OwnershipTimes: GetFullUintRanges(),
@@ -341,8 +341,8 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 
 // 	newOutgoingTimeline :=  []*types.UserOutgoingApproval{
 // 			{
-// 				ToMappingId:          "AllWithoutMint",
-// 				InitiatedByMappingId: alice,
+// 				ToListId:          "AllWithoutMint",
+// 				InitiatedByListId: alice,
 // 				TransferTimes:        GetFullUintRanges(),
 // 				OwnershipTimes: 			GetFullUintRanges(),
 // 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
@@ -360,8 +360,8 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 				},
 // 			},
 // 			{
-// 				ToMappingId:          "AllWithoutMint",
-// 				InitiatedByMappingId: alice,
+// 				ToListId:          "AllWithoutMint",
+// 				InitiatedByListId: alice,
 // 				TransferTimes:        GetFullUintRanges(),
 // 				OwnershipTimes: 			GetFullUintRanges(),
 // 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
@@ -391,8 +391,8 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 
 // 	newOutgoingTimeline := []*types.UserOutgoingApproval{
 // 			{
-// 				ToMappingId:          "AllWithoutMint",
-// 				InitiatedByMappingId: alice,
+// 				ToListId:          "AllWithoutMint",
+// 				InitiatedByListId: alice,
 // 				TransferTimes:        GetFullUintRanges(),
 // 				OwnershipTimes: GetFullUintRanges(),
 // 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
@@ -400,12 +400,12 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 
 // 			},
 // 			{
-// 					ToMappingId:          "AllWithoutMint",
-// 					InitiatedByMappingId: alice,
+// 					ToListId:          "AllWithoutMint",
+// 					InitiatedByListId: alice,
 // 					TransferTimes:        GetFullUintRanges(),
 // 					OwnershipTimes: GetFullUintRanges(),
 // 					BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-// 					InitiatedByMappingOptions: &types.ValueOptions{ InvertDefault: true },
+// 					InitiatedByListOptions: &types.ValueOptions{ InvertDefault: true },
 // 					IsApproved:         true,
 // 					ApprovalId: "test",
 // 					AmountTrackerId:                 "test",
@@ -437,15 +437,15 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 // 	collectionsToCreate := GetCollectionsToCreate()
-// 	collectionsToCreate[0].DefaultOutgoingApprovals[0].InitiatedByMappingId = alice
+// 	collectionsToCreate[0].DefaultOutgoingApprovals[0].InitiatedByListId = alice
 // 	newOutgoingTimeline := []*types.UserOutgoingApproval{
 // 			collectionsToCreate[0].DefaultOutgoingApprovals[0],
 // 	}
 // 	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
 // 	collectionsToCreate[0].DefaultOutgoingApprovals = append(collectionsToCreate[0].DefaultOutgoingApprovals, &types.UserOutgoingApproval{
 
-// 			ToMappingId:          "AllWithoutMint",
-// 			InitiatedByMappingId: "AllWithoutMint",
+// 			ToListId:          "AllWithoutMint",
+// 			InitiatedByListId: "AllWithoutMint",
 // 			TransferTimes:        GetFullUintRanges(),
 // 			OwnershipTimes: GetFullUintRanges(),
 // 			BadgeIds:             GetFullUintRanges(),
@@ -469,8 +469,8 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 
 	newOutgoingTimeline := []*types.UserOutgoingApproval{
 		{
-			ToMappingId:          "AllWithoutMint",
-			InitiatedByMappingId: alice,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: alice,
 			TransferTimes:        GetFullUintRanges(),
 			OwnershipTimes:       GetFullUintRanges(),
 			BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
@@ -576,9 +576,9 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 // 	collectionsToCreate := GetCollectionsToCreate()
 // 	collectionsToCreate[0].CollectionApprovals = []*types.CollectionApproval{
 // 		{
-// 			FromMappingId: "AllWithMint",
-// 			ToMappingId:   "AllWithMint",
-// 			InitiatedByMappingId: "AllWithMint",
+// 			FromListId: "AllWithMint",
+// 			ToListId:   "AllWithMint",
+// 			InitiatedByListId: "AllWithMint",
 // 			BadgeIds: 					 GetFullUintRanges(),
 // 			TransferTimes:        GetFullUintRanges(),
 // 			OwnershipTimes: GetFullUintRanges(),

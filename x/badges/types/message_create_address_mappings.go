@@ -5,26 +5,26 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const TypeMsgCreateAddressMappings = "create_address_mappings"
+const TypeMsgCreateAddressLists = "create_address_lists"
 
-var _ sdk.Msg = &MsgCreateAddressMappings{}
+var _ sdk.Msg = &MsgCreateAddressLists{}
 
-func NewMsgCreateAddressMappings(creator string, addressMappings []*AddressMapping) *MsgCreateAddressMappings {
-	return &MsgCreateAddressMappings{
+func NewMsgCreateAddressLists(creator string, addressLists []*AddressList) *MsgCreateAddressLists {
+	return &MsgCreateAddressLists{
 		Creator:         creator,
-		AddressMappings: addressMappings,
+		AddressLists: addressLists,
 	}
 }
 
-func (msg *MsgCreateAddressMappings) Route() string {
+func (msg *MsgCreateAddressLists) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgCreateAddressMappings) Type() string {
-	return TypeMsgCreateAddressMappings
+func (msg *MsgCreateAddressLists) Type() string {
+	return TypeMsgCreateAddressLists
 }
 
-func (msg *MsgCreateAddressMappings) GetSigners() []sdk.AccAddress {
+func (msg *MsgCreateAddressLists) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -32,19 +32,19 @@ func (msg *MsgCreateAddressMappings) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgCreateAddressMappings) GetSignBytes() []byte {
+func (msg *MsgCreateAddressLists) GetSignBytes() []byte {
 	bz := AminoCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgCreateAddressMappings) ValidateBasic() error {
+func (msg *MsgCreateAddressLists) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	for _, mapping := range msg.AddressMappings {
-		if err := ValidateAddressMapping(mapping); err != nil {
+	for _, list := range msg.AddressLists {
+		if err := ValidateAddressList(list); err != nil {
 			return err
 		}
 	}

@@ -83,9 +83,9 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 			BalancesType: sdkmath.NewUint(1),
 			CollectionApprovals: []*types.CollectionApproval{
 				{
-					ToMappingId:          "AllWithoutMint",
-					FromMappingId:        "AllWithoutMint",
-					InitiatedByMappingId: "AllWithoutMint",
+					ToListId:          "AllWithoutMint",
+					FromListId:        "AllWithoutMint",
+					InitiatedByListId: "AllWithoutMint",
 					TransferTimes:        GetFullUintRanges(),
 					OwnershipTimes:       GetFullUintRanges(),
 					BadgeIds:             GetFullUintRanges(),
@@ -103,8 +103,8 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 				}},
 			DefaultIncomingApprovals: []*types.UserIncomingApproval{
 				{
-					FromMappingId:        "AllWithoutMint",
-					InitiatedByMappingId: "AllWithoutMint",
+					FromListId:        "AllWithoutMint",
+					InitiatedByListId: "AllWithoutMint",
 					TransferTimes:        GetFullUintRanges(),
 					OwnershipTimes:       GetFullUintRanges(),
 					BadgeIds:             GetFullUintRanges(),
@@ -125,8 +125,8 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 			},
 			DefaultOutgoingApprovals: []*types.UserOutgoingApproval{
 				{
-					ToMappingId:          "AllWithoutMint",
-					InitiatedByMappingId: "AllWithoutMint",
+					ToListId:          "AllWithoutMint",
+					InitiatedByListId: "AllWithoutMint",
 					TransferTimes:        GetFullUintRanges(),
 					OwnershipTimes:       GetFullUintRanges(),
 					BadgeIds:             GetFullUintRanges(),
@@ -164,7 +164,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 				CanUpdateCollectionApprovals:      []*types.CollectionApprovalPermission{},
 				CanCreateMoreBadges: []*types.BalancesActionPermission{
 					{
-						PermittedTimes: GetFullUintRanges(),
+						PermanentlyPermittedTimes: GetFullUintRanges(),
 					},
 				},
 			},
@@ -179,9 +179,9 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*type
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(uint64(math.MaxUint64))
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
 
-		ToMappingId:          "AllWithoutMint",
-		FromMappingId:        "Mint",
-		InitiatedByMappingId: "AllWithoutMint",
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
 
 		TransferTimes:      GetFullUintRanges(),
 		BadgeIds:           GetFullUintRanges(),

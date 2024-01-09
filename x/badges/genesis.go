@@ -44,20 +44,20 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		}
 	}
 
-	for idx, numUsed := range genState.NumUsedForMerkleChallenges {
-		if err := k.SetNumUsedForMerkleChallengeInStore(ctx, genState.NumUsedForMerkleChallengesStoreKeys[idx], numUsed); err != nil {
+	for idx, numUsed := range genState.ChallengeTrackers {
+		if err := k.SetChallengeTrackerInStore(ctx, genState.ChallengeTrackerStoreKeys[idx], numUsed); err != nil {
 			panic(err)
 		}
 	}
 
-	for _, addressMapping := range genState.AddressMappings {
-		if err := k.SetAddressMappingInStore(ctx, *addressMapping); err != nil {
+	for _, addressList := range genState.AddressLists {
+		if err := k.SetAddressListInStore(ctx, *addressList); err != nil {
 			panic(err)
 		}
 	}
 
-	for idx, approvalsTracker := range genState.ApprovalsTrackers {
-		if err := k.SetApprovalsTrackerInStoreViaKey(ctx, genState.ApprovalsTrackerStoreKeys[idx], *approvalsTracker); err != nil {
+	for idx, approvalTracker := range genState.ApprovalTrackers {
+		if err := k.SetApprovalTrackerInStoreViaKey(ctx, genState.ApprovalTrackerStoreKeys[idx], *approvalTracker); err != nil {
 			panic(err)
 		}
 	}
@@ -82,11 +82,11 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		genesis.BalanceStoreKeys = append(genesis.BalanceStoreKeys, keeper.ConstructBalanceKey(address, balanceIds[i]))
 	}
 
-	genesis.NumUsedForMerkleChallenges, genesis.NumUsedForMerkleChallengesStoreKeys = k.GetNumUsedForMerkleChallengesFromStore(ctx)
+	genesis.ChallengeTrackers, genesis.ChallengeTrackerStoreKeys = k.GetChallengeTrackersFromStore(ctx)
 
-	genesis.AddressMappings = k.GetAddressMappingsFromStore(ctx)
+	genesis.AddressLists = k.GetAddressListsFromStore(ctx)
 
-	genesis.ApprovalsTrackers, genesis.ApprovalsTrackerStoreKeys = k.GetApprovalsTrackersFromStore(ctx)
+	genesis.ApprovalTrackers, genesis.ApprovalTrackerStoreKeys = k.GetApprovalTrackersFromStore(ctx)
 
 	// this line is used by starport scaffolding # genesis/module/export
 

@@ -8,28 +8,13 @@ import "badges/permissions.proto";
 import "badges/metadata.proto";
 import "badges/collections.proto";
 import "gogoproto/gogo.proto";
-import "badges/address_mappings.proto";
+import "badges/address_lists.proto";
 import "badges/timelines.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 //Before switching to the universal Msgs, we had a separate Msg for each action.
 //This is the old Msg service definition. It is still used in some parts of the codebase for compatibility.
-
-
-
-// // Msg defines the Msg service.
-// service Msg {
-//   rpc NewCollection(MsgNewCollection) returns (MsgNewCollectionResponse);
-//   rpc MintAndDistributeBadges(MsgMintAndDistributeBadges) returns (MsgMintAndDistributeBadgesResponse);
-//   rpc UpdateCollectionApprovals(MsgUniversalUpdateCollectionApprovals) returns (MsgUniversalUpdateCollectionApprovalsResponse);
-//   rpc UpdateMetadata(MsgUpdateMetadata) returns (MsgUpdateMetadataResponse);
-//   rpc UpdateCollectionPermissions(MsgUniversalUpdateCollectionPermissions) returns (MsgUniversalUpdateCollectionPermissionsResponse);
-//   rpc UpdateUserPermissions (MsgUpdateUserPermissions) returns (MsgUpdateUserPermissionsResponse);
-//   rpc UpdateManager(MsgUpdateManager) returns (MsgUpdateManagerResponse);
-//   rpc ArchiveCollection(MsgArchiveCollection) returns (MsgArchiveCollectionResponse);
-//   // this line is used by starport scaffolding # proto/tx/rpc
-// }
 
 //The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
 message UserOutgoingApprovalTimeline {
@@ -65,7 +50,7 @@ message MsgNewCollection {
   repeated Balance badgesToCreate = 11;
   repeated Transfer transfers = 12;
   repeated ContractAddressTimeline contractAddressTimeline = 13;
-  repeated AddressMapping addressMappings = 14;
+  repeated AddressList addressLists = 14;
 
   repeated UserOutgoingApproval defaultOutgoingApprovals = 15; //The user's approved transfers for each badge ID.
   repeated UserIncomingApproval defaultIncomingApprovals = 16; //The user's approved incoming transfers for each badge ID.
@@ -77,19 +62,6 @@ message MsgNewCollectionResponse {
   string collectionId = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false
   ]; //ID of created badge collecon
 }
-
-// message MsgForkCollection {
-//   string creator = 1;
-//   string parentCollectionId = 2  [(gogoproto.customtype) = "Uint", 
-//     (gogoproto.nullable) = false];
-// }
-
-// message MsgForkCollectionResponse {
-//   string collectionId = 1  [
-//     (gogoproto.customtype) = "Uint", 
-//     (gogoproto.nullable) = false
-//   ]; //ID of created badge collection
-// }
 
 //This handles both minting more of existing badges and creating new badges.
 message MsgMintAndDistributeBadges {
@@ -103,7 +75,7 @@ message MsgMintAndDistributeBadges {
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 8;
   repeated CollectionApproval collectionApprovals = 9;
 
-  repeated AddressMapping addressMappings = 10;
+  repeated AddressList addressLists = 10;
 }
 
 message MsgMintAndDistributeBadgesResponse {}
@@ -112,7 +84,7 @@ message MsgUniversalUpdateCollectionApprovals {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated CollectionApproval collectionApprovals = 3;
-  repeated AddressMapping addressMappings = 4;
+  repeated AddressList addressLists = 4;
 }
 
 
@@ -138,7 +110,7 @@ message MsgUniversalUpdateCollectionPermissions {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   CollectionPermissions permissions = 3;
-  repeated AddressMapping addressMappings = 4;
+  repeated AddressList addressLists = 4;
 }
 
 message MsgUniversalUpdateCollectionPermissionsResponse {}
@@ -147,7 +119,7 @@ message MsgUpdateUserPermissions {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   UserPermissions permissions = 3;
-  repeated AddressMapping addressMappings = 4;
+  repeated AddressList addressLists = 4;
 }
 
 message MsgUpdateUserPermissionsResponse {}

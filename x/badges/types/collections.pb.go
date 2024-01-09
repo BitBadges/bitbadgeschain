@@ -27,10 +27,10 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // A BadgeCollection is the top-level object for a collection of badges.
 // It defines everything about the collection, such as the manager, metadata, etc.
 //
-// All collections are identified by a collectionId assigned by the blockchain, which is a uint64 that increments (i.e., the first collection has ID 1).
+// All collections are identified by a collectionId assigned by the blockchain, which is a uint64 that increments (i.e. the first collection has ID 1).
 //
-// All collections also have a manager who is responsible for managing the collection.
-// They can be granted certain permissions, such as the ability to mint new badges.
+// All collections can have a manager who is responsible for managing the collection and can be granted certain admin
+// permissions, such as the ability to mint new badges.
 //
 // Certain fields are timeline-based, which means they may have different values at different block heights.
 // We fetch the value according to the current time.

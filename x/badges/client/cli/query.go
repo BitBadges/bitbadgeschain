@@ -27,20 +27,20 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	cmd.AddCommand(CmdGetBalance())
 	cmd.AddCommand(CmdGetCollection())
 	cmd.AddCommand(CmdQueryParams())
-	cmd.AddCommand(CmdGetAddressMapping())
-	cmd.AddCommand(CmdGetApprovalsTrackers())
-	cmd.AddCommand(CmdGetNumUsedForMerkleChallenge())
+	cmd.AddCommand(CmdGetAddressList())
+	cmd.AddCommand(CmdGetApprovalTrackers())
+	cmd.AddCommand(CmdGetChallengeTracker())
 	// this line is used by starport scaffolding # 1
 
 	return cmd
 }
 
 // // Queries an approvals tracker by ID.
-// rpc GetApprovalsTracker(QueryGetApprovalsTrackerRequest) returns (QueryGetApprovalsTrackerResponse) {
+// rpc GetApprovalTracker(QueryGetApprovalTrackerRequest) returns (QueryGetApprovalTrackerResponse) {
 // 	option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_approvals_tracker/{collectionId}/{approvalLevel}/{approverAddress}/{amountTrackerId}/{trackerType}/{approvedAddress}";
 // }
 
 // // Queries the number of times a given leaf has been used for a given merkle challenge.
-// rpc GetNumUsedForMerkleChallenge(QueryGetNumUsedForMerkleChallengeRequest) returns (QueryGetNumUsedForMerkleChallengeResponse) {
+// rpc GetChallengeTracker(QueryGetChallengeTrackerRequest) returns (QueryGetChallengeTrackerResponse) {
 // 	option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{collectionId}/{approvalLevel}/{approverAddress}/{challengeTrackerId}/{leafIndex}";
 // }

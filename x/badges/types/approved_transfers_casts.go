@@ -22,9 +22,9 @@ func CastOutgoingTransferToCollectionTransfer(transfer *UserOutgoingApproval, fr
 
 	approvalCriteria := CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(transfer.ApprovalCriteria)
 	return &CollectionApproval{
-		ToMappingId:          transfer.ToMappingId,
-		FromMappingId:        fromAddress,
-		InitiatedByMappingId: transfer.InitiatedByMappingId,
+		ToListId:          transfer.ToListId,
+		FromListId:        fromAddress,
+		InitiatedByListId: transfer.InitiatedByListId,
 		TransferTimes:        transfer.TransferTimes,
 		BadgeIds:             transfer.BadgeIds,
 		OwnershipTimes:       transfer.OwnershipTimes,
@@ -42,8 +42,8 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApproval) 
 	approvalCriteria := CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(transfer.ApprovalCriteria)
 
 	return &UserOutgoingApproval{
-		ToMappingId:          transfer.ToMappingId,
-		InitiatedByMappingId: transfer.InitiatedByMappingId,
+		ToListId:          transfer.ToListId,
+		InitiatedByListId: transfer.InitiatedByListId,
 		TransferTimes:        transfer.TransferTimes,
 		BadgeIds:             transfer.BadgeIds,
 		OwnershipTimes:       transfer.OwnershipTimes,
@@ -61,9 +61,9 @@ func CastIncomingTransferToCollectionTransfer(transfer *UserIncomingApproval, to
 	approvalCriteria := CastIncomingApprovalCriteriaToCollectionApprovalCriteria(transfer.ApprovalCriteria)
 
 	return &CollectionApproval{
-		ToMappingId:          toAddress,
-		FromMappingId:        transfer.FromMappingId,
-		InitiatedByMappingId: transfer.InitiatedByMappingId,
+		ToListId:          toAddress,
+		FromListId:        transfer.FromListId,
+		InitiatedByListId: transfer.InitiatedByListId,
 		TransferTimes:        transfer.TransferTimes,
 		BadgeIds:             transfer.BadgeIds,
 		OwnershipTimes:       transfer.OwnershipTimes,
@@ -81,8 +81,8 @@ func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApproval) 
 	approvalCriteria := CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(transfer.ApprovalCriteria)
 
 	return &UserIncomingApproval{
-		FromMappingId:        transfer.FromMappingId,
-		InitiatedByMappingId: transfer.InitiatedByMappingId,
+		FromListId:        transfer.FromListId,
+		InitiatedByListId: transfer.InitiatedByListId,
 		TransferTimes:        transfer.TransferTimes,
 		BadgeIds:             transfer.BadgeIds,
 		OwnershipTimes:       transfer.OwnershipTimes,

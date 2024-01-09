@@ -6,8 +6,8 @@
     "balancesType": "",
     "defaultOutgoingApprovals": [
       {
-        "toMappingId": "",
-        "initiatedByMappingId": "",
+        "toListId": "",
+        "initiatedByListId": "",
         "transferTimes": [
           {
             "start": "",
@@ -133,8 +133,8 @@
     ],
     "defaultIncomingApprovals": [
       {
-        "fromMappingId": "",
-        "initiatedByMappingId": "",
+        "fromListId": "",
+        "initiatedByListId": "",
         "transferTimes": [
           {
             "start": "",
@@ -263,8 +263,8 @@
     "defaultUserPermissions": {
       "canUpdateOutgoingApprovals": [
         {
-          "toMappingId": "",
-          "initiatedByMappingId": "",
+          "toListId": "",
+          "initiatedByListId": "",
           "transferTimes": [
             {
               "start": "",
@@ -285,13 +285,13 @@
           ],
           "amountTrackerId": "",
           "challengeTrackerId": "",
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -301,8 +301,8 @@
       ],
       "canUpdateIncomingApprovals": [
         {
-          "fromMappingId": "",
-          "initiatedByMappingId": "",
+          "fromListId": "",
+          "initiatedByListId": "",
           "transferTimes": [
             {
               "start": "",
@@ -323,13 +323,13 @@
           ],
           "amountTrackerId": "",
           "challengeTrackerId": "",
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -339,13 +339,13 @@
       ],
       "canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [
         {
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -355,13 +355,13 @@
       ],
       "canUpdateAutoApproveSelfInitiatedIncomingTransfers": [
         {
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -391,13 +391,13 @@
     "collectionPermissions": {
       "canDeleteCollection": [
         {
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -413,13 +413,13 @@
               "end": ""
             }
           ],
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -435,13 +435,13 @@
               "end": ""
             }
           ],
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -457,13 +457,13 @@
               "end": ""
             }
           ],
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -479,13 +479,13 @@
               "end": ""
             }
           ],
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -501,13 +501,13 @@
               "end": ""
             }
           ],
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -523,13 +523,13 @@
               "end": ""
             }
           ],
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -551,13 +551,13 @@
               "end": ""
             }
           ],
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -579,13 +579,13 @@
               "end": ""
             }
           ],
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -595,9 +595,9 @@
       ],
       "canUpdateCollectionApprovals": [
         {
-          "fromMappingId": "",
-          "toMappingId": "",
-          "initiatedByMappingId": "",
+          "fromListId": "",
+          "toListId": "",
+          "initiatedByListId": "",
           "transferTimes": [
             {
               "start": "",
@@ -618,13 +618,13 @@
           ],
           "amountTrackerId": "",
           "challengeTrackerId": "",
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -713,9 +713,9 @@
     "updateCollectionApprovals": false,
     "collectionApprovals": [
       {
-        "fromMappingId": "",
-        "toMappingId": "",
-        "initiatedByMappingId": "",
+        "fromListId": "",
+        "toListId": "",
+        "initiatedByListId": "",
         "transferTimes": [
           {
             "start": "",

@@ -8,21 +8,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMsgCreateAddressMappings_ValidateBasic(t *testing.T) {
+func TestMsgCreateAddressLists_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgCreateAddressMappings
+		msg  MsgCreateAddressLists
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgCreateAddressMappings{
+			msg: MsgCreateAddressLists{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgCreateAddressMappings{
+			msg: MsgCreateAddressLists{
 				Creator: sample.AccAddress(),
 			},
 		},

@@ -25,8 +25,8 @@ func TestMsgUniversalUpdateCollectionPermissions_ValidateBasic(t *testing.T) {
 				CollectionPermissions: &types.CollectionPermissions{
 					CanDeleteCollection: []*types.ActionPermission{
 						{
-							PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
-							ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+							PermanentlyPermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+							PermanentlyForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 						},
 					},
 				},
@@ -49,8 +49,8 @@ func TestMsgUniversalUpdateCollectionPermissions_ValidateBasic(t *testing.T) {
 				CollectionPermissions: &types.CollectionPermissions{
 					CanDeleteCollection: []*types.ActionPermission{
 						{
-							PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
-							ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+							PermanentlyPermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+							PermanentlyForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 						},
 					},
 				},
@@ -66,8 +66,8 @@ func TestMsgUniversalUpdateCollectionPermissions_ValidateBasic(t *testing.T) {
 				CollectionPermissions: &types.CollectionPermissions{
 					CanDeleteCollection: []*types.ActionPermission{
 						{
-							PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
-							ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(10), End: sdkmath.NewUint(22)}},
+							PermanentlyPermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+							PermanentlyForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(10), End: sdkmath.NewUint(22)}},
 						},
 					},
 				},

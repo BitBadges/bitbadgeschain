@@ -6,8 +6,8 @@
     "updateOutgoingApprovals": false,
     "outgoingApprovals": [
       {
-        "toMappingId": "",
-        "initiatedByMappingId": "",
+        "toListId": "",
+        "initiatedByListId": "",
         "transferTimes": [
           {
             "start": "",
@@ -134,8 +134,8 @@
     "updateIncomingApprovals": false,
     "incomingApprovals": [
       {
-        "fromMappingId": "",
-        "initiatedByMappingId": "",
+        "fromListId": "",
+        "initiatedByListId": "",
         "transferTimes": [
           {
             "start": "",
@@ -267,8 +267,8 @@
     "userPermissions": {
       "canUpdateOutgoingApprovals": [
         {
-          "toMappingId": "",
-          "initiatedByMappingId": "",
+          "toListId": "",
+          "initiatedByListId": "",
           "transferTimes": [
             {
               "start": "",
@@ -289,13 +289,13 @@
           ],
           "amountTrackerId": "",
           "challengeTrackerId": "",
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -305,8 +305,8 @@
       ],
       "canUpdateIncomingApprovals": [
         {
-          "fromMappingId": "",
-          "initiatedByMappingId": "",
+          "fromListId": "",
+          "initiatedByListId": "",
           "transferTimes": [
             {
               "start": "",
@@ -327,13 +327,13 @@
           ],
           "amountTrackerId": "",
           "challengeTrackerId": "",
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -343,13 +343,13 @@
       ],
       "canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [
         {
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""
@@ -359,13 +359,13 @@
       ],
       "canUpdateAutoApproveSelfInitiatedIncomingTransfers": [
         {
-          "permittedTimes": [
+          "permanentlyPermittedTimes": [
             {
               "start": "",
               "end": ""
             }
           ],
-          "forbiddenTimes": [
+          "permanentlyForbiddenTimes": [
             {
               "start": "",
               "end": ""

@@ -34,24 +34,24 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 			}
 			return json.Marshal(badgeTypes.QueryGetBalanceResponse{Balance: res.Balance})
 
-		case custom.QueryAddressMapping != nil:
-			res, err := keeper.GetAddressMapping(ctx, custom.QueryAddressMapping)
+		case custom.QueryAddressList != nil:
+			res, err := keeper.GetAddressList(ctx, custom.QueryAddressList)
 			if err != nil {
 				return nil, err
 			}
-			return json.Marshal(badgeTypes.QueryGetAddressMappingResponse{Mapping: res.Mapping})
-		case custom.QueryApprovalsTracker != nil:
-			res, err := keeper.GetApprovalsTracker(ctx, custom.QueryApprovalsTracker)
+			return json.Marshal(badgeTypes.QueryGetAddressListResponse{List: res.List})
+		case custom.QueryApprovalTracker != nil:
+			res, err := keeper.GetApprovalTracker(ctx, custom.QueryApprovalTracker)
 			if err != nil {
 				return nil, err
 			}
-			return json.Marshal(badgeTypes.QueryGetApprovalsTrackerResponse{Tracker: res.Tracker})
-		case custom.QueryGetNumUsedForMerkleChallenge != nil:
-			res, err := keeper.GetNumUsedForMerkleChallenge(ctx, custom.QueryGetNumUsedForMerkleChallenge)
+			return json.Marshal(badgeTypes.QueryGetApprovalTrackerResponse{Tracker: res.Tracker})
+		case custom.QueryGetChallengeTracker != nil:
+			res, err := keeper.GetChallengeTracker(ctx, custom.QueryGetChallengeTracker)
 			if err != nil {
 				return nil, err
 			}
-			return json.Marshal(badgeTypes.QueryGetNumUsedForMerkleChallengeResponse{NumUsed: res.NumUsed})
+			return json.Marshal(badgeTypes.QueryGetChallengeTrackerResponse{NumUsed: res.NumUsed})
 		}
 		return nil, sdkerrors.Wrap(types.ErrInvalidMsg, "Unknown Custom query variant")
 	}
@@ -60,7 +60,7 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 type badgeCustomQuery struct {
 	QueryCollection                   *badgeTypes.QueryGetCollectionRequest                `json:"queryCollection,omitempty"`
 	QueryBalance                      *badgeTypes.QueryGetBalanceRequest                   `json:"queryBalance,omitempty"`
-	QueryAddressMapping               *badgeTypes.QueryGetAddressMappingRequest            `json:"queryAddressMapping,omitempty"`
-	QueryApprovalsTracker             *badgeTypes.QueryGetApprovalsTrackerRequest          `json:"queryApprovalsTracker,omitempty"`
-	QueryGetNumUsedForMerkleChallenge *badgeTypes.QueryGetNumUsedForMerkleChallengeRequest `json:"queryGetNumUsedForMerkleChallenge,omitempty"`
+	QueryAddressList               *badgeTypes.QueryGetAddressListRequest            `json:"queryAddressList,omitempty"`
+	QueryApprovalTracker             *badgeTypes.QueryGetApprovalTrackerRequest          `json:"queryApprovalTracker,omitempty"`
+	QueryGetChallengeTracker *badgeTypes.QueryGetChallengeTrackerRequest `json:"queryGetChallengeTracker,omitempty"`
 }

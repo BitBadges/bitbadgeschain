@@ -54,14 +54,14 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/CreateAddressMappings",
+		"type": "badges/CreateAddressLists",
 		"value": {
 			"creator": "",
-			"addressMappings": [
+			"addressLists": [
 				{
-					"mappingId": "",
+					"listId": "",
 					"addresses": [],
-					"includeAddresses": false,
+					"allowlist": false,
 					"uri": "",
 					"customData": "",
 					"createdBy": "",
@@ -159,8 +159,8 @@ func GetSchemas() []string {
 				}],
 				"incomingApprovals":  [
 					{
-						"fromMappingId": "",
-						"initiatedByMappingId": "",
+						"fromListId": "",
+						"initiatedByListId": "",
 						"transferTimes": [
 							{
 								"start": "",
@@ -286,8 +286,8 @@ func GetSchemas() []string {
 				],
 				"outgoingApprovals": [
 					{
-						"toMappingId": "",
-						"initiatedByMappingId": "",
+						"toListId": "",
+						"initiatedByListId": "",
 						"transferTimes": [
 							{
 								"start": "",
@@ -414,8 +414,8 @@ func GetSchemas() []string {
 				"userPermissions": {
 					"canUpdateOutgoingApprovals": [
 						{
-							"toMappingId": "",
-							"initiatedByMappingId": "",
+							"toListId": "",
+							"initiatedByListId": "",
 							"transferTimes": [
 								{
 									"start": "",
@@ -436,13 +436,13 @@ func GetSchemas() []string {
 							],
 							"amountTrackerId": "",
 							"challengeTrackerId": "",
-							"permittedTimes": [
+							"permanentlyPermittedTimes": [
 								{
 									"start": "",
 									"end": ""
 								}
 							],
-							"forbiddenTimes": [
+							"permanentlyForbiddenTimes": [
 								{
 									"start": "",
 									"end": ""
@@ -452,8 +452,8 @@ func GetSchemas() []string {
 					],
 					"canUpdateIncomingApprovals": [
 						{
-							"fromMappingId": "",
-							"initiatedByMappingId": "",
+							"fromListId": "",
+							"initiatedByListId": "",
 							"transferTimes": [
 								{
 									"start": "",
@@ -474,13 +474,13 @@ func GetSchemas() []string {
 							],
 							"amountTrackerId": "",
 							"challengeTrackerId": "",
-							"permittedTimes": [
+							"permanentlyPermittedTimes": [
 								{
 									"start": "",
 									"end": ""
 								}
 							],
-							"forbiddenTimes": [
+							"permanentlyForbiddenTimes": [
 								{
 									"start": "",
 									"end": ""
@@ -490,13 +490,13 @@ func GetSchemas() []string {
 					],
 					"canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [
 						{
-							"permittedTimes": [
+							"permanentlyPermittedTimes": [
 								{
 									"start": "",
 									"end": ""
 								}
 							],
-							"forbiddenTimes": [
+							"permanentlyForbiddenTimes": [
 								{
 									"start": "",
 									"end": ""
@@ -506,13 +506,13 @@ func GetSchemas() []string {
 					],
 					"canUpdateAutoApproveSelfInitiatedIncomingTransfers": [
 						{
-							"permittedTimes": [
+							"permanentlyPermittedTimes": [
 								{
 									"start": "",
 									"end": ""
 								}
 							],
-							"forbiddenTimes": [
+							"permanentlyForbiddenTimes": [
 								{
 									"start": "",
 									"end": ""
@@ -545,13 +545,13 @@ func GetSchemas() []string {
 			"collectionPermissions": {
 				"canDeleteCollection": [
 					{
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -567,13 +567,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -589,13 +589,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -611,13 +611,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -633,13 +633,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -655,13 +655,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -677,13 +677,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -705,13 +705,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -733,13 +733,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -749,9 +749,9 @@ func GetSchemas() []string {
 				],
 				"canUpdateCollectionApprovals": [
 					{
-						"fromMappingId": "",
-						"toMappingId": "",
-						"initiatedByMappingId": "",
+						"fromListId": "",
+						"toListId": "",
+						"initiatedByListId": "",
 						"transferTimes": [
 							{
 								"start": "",
@@ -772,13 +772,13 @@ func GetSchemas() []string {
 						],
 						"amountTrackerId": "",
 						"challengeTrackerId": "",
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -867,9 +867,9 @@ func GetSchemas() []string {
 			"updateCollectionApprovals": false,
 			"collectionApprovals": [
 				{
-					"fromMappingId": "",
-					"toMappingId": "",
-					"initiatedByMappingId": "",
+					"fromListId": "",
+					"toListId": "",
+					"initiatedByListId": "",
 					"transferTimes": [
 						{
 							"start": "",
@@ -1032,8 +1032,8 @@ func GetSchemas() []string {
 			"updateOutgoingApprovals": false,
 			"outgoingApprovals": [
 				{
-					"toMappingId": "",
-					"initiatedByMappingId": "",
+					"toListId": "",
+					"initiatedByListId": "",
 					"transferTimes": [
 						{
 							"start": "",
@@ -1160,8 +1160,8 @@ func GetSchemas() []string {
 			"updateIncomingApprovals": false,
 			"incomingApprovals": [
 				{
-					"fromMappingId": "",
-					"initiatedByMappingId": "",
+					"fromListId": "",
+					"initiatedByListId": "",
 					"transferTimes": [
 						{
 							"start": "",
@@ -1293,8 +1293,8 @@ func GetSchemas() []string {
 			"userPermissions": {
 				"canUpdateOutgoingApprovals": [
 					{
-						"toMappingId": "",
-						"initiatedByMappingId": "",
+						"toListId": "",
+						"initiatedByListId": "",
 						"transferTimes": [
 							{
 								"start": "",
@@ -1315,13 +1315,13 @@ func GetSchemas() []string {
 						],
 						"amountTrackerId": "",
 						"challengeTrackerId": "",
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -1331,8 +1331,8 @@ func GetSchemas() []string {
 				],
 				"canUpdateIncomingApprovals": [
 					{
-						"fromMappingId": "",
-						"initiatedByMappingId": "",
+						"fromListId": "",
+						"initiatedByListId": "",
 						"transferTimes": [
 							{
 								"start": "",
@@ -1353,13 +1353,13 @@ func GetSchemas() []string {
 						],
 						"amountTrackerId": "",
 						"challengeTrackerId": "",
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -1369,13 +1369,13 @@ func GetSchemas() []string {
 				],
 				"canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [
 					{
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -1385,13 +1385,13 @@ func GetSchemas() []string {
 				],
 				"canUpdateAutoApproveSelfInitiatedIncomingTransfers": [
 					{
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -1426,8 +1426,8 @@ func GetSchemas() []string {
 				}],
 				"incomingApprovals":  [
 					{
-						"fromMappingId": "",
-						"initiatedByMappingId": "",
+						"fromListId": "",
+						"initiatedByListId": "",
 						"transferTimes": [
 							{
 								"start": "",
@@ -1553,8 +1553,8 @@ func GetSchemas() []string {
 				],
 				"outgoingApprovals": [
 					{
-						"toMappingId": "",
-						"initiatedByMappingId": "",
+						"toListId": "",
+						"initiatedByListId": "",
 						"transferTimes": [
 							{
 								"start": "",
@@ -1681,8 +1681,8 @@ func GetSchemas() []string {
 				"userPermissions": {
 					"canUpdateOutgoingApprovals": [
 						{
-							"toMappingId": "",
-							"initiatedByMappingId": "",
+							"toListId": "",
+							"initiatedByListId": "",
 							"transferTimes": [
 								{
 									"start": "",
@@ -1703,13 +1703,13 @@ func GetSchemas() []string {
 							],
 							"amountTrackerId": "",
 							"challengeTrackerId": "",
-							"permittedTimes": [
+							"permanentlyPermittedTimes": [
 								{
 									"start": "",
 									"end": ""
 								}
 							],
-							"forbiddenTimes": [
+							"permanentlyForbiddenTimes": [
 								{
 									"start": "",
 									"end": ""
@@ -1719,8 +1719,8 @@ func GetSchemas() []string {
 					],
 					"canUpdateIncomingApprovals": [
 						{
-							"fromMappingId": "",
-							"initiatedByMappingId": "",
+							"fromListId": "",
+							"initiatedByListId": "",
 							"transferTimes": [
 								{
 									"start": "",
@@ -1741,13 +1741,13 @@ func GetSchemas() []string {
 							],
 							"amountTrackerId": "",
 							"challengeTrackerId": "",
-							"permittedTimes": [
+							"permanentlyPermittedTimes": [
 								{
 									"start": "",
 									"end": ""
 								}
 							],
-							"forbiddenTimes": [
+							"permanentlyForbiddenTimes": [
 								{
 									"start": "",
 									"end": ""
@@ -1757,13 +1757,13 @@ func GetSchemas() []string {
 					],
 					"canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [
 						{
-							"permittedTimes": [
+							"permanentlyPermittedTimes": [
 								{
 									"start": "",
 									"end": ""
 								}
 							],
-							"forbiddenTimes": [
+							"permanentlyForbiddenTimes": [
 								{
 									"start": "",
 									"end": ""
@@ -1773,13 +1773,13 @@ func GetSchemas() []string {
 					],
 					"canUpdateAutoApproveSelfInitiatedIncomingTransfers": [
 						{
-							"permittedTimes": [
+							"permanentlyPermittedTimes": [
 								{
 									"start": "",
 									"end": ""
 								}
 							],
-							"forbiddenTimes": [
+							"permanentlyForbiddenTimes": [
 								{
 									"start": "",
 									"end": ""
@@ -1811,13 +1811,13 @@ func GetSchemas() []string {
 			"collectionPermissions": {
 				"canDeleteCollection": [
 					{
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -1833,13 +1833,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -1855,13 +1855,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -1877,13 +1877,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -1899,13 +1899,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -1921,13 +1921,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -1943,13 +1943,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -1971,13 +1971,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -1999,13 +1999,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -2015,9 +2015,9 @@ func GetSchemas() []string {
 				],
 				"canUpdateCollectionApprovals": [
 					{
-						"fromMappingId": "",
-						"toMappingId": "",
-						"initiatedByMappingId": "",
+						"fromListId": "",
+						"toListId": "",
+						"initiatedByListId": "",
 						"transferTimes": [
 							{
 								"start": "",
@@ -2038,13 +2038,13 @@ func GetSchemas() []string {
 						],
 						"amountTrackerId": "",
 						"challengeTrackerId": "",
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -2127,9 +2127,9 @@ func GetSchemas() []string {
 			],
 			"collectionApprovals": [
 				{
-					"fromMappingId": "",
-					"toMappingId": "",
-					"initiatedByMappingId": "",
+					"fromListId": "",
+					"toListId": "",
+					"initiatedByListId": "",
 					"transferTimes": [
 						{
 							"start": "",
@@ -2308,13 +2308,13 @@ func GetSchemas() []string {
 			"collectionPermissions": {
 				"canDeleteCollection": [
 					{
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -2330,13 +2330,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -2352,13 +2352,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -2374,13 +2374,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -2396,13 +2396,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -2418,13 +2418,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -2440,13 +2440,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -2468,13 +2468,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -2496,13 +2496,13 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -2512,9 +2512,9 @@ func GetSchemas() []string {
 				],
 				"canUpdateCollectionApprovals": [
 					{
-						"fromMappingId": "",
-						"toMappingId": "",
-						"initiatedByMappingId": "",
+						"fromListId": "",
+						"toListId": "",
+						"initiatedByListId": "",
 						"transferTimes": [
 							{
 								"start": "",
@@ -2535,13 +2535,13 @@ func GetSchemas() []string {
 						],
 						"amountTrackerId": "",
 						"challengeTrackerId": "",
-						"permittedTimes": [
+						"permanentlyPermittedTimes": [
 							{
 								"start": "",
 								"end": ""
 							}
 						],
-						"forbiddenTimes": [
+						"permanentlyForbiddenTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -2630,9 +2630,9 @@ func GetSchemas() []string {
 			"updateCollectionApprovals": false,
 			"collectionApprovals": [
 				{
-					"fromMappingId": "",
-					"toMappingId": "",
-					"initiatedByMappingId": "",
+					"fromListId": "",
+					"toListId": "",
+					"initiatedByListId": "",
 					"transferTimes": [
 						{
 							"start": "",

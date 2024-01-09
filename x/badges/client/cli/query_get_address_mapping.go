@@ -11,10 +11,10 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdGetAddressMapping() *cobra.Command {
+func CmdGetAddressList() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-address-mapping [id]",
-		Short: "Query getAddressMapping",
+		Use:   "get-address-list [id]",
+		Short: "Query getAddressList",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
@@ -25,11 +25,11 @@ func CmdGetAddressMapping() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryGetAddressMappingRequest{
-				MappingId: args[0],
+			params := &types.QueryGetAddressListRequest{
+				ListId: args[0],
 			}
 
-			res, err := queryClient.GetAddressMapping(cmd.Context(), params)
+			res, err := queryClient.GetAddressList(cmd.Context(), params)
 			if err != nil {
 				return err
 			}

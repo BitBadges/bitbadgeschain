@@ -283,22 +283,22 @@ func (m *QueryGetBalanceResponse) GetBalance() *UserBalanceStore {
 	return nil
 }
 
-type QueryGetAddressMappingRequest struct {
-	MappingId string `protobuf:"bytes,1,opt,name=mappingId,proto3" json:"mappingId,omitempty"`
+type QueryGetAddressListRequest struct {
+	ListId string `protobuf:"bytes,1,opt,name=listId,proto3" json:"listId,omitempty"`
 }
 
-func (m *QueryGetAddressMappingRequest) Reset()         { *m = QueryGetAddressMappingRequest{} }
-func (m *QueryGetAddressMappingRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetAddressMappingRequest) ProtoMessage()    {}
-func (*QueryGetAddressMappingRequest) Descriptor() ([]byte, []int) {
+func (m *QueryGetAddressListRequest) Reset()         { *m = QueryGetAddressListRequest{} }
+func (m *QueryGetAddressListRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryGetAddressListRequest) ProtoMessage()    {}
+func (*QueryGetAddressListRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_938ed0d19dbc00d5, []int{6}
 }
-func (m *QueryGetAddressMappingRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetAddressListRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetAddressMappingRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetAddressListRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetAddressMappingRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetAddressListRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -308,41 +308,41 @@ func (m *QueryGetAddressMappingRequest) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *QueryGetAddressMappingRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetAddressMappingRequest.Merge(m, src)
+func (m *QueryGetAddressListRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetAddressListRequest.Merge(m, src)
 }
-func (m *QueryGetAddressMappingRequest) XXX_Size() int {
+func (m *QueryGetAddressListRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetAddressMappingRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetAddressMappingRequest.DiscardUnknown(m)
+func (m *QueryGetAddressListRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetAddressListRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetAddressMappingRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetAddressListRequest proto.InternalMessageInfo
 
-func (m *QueryGetAddressMappingRequest) GetMappingId() string {
+func (m *QueryGetAddressListRequest) GetListId() string {
 	if m != nil {
-		return m.MappingId
+		return m.ListId
 	}
 	return ""
 }
 
-type QueryGetAddressMappingResponse struct {
-	Mapping *AddressMapping `protobuf:"bytes,1,opt,name=mapping,proto3" json:"mapping,omitempty"`
+type QueryGetAddressListResponse struct {
+	List *AddressList `protobuf:"bytes,1,opt,name=list,proto3" json:"list,omitempty"`
 }
 
-func (m *QueryGetAddressMappingResponse) Reset()         { *m = QueryGetAddressMappingResponse{} }
-func (m *QueryGetAddressMappingResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetAddressMappingResponse) ProtoMessage()    {}
-func (*QueryGetAddressMappingResponse) Descriptor() ([]byte, []int) {
+func (m *QueryGetAddressListResponse) Reset()         { *m = QueryGetAddressListResponse{} }
+func (m *QueryGetAddressListResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryGetAddressListResponse) ProtoMessage()    {}
+func (*QueryGetAddressListResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_938ed0d19dbc00d5, []int{7}
 }
-func (m *QueryGetAddressMappingResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetAddressListResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetAddressMappingResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetAddressListResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetAddressMappingResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetAddressListResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -352,26 +352,26 @@ func (m *QueryGetAddressMappingResponse) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
-func (m *QueryGetAddressMappingResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetAddressMappingResponse.Merge(m, src)
+func (m *QueryGetAddressListResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetAddressListResponse.Merge(m, src)
 }
-func (m *QueryGetAddressMappingResponse) XXX_Size() int {
+func (m *QueryGetAddressListResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetAddressMappingResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetAddressMappingResponse.DiscardUnknown(m)
+func (m *QueryGetAddressListResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetAddressListResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetAddressMappingResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetAddressListResponse proto.InternalMessageInfo
 
-func (m *QueryGetAddressMappingResponse) GetMapping() *AddressMapping {
+func (m *QueryGetAddressListResponse) GetList() *AddressList {
 	if m != nil {
-		return m.Mapping
+		return m.List
 	}
 	return nil
 }
 
-type QueryGetApprovalsTrackerRequest struct {
+type QueryGetApprovalTrackerRequest struct {
 	CollectionId    Uint   `protobuf:"bytes,5,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 	ApprovalLevel   string `protobuf:"bytes,2,opt,name=approvalLevel,proto3" json:"approvalLevel,omitempty"`
 	ApproverAddress string `protobuf:"bytes,3,opt,name=approverAddress,proto3" json:"approverAddress,omitempty"`
@@ -380,18 +380,18 @@ type QueryGetApprovalsTrackerRequest struct {
 	ApprovedAddress string `protobuf:"bytes,6,opt,name=approvedAddress,proto3" json:"approvedAddress,omitempty"`
 }
 
-func (m *QueryGetApprovalsTrackerRequest) Reset()         { *m = QueryGetApprovalsTrackerRequest{} }
-func (m *QueryGetApprovalsTrackerRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetApprovalsTrackerRequest) ProtoMessage()    {}
-func (*QueryGetApprovalsTrackerRequest) Descriptor() ([]byte, []int) {
+func (m *QueryGetApprovalTrackerRequest) Reset()         { *m = QueryGetApprovalTrackerRequest{} }
+func (m *QueryGetApprovalTrackerRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryGetApprovalTrackerRequest) ProtoMessage()    {}
+func (*QueryGetApprovalTrackerRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_938ed0d19dbc00d5, []int{8}
 }
-func (m *QueryGetApprovalsTrackerRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetApprovalTrackerRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetApprovalsTrackerRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetApprovalTrackerRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetApprovalsTrackerRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetApprovalTrackerRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -401,69 +401,69 @@ func (m *QueryGetApprovalsTrackerRequest) XXX_Marshal(b []byte, deterministic bo
 		return b[:n], nil
 	}
 }
-func (m *QueryGetApprovalsTrackerRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetApprovalsTrackerRequest.Merge(m, src)
+func (m *QueryGetApprovalTrackerRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetApprovalTrackerRequest.Merge(m, src)
 }
-func (m *QueryGetApprovalsTrackerRequest) XXX_Size() int {
+func (m *QueryGetApprovalTrackerRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetApprovalsTrackerRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetApprovalsTrackerRequest.DiscardUnknown(m)
+func (m *QueryGetApprovalTrackerRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetApprovalTrackerRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetApprovalsTrackerRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetApprovalTrackerRequest proto.InternalMessageInfo
 
-func (m *QueryGetApprovalsTrackerRequest) GetApprovalLevel() string {
+func (m *QueryGetApprovalTrackerRequest) GetApprovalLevel() string {
 	if m != nil {
 		return m.ApprovalLevel
 	}
 	return ""
 }
 
-func (m *QueryGetApprovalsTrackerRequest) GetApproverAddress() string {
+func (m *QueryGetApprovalTrackerRequest) GetApproverAddress() string {
 	if m != nil {
 		return m.ApproverAddress
 	}
 	return ""
 }
 
-func (m *QueryGetApprovalsTrackerRequest) GetAmountTrackerId() string {
+func (m *QueryGetApprovalTrackerRequest) GetAmountTrackerId() string {
 	if m != nil {
 		return m.AmountTrackerId
 	}
 	return ""
 }
 
-func (m *QueryGetApprovalsTrackerRequest) GetTrackerType() string {
+func (m *QueryGetApprovalTrackerRequest) GetTrackerType() string {
 	if m != nil {
 		return m.TrackerType
 	}
 	return ""
 }
 
-func (m *QueryGetApprovalsTrackerRequest) GetApprovedAddress() string {
+func (m *QueryGetApprovalTrackerRequest) GetApprovedAddress() string {
 	if m != nil {
 		return m.ApprovedAddress
 	}
 	return ""
 }
 
-type QueryGetApprovalsTrackerResponse struct {
-	Tracker *ApprovalsTracker `protobuf:"bytes,1,opt,name=tracker,proto3" json:"tracker,omitempty"`
+type QueryGetApprovalTrackerResponse struct {
+	Tracker *ApprovalTracker `protobuf:"bytes,1,opt,name=tracker,proto3" json:"tracker,omitempty"`
 }
 
-func (m *QueryGetApprovalsTrackerResponse) Reset()         { *m = QueryGetApprovalsTrackerResponse{} }
-func (m *QueryGetApprovalsTrackerResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetApprovalsTrackerResponse) ProtoMessage()    {}
-func (*QueryGetApprovalsTrackerResponse) Descriptor() ([]byte, []int) {
+func (m *QueryGetApprovalTrackerResponse) Reset()         { *m = QueryGetApprovalTrackerResponse{} }
+func (m *QueryGetApprovalTrackerResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryGetApprovalTrackerResponse) ProtoMessage()    {}
+func (*QueryGetApprovalTrackerResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_938ed0d19dbc00d5, []int{9}
 }
-func (m *QueryGetApprovalsTrackerResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetApprovalTrackerResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetApprovalsTrackerResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetApprovalTrackerResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetApprovalsTrackerResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetApprovalTrackerResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -473,26 +473,26 @@ func (m *QueryGetApprovalsTrackerResponse) XXX_Marshal(b []byte, deterministic b
 		return b[:n], nil
 	}
 }
-func (m *QueryGetApprovalsTrackerResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetApprovalsTrackerResponse.Merge(m, src)
+func (m *QueryGetApprovalTrackerResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetApprovalTrackerResponse.Merge(m, src)
 }
-func (m *QueryGetApprovalsTrackerResponse) XXX_Size() int {
+func (m *QueryGetApprovalTrackerResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetApprovalsTrackerResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetApprovalsTrackerResponse.DiscardUnknown(m)
+func (m *QueryGetApprovalTrackerResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetApprovalTrackerResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetApprovalsTrackerResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetApprovalTrackerResponse proto.InternalMessageInfo
 
-func (m *QueryGetApprovalsTrackerResponse) GetTracker() *ApprovalsTracker {
+func (m *QueryGetApprovalTrackerResponse) GetTracker() *ApprovalTracker {
 	if m != nil {
 		return m.Tracker
 	}
 	return nil
 }
 
-type QueryGetNumUsedForMerkleChallengeRequest struct {
+type QueryGetChallengeTrackerRequest struct {
 	CollectionId       Uint   `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 	ApprovalLevel      string `protobuf:"bytes,2,opt,name=approvalLevel,proto3" json:"approvalLevel,omitempty"`
 	ApproverAddress    string `protobuf:"bytes,3,opt,name=approverAddress,proto3" json:"approverAddress,omitempty"`
@@ -500,20 +500,18 @@ type QueryGetNumUsedForMerkleChallengeRequest struct {
 	LeafIndex          Uint   `protobuf:"bytes,5,opt,name=leafIndex,proto3,customtype=Uint" json:"leafIndex"`
 }
 
-func (m *QueryGetNumUsedForMerkleChallengeRequest) Reset() {
-	*m = QueryGetNumUsedForMerkleChallengeRequest{}
-}
-func (m *QueryGetNumUsedForMerkleChallengeRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetNumUsedForMerkleChallengeRequest) ProtoMessage()    {}
-func (*QueryGetNumUsedForMerkleChallengeRequest) Descriptor() ([]byte, []int) {
+func (m *QueryGetChallengeTrackerRequest) Reset()         { *m = QueryGetChallengeTrackerRequest{} }
+func (m *QueryGetChallengeTrackerRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryGetChallengeTrackerRequest) ProtoMessage()    {}
+func (*QueryGetChallengeTrackerRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_938ed0d19dbc00d5, []int{10}
 }
-func (m *QueryGetNumUsedForMerkleChallengeRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetChallengeTrackerRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetNumUsedForMerkleChallengeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetChallengeTrackerRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetNumUsedForMerkleChallengeRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetChallengeTrackerRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -523,59 +521,55 @@ func (m *QueryGetNumUsedForMerkleChallengeRequest) XXX_Marshal(b []byte, determi
 		return b[:n], nil
 	}
 }
-func (m *QueryGetNumUsedForMerkleChallengeRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetNumUsedForMerkleChallengeRequest.Merge(m, src)
+func (m *QueryGetChallengeTrackerRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetChallengeTrackerRequest.Merge(m, src)
 }
-func (m *QueryGetNumUsedForMerkleChallengeRequest) XXX_Size() int {
+func (m *QueryGetChallengeTrackerRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetNumUsedForMerkleChallengeRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetNumUsedForMerkleChallengeRequest.DiscardUnknown(m)
+func (m *QueryGetChallengeTrackerRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetChallengeTrackerRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetNumUsedForMerkleChallengeRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetChallengeTrackerRequest proto.InternalMessageInfo
 
-func (m *QueryGetNumUsedForMerkleChallengeRequest) GetApprovalLevel() string {
+func (m *QueryGetChallengeTrackerRequest) GetApprovalLevel() string {
 	if m != nil {
 		return m.ApprovalLevel
 	}
 	return ""
 }
 
-func (m *QueryGetNumUsedForMerkleChallengeRequest) GetApproverAddress() string {
+func (m *QueryGetChallengeTrackerRequest) GetApproverAddress() string {
 	if m != nil {
 		return m.ApproverAddress
 	}
 	return ""
 }
 
-func (m *QueryGetNumUsedForMerkleChallengeRequest) GetChallengeTrackerId() string {
+func (m *QueryGetChallengeTrackerRequest) GetChallengeTrackerId() string {
 	if m != nil {
 		return m.ChallengeTrackerId
 	}
 	return ""
 }
 
-type QueryGetNumUsedForMerkleChallengeResponse struct {
+type QueryGetChallengeTrackerResponse struct {
 	NumUsed Uint `protobuf:"bytes,1,opt,name=numUsed,proto3,customtype=Uint" json:"numUsed"`
 }
 
-func (m *QueryGetNumUsedForMerkleChallengeResponse) Reset() {
-	*m = QueryGetNumUsedForMerkleChallengeResponse{}
-}
-func (m *QueryGetNumUsedForMerkleChallengeResponse) String() string {
-	return proto.CompactTextString(m)
-}
-func (*QueryGetNumUsedForMerkleChallengeResponse) ProtoMessage() {}
-func (*QueryGetNumUsedForMerkleChallengeResponse) Descriptor() ([]byte, []int) {
+func (m *QueryGetChallengeTrackerResponse) Reset()         { *m = QueryGetChallengeTrackerResponse{} }
+func (m *QueryGetChallengeTrackerResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryGetChallengeTrackerResponse) ProtoMessage()    {}
+func (*QueryGetChallengeTrackerResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_938ed0d19dbc00d5, []int{11}
 }
-func (m *QueryGetNumUsedForMerkleChallengeResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetChallengeTrackerResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetNumUsedForMerkleChallengeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetChallengeTrackerResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetNumUsedForMerkleChallengeResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetChallengeTrackerResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -585,17 +579,17 @@ func (m *QueryGetNumUsedForMerkleChallengeResponse) XXX_Marshal(b []byte, determ
 		return b[:n], nil
 	}
 }
-func (m *QueryGetNumUsedForMerkleChallengeResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetNumUsedForMerkleChallengeResponse.Merge(m, src)
+func (m *QueryGetChallengeTrackerResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetChallengeTrackerResponse.Merge(m, src)
 }
-func (m *QueryGetNumUsedForMerkleChallengeResponse) XXX_Size() int {
+func (m *QueryGetChallengeTrackerResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetNumUsedForMerkleChallengeResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetNumUsedForMerkleChallengeResponse.DiscardUnknown(m)
+func (m *QueryGetChallengeTrackerResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetChallengeTrackerResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetNumUsedForMerkleChallengeResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetChallengeTrackerResponse proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*QueryParamsRequest)(nil), "badges.QueryParamsRequest")
@@ -604,76 +598,74 @@ func init() {
 	proto.RegisterType((*QueryGetCollectionResponse)(nil), "badges.QueryGetCollectionResponse")
 	proto.RegisterType((*QueryGetBalanceRequest)(nil), "badges.QueryGetBalanceRequest")
 	proto.RegisterType((*QueryGetBalanceResponse)(nil), "badges.QueryGetBalanceResponse")
-	proto.RegisterType((*QueryGetAddressMappingRequest)(nil), "badges.QueryGetAddressMappingRequest")
-	proto.RegisterType((*QueryGetAddressMappingResponse)(nil), "badges.QueryGetAddressMappingResponse")
-	proto.RegisterType((*QueryGetApprovalsTrackerRequest)(nil), "badges.QueryGetApprovalsTrackerRequest")
-	proto.RegisterType((*QueryGetApprovalsTrackerResponse)(nil), "badges.QueryGetApprovalsTrackerResponse")
-	proto.RegisterType((*QueryGetNumUsedForMerkleChallengeRequest)(nil), "badges.QueryGetNumUsedForMerkleChallengeRequest")
-	proto.RegisterType((*QueryGetNumUsedForMerkleChallengeResponse)(nil), "badges.QueryGetNumUsedForMerkleChallengeResponse")
+	proto.RegisterType((*QueryGetAddressListRequest)(nil), "badges.QueryGetAddressListRequest")
+	proto.RegisterType((*QueryGetAddressListResponse)(nil), "badges.QueryGetAddressListResponse")
+	proto.RegisterType((*QueryGetApprovalTrackerRequest)(nil), "badges.QueryGetApprovalTrackerRequest")
+	proto.RegisterType((*QueryGetApprovalTrackerResponse)(nil), "badges.QueryGetApprovalTrackerResponse")
+	proto.RegisterType((*QueryGetChallengeTrackerRequest)(nil), "badges.QueryGetChallengeTrackerRequest")
+	proto.RegisterType((*QueryGetChallengeTrackerResponse)(nil), "badges.QueryGetChallengeTrackerResponse")
 }
 
 func init() { proto.RegisterFile("badges/query.proto", fileDescriptor_938ed0d19dbc00d5) }
 
 var fileDescriptor_938ed0d19dbc00d5 = []byte{
-	// 921 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0x41, 0x6f, 0x1b, 0x45,
-	0x14, 0xce, 0x9a, 0xd4, 0x51, 0x5e, 0x5b, 0x10, 0x93, 0x92, 0x9a, 0x25, 0x75, 0xc2, 0x0a, 0xda,
-	0xb4, 0x42, 0xde, 0x24, 0x1c, 0x38, 0x81, 0x8a, 0x23, 0x5a, 0x2a, 0xd5, 0x08, 0xdc, 0x9a, 0x03,
-	0x17, 0x6b, 0xbc, 0x3b, 0xd9, 0xac, 0xba, 0xde, 0xd9, 0xce, 0xac, 0xa3, 0x46, 0x96, 0x2f, 0x9c,
-	0xb8, 0x80, 0x2a, 0x71, 0x40, 0x15, 0x85, 0x0b, 0x57, 0x7e, 0x48, 0x8f, 0x95, 0xb8, 0x20, 0x0e,
-	0x15, 0x4a, 0xf8, 0x21, 0xc8, 0x3b, 0x6f, 0x76, 0xbd, 0xeb, 0x75, 0x6d, 0x42, 0x4f, 0xf6, 0xbe,
-	0xf7, 0xcd, 0xf7, 0xbe, 0xf7, 0xed, 0xcc, 0x9b, 0x05, 0xd2, 0xa3, 0xae, 0xc7, 0xa4, 0xfd, 0x70,
-	0xc0, 0xc4, 0x71, 0x23, 0x12, 0x3c, 0xe6, 0xa4, 0xaa, 0x62, 0xe6, 0x25, 0x8f, 0x7b, 0x3c, 0x09,
-	0xd9, 0xe3, 0x7f, 0x2a, 0x6b, 0x6e, 0x78, 0x9c, 0x7b, 0x01, 0xb3, 0x69, 0xe4, 0xdb, 0x34, 0x0c,
-	0x79, 0x4c, 0x63, 0x9f, 0x87, 0x12, 0xb3, 0x37, 0x1c, 0x2e, 0xfb, 0x5c, 0xda, 0x3d, 0x2a, 0x99,
-	0x22, 0xb5, 0x8f, 0x76, 0x7b, 0x2c, 0xa6, 0xbb, 0x76, 0x44, 0x3d, 0x3f, 0x4c, 0xc0, 0x88, 0x5d,
-	0xc3, 0xda, 0x11, 0x15, 0xb4, 0xaf, 0x09, 0x6a, 0x18, 0x74, 0x78, 0x10, 0x30, 0x67, 0x92, 0xfa,
-	0x2d, 0xcc, 0xf4, 0x68, 0x40, 0x43, 0x87, 0xe9, 0xf0, 0x3a, 0x86, 0x63, 0x41, 0x43, 0x79, 0xc0,
-	0x84, 0x8e, 0x5f, 0xc1, 0x38, 0x75, 0x5d, 0xc1, 0xa4, 0xec, 0xf6, 0x69, 0x14, 0xf9, 0xa1, 0x87,
-	0x69, 0xeb, 0x12, 0x90, 0xaf, 0xc6, 0xf2, 0xbe, 0x4c, 0x8a, 0xb7, 0xd9, 0xc3, 0x01, 0x93, 0xb1,
-	0xb5, 0x0f, 0x6b, 0xb9, 0xa8, 0x8c, 0x78, 0x28, 0x19, 0xf9, 0x00, 0xaa, 0x4a, 0x64, 0xcd, 0xd8,
-	0x32, 0xb6, 0xcf, 0xef, 0xbd, 0xde, 0x50, 0xe4, 0x0d, 0x85, 0x6b, 0x2e, 0x3f, 0x7b, 0xb1, 0xb9,
-	0xd4, 0x46, 0x8c, 0xd5, 0x82, 0xb7, 0x13, 0x92, 0xdb, 0x2c, 0xde, 0x4f, 0xbb, 0xc0, 0x0a, 0x64,
-	0x07, 0x2e, 0x64, 0xad, 0xdd, 0x71, 0x13, 0xc2, 0xd5, 0xe6, 0x85, 0x31, 0xc1, 0x5f, 0x2f, 0x36,
-	0x97, 0x3b, 0x7e, 0x18, 0xb7, 0x73, 0x08, 0xab, 0x03, 0x66, 0x19, 0x1d, 0x4a, 0xfb, 0x08, 0x20,
-	0x43, 0xa3, 0xbc, 0xcb, 0x5a, 0x5e, 0x73, 0xfc, 0x33, 0xb1, 0x68, 0x02, 0x6a, 0xb9, 0xb0, 0xae,
-	0x69, 0x9b, 0xca, 0xd1, 0x33, 0x4b, 0x24, 0x35, 0x58, 0x41, 0x9b, 0x6b, 0x95, 0x31, 0xb8, 0xad,
-	0x1f, 0xad, 0x16, 0x5c, 0x9e, 0xaa, 0x82, 0xca, 0xf7, 0x60, 0x05, 0x5f, 0x25, 0xca, 0xae, 0x69,
-	0xd9, 0x1d, 0xc9, 0x04, 0xa2, 0xef, 0xc5, 0x5c, 0xb0, 0xb6, 0x06, 0x5a, 0x1f, 0xc3, 0x15, 0x4d,
-	0xf7, 0xa9, 0xaa, 0xd0, 0x52, 0xaf, 0x55, 0x6b, 0xdf, 0x80, 0x55, 0x7c, 0xd1, 0x5a, 0x78, 0x3b,
-	0x0b, 0x58, 0x6d, 0xa8, 0xcf, 0x5a, 0x8e, 0xa2, 0x76, 0x60, 0x05, 0xe1, 0x28, 0x6a, 0x5d, 0x8b,
-	0x2a, 0x2c, 0xd0, 0x30, 0xeb, 0x49, 0x05, 0x36, 0x53, 0xd2, 0x28, 0x12, 0xfc, 0x88, 0x06, 0xf2,
-	0xbe, 0xa0, 0xce, 0x03, 0x26, 0x66, 0x39, 0x7a, 0x6e, 0xae, 0xa3, 0xef, 0xc1, 0x45, 0x8a, 0x64,
-	0x77, 0xd9, 0x11, 0x0b, 0xd0, 0xd7, 0x7c, 0x90, 0x6c, 0xc3, 0x1b, 0x2a, 0xc0, 0x04, 0xca, 0xab,
-	0xbd, 0x96, 0xe0, 0x8a, 0xe1, 0x04, 0xd9, 0xe7, 0x83, 0x30, 0x46, 0x65, 0xa9, 0x3b, 0xc5, 0x30,
-	0xd9, 0x82, 0xf3, 0xb1, 0x7a, 0xb8, 0x7f, 0x1c, 0xb1, 0xda, 0x72, 0x82, 0x9a, 0x0c, 0x4d, 0x54,
-	0x75, 0x75, 0xd5, 0x6a, 0xae, 0xaa, 0x0e, 0x5b, 0x5f, 0xc3, 0xd6, 0x6c, 0x6b, 0xb2, 0x6d, 0x80,
-	0xe4, 0xc5, 0x6d, 0x30, 0xb5, 0x44, 0x03, 0xad, 0xef, 0x2a, 0xb0, 0xad, 0x89, 0xbf, 0x18, 0xf4,
-	0x3b, 0x92, 0xb9, 0xb7, 0xb8, 0x68, 0x31, 0xf1, 0x20, 0x60, 0xfb, 0x87, 0x34, 0x08, 0x58, 0xe8,
-	0xfd, 0x8f, 0xed, 0xfc, 0xaa, 0xcd, 0x6f, 0x00, 0x71, 0xb4, 0xaa, 0xcc, 0x7f, 0xe5, 0x6c, 0x49,
-	0x86, 0xdc, 0x80, 0xd5, 0x80, 0xd1, 0x83, 0x3b, 0xa1, 0xcb, 0x1e, 0x95, 0xee, 0x95, 0x2c, 0x6d,
-	0xdd, 0x83, 0xeb, 0x0b, 0x38, 0x81, 0x5e, 0x5f, 0x85, 0x95, 0x50, 0x81, 0x4a, 0x5d, 0xd0, 0xc9,
-	0xbd, 0x9f, 0x57, 0xe1, 0x5c, 0xc2, 0x4a, 0x04, 0x54, 0xd5, 0x8c, 0x23, 0xa6, 0x7e, 0x2d, 0xd3,
-	0x63, 0xd3, 0x7c, 0xa7, 0x34, 0xa7, 0x8a, 0x5a, 0xf6, 0xb7, 0x7f, 0xfc, 0xf3, 0x63, 0xe5, 0x3a,
-	0xb9, 0x66, 0xf7, 0xfc, 0x58, 0xcf, 0x70, 0xfd, 0xcf, 0x39, 0xa4, 0x7e, 0x68, 0xe7, 0x2e, 0x02,
-	0xf2, 0xab, 0x01, 0x17, 0x73, 0xc3, 0x8e, 0xbc, 0x9b, 0xe3, 0x2f, 0x9b, 0xab, 0xa6, 0xf5, 0x32,
-	0x08, 0x2a, 0xb9, 0x95, 0x28, 0xb9, 0x49, 0x3e, 0x99, 0xab, 0xc4, 0x63, 0x71, 0x37, 0xdb, 0x12,
-	0xf6, 0x70, 0x72, 0x7b, 0x8c, 0xc8, 0xef, 0x06, 0xbc, 0x39, 0x35, 0x42, 0xc8, 0xfb, 0x45, 0x05,
-	0xa5, 0x13, 0xca, 0xbc, 0x3a, 0x0f, 0x86, 0x62, 0x3f, 0x4f, 0xc4, 0x36, 0xc9, 0xcd, 0x85, 0xc4,
-	0x16, 0x6e, 0x39, 0x7b, 0x98, 0x0e, 0xbd, 0x11, 0xf9, 0xa1, 0x02, 0x6b, 0x25, 0x27, 0x90, 0x5c,
-	0x9b, 0x52, 0x52, 0x3e, 0xbe, 0xcc, 0xed, 0xf9, 0x40, 0x14, 0xfd, 0x9b, 0x91, 0xa8, 0x7e, 0x6a,
-	0x90, 0x27, 0xc6, 0x62, 0xba, 0x35, 0x53, 0x17, 0xcf, 0x76, 0xc1, 0x6b, 0x7b, 0x98, 0x3b, 0x74,
-	0xe9, 0x73, 0x7a, 0xb8, 0xc6, 0x91, 0xfc, 0x04, 0x1b, 0xd9, 0xc3, 0x89, 0x69, 0x95, 0xad, 0xd0,
-	0x53, 0x69, 0x44, 0x7e, 0xa9, 0xc0, 0xc6, 0xcb, 0xce, 0x0b, 0xd9, 0x29, 0x36, 0x3c, 0x6f, 0xc8,
-	0x98, 0xbb, 0xff, 0x61, 0x05, 0x7a, 0xf5, 0x93, 0xf2, 0xea, 0xb1, 0x41, 0xbe, 0x5f, 0xcc, 0xab,
-	0x70, 0xd0, 0xef, 0x0e, 0x24, 0x73, 0xbb, 0x07, 0x5c, 0x74, 0xd3, 0xb1, 0x71, 0x06, 0xc3, 0xa6,
-	0x47, 0xce, 0xc8, 0x1e, 0xa6, 0x23, 0x65, 0x44, 0x9e, 0x1a, 0x00, 0xd9, 0x85, 0x4d, 0xea, 0xc5,
-	0xde, 0xf2, 0xdf, 0x0b, 0xe6, 0xe6, 0xcc, 0x3c, 0x76, 0xda, 0x4a, 0x1a, 0xbd, 0x4d, 0x3e, 0x5b,
-	0xa8, 0x4d, 0xbc, 0xeb, 0xa7, 0xfb, 0x42, 0xfd, 0xcd, 0xbb, 0xcf, 0x4e, 0xea, 0xc6, 0xf3, 0x93,
-	0xba, 0xf1, 0xf7, 0x49, 0xdd, 0x78, 0x7c, 0x5a, 0x5f, 0x7a, 0x7e, 0x5a, 0x5f, 0xfa, 0xf3, 0xb4,
-	0xbe, 0xf4, 0xcd, 0x9e, 0xe7, 0xc7, 0x87, 0x83, 0x5e, 0xc3, 0xe1, 0xfd, 0xd9, 0xa5, 0x1e, 0xe9,
-	0x62, 0xf1, 0x71, 0xc4, 0x64, 0xaf, 0x9a, 0x7c, 0x0f, 0x7e, 0xf8, 0x6f, 0x00, 0x00, 0x00, 0xff,
-	0xff, 0xae, 0xc5, 0x81, 0x8c, 0x0a, 0x0b, 0x00, 0x00,
+	// 893 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x56, 0xcf, 0x6f, 0xe3, 0x44,
+	0x14, 0xae, 0x4b, 0x36, 0x61, 0xdf, 0xfe, 0x40, 0x9a, 0x2c, 0xdd, 0xe0, 0x45, 0x4e, 0x31, 0x68,
+	0x5b, 0x56, 0x28, 0xa6, 0x01, 0x09, 0x09, 0x21, 0x04, 0xa9, 0xd8, 0x55, 0x51, 0x2b, 0x41, 0x68,
+	0x2e, 0x5c, 0xaa, 0x89, 0x3d, 0xeb, 0x5a, 0x38, 0x1e, 0xaf, 0x67, 0x52, 0x6d, 0x15, 0xe5, 0xc2,
+	0x09, 0x69, 0x2f, 0x08, 0x2e, 0x20, 0x2d, 0x5c, 0xf8, 0x67, 0xf6, 0xb8, 0x12, 0x17, 0xc4, 0x61,
+	0x85, 0x5a, 0x2e, 0xfc, 0x11, 0x08, 0x64, 0xfb, 0x4d, 0x6c, 0xc7, 0x4e, 0x13, 0x81, 0xb4, 0xa7,
+	0xc6, 0xef, 0x7d, 0xfe, 0xde, 0xf7, 0x3e, 0x7b, 0x3e, 0x17, 0xc8, 0x90, 0x3a, 0x2e, 0x13, 0xd6,
+	0x83, 0x31, 0x8b, 0x4e, 0x3b, 0x61, 0xc4, 0x25, 0x27, 0xf5, 0xb4, 0xa6, 0xdf, 0x70, 0xb9, 0xcb,
+	0x93, 0x92, 0x15, 0xff, 0x4a, 0xbb, 0xfa, 0xab, 0x2e, 0xe7, 0xae, 0xcf, 0x2c, 0x1a, 0x7a, 0x16,
+	0x0d, 0x02, 0x2e, 0xa9, 0xf4, 0x78, 0x20, 0xb0, 0x7b, 0xc7, 0xe6, 0x62, 0xc4, 0x85, 0x35, 0xa4,
+	0x82, 0xa5, 0xa4, 0xd6, 0xc9, 0xce, 0x90, 0x49, 0xba, 0x63, 0x85, 0xd4, 0xf5, 0x82, 0x04, 0x8c,
+	0xd8, 0x26, 0xce, 0x0e, 0x69, 0x44, 0x47, 0x8a, 0xa0, 0x85, 0x45, 0x9b, 0xfb, 0x3e, 0xb3, 0xf3,
+	0xd4, 0x2f, 0x63, 0x67, 0x48, 0x7d, 0x1a, 0xd8, 0x4c, 0x95, 0x37, 0xb0, 0x2c, 0x23, 0x1a, 0x88,
+	0xfb, 0x2c, 0x52, 0x75, 0x1d, 0xeb, 0xd4, 0x71, 0x22, 0x26, 0xc4, 0x91, 0xef, 0x09, 0x89, 0x3d,
+	0xf3, 0x06, 0x90, 0xcf, 0x63, 0x6d, 0x9f, 0x25, 0x93, 0xfb, 0xec, 0xc1, 0x98, 0x09, 0x69, 0xee,
+	0x42, 0xb3, 0x50, 0x15, 0x21, 0x0f, 0x04, 0x23, 0x6f, 0x41, 0x3d, 0x55, 0xd8, 0xd2, 0x36, 0xb5,
+	0xed, 0x2b, 0xdd, 0xeb, 0x9d, 0x94, 0xb9, 0x93, 0xe2, 0x7a, 0xb5, 0x27, 0xcf, 0xda, 0x6b, 0x7d,
+	0xc4, 0x98, 0x07, 0xf0, 0x4a, 0x42, 0x72, 0x8f, 0xc9, 0xdd, 0xd9, 0x0a, 0x38, 0x81, 0xbc, 0x0d,
+	0x57, 0xb3, 0xbd, 0xf6, 0x9c, 0x84, 0xf0, 0x72, 0xef, 0x6a, 0x4c, 0xf0, 0xfb, 0xb3, 0x76, 0x6d,
+	0xe0, 0x05, 0xb2, 0x5f, 0x40, 0x98, 0x03, 0xd0, 0xab, 0xe8, 0x50, 0xda, 0x7b, 0x00, 0x19, 0x1a,
+	0xe5, 0xdd, 0x54, 0xf2, 0x7a, 0xf1, 0x9f, 0xdc, 0x4d, 0x39, 0xa8, 0xe9, 0xc0, 0x86, 0xa2, 0xed,
+	0xa5, 0x76, 0xfe, 0x67, 0x89, 0xa4, 0x05, 0x0d, 0xf4, 0xb8, 0xb5, 0x1e, 0x83, 0xfb, 0xea, 0xd2,
+	0x3c, 0x80, 0x9b, 0xa5, 0x29, 0xa8, 0xbc, 0x0b, 0x0d, 0x7c, 0x8e, 0x28, 0xbb, 0xa5, 0x64, 0x0f,
+	0x04, 0x8b, 0x10, 0xfd, 0x85, 0xe4, 0x11, 0xeb, 0x2b, 0xa0, 0xf9, 0x6e, 0xe6, 0xc5, 0xc7, 0xe9,
+	0x84, 0x7d, 0x4f, 0x48, 0x25, 0x7c, 0x03, 0xea, 0xf1, 0x23, 0x56, 0x92, 0xfb, 0x78, 0x65, 0xde,
+	0x85, 0x5b, 0x95, 0x77, 0xa1, 0x90, 0x2d, 0xa8, 0xc5, 0x40, 0x54, 0xd1, 0x54, 0x2a, 0xf2, 0xd0,
+	0x04, 0x60, 0xfe, 0xb0, 0x0e, 0xc6, 0x8c, 0x28, 0x0c, 0x23, 0x7e, 0x42, 0xfd, 0xc3, 0x88, 0xda,
+	0x5f, 0xb1, 0x68, 0x91, 0x77, 0x97, 0x96, 0x7a, 0xf7, 0x06, 0x5c, 0xa3, 0xc8, 0xb5, 0xcf, 0x4e,
+	0x98, 0x8f, 0x0e, 0x16, 0x8b, 0x64, 0x1b, 0x5e, 0x4a, 0x0b, 0x2c, 0x42, 0x5d, 0xad, 0x17, 0x12,
+	0xdc, 0x7c, 0x39, 0x41, 0x8e, 0xf8, 0x38, 0x90, 0xa8, 0x6c, 0xe6, 0xc6, 0x7c, 0x99, 0x6c, 0xc2,
+	0x15, 0x99, 0x5e, 0x1c, 0x9e, 0x86, 0xac, 0x55, 0x4b, 0x50, 0xf9, 0x52, 0x6e, 0xaa, 0xa3, 0xa6,
+	0xd6, 0x0b, 0x53, 0x55, 0xd9, 0x3c, 0x84, 0xf6, 0x42, 0x67, 0xd0, 0xe6, 0x1d, 0x68, 0x20, 0xf7,
+	0xfc, 0x6b, 0x3a, 0x7f, 0x87, 0xc2, 0x99, 0xff, 0x68, 0x19, 0xed, 0xee, 0x31, 0xf5, 0x7d, 0x16,
+	0xb8, 0x6c, 0x89, 0xe3, 0xda, 0x73, 0x77, 0xbc, 0x03, 0xc4, 0x9e, 0x13, 0xb7, 0xe7, 0xa0, 0x9d,
+	0x15, 0x1d, 0x72, 0x07, 0x2e, 0xfb, 0x8c, 0xde, 0xdf, 0x0b, 0x1c, 0xf6, 0xb0, 0xf2, 0x05, 0xc9,
+	0xda, 0xe6, 0xa7, 0xb0, 0xb9, 0xd8, 0x00, 0x34, 0xf6, 0x36, 0x34, 0x82, 0xf1, 0x68, 0x20, 0x58,
+	0xf5, 0xf2, 0xaa, 0xd9, 0xfd, 0xeb, 0x45, 0xb8, 0x94, 0x90, 0x91, 0x08, 0xea, 0x69, 0x72, 0x11,
+	0x5d, 0x3d, 0x83, 0x72, 0x18, 0xea, 0xb7, 0x2a, 0x7b, 0xe9, 0x50, 0xd3, 0xfa, 0xfa, 0xd7, 0x3f,
+	0xbf, 0x5f, 0x7f, 0x93, 0x6c, 0x59, 0x43, 0x4f, 0xaa, 0x58, 0x56, 0xbf, 0xec, 0x63, 0xea, 0x05,
+	0x56, 0x21, 0xdb, 0xc9, 0xcf, 0x1a, 0x5c, 0x2b, 0x44, 0x18, 0x79, 0xad, 0xc0, 0x5f, 0x95, 0x96,
+	0xba, 0x79, 0x11, 0x04, 0x95, 0xdc, 0x4d, 0x94, 0x7c, 0x44, 0x3e, 0x5c, 0xaa, 0xc4, 0x65, 0xf2,
+	0x28, 0x7b, 0x13, 0xac, 0x49, 0xfe, 0xad, 0x98, 0x92, 0x9f, 0x34, 0xb8, 0x5e, 0x4c, 0x08, 0x52,
+	0x1a, 0x5f, 0x0e, 0x1d, 0xfd, 0xf5, 0x0b, 0x31, 0xa8, 0xb1, 0x97, 0x68, 0xfc, 0x80, 0xbc, 0xbf,
+	0x92, 0xc6, 0xfc, 0xf7, 0xca, 0x9a, 0xa4, 0x21, 0x36, 0x25, 0x8f, 0xd6, 0x81, 0x94, 0x8f, 0x17,
+	0xb9, 0x5d, 0x9a, 0x5f, 0x99, 0x4c, 0xfa, 0xd6, 0x52, 0x1c, 0x6a, 0xfd, 0x45, 0x4b, 0xc4, 0x3e,
+	0xd6, 0xc8, 0x8f, 0xda, 0x6a, 0x72, 0x91, 0x48, 0x1c, 0xe1, 0xb9, 0x9d, 0x73, 0xd6, 0x9a, 0x14,
+	0x4e, 0xd6, 0xec, 0x7a, 0x76, 0x82, 0xe2, 0x4a, 0x31, 0x9b, 0xa6, 0xd6, 0x24, 0x97, 0x43, 0xd9,
+	0x1d, 0x2a, 0x6f, 0xa6, 0xe4, 0x6f, 0x0d, 0x9a, 0x15, 0x87, 0x82, 0x94, 0xd6, 0x5c, 0x90, 0x1b,
+	0xfa, 0xf6, 0x72, 0x20, 0x1a, 0xf2, 0x5d, 0x6a, 0xc8, 0x23, 0x8d, 0x7c, 0xb3, 0x9a, 0x21, 0xb3,
+	0x33, 0xff, 0x3f, 0x0c, 0x29, 0xe7, 0xc6, 0xd4, 0x9a, 0xcc, 0x72, 0x61, 0x4a, 0x1e, 0x6b, 0x00,
+	0xd9, 0x47, 0x95, 0x18, 0xf3, 0xdb, 0x14, 0xbf, 0xe9, 0x7a, 0x7b, 0x61, 0x1f, 0x97, 0x3c, 0x48,
+	0x76, 0xbc, 0x47, 0x3e, 0x59, 0x69, 0x43, 0xfc, 0x1e, 0x97, 0xf7, 0x42, 0xfd, 0xbd, 0xfd, 0x27,
+	0x67, 0x86, 0xf6, 0xf4, 0xcc, 0xd0, 0xfe, 0x38, 0x33, 0xb4, 0x6f, 0xcf, 0x8d, 0xb5, 0xa7, 0xe7,
+	0xc6, 0xda, 0x6f, 0xe7, 0xc6, 0xda, 0x97, 0x5d, 0xd7, 0x93, 0xc7, 0xe3, 0x61, 0xc7, 0xe6, 0xa3,
+	0xc5, 0xa3, 0x1e, 0xaa, 0x61, 0xf2, 0x34, 0x64, 0x62, 0x58, 0x4f, 0xfe, 0x67, 0x7b, 0xe7, 0xdf,
+	0x00, 0x00, 0x00, 0xff, 0xff, 0x34, 0x0f, 0x7d, 0xf3, 0xab, 0x0a, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -692,12 +684,12 @@ type QueryClient interface {
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 	// Queries a badge collection by ID.
 	GetCollection(ctx context.Context, in *QueryGetCollectionRequest, opts ...grpc.CallOption) (*QueryGetCollectionResponse, error)
-	// Queries an address mapping by ID.
-	GetAddressMapping(ctx context.Context, in *QueryGetAddressMappingRequest, opts ...grpc.CallOption) (*QueryGetAddressMappingResponse, error)
+	// Queries an address list by ID.
+	GetAddressList(ctx context.Context, in *QueryGetAddressListRequest, opts ...grpc.CallOption) (*QueryGetAddressListResponse, error)
 	// Queries an approvals tracker by ID.
-	GetApprovalsTracker(ctx context.Context, in *QueryGetApprovalsTrackerRequest, opts ...grpc.CallOption) (*QueryGetApprovalsTrackerResponse, error)
+	GetApprovalTracker(ctx context.Context, in *QueryGetApprovalTrackerRequest, opts ...grpc.CallOption) (*QueryGetApprovalTrackerResponse, error)
 	// Queries the number of times a given leaf has been used for a given merkle challenge.
-	GetNumUsedForMerkleChallenge(ctx context.Context, in *QueryGetNumUsedForMerkleChallengeRequest, opts ...grpc.CallOption) (*QueryGetNumUsedForMerkleChallengeResponse, error)
+	GetChallengeTracker(ctx context.Context, in *QueryGetChallengeTrackerRequest, opts ...grpc.CallOption) (*QueryGetChallengeTrackerResponse, error)
 	// Queries an addresses balance for a badge collection, specified by its ID.
 	GetBalance(ctx context.Context, in *QueryGetBalanceRequest, opts ...grpc.CallOption) (*QueryGetBalanceResponse, error)
 }
@@ -728,27 +720,27 @@ func (c *queryClient) GetCollection(ctx context.Context, in *QueryGetCollectionR
 	return out, nil
 }
 
-func (c *queryClient) GetAddressMapping(ctx context.Context, in *QueryGetAddressMappingRequest, opts ...grpc.CallOption) (*QueryGetAddressMappingResponse, error) {
-	out := new(QueryGetAddressMappingResponse)
-	err := c.cc.Invoke(ctx, "/badges.Query/GetAddressMapping", in, out, opts...)
+func (c *queryClient) GetAddressList(ctx context.Context, in *QueryGetAddressListRequest, opts ...grpc.CallOption) (*QueryGetAddressListResponse, error) {
+	out := new(QueryGetAddressListResponse)
+	err := c.cc.Invoke(ctx, "/badges.Query/GetAddressList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *queryClient) GetApprovalsTracker(ctx context.Context, in *QueryGetApprovalsTrackerRequest, opts ...grpc.CallOption) (*QueryGetApprovalsTrackerResponse, error) {
-	out := new(QueryGetApprovalsTrackerResponse)
-	err := c.cc.Invoke(ctx, "/badges.Query/GetApprovalsTracker", in, out, opts...)
+func (c *queryClient) GetApprovalTracker(ctx context.Context, in *QueryGetApprovalTrackerRequest, opts ...grpc.CallOption) (*QueryGetApprovalTrackerResponse, error) {
+	out := new(QueryGetApprovalTrackerResponse)
+	err := c.cc.Invoke(ctx, "/badges.Query/GetApprovalTracker", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *queryClient) GetNumUsedForMerkleChallenge(ctx context.Context, in *QueryGetNumUsedForMerkleChallengeRequest, opts ...grpc.CallOption) (*QueryGetNumUsedForMerkleChallengeResponse, error) {
-	out := new(QueryGetNumUsedForMerkleChallengeResponse)
-	err := c.cc.Invoke(ctx, "/badges.Query/GetNumUsedForMerkleChallenge", in, out, opts...)
+func (c *queryClient) GetChallengeTracker(ctx context.Context, in *QueryGetChallengeTrackerRequest, opts ...grpc.CallOption) (*QueryGetChallengeTrackerResponse, error) {
+	out := new(QueryGetChallengeTrackerResponse)
+	err := c.cc.Invoke(ctx, "/badges.Query/GetChallengeTracker", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -770,12 +762,12 @@ type QueryServer interface {
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 	// Queries a badge collection by ID.
 	GetCollection(context.Context, *QueryGetCollectionRequest) (*QueryGetCollectionResponse, error)
-	// Queries an address mapping by ID.
-	GetAddressMapping(context.Context, *QueryGetAddressMappingRequest) (*QueryGetAddressMappingResponse, error)
+	// Queries an address list by ID.
+	GetAddressList(context.Context, *QueryGetAddressListRequest) (*QueryGetAddressListResponse, error)
 	// Queries an approvals tracker by ID.
-	GetApprovalsTracker(context.Context, *QueryGetApprovalsTrackerRequest) (*QueryGetApprovalsTrackerResponse, error)
+	GetApprovalTracker(context.Context, *QueryGetApprovalTrackerRequest) (*QueryGetApprovalTrackerResponse, error)
 	// Queries the number of times a given leaf has been used for a given merkle challenge.
-	GetNumUsedForMerkleChallenge(context.Context, *QueryGetNumUsedForMerkleChallengeRequest) (*QueryGetNumUsedForMerkleChallengeResponse, error)
+	GetChallengeTracker(context.Context, *QueryGetChallengeTrackerRequest) (*QueryGetChallengeTrackerResponse, error)
 	// Queries an addresses balance for a badge collection, specified by its ID.
 	GetBalance(context.Context, *QueryGetBalanceRequest) (*QueryGetBalanceResponse, error)
 }
@@ -790,14 +782,14 @@ func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsReq
 func (*UnimplementedQueryServer) GetCollection(ctx context.Context, req *QueryGetCollectionRequest) (*QueryGetCollectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCollection not implemented")
 }
-func (*UnimplementedQueryServer) GetAddressMapping(ctx context.Context, req *QueryGetAddressMappingRequest) (*QueryGetAddressMappingResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAddressMapping not implemented")
+func (*UnimplementedQueryServer) GetAddressList(ctx context.Context, req *QueryGetAddressListRequest) (*QueryGetAddressListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAddressList not implemented")
 }
-func (*UnimplementedQueryServer) GetApprovalsTracker(ctx context.Context, req *QueryGetApprovalsTrackerRequest) (*QueryGetApprovalsTrackerResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetApprovalsTracker not implemented")
+func (*UnimplementedQueryServer) GetApprovalTracker(ctx context.Context, req *QueryGetApprovalTrackerRequest) (*QueryGetApprovalTrackerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetApprovalTracker not implemented")
 }
-func (*UnimplementedQueryServer) GetNumUsedForMerkleChallenge(ctx context.Context, req *QueryGetNumUsedForMerkleChallengeRequest) (*QueryGetNumUsedForMerkleChallengeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetNumUsedForMerkleChallenge not implemented")
+func (*UnimplementedQueryServer) GetChallengeTracker(ctx context.Context, req *QueryGetChallengeTrackerRequest) (*QueryGetChallengeTrackerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetChallengeTracker not implemented")
 }
 func (*UnimplementedQueryServer) GetBalance(ctx context.Context, req *QueryGetBalanceRequest) (*QueryGetBalanceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBalance not implemented")
@@ -843,56 +835,56 @@ func _Query_GetCollection_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_GetAddressMapping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetAddressMappingRequest)
+func _Query_GetAddressList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetAddressListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).GetAddressMapping(ctx, in)
+		return srv.(QueryServer).GetAddressList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/badges.Query/GetAddressMapping",
+		FullMethod: "/badges.Query/GetAddressList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetAddressMapping(ctx, req.(*QueryGetAddressMappingRequest))
+		return srv.(QueryServer).GetAddressList(ctx, req.(*QueryGetAddressListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_GetApprovalsTracker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetApprovalsTrackerRequest)
+func _Query_GetApprovalTracker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetApprovalTrackerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).GetApprovalsTracker(ctx, in)
+		return srv.(QueryServer).GetApprovalTracker(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/badges.Query/GetApprovalsTracker",
+		FullMethod: "/badges.Query/GetApprovalTracker",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetApprovalsTracker(ctx, req.(*QueryGetApprovalsTrackerRequest))
+		return srv.(QueryServer).GetApprovalTracker(ctx, req.(*QueryGetApprovalTrackerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_GetNumUsedForMerkleChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetNumUsedForMerkleChallengeRequest)
+func _Query_GetChallengeTracker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetChallengeTrackerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).GetNumUsedForMerkleChallenge(ctx, in)
+		return srv.(QueryServer).GetChallengeTracker(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/badges.Query/GetNumUsedForMerkleChallenge",
+		FullMethod: "/badges.Query/GetChallengeTracker",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetNumUsedForMerkleChallenge(ctx, req.(*QueryGetNumUsedForMerkleChallengeRequest))
+		return srv.(QueryServer).GetChallengeTracker(ctx, req.(*QueryGetChallengeTrackerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -928,16 +920,16 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Query_GetCollection_Handler,
 		},
 		{
-			MethodName: "GetAddressMapping",
-			Handler:    _Query_GetAddressMapping_Handler,
+			MethodName: "GetAddressList",
+			Handler:    _Query_GetAddressList_Handler,
 		},
 		{
-			MethodName: "GetApprovalsTracker",
-			Handler:    _Query_GetApprovalsTracker_Handler,
+			MethodName: "GetApprovalTracker",
+			Handler:    _Query_GetApprovalTracker_Handler,
 		},
 		{
-			MethodName: "GetNumUsedForMerkleChallenge",
-			Handler:    _Query_GetNumUsedForMerkleChallenge_Handler,
+			MethodName: "GetChallengeTracker",
+			Handler:    _Query_GetChallengeTracker_Handler,
 		},
 		{
 			MethodName: "GetBalance",
@@ -1147,7 +1139,7 @@ func (m *QueryGetBalanceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetAddressMappingRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetAddressListRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1157,27 +1149,27 @@ func (m *QueryGetAddressMappingRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetAddressMappingRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetAddressListRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetAddressMappingRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetAddressListRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.MappingId) > 0 {
-		i -= len(m.MappingId)
-		copy(dAtA[i:], m.MappingId)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.MappingId)))
+	if len(m.ListId) > 0 {
+		i -= len(m.ListId)
+		copy(dAtA[i:], m.ListId)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.ListId)))
 		i--
 		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetAddressMappingResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetAddressListResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1187,19 +1179,19 @@ func (m *QueryGetAddressMappingResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetAddressMappingResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetAddressListResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetAddressMappingResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetAddressListResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Mapping != nil {
+	if m.List != nil {
 		{
-			size, err := m.Mapping.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.List.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -1212,7 +1204,7 @@ func (m *QueryGetAddressMappingResponse) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetApprovalsTrackerRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetApprovalTrackerRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1222,12 +1214,12 @@ func (m *QueryGetApprovalsTrackerRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetApprovalsTrackerRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetApprovalTrackerRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetApprovalsTrackerRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetApprovalTrackerRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1280,7 +1272,7 @@ func (m *QueryGetApprovalsTrackerRequest) MarshalToSizedBuffer(dAtA []byte) (int
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetApprovalsTrackerResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetApprovalTrackerResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1290,12 +1282,12 @@ func (m *QueryGetApprovalsTrackerResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetApprovalsTrackerResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetApprovalTrackerResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetApprovalsTrackerResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetApprovalTrackerResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1315,7 +1307,7 @@ func (m *QueryGetApprovalsTrackerResponse) MarshalToSizedBuffer(dAtA []byte) (in
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetNumUsedForMerkleChallengeRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetChallengeTrackerRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1325,12 +1317,12 @@ func (m *QueryGetNumUsedForMerkleChallengeRequest) Marshal() (dAtA []byte, err e
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetNumUsedForMerkleChallengeRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetChallengeTrackerRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetNumUsedForMerkleChallengeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetChallengeTrackerRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1379,7 +1371,7 @@ func (m *QueryGetNumUsedForMerkleChallengeRequest) MarshalToSizedBuffer(dAtA []b
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetNumUsedForMerkleChallengeResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetChallengeTrackerResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1389,12 +1381,12 @@ func (m *QueryGetNumUsedForMerkleChallengeResponse) Marshal() (dAtA []byte, err 
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetNumUsedForMerkleChallengeResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetChallengeTrackerResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetNumUsedForMerkleChallengeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetChallengeTrackerResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1495,33 +1487,33 @@ func (m *QueryGetBalanceResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetAddressMappingRequest) Size() (n int) {
+func (m *QueryGetAddressListRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.MappingId)
+	l = len(m.ListId)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
 }
 
-func (m *QueryGetAddressMappingResponse) Size() (n int) {
+func (m *QueryGetAddressListResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Mapping != nil {
-		l = m.Mapping.Size()
+	if m.List != nil {
+		l = m.List.Size()
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
 }
 
-func (m *QueryGetApprovalsTrackerRequest) Size() (n int) {
+func (m *QueryGetApprovalTrackerRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1552,7 +1544,7 @@ func (m *QueryGetApprovalsTrackerRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetApprovalsTrackerResponse) Size() (n int) {
+func (m *QueryGetApprovalTrackerResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1565,7 +1557,7 @@ func (m *QueryGetApprovalsTrackerResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetNumUsedForMerkleChallengeRequest) Size() (n int) {
+func (m *QueryGetChallengeTrackerRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1590,7 +1582,7 @@ func (m *QueryGetNumUsedForMerkleChallengeRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetNumUsedForMerkleChallengeResponse) Size() (n int) {
+func (m *QueryGetChallengeTrackerResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2112,7 +2104,7 @@ func (m *QueryGetBalanceResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetAddressMappingRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryGetAddressListRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2135,15 +2127,15 @@ func (m *QueryGetAddressMappingRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetAddressMappingRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetAddressListRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetAddressMappingRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetAddressListRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MappingId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ListId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2171,7 +2163,7 @@ func (m *QueryGetAddressMappingRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.MappingId = string(dAtA[iNdEx:postIndex])
+			m.ListId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2194,7 +2186,7 @@ func (m *QueryGetAddressMappingRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetAddressMappingResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryGetAddressListResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2217,15 +2209,15 @@ func (m *QueryGetAddressMappingResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetAddressMappingResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetAddressListResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetAddressMappingResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetAddressListResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Mapping", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field List", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2252,10 +2244,10 @@ func (m *QueryGetAddressMappingResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Mapping == nil {
-				m.Mapping = &AddressMapping{}
+			if m.List == nil {
+				m.List = &AddressList{}
 			}
-			if err := m.Mapping.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.List.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2280,7 +2272,7 @@ func (m *QueryGetAddressMappingResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetApprovalsTrackerRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryGetApprovalTrackerRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2303,10 +2295,10 @@ func (m *QueryGetApprovalsTrackerRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetApprovalsTrackerRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetApprovalTrackerRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetApprovalsTrackerRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetApprovalTrackerRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2524,7 +2516,7 @@ func (m *QueryGetApprovalsTrackerRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetApprovalsTrackerResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryGetApprovalTrackerResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2547,10 +2539,10 @@ func (m *QueryGetApprovalsTrackerResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetApprovalsTrackerResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetApprovalTrackerResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetApprovalsTrackerResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetApprovalTrackerResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2583,7 +2575,7 @@ func (m *QueryGetApprovalsTrackerResponse) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Tracker == nil {
-				m.Tracker = &ApprovalsTracker{}
+				m.Tracker = &ApprovalTracker{}
 			}
 			if err := m.Tracker.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -2610,7 +2602,7 @@ func (m *QueryGetApprovalsTrackerResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetNumUsedForMerkleChallengeRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryGetChallengeTrackerRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2633,10 +2625,10 @@ func (m *QueryGetNumUsedForMerkleChallengeRequest) Unmarshal(dAtA []byte) error 
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetNumUsedForMerkleChallengeRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetChallengeTrackerRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetNumUsedForMerkleChallengeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetChallengeTrackerRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2824,7 +2816,7 @@ func (m *QueryGetNumUsedForMerkleChallengeRequest) Unmarshal(dAtA []byte) error 
 	}
 	return nil
 }
-func (m *QueryGetNumUsedForMerkleChallengeResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryGetChallengeTrackerResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2847,10 +2839,10 @@ func (m *QueryGetNumUsedForMerkleChallengeResponse) Unmarshal(dAtA []byte) error
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetNumUsedForMerkleChallengeResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetChallengeTrackerResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetNumUsedForMerkleChallengeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetChallengeTrackerResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

@@ -3,7 +3,7 @@ package badges;
 
 import "google/protobuf/any.proto";
 import "badges/balances.proto";
-import "badges/address_mappings.proto";
+import "badges/address_lists.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
@@ -21,11 +21,11 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
   Note there are a few different times here which could get confusing:
   - timelineTimes: the times when a timeline-based field is a specific value
-  - permitted/forbiddenTimes - the times that a permission can be performed
+  - permanentlyPermitted/ForbiddenTimes - the times that a permission can be performed
   - transferTimes - the times that a transfer occurs
   - ownershipTimes - the times when a badge is owned by a user
 
-  The permitted/forbiddenTimes are used to determine when a permission can be executed.
+  The permitted/permanentlyForbiddenTimes are used to determine when a permission can be executed.
   Once a time is set to be permitted or forbidden, it is PERMANENT and cannot be changed.
   If a time is not set to be permitted or forbidden, it is considered NEUTRAL and can be updated but is ALLOWED by default.
 
@@ -92,11 +92,11 @@ message UserPermissions {
 
   Each transfer is broken down to a (from, to, initiatedBy, transferTime, badgeId) tuple.
   For a transfer to match, we need to match ALL of the fields in the combination. 
-  These are determined by the fromMappingId, toMappingId, initiatedByMappingId, transferTimes, badgeIds fields.
-  AddressMappings are used for (from, to, initiatedBy) which are a permanent list of addresses identified by an ID (see AddressMappings). 
+  These are determined by the fromListId, toListId, initiatedByListId, transferTimes, badgeIds fields.
+  AddressLists are used for (from, to, initiatedBy) which are a permanent list of addresses identified by an ID (see AddressLists). 
   
   TimelineTimes: which timeline times of the collection's approvalsTimeline field can be updated or not?
-  permitted/forbidden TimelineTimes: when can the manager execute this permission?
+  permanentlyPermitted/ForbiddenTimes: when can the manager execute this permission?
 
   Ex: Let's say we are updating the transferability for timelineTime 1 and the transfer tuple ("AllWithoutMint", "AllWithoutMint", "AllWithoutMint", 10, 1000).
   We would check to find the FIRST CollectionApprovalPermission that matches this combination.
@@ -106,14 +106,14 @@ message UserPermissions {
   the combination ("AllWithoutMint", "AllWithoutMint", "AllWithoutMint", "All Transfer Times", 1) to always be forbidden at all timelineTimes.
 */
 message CollectionApprovalPermission {
-  // Identifier for the sender mapping.
-  string fromMappingId = 1;
+  // Identifier for the sender list.
+  string fromListId = 1;
 
-  // Identifier for the recipient mapping.
-  string toMappingId = 2;
+  // Identifier for the recipient list.
+  string toListId = 2;
 
-  // Identifier for the initiator mapping (who is approved?).
-  string initiatedByMappingId = 3;
+  // Identifier for the initiator list (who is approved?).
+  string initiatedByListId = 3;
 
   // Specifies the times when the transfer can occur.
   repeated UintRange transferTimes = 4;
@@ -136,11 +136,11 @@ message CollectionApprovalPermission {
   // If you use "trackerId", this approval will match to only the specified trackerId and fail on all others.
   string challengeTrackerId = 8;
 
-  // Specifies the times when this permission is permitted. Can not overlap with forbiddenTimes.
-  repeated UintRange permittedTimes = 9;
+  // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
+  repeated UintRange permanentlyPermittedTimes = 9;
 
-  // Specifies the times when this permission is forbidden. Can not overlap with permittedTimes.
-  repeated UintRange forbiddenTimes = 10;
+  // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
+  repeated UintRange permanentlyForbiddenTimes = 10;
 }
 
 
@@ -148,11 +148,11 @@ message CollectionApprovalPermission {
   UserOutgoingApprovalPermission defines the permissions for updating the user's approved outgoing transfers.
 */
 message UserOutgoingApprovalPermission {
-  // Identifier for the recipient mapping.
-  string toMappingId = 1;
+  // Identifier for the recipient list.
+  string toListId = 1;
 
-  // Identifier for the initiator mapping (who is approved?).
-  string initiatedByMappingId = 2;
+  // Identifier for the initiator list (who is approved?).
+  string initiatedByListId = 2;
 
   // Specifies the times when the transfer can occur.
   repeated UintRange transferTimes = 3;
@@ -175,24 +175,24 @@ message UserOutgoingApprovalPermission {
   // If you use "trackerId", this approval will match to only the specified trackerId and fail on all others.
   string challengeTrackerId = 7;
 
-  // Specifies the times when this permission is permitted. Can not overlap with forbiddenTimes.
-  repeated UintRange permittedTimes = 8;
+  // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
+  repeated UintRange permanentlyPermittedTimes = 8;
 
-  // Specifies the times when this permission is forbidden. Can not overlap with permittedTimes.
-  repeated UintRange forbiddenTimes = 9;
+  // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
+  repeated UintRange permanentlyForbiddenTimes = 9;
 }
 
 /* 
   UserIncomingApprovalPermission defines the permissions for updating the user's approved incoming transfers.
 
-  See CollectionApprovalPermission for more details. This is equivalent without the toMappingId field because that is always the user.
+  See CollectionApprovalPermission for more details. This is equivalent without the toListId field because that is always the user.
 */
 message UserIncomingApprovalPermission {
-  // Identifier for the sender mapping.
-  string fromMappingId = 1;
+  // Identifier for the sender list.
+  string fromListId = 1;
 
-  // Identifier for the initiator mapping (who is approved?).
-  string initiatedByMappingId = 2;
+  // Identifier for the initiator list (who is approved?).
+  string initiatedByListId = 2;
 
   // Specifies the times when the transfer can occur.
   repeated UintRange transferTimes = 3;
@@ -215,11 +215,11 @@ message UserIncomingApprovalPermission {
   // If you use "trackerId", this approval will match to only the specified trackerId and fail on all others.
   string challengeTrackerId = 7;
 
-  // Specifies the times when this permission is permitted. Can not overlap with forbiddenTimes.
-  repeated UintRange permittedTimes = 8;
+  // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
+  repeated UintRange permanentlyPermittedTimes = 8;
 
-  // Specifies the times when this permission is forbidden. Can not overlap with permittedTimes.
-  repeated UintRange forbiddenTimes = 9;
+  // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
+  repeated UintRange permanentlyForbiddenTimes = 9;
 }
 
 /* 
@@ -236,24 +236,24 @@ message BalancesActionPermission {
   // Specifies the ownership times for the badges in the transfer.
   repeated UintRange ownershipTimes = 2;
 
-  // Specifies the times when this permission is permitted. Can not overlap with forbiddenTimes.
-  repeated UintRange permittedTimes = 3;
+  // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
+  repeated UintRange permanentlyPermittedTimes = 3;
 
-  // Specifies the times when this permission is forbidden. Can not overlap with permittedTimes.
-  repeated UintRange forbiddenTimes = 4;
+  // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
+  repeated UintRange permanentlyForbiddenTimes = 4;
 }
 
 /* 
   ActionPermission defines the permissions for performing an action.
-   
+  
   This is simple and straightforward as the only thing we need to check is the permitted/forbidden times.
 */
 message ActionPermission {
-  // Specifies the times when this permission is permitted. Can not overlap with forbiddenTimes.
-  repeated UintRange permittedTimes = 1;
+  // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
+  repeated UintRange permanentlyPermittedTimes = 1;
 
-  // Specifies the times when this permission is forbidden. Can not overlap with permittedTimes.
-  repeated UintRange forbiddenTimes = 2;
+  // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
+  repeated UintRange permanentlyForbiddenTimes = 2;
 }
 
 /* 
@@ -263,11 +263,11 @@ message ActionPermission {
   you could set the combination (TimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
 */
 message TimedUpdatePermission {
-  // Specifies the times when this permission is permitted. Can not overlap with forbiddenTimes.
-  repeated UintRange permittedTimes = 1;
+  // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
+  repeated UintRange permanentlyPermittedTimes = 1;
 
-  // Specifies the times when this permission is forbidden. Can not overlap with permittedTimes.
-  repeated UintRange forbiddenTimes = 2;
+  // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
+  repeated UintRange permanentlyForbiddenTimes = 2;
 
   // Specifies the times when the timeline-based field is a specific value.
   repeated UintRange timelineTimes = 3;
@@ -284,11 +284,11 @@ message TimedUpdateWithBadgeIdsPermission {
   // Specifies the badge IDs involved in the transfer.
   repeated UintRange badgeIds = 1;
 
-  // Specifies the times when this permission is permitted. Can not overlap with forbiddenTimes.
-  repeated UintRange permittedTimes = 2;
+  // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
+  repeated UintRange permanentlyPermittedTimes = 2;
 
-  // Specifies the times when this permission is forbidden. Can not overlap with permittedTimes.
-  repeated UintRange forbiddenTimes = 3;
+  // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
+  repeated UintRange permanentlyForbiddenTimes = 3;
 
   // Specifies the times when the timeline-based field is a specific value.
   repeated UintRange timelineTimes = 4;

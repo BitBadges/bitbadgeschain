@@ -23,7 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// uintRange is a range of IDs from some start to some end (inclusive).
+// The UintRange is a range of IDs from some start to some end (inclusive).
 //
 // uintRanges are one of the core types used in the BitBadgesChain module.
 // They are used for everything from badge IDs to time ranges to min/max balance amounts.
@@ -75,8 +75,6 @@ var xxx_messageInfo_UintRange proto.InternalMessageInfo
 // Example: User A owns x10 of badge IDs 1-10 from 1/1/2020 to 1/1/2021.
 //
 // If times or badgeIDs have len > 1, then the user owns all badge IDs specified for all time ranges specified.
-//
-// See the BitBadges documentation for more information.
 type Balance struct {
 	// The amount of the badge owned by the user.
 	Amount Uint `protobuf:"bytes,1,opt,name=amount,proto3,customtype=Uint" json:"amount"`

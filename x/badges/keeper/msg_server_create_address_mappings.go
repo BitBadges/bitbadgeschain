@@ -7,12 +7,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k msgServer) CreateAddressMappings(goCtx context.Context, msg *types.MsgCreateAddressMappings) (*types.MsgCreateAddressMappingsResponse, error) {
+func (k msgServer) CreateAddressLists(goCtx context.Context, msg *types.MsgCreateAddressLists) (*types.MsgCreateAddressListsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	for _, addressMapping := range msg.AddressMappings {
-		addressMapping.CreatedBy = msg.Creator
-		if err := k.CreateAddressMapping(ctx, addressMapping); err != nil {
+	for _, addressList := range msg.AddressLists {
+		addressList.CreatedBy = msg.Creator
+		if err := k.CreateAddressList(ctx, addressList); err != nil {
 			return nil, err
 		}
 	}
@@ -24,5 +24,5 @@ func (k msgServer) CreateAddressMappings(goCtx context.Context, msg *types.MsgCr
 		),
 	)
 
-	return &types.MsgCreateAddressMappingsResponse{}, nil
+	return &types.MsgCreateAddressListsResponse{}, nil
 }

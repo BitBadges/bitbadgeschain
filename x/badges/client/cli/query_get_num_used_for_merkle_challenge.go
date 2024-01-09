@@ -11,7 +11,7 @@ import (
 
 var _ = strconv.Itoa(0)
 
-// message QueryGetNumUsedForMerkleChallengeRequest {
+// message QueryGetChallengeTrackerRequest {
 //   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 //   string approvalLevel = 2; //"collection" or "incoming" or "outgoing"
 //   string approverAddress = 3; //if approvalLevel is "collection", leave blank
@@ -19,10 +19,10 @@ var _ = strconv.Itoa(0)
 //   string leafIndex = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 // }
 
-func CmdGetNumUsedForMerkleChallenge() *cobra.Command {
+func CmdGetChallengeTracker() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get-num-used-for-merkle-challenge [collectionId] [approvalLevel] [approverAddress] [challengeTrackerId] [leafIndex]",
-		Short: "Query getNumUsedForMerkleChallenge",
+		Short: "Query getChallengeTracker",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
@@ -33,7 +33,7 @@ func CmdGetNumUsedForMerkleChallenge() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryGetNumUsedForMerkleChallengeRequest{
+			params := &types.QueryGetChallengeTrackerRequest{
 				CollectionId:       types.NewUintFromString(args[0]),
 				ApprovalLevel:      args[1],
 				ApproverAddress:    args[2],
@@ -41,7 +41,7 @@ func CmdGetNumUsedForMerkleChallenge() *cobra.Command {
 				LeafIndex:          types.NewUintFromString(args[4]),
 			}
 
-			res, err := queryClient.GetNumUsedForMerkleChallenge(cmd.Context(), params)
+			res, err := queryClient.GetChallengeTracker(cmd.Context(), params)
 			if err != nil {
 				return err
 			}

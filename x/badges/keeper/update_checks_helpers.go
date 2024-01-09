@@ -31,10 +31,10 @@ import (
 //		-Lastly, if it was updated, in addition to just simply checking timeA-timeB, we may also have to be more specific with what that we need to check.
 //		 Ex: If we go from [badgeIDs 1 to 10 -> www.example.com] to [badgeIDs 1 to 2 -> www.example2.com, badgeIDs 3 to 10 -> www.example.com],
 //				 we only need to check badgeIDs 1 to 2 from timeA-timeB
-//		 We eventually end with a (timeA-timeB, badgeIds, transferTimes, toMapping, fromMapping, initiatedByMapping) tuples array[] that we need to check, adding dummy values where needed.
+//		 We eventually end with a (timeA-timeB, badgeIds, transferTimes, toList, fromList, initiatedByList) tuples array[] that we need to check, adding dummy values where needed.
 //		 This step and the third step is field-specific, so that is why we do it via a generic custom function (GetUpdatedStringCombinations, GetUpdatedBoolCombinations, etc...)
 //-2) For all the values that are considered "updated", we check if we are allowed to update them, according to the permissions.
-//		This is done by fetching wherever the returned tuples from above overlaps any of the permission's (timelineTime, badgeIds, transferTimes, toMapping, fromMapping, initiatedByMapping) tuples, again adding dummy values where needed.
+//		This is done by fetching wherever the returned tuples from above overlaps any of the permission's (timelineTime, badgeIds, transferTimes, toList, fromList, initiatedByList) tuples, again adding dummy values where needed.
 //		For all overlaps, we then assert that the current block time is NOT forbidden (permitted or undefined both correspond to allowed)
 //		If all are not forbidden, it is a valid update.
 
@@ -66,15 +66,15 @@ func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermiss
 		timelineTimes := types.GetUintRangesWithOptions(permission.TimelineTimes, permission.UsesTimelineTimes)
 		transferTimes := types.GetUintRangesWithOptions(permission.TransferTimes, permission.UsesTransferTimes)
 		ownershipTimes := types.GetUintRangesWithOptions(permission.OwnershipTimes, permission.UsesOwnershipTimes)
-		permittedTimes := types.GetUintRangesWithOptions(permission.PermittedTimes, true)
-		forbiddenTimes := types.GetUintRangesWithOptions(permission.ForbiddenTimes, true)
+		permanentlyPermittedTimes := types.GetUintRangesWithOptions(permission.PermanentlyPermittedTimes, true)
+		permanentlyForbiddenTimes := types.GetUintRangesWithOptions(permission.PermanentlyForbiddenTimes, true)
 
-		toMapping := types.GetMappingWithOptions(permission.ToMapping, permission.UsesToMapping)
-		fromMapping := types.GetMappingWithOptions(permission.FromMapping, permission.UsesFromMapping)
-		initiatedByMapping := types.GetMappingWithOptions(permission.InitiatedByMapping, permission.UsesInitiatedByMapping)
+		toList := types.GetListWithOptions(permission.ToList, permission.UsesToList)
+		fromList := types.GetListWithOptions(permission.FromList, permission.UsesFromList)
+		initiatedByList := types.GetListWithOptions(permission.InitiatedByList, permission.UsesInitiatedByList)
 
-		amountTrackerIdMapping := types.GetMappingWithOptions(permission.AmountTrackerIdMapping, permission.UsesAmountTrackerId)
-		challengeTrackerIdMapping := types.GetMappingWithOptions(permission.ChallengeTrackerIdMapping, permission.UsesChallengeTrackerId)
+		amountTrackerIdList := types.GetListWithOptions(permission.AmountTrackerIdList, permission.UsesAmountTrackerId)
+		challengeTrackerIdList := types.GetListWithOptions(permission.ChallengeTrackerIdList, permission.UsesChallengeTrackerId)
 
 		for _, badgeId := range badgeIds {
 			for _, timelineTime := range timelineTimes {
@@ -94,11 +94,11 @@ func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermiss
 								TimelineTime:              timelineTime,
 								TransferTime:              transferTime,
 								OwnershipTime:             ownershipTime,
-								ToMapping:                 toMapping,
-								FromMapping:               fromMapping,
-								InitiatedByMapping:        initiatedByMapping,
-								AmountTrackerIdMapping:    amountTrackerIdMapping,
-								ChallengeTrackerIdMapping: challengeTrackerIdMapping,
+								ToList:                 toList,
+								FromList:               fromList,
+								InitiatedByList:        initiatedByList,
+								AmountTrackerIdList:    amountTrackerIdList,
+								ChallengeTrackerIdList: challengeTrackerIdList,
 
 								ArbitraryValue: arbValue,
 							},
@@ -127,16 +127,16 @@ func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermiss
 								BadgeId:            overlap.Overlap.BadgeId,
 								TransferTime:       overlap.Overlap.TransferTime,
 								OwnershipTime:      overlap.Overlap.OwnershipTime,
-								ToMapping:          overlap.Overlap.ToMapping,
-								FromMapping:        overlap.Overlap.FromMapping,
-								InitiatedByMapping: overlap.Overlap.InitiatedByMapping,
+								ToList:          overlap.Overlap.ToList,
+								FromList:        overlap.Overlap.FromList,
+								InitiatedByList: overlap.Overlap.InitiatedByList,
 
-								AmountTrackerIdMapping:    overlap.Overlap.AmountTrackerIdMapping,
-								ChallengeTrackerIdMapping: overlap.Overlap.ChallengeTrackerIdMapping,
+								AmountTrackerIdList:    overlap.Overlap.AmountTrackerIdList,
+								ChallengeTrackerIdList: overlap.Overlap.ChallengeTrackerIdList,
 
 								//Appended for future lookups (not involved in overlap logic)
-								PermittedTimes: permittedTimes,
-								ForbiddenTimes: forbiddenTimes,
+								PermanentlyPermittedTimes: permanentlyPermittedTimes,
+								PermanentlyForbiddenTimes: permanentlyForbiddenTimes,
 								ArbitraryValue: newArbValue,
 							})
 						}

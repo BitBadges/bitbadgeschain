@@ -3,7 +3,7 @@ package badges;
 
 import "gogoproto/gogo.proto";
 import "badges/permissions.proto";
-import "badges/address_mappings.proto";
+import "badges/address_lists.proto";
 import "badges/balances.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
@@ -75,20 +75,20 @@ message MerkleChallenge {
   string maxUsesPerLeaf = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
   // The URI associated with this Merkle challenge, optionally providing metadata about the challenge.
-  string uri = 6;
+  string uri = 5;
 
   // Arbitrary custom data associated with this Merkle challenge.
-  string customData = 7;
+  string customData = 6;
 }
 
 
 // UserOutgoingApproval defines the rules for the approval of an outgoing transfer from a user.
 message UserOutgoingApproval {
-  // The mapping ID for the recipient of the transfer.
-  string toMappingId = 1;
+  // The list ID for the recipient of the transfer.
+  string toListId = 1;
 
-  // The mapping ID for the user who initiated the transfer.
-  string initiatedByMappingId = 2;
+  // The list ID for the user who initiated the transfer.
+  string initiatedByListId = 2;
 
   // The allowed range of transfer times for approval.
   repeated UintRange transferTimes = 3;
@@ -122,11 +122,11 @@ message UserOutgoingApproval {
 
 // UserIncomingApproval defines the rules for the approval of an incoming transfer to a user.
 message UserIncomingApproval {
-  // The mapping ID for the sender of the transfer.
-  string fromMappingId = 1;
+  // The list ID for the sender of the transfer.
+  string fromListId = 1;
 
-  // The mapping ID for the user who initiated the transfer.
-  string initiatedByMappingId = 2;
+  // The list ID for the user who initiated the transfer.
+  string initiatedByListId = 2;
 
   // The allowed range of transfer times for approval.
   repeated UintRange transferTimes = 3;
@@ -283,8 +283,8 @@ message MaxNumTransfers {
   string perInitiatedByAddressMaxNumTransfers = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
-// ApprovalsTracker defines the tracker for approvals. This tracks the cumulative number of transfers and associated balances transferred.
-message ApprovalsTracker {
+// ApprovalTracker defines the tracker for approvals. This tracks the cumulative number of transfers and associated balances transferred.
+message ApprovalTracker {
   // The number of transfers that have been processed.
   string numTransfers = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // Cumulative balances associated with the transfers that have been processed.
@@ -361,12 +361,12 @@ message IncomingApprovalCriteria {
 
 // CollectionApproval defines the rules for the approval of a transfer on the collection level
 message CollectionApproval {
-  // The mapping ID for the sender of the transfer.
-  string fromMappingId = 1;
-  // The mapping ID for the recipient of the transfer.
-  string toMappingId = 2;
-  // The mapping ID for the user who initiated the transfer.
-  string initiatedByMappingId = 3;
+  // The list ID for the sender of the transfer.
+  string fromListId = 1;
+  // The list ID for the recipient of the transfer.
+  string toListId = 2;
+  // The list ID for the user who initiated the transfer.
+  string initiatedByListId = 3;
   // The allowed range of transfer times for approval.
   repeated UintRange transferTimes = 4;
   // The allowed range of badge IDs for approval.

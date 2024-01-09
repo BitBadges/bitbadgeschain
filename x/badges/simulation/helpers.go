@@ -77,63 +77,63 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 		CanDeleteCollection: []*types.ActionPermission{
 			{
 
-				PermittedTimes: GetTimelineTimes(r, 3),
-				ForbiddenTimes: GetTimelineTimes(r, 3),
+				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
+				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
 			},
 		},
 		CanArchiveCollection: []*types.TimedUpdatePermission{
 			{
 
-				PermittedTimes: GetTimelineTimes(r, 3),
-				ForbiddenTimes: GetTimelineTimes(r, 3),
+				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
+				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
 				TimelineTimes:  GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateOffChainBalancesMetadata: []*types.TimedUpdatePermission{
 			{
 
-				PermittedTimes: GetTimelineTimes(r, 3),
-				ForbiddenTimes: GetTimelineTimes(r, 3),
+				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
+				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
 				TimelineTimes:  GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateStandards: []*types.TimedUpdatePermission{
 			{
 
-				PermittedTimes: GetTimelineTimes(r, 3),
-				ForbiddenTimes: GetTimelineTimes(r, 3),
+				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
+				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
 				TimelineTimes:  GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateCustomData: []*types.TimedUpdatePermission{
 			{
 
-				PermittedTimes: GetTimelineTimes(r, 3),
-				ForbiddenTimes: GetTimelineTimes(r, 3),
+				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
+				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
 				TimelineTimes:  GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateManager: []*types.TimedUpdatePermission{
 			{
 
-				PermittedTimes: GetTimelineTimes(r, 3),
-				ForbiddenTimes: GetTimelineTimes(r, 3),
+				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
+				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
 				TimelineTimes:  GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateCollectionMetadata: []*types.TimedUpdatePermission{
 			{
 
-				PermittedTimes: GetTimelineTimes(r, 3),
-				ForbiddenTimes: GetTimelineTimes(r, 3),
+				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
+				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
 				TimelineTimes:  GetTimelineTimes(r, 3),
 			},
 		},
 		CanCreateMoreBadges: []*types.BalancesActionPermission{
 			{
 
-				PermittedTimes: GetTimelineTimes(r, 3),
-				ForbiddenTimes: GetTimelineTimes(r, 3),
+				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
+				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
 				OwnershipTimes: GetTimelineTimes(r, 3),
 				BadgeIds:       GetTimelineTimes(r, 3),
 			},
@@ -141,8 +141,8 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 		CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{
 			{
 
-				PermittedTimes: GetTimelineTimes(r, 3),
-				ForbiddenTimes: GetTimelineTimes(r, 3),
+				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
+				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
 				TimelineTimes:  GetTimelineTimes(r, 3),
 				BadgeIds:       GetTimelineTimes(r, 3),
 			},
@@ -150,14 +150,14 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 		CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{
 			{
 
-				PermittedTimes:       GetTimelineTimes(r, 3),
-				ForbiddenTimes:       GetTimelineTimes(r, 3),
+				PermanentlyPermittedTimes:       GetTimelineTimes(r, 3),
+				PermanentlyForbiddenTimes:       GetTimelineTimes(r, 3),
 				TransferTimes:        GetTimelineTimes(r, 3),
 				OwnershipTimes:       GetTimelineTimes(r, 3),
 				BadgeIds:             GetTimelineTimes(r, 3),
-				ToMappingId:          GetRandomAddresses(r, 3, accs)[0],
-				FromMappingId:        GetRandomAddresses(r, 3, accs)[0],
-				InitiatedByMappingId: GetRandomAddresses(r, 3, accs)[0],
+				ToListId:          GetRandomAddresses(r, 3, accs)[0],
+				FromListId:        GetRandomAddresses(r, 3, accs)[0],
+				InitiatedByListId: GetRandomAddresses(r, 3, accs)[0],
 			},
 		},
 	}

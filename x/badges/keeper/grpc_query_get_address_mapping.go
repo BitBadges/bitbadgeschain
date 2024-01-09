@@ -10,19 +10,19 @@ import (
 )
 
 // Queries a balance for the given address and badgeId and returns its contents.
-func (k Keeper) GetAddressMapping(goCtx context.Context, req *types.QueryGetAddressMappingRequest) (*types.QueryGetAddressMappingResponse, error) {
+func (k Keeper) GetAddressList(goCtx context.Context, req *types.QueryGetAddressListRequest) (*types.QueryGetAddressListResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	addressMapping, err := k.GetAddressMappingById(ctx, req.MappingId)
+	addressList, err := k.GetAddressListById(ctx, req.ListId)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	return &types.QueryGetAddressMappingResponse{
-		Mapping: addressMapping,
+	return &types.QueryGetAddressListResponse{
+		List: addressList,
 	}, nil
 }

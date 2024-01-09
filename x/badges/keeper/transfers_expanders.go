@@ -11,8 +11,8 @@ import (
 func AppendDefaultForIncoming(currApprovals []*types.UserIncomingApproval, userAddress string) []*types.UserIncomingApproval {
 	currApprovals = append([]*types.UserIncomingApproval{
 		{
-			FromMappingId:        "AllWithMint", //everyone
-			InitiatedByMappingId: userAddress,
+			FromListId:        "AllWithMint", //everyone
+			InitiatedByListId: userAddress,
 			TransferTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -41,8 +41,8 @@ func AppendDefaultForOutgoing(currApprovals []*types.UserOutgoingApproval, userA
 	//prepend it
 	currApprovals = append([]*types.UserOutgoingApproval{
 		{
-			ToMappingId:          "AllWithMint", //everyone
-			InitiatedByMappingId: userAddress,
+			ToListId:          "AllWithMint", //everyone
+			InitiatedByListId: userAddress,
 			TransferTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),

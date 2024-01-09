@@ -11,8 +11,8 @@ func GetValidUserPermissions() *types.UserPermissions {
 	return &types.UserPermissions{
 		CanUpdateOutgoingApprovals: []*types.UserOutgoingApprovalPermission{
 			{
-				PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
-				ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(6), End: sdkmath.NewUint(8)}},
+				PermanentlyPermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+				PermanentlyForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(6), End: sdkmath.NewUint(8)}},
 			},
 		},
 	}

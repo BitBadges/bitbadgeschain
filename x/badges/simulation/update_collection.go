@@ -41,9 +41,9 @@ func SimulateMsgUniversalUpdateCollection(
 			BadgesToCreate: GetRandomBalances(r, 3),
 			CollectionApprovals: []*types.CollectionApproval{
 				{
-					FromMappingId:        GetRandomAddresses(r, 1, accs)[0],
-					ToMappingId:          GetRandomAddresses(r, 1, accs)[0],
-					InitiatedByMappingId: GetRandomAddresses(r, 1, accs)[0],
+					FromListId:        GetRandomAddresses(r, 1, accs)[0],
+					ToListId:          GetRandomAddresses(r, 1, accs)[0],
+					InitiatedByListId: GetRandomAddresses(r, 1, accs)[0],
 					TransferTimes:        GetTimelineTimes(r, 100),
 					OwnershipTimes:       GetTimelineTimes(r, 100),
 					BadgeIds:             GetTimelineTimes(r, 3),

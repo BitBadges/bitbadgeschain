@@ -13,10 +13,10 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdCreateAddressMappings() *cobra.Command {
+func CmdCreateAddressLists() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-address-mappings [tx-json]",
-		Short: "Broadcast message createAddressMappings",
+		Use:   "create-address-lists [tx-json]",
+		Short: "Broadcast message createAddressLists",
 		Args:  cobra.ExactArgs(1), // Accept exactly one argument (the JSON string)
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
@@ -29,7 +29,7 @@ func CmdCreateAddressMappings() *cobra.Command {
 			txJSON := args[0]
 
 			// Unmarshal the JSON into a transaction structure
-			var txData types.MsgCreateAddressMappings
+			var txData types.MsgCreateAddressLists
 			if err := jsonpb.UnmarshalString(txJSON, &txData); err != nil {
 				return err
 			}

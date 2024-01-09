@@ -36,8 +36,8 @@ const (
 	opWeightMsgUniversalUpdateCollection          = "op_weight_msg_update_collection"
 	defaultWeightMsgUniversalUpdateCollection int = 1000
 
-	opWeightMsgCreateAddressMappings          = "op_weight_msg_create_address_mappings"
-	defaultWeightMsgCreateAddressMappings int = 100
+	opWeightMsgCreateAddressLists          = "op_weight_msg_create_address_lists"
+	defaultWeightMsgCreateAddressLists int = 100
 
 	opWeightMsgCreateCollection = "op_weight_msg_msg_create_collection"
 	// TODO: Determine the simulation weight value
@@ -121,15 +121,15 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		badgessimulation.SimulateMsgUniversalUpdateCollection(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgCreateAddressMappings int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgCreateAddressMappings, &weightMsgCreateAddressMappings, nil,
+	var weightMsgCreateAddressLists int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgCreateAddressLists, &weightMsgCreateAddressLists, nil,
 		func(_ *rand.Rand) {
-			weightMsgCreateAddressMappings = defaultWeightMsgCreateAddressMappings
+			weightMsgCreateAddressLists = defaultWeightMsgCreateAddressLists
 		},
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgCreateAddressMappings,
-		badgessimulation.SimulateMsgCreateAddressMappings(am.accountKeeper, am.bankKeeper, am.keeper),
+		weightMsgCreateAddressLists,
+		badgessimulation.SimulateMsgCreateAddressLists(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	var weightMsgCreateCollection int

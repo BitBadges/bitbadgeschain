@@ -33,7 +33,7 @@ func (suite *TestSuite) TestCreateBadges() {
 			},
 		},
 	}
-	collectionsToCreate[0].CollectionApprovals[0].FromMappingId = "Mint"
+	collectionsToCreate[0].CollectionApprovals[0].FromListId = "Mint"
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 
@@ -256,7 +256,7 @@ func (suite *TestSuite) TestCreateBadgesIdGreaterThanMax() {
 			},
 		},
 	}
-	collectionsToCreate[0].CollectionApprovals[0].FromMappingId = "Mint"
+	collectionsToCreate[0].CollectionApprovals[0].FromListId = "Mint"
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 

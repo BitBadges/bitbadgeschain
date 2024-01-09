@@ -75,7 +75,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 				newNumUsed := sdk.NewUint(0)
 				if !challenge.MaxUsesPerLeaf.IsNil() && challenge.MaxUsesPerLeaf.GT(sdkmath.NewUint(0)) {
 
-					numUsed, err := k.GetNumUsedForMerkleChallengeFromStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex)
+					numUsed, err := k.GetChallengeTrackerFromStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex)
 					if err != nil {
 						additionalDetailsErrorStr = "error getting num processed"
 						continue
@@ -100,7 +100,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 
 						if !alreadyIncremented {
 							*challengeIdsIncremented = append(*challengeIdsIncremented, incrementId)
-							newNumUsed, err = k.IncrementNumUsedForMerkleChallengeInStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex.Sub(leftmostLeafIndex))
+							newNumUsed, err = k.IncrementChallengeTrackerInStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex.Sub(leftmostLeafIndex))
 							if err != nil {
 								continue
 							}

@@ -16,8 +16,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
-		case *types.MsgCreateAddressMappings:
-			res, err := msgServer.CreateAddressMappings(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgCreateAddressLists:
+			res, err := msgServer.CreateAddressLists(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgUniversalUpdateCollection:
 			res, err := msgServer.UniversalUpdateCollection(sdk.WrapSDKContext(ctx), msg)

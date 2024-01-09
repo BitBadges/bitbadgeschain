@@ -51,8 +51,8 @@ func TestMsgUpdateUserPermissions_ValidateBasic(t *testing.T) {
 				UserPermissions: &types.UserPermissions{
 					CanUpdateOutgoingApprovals: []*types.UserOutgoingApprovalPermission{
 						{
-							PermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
-							ForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+							PermanentlyPermittedTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+							PermanentlyForbiddenTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 						},
 					},
 				},

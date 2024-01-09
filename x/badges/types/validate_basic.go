@@ -143,30 +143,30 @@ func ValidateNoStringElementIsX(addresses []string, x string) error {
 	return nil
 }
 
-func ValidateAddressMapping(addressMapping *AddressMapping) error {
-	if addressMapping.MappingId == "" ||
-		addressMapping.MappingId == "Mint" ||
-		addressMapping.MappingId == "Manager" ||
-		addressMapping.MappingId == "AllWithoutMint" ||
-		addressMapping.MappingId == "None" {
-		return sdkerrors.Wrapf(ErrInvalidAddress, "mapping id is uninitialized")
+func ValidateAddressList(addressList *AddressList) error {
+	if addressList.ListId == "" ||
+		addressList.ListId == "Mint" ||
+		addressList.ListId == "Manager" ||
+		addressList.ListId == "AllWithoutMint" ||
+		addressList.ListId == "None" {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "list id is uninitialized")
 	}
 
-	if err := ValidateAddress(addressMapping.MappingId, false); err == nil {
-		return sdkerrors.Wrapf(ErrInvalidAddress, "mapping id can not be a valid address")
+	if err := ValidateAddress(addressList.ListId, false); err == nil {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "list id can not be a valid address")
 	}
 
-	if strings.Contains(addressMapping.MappingId, ":") || strings.Contains(addressMapping.MappingId, "!") {
-		return sdkerrors.Wrapf(ErrInvalidAddress, "mapping id can not contain : or !")
+	if strings.Contains(addressList.ListId, ":") || strings.Contains(addressList.ListId, "!") {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "list id can not contain : or !")
 	}
 
-	if addressMapping.Uri != "" {
-		if err := ValidateURI(addressMapping.Uri); err != nil {
+	if addressList.Uri != "" {
+		if err := ValidateURI(addressList.Uri); err != nil {
 			return err
 		}
 	}
 
-	for _, address := range addressMapping.Addresses {
+	for _, address := range addressList.Addresses {
 		if err := ValidateAddress(address, false); err != nil {
 			return err
 		}
@@ -209,16 +209,16 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 			return sdkerrors.Wrapf(ErrInvalidRequest, "collection approved transfer is nil")
 		}
 
-		if collectionApproval.FromMappingId == "" {
-			return sdkerrors.Wrapf(ErrInvalidAddress, "from mapping id is uninitialized")
+		if collectionApproval.FromListId == "" {
+			return sdkerrors.Wrapf(ErrInvalidAddress, "from list id is uninitialized")
 		}
 
-		if collectionApproval.ToMappingId == "" {
-			return sdkerrors.Wrapf(ErrInvalidAddress, "to mapping id is uninitialized")
+		if collectionApproval.ToListId == "" {
+			return sdkerrors.Wrapf(ErrInvalidAddress, "to list id is uninitialized")
 		}
 
-		if collectionApproval.InitiatedByMappingId == "" {
-			return sdkerrors.Wrapf(ErrInvalidAddress, "initiated by mapping id is uninitialized")
+		if collectionApproval.InitiatedByListId == "" {
+			return sdkerrors.Wrapf(ErrInvalidAddress, "initiated by list id is uninitialized")
 		}
 
 		if err := ValidateRangesAreValid(collectionApproval.BadgeIds, false, false); err != nil {

@@ -44,11 +44,11 @@ func GetUpdateCombinationsToCheck(
 				BadgeId:                   detailToAdd.BadgeId,
 				TransferTime:              detailToAdd.TransferTime,
 				OwnershipTime:             detailToAdd.OwnershipTime,
-				ToMapping:                 detailToAdd.ToMapping,
-				FromMapping:               detailToAdd.FromMapping,
-				InitiatedByMapping:        detailToAdd.InitiatedByMapping,
-				AmountTrackerIdMapping:    detailToAdd.AmountTrackerIdMapping,
-				ChallengeTrackerIdMapping: detailToAdd.ChallengeTrackerIdMapping,
+				ToList:                 detailToAdd.ToList,
+				FromList:               detailToAdd.FromList,
+				InitiatedByList:        detailToAdd.InitiatedByList,
+				AmountTrackerIdList:    detailToAdd.AmountTrackerIdList,
+				ChallengeTrackerIdList: detailToAdd.ChallengeTrackerIdList,
 			})
 		}
 	}
@@ -65,11 +65,11 @@ func GetUpdateCombinationsToCheck(
 				BadgeId:                   detailToAdd.BadgeId,
 				TransferTime:              detailToAdd.TransferTime,
 				OwnershipTime:             detailToAdd.OwnershipTime,
-				ToMapping:                 detailToAdd.ToMapping,
-				FromMapping:               detailToAdd.FromMapping,
-				InitiatedByMapping:        detailToAdd.InitiatedByMapping,
-				AmountTrackerIdMapping:    detailToAdd.AmountTrackerIdMapping,
-				ChallengeTrackerIdMapping: detailToAdd.ChallengeTrackerIdMapping,
+				ToList:                 detailToAdd.ToList,
+				FromList:               detailToAdd.FromList,
+				InitiatedByList:        detailToAdd.InitiatedByList,
+				AmountTrackerIdList:    detailToAdd.AmountTrackerIdList,
+				ChallengeTrackerIdList: detailToAdd.ChallengeTrackerIdList,
 			})
 		}
 	}
@@ -89,11 +89,11 @@ func GetUpdateCombinationsToCheck(
 				BadgeId:                   detailToAdd.BadgeId,
 				TransferTime:              detailToAdd.TransferTime,
 				OwnershipTime:             detailToAdd.OwnershipTime,
-				ToMapping:                 detailToAdd.ToMapping,
-				FromMapping:               detailToAdd.FromMapping,
-				InitiatedByMapping:        detailToAdd.InitiatedByMapping,
-				AmountTrackerIdMapping:    detailToAdd.AmountTrackerIdMapping,
-				ChallengeTrackerIdMapping: detailToAdd.ChallengeTrackerIdMapping,
+				ToList:                 detailToAdd.ToList,
+				FromList:               detailToAdd.FromList,
+				InitiatedByList:        detailToAdd.InitiatedByList,
+				AmountTrackerIdList:    detailToAdd.AmountTrackerIdList,
+				ChallengeTrackerIdList: detailToAdd.ChallengeTrackerIdList,
 			})
 		}
 	}
@@ -104,7 +104,7 @@ func GetUpdateCombinationsToCheck(
 func CheckNotForbidden(ctx sdk.Context, permission *types.UniversalPermissionDetails, permissionStr string) error {
 	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 
-	found, err := types.SearchUintRangesForUint(blockTime, permission.ForbiddenTimes)
+	found, err := types.SearchUintRangesForUint(blockTime, permission.PermanentlyForbiddenTimes)
 	if found || err != nil {
 		return sdkerrors.Wrapf(ErrForbiddenTime, "current time %s is forbidden for permission %s", blockTime.String(), permissionStr)
 	}
@@ -216,24 +216,24 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 			detailToCheck.OwnershipTime = &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)} //dummy range
 		}
 
-		if detailToCheck.AmountTrackerIdMapping == nil {
-			detailToCheck.AmountTrackerIdMapping = &types.AddressMapping{Addresses: []string{}, IncludeAddresses: false}
+		if detailToCheck.AmountTrackerIdList == nil {
+			detailToCheck.AmountTrackerIdList = &types.AddressList{Addresses: []string{}, Allowlist: false}
 		}
 
-		if detailToCheck.ChallengeTrackerIdMapping == nil {
-			detailToCheck.ChallengeTrackerIdMapping = &types.AddressMapping{Addresses: []string{}, IncludeAddresses: false}
+		if detailToCheck.ChallengeTrackerIdList == nil {
+			detailToCheck.ChallengeTrackerIdList = &types.AddressList{Addresses: []string{}, Allowlist: false}
 		}
 
-		if detailToCheck.ToMapping == nil {
-			detailToCheck.ToMapping = &types.AddressMapping{Addresses: []string{}, IncludeAddresses: false}
+		if detailToCheck.ToList == nil {
+			detailToCheck.ToList = &types.AddressList{Addresses: []string{}, Allowlist: false}
 		}
 
-		if detailToCheck.FromMapping == nil {
-			detailToCheck.FromMapping = &types.AddressMapping{Addresses: []string{}, IncludeAddresses: false}
+		if detailToCheck.FromList == nil {
+			detailToCheck.FromList = &types.AddressList{Addresses: []string{}, Allowlist: false}
 		}
 
-		if detailToCheck.InitiatedByMapping == nil {
-			detailToCheck.InitiatedByMapping = &types.AddressMapping{Addresses: []string{}, IncludeAddresses: false}
+		if detailToCheck.InitiatedByList == nil {
+			detailToCheck.InitiatedByList = &types.AddressList{Addresses: []string{}, Allowlist: false}
 		}
 	}
 
@@ -244,7 +244,7 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 		for _, detailToCheck := range detailsToCheck {
 			_, overlap := types.UniversalRemoveOverlaps(permissionDetail, detailToCheck)
 			if len(overlap) > 0 {
-				err := CheckNotForbidden(ctx, permissionDetail, permissionStr) //forbiddenTimes and permittedTimes are stored in here
+				err := CheckNotForbidden(ctx, permissionDetail, permissionStr) //permanentlyForbiddenTimes and permanentlyPermittedTimes are stored in here
 				if err != nil {
 					return err
 				}

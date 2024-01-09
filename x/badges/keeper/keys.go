@@ -14,13 +14,13 @@ var (
 	NextCollectionIdKey   = []byte{0x03}
 	UsedClaimChallengeKey = []byte{0x04}
 	WhitelistIndexKey     = []byte{0x05}
-	AddressMappingKey     = []byte{0x06}
-	ApprovalsTrackerKey   = []byte{0x07}
+	AddressListKey     = []byte{0x06}
+	ApprovalTrackerKey   = []byte{0x07}
 
 	AccountGenerationPrefix = []byte{0x08}
 	AddressGenerationPrefix = []byte{0x09}
 
-	NextAddressMappingIdKey = []byte{0x0A}
+	NextAddressListIdKey = []byte{0x0A}
 
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}
@@ -47,11 +47,11 @@ func ConstructBalanceKey(address string, id sdkmath.Uint) string {
 	return collection_id_str + BalanceKeyDelimiter + address_str
 }
 
-func ConstructAddressMappingKey(addressMappingId string) string {
-	return addressMappingId
+func ConstructAddressListKey(addressListId string) string {
+	return addressListId
 }
 
-func ConstructApprovalsTrackerKey(collectionId sdkmath.Uint, addressForApproval string, amountTrackerId string, level string, trackerType string, address string) string {
+func ConstructApprovalTrackerKey(collectionId sdkmath.Uint, addressForApproval string, amountTrackerId string, level string, trackerType string, address string) string {
 	collection_id_str := collectionId.String()
 	tracker_id_str := amountTrackerId
 	return collection_id_str + BalanceKeyDelimiter + addressForApproval + BalanceKeyDelimiter + tracker_id_str + BalanceKeyDelimiter + level + BalanceKeyDelimiter + trackerType + BalanceKeyDelimiter + address
@@ -114,21 +114,21 @@ func usedClaimChallengeStoreKey(usedClaimChallengeKey string) []byte {
 func nextCollectionIdKey() []byte {
 	return NextCollectionIdKey
 }
-func nextAddressMappingCounterKey() []byte {
-	return NextAddressMappingIdKey
+func nextAddressListCounterKey() []byte {
+	return NextAddressListIdKey
 }
 
 
-func addressMappingStoreKey(addressMappingKey string) []byte {
-	key := make([]byte, len(AddressMappingKey)+len(addressMappingKey))
-	copy(key, AddressMappingKey)
-	copy(key[len(AddressMappingKey):], []byte(addressMappingKey))
+func addressListStoreKey(addressListKey string) []byte {
+	key := make([]byte, len(AddressListKey)+len(addressListKey))
+	copy(key, AddressListKey)
+	copy(key[len(AddressListKey):], []byte(addressListKey))
 	return key
 }
 
-func approvalsTrackerStoreKey(approvalsTrackerKey string) []byte {
-	key := make([]byte, len(ApprovalsTrackerKey)+len(approvalsTrackerKey))
-	copy(key, ApprovalsTrackerKey)
-	copy(key[len(ApprovalsTrackerKey):], []byte(approvalsTrackerKey))
+func approvalTrackerStoreKey(approvalTrackerKey string) []byte {
+	key := make([]byte, len(ApprovalTrackerKey)+len(approvalTrackerKey))
+	copy(key, ApprovalTrackerKey)
+	copy(key[len(ApprovalTrackerKey):], []byte(approvalTrackerKey))
 	return key
 }

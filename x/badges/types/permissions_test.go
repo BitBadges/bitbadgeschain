@@ -13,18 +13,18 @@ import (
 func TestActionPermissionUpdate(t *testing.T) {
 	oldActionPermission := &types.ActionPermission{
 
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{},
+		PermanentlyForbiddenTimes: []*types.UintRange{},
 	}
 
 	newActionPermission := &types.ActionPermission{
 
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -34,7 +34,7 @@ func TestActionPermissionUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -48,7 +48,7 @@ func TestActionPermissionUpdate(t *testing.T) {
 
 	newActionPermission = &types.ActionPermission{
 
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(120),
@@ -58,7 +58,7 @@ func TestActionPermissionUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -70,7 +70,7 @@ func TestActionPermissionUpdate(t *testing.T) {
 	require.Error(t, err)
 	newActionPermission = &types.ActionPermission{
 
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(80),
@@ -80,7 +80,7 @@ func TestActionPermissionUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -107,13 +107,13 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{},
+		PermanentlyForbiddenTimes: []*types.UintRange{},
 	}
 
 	newActionPermission := &types.BalancesActionPermission{
@@ -130,7 +130,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -140,7 +140,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -166,7 +166,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(122),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -176,7 +176,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -201,7 +201,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(80),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -211,7 +211,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -236,7 +236,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(80),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -246,7 +246,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -270,7 +270,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -280,7 +280,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -313,7 +313,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -323,7 +323,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -348,7 +348,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(120),
@@ -358,7 +358,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -383,7 +383,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(80),
@@ -393,7 +393,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -418,7 +418,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -428,7 +428,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -455,13 +455,13 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{},
+		PermanentlyForbiddenTimes: []*types.UintRange{},
 	}
 
 	newActionPermission := &types.TimedUpdatePermission{
@@ -472,7 +472,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -482,7 +482,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -502,7 +502,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(122),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -512,7 +512,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -531,7 +531,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(80),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -541,7 +541,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -559,7 +559,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(80),
 			},
 		}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -569,7 +569,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -587,7 +587,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -597,7 +597,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -620,7 +620,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -630,7 +630,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -649,7 +649,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(120),
@@ -659,7 +659,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -678,7 +678,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(80),
@@ -688,7 +688,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -706,7 +706,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -716,7 +716,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -749,13 +749,13 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{},
+			PermanentlyForbiddenTimes: []*types.UintRange{},
 		},
 	}
 
@@ -774,7 +774,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -784,7 +784,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -812,7 +812,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(122),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -822,7 +822,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -849,7 +849,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(80),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -859,7 +859,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -886,7 +886,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 				},
 			},
 
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -896,7 +896,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -923,7 +923,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -933,7 +933,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -968,7 +968,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -978,7 +978,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1005,7 +1005,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(120),
@@ -1015,7 +1015,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1042,7 +1042,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(80),
@@ -1052,7 +1052,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1078,7 +1078,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1088,7 +1088,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1108,7 +1108,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1118,7 +1118,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1143,7 +1143,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -1153,7 +1153,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -1172,7 +1172,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -1182,7 +1182,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -1213,7 +1213,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1223,7 +1223,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1252,7 +1252,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1262,7 +1262,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1297,7 +1297,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1307,7 +1307,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1336,7 +1336,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1346,7 +1346,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1373,7 +1373,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1383,7 +1383,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1403,7 +1403,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1413,7 +1413,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1436,7 +1436,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1446,7 +1446,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1467,7 +1467,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1477,7 +1477,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1503,7 +1503,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -1513,7 +1513,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -1533,7 +1533,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -1543,7 +1543,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -1566,7 +1566,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1576,7 +1576,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1597,7 +1597,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1607,7 +1607,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1631,7 +1631,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1641,7 +1641,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1662,7 +1662,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1672,7 +1672,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1703,7 +1703,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(50),
@@ -1713,7 +1713,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1733,7 +1733,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(50),
@@ -1743,7 +1743,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1766,7 +1766,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1776,7 +1776,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1796,7 +1796,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1806,7 +1806,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1832,7 +1832,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -1842,7 +1842,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -1866,7 +1866,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -1876,7 +1876,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -1907,7 +1907,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(50),
@@ -1917,7 +1917,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1937,7 +1937,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(50),
@@ -1947,7 +1947,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -1971,7 +1971,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1981,7 +1981,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -2001,7 +2001,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -2011,7 +2011,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -2039,7 +2039,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -2049,7 +2049,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -2072,7 +2072,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -2082,7 +2082,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -2118,12 +2118,12 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToMappingId:          "AllWithoutMint",
-		FromMappingId:        "AllWithoutMint",
-		InitiatedByMappingId: alice,
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: alice,
 		AmountTrackerId:      "All",
 		ChallengeTrackerId:   "All",
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -2133,7 +2133,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -2159,12 +2159,12 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToMappingId:          "AllWithoutMint",
-		FromMappingId:        "AllWithoutMint",
-		InitiatedByMappingId: alice,
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: alice,
 		AmountTrackerId:      "All",
 		ChallengeTrackerId:   "All",
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -2174,7 +2174,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -2203,12 +2203,12 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToMappingId:          "AllWithoutMint",
-		FromMappingId:        "AllWithoutMint",
-		InitiatedByMappingId: alice,
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: alice,
 		AmountTrackerId:      "All",
 		ChallengeTrackerId:   "All",
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -2218,7 +2218,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -2244,12 +2244,12 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToMappingId:          "AllWithoutMint",
-			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: alice,
+			ToListId:          "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: alice,
 			AmountTrackerId:      "All",
 			ChallengeTrackerId:   "All",
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -2259,7 +2259,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -2292,12 +2292,12 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToMappingId:          "AllWithoutMint",
-			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: alice,
+			ToListId:          "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: alice,
 			AmountTrackerId:      "All",
 			ChallengeTrackerId:   "All",
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -2307,7 +2307,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -2338,12 +2338,12 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToMappingId:          "AllWithoutMint",
-			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: alice,
+			ToListId:          "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: alice,
 			AmountTrackerId:      "All",
 			ChallengeTrackerId:   "All",
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -2353,7 +2353,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -2388,12 +2388,12 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToMappingId:          "x",
-			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: alice,
+			ToListId:          "x",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: alice,
 			AmountTrackerId:      "All",
 			ChallengeTrackerId:   "All",
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -2403,7 +2403,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -2429,12 +2429,12 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToMappingId:          "x",
-			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: alice,
+			ToListId:          "x",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: alice,
 			AmountTrackerId:      "All",
 			ChallengeTrackerId:   "All",
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -2444,7 +2444,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -2477,12 +2477,12 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToMappingId:          "AllWithoutMint",
-		FromMappingId:        "AllWithoutMint",
-		InitiatedByMappingId: alice,
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: alice,
 		AmountTrackerId:      "All",
 		ChallengeTrackerId:   "All",
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -2492,7 +2492,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -2523,12 +2523,12 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToMappingId:          "AllWithoutMint",
-			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: alice,
+			ToListId:          "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: alice,
 			AmountTrackerId:      "All",
 			ChallengeTrackerId:   "All",
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -2538,7 +2538,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -2572,12 +2572,12 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToMappingId:          "AllWithoutMint",
-		FromMappingId:        "AllWithoutMint",
-		InitiatedByMappingId: alice,
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: alice,
 		AmountTrackerId:      "All",
 		ChallengeTrackerId:   "All",
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -2587,7 +2587,7 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -2614,12 +2614,12 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToMappingId:          "AllWithoutMint",
-			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: alice,
+			ToListId:          "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: alice,
 			AmountTrackerId:      "All",
 			ChallengeTrackerId:   "All",
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(50),
@@ -2629,7 +2629,7 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -2658,12 +2658,12 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToMappingId:          "AllWithoutMint",
-		FromMappingId:        "AllWithoutMint",
-		InitiatedByMappingId: alice,
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: alice,
 		AmountTrackerId:      "All",
 		ChallengeTrackerId:   "All",
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -2673,7 +2673,7 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -2698,12 +2698,12 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToMappingId:          "AllWithoutMint",
-		FromMappingId:        "AllWithoutMint",
-		InitiatedByMappingId: alice,
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: alice,
 		AmountTrackerId:      "All",
 		ChallengeTrackerId:   "All",
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -2713,7 +2713,7 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -2729,24 +2729,24 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 
 func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 	keeper, ctx := keeper.BadgesKeeper(t)
-	err := keeper.CreateAddressMapping(ctx, &types.AddressMapping{
-		MappingId:        "ABC",
+	err := keeper.CreateAddressList(ctx, &types.AddressList{
+		ListId:        "ABC",
 		Addresses:        []string{bob, alice, charlie},
-		IncludeAddresses: true,
+		Allowlist: true,
 	})
 	require.NoError(t, err)
 
-	err = keeper.CreateAddressMapping(ctx, &types.AddressMapping{
-		MappingId:        "Alice",
+	err = keeper.CreateAddressList(ctx, &types.AddressList{
+		ListId:        "Alice",
 		Addresses:        []string{alice},
-		IncludeAddresses: true,
+		Allowlist: true,
 	})
 	require.NoError(t, err)
 
-	err = keeper.CreateAddressMapping(ctx, &types.AddressMapping{
-		MappingId:        "BobCharlie",
+	err = keeper.CreateAddressList(ctx, &types.AddressList{
+		ListId:        "BobCharlie",
 		Addresses:        []string{bob, charlie},
-		IncludeAddresses: true,
+		Allowlist: true,
 	})
 	require.NoError(t, err)
 
@@ -2770,12 +2770,12 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToMappingId:          "ABC",
-		FromMappingId:        "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		ToListId:          "ABC",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 		AmountTrackerId:      "All",
 		ChallengeTrackerId:   "All",
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -2785,7 +2785,7 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -2811,12 +2811,12 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToMappingId:          "ABC",
-		FromMappingId:        "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		ToListId:          "ABC",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 		AmountTrackerId:      "All",
 		ChallengeTrackerId:   "All",
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -2826,7 +2826,7 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -2855,12 +2855,12 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToMappingId:          "AllWithoutMint",
-		FromMappingId:        "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 		AmountTrackerId:      "All",
 		ChallengeTrackerId:   "All",
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -2870,7 +2870,7 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -2897,12 +2897,12 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToMappingId:          "AllWithoutMint",
-			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: "AllWithoutMint",
+			ToListId:          "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
 			AmountTrackerId:      "All",
 			ChallengeTrackerId:   "All",
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(50),
@@ -2912,7 +2912,7 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -2927,24 +2927,24 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 
 func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 	keeper, ctx := keeper.BadgesKeeper(t)
-	err := keeper.CreateAddressMapping(ctx, &types.AddressMapping{
-		MappingId:        "ABC",
+	err := keeper.CreateAddressList(ctx, &types.AddressList{
+		ListId:        "ABC",
 		Addresses:        []string{bob, alice, charlie},
-		IncludeAddresses: true,
+		Allowlist: true,
 	})
 	require.NoError(t, err)
 
-	err = keeper.CreateAddressMapping(ctx, &types.AddressMapping{
-		MappingId:        "Alice",
+	err = keeper.CreateAddressList(ctx, &types.AddressList{
+		ListId:        "Alice",
 		Addresses:        []string{alice},
-		IncludeAddresses: true,
+		Allowlist: true,
 	})
 	require.NoError(t, err)
 
-	err = keeper.CreateAddressMapping(ctx, &types.AddressMapping{
-		MappingId:        "BobCharlie",
+	err = keeper.CreateAddressList(ctx, &types.AddressList{
+		ListId:        "BobCharlie",
 		Addresses:        []string{bob, charlie},
-		IncludeAddresses: true,
+		Allowlist: true,
 	})
 	require.NoError(t, err)
 
@@ -2968,12 +2968,12 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToMappingId:          "ABC",
-		FromMappingId:        "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		ToListId:          "ABC",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 		AmountTrackerId:      "All",
 		ChallengeTrackerId:   "All",
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -2983,7 +2983,7 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -3009,12 +3009,12 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToMappingId:          "ABC",
-			FromMappingId:        "AllWithoutMint",
-			InitiatedByMappingId: "AllWithoutMint",
+			ToListId:          "ABC",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
 			AmountTrackerId:      "All",
 			ChallengeTrackerId:   "All",
-			PermittedTimes: []*types.UintRange{
+			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(50),
@@ -3024,7 +3024,7 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			ForbiddenTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(101),
 					End:   sdkmath.NewUint(199),
@@ -3053,12 +3053,12 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToMappingId:          "BobCharlie",
-		FromMappingId:        "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		ToListId:          "BobCharlie",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 		AmountTrackerId:      "All",
 		ChallengeTrackerId:   "All",
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -3068,7 +3068,7 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),
@@ -3093,12 +3093,12 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToMappingId:          "BobCharlie",
-		FromMappingId:        "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		ToListId:          "BobCharlie",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 		AmountTrackerId:      "All",
 		ChallengeTrackerId:   "All",
-		PermittedTimes: []*types.UintRange{
+		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(50),
@@ -3108,7 +3108,7 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 				End:   sdkmath.NewUint(300),
 			},
 		},
-		ForbiddenTimes: []*types.UintRange{
+		PermanentlyForbiddenTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(101),
 				End:   sdkmath.NewUint(199),

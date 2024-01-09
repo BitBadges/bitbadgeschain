@@ -94,11 +94,11 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 				OwnershipTime:             time,
 				TimelineTime:              &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
 				TransferTime:              &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-				ToMapping:                 &types.AddressMapping{},
-				FromMapping:               &types.AddressMapping{},
-				InitiatedByMapping:        &types.AddressMapping{},
-				AmountTrackerIdMapping:    &types.AddressMapping{},
-				ChallengeTrackerIdMapping: &types.AddressMapping{},
+				ToList:                 &types.AddressList{},
+				FromList:               &types.AddressList{},
+				InitiatedByList:        &types.AddressList{},
+				AmountTrackerIdList:    &types.AddressList{},
+				ChallengeTrackerIdList: &types.AddressList{},
 			})
 		}
 	}
@@ -122,7 +122,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 			break
 		}
 
-		doAddressesMatch := k.CheckIfAddressesMatchCollectionMappingIds(ctx, transferVal, fromAddress, toAddress, initiatedBy)
+		doAddressesMatch := k.CheckIfAddressesMatchCollectionListIds(ctx, transferVal, fromAddress, toAddress, initiatedBy)
 		if !doAddressesMatch {
 			continue
 		}
@@ -135,7 +135,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 
 		//From here on, we must have a full match or else continue
 
-		//For the overlapping badges and ownership times, we have a match because mapping IDs, time, and badge IDs match.
+		//For the overlapping badges and ownership times, we have a match because list IDs, time, and badge IDs match.
 		//We can now proceed to check any restrictions.
 		transferStr := "(from: " + fromAddress + ", to: " + toAddress + ", initiatedBy: " + initiatedBy + ", badgeId: " + transferVal.BadgeIds[0].Start.String() + ", time: " + transferVal.TransferTimes[0].Start.String() + ", ownershipTime: " + transferVal.OwnershipTimes[0].Start.String() + ")"
 
@@ -480,13 +480,13 @@ func (k Keeper) GetMaxPossible(
 		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers && trackerType == "from") ||
 		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers && trackerType == "initiatedBy")
 
-	approvalTrackerDetails := types.ApprovalsTracker{
+	approvalTrackerDetails := types.ApprovalTracker{
 		Amounts:      []*types.Balance{},
 		NumTransfers: sdkmath.NewUint(0),
 	}
 
 	if needToFetchApprovalTrackerDetails {
-		fetchedDetails, found := k.GetApprovalsTrackerFromStore(ctx, collection.CollectionId, approverAddress, amountTrackerId, approvalLevel, trackerType, address)
+		fetchedDetails, found := k.GetApprovalTrackerFromStore(ctx, collection.CollectionId, approverAddress, amountTrackerId, approvalLevel, trackerType, address)
 		if found {
 			approvalTrackerDetails = fetchedDetails
 		}
@@ -555,14 +555,14 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers && trackerType == "from") ||
 		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers && trackerType == "initiatedBy")
 
-	approvalTrackerDetails := types.ApprovalsTracker{
+	approvalTrackerDetails := types.ApprovalTracker{
 		Amounts:      []*types.Balance{},
 		NumTransfers: sdkmath.NewUint(0),
 	}
 
 	trackerIncrementId := fmt.Sprintf("%s-%s-%s-%s-%s-%s", amountTrackerId, approverAddress, approvalLevel, trackerType, address, collection.CollectionId)
 	if needToFetchApprovalTrackerDetails {
-		fetchedDetails, found := k.GetApprovalsTrackerFromStore(ctx, collection.CollectionId, approverAddress, amountTrackerId, approvalLevel, trackerType, address)
+		fetchedDetails, found := k.GetApprovalTrackerFromStore(ctx, collection.CollectionId, approverAddress, amountTrackerId, approvalLevel, trackerType, address)
 		if found {
 			approvalTrackerDetails = fetchedDetails
 		}
@@ -714,7 +714,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			),
 		)
 
-		err = k.SetApprovalsTrackerInStore(ctx, collection.CollectionId, approverAddress, amountTrackerId, approvalTrackerDetails, approvalLevel, trackerType, address)
+		err = k.SetApprovalTrackerInStore(ctx, collection.CollectionId, approverAddress, amountTrackerId, approvalTrackerDetails, approvalLevel, trackerType, address)
 		if err != nil {
 			return err
 		}
@@ -767,9 +767,9 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(ctx sdk.Context, app
 					trackerType = "initiatedBy"
 				}
 
-				approvalTrackerDetails, found := k.GetApprovalsTrackerFromStore(ctx, collection.CollectionId, approverAddress, amountTrackerId, approvalLevel, trackerType, address)
+				approvalTrackerDetails, found := k.GetApprovalTrackerFromStore(ctx, collection.CollectionId, approverAddress, amountTrackerId, approvalLevel, trackerType, address)
 				if !found {
-					approvalTrackerDetails = types.ApprovalsTracker{
+					approvalTrackerDetails = types.ApprovalTracker{
 						Amounts:      []*types.Balance{},
 						NumTransfers: sdkmath.NewUint(0),
 					}

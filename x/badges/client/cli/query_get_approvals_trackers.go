@@ -11,10 +11,10 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdGetApprovalsTrackers() *cobra.Command {
+func CmdGetApprovalTrackers() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get-approvals-trackers [collectionId] [approvalLevel] [approverAddress] [amountTrackerId] [trackerType] [approvedAddress]",
-		Short: "Query getApprovalsTrackers",
+		Short: "Query getApprovalTrackers",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
@@ -25,7 +25,7 @@ func CmdGetApprovalsTrackers() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryGetApprovalsTrackerRequest{
+			params := &types.QueryGetApprovalTrackerRequest{
 				CollectionId:    types.NewUintFromString(args[0]),
 				ApprovalLevel:   args[1],
 				ApproverAddress: args[2],
@@ -34,7 +34,7 @@ func CmdGetApprovalsTrackers() *cobra.Command {
 				ApprovedAddress: args[5],
 			}
 
-			res, err := queryClient.GetApprovalsTracker(cmd.Context(), params)
+			res, err := queryClient.GetApprovalTracker(cmd.Context(), params)
 			if err != nil {
 				return err
 			}

@@ -10,19 +10,19 @@ import (
 )
 
 // Queries a balance for the given address and badgeId and returns its contents.
-func (k Keeper) GetApprovalsTracker(goCtx context.Context, req *types.QueryGetApprovalsTrackerRequest) (*types.QueryGetApprovalsTrackerResponse, error) {
+func (k Keeper) GetApprovalTracker(goCtx context.Context, req *types.QueryGetApprovalTrackerRequest) (*types.QueryGetApprovalTrackerResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// collectionId math.Uint, addressForApproval string, amountTrackerId string, level string, trackerType string, address string)
-	address, found := k.GetApprovalsTrackerFromStore(ctx, req.CollectionId, req.ApproverAddress, req.AmountTrackerId, req.ApprovalLevel, req.TrackerType, req.ApprovedAddress)
+	address, found := k.GetApprovalTrackerFromStore(ctx, req.CollectionId, req.ApproverAddress, req.AmountTrackerId, req.ApprovalLevel, req.TrackerType, req.ApprovedAddress)
 	if !found {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	return &types.QueryGetApprovalsTrackerResponse{
+	return &types.QueryGetApprovalTrackerResponse{
 		Tracker: &address,
 	}, nil
 }

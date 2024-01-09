@@ -105,9 +105,9 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -274,9 +274,9 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -370,9 +370,9 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -491,9 +491,9 @@ func (suite *TestSuite) TestIncrements() {
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -639,9 +639,9 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -763,9 +763,9 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -933,9 +933,9 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -1057,9 +1057,9 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -1220,9 +1220,9 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -1375,9 +1375,9 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -1527,9 +1527,9 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -1688,9 +1688,9 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             GetFullUintRanges(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -1839,9 +1839,9 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 		TransferTimes:        GetFullUintRanges(),
 		OwnershipTimes:       GetFullUintRanges(),
 		BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -2025,9 +2025,9 @@ func (suite *TestSuite) TestMustOwnBadges() {
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -2091,9 +2091,9 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll() {
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -2167,9 +2167,9 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll2() {
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -2241,9 +2241,9 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne() {
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -2306,9 +2306,9 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne2() {
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -2372,9 +2372,9 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -2437,9 +2437,9 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -2522,9 +2522,9 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -2644,9 +2644,9 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
@@ -2719,9 +2719,9 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 	collectionsToCreate[0].CollectionApprovals = []*types.CollectionApproval{
 		collectionsToCreate[0].CollectionApprovals[0],
 		{
-			FromMappingId:        "AllWithoutMint",
-			ToMappingId:          "AllWithoutMint",
-			InitiatedByMappingId: "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
 			AmountTrackerId:      "testing232",
 			ChallengeTrackerId:   "testing232",
 			ApprovalId:           "asadsdas",
@@ -2752,9 +2752,9 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 			},
 		},
 		{
-			FromMappingId:        "AllWithoutMint",
-			ToMappingId:          "AllWithoutMint",
-			InitiatedByMappingId: "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
 			AmountTrackerId:      "testing232",
 			ChallengeTrackerId:   "testing232",
 			ApprovalId:           "target approval",
@@ -2838,9 +2838,9 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 	collectionsToCreate[0].CollectionApprovals = []*types.CollectionApproval{
 		collectionsToCreate[0].CollectionApprovals[0],
 		{
-			FromMappingId:        "AllWithoutMint",
-			ToMappingId:          "AllWithoutMint",
-			InitiatedByMappingId: "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
 			AmountTrackerId:      "testing232",
 			ChallengeTrackerId:   "testing232",
 			ApprovalId:           "asadsdas",
@@ -2871,9 +2871,9 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 			},
 		},
 		{
-			FromMappingId:        "AllWithoutMint",
-			ToMappingId:          "AllWithoutMint",
-			InitiatedByMappingId: "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
 			AmountTrackerId:      "testing232",
 			ChallengeTrackerId:   "testing232",
 			ApprovalId:           "target approval",
@@ -3055,9 +3055,9 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 		TransferTimes:        GetFullUintRanges(),
 		BadgeIds:             GetOneUintRange(),
 		OwnershipTimes:       GetFullUintRanges(),
-		FromMappingId:        "Mint",
-		ToMappingId:          "AllWithoutMint",
-		InitiatedByMappingId: "AllWithoutMint",
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
 	})
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)

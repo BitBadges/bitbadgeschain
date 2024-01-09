@@ -31,19 +31,19 @@ func GetUserBalance(suite *TestSuite, ctx context.Context, collectionId sdkmath.
 	return res.Balance, nil
 }
 
-func GetAddressMapping(suite *TestSuite, ctx context.Context, mappingId string) (*types.AddressMapping, error) {
-	res, err := suite.app.BadgesKeeper.GetAddressMapping(ctx, &types.QueryGetAddressMappingRequest{
-		MappingId: mappingId,
+func GetAddressList(suite *TestSuite, ctx context.Context, listId string) (*types.AddressList, error) {
+	res, err := suite.app.BadgesKeeper.GetAddressList(ctx, &types.QueryGetAddressListRequest{
+		ListId: listId,
 	})
 	if err != nil {
-		return &types.AddressMapping{}, err
+		return &types.AddressList{}, err
 	}
 
-	return res.Mapping, nil
+	return res.List, nil
 }
 
-// func GetNumUsedForMerkleChallenge(suite *TestSuite, ctx context.Context, challengeId string, level string, leafIndex sdkmath.Uint, collectionId sdkmath.Uint) (sdkmath.Uint, error) {
-// 	res, err := suite.app.BadgesKeeper.GetNumUsedForMerkleChallenge(ctx, &types.QueryGetNumUsedForMerkleChallengeRequest{
+// func GetChallengeTracker(suite *TestSuite, ctx context.Context, challengeId string, level string, leafIndex sdkmath.Uint, collectionId sdkmath.Uint) (sdkmath.Uint, error) {
+// 	res, err := suite.app.BadgesKeeper.GetChallengeTracker(ctx, &types.QueryGetChallengeTrackerRequest{
 // 		ChallengeId:  challengeId,
 // 		Level:        level,
 // 		LeafIndex:    leafIndex,
@@ -56,8 +56,8 @@ func GetAddressMapping(suite *TestSuite, ctx context.Context, mappingId string) 
 // 	return res.NumUsed, nil
 // }
 
-// func GetApprovalsTracker(suite *TestSuite, ctx context.Context, collectionId sdkmath.Uint, address string, amountTrackerId string, level string, trackerType string) (*types.ApprovalsTracker, error) {
-// 	res, err := suite.app.BadgesKeeper.GetApprovalsTracker(ctx, &types.QueryGetApprovalsTrackerRequest{
+// func GetApprovalTracker(suite *TestSuite, ctx context.Context, collectionId sdkmath.Uint, address string, amountTrackerId string, level string, trackerType string) (*types.ApprovalTracker, error) {
+// 	res, err := suite.app.BadgesKeeper.GetApprovalTracker(ctx, &types.QueryGetApprovalTrackerRequest{
 // 		CollectionId: sdkmath.Uint(collectionId),
 // 		Address:      address,
 // 		AmountTrackerId:    amountTrackerId,
@@ -65,7 +65,7 @@ func GetAddressMapping(suite *TestSuite, ctx context.Context, mappingId string) 
 // 		Depth:        depth,
 // 	})
 // 	if err != nil {
-// 		return &types.ApprovalsTracker{}, err
+// 		return &types.ApprovalTracker{}, err
 // 	}
 
 // 	return res.Tracker, nil
@@ -123,13 +123,13 @@ func UpdateUserApprovals(suite *TestSuite, ctx context.Context, msg *types.MsgUp
 	return err
 }
 
-func CreateAddressMappings(suite *TestSuite, ctx context.Context, msg *types.MsgCreateAddressMappings) error {
+func CreateAddressLists(suite *TestSuite, ctx context.Context, msg *types.MsgCreateAddressLists) error {
 	err := msg.ValidateBasic()
 	if err != nil {
 		return err
 	}
 
-	_, err = suite.msgServer.CreateAddressMappings(ctx, msg)
+	_, err = suite.msgServer.CreateAddressLists(ctx, msg)
 	return err
 }
 
@@ -207,9 +207,9 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			}
 		}
 
-		err = CreateAddressMappings(suite, ctx, &types.MsgCreateAddressMappings{
+		err = CreateAddressLists(suite, ctx, &types.MsgCreateAddressLists{
 			Creator:         bob,
-			AddressMappings: collectionToCreate.AddressMappings,
+			AddressLists: collectionToCreate.AddressLists,
 		})
 		if err != nil {
 			return err
