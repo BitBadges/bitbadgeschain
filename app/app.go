@@ -619,6 +619,7 @@ func New(
 		app.GetSubspace(wasmxtypes.ModuleName),
 		app.AccountKeeper,
 		app.BankKeeper,
+		app.WasmKeeper,
 	)
 
 	badgesIBCModule := badgesmodule.NewIBCModule(app.BadgesKeeper)

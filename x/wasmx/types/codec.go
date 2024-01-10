@@ -13,6 +13,7 @@ import (
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgExecuteContractCompat{}, "wasmx/MsgExecuteContractCompat", nil)
 	cdc.RegisterConcrete(&MsgStoreCodeCompat{}, "wasmx/MsgStoreCodeCompat", nil)
+	cdc.RegisterConcrete(&MsgInstantiateContractCompat{}, "wasmx/MsgInstantiateContractCompat", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
@@ -20,6 +21,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgExecuteContractCompat{},
 		&MsgStoreCodeCompat{},
+		&MsgInstantiateContractCompat{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

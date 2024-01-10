@@ -31,6 +31,7 @@ func NewKeeper(
 	paramSpace paramtypes.Subspace,
 	ak authkeeper.AccountKeeper,
 	bk types.BankKeeper,
+	wk wasmkeeper.Keeper,
 ) Keeper {
 
 	// set KeyTable if it has not already been set
@@ -45,6 +46,7 @@ func NewKeeper(
 		cdc:           cdc,
 		accountKeeper: ak,
 		bankKeeper:    bk,
+		wasmKeeper: 	 wk,
 	}
 }
 

@@ -9,6 +9,7 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/wasmx/types";
 service Msg {
   rpc ExecuteContractCompat(MsgExecuteContractCompat) returns (MsgExecuteContractCompatResponse);
   rpc StoreCodeCompat(MsgStoreCodeCompat) returns (MsgStoreCodeCompatResponse);
+  rpc InstantiateContractCompat(MsgInstantiateContractCompat) returns (MsgInstantiateContractCompatResponse);
 }
 
 // MsgExecuteContractCompat submits the given message data to a smart contract, compatible with EIP712
@@ -43,4 +44,21 @@ message MsgStoreCodeCompatResponse {
   string codeId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // Checksum is the sha256 hash of the stored code
   bytes checksum = 2;
+}
+
+message MsgInstantiateContractCompat {
+  // Sender is the that actor that signed the messages
+  string sender = 1;
+  // Code ID obtained from store wasm code
+  string codeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Label is a human-readable string for labelling the contract
+  string label = 3;
+  // Funds coins that are transferred to the contract on instantiation
+  string funds = 4;
+}
+
+// MsgInstantiateContractCompatResponse returns store result data.
+message MsgInstantiateContractCompatResponse {
+  string address = 1;
+  bytes data = 2;
 }

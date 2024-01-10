@@ -58,6 +58,10 @@ func (m msgServer) StoreCodeCompat(goCtx context.Context, msg *types.MsgStoreCod
 	oMsg := &wasmtypes.MsgStoreCode{
 		Sender:   msg.Sender,
 		WASMByteCode: hexutil.MustDecode(msg.HexWasmByteCode),
+		InstantiatePermission: &wasmtypes.AccessConfig{
+			Permission: wasmtypes.AccessTypeEverybody,
+			Addresses: []string{},
+		},
 	}
 
 	res, err := wasmMsgServer.StoreCode(goCtx, oMsg)
@@ -70,3 +74,28 @@ func (m msgServer) StoreCodeCompat(goCtx context.Context, msg *types.MsgStoreCod
 		Checksum: res.Checksum,
 	}, nil
 }
+
+func (m msgServer) InstantiateContractCompat(goCtx context.Context, msg *types.MsgInstantiateContractCompat) (*types.MsgInstantiateContractCompatResponse, error) {
+	wasmMsgServer := wasmkeeper.NewMsgServerImpl(&m.wasmKeeper)
+	funds := sdk.Coins{}
+	if msg.Funds != "0" {
+		funds, _ = sdk.ParseCoinsNormalized(msg.Funds)
+	}
+	oMsg := &wasmtypes.MsgInstantiateContract{
+		Sender: msg.Sender,
+		CodeID: msg.CodeId.Uint64(),
+		Label: 	msg.Label,
+		Funds: 	funds,
+	}
+
+	res, err := wasmMsgServer.InstantiateContract(goCtx, oMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgInstantiateContractCompatResponse{
+		Address: res.Address,
+		Data: res.Data,
+	}, nil
+}
+

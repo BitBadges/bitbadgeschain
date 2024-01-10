@@ -22,6 +22,10 @@ func (msg MsgStoreCodeCompat) ValidateBasic() error {
 	oMsg := &wasmtypes.MsgStoreCode{
 		Sender:   msg.Sender,
 		WASMByteCode: hexutil.MustDecode(msg.HexWasmByteCode),
+		InstantiatePermission: &wasmtypes.AccessConfig{
+			Permission: wasmtypes.AccessTypeEverybody,
+			Addresses: []string{},
+		},
 	}
 
 	if err := oMsg.ValidateBasic(); err != nil {
