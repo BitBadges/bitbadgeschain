@@ -8,7 +8,7 @@ import (
 )
 
 // By default, we approve all transfers if to === initiatedBy
-func AppendDefaultForIncoming(currApprovals []*types.UserIncomingApproval, userAddress string) []*types.UserIncomingApproval {
+func AppendSelfInitiatedIncomingApproval(currApprovals []*types.UserIncomingApproval, userAddress string) []*types.UserIncomingApproval {
 	currApprovals = append([]*types.UserIncomingApproval{
 		{
 			FromListId:        "AllWithMint", //everyone
@@ -37,7 +37,7 @@ func AppendDefaultForIncoming(currApprovals []*types.UserIncomingApproval, userA
 }
 
 // By default, we approve all transfers if from === initiatedBy
-func AppendDefaultForOutgoing(currApprovals []*types.UserOutgoingApproval, userAddress string) []*types.UserOutgoingApproval {
+func AppendSelfInitiatedOutgoingApproval(currApprovals []*types.UserOutgoingApproval, userAddress string) []*types.UserOutgoingApproval {
 	//prepend it
 	currApprovals = append([]*types.UserOutgoingApproval{
 		{

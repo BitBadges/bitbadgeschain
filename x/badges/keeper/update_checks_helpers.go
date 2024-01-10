@@ -278,7 +278,7 @@ func (k Keeper) ValidateCollectionApprovalsUpdate(ctx sdk.Context, collection *t
 		return err
 	}
 
-	err = k.CheckCollectionApprovalPermission(ctx, detailsToCheck, CanUpdateCollectionApprovals, "update collection approved transfers")
+	err = k.CheckIfCollectionApprovalPermissionPermits(ctx, detailsToCheck, CanUpdateCollectionApprovals, "update collection approved transfers")
 	if err != nil {
 		return err
 	}
@@ -295,7 +295,7 @@ func (k Keeper) ValidateUserOutgoingApprovalsUpdate(ctx sdk.Context, collection 
 		return err
 	}
 
-	err = k.CheckUserOutgoingApprovalPermission(ctx, detailsToCheck, CanUpdateCollectionApprovals, "update collection approved transfers")
+	err = k.CheckIfUserOutgoingApprovalPermissionPermits(ctx, detailsToCheck, CanUpdateCollectionApprovals, "update collection approved transfers")
 	if err != nil {
 		return err
 	}
@@ -312,7 +312,7 @@ func (k Keeper) ValidateUserIncomingApprovalsUpdate(ctx sdk.Context, collection 
 		return err
 	}
 
-	err = k.CheckUserIncomingApprovalPermission(ctx, detailsToCheck, CanUpdateCollectionApprovals, "update collection approved transfers")
+	err = k.CheckIfUserIncomingApprovalPermissionPermits(ctx, detailsToCheck, CanUpdateCollectionApprovals, "update collection approved transfers")
 	if err != nil {
 		return err
 	}
@@ -366,7 +366,7 @@ func (k Keeper) ValidateBadgeMetadataUpdate(ctx sdk.Context, oldBadgeMetadata []
 		return err
 	}
 
-	err = k.CheckTimedUpdateWithBadgeIdsPermission(ctx, detailsToCheck, canUpdateBadgeMetadata, "update badge metadata")
+	err = k.CheckIfTimedUpdateWithBadgeIdsPermissionPermits(ctx, detailsToCheck, canUpdateBadgeMetadata, "update badge metadata")
 	if err != nil {
 		return err
 	}
@@ -399,7 +399,7 @@ func (k Keeper) ValidateCollectionMetadataUpdate(ctx sdk.Context, oldCollectionM
 		return err
 	}
 
-	err = k.CheckTimedUpdatePermission(ctx, detailsToCheck, canUpdateCollectionMetadata, "update collection metadata")
+	err = k.CheckIfTimedUpdatePermissionPermits(ctx, detailsToCheck, canUpdateCollectionMetadata, "update collection metadata")
 	if err != nil {
 		return err
 	}
@@ -440,7 +440,7 @@ func (k Keeper) ValidateOffChainBalancesMetadataUpdate(ctx sdk.Context, collecti
 		return err
 	}
 
-	err = k.CheckTimedUpdatePermission(ctx, detailsToCheck, canUpdateOffChainBalancesMetadata, "update off chain balances metadata")
+	err = k.CheckIfTimedUpdatePermissionPermits(ctx, detailsToCheck, canUpdateOffChainBalancesMetadata, "update off chain balances metadata")
 	if err != nil {
 		return err
 	}
@@ -487,7 +487,7 @@ func (k Keeper) ValidateManagerUpdate(ctx sdk.Context, oldManager []*types.Manag
 		return err
 	}
 
-	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateManager, "update manager"); err != nil {
+	if err = k.CheckIfTimedUpdatePermissionPermits(ctx, updatedTimelineTimes, canUpdateManager, "update manager"); err != nil {
 		return err
 	}
 
@@ -506,7 +506,7 @@ func (k Keeper) ValidateCustomDataUpdate(ctx sdk.Context, oldCustomData []*types
 		return err
 	}
 
-	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateCustomData, "update custom data"); err != nil {
+	if err = k.CheckIfTimedUpdatePermissionPermits(ctx, updatedTimelineTimes, canUpdateCustomData, "update custom data"); err != nil {
 		return err
 	}
 
@@ -544,7 +544,7 @@ func (k Keeper) ValidateStandardsUpdate(ctx sdk.Context, oldStandards []*types.S
 		return err
 	}
 
-	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateStandards, "update standards"); err != nil {
+	if err = k.CheckIfTimedUpdatePermissionPermits(ctx, updatedTimelineTimes, canUpdateStandards, "update standards"); err != nil {
 		return err
 	}
 
@@ -563,7 +563,7 @@ func (k Keeper) ValidateIsArchivedUpdate(ctx sdk.Context, oldIsArchived []*types
 		return err
 	}
 
-	if err = k.CheckTimedUpdatePermission(ctx, updatedTimelineTimes, canUpdateIsArchived, "update is archived"); err != nil {
+	if err = k.CheckIfTimedUpdatePermissionPermits(ctx, updatedTimelineTimes, canUpdateIsArchived, "update is archived"); err != nil {
 		return err
 	}
 

@@ -24,7 +24,7 @@ type UserApprovalsToCheck struct {
 func (k Keeper) DeductUserOutgoingApprovals(ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.MerkleProof, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string, prioritizedApprovals []*types.ApprovalIdentifierDetails, onlyCheckPrioritized bool) error {
 	currApprovals := userBalance.OutgoingApprovals
 	if userBalance.AutoApproveSelfInitiatedOutgoingTransfers {
-		currApprovals = AppendDefaultForOutgoing(currApprovals, from)
+		currApprovals = AppendSelfInitiatedOutgoingApproval(currApprovals, from)
 	}
 
 	//Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
@@ -37,7 +37,7 @@ func (k Keeper) DeductUserOutgoingApprovals(ctx sdk.Context, overallTransferBala
 func (k Keeper) DeductUserIncomingApprovals(ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.MerkleProof, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string, prioritizedApprovals []*types.ApprovalIdentifierDetails, onlyCheckPrioritized bool) error {
 	currApprovals := userBalance.IncomingApprovals
 	if userBalance.AutoApproveSelfInitiatedIncomingTransfers {
-		currApprovals = AppendDefaultForIncoming(currApprovals, to)
+		currApprovals = AppendSelfInitiatedIncomingApproval(currApprovals, to)
 	}
 
 	//Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)

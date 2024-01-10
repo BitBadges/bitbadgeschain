@@ -56,7 +56,7 @@ func InvertUintRanges(uintRanges []*UintRange, minId sdkmath.Uint, maxId sdkmath
 	for _, uintRange := range uintRanges {
 		newRanges := []*UintRange{}
 		for _, rangeObject := range ranges {
-			rangesAfterRemoval, _ := RemoveUintsFromUintRange(uintRange, rangeObject)
+			rangesAfterRemoval, _ := RemoveUintRangeFromUintRange(uintRange, rangeObject)
 			newRanges = append(newRanges, rangesAfterRemoval...)
 		}
 		ranges = newRanges
@@ -68,7 +68,7 @@ func InvertUintRanges(uintRanges []*UintRange, minId sdkmath.Uint, maxId sdkmath
 // Removes all ids within an id range from an id range.
 // Removing can make this range be split into 0, 1, or 2 new ranges.
 // Returns if anything was removed or not
-func RemoveUintsFromUintRange(idxsToRemove *UintRange, rangeObject *UintRange) ([]*UintRange, []*UintRange) {
+func RemoveUintRangeFromUintRange(idxsToRemove *UintRange, rangeObject *UintRange) ([]*UintRange, []*UintRange) {
 	if idxsToRemove.End.LT(rangeObject.Start) || idxsToRemove.Start.GT(rangeObject.End) {
 		// idxsToRemove doesn't overlap with rangeObject, so nothing is removed
 		return []*UintRange{rangeObject}, []*UintRange{}
@@ -129,7 +129,7 @@ func RemoveUintsFromUintRange(idxsToRemove *UintRange, rangeObject *UintRange) (
 	return newRanges, removedRanges
 }
 
-func RemoveUintRangeFromUintRange(idsToRemove []*UintRange, rangeToRemoveFrom []*UintRange) ([]*UintRange, []*UintRange) {
+func RemoveUintRangesFromUintRanges(idsToRemove []*UintRange, rangeToRemoveFrom []*UintRange) ([]*UintRange, []*UintRange) {
 	if len(idsToRemove) == 0 {
 		return rangeToRemoveFrom, []*UintRange{}
 	}
@@ -138,7 +138,7 @@ func RemoveUintRangeFromUintRange(idsToRemove []*UintRange, rangeToRemoveFrom []
 	for _, handledValue := range idsToRemove {
 		newRanges := []*UintRange{}
 		for _, oldPermittedTime := range rangeToRemoveFrom {
-			rangesAfterRemoval, removed := RemoveUintsFromUintRange(handledValue, oldPermittedTime)
+			rangesAfterRemoval, removed := RemoveUintRangeFromUintRange(handledValue, oldPermittedTime)
 			newRanges = append(newRanges, rangesAfterRemoval...)
 			removedRanges = append(removedRanges, removed...)
 		}
@@ -153,7 +153,7 @@ func AssertRangesDoNotOverlapAtAll(rangeToCheck []*UintRange, overlappingRange [
 	for _, oldAllowedTime := range rangeToCheck {
 		for _, newAllowedTime := range overlappingRange {
 			//Check that the new time completely overlaps with the old time
-			_, removed := RemoveUintsFromUintRange(newAllowedTime, oldAllowedTime)
+			_, removed := RemoveUintRangeFromUintRange(newAllowedTime, oldAllowedTime)
 			if len(removed) > 0 {
 				return ErrRangesOverlap
 			}

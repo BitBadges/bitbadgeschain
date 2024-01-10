@@ -117,10 +117,10 @@ func IsAddressListEmpty(list *AddressList) bool {
 }
 
 func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
-	timelineTimesAfterRemoval, removedTimelineTimes := RemoveUintsFromUintRange(handled.TimelineTime, valueToCheck.TimelineTime)
-	badgesAfterRemoval, removedBadges := RemoveUintsFromUintRange(handled.BadgeId, valueToCheck.BadgeId)
-	transferTimesAfterRemoval, removedTransferTimes := RemoveUintsFromUintRange(handled.TransferTime, valueToCheck.TransferTime)
-	ownershipTimesAfterRemoval, removedOwnershipTimes := RemoveUintsFromUintRange(handled.OwnershipTime, valueToCheck.OwnershipTime)
+	timelineTimesAfterRemoval, removedTimelineTimes := RemoveUintRangeFromUintRange(handled.TimelineTime, valueToCheck.TimelineTime)
+	badgesAfterRemoval, removedBadges := RemoveUintRangeFromUintRange(handled.BadgeId, valueToCheck.BadgeId)
+	transferTimesAfterRemoval, removedTransferTimes := RemoveUintRangeFromUintRange(handled.TransferTime, valueToCheck.TransferTime)
+	ownershipTimesAfterRemoval, removedOwnershipTimes := RemoveUintRangeFromUintRange(handled.OwnershipTime, valueToCheck.OwnershipTime)
 
 	toListAfterRemoval, removedToList := RemoveAddressListFromAddressList(handled.ToList, valueToCheck.ToList)
 	fromListAfterRemoval, removedFromList := RemoveAddressListFromAddressList(handled.FromList, valueToCheck.FromList)
@@ -571,8 +571,8 @@ func ValidateUniversalPermissionUpdate(oldPermissions []*UniversalPermissionDeta
 		oldPermission := overlapObj.FirstDetails
 		newPermission := overlapObj.SecondDetails
 
-		leftoverPermanentlyPermittedTimes, _ := RemoveUintRangeFromUintRange(newPermission.PermanentlyPermittedTimes, oldPermission.PermanentlyPermittedTimes)
-		leftoverPermanentlyForbiddenTimes, _ := RemoveUintRangeFromUintRange(newPermission.PermanentlyForbiddenTimes, oldPermission.PermanentlyForbiddenTimes)
+		leftoverPermanentlyPermittedTimes, _ := RemoveUintRangesFromUintRanges(newPermission.PermanentlyPermittedTimes, oldPermission.PermanentlyPermittedTimes)
+		leftoverPermanentlyForbiddenTimes, _ := RemoveUintRangesFromUintRanges(newPermission.PermanentlyForbiddenTimes, oldPermission.PermanentlyForbiddenTimes)
 
 		if len(leftoverPermanentlyPermittedTimes) > 0 || len(leftoverPermanentlyForbiddenTimes) > 0 {
 			errMsg := "permission "

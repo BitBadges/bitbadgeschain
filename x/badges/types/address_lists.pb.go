@@ -25,7 +25,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // An AddressList is a list of addresses that are referenced by an ID.
 // The list may include only the specified addresses, or it may include all addresses but
-// the specified addresses (depending on if allowlist is true (whitelist) or false (blacklist)).
+// the specified addresses (depending on if allowlist is true (allowlist) or false (blocklist)).
 //
 // AddressLists are used for defining approvals, as well as being a simplified badge interface.
 type AddressList struct {

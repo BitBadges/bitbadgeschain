@@ -25,7 +25,7 @@ var (
 	ErrRangesOverlap                               = sdkerrors.Register(ModuleName, 1513, "id ranges overlap. for example, { Start: sdkmath.NewUint(1), end: 5 } and { Start: sdkmath.NewUint(4), End: sdkmath.NewUint(10) } overlap")
 	ErrUintUnititialized                           = sdkerrors.Register(ModuleName, 1514, "uint is uninitialized (nil)")
 	ErrPrimaryChallengeMustBeOneUsePerLeaf         = sdkerrors.Register(ModuleName, 1515, "if you are using leaf index for predetermined balances, it must be max one use per leaf")
-	ErrCanOnlyUseMaxOneUsePerLeafWithWhitelistTree = sdkerrors.Register(ModuleName, 1516, "must use max one use per leaf with non-whitelist tree")
+	ErrCanOnlyUseMaxOneUsePerLeafWithAllowlistTree = sdkerrors.Register(ModuleName, 1516, "must use max one use per leaf with non-allowlist tree")
 	ErrCanOnlyUseLeafIndexForBadgeIdsOnce          = sdkerrors.Register(ModuleName, 1517, "can only use leaf index for badge ids once")
 	ErrRangeDoesNotOverlap                         = sdkerrors.Register(ModuleName, 1518, "range does not overlap with existing ranges")
 	ErrAmountRestrictionsIsNil                     = sdkerrors.Register(ModuleName, 1519, "amount restrictions is nil")

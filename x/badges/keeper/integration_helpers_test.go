@@ -13,8 +13,8 @@ func AssertUintsEqual(suite *TestSuite, expected sdkmath.Uint, actual sdkmath.Ui
 }
 
 func AssertUintRangesEqual(suite *TestSuite, expected []*types.UintRange, actual []*types.UintRange) {
-	remainingOne, _ := types.RemoveUintRangeFromUintRange(actual, expected)
-	remainingTwo, _ := types.RemoveUintRangeFromUintRange(expected, actual)
+	remainingOne, _ := types.RemoveUintRangesFromUintRanges(actual, expected)
+	remainingTwo, _ := types.RemoveUintRangesFromUintRanges(expected, actual)
 	suite.Require().Equal(len(remainingOne), 0, "UintRanges not equal %s %s", expected, actual)
 	suite.Require().Equal(len(remainingTwo), 0, "UintRanges not equal %s %s", expected, actual)
 }

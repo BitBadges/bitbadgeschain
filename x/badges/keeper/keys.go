@@ -13,7 +13,6 @@ var (
 	UserBalanceKey        = []byte{0x02}
 	NextCollectionIdKey   = []byte{0x03}
 	UsedClaimChallengeKey = []byte{0x04}
-	WhitelistIndexKey     = []byte{0x05}
 	AddressListKey     = []byte{0x06}
 	ApprovalTrackerKey   = []byte{0x07}
 

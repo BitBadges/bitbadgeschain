@@ -68,7 +68,7 @@ message MerkleChallenge {
   // The expected length of the Merkle path for verification. Used to prevent Merkle path truncation attacks.
   string expectedProofLength = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
-  // If true, we will override the user's leaf for their proof with their creator address. Used for whitelist trees where all leaves are valid Cosmos addresses.
+  // If true, we will override the user's leaf for their proof with their creator address. Used for allowlist trees where all leaves are valid Cosmos addresses.
   bool useCreatorAddressAsLeaf = 3;
 
   // The maximum number of times each leaf can be used. Must be 1 if useCreatorAddressAsLeaf is false to prevent replay attacks.

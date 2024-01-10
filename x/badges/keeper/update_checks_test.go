@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (suite *TestSuite) TestCheckTimedUpdatePermission() {
+func (suite *TestSuite) TestCheckIfTimedUpdatePermissionPermits() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -42,7 +42,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermission() {
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-func (suite *TestSuite) TestCheckTimedUpdatePermissionDefaultAllowed() {
+func (suite *TestSuite) TestCheckIfTimedUpdatePermissionPermitsDefaultAllowed() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -72,7 +72,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionDefaultAllowed() {
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
+func (suite *TestSuite) TestCheckIfTimedUpdatePermissionPermitsInvalidTimes() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -125,7 +125,7 @@ func (suite *TestSuite) TestCheckTimedUpdatePermissionInvalidTimes() {
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermission() {
+func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermits() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -167,7 +167,7 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermission() {
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionDefaultAllowed() {
+func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermitsDefaultAllowed() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -202,7 +202,7 @@ func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionDefaultAllowed
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-func (suite *TestSuite) TestCheckTimedUpdateWithBadgeIdsPermissionInvalidTimes() {
+func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermitsInvalidTimes() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)

@@ -24,7 +24,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 		hasValidSolution := false
 		errStr := ""
 		if challenge.UseCreatorAddressAsLeaf {
-			errStr = "does not satisfy whitelist"
+			errStr = "does not satisfy allowlist"
 		} else {
 			errStr = "invalid code / password"
 		}
@@ -163,7 +163,7 @@ func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.MerklePath
 
 func GetLeafIndex(aunts []*types.MerklePathItem) sdkmath.Uint {
 	leafIndex := sdkmath.NewUint(1)
-	//iterate through msg.WhitelistProof.Aunts backwards
+	//iterate through msg.AllowlistProof.Aunts backwards
 	for i := len(aunts) - 1; i >= 0; i-- {
 		aunt := aunts[i]
 		onRight := aunt.OnRight
