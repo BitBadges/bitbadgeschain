@@ -6,6 +6,7 @@ package types
 import (
 	context "context"
 	fmt "fmt"
+	_ "github.com/cosmos/gogoproto/gogoproto"
 	grpc1 "github.com/cosmos/gogoproto/grpc"
 	proto "github.com/cosmos/gogoproto/proto"
 	grpc "google.golang.org/grpc"
@@ -146,32 +147,143 @@ func (m *MsgExecuteContractCompatResponse) GetData() []byte {
 	return nil
 }
 
+// MsgStoreCodeCompat submits the given message data to a smart contract, compatible with EIP712
+type MsgStoreCodeCompat struct {
+	// Sender is the that actor that signed the messages
+	Sender string `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
+	// WasmByteCode is the raw wasm bytes
+	HexWasmByteCode string `protobuf:"bytes,2,opt,name=hexWasmByteCode,proto3" json:"hexWasmByteCode,omitempty"`
+}
+
+func (m *MsgStoreCodeCompat) Reset()         { *m = MsgStoreCodeCompat{} }
+func (m *MsgStoreCodeCompat) String() string { return proto.CompactTextString(m) }
+func (*MsgStoreCodeCompat) ProtoMessage()    {}
+func (*MsgStoreCodeCompat) Descriptor() ([]byte, []int) {
+	return fileDescriptor_118da44f5457e43b, []int{2}
+}
+func (m *MsgStoreCodeCompat) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgStoreCodeCompat) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgStoreCodeCompat.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgStoreCodeCompat) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgStoreCodeCompat.Merge(m, src)
+}
+func (m *MsgStoreCodeCompat) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgStoreCodeCompat) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgStoreCodeCompat.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgStoreCodeCompat proto.InternalMessageInfo
+
+func (m *MsgStoreCodeCompat) GetSender() string {
+	if m != nil {
+		return m.Sender
+	}
+	return ""
+}
+
+func (m *MsgStoreCodeCompat) GetHexWasmByteCode() string {
+	if m != nil {
+		return m.HexWasmByteCode
+	}
+	return ""
+}
+
+// MsgStoreCodeCompatResponse returns store result data.
+type MsgStoreCodeCompatResponse struct {
+	// CodeID is the reference to the stored WASM code
+	CodeId Uint `protobuf:"bytes,1,opt,name=codeId,proto3,customtype=Uint" json:"codeId"`
+	// Checksum is the sha256 hash of the stored code
+	Checksum []byte `protobuf:"bytes,2,opt,name=checksum,proto3" json:"checksum,omitempty"`
+}
+
+func (m *MsgStoreCodeCompatResponse) Reset()         { *m = MsgStoreCodeCompatResponse{} }
+func (m *MsgStoreCodeCompatResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgStoreCodeCompatResponse) ProtoMessage()    {}
+func (*MsgStoreCodeCompatResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_118da44f5457e43b, []int{3}
+}
+func (m *MsgStoreCodeCompatResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgStoreCodeCompatResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgStoreCodeCompatResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgStoreCodeCompatResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgStoreCodeCompatResponse.Merge(m, src)
+}
+func (m *MsgStoreCodeCompatResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgStoreCodeCompatResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgStoreCodeCompatResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgStoreCodeCompatResponse proto.InternalMessageInfo
+
+func (m *MsgStoreCodeCompatResponse) GetChecksum() []byte {
+	if m != nil {
+		return m.Checksum
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*MsgExecuteContractCompat)(nil), "wasmx.MsgExecuteContractCompat")
 	proto.RegisterType((*MsgExecuteContractCompatResponse)(nil), "wasmx.MsgExecuteContractCompatResponse")
+	proto.RegisterType((*MsgStoreCodeCompat)(nil), "wasmx.MsgStoreCodeCompat")
+	proto.RegisterType((*MsgStoreCodeCompatResponse)(nil), "wasmx.MsgStoreCodeCompatResponse")
 }
 
 func init() { proto.RegisterFile("wasmx/tx.proto", fileDescriptor_118da44f5457e43b) }
 
 var fileDescriptor_118da44f5457e43b = []byte{
-	// 257 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2b, 0x4f, 0x2c, 0xce,
-	0xad, 0xd0, 0x2f, 0xa9, 0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x05, 0xf3, 0x95, 0xca,
-	0xb8, 0x24, 0x7c, 0x8b, 0xd3, 0x5d, 0x2b, 0x52, 0x93, 0x4b, 0x4b, 0x52, 0x9d, 0xf3, 0xf3, 0x4a,
-	0x8a, 0x12, 0x93, 0x4b, 0x9c, 0xf3, 0x73, 0x0b, 0x12, 0x4b, 0x84, 0xc4, 0xb8, 0xd8, 0x8a, 0x53,
-	0xf3, 0x52, 0x52, 0x8b, 0x24, 0x18, 0x15, 0x18, 0x35, 0x38, 0x83, 0xa0, 0x3c, 0x21, 0x29, 0x2e,
-	0x8e, 0x64, 0xa8, 0x4a, 0x09, 0x26, 0xb0, 0x0c, 0x9c, 0x2f, 0x24, 0xc0, 0xc5, 0x9c, 0x5b, 0x9c,
-	0x2e, 0xc1, 0x0c, 0x16, 0x06, 0x31, 0x85, 0x44, 0xb8, 0x58, 0xd3, 0x4a, 0xf3, 0x52, 0x8a, 0x25,
-	0x58, 0xc0, 0x62, 0x10, 0x8e, 0x92, 0x19, 0x97, 0x02, 0x2e, 0x7b, 0x83, 0x52, 0x8b, 0x0b, 0xf2,
-	0xf3, 0x8a, 0x53, 0x85, 0x84, 0xb8, 0x58, 0x52, 0x12, 0x4b, 0x12, 0xc1, 0xb6, 0xf3, 0x04, 0x81,
-	0xd9, 0x46, 0x19, 0x5c, 0xcc, 0xbe, 0xc5, 0xe9, 0x42, 0x89, 0x5c, 0xa2, 0xd8, 0xdd, 0x2c, 0xaf,
-	0x07, 0xf6, 0x97, 0x1e, 0x2e, 0xc3, 0xa5, 0xd4, 0x09, 0x28, 0x80, 0xd9, 0xee, 0xe4, 0x7d, 0xe2,
-	0x91, 0x1c, 0xe3, 0x85, 0x47, 0x72, 0x8c, 0x0f, 0x1e, 0xc9, 0x31, 0x4e, 0x78, 0x2c, 0xc7, 0x70,
-	0xe1, 0xb1, 0x1c, 0xc3, 0x8d, 0xc7, 0x72, 0x0c, 0x51, 0x86, 0xe9, 0x99, 0x25, 0x19, 0xa5, 0x49,
-	0x7a, 0xc9, 0xf9, 0xb9, 0xfa, 0x49, 0x99, 0x25, 0x49, 0x89, 0x29, 0xe9, 0xa9, 0xc5, 0x08, 0x56,
-	0x72, 0x46, 0x62, 0x66, 0x9e, 0x7e, 0x85, 0x3e, 0x34, 0xc0, 0x2b, 0x0b, 0x52, 0x8b, 0x93, 0xd8,
-	0xc0, 0x81, 0x6e, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0x47, 0xd4, 0xe1, 0xe3, 0x86, 0x01, 0x00,
-	0x00,
+	// 367 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x52, 0x4d, 0x4a, 0xc3, 0x40,
+	0x14, 0x4e, 0xec, 0x0f, 0xfa, 0x28, 0x56, 0x86, 0x2a, 0x31, 0x8b, 0xb4, 0x06, 0xc1, 0xae, 0x12,
+	0x54, 0xf0, 0x00, 0x2d, 0x2e, 0x44, 0x8a, 0x10, 0x51, 0xc1, 0x85, 0x30, 0x49, 0xc6, 0x49, 0x90,
+	0x64, 0x42, 0x66, 0xa2, 0xe9, 0x2d, 0xbc, 0x8e, 0x37, 0xe8, 0xb2, 0x4b, 0x71, 0x51, 0xa4, 0xbd,
+	0x88, 0x74, 0x1a, 0x53, 0xa8, 0x96, 0xee, 0xbe, 0x9f, 0x99, 0xf7, 0x3e, 0xbe, 0x19, 0xd8, 0x7d,
+	0xc3, 0x3c, 0xca, 0x6d, 0x91, 0x5b, 0x49, 0xca, 0x04, 0x43, 0x35, 0xc9, 0xf5, 0x16, 0x65, 0x94,
+	0x49, 0xc5, 0x9e, 0xa3, 0x85, 0x69, 0xbe, 0x82, 0x36, 0xe0, 0xf4, 0x32, 0x27, 0x5e, 0x26, 0x48,
+	0x9f, 0xc5, 0x22, 0xc5, 0x9e, 0xe8, 0xb3, 0x28, 0xc1, 0x02, 0x1d, 0x40, 0x9d, 0x93, 0xd8, 0x27,
+	0xa9, 0xa6, 0x76, 0xd4, 0xee, 0x8e, 0x53, 0x30, 0xa4, 0xc3, 0xb6, 0x57, 0x9c, 0xd4, 0xb6, 0xa4,
+	0x53, 0x72, 0xb4, 0x07, 0x95, 0x88, 0x53, 0xad, 0x22, 0xe5, 0x39, 0x44, 0x2d, 0xa8, 0x3d, 0x67,
+	0xb1, 0xcf, 0xb5, 0xaa, 0xd4, 0x16, 0xc4, 0xbc, 0x80, 0xce, 0xba, 0xbd, 0x0e, 0xe1, 0x09, 0x8b,
+	0x39, 0x41, 0x08, 0xaa, 0x3e, 0x16, 0x58, 0x6e, 0x6f, 0x38, 0x12, 0x9b, 0xf7, 0x80, 0x06, 0x9c,
+	0xde, 0x0a, 0x96, 0x92, 0x3e, 0xf3, 0xc9, 0x86, 0xa4, 0x5d, 0x68, 0x06, 0x24, 0x7f, 0xc0, 0x3c,
+	0xea, 0x0d, 0x85, 0xbc, 0x50, 0x04, 0x5e, 0x95, 0xcd, 0x27, 0xd0, 0xff, 0xce, 0x2d, 0x93, 0x1c,
+	0x43, 0xdd, 0x63, 0x3e, 0xb9, 0xf2, 0x17, 0xf3, 0x7b, 0x8d, 0xd1, 0xa4, 0xad, 0x7c, 0x4d, 0xda,
+	0xd5, 0xbb, 0x30, 0x16, 0x4e, 0xe1, 0xc9, 0x5e, 0x02, 0xe2, 0xbd, 0xf0, 0x2c, 0x92, 0x6b, 0x1a,
+	0x4e, 0xc9, 0xcf, 0x3e, 0x54, 0xa8, 0x0c, 0x38, 0x45, 0x18, 0xf6, 0xff, 0x2f, 0xbb, 0x6d, 0xc9,
+	0x67, 0xb2, 0xd6, 0xb5, 0xa2, 0x9f, 0x6c, 0x38, 0x50, 0x86, 0xbd, 0x81, 0xe6, 0x6a, 0x3f, 0x87,
+	0xcb, 0xbb, 0x2b, 0x96, 0x7e, 0xb4, 0xd6, 0xfa, 0x1d, 0xd8, 0xbb, 0x1e, 0x4d, 0x0d, 0x75, 0x3c,
+	0x35, 0xd4, 0xef, 0xa9, 0xa1, 0xbe, 0xcf, 0x0c, 0x65, 0x3c, 0x33, 0x94, 0xcf, 0x99, 0xa1, 0x3c,
+	0x9e, 0xd2, 0x50, 0x04, 0x99, 0x6b, 0x79, 0x2c, 0xb2, 0xdd, 0x50, 0xb8, 0xd8, 0xa7, 0x84, 0x2f,
+	0x91, 0x17, 0xe0, 0x30, 0xb6, 0x73, 0xbb, 0xf8, 0x90, 0xc3, 0x84, 0x70, 0xb7, 0x2e, 0xff, 0xdd,
+	0xf9, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x9d, 0x76, 0x08, 0x0c, 0xa6, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -187,6 +299,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
 	ExecuteContractCompat(ctx context.Context, in *MsgExecuteContractCompat, opts ...grpc.CallOption) (*MsgExecuteContractCompatResponse, error)
+	StoreCodeCompat(ctx context.Context, in *MsgStoreCodeCompat, opts ...grpc.CallOption) (*MsgStoreCodeCompatResponse, error)
 }
 
 type msgClient struct {
@@ -206,9 +319,19 @@ func (c *msgClient) ExecuteContractCompat(ctx context.Context, in *MsgExecuteCon
 	return out, nil
 }
 
+func (c *msgClient) StoreCodeCompat(ctx context.Context, in *MsgStoreCodeCompat, opts ...grpc.CallOption) (*MsgStoreCodeCompatResponse, error) {
+	out := new(MsgStoreCodeCompatResponse)
+	err := c.cc.Invoke(ctx, "/wasmx.Msg/StoreCodeCompat", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	ExecuteContractCompat(context.Context, *MsgExecuteContractCompat) (*MsgExecuteContractCompatResponse, error)
+	StoreCodeCompat(context.Context, *MsgStoreCodeCompat) (*MsgStoreCodeCompatResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -217,6 +340,9 @@ type UnimplementedMsgServer struct {
 
 func (*UnimplementedMsgServer) ExecuteContractCompat(ctx context.Context, req *MsgExecuteContractCompat) (*MsgExecuteContractCompatResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ExecuteContractCompat not implemented")
+}
+func (*UnimplementedMsgServer) StoreCodeCompat(ctx context.Context, req *MsgStoreCodeCompat) (*MsgStoreCodeCompatResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StoreCodeCompat not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -241,6 +367,24 @@ func _Msg_ExecuteContractCompat_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_StoreCodeCompat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgStoreCodeCompat)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).StoreCodeCompat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/wasmx.Msg/StoreCodeCompat",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).StoreCodeCompat(ctx, req.(*MsgStoreCodeCompat))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "wasmx.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -248,6 +392,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ExecuteContractCompat",
 			Handler:    _Msg_ExecuteContractCompat_Handler,
+		},
+		{
+			MethodName: "StoreCodeCompat",
+			Handler:    _Msg_StoreCodeCompat_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -335,6 +483,83 @@ func (m *MsgExecuteContractCompatResponse) MarshalToSizedBuffer(dAtA []byte) (in
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgStoreCodeCompat) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgStoreCodeCompat) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgStoreCodeCompat) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.HexWasmByteCode) > 0 {
+		i -= len(m.HexWasmByteCode)
+		copy(dAtA[i:], m.HexWasmByteCode)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.HexWasmByteCode)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Sender) > 0 {
+		i -= len(m.Sender)
+		copy(dAtA[i:], m.Sender)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Sender)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgStoreCodeCompatResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgStoreCodeCompatResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgStoreCodeCompatResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Checksum) > 0 {
+		i -= len(m.Checksum)
+		copy(dAtA[i:], m.Checksum)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Checksum)))
+		i--
+		dAtA[i] = 0x12
+	}
+	{
+		size := m.CodeId.Size()
+		i -= size
+		if _, err := m.CodeId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -378,6 +603,38 @@ func (m *MsgExecuteContractCompatResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Data)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgStoreCodeCompat) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Sender)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.HexWasmByteCode)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgStoreCodeCompatResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.CodeId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	l = len(m.Checksum)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -629,6 +886,238 @@ func (m *MsgExecuteContractCompatResponse) Unmarshal(dAtA []byte) error {
 			m.Data = append(m.Data[:0], dAtA[iNdEx:postIndex]...)
 			if m.Data == nil {
 				m.Data = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgStoreCodeCompat) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgStoreCodeCompat: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgStoreCodeCompat: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Sender = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HexWasmByteCode", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.HexWasmByteCode = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgStoreCodeCompatResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgStoreCodeCompatResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgStoreCodeCompatResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CodeId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CodeId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Checksum", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Checksum = append(m.Checksum[:0], dAtA[iNdEx:postIndex]...)
+			if m.Checksum == nil {
+				m.Checksum = []byte{}
 			}
 			iNdEx = postIndex
 		default:

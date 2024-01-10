@@ -44,7 +44,7 @@ func (msg MsgExecuteContractCompat) ValidateBasic() error {
 
 // Note ModuleCdc is Amino (see codec.go)
 func (msg MsgExecuteContractCompat) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+	return sdk.MustSortJSON(AminoCdc.MustMarshalJSON(&msg))
 }
 
 func (msg MsgExecuteContractCompat) GetSigners() []sdk.AccAddress {

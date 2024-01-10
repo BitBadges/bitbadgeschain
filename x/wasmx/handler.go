@@ -27,6 +27,9 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgExecuteContractCompat:
 			res, err := msgServer.ExecuteContractCompat(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgStoreCodeCompat:
+			res, err := msgServer.StoreCodeCompat(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 		default:
 			return nil, sdkerrors.Wrap(badgestypes.ErrUnknownRequest,
 				fmt.Sprintf("Unrecognized wasmx Msg type: %T", msg))
