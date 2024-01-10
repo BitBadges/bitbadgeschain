@@ -350,13 +350,13 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers &&
 					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers
 
-				sequentialTransferIsBasicallyNil := approvalCriteria.PredeterminedBalances.IncrementedBalances == nil || (approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances == nil &&
+				sequentialTransferIsBasicallyNil := approvalCriteria.PredeterminedBalances.IncrementedBalances == nil || ((approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances == nil || len(approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances) == 0					) &&
 					(approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsNil() ||
 						approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsZero()) &&
 					(approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy.IsNil() ||
 						approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy.IsZero()))
 
-				manualBalancesIsBasicallyNil := approvalCriteria.PredeterminedBalances.ManualBalances == nil
+				manualBalancesIsBasicallyNil := approvalCriteria.PredeterminedBalances.ManualBalances == nil || len(approvalCriteria.PredeterminedBalances.ManualBalances) == 0
 
 				isBasicallyNil := orderCalculationMethodIsBasicallyNil && sequentialTransferIsBasicallyNil && manualBalancesIsBasicallyNil
 
