@@ -205,7 +205,7 @@ func GetSchemas() []string {
 										}
 									],
 									"overrideWithCurrentTime": false,
-									"mustOwnAll": false
+									"mustSatisfyForAllAssets": false
 								}
 							],
 							"merkleChallenge": {
@@ -332,7 +332,7 @@ func GetSchemas() []string {
 										}
 									],
 									"overrideWithCurrentTime": false,
-									"mustOwnAll": false
+									"mustSatisfyForAllAssets": false
 								}
 							],
 							"merkleChallenge": {
@@ -914,7 +914,7 @@ func GetSchemas() []string {
 									}
 								],
 								"overrideWithCurrentTime": false,
-								"mustOwnAll": false
+								"mustSatisfyForAllAssets": false
 							}
 						],
 						"merkleChallenge": {
@@ -1078,7 +1078,7 @@ func GetSchemas() []string {
 									}
 								],
 								"overrideWithCurrentTime": false,
-								"mustOwnAll": false
+								"mustSatisfyForAllAssets": false
 							}
 						],
 						"merkleChallenge": {
@@ -1206,7 +1206,7 @@ func GetSchemas() []string {
 									}
 								],
 								"overrideWithCurrentTime": false,
-								"mustOwnAll": false
+								"mustSatisfyForAllAssets": false
 							}
 						],
 						"merkleChallenge": {
@@ -1472,7 +1472,7 @@ func GetSchemas() []string {
 										}
 									],
 									"overrideWithCurrentTime": false,
-									"mustOwnAll": false
+									"mustSatisfyForAllAssets": false
 								}
 							],
 							"merkleChallenge": {
@@ -1599,7 +1599,7 @@ func GetSchemas() []string {
 										}
 									],
 									"overrideWithCurrentTime": false,
-									"mustOwnAll": false
+									"mustSatisfyForAllAssets": false
 								}
 							],
 							"merkleChallenge": {
@@ -2174,7 +2174,7 @@ func GetSchemas() []string {
 									}
 								],
 								"overrideWithCurrentTime": false,
-								"mustOwnAll": false
+								"mustSatisfyForAllAssets": false
 							}
 						],
 						"merkleChallenge": {
@@ -2677,7 +2677,7 @@ func GetSchemas() []string {
 									}
 								],
 								"overrideWithCurrentTime": false,
-								"mustOwnAll": false
+								"mustSatisfyForAllAssets": false
 							}
 						],
 						"merkleChallenge": {

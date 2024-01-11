@@ -139,7 +139,7 @@ func (m *Balance) GetBadgeIds() []*UintRange {
 // - ownershipTimes: The time ranges during which the user must own the badges.
 // - badgeIds: The badge IDs the user must own.
 // - overrideWithCurrentTime: If true, auto override ownershipTimes with the current time.
-// - mustOwnAll: If true, the user must own all specified badges; otherwise, owning any one for >= 1 millisecond is sufficient.
+// - mustSatisfyForAllAssets: If true, the user must own all specified badges; otherwise, owning any one for >= 1 millisecond is sufficient.
 type MustOwnBadges struct {
 	// The ID of the badge collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
@@ -152,7 +152,7 @@ type MustOwnBadges struct {
 	// If true, override ownershipTimes with the current time.
 	OverrideWithCurrentTime bool `protobuf:"varint,5,opt,name=overrideWithCurrentTime,proto3" json:"overrideWithCurrentTime,omitempty"`
 	// If true, the user must own all specified badges; otherwise, owning any is sufficient (>= 1 millisecond).
-	MustOwnAll bool `protobuf:"varint,6,opt,name=mustOwnAll,proto3" json:"mustOwnAll,omitempty"`
+	MustSatisfyForAllAssets bool `protobuf:"varint,6,opt,name=mustSatisfyForAllAssets,proto3" json:"mustSatisfyForAllAssets,omitempty"`
 }
 
 func (m *MustOwnBadges) Reset()         { *m = MustOwnBadges{} }
@@ -216,9 +216,9 @@ func (m *MustOwnBadges) GetOverrideWithCurrentTime() bool {
 	return false
 }
 
-func (m *MustOwnBadges) GetMustOwnAll() bool {
+func (m *MustOwnBadges) GetMustSatisfyForAllAssets() bool {
 	if m != nil {
-		return m.MustOwnAll
+		return m.MustSatisfyForAllAssets
 	}
 	return false
 }
@@ -383,9 +383,9 @@ func (m *MustOwnBadges) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.MustOwnAll {
+	if m.MustSatisfyForAllAssets {
 		i--
-		if m.MustOwnAll {
+		if m.MustSatisfyForAllAssets {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -530,7 +530,7 @@ func (m *MustOwnBadges) Size() (n int) {
 	if m.OverrideWithCurrentTime {
 		n += 2
 	}
-	if m.MustOwnAll {
+	if m.MustSatisfyForAllAssets {
 		n += 2
 	}
 	return n
@@ -1001,7 +1001,7 @@ func (m *MustOwnBadges) Unmarshal(dAtA []byte) error {
 			m.OverrideWithCurrentTime = bool(v != 0)
 		case 6:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MustOwnAll", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MustSatisfyForAllAssets", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -1018,7 +1018,7 @@ func (m *MustOwnBadges) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.MustOwnAll = bool(v != 0)
+			m.MustSatisfyForAllAssets = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipBalances(dAtA[iNdEx:])

@@ -2054,7 +2054,7 @@ func (suite *TestSuite) TestMustOwnBadges() {
 	suite.Require().Nil(err, "Error transferring badge: %s")
 }
 
-func (suite *TestSuite) TestMustOwnBadgesMustOwnAll() {
+func (suite *TestSuite) TestMustOwnBadgesMustSatisfyForAllAssets() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 
@@ -2068,7 +2068,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll() {
 			},
 			BadgeIds:       GetFullUintRanges(),
 			OwnershipTimes: GetFullUintRanges(),
-			MustOwnAll:     true,
+			MustSatisfyForAllAssets:     true,
 		},
 	}
 
@@ -2120,7 +2120,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll() {
 	suite.Require().Nil(err, "Error transferring badge: %s")
 }
 
-func (suite *TestSuite) TestMustOwnBadgesMustOwnAll2() {
+func (suite *TestSuite) TestMustOwnBadgesMustSatisfyForAllAssets2() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 
@@ -2134,7 +2134,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll2() {
 			},
 			BadgeIds:       GetFullUintRanges(),
 			OwnershipTimes: GetFullUintRanges(),
-			MustOwnAll:     true,
+			MustSatisfyForAllAssets:     true,
 		},
 		{
 			CollectionId: sdk.NewUint(2),
@@ -2144,7 +2144,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnAll2() {
 			},
 			BadgeIds:       GetFullUintRanges(),
 			OwnershipTimes: GetFullUintRanges(),
-			MustOwnAll:     true,
+			MustSatisfyForAllAssets:     true,
 		},
 	}
 

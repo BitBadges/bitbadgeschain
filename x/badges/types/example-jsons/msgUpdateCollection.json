@@ -52,7 +52,7 @@
                 }
               ],
               "overrideWithCurrentTime": false,
-              "mustOwnAll": false
+              "mustSatisfyForAllAssets": false
             }
           ],
           "merkleChallenge": {
@@ -179,7 +179,7 @@
                 }
               ],
               "overrideWithCurrentTime": false,
-              "mustOwnAll": false
+              "mustSatisfyForAllAssets": false
             }
           ],
           "merkleChallenge": {
@@ -760,7 +760,7 @@
                 }
               ],
               "overrideWithCurrentTime": false,
-              "mustOwnAll": false
+              "mustSatisfyForAllAssets": false
             }
           ],
           "merkleChallenge": {

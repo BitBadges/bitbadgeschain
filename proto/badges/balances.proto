@@ -53,7 +53,7 @@ message Balance {
   - ownershipTimes: The time ranges during which the user must own the badges.
   - badgeIds: The badge IDs the user must own.
   - overrideWithCurrentTime: If true, auto override ownershipTimes with the current time.
-  - mustOwnAll: If true, the user must own all specified badges; otherwise, owning any one for >= 1 millisecond is sufficient.
+  - mustSatisfyForAllAssets: If true, the user must own all specified badges; otherwise, owning any one for >= 1 millisecond is sufficient.
 */
 message MustOwnBadges {
   // The ID of the badge collection.
@@ -71,6 +71,6 @@ message MustOwnBadges {
   // If true, override ownershipTimes with the current time.
   bool overrideWithCurrentTime = 5;
 
-  // If true, the user must own all specified badges; otherwise, owning any is sufficient (>= 1 millisecond).
-  bool mustOwnAll = 6;
+  // If true, the user must meet ownership requirements for all specified badges; else, must meet requirements for any single badge.
+  bool mustSatisfyForAllAssets = 6;
 }
