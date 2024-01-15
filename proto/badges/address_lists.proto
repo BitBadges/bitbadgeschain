@@ -11,7 +11,7 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 /* 
   An AddressList is a list of addresses that are referenced by an ID.
   The list may include only the specified addresses, or it may include all addresses but
-  the specified addresses (depending on if allowlist is true (allowlist) or false (blocklist)).
+  the specified addresses (depending on if whitelist is true (whitelist) or false (blacklist)).
   
   AddressLists are used for defining approvals, as well as being a simplified badge interface.
 */
@@ -23,7 +23,7 @@ message AddressList {
   repeated string addresses = 2;
   
   // Indicates whether the list includes the specified addresses (true) or excludes them (false).
-  bool allowlist = 3;
+  bool whitelist = 3;
   
   // URI (Uniform Resource Identifier) associated with the address list to provide metadata, if applicable.
   string uri = 4;

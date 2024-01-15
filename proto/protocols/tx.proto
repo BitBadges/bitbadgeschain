@@ -15,6 +15,15 @@ service Msg {
   rpc UnsetCollectionForProtocol (MsgUnsetCollectionForProtocol) returns (MsgUnsetCollectionForProtocolResponse);
 }
 
+//Used for WASM bindings and JSON parsing
+message ProtocolCustomMsgType {
+  MsgCreateProtocol createProtocolMsg = 1;
+  MsgUpdateProtocol updateProtocolMsg = 2;
+  MsgDeleteProtocol deleteProtocolMsg = 3;
+  MsgSetCollectionForProtocol setCollectionForProtocolMsg = 4;
+  MsgUnsetCollectionForProtocol unsetCollectionForProtocolMsg = 5;
+}
+
 message Protocol {
   string name = 1;
   string uri = 2;

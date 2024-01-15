@@ -65,6 +65,7 @@ func ConstructUsedClaimDataKey(collectionId sdkmath.Uint, claimId sdkmath.Uint) 
 
 func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, addressForChallenge string, challengeLevel string, challengeId string, codeLeafIndex sdkmath.Uint) string {
 	collection_id_str := collectionId.String()
+	
 	code_leaf_index_str := codeLeafIndex.String()
 	challenge_id_str := challengeId
 	address_for_challenge_str := addressForChallenge

@@ -36,15 +36,15 @@ func TestRemoveOverlaps(t *testing.T) {
 
 		ToList: &types.AddressList{
 			Addresses:        []string{alice, bob, charlie},
-			Allowlist: true,
+			Whitelist: true,
 		},
 		FromList: &types.AddressList{
 			Addresses:        []string{alice, bob, charlie},
-			Allowlist: true,
+			Whitelist: true,
 		},
 		InitiatedByList: &types.AddressList{
 			Addresses:        []string{alice, bob, charlie},
-			Allowlist: true,
+			Whitelist: true,
 		},
 
 		AmountTrackerIdList: &types.AddressList{},
@@ -69,15 +69,15 @@ func TestRemoveOverlaps(t *testing.T) {
 		},
 		ToList: &types.AddressList{
 			Addresses:        []string{alice, bob, charlie},
-			Allowlist: true,
+			Whitelist: true,
 		},
 		FromList: &types.AddressList{
 			Addresses:        []string{alice, bob, charlie},
-			Allowlist: true,
+			Whitelist: true,
 		},
 		InitiatedByList: &types.AddressList{
 			Addresses:        []string{alice, bob, charlie},
-			Allowlist: true,
+			Whitelist: true,
 		},
 
 		AmountTrackerIdList: &types.AddressList{},
@@ -104,15 +104,15 @@ func TestRemoveOverlaps(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList:    &types.AddressList{},
@@ -137,15 +137,15 @@ func TestRemoveOverlaps(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -171,15 +171,15 @@ func TestRemoveOverlaps(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -205,15 +205,15 @@ func TestRemoveOverlaps(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -239,15 +239,15 @@ func TestRemoveOverlaps(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -274,15 +274,15 @@ func TestRemoveOverlaps(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -308,15 +308,15 @@ func TestRemoveOverlaps(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -343,15 +343,15 @@ func TestRemoveOverlaps(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -388,9 +388,9 @@ func TestRemoveOverlaps(t *testing.T) {
 			require.Contains(t, x.InitiatedByList.Addresses, addr)
 		}
 
-		require.Equal(t, r.ToList.Allowlist, x.ToList.Allowlist)
-		require.Equal(t, r.FromList.Allowlist, x.FromList.Allowlist)
-		require.Equal(t, r.InitiatedByList.Allowlist, x.InitiatedByList.Allowlist)
+		require.Equal(t, r.ToList.Whitelist, x.ToList.Whitelist)
+		require.Equal(t, r.FromList.Whitelist, x.FromList.Whitelist)
+		require.Equal(t, r.InitiatedByList.Whitelist, x.InitiatedByList.Whitelist)
 	}
 
 	require.Equal(t, expected, remaining)
@@ -416,15 +416,15 @@ func TestRemoveAddresses(t *testing.T) {
 		},
 		ToList: &types.AddressList{
 			Addresses:        []string{alice},
-			Allowlist: true,
+			Whitelist: true,
 		},
 		FromList: &types.AddressList{
 			Addresses:        []string{alice},
-			Allowlist: true,
+			Whitelist: true,
 		},
 		InitiatedByList: &types.AddressList{
 			Addresses:        []string{alice},
-			Allowlist: true,
+			Whitelist: true,
 		},
 
 		AmountTrackerIdList: &types.AddressList{},
@@ -449,15 +449,15 @@ func TestRemoveAddresses(t *testing.T) {
 		},
 		ToList: &types.AddressList{
 			Addresses:        []string{alice, bob, charlie},
-			Allowlist: true,
+			Whitelist: true,
 		},
 		FromList: &types.AddressList{
 			Addresses:        []string{alice, bob, charlie},
-			Allowlist: true,
+			Whitelist: true,
 		},
 		InitiatedByList: &types.AddressList{
 			Addresses:        []string{alice, bob, charlie},
-			Allowlist: true,
+			Whitelist: true,
 		},
 
 		AmountTrackerIdList: &types.AddressList{},
@@ -484,15 +484,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -518,15 +518,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -552,15 +552,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -586,15 +586,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -620,15 +620,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -655,15 +655,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -689,15 +689,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -724,15 +724,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -759,15 +759,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -793,15 +793,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{alice, bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -827,15 +827,15 @@ func TestRemoveAddresses(t *testing.T) {
 			},
 			ToList: &types.AddressList{
 				Addresses:        []string{alice},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			FromList: &types.AddressList{
 				Addresses:        []string{alice},
-				Allowlist: true,
+				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
 				Addresses:        []string{bob, charlie},
-				Allowlist: true,
+				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
@@ -874,9 +874,9 @@ func TestRemoveAddresses(t *testing.T) {
 			require.Contains(t, x.InitiatedByList.Addresses, addr)
 		}
 
-		require.Equal(t, r.ToList.Allowlist, x.ToList.Allowlist)
-		require.Equal(t, r.FromList.Allowlist, x.FromList.Allowlist)
-		require.Equal(t, r.InitiatedByList.Allowlist, x.InitiatedByList.Allowlist)
+		require.Equal(t, r.ToList.Whitelist, x.ToList.Whitelist)
+		require.Equal(t, r.FromList.Whitelist, x.FromList.Whitelist)
+		require.Equal(t, r.InitiatedByList.Whitelist, x.InitiatedByList.Whitelist)
 	}
 
 	require.Equal(t, expected, remaining)

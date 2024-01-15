@@ -61,7 +61,7 @@ func GetSchemas() []string {
 				{
 					"listId": "",
 					"addresses": [],
-					"allowlist": false,
+					"whitelist": false,
 					"uri": "",
 					"customData": "",
 					"createdBy": "",

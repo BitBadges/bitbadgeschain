@@ -28,6 +28,83 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// Used for WASM bindings and JSON parsing
+type ProtocolCustomMsgType struct {
+	CreateProtocolMsg             *MsgCreateProtocol             `protobuf:"bytes,1,opt,name=createProtocolMsg,proto3" json:"createProtocolMsg,omitempty"`
+	UpdateProtocolMsg             *MsgUpdateProtocol             `protobuf:"bytes,2,opt,name=updateProtocolMsg,proto3" json:"updateProtocolMsg,omitempty"`
+	DeleteProtocolMsg             *MsgDeleteProtocol             `protobuf:"bytes,3,opt,name=deleteProtocolMsg,proto3" json:"deleteProtocolMsg,omitempty"`
+	SetCollectionForProtocolMsg   *MsgSetCollectionForProtocol   `protobuf:"bytes,4,opt,name=setCollectionForProtocolMsg,proto3" json:"setCollectionForProtocolMsg,omitempty"`
+	UnsetCollectionForProtocolMsg *MsgUnsetCollectionForProtocol `protobuf:"bytes,5,opt,name=unsetCollectionForProtocolMsg,proto3" json:"unsetCollectionForProtocolMsg,omitempty"`
+}
+
+func (m *ProtocolCustomMsgType) Reset()         { *m = ProtocolCustomMsgType{} }
+func (m *ProtocolCustomMsgType) String() string { return proto.CompactTextString(m) }
+func (*ProtocolCustomMsgType) ProtoMessage()    {}
+func (*ProtocolCustomMsgType) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5ff1a8407b9f1218, []int{0}
+}
+func (m *ProtocolCustomMsgType) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ProtocolCustomMsgType) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ProtocolCustomMsgType.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ProtocolCustomMsgType) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtocolCustomMsgType.Merge(m, src)
+}
+func (m *ProtocolCustomMsgType) XXX_Size() int {
+	return m.Size()
+}
+func (m *ProtocolCustomMsgType) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtocolCustomMsgType.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtocolCustomMsgType proto.InternalMessageInfo
+
+func (m *ProtocolCustomMsgType) GetCreateProtocolMsg() *MsgCreateProtocol {
+	if m != nil {
+		return m.CreateProtocolMsg
+	}
+	return nil
+}
+
+func (m *ProtocolCustomMsgType) GetUpdateProtocolMsg() *MsgUpdateProtocol {
+	if m != nil {
+		return m.UpdateProtocolMsg
+	}
+	return nil
+}
+
+func (m *ProtocolCustomMsgType) GetDeleteProtocolMsg() *MsgDeleteProtocol {
+	if m != nil {
+		return m.DeleteProtocolMsg
+	}
+	return nil
+}
+
+func (m *ProtocolCustomMsgType) GetSetCollectionForProtocolMsg() *MsgSetCollectionForProtocol {
+	if m != nil {
+		return m.SetCollectionForProtocolMsg
+	}
+	return nil
+}
+
+func (m *ProtocolCustomMsgType) GetUnsetCollectionForProtocolMsg() *MsgUnsetCollectionForProtocol {
+	if m != nil {
+		return m.UnsetCollectionForProtocolMsg
+	}
+	return nil
+}
+
 type Protocol struct {
 	Name       string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Uri        string `protobuf:"bytes,2,opt,name=uri,proto3" json:"uri,omitempty"`
@@ -40,7 +117,7 @@ func (m *Protocol) Reset()         { *m = Protocol{} }
 func (m *Protocol) String() string { return proto.CompactTextString(m) }
 func (*Protocol) ProtoMessage()    {}
 func (*Protocol) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5ff1a8407b9f1218, []int{0}
+	return fileDescriptor_5ff1a8407b9f1218, []int{1}
 }
 func (m *Protocol) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -116,7 +193,7 @@ func (m *MsgCreateProtocol) Reset()         { *m = MsgCreateProtocol{} }
 func (m *MsgCreateProtocol) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateProtocol) ProtoMessage()    {}
 func (*MsgCreateProtocol) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5ff1a8407b9f1218, []int{1}
+	return fileDescriptor_5ff1a8407b9f1218, []int{2}
 }
 func (m *MsgCreateProtocol) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -187,7 +264,7 @@ func (m *MsgCreateProtocolResponse) Reset()         { *m = MsgCreateProtocolResp
 func (m *MsgCreateProtocolResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateProtocolResponse) ProtoMessage()    {}
 func (*MsgCreateProtocolResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5ff1a8407b9f1218, []int{2}
+	return fileDescriptor_5ff1a8407b9f1218, []int{3}
 }
 func (m *MsgCreateProtocolResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -228,7 +305,7 @@ func (m *MsgUpdateProtocol) Reset()         { *m = MsgUpdateProtocol{} }
 func (m *MsgUpdateProtocol) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateProtocol) ProtoMessage()    {}
 func (*MsgUpdateProtocol) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5ff1a8407b9f1218, []int{3}
+	return fileDescriptor_5ff1a8407b9f1218, []int{4}
 }
 func (m *MsgUpdateProtocol) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -299,7 +376,7 @@ func (m *MsgUpdateProtocolResponse) Reset()         { *m = MsgUpdateProtocolResp
 func (m *MsgUpdateProtocolResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateProtocolResponse) ProtoMessage()    {}
 func (*MsgUpdateProtocolResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5ff1a8407b9f1218, []int{4}
+	return fileDescriptor_5ff1a8407b9f1218, []int{5}
 }
 func (m *MsgUpdateProtocolResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -337,7 +414,7 @@ func (m *MsgDeleteProtocol) Reset()         { *m = MsgDeleteProtocol{} }
 func (m *MsgDeleteProtocol) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteProtocol) ProtoMessage()    {}
 func (*MsgDeleteProtocol) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5ff1a8407b9f1218, []int{5}
+	return fileDescriptor_5ff1a8407b9f1218, []int{6}
 }
 func (m *MsgDeleteProtocol) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -387,7 +464,7 @@ func (m *MsgDeleteProtocolResponse) Reset()         { *m = MsgDeleteProtocolResp
 func (m *MsgDeleteProtocolResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteProtocolResponse) ProtoMessage()    {}
 func (*MsgDeleteProtocolResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5ff1a8407b9f1218, []int{6}
+	return fileDescriptor_5ff1a8407b9f1218, []int{7}
 }
 func (m *MsgDeleteProtocolResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -426,7 +503,7 @@ func (m *MsgSetCollectionForProtocol) Reset()         { *m = MsgSetCollectionFor
 func (m *MsgSetCollectionForProtocol) String() string { return proto.CompactTextString(m) }
 func (*MsgSetCollectionForProtocol) ProtoMessage()    {}
 func (*MsgSetCollectionForProtocol) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5ff1a8407b9f1218, []int{7}
+	return fileDescriptor_5ff1a8407b9f1218, []int{8}
 }
 func (m *MsgSetCollectionForProtocol) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -476,7 +553,7 @@ func (m *MsgSetCollectionForProtocolResponse) Reset()         { *m = MsgSetColle
 func (m *MsgSetCollectionForProtocolResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgSetCollectionForProtocolResponse) ProtoMessage()    {}
 func (*MsgSetCollectionForProtocolResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5ff1a8407b9f1218, []int{8}
+	return fileDescriptor_5ff1a8407b9f1218, []int{9}
 }
 func (m *MsgSetCollectionForProtocolResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -514,7 +591,7 @@ func (m *MsgUnsetCollectionForProtocol) Reset()         { *m = MsgUnsetCollectio
 func (m *MsgUnsetCollectionForProtocol) String() string { return proto.CompactTextString(m) }
 func (*MsgUnsetCollectionForProtocol) ProtoMessage()    {}
 func (*MsgUnsetCollectionForProtocol) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5ff1a8407b9f1218, []int{9}
+	return fileDescriptor_5ff1a8407b9f1218, []int{10}
 }
 func (m *MsgUnsetCollectionForProtocol) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -564,7 +641,7 @@ func (m *MsgUnsetCollectionForProtocolResponse) Reset()         { *m = MsgUnsetC
 func (m *MsgUnsetCollectionForProtocolResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUnsetCollectionForProtocolResponse) ProtoMessage()    {}
 func (*MsgUnsetCollectionForProtocolResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5ff1a8407b9f1218, []int{10}
+	return fileDescriptor_5ff1a8407b9f1218, []int{11}
 }
 func (m *MsgUnsetCollectionForProtocolResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -594,6 +671,7 @@ func (m *MsgUnsetCollectionForProtocolResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgUnsetCollectionForProtocolResponse proto.InternalMessageInfo
 
 func init() {
+	proto.RegisterType((*ProtocolCustomMsgType)(nil), "protocols.ProtocolCustomMsgType")
 	proto.RegisterType((*Protocol)(nil), "protocols.Protocol")
 	proto.RegisterType((*MsgCreateProtocol)(nil), "protocols.MsgCreateProtocol")
 	proto.RegisterType((*MsgCreateProtocolResponse)(nil), "protocols.MsgCreateProtocolResponse")
@@ -610,37 +688,43 @@ func init() {
 func init() { proto.RegisterFile("protocols/tx.proto", fileDescriptor_5ff1a8407b9f1218) }
 
 var fileDescriptor_5ff1a8407b9f1218 = []byte{
-	// 472 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x94, 0x4d, 0x6b, 0xd4, 0x40,
-	0x18, 0xc7, 0x77, 0x9a, 0xa8, 0xbb, 0x0f, 0x45, 0x74, 0xf0, 0x10, 0xd3, 0x9a, 0x96, 0x68, 0x75,
-	0x4f, 0x49, 0x51, 0xfc, 0x00, 0x6e, 0x4b, 0xc1, 0x43, 0x50, 0xa2, 0xbd, 0x78, 0xcb, 0xcb, 0x90,
-	0x06, 0xb2, 0x99, 0x90, 0x99, 0x85, 0xad, 0xe0, 0x17, 0xf0, 0xa2, 0x1f, 0xab, 0xc7, 0x1e, 0xc5,
-	0x43, 0x91, 0xdd, 0xcf, 0xe0, 0x5d, 0x32, 0xdd, 0x4c, 0x9b, 0x49, 0x13, 0xca, 0xe2, 0xa1, 0xb7,
-	0xe7, 0xe5, 0x9f, 0xff, 0xf3, 0xe3, 0xc9, 0x93, 0x00, 0x2e, 0x4a, 0xca, 0x69, 0x44, 0x33, 0xe6,
-	0xf2, 0xb9, 0x23, 0x12, 0x3c, 0x92, 0x35, 0xf3, 0x49, 0x42, 0x13, 0x2a, 0x52, 0xb7, 0x8a, 0x2e,
-	0x05, 0xf6, 0x77, 0x04, 0xc3, 0x8f, 0x2b, 0x0d, 0xc6, 0xa0, 0xe7, 0xc1, 0x94, 0x18, 0x68, 0x17,
-	0x8d, 0x47, 0xbe, 0x88, 0xf1, 0x23, 0xd0, 0x66, 0x65, 0x6a, 0x6c, 0x88, 0x52, 0x15, 0x62, 0x0b,
-	0x20, 0x9a, 0x31, 0x4e, 0xa7, 0x87, 0x01, 0x0f, 0x0c, 0x4d, 0x34, 0xae, 0x55, 0xf0, 0x36, 0x8c,
-	0xa2, 0x92, 0x04, 0x9c, 0xc4, 0x93, 0x53, 0x43, 0x17, 0xed, 0xab, 0x02, 0x36, 0x61, 0x98, 0xb2,
-	0xa3, 0x92, 0x7e, 0x25, 0xb9, 0x71, 0x6f, 0x17, 0x8d, 0x87, 0xbe, 0xcc, 0xed, 0x1f, 0x08, 0x1e,
-	0x7b, 0x2c, 0x39, 0x10, 0x62, 0x49, 0x65, 0xc0, 0x03, 0xf1, 0x38, 0x2d, 0x57, 0x60, 0x75, 0x2a,
-	0x79, 0x37, 0xda, 0xbc, 0x5a, 0x17, 0xaf, 0xde, 0xe2, 0xed, 0x23, 0xda, 0x82, 0xa7, 0x2d, 0x20,
-	0x9f, 0xb0, 0x82, 0xe6, 0x8c, 0xd4, 0xb8, 0xc7, 0x45, 0x7c, 0xb7, 0x70, 0x9b, 0x40, 0x12, 0xf7,
-	0x9d, 0xa0, 0x3d, 0x24, 0x19, 0x59, 0x97, 0x76, 0xe5, 0xdf, 0xb4, 0x90, 0xfe, 0xdf, 0x60, 0xcb,
-	0x63, 0xc9, 0x27, 0xc2, 0x0f, 0x68, 0x96, 0x91, 0x88, 0xa7, 0x34, 0x3f, 0xa2, 0xe5, 0x9a, 0x7b,
-	0xd9, 0x87, 0xcd, 0x48, 0xda, 0xbc, 0x8f, 0x2f, 0x17, 0x34, 0xd9, 0x3c, 0xbb, 0xd8, 0x19, 0xfc,
-	0xbe, 0xd8, 0xd1, 0x8f, 0xd3, 0x9c, 0xfb, 0x0d, 0x85, 0xbd, 0x07, 0xcf, 0x7b, 0xc6, 0x4b, 0x4a,
-	0x0f, 0x9e, 0x55, 0x2b, 0xca, 0xd9, 0x7f, 0xe1, 0xb4, 0x5f, 0xc1, 0x5e, 0xaf, 0x5d, 0x3d, 0xf7,
-	0xf5, 0x5f, 0x0d, 0x34, 0x8f, 0x25, 0xf8, 0x33, 0x3c, 0x54, 0xee, 0x7b, 0xdb, 0x91, 0x1f, 0xa9,
-	0xd3, 0x3a, 0x36, 0xf3, 0x45, 0x5f, 0xb7, 0x76, 0xaf, 0x5c, 0x95, 0x33, 0x54, 0x5c, 0x9b, 0x5d,
-	0xd5, 0xf5, 0xe6, 0x8b, 0xa9, 0x5c, 0x95, 0x73, 0x51, 0x5c, 0x9b, 0x5d, 0xd5, 0xf5, 0xe6, 0x3b,
-	0xc1, 0x25, 0x18, 0x9d, 0x47, 0xf2, 0xb2, 0xe9, 0xd0, 0xa5, 0x33, 0x9d, 0xdb, 0xe9, 0xe4, 0xcc,
-	0x39, 0x98, 0x3d, 0xaf, 0x7c, 0xac, 0x6c, 0xa3, 0x53, 0x69, 0xee, 0xdf, 0x56, 0x59, 0x4f, 0x9e,
-	0x7c, 0x38, 0x5b, 0x58, 0xe8, 0x7c, 0x61, 0xa1, 0x3f, 0x0b, 0x0b, 0xfd, 0x5c, 0x5a, 0x83, 0xf3,
-	0xa5, 0x35, 0xf8, 0xb5, 0xb4, 0x06, 0x5f, 0xde, 0x26, 0x29, 0x3f, 0x99, 0x85, 0x4e, 0x44, 0xa7,
-	0x6e, 0x98, 0xf2, 0x30, 0x88, 0x13, 0xc2, 0xae, 0xa2, 0xe8, 0x24, 0x48, 0x73, 0x77, 0xee, 0x5e,
-	0xfb, 0xab, 0x9f, 0x16, 0x84, 0x85, 0xf7, 0x45, 0xe1, 0xcd, 0xbf, 0x00, 0x00, 0x00, 0xff, 0xff,
-	0xfd, 0xf4, 0x20, 0xd7, 0xef, 0x05, 0x00, 0x00,
+	// 561 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x95, 0x41, 0x6f, 0xd3, 0x30,
+	0x14, 0xc7, 0x9b, 0xa5, 0x40, 0xf3, 0x98, 0x10, 0xb3, 0x40, 0x2a, 0xe9, 0x96, 0xa1, 0xc2, 0x60,
+	0xa7, 0x66, 0x1a, 0xe2, 0x03, 0xd0, 0x4e, 0x93, 0x40, 0xaa, 0x40, 0x66, 0xbb, 0x70, 0x4b, 0x13,
+	0x2b, 0x8d, 0xd4, 0xc6, 0x51, 0xec, 0x48, 0x2d, 0x12, 0x5f, 0x80, 0x0b, 0x7c, 0xac, 0x1d, 0x77,
+	0x41, 0x42, 0x1c, 0x26, 0xd4, 0x7e, 0x06, 0xee, 0x28, 0x6e, 0x92, 0x35, 0x4e, 0x6b, 0xb5, 0xb7,
+	0xdd, 0x6c, 0xf7, 0xbd, 0x9f, 0xff, 0x7d, 0xfe, 0xbf, 0x17, 0x40, 0x51, 0x4c, 0x39, 0x75, 0xe9,
+	0x88, 0xd9, 0x7c, 0xd2, 0x11, 0x1b, 0x64, 0x14, 0x67, 0xe6, 0x13, 0x9f, 0xfa, 0x54, 0x6c, 0xed,
+	0x74, 0xb5, 0x08, 0x68, 0xff, 0xd2, 0xe1, 0xe9, 0xa7, 0x2c, 0xa6, 0x97, 0x30, 0x4e, 0xc7, 0x7d,
+	0xe6, 0x5f, 0x4c, 0x23, 0x82, 0x3e, 0xc0, 0x9e, 0x1b, 0x13, 0x87, 0x93, 0xfc, 0xe7, 0x3e, 0xf3,
+	0x9b, 0xda, 0x73, 0xed, 0xf8, 0xe1, 0xe9, 0x7e, 0xa7, 0xc0, 0x76, 0xfa, 0xcc, 0xef, 0x95, 0xc2,
+	0x70, 0x35, 0x2d, 0x65, 0x25, 0x91, 0x27, 0xb1, 0x76, 0x56, 0xb1, 0x2e, 0x4b, 0x61, 0xb8, 0x9a,
+	0x96, 0xb2, 0x3c, 0x32, 0x22, 0x65, 0x96, 0xbe, 0x8a, 0x75, 0x56, 0x0a, 0xc3, 0xd5, 0x34, 0x34,
+	0x84, 0x16, 0x23, 0xbc, 0x47, 0x47, 0x23, 0xe2, 0xf2, 0x80, 0x86, 0xe7, 0x34, 0x5e, 0xa6, 0xd6,
+	0x05, 0xf5, 0x55, 0x99, 0xfa, 0x79, 0x4d, 0x02, 0x56, 0xa1, 0x50, 0x08, 0x07, 0x49, 0xa8, 0xba,
+	0xeb, 0x9e, 0xb8, 0xeb, 0x58, 0xaa, 0xc6, 0xda, 0x14, 0xac, 0xc6, 0xb5, 0xbf, 0x6b, 0xd0, 0xc8,
+	0xf7, 0x08, 0x41, 0x3d, 0x74, 0xc6, 0x44, 0xbc, 0x9e, 0x81, 0xc5, 0x1a, 0x3d, 0x06, 0x3d, 0x89,
+	0x03, 0xf1, 0x08, 0x06, 0x4e, 0x97, 0xc8, 0x02, 0x70, 0x85, 0x03, 0xce, 0x1c, 0xee, 0x88, 0x8a,
+	0x1a, 0x78, 0xe9, 0x04, 0xed, 0x83, 0xb1, 0x78, 0x59, 0xaf, 0x3b, 0x15, 0xa5, 0x31, 0xf0, 0xed,
+	0x01, 0x32, 0xa1, 0x11, 0xb0, 0xf3, 0x98, 0x7e, 0x25, 0xa1, 0xf8, 0x2f, 0x0d, 0x5c, 0xec, 0xdb,
+	0x3f, 0x34, 0xd8, 0xab, 0xf8, 0x04, 0x35, 0xe1, 0x81, 0x48, 0xa7, 0x71, 0x26, 0x2c, 0xdf, 0x16,
+	0x7a, 0x77, 0xaa, 0x7a, 0xf5, 0x75, 0x7a, 0xeb, 0x15, 0xbd, 0x2a, 0x45, 0x2d, 0x78, 0x56, 0x35,
+	0x2e, 0x61, 0x11, 0x0d, 0x19, 0xc9, 0xe5, 0x96, 0xad, 0x78, 0x07, 0xe4, 0x4a, 0xbd, 0x91, 0xcb,
+	0x7d, 0x27, 0xd4, 0x96, 0xcd, 0xbe, 0x9d, 0xda, 0x8c, 0x2f, 0xf5, 0x4b, 0xce, 0xff, 0x06, 0x2d,
+	0x85, 0xed, 0xb7, 0xac, 0xcb, 0x09, 0xec, 0xba, 0x05, 0xe6, 0xbd, 0xb7, 0x28, 0x50, 0x77, 0xf7,
+	0xea, 0xe6, 0xb0, 0xf6, 0xe7, 0xe6, 0xb0, 0x7e, 0x19, 0x84, 0x1c, 0x97, 0x22, 0xda, 0x47, 0xf0,
+	0x42, 0xd5, 0x75, 0xb9, 0xca, 0x3e, 0x1c, 0x28, 0x1b, 0x66, 0xcb, 0x8a, 0xbc, 0x86, 0x23, 0x75,
+	0xff, 0x65, 0xf7, 0x9e, 0xfe, 0xd3, 0x41, 0x4f, 0x1b, 0xfc, 0x02, 0x1e, 0x49, 0xfe, 0x56, 0x4e,
+	0x49, 0xf3, 0xa5, 0x72, 0x86, 0x66, 0xf4, 0x94, 0x2a, 0xd9, 0x50, 0x39, 0x2f, 0x65, 0xea, 0x6a,
+	0xc7, 0xa4, 0x54, 0xc9, 0x2e, 0xca, 0xc9, 0x29, 0x53, 0x57, 0xfb, 0x04, 0xc5, 0xd0, 0x5c, 0x6b,
+	0x92, 0x0d, 0x67, 0xa8, 0xd9, 0xd9, 0x70, 0xd6, 0xe6, 0x77, 0x4e, 0xc0, 0x54, 0x3c, 0xf9, 0xc6,
+	0xd3, 0xd4, 0x3c, 0xd9, 0x78, 0xee, 0x66, 0x37, 0x77, 0x3f, 0x5e, 0xcd, 0x2c, 0xed, 0x7a, 0x66,
+	0x69, 0x7f, 0x67, 0x96, 0xf6, 0x73, 0x6e, 0xd5, 0xae, 0xe7, 0x56, 0xed, 0xf7, 0xdc, 0xaa, 0x7d,
+	0x79, 0xeb, 0x07, 0x7c, 0x98, 0x0c, 0x3a, 0x2e, 0x1d, 0xdb, 0x83, 0x80, 0x0f, 0x1c, 0xcf, 0x27,
+	0xec, 0x76, 0xe5, 0x0e, 0x9d, 0x20, 0xb4, 0x27, 0xf6, 0xd2, 0xd7, 0x7a, 0x1a, 0x11, 0x36, 0xb8,
+	0x2f, 0x0e, 0xde, 0xfc, 0x0f, 0x00, 0x00, 0xff, 0xff, 0x52, 0xf2, 0xfd, 0xf1, 0xc7, 0x07, 0x00,
+	0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -865,6 +949,89 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "protocols/tx.proto",
+}
+
+func (m *ProtocolCustomMsgType) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ProtocolCustomMsgType) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ProtocolCustomMsgType) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.UnsetCollectionForProtocolMsg != nil {
+		{
+			size, err := m.UnsetCollectionForProtocolMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.SetCollectionForProtocolMsg != nil {
+		{
+			size, err := m.SetCollectionForProtocolMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.DeleteProtocolMsg != nil {
+		{
+			size, err := m.DeleteProtocolMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.UpdateProtocolMsg != nil {
+		{
+			size, err := m.UpdateProtocolMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.CreateProtocolMsg != nil {
+		{
+			size, err := m.CreateProtocolMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *Protocol) Marshal() (dAtA []byte, err error) {
@@ -1297,6 +1464,35 @@ func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *ProtocolCustomMsgType) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.CreateProtocolMsg != nil {
+		l = m.CreateProtocolMsg.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.UpdateProtocolMsg != nil {
+		l = m.UpdateProtocolMsg.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.DeleteProtocolMsg != nil {
+		l = m.DeleteProtocolMsg.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.SetCollectionForProtocolMsg != nil {
+		l = m.SetCollectionForProtocolMsg.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.UnsetCollectionForProtocolMsg != nil {
+		l = m.UnsetCollectionForProtocolMsg.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
 func (m *Protocol) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1484,6 +1680,236 @@ func sovTx(x uint64) (n int) {
 }
 func sozTx(x uint64) (n int) {
 	return sovTx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *ProtocolCustomMsgType) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProtocolCustomMsgType: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProtocolCustomMsgType: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CreateProtocolMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CreateProtocolMsg == nil {
+				m.CreateProtocolMsg = &MsgCreateProtocol{}
+			}
+			if err := m.CreateProtocolMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateProtocolMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.UpdateProtocolMsg == nil {
+				m.UpdateProtocolMsg = &MsgUpdateProtocol{}
+			}
+			if err := m.UpdateProtocolMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DeleteProtocolMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.DeleteProtocolMsg == nil {
+				m.DeleteProtocolMsg = &MsgDeleteProtocol{}
+			}
+			if err := m.DeleteProtocolMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SetCollectionForProtocolMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SetCollectionForProtocolMsg == nil {
+				m.SetCollectionForProtocolMsg = &MsgSetCollectionForProtocol{}
+			}
+			if err := m.SetCollectionForProtocolMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UnsetCollectionForProtocolMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.UnsetCollectionForProtocolMsg == nil {
+				m.UnsetCollectionForProtocolMsg = &MsgUnsetCollectionForProtocol{}
+			}
+			if err := m.UnsetCollectionForProtocolMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *Protocol) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

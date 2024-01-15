@@ -46,12 +46,12 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 		if approval.AmountTrackerId == "All" {
 			approvalTrackerList = &types.AddressList{
 				Addresses:        []string{},
-				Allowlist: false,
+				Whitelist: false,
 			}
 		} else {
 			approvalTrackerList = &types.AddressList{
 				Addresses:        []string{approval.AmountTrackerId},
-				Allowlist: true,
+				Whitelist: true,
 			}
 		}
 
@@ -59,12 +59,12 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 		if approval.ChallengeTrackerId == "All" {
 			challengeTrackerList = &types.AddressList{
 				Addresses:        []string{},
-				Allowlist: false,
+				Whitelist: false,
 			}
 		} else {
 			challengeTrackerList = &types.AddressList{
 				Addresses:        []string{approval.ChallengeTrackerId},
-				Allowlist: true,
+				Whitelist: true,
 			}
 		}
 
@@ -108,12 +108,12 @@ func (k Keeper) CastUserOutgoingApprovalToUniversalPermission(ctx sdk.Context, a
 		if approval.AmountTrackerId == "All" {
 			approvalTrackerList = &types.AddressList{
 				Addresses:        []string{},
-				Allowlist: false,
+				Whitelist: false,
 			}
 		} else {
 			approvalTrackerList = &types.AddressList{
 				Addresses:        []string{approval.AmountTrackerId},
-				Allowlist: true,
+				Whitelist: true,
 			}
 		}
 
@@ -121,12 +121,12 @@ func (k Keeper) CastUserOutgoingApprovalToUniversalPermission(ctx sdk.Context, a
 		if approval.ChallengeTrackerId == "All" {
 			challengeTrackerList = &types.AddressList{
 				Addresses:        []string{},
-				Allowlist: false,
+				Whitelist: false,
 			}
 		} else {
 			challengeTrackerList = &types.AddressList{
 				Addresses:        []string{approval.ChallengeTrackerId},
-				Allowlist: true,
+				Whitelist: true,
 			}
 		}
 
@@ -169,12 +169,12 @@ func (k Keeper) CastUserIncomingApprovalToUniversalPermission(ctx sdk.Context, a
 		if approval.AmountTrackerId == "All" {
 			approvalTrackerList = &types.AddressList{
 				Addresses:        []string{},
-				Allowlist: false,
+				Whitelist: false,
 			}
 		} else {
 			approvalTrackerList = &types.AddressList{
 				Addresses:        []string{approval.AmountTrackerId},
-				Allowlist: true,
+				Whitelist: true,
 			}
 		}
 
@@ -182,12 +182,12 @@ func (k Keeper) CastUserIncomingApprovalToUniversalPermission(ctx sdk.Context, a
 		if approval.ChallengeTrackerId == "All" {
 			challengeTrackerList = &types.AddressList{
 				Addresses:        []string{},
-				Allowlist: false,
+				Whitelist: false,
 			}
 		} else {
 			challengeTrackerList = &types.AddressList{
 				Addresses:        []string{approval.ChallengeTrackerId},
-				Allowlist: true,
+				Whitelist: true,
 			}
 		}
 

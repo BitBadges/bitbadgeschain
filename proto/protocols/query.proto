@@ -13,23 +13,7 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/protocols/types";
 // Query defines the gRPC querier service.
 service Query {
   
-  // Parameters queries the parameters of the module.
-  rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/bitbadges/bitbadgeschain/protocols/params";
   
-  }
-  
-  // Queries a list of GetProtocol items.
-  rpc GetProtocol (QueryGetProtocolRequest) returns (QueryGetProtocolResponse) {
-    option (google.api.http).get = "/bitbadges/bitbadgeschain/protocols/get_protocol";
-  
-  }
-  
-  // Queries a list of GetCollectionIdForProtocol items.
-  rpc GetCollectionIdForProtocol (QueryGetCollectionIdForProtocolRequest) returns (QueryGetCollectionIdForProtocolResponse) {
-    option (google.api.http).get = "/bitbadges/bitbadgeschain/protocols/get_collection_id_for_protocol";
-  
-  }
 }
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}

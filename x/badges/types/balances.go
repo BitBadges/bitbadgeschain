@@ -169,11 +169,11 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 					OwnershipTime:             currTime,
 					TransferTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
 					TimelineTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-					ToList:                 &AddressList{Addresses: []string{}, Allowlist: false},
-					FromList:               &AddressList{Addresses: []string{}, Allowlist: false},
-					InitiatedByList:        &AddressList{Addresses: []string{}, Allowlist: false},
-					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Allowlist: false},
-					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Allowlist: false},
+					ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
+					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
+					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
+					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
+					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
 					ArbitraryValue:            balanceObj.Amount,
 				})
 			}
@@ -188,11 +188,11 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 				OwnershipTime:             timeToFetch,
 				TransferTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
 				TimelineTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-				ToList:                 &AddressList{Addresses: []string{}, Allowlist: false},
-				FromList:               &AddressList{Addresses: []string{}, Allowlist: false},
-				InitiatedByList:        &AddressList{Addresses: []string{}, Allowlist: false},
-				AmountTrackerIdList:    &AddressList{Addresses: []string{}, Allowlist: false},
-				ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Allowlist: false},
+				ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
+				FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
+				InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
+				AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
+				ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
 			},
 			)
 		}
@@ -351,11 +351,11 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 					OwnershipTime:             currTime,
 					TransferTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
 					TimelineTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-					ToList:                 &AddressList{Addresses: []string{}, Allowlist: false},
-					FromList:               &AddressList{Addresses: []string{}, Allowlist: false},
-					InitiatedByList:        &AddressList{Addresses: []string{}, Allowlist: false},
-					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Allowlist: false},
-					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Allowlist: false},
+					ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
+					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
+					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
+					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
+					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
 				})
 			}
 		}
@@ -368,11 +368,11 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 					OwnershipTime:             timeToDelete,
 					TransferTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
 					TimelineTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-					ToList:                 &AddressList{Addresses: []string{}, Allowlist: false},
-					FromList:               &AddressList{Addresses: []string{}, Allowlist: false},
-					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Allowlist: false},
-					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Allowlist: false},
-					InitiatedByList:        &AddressList{Addresses: []string{}, Allowlist: false},
+					ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
+					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
+					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
+					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
+					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
 				},
 				)
 			}

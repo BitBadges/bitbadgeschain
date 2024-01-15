@@ -1,8 +1,8 @@
 package types
 
 func RemoveAddressListFromAddressList(listToRemove *AddressList, addressList *AddressList) (*AddressList, *AddressList) {
-	//Each address list has a list of addresses and a boolean allowlist.
-	//Four cases (toRemove.Allowlist, addressList.Allowlist):
+	//Each address list has a list of addresses and a boolean whitelist.
+	//Four cases (toRemove.Whitelist, addressList.Whitelist):
 	// 1) (true, true) - Remove ABC from BCD
 	//    Removed - duplicates from toRemove.Addresses and addressList.Addresses (BC)
 	//    Remaining - non-duplicates from addressList.Addresses (D)
@@ -55,37 +55,37 @@ func RemoveAddressListFromAddressList(listToRemove *AddressList, addressList *Ad
 	removed := &AddressList{}
 	remaining := &AddressList{}
 
-	if listToRemove.Allowlist && addressList.Allowlist {
+	if listToRemove.Whitelist && addressList.Whitelist {
 		//Case 1
-		removed.Allowlist = true
+		removed.Whitelist = true
 		removed.Addresses = duplicates
 
-		remaining.Allowlist = true
+		remaining.Whitelist = true
 		remaining.Addresses = inListButNotToRemove
-	} else if !listToRemove.Allowlist && addressList.Allowlist {
+	} else if !listToRemove.Whitelist && addressList.Whitelist {
 		//Case 2
-		removed.Allowlist = true
+		removed.Whitelist = true
 		removed.Addresses = inListButNotToRemove
 
-		remaining.Allowlist = true
+		remaining.Whitelist = true
 		remaining.Addresses = duplicates
-	} else if listToRemove.Allowlist && !addressList.Allowlist {
+	} else if listToRemove.Whitelist && !addressList.Whitelist {
 		//Case 3
-		removed.Allowlist = true
+		removed.Whitelist = true
 		removed.Addresses = inToRemoveButNotList
 
-		remaining.Allowlist = false
+		remaining.Whitelist = false
 		remaining.Addresses = append(remaining.Addresses, inListButNotToRemove...)
 		remaining.Addresses = append(remaining.Addresses, inToRemoveButNotList...)
 		remaining.Addresses = append(remaining.Addresses, duplicates...)
-	} else if !listToRemove.Allowlist && !addressList.Allowlist {
+	} else if !listToRemove.Whitelist && !addressList.Whitelist {
 		//Case 4
-		removed.Allowlist = false
+		removed.Whitelist = false
 		removed.Addresses = append(removed.Addresses, inListButNotToRemove...)
 		removed.Addresses = append(removed.Addresses, inToRemoveButNotList...)
 		removed.Addresses = append(removed.Addresses, duplicates...)
 
-		remaining.Allowlist = true
+		remaining.Whitelist = true
 		remaining.Addresses = inToRemoveButNotList
 	}
 

@@ -587,7 +587,7 @@ func New(
 	}
 
 	customEncoderOptions := GetCustomMsgEncodersOptions()
-	customQueryOptions := GetCustomMsgQueryOptions(app.BadgesKeeper)
+	customQueryOptions := GetCustomMsgQueryOptions(app.BadgesKeeper, app.ProtocolsKeeper)
 	wasmOpts := append(customEncoderOptions, customQueryOptions...)
 	availableCapabilities := "iterator,staking,stargate,cosmwasm_1_1,cosmwasm_1_2,bitbadges"
 

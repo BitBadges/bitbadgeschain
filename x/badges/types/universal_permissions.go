@@ -113,7 +113,7 @@ func UniversalRemoveOverlapFromValues(handled *UniversalPermissionDetails, value
 }
 
 func IsAddressListEmpty(list *AddressList) bool {
-	return len(list.Addresses) == 0 && list.Allowlist
+	return len(list.Addresses) == 0 && list.Whitelist
 }
 
 func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
@@ -352,7 +352,7 @@ func GetListIdWithOptions(listId string, uses bool) string {
 
 func GetListWithOptions(list *AddressList, uses bool) *AddressList {
 	if !uses {
-		list = &AddressList{Addresses: []string{}, Allowlist: false} //All addresses
+		list = &AddressList{Addresses: []string{}, Whitelist: false} //All addresses
 	}
 
 	return list
@@ -496,7 +496,7 @@ func GetPermissionString(permission *UniversalPermissionDetails) string {
 
 	if permission.ToList != nil {
 		str += "toList: "
-		if !permission.ToList.Allowlist {
+		if !permission.ToList.Whitelist {
 			str += fmt.Sprint(len(permission.ToList.Addresses)) + " addresses "
 		} else {
 			str += "all except " + fmt.Sprint(len(permission.ToList.Addresses)) + " addresses "
@@ -513,7 +513,7 @@ func GetPermissionString(permission *UniversalPermissionDetails) string {
 
 	if permission.FromList != nil {
 		str += "fromList: "
-		if !permission.FromList.Allowlist {
+		if !permission.FromList.Whitelist {
 			str += fmt.Sprint(len(permission.FromList.Addresses)) + " addresses "
 		} else {
 			str += "all except " + fmt.Sprint(len(permission.FromList.Addresses)) + " addresses "
@@ -530,7 +530,7 @@ func GetPermissionString(permission *UniversalPermissionDetails) string {
 
 	if permission.InitiatedByList != nil {
 		str += "initiatedByList: "
-		if !permission.InitiatedByList.Allowlist {
+		if !permission.InitiatedByList.Whitelist {
 			str += fmt.Sprint(len(permission.InitiatedByList.Addresses)) + " addresses "
 		} else {
 			str += "all except " + fmt.Sprint(len(permission.InitiatedByList.Addresses)) + " addresses "

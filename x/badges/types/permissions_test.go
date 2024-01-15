@@ -2732,21 +2732,21 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 	err := keeper.CreateAddressList(ctx, &types.AddressList{
 		ListId:        "ABC",
 		Addresses:        []string{bob, alice, charlie},
-		Allowlist: true,
+		Whitelist: true,
 	})
 	require.NoError(t, err)
 
 	err = keeper.CreateAddressList(ctx, &types.AddressList{
 		ListId:        "Alice",
 		Addresses:        []string{alice},
-		Allowlist: true,
+		Whitelist: true,
 	})
 	require.NoError(t, err)
 
 	err = keeper.CreateAddressList(ctx, &types.AddressList{
 		ListId:        "BobCharlie",
 		Addresses:        []string{bob, charlie},
-		Allowlist: true,
+		Whitelist: true,
 	})
 	require.NoError(t, err)
 
@@ -2930,21 +2930,21 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 	err := keeper.CreateAddressList(ctx, &types.AddressList{
 		ListId:        "ABC",
 		Addresses:        []string{bob, alice, charlie},
-		Allowlist: true,
+		Whitelist: true,
 	})
 	require.NoError(t, err)
 
 	err = keeper.CreateAddressList(ctx, &types.AddressList{
 		ListId:        "Alice",
 		Addresses:        []string{alice},
-		Allowlist: true,
+		Whitelist: true,
 	})
 	require.NoError(t, err)
 
 	err = keeper.CreateAddressList(ctx, &types.AddressList{
 		ListId:        "BobCharlie",
 		Addresses:        []string{bob, charlie},
-		Allowlist: true,
+		Whitelist: true,
 	})
 	require.NoError(t, err)
 

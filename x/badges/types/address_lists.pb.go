@@ -25,7 +25,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // An AddressList is a list of addresses that are referenced by an ID.
 // The list may include only the specified addresses, or it may include all addresses but
-// the specified addresses (depending on if allowlist is true (allowlist) or false (blocklist)).
+// the specified addresses (depending on if whitelist is true (whitelist) or false (blacklist)).
 //
 // AddressLists are used for defining approvals, as well as being a simplified badge interface.
 type AddressList struct {
@@ -34,7 +34,7 @@ type AddressList struct {
 	// List of addresses included in the list.
 	Addresses []string `protobuf:"bytes,2,rep,name=addresses,proto3" json:"addresses,omitempty"`
 	// Indicates whether the list includes the specified addresses (true) or excludes them (false).
-	Allowlist bool `protobuf:"varint,3,opt,name=allowlist,proto3" json:"allowlist,omitempty"`
+	Whitelist bool `protobuf:"varint,3,opt,name=whitelist,proto3" json:"whitelist,omitempty"`
 	// URI (Uniform Resource Identifier) associated with the address list to provide metadata, if applicable.
 	Uri string `protobuf:"bytes,4,opt,name=uri,proto3" json:"uri,omitempty"`
 	// Custom arbitrary data or additional information related to the address list.
@@ -92,9 +92,9 @@ func (m *AddressList) GetAddresses() []string {
 	return nil
 }
 
-func (m *AddressList) GetAllowlist() bool {
+func (m *AddressList) GetWhitelist() bool {
 	if m != nil {
-		return m.Allowlist
+		return m.Whitelist
 	}
 	return false
 }
@@ -203,9 +203,9 @@ func (m *AddressList) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x22
 	}
-	if m.Allowlist {
+	if m.Whitelist {
 		i--
-		if m.Allowlist {
+		if m.Whitelist {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -259,7 +259,7 @@ func (m *AddressList) Size() (n int) {
 			n += 1 + l + sovAddressLists(uint64(l))
 		}
 	}
-	if m.Allowlist {
+	if m.Whitelist {
 		n += 2
 	}
 	l = len(m.Uri)
@@ -382,7 +382,7 @@ func (m *AddressList) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Allowlist", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Whitelist", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -399,7 +399,7 @@ func (m *AddressList) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.Allowlist = bool(v != 0)
+			m.Whitelist = bool(v != 0)
 		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)

@@ -449,9 +449,9 @@ func ValidateMerkleChallenge(challenge *MerkleChallenge, challengeId string, usi
 		return ErrPrimaryChallengeMustBeOneUsePerLeaf
 	}
 
-	//For non-allowlist trees, we can only use max one use per leaf (bc as soon as we use a leaf, the merkle path is public so anyone can use it)
+	//For non-whitelist trees, we can only use max one use per leaf (bc as soon as we use a leaf, the merkle path is public so anyone can use it)
 	if !maxOneUsePerLeaf && !challenge.UseCreatorAddressAsLeaf {
-		return ErrCanOnlyUseMaxOneUsePerLeafWithAllowlistTree
+		return ErrCanOnlyUseMaxOneUsePerLeafWithWhitelistTree
 	}
 
 	return nil

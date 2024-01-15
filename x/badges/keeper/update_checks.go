@@ -217,23 +217,23 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 		}
 
 		if detailToCheck.AmountTrackerIdList == nil {
-			detailToCheck.AmountTrackerIdList = &types.AddressList{Addresses: []string{}, Allowlist: false}
+			detailToCheck.AmountTrackerIdList = &types.AddressList{Addresses: []string{}, Whitelist: false}
 		}
 
 		if detailToCheck.ChallengeTrackerIdList == nil {
-			detailToCheck.ChallengeTrackerIdList = &types.AddressList{Addresses: []string{}, Allowlist: false}
+			detailToCheck.ChallengeTrackerIdList = &types.AddressList{Addresses: []string{}, Whitelist: false}
 		}
 
 		if detailToCheck.ToList == nil {
-			detailToCheck.ToList = &types.AddressList{Addresses: []string{}, Allowlist: false}
+			detailToCheck.ToList = &types.AddressList{Addresses: []string{}, Whitelist: false}
 		}
 
 		if detailToCheck.FromList == nil {
-			detailToCheck.FromList = &types.AddressList{Addresses: []string{}, Allowlist: false}
+			detailToCheck.FromList = &types.AddressList{Addresses: []string{}, Whitelist: false}
 		}
 
 		if detailToCheck.InitiatedByList == nil {
-			detailToCheck.InitiatedByList = &types.AddressList{Addresses: []string{}, Allowlist: false}
+			detailToCheck.InitiatedByList = &types.AddressList{Addresses: []string{}, Whitelist: false}
 		}
 	}
 

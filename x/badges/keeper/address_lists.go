@@ -72,7 +72,7 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 		addressList = &types.AddressList{
 			ListId:        "Mint",
 			Addresses:        []string{"Mint"},
-			Allowlist: true,
+			Whitelist: true,
 			Uri:              "",
 			CustomData:       "",
 		}
@@ -83,7 +83,7 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 		addressList = &types.AddressList{
 			ListId:        addressListId,
 			Addresses:        []string{},
-			Allowlist: false,
+			Whitelist: false,
 			Uri:              "",
 			CustomData:       "",
 		}
@@ -103,7 +103,7 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 		addressList = &types.AddressList{
 			ListId:        "All",
 			Addresses:        []string{},
-			Allowlist: false,
+			Whitelist: false,
 			Uri:              "",
 			CustomData:       "",
 		}
@@ -112,7 +112,7 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 		addressList = &types.AddressList{
 			ListId:        "AllWithMint",
 			Addresses:        []string{},
-			Allowlist: false,
+			Whitelist: false,
 			Uri:              "",
 			CustomData:       "",
 		}
@@ -121,7 +121,7 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 		addressList = &types.AddressList{
 			ListId:        "None",
 			Addresses:        []string{},
-			Allowlist: true,
+			Whitelist: true,
 			Uri:              "",
 			CustomData:       "",
 		}
@@ -144,7 +144,7 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 			addressList = &types.AddressList{
 				ListId:        addressListId,
 				Addresses:        addresses,
-				Allowlist: true,
+				Whitelist: true,
 				Uri:              "",
 				CustomData:       "",
 			}
@@ -174,7 +174,7 @@ func (k Keeper) GetTrackerListById(ctx sdk.Context, trackerListId string) (*type
 	}
 
 	if inverted {
-		addressList.Allowlist = !addressList.Allowlist
+		addressList.Whitelist = !addressList.Whitelist
 	}
 
 	return addressList, nil
@@ -208,7 +208,7 @@ func (k Keeper) GetAddressListById(ctx sdk.Context, addressListId string) (*type
 	}
 
 	if inverted {
-		addressList.Allowlist = !addressList.Allowlist
+		addressList.Whitelist = !addressList.Whitelist
 	}
 
 	return addressList, nil
@@ -227,7 +227,7 @@ func (k Keeper) CheckAddresses(ctx sdk.Context, addressListId string, addressToC
 		}
 	}
 
-	if !addressList.Allowlist {
+	if !addressList.Whitelist {
 		found = !found
 	}
 
@@ -239,8 +239,8 @@ func (k Keeper) CheckAddresses(ctx sdk.Context, addressListId string, addressToC
 }
 
 // Checks if the addresses are in their respective list.
-// If allowlist is true, then we check if the address is in the Addresses field.
-// If allowlist is false, then we check if the address is NOT in the Addresses field.
+// If whitelist is true, then we check if the address is in the Addresses field.
+// If whitelist is false, then we check if the address is NOT in the Addresses field.
 
 // Note addresses matching does not mean the transfer is allowed. It just means the addresses match.
 // All other criteria must also be met.

@@ -139,7 +139,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test",
 // 		Addresses: []string{},
-// 		Allowlist: false,
+// 		Whitelist: false,
 // 		Filters: []*types.AddressListFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -164,7 +164,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test",
 // 		Addresses: []string{},
-// 		Allowlist: false,
+// 		Whitelist: false,
 // 		Filters: []*types.AddressListFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -197,7 +197,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test",
 // 		Addresses: []string{},
-// 		Allowlist: false,
+// 		Whitelist: false,
 // 		Filters: []*types.AddressListFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -214,7 +214,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test2",
 // 		Addresses: []string{},
-// 		Allowlist: false,
+// 		Whitelist: false,
 // 		Filters: []*types.AddressListFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -231,7 +231,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test3",
 // 		Addresses: []string{},
-// 		Allowlist: false,
+// 		Whitelist: false,
 // 		Filters: []*types.AddressListFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -262,7 +262,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test",
 // 		Addresses: []string{},
-// 		Allowlist: false,
+// 		Whitelist: false,
 // 		Filters: []*types.AddressListFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -279,7 +279,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test2",
 // 		Addresses: []string{},
-// 		Allowlist: false,
+// 		Whitelist: false,
 // 		Filters: []*types.AddressListFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -296,7 +296,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test3",
 // 		Addresses: []string{},
-// 		Allowlist: false,
+// 		Whitelist: false,
 // 		Filters: []*types.AddressListFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -327,14 +327,14 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test",
 // 		Addresses: []string{alice},
-// 		Allowlist: true,
+// 		Whitelist: true,
 // 	})
 // 	suite.Require().Nil(err, "Error creating address list: %s", "test")
 
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test3",
 // 		Addresses: []string{},
-// 		Allowlist: false,
+// 		Whitelist: false,
 // 		Filters: []*types.AddressListFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -351,7 +351,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "mustnot",
 // 		Addresses: []string{},
-// 		Allowlist: false,
+// 		Whitelist: false,
 // 		Filters: []*types.AddressListFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -392,14 +392,14 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test",
 // 		Addresses: []string{alice},
-// 		Allowlist: true,
+// 		Whitelist: true,
 // 	})
 // 	suite.Require().Nil(err, "Error creating address list: %s", "test")
 
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test3",
 // 		Addresses: []string{},
-// 		Allowlist: false,
+// 		Whitelist: false,
 // 		Filters: []*types.AddressListFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
@@ -425,7 +425,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test3",
 // 		Addresses: []string{},
-// 		Allowlist: false,
+// 		Whitelist: false,
 // 		Filters: []*types.AddressListFilters{
 // 			{
 // 				MustSatisfyMinX: sdkmath.NewUint(1),
