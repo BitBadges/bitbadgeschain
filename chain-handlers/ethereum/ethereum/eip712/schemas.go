@@ -434,8 +434,7 @@ func GetSchemas() []string {
 									"end": ""
 								}
 							],
-							"amountTrackerId": "",
-							"challengeTrackerId": "",
+							"approvalId": "",
 							"permanentlyPermittedTimes": [
 								{
 									"start": "",
@@ -472,8 +471,7 @@ func GetSchemas() []string {
 									"end": ""
 								}
 							],
-							"amountTrackerId": "",
-							"challengeTrackerId": "",
+							"approvalId": "",
 							"permanentlyPermittedTimes": [
 								{
 									"start": "",
@@ -770,8 +768,7 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"amountTrackerId": "",
-						"challengeTrackerId": "",
+						"approvalId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
@@ -1313,8 +1310,7 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"amountTrackerId": "",
-						"challengeTrackerId": "",
+						"approvalId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
@@ -1351,8 +1347,7 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"amountTrackerId": "",
-						"challengeTrackerId": "",
+						"approvalId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
@@ -1701,8 +1696,7 @@ func GetSchemas() []string {
 									"end": ""
 								}
 							],
-							"amountTrackerId": "",
-							"challengeTrackerId": "",
+						  "approvalId": "",
 							"permanentlyPermittedTimes": [
 								{
 									"start": "",
@@ -1739,8 +1733,7 @@ func GetSchemas() []string {
 									"end": ""
 								}
 							],
-							"amountTrackerId": "",
-							"challengeTrackerId": "",
+							"approvalId": "",
 							"permanentlyPermittedTimes": [
 								{
 									"start": "",
@@ -2036,8 +2029,7 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"amountTrackerId": "",
-						"challengeTrackerId": "",
+						"approvalId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
@@ -2533,8 +2525,7 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"amountTrackerId": "",
-						"challengeTrackerId": "",
+						"approvalId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
