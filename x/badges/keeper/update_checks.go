@@ -47,8 +47,7 @@ func GetUpdateCombinationsToCheck(
 				ToList:                 detailToAdd.ToList,
 				FromList:               detailToAdd.FromList,
 				InitiatedByList:        detailToAdd.InitiatedByList,
-				AmountTrackerIdList:    detailToAdd.AmountTrackerIdList,
-				ChallengeTrackerIdList: detailToAdd.ChallengeTrackerIdList,
+				ApprovalIdList: 			 detailToAdd.ApprovalIdList,
 			})
 		}
 	}
@@ -68,8 +67,7 @@ func GetUpdateCombinationsToCheck(
 				ToList:                 detailToAdd.ToList,
 				FromList:               detailToAdd.FromList,
 				InitiatedByList:        detailToAdd.InitiatedByList,
-				AmountTrackerIdList:    detailToAdd.AmountTrackerIdList,
-				ChallengeTrackerIdList: detailToAdd.ChallengeTrackerIdList,
+				ApprovalIdList: 			 detailToAdd.ApprovalIdList,
 			})
 		}
 	}
@@ -92,8 +90,7 @@ func GetUpdateCombinationsToCheck(
 				ToList:                 detailToAdd.ToList,
 				FromList:               detailToAdd.FromList,
 				InitiatedByList:        detailToAdd.InitiatedByList,
-				AmountTrackerIdList:    detailToAdd.AmountTrackerIdList,
-				ChallengeTrackerIdList: detailToAdd.ChallengeTrackerIdList,
+				ApprovalIdList: 			 detailToAdd.ApprovalIdList,
 			})
 		}
 	}
@@ -216,14 +213,10 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 			detailToCheck.OwnershipTime = &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)} //dummy range
 		}
 
-		if detailToCheck.AmountTrackerIdList == nil {
-			detailToCheck.AmountTrackerIdList = &types.AddressList{Addresses: []string{}, Whitelist: false}
+		if detailToCheck.ApprovalIdList == nil {
+			detailToCheck.ApprovalIdList = &types.AddressList{Addresses: []string{}, Whitelist: false}
 		}
-
-		if detailToCheck.ChallengeTrackerIdList == nil {
-			detailToCheck.ChallengeTrackerIdList = &types.AddressList{Addresses: []string{}, Whitelist: false}
-		}
-
+		
 		if detailToCheck.ToList == nil {
 			detailToCheck.ToList = &types.AddressList{Addresses: []string{}, Whitelist: false}
 		}

@@ -193,6 +193,10 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id is uninitialized")
 		}
 
+		if collectionApprovals[i].ApprovalId == "All" {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be All")
+		}
+
 		if collectionApprovals[i].ApprovalId == "default-outgoing" || collectionApprovals[i].ApprovalId == "default-incoming" {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be default-outgoing or default-incoming")
 		}

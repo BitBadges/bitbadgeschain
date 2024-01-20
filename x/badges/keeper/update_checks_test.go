@@ -286,8 +286,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 					ToListId:          "AllWithoutMint",
 					PermanentlyForbiddenTimes:       GetFullUintRanges(),
 					InitiatedByListId: "AllWithoutMint",
-					AmountTrackerId:      "All",
-					ChallengeTrackerId:   "All",
+					ApprovalId: "All",
 					BadgeIds:             GetFullUintRanges(),
 					TransferTimes:        GetFullUintRanges(),
 					OwnershipTimes:       GetFullUintRanges(),
@@ -536,8 +535,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIds() {
 					ToListId:          "AllWithoutMint",
 					PermanentlyForbiddenTimes:       GetFullUintRanges(),
 					InitiatedByListId: "AllWithoutMint",
-					AmountTrackerId:      "All",
-					ChallengeTrackerId:   "All",
+					ApprovalId: "All",
 					BadgeIds:             GetFullUintRanges(),
 					TransferTimes:        GetFullUintRanges(),
 					OwnershipTimes:       GetFullUintRanges(),
@@ -620,6 +618,28 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating collections")
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		CollectionApprovals: []*types.CollectionApproval{
+			collectionsToCreate[0].CollectionApprovals[0],
+			{
+				FromListId:        alice,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:             GetFullUintRanges(),
+				TransferTimes:        GetFullUintRanges(),
+				OwnershipTimes:       GetFullUintRanges(),
+				ApprovalId:           "test",
+				AmountTrackerId:      "test",
+				ChallengeTrackerId:   "test",
+
+				ApprovalCriteria: collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection approved transfers")
+
 
 	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
 		Creator:      bob,
@@ -632,8 +652,8 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 					ToListId:          "AllWithoutMint",
 					PermanentlyForbiddenTimes:       GetFullUintRanges(),
 					InitiatedByListId: "AllWithoutMint",
-					AmountTrackerId:      "test",
-					ChallengeTrackerId:   "All",
+					ApprovalId:      		"test",
+					
 					BadgeIds:             GetFullUintRanges(),
 					TransferTimes:        GetFullUintRanges(),
 					OwnershipTimes:       GetFullUintRanges(),
@@ -756,6 +776,81 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 	suite.Require().Nil(err, "Error updating collection approved transfers")
 }
 
+func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecificIdLockedNoPreviousValues() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating collections")
+	
+	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Permissions: &types.CollectionPermissions{
+			CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{
+				{
+
+					FromListId:        alice,
+					ToListId:          "AllWithoutMint",
+					PermanentlyForbiddenTimes:       GetFullUintRanges(),
+					InitiatedByListId: "AllWithoutMint",
+					ApprovalId:      		"approvalidtotest",
+					
+					BadgeIds:             GetFullUintRanges(),
+					TransferTimes:        GetFullUintRanges(),
+					OwnershipTimes:       GetFullUintRanges(),
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection permissions")
+
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		CollectionApprovals: []*types.CollectionApproval{
+			collectionsToCreate[0].CollectionApprovals[0],
+			{
+				FromListId:        alice,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:             GetFullUintRanges(),
+				TransferTimes:        GetFullUintRanges(),
+				OwnershipTimes:       GetFullUintRanges(),
+				ApprovalId:           "approvalidtotest",
+				AmountTrackerId:      "test",
+				ChallengeTrackerId:   "something different",
+
+				ApprovalCriteria: collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
+			},
+		},
+	})
+	suite.Require().Error(err, "Error updating collection approved transfers")
+
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		CollectionApprovals: []*types.CollectionApproval{
+			collectionsToCreate[0].CollectionApprovals[0],
+			{
+				FromListId:        alice,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:             GetFullUintRanges(),
+				TransferTimes:        GetFullUintRanges(),
+				OwnershipTimes:       GetFullUintRanges(),
+				ApprovalId:           "different id",
+				AmountTrackerId:      "test",
+				ChallengeTrackerId:   "something different",
+
+				ApprovalCriteria: collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection approved transfers")
+}
+
 func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
@@ -779,8 +874,7 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 					BadgeIds:             GetFullUintRanges(),
 					TransferTimes:        GetFullUintRanges(),
 					OwnershipTimes:       GetFullUintRanges(),
-					AmountTrackerId:      "All",
-					ChallengeTrackerId:   "All",
+					ApprovalId: "All",
 				},
 			},
 			CanUpdateIncomingApprovals: []*types.UserIncomingApprovalPermission{
@@ -792,8 +886,7 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 					BadgeIds:             GetFullUintRanges(),
 					TransferTimes:        GetFullUintRanges(),
 					OwnershipTimes:       GetFullUintRanges(),
-					AmountTrackerId:      "All",
-					ChallengeTrackerId:   "All",
+					ApprovalId: "All",
 				},
 			},
 		},
@@ -906,8 +999,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentBaseCaseNoSplit() {
 					BadgeIds:             GetFullUintRanges(),
 					TransferTimes:        GetFullUintRanges(),
 					OwnershipTimes:       GetFullUintRanges(),
-					AmountTrackerId:      "All",
-					ChallengeTrackerId:   "All",
+					ApprovalId: "All",
 				},
 			},
 		},

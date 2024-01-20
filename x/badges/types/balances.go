@@ -172,8 +172,7 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 					ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
 					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
 					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
-					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
-					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
+					ApprovalIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
 					ArbitraryValue:            balanceObj.Amount,
 				})
 			}
@@ -191,8 +190,7 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 				ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
 				FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
 				InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
-				AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
-				ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
+				ApprovalIdList: 	&AddressList{Addresses: []string{}, Whitelist: false},
 			},
 			)
 		}
@@ -354,8 +352,7 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 					ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
 					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
 					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
-					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
-					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
+					ApprovalIdList: 	&AddressList{Addresses: []string{}, Whitelist: false},
 				})
 			}
 		}
@@ -370,8 +367,7 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 					TimelineTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
 					ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
 					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
-					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
-					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
+					ApprovalIdList:  &AddressList{Addresses: []string{}, Whitelist: false},
 					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
 				},
 				)

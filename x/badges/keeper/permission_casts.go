@@ -10,12 +10,7 @@ import (
 func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.Context, permissions []*types.UserIncomingApprovalPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, permission := range permissions {
-		approvalTrackerList, err := k.GetTrackerListById(ctx, permission.AmountTrackerId)
-		if err != nil {
-			return nil, err
-		}
-
-		challengeTrackerList, err := k.GetTrackerListById(ctx, permission.ChallengeTrackerId)
+		approvalTrackerList, err := k.GetTrackerListById(ctx, permission.ApprovalId)
 		if err != nil {
 			return nil, err
 		}
@@ -36,16 +31,14 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 			OwnershipTimes:            permission.OwnershipTimes,
 			FromList:               fromList,
 			InitiatedByList:        initiatedByList,
-			AmountTrackerIdList:    approvalTrackerList,
-			ChallengeTrackerIdList: challengeTrackerList,
+			ApprovalIdList: 			 approvalTrackerList,
 
 			UsesBadgeIds:           true,
 			UsesTransferTimes:      true,
 			UsesOwnershipTimes:     true,
 			UsesFromList:        true,
 			UsesInitiatedByList: true,
-			UsesAmountTrackerId:    true,
-			UsesChallengeTrackerId: true,
+			UsesApprovalId: true,
 			PermanentlyPermittedTimes:         permission.PermanentlyPermittedTimes,
 			PermanentlyForbiddenTimes:         permission.PermanentlyForbiddenTimes,
 		})
@@ -56,12 +49,7 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.Context, permissions []*types.UserOutgoingApprovalPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, permission := range permissions {
-		approvalTrackerList, err := k.GetTrackerListById(ctx, permission.AmountTrackerId)
-		if err != nil {
-			return nil, err
-		}
-
-		challengeTrackerList, err := k.GetTrackerListById(ctx, permission.ChallengeTrackerId)
+		approvalTrackerList, err := k.GetTrackerListById(ctx, permission.ApprovalId)
 		if err != nil {
 			return nil, err
 		}
@@ -81,10 +69,8 @@ func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.
 			OwnershipTimes:            permission.OwnershipTimes,
 			ToList:                 toList,
 			InitiatedByList:        initiatedByList,
-			AmountTrackerIdList:    approvalTrackerList,
-			ChallengeTrackerIdList: challengeTrackerList,
-			UsesAmountTrackerId:       true,
-			UsesChallengeTrackerId:    true,
+			ApprovalIdList: 			 approvalTrackerList,
+			UsesApprovalId: true,
 			UsesBadgeIds:              true,
 			UsesTransferTimes:         true,
 			UsesOwnershipTimes:        true,
@@ -113,12 +99,7 @@ func (k Keeper) CastActionPermissionToUniversalPermission(actionPermission []*ty
 func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Context, collectionUpdatePermission []*types.CollectionApprovalPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, collectionUpdatePermission := range collectionUpdatePermission {
-		approvalTrackerList, err := k.GetTrackerListById(ctx, collectionUpdatePermission.AmountTrackerId)
-		if err != nil {
-			return nil, err
-		}
-
-		challengeTrackerList, err := k.GetTrackerListById(ctx, collectionUpdatePermission.ChallengeTrackerId)
+		approvalTrackerList, err := k.GetTrackerListById(ctx, collectionUpdatePermission.ApprovalId)
 		if err != nil {
 			return nil, err
 		}
@@ -147,11 +128,8 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 			FromList:               fromList,
 			InitiatedByList:        initiatedByList,
 			BadgeIds:                  collectionUpdatePermission.BadgeIds,
-			AmountTrackerIdList:    approvalTrackerList,
-			ChallengeTrackerIdList: challengeTrackerList,
-
-			UsesAmountTrackerId:    true,
-			UsesChallengeTrackerId: true,
+			ApprovalIdList: 			 approvalTrackerList,
+			UsesApprovalId: true,
 			UsesBadgeIds:           true,
 			UsesTransferTimes:      true,
 			UsesOwnershipTimes:     true,

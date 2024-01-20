@@ -45,12 +45,8 @@ func ValidateCollectionApprovalPermissions(permissions []*CollectionApprovalPerm
 			return err
 		}
 
-		if permission.AmountTrackerId == "" {
+		if permission.ApprovalId == "" {
 			return ErrAmountTrackerIdIsNil
-		}
-
-		if permission.ChallengeTrackerId == "" {
-			return ErrChallengeTrackerIdIsNil
 		}
 
 		if permission.ToListId == "" {

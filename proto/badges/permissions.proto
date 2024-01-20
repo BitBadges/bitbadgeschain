@@ -124,23 +124,17 @@ message CollectionApprovalPermission {
   // Specifies the ownership times for the badges in the transfer.
   repeated UintRange ownershipTimes = 6;
 
-  // Identifier for the amountTrackerId. You can use "All" or "!trackerId" for shorthand.
-  // If you use "All", this approval will match to all amountTrackerIds.
-  // If you use "!trackerId", this approval will match to all amountTrackerIds except for trackerId.
-  // If you use "trackerId", this approval will match to only the specified trackerId and fail on all others.
-  string amountTrackerId = 7;
-
-  // Identifier for the challengeTrackerId. You can use "All" or "!trackerId" for shorthand.
-  // If you use "All", this approval will match to all challengeTrackerIds.
-  // If you use "!trackerId", this approval will match to all challengeTrackerIds except for trackerId.
-  // If you use "trackerId", this approval will match to only the specified trackerId and fail on all others.
-  string challengeTrackerId = 8;
+  // Identifier for the approvalId. You can use "All" or "!approvalId" for shorthand.
+  // If you use "All", this approval will match to all approvalIds.
+  // If you use "!approvalId", this approval will match to all approvalIds except for approvalId.
+  // If you use "approvalId", this approval will match to only the specified approvalId and fail on all others.
+  string approvalId = 7;
 
   // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
-  repeated UintRange permanentlyPermittedTimes = 9;
+  repeated UintRange permanentlyPermittedTimes = 8;
 
   // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
-  repeated UintRange permanentlyForbiddenTimes = 10;
+  repeated UintRange permanentlyForbiddenTimes = 9;
 }
 
 
@@ -163,23 +157,17 @@ message UserOutgoingApprovalPermission {
   // Specifies the ownership times for the badges in the transfer.
   repeated UintRange ownershipTimes = 5;
 
-  // Identifier for the amountTrackerId. You can use "All" or "!trackerId" for shorthand.
-  // If you use "All", this approval will match to all amountTrackerIds.
-  // If you use "!trackerId", this approval will match to all amountTrackerIds except for trackerId.
-  // If you use "trackerId", this approval will match to only the specified trackerId and fail on all others.
-  string amountTrackerId = 6;
-
-  // Identifier for the challengeTrackerId. You can use "All" or "!trackerId" for shorthand.
-  // If you use "All", this approval will match to all challengeTrackerIds.
-  // If you use "!trackerId", this approval will match to all challengeTrackerIds except for trackerId.
-  // If you use "trackerId", this approval will match to only the specified trackerId and fail on all others.
-  string challengeTrackerId = 7;
+  // Identifier for the approvalId. You can use "All" or "!approvalId" for shorthand.
+  // If you use "All", this approval will match to all approvalIds.
+  // If you use "!approvalId", this approval will match to all approvalIds except for approvalId.
+  // If you use "approvalId", this approval will match to only the specified approvalId and fail on all others.
+  string approvalId = 6;
 
   // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
-  repeated UintRange permanentlyPermittedTimes = 8;
+  repeated UintRange permanentlyPermittedTimes = 7;
 
   // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
-  repeated UintRange permanentlyForbiddenTimes = 9;
+  repeated UintRange permanentlyForbiddenTimes = 8;
 }
 
 /* 
@@ -203,23 +191,18 @@ message UserIncomingApprovalPermission {
   // Specifies the ownership times for the badges in the transfer.
   repeated UintRange ownershipTimes = 5;
 
-  // Identifier for the amountTrackerId. You can use "All" or "!trackerId" for shorthand.
-  // If you use "All", this approval will match to all amountTrackerIds.
-  // If you use "!trackerId", this approval will match to all amountTrackerIds except for trackerId.
-  // If you use "trackerId", this approval will match to only the specified trackerId and fail on all others.
-  string amountTrackerId = 6;
+  // Identifier for the approvalId. You can use "All" or "!approvalId" for shorthand.
+  // If you use "All", this approval will match to all approvalIds.
+  // If you use "!approvalId", this approval will match to all approvalIds except for approvalId.
+  // If you use "approvalId", this approval will match to only the specified approvalId and fail on all others.
+  string approvalId = 6;
 
-  // Identifier for the challengeTrackerId. You can use "All" or "!trackerId" for shorthand.
-  // If you use "All", this approval will match to all challengeTrackerIds.
-  // If you use "!trackerId", this approval will match to all challengeTrackerIds except for trackerId.
-  // If you use "trackerId", this approval will match to only the specified trackerId and fail on all others.
-  string challengeTrackerId = 7;
 
   // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
-  repeated UintRange permanentlyPermittedTimes = 8;
+  repeated UintRange permanentlyPermittedTimes = 7;
 
   // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
-  repeated UintRange permanentlyForbiddenTimes = 9;
+  repeated UintRange permanentlyForbiddenTimes = 8;
 }
 
 /* 

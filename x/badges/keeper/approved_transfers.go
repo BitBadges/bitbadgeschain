@@ -97,8 +97,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 				ToList:                 &types.AddressList{},
 				FromList:               &types.AddressList{},
 				InitiatedByList:        &types.AddressList{},
-				AmountTrackerIdList:    &types.AddressList{},
-				ChallengeTrackerIdList: &types.AddressList{},
+				ApprovalIdList: 			 &types.AddressList{},
 			})
 		}
 	}

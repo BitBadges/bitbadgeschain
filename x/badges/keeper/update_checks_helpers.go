@@ -56,7 +56,9 @@ func GetPotentialUpdatesForTimelineValues(times [][]*types.UintRange, values []i
 
 // Make a struct witha  bool flag isApproved and an approval details arr
 type ApprovalCriteriaWithIsApproved struct {
-	ApprovalCriteria []*types.ApprovalCriteria
+	ApprovalCriteria *types.ApprovalCriteria
+	AmountTrackerId string
+	ChallengeTrackerId string
 }
 
 func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermission) []*types.UniversalPermissionDetails {
@@ -73,19 +75,18 @@ func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermiss
 		fromList := types.GetListWithOptions(permission.FromList, permission.UsesFromList)
 		initiatedByList := types.GetListWithOptions(permission.InitiatedByList, permission.UsesInitiatedByList)
 
-		amountTrackerIdList := types.GetListWithOptions(permission.AmountTrackerIdList, permission.UsesAmountTrackerId)
-		challengeTrackerIdList := types.GetListWithOptions(permission.ChallengeTrackerIdList, permission.UsesChallengeTrackerId)
+		approvalIdList := types.GetListWithOptions(permission.ApprovalIdList, permission.UsesApprovalId)
 
 		for _, badgeId := range badgeIds {
 			for _, timelineTime := range timelineTimes {
 				for _, transferTime := range transferTimes {
-					for _, ownershipTime := range ownershipTimes {
-						approvalCriteria :=
-							[]*types.ApprovalCriteria{
-								permission.ArbitraryValue.(*types.CollectionApproval).ApprovalCriteria,
-							}
-						arbValue := &ApprovalCriteriaWithIsApproved{
-							ApprovalCriteria: approvalCriteria,
+					for _, ownershipTime := range ownershipTimes {							
+						arbValue := []*ApprovalCriteriaWithIsApproved{
+							{
+								ApprovalCriteria: permission.ArbitraryValue.(*types.CollectionApproval).ApprovalCriteria,
+								AmountTrackerId: permission.ArbitraryValue.(*types.CollectionApproval).AmountTrackerId,
+								ChallengeTrackerId: permission.ArbitraryValue.(*types.CollectionApproval).ChallengeTrackerId,
+							},
 						}
 
 						brokenDown := []*types.UniversalPermissionDetails{
@@ -97,8 +98,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermiss
 								ToList:                 toList,
 								FromList:               fromList,
 								InitiatedByList:        initiatedByList,
-								AmountTrackerIdList:    amountTrackerIdList,
-								ChallengeTrackerIdList: challengeTrackerIdList,
+								ApprovalIdList: 			 approvalIdList,
 
 								ArbitraryValue: arbValue,
 							},
@@ -112,15 +112,13 @@ func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermiss
 
 						//for overlaps, we append approval details
 						for _, overlap := range overlaps {
-							mergedApprovalCriteria := overlap.SecondDetails.ArbitraryValue.(*ApprovalCriteriaWithIsApproved).ApprovalCriteria
+							mergedApprovalCriteria := overlap.SecondDetails.ArbitraryValue.([]*ApprovalCriteriaWithIsApproved)
 
-							for _, approvalDetail := range overlap.FirstDetails.ArbitraryValue.(*ApprovalCriteriaWithIsApproved).ApprovalCriteria {
+							for _, approvalDetail := range overlap.FirstDetails.ArbitraryValue.([]*ApprovalCriteriaWithIsApproved) {
 								mergedApprovalCriteria = append(mergedApprovalCriteria, approvalDetail)
 							}
 
-							newArbValue := &ApprovalCriteriaWithIsApproved{
-								ApprovalCriteria: mergedApprovalCriteria,
-							}
+							newArbValue := mergedApprovalCriteria
 
 							handled = append(handled, &types.UniversalPermissionDetails{
 								TimelineTime:       overlap.Overlap.TimelineTime,
@@ -131,8 +129,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermiss
 								FromList:        overlap.Overlap.FromList,
 								InitiatedByList: overlap.Overlap.InitiatedByList,
 
-								AmountTrackerIdList:    overlap.Overlap.AmountTrackerIdList,
-								ChallengeTrackerIdList: overlap.Overlap.ChallengeTrackerIdList,
+								ApprovalIdList: overlap.Overlap.ApprovalIdList,
 
 								//Appended for future lookups (not involved in overlap logic)
 								PermanentlyPermittedTimes: permanentlyPermittedTimes,
@@ -227,11 +224,11 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollec
 			if (oldDetails.ArbitraryValue == nil && newDetails.ArbitraryValue != nil) || (oldDetails.ArbitraryValue != nil && newDetails.ArbitraryValue == nil) {
 				different = true
 			} else {
-				oldArbVal := oldDetails.ArbitraryValue.(*ApprovalCriteriaWithIsApproved)
-				newArbVal := newDetails.ArbitraryValue.(*ApprovalCriteriaWithIsApproved)
+				oldArbVal := oldDetails.ArbitraryValue.([]*ApprovalCriteriaWithIsApproved)
+				newArbVal := newDetails.ArbitraryValue.([]*ApprovalCriteriaWithIsApproved)
 
-				oldVal := oldArbVal.ApprovalCriteria
-				newVal := newArbVal.ApprovalCriteria
+				oldVal := oldArbVal
+				newVal := newArbVal
 
 				//TODO: Eventually we should make this more flexible instead of simply stringifying
 				//For example, does it really matter what order they are in if approved? What about simply changing details that have no impact like customdata?
@@ -247,7 +244,17 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollec
 					//The only thing is I am not too sure how deterministic the GetFirstMatchOnlyWithApprovalCriteria function is.
 					//TODO: Determine best path forward
 					for i := 0; i < len(oldVal); i++ {
-						if proto.MarshalTextString(oldVal[i]) != proto.MarshalTextString(newVal[i]) {
+						oldApprovalCriteria := oldVal[i].ApprovalCriteria
+						newApprovalCriteria := newVal[i].ApprovalCriteria
+						if proto.MarshalTextString(oldApprovalCriteria) != proto.MarshalTextString(newApprovalCriteria) {
+							different = true
+						}
+
+						if oldVal[i].AmountTrackerId != newVal[i].AmountTrackerId {
+							different = true
+						}
+
+						if oldVal[i].ChallengeTrackerId != newVal[i].ChallengeTrackerId {
 							different = true
 						}
 					}
