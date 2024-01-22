@@ -15,6 +15,16 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 			return nil, err
 		}
 
+		amountTrackerList, err := k.GetTrackerListById(ctx, permission.AmountTrackerId)
+		if err != nil {
+			return nil, err
+		}
+
+		challengeTrackerList, err := k.GetTrackerListById(ctx, permission.ChallengeTrackerId)
+		if err != nil {
+			return nil, err
+		}
+
 		fromList, err := k.GetAddressListById(ctx, permission.FromListId)
 		if err != nil {
 			return nil, err
@@ -32,6 +42,8 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 			FromList:               fromList,
 			InitiatedByList:        initiatedByList,
 			ApprovalIdList: 			 approvalTrackerList,
+			AmountTrackerIdList: 	 amountTrackerList,
+			ChallengeTrackerIdList:  challengeTrackerList,
 
 			UsesBadgeIds:           true,
 			UsesTransferTimes:      true,
@@ -39,6 +51,8 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 			UsesFromList:        true,
 			UsesInitiatedByList: true,
 			UsesApprovalId: true,
+			UsesAmountTrackerId: true,
+			UsesChallengeTrackerId: true,
 			PermanentlyPermittedTimes:         permission.PermanentlyPermittedTimes,
 			PermanentlyForbiddenTimes:         permission.PermanentlyForbiddenTimes,
 		})
@@ -53,6 +67,17 @@ func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.
 		if err != nil {
 			return nil, err
 		}
+
+		amountTrackerList, err := k.GetTrackerListById(ctx, permission.AmountTrackerId)
+		if err != nil {
+			return nil, err
+		}
+
+		challengeTrackerList, err := k.GetTrackerListById(ctx, permission.ChallengeTrackerId)
+		if err != nil {
+			return nil, err
+		}
+
 		initiatedByList, err := k.GetAddressListById(ctx, permission.InitiatedByListId)
 		if err != nil {
 			return nil, err
@@ -70,6 +95,10 @@ func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.
 			ToList:                 toList,
 			InitiatedByList:        initiatedByList,
 			ApprovalIdList: 			 approvalTrackerList,
+			AmountTrackerIdList: 	 amountTrackerList,
+			ChallengeTrackerIdList:  challengeTrackerList,
+			UsesAmountTrackerId: true,
+			UsesChallengeTrackerId: true,
 			UsesApprovalId: true,
 			UsesBadgeIds:              true,
 			UsesTransferTimes:         true,
@@ -105,6 +134,17 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 		}
 
 
+		amountTrackerList, err := k.GetTrackerListById(ctx, collectionUpdatePermission.AmountTrackerId)
+		if err != nil {
+			return nil, err
+		}
+
+		challengeTrackerList, err := k.GetTrackerListById(ctx, collectionUpdatePermission.ChallengeTrackerId)
+		if err != nil {
+			return nil, err
+		}
+
+
 		fromList, err := k.GetAddressListById(ctx, collectionUpdatePermission.FromListId)
 		if err != nil {
 			return nil, err
@@ -129,6 +169,10 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 			InitiatedByList:        initiatedByList,
 			BadgeIds:                  collectionUpdatePermission.BadgeIds,
 			ApprovalIdList: 			 approvalTrackerList,
+			AmountTrackerIdList: 	 amountTrackerList,
+			ChallengeTrackerIdList:  challengeTrackerList,
+			UsesAmountTrackerId: true,
+			UsesChallengeTrackerId: true,
 			UsesApprovalId: true,
 			UsesBadgeIds:           true,
 			UsesTransferTimes:      true,

@@ -57,8 +57,6 @@ func GetPotentialUpdatesForTimelineValues(times [][]*types.UintRange, values []i
 // Make a struct witha  bool flag isApproved and an approval details arr
 type ApprovalCriteriaWithIsApproved struct {
 	ApprovalCriteria *types.ApprovalCriteria
-	AmountTrackerId string
-	ChallengeTrackerId string
 }
 
 func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermission) []*types.UniversalPermissionDetails {
@@ -76,6 +74,8 @@ func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermiss
 		initiatedByList := types.GetListWithOptions(permission.InitiatedByList, permission.UsesInitiatedByList)
 
 		approvalIdList := types.GetListWithOptions(permission.ApprovalIdList, permission.UsesApprovalId)
+		amountTrackerIdList := types.GetListWithOptions(permission.AmountTrackerIdList, permission.UsesAmountTrackerId)
+		challengeTrackerIdList := types.GetListWithOptions(permission.ChallengeTrackerIdList, permission.UsesChallengeTrackerId)
 
 		for _, badgeId := range badgeIds {
 			for _, timelineTime := range timelineTimes {
@@ -84,8 +84,6 @@ func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermiss
 						arbValue := []*ApprovalCriteriaWithIsApproved{
 							{
 								ApprovalCriteria: permission.ArbitraryValue.(*types.CollectionApproval).ApprovalCriteria,
-								AmountTrackerId: permission.ArbitraryValue.(*types.CollectionApproval).AmountTrackerId,
-								ChallengeTrackerId: permission.ArbitraryValue.(*types.CollectionApproval).ChallengeTrackerId,
 							},
 						}
 
@@ -99,6 +97,8 @@ func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermiss
 								FromList:               fromList,
 								InitiatedByList:        initiatedByList,
 								ApprovalIdList: 			 approvalIdList,
+								AmountTrackerIdList: 	 amountTrackerIdList,
+								ChallengeTrackerIdList:  challengeTrackerIdList,
 
 								ArbitraryValue: arbValue,
 							},
@@ -130,6 +130,8 @@ func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermiss
 								InitiatedByList: overlap.Overlap.InitiatedByList,
 
 								ApprovalIdList: overlap.Overlap.ApprovalIdList,
+								AmountTrackerIdList: overlap.Overlap.AmountTrackerIdList,
+								ChallengeTrackerIdList: overlap.Overlap.ChallengeTrackerIdList,
 
 								//Appended for future lookups (not involved in overlap logic)
 								PermanentlyPermittedTimes: permanentlyPermittedTimes,
@@ -247,14 +249,6 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollec
 						oldApprovalCriteria := oldVal[i].ApprovalCriteria
 						newApprovalCriteria := newVal[i].ApprovalCriteria
 						if proto.MarshalTextString(oldApprovalCriteria) != proto.MarshalTextString(newApprovalCriteria) {
-							different = true
-						}
-
-						if oldVal[i].AmountTrackerId != newVal[i].AmountTrackerId {
-							different = true
-						}
-
-						if oldVal[i].ChallengeTrackerId != newVal[i].ChallengeTrackerId {
 							different = true
 						}
 					}

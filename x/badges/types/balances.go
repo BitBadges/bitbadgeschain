@@ -173,6 +173,8 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
 					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
 					ApprovalIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
+					AmountTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
+					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
 					ArbitraryValue:            balanceObj.Amount,
 				})
 			}
@@ -191,6 +193,8 @@ func GetBalancesForIds(idRanges []*UintRange, times []*UintRange, balances []*Ba
 				FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
 				InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
 				ApprovalIdList: 	&AddressList{Addresses: []string{}, Whitelist: false},
+				AmountTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
+					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
 			},
 			)
 		}
@@ -353,6 +357,8 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
 					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
 					ApprovalIdList: 	&AddressList{Addresses: []string{}, Whitelist: false},
+					AmountTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
+					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
 				})
 			}
 		}
@@ -368,6 +374,8 @@ func DeleteBalances(rangesToDelete []*UintRange, timesToDelete []*UintRange, bal
 					ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
 					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
 					ApprovalIdList:  &AddressList{Addresses: []string{}, Whitelist: false},
+					AmountTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
+					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
 					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
 				},
 				)

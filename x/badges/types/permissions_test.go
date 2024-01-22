@@ -2122,6 +2122,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 		FromListId:        "AllWithoutMint",
 		InitiatedByListId: alice,
 		ApprovalId: "All",
+		AmountTrackerId: "All",
+		ChallengeTrackerId: "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2162,6 +2164,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 		FromListId:        "AllWithoutMint",
 		InitiatedByListId: alice,
 		ApprovalId: "All",
+		AmountTrackerId: "All",
+		ChallengeTrackerId: "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2205,6 +2209,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 		FromListId:        "AllWithoutMint",
 		InitiatedByListId: alice,
 		ApprovalId: "All",
+		AmountTrackerId: "All",
+		ChallengeTrackerId: "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2245,6 +2251,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			FromListId:        "AllWithoutMint",
 			InitiatedByListId: alice,
 			ApprovalId: "All",
+			AmountTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2292,6 +2300,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			FromListId:        "AllWithoutMint",
 			InitiatedByListId: alice,
 			ApprovalId: "All",
+			AmountTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2337,6 +2347,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			FromListId:        "AllWithoutMint",
 			InitiatedByListId: alice,
 			ApprovalId: "All",
+			AmountTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2386,6 +2398,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			FromListId:        "AllWithoutMint",
 			InitiatedByListId: alice,
 			ApprovalId: "All",
+			AmountTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2426,6 +2440,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			FromListId:        "AllWithoutMint",
 			InitiatedByListId: alice,
 			ApprovalId: "All",
+			AmountTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2473,6 +2489,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 		FromListId:        "AllWithoutMint",
 		InitiatedByListId: alice,
 		ApprovalId: "All",
+		AmountTrackerId: "All",
+		ChallengeTrackerId: "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2518,6 +2536,8 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 			FromListId:        "AllWithoutMint",
 			InitiatedByListId: alice,
 			ApprovalId: "All",
+			AmountTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2566,6 +2586,8 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 		FromListId:        "AllWithoutMint",
 		InitiatedByListId: alice,
 		ApprovalId: "All",
+		AmountTrackerId: "All",
+		ChallengeTrackerId: "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2607,6 +2629,8 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 			FromListId:        "AllWithoutMint",
 			InitiatedByListId: alice,
 			ApprovalId: "All",
+			AmountTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2650,6 +2674,8 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 		FromListId:        "AllWithoutMint",
 		InitiatedByListId: alice,
 		ApprovalId: "All",
+		AmountTrackerId: "All",
+		ChallengeTrackerId: "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2689,6 +2715,8 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 		FromListId:        "AllWithoutMint",
 		InitiatedByListId: alice,
 		ApprovalId: "All",
+		AmountTrackerId: "All",
+		ChallengeTrackerId: "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2760,6 +2788,8 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 		FromListId:        "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalId: "All",
+		AmountTrackerId: "All",
+		ChallengeTrackerId: "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2800,6 +2830,8 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 		FromListId:        "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalId: "All",
+		AmountTrackerId: "All",
+		ChallengeTrackerId: "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2843,6 +2875,8 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 		FromListId:        "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalId: "All",
+		AmountTrackerId: "All",
+		ChallengeTrackerId: "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2884,6 +2918,8 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 			FromListId:        "AllWithoutMint",
 			InitiatedByListId: "AllWithoutMint",
 			ApprovalId: "All",
+			AmountTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2954,6 +2990,8 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 		FromListId:        "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalId: "All",
+		AmountTrackerId: "All",
+		ChallengeTrackerId: "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2994,6 +3032,8 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 			FromListId:        "AllWithoutMint",
 			InitiatedByListId: "AllWithoutMint",
 			ApprovalId: "All",
+			AmountTrackerId: "All",
+			ChallengeTrackerId: "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -3037,6 +3077,8 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 		FromListId:        "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalId: "All",
+		AmountTrackerId: "All",
+		ChallengeTrackerId: "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -3076,6 +3118,8 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 		FromListId:        "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalId: "All",
+		AmountTrackerId: "All",
+		ChallengeTrackerId: "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),

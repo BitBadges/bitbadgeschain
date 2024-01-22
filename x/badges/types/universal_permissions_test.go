@@ -47,6 +47,9 @@ func TestRemoveOverlaps(t *testing.T) {
 			Whitelist: true,
 		},
 
+		AmountTrackerIdList: &types.AddressList{},
+
+		ChallengeTrackerIdList: &types.AddressList{},
 		ApprovalIdList: &types.AddressList{},
 	}, &types.UniversalPermissionDetails{
 		BadgeId: &types.UintRange{
@@ -78,6 +81,9 @@ func TestRemoveOverlaps(t *testing.T) {
 			Whitelist: true,
 		},
 
+		AmountTrackerIdList: &types.AddressList{},
+
+		ChallengeTrackerIdList: &types.AddressList{},
 		ApprovalIdList: &types.AddressList{},
 	})
 	expected := []*types.UniversalPermissionDetails{
@@ -111,7 +117,9 @@ func TestRemoveOverlaps(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList:    &types.AddressList{},
+			AmountTrackerIdList:    &types.AddressList{},
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -143,8 +151,10 @@ func TestRemoveOverlaps(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -176,8 +186,10 @@ func TestRemoveOverlaps(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -209,8 +221,10 @@ func TestRemoveOverlaps(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -242,8 +256,10 @@ func TestRemoveOverlaps(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 
 		{
@@ -276,8 +292,10 @@ func TestRemoveOverlaps(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -309,8 +327,10 @@ func TestRemoveOverlaps(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 
 		{
@@ -343,8 +363,10 @@ func TestRemoveOverlaps(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 	}
 
@@ -415,6 +437,9 @@ func TestRemoveAddresses(t *testing.T) {
 			Whitelist: true,
 		},
 
+		AmountTrackerIdList: &types.AddressList{},
+
+		ChallengeTrackerIdList: &types.AddressList{},
 		ApprovalIdList: &types.AddressList{},
 	}, &types.UniversalPermissionDetails{
 		BadgeId: &types.UintRange{
@@ -446,6 +471,9 @@ func TestRemoveAddresses(t *testing.T) {
 			Whitelist: true,
 		},
 
+		AmountTrackerIdList: &types.AddressList{},
+
+		ChallengeTrackerIdList: &types.AddressList{},
 		ApprovalIdList: &types.AddressList{},
 	})
 	expected := []*types.UniversalPermissionDetails{
@@ -479,8 +507,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -512,8 +542,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -545,8 +577,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -578,8 +612,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -611,8 +647,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 
 		{
@@ -645,8 +683,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -678,8 +718,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 
 		{
@@ -712,8 +754,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 
 		{
@@ -746,8 +790,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -779,8 +825,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -812,8 +860,10 @@ func TestRemoveAddresses(t *testing.T) {
 				Whitelist: true,
 			},
 
-			ApprovalIdList: &types.AddressList{},
+			AmountTrackerIdList: &types.AddressList{},
 
+			ChallengeTrackerIdList: &types.AddressList{},
+			ApprovalIdList: &types.AddressList{},
 		},
 	}
 

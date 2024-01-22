@@ -48,6 +48,8 @@ func GetUpdateCombinationsToCheck(
 				FromList:               detailToAdd.FromList,
 				InitiatedByList:        detailToAdd.InitiatedByList,
 				ApprovalIdList: 			 detailToAdd.ApprovalIdList,
+				AmountTrackerIdList: 	detailToAdd.AmountTrackerIdList,
+				ChallengeTrackerIdList: detailToAdd.ChallengeTrackerIdList,
 			})
 		}
 	}
@@ -68,6 +70,8 @@ func GetUpdateCombinationsToCheck(
 				FromList:               detailToAdd.FromList,
 				InitiatedByList:        detailToAdd.InitiatedByList,
 				ApprovalIdList: 			 detailToAdd.ApprovalIdList,
+				AmountTrackerIdList: 	detailToAdd.AmountTrackerIdList,
+				ChallengeTrackerIdList: detailToAdd.ChallengeTrackerIdList,
 			})
 		}
 	}
@@ -91,6 +95,8 @@ func GetUpdateCombinationsToCheck(
 				FromList:               detailToAdd.FromList,
 				InitiatedByList:        detailToAdd.InitiatedByList,
 				ApprovalIdList: 			 detailToAdd.ApprovalIdList,
+				AmountTrackerIdList: 	detailToAdd.AmountTrackerIdList,
+				ChallengeTrackerIdList: detailToAdd.ChallengeTrackerIdList,
 			})
 		}
 	}
@@ -216,7 +222,15 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 		if detailToCheck.ApprovalIdList == nil {
 			detailToCheck.ApprovalIdList = &types.AddressList{Addresses: []string{}, Whitelist: false}
 		}
-		
+
+		if detailToCheck.AmountTrackerIdList == nil {
+			detailToCheck.AmountTrackerIdList = &types.AddressList{Addresses: []string{}, Whitelist: false}
+		}
+
+		if detailToCheck.ChallengeTrackerIdList == nil {
+			detailToCheck.ChallengeTrackerIdList = &types.AddressList{Addresses: []string{}, Whitelist: false}
+		}
+
 		if detailToCheck.ToList == nil {
 			detailToCheck.ToList = &types.AddressList{Addresses: []string{}, Whitelist: false}
 		}

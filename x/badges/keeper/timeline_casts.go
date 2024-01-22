@@ -42,21 +42,20 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 			return nil, err
 		}
 
-		//TODO: It can never be "All" right?
-		approvalTrackerList := &types.AddressList{}
-		if approval.ApprovalId == "All" {
-			approvalTrackerList = &types.AddressList{
-				Addresses:        []string{},
-				Whitelist: false,
-			}
-		} else {
-			approvalTrackerList = &types.AddressList{
-				Addresses:        []string{approval.ApprovalId},
-				Whitelist: true,
-			}
+		approvalTrackerList := &types.AddressList{
+			Addresses:        []string{approval.ApprovalId},
+			Whitelist: true,
 		}
-
 		
+		amountTrackerList := &types.AddressList{
+			Addresses:        []string{approval.AmountTrackerId},
+			Whitelist: true,
+		}
+		
+		challengeTrackerList := &types.AddressList{
+			Addresses:        []string{approval.ChallengeTrackerId},
+			Whitelist: true,
+		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			BadgeIds:                  approval.BadgeIds,
@@ -66,6 +65,8 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 			ToList:                 toList,
 			InitiatedByList:        initiatedByList,
 			ApprovalIdList: 			 approvalTrackerList,
+			AmountTrackerIdList: 	 amountTrackerList,
+			ChallengeTrackerIdList:  challengeTrackerList,
 			UsesBadgeIds:              true,
 			UsesTransferTimes:         true,
 			UsesToList:             true,
@@ -73,12 +74,15 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 			UsesInitiatedByList:    true,
 			UsesOwnershipTimes:        true,
 			UsesApprovalId: 					true,
+			UsesAmountTrackerId: 			true,
+			UsesChallengeTrackerId: 		true,
 			ArbitraryValue:            approval,
 		})
 	}
 	return castedPermissions, nil
 }
 //TODO: Unused currently .... keep?
+//TODO: Note tracker ids may be msising when i uncomment
 // func (k Keeper) CastUserOutgoingApprovalToUniversalPermission(ctx sdk.Context, approvals []*types.UserOutgoingApproval) ([]*types.UniversalPermission, error) {
 // 	castedPermissions := []*types.UniversalPermission{}
 // 	for _, approval := range approvals {

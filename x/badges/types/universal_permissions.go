@@ -28,6 +28,8 @@ type UniversalPermission struct {
 	InitiatedByList *AddressList
 
 	ApprovalIdList    *AddressList
+	ChallengeTrackerIdList *AddressList
+	AmountTrackerIdList *AddressList
 
 	PermanentlyPermittedTimes []*UintRange
 	PermanentlyForbiddenTimes []*UintRange
@@ -37,10 +39,12 @@ type UniversalPermission struct {
 	UsesTransferTimes      bool
 	UsesToList          bool
 	UsesFromList        bool
-	UsesInitiatedByList bool
+	UsesInitiatedByList 	 bool
 	UsesOwnershipTimes     bool
 
 	UsesApprovalId    bool
+	UsesAmountTrackerId bool
+	UsesChallengeTrackerId   bool
 
 	ArbitraryValue interface{}
 }
@@ -55,6 +59,8 @@ type UniversalPermissionDetails struct {
 	InitiatedByList *AddressList
 
 	ApprovalIdList    *AddressList
+	ChallengeTrackerIdList *AddressList
+	AmountTrackerIdList *AddressList
 
 	//These fields are not actually used in the overlapping logic.
 	//They are just along for the ride and used later for lookups
@@ -124,11 +130,15 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 	initiatedByListAfterRemoval, removedInitiatedByList := RemoveAddressListFromAddressList(handled.InitiatedByList, valueToCheck.InitiatedByList)
 	
 	approvalIdListAfterRemoval, removedApprovalIdList := RemoveAddressListFromAddressList(handled.ApprovalIdList, valueToCheck.ApprovalIdList)
+	amountTrackerIdListAfterRemoval, removedAmountTrackerIdList := RemoveAddressListFromAddressList(handled.AmountTrackerIdList, valueToCheck.AmountTrackerIdList)
+	challengeTrackerIdListAfterRemoval, removedChallengeTrackerIdList := RemoveAddressListFromAddressList(handled.ChallengeTrackerIdList, valueToCheck.ChallengeTrackerIdList)
 	
 	toListRemoved := !IsAddressListEmpty(removedToList)
 	fromListRemoved := !IsAddressListEmpty(removedFromList)
 	initiatedByListRemoved := !IsAddressListEmpty(removedInitiatedByList)
 	approvalIdListRemoved := !IsAddressListEmpty(removedApprovalIdList)
+	amountTrackerIdListRemoved := !IsAddressListEmpty(removedAmountTrackerIdList)
+	challengeTrackerIdListRemoved := !IsAddressListEmpty(removedChallengeTrackerIdList)
 
 	//Approach: Iterate through each field one by one. Attempt to remove the overlap. We'll call each field by an ID number corresponding to its order
 	//					Order doesn't matter as long as all fields are handled
@@ -153,7 +163,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 
 	//If some field does not overlap, we simply end up with the original values because it is only considered an overlap if all fields overlap.
 	//The function would work fine without this but it makes it more efficient and less complicated because it will not get broken down further
-	if len(removedTimelineTimes) == 0 || len(removedBadges) == 0 || len(removedTransferTimes) == 0 || len(removedOwnershipTimes) == 0 || !toListRemoved || !fromListRemoved || !initiatedByListRemoved || !approvalIdListRemoved {
+	if len(removedTimelineTimes) == 0 || len(removedBadges) == 0 || len(removedTransferTimes) == 0 || len(removedOwnershipTimes) == 0 || !toListRemoved || !fromListRemoved || !initiatedByListRemoved || !approvalIdListRemoved || !amountTrackerIdListRemoved || !challengeTrackerIdListRemoved {
 		remaining = append(remaining, valueToCheck)
 		return remaining, []*UniversalPermissionDetails{}
 	}
@@ -168,6 +178,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			FromList:               valueToCheck.FromList,
 			InitiatedByList:        valueToCheck.InitiatedByList,
 			ApprovalIdList: 			 valueToCheck.ApprovalIdList,
+			AmountTrackerIdList: 	 valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList:  valueToCheck.ChallengeTrackerIdList,
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
@@ -182,6 +194,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			FromList:               valueToCheck.FromList,
 			InitiatedByList:        valueToCheck.InitiatedByList,
 			ApprovalIdList: valueToCheck.ApprovalIdList,
+			AmountTrackerIdList: 	 valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList:  valueToCheck.ChallengeTrackerIdList,
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
@@ -196,6 +210,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			FromList:               valueToCheck.FromList,
 			InitiatedByList:        valueToCheck.InitiatedByList,
 			ApprovalIdList: valueToCheck.ApprovalIdList,
+			AmountTrackerIdList: 	 valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList:  valueToCheck.ChallengeTrackerIdList,
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
@@ -210,6 +226,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			FromList:               valueToCheck.FromList,
 			InitiatedByList:        valueToCheck.InitiatedByList,
 			ApprovalIdList: valueToCheck.ApprovalIdList,
+			AmountTrackerIdList: 	 valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList:  valueToCheck.ChallengeTrackerIdList,
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
@@ -224,6 +242,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			FromList:               valueToCheck.FromList,
 			InitiatedByList:        valueToCheck.InitiatedByList,
 			ApprovalIdList: valueToCheck.ApprovalIdList,
+			AmountTrackerIdList: 	 valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList:  valueToCheck.ChallengeTrackerIdList,
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
@@ -238,6 +258,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			FromList:               fromListAfterRemoval,
 			InitiatedByList:        valueToCheck.InitiatedByList,
 			ApprovalIdList: valueToCheck.ApprovalIdList,
+			AmountTrackerIdList: 	 valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList:  valueToCheck.ChallengeTrackerIdList,
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
@@ -252,6 +274,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			FromList:               removedFromList,
 			InitiatedByList:        initiatedByListAfterRemoval,
 			ApprovalIdList: valueToCheck.ApprovalIdList,
+			AmountTrackerIdList: 	 valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList:  valueToCheck.ChallengeTrackerIdList,
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
 	}
@@ -266,6 +290,42 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 			FromList:               removedFromList,
 			InitiatedByList:        removedInitiatedByList,
 			ApprovalIdList: approvalIdListAfterRemoval,
+			AmountTrackerIdList: 	 valueToCheck.AmountTrackerIdList,
+			ChallengeTrackerIdList:  valueToCheck.ChallengeTrackerIdList,
+
+			ArbitraryValue: valueToCheck.ArbitraryValue,
+		})
+	}
+
+	if !IsAddressListEmpty(amountTrackerIdListAfterRemoval) {
+		remaining = append(remaining, &UniversalPermissionDetails{
+			TimelineTime:              removedTimelineTimes[0],
+			BadgeId:                   removedBadges[0],
+			TransferTime:              removedTransferTimes[0],
+			OwnershipTime:             removedOwnershipTimes[0],
+			ToList:                 removedToList,
+			FromList:               removedFromList,
+			InitiatedByList:        removedInitiatedByList,
+			ApprovalIdList: removedApprovalIdList,
+			AmountTrackerIdList: amountTrackerIdListAfterRemoval,
+			ChallengeTrackerIdList:  valueToCheck.ChallengeTrackerIdList,
+
+			ArbitraryValue: valueToCheck.ArbitraryValue,
+		})
+	}
+
+	if !IsAddressListEmpty(challengeTrackerIdListAfterRemoval) {
+		remaining = append(remaining, &UniversalPermissionDetails{
+			TimelineTime:              removedTimelineTimes[0],
+			BadgeId:                   removedBadges[0],
+			TransferTime:              removedTransferTimes[0],
+			OwnershipTime:             removedOwnershipTimes[0],
+			ToList:                 removedToList,
+			FromList:               removedFromList,
+			InitiatedByList:        removedInitiatedByList,
+			ApprovalIdList: removedApprovalIdList,
+			AmountTrackerIdList: removedAmountTrackerIdList,
+			ChallengeTrackerIdList:  challengeTrackerIdListAfterRemoval,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
@@ -285,6 +345,8 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 						FromList:               removedFromList,
 						InitiatedByList:        removedInitiatedByList,
 						ApprovalIdList: removedApprovalIdList,
+						AmountTrackerIdList: removedAmountTrackerIdList,
+						ChallengeTrackerIdList: removedChallengeTrackerIdList,
 
 						ArbitraryValue: valueToCheck.ArbitraryValue,
 					})
@@ -337,6 +399,8 @@ func ApplyManipulations(permissions []*UniversalPermission) []*UniversalPermissi
 		fromList := GetListWithOptions(permission.FromList, permission.UsesFromList)
 		initiatedByList := GetListWithOptions(permission.InitiatedByList, permission.UsesInitiatedByList)
 		approvalIdList := GetListWithOptions(permission.ApprovalIdList, permission.UsesApprovalId)
+		amountTrackerIdList := GetListWithOptions(permission.AmountTrackerIdList, permission.UsesAmountTrackerId)
+		challengeTrackerIdList := GetListWithOptions(permission.ChallengeTrackerIdList, permission.UsesChallengeTrackerId)
 
 		for _, badgeId := range badgeIds {
 			for _, timelineTime := range timelineTimes {
@@ -352,6 +416,8 @@ func ApplyManipulations(permissions []*UniversalPermission) []*UniversalPermissi
 								FromList:               fromList,
 								InitiatedByList:        initiatedByList,
 								ApprovalIdList: approvalIdList,
+								AmountTrackerIdList: amountTrackerIdList,
+								ChallengeTrackerIdList: challengeTrackerIdList,
 
 								//Appended for future lookups (not involved in overlap logic)
 								PermanentlyPermittedTimes: permanentlyPermittedTimes,
@@ -388,6 +454,8 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissio
 		initiatedByList := GetListWithOptions(permission.InitiatedByList, permission.UsesInitiatedByList)
 
 		approvalIdList := GetListWithOptions(permission.ApprovalIdList, permission.UsesApprovalId)
+		amountTrackerIdList := GetListWithOptions(permission.AmountTrackerIdList, permission.UsesAmountTrackerId)
+		challengeTrackerIdList := GetListWithOptions(permission.ChallengeTrackerIdList, permission.UsesChallengeTrackerId)
 
 		for _, badgeId := range badgeIds {
 			for _, timelineTime := range timelineTimes {
@@ -403,6 +471,8 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissio
 								FromList:               fromList,
 								InitiatedByList:        initiatedByList,
 								ApprovalIdList: approvalIdList,
+								AmountTrackerIdList: amountTrackerIdList,
+								ChallengeTrackerIdList: challengeTrackerIdList,
 							},
 						}
 
@@ -417,6 +487,8 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissio
 								FromList:               remaining.FromList,
 								InitiatedByList:        remaining.InitiatedByList,
 								ApprovalIdList: remaining.ApprovalIdList,
+								AmountTrackerIdList: remaining.AmountTrackerIdList,
+								ChallengeTrackerIdList: remaining.ChallengeTrackerIdList,
 
 								//Appended for future lookups (not involved in overlap logic)
 								PermanentlyPermittedTimes: permanentlyPermittedTimes,

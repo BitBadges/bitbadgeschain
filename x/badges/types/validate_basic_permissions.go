@@ -49,6 +49,14 @@ func ValidateCollectionApprovalPermissions(permissions []*CollectionApprovalPerm
 			return ErrAmountTrackerIdIsNil
 		}
 
+		if permission.AmountTrackerId == "" {
+			return ErrAmountTrackerIdIsNil
+		}
+
+		if permission.ChallengeTrackerId == "" {
+			return ErrChallengeTrackerIdIsNil
+		}
+
 		if permission.ToListId == "" {
 			return sdkerrors.Wrap(ErrInvalidRequest, "toListId is nil")
 		}
