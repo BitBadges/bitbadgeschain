@@ -157,6 +157,7 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 
 func (k Keeper) GetTrackerListById(ctx sdk.Context, trackerListId string) (*types.AddressList, error) {
 	inverted := false
+	trackerListIdCopy := trackerListId
 	addressList := &types.AddressList{}
 	if trackerListId[0] == '!' {
 		inverted = true
@@ -177,11 +178,16 @@ func (k Keeper) GetTrackerListById(ctx sdk.Context, trackerListId string) (*type
 		addressList.Whitelist = !addressList.Whitelist
 	}
 
+	if addressList.ListId != trackerListIdCopy {
+		addressList.ListId = trackerListIdCopy
+	}
+	
 	return addressList, nil
 }
 
 func (k Keeper) GetAddressListById(ctx sdk.Context, addressListId string) (*types.AddressList, error) {
 	inverted := false
+	addressListIdCopy := addressListId
 	addressList := &types.AddressList{}
 	if addressListId[0] == '!' && len(addressListId) > 1 && addressListId[len(addressListId)-1] != ')' {
 		inverted = true
@@ -209,6 +215,10 @@ func (k Keeper) GetAddressListById(ctx sdk.Context, addressListId string) (*type
 
 	if inverted {
 		addressList.Whitelist = !addressList.Whitelist
+	}
+
+	if addressList.ListId != addressListIdCopy {
+		addressList.ListId = addressListIdCopy
 	}
 
 	return addressList, nil
