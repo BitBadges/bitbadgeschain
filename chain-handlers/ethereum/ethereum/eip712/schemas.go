@@ -435,6 +435,8 @@ func GetSchemas() []string {
 								}
 							],
 							"approvalId": "",
+							"amountTrackerId": "",
+							"challengeTrackerId": "",
 							"permanentlyPermittedTimes": [
 								{
 									"start": "",
@@ -472,6 +474,8 @@ func GetSchemas() []string {
 								}
 							],
 							"approvalId": "",
+							"amountTrackerId": "",
+							"challengeTrackerId": "",
 							"permanentlyPermittedTimes": [
 								{
 									"start": "",
@@ -769,6 +773,8 @@ func GetSchemas() []string {
 							}
 						],
 						"approvalId": "",
+						"amountTrackerId": "",
+						"challengeTrackerId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
@@ -1311,6 +1317,8 @@ func GetSchemas() []string {
 							}
 						],
 						"approvalId": "",
+						"amountTrackerId": "",
+						"challengeTrackerId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
@@ -1348,6 +1356,8 @@ func GetSchemas() []string {
 							}
 						],
 						"approvalId": "",
+						"amountTrackerId": "",
+						"challengeTrackerId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
@@ -1697,6 +1707,8 @@ func GetSchemas() []string {
 								}
 							],
 						  "approvalId": "",
+							"amountTrackerId": "",
+							"challengeTrackerId": "",
 							"permanentlyPermittedTimes": [
 								{
 									"start": "",
@@ -1734,6 +1746,8 @@ func GetSchemas() []string {
 								}
 							],
 							"approvalId": "",
+							"amountTrackerId": "",
+							"challengeTrackerId": "",
 							"permanentlyPermittedTimes": [
 								{
 									"start": "",
@@ -2030,6 +2044,8 @@ func GetSchemas() []string {
 							}
 						],
 						"approvalId": "",
+						"amountTrackerId": "",
+						"challengeTrackerId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
@@ -2526,6 +2542,8 @@ func GetSchemas() []string {
 							}
 						],
 						"approvalId": "",
+						"amountTrackerId": "",
+						"challengeTrackerId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
