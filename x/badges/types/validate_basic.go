@@ -172,6 +172,11 @@ func ValidateAddressList(addressList *AddressList) error {
 		}
 	}
 
+	//check duplicate addresses
+	if duplicateInStringArray(addressList.Addresses) {
+		return ErrDuplicateAddresses
+	}
+
 	return nil
 }
 
@@ -208,7 +213,7 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 		}
 	}
 
-	for _, collectionApproval := range collectionApprovals {
+	for i, collectionApproval := range collectionApprovals {
 		if collectionApproval == nil {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "collection approved transfer is nil")
 		}
@@ -251,6 +256,17 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 			return sdkerrors.Wrapf(ErrInvalidRequest, "approval tracker id can not be All")
 		}
 
+		//assert the amount tracker ID is not the approval ID of another approval
+		for j, otherCollectionApproval := range collectionApprovals {
+			if i == j {
+				continue
+			}
+
+			if collectionApproval.AmountTrackerId == otherCollectionApproval.ApprovalId {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "approval tracker id can not be the approval id of another approval")
+			}
+		}
+
 		if strings.Contains(collectionApproval.AmountTrackerId, ":") || strings.Contains(collectionApproval.AmountTrackerId, "!") {
 			return sdkerrors.Wrapf(ErrIdsContainsInvalidChars, "approval tracker id can not contain : or !")
 		}
@@ -263,6 +279,17 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 			return sdkerrors.Wrapf(ErrInvalidRequest, "challenge tracker id can not be All")
 		}
 
+		//assert the challenge tracker ID is not the approval ID of another approval
+		for j, otherCollectionApproval := range collectionApprovals {
+			if i == j {
+				continue
+			}
+
+			if collectionApproval.ChallengeTrackerId == otherCollectionApproval.ApprovalId {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "challenge tracker id can not be the approval id of another approval")
+			}
+		}
+		
 		if strings.Contains(collectionApproval.ChallengeTrackerId, ":") || strings.Contains(collectionApproval.ChallengeTrackerId, "!") {
 			return sdkerrors.Wrapf(ErrIdsContainsInvalidChars, "challenge tracker id can not contain : or !")
 		}
