@@ -2598,6 +2598,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &deepCopy)
 
 	collectionsToCreate[0].CollectionApprovals[2].AmountTrackerId = "test2"
+	collectionsToCreate[0].CollectionApprovals[2].ChallengeTrackerId = "test2"
 	collectionsToCreate[0].CollectionApprovals[2].ApprovalId = "fasdfasdf"
 	collectionsToCreate[0].CollectionApprovals[2].ApprovalCriteria = &types.ApprovalCriteria{
 		MaxNumTransfers: &types.MaxNumTransfers{
@@ -2637,8 +2638,8 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 
 			OverridesFromOutgoingApprovals: true,
 			OverridesToIncomingApprovals:   true,
-		}, AmountTrackerId: "testing232",
-		ChallengeTrackerId: "testing232",
+		}, AmountTrackerId: "asadsdas",
+		ChallengeTrackerId: "asadsdas",
 		ApprovalId:         "asadsdas",
 
 		TransferTimes:        GetFullUintRanges(),
