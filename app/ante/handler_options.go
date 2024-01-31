@@ -11,6 +11,8 @@ import (
 
 	ibcante "github.com/cosmos/ibc-go/v7/modules/core/ante"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
+
+	wasmxkeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
 )
 
 // HandlerOptions extend the SDK's AnteHandler options by requiring the IBC
@@ -23,6 +25,9 @@ type HandlerOptions struct {
 	SignModeHandler authsigning.SignModeHandler
 	SigGasConsumer  func(meter sdk.GasMeter, sig signing.SignatureV2, params authtypes.Params) error
 	TxFeeChecker    ante.TxFeeChecker
+	WasmXKeeper			wasmxkeeper.Keeper
+
+	VerifyBtcSigPath  string
 }
 
 func (options HandlerOptions) Validate() error {
@@ -81,7 +86,7 @@ func newCosmosAnteHandlerEip712(options HandlerOptions, chain string) sdk.AnteHa
 
 		// Note: signature verification uses EIP instead of the cosmos signature validator
 		//This also accounts for Solana signatures
-		NewEip712SigVerificationDecorator(options.AccountKeeper, options.SignModeHandler, chain),
+		NewEip712SigVerificationDecorator(options.AccountKeeper, options.WasmXKeeper, options.SignModeHandler, chain, options.VerifyBtcSigPath),
 
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),

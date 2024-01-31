@@ -2,8 +2,11 @@ package ante
 
 import (
 	"crypto/ed25519"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"os/exec"
+	"strings"
 
 	sdkerrors "cosmossdk.io/errors"
 	"github.com/btcsuite/btcutil/base58"
@@ -32,7 +35,7 @@ import (
 	solana "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/utils"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-
+	wasmxkeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 )
 
@@ -54,16 +57,22 @@ func init() {
 // CONTRACT: Tx must implement SigVerifiableTx interface
 type Eip712SigVerificationDecorator struct {
 	ak              ante.AccountKeeper
+	wasmxKeeper     wasmxkeeper.Keeper
 	signModeHandler authsigning.SignModeHandler
 	chain           string
+	verifyBtcSigPath string
 }
 
 // NewEip712SigVerificationDecorator creates a new Eip712SigVerificationDecorator
-func NewEip712SigVerificationDecorator(ak ante.AccountKeeper, signModeHandler authsigning.SignModeHandler, chain string) Eip712SigVerificationDecorator {
+func NewEip712SigVerificationDecorator(ak ante.AccountKeeper,
+	wk wasmxkeeper.Keeper,
+	signModeHandler authsigning.SignModeHandler, chain string, verifyBtcSigPath string) Eip712SigVerificationDecorator {
 	return Eip712SigVerificationDecorator{
 		ak:              ak,
+		wasmxKeeper: 	 	 wk,
 		signModeHandler: signModeHandler,
 		chain:           chain,
+		verifyBtcSigPath: verifyBtcSigPath,
 	}
 }
 
@@ -146,7 +155,7 @@ func (svd Eip712SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx,
 		return next(ctx, tx, simulate)
 	}
 
-	if err := VerifySignature(pubKey, signerData, sig.Data, svd.signModeHandler, authSignTx, svd.chain); err != nil {
+	if err := VerifySignature(pubKey, signerData, sig.Data, svd.signModeHandler, authSignTx, svd.chain, svd.wasmxKeeper, ctx, svd.verifyBtcSigPath); err != nil {
 		errMsg := fmt.Errorf("signature verification failed; please verify account number (%d) and chain-id (%s): %w", accNum, chainID, err)
 		return ctx, sdkerrors.Wrap(types.ErrUnauthorized, errMsg.Error())
 	}
@@ -163,6 +172,9 @@ func VerifySignature(
 	_ authsigning.SignModeHandler,
 	tx authsigning.Tx,
 	chain string,
+	wk wasmxkeeper.Keeper,
+	ctx sdk.Context,
+	verifyBtcSigPath string,
 ) error {
 	switch data := sigData.(type) {
 	case *signing.SingleSignatureData:
@@ -319,10 +331,26 @@ func VerifySignature(
 			} else if chain == "Bitcoin" {
 				//verify bitcoin bip322 signature
 
-				//TODO:
-				
-				return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify signer signature of Bitcoin signature: not implemented")
-				
+				message := string(sortedBytes)
+				signature := hex.EncodeToString(feePayerSig)
+				address := feePayer.String()
+
+				scriptPath := verifyBtcSigPath + "/dist/verify.js"
+				output, err := exec.Command("node", scriptPath, message, signature, address).Output()
+				if err != nil {
+					return sdkerrors.Wrapf(err, "unable to verify signer signature of Bitcoin signature")
+				}
+			
+				// Process the output as needed, for example, splitting it into lines
+				lines := strings.Split(string(output), "\n")
+				if len(lines) < 1 {
+					return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify signer signature of Bitcoin signature")
+				}
+
+				verified := string(lines[0]) == "true"
+				if !verified {
+					return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify signer signature of Bitcoin signature")
+				}
 			}
 
 			return nil

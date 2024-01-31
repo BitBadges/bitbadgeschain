@@ -227,7 +227,7 @@ func init() {
 		panic(err)
 	}
 
-	DefaultNodeHome = filepath.Join(userHomeDir, "."+Name)
+	DefaultNodeHome = filepath.Join(userHomeDir, "." + Name)
 }
 
 // App extends an ABCI application, but with most of its parameters exported.
@@ -858,6 +858,8 @@ func New(
 		IBCKeeper:       app.IBCKeeper,
 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 		SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
+		WasmXKeeper: 		 app.WasmxKeeper,
+		VerifyBtcSigPath: homePath + "/bip322-js",
 	}
 
 	if err := options.Validate(); err != nil {
