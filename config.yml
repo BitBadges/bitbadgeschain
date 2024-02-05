@@ -17,36 +17,22 @@ accounts:
 - name: alice
   coins:
   - 200000000badge
+  - 2000000000stake
 - name: bob
   coins:
-  - 100000000badge
+  - 10000000000badge
+  - 100000000000000stake
   address: cosmos1kx9532ujful8vgg2dht6k544ax4k9qzszjcw04
 - name: charlie
   coins:
   - 100000000badge
-faucet:
-  name: alice
-  coins:
-  - 100000badge
-  host: 0.0.0.0:4500
 client:
   typescript:
     path: ts-client
   openapi:
     path: docs/static/openapi.yml
 genesis:
-  app_state:
-    staking:
-      params:
-        bond_denom: badge
   chain_id: bitbadges_1-2
-  
 validators:
 - name: alice
-  bonded: 100000000badge
-  config:
-      consensus:
-        timeout_commit: "1s"
-        timeout_propose: "1s"
-
-# set block time
+  bonded: 100000000stake

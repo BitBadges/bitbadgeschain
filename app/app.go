@@ -830,6 +830,7 @@ func New(
 	app.mm.RegisterInvariants(app.CrisisKeeper)
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterServices(app.configurator)
+	
 
 	autocliv1.RegisterQueryServer(app.GRPCQueryRouter(), runtimeservices.NewAutoCLIQueryService(app.mm.Modules))
 	reflectionSvc, err := runtimeservices.NewReflectionService()
@@ -876,6 +877,7 @@ func New(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
+	app.setupUpgradeHandlers()
 
 	if manager := app.SnapshotManager(); manager != nil {
 		err := manager.RegisterExtensions(
@@ -905,6 +907,10 @@ func New(
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 
 	return app
+}
+
+func (app *App) setupUpgradeHandlers() {
+	//see https://tutorials.cosmos.network/hands-on-exercise/4-run-in-prod/2-migration-info.html#callback-in-app
 }
 
 // Name returns the name of the App
