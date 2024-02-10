@@ -8,7 +8,6 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/wasmx/types";
 // Msg defines the wasmx Msg service.
 service Msg {
   rpc ExecuteContractCompat(MsgExecuteContractCompat) returns (MsgExecuteContractCompatResponse);
-  rpc StoreCodeCompat(MsgStoreCodeCompat) returns (MsgStoreCodeCompatResponse);
   rpc InstantiateContractCompat(MsgInstantiateContractCompat) returns (MsgInstantiateContractCompatResponse);
 }
 
@@ -28,22 +27,6 @@ message MsgExecuteContractCompat {
 message MsgExecuteContractCompatResponse {
     // Data contains bytes to returned from the contract
     bytes data = 1;
-}
-
-// MsgStoreCodeCompat submits the given message data to a smart contract, compatible with EIP712
-message MsgStoreCodeCompat {
-  // Sender is the that actor that signed the messages
-  string sender = 1;
-  // WasmByteCode is the raw wasm bytes
-  string hexWasmByteCode = 2;
-}
-
-// MsgStoreCodeCompatResponse returns store result data.
-message MsgStoreCodeCompatResponse {
-  // CodeID is the reference to the stored WASM code
-  string codeId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  // Checksum is the sha256 hash of the stored code
-  bytes checksum = 2;
 }
 
 message MsgInstantiateContractCompat {

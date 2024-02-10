@@ -6,7 +6,6 @@ import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 
 	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 )
@@ -52,29 +51,6 @@ func (m msgServer) ExecuteContractCompat(goCtx context.Context, msg *types.MsgEx
 	}, nil
 }
 
-func (m msgServer) StoreCodeCompat(goCtx context.Context, msg *types.MsgStoreCodeCompat) (*types.MsgStoreCodeCompatResponse, error) {
-	wasmMsgServer := wasmkeeper.NewMsgServerImpl(&m.wasmKeeper)
-
-	oMsg := &wasmtypes.MsgStoreCode{
-		Sender:   msg.Sender,
-		WASMByteCode: hexutil.MustDecode(msg.HexWasmByteCode),
-		InstantiatePermission: &wasmtypes.AccessConfig{
-			Permission: wasmtypes.AccessTypeEverybody,
-			Addresses: []string{},
-		},
-	}
-
-	res, err := wasmMsgServer.StoreCode(goCtx, oMsg)
-	if err != nil {
-		return nil, err
-	}
-
-	return &types.MsgStoreCodeCompatResponse{
-		CodeId: sdk.NewUint(res.CodeID),
-		Checksum: res.Checksum,
-	}, nil
-}
-
 func (m msgServer) InstantiateContractCompat(goCtx context.Context, msg *types.MsgInstantiateContractCompat) (*types.MsgInstantiateContractCompatResponse, error) {
 	wasmMsgServer := wasmkeeper.NewMsgServerImpl(&m.wasmKeeper)
 	funds := sdk.Coins{}
@@ -90,7 +66,7 @@ func (m msgServer) InstantiateContractCompat(goCtx context.Context, msg *types.M
 		CodeID: msg.CodeId.Uint64(),
 		Label: 	msg.Label,
 		Funds: 	funds,
-		Msg: 			bytesMsg,
+		Msg: 		bytesMsg,
 	}
 
 	res, err := wasmMsgServer.InstantiateContract(goCtx, oMsg)
