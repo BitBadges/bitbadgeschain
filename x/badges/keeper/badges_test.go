@@ -263,3 +263,86 @@ func (suite *TestSuite) TestCreateBadgesIdGreaterThanMax() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Error(err, "Error creating badge: %s")
 }
+
+
+func (suite *TestSuite) TestDuplicateBadgeIDs() {
+	// wctx := sdk.WrapSDKContext(suite.ctx)
+
+	currBalances := []*types.Balance{
+		{
+			Amount:         sdkmath.NewUint(1),
+			BadgeIds:       []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(2),
+					End:   sdkmath.NewUint(1000),
+				},
+			},
+			OwnershipTimes: GetFullUintRanges(),
+		},
+		{
+			Amount:         sdkmath.NewUint(2),
+			BadgeIds:       GetOneUintRange(),
+			OwnershipTimes: GetFullUintRanges(),
+		},
+	}	
+
+	currBalances, err := types.SubtractBalance(currBalances, &types.Balance{
+		Amount:         sdkmath.NewUint(1),
+		BadgeIds:       GetOneUintRange(),
+		OwnershipTimes: GetFullUintRanges(),
+	}, false)
+	suite.Require().Nil(err, "Error subtracting balances: %s")
+
+	suite.Require().Equal(1, len(currBalances))
+	suite.Require().Equal(sdkmath.NewUint(1), currBalances[0].Amount)
+	suite.Require().Equal(sdkmath.NewUint(1), currBalances[0].BadgeIds[0].Start)
+	suite.Require().Equal(sdkmath.NewUint(1000), currBalances[0].BadgeIds[0].End)
+	suite.Require().Equal(1, len(currBalances[0].BadgeIds))
+}
+
+func (suite *TestSuite) TestBadgeIdsWeirdJSThing() {
+	// wctx := sdk.WrapSDKContext(suite.ctx)
+
+	currBalances := []*types.Balance{
+		{
+			Amount:         sdkmath.NewUint(1),
+			BadgeIds:       []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:   sdkmath.NewUint(10000),
+				},
+			},
+			OwnershipTimes: GetFullUintRanges(),
+		},
+	}	
+
+	currBalances, err := types.SubtractBalance(currBalances, &types.Balance{
+		Amount:         sdkmath.NewUint(1),
+		BadgeIds:       []*types.UintRange{
+			{
+				Start: sdkmath.NewUint(2),
+				End:   sdkmath.NewUint(2),
+			},
+		},
+		OwnershipTimes: GetFullUintRanges(),
+	}, false)
+	suite.Require().Nil(err, "Error subtracting balances: %s")
+
+	currBalances, err = types.SubtractBalance(currBalances, &types.Balance{
+		Amount:         sdkmath.NewUint(1),
+		BadgeIds:       []*types.UintRange{
+			{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+		},
+		OwnershipTimes: GetFullUintRanges(),
+	}, false)
+	suite.Require().Nil(err, "Error subtracting balances: %s")
+
+	suite.Require().Equal(1, len(currBalances))
+	suite.Require().Equal(sdkmath.NewUint(1), currBalances[0].Amount)
+	suite.Require().Equal(sdkmath.NewUint(3), currBalances[0].BadgeIds[0].Start)
+	suite.Require().Equal(sdkmath.NewUint(10000), currBalances[0].BadgeIds[0].End)
+	suite.Require().Equal(1, len(currBalances[0].BadgeIds))
+}
