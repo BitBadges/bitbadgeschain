@@ -35,14 +35,16 @@ func (msg *MsgUniversalUpdateCollection) GetSigners() []sdk.AccAddress {
 
 func (msg *MsgUniversalUpdateCollection) GetSignBytes() []byte {
 	bz := AminoCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	sorted := sdk.MustSortJSON(bz)
+
+	return sorted
 }
 
 func (msg *MsgUniversalUpdateCollection) ValidateBasic() error {
-	return msg.CheckAndCleanMsg(false)
+	return msg.CheckAndCleanMsg(sdk.Context{}, false)
 }
 
-func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(canChangeValues bool) error {
+func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canChangeValues bool) error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
@@ -52,13 +54,14 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(canChangeValues bool) 
 		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
 	}
 
+
 	if msg.BadgesToCreate != nil {
-		msg.BadgesToCreate, err = ValidateBalances(msg.BadgesToCreate, canChangeValues)
+		msg.BadgesToCreate, err = ValidateBalances(ctx, msg.BadgesToCreate, canChangeValues)
 		if err != nil {
 			return err
 		}
 	}
-
+	
 	if err := ValidateIsArchivedTimeline(msg.IsArchivedTimeline); err != nil {
 		return err
 	}
@@ -75,7 +78,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(canChangeValues bool) 
 		return err
 	}
 
-	if err := ValidateCollectionApprovals(msg.CollectionApprovals, canChangeValues); err != nil {
+	if err := ValidateCollectionApprovals(ctx, msg.CollectionApprovals, canChangeValues); err != nil {
 		return err
 	}
 
@@ -112,15 +115,15 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(canChangeValues bool) 
 	}
 
 
-	if _, err := ValidateBalances(msg.DefaultBalances.Balances, canChangeValues); err != nil {
+	if _, err := ValidateBalances(ctx, msg.DefaultBalances.Balances, canChangeValues); err != nil {
 		return err
 	}
 
-	if err := ValidateUserIncomingApprovals(msg.DefaultBalances.IncomingApprovals, msg.Creator, canChangeValues); err != nil {
+	if err := ValidateUserIncomingApprovals(ctx, msg.DefaultBalances.IncomingApprovals, msg.Creator, canChangeValues); err != nil {
 		return err
 	}
 
-	if err := ValidateUserOutgoingApprovals(msg.DefaultBalances.OutgoingApprovals, msg.Creator, canChangeValues); err != nil {
+	if err := ValidateUserOutgoingApprovals(ctx, msg.DefaultBalances.OutgoingApprovals, msg.Creator, canChangeValues); err != nil {
 		return err
 	}
 

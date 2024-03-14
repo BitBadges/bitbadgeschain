@@ -9,13 +9,11 @@ import (
 )
 
 func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferBadges) (*types.MsgTransferBadgesResponse, error) {
-	err := msg.CheckAndCleanMsg(true)
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	err := msg.CheckAndCleanMsg(ctx, true)
 	if err != nil {
 		return nil, err
 	}
-
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
 	collectionId := msg.CollectionId
 	if collectionId.Equal(sdk.NewUint(0)) {
 		//Get next collection id - 1 from badges keeper

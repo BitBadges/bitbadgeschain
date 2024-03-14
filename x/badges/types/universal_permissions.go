@@ -6,6 +6,7 @@ import (
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 //TODO: This file should probably be refactored a lot, but it currently works.
@@ -76,7 +77,7 @@ type Overlap struct {
 	SecondDetails *UniversalPermissionDetails
 }
 
-func GetOverlapsAndNonOverlaps(firstDetails []*UniversalPermissionDetails, secondDetails []*UniversalPermissionDetails) ([]*Overlap, []*UniversalPermissionDetails, []*UniversalPermissionDetails) {
+func GetOverlapsAndNonOverlaps(ctx sdk.Context,	firstDetails []*UniversalPermissionDetails, secondDetails []*UniversalPermissionDetails) ([]*Overlap, []*UniversalPermissionDetails, []*UniversalPermissionDetails) {
 	//TODO: deep copy???
 	inOldButNotNew := make([]*UniversalPermissionDetails, len(firstDetails))
 	copy(inOldButNotNew, firstDetails)
@@ -84,30 +85,33 @@ func GetOverlapsAndNonOverlaps(firstDetails []*UniversalPermissionDetails, secon
 	copy(inNewButNotOld, secondDetails)
 
 	allOverlaps := []*Overlap{}
-
 	for _, oldPermission := range firstDetails {
 		for _, newPermission := range secondDetails {
-			_, overlaps := UniversalRemoveOverlaps(newPermission, oldPermission)
+			_, overlaps := UniversalRemoveOverlaps(ctx, newPermission, oldPermission)
+			// fmt.Println("UniversalRemoveOverlaps", time.Since(startTime))
 			for _, overlap := range overlaps {
 				allOverlaps = append(allOverlaps, &Overlap{
 					Overlap:       overlap,
 					FirstDetails:  oldPermission,
 					SecondDetails: newPermission,
 				})
-				inOldButNotNew, _ = UniversalRemoveOverlapFromValues(overlap, inOldButNotNew)
-				inNewButNotOld, _ = UniversalRemoveOverlapFromValues(overlap, inNewButNotOld)
 			}
 		}
+	}
+
+	for _, overlap := range allOverlaps {
+		inOldButNotNew, _ = UniversalRemoveOverlapFromValues(ctx, overlap.Overlap, inOldButNotNew)
+		inNewButNotOld, _ = UniversalRemoveOverlapFromValues(ctx, overlap.Overlap, inNewButNotOld)
 	}
 
 	return allOverlaps, inOldButNotNew, inNewButNotOld
 }
 
-func UniversalRemoveOverlapFromValues(handled *UniversalPermissionDetails, valuesToCheck []*UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
+func UniversalRemoveOverlapFromValues(ctx sdk.Context, handled *UniversalPermissionDetails, valuesToCheck []*UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
 	newValuesToCheck := []*UniversalPermissionDetails{}
 	removed := []*UniversalPermissionDetails{}
 	for _, valueToCheck := range valuesToCheck {
-		remaining, overlaps := UniversalRemoveOverlaps(handled, valueToCheck)
+		remaining, overlaps := UniversalRemoveOverlaps(ctx, handled, valueToCheck)
 		newValuesToCheck = append(newValuesToCheck, remaining...)
 		removed = append(removed, overlaps...)
 	}
@@ -119,12 +123,38 @@ func IsAddressListEmpty(list *AddressList) bool {
 	return len(list.Addresses) == 0 && list.Whitelist
 }
 
-func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
-	timelineTimesAfterRemoval, removedTimelineTimes := RemoveUintRangeFromUintRange(handled.TimelineTime, valueToCheck.TimelineTime)
-	badgesAfterRemoval, removedBadges := RemoveUintRangeFromUintRange(handled.BadgeId, valueToCheck.BadgeId)
-	transferTimesAfterRemoval, removedTransferTimes := RemoveUintRangeFromUintRange(handled.TransferTime, valueToCheck.TransferTime)
-	ownershipTimesAfterRemoval, removedOwnershipTimes := RemoveUintRangeFromUintRange(handled.OwnershipTime, valueToCheck.OwnershipTime)
+func UniversalRemoveOverlaps(ctx sdk.Context, handled *UniversalPermissionDetails, valueToCheck *UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
+	if !ctx.IsZero() {
+		ctx.GasMeter().ConsumeGas(500, "UniversalRemoveOverlaps")
+	}
 
+	remaining := []*UniversalPermissionDetails{}
+
+	timelineTimesAfterRemoval, removedTimelineTimes := RemoveUintRangeFromUintRange(handled.TimelineTime, valueToCheck.TimelineTime)
+	if len(removedTimelineTimes) == 0 {
+		remaining = append(remaining, valueToCheck)
+		return remaining, []*UniversalPermissionDetails{}
+	}
+
+
+	badgesAfterRemoval, removedBadges := RemoveUintRangeFromUintRange(handled.BadgeId, valueToCheck.BadgeId)
+	if len(removedBadges) == 0 {
+		remaining = append(remaining, valueToCheck)
+		return remaining, []*UniversalPermissionDetails{}
+	}
+	
+	transferTimesAfterRemoval, removedTransferTimes := RemoveUintRangeFromUintRange(handled.TransferTime, valueToCheck.TransferTime)
+	if len(removedTransferTimes) == 0 {
+		remaining = append(remaining, valueToCheck)
+		return remaining, []*UniversalPermissionDetails{}
+	}
+	
+	ownershipTimesAfterRemoval, removedOwnershipTimes := RemoveUintRangeFromUintRange(handled.OwnershipTime, valueToCheck.OwnershipTime)
+	if len(removedOwnershipTimes) == 0 {
+		remaining = append(remaining, valueToCheck)
+		return remaining, []*UniversalPermissionDetails{}
+	}
+	
 	toListAfterRemoval, removedToList := RemoveAddressListFromAddressList(handled.ToList, valueToCheck.ToList)
 	fromListAfterRemoval, removedFromList := RemoveAddressListFromAddressList(handled.FromList, valueToCheck.FromList)
 	initiatedByListAfterRemoval, removedInitiatedByList := RemoveAddressListFromAddressList(handled.InitiatedByList, valueToCheck.InitiatedByList)
@@ -159,8 +189,7 @@ func UniversalRemoveOverlaps(handled *UniversalPermissionDetails, valueToCheck *
 	//							 We optimize step 3) by checking right away if something does not overlap with some field. If it does not overlap with some field,
 	//							 we can just add the original values and be done with it. If it does overlap with all fields, we need to execute the algorithm
 
-	remaining := []*UniversalPermissionDetails{}
-
+	
 	//If some field does not overlap, we simply end up with the original values because it is only considered an overlap if all fields overlap.
 	//The function would work fine without this but it makes it more efficient and less complicated because it will not get broken down further
 	if len(removedTimelineTimes) == 0 || len(removedBadges) == 0 || len(removedTransferTimes) == 0 || len(removedOwnershipTimes) == 0 || !toListRemoved || !fromListRemoved || !initiatedByListRemoved || !approvalIdListRemoved || !amountTrackerIdListRemoved || !challengeTrackerIdListRemoved {
@@ -437,7 +466,7 @@ func ApplyManipulations(permissions []*UniversalPermission) []*UniversalPermissi
 	return handled
 }
 
-func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissionDetails {
+func GetFirstMatchOnly(ctx sdk.Context, permissions []*UniversalPermission) []*UniversalPermissionDetails {
 	handled := []*UniversalPermissionDetails{}
 	for _, permission := range permissions {
 
@@ -476,7 +505,7 @@ func GetFirstMatchOnly(permissions []*UniversalPermission) []*UniversalPermissio
 							},
 						}
 
-						_, inBrokenDownButNotHandled, _ := GetOverlapsAndNonOverlaps(brokenDown, handled)
+						_, inBrokenDownButNotHandled, _ := GetOverlapsAndNonOverlaps(ctx, brokenDown, handled)
 						for _, remaining := range inBrokenDownButNotHandled {
 							handled = append(handled, &UniversalPermissionDetails{
 								TimelineTime:              remaining.TimelineTime,
@@ -581,8 +610,8 @@ func GetPermissionString(permission *UniversalPermissionDetails) string {
 }
 
 // IMPORTANT PRECONDITION: Must be first match only
-func ValidateUniversalPermissionUpdate(oldPermissions []*UniversalPermissionDetails, newPermissions []*UniversalPermissionDetails) error {
-	allOverlaps, inOldButNotNew, _ := GetOverlapsAndNonOverlaps(oldPermissions, newPermissions) //we don't care about new not in old
+func ValidateUniversalPermissionUpdate(ctx sdk.Context, oldPermissions []*UniversalPermissionDetails, newPermissions []*UniversalPermissionDetails) error {
+	allOverlaps, inOldButNotNew, _ := GetOverlapsAndNonOverlaps(ctx,  oldPermissions, newPermissions) //we don't care about new not in old
 
 	if len(inOldButNotNew) > 0 {
 		errMsg := "permission "

@@ -20,10 +20,17 @@ func SimulateMsgCreateAddressLists(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgCreateAddressLists{
 			Creator: simAccount.Address.String(),
+			AddressLists: []*types.AddressList{
+				{
+					Addresses: []string{ simAccount.Address.String() },
+					Uri: "",
+					CustomData: "",
+					ListId: simtypes.RandStringOfLength(r, 10),
+					CreatedBy: simAccount.Address.String(),
+				},
+			},
 		}
 
-		// TODO: Handling the CreateAddressLists simulation
-
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "CreateAddressLists simulation not implemented"), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
 	}
 }

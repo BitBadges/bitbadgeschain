@@ -149,12 +149,12 @@ func (k Keeper) HandleTransfer(ctx sdk.Context, collection *types.BadgeCollectio
 	}
 
 	for _, balance := range transferBalances {
-		fromUserBalance.Balances, err = types.SubtractBalance(fromUserBalance.Balances, balance, false)
+		fromUserBalance.Balances, err = types.SubtractBalance(ctx, fromUserBalance.Balances, balance, false)
 		if err != nil {
 			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "inadequate balances for transfer from %s", from)
 		}
 
-		toUserBalance.Balances, err = types.AddBalance(toUserBalance.Balances, balance)
+		toUserBalance.Balances, err = types.AddBalance(ctx, toUserBalance.Balances, balance)
 		if err != nil {
 			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 		}

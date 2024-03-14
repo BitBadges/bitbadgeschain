@@ -30,7 +30,7 @@ func GetUpdateCombinationsToCheck(
 ) ([]*types.UniversalPermissionDetails, error) {
 	detailsToCheck := []*types.UniversalPermissionDetails{}
 
-	overlapObjects, inOldButNotNew, inNewButNotOld := types.GetOverlapsAndNonOverlaps(firstMatchesForOld, firstMatchesForNew)
+	overlapObjects, inOldButNotNew, inNewButNotOld := types.GetOverlapsAndNonOverlaps(ctx, firstMatchesForOld, firstMatchesForNew)
 
 	//Handle all old combinations that are not in the new (by comparing to empty value)
 	for _, detail := range inOldButNotNew {
@@ -121,7 +121,7 @@ func (k Keeper) CheckIfActionPermissionPermits(ctx sdk.Context, permissions []*t
 		return err
 	}
 
-	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
+	permissionDetails := types.GetFirstMatchOnly(ctx, castedPermissions)
 
 	//In this case we only care about the first match since we have no extra criteria
 	for _, permissionDetail := range permissionDetails {
@@ -140,7 +140,7 @@ func (k Keeper) CheckIfTimedUpdatePermissionPermits(ctx sdk.Context, detailsToCh
 		return err
 	}
 
-	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
+	permissionDetails := types.GetFirstMatchOnly(ctx, castedPermissions)
 
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
@@ -151,7 +151,7 @@ func (k Keeper) CheckIfBalancesActionPermissionPermits(ctx sdk.Context, detailsT
 		return err
 	}
 
-	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
+	permissionDetails := types.GetFirstMatchOnly(ctx, castedPermissions)
 
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
@@ -162,7 +162,7 @@ func (k Keeper) CheckIfTimedUpdateWithBadgeIdsPermissionPermits(ctx sdk.Context,
 		return err
 	}
 
-	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
+	permissionDetails := types.GetFirstMatchOnly(ctx, castedPermissions)
 
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
@@ -173,7 +173,7 @@ func (k Keeper) CheckIfCollectionApprovalPermissionPermits(ctx sdk.Context, deta
 		return err
 	}
 
-	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
+	permissionDetails := types.GetFirstMatchOnly(ctx, castedPermissions)
 
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
@@ -184,7 +184,7 @@ func (k Keeper) CheckIfUserOutgoingApprovalPermissionPermits(ctx sdk.Context, de
 		return err
 	}
 
-	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
+	permissionDetails := types.GetFirstMatchOnly(ctx, castedPermissions)
 
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
@@ -195,7 +195,7 @@ func (k Keeper) CheckIfUserIncomingApprovalPermissionPermits(ctx sdk.Context, de
 		return err
 	}
 
-	permissionDetails := types.GetFirstMatchOnly(castedPermissions)
+	permissionDetails := types.GetFirstMatchOnly(ctx, castedPermissions)
 
 	return CheckNotForbiddenForAllOverlaps(ctx, permissionDetails, detailsToCheck, permissionStr)
 }
@@ -249,7 +249,7 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, permissionDetails []*types
 	//If we find a match for some timeline time, we check that the current time is not forbidden
 	for _, permissionDetail := range permissionDetails {
 		for _, detailToCheck := range detailsToCheck {
-			_, overlap := types.UniversalRemoveOverlaps(permissionDetail, detailToCheck)
+			_, overlap := types.UniversalRemoveOverlaps(ctx, permissionDetail, detailToCheck)
 			if len(overlap) > 0 {
 				err := CheckNotForbidden(ctx, permissionDetail, permissionStr) //permanentlyForbiddenTimes and permanentlyPermittedTimes are stored in here
 				if err != nil {

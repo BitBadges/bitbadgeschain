@@ -15,13 +15,14 @@ import (
 )
 
 func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.MsgUniversalUpdateCollection) (*types.MsgUniversalUpdateCollectionResponse, error) {
-	err := msg.CheckAndCleanMsg(true)
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	err := msg.CheckAndCleanMsg(ctx, true)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
+	
 	collection := &types.BadgeCollection{}
 	if msg.CollectionId.Equal(sdkmath.NewUint(0)) {
 		nextCollectionId := k.GetNextCollectionId(ctx)

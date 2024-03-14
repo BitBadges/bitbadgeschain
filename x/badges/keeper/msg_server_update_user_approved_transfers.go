@@ -8,13 +8,11 @@ import (
 )
 
 func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpdateUserApprovals) (*types.MsgUpdateUserApprovalsResponse, error) {
-	err := msg.CheckAndCleanMsg(true)
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	err := msg.CheckAndCleanMsg(ctx, true)
 	if err != nil {
 		return nil, err
 	}
-
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
 	if !found {
 		return nil, ErrCollectionNotExists

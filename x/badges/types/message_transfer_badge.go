@@ -39,7 +39,7 @@ func (msg *MsgTransferBadges) GetSignBytes() []byte {
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgTransferBadges) CheckAndCleanMsg(canChangeValues bool) error {
+func (msg *MsgTransferBadges) CheckAndCleanMsg(ctx sdk.Context, canChangeValues bool) error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
@@ -50,7 +50,7 @@ func (msg *MsgTransferBadges) CheckAndCleanMsg(canChangeValues bool) error {
 	}
 
 	for _, transfer := range msg.Transfers {
-		err = ValidateTransfer(transfer, canChangeValues)
+		err = ValidateTransfer(ctx, transfer, canChangeValues)
 		if err != nil {
 			return err
 		}
@@ -60,5 +60,5 @@ func (msg *MsgTransferBadges) CheckAndCleanMsg(canChangeValues bool) error {
 }
 
 func (msg *MsgTransferBadges) ValidateBasic() error {
-	return msg.CheckAndCleanMsg(false)
+	return msg.CheckAndCleanMsg(sdk.Context{}, false)
 }

@@ -51,7 +51,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		},
 	}
 
-	balances, err = types.UpdateBalance(&types.Balance{
+	balances, err = types.UpdateBalance(suite.ctx, &types.Balance{
 		BadgeIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -63,7 +63,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 	}, balances)
 	suite.Require().Nil(err, "Error updating balances: %s")
 
-	fetchedBalances, err := types.GetBalancesForIds([]*types.UintRange{
+	fetchedBalances, err := types.GetBalancesForIds(suite.ctx, []*types.UintRange{
 		{
 			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(1),
@@ -85,7 +85,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 	})
 	AssertBalancesEqual(suite, balances, fetchedBalances)
 
-	fetchedBalances, err = types.GetBalancesForIds([]*types.UintRange{
+	fetchedBalances, err = types.GetBalancesForIds(suite.ctx, []*types.UintRange{
 		{
 			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(1),
@@ -106,7 +106,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		},
 	})
 
-	fetchedBalances, err = types.GetBalancesForIds([]*types.UintRange{
+	fetchedBalances, err = types.GetBalancesForIds(suite.ctx, []*types.UintRange{
 		{
 			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(2),
@@ -137,7 +137,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		},
 	})
 
-	fetchedBalances, err = types.GetBalancesForIds([]*types.UintRange{
+	fetchedBalances, err = types.GetBalancesForIds(suite.ctx, []*types.UintRange{
 		{
 			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(math.MaxUint64),
@@ -168,7 +168,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		},
 	})
 
-	fetchedBalances, err = types.GetBalancesForIds([]*types.UintRange{
+	fetchedBalances, err = types.GetBalancesForIds(suite.ctx, []*types.UintRange{
 		{
 			Start: sdkmath.NewUint(3),
 			End:   sdkmath.NewUint(math.MaxUint64),
@@ -207,7 +207,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		},
 	})
 
-	balances, err = types.UpdateBalance(&types.Balance{
+	balances, err = types.UpdateBalance(suite.ctx, &types.Balance{
 		BadgeIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -239,7 +239,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		// },
 	})
 
-	balances, err = types.UpdateBalance(&types.Balance{
+	balances, err = types.UpdateBalance(suite.ctx, &types.Balance{
 		BadgeIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(2),
@@ -271,7 +271,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		// },
 	})
 
-	balances, err = types.UpdateBalance(&types.Balance{
+	balances, err = types.UpdateBalance(suite.ctx, &types.Balance{
 		BadgeIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(2),
@@ -342,6 +342,231 @@ func (suite *TestSuite) TestDefaultBalances() {
 	})
 }
 
+func (suite *TestSuite) TestWeirdJSSDKThing() {
+	err := UpdateCollection(suite, suite.ctx, &types.MsgUniversalUpdateCollection{
+		CollectionId: sdkmath.NewUint(0),
+		Creator:      alice,
+		ManagerTimeline: []*types.ManagerTimeline{},
+		BalancesType: "Standard",
+		BadgesToCreate: []*types.Balance{
+			{
+				Amount: 			 sdkmath.NewUint(71),
+				BadgeIds: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(1),
+						End:   sdkmath.NewUint(72),
+					},
+				},
+				OwnershipTimes: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(54),
+						End:   sdkmath.NewUint(150),
+					},
+				},
+			},
+			{
+				Amount: 			 sdkmath.NewUint(45),
+				BadgeIds: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(85),
+						End:   sdkmath.NewUint(99),
+					},
+				},
+				OwnershipTimes: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(1),
+						End:   sdkmath.NewUint(19),
+					},
+				},
+			},
+			{
+				Amount: 			 sdkmath.NewUint(80),
+				BadgeIds: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(37),
+						End:   sdkmath.NewUint(42),
+					},
+				},
+				OwnershipTimes: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(1),
+						End:   sdkmath.NewUint(35),
+					},
+				},
+			},
+			{
+				Amount: 			 sdkmath.NewUint(99),
+				BadgeIds: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(1),
+						End:   sdkmath.NewUint(9),
+					},
+				},
+				OwnershipTimes: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(72),
+						End:   sdkmath.NewUint(76),
+					},
+				},
+			},
+			{
+				Amount: 			 sdkmath.NewUint(14),
+				BadgeIds: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(11),
+						End:   sdkmath.NewUint(25),
+					},
+				},
+				OwnershipTimes: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(15),
+						End:   sdkmath.NewUint(110),
+					},
+				},
+			},
+			{
+				Amount: 			 sdkmath.NewUint(70),
+				BadgeIds: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(9),
+						End:   sdkmath.NewUint(88),
+					},
+				},
+				OwnershipTimes: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(74),
+						End:   sdkmath.NewUint(89),
+					},
+				},
+			},
+			{
+				Amount: 			 sdkmath.NewUint(49),
+				BadgeIds: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(1),
+						End:   sdkmath.NewUint(24),
+					},
+				},
+				OwnershipTimes: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(12),
+						End:   sdkmath.NewUint(64),
+					},
+				},
+			},
+			{
+				Amount: 			 sdkmath.NewUint(70),
+				BadgeIds: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(1),
+						End:   sdkmath.NewUint(78),
+					},
+				},
+				OwnershipTimes: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(1),
+						End:   sdkmath.NewUint(56),
+					},
+				},
+			},
+			{
+				Amount: 			 sdkmath.NewUint(66),
+				BadgeIds: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(1),
+						End:   sdkmath.NewUint(80),
+					},
+				},
+				OwnershipTimes: []*types.UintRange{
+					{
+						Start: sdkmath.NewUint(64),
+						End:   sdkmath.NewUint(127),
+					},
+				},
+			},
+		},
+		DefaultBalances: &types.UserBalanceStore{		},
+	})
+	suite.Require().Nil(err, "Error updating collection: %s")
+
+	bal, err := GetUserBalance(suite, suite.ctx, sdkmath.NewUint(1), "Mint")
+	suite.Require().Nil(err, "Error getting user balance: %s")
+
+	for _, balance := range bal.Balances {
+		//json
+		println(balance.String())
+	}
+
+
+	fetchedBalances, _ := types.GetBalancesForIds(suite.ctx, []*types.UintRange{	
+		{
+			Start: sdkmath.NewUint(26),
+			End:   sdkmath.NewUint(72),
+		},
+	}, []*types.UintRange{
+		{
+			Start: sdkmath.NewUint(90),
+			End:   sdkmath.NewUint(127),
+		},
+	}, bal.Balances)
+
+	AssertBalancesEqual(suite, fetchedBalances, []*types.Balance{
+		{
+			Amount: 			 sdkmath.NewUint(137),
+			OwnershipTimes: []*types.UintRange{	
+				{
+					Start: sdkmath.NewUint(90),
+					End:   sdkmath.NewUint(127),
+				},
+			},
+			BadgeIds: 		[]*types.UintRange{	
+				{
+					Start: sdkmath.NewUint(26),
+					End:   sdkmath.NewUint(72),
+				},
+			},
+		},
+	})
+}
+
+func (suite *TestSuite) TestBruteForcedBalances() {
+	badgesToCreate := []*types.Balance{}
+	for i := 0; i < 100; i++ {
+		start := (uint64(rand.Intn(100) + 1))
+		if i == 0 {
+			start = 1
+		}
+		end := (uint64(100 + rand.Intn(100)))
+
+		badgesToCreate = append(badgesToCreate, &types.Balance{
+			Amount: 			 sdkmath.NewUint(rand.Uint64()),
+			BadgeIds: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(start),
+					End:   sdkmath.NewUint(end),
+				},
+			},
+			OwnershipTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:   sdkmath.NewUint(100),
+				},
+			},
+		})
+	}
+
+	err := UpdateCollection(suite, suite.ctx, &types.MsgUniversalUpdateCollection{
+		CollectionId: sdkmath.NewUint(0),
+		Creator:      alice,
+		ManagerTimeline: []*types.ManagerTimeline{},
+		BalancesType: "Standard",
+		BadgesToCreate: badgesToCreate,
+		DefaultBalances: &types.UserBalanceStore{		},
+	})
+	suite.Require().Nil(err, "Error updating collection: %s")
+}
+
+
 
 // Adjust these values to test more or less
 const NUM_RUNS = 1
@@ -367,7 +592,7 @@ func (suite *TestSuite) TestBalancesFuzz() {
 			amount := sdkmath.NewUint(uint64(rand.Intn(100)))
 			err := *new(error)
 
-			userBalance.Balances, err = types.AddBalance(userBalance.Balances, &types.Balance{
+			userBalance.Balances, err = types.AddBalance(suite.ctx, userBalance.Balances, &types.Balance{
 				Amount: amount,
 				BadgeIds: []*types.UintRange{
 					{
@@ -396,7 +621,7 @@ func (suite *TestSuite) TestBalancesFuzz() {
 
 			userBalancesCopy := types.DeepCopyBalances(userBalance.Balances)
 
-			userBalance.Balances, err = types.SubtractBalance(userBalance.Balances, &types.Balance{
+			userBalance.Balances, err = types.SubtractBalance(suite.ctx, userBalance.Balances, &types.Balance{
 				Amount: amount,
 				BadgeIds: []*types.UintRange{
 					{
@@ -427,7 +652,7 @@ func (suite *TestSuite) TestBalancesFuzz() {
 		}
 
 		for i := 0; i < NUM_IDS; i++ {
-			fetchedBalances, _ := types.GetBalancesForIds(
+			fetchedBalances, _ := types.GetBalancesForIds(suite.ctx, 
 				[]*types.UintRange{
 					{
 						Start: sdkmath.NewUint(uint64(i)),
@@ -474,7 +699,7 @@ func (suite *TestSuite) TestBalancesWithTimesFuzz() {
 			amount := sdkmath.NewUint(uint64(rand.Intn(100)))
 			err := *new(error)
 
-			userBalance.Balances, err = types.AddBalance(userBalance.Balances, &types.Balance{
+			userBalance.Balances, err = types.AddBalance(suite.ctx, userBalance.Balances, &types.Balance{
 				Amount: amount,
 				BadgeIds: []*types.UintRange{
 					{
@@ -514,7 +739,7 @@ func (suite *TestSuite) TestBalancesWithTimesFuzz() {
 
 			//removing 18 from IDs 1-7 Times 1-6
 
-			userBalance.Balances, err = types.SubtractBalance(userBalance.Balances, &types.Balance{
+			userBalance.Balances, err = types.SubtractBalance(suite.ctx, userBalance.Balances, &types.Balance{
 				Amount: amount,
 				BadgeIds: []*types.UintRange{
 					{
@@ -553,7 +778,7 @@ func (suite *TestSuite) TestBalancesWithTimesFuzz() {
 
 		for i := 0; i < NUM_IDS; i++ {
 			for j := 0; j < NUM_IDS; j++ {
-				fetchedBalances, _ := types.GetBalancesForIds(
+				fetchedBalances, _ := types.GetBalancesForIds(suite.ctx, 
 					[]*types.UintRange{
 						{
 							Start: sdkmath.NewUint(uint64(i)),
@@ -580,4 +805,6 @@ func (suite *TestSuite) TestBalancesWithTimesFuzz() {
 		}
 	}
 }
+
+
 

@@ -39,7 +39,8 @@ import (
 //		If all are not forbidden, it is a valid update.
 
 // To make it easier, we first
-func GetPotentialUpdatesForTimelineValues(times [][]*types.UintRange, values []interface{}) []*types.UniversalPermissionDetails {
+func GetPotentialUpdatesForTimelineValues(ctx sdk.Context,
+	times [][]*types.UintRange, values []interface{}) []*types.UniversalPermissionDetails {
 	castedPermissions := []*types.UniversalPermission{}
 	for idx, time := range times {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
@@ -49,7 +50,7 @@ func GetPotentialUpdatesForTimelineValues(times [][]*types.UintRange, values []i
 		})
 	}
 
-	firstMatches := types.GetFirstMatchOnly(castedPermissions) //I think this is unnecessary because we already disallow duplicate timeline times in ValidateBasic but if we allow duplicates, this may be needed
+	firstMatches := types.GetFirstMatchOnly(ctx, castedPermissions) //I think this is unnecessary because we already disallow duplicate timeline times in ValidateBasic but if we allow duplicates, this may be needed
 
 	return firstMatches
 }
@@ -59,7 +60,7 @@ type ApprovalCriteriaWithIsApproved struct {
 	ApprovalCriteria *types.ApprovalCriteria
 }
 
-func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermission) []*types.UniversalPermissionDetails {
+func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types.UniversalPermission) []*types.UniversalPermissionDetails {
 	handled := []*types.UniversalPermissionDetails{}
 	for _, permission := range permissions {
 		badgeIds := types.GetUintRangesWithOptions(permission.BadgeIds, permission.UsesBadgeIds)
@@ -104,7 +105,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(permissions []*types.UniversalPermiss
 							},
 						}
 
-						overlaps, inBrokenDownButNotHandled, inHandledButNotBrokenDown := types.GetOverlapsAndNonOverlaps(brokenDown, handled)
+						overlaps, inBrokenDownButNotHandled, inHandledButNotBrokenDown := types.GetOverlapsAndNonOverlaps(ctx, brokenDown, handled)
 						handled = []*types.UniversalPermissionDetails{}
 						//if no overlaps, we can just append all of them
 						handled = append(handled, inHandledButNotBrokenDown...)
@@ -185,9 +186,9 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollec
 	})
 
 	//This is just to maintain consistency with the legacy features when we used to have timeline times
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(x, []interface{}{oldApprovals})
+	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, x, []interface{}{oldApprovals})
 
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(y, []interface{}{newApprovals})
+	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, y, []interface{}{newApprovals})
 
 	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []*types.CollectionApproval{}, func(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
 		//This is a little different from the other functions because it is not first match only
@@ -204,20 +205,20 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollec
 		if err != nil {
 			return nil, err
 		}
-		firstMatchesForOld := GetFirstMatchOnlyWithApprovalCriteria(oldApprovalsCasted)
+		firstMatchesForOld := GetFirstMatchOnlyWithApprovalCriteria(ctx, oldApprovalsCasted)
 
 		newApprovalsCasted, err := k.CastCollectionApprovalToUniversalPermission(ctx, newApprovals)
 		if err != nil {
 			return nil, err
 		}
-		firstMatchesForNew := GetFirstMatchOnlyWithApprovalCriteria(newApprovalsCasted)
+		firstMatchesForNew := GetFirstMatchOnlyWithApprovalCriteria(ctx, newApprovalsCasted)
 
 		//Step 2:
 		//For every badge, we need to check if the new provided value is different in any way from the old value for each badge ID
 		//The overlapObjects from GetOverlapsAndNonOverlaps will return which badge IDs overlap
 		//Note this okay since we already converted everything to first match only in the previous step
 		detailsToReturn := []*types.UniversalPermissionDetails{}
-		overlapObjects, inOldButNotNew, inNewButNotOld := types.GetOverlapsAndNonOverlaps(firstMatchesForOld, firstMatchesForNew)
+		overlapObjects, inOldButNotNew, inNewButNotOld := types.GetOverlapsAndNonOverlaps(ctx, firstMatchesForOld, firstMatchesForNew)
 		for _, overlapObject := range overlapObjects {
 			overlap := overlapObject.Overlap
 			oldDetails := overlapObject.FirstDetails
@@ -323,23 +324,23 @@ func (k Keeper) ValidateUserIncomingApprovalsUpdate(ctx sdk.Context, collection 
 
 func (k Keeper) ValidateBadgeMetadataUpdate(ctx sdk.Context, oldBadgeMetadata []*types.BadgeMetadataTimeline, newBadgeMetadata []*types.BadgeMetadataTimeline, canUpdateBadgeMetadata []*types.TimedUpdateWithBadgeIdsPermission) error {
 	oldTimes, oldValues := types.GetBadgeMetadataTimesAndValues(oldBadgeMetadata)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
+	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
 
 	newTimes, newValues := types.GetBadgeMetadataTimesAndValues(newBadgeMetadata)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
+	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
 
 	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []*types.BadgeMetadata{}, func(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
 		//Cast to UniversalPermissionDetails for comaptibility with these overlap functions and get first matches only (i.e. first match for each badge ID)
 		oldBadgeMetadata := oldValue.([]*types.BadgeMetadata)
-		firstMatchesForOld := types.GetFirstMatchOnly(k.CastBadgeMetadataToUniversalPermission(oldBadgeMetadata))
+		firstMatchesForOld := types.GetFirstMatchOnly(ctx, k.CastBadgeMetadataToUniversalPermission(oldBadgeMetadata))
 
 		newBadgeMetadata := newValue.([]*types.BadgeMetadata)
-		firstMatchesForNew := types.GetFirstMatchOnly(k.CastBadgeMetadataToUniversalPermission(newBadgeMetadata))
+		firstMatchesForNew := types.GetFirstMatchOnly(ctx, k.CastBadgeMetadataToUniversalPermission(newBadgeMetadata))
 
 		//For every badge, we need to check if the new provided value is different in any way from the old value for each badge ID
 		//The overlapObjects from GetOverlapsAndNonOverlaps will return which badge IDs overlap
 		detailsToReturn := []*types.UniversalPermissionDetails{}
-		overlapObjects, inOldButNotNew, inNewButNotOld := types.GetOverlapsAndNonOverlaps(firstMatchesForOld, firstMatchesForNew)
+		overlapObjects, inOldButNotNew, inNewButNotOld := types.GetOverlapsAndNonOverlaps(ctx, firstMatchesForOld, firstMatchesForNew)
 		for _, overlapObject := range overlapObjects {
 			overlap := overlapObject.Overlap
 			oldDetails := overlapObject.FirstDetails
@@ -377,10 +378,10 @@ func (k Keeper) ValidateBadgeMetadataUpdate(ctx sdk.Context, oldBadgeMetadata []
 
 func (k Keeper) ValidateCollectionMetadataUpdate(ctx sdk.Context, oldCollectionMetadata []*types.CollectionMetadataTimeline, newCollectionMetadata []*types.CollectionMetadataTimeline, canUpdateCollectionMetadata []*types.TimedUpdatePermission) error {
 	oldTimes, oldValues := types.GetCollectionMetadataTimesAndValues(oldCollectionMetadata)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
+	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
 
 	newTimes, newValues := types.GetCollectionMetadataTimesAndValues(newCollectionMetadata)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
+	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
 
 	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, &types.CollectionMetadata{}, func(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
 		detailsToCheck := []*types.UniversalPermissionDetails{}
@@ -417,10 +418,10 @@ func (k Keeper) ValidateOffChainBalancesMetadataUpdate(ctx sdk.Context, collecti
 	}
 
 	oldTimes, oldValues := types.GetOffChainBalancesMetadataTimesAndValues(oldOffChainBalancesMetadata)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
+	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
 
 	newTimes, newValues := types.GetOffChainBalancesMetadataTimesAndValues(newOffChainBalancesMetadata)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
+	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
 
 	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, &types.OffChainBalancesMetadata{}, func(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
 		detailsToCheck := []*types.UniversalPermissionDetails{}
@@ -478,10 +479,10 @@ func GetUpdatedBoolCombinations(ctx sdk.Context, oldValue interface{}, newValue 
 
 func (k Keeper) ValidateManagerUpdate(ctx sdk.Context, oldManager []*types.ManagerTimeline, newManager []*types.ManagerTimeline, canUpdateManager []*types.TimedUpdatePermission) error {
 	oldTimes, oldValues := types.GetManagerTimesAndValues(oldManager)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
+	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
 
 	newTimes, newValues := types.GetManagerTimesAndValues(newManager)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
+	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
 
 	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, "", GetUpdatedStringCombinations)
 	if err != nil {
@@ -497,10 +498,10 @@ func (k Keeper) ValidateManagerUpdate(ctx sdk.Context, oldManager []*types.Manag
 
 func (k Keeper) ValidateCustomDataUpdate(ctx sdk.Context, oldCustomData []*types.CustomDataTimeline, newCustomData []*types.CustomDataTimeline, canUpdateCustomData []*types.TimedUpdatePermission) error {
 	oldTimes, oldValues := types.GetCustomDataTimesAndValues(oldCustomData)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
+	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
 
 	newTimes, newValues := types.GetCustomDataTimesAndValues(newCustomData)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
+	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
 
 	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, "", GetUpdatedStringCombinations)
 	if err != nil {
@@ -516,10 +517,10 @@ func (k Keeper) ValidateCustomDataUpdate(ctx sdk.Context, oldCustomData []*types
 
 func (k Keeper) ValidateStandardsUpdate(ctx sdk.Context, oldStandards []*types.StandardsTimeline, newStandards []*types.StandardsTimeline, canUpdateStandards []*types.TimedUpdatePermission) error {
 	oldTimes, oldValues := types.GetStandardsTimesAndValues(oldStandards)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
+	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
 
 	newTimes, newValues := types.GetStandardsTimesAndValues(newStandards)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
+	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
 
 	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []string{}, func(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
 		if (oldValue == nil && newValue != nil) || (oldValue != nil && newValue == nil) {
@@ -554,10 +555,10 @@ func (k Keeper) ValidateStandardsUpdate(ctx sdk.Context, oldStandards []*types.S
 
 func (k Keeper) ValidateIsArchivedUpdate(ctx sdk.Context, oldIsArchived []*types.IsArchivedTimeline, newIsArchived []*types.IsArchivedTimeline, canUpdateIsArchived []*types.TimedUpdatePermission) error {
 	oldTimes, oldValues := types.GetIsArchivedTimesAndValues(oldIsArchived)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(oldTimes, oldValues)
+	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
 
 	newTimes, newValues := types.GetIsArchivedTimesAndValues(newIsArchived)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(newTimes, newValues)
+	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
 
 	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, false, GetUpdatedBoolCombinations)
 	if err != nil {

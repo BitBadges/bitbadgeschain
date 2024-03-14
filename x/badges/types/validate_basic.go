@@ -180,19 +180,19 @@ func ValidateAddressList(addressList *AddressList) error {
 	return nil
 }
 
-func ValidateUserOutgoingApprovals(userOutgoingApprovals []*UserOutgoingApproval, fromAddress string, canChangeValues bool) error {
+func ValidateUserOutgoingApprovals(ctx sdk.Context, userOutgoingApprovals []*UserOutgoingApproval, fromAddress string, canChangeValues bool) error {
 	castedTransfers := CastOutgoingTransfersToCollectionTransfers(userOutgoingApprovals, fromAddress)
-	err := ValidateCollectionApprovals(castedTransfers, canChangeValues)
+	err := ValidateCollectionApprovals(ctx, castedTransfers, canChangeValues)
 	return err
 }
 
-func ValidateUserIncomingApprovals(userIncomingApprovals []*UserIncomingApproval, toAddress string, canChangeValues bool) error {
+func ValidateUserIncomingApprovals(ctx sdk.Context, userIncomingApprovals []*UserIncomingApproval, toAddress string, canChangeValues bool) error {
 	castedTransfers := CastIncomingTransfersToCollectionTransfers(userIncomingApprovals, toAddress)
-	err := ValidateCollectionApprovals(castedTransfers, canChangeValues)
+	err := ValidateCollectionApprovals(ctx, castedTransfers, canChangeValues)
 	return err
 }
 
-func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canChangeValues bool) error {
+func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*CollectionApproval, canChangeValues bool) error {
 	for i := 0; i < len(collectionApprovals); i++ {
 		if collectionApprovals[i].ApprovalId == "" {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id is uninitialized")
@@ -425,7 +425,7 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 					err := *new(error)
 					if manualBalancesIsBasicallyNil && !sequentialTransferIsBasicallyNil {
 						sequentialTransfer := approvalCriteria.PredeterminedBalances.IncrementedBalances
-						sequentialTransfer.StartBalances, err = ValidateBalances(sequentialTransfer.StartBalances, canChangeValues)
+						sequentialTransfer.StartBalances, err = ValidateBalances(ctx, sequentialTransfer.StartBalances, canChangeValues)
 						if err != nil {
 							return err
 						}
@@ -439,7 +439,7 @@ func ValidateCollectionApprovals(collectionApprovals []*CollectionApproval, canC
 						}
 					} else if !manualBalancesIsBasicallyNil && sequentialTransferIsBasicallyNil {
 						for _, manualTransfer := range approvalCriteria.PredeterminedBalances.ManualBalances {
-							manualTransfer.Balances, err = ValidateBalances(manualTransfer.Balances, canChangeValues)
+							manualTransfer.Balances, err = ValidateBalances(ctx, manualTransfer.Balances, canChangeValues)
 							if err != nil {
 								return err
 							}
@@ -488,7 +488,7 @@ func ValidateMerkleChallenge(challenge *MerkleChallenge, challengeId string, usi
 	return nil
 }
 
-func ValidateBalances(balances []*Balance, canChangeValues bool) ([]*Balance, error) {
+func ValidateBalances(ctx sdk.Context, balances []*Balance, canChangeValues bool) ([]*Balance, error) {
 	err := *new(error)
 	for _, balance := range balances {
 		if balance == nil {
@@ -510,18 +510,19 @@ func ValidateBalances(balances []*Balance, canChangeValues bool) ([]*Balance, er
 		}
 	}
 
-	balances, err = HandleDuplicateBadgeIds(balances, canChangeValues)
+	balances, err = HandleDuplicateBadgeIds(ctx, balances, canChangeValues)
 	if err != nil {
 		return balances, err
 	}
 
+
 	return balances, nil
 }
 
-func ValidateTransfer(transfer *Transfer, canChangeValues bool) error {
+func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool) error {
 	err := *new(error)
 
-	transfer.Balances, err = ValidateBalances(transfer.Balances, canChangeValues)
+	transfer.Balances, err = ValidateBalances(ctx, transfer.Balances, canChangeValues)
 	if err != nil {
 		return err
 	}

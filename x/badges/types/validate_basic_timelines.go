@@ -1,5 +1,7 @@
 package types
 
+import sdk "github.com/cosmos/cosmos-sdk/types"
+
 func ValidateTimelineTimesDoNotOverlap(times [][]*UintRange) error {
 	handledBadgeIds := []*UintRange{}
 	for _, time := range times {
@@ -17,10 +19,10 @@ func ValidateTimelineTimesDoNotOverlap(times [][]*UintRange) error {
 	return nil
 }
 
-func ValidateApprovalTimeline(timeline []*CollectionApprovalTimeline, canChangeValues bool) error {
+func ValidateApprovalTimeline(ctx sdk.Context, timeline []*CollectionApprovalTimeline, canChangeValues bool) error {
 	err := *new(error)
 	for _, timelineVal := range timeline {
-		err = ValidateCollectionApprovals(timelineVal.CollectionApprovals, canChangeValues)
+		err = ValidateCollectionApprovals(ctx, timelineVal.CollectionApprovals, canChangeValues)
 		if err != nil {
 			return err
 		}
@@ -143,9 +145,9 @@ func ValidateIsArchivedTimeline(timeline []*IsArchivedTimeline) error {
 	return nil
 }
 
-func ValidateUserOutgoingApprovalTimeline(timeline []*UserOutgoingApprovalTimeline, address string, canChangeValues bool) error {
+func ValidateUserOutgoingApprovalTimeline(ctx sdk.Context, timeline []*UserOutgoingApprovalTimeline, address string, canChangeValues bool) error {
 	for _, timelineVal := range timeline {
-		err := ValidateUserOutgoingApprovals(timelineVal.OutgoingApprovals, address, canChangeValues)
+		err := ValidateUserOutgoingApprovals(ctx, timelineVal.OutgoingApprovals, address, canChangeValues)
 		if err != nil {
 			return err
 		}
@@ -160,9 +162,9 @@ func ValidateUserOutgoingApprovalTimeline(timeline []*UserOutgoingApprovalTimeli
 	return nil
 }
 
-func ValidateUserIncomingApprovalTimeline(timeline []*UserIncomingApprovalTimeline, address string, canChangeValues bool) error {
+func ValidateUserIncomingApprovalTimeline(ctx sdk.Context, timeline []*UserIncomingApprovalTimeline, address string, canChangeValues bool) error {
 	for _, timelineVal := range timeline {
-		err := ValidateUserIncomingApprovals(timelineVal.IncomingApprovals, address, canChangeValues)
+		err := ValidateUserIncomingApprovals(ctx, timelineVal.IncomingApprovals, address, canChangeValues)
 		if err != nil {
 			return err
 		}

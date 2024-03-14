@@ -73,12 +73,12 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 			return &types.BadgeCollection{}, ErrSupplyEqualsZero
 		}
 
-		totalSupplys.Balances, err = types.AddBalance(totalSupplys.Balances, balance)
+		totalSupplys.Balances, err = types.AddBalance(ctx, totalSupplys.Balances, balance)
 		if err != nil {
 			return &types.BadgeCollection{}, err
 		}
 
-		unmintedSupplys.Balances, err = types.AddBalance(unmintedSupplys.Balances, balance)
+		unmintedSupplys.Balances, err = types.AddBalance(ctx, unmintedSupplys.Balances, balance)
 		if err != nil {
 			return &types.BadgeCollection{}, err
 		}

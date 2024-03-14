@@ -141,12 +141,12 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 		if transferVal.ApprovalCriteria == nil {
 			//If there are no restrictions, it is a full match
 			//Setting remainingBalances to remaining will set everything to handled since remaining is empty
-			allBalancesForIdsAndTimes, err := types.GetBalancesForIds(transferVal.BadgeIds, transferVal.OwnershipTimes, remainingBalances)
+			allBalancesForIdsAndTimes, err := types.GetBalancesForIds( ctx, transferVal.BadgeIds, transferVal.OwnershipTimes, remainingBalances)
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "transfer disallowed: err fetching balances for transfer: %s", transferStr)
 			}
 
-			remainingBalances, err = types.SubtractBalances(allBalancesForIdsAndTimes, remainingBalances)
+			remainingBalances, err = types.SubtractBalances(ctx, allBalancesForIdsAndTimes, remainingBalances)
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "transfer disallowed: underflow error subtracting balances for transfer: %s", transferStr)
 			}
@@ -219,7 +219,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 					mustOwnBadge.OwnershipTimes = []*types.UintRange{{Start: currTime, End: currTime}}
 				}
 
-				fetchedBalances, err := types.GetBalancesForIds(mustOwnBadge.BadgeIds, mustOwnBadge.OwnershipTimes, balances)
+				fetchedBalances, err := types.GetBalancesForIds( ctx, mustOwnBadge.BadgeIds, mustOwnBadge.OwnershipTimes, balances)
 				if err != nil {
 					failedMustOwnBadges = true
 					break
@@ -255,7 +255,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 
 			//Get max balances allowed for this approvalCriteria element
 			//Get the max balances allowed for this approvalCriteria element WITHOUT incrementing
-			transferBalancesToCheck, err := types.GetBalancesForIds(transferVal.BadgeIds, transferVal.OwnershipTimes, remainingBalances)
+			transferBalancesToCheck, err := types.GetBalancesForIds( ctx, transferVal.BadgeIds, transferVal.OwnershipTimes, remainingBalances)
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "transfer disallowed: err fetching balances for transfer: %s", transferStr)
 			}
@@ -285,7 +285,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 			if err != nil {
 				continue
 			}
-			transferBalancesToCheck, err = types.GetOverlappingBalances(maxPossible, transferBalancesToCheck)
+			transferBalancesToCheck, err = types.GetOverlappingBalances(ctx, maxPossible, transferBalancesToCheck)
 			if err != nil {
 				continue
 			}
@@ -294,7 +294,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 			if err != nil {
 				continue
 			}
-			transferBalancesToCheck, err = types.GetOverlappingBalances(maxPossible, transferBalancesToCheck)
+			transferBalancesToCheck, err = types.GetOverlappingBalances(ctx, maxPossible, transferBalancesToCheck)
 			if err != nil {
 				continue
 			}
@@ -303,7 +303,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 			if err != nil {
 				continue
 			}
-			transferBalancesToCheck, err = types.GetOverlappingBalances(maxPossible, transferBalancesToCheck)
+			transferBalancesToCheck, err = types.GetOverlappingBalances(ctx, maxPossible, transferBalancesToCheck)
 			if err != nil {
 				continue
 			}
@@ -312,7 +312,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 			if err != nil {
 				continue
 			}
-			transferBalancesToCheck, err = types.GetOverlappingBalances(maxPossible, transferBalancesToCheck)
+			transferBalancesToCheck, err = types.GetOverlappingBalances(ctx, maxPossible, transferBalancesToCheck)
 			if err != nil {
 				continue
 			}
@@ -348,7 +348,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 			}
 
 			//Finally, increment everything in store
-			remainingBalances, err = types.SubtractBalances(transferBalancesToCheck, remainingBalances)
+			remainingBalances, err = types.SubtractBalances(ctx, transferBalancesToCheck, remainingBalances)
 			if err != nil {
 				continue
 			}
@@ -496,12 +496,12 @@ func (k Keeper) GetMaxPossible(
 	if approvedAmount.GT(sdkmath.NewUint(0)) {
 		//Assume that if approvalTrackerDetails.Amounts is already not nil, it is correct and has been incremented properly
 		//Here, we ONLY check if the NEW transferBalances makes it exceed the threshold
-		currTallyForCurrentIdsAndTimes, err := types.GetBalancesForIds(transferVal.BadgeIds, transferVal.OwnershipTimes, approvalTrackerDetails.Amounts)
+		currTallyForCurrentIdsAndTimes, err := types.GetBalancesForIds( ctx, transferVal.BadgeIds, transferVal.OwnershipTimes, approvalTrackerDetails.Amounts)
 		if err != nil {
 			return nil, err
 		}
 
-		maxBalancesWeCanAdd, err := types.SubtractBalances(currTallyForCurrentIdsAndTimes, allApprovals)
+		maxBalancesWeCanAdd, err := types.SubtractBalances(ctx, currTallyForCurrentIdsAndTimes, allApprovals)
 		if err != nil {
 			return nil, err
 		}
@@ -624,7 +624,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			// //Filter out any balances that have an amount of 0
 			// fetchedBalances := []*types.Balance{}
 			// for _, calculatedBalance := range calculatedBalances {
-			// 	fetchedBalancesOfOverall, err := types.GetBalancesForIds(calculatedBalance.BadgeIds, calculatedBalance.OwnershipTimes, overallTransferBalances)
+			// 	fetchedBalancesOfOverall, err := types.GetBalancesForIds( ctx, calculatedBalance.BadgeIds, calculatedBalance.OwnershipTimes, overallTransferBalances)
 			// 	if err != nil {
 			// 		return err
 			// 	}
@@ -636,7 +636,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			// }
 
 			//Assert that we have exactly the amount specified in the original transfers
-			equal := types.AreBalancesEqual(overallTransferBalances, calculatedBalances, false)
+			equal := types.AreBalancesEqual(ctx, overallTransferBalances, calculatedBalances, false)
 			if !equal {
 				return sdkerrors.Wrapf(ErrDisallowedTransfer, "transfer disallowed because predetermined balances do not match: %s", amountTrackerId)
 			}
@@ -647,19 +647,19 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	if approvedAmount.GT(sdkmath.NewUint(0)) {
 		//Assume that if approvalTrackerDetails.Amounts is already not nil, it is correct and has been incremented properly
 		//Here, we ONLY check if the NEW transferBalances makes it exceed the threshold
-		currTallyForCurrentIdsAndTimes, err := types.GetBalancesForIds(transferVal.BadgeIds, transferVal.OwnershipTimes, approvalTrackerDetails.Amounts)
+		currTallyForCurrentIdsAndTimes, err := types.GetBalancesForIds( ctx, transferVal.BadgeIds, transferVal.OwnershipTimes, approvalTrackerDetails.Amounts)
 		if err != nil {
 			return err
 		}
 
 		//If this passes, the new transferBalances are okay
-		_, err = types.AddBalancesAndAssertDoesntExceedThreshold(currTallyForCurrentIdsAndTimes, transferBalances, allApprovals)
+		_, err = types.AddBalancesAndAssertDoesntExceedThreshold(ctx, currTallyForCurrentIdsAndTimes, transferBalances, allApprovals)
 		if err != nil {
 			return err
 		}
 
 		//We then add them to the current tally of ALL ids and times
-		approvalTrackerDetails.Amounts, err = types.AddBalances(approvalTrackerDetails.Amounts, transferBalances)
+		approvalTrackerDetails.Amounts, err = types.AddBalances(ctx, approvalTrackerDetails.Amounts, transferBalances)
 		if err != nil {
 			return err
 		}

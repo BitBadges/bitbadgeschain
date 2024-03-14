@@ -6,6 +6,8 @@ import (
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/stretchr/testify/require"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
@@ -16,7 +18,7 @@ const (
 )
 
 func TestRemoveOverlaps(t *testing.T) {
-	remaining, _ := types.UniversalRemoveOverlaps(&types.UniversalPermissionDetails{
+	remaining, _ := types.UniversalRemoveOverlaps(sdk.Context{}, &types.UniversalPermissionDetails{
 		BadgeId: &types.UintRange{
 			Start: sdkmath.NewUint(5),
 			End:   sdkmath.NewUint(5),
@@ -407,7 +409,7 @@ func TestRemoveOverlaps(t *testing.T) {
 }
 
 func TestRemoveAddresses(t *testing.T) {
-	remaining, _ := types.UniversalRemoveOverlaps(&types.UniversalPermissionDetails{
+	remaining, _ := types.UniversalRemoveOverlaps(sdk.Context{}, &types.UniversalPermissionDetails{
 		BadgeId: &types.UintRange{
 			Start: sdkmath.NewUint(5),
 			End:   sdkmath.NewUint(5),

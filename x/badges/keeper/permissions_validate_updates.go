@@ -14,7 +14,7 @@ import (
 
 //HACK: For resuable code, we cast the permissions to their UniversalPermission equivalents, so we can reuse the UniversalPermission functions
 
-func (k Keeper) ValidateBalancesActionPermissionUpdate(oldPermissions []*types.BalancesActionPermission, newPermissions []*types.BalancesActionPermission) error {
+func (k Keeper) ValidateBalancesActionPermissionUpdate(ctx sdk.Context, oldPermissions []*types.BalancesActionPermission, newPermissions []*types.BalancesActionPermission) error {
 	if err := types.ValidateBalancesActionPermission(oldPermissions, true); err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func (k Keeper) ValidateBalancesActionPermissionUpdate(oldPermissions []*types.B
 		return err
 	}
 
-	err = types.ValidateUniversalPermissionUpdate(types.GetFirstMatchOnly(castedOldPermissions), types.GetFirstMatchOnly(castedNewPermissions))
+	err = types.ValidateUniversalPermissionUpdate(ctx, types.GetFirstMatchOnly(ctx, castedOldPermissions), types.GetFirstMatchOnly(ctx, castedNewPermissions))
 	if err != nil {
 		return err
 	}
@@ -41,7 +41,7 @@ func (k Keeper) ValidateBalancesActionPermissionUpdate(oldPermissions []*types.B
 	return nil
 }
 
-func (k Keeper) ValidateTimedUpdatePermissionUpdate(oldPermissions []*types.TimedUpdatePermission, newPermissions []*types.TimedUpdatePermission) error {
+func (k Keeper) ValidateTimedUpdatePermissionUpdate(ctx sdk.Context, oldPermissions []*types.TimedUpdatePermission, newPermissions []*types.TimedUpdatePermission) error {
 	if err := types.ValidateTimedUpdatePermission(oldPermissions, true); err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (k Keeper) ValidateTimedUpdatePermissionUpdate(oldPermissions []*types.Time
 		return err
 	}
 
-	err = types.ValidateUniversalPermissionUpdate(types.GetFirstMatchOnly(castedOldPermissions), types.GetFirstMatchOnly(castedNewPermissions))
+	err = types.ValidateUniversalPermissionUpdate(ctx, types.GetFirstMatchOnly(ctx, castedOldPermissions), types.GetFirstMatchOnly(ctx, castedNewPermissions))
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ func (k Keeper) ValidateTimedUpdatePermissionUpdate(oldPermissions []*types.Time
 	return nil
 }
 
-func (k Keeper) ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldPermissions []*types.TimedUpdateWithBadgeIdsPermission, newPermissions []*types.TimedUpdateWithBadgeIdsPermission) error {
+func (k Keeper) ValidateTimedUpdateWithBadgeIdsPermissionUpdate(ctx sdk.Context, oldPermissions []*types.TimedUpdateWithBadgeIdsPermission, newPermissions []*types.TimedUpdateWithBadgeIdsPermission) error {
 	if err := types.ValidateTimedUpdateWithBadgeIdsPermission(oldPermissions, true); err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func (k Keeper) ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldPermissions [
 		return err
 	}
 
-	err = types.ValidateUniversalPermissionUpdate(types.GetFirstMatchOnly(castedOldPermissions), types.GetFirstMatchOnly(castedNewPermissions))
+	err = types.ValidateUniversalPermissionUpdate(ctx, types.GetFirstMatchOnly(ctx, castedOldPermissions), types.GetFirstMatchOnly(ctx, castedNewPermissions))
 	if err != nil {
 		return err
 	}
@@ -114,7 +114,7 @@ func (k Keeper) ValidateCollectionApprovalPermissionsUpdate(ctx sdk.Context, old
 		return err
 	}
 
-	err = types.ValidateUniversalPermissionUpdate(types.GetFirstMatchOnly(castedOldPermissions), types.GetFirstMatchOnly(castedNewPermissions))
+	err = types.ValidateUniversalPermissionUpdate(ctx, types.GetFirstMatchOnly(ctx, castedOldPermissions), types.GetFirstMatchOnly(ctx, castedNewPermissions))
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func (k Keeper) ValidateCollectionApprovalPermissionsUpdate(ctx sdk.Context, old
 	return nil
 }
 
-func (k Keeper) ValidateActionPermissionUpdate(oldPermissions []*types.ActionPermission, newPermissions []*types.ActionPermission) error {
+func (k Keeper) ValidateActionPermissionUpdate(ctx sdk.Context, oldPermissions []*types.ActionPermission, newPermissions []*types.ActionPermission) error {
 	if err := types.ValidateActionPermission(oldPermissions, true); err != nil {
 		return err
 	}
@@ -141,7 +141,7 @@ func (k Keeper) ValidateActionPermissionUpdate(oldPermissions []*types.ActionPer
 		return err
 	}
 
-	err = types.ValidateUniversalPermissionUpdate(types.GetFirstMatchOnly(castedOldPermissions), types.GetFirstMatchOnly(castedNewPermissions))
+	err = types.ValidateUniversalPermissionUpdate(ctx, types.GetFirstMatchOnly(ctx, castedOldPermissions), types.GetFirstMatchOnly(ctx, castedNewPermissions))
 	if err != nil {
 		return err
 	}
@@ -168,7 +168,7 @@ func (k Keeper) ValidateUserIncomingApprovalPermissionsUpdate(ctx sdk.Context, o
 		return err
 	}
 
-	err = types.ValidateUniversalPermissionUpdate(types.GetFirstMatchOnly(castedOldPermissions), types.GetFirstMatchOnly(castedNewPermissions))
+	err = types.ValidateUniversalPermissionUpdate(ctx, types.GetFirstMatchOnly(ctx, castedOldPermissions), types.GetFirstMatchOnly(ctx, castedNewPermissions))
 	if err != nil {
 		return err
 	}
@@ -195,7 +195,7 @@ func (k Keeper) ValidateUserOutgoingApprovalPermissionsUpdate(ctx sdk.Context, o
 		return err
 	}
 
-	err = types.ValidateUniversalPermissionUpdate(types.GetFirstMatchOnly(castedOldPermissions), types.GetFirstMatchOnly(castedNewPermissions))
+	err = types.ValidateUniversalPermissionUpdate(ctx, types.GetFirstMatchOnly(ctx, castedOldPermissions), types.GetFirstMatchOnly(ctx, castedNewPermissions))
 	if err != nil {
 		return err
 	}
@@ -220,11 +220,11 @@ func (k Keeper) ValidateUserPermissionsUpdate(ctx sdk.Context, oldPermissions *t
 		return err
 	}
 
-	if err := k.ValidateActionPermissionUpdate(oldPermissions.CanUpdateAutoApproveSelfInitiatedIncomingTransfers, newPermissions.CanUpdateAutoApproveSelfInitiatedIncomingTransfers); err != nil {
+	if err := k.ValidateActionPermissionUpdate(ctx, oldPermissions.CanUpdateAutoApproveSelfInitiatedIncomingTransfers, newPermissions.CanUpdateAutoApproveSelfInitiatedIncomingTransfers); err != nil {
 		return err
 	}
 
-	if err := k.ValidateActionPermissionUpdate(oldPermissions.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers, newPermissions.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers); err != nil {
+	if err := k.ValidateActionPermissionUpdate(ctx, oldPermissions.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers, newPermissions.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers); err != nil {
 		return err
 	}
 
@@ -241,39 +241,39 @@ func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types
 		return err
 	}
 
-	if err := k.ValidateActionPermissionUpdate(oldPermissions.CanDeleteCollection, newPermissions.CanDeleteCollection); err != nil {
+	if err := k.ValidateActionPermissionUpdate(ctx, oldPermissions.CanDeleteCollection, newPermissions.CanDeleteCollection); err != nil {
 		return err
 	}
 
-	if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateManager, newPermissions.CanUpdateManager); err != nil {
+	if err := k.ValidateTimedUpdatePermissionUpdate(ctx, oldPermissions.CanUpdateManager, newPermissions.CanUpdateManager); err != nil {
 		return err
 	}
 
-	if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateCustomData, newPermissions.CanUpdateCustomData); err != nil {
+	if err := k.ValidateTimedUpdatePermissionUpdate(ctx, oldPermissions.CanUpdateCustomData, newPermissions.CanUpdateCustomData); err != nil {
 		return err
 	}
 
-	if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateStandards, newPermissions.CanUpdateStandards); err != nil {
+	if err := k.ValidateTimedUpdatePermissionUpdate(ctx, oldPermissions.CanUpdateStandards, newPermissions.CanUpdateStandards); err != nil {
 		return err
 	}
 
-	if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanArchiveCollection, newPermissions.CanArchiveCollection); err != nil {
+	if err := k.ValidateTimedUpdatePermissionUpdate(ctx, oldPermissions.CanArchiveCollection, newPermissions.CanArchiveCollection); err != nil {
 		return err
 	}
 
-	if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateOffChainBalancesMetadata, newPermissions.CanUpdateOffChainBalancesMetadata); err != nil {
+	if err := k.ValidateTimedUpdatePermissionUpdate(ctx, oldPermissions.CanUpdateOffChainBalancesMetadata, newPermissions.CanUpdateOffChainBalancesMetadata); err != nil {
 		return err
 	}
 
-	if err := k.ValidateTimedUpdatePermissionUpdate(oldPermissions.CanUpdateCollectionMetadata, newPermissions.CanUpdateCollectionMetadata); err != nil {
+	if err := k.ValidateTimedUpdatePermissionUpdate(ctx, oldPermissions.CanUpdateCollectionMetadata, newPermissions.CanUpdateCollectionMetadata); err != nil {
 		return err
 	}
 
-	if err := k.ValidateBalancesActionPermissionUpdate(oldPermissions.CanCreateMoreBadges, newPermissions.CanCreateMoreBadges); err != nil {
+	if err := k.ValidateBalancesActionPermissionUpdate(ctx, oldPermissions.CanCreateMoreBadges, newPermissions.CanCreateMoreBadges); err != nil {
 		return err
 	}
 
-	if err := k.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldPermissions.CanUpdateBadgeMetadata, newPermissions.CanUpdateBadgeMetadata); err != nil {
+	if err := k.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(ctx, oldPermissions.CanUpdateBadgeMetadata, newPermissions.CanUpdateBadgeMetadata); err != nil {
 		return err
 	}
 

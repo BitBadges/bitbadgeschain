@@ -37,20 +37,20 @@ func (msg *MsgUpdateUserApprovals) GetSignBytes() []byte {
 }
 
 func (msg *MsgUpdateUserApprovals) ValidateBasic() error {
-	return msg.CheckAndCleanMsg(false)
+	return msg.CheckAndCleanMsg(sdk.Context{}, false)
 }
 
-func (msg *MsgUpdateUserApprovals) CheckAndCleanMsg(canChangeValues bool) error {
+func (msg *MsgUpdateUserApprovals) CheckAndCleanMsg(ctx sdk.Context, canChangeValues bool) error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if err := ValidateUserIncomingApprovals(msg.IncomingApprovals, msg.Creator, canChangeValues); err != nil {
+	if err := ValidateUserIncomingApprovals(ctx, msg.IncomingApprovals, msg.Creator, canChangeValues); err != nil {
 		return err
 	}
 
-	if err := ValidateUserOutgoingApprovals(msg.OutgoingApprovals, msg.Creator, canChangeValues); err != nil {
+	if err := ValidateUserOutgoingApprovals(ctx, msg.OutgoingApprovals, msg.Creator, canChangeValues); err != nil {
 		return err
 	}
 

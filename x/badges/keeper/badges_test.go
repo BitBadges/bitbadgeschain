@@ -95,7 +95,7 @@ func (suite *TestSuite) TestCreateBadges() {
 	balance, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
 
-	_, err = types.SubtractBalance(balance.Balances, &types.Balance{
+	_, err = types.SubtractBalance(suite.ctx, balance.Balances, &types.Balance{
 		BadgeIds: []*types.UintRange{
 			GetOneUintRange()[0],
 			GetTwoUintRanges()[0],
@@ -107,7 +107,7 @@ func (suite *TestSuite) TestCreateBadges() {
 
 	totalSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Total")
 	suite.Require().Nil(err, "Error getting user balance: %s")
-	_, err = types.SubtractBalance(totalSupplys.Balances, &types.Balance{
+	_, err = types.SubtractBalance(suite.ctx, totalSupplys.Balances, &types.Balance{
 		BadgeIds: []*types.UintRange{
 			GetOneUintRange()[0],
 			GetTwoUintRanges()[0],
@@ -132,7 +132,7 @@ func (suite *TestSuite) TestCreateBadges() {
 
 	totalSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Total")
 	suite.Require().Nil(err, "Error getting user balance: %s")
-	_, err = types.SubtractBalance(totalSupplys.Balances, &types.Balance{
+	_, err = types.SubtractBalance(suite.ctx, totalSupplys.Balances, &types.Balance{
 		BadgeIds: []*types.UintRange{
 			GetTwoUintRanges()[0],
 		},
@@ -143,7 +143,7 @@ func (suite *TestSuite) TestCreateBadges() {
 
 	unmintedSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Mint")
 	suite.Require().Nil(err, "Error getting user balance: %s")
-	_, err = types.SubtractBalance(unmintedSupplys.Balances, &types.Balance{
+	_, err = types.SubtractBalance(suite.ctx, unmintedSupplys.Balances, &types.Balance{
 		BadgeIds: []*types.UintRange{
 			GetTwoUintRanges()[0],
 		},
@@ -154,7 +154,7 @@ func (suite *TestSuite) TestCreateBadges() {
 
 	unmintedSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Mint")
 	suite.Require().Nil(err, "Error getting user balance: %s")
-	_, err = types.SubtractBalance(unmintedSupplys.Balances, &types.Balance{
+	_, err = types.SubtractBalance(suite.ctx, unmintedSupplys.Balances, &types.Balance{
 		BadgeIds: []*types.UintRange{
 			GetTwoUintRanges()[0],
 		},
@@ -189,7 +189,7 @@ func (suite *TestSuite) TestCreateBadges() {
 
 	unmintedSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Mint")
 	suite.Require().Nil(err, "Error getting user balance: %s")
-	_, err = types.SubtractBalance(unmintedSupplys.Balances, &types.Balance{
+	_, err = types.SubtractBalance(suite.ctx, unmintedSupplys.Balances, &types.Balance{
 		BadgeIds: []*types.UintRange{
 			GetTopHalfUintRanges()[0],
 		},
@@ -286,7 +286,7 @@ func (suite *TestSuite) TestDuplicateBadgeIDs() {
 		},
 	}	
 
-	currBalances, err := types.SubtractBalance(currBalances, &types.Balance{
+	currBalances, err := types.SubtractBalance(suite.ctx, currBalances, &types.Balance{
 		Amount:         sdkmath.NewUint(1),
 		BadgeIds:       GetOneUintRange(),
 		OwnershipTimes: GetFullUintRanges(),
@@ -316,7 +316,7 @@ func (suite *TestSuite) TestBadgeIdsWeirdJSThing() {
 		},
 	}	
 
-	currBalances, err := types.SubtractBalance(currBalances, &types.Balance{
+	currBalances, err := types.SubtractBalance(suite.ctx, currBalances, &types.Balance{
 		Amount:         sdkmath.NewUint(1),
 		BadgeIds:       []*types.UintRange{
 			{
@@ -328,7 +328,7 @@ func (suite *TestSuite) TestBadgeIdsWeirdJSThing() {
 	}, false)
 	suite.Require().Nil(err, "Error subtracting balances: %s")
 
-	currBalances, err = types.SubtractBalance(currBalances, &types.Balance{
+	currBalances, err = types.SubtractBalance(suite.ctx, currBalances, &types.Balance{
 		Amount:         sdkmath.NewUint(1),
 		BadgeIds:       []*types.UintRange{
 			{

@@ -8,6 +8,8 @@ import (
 	"github.com/bitbadges/bitbadgeschain/testutil/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/stretchr/testify/require"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func TestActionPermissionUpdate(t *testing.T) {
@@ -41,9 +43,8 @@ func TestActionPermissionUpdate(t *testing.T) {
 			},
 		},
 	}
-
 	keeper, _ := keeper.BadgesKeeper(t)
-	err := keeper.ValidateActionPermissionUpdate([]*types.ActionPermission{oldActionPermission}, []*types.ActionPermission{newActionPermission})
+	err := keeper.ValidateActionPermissionUpdate(sdk.Context{}, []*types.ActionPermission{oldActionPermission}, []*types.ActionPermission{newActionPermission})
 	require.NoError(t, err)
 
 	newActionPermission = &types.ActionPermission{
@@ -66,7 +67,7 @@ func TestActionPermissionUpdate(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateActionPermissionUpdate([]*types.ActionPermission{oldActionPermission}, []*types.ActionPermission{newActionPermission})
+	err = keeper.ValidateActionPermissionUpdate(sdk.Context{}, []*types.ActionPermission{oldActionPermission}, []*types.ActionPermission{newActionPermission})
 	require.Error(t, err)
 	newActionPermission = &types.ActionPermission{
 
@@ -88,7 +89,7 @@ func TestActionPermissionUpdate(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateActionPermissionUpdate([]*types.ActionPermission{oldActionPermission}, []*types.ActionPermission{newActionPermission})
+	err = keeper.ValidateActionPermissionUpdate(sdk.Context{}, []*types.ActionPermission{oldActionPermission}, []*types.ActionPermission{newActionPermission})
 	require.Error(t, err)
 }
 
@@ -149,7 +150,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	}
 
 	keeper, _ := keeper.BadgesKeeper(t)
-	err := keeper.ValidateBalancesActionPermissionUpdate([]*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err := keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
 	require.NoError(t, err)
 
 	newActionPermission = &types.BalancesActionPermission{
@@ -184,7 +185,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateBalancesActionPermissionUpdate([]*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
 	require.NoError(t, err)
 
 	newActionPermission = &types.BalancesActionPermission{
@@ -219,7 +220,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateBalancesActionPermissionUpdate([]*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
 	require.Error(t, err)
 
 	newActionPermission = &types.BalancesActionPermission{
@@ -254,7 +255,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateBalancesActionPermissionUpdate([]*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
 	require.Error(t, err)
 
 	newActionPermission = &types.BalancesActionPermission{
@@ -288,7 +289,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateBalancesActionPermissionUpdate([]*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
 	require.Error(t, err)
 
 	newActionPermission = &types.BalancesActionPermission{
@@ -331,7 +332,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateBalancesActionPermissionUpdate([]*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
 	require.NoError(t, err)
 
 	newActionPermission = &types.BalancesActionPermission{
@@ -366,7 +367,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateBalancesActionPermissionUpdate([]*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
 	require.Error(t, err)
 
 	newActionPermission = &types.BalancesActionPermission{
@@ -401,7 +402,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateBalancesActionPermissionUpdate([]*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
 	require.Error(t, err)
 
 	newActionPermission = &types.BalancesActionPermission{
@@ -442,7 +443,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	newActionPermission2.BadgeIds = types.InvertUintRanges(newActionPermission2.BadgeIds, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64))
 	//Everything else from newActionPermission
 
-	err = keeper.ValidateBalancesActionPermissionUpdate([]*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission, newActionPermission2})
+	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission, newActionPermission2})
 	require.NoError(t, err)
 }
 
@@ -491,7 +492,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 	}
 
 	keeper, _ := keeper.BadgesKeeper(t)
-	err := keeper.ValidateTimedUpdatePermissionUpdate([]*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
+	err := keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
 	require.NoError(t, err)
 
 	newActionPermission = &types.TimedUpdatePermission{
@@ -520,7 +521,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdatePermissionUpdate([]*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
+	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
 	require.NoError(t, err)
 
 	newActionPermission = &types.TimedUpdatePermission{
@@ -549,7 +550,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdatePermissionUpdate([]*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
+	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
 	require.Error(t, err)
 
 	newActionPermission = &types.TimedUpdatePermission{
@@ -577,7 +578,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdatePermissionUpdate([]*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
+	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
 	require.Error(t, err)
 
 	newActionPermission = &types.TimedUpdatePermission{
@@ -605,7 +606,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdatePermissionUpdate([]*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
+	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
 	require.Error(t, err)
 
 	newActionPermission = &types.TimedUpdatePermission{
@@ -638,7 +639,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdatePermissionUpdate([]*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
+	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
 	require.NoError(t, err)
 
 	newActionPermission = &types.TimedUpdatePermission{
@@ -667,7 +668,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdatePermissionUpdate([]*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
+	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
 	require.Error(t, err)
 
 	newActionPermission = &types.TimedUpdatePermission{
@@ -696,7 +697,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdatePermissionUpdate([]*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
+	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
 	require.Error(t, err)
 
 	newActionPermission = &types.TimedUpdatePermission{
@@ -729,7 +730,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 	*newActionPermission2 = *newActionPermission
 	newActionPermission2.TimelineTimes = types.InvertUintRanges(newActionPermission2.TimelineTimes, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64))
 
-	err = keeper.ValidateTimedUpdatePermissionUpdate([]*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission, newActionPermission2})
+	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission, newActionPermission2})
 	require.NoError(t, err)
 }
 
@@ -794,7 +795,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 	}
 
 	keeper, _ := keeper.BadgesKeeper(t)
-	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(t, err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
@@ -831,7 +832,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(t, err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
@@ -868,7 +869,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.Error(t, err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
@@ -905,7 +906,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.Error(t, err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
@@ -942,7 +943,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.Error(t, err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
@@ -987,7 +988,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(t, err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
@@ -1024,7 +1025,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.Error(t, err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
@@ -1061,7 +1062,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.Error(t, err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
@@ -1127,7 +1128,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(t, err)
 
 	oldActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{{
@@ -1271,7 +1272,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(t, err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
@@ -1355,7 +1356,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.Error(t, err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
@@ -1487,7 +1488,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 	}
 
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(t, err)
 
 	oldActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{{
@@ -1682,7 +1683,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 	}
 
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.Error(t, err)
 
 }
@@ -1887,7 +1888,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 
 	keeper, _ := keeper.BadgesKeeper(t)
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
-	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(t, err)
 }
 
@@ -2093,7 +2094,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 
 	keeper, _ := keeper.BadgesKeeper(t)
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
-	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(oldActionPermissions, newActionPermissions)
+	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(t, err)
 }
 
