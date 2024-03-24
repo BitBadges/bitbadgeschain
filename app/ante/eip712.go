@@ -2,6 +2,7 @@ package ante
 
 import (
 	"crypto/ed25519"
+	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -36,7 +37,9 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	wasmxkeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
+	ethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
+	"github.com/storyicon/sigverify"
 )
 
 var ethereumCodec codec.ProtoCodecMarshaler
@@ -288,28 +291,33 @@ func VerifySignature(
 			return sdkerrors.Wrap(err, "failed to normalize EIP712 typed data for badges module")
 		}
 
+		//We generate the Solana message payload using the code from generatin EIP712
+		//We only use the message field (no types or domain)
+		//Then, we sort the message field by alphabetizing the JSON keys
+
+		//Creates the EIP712 message payload
+		eip712Message := typedData.Message //map[string]interface{}
+		// Marshal the map to JSON
+		jsonData, err := json.Marshal(eip712Message)
+		if err != nil {
+			return sdkerrors.Wrap(err, "failed to marshal json")
+		}
+
+		// convert to gson and alphabetize the JSON
+		jsonStr := gjson.ParseBytes(jsonData).String()
+		sortedBytes, err := sdk.SortJSON([]byte(jsonStr))
+		if err != nil {
+			return sdkerrors.Wrap(err, "failed to sort JSON")
+		}
+
+		sha256JsonHash := sha256.Sum256(sortedBytes)
+		jsonHashHexStr := hex.EncodeToString(sha256JsonHash[:])
+
+
 		//If chain is Solana, we need to use the Solana way to verify the signature (alphabetically sorted JSON keys)
 		//Else, we use EIP712 typed signatures for Ethereum
 		if chain == "Solana" || chain == "Bitcoin" {
-			//We generate the Solana message payload using the code from generatin EIP712
-			//We only use the message field (no types or domain)
-			//Then, we sort the message field by alphabetizing the JSON keys
-
-			//Creates the EIP712 message payload
-			eip712Message := typedData.Message //map[string]interface{}
-			// Marshal the map to JSON
-			jsonData, err := json.Marshal(eip712Message)
-			if err != nil {
-				return sdkerrors.Wrap(err, "failed to marshal json")
-			}
-
-			// convert to gson and alphabetize the JSON
-			jsonStr := gjson.ParseBytes(jsonData).String()
-			sortedBytes, err := sdk.SortJSON([]byte(jsonStr))
-			if err != nil {
-				return sdkerrors.Wrap(err, "failed to sort JSON")
-			}
-
+			
 			//Match address to pubkey to make sure it's equivalent and no random address is used
 			//This is used for indexing purposes (to be able to map Solana addresses to Cosmos addresses,
 			//you need to know the Solana address bc it takes a hash to convert, so you can't go the opposite way)
@@ -323,10 +331,11 @@ func VerifySignature(
 					return sdkerrors.Wrap(types.ErrUnknownExtensionOptions, "provided solana address in extension does not match signer pubkey")
 				}
 
-				//Verify signature w/ ed25519
-				valid := ed25519.Verify(pubKey.Bytes(), sortedBytes, feePayerSig)
-				if !valid {
-					return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature %s", recoveredFeePayerAcc, jsonStr)
+				//Verify signature w/ ed25519 or the SHA256 hash of the sorted JSON (as a workaround for the 1000 byte limit)
+				standardMsgSigValid := ed25519.Verify(pubKey.Bytes(), sortedBytes, feePayerSig)
+				hashedMsgSigValid := ed25519.Verify(pubKey.Bytes(), []byte(jsonHashHexStr), feePayerSig)
+				if !standardMsgSigValid && !hashedMsgSigValid {
+					return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature %s %s", recoveredFeePayerAcc, jsonStr, jsonHashHexStr)
 				}
 			} else if chain == "Bitcoin" {
 				//verify bitcoin bip322 signature
@@ -355,16 +364,31 @@ func VerifySignature(
 
 			return nil
 		} else {
+			if len(feePayerSig) != ethcrypto.SignatureLength {
+				return sdkerrors.Wrap(types.ErrorInvalidSigner, "signature length doesn't match typical [R||S||V] signature 65 bytes")
+			}
 
-			// return sdkerrors.Wrapf(types.ErrInvalidChainID, "%s", typedData)
+			//Standard JSON signature verification
+			isHashSigValid, hashSigErr := sigverify.VerifyEllipticCurveHexSignatureEx(
+				ethcommon.Address(pubKey.Address().Bytes()),
+				// []byte(jsonHashHexStr),
+				[]byte(jsonStr),
+				"0x" + hex.EncodeToString(feePayerSig),
+			)
+			if isHashSigValid && hashSigErr == nil {
+				return nil
+			}
+
+			//If we do not pass the above check, we will try to EIP-712 sign the message
+			
+			//TODO: Make this num nested structs to account for the nested structs in the EIP712 message?
+			if len(jsonStr) > 1000 {
+				return sdkerrors.Wrapf(types.ErrInvalidChainID, "could not verify standard JSON signature and tx is too expensive for Ethereum EIP712 signature verification")
+			}
 
 			sigHash, _, err := apitypes.TypedDataAndHash(typedData)
 			if err != nil {
 				return sdkerrors.Wrapf(err, "failed to compute typed data hash")
-			}
-
-			if len(feePayerSig) != ethcrypto.SignatureLength {
-				return sdkerrors.Wrap(types.ErrorInvalidSigner, "signature length doesn't match typical [R||S||V] signature 65 bytes")
 			}
 
 			// Remove the recovery offset if needed (ie. Metamask eip712 signature)
@@ -372,28 +396,13 @@ func VerifySignature(
 				feePayerSig[ethcrypto.RecoveryIDOffset] -= 27
 			}
 
-			feePayerPubkey, err := secp256k1.RecoverPubkey(sigHash, feePayerSig)
-			if err != nil {
-				return sdkerrors.Wrap(err, "failed to recover delegated fee payer from sig")
+			if CheckFeePayerPubKey(pubKey, sigHash, feePayerSig) != nil {
+				return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify Ethereum signature")
 			}
-
-			ecPubKey, err := ethcrypto.UnmarshalPubkey(feePayerPubkey)
-			if err != nil {
-				return sdkerrors.Wrap(err, "failed to unmarshal recovered fee payer pubkey")
-			}
-
-			pk := &ethsecp256k1.PubKey{
-				Key: ethcrypto.CompressPubkey(ecPubKey),
-			}
-
-			if !pubKey.Equals(pk) {
-				return sdkerrors.Wrapf(types.ErrInvalidPubKey, "feePayer pubkey %s is different from transaction pubkey %s", pubKey, pk)
-			}
-
-			// VerifySignature of ethsecp256k1 accepts 64 byte signature [R||S]
-			// WARNING! Under NO CIRCUMSTANCES try to use pubKey.VerifySignature there
-			if !secp256k1.VerifySignature(pubKey.Bytes(), sigHash, feePayerSig[:len(feePayerSig)-1]) {
-				return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify signer signature of EIP712 typed data")
+			
+			standardMsgSigValid := secp256k1.VerifySignature(pubKey.Bytes(), sigHash, feePayerSig[:len(feePayerSig)-1])
+			if !standardMsgSigValid {
+				return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify Ethereum signature")
 			}
 		}
 
@@ -401,4 +410,46 @@ func VerifySignature(
 	default:
 		return sdkerrors.Wrapf(types.ErrTooManySignatures, "unexpected SignatureData %T", sigData)
 	}
+}
+
+func CheckFeePayerPubKey(pubKey cryptotypes.PubKey, message []byte, feePayerSig []byte) error {
+	feePayerPubkey, err := secp256k1.RecoverPubkey(message, feePayerSig)
+	if err != nil {
+		return sdkerrors.Wrap(err, "failed to recover delegated fee payer from sig")
+	}
+
+	ecPubKey, err := ethcrypto.UnmarshalPubkey(feePayerPubkey)
+	if err != nil {
+		return sdkerrors.Wrap(err, "failed to unmarshal recovered fee payer pubkey")
+	}
+
+	pk := &ethsecp256k1.PubKey{
+		Key: ethcrypto.CompressPubkey(ecPubKey),
+	}
+
+	if !pubKey.Equals(pk) {
+		return sdkerrors.Wrapf(types.ErrInvalidPubKey, "feePayer pubkey %s is different from transaction pubkey %s", pubKey, pk)
+	}
+
+	return nil
+}
+
+func GetNumNestedStructs(m map[string]interface{}) int {
+	numNestedStructs := 0
+	for _, v := range m {
+		switch v.(type) {
+		case map[string]interface{}:
+			numNestedStructs += GetNumNestedStructs(v.(map[string]interface{}))
+		
+		case []interface{}:
+			for _, v := range v.([]interface{}) {
+				switch v.(type) {
+				case map[string]interface{}:
+					numNestedStructs += GetNumNestedStructs(v.(map[string]interface{}))
+				}
+			}
+		}
+			
+	}
+	return numNestedStructs + 1
 }

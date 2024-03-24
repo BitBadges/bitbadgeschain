@@ -106,22 +106,12 @@ func HandleDuplicateBadgeIds(ctx sdk.Context, balances []*Balance, canChangeValu
 
 	newBalances := []*Balance{}
 	err := *new(error)
-	for _, balance := range balances {
-		for _, badgeId := range balance.BadgeIds {
-			for _, time := range balance.OwnershipTimes {
-				newBalances, err = AddBalance(ctx, newBalances, &Balance{
-					Amount:         balance.Amount,
-					BadgeIds:       []*UintRange{badgeId},
-					OwnershipTimes: []*UintRange{time},
-				})
-				if err != nil {
-					return []*Balance{}, err
-				}
-			}
-		}
+	newBalances, err = AddBalances(ctx, balances, newBalances)
+	if err != nil {
+		return []*Balance{}, err
 	}
 
-	return balances, nil
+	return newBalances, nil
 }
 
 // Updates the balance for a specific ids from what it currently is to newAmount. No add/subtract logic. Just set it.
@@ -134,7 +124,9 @@ func UpdateBalance(ctx sdk.Context, newBalance *Balance, balances []*Balance) ([
 		return balances, err
 	}
 
-	balances, err = SetBalance(newBalance, balances)
+	bals := []*Balance{}
+	bals = append(bals, newBalance)
+	balances, err = SetBalances(bals, balances)
 	if err != nil {
 		return balances, err
 	}
@@ -268,11 +260,11 @@ func AddBalance(ctx sdk.Context, existingBalances []*Balance, balanceToAdd *Bala
 		if err != nil {
 			return existingBalances, err
 		}
+	}
 
-		existingBalances, err = SetBalance(balance, existingBalances)
-		if err != nil {
-			return existingBalances, err
-		}
+	existingBalances, err = SetBalances(currBalances, existingBalances)
+	if err != nil {
+		return existingBalances, err
 	}
 
 	return existingBalances, nil
@@ -325,11 +317,11 @@ func SubtractBalance(ctx sdk.Context, balances []*Balance, balanceToRemove *Bala
 				return balances, err
 			}
 		}
+	}
 
-		balances, err = SetBalance(currBalanceObj, balances)
-		if err != nil {
-			return balances, err
-		}
+	balances, err = SetBalances(currBalances, balances)
+	if err != nil {
+		return balances, err
 	}
 
 	return balances, nil
@@ -391,12 +383,19 @@ func DeleteBalances(ctx sdk.Context, rangesToDelete []*UintRange, timesToDelete 
 
 // Sets the balance for a specific id.
 // Important precondition: assumes balance does not exist.
-func SetBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error) {
-	if newBalance.Amount.IsZero() {
+func SetBalances(newBalancesToSet []*Balance, balances []*Balance) ([]*Balance, error) {
+	newBalancesWithoutZeroes := []*Balance{}
+	for _, balance := range newBalancesToSet {
+		if balance.Amount.GT(sdkmath.NewUint(0)) {
+			newBalancesWithoutZeroes = append(newBalancesWithoutZeroes, balance)
+		}
+	}
+	if len(newBalancesWithoutZeroes) == 0 {
 		return balances, nil
 	}
 
-	balances = append(balances, newBalance)
+	balances = append(balances, newBalancesWithoutZeroes...)
+
 	err := *new(error)
 
 	//Little clean up to start. We sort and if we have adjacent (note not intersecting), we  merge them
@@ -436,6 +435,9 @@ func SetBalance(newBalance *Balance, balances []*Balance) ([]*Balance, error) {
 					merged = true
 					break
 				}
+			} else if currBalance.Amount.GT(existingBalance.Amount) {
+				//We can't merge if the current balance has a greater amount (arr is sorted by amount)
+				break
 			}
 		}
 
