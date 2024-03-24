@@ -79,11 +79,21 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 	}
 
+	err = k.UniversalValidateNotHalted(ctx)
+	if err != nil {
+		return nil, err
+	}
+	
 	//Check must be manager
 	err = k.UniversalValidate(ctx, collection, UniversalValidationParams{
 		Creator:       msg.Creator,
 		MustBeManager: true,
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.UniversalValidateNotHalted(ctx)
 	if err != nil {
 		return nil, err
 	}

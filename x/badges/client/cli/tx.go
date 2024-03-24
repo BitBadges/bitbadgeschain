@@ -31,6 +31,7 @@ func GetTxCmd() *cobra.Command {
 
 	cmd.AddCommand(CmdTransferBadges())
 	cmd.AddCommand(CmdDeleteCollection())
+	cmd.AddCommand(CmdGlobalArchive())
 	cmd.AddCommand(CmdUpdateUserOutgoingApprovals())
 	cmd.AddCommand(CmdUpdateCollection())
 	cmd.AddCommand(CmdCreateAddressLists())

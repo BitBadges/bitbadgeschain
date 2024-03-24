@@ -13,6 +13,12 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 	if err != nil {
 		return nil, err
 	}
+
+	err = k.UniversalValidateNotHalted(ctx)
+	if err != nil {
+		return nil, err
+	}
+	
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
 	if !found {
 		return nil, ErrCollectionNotExists

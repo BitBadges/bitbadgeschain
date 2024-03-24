@@ -26,4 +26,5 @@ var (
 	ErrExceedsThreshold            = sdkerrors.Register(types.ModuleName, 78, "exceeds threshold")
 	ErrCircularInheritance         = sdkerrors.Register(types.ModuleName, 79, "circular inheritance")
 	ErrAddressListAlreadyExists = sdkerrors.Register(types.ModuleName, 80, "address list already exists")
+	ErrGlobalArchive							 = sdkerrors.Register(types.ModuleName, 81, "global halt is active")
 )

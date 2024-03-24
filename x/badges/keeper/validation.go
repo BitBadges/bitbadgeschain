@@ -24,3 +24,14 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, collection *types.BadgeCollec
 
 	return nil
 }
+
+
+func (k Keeper) UniversalValidateNotHalted(ctx sdk.Context) error {
+	halted := k.GetGlobalArchiveFromStore(ctx)
+
+	if halted {
+		return sdkerrors.Wrap(ErrGlobalArchive, "this action is not executable while the chain is halted")
+	}
+
+	return nil
+}

@@ -67,6 +67,20 @@ func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId sdkmath.
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(collectionStoreKey(collectionId))
 }
+/** ****************************** GLOBAL ARCHIVE ****************************** **/
+func (k Keeper) SetGlobalArchiveInStore(ctx sdk.Context, archive bool) error {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(GlobalArchiveKey, []byte(strconv.FormatBool(archive)))
+	return nil
+}
+func (k Keeper) GetGlobalArchiveFromStore(ctx sdk.Context) (bool) {
+	store := ctx.KVStore(k.storeKey)
+	archive := store.Get(GlobalArchiveKey)
+	if archive == nil {
+		return false
+	}
+	return archive[0] == 't'
+}
 
 /****************************************USER BALANCES****************************************/
 

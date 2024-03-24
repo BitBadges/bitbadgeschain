@@ -14,6 +14,12 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 	if err != nil {
 		return nil, err
 	}
+
+	err = k.UniversalValidateNotHalted(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	collectionId := msg.CollectionId
 	if collectionId.Equal(sdk.NewUint(0)) {
 		//Get next collection id - 1 from badges keeper

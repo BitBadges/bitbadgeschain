@@ -22,6 +22,7 @@ service Msg {
   rpc DeleteCollection(MsgDeleteCollection) returns (MsgDeleteCollectionResponse);
   rpc UpdateCollection      (MsgUpdateCollection) returns (MsgUpdateCollectionResponse);
   rpc CreateCollection      (MsgCreateCollection) returns (MsgCreateCollectionResponse);
+  rpc GlobalArchive(MsgGlobalArchive) returns (MsgGlobalArchiveResponse);
   // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -34,6 +35,7 @@ message BadgeCustomMsgType {
   MsgUpdateUserApprovals updateUserApprovalsMsg = 5;
   MsgUpdateCollection updateCollectionMsg = 6;
   MsgCreateCollection createCollectionMsg = 7;
+  MsgGlobalArchive globalArchiveMsg = 8;
 }
 
 // MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the badges module.
@@ -274,6 +276,13 @@ message MsgDeleteCollection {
 
 // MsgDeleteCollectionResponse is the response to MsgDeleteCollection.
 message MsgDeleteCollectionResponse {}
+
+message MsgGlobalArchive {
+  string creator = 1;
+  bool archive = 2;
+}
+
+message MsgGlobalArchiveResponse {}
 
 // MsgUpdateUserApprovals is used to update user approvals.
 message MsgUpdateUserApprovals {
