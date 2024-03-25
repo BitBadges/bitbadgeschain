@@ -1,13 +1,16 @@
 package keeper
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"math"
 	"time"
 
+	"github.com/bitbadges/bitbadgeschain/third_party/go-rapidsnark"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	rapidsnarktypes "github.com/iden3/go-rapidsnark/types"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -21,7 +24,7 @@ type UserApprovalsToCheck struct {
 }
 
 // DeductUserOutgoingApprovals will check if the current transfer is approved from the from's outgoing approvals and handle the approval tallying accordingly
-func (k Keeper) DeductUserOutgoingApprovals(ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.MerkleProof, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string, prioritizedApprovals []*types.ApprovalIdentifierDetails, onlyCheckPrioritized bool) error {
+func (k Keeper) DeductUserOutgoingApprovals(ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.MerkleProof, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string, prioritizedApprovals []*types.ApprovalIdentifierDetails, onlyCheckPrioritized bool, zkProofSolutions []*types.ZkProofSolution) error {
 	currApprovals := userBalance.OutgoingApprovals
 	if userBalance.AutoApproveSelfInitiatedOutgoingTransfers {
 		currApprovals = AppendSelfInitiatedOutgoingApproval(currApprovals, from)
@@ -29,12 +32,12 @@ func (k Keeper) DeductUserOutgoingApprovals(ctx sdk.Context, overallTransferBala
 
 	//Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
 	castedTransfers := types.CastOutgoingTransfersToCollectionTransfers(currApprovals, from)
-	_, err := k.DeductAndGetUserApprovals(overallTransferBalances, castedTransfers, ctx, collection, badgeIds, times, from, to, requester, amount, solutions, "outgoing", from, challengeIdsIncremented, trackerIdsIncremented, prioritizedApprovals, onlyCheckPrioritized)
+	_, err := k.DeductAndGetUserApprovals(overallTransferBalances, castedTransfers, ctx, collection, badgeIds, times, from, to, requester, amount, solutions, "outgoing", from, challengeIdsIncremented, trackerIdsIncremented, prioritizedApprovals, onlyCheckPrioritized, zkProofSolutions)
 	return err
 }
 
 // DeductUserIncomingApprovals will check if the current transfer is approved from the to's outgoing approvals and handle the approval tallying accordingly
-func (k Keeper) DeductUserIncomingApprovals(ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.MerkleProof, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string, prioritizedApprovals []*types.ApprovalIdentifierDetails, onlyCheckPrioritized bool) error {
+func (k Keeper) DeductUserIncomingApprovals(ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.MerkleProof, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string, prioritizedApprovals []*types.ApprovalIdentifierDetails, onlyCheckPrioritized bool, zkProofSolutions []*types.ZkProofSolution) error {
 	currApprovals := userBalance.IncomingApprovals
 	if userBalance.AutoApproveSelfInitiatedIncomingTransfers {
 		currApprovals = AppendSelfInitiatedIncomingApproval(currApprovals, to)
@@ -42,17 +45,25 @@ func (k Keeper) DeductUserIncomingApprovals(ctx sdk.Context, overallTransferBala
 
 	//Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
 	castedTransfers := types.CastIncomingTransfersToCollectionTransfers(currApprovals, to)
-	_, err := k.DeductAndGetUserApprovals(overallTransferBalances, castedTransfers, ctx, collection, badgeIds, times, from, to, requester, amount, solutions, "incoming", to, challengeIdsIncremented, trackerIdsIncremented, prioritizedApprovals, onlyCheckPrioritized)
+	_, err := k.DeductAndGetUserApprovals(overallTransferBalances, castedTransfers, ctx, collection, badgeIds, times, from, to, requester, amount, solutions, "incoming", to, challengeIdsIncremented, trackerIdsIncremented, prioritizedApprovals, onlyCheckPrioritized, zkProofSolutions)
 	return err
 }
 
 // DeductCollectionApprovalsAndGetUserApprovalsToCheck will check if the current transfer is allowed via the collection's approved transfers and handle any tallying accordingly
-func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, fromAddress string, toAddress string, initiatedBy string, amount sdkmath.Uint, solutions []*types.MerkleProof, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string, prioritizedApprovals []*types.ApprovalIdentifierDetails, onlyCheckPrioritized bool) ([]*UserApprovalsToCheck, error) {
+func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, fromAddress string, toAddress string, initiatedBy string, amount sdkmath.Uint, solutions []*types.MerkleProof, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string, prioritizedApprovals []*types.ApprovalIdentifierDetails, onlyCheckPrioritized bool, zkProofSolutions []*types.ZkProofSolution) ([]*UserApprovalsToCheck, error) {
 	approvals := collection.CollectionApprovals
-	return k.DeductAndGetUserApprovals(overallTransferBalances, approvals, ctx, collection, badgeIds, times, fromAddress, toAddress, initiatedBy, amount, solutions, "collection", "", challengeIdsIncremented, trackerIdsIncremented, prioritizedApprovals, onlyCheckPrioritized)
+	return k.DeductAndGetUserApprovals(overallTransferBalances, approvals, ctx, collection, badgeIds, times, fromAddress, toAddress, initiatedBy, amount, solutions, "collection", "", challengeIdsIncremented, trackerIdsIncremented, prioritizedApprovals, onlyCheckPrioritized, zkProofSolutions)
 }
 
-func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balance, _approvals []*types.CollectionApproval, ctx sdk.Context, collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, fromAddress string, toAddress string, initiatedBy string, amount sdkmath.Uint, solutions []*types.MerkleProof, approvalLevel string, approverAddress string, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string, prioritizedApprovals []*types.ApprovalIdentifierDetails, onlyCheckPrioritized bool) ([]*UserApprovalsToCheck, error) {
+func (k Keeper) DeductAndGetUserApprovals(
+	overallTransferBalances []*types.Balance, _approvals []*types.CollectionApproval, ctx sdk.Context, 
+	collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, fromAddress string, 
+	toAddress string, initiatedBy string, amount sdkmath.Uint, solutions []*types.MerkleProof, 
+	approvalLevel string, approverAddress string, challengeIdsIncremented *[]string, trackerIdsIncremented *[]string, 
+	prioritizedApprovals []*types.ApprovalIdentifierDetails, onlyCheckPrioritized bool,
+	zkProofSolutions []*types.ZkProofSolution,
+	
+) ([]*UserApprovalsToCheck, error) {
 	//Reorder approvals based on prioritized approvals
 	approvals := []*types.CollectionApproval{}
 	prioritizedTransfers := []*types.CollectionApproval{}
@@ -177,6 +188,8 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 				continue
 				//return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrDisallowedTransfer, "transfer disallowed because to != initiatedBy: %s", transferStr)
 			}
+		
+
 
 			//Assert that initiatedBy owns the required badges
 			failedMustOwnBadges := false
@@ -280,6 +293,64 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 				// return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "%s", transferStr)
 			}
 
+			validProofs := make([]bool, len(approvalCriteria.ZkProofs))
+
+			//Assert valid solution for every ZKP
+			for i, zkProof := range approvalCriteria.ZkProofs {
+				for _, zkProofSolution := range zkProofSolutions {
+					if validProofs[i] {
+						continue
+					}
+
+					verificationKey := []byte(zkProof.VerificationKey)
+
+					proof := rapidsnarktypes.ProofData{}
+					err = json.Unmarshal([]byte(zkProofSolution.Proof), &proof)
+					if err != nil {
+						continue
+					}
+
+					pubSignals := []string{}
+					err = json.Unmarshal([]byte(zkProofSolution.PublicInputs), &pubSignals)
+					if err != nil {
+						continue
+					}
+
+					proofData := rapidsnarktypes.ZKProof{
+						Proof:      &proof,
+						PubSignals: pubSignals,
+					}
+
+					// verify the proof with the given verificationKey & publicSignals
+					err := rapidsnark.VerifyGroth16(proofData, verificationKey)
+					if err != nil {
+						fmt.Println("Error verifying proof:", err)
+						continue
+					}
+
+					proofHash := sha256.Sum256([]byte(zkProofSolution.Proof))
+					proofHashStr := fmt.Sprintf("%x", proofHash)
+
+					found, err := k.GetZKPFromStore(ctx, collection.CollectionId, approverAddress, approvalLevel, transferVal.ChallengeTrackerId, proofHashStr)
+					if !found && err == nil {
+						validProofs[i] = true
+					}
+				}
+			}
+
+			someProofIsInvalid := false
+			for _, valid := range validProofs {
+				if !valid {
+					someProofIsInvalid = true
+				}
+			}
+
+			if someProofIsInvalid {
+				continue
+			}
+
+
+
 			//here, we assert the transfer is good for each level of approvals and increment if necessary
 			maxPossible, err := k.GetMaxPossible(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.OverallApprovalAmount, approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "overall", "", true, trackerIdsIncremented)
 			if err != nil {
@@ -363,6 +434,23 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "%s", transferStr)
 			}
 
+
+
+			//Assert valid solution for every ZKP
+			for i := range approvalCriteria.ZkProofs {
+				if validProofs[i] {
+					hashStr := sha256.Sum256([]byte(zkProofSolutions[i].Proof))
+					proofHashStr := fmt.Sprintf("%x", hashStr)
+					
+					err =	k.SetZKPAsUsedInStore(ctx, collection.CollectionId, approverAddress, approvalLevel, transferVal.ChallengeTrackerId, proofHashStr)
+					if err != nil {
+						return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error setting zk proof as used in store")
+					}
+				}
+			}
+
+			
+			
 			//here, we assert the transfer is good for each level of approvals and increment if necessary
 			err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.OverallApprovalAmount, approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "overall", "", false, trackerIdsIncremented)
 			if err != nil {

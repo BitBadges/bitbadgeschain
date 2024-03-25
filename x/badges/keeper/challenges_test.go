@@ -21,7 +21,7 @@ func (suite *TestSuite) TestNoMerkleChallengeWorking() {
 	CreateCollections(suite, wctx, collectionsToCreate)
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
+	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false, []*types.ZkProofSolution{})
 	suite.Require().Nil(err, "Error getting user balance: %s")
 }
 
@@ -40,7 +40,7 @@ func (suite *TestSuite) TestMerkleChallengeInvalidSolutions() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false)
+	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, &[]string{}, &[]string{}, nil, false, []*types.ZkProofSolution{})
 	suite.Require().Error(err, "Error getting user balance: %s")
 
 	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{
@@ -49,7 +49,7 @@ func (suite *TestSuite) TestMerkleChallengeInvalidSolutions() {
 			Aunts: []*types.MerklePathItem{},
 			Leaf:  "sample",
 		},
-	}, &[]string{}, &[]string{}, nil, false)
+	}, &[]string{}, &[]string{}, nil, false, []*types.ZkProofSolution{})
 	suite.Require().Error(err, "Error getting user balance: %s")
 }
 func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {

@@ -291,6 +291,21 @@ message ApprovalTracker {
   repeated Balance amounts = 2;
 }
 
+message ZkProof {
+  // The verification key for the proof.
+  string verificationKey = 1;
+  // The URI associated with this proof, optionally providing metadata about the proof.
+  string uri = 2;
+  // Arbitrary custom data associated with this proof.
+  string customData = 3;
+}
+
+message ZkProofSolution {
+  // The public inputs
+  string publicInputs = 1;
+  // The proof
+  string proof = 2;
+}
 
 // ApprovalCriteria defines the criteria for approving transfers.
 message ApprovalCriteria {
@@ -304,6 +319,8 @@ message ApprovalCriteria {
   ApprovalAmounts approvalAmounts = 4;
   // Maximum number of transfers that can be processed using this approval.
   MaxNumTransfers maxNumTransfers = 5;
+  // The ZKPs that need to be solved for approval.
+  repeated ZkProof zkProofs = 6;
 
   // Require the "to" address to be equal to the "initiated by" address for approval.
   bool requireToEqualsInitiatedBy = 9;
@@ -332,6 +349,8 @@ message OutgoingApprovalCriteria {
   ApprovalAmounts approvalAmounts = 4;
   // Maximum number of transfers that can be processed using this approval.
   MaxNumTransfers maxNumTransfers = 5;
+  // The ZKPs that need to be solved for approval.
+  repeated ZkProof zkProofs = 6;
 
   // Require the "to" address to be equal to the "initiated by" address for approval.
   bool requireToEqualsInitiatedBy = 9;
@@ -351,6 +370,8 @@ message IncomingApprovalCriteria {
   ApprovalAmounts approvalAmounts = 4;
   // Maximum number of transfers that can be processed using this approval.
   MaxNumTransfers maxNumTransfers = 5;
+  // The ZKPs that need to be solved for approval.
+  repeated ZkProof zkProofs = 6;
 
   // Require the "from" address to be equal to the "initiated by" address for approval.
   bool requireFromEqualsInitiatedBy = 10;
@@ -421,6 +442,8 @@ message Transfer {
   // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
   // If false, we will check the prioritized approvals first and then scan through the rest of the approvals. 
   bool onlyCheckPrioritizedApprovals = 8;
+  // The ZKPs that need to be solved for approval.
+  repeated ZkProofSolution zkProofSolutions = 9;
 }
 
 // MerklePathItem represents an item in a Merkle path.

@@ -24,6 +24,7 @@ func TestMsgAddCustomData_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: MsgAddCustomData{
 				Creator: sample.AccAddress(),
+				Data:    "test",
 			},
 		},
 	}

@@ -19,6 +19,8 @@ var (
 	AccountGenerationPrefix = []byte{0x08}
 	AddressGenerationPrefix = []byte{0x09}
 
+	ZKPTrackerKey = []byte{0x0C}
+
 	NextAddressListIdKey = []byte{0x0A}
 
 	GlobalArchiveKey = []byte{0x0B}
@@ -57,6 +59,13 @@ func ConstructApprovalTrackerKey(collectionId sdkmath.Uint, addressForApproval s
 	tracker_id_str := amountTrackerId
 	return collection_id_str + BalanceKeyDelimiter + addressForApproval + BalanceKeyDelimiter + tracker_id_str + BalanceKeyDelimiter + level + BalanceKeyDelimiter + trackerType + BalanceKeyDelimiter + address
 }
+
+func ConstructZKPTreeTrackerKey(collectionId sdkmath.Uint, addressForApproval string, challengeLevel string, challengeId string, proofHash string) string {
+	collection_id_str := collectionId.String()
+	challenge_id_str := challengeId
+	return collection_id_str + BalanceKeyDelimiter + addressForApproval + BalanceKeyDelimiter + challengeLevel + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + proofHash
+}
+
 
 // Creates the used claim data key from an id and data. Note this is not prefixed yet. It is just performing a delimited string concatenation.
 func ConstructUsedClaimDataKey(collectionId sdkmath.Uint, claimId sdkmath.Uint) string {
@@ -109,6 +118,13 @@ func usedClaimChallengeStoreKey(usedClaimChallengeKey string) []byte {
 	key := make([]byte, len(UsedClaimChallengeKey)+len(usedClaimChallengeKey))
 	copy(key, UsedClaimChallengeKey)
 	copy(key[len(UsedClaimChallengeKey):], []byte(usedClaimChallengeKey))
+	return key
+}
+
+func usedZKPTrackerStoreKey(usedZKPTrackerKey string) []byte {
+	key := make([]byte, len(ZKPTrackerKey)+len(usedZKPTrackerKey))
+	copy(key, ZKPTrackerKey)
+	copy(key[len(ZKPTrackerKey):], []byte(usedZKPTrackerKey))
 	return key
 }
 

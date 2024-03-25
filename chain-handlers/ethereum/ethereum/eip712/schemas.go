@@ -129,7 +129,13 @@ func GetSchemas() []string {
 							"approverAddress": ""
 						}
 					],
-					"onlyCheckPrioritizedApprovals": false
+					"onlyCheckPrioritizedApprovals": false,
+					"zkProofSolutions": [
+						{
+							"proof": "",
+							"publicInputs": ""
+						}
+					]
 				}
 			]
 		}
@@ -216,6 +222,13 @@ func GetSchemas() []string {
 								"uri": "",
 								"customData": ""
 							},
+							"zkProofs": [
+								{
+									"verificationKey": "",
+									"uri": "",
+									"customData": ""
+								}
+							],
 							"predeterminedBalances": {
 								"manualBalances": [
 									{
@@ -343,6 +356,13 @@ func GetSchemas() []string {
 								"uri": "",
 								"customData": ""
 							},
+							"zkProofs": [
+								{
+									"verificationKey": "",
+									"uri": "",
+									"customData": ""
+								}
+							],
 							"predeterminedBalances": {
 								"manualBalances": [
 									{
@@ -928,6 +948,13 @@ func GetSchemas() []string {
 							"uri": "",
 							"customData": ""
 						},
+						"zkProofs": [
+							{
+								"verificationKey": "",
+								"uri": "",
+								"customData": ""
+							}
+						],
 						"predeterminedBalances": {
 							"manualBalances": [
 								{
@@ -1092,6 +1119,13 @@ func GetSchemas() []string {
 							"uri": "",
 							"customData": ""
 						},
+						"zkProofs": [
+							{
+								"verificationKey": "",
+								"uri": "",
+								"customData": ""
+							}
+						],
 						"predeterminedBalances": {
 							"manualBalances": [
 								{
@@ -1220,6 +1254,13 @@ func GetSchemas() []string {
 							"uri": "",
 							"customData": ""
 						},
+						"zkProofs": [
+							{
+								"verificationKey": "",
+								"uri": "",
+								"customData": ""
+							}
+						],
 						"predeterminedBalances": {
 							"manualBalances": [
 								{
@@ -1488,6 +1529,13 @@ func GetSchemas() []string {
 								"uri": "",
 								"customData": ""
 							},
+							"zkProofs": [
+								{
+									"verificationKey": "",
+									"uri": "",
+									"customData": ""
+								}
+							],
 							"predeterminedBalances": {
 								"manualBalances": [
 									{
@@ -1615,6 +1663,13 @@ func GetSchemas() []string {
 								"uri": "",
 								"customData": ""
 							},
+							"zkProofs": [
+								{
+									"verificationKey": "",
+									"uri": "",
+									"customData": ""
+								}
+							],
 							"predeterminedBalances": {
 								"manualBalances": [
 									{
@@ -2193,6 +2248,13 @@ func GetSchemas() []string {
 							"uri": "",
 							"customData": ""
 						},
+						"zkProofs": [
+							{
+								"verificationKey": "",
+								"uri": "",
+								"customData": ""
+							}
+						],
 						"predeterminedBalances": {
 							"manualBalances": [
 								{
@@ -2697,6 +2759,13 @@ func GetSchemas() []string {
 							"uri": "",
 							"customData": ""
 						},
+						"zkProofs": [
+							{
+								"verificationKey": "",
+								"uri": "",
+								"customData": ""
+							}
+						],
 						"predeterminedBalances": {
 							"manualBalances": [
 								{

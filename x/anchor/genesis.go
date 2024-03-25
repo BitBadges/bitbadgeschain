@@ -22,9 +22,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	}
 	k.SetParams(ctx, genState.Params)
 
-	if genState.NextLocationId.IsZero() {
-		genState.NextLocationId = sdk.NewUint(1)
-	}
+	genState.NextLocationId = sdk.NewUint(uint64(len(genState.AnchorData) + 1))
 
 	for i, anchor := range genState.AnchorData {
 		k.SetAnchorLocation(ctx, sdk.NewUint(uint64(i + 1)), anchor.Data, anchor.Creator)

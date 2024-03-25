@@ -83,6 +83,7 @@ func (k Keeper) GetGlobalArchiveFromStore(ctx sdk.Context) bool {
 	return archive[0] == 't'
 }
 
+
 /****************************************USER BALANCES****************************************/
 
 // Sets a user balance in the store using UserBalanceKey ([]byte{0x02}) as the prefix. No check if store has key already.
@@ -198,6 +199,18 @@ func (k Keeper) SetNextAddressListCounter(ctx sdk.Context, nextID sdkmath.Uint) 
 func (k Keeper) IncrementNextAddressListCounter(ctx sdk.Context) {
 	nextID := k.GetNextAddressListCounter(ctx)
 	k.SetNextAddressListCounter(ctx, nextID.AddUint64(1)) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
+}
+
+/*********************************USED ZKPS*********************************/
+func (k Keeper) SetZKPAsUsedInStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForZKP string, challengeLevel string, zkpId string, proofHash string) error {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(usedZKPTrackerStoreKey(ConstructZKPTreeTrackerKey(collectionId, addressForZKP, challengeLevel, zkpId, proofHash)), []byte("1"))
+	return nil
+}
+
+func (k Keeper) GetZKPFromStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForZKP string, challengeLevel string, zkpId string, proofHash string) (bool, error) {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(usedZKPTrackerStoreKey(ConstructZKPTreeTrackerKey(collectionId, addressForZKP, challengeLevel, zkpId, proofHash))), nil
 }
 
 /********************************************************************************/
