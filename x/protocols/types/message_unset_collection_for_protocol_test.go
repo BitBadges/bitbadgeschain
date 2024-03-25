@@ -24,7 +24,7 @@ func TestMsgUnsetCollectionForProtocol_ValidateBasic(t *testing.T) {
 			name: "valid address",
 			msg: MsgUnsetCollectionForProtocol{
 				Creator: sample.AccAddress(),
-				Name: "fdjhsajhksfd",
+				Name:    "fdjhsajhksfd",
 			},
 		},
 	}

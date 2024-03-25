@@ -46,7 +46,7 @@ func NewKeeper(
 		cdc:           cdc,
 		accountKeeper: ak,
 		bankKeeper:    bk,
-		wasmKeeper: 	 wk,
+		wasmKeeper:    wk,
 	}
 }
 

@@ -20,7 +20,6 @@ func CmdGlobalArchive() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argArchive := args[0]
 
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err

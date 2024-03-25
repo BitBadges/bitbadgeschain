@@ -22,16 +22,16 @@ func (msg MsgInstantiateContractCompat) ValidateBasic() error {
 	if msg.Funds != "0" {
 		funds, _ = sdk.ParseCoinsNormalized(msg.Funds)
 	}
-	
+
 	jsonMsgStr := "{}"
 	bytesMsg := []byte(jsonMsgStr)
 
 	oMsg := &wasmtypes.MsgInstantiateContract{
 		Sender: msg.Sender,
 		CodeID: msg.CodeId.Uint64(),
-		Label: 	msg.Label,
-		Funds: 	funds,
-		Msg: 		bytesMsg,
+		Label:  msg.Label,
+		Funds:  funds,
+		Msg:    bytesMsg,
 	}
 
 	if err := oMsg.ValidateBasic(); err != nil {

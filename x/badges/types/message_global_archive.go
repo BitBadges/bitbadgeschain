@@ -11,7 +11,7 @@ var _ sdk.Msg = &MsgGlobalArchive{}
 
 func NewMsgGlobalArchive(creator string, archive bool) *MsgGlobalArchive {
 	return &MsgGlobalArchive{
-		Creator:      creator,
+		Creator: creator,
 		Archive: archive,
 	}
 }
@@ -42,6 +42,6 @@ func (msg *MsgGlobalArchive) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
-	
+
 	return nil
 }

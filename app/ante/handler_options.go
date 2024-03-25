@@ -25,9 +25,9 @@ type HandlerOptions struct {
 	SignModeHandler authsigning.SignModeHandler
 	SigGasConsumer  func(meter sdk.GasMeter, sig signing.SignatureV2, params authtypes.Params) error
 	TxFeeChecker    ante.TxFeeChecker
-	WasmXKeeper			wasmxkeeper.Keeper
+	WasmXKeeper     wasmxkeeper.Keeper
 
-	VerifyBtcSigPath  string
+	VerifyBtcSigPath string
 }
 
 func (options HandlerOptions) Validate() error {

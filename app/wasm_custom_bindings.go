@@ -16,7 +16,7 @@ func GetCustomMsgEncodersOptions() []wasmKeeper.Option {
 }
 
 func GetCustomMsgQueryOptions(keeper badgeKeeper.Keeper, keeper2 protocolKeeper.Keeper) []wasmKeeper.Option {
-	badgeQueryOptions := wasmKeeper.WithQueryPlugins(badgeQueryPlugins(keeper ,keeper2))
+	badgeQueryOptions := wasmKeeper.WithQueryPlugins(badgeQueryPlugins(keeper, keeper2))
 	return []wasm.Option{badgeQueryOptions}
 }
 

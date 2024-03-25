@@ -83,15 +83,15 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 			BalancesType: sdkmath.NewUint(1),
 			CollectionApprovals: []*types.CollectionApproval{
 				{
-					ToListId:          "AllWithoutMint",
-					FromListId:        "AllWithoutMint",
-					InitiatedByListId: "AllWithoutMint",
-					TransferTimes:        GetFullUintRanges(),
-					OwnershipTimes:       GetFullUintRanges(),
-					BadgeIds:             GetFullUintRanges(),
-					ApprovalId:           "test",
-					AmountTrackerId:      "test",
-					ChallengeTrackerId:   "test",
+					ToListId:           "AllWithoutMint",
+					FromListId:         "AllWithoutMint",
+					InitiatedByListId:  "AllWithoutMint",
+					TransferTimes:      GetFullUintRanges(),
+					OwnershipTimes:     GetFullUintRanges(),
+					BadgeIds:           GetFullUintRanges(),
+					ApprovalId:         "test",
+					AmountTrackerId:    "test",
+					ChallengeTrackerId: "test",
 					ApprovalCriteria: &types.ApprovalCriteria{
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
@@ -105,9 +105,9 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 				{
 					FromListId:        "AllWithoutMint",
 					InitiatedByListId: "AllWithoutMint",
-					TransferTimes:        GetFullUintRanges(),
-					OwnershipTimes:       GetFullUintRanges(),
-					BadgeIds:             GetFullUintRanges(),
+					TransferTimes:     GetFullUintRanges(),
+					OwnershipTimes:    GetFullUintRanges(),
+					BadgeIds:          GetFullUintRanges(),
 
 					ApprovalId:         "test",
 					AmountTrackerId:    "test",
@@ -127,9 +127,9 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 				{
 					ToListId:          "AllWithoutMint",
 					InitiatedByListId: "AllWithoutMint",
-					TransferTimes:        GetFullUintRanges(),
-					OwnershipTimes:       GetFullUintRanges(),
-					BadgeIds:             GetFullUintRanges(),
+					TransferTimes:     GetFullUintRanges(),
+					OwnershipTimes:    GetFullUintRanges(),
+					BadgeIds:          GetFullUintRanges(),
 
 					ApprovalId:         "test",
 					AmountTrackerId:    "test",

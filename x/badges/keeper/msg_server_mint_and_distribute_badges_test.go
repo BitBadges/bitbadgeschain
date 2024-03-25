@@ -137,8 +137,8 @@ func (suite *TestSuite) TestNewBadgesNotAllowed() {
 			CanCreateMoreBadges: []*types.BalancesActionPermission{
 				{
 					PermanentlyForbiddenTimes: GetFullUintRanges(),
-					BadgeIds:       GetFullUintRanges(),
-					OwnershipTimes: GetFullUintRanges(),
+					BadgeIds:                  GetFullUintRanges(),
+					OwnershipTimes:            GetFullUintRanges(),
 				},
 			},
 		},
@@ -187,13 +187,13 @@ func (suite *TestSuite) TestNewBadgesPermissionIsApproved() {
 			CanCreateMoreBadges: []*types.BalancesActionPermission{
 				{
 					PermanentlyPermittedTimes: GetFullUintRanges(),
-					BadgeIds:       GetOneUintRange(),
-					OwnershipTimes: GetOneUintRange(),
+					BadgeIds:                  GetOneUintRange(),
+					OwnershipTimes:            GetOneUintRange(),
 				},
 				{
 					PermanentlyForbiddenTimes: GetFullUintRanges(),
-					BadgeIds:       GetFullUintRanges(),
-					OwnershipTimes: GetFullUintRanges(),
+					BadgeIds:                  GetFullUintRanges(),
+					OwnershipTimes:            GetFullUintRanges(),
 				},
 			},
 		},

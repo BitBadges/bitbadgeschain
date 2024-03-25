@@ -15,8 +15,8 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		CollectionId: sdk.NewUint(0), //We use 0 to indicate a new collection
 
 		//Exclusive to collection creations
-		BalancesType:             msg.BalancesType,
-		DefaultBalances: 					msg.DefaultBalances,
+		BalancesType:    msg.BalancesType,
+		DefaultBalances: msg.DefaultBalances,
 
 		//Applicable to creations and updates
 		BadgesToCreate:                         msg.BadgesToCreate,

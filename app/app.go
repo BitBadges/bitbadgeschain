@@ -131,6 +131,9 @@ import (
 	protocolsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/protocols/keeper"
 	protocolsmoduletypes "github.com/bitbadges/bitbadgeschain/x/protocols/types"
 
+	anchormodule "github.com/bitbadges/bitbadgeschain/x/anchor"
+	anchormodulekeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
+	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
@@ -196,6 +199,7 @@ var (
 		wasm.AppModuleBasic{},
 		wasmx.AppModuleBasic{},
 		protocolsmodule.AppModuleBasic{},
+		anchormodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -227,7 +231,7 @@ func init() {
 		panic(err)
 	}
 
-	DefaultNodeHome = filepath.Join(userHomeDir, "." + Name)
+	DefaultNodeHome = filepath.Join(userHomeDir, "."+Name)
 }
 
 // App extends an ABCI application, but with most of its parameters exported.
@@ -284,6 +288,8 @@ type App struct {
 	WasmxKeeper           wasmxkeeper.Keeper
 	ScopedProtocolsKeeper capabilitykeeper.ScopedKeeper
 	ProtocolsKeeper       protocolsmodulekeeper.Keeper
+	ScopedAnchorKeeper    capabilitykeeper.ScopedKeeper
+	AnchorKeeper          anchormodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -335,6 +341,7 @@ func New(
 		wasmxtypes.StoreKey,
 		ibcfeetypes.StoreKey,
 		protocolsmoduletypes.StoreKey,
+		anchormoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -641,6 +648,20 @@ func New(
 	protocolsModule := protocolsmodule.NewAppModule(appCodec, app.ProtocolsKeeper, app.AccountKeeper, app.BankKeeper)
 
 	protocolsIBCModule := protocolsmodule.NewIBCModule(app.ProtocolsKeeper)
+	scopedAnchorKeeper := app.CapabilityKeeper.ScopeToModule(anchormoduletypes.ModuleName)
+	app.ScopedAnchorKeeper = scopedAnchorKeeper
+	app.AnchorKeeper = *anchormodulekeeper.NewKeeper(
+		appCodec,
+		keys[anchormoduletypes.StoreKey],
+		keys[anchormoduletypes.MemStoreKey],
+		app.GetSubspace(anchormoduletypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedAnchorKeeper,
+	)
+	anchorModule := anchormodule.NewAppModule(appCodec, app.AnchorKeeper, app.AccountKeeper, app.BankKeeper)
+
+	anchorIBCModule := anchormodule.NewIBCModule(app.AnchorKeeper)
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	/**** IBC Routing ****/
@@ -659,8 +680,10 @@ func New(
 	ibcRouter.AddRoute(badgesmoduletypes.ModuleName, badgesIBCModule)
 	ibcRouter.AddRoute(wasmtypes.ModuleName, wasmStack)
 	ibcRouter.AddRoute(protocolsmoduletypes.ModuleName, protocolsIBCModule)
-
+	ibcRouter.AddRoute(anchormoduletypes.ModuleName, anchorIBCModule)
+	
 	app.IBCKeeper.SetRouter(ibcRouter)
+
 
 	// this line is used by starport scaffolding # ibc/app/router
 
@@ -720,6 +743,7 @@ func New(
 		badgesModule,
 		wasmxModule,
 		protocolsModule,
+		anchorModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
@@ -756,6 +780,7 @@ func New(
 		wasmtypes.ModuleName,
 		wasmxtypes.ModuleName,
 		protocolsmoduletypes.ModuleName,
+		anchormoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -785,6 +810,7 @@ func New(
 		wasmtypes.ModuleName,
 		wasmxtypes.ModuleName,
 		protocolsmoduletypes.ModuleName,
+		anchormoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -819,6 +845,7 @@ func New(
 		wasmtypes.ModuleName,
 		wasmxtypes.ModuleName,
 		protocolsmoduletypes.ModuleName,
+		anchormoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)
@@ -830,7 +857,6 @@ func New(
 	app.mm.RegisterInvariants(app.CrisisKeeper)
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterServices(app.configurator)
-	
 
 	autocliv1.RegisterQueryServer(app.GRPCQueryRouter(), runtimeservices.NewAutoCLIQueryService(app.mm.Modules))
 	reflectionSvc, err := runtimeservices.NewReflectionService()
@@ -853,13 +879,13 @@ func New(
 
 	// use custom AnteHandler
 	options := ante.HandlerOptions{
-		AccountKeeper:   app.AccountKeeper,
-		BankKeeper:      app.BankKeeper,
-		FeegrantKeeper:  app.FeeGrantKeeper,
-		IBCKeeper:       app.IBCKeeper,
-		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-		SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
-		WasmXKeeper: 		 app.WasmxKeeper,
+		AccountKeeper:    app.AccountKeeper,
+		BankKeeper:       app.BankKeeper,
+		FeegrantKeeper:   app.FeeGrantKeeper,
+		IBCKeeper:        app.IBCKeeper,
+		SignModeHandler:  encodingConfig.TxConfig.SignModeHandler(),
+		SigGasConsumer:   ante.DefaultSigVerificationGasConsumer,
+		WasmXKeeper:      app.WasmxKeeper,
 		VerifyBtcSigPath: homePath + "/bip322-js",
 	}
 
@@ -1078,6 +1104,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(wasmtypes.ModuleName)
 	paramsKeeper.Subspace(wasmxtypes.ModuleName)
 	paramsKeeper.Subspace(protocolsmoduletypes.ModuleName)
+	paramsKeeper.Subspace(anchormoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper

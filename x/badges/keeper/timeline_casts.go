@@ -43,44 +43,45 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 		}
 
 		approvalTrackerList := &types.AddressList{
-			Addresses:        []string{approval.ApprovalId},
+			Addresses: []string{approval.ApprovalId},
 			Whitelist: true,
 		}
-		
+
 		amountTrackerList := &types.AddressList{
-			Addresses:        []string{approval.AmountTrackerId},
+			Addresses: []string{approval.AmountTrackerId},
 			Whitelist: true,
 		}
-		
+
 		challengeTrackerList := &types.AddressList{
-			Addresses:        []string{approval.ChallengeTrackerId},
+			Addresses: []string{approval.ChallengeTrackerId},
 			Whitelist: true,
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			BadgeIds:                  approval.BadgeIds,
-			TransferTimes:             approval.TransferTimes,
-			OwnershipTimes:            approval.OwnershipTimes,
+			BadgeIds:               approval.BadgeIds,
+			TransferTimes:          approval.TransferTimes,
+			OwnershipTimes:         approval.OwnershipTimes,
 			FromList:               fromList,
 			ToList:                 toList,
 			InitiatedByList:        initiatedByList,
-			ApprovalIdList: 			 approvalTrackerList,
-			AmountTrackerIdList: 	 amountTrackerList,
-			ChallengeTrackerIdList:  challengeTrackerList,
-			UsesBadgeIds:              true,
-			UsesTransferTimes:         true,
+			ApprovalIdList:         approvalTrackerList,
+			AmountTrackerIdList:    amountTrackerList,
+			ChallengeTrackerIdList: challengeTrackerList,
+			UsesBadgeIds:           true,
+			UsesTransferTimes:      true,
 			UsesToList:             true,
 			UsesFromList:           true,
 			UsesInitiatedByList:    true,
-			UsesOwnershipTimes:        true,
-			UsesApprovalId: 					true,
-			UsesAmountTrackerId: 			true,
-			UsesChallengeTrackerId: 		true,
-			ArbitraryValue:            approval,
+			UsesOwnershipTimes:     true,
+			UsesApprovalId:         true,
+			UsesAmountTrackerId:    true,
+			UsesChallengeTrackerId: true,
+			ArbitraryValue:         approval,
 		})
 	}
 	return castedPermissions, nil
 }
+
 //TODO: Unused currently .... keep?
 //TODO: Note tracker ids may be msising when i uncomment
 // func (k Keeper) CastUserOutgoingApprovalToUniversalPermission(ctx sdk.Context, approvals []*types.UserOutgoingApproval) ([]*types.UniversalPermission, error) {
@@ -108,7 +109,6 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 // 				Whitelist: true,
 // 			}
 // 		}
-		
 
 // 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 // 			BadgeIds:                  approval.BadgeIds,

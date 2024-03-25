@@ -31,7 +31,6 @@ func (k Keeper) CreateAddressList(ctx sdk.Context, addressList *types.AddressLis
 		return sdkerrors.Wrapf(ErrAddressListAlreadyExists, "address list with id %s already exists or is reserved", id)
 	}
 
-
 	// From cosmos SDK x/group module
 	// Generate account address for list
 	var accountAddr sdk.AccAddress
@@ -48,7 +47,7 @@ func (k Keeper) CreateAddressList(ctx sdk.Context, addressList *types.AddressLis
 		}
 		//generate the address from the credential
 		accountAddr = sdk.AccAddress(ac.Address())
-		
+
 		break
 	}
 
@@ -70,22 +69,22 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 
 	if addressListId == "Mint" {
 		addressList = &types.AddressList{
-			ListId:        "Mint",
-			Addresses:        []string{"Mint"},
-			Whitelist: true,
-			Uri:              "",
-			CustomData:       "",
+			ListId:     "Mint",
+			Addresses:  []string{"Mint"},
+			Whitelist:  true,
+			Uri:        "",
+			CustomData: "",
 		}
 		handled = true
 	} else if len(addressListId) > 10 && addressListId[0:10] == "AllWithout" {
 		//If starts with AllWithout, we create a list with all addresses except the ones specified delimited by :
 		addresses := addressListId[10:]
 		addressList = &types.AddressList{
-			ListId:        addressListId,
-			Addresses:        []string{},
-			Whitelist: false,
-			Uri:              "",
-			CustomData:       "",
+			ListId:     addressListId,
+			Addresses:  []string{},
+			Whitelist:  false,
+			Uri:        "",
+			CustomData: "",
 		}
 
 		//split by :
@@ -101,29 +100,29 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 		handled = true
 	} else if addressListId == "All" {
 		addressList = &types.AddressList{
-			ListId:        "All",
-			Addresses:        []string{},
-			Whitelist: false,
-			Uri:              "",
-			CustomData:       "",
+			ListId:     "All",
+			Addresses:  []string{},
+			Whitelist:  false,
+			Uri:        "",
+			CustomData: "",
 		}
 		handled = true
 	} else if addressListId == "AllWithMint" {
 		addressList = &types.AddressList{
-			ListId:        "AllWithMint",
-			Addresses:        []string{},
-			Whitelist: false,
-			Uri:              "",
-			CustomData:       "",
+			ListId:     "AllWithMint",
+			Addresses:  []string{},
+			Whitelist:  false,
+			Uri:        "",
+			CustomData: "",
 		}
 		handled = true
 	} else if addressListId == "None" {
 		addressList = &types.AddressList{
-			ListId:        "None",
-			Addresses:        []string{},
-			Whitelist: true,
-			Uri:              "",
-			CustomData:       "",
+			ListId:     "None",
+			Addresses:  []string{},
+			Whitelist:  true,
+			Uri:        "",
+			CustomData: "",
 		}
 		handled = true
 	}
@@ -142,11 +141,11 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 
 		if allAreValid {
 			addressList = &types.AddressList{
-				ListId:        addressListId,
-				Addresses:        addresses,
-				Whitelist: true,
-				Uri:              "",
-				CustomData:       "",
+				ListId:     addressListId,
+				Addresses:  addresses,
+				Whitelist:  true,
+				Uri:        "",
+				CustomData: "",
 			}
 			handled = true
 		}
@@ -181,7 +180,7 @@ func (k Keeper) GetTrackerListById(ctx sdk.Context, trackerListId string) (*type
 	if addressList.ListId != trackerListIdCopy {
 		addressList.ListId = trackerListIdCopy
 	}
-	
+
 	return addressList, nil
 }
 
@@ -192,17 +191,15 @@ func (k Keeper) GetAddressListById(ctx sdk.Context, addressListId string) (*type
 	if addressListId[0] == '!' && len(addressListId) > 1 && addressListId[len(addressListId)-1] != ')' {
 		inverted = true
 		addressListId = addressListId[1:]
-	} else if  len(addressListId) > 3 && addressListId[0:2] == "!(" && addressListId[len(addressListId)-1] == ')' {
+	} else if len(addressListId) > 3 && addressListId[0:2] == "!(" && addressListId[len(addressListId)-1] == ')' {
 		inverted = true
-		addressListId = addressListId[2:len(addressListId)-1]
+		addressListId = addressListId[2 : len(addressListId)-1]
 	}
-
 
 	addressList, handled, err := getReservedListById(addressListId, false)
 	if err != nil {
 		return nil, err
 	}
-
 
 	if !handled {
 		addressListFetched, found := k.GetAddressListFromStore(ctx, addressListId)

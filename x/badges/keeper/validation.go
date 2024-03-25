@@ -25,7 +25,6 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, collection *types.BadgeCollec
 	return nil
 }
 
-
 func (k Keeper) UniversalValidateNotHalted(ctx sdk.Context) error {
 	halted := k.GetGlobalArchiveFromStore(ctx)
 

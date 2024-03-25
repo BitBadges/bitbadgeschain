@@ -143,17 +143,17 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 		for _, currRange := range balanceObj.BadgeIds {
 			for _, currTime := range balanceObj.OwnershipTimes {
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
-					BadgeId:                   currRange,
-					OwnershipTime:             currTime,
-					TransferTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-					TimelineTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
+					BadgeId:                currRange,
+					OwnershipTime:          currTime,
+					TransferTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
+					TimelineTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
 					ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
 					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
 					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
-					ApprovalIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
-					AmountTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
+					ApprovalIdList:         &AddressList{Addresses: []string{}, Whitelist: false},
+					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
 					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
-					ArbitraryValue:            balanceObj.Amount,
+					ArbitraryValue:         balanceObj.Amount,
 				})
 			}
 		}
@@ -163,16 +163,16 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 	for _, rangeToFetch := range idRanges {
 		for _, timeToFetch := range times {
 			toFetchPermissionDetails = append(toFetchPermissionDetails, &UniversalPermissionDetails{
-				BadgeId:                   rangeToFetch,
-				OwnershipTime:             timeToFetch,
-				TransferTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-				TimelineTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
+				BadgeId:                rangeToFetch,
+				OwnershipTime:          timeToFetch,
+				TransferTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
+				TimelineTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
 				ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
 				FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
 				InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
-				ApprovalIdList: 	&AddressList{Addresses: []string{}, Whitelist: false},
-				AmountTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
-					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
+				ApprovalIdList:         &AddressList{Addresses: []string{}, Whitelist: false},
+				AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
+				ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
 			},
 			)
 		}
@@ -336,15 +336,15 @@ func DeleteBalances(ctx sdk.Context, rangesToDelete []*UintRange, timesToDelete 
 		for _, currRange := range balanceObj.BadgeIds {
 			for _, currTime := range balanceObj.OwnershipTimes {
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
-					BadgeId:                   currRange,
-					OwnershipTime:             currTime,
-					TransferTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-					TimelineTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
+					BadgeId:                currRange,
+					OwnershipTime:          currTime,
+					TransferTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
+					TimelineTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
 					ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
 					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
 					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
-					ApprovalIdList: 	&AddressList{Addresses: []string{}, Whitelist: false},
-					AmountTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
+					ApprovalIdList:         &AddressList{Addresses: []string{}, Whitelist: false},
+					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
 					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
 				})
 			}
@@ -354,14 +354,14 @@ func DeleteBalances(ctx sdk.Context, rangesToDelete []*UintRange, timesToDelete 
 		for _, rangeToDelete := range rangesToDelete {
 			for _, timeToDelete := range timesToDelete {
 				toDeletePermissionDetails = append(toDeletePermissionDetails, &UniversalPermissionDetails{
-					BadgeId:                   rangeToDelete,
-					OwnershipTime:             timeToDelete,
-					TransferTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-					TimelineTime:              &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
+					BadgeId:                rangeToDelete,
+					OwnershipTime:          timeToDelete,
+					TransferTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
+					TimelineTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
 					ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
 					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
-					ApprovalIdList:  &AddressList{Addresses: []string{}, Whitelist: false},
-					AmountTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
+					ApprovalIdList:         &AddressList{Addresses: []string{}, Whitelist: false},
+					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
 					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
 					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
 				})
@@ -428,7 +428,7 @@ func SetBalances(newBalancesToSet []*Balance, balances []*Balance) ([]*Balance, 
 					existingBalance.OwnershipTimes = append(existingBalance.OwnershipTimes, currBalance.OwnershipTimes...)
 					existingBalance.OwnershipTimes = SortUintRangesAndMergeAdjacentAndIntersecting(existingBalance.OwnershipTimes)
 					merged = true
-					break	
+					break
 				} else if compareSlices(currBalance.OwnershipTimes, existingBalance.OwnershipTimes) {
 					existingBalance.BadgeIds = append(existingBalance.BadgeIds, currBalance.BadgeIds...)
 					existingBalance.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(existingBalance.BadgeIds)

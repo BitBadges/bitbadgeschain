@@ -33,7 +33,7 @@ func (k msgServer) UpdateProtocol(goCtx context.Context, msg *types.MsgUpdatePro
 		Uri:        msg.Uri,
 		CustomData: msg.CustomData,
 		CreatedBy:  msg.Creator,
-		IsFrozen: 	msg.IsFrozen,
+		IsFrozen:   msg.IsFrozen,
 	}
 
 	//Update protocol in store

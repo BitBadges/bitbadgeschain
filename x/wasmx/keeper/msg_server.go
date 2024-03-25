@@ -64,9 +64,9 @@ func (m msgServer) InstantiateContractCompat(goCtx context.Context, msg *types.M
 	oMsg := &wasmtypes.MsgInstantiateContract{
 		Sender: msg.Sender,
 		CodeID: msg.CodeId.Uint64(),
-		Label: 	msg.Label,
-		Funds: 	funds,
-		Msg: 		bytesMsg,
+		Label:  msg.Label,
+		Funds:  funds,
+		Msg:    bytesMsg,
 	}
 
 	res, err := wasmMsgServer.InstantiateContract(goCtx, oMsg)
@@ -76,7 +76,6 @@ func (m msgServer) InstantiateContractCompat(goCtx context.Context, msg *types.M
 
 	return &types.MsgInstantiateContractCompatResponse{
 		Address: res.Address,
-		Data: res.Data,
+		Data:    res.Data,
 	}, nil
 }
-

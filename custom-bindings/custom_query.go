@@ -68,22 +68,23 @@ func PerformCustomBitBadgesModuleQuery(bk badgeKeeper.Keeper, pk protocolKeeper.
 			switch {
 			case custom.QueryGetProtocol != nil:
 				res, err := pk.GetProtocol(ctx, custom.QueryGetProtocol)
-					if err != nil {
-						return nil, err
-					}
-					return json.Marshal(protocolTypes.QueryGetProtocolResponse{Protocol: res.Protocol})
-				case custom.QueryGetCollectionIdForProtocol != nil:
-					res, err := pk.GetCollectionIdForProtocol(ctx, custom.QueryGetCollectionIdForProtocol)
-					if err != nil {
-						return nil, err
-					}
-					return json.Marshal(protocolTypes.QueryGetCollectionIdForProtocolResponse{CollectionId: res.CollectionId})
+				if err != nil {
+					return nil, err
 				}
+				return json.Marshal(protocolTypes.QueryGetProtocolResponse{Protocol: res.Protocol})
+			case custom.QueryGetCollectionIdForProtocol != nil:
+				res, err := pk.GetCollectionIdForProtocol(ctx, custom.QueryGetCollectionIdForProtocol)
+				if err != nil {
+					return nil, err
+				}
+				return json.Marshal(protocolTypes.QueryGetCollectionIdForProtocolResponse{CollectionId: res.CollectionId})
+			}
 		}
 
 		return nil, sdkerrors.Wrap(types.ErrInvalidMsg, "Unknown Custom query variant")
 	}
 }
+
 // WASM handler for contracts calling into the badges module
 func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier {
 	return func(ctx sdk.Context, request json.RawMessage) ([]byte, error) {
@@ -131,14 +132,14 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 }
 
 type badgeCustomQuery struct {
-	QueryCollection                   *badgeTypes.QueryGetCollectionRequest                `json:"queryCollection,omitempty"`
-	QueryBalance                      *badgeTypes.QueryGetBalanceRequest                   `json:"queryBalance,omitempty"`
-	QueryAddressList               *badgeTypes.QueryGetAddressListRequest            `json:"queryAddressList,omitempty"`
-	QueryApprovalTracker             *badgeTypes.QueryGetApprovalTrackerRequest          `json:"queryApprovalTracker,omitempty"`
+	QueryCollection          *badgeTypes.QueryGetCollectionRequest       `json:"queryCollection,omitempty"`
+	QueryBalance             *badgeTypes.QueryGetBalanceRequest          `json:"queryBalance,omitempty"`
+	QueryAddressList         *badgeTypes.QueryGetAddressListRequest      `json:"queryAddressList,omitempty"`
+	QueryApprovalTracker     *badgeTypes.QueryGetApprovalTrackerRequest  `json:"queryApprovalTracker,omitempty"`
 	QueryGetChallengeTracker *badgeTypes.QueryGetChallengeTrackerRequest `json:"queryGetChallengeTracker,omitempty"`
 }
 
 type protocolCustomQuery struct {
-	QueryGetProtocol 								*protocolTypes.QueryGetProtocolRequest                   `json:"queryGetProtocol,omitempty"`
-	QueryGetCollectionIdForProtocol 	*protocolTypes.QueryGetCollectionIdForProtocolRequest       `json:"queryGetCollectionIdForProtocol,omitempty"`
+	QueryGetProtocol                *protocolTypes.QueryGetProtocolRequest                `json:"queryGetProtocol,omitempty"`
+	QueryGetCollectionIdForProtocol *protocolTypes.QueryGetCollectionIdForProtocolRequest `json:"queryGetCollectionIdForProtocol,omitempty"`
 }

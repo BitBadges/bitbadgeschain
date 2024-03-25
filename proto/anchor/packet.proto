@@ -1,0 +1,13 @@
+syntax = "proto3";
+package anchor;
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/anchor/types";
+
+message AnchorPacketData {
+    oneof packet {
+        NoData noData = 1;
+    }
+}
+
+message NoData {
+}

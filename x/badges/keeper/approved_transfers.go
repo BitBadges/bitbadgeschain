@@ -90,14 +90,14 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 	for _, badgeId := range badgeIds {
 		for _, time := range times {
 			unhandled = append(unhandled, &types.UniversalPermissionDetails{
-				BadgeId:                   badgeId,
-				OwnershipTime:             time,
-				TimelineTime:              &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-				TransferTime:              &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-				ToList:                 &types.AddressList{},
-				FromList:               &types.AddressList{},
-				InitiatedByList:        &types.AddressList{},
-				ApprovalIdList: 			 &types.AddressList{},
+				BadgeId:         badgeId,
+				OwnershipTime:   time,
+				TimelineTime:    &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
+				TransferTime:    &types.UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
+				ToList:          &types.AddressList{},
+				FromList:        &types.AddressList{},
+				InitiatedByList: &types.AddressList{},
+				ApprovalIdList:  &types.AddressList{},
 			})
 		}
 	}
@@ -141,7 +141,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 		if transferVal.ApprovalCriteria == nil {
 			//If there are no restrictions, it is a full match
 			//Setting remainingBalances to remaining will set everything to handled since remaining is empty
-			allBalancesForIdsAndTimes, err := types.GetBalancesForIds( ctx, transferVal.BadgeIds, transferVal.OwnershipTimes, remainingBalances)
+			allBalancesForIdsAndTimes, err := types.GetBalancesForIds(ctx, transferVal.BadgeIds, transferVal.OwnershipTimes, remainingBalances)
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "transfer disallowed: err fetching balances for transfer: %s", transferStr)
 			}
@@ -219,7 +219,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 					mustOwnBadge.OwnershipTimes = []*types.UintRange{{Start: currTime, End: currTime}}
 				}
 
-				fetchedBalances, err := types.GetBalancesForIds( ctx, mustOwnBadge.BadgeIds, mustOwnBadge.OwnershipTimes, balances)
+				fetchedBalances, err := types.GetBalancesForIds(ctx, mustOwnBadge.BadgeIds, mustOwnBadge.OwnershipTimes, balances)
 				if err != nil {
 					failedMustOwnBadges = true
 					break
@@ -255,7 +255,7 @@ func (k Keeper) DeductAndGetUserApprovals(overallTransferBalances []*types.Balan
 
 			//Get max balances allowed for this approvalCriteria element
 			//Get the max balances allowed for this approvalCriteria element WITHOUT incrementing
-			transferBalancesToCheck, err := types.GetBalancesForIds( ctx, transferVal.BadgeIds, transferVal.OwnershipTimes, remainingBalances)
+			transferBalancesToCheck, err := types.GetBalancesForIds(ctx, transferVal.BadgeIds, transferVal.OwnershipTimes, remainingBalances)
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "transfer disallowed: err fetching balances for transfer: %s", transferStr)
 			}
@@ -496,7 +496,7 @@ func (k Keeper) GetMaxPossible(
 	if approvedAmount.GT(sdkmath.NewUint(0)) {
 		//Assume that if approvalTrackerDetails.Amounts is already not nil, it is correct and has been incremented properly
 		//Here, we ONLY check if the NEW transferBalances makes it exceed the threshold
-		currTallyForCurrentIdsAndTimes, err := types.GetBalancesForIds( ctx, transferVal.BadgeIds, transferVal.OwnershipTimes, approvalTrackerDetails.Amounts)
+		currTallyForCurrentIdsAndTimes, err := types.GetBalancesForIds(ctx, transferVal.BadgeIds, transferVal.OwnershipTimes, approvalTrackerDetails.Amounts)
 		if err != nil {
 			return nil, err
 		}
@@ -647,7 +647,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	if approvedAmount.GT(sdkmath.NewUint(0)) {
 		//Assume that if approvalTrackerDetails.Amounts is already not nil, it is correct and has been incremented properly
 		//Here, we ONLY check if the NEW transferBalances makes it exceed the threshold
-		currTallyForCurrentIdsAndTimes, err := types.GetBalancesForIds( ctx, transferVal.BadgeIds, transferVal.OwnershipTimes, approvalTrackerDetails.Amounts)
+		currTallyForCurrentIdsAndTimes, err := types.GetBalancesForIds(ctx, transferVal.BadgeIds, transferVal.OwnershipTimes, approvalTrackerDetails.Amounts)
 		if err != nil {
 			return err
 		}

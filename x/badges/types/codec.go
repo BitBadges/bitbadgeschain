@@ -44,5 +44,5 @@ func init() {
 var (
 	Amino     = codec.NewLegacyAmino()
 	ModuleCdc = codec.NewProtoCodec(cdctypes.NewInterfaceRegistry())
-	AminoCdc = codec.NewAminoCodec(Amino)
+	AminoCdc  = codec.NewAminoCodec(Amino)
 )

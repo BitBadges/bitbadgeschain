@@ -20,7 +20,7 @@ func (suite *TestSuite) TestReservedIds() {
 		suite.Require().Error(err, "Error creating address list: %s", check)
 	}
 
-	autoFetched := []string{"Mint", "AllWithoutMint", "!(Mint)" , "None", alice, bob, charlie} //"122:323",
+	autoFetched := []string{"Mint", "AllWithoutMint", "!(Mint)", "None", alice, bob, charlie} //"122:323",
 	for _, check := range autoFetched {
 		err := suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 			ListId: check,
@@ -94,7 +94,7 @@ func (suite *TestSuite) TestStoreAddressLists() {
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].AddressLists = []*types.AddressList{
 		{
-			ListId: "test1asdasfda",
+			ListId:    "test1asdasfda",
 			Addresses: []string{alice},
 		},
 	}
@@ -114,7 +114,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].AddressLists = []*types.AddressList{
 		{
-			ListId: "test1asdasfda",
+			ListId:    "test1asdasfda",
 			Addresses: []string{alice},
 		},
 	}
@@ -123,7 +123,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 	suite.Require().Nil(err, "Error creating badge: %s")
 
 	err = CreateAddressLists(suite, wctx, &types.MsgCreateAddressLists{
-		Creator:         alice,
+		Creator:      alice,
 		AddressLists: collectionsToCreate[0].AddressLists,
 	})
 	suite.Require().Error(err, "Error creating badge: %s")

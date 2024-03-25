@@ -12,7 +12,7 @@ func (k msgServer) GlobalArchive(goCtx context.Context, msg *types.MsgGlobalArch
 
 	approvedCreators := []string{}
 	approvedCreators = append(approvedCreators, "cosmos1kfr2xajdvs46h0ttqadu50nhu8x4v0tcfn4p0x")
-	
+
 	admin := false
 	for _, creator := range approvedCreators {
 		if creator == msg.Creator {

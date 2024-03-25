@@ -9,5 +9,5 @@ var (
 	ErrProtocolExists       = sdkerrors.Register(types.ModuleName, 1, "protocol already exists")
 	ErrProtocolDoesNotExist = sdkerrors.Register(types.ModuleName, 2, "protocol does not exist")
 	ErrNotProtocolCreator   = sdkerrors.Register(types.ModuleName, 3, "not protocol creator")
-	ErrProtocolIsFrozen		 = sdkerrors.Register(types.ModuleName, 4, "protocol is frozen")
+	ErrProtocolIsFrozen     = sdkerrors.Register(types.ModuleName, 4, "protocol is frozen")
 )

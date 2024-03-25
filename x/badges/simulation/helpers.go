@@ -86,7 +86,7 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				TimelineTimes:  GetTimelineTimes(r, 3),
+				TimelineTimes:             GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateOffChainBalancesMetadata: []*types.TimedUpdatePermission{
@@ -94,7 +94,7 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				TimelineTimes:  GetTimelineTimes(r, 3),
+				TimelineTimes:             GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateStandards: []*types.TimedUpdatePermission{
@@ -102,7 +102,7 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				TimelineTimes:  GetTimelineTimes(r, 3),
+				TimelineTimes:             GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateCustomData: []*types.TimedUpdatePermission{
@@ -110,7 +110,7 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				TimelineTimes:  GetTimelineTimes(r, 3),
+				TimelineTimes:             GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateManager: []*types.TimedUpdatePermission{
@@ -118,7 +118,7 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				TimelineTimes:  GetTimelineTimes(r, 3),
+				TimelineTimes:             GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateCollectionMetadata: []*types.TimedUpdatePermission{
@@ -126,7 +126,7 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				TimelineTimes:  GetTimelineTimes(r, 3),
+				TimelineTimes:             GetTimelineTimes(r, 3),
 			},
 		},
 		CanCreateMoreBadges: []*types.BalancesActionPermission{
@@ -134,8 +134,8 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				OwnershipTimes: GetTimelineTimes(r, 3),
-				BadgeIds:       GetTimelineTimes(r, 3),
+				OwnershipTimes:            GetTimelineTimes(r, 3),
+				BadgeIds:                  GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{
@@ -143,21 +143,21 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				TimelineTimes:  GetTimelineTimes(r, 3),
-				BadgeIds:       GetTimelineTimes(r, 3),
+				TimelineTimes:             GetTimelineTimes(r, 3),
+				BadgeIds:                  GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{
 			{
 
-				PermanentlyPermittedTimes:       GetTimelineTimes(r, 3),
-				PermanentlyForbiddenTimes:       GetTimelineTimes(r, 3),
-				TransferTimes:        GetTimelineTimes(r, 3),
-				OwnershipTimes:       GetTimelineTimes(r, 3),
-				BadgeIds:             GetTimelineTimes(r, 3),
-				ToListId:          GetRandomAddresses(r, 3, accs)[0],
-				FromListId:        GetRandomAddresses(r, 3, accs)[0],
-				InitiatedByListId: GetRandomAddresses(r, 3, accs)[0],
+				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
+				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
+				TransferTimes:             GetTimelineTimes(r, 3),
+				OwnershipTimes:            GetTimelineTimes(r, 3),
+				BadgeIds:                  GetTimelineTimes(r, 3),
+				ToListId:                  GetRandomAddresses(r, 3, accs)[0],
+				FromListId:                GetRandomAddresses(r, 3, accs)[0],
+				InitiatedByListId:         GetRandomAddresses(r, 3, accs)[0],
 			},
 		},
 	}

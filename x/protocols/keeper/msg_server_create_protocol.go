@@ -19,7 +19,7 @@ func (k msgServer) CreateProtocol(goCtx context.Context, msg *types.MsgCreatePro
 		Uri:        msg.Uri,
 		CustomData: msg.CustomData,
 		CreatedBy:  msg.Creator,
-		IsFrozen:  msg.IsFrozen,
+		IsFrozen:   msg.IsFrozen,
 	}
 
 	//Check if protocol already exists

@@ -22,7 +22,6 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		return nil, err
 	}
 
-	
 	collection := &types.BadgeCollection{}
 	if msg.CollectionId.Equal(sdkmath.NewUint(0)) {
 		nextCollectionId := k.GetNextCollectionId(ctx)
@@ -36,24 +35,24 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		for {
 			derivationKey := make([]byte, 8)
 			binary.BigEndian.PutUint64(derivationKey, nextCollectionId.Uint64())
-	
+
 			ac, err := authtypes.NewModuleCredential(types.ModuleName, AccountGenerationPrefix, derivationKey)
 			if err != nil {
 				return nil, err
 			}
 			//generate the address from the credential
 			accountAddr = sdk.AccAddress(ac.Address())
-			
+
 			break
 		}
 
 		collection = &types.BadgeCollection{
-			CollectionId: nextCollectionId,
-			CollectionPermissions:                            &types.CollectionPermissions{},
-			BalancesType:                                     msg.BalancesType,
-			DefaultBalances: 																	msg.DefaultBalances,
-			CreatedBy:                                        msg.Creator,
-			AliasAddress: 																		accountAddr.String(),
+			CollectionId:          nextCollectionId,
+			CollectionPermissions: &types.CollectionPermissions{},
+			BalancesType:          msg.BalancesType,
+			DefaultBalances:       msg.DefaultBalances,
+			CreatedBy:             msg.Creator,
+			AliasAddress:          accountAddr.String(),
 			ManagerTimeline: []*types.ManagerTimeline{
 				{
 					Manager: msg.Creator,
@@ -83,7 +82,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	if err != nil {
 		return nil, err
 	}
-	
+
 	//Check must be manager
 	err = k.UniversalValidate(ctx, collection, UniversalValidationParams{
 		Creator:       msg.Creator,

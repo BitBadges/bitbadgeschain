@@ -6,10 +6,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/std"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	bitcoin "github.com/bitbadges/bitbadgeschain/chain-handlers/bitcoin/utils"
 	ethereumcodec "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/crypto/codec"
 	ethereum "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/utils"
 	solana "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/utils"
-	bitcoin "github.com/bitbadges/bitbadgeschain/chain-handlers/bitcoin/utils"
 )
 
 // RegisterLegacyAminoCodec registers Interfaces from types, crypto, and SDK std.

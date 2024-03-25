@@ -59,10 +59,10 @@ func init() {
 // CONTRACT: Pubkeys are set in context for all signers before this decorator runs
 // CONTRACT: Tx must implement SigVerifiableTx interface
 type Eip712SigVerificationDecorator struct {
-	ak              ante.AccountKeeper
-	wasmxKeeper     wasmxkeeper.Keeper
-	signModeHandler authsigning.SignModeHandler
-	chain           string
+	ak               ante.AccountKeeper
+	wasmxKeeper      wasmxkeeper.Keeper
+	signModeHandler  authsigning.SignModeHandler
+	chain            string
 	verifyBtcSigPath string
 }
 
@@ -71,10 +71,10 @@ func NewEip712SigVerificationDecorator(ak ante.AccountKeeper,
 	wk wasmxkeeper.Keeper,
 	signModeHandler authsigning.SignModeHandler, chain string, verifyBtcSigPath string) Eip712SigVerificationDecorator {
 	return Eip712SigVerificationDecorator{
-		ak:              ak,
-		wasmxKeeper: 	 	 wk,
-		signModeHandler: signModeHandler,
-		chain:           chain,
+		ak:               ak,
+		wasmxKeeper:      wk,
+		signModeHandler:  signModeHandler,
+		chain:            chain,
 		verifyBtcSigPath: verifyBtcSigPath,
 	}
 }
@@ -313,11 +313,10 @@ func VerifySignature(
 		sha256JsonHash := sha256.Sum256(sortedBytes)
 		jsonHashHexStr := hex.EncodeToString(sha256JsonHash[:])
 
-
 		//If chain is Solana, we need to use the Solana way to verify the signature (alphabetically sorted JSON keys)
 		//Else, we use EIP712 typed signatures for Ethereum
 		if chain == "Solana" || chain == "Bitcoin" {
-			
+
 			//Match address to pubkey to make sure it's equivalent and no random address is used
 			//This is used for indexing purposes (to be able to map Solana addresses to Cosmos addresses,
 			//you need to know the Solana address bc it takes a hash to convert, so you can't go the opposite way)
@@ -349,7 +348,7 @@ func VerifySignature(
 				if err != nil {
 					return sdkerrors.Wrapf(err, "unable to verify signer signature of Bitcoin signature")
 				}
-			
+
 				// Process the output as needed, for example, splitting it into lines
 				lines := strings.Split(string(output), "\n")
 				if len(lines) < 1 {
@@ -373,14 +372,14 @@ func VerifySignature(
 				ethcommon.Address(pubKey.Address().Bytes()),
 				// []byte(jsonHashHexStr),
 				[]byte(jsonStr),
-				"0x" + hex.EncodeToString(feePayerSig),
+				"0x"+hex.EncodeToString(feePayerSig),
 			)
 			if isHashSigValid && hashSigErr == nil {
 				return nil
 			}
 
 			//If we do not pass the above check, we will try to EIP-712 sign the message
-			
+
 			//TODO: Make this num nested structs to account for the nested structs in the EIP712 message?
 			if len(jsonStr) > 1000 {
 				return sdkerrors.Wrapf(types.ErrInvalidChainID, "could not verify standard JSON signature and tx is too expensive for Ethereum EIP712 signature verification")
@@ -399,7 +398,7 @@ func VerifySignature(
 			if CheckFeePayerPubKey(pubKey, sigHash, feePayerSig) != nil {
 				return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify Ethereum signature")
 			}
-			
+
 			standardMsgSigValid := secp256k1.VerifySignature(pubKey.Bytes(), sigHash, feePayerSig[:len(feePayerSig)-1])
 			if !standardMsgSigValid {
 				return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify Ethereum signature")
@@ -440,7 +439,7 @@ func GetNumNestedStructs(m map[string]interface{}) int {
 		switch v.(type) {
 		case map[string]interface{}:
 			numNestedStructs += GetNumNestedStructs(v.(map[string]interface{}))
-		
+
 		case []interface{}:
 			for _, v := range v.([]interface{}) {
 				switch v.(type) {
@@ -449,7 +448,7 @@ func GetNumNestedStructs(m map[string]interface{}) int {
 				}
 			}
 		}
-			
+
 	}
 	return numNestedStructs + 1
 }

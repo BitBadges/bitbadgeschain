@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package anchor;
+
+import "gogoproto/gogo.proto";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/anchor/types";
+
+// Msg defines the Msg service.
+service Msg {
+  rpc AddCustomData (MsgAddCustomData) returns (MsgAddCustomDataResponse);
+}
+
+message AnchorData {
+  string creator = 1;
+  string data    = 2;
+  string timestamp = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+message MsgAddCustomData {
+  string creator = 1;
+  string data    = 2;
+}
+
+message MsgAddCustomDataResponse {
+  // ID of the anchor location.
+  string locationId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}

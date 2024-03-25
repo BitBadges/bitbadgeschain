@@ -264,14 +264,13 @@ func (suite *TestSuite) TestCreateBadgesIdGreaterThanMax() {
 	suite.Require().Error(err, "Error creating badge: %s")
 }
 
-
 func (suite *TestSuite) TestDuplicateBadgeIDs() {
 	// wctx := sdk.WrapSDKContext(suite.ctx)
 
 	currBalances := []*types.Balance{
 		{
-			Amount:         sdkmath.NewUint(1),
-			BadgeIds:       []*types.UintRange{
+			Amount: sdkmath.NewUint(1),
+			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(2),
 					End:   sdkmath.NewUint(1000),
@@ -284,7 +283,7 @@ func (suite *TestSuite) TestDuplicateBadgeIDs() {
 			BadgeIds:       GetOneUintRange(),
 			OwnershipTimes: GetFullUintRanges(),
 		},
-	}	
+	}
 
 	currBalances, err := types.SubtractBalance(suite.ctx, currBalances, &types.Balance{
 		Amount:         sdkmath.NewUint(1),
@@ -305,8 +304,8 @@ func (suite *TestSuite) TestBadgeIdsWeirdJSThing() {
 
 	currBalances := []*types.Balance{
 		{
-			Amount:         sdkmath.NewUint(1),
-			BadgeIds:       []*types.UintRange{
+			Amount: sdkmath.NewUint(1),
+			BadgeIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(10000),
@@ -314,11 +313,11 @@ func (suite *TestSuite) TestBadgeIdsWeirdJSThing() {
 			},
 			OwnershipTimes: GetFullUintRanges(),
 		},
-	}	
+	}
 
 	currBalances, err := types.SubtractBalance(suite.ctx, currBalances, &types.Balance{
-		Amount:         sdkmath.NewUint(1),
-		BadgeIds:       []*types.UintRange{
+		Amount: sdkmath.NewUint(1),
+		BadgeIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(2),
 				End:   sdkmath.NewUint(2),
@@ -329,8 +328,8 @@ func (suite *TestSuite) TestBadgeIdsWeirdJSThing() {
 	suite.Require().Nil(err, "Error subtracting balances: %s")
 
 	currBalances, err = types.SubtractBalance(suite.ctx, currBalances, &types.Balance{
-		Amount:         sdkmath.NewUint(1),
-		BadgeIds:       []*types.UintRange{
+		Amount: sdkmath.NewUint(1),
+		BadgeIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(1),

@@ -81,7 +81,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 		for _, badgeId := range badgeIds {
 			for _, timelineTime := range timelineTimes {
 				for _, transferTime := range transferTimes {
-					for _, ownershipTime := range ownershipTimes {							
+					for _, ownershipTime := range ownershipTimes {
 						arbValue := []*ApprovalCriteriaWithIsApproved{
 							{
 								ApprovalCriteria: permission.ArbitraryValue.(*types.CollectionApproval).ApprovalCriteria,
@@ -90,16 +90,16 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 
 						brokenDown := []*types.UniversalPermissionDetails{
 							{
-								BadgeId:                   badgeId,
-								TimelineTime:              timelineTime,
-								TransferTime:              transferTime,
-								OwnershipTime:             ownershipTime,
+								BadgeId:                badgeId,
+								TimelineTime:           timelineTime,
+								TransferTime:           transferTime,
+								OwnershipTime:          ownershipTime,
 								ToList:                 toList,
 								FromList:               fromList,
 								InitiatedByList:        initiatedByList,
-								ApprovalIdList: 			 approvalIdList,
-								AmountTrackerIdList: 	 amountTrackerIdList,
-								ChallengeTrackerIdList:  challengeTrackerIdList,
+								ApprovalIdList:         approvalIdList,
+								AmountTrackerIdList:    amountTrackerIdList,
+								ChallengeTrackerIdList: challengeTrackerIdList,
 
 								ArbitraryValue: arbValue,
 							},
@@ -122,22 +122,22 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 							newArbValue := mergedApprovalCriteria
 
 							handled = append(handled, &types.UniversalPermissionDetails{
-								TimelineTime:       overlap.Overlap.TimelineTime,
-								BadgeId:            overlap.Overlap.BadgeId,
-								TransferTime:       overlap.Overlap.TransferTime,
-								OwnershipTime:      overlap.Overlap.OwnershipTime,
+								TimelineTime:    overlap.Overlap.TimelineTime,
+								BadgeId:         overlap.Overlap.BadgeId,
+								TransferTime:    overlap.Overlap.TransferTime,
+								OwnershipTime:   overlap.Overlap.OwnershipTime,
 								ToList:          overlap.Overlap.ToList,
 								FromList:        overlap.Overlap.FromList,
 								InitiatedByList: overlap.Overlap.InitiatedByList,
 
-								ApprovalIdList: overlap.Overlap.ApprovalIdList,
-								AmountTrackerIdList: overlap.Overlap.AmountTrackerIdList,
+								ApprovalIdList:         overlap.Overlap.ApprovalIdList,
+								AmountTrackerIdList:    overlap.Overlap.AmountTrackerIdList,
 								ChallengeTrackerIdList: overlap.Overlap.ChallengeTrackerIdList,
 
 								//Appended for future lookups (not involved in overlap logic)
 								PermanentlyPermittedTimes: permanentlyPermittedTimes,
 								PermanentlyForbiddenTimes: permanentlyForbiddenTimes,
-								ArbitraryValue: newArbValue,
+								ArbitraryValue:            newArbValue,
 							})
 						}
 					}

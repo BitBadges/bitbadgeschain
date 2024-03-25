@@ -21,7 +21,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 				return sdkerrors.Wrapf(ErrUserBalanceNotExists, "sender user balance (Mint) for %s is empty or does not exist", transfer.From)
 			} else {
 				fromUserBalance = &types.UserBalanceStore{
-					Balances:         collection.DefaultBalances.Balances,
+					Balances:          collection.DefaultBalances.Balances,
 					OutgoingApprovals: collection.DefaultBalances.OutgoingApprovals,
 					IncomingApprovals: collection.DefaultBalances.IncomingApprovals,
 					AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedOutgoingTransfers,
@@ -36,7 +36,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 			toUserBalance, found := k.GetUserBalanceFromStore(ctx, toBalanceKey)
 			if !found {
 				toUserBalance = &types.UserBalanceStore{
-					Balances:         collection.DefaultBalances.Balances,
+					Balances:          collection.DefaultBalances.Balances,
 					OutgoingApprovals: collection.DefaultBalances.OutgoingApprovals,
 					IncomingApprovals: collection.DefaultBalances.IncomingApprovals,
 					AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedOutgoingTransfers,

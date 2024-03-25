@@ -37,22 +37,22 @@ func TestRemoveOverlaps(t *testing.T) {
 		},
 
 		ToList: &types.AddressList{
-			Addresses:        []string{alice, bob, charlie},
+			Addresses: []string{alice, bob, charlie},
 			Whitelist: true,
 		},
 		FromList: &types.AddressList{
-			Addresses:        []string{alice, bob, charlie},
+			Addresses: []string{alice, bob, charlie},
 			Whitelist: true,
 		},
 		InitiatedByList: &types.AddressList{
-			Addresses:        []string{alice, bob, charlie},
+			Addresses: []string{alice, bob, charlie},
 			Whitelist: true,
 		},
 
 		AmountTrackerIdList: &types.AddressList{},
 
 		ChallengeTrackerIdList: &types.AddressList{},
-		ApprovalIdList: &types.AddressList{},
+		ApprovalIdList:         &types.AddressList{},
 	}, &types.UniversalPermissionDetails{
 		BadgeId: &types.UintRange{
 			Start: sdkmath.NewUint(1),
@@ -71,22 +71,22 @@ func TestRemoveOverlaps(t *testing.T) {
 			End:   sdkmath.NewUint(10),
 		},
 		ToList: &types.AddressList{
-			Addresses:        []string{alice, bob, charlie},
+			Addresses: []string{alice, bob, charlie},
 			Whitelist: true,
 		},
 		FromList: &types.AddressList{
-			Addresses:        []string{alice, bob, charlie},
+			Addresses: []string{alice, bob, charlie},
 			Whitelist: true,
 		},
 		InitiatedByList: &types.AddressList{
-			Addresses:        []string{alice, bob, charlie},
+			Addresses: []string{alice, bob, charlie},
 			Whitelist: true,
 		},
 
 		AmountTrackerIdList: &types.AddressList{},
 
 		ChallengeTrackerIdList: &types.AddressList{},
-		ApprovalIdList: &types.AddressList{},
+		ApprovalIdList:         &types.AddressList{},
 	})
 	expected := []*types.UniversalPermissionDetails{
 		{
@@ -107,21 +107,21 @@ func TestRemoveOverlaps(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList:    &types.AddressList{},
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -141,22 +141,22 @@ func TestRemoveOverlaps(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -176,22 +176,22 @@ func TestRemoveOverlaps(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -211,22 +211,22 @@ func TestRemoveOverlaps(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -246,22 +246,22 @@ func TestRemoveOverlaps(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 
 		{
@@ -282,22 +282,22 @@ func TestRemoveOverlaps(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -317,22 +317,22 @@ func TestRemoveOverlaps(t *testing.T) {
 				End:   sdkmath.NewUint(4),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 
 		{
@@ -353,22 +353,22 @@ func TestRemoveOverlaps(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 	}
 
@@ -427,22 +427,22 @@ func TestRemoveAddresses(t *testing.T) {
 			End:   sdkmath.NewUint(5),
 		},
 		ToList: &types.AddressList{
-			Addresses:        []string{alice},
+			Addresses: []string{alice},
 			Whitelist: true,
 		},
 		FromList: &types.AddressList{
-			Addresses:        []string{alice},
+			Addresses: []string{alice},
 			Whitelist: true,
 		},
 		InitiatedByList: &types.AddressList{
-			Addresses:        []string{alice},
+			Addresses: []string{alice},
 			Whitelist: true,
 		},
 
 		AmountTrackerIdList: &types.AddressList{},
 
 		ChallengeTrackerIdList: &types.AddressList{},
-		ApprovalIdList: &types.AddressList{},
+		ApprovalIdList:         &types.AddressList{},
 	}, &types.UniversalPermissionDetails{
 		BadgeId: &types.UintRange{
 			Start: sdkmath.NewUint(1),
@@ -461,22 +461,22 @@ func TestRemoveAddresses(t *testing.T) {
 			End:   sdkmath.NewUint(10),
 		},
 		ToList: &types.AddressList{
-			Addresses:        []string{alice, bob, charlie},
+			Addresses: []string{alice, bob, charlie},
 			Whitelist: true,
 		},
 		FromList: &types.AddressList{
-			Addresses:        []string{alice, bob, charlie},
+			Addresses: []string{alice, bob, charlie},
 			Whitelist: true,
 		},
 		InitiatedByList: &types.AddressList{
-			Addresses:        []string{alice, bob, charlie},
+			Addresses: []string{alice, bob, charlie},
 			Whitelist: true,
 		},
 
 		AmountTrackerIdList: &types.AddressList{},
 
 		ChallengeTrackerIdList: &types.AddressList{},
-		ApprovalIdList: &types.AddressList{},
+		ApprovalIdList:         &types.AddressList{},
 	})
 	expected := []*types.UniversalPermissionDetails{
 		{
@@ -497,22 +497,22 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -532,22 +532,22 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -567,22 +567,22 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -602,22 +602,22 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -637,22 +637,22 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 
 		{
@@ -673,22 +673,22 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -708,22 +708,22 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(4),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 
 		{
@@ -744,22 +744,22 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(10),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 
 		{
@@ -780,22 +780,22 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(5),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{bob, charlie},
+				Addresses: []string{bob, charlie},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -815,22 +815,22 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(5),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice},
+				Addresses: []string{alice},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{bob, charlie},
+				Addresses: []string{bob, charlie},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{alice, bob, charlie},
+				Addresses: []string{alice, bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 		{
 			TimelineTime: &types.UintRange{
@@ -850,22 +850,22 @@ func TestRemoveAddresses(t *testing.T) {
 				End:   sdkmath.NewUint(5),
 			},
 			ToList: &types.AddressList{
-				Addresses:        []string{alice},
+				Addresses: []string{alice},
 				Whitelist: true,
 			},
 			FromList: &types.AddressList{
-				Addresses:        []string{alice},
+				Addresses: []string{alice},
 				Whitelist: true,
 			},
 			InitiatedByList: &types.AddressList{
-				Addresses:        []string{bob, charlie},
+				Addresses: []string{bob, charlie},
 				Whitelist: true,
 			},
 
 			AmountTrackerIdList: &types.AddressList{},
 
 			ChallengeTrackerIdList: &types.AddressList{},
-			ApprovalIdList: &types.AddressList{},
+			ApprovalIdList:         &types.AddressList{},
 		},
 	}
 

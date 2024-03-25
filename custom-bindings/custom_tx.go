@@ -10,8 +10,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/jsonpb"
 
-	protocolTypes "github.com/bitbadges/bitbadgeschain/x/protocols/types"
 	badgeTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	protocolTypes "github.com/bitbadges/bitbadgeschain/x/protocols/types"
 )
 
 func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
@@ -23,7 +23,7 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 		}
 
 		reader := bytes.NewReader(jsonData)
-		
+
 		isBadgeModuleMsg := false
 		var badgeCustomMsg badgeTypes.BadgeCustomMsgType
 		err = jsonpb.Unmarshal(reader, &badgeCustomMsg)
@@ -72,7 +72,7 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 				return nil, sdkerrors.Wrap(err, err.Error())
 			}
 			switch {
-				case badgeCustomMsg.CreateProtocolMsg != nil:
+			case badgeCustomMsg.CreateProtocolMsg != nil:
 				badgeCustomMsg.CreateProtocolMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.CreateProtocolMsg}, nil
 			case badgeCustomMsg.UpdateProtocolMsg != nil:
@@ -94,5 +94,3 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 
 	}
 }
-
-

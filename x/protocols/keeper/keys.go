@@ -19,7 +19,7 @@ const StoreKey = types.ModuleName
 
 // protocolStoreKey returns the byte representation of the protocol key ([]byte{0x01} + protocolId)
 func protocolStoreKey(protocolName string) []byte {
-	key := make([]byte, len(ProtocolKey)+ len(protocolName))
+	key := make([]byte, len(ProtocolKey)+len(protocolName))
 	copy(key, ProtocolKey)
 	copy(key[len(ProtocolKey):], []byte(protocolName))
 	return key
@@ -32,7 +32,7 @@ func ConstructCollectionIdForProtocolKey(protocolName string, address string) st
 }
 
 func collectionIdForProtocolStoreKey(constructedKey string) []byte {
-	key := make([]byte, len(CollectionIdKey) + len(constructedKey))
+	key := make([]byte, len(CollectionIdKey)+len(constructedKey))
 	copy(key, CollectionIdKey)
 	copy(key[len(CollectionIdKey):], []byte(constructedKey))
 	return key

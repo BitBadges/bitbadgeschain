@@ -151,13 +151,13 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 		}
 
 		collectionRes, err := UpdateCollectionWithRes(suite, ctx, &types.MsgUniversalUpdateCollection{
-			CollectionId:             sdkmath.NewUint(0),
-			Creator:                  bob,
-			BalancesType:             balancesType,
-			CollectionPermissions:    collectionToCreate.Permissions,
-			CollectionApprovals:      collectionToCreate.CollectionApprovals,
-			DefaultBalances: 				  &types.UserBalanceStore{
-				Balances:  []*types.Balance{},
+			CollectionId:          sdkmath.NewUint(0),
+			Creator:               bob,
+			BalancesType:          balancesType,
+			CollectionPermissions: collectionToCreate.Permissions,
+			CollectionApprovals:   collectionToCreate.CollectionApprovals,
+			DefaultBalances: &types.UserBalanceStore{
+				Balances:          []*types.Balance{},
 				OutgoingApprovals: collectionToCreate.DefaultOutgoingApprovals,
 				IncomingApprovals: collectionToCreate.DefaultIncomingApprovals,
 				AutoApproveSelfInitiatedOutgoingTransfers: !collectionToCreate.DefaultDisapproveSelfInitiated,
@@ -208,7 +208,7 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 		}
 
 		err = CreateAddressLists(suite, ctx, &types.MsgCreateAddressLists{
-			Creator:         bob,
+			Creator:      bob,
 			AddressLists: collectionToCreate.AddressLists,
 		})
 		if err != nil {
@@ -232,7 +232,7 @@ func MintAndDistributeBadges(suite *TestSuite, ctx context.Context, msg *types.M
 		UpdateOffChainBalancesMetadataTimeline: true,
 		CollectionApprovals:                    msg.CollectionApprovals,
 		UpdateCollectionApprovals:              true,
-		DefaultBalances: 											  &types.UserBalanceStore{},
+		DefaultBalances:                        &types.UserBalanceStore{},
 	})
 	if err != nil {
 		return err

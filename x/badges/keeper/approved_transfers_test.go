@@ -471,9 +471,9 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 		{
 			ToListId:          "AllWithoutMint",
 			InitiatedByListId: alice,
-			TransferTimes:        GetFullUintRanges(),
-			OwnershipTimes:       GetFullUintRanges(),
-			BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			BadgeIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 
 			ApprovalId:         "test",
 			AmountTrackerId:    "test",

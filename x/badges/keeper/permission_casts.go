@@ -36,25 +36,25 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			BadgeIds:                  permission.BadgeIds,
-			TransferTimes:             permission.TransferTimes,
-			OwnershipTimes:            permission.OwnershipTimes,
+			BadgeIds:               permission.BadgeIds,
+			TransferTimes:          permission.TransferTimes,
+			OwnershipTimes:         permission.OwnershipTimes,
 			FromList:               fromList,
 			InitiatedByList:        initiatedByList,
-			ApprovalIdList: 			 approvalTrackerList,
-			AmountTrackerIdList: 	 amountTrackerList,
-			ChallengeTrackerIdList:  challengeTrackerList,
+			ApprovalIdList:         approvalTrackerList,
+			AmountTrackerIdList:    amountTrackerList,
+			ChallengeTrackerIdList: challengeTrackerList,
 
-			UsesBadgeIds:           true,
-			UsesTransferTimes:      true,
-			UsesOwnershipTimes:     true,
-			UsesFromList:        true,
-			UsesInitiatedByList: true,
-			UsesApprovalId: true,
-			UsesAmountTrackerId: true,
-			UsesChallengeTrackerId: true,
-			PermanentlyPermittedTimes:         permission.PermanentlyPermittedTimes,
-			PermanentlyForbiddenTimes:         permission.PermanentlyForbiddenTimes,
+			UsesBadgeIds:              true,
+			UsesTransferTimes:         true,
+			UsesOwnershipTimes:        true,
+			UsesFromList:              true,
+			UsesInitiatedByList:       true,
+			UsesApprovalId:            true,
+			UsesAmountTrackerId:       true,
+			UsesChallengeTrackerId:    true,
+			PermanentlyPermittedTimes: permission.PermanentlyPermittedTimes,
+			PermanentlyForbiddenTimes: permission.PermanentlyForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil
@@ -92,21 +92,21 @@ func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.
 			BadgeIds:                  permission.BadgeIds,
 			TransferTimes:             permission.TransferTimes,
 			OwnershipTimes:            permission.OwnershipTimes,
-			ToList:                 toList,
-			InitiatedByList:        initiatedByList,
-			ApprovalIdList: 			 approvalTrackerList,
-			AmountTrackerIdList: 	 amountTrackerList,
-			ChallengeTrackerIdList:  challengeTrackerList,
-			UsesAmountTrackerId: true,
-			UsesChallengeTrackerId: true,
-			UsesApprovalId: true,
+			ToList:                    toList,
+			InitiatedByList:           initiatedByList,
+			ApprovalIdList:            approvalTrackerList,
+			AmountTrackerIdList:       amountTrackerList,
+			ChallengeTrackerIdList:    challengeTrackerList,
+			UsesAmountTrackerId:       true,
+			UsesChallengeTrackerId:    true,
+			UsesApprovalId:            true,
 			UsesBadgeIds:              true,
 			UsesTransferTimes:         true,
 			UsesOwnershipTimes:        true,
-			UsesToList:             true,
-			UsesInitiatedByList:    true,
-			PermanentlyPermittedTimes:            permission.PermanentlyPermittedTimes,
-			PermanentlyForbiddenTimes:            permission.PermanentlyForbiddenTimes,
+			UsesToList:                true,
+			UsesInitiatedByList:       true,
+			PermanentlyPermittedTimes: permission.PermanentlyPermittedTimes,
+			PermanentlyForbiddenTimes: permission.PermanentlyForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil
@@ -133,7 +133,6 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 			return nil, err
 		}
 
-
 		amountTrackerList, err := k.GetTrackerListById(ctx, collectionUpdatePermission.AmountTrackerId)
 		if err != nil {
 			return nil, err
@@ -143,7 +142,6 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 		if err != nil {
 			return nil, err
 		}
-
 
 		fromList, err := k.GetAddressListById(ctx, collectionUpdatePermission.FromListId)
 		if err != nil {
@@ -164,24 +162,24 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 
 			TransferTimes:             collectionUpdatePermission.TransferTimes,
 			OwnershipTimes:            collectionUpdatePermission.OwnershipTimes,
-			ToList:                 toList,
-			FromList:               fromList,
-			InitiatedByList:        initiatedByList,
+			ToList:                    toList,
+			FromList:                  fromList,
+			InitiatedByList:           initiatedByList,
 			BadgeIds:                  collectionUpdatePermission.BadgeIds,
-			ApprovalIdList: 			 approvalTrackerList,
-			AmountTrackerIdList: 	 amountTrackerList,
-			ChallengeTrackerIdList:  challengeTrackerList,
-			UsesAmountTrackerId: true,
-			UsesChallengeTrackerId: true,
-			UsesApprovalId: true,
-			UsesBadgeIds:           true,
-			UsesTransferTimes:      true,
-			UsesOwnershipTimes:     true,
-			UsesToList:          true,
-			UsesFromList:        true,
-			UsesInitiatedByList: true,
-			PermanentlyPermittedTimes:         collectionUpdatePermission.PermanentlyPermittedTimes,
-			PermanentlyForbiddenTimes:         collectionUpdatePermission.PermanentlyForbiddenTimes,
+			ApprovalIdList:            approvalTrackerList,
+			AmountTrackerIdList:       amountTrackerList,
+			ChallengeTrackerIdList:    challengeTrackerList,
+			UsesAmountTrackerId:       true,
+			UsesChallengeTrackerId:    true,
+			UsesApprovalId:            true,
+			UsesBadgeIds:              true,
+			UsesTransferTimes:         true,
+			UsesOwnershipTimes:        true,
+			UsesToList:                true,
+			UsesFromList:              true,
+			UsesInitiatedByList:       true,
+			PermanentlyPermittedTimes: collectionUpdatePermission.PermanentlyPermittedTimes,
+			PermanentlyForbiddenTimes: collectionUpdatePermission.PermanentlyForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil
@@ -193,12 +191,12 @@ func (k Keeper) CastTimedUpdateWithBadgeIdsPermissionToUniversalPermission(timed
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 
-			TimelineTimes:     timedUpdateWithBadgeIdsPermission.TimelineTimes,
-			BadgeIds:          timedUpdateWithBadgeIdsPermission.BadgeIds,
-			UsesTimelineTimes: true,
-			UsesBadgeIds:      true,
-			PermanentlyPermittedTimes:    timedUpdateWithBadgeIdsPermission.PermanentlyPermittedTimes,
-			PermanentlyForbiddenTimes:    timedUpdateWithBadgeIdsPermission.PermanentlyForbiddenTimes,
+			TimelineTimes:             timedUpdateWithBadgeIdsPermission.TimelineTimes,
+			BadgeIds:                  timedUpdateWithBadgeIdsPermission.BadgeIds,
+			UsesTimelineTimes:         true,
+			UsesBadgeIds:              true,
+			PermanentlyPermittedTimes: timedUpdateWithBadgeIdsPermission.PermanentlyPermittedTimes,
+			PermanentlyForbiddenTimes: timedUpdateWithBadgeIdsPermission.PermanentlyForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil
@@ -210,10 +208,10 @@ func (k Keeper) CastTimedUpdatePermissionToUniversalPermission(timedUpdatePermis
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 
-			TimelineTimes:     timedUpdatePermission.TimelineTimes,
-			UsesTimelineTimes: true,
-			PermanentlyPermittedTimes:    timedUpdatePermission.PermanentlyPermittedTimes,
-			PermanentlyForbiddenTimes:    timedUpdatePermission.PermanentlyForbiddenTimes,
+			TimelineTimes:             timedUpdatePermission.TimelineTimes,
+			UsesTimelineTimes:         true,
+			PermanentlyPermittedTimes: timedUpdatePermission.PermanentlyPermittedTimes,
+			PermanentlyForbiddenTimes: timedUpdatePermission.PermanentlyForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil
@@ -224,12 +222,12 @@ func (k Keeper) CastBalancesActionPermissionToUniversalPermission(BalancesAction
 	for _, BalancesActionPermission := range BalancesActionPermission {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 
-			BadgeIds:           BalancesActionPermission.BadgeIds,
-			OwnershipTimes:     BalancesActionPermission.OwnershipTimes,
-			UsesBadgeIds:       true,
-			UsesOwnershipTimes: true,
-			PermanentlyPermittedTimes:     BalancesActionPermission.PermanentlyPermittedTimes,
-			PermanentlyForbiddenTimes:     BalancesActionPermission.PermanentlyForbiddenTimes,
+			BadgeIds:                  BalancesActionPermission.BadgeIds,
+			OwnershipTimes:            BalancesActionPermission.OwnershipTimes,
+			UsesBadgeIds:              true,
+			UsesOwnershipTimes:        true,
+			PermanentlyPermittedTimes: BalancesActionPermission.PermanentlyPermittedTimes,
+			PermanentlyForbiddenTimes: BalancesActionPermission.PermanentlyForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil

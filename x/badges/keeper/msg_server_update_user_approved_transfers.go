@@ -18,7 +18,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 	if err != nil {
 		return nil, err
 	}
-	
+
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
 	if !found {
 		return nil, ErrCollectionNotExists
@@ -37,7 +37,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 	userBalance, found := k.GetUserBalanceFromStore(ctx, balanceKey)
 	if !found {
 		userBalance = &types.UserBalanceStore{
-			Balances:         collection.DefaultBalances.Balances,
+			Balances:          collection.DefaultBalances.Balances,
 			OutgoingApprovals: collection.DefaultBalances.OutgoingApprovals,
 			IncomingApprovals: collection.DefaultBalances.IncomingApprovals,
 			AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedOutgoingTransfers,

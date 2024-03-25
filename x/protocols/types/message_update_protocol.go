@@ -17,7 +17,7 @@ func NewMsgUpdateProtocol(creator string, name string, uri string, customData st
 		Name:       name,
 		Uri:        uri,
 		CustomData: customData,
-		IsFrozen:  isFrozen,
+		IsFrozen:   isFrozen,
 	}
 }
 

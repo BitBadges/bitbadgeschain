@@ -289,7 +289,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 				return sdkerrors.Wrapf(ErrInvalidRequest, "challenge tracker id can not be the approval id of another approval")
 			}
 		}
-		
+
 		if strings.Contains(collectionApproval.ChallengeTrackerId, ":") || strings.Contains(collectionApproval.ChallengeTrackerId, "!") {
 			return sdkerrors.Wrapf(ErrIdsContainsInvalidChars, "challenge tracker id can not contain : or !")
 		}
@@ -381,7 +381,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers &&
 					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers
 
-				sequentialTransferIsBasicallyNil := approvalCriteria.PredeterminedBalances.IncrementedBalances == nil || ((approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances == nil || len(approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances) == 0					) &&
+				sequentialTransferIsBasicallyNil := approvalCriteria.PredeterminedBalances.IncrementedBalances == nil || ((approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances == nil || len(approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances) == 0) &&
 					(approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsNil() ||
 						approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsZero()) &&
 					(approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy.IsNil() ||
@@ -514,7 +514,6 @@ func ValidateBalances(ctx sdk.Context, balances []*Balance, canChangeValues bool
 	if err != nil {
 		return balances, err
 	}
-
 
 	return balances, nil
 }

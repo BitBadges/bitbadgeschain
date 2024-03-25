@@ -54,14 +54,13 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
 	}
 
-
 	if msg.BadgesToCreate != nil {
 		msg.BadgesToCreate, err = ValidateBalances(ctx, msg.BadgesToCreate, canChangeValues)
 		if err != nil {
 			return err
 		}
 	}
-	
+
 	if err := ValidateIsArchivedTimeline(msg.IsArchivedTimeline); err != nil {
 		return err
 	}
@@ -113,7 +112,6 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 	if msg.DefaultBalances == nil {
 		msg.DefaultBalances = &UserBalanceStore{}
 	}
-
 
 	if _, err := ValidateBalances(ctx, msg.DefaultBalances.Balances, canChangeValues); err != nil {
 		return err
@@ -178,7 +176,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default approvals are set")
 			}
 
-			if (len(msg.DefaultBalances.Balances) > 0) {
+			if len(msg.DefaultBalances.Balances) > 0 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default balances are set")
 			}
 

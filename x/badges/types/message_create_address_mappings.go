@@ -11,7 +11,7 @@ var _ sdk.Msg = &MsgCreateAddressLists{}
 
 func NewMsgCreateAddressLists(creator string, addressLists []*AddressList) *MsgCreateAddressLists {
 	return &MsgCreateAddressLists{
-		Creator:         creator,
+		Creator:      creator,
 		AddressLists: addressLists,
 	}
 }
