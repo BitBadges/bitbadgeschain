@@ -142,6 +142,14 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
+		"type": "badges/GlobalArchive",
+		"value": {
+			"creator": "",
+			"archive": true
+		}
+	}`)
+
+	schemas = append(schemas, `{
 		"type": "badges/UniversalUpdateCollection",
 		"value": {
 			"creator": "",

@@ -827,8 +827,6 @@ github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/iden3/go-iden3-crypto v0.0.15 h1:4MJYlrot1l31Fzlo2sF56u7EVFeHHJkxGXXZCtESgK4=
 github.com/iden3/go-iden3-crypto v0.0.15/go.mod h1:dLpM4vEPJ3nDHzhWFXDjzkn1qHoBeOT/3UEhXsEsP3E=
-github.com/iden3/go-rapidsnark v0.0.0-20230524142950-0986cf057d4e h1:JbL8xq63NbrhO55qO7ebeGvnpZVduOqv+zRJxjrjz+0=
-github.com/iden3/go-rapidsnark v0.0.0-20230524142950-0986cf057d4e/go.mod h1:7FGU0mj9LrKGNtBc49rH3XSY5gYfbs5pxXoq4SRiaNg=
 github.com/iden3/go-rapidsnark/types v0.0.3 h1:f0s1Qdut1qHe1O67+m+xUVRBPwSXnq5j0xSrBi0jqM4=
 github.com/iden3/go-rapidsnark/types v0.0.3/go.mod h1:ApgcaUxKIgSRA6fAeFxK7p+lgXXfG4oA2HN5DhFlfF4=
 github.com/iden3/go-rapidsnark/verifier v0.0.5 h1:J7y0ovrEjDQoWtZmlrp4tgGng1A9faMeYsQH4igAEqA=
