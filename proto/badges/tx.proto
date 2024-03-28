@@ -48,7 +48,7 @@ message MsgUniversalUpdateCollection {
   // ID of the collection (0 for new collection).
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
-  // Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed".
+  // Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed" or "Non-Public".
   string balancesType = 3;
 
   //The default balances for the user
@@ -195,7 +195,7 @@ message MsgCreateCollection {
   // Address of the creator.
   string creator = 1;
   
-  // Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed".
+  // Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed" or "Non-Public".
   string balancesType = 2;
   
   //The default balances for the user

@@ -16,9 +16,6 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		}
 	}
 
-	if IsInheritedBalances(collection) {
-		return collection, nil
-	}
 
 	//Check if we are allowed to create these badges
 	err := *new(error)

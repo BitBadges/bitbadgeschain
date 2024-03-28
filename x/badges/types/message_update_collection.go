@@ -159,57 +159,47 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 	}
 
 	if msg.CollectionId.IsZero() {
-		if msg.BalancesType != "Standard" && msg.BalancesType != "Inherited" && msg.BalancesType != "Off-Chain - Indexed" && msg.BalancesType != "Off-Chain - Non-Indexed" {
+		if msg.BalancesType != "Standard" && msg.BalancesType != "Off-Chain - Indexed" && msg.BalancesType != "Off-Chain - Non-Indexed" && msg.BalancesType != "Non-Public" {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "balances type must be Standard, Inherited, Off-Chain - Indexed, or Off-Chain - Non-Indexed")
 		}
 
 		if msg.BalancesType != "Standard" {
 			if len(msg.CollectionApprovals) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but claims and/or transfers are set")
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but claims and/or transfers are set")
 			}
 
 			if len(msg.DefaultBalances.IncomingApprovals) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default approvals are set")
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default approvals are set")
 			}
 
 			if len(msg.DefaultBalances.OutgoingApprovals) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default approvals are set")
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default approvals are set")
 			}
 
 			if len(msg.DefaultBalances.Balances) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default balances are set")
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default balances are set")
 			}
 
 			if len(msg.DefaultBalances.UserPermissions.CanUpdateIncomingApprovals) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default user permissions are being set")
 			}
 
 			if len(msg.DefaultBalances.UserPermissions.CanUpdateOutgoingApprovals) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default user permissions are being set")
 			}
 
 			if len(msg.DefaultBalances.UserPermissions.CanUpdateAutoApproveSelfInitiatedIncomingTransfers) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default user permissions are being set")
 			}
 
 			if len(msg.DefaultBalances.UserPermissions.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes off-chain balances but default user permissions are being set")
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default user permissions are being set")
 			}
 		}
 
-		if msg.BalancesType != "Off-Chain - Indexed" && msg.BalancesType != "Off-Chain - Non-Indexed" {
+		if msg.BalancesType == "Standard" || msg.BalancesType == "Non-Public" {
 			if len(msg.OffChainBalancesMetadataTimeline) > 0 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes on-chain balances but off-chain balances are set")
-			}
-		}
-
-		if msg.BalancesType == "Inherited" {
-			// if msg.InheritedCollectionId.IsNil() || msg.InheritedCollectionId.IsZero() {
-			// 	return sdkerrors.Wrapf(ErrInvalidRequest, "inherited collection id must be set for inherited balances")
-			// }
-
-			if msg.BadgesToCreate != nil && len(msg.BadgesToCreate) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "badges are inherited from parent so you should not specify to create any badges")
 			}
 		}
 

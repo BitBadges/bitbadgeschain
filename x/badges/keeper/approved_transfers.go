@@ -223,7 +223,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 								balances = initiatedByBalance.Balances
 							}
 						} else {
-							return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrWrongBalancesType, "must own badges must have Standard balances type %s", collection.CollectionId)
+							return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrWrongBalancesType, "collections in must own badges must have Standard balances type %s", collection.CollectionId)
 						}
 					}
 				}

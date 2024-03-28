@@ -12,8 +12,8 @@ func IsOffChainBalances(collection *types.BadgeCollection) bool {
 	return collection.BalancesType == "Off-Chain - Indexed"
 }
 
-func IsInheritedBalances(collection *types.BadgeCollection) bool {
-	return collection.BalancesType == "Inherited"
+func IsNonPublicBalances(collection *types.BadgeCollection) bool {
+	return collection.BalancesType == "Non-Public"
 }
 
 func IsNonIndexedBalances(collection *types.BadgeCollection) bool {

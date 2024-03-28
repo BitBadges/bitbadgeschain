@@ -137,7 +137,7 @@ type MsgUniversalUpdateCollection struct {
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	// ID of the collection (0 for new collection).
 	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
-	// Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed".
+	// Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed" or "Non-Public".
 	BalancesType string `protobuf:"bytes,3,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
 	//The default balances for the user
 	DefaultBalances *UserBalanceStore `protobuf:"bytes,4,opt,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
@@ -669,7 +669,7 @@ var xxx_messageInfo_MsgUpdateCollectionResponse proto.InternalMessageInfo
 type MsgCreateCollection struct {
 	// Address of the creator.
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	// Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed".
+	// Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed" or "Non-Public".
 	BalancesType string `protobuf:"bytes,2,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
 	//The default balances for the user
 	DefaultBalances *UserBalanceStore `protobuf:"bytes,4,opt,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
