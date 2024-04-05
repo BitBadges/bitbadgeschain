@@ -21,9 +21,9 @@ var _ = strconv.Itoa(0)
 
 func CmdGetChallengeTracker() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-num-used-for-merkle-challenge [collectionId] [approvalLevel] [approverAddress] [challengeTrackerId] [leafIndex]",
+		Use:   "get-num-used-for-merkle-challenge [collectionId] [approvalLevel] [approverAddress] [approvalId] [challengeTrackerId] [leafIndex]",
 		Short: "Query getChallengeTracker",
-		Args:  cobra.ExactArgs(5),
+		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -37,8 +37,9 @@ func CmdGetChallengeTracker() *cobra.Command {
 				CollectionId:       types.NewUintFromString(args[0]),
 				ApprovalLevel:      args[1],
 				ApproverAddress:    args[2],
-				ChallengeTrackerId: args[3],
-				LeafIndex:          types.NewUintFromString(args[4]),
+				ApprovalId:         args[3],
+				ChallengeTrackerId: args[4],
+				LeafIndex:          types.NewUintFromString(args[5]),
 			}
 
 			res, err := queryClient.GetChallengeTracker(cmd.Context(), params)

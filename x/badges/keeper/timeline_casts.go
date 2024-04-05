@@ -46,17 +46,7 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 			Addresses: []string{approval.ApprovalId},
 			Whitelist: true,
 		}
-
-		amountTrackerList := &types.AddressList{
-			Addresses: []string{approval.AmountTrackerId},
-			Whitelist: true,
-		}
-
-		challengeTrackerList := &types.AddressList{
-			Addresses: []string{approval.ChallengeTrackerId},
-			Whitelist: true,
-		}
-
+		
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			BadgeIds:               approval.BadgeIds,
 			TransferTimes:          approval.TransferTimes,
@@ -65,8 +55,6 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 			ToList:                 toList,
 			InitiatedByList:        initiatedByList,
 			ApprovalIdList:         approvalTrackerList,
-			AmountTrackerIdList:    amountTrackerList,
-			ChallengeTrackerIdList: challengeTrackerList,
 			UsesBadgeIds:           true,
 			UsesTransferTimes:      true,
 			UsesToList:             true,
@@ -74,8 +62,6 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 			UsesInitiatedByList:    true,
 			UsesOwnershipTimes:     true,
 			UsesApprovalId:         true,
-			UsesAmountTrackerId:    true,
-			UsesChallengeTrackerId: true,
 			ArbitraryValue:         approval,
 		})
 	}

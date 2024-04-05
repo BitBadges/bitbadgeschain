@@ -1,0 +1,50 @@
+syntax = "proto3";
+package maps;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "maps/params.proto";
+import "maps/tx.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/maps/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/maps/params";
+  }
+  rpc Map(QueryGetMapRequest) returns (QueryGetMapResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/maps/{mapId}";
+  }
+  rpc MapValue(QueryGetMapValueRequest) returns (QueryGetMapValueResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/maps/{mapId}/{key}";
+  }
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryGetMapRequest {
+  string mapId = 1;
+}
+
+message QueryGetMapResponse {
+  Map map = 1;
+}
+
+message QueryGetMapValueRequest {
+  string mapId = 1;
+  string key = 2;
+}
+
+message QueryGetMapValueResponse {
+  ValueStore value = 1;
+}

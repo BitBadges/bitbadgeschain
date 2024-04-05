@@ -22,7 +22,6 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-
 	sdkmath "cosmossdk.io/math"
 )
 
@@ -163,6 +162,10 @@ func local_request_Query_GetAddressList_0(ctx context.Context, marshaler runtime
 
 }
 
+var (
+	filter_Query_GetApprovalTracker_0 = &utilities.DoubleArray{Encoding: map[string]int{"collectionId": 0, "approvalLevel": 1, "approverAddress": 2, "amountTrackerId": 3, "trackerType": 4, "approvedAddress": 5}, Base: []int{1, 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7}}
+)
+
 func request_Query_GetApprovalTracker_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetApprovalTrackerRequest
 	var metadata runtime.ServerMetadata
@@ -239,6 +242,13 @@ func request_Query_GetApprovalTracker_0(ctx context.Context, marshaler runtime.M
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvedAddress", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_GetApprovalTracker_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.GetApprovalTracker(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -324,10 +334,21 @@ func local_request_Query_GetApprovalTracker_0(ctx context.Context, marshaler run
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "approvedAddress", err)
 	}
 
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_GetApprovalTracker_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
 	msg, err := server.GetApprovalTracker(ctx, &protoReq)
 	return msg, metadata, err
 
 }
+
+var (
+	filter_Query_GetChallengeTracker_0 = &utilities.DoubleArray{Encoding: map[string]int{"collectionId": 0, "approvalLevel": 1, "approverAddress": 2, "challengeTrackerId": 3, "leafIndex": 4}, Base: []int{1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6}}
+)
 
 func request_Query_GetChallengeTracker_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetChallengeTrackerRequest
@@ -395,6 +416,13 @@ func request_Query_GetChallengeTracker_0(ctx context.Context, marshaler runtime.
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "leafIndex", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_GetChallengeTracker_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.GetChallengeTracker(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -470,6 +498,13 @@ func local_request_Query_GetChallengeTracker_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "leafIndex", err)
 	}
 
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_GetChallengeTracker_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
 	msg, err := server.GetChallengeTracker(ctx, &protoReq)
 	return msg, metadata, err
 
@@ -493,7 +528,6 @@ func request_Query_GetBalance_0(ctx context.Context, marshaler runtime.Marshaler
 
 	str, err := runtime.String(val)
 	protoReq.CollectionId = sdkmath.NewUintFromString(str)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
 	}

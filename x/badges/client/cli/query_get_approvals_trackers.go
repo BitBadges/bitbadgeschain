@@ -13,9 +13,9 @@ var _ = strconv.Itoa(0)
 
 func CmdGetApprovalTrackers() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-approvals-trackers [collectionId] [approvalLevel] [approverAddress] [amountTrackerId] [trackerType] [approvedAddress]",
+		Use:   "get-approvals-trackers [collectionId] [approvalLevel] [approverAddress] [approvalId] [amountTrackerId] [trackerType] [approvedAddress]",
 		Short: "Query getApprovalTrackers",
-		Args:  cobra.ExactArgs(6),
+		Args:  cobra.ExactArgs(7),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -29,9 +29,10 @@ func CmdGetApprovalTrackers() *cobra.Command {
 				CollectionId:    types.NewUintFromString(args[0]),
 				ApprovalLevel:   args[1],
 				ApproverAddress: args[2],
-				AmountTrackerId: args[3],
-				TrackerType:     args[4],
-				ApprovedAddress: args[5],
+				ApprovalId:      args[3],
+				AmountTrackerId: args[4],
+				TrackerType:     args[5],
+				ApprovedAddress: args[6],
 			}
 
 			res, err := queryClient.GetApprovalTracker(cmd.Context(), params)

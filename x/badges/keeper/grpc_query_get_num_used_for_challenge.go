@@ -16,7 +16,7 @@ func (k Keeper) GetChallengeTracker(goCtx context.Context, req *types.QueryGetCh
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	numUsed, err := k.GetChallengeTrackerFromStore(ctx, req.CollectionId, req.ApproverAddress, req.ApprovalLevel, req.ChallengeTrackerId, req.LeafIndex)
+	numUsed, err := k.GetChallengeTrackerFromStore(ctx, req.CollectionId, req.ApproverAddress, req.ApprovalLevel, req.ApprovalId, req.ChallengeTrackerId, req.LeafIndex)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}

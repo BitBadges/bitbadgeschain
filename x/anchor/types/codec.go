@@ -34,6 +34,3 @@ var (
 	ModuleCdc = codec.NewProtoCodec(cdctypes.NewInterfaceRegistry())
 	AminoCdc  = codec.NewAminoCodec(Amino)
 )
-
-
-

@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package maps;
+
+import "gogoproto/gogo.proto";
+import "maps/params.proto";
+import "maps/tx.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/maps/types";
+
+// GenesisState defines the maps module's genesis state.
+message GenesisState {
+  Params params  = 1 [(gogoproto.nullable) = false];
+  string port_id = 2;
+
+  repeated Map maps = 3;
+  repeated string full_keys = 4;
+  repeated ValueStore values = 5;
+
+  repeated string duplicates_full_keys = 6;
+}
+

@@ -30,8 +30,6 @@ func CastOutgoingTransferToCollectionTransfer(transfer *UserOutgoingApproval, fr
 		OwnershipTimes:     transfer.OwnershipTimes,
 		ApprovalCriteria:   approvalCriteria,
 		ApprovalId:         transfer.ApprovalId,
-		AmountTrackerId:    transfer.AmountTrackerId,
-		ChallengeTrackerId: transfer.ChallengeTrackerId,
 		Uri:                transfer.Uri,
 		CustomData:         transfer.CustomData,
 	}
@@ -49,8 +47,6 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApproval) 
 		OwnershipTimes:     transfer.OwnershipTimes,
 		ApprovalCriteria:   approvalCriteria,
 		ApprovalId:         transfer.ApprovalId,
-		AmountTrackerId:    transfer.AmountTrackerId,
-		ChallengeTrackerId: transfer.ChallengeTrackerId,
 		Uri:                transfer.Uri,
 		CustomData:         transfer.CustomData,
 	}
@@ -69,8 +65,6 @@ func CastIncomingTransferToCollectionTransfer(transfer *UserIncomingApproval, to
 		OwnershipTimes:     transfer.OwnershipTimes,
 		ApprovalCriteria:   approvalCriteria,
 		ApprovalId:         transfer.ApprovalId,
-		AmountTrackerId:    transfer.AmountTrackerId,
-		ChallengeTrackerId: transfer.ChallengeTrackerId,
 		Uri:                transfer.Uri,
 		CustomData:         transfer.CustomData,
 	}
@@ -88,8 +82,6 @@ func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApproval) 
 		OwnershipTimes:     transfer.OwnershipTimes,
 		ApprovalCriteria:   approvalCriteria,
 		ApprovalId:         transfer.ApprovalId,
-		AmountTrackerId:    transfer.AmountTrackerId,
-		ChallengeTrackerId: transfer.ChallengeTrackerId,
 		Uri:                transfer.Uri,
 		CustomData:         transfer.CustomData,
 	}
@@ -107,7 +99,7 @@ func CastIncomingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		RequireFromDoesNotEqualInitiatedBy: approvalCriteria.RequireFromDoesNotEqualInitiatedBy,
 		PredeterminedBalances:              approvalCriteria.PredeterminedBalances,
 		MustOwnBadges:                      approvalCriteria.MustOwnBadges,
-		MerkleChallenge:                    approvalCriteria.MerkleChallenge,
+		MerkleChallenges:                    approvalCriteria.MerkleChallenges,
 	}
 }
 
@@ -123,7 +115,7 @@ func CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		RequireToDoesNotEqualInitiatedBy: approvalCriteria.RequireToDoesNotEqualInitiatedBy,
 		PredeterminedBalances:            approvalCriteria.PredeterminedBalances,
 		MustOwnBadges:                    approvalCriteria.MustOwnBadges,
-		MerkleChallenge:                  approvalCriteria.MerkleChallenge,
+		MerkleChallenges:                  approvalCriteria.MerkleChallenges,
 	}
 }
 
@@ -135,7 +127,7 @@ func CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(approvalCriter
 		RequireFromDoesNotEqualInitiatedBy: approvalCriteria.RequireFromDoesNotEqualInitiatedBy,
 		PredeterminedBalances:              approvalCriteria.PredeterminedBalances,
 		MustOwnBadges:                      approvalCriteria.MustOwnBadges,
-		MerkleChallenge:                    approvalCriteria.MerkleChallenge,
+		MerkleChallenges:                    approvalCriteria.MerkleChallenges,
 	}
 }
 
@@ -147,6 +139,6 @@ func CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(approvalCriter
 		RequireToDoesNotEqualInitiatedBy: approvalCriteria.RequireToDoesNotEqualInitiatedBy,
 		PredeterminedBalances:            approvalCriteria.PredeterminedBalances,
 		MustOwnBadges:                    approvalCriteria.MustOwnBadges,
-		MerkleChallenge:                  approvalCriteria.MerkleChallenge,
+		MerkleChallenges:                  approvalCriteria.MerkleChallenges,
 	}
 }

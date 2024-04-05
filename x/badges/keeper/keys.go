@@ -45,27 +45,41 @@ type BalanceKeyDetails struct {
 
 // Creates the balance key from an address and collectionId. Note this is not prefixed yet. It is just performing a delimited string concatenation.
 func ConstructBalanceKey(address string, id sdkmath.Uint) string {
-	collection_id_str := id.String()
-	address_str := address
-	return collection_id_str + BalanceKeyDelimiter + address_str
+	keyParts := []string{
+		id.String(),
+		address,
+	}
+	return strings.Join(keyParts, BalanceKeyDelimiter)
 }
 
 func ConstructAddressListKey(addressListId string) string {
 	return addressListId
 }
 
-func ConstructApprovalTrackerKey(collectionId sdkmath.Uint, addressForApproval string, amountTrackerId string, level string, trackerType string, address string) string {
-	collection_id_str := collectionId.String()
-	tracker_id_str := amountTrackerId
-	return collection_id_str + BalanceKeyDelimiter + addressForApproval + BalanceKeyDelimiter + tracker_id_str + BalanceKeyDelimiter + level + BalanceKeyDelimiter + trackerType + BalanceKeyDelimiter + address
+func ConstructApprovalTrackerKey(collectionID sdkmath.Uint, addressForApproval, approvalID, amountTrackerID, level, trackerType, address string) string {
+	keyParts := []string{
+		collectionID.String(),
+		addressForApproval,
+		approvalID,
+		amountTrackerID,
+		level,
+		trackerType,
+		address,
+	}
+	return strings.Join(keyParts, BalanceKeyDelimiter)
 }
 
-func ConstructZKPTreeTrackerKey(collectionId sdkmath.Uint, addressForApproval string, challengeLevel string, challengeId string, proofHash string) string {
-	collection_id_str := collectionId.String()
-	challenge_id_str := challengeId
-	return collection_id_str + BalanceKeyDelimiter + addressForApproval + BalanceKeyDelimiter + challengeLevel + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + proofHash
+func ConstructZKPTreeTrackerKey(collectionId sdkmath.Uint, addressForApproval string, challengeLevel string, approvalId string, challengeId string, proofHash string) string {
+	keyParts := []string{
+		collectionId.String(),
+		addressForApproval,
+		challengeLevel,
+		approvalId,
+		challengeId,
+		proofHash,
+	}
+	return strings.Join(keyParts, BalanceKeyDelimiter)
 }
-
 
 // Creates the used claim data key from an id and data. Note this is not prefixed yet. It is just performing a delimited string concatenation.
 func ConstructUsedClaimDataKey(collectionId sdkmath.Uint, claimId sdkmath.Uint) string {
@@ -74,15 +88,17 @@ func ConstructUsedClaimDataKey(collectionId sdkmath.Uint, claimId sdkmath.Uint) 
 	return collection_id_str + BalanceKeyDelimiter + claim_id_str
 }
 
-func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, addressForChallenge string, challengeLevel string, challengeId string, codeLeafIndex sdkmath.Uint) string {
+func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, addressForChallenge string, challengeLevel string, approvalId string, challengeId string, codeLeafIndex sdkmath.Uint) string {
 	collection_id_str := collectionId.String()
 
 	code_leaf_index_str := codeLeafIndex.String()
 	challenge_id_str := challengeId
 	address_for_challenge_str := addressForChallenge
 	challenge_level_str := challengeLevel
-	return collection_id_str + BalanceKeyDelimiter + address_for_challenge_str + BalanceKeyDelimiter + challenge_level_str + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + code_leaf_index_str
+	return collection_id_str + BalanceKeyDelimiter + address_for_challenge_str + BalanceKeyDelimiter + challenge_level_str + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + code_leaf_index_str
 }
+
+// Note be careful when getting details from a key because there could be a "-" (BalanceKeyDelimiter) in other fields.
 
 // Helper function to unparse a balance key and get the information from it.
 func GetDetailsFromBalanceKey(id string) BalanceKeyDetails {
@@ -132,6 +148,7 @@ func usedZKPTrackerStoreKey(usedZKPTrackerKey string) []byte {
 func nextCollectionIdKey() []byte {
 	return NextCollectionIdKey
 }
+
 func nextAddressListCounterKey() []byte {
 	return NextAddressListIdKey
 }

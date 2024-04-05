@@ -75,8 +75,6 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 		initiatedByList := types.GetListWithOptions(permission.InitiatedByList, permission.UsesInitiatedByList)
 
 		approvalIdList := types.GetListWithOptions(permission.ApprovalIdList, permission.UsesApprovalId)
-		amountTrackerIdList := types.GetListWithOptions(permission.AmountTrackerIdList, permission.UsesAmountTrackerId)
-		challengeTrackerIdList := types.GetListWithOptions(permission.ChallengeTrackerIdList, permission.UsesChallengeTrackerId)
 
 		for _, badgeId := range badgeIds {
 			for _, timelineTime := range timelineTimes {
@@ -98,8 +96,6 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 								FromList:               fromList,
 								InitiatedByList:        initiatedByList,
 								ApprovalIdList:         approvalIdList,
-								AmountTrackerIdList:    amountTrackerIdList,
-								ChallengeTrackerIdList: challengeTrackerIdList,
 
 								ArbitraryValue: arbValue,
 							},
@@ -131,8 +127,6 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 								InitiatedByList: overlap.Overlap.InitiatedByList,
 
 								ApprovalIdList:         overlap.Overlap.ApprovalIdList,
-								AmountTrackerIdList:    overlap.Overlap.AmountTrackerIdList,
-								ChallengeTrackerIdList: overlap.Overlap.ChallengeTrackerIdList,
 
 								//Appended for future lookups (not involved in overlap logic)
 								PermanentlyPermittedTimes: permanentlyPermittedTimes,

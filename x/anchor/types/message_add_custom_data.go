@@ -46,6 +46,6 @@ func (msg *MsgAddCustomData) ValidateBasic() error {
 	if len(msg.Data) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "data cannot be empty")
 	}
-	
+
 	return nil
 }

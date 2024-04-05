@@ -21,16 +21,16 @@ func (k Keeper) GetNextAnchorId(ctx sdk.Context) sdkmath.Uint {
 	return nextID
 }
 
-//* ****************************** BADGES ****************************** **/
+// * ****************************** BADGES ****************************** **/
 // Set anchor location by ID
 func (k Keeper) SetAnchorLocation(ctx sdk.Context, idx sdkmath.Uint, value string, creator string) error {
 	store := ctx.KVStore(k.storeKey)
 
-	blockTime := ctx.BlockTime().Unix()
+	blockTime := ctx.BlockTime().UnixMilli()
 
 	anchor := types.AnchorData{
-		Creator: creator,
-		Data: 	value,
+		Creator:   creator,
+		Data:      value,
 		Timestamp: sdk.NewUint(uint64(blockTime)),
 	}
 

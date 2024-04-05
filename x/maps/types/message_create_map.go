@@ -1,0 +1,110 @@
+package types
+
+import (
+	sdkmath "cosmossdk.io/math"
+	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+)
+
+const TypeMsgCreateMap = "create_map"
+
+var _ sdk.Msg = &MsgCreateMap{}
+
+func NewMsgCreateMap(creator string, mapId string, updateCriteria *MapUpdateCriteria, valueOptions *ValueOptions, defaultValue string, managerTimeline []*ManagerTimeline, isEditableTimeline []*IsEditableTimeline, metadataTimeline []*MapMetadataTimeline, permissions *MapPermissions, inheritManagerTimelineFrom sdkmath.Uint, isForceEditableTimeline []*IsEditableTimeline) *MsgCreateMap {
+	return &MsgCreateMap{
+		Creator:            creator,
+		MapId:              mapId,
+		UpdateCriteria:     updateCriteria,
+		ValueOptions:       valueOptions,
+		DefaultValue:       defaultValue,
+		ManagerTimeline:    managerTimeline,
+		IsEditableTimeline: isEditableTimeline,
+		MetadataTimeline:   metadataTimeline,
+		Permissions:        permissions,
+		InheritManagerTimelineFrom: inheritManagerTimelineFrom,
+		IsForceEditableTimeline: isForceEditableTimeline,
+	}
+}
+
+func (msg *MsgCreateMap) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgCreateMap) Type() string {
+	return TypeMsgCreateMap
+}
+
+func (msg *MsgCreateMap) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{creator}
+}
+
+func (msg *MsgCreateMap) GetSignBytes() []byte {
+	bz := Amino.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgCreateMap) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	if len(msg.MapId) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "map ID cannot be empty")
+	}
+
+	err = badgestypes.ValidateManagerTimeline(CastManagerTimelineArray(msg.ManagerTimeline)) 
+	if err != nil {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "manager timeline cannot be invalid")
+	}
+
+	blankCtx := sdk.Context{}
+	err = badgestypes.ValidateCollectionApprovals(blankCtx, CastIsEditableTimelineArray(msg.IsEditableTimeline), false)
+	if err != nil {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "is editable timeline cannot be invalid")
+	}
+
+	err = badgestypes.ValidateCollectionApprovals(blankCtx, CastIsEditableTimelineArray(msg.IsForceEditableTimeline), false)
+	if err != nil {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "is force editable timeline cannot be invalid")
+	}
+
+	err = badgestypes.ValidateCollectionMetadataTimeline(CastMetadataTimelineArray(msg.MetadataTimeline))
+	if err != nil {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "metadata timeline cannot be invalid")
+	}
+
+	//Validate update criteria
+	if msg.UpdateCriteria == nil {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "update criteria cannot be nil")
+	}
+
+	numDefined := 0
+	if msg.UpdateCriteria.ManagerOnly {
+		numDefined++
+	}
+	if !msg.UpdateCriteria.CollectionId.IsNil() && !msg.UpdateCriteria.CollectionId.IsZero() {
+		numDefined++
+	}
+	if msg.UpdateCriteria.CreatorOnly {
+		numDefined++
+	}
+	if msg.UpdateCriteria.FirstComeFirstServe {
+		numDefined++
+	}
+
+	if numDefined != 1 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "update criteria must have exactly one field defined")
+	}
+
+	if ValidatePermissions(msg.Permissions, false) != nil {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "permissions are invalid")
+	}
+
+	return nil
+}

@@ -1,0 +1,13 @@
+syntax = "proto3";
+package maps;
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/maps/types";
+
+message MapsPacketData {
+    oneof packet {
+        NoData noData = 1;
+    }
+}
+
+message NoData {
+}

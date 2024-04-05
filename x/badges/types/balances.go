@@ -151,8 +151,6 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
 					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
 					ApprovalIdList:         &AddressList{Addresses: []string{}, Whitelist: false},
-					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
-					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
 					ArbitraryValue:         balanceObj.Amount,
 				})
 			}
@@ -171,8 +169,6 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 				FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
 				InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
 				ApprovalIdList:         &AddressList{Addresses: []string{}, Whitelist: false},
-				AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
-				ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
 			},
 			)
 		}
@@ -344,8 +340,6 @@ func DeleteBalances(ctx sdk.Context, rangesToDelete []*UintRange, timesToDelete 
 					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
 					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
 					ApprovalIdList:         &AddressList{Addresses: []string{}, Whitelist: false},
-					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
-					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
 				})
 			}
 		}
@@ -361,8 +355,6 @@ func DeleteBalances(ctx sdk.Context, rangesToDelete []*UintRange, timesToDelete 
 					ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
 					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
 					ApprovalIdList:         &AddressList{Addresses: []string{}, Whitelist: false},
-					AmountTrackerIdList:    &AddressList{Addresses: []string{}, Whitelist: false},
-					ChallengeTrackerIdList: &AddressList{Addresses: []string{}, Whitelist: false},
 					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
 				})
 			}

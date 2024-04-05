@@ -1,0 +1,20 @@
+syntax = "proto3";
+package maps;
+
+import "google/protobuf/any.proto";
+import "maps/balances.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/maps/types";
+
+/* 
+  This message defines the metadata for the map.
+  The interpretation of this metadata should follow the map standard.
+*/
+message Metadata {
+  // The URI (Uniform Resource Identifier) associated with the map metadata.
+  string uri = 1;
+  
+  // Custom data or additional information related to the map metadata.
+  string customData = 2;
+}

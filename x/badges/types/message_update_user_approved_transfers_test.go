@@ -27,7 +27,7 @@ func TestMsgUpdateUserApprovals_ValidateBasic(t *testing.T) {
 			},
 		},
 		{
-			name: "tracker ID = ID of another approval",
+			name: "ID = ID of another approval",
 			msg: types.MsgUpdateUserApprovals{
 				Creator: sample.AccAddress(),
 				OutgoingApprovals: []*types.UserOutgoingApproval{
@@ -35,60 +35,11 @@ func TestMsgUpdateUserApprovals_ValidateBasic(t *testing.T) {
 						ToListId:           "All",
 						InitiatedByListId:  "All",
 						ApprovalId:         "approval_id",
-						AmountTrackerId:    "other_approval_id",
-						ChallengeTrackerId: "challenge_id",
 					},
-					{
-						ToListId:           "All",
-						InitiatedByListId:  "All",
-						ApprovalId:         "other_approval_id",
-						AmountTrackerId:    "other_approval_id",
-						ChallengeTrackerId: "challenge_id",
-					},
-				},
-			},
-			err: types.ErrAmountTrackerIdIsNil,
-		},
-		{
-			name: "tracker ID = ID of another approval",
-			msg: types.MsgUpdateUserApprovals{
-				Creator: sample.AccAddress(),
-				OutgoingApprovals: []*types.UserOutgoingApproval{
 					{
 						ToListId:           "All",
 						InitiatedByListId:  "All",
 						ApprovalId:         "approval_id",
-						AmountTrackerId:    "other_approval_id",
-						ChallengeTrackerId: "challenge_id",
-					},
-					{
-						ToListId:           "All",
-						InitiatedByListId:  "All",
-						ApprovalId:         "dfsdgffds_approval_id",
-						AmountTrackerId:    "other_approval_id",
-						ChallengeTrackerId: "challenge_id",
-					},
-				},
-			},
-		},
-		{
-			name: "tracker ID = ID of another approval",
-			msg: types.MsgUpdateUserApprovals{
-				Creator: sample.AccAddress(),
-				OutgoingApprovals: []*types.UserOutgoingApproval{
-					{
-						ToListId:           "All",
-						InitiatedByListId:  "All",
-						ApprovalId:         "approval_id",
-						AmountTrackerId:    "sdafaf",
-						ChallengeTrackerId: "other_approval_id",
-					},
-					{
-						ToListId:           "All",
-						InitiatedByListId:  "All",
-						ApprovalId:         "other_approval_id",
-						AmountTrackerId:    "afdsa",
-						ChallengeTrackerId: "asfdadsf",
 					},
 				},
 			},

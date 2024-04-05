@@ -4,6 +4,49 @@ info:
   name: ''
   description: ''
 paths:
+  /bitbadges/bitbadgeschain/anchor/locations/{locationId}:
+    get:
+      operationId: AnchorGetValueAtLocation
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              anchorData:
+                type: object
+                properties:
+                  creator:
+                    type: string
+                  data:
+                    type: string
+                  timestamp:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: locationId
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
   /bitbadges/bitbadgeschain/anchor/params:
     get:
       summary: Parameters queries the parameters of the module.
@@ -1293,6 +1336,26 @@ paths:
                                   description: >-
                                     Maximum number of transfers per "initiated
                                     by" address.
+                            zkProofs:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  verificationKey:
+                                    type: string
+                                    description: The verification key for the proof.
+                                  uri:
+                                    type: string
+                                    description: >-
+                                      The URI associated with this proof,
+                                      optionally providing metadata about the
+                                      proof.
+                                  customData:
+                                    type: string
+                                    description: >-
+                                      Arbitrary custom data associated with this
+                                      proof.
+                              description: The ZKPs that need to be solved for approval.
                             requireToEqualsInitiatedBy:
                               type: boolean
                               description: >-
@@ -1907,6 +1970,26 @@ paths:
                                   description: >-
                                     Maximum number of transfers per "initiated
                                     by" address.
+                            zkProofs:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  verificationKey:
+                                    type: string
+                                    description: The verification key for the proof.
+                                  uri:
+                                    type: string
+                                    description: >-
+                                      The URI associated with this proof,
+                                      optionally providing metadata about the
+                                      proof.
+                                  customData:
+                                    type: string
+                                    description: >-
+                                      Arbitrary custom data associated with this
+                                      proof.
+                              description: The ZKPs that need to be solved for approval.
                             requireFromEqualsInitiatedBy:
                               type: boolean
                               description: >-
@@ -3164,7 +3247,7 @@ paths:
                     description: >-
                       The type of balances this collection uses ("Standard",
                       "Off-Chain - Indexed", "Off-Chain - Non-Indexed", or
-                      "Inherited").
+                      "Non-Public").
                   offChainBalancesMetadataTimeline:
                     type: array
                     items:
@@ -5206,6 +5289,26 @@ paths:
                                   description: >-
                                     Maximum number of transfers per "initiated
                                     by" address.
+                            zkProofs:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  verificationKey:
+                                    type: string
+                                    description: The verification key for the proof.
+                                  uri:
+                                    type: string
+                                    description: >-
+                                      The URI associated with this proof,
+                                      optionally providing metadata about the
+                                      proof.
+                                  customData:
+                                    type: string
+                                    description: >-
+                                      Arbitrary custom data associated with this
+                                      proof.
+                              description: The ZKPs that need to be solved for approval.
                             requireToEqualsInitiatedBy:
                               type: boolean
                               description: >-
@@ -6052,6 +6155,28 @@ paths:
                                       description: >-
                                         Maximum number of transfers per
                                         "initiated by" address.
+                                zkProofs:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      verificationKey:
+                                        type: string
+                                        description: The verification key for the proof.
+                                      uri:
+                                        type: string
+                                        description: >-
+                                          The URI associated with this proof,
+                                          optionally providing metadata about the
+                                          proof.
+                                      customData:
+                                        type: string
+                                        description: >-
+                                          Arbitrary custom data associated with
+                                          this proof.
+                                  description: >-
+                                    The ZKPs that need to be solved for
+                                    approval.
                                 requireToEqualsInitiatedBy:
                                   type: boolean
                                   description: >-
@@ -6689,6 +6814,28 @@ paths:
                                       description: >-
                                         Maximum number of transfers per
                                         "initiated by" address.
+                                zkProofs:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      verificationKey:
+                                        type: string
+                                        description: The verification key for the proof.
+                                      uri:
+                                        type: string
+                                        description: >-
+                                          The URI associated with this proof,
+                                          optionally providing metadata about the
+                                          proof.
+                                      customData:
+                                        type: string
+                                        description: >-
+                                          Arbitrary custom data associated with
+                                          this proof.
+                                  description: >-
+                                    The ZKPs that need to be solved for
+                                    approval.
                                 requireFromEqualsInitiatedBy:
                                   type: boolean
                                   description: >-
@@ -7446,7 +7593,8 @@ paths:
 
 
                   Collections may have different balance types: standard vs.
-                  off-chain - indexed vs. inherited.vs off-chain - non-indexed.
+                  off-chain - indexed vs. inherited.vs off-chain - non-indexed
+                  vs non-public.
 
 
                   See documentation for more details.
@@ -60015,6 +60163,42 @@ paths:
                         }
       tags:
         - Query
+  /bitbadges/bitbadgeschain/maps/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: MapsParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
   /protocols/params:
     get:
       operationId: ProtocolsParams
@@ -60261,9 +60445,36 @@ paths:
       tags:
         - Query
 definitions:
+  anchor.AnchorData:
+    type: object
+    properties:
+      creator:
+        type: string
+      data:
+        type: string
+      timestamp:
+        type: string
+  anchor.MsgAddCustomDataResponse:
+    type: object
+    properties:
+      locationId:
+        type: string
+        description: ID of the anchor location.
   anchor.Params:
     type: object
     description: Params defines the parameters for the module.
+  anchor.QueryGetValueAtLocationResponse:
+    type: object
+    properties:
+      anchorData:
+        type: object
+        properties:
+          creator:
+            type: string
+          data:
+            type: string
+          timestamp:
+            type: string
   anchor.QueryParamsResponse:
     type: object
     properties:
@@ -61108,6 +61319,23 @@ definitions:
           perInitiatedByAddressMaxNumTransfers:
             type: string
             description: Maximum number of transfers per "initiated by" address.
+      zkProofs:
+        type: array
+        items:
+          type: object
+          properties:
+            verificationKey:
+              type: string
+              description: The verification key for the proof.
+            uri:
+              type: string
+              description: >-
+                The URI associated with this proof, optionally providing
+                metadata about the proof.
+            customData:
+              type: string
+              description: Arbitrary custom data associated with this proof.
+        description: The ZKPs that need to be solved for approval.
       requireToEqualsInitiatedBy:
         type: boolean
         description: >-
@@ -61383,7 +61611,7 @@ definitions:
         type: string
         description: >-
           The type of balances this collection uses ("Standard", "Off-Chain -
-          Indexed", "Off-Chain - Non-Indexed", or "Inherited").
+          Indexed", "Off-Chain - Non-Indexed", or "Non-Public").
       offChainBalancesMetadataTimeline:
         type: array
         items:
@@ -63202,6 +63430,23 @@ definitions:
                     perInitiatedByAddressMaxNumTransfers:
                       type: string
                       description: Maximum number of transfers per "initiated by" address.
+                zkProofs:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      verificationKey:
+                        type: string
+                        description: The verification key for the proof.
+                      uri:
+                        type: string
+                        description: >-
+                          The URI associated with this proof, optionally
+                          providing metadata about the proof.
+                      customData:
+                        type: string
+                        description: Arbitrary custom data associated with this proof.
+                  description: The ZKPs that need to be solved for approval.
                 requireToEqualsInitiatedBy:
                   type: boolean
                   description: >-
@@ -63968,6 +64213,23 @@ definitions:
                           description: >-
                             Maximum number of transfers per "initiated by"
                             address.
+                    zkProofs:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          verificationKey:
+                            type: string
+                            description: The verification key for the proof.
+                          uri:
+                            type: string
+                            description: >-
+                              The URI associated with this proof, optionally
+                              providing metadata about the proof.
+                          customData:
+                            type: string
+                            description: Arbitrary custom data associated with this proof.
+                      description: The ZKPs that need to be solved for approval.
                     requireToEqualsInitiatedBy:
                       type: boolean
                       description: >-
@@ -64544,6 +64806,23 @@ definitions:
                           description: >-
                             Maximum number of transfers per "initiated by"
                             address.
+                    zkProofs:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          verificationKey:
+                            type: string
+                            description: The verification key for the proof.
+                          uri:
+                            type: string
+                            description: >-
+                              The URI associated with this proof, optionally
+                              providing metadata about the proof.
+                          customData:
+                            type: string
+                            description: Arbitrary custom data associated with this proof.
+                      description: The ZKPs that need to be solved for approval.
                     requireFromEqualsInitiatedBy:
                       type: boolean
                       description: >-
@@ -65172,7 +65451,7 @@ definitions:
 
 
       Collections may have different balance types: standard vs. off-chain -
-      indexed vs. inherited.vs off-chain - non-indexed.
+      indexed vs. inherited.vs off-chain - non-indexed vs non-public.
 
 
       See documentation for more details.
@@ -65989,6 +66268,23 @@ definitions:
               perInitiatedByAddressMaxNumTransfers:
                 type: string
                 description: Maximum number of transfers per "initiated by" address.
+          zkProofs:
+            type: array
+            items:
+              type: object
+              properties:
+                verificationKey:
+                  type: string
+                  description: The verification key for the proof.
+                uri:
+                  type: string
+                  description: >-
+                    The URI associated with this proof, optionally providing
+                    metadata about the proof.
+                customData:
+                  type: string
+                  description: Arbitrary custom data associated with this proof.
+            description: The ZKPs that need to be solved for approval.
           requireToEqualsInitiatedBy:
             type: boolean
             description: >-
@@ -67898,6 +68194,23 @@ definitions:
           perInitiatedByAddressMaxNumTransfers:
             type: string
             description: Maximum number of transfers per "initiated by" address.
+      zkProofs:
+        type: array
+        items:
+          type: object
+          properties:
+            verificationKey:
+              type: string
+              description: The verification key for the proof.
+            uri:
+              type: string
+              description: >-
+                The URI associated with this proof, optionally providing
+                metadata about the proof.
+            customData:
+              type: string
+              description: Arbitrary custom data associated with this proof.
+        description: The ZKPs that need to be solved for approval.
       requireFromEqualsInitiatedBy:
         type: boolean
         description: >-
@@ -68838,6 +69151,23 @@ definitions:
           perInitiatedByAddressMaxNumTransfers:
             type: string
             description: Maximum number of transfers per "initiated by" address.
+      zkProofs:
+        type: array
+        items:
+          type: object
+          properties:
+            verificationKey:
+              type: string
+              description: The verification key for the proof.
+            uri:
+              type: string
+              description: >-
+                The URI associated with this proof, optionally providing
+                metadata about the proof.
+            customData:
+              type: string
+              description: Arbitrary custom data associated with this proof.
+        description: The ZKPs that need to be solved for approval.
       requireToEqualsInitiatedBy:
         type: boolean
         description: >-
@@ -69871,6 +70201,23 @@ definitions:
                           description: >-
                             Maximum number of transfers per "initiated by"
                             address.
+                    zkProofs:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          verificationKey:
+                            type: string
+                            description: The verification key for the proof.
+                          uri:
+                            type: string
+                            description: >-
+                              The URI associated with this proof, optionally
+                              providing metadata about the proof.
+                          customData:
+                            type: string
+                            description: Arbitrary custom data associated with this proof.
+                      description: The ZKPs that need to be solved for approval.
                     requireToEqualsInitiatedBy:
                       type: boolean
                       description: >-
@@ -70447,6 +70794,23 @@ definitions:
                           description: >-
                             Maximum number of transfers per "initiated by"
                             address.
+                    zkProofs:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          verificationKey:
+                            type: string
+                            description: The verification key for the proof.
+                          uri:
+                            type: string
+                            description: >-
+                              The URI associated with this proof, optionally
+                              providing metadata about the proof.
+                          customData:
+                            type: string
+                            description: Arbitrary custom data associated with this proof.
+                      description: The ZKPs that need to be solved for approval.
                     requireFromEqualsInitiatedBy:
                       type: boolean
                       description: >-
@@ -71196,7 +71560,7 @@ definitions:
             type: string
             description: >-
               The type of balances this collection uses ("Standard", "Off-Chain
-              - Indexed", "Off-Chain - Non-Indexed", or "Inherited").
+              - Indexed", "Off-Chain - Non-Indexed", or "Non-Public").
           offChainBalancesMetadataTimeline:
             type: array
             items:
@@ -73044,6 +73408,23 @@ definitions:
                           description: >-
                             Maximum number of transfers per "initiated by"
                             address.
+                    zkProofs:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          verificationKey:
+                            type: string
+                            description: The verification key for the proof.
+                          uri:
+                            type: string
+                            description: >-
+                              The URI associated with this proof, optionally
+                              providing metadata about the proof.
+                          customData:
+                            type: string
+                            description: Arbitrary custom data associated with this proof.
+                      description: The ZKPs that need to be solved for approval.
                     requireToEqualsInitiatedBy:
                       type: boolean
                       description: >-
@@ -73830,6 +74211,25 @@ definitions:
                               description: >-
                                 Maximum number of transfers per "initiated by"
                                 address.
+                        zkProofs:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              verificationKey:
+                                type: string
+                                description: The verification key for the proof.
+                              uri:
+                                type: string
+                                description: >-
+                                  The URI associated with this proof, optionally
+                                  providing metadata about the proof.
+                              customData:
+                                type: string
+                                description: >-
+                                  Arbitrary custom data associated with this
+                                  proof.
+                          description: The ZKPs that need to be solved for approval.
                         requireToEqualsInitiatedBy:
                           type: boolean
                           description: >-
@@ -74425,6 +74825,25 @@ definitions:
                               description: >-
                                 Maximum number of transfers per "initiated by"
                                 address.
+                        zkProofs:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              verificationKey:
+                                type: string
+                                description: The verification key for the proof.
+                              uri:
+                                type: string
+                                description: >-
+                                  The URI associated with this proof, optionally
+                                  providing metadata about the proof.
+                              customData:
+                                type: string
+                                description: >-
+                                  Arbitrary custom data associated with this
+                                  proof.
+                          description: The ZKPs that need to be solved for approval.
                         requireFromEqualsInitiatedBy:
                           type: boolean
                           description: >-
@@ -75082,7 +75501,7 @@ definitions:
 
 
           Collections may have different balance types: standard vs. off-chain -
-          indexed vs. inherited.vs off-chain - non-indexed.
+          indexed vs. inherited.vs off-chain - non-indexed vs non-public.
 
 
           See documentation for more details.
@@ -75516,6 +75935,18 @@ definitions:
 
           If false, we will check the prioritized approvals first and then scan
           through the rest of the approvals.
+      zkProofSolutions:
+        type: array
+        items:
+          type: object
+          properties:
+            publicInputs:
+              type: string
+              title: The public inputs
+            proof:
+              type: string
+              title: The proof
+        description: The ZKPs that need to be solved for approval.
     description: Transfer defines the details of a transfer of badges.
   badges.UintRange:
     type: object
@@ -76158,6 +76589,23 @@ definitions:
                     perInitiatedByAddressMaxNumTransfers:
                       type: string
                       description: Maximum number of transfers per "initiated by" address.
+                zkProofs:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      verificationKey:
+                        type: string
+                        description: The verification key for the proof.
+                      uri:
+                        type: string
+                        description: >-
+                          The URI associated with this proof, optionally
+                          providing metadata about the proof.
+                      customData:
+                        type: string
+                        description: Arbitrary custom data associated with this proof.
+                  description: The ZKPs that need to be solved for approval.
                 requireToEqualsInitiatedBy:
                   type: boolean
                   description: >-
@@ -76718,6 +77166,23 @@ definitions:
                     perInitiatedByAddressMaxNumTransfers:
                       type: string
                       description: Maximum number of transfers per "initiated by" address.
+                zkProofs:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      verificationKey:
+                        type: string
+                        description: The verification key for the proof.
+                      uri:
+                        type: string
+                        description: >-
+                          The URI associated with this proof, optionally
+                          providing metadata about the proof.
+                      customData:
+                        type: string
+                        description: Arbitrary custom data associated with this proof.
+                  description: The ZKPs that need to be solved for approval.
                 requireFromEqualsInitiatedBy:
                   type: boolean
                   description: >-
@@ -77816,6 +78281,23 @@ definitions:
               perInitiatedByAddressMaxNumTransfers:
                 type: string
                 description: Maximum number of transfers per "initiated by" address.
+          zkProofs:
+            type: array
+            items:
+              type: object
+              properties:
+                verificationKey:
+                  type: string
+                  description: The verification key for the proof.
+                uri:
+                  type: string
+                  description: >-
+                    The URI associated with this proof, optionally providing
+                    metadata about the proof.
+                customData:
+                  type: string
+                  description: Arbitrary custom data associated with this proof.
+            description: The ZKPs that need to be solved for approval.
           requireFromEqualsInitiatedBy:
             type: boolean
             description: >-
@@ -78517,6 +78999,23 @@ definitions:
               perInitiatedByAddressMaxNumTransfers:
                 type: string
                 description: Maximum number of transfers per "initiated by" address.
+          zkProofs:
+            type: array
+            items:
+              type: object
+              properties:
+                verificationKey:
+                  type: string
+                  description: The verification key for the proof.
+                uri:
+                  type: string
+                  description: >-
+                    The URI associated with this proof, optionally providing
+                    metadata about the proof.
+                customData:
+                  type: string
+                  description: Arbitrary custom data associated with this proof.
+            description: The ZKPs that need to be solved for approval.
           requireToEqualsInitiatedBy:
             type: boolean
             description: >-
@@ -79243,7 +79742,30 @@ definitions:
       as the canUpdateCollectionApprovals in CollectionPermissions,
 
       but certain fields are removed because they are not relevant to the user.
-  bitbadgeschain.anchor.MsgAddCustomDataResponse:
+  badges.ZkProof:
+    type: object
+    properties:
+      verificationKey:
+        type: string
+        description: The verification key for the proof.
+      uri:
+        type: string
+        description: >-
+          The URI associated with this proof, optionally providing metadata
+          about the proof.
+      customData:
+        type: string
+        description: Arbitrary custom data associated with this proof.
+  badges.ZkProofSolution:
+    type: object
+    properties:
+      publicInputs:
+        type: string
+        title: The public inputs
+      proof:
+        type: string
+        title: The proof
+  bitbadgeschain.maps.MsgCreateMapResponse:
     type: object
   cosmos.auth.v1beta1.AddressBytesToStringResponse:
     type: object
@@ -109287,6 +109809,16 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
+  maps.Params:
+    type: object
+    description: Params defines the parameters for the module.
+  maps.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
   protocols.MsgCreateProtocolResponse:
     type: object
   protocols.MsgDeleteProtocolResponse:

@@ -7,7 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-
 func (suite *TestSuite) TestZKPs() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
@@ -120,8 +119,8 @@ func (suite *TestSuite) TestZKPs() {
 				 ]
 				]
 			 }`,
-			 Uri: "",
-			 CustomData: "",
+			Uri:        "",
+			CustomData: "",
 		},
 	}
 	collectionsToCreate[0].Transfers = []*types.Transfer{}
@@ -173,7 +172,7 @@ func (suite *TestSuite) TestZKPs() {
 							"protocol": "groth16",
 							"curve": "bn128"
 						 }`,
-						 PublicInputs: `[
+						PublicInputs: `[
 							"33"
 						 ]`,
 					},
@@ -227,7 +226,7 @@ func (suite *TestSuite) TestZKPs() {
 							"protocol": "groth16",
 							"curve": "bn128"
 						 }`,
-						 PublicInputs: `[
+						PublicInputs: `[
 							"33"
 						 ]`,
 					},
@@ -351,8 +350,8 @@ func (suite *TestSuite) TestZKPsInvalidVerificationKey() {
 				 ]
 				]
 			 }`,
-			 Uri: "",
-			 CustomData: "",
+			Uri:        "",
+			CustomData: "",
 		},
 	}
 	collectionsToCreate[0].Transfers = []*types.Transfer{}
@@ -404,7 +403,7 @@ func (suite *TestSuite) TestZKPsInvalidVerificationKey() {
 							"protocol": "groth16",
 							"curve": "bn128"
 						 }`,
-						 PublicInputs: `[
+						PublicInputs: `[
 							"33"
 						 ]`,
 					},
@@ -527,8 +526,8 @@ func (suite *TestSuite) TestZKPsInvalidProof() {
 				 ]
 				]
 			 }`,
-			 Uri: "",
-			 CustomData: "",
+			Uri:        "",
+			CustomData: "",
 		},
 	}
 	collectionsToCreate[0].Transfers = []*types.Transfer{}
@@ -581,7 +580,7 @@ func (suite *TestSuite) TestZKPsInvalidProof() {
 							"protocol": "groth16",
 							"curve": "bn128"
 						 }`,
-						 PublicInputs: `[
+						PublicInputs: `[
 							"33"
 						 ]`,
 					},
@@ -591,4 +590,3 @@ func (suite *TestSuite) TestZKPsInvalidProof() {
 	})
 	suite.Require().Error(err, "Error transferring badge") //should be marked as used
 }
-

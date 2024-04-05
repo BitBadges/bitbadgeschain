@@ -1,0 +1,24 @@
+syntax = "proto3";
+package maps;
+
+import "gogoproto/gogo.proto";
+import "maps/params.proto";
+// this line is used by starport scaffolding # genesis/proto/import
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/maps/types";
+
+/* 
+  The UintRange is a range of IDs from some start to some end (inclusive).
+
+  uintRanges are one of the core types used in the BitBadgesChain module.
+  They are used for everything from badge IDs to time ranges to min/max balance amounts.
+
+  See the BitBadges documentation for more information.
+*/
+message UintRange {
+  // The starting value of the range (inclusive).
+  string start = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  // The ending value of the range (inclusive).
+  string end = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}

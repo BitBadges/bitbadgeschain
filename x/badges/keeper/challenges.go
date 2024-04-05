@@ -11,10 +11,26 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challengeId string, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool, approverAddress string, challengeLevel string, challengeIdsIncremented *[]string, approval *types.CollectionApproval) (sdkmath.Uint, error) {
+func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool, approverAddress string, challengeLevel string, approval *types.CollectionApproval) (sdkmath.Uint, error) {
 	numIncrements := sdkmath.NewUint(0)
 
+	if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.PredeterminedBalances != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId != "" && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
+		hasMatchingChallenge := false
+		for _, challenge := range challenges {
+			if challenge.ChallengeTrackerId == approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId {
+				hasMatchingChallenge = true
+				break
+			}
+		}
+
+		if !hasMatchingChallenge {
+			return numIncrements, sdkerrors.Wrapf(ErrNoMatchingChallengeForChallengeTrackerId, "expected to calculate balances from challenge but no matching challenge for challenge tracker id %s", approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId)
+		}
+	}
+
 	for _, challenge := range challenges {
+		challengeId := challenge.ChallengeTrackerId
+
 		if challenge == nil || challenge.Root == "" {
 			//No challenge specified
 			continue
@@ -59,7 +75,9 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 
 				useLeafIndexForTransferOrder := false
 				if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.PredeterminedBalances != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
-					useLeafIndexForTransferOrder = true
+					if approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId == challengeId {
+						useLeafIndexForTransferOrder = true
+					}
 				}
 
 				if useLeafIndexForTransferOrder {
@@ -72,10 +90,9 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 					continue
 				}
 
-				newNumUsed := sdk.NewUint(0)
 				if !challenge.MaxUsesPerLeaf.IsNil() && challenge.MaxUsesPerLeaf.GT(sdkmath.NewUint(0)) {
 
-					numUsed, err := k.GetChallengeTrackerFromStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex)
+					numUsed, err := k.GetChallengeTrackerFromStore(ctx, collectionId, approverAddress, challengeLevel, approval.ApprovalId, challengeId, leafIndex)
 					if err != nil {
 						additionalDetailsErrorStr = "error getting num processed"
 						continue
@@ -89,35 +106,24 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 					}
 
 					if !simulation {
-						incrementId := fmt.Sprint(collectionId) + "-" + fmt.Sprint(approverAddress) + "-" + fmt.Sprint(challengeLevel) + "-" + fmt.Sprint(challengeId) + "-" + fmt.Sprint(leafIndex)
-						alreadyIncremented := false
-						for _, id := range *challengeIdsIncremented {
-							if id == incrementId {
-								alreadyIncremented = true
-								break
-							}
+						newNumUsed, err := k.IncrementChallengeTrackerInStore(ctx, collectionId, approverAddress, challengeLevel, approval.ApprovalId, challengeId, leafIndex.Sub(leftmostLeafIndex))
+						if err != nil {
+							continue
 						}
 
-						if !alreadyIncremented {
-							*challengeIdsIncremented = append(*challengeIdsIncremented, incrementId)
-							newNumUsed, err = k.IncrementChallengeTrackerInStore(ctx, collectionId, approverAddress, challengeLevel, challengeId, leafIndex.Sub(leftmostLeafIndex))
-							if err != nil {
-								continue
-							}
-
-							//Currently added for indexer, but note that it is planned to be deprecated
-							ctx.EventManager().EmitEvent(
-								sdk.NewEvent("challenge"+fmt.Sprint(challengeId)+fmt.Sprint(challengeId)+fmt.Sprint(leafIndex)+fmt.Sprint(approverAddress)+fmt.Sprint(challengeLevel)+fmt.Sprint(newNumUsed),
-									sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-									sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-									sdk.NewAttribute("challengeId", fmt.Sprint(challengeId)),
-									sdk.NewAttribute("leafIndex", fmt.Sprint(leafIndex.Sub(leftmostLeafIndex))),
-									sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
-									sdk.NewAttribute("challengeLevel", fmt.Sprint(challengeLevel)),
-									sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),
-								),
-							)
-						}
+						//Currently added for indexer, but note that it is planned to be deprecated
+						ctx.EventManager().EmitEvent(
+							sdk.NewEvent("challenge"+fmt.Sprint(approval.ApprovalId)+fmt.Sprint(challengeId)+fmt.Sprint(leafIndex)+fmt.Sprint(approverAddress)+fmt.Sprint(challengeLevel)+fmt.Sprint(newNumUsed),
+								sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+								sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
+								sdk.NewAttribute("challengeId", fmt.Sprint(challengeId)),
+								sdk.NewAttribute("approvalId", fmt.Sprint(approval.ApprovalId)),
+								sdk.NewAttribute("leafIndex", fmt.Sprint(leafIndex.Sub(leftmostLeafIndex))),
+								sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
+								sdk.NewAttribute("challengeLevel", fmt.Sprint(challengeLevel)),
+								sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),
+							),
+						)
 					}
 				}
 

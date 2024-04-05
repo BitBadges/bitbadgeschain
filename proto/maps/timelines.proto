@@ -1,0 +1,28 @@
+syntax = "proto3";
+package maps;
+
+import "google/protobuf/any.proto";
+import "maps/balances.proto";
+import "maps/permissions.proto";
+import "maps/metadata.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/maps/types";
+
+// MapMetadataTimeline defines the metadata for a collection at different timeline times.
+message MapMetadataTimeline {
+  // The collection metadata for a specific timeline element.
+  Metadata metadata = 1;
+
+  // The timeline times when the collection metadata is valid. Can not overlap with other timeline elements in same array.
+  repeated UintRange timelineTimes = 2;
+}
+
+// ManagerTimeline defines the manager address at different timeline times.
+message ManagerTimeline {
+  // The manager address for a specific timeline element.
+  string manager = 1;
+
+  // The timeline times when the manager address is valid. Can not overlap with other timeline elements in same array.
+  repeated UintRange timelineTimes = 2;
+}

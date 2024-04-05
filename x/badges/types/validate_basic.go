@@ -213,7 +213,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 		}
 	}
 
-	for i, collectionApproval := range collectionApprovals {
+	for _, collectionApproval := range collectionApprovals {
 		if collectionApproval == nil {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "collection approved transfer is nil")
 		}
@@ -248,59 +248,14 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			}
 		}
 
-		if collectionApproval.AmountTrackerId == "" {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "approval tracker id is uninitialized")
-		}
-
-		if collectionApproval.AmountTrackerId == "All" {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "approval tracker id can not be All")
-		}
-
-		//assert the amount tracker ID is not the approval ID of another approval
-		for j, otherCollectionApproval := range collectionApprovals {
-			if i == j {
-				continue
-			}
-
-			if collectionApproval.AmountTrackerId == otherCollectionApproval.ApprovalId {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "approval tracker id can not be the approval id of another approval")
-			}
-		}
-
-		if strings.Contains(collectionApproval.AmountTrackerId, ":") || strings.Contains(collectionApproval.AmountTrackerId, "!") {
-			return sdkerrors.Wrapf(ErrIdsContainsInvalidChars, "approval tracker id can not contain : or !")
-		}
-
-		if collectionApproval.ChallengeTrackerId == "" {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "challenge tracker id is uninitialized")
-		}
-
-		if collectionApproval.ChallengeTrackerId == "All" {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "challenge tracker id can not be All")
-		}
-
-		//assert the challenge tracker ID is not the approval ID of another approval
-		for j, otherCollectionApproval := range collectionApprovals {
-			if i == j {
-				continue
-			}
-
-			if collectionApproval.ChallengeTrackerId == otherCollectionApproval.ApprovalId {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "challenge tracker id can not be the approval id of another approval")
-			}
-		}
-
-		if strings.Contains(collectionApproval.ChallengeTrackerId, ":") || strings.Contains(collectionApproval.ChallengeTrackerId, "!") {
-			return sdkerrors.Wrapf(ErrIdsContainsInvalidChars, "challenge tracker id can not contain : or !")
-		}
-
 		approvalCriteria := collectionApproval.ApprovalCriteria
 		if approvalCriteria != nil {
 			usingLeafIndexForTransferOrder := false
 			if approvalCriteria.PredeterminedBalances != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
 				usingLeafIndexForTransferOrder = true
 			}
-			if err := ValidateMerkleChallenge(approvalCriteria.MerkleChallenge, collectionApproval.ChallengeTrackerId, usingLeafIndexForTransferOrder); err != nil {
+
+			if err := ValidateMerkleChallenges(approvalCriteria.MerkleChallenges, usingLeafIndexForTransferOrder); err != nil {
 				return sdkerrors.Wrapf(err, "invalid challenges")
 			}
 
@@ -460,29 +415,38 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 	return nil
 }
 
-func ValidateMerkleChallenge(challenge *MerkleChallenge, challengeId string, usingLeafIndexForTransferOrder bool) error {
-	if challenge == nil || challenge.Root == "" {
-		challenge = &MerkleChallenge{}
-		return nil
-	}
+func ValidateMerkleChallenges(challenges []*MerkleChallenge, usingLeafIndexForTransferOrder bool) error {
 
-	if challenge.ExpectedProofLength.IsNil() {
-		return sdkerrors.Wrapf(ErrUintUnititialized, "expected proof length is uninitialized")
-	}
+	for  i, challenge := range challenges {
+		if challenge == nil || challenge.Root == "" {
+			challenge = &MerkleChallenge{}
+			return nil
+		}
 
-	if challenge.MaxUsesPerLeaf.IsNil() {
-		return sdkerrors.Wrapf(ErrUintUnititialized, "max uses per leaf is uninitialized")
-	}
+		if challenge.ExpectedProofLength.IsNil() {
+			return sdkerrors.Wrapf(ErrUintUnititialized, "expected proof length is uninitialized")
+		}
 
-	maxOneUsePerLeaf := challenge.MaxUsesPerLeaf.Equal(sdkmath.NewUint(1))
+		if challenge.MaxUsesPerLeaf.IsNil() {
+			return sdkerrors.Wrapf(ErrUintUnititialized, "max uses per leaf is uninitialized")
+		}
 
-	if !maxOneUsePerLeaf && usingLeafIndexForTransferOrder {
-		return ErrPrimaryChallengeMustBeOneUsePerLeaf
-	}
+		maxOneUsePerLeaf := challenge.MaxUsesPerLeaf.Equal(sdkmath.NewUint(1))
 
-	//For non-whitelist trees, we can only use max one use per leaf (bc as soon as we use a leaf, the merkle path is public so anyone can use it)
-	if !maxOneUsePerLeaf && !challenge.UseCreatorAddressAsLeaf {
-		return ErrCanOnlyUseMaxOneUsePerLeafWithWhitelistTree
+		if !maxOneUsePerLeaf && usingLeafIndexForTransferOrder {
+			return ErrPrimaryChallengeMustBeOneUsePerLeaf
+		}
+
+		//For non-whitelist trees, we can only use max one use per leaf (bc as soon as we use a leaf, the merkle path is public so anyone can use it)
+		if !maxOneUsePerLeaf && !challenge.UseCreatorAddressAsLeaf {
+			return ErrCanOnlyUseMaxOneUsePerLeafWithWhitelistTree
+		}
+
+		for j := i + 1; j < len(challenges); j++ {
+			if challenge.ChallengeTrackerId == challenges[j].ChallengeTrackerId {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate challenge ids")
+			}
+		}
 	}
 
 	return nil

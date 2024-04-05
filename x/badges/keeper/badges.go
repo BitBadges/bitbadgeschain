@@ -16,7 +16,6 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		}
 	}
 
-
 	//Check if we are allowed to create these badges
 	err := *new(error)
 	detailsToCheck := []*types.UniversalPermissionDetails{}

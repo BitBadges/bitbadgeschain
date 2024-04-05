@@ -1,0 +1,153 @@
+syntax = "proto3";
+
+package maps;
+
+import "gogoproto/gogo.proto";
+import "maps/permissions.proto";
+import "maps/timelines.proto";
+import "maps/balances.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/maps/types";
+
+// Msg defines the Msg service.
+service Msg {
+  rpc CreateMap (MsgCreateMap) returns (MsgCreateMapResponse);
+  rpc UpdateMap (MsgUpdateMap) returns (MsgUpdateMapResponse);
+  rpc DeleteMap (MsgDeleteMap) returns (MsgDeleteMapResponse);
+  rpc SetValue (MsgSetValue) returns (MsgSetValueResponse);
+}
+
+message ValueStore {
+  string key = 1;
+  string value = 2;
+  string lastSetBy = 3;
+}
+
+message MapUpdateCriteria {
+  //All ID slots are only updatable by manager
+  bool managerOnly = 1;
+  //ID slots are only updatable by badge ID owner of this collection (>1 balance at current time)
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  //Keys are address based and can only be updated by that respective address
+  bool creatorOnly = 3;
+  //Claim slots. Can unclaim by setting to blank. Uses lastSetBy.
+  bool firstComeFirstServe = 4;
+}
+
+message ValueOptions {
+  bool noDuplicates = 1;
+  bool permanentOnceSet = 2;
+  bool expectUint = 3;
+  bool expectBoolean = 4;
+  bool expectAddress = 5;
+  bool expectUri = 6;
+}
+
+message MapPermissions {
+  repeated TimedUpdatePermission canUpdateMetadata = 1;
+  repeated TimedUpdatePermission canUpdateManager = 2;
+  repeated IsEditablePermission canUpdateIsEditable = 3;
+  repeated ActionPermission canDeleteMap = 4;
+  repeated IsEditablePermission canUpdateIsForceEditable = 5;
+}
+
+message IsEditableTimeline {
+  repeated UintRange timelineTimes = 1;
+  string keyListId = 2;
+  bool isEditable = 3;
+}
+
+message IsEditablePermission {
+  repeated UintRange timelineTimes = 1;
+  string keyListId = 2;
+
+  repeated UintRange permanentlyPermittedTimes = 3;
+  repeated UintRange permanentlyForbiddenTimes = 4;
+}
+
+
+message Map {
+  string creator = 1;
+  string mapId = 2; 
+
+  string inheritManagerTimelineFrom = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated ManagerTimeline managerTimeline = 4;
+
+  //config options that will not change at all
+  MapUpdateCriteria updateCriteria = 5;
+
+  ValueOptions valueOptions = 6;
+  string defaultValue = 7;
+
+  repeated IsEditableTimeline isEditableTimeline = 8;
+  repeated IsEditableTimeline isForceEditableTimeline = 9;
+
+  repeated MapMetadataTimeline metadataTimeline = 10;
+
+  MapPermissions permissions = 11;
+}
+
+message MsgCreateMap {
+  string creator = 1;
+  string mapId = 2; 
+
+  string inheritManagerTimelineFrom = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated ManagerTimeline managerTimeline = 4;
+
+  //config options that will not change at all
+  MapUpdateCriteria updateCriteria = 5;
+  ValueOptions valueOptions = 6;
+  string defaultValue = 7;
+
+  repeated IsEditableTimeline isEditableTimeline = 8;
+  repeated MapMetadataTimeline metadataTimeline = 9;
+
+  MapPermissions permissions = 10;
+
+  repeated IsEditableTimeline isForceEditableTimeline = 11;
+}
+
+message MsgCreateMapResponse {}
+
+message MsgUpdateMap {
+  string creator = 1;
+  string mapId = 2;
+
+  bool updateManagerTimeline = 3;
+  repeated ManagerTimeline managerTimeline = 4;
+
+  bool updateIsEditableTimeline = 5;
+  repeated IsEditableTimeline isEditableTimeline = 6;
+
+  bool updateMetadataTimeline = 7;
+  repeated MapMetadataTimeline metadataTimeline = 8;
+
+  bool updatePermissions = 9;
+  MapPermissions permissions = 10;
+
+  bool updateIsForceEditableTimeline = 11;
+  repeated IsEditableTimeline isForceEditableTimeline = 12;
+}
+
+message MsgUpdateMapResponse {}
+
+message MsgDeleteMap {
+  string creator = 1;
+  string mapId = 2;
+}
+
+message MsgDeleteMapResponse {}
+
+message SetOptions {
+  bool useMostRecentCollectionId = 1;
+}
+
+message MsgSetValue {
+  string creator = 1;
+  string mapId = 2;
+  string key = 3;
+  string value = 4;
+  SetOptions options = 5;
+}
+
+message MsgSetValueResponse {}

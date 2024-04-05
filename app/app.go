@@ -134,6 +134,9 @@ import (
 	anchormodule "github.com/bitbadges/bitbadgeschain/x/anchor"
 	anchormodulekeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
 	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
+	mapsmodule "github.com/bitbadges/bitbadgeschain/x/maps"
+	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
+	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
@@ -200,6 +203,7 @@ var (
 		wasmx.AppModuleBasic{},
 		protocolsmodule.AppModuleBasic{},
 		anchormodule.AppModuleBasic{},
+		mapsmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -290,6 +294,8 @@ type App struct {
 	ProtocolsKeeper       protocolsmodulekeeper.Keeper
 	ScopedAnchorKeeper    capabilitykeeper.ScopedKeeper
 	AnchorKeeper          anchormodulekeeper.Keeper
+	ScopedMapsKeeper      capabilitykeeper.ScopedKeeper
+	MapsKeeper            mapsmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -342,6 +348,7 @@ func New(
 		ibcfeetypes.StoreKey,
 		protocolsmoduletypes.StoreKey,
 		anchormoduletypes.StoreKey,
+		mapsmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -662,6 +669,21 @@ func New(
 	anchorModule := anchormodule.NewAppModule(appCodec, app.AnchorKeeper, app.AccountKeeper, app.BankKeeper)
 
 	anchorIBCModule := anchormodule.NewIBCModule(app.AnchorKeeper)
+	scopedMapsKeeper := app.CapabilityKeeper.ScopeToModule(mapsmoduletypes.ModuleName)
+	app.ScopedMapsKeeper = scopedMapsKeeper
+	app.MapsKeeper = *mapsmodulekeeper.NewKeeper(
+		appCodec,
+		keys[mapsmoduletypes.StoreKey],
+		keys[mapsmoduletypes.MemStoreKey],
+		app.GetSubspace(mapsmoduletypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedMapsKeeper,
+		app.BadgesKeeper,
+	)
+	mapsModule := mapsmodule.NewAppModule(appCodec, app.MapsKeeper, app.AccountKeeper, app.BankKeeper)
+
+	mapsIBCModule := mapsmodule.NewIBCModule(app.MapsKeeper)
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	/**** IBC Routing ****/
@@ -669,6 +691,7 @@ func New(
 	var wasmStack ibcporttypes.IBCModule
 	wasmStack = wasm.NewIBCHandler(app.WasmKeeper, app.IBCKeeper.ChannelKeeper, app.IBCFeeKeeper)
 	wasmStack = ibcfee.NewIBCMiddleware(wasmStack, app.IBCFeeKeeper)
+
 
 	// Sealing prevents other modules from creating scoped sub-keepers
 	app.CapabilityKeeper.Seal()
@@ -681,9 +704,9 @@ func New(
 	ibcRouter.AddRoute(wasmtypes.ModuleName, wasmStack)
 	ibcRouter.AddRoute(protocolsmoduletypes.ModuleName, protocolsIBCModule)
 	ibcRouter.AddRoute(anchormoduletypes.ModuleName, anchorIBCModule)
-	
-	app.IBCKeeper.SetRouter(ibcRouter)
+	ibcRouter.AddRoute(mapsmoduletypes.ModuleName, mapsIBCModule)
 
+	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// this line is used by starport scaffolding # ibc/app/router
 
@@ -744,6 +767,7 @@ func New(
 		wasmxModule,
 		protocolsModule,
 		anchorModule,
+		mapsModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
@@ -781,6 +805,7 @@ func New(
 		wasmxtypes.ModuleName,
 		protocolsmoduletypes.ModuleName,
 		anchormoduletypes.ModuleName,
+		mapsmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -811,6 +836,7 @@ func New(
 		wasmxtypes.ModuleName,
 		protocolsmoduletypes.ModuleName,
 		anchormoduletypes.ModuleName,
+		mapsmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -846,6 +872,7 @@ func New(
 		wasmxtypes.ModuleName,
 		protocolsmoduletypes.ModuleName,
 		anchormoduletypes.ModuleName,
+		mapsmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)
@@ -1105,6 +1132,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(wasmxtypes.ModuleName)
 	paramsKeeper.Subspace(protocolsmoduletypes.ModuleName)
 	paramsKeeper.Subspace(anchormoduletypes.ModuleName)
+	paramsKeeper.Subspace(mapsmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
