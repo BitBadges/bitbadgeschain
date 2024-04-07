@@ -11,23 +11,18 @@ const TypeMsgUpdateMap = "update_map"
 
 var _ sdk.Msg = &MsgUpdateMap{}
 
-func NewMsgUpdateMap(creator string, mapId string, updateManagerTimeline bool, managerTimeline []*ManagerTimeline, updateIsEditableTimeline bool, isEditableTimeline []*IsEditableTimeline, updateMetadataTimeline bool, metadataTimeline []*MapMetadataTimeline, updatePermissions bool, permissions *MapPermissions, updateIsForceEditableTimeline bool, isForceEditableTimeline []*IsEditableTimeline) *MsgUpdateMap {
+func NewMsgUpdateMap(creator string, mapId string, updateManagerTimeline bool, managerTimeline []*ManagerTimeline, updateMetadataTimeline bool, metadataTimeline []*MapMetadataTimeline, updatePermissions bool, permissions *MapPermissions) *MsgUpdateMap {
 	return &MsgUpdateMap{
-		Creator:                  creator,
-		MapId:                    mapId,
-		UpdateManagerTimeline:    updateManagerTimeline,
-		ManagerTimeline:          managerTimeline,
-		UpdateIsEditableTimeline: updateIsEditableTimeline,
-		IsEditableTimeline:       isEditableTimeline,
-		UpdateMetadataTimeline:   updateMetadataTimeline,
-		MetadataTimeline:         metadataTimeline,
-		UpdatePermissions:        updatePermissions,
-		Permissions:              permissions,
-		UpdateIsForceEditableTimeline: updateIsForceEditableTimeline,
-		IsForceEditableTimeline: isForceEditableTimeline,
+		Creator:                creator,
+		MapId:                  mapId,
+		UpdateManagerTimeline:  updateManagerTimeline,
+		ManagerTimeline:        managerTimeline,
+		UpdateMetadataTimeline: updateMetadataTimeline,
+		MetadataTimeline:       metadataTimeline,
+		UpdatePermissions:      updatePermissions,
+		Permissions:            permissions,
 	}
 }
-
 
 func (msg *MsgUpdateMap) Route() string {
 	return RouterKey
@@ -60,20 +55,9 @@ func (msg *MsgUpdateMap) ValidateBasic() error {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "map ID cannot be empty")
 	}
 
-	err = badgestypes.ValidateManagerTimeline(CastManagerTimelineArray(msg.ManagerTimeline)) 
+	err = badgestypes.ValidateManagerTimeline(CastManagerTimelineArray(msg.ManagerTimeline))
 	if err != nil {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "manager timeline cannot be invalid")
-	}
-
-	blankCtx := sdk.Context{}
-	err = badgestypes.ValidateCollectionApprovals(blankCtx, CastIsEditableTimelineArray(msg.IsEditableTimeline), false)
-	if err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "is editable timeline cannot be invalid")
-	}
-
-	err = badgestypes.ValidateCollectionApprovals(blankCtx, CastIsEditableTimelineArray(msg.IsForceEditableTimeline), false)
-	if err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "is force editable timeline cannot be invalid")
 	}
 
 	err = badgestypes.ValidateCollectionMetadataTimeline(CastMetadataTimelineArray(msg.MetadataTimeline))
@@ -84,6 +68,6 @@ func (msg *MsgUpdateMap) ValidateBasic() error {
 	if ValidatePermissions(msg.Permissions, false) != nil {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "permissions are invalid")
 	}
-	
+
 	return nil
 }

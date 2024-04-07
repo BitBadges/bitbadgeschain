@@ -1,6 +1,8 @@
 package types
 
 import (
+	"math"
+
 	sdkmath "cosmossdk.io/math"
 	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -49,7 +51,7 @@ func CastTimedUpdatePermission(perm *TimedUpdatePermission) *badgetypes.TimedUpd
 	return &badgetypes.TimedUpdatePermission{
 		PermanentlyPermittedTimes: CastUintRanges(perm.PermanentlyPermittedTimes),
 		PermanentlyForbiddenTimes: CastUintRanges(perm.PermanentlyForbiddenTimes),
-		TimelineTimes: 						CastUintRanges(perm.TimelineTimes),
+		TimelineTimes:             CastUintRanges(perm.TimelineTimes),
 	}
 }
 
@@ -71,16 +73,18 @@ func CastTimedUpdatePermissions(perms []*TimedUpdatePermission) []*badgetypes.Ti
 
 func CastIsEditablePermission(perm *IsEditablePermission) *badgetypes.CollectionApprovalPermission {
 	return &badgetypes.CollectionApprovalPermission{
-		ApprovalId: perm.KeyListId,
-		FromListId: "All",
-		ToListId: "All",
+		ApprovalId:        perm.KeyListId,
+		FromListId:        "All",
+		ToListId:          "All",
 		InitiatedByListId: "All",
-		TransferTimes: CastUintRanges(perm.TimelineTimes),
+		TransferTimes: []*badgetypes.UintRange{
+			{Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64)},
+		},
 		BadgeIds: []*badgetypes.UintRange{
-			{ Start: sdk.NewUint(1), End: sdk.NewUint(1) },
+			{Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64)},
 		},
 		OwnershipTimes: []*badgetypes.UintRange{
-			{ Start: sdk.NewUint(1), End: sdk.NewUint(1) },
+			{Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64)},
 		},
 		PermanentlyPermittedTimes: CastUintRanges(perm.PermanentlyPermittedTimes),
 		PermanentlyForbiddenTimes: CastUintRanges(perm.PermanentlyForbiddenTimes),
@@ -95,10 +99,9 @@ func CastIsEditablePermissions(perms []*IsEditablePermission) []*badgetypes.Coll
 	return casted
 }
 
-
 func CastManagerTimeline(timeline *ManagerTimeline) *badgetypes.ManagerTimeline {
 	return &badgetypes.ManagerTimeline{
-		Manager: timeline.Manager,
+		Manager:       timeline.Manager,
 		TimelineTimes: CastUintRanges(timeline.TimelineTimes),
 	}
 }
@@ -111,39 +114,10 @@ func CastManagerTimelineArray(timelines []*ManagerTimeline) []*badgetypes.Manage
 	return casted
 }
 
-func CastIsEditableTimeline(timeline *IsEditableTimeline) *badgetypes.CollectionApproval {
-	approvalCriteria := &badgetypes.ApprovalCriteria{
-		RequireToEqualsInitiatedBy: timeline.IsEditable,
-	}
-	
-	return &badgetypes.CollectionApproval{
-		ApprovalCriteria: approvalCriteria,
-		ApprovalId: timeline.KeyListId,
-		TransferTimes: CastUintRanges(timeline.TimelineTimes),
-		FromListId: "All",
-		ToListId: "All",
-		InitiatedByListId: "All",
-		BadgeIds: []*badgetypes.UintRange{
-			{ Start: sdk.NewUint(1), End: sdk.NewUint(1) },
-		},
-		OwnershipTimes: []*badgetypes.UintRange{
-			{ Start: sdk.NewUint(1), End: sdk.NewUint(1) },
-		},
-	}
-}
-
-func CastIsEditableTimelineArray(timelines []*IsEditableTimeline) []*badgetypes.CollectionApproval {
-	casted := make([]*badgetypes.CollectionApproval, len(timelines))
-	for i, timeline := range timelines {
-		casted[i] = CastIsEditableTimeline(timeline)
-	}
-	return casted
-}
-
 func CastMetadataTimeline(timeline *MapMetadataTimeline) *badgetypes.CollectionMetadataTimeline {
 	return &badgetypes.CollectionMetadataTimeline{
 		CollectionMetadata: &badgetypes.CollectionMetadata{
-			Uri: timeline.Metadata.Uri,
+			Uri:        timeline.Metadata.Uri,
 			CustomData: timeline.Metadata.CustomData,
 		},
 		TimelineTimes: CastUintRanges(timeline.TimelineTimes),

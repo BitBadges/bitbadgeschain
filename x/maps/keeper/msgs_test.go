@@ -13,20 +13,20 @@ import (
 
 func GetDefaultCreateMsg() *types.MsgCreateMap {
 	return &types.MsgCreateMap{
-		Creator:          bob,
-		MapId:            "test",
-		UpdateCriteria:   &types.MapUpdateCriteria{
+		Creator: bob,
+		MapId:   "test",
+		UpdateCriteria: &types.MapUpdateCriteria{
 			ManagerOnly:         true,
-			CollectionId:      sdkmath.NewUintFromString("0"),
-			CreatorOnly:       false,
+			CollectionId:        sdkmath.NewUintFromString("0"),
+			CreatorOnly:         false,
 			FirstComeFirstServe: false,
 		},
-		ValueOptions:     &types.ValueOptions{
+		ValueOptions: &types.ValueOptions{
 			PermanentOnceSet: false,
-			NoDuplicates: 	 false,
+			NoDuplicates:     false,
 		},
-		DefaultValue:    	"",
-		ManagerTimeline:  []*types.ManagerTimeline{
+		DefaultValue: "",
+		ManagerTimeline: []*types.ManagerTimeline{
 			{
 				TimelineTimes: []*types.UintRange{
 					{
@@ -34,37 +34,13 @@ func GetDefaultCreateMsg() *types.MsgCreateMap {
 						End:   sdkmath.NewUint(math.MaxUint64),
 					},
 				},
-				Manager:       bob,
-			},
-		},
-		IsEditableTimeline: []*types.IsEditableTimeline{
-			{
-				IsEditable:    true,
-				TimelineTimes: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(math.MaxUint64),
-					},
-				},
-				KeyListId: "All",
-			},
-		},
-		IsForceEditableTimeline: []*types.IsEditableTimeline{
-			{
-				IsEditable:    true,
-				TimelineTimes: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(math.MaxUint64),
-					},
-				},
-				KeyListId: "All",
+				Manager: bob,
 			},
 		},
 		MetadataTimeline: []*types.MapMetadataTimeline{
 			{
 				Metadata: &types.Metadata{
-					Uri: "test",
+					Uri:        "test",
 					CustomData: "",
 				},
 				TimelineTimes: []*types.UintRange{
@@ -75,7 +51,7 @@ func GetDefaultCreateMsg() *types.MsgCreateMap {
 				},
 			},
 		},
-		Permissions:      &types.MapPermissions{
+		Permissions: &types.MapPermissions{
 			CanUpdateMetadata: []*types.TimedUpdatePermission{
 				{
 					PermanentlyPermittedTimes: []*types.UintRange{},
@@ -88,15 +64,9 @@ func GetDefaultCreateMsg() *types.MsgCreateMap {
 					},
 				},
 			},
-			CanUpdateIsForceEditable: []*types.IsEditablePermission{
+			CanForceEdit: []*types.IsEditablePermission{
 				{
-					KeyListId: "All",
-					TimelineTimes: []*types.UintRange{
-						{
-							Start: sdkmath.NewUint(1),
-							End:   sdkmath.NewUint(math.MaxUint64),
-						},
-					},
+					KeyListId:                 "All",
 					PermanentlyPermittedTimes: []*types.UintRange{},
 					PermanentlyForbiddenTimes: []*types.UintRange{},
 				},
@@ -113,17 +83,11 @@ func GetDefaultCreateMsg() *types.MsgCreateMap {
 					},
 				},
 			},
-			CanUpdateIsEditable: []*types.IsEditablePermission{
+			CanEdit: []*types.IsEditablePermission{
 				{
 					PermanentlyPermittedTimes: []*types.UintRange{},
 					PermanentlyForbiddenTimes: []*types.UintRange{},
-					KeyListId: "All",
-					TimelineTimes: []*types.UintRange{
-						{
-							Start: sdkmath.NewUint(1),
-							End:   sdkmath.NewUint(math.MaxUint64),
-						},
-					},
+					KeyListId:                 "All",
 				},
 			},
 			CanDeleteMap: []*types.ActionPermission{
@@ -135,7 +99,6 @@ func GetDefaultCreateMsg() *types.MsgCreateMap {
 		},
 	}
 }
-
 
 func (suite *TestSuite) TestMaps() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -150,9 +113,9 @@ func (suite *TestSuite) TestMaps() {
 
 	suite.Require().Equal(bob, currMap.ManagerTimeline[0].Manager, "Error getting map: %s")
 
-	updateMapMsg :=  &types.MsgUpdateMap{
-		Creator: bob,
-		MapId: "test",
+	updateMapMsg := &types.MsgUpdateMap{
+		Creator:               bob,
+		MapId:                 "test",
 		UpdateManagerTimeline: true,
 		ManagerTimeline: []*types.ManagerTimeline{
 			{
@@ -165,12 +128,10 @@ func (suite *TestSuite) TestMaps() {
 				},
 			},
 		},
-		UpdateIsEditableTimeline: false,
 		UpdateMetadataTimeline: false,
-		IsEditableTimeline: nil,
-		MetadataTimeline: nil,
-		UpdatePermissions: false,
-		Permissions: nil,
+		MetadataTimeline:       nil,
+		UpdatePermissions:      false,
+		Permissions:            nil,
 	}
 
 	updateMapMsg.Creator = alice
@@ -184,13 +145,13 @@ func (suite *TestSuite) TestMaps() {
 
 	err = DeleteMap(suite, wctx, &types.MsgDeleteMap{
 		Creator: bob,
-		MapId: "test",
+		MapId:   "test",
 	})
 	suite.Require().Error(err, "Error deleting map: %s")
 
 	err = DeleteMap(suite, wctx, &types.MsgDeleteMap{
 		Creator: alice,
-		MapId: "test",
+		MapId:   "test",
 	})
 	suite.Require().Nil(err, "Error deleting map: %s")
 }
@@ -200,13 +161,11 @@ func (suite *TestSuite) TestPermissions() {
 	createMsg := GetDefaultCreateMsg()
 	createMsg.Permissions.CanUpdateManager = []*types.TimedUpdatePermission{
 		{
-			PermanentlyPermittedTimes: []*types.UintRange{
-				
-			},
+			PermanentlyPermittedTimes: []*types.UintRange{},
 			PermanentlyForbiddenTimes: []*types.UintRange{{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(math.MaxUint64),
-			},},
+			}},
 			TimelineTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -219,9 +178,9 @@ func (suite *TestSuite) TestPermissions() {
 	err := CreateMap(suite, wctx, createMsg)
 	suite.Require().Nil(err, "Error creating map: %s")
 
-	updateMapMsg :=  &types.MsgUpdateMap{
-		Creator: bob,
-		MapId: "test",
+	updateMapMsg := &types.MsgUpdateMap{
+		Creator:               bob,
+		MapId:                 "test",
 		UpdateManagerTimeline: true,
 		ManagerTimeline: []*types.ManagerTimeline{
 			{
@@ -245,13 +204,11 @@ func (suite *TestSuite) TestDeleteIsDisallowed() {
 	createMsg := GetDefaultCreateMsg()
 	createMsg.Permissions.CanDeleteMap = []*types.ActionPermission{
 		{
-			PermanentlyPermittedTimes: []*types.UintRange{
-				
-			},
+			PermanentlyPermittedTimes: []*types.UintRange{},
 			PermanentlyForbiddenTimes: []*types.UintRange{{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(math.MaxUint64),
-			},},
+			}},
 		},
 	}
 
@@ -260,7 +217,7 @@ func (suite *TestSuite) TestDeleteIsDisallowed() {
 
 	err = DeleteMap(suite, wctx, &types.MsgDeleteMap{
 		Creator: bob,
-		MapId: "test",
+		MapId:   "test",
 	})
 	suite.Require().Error(err, "Error deleting map: %s")
 }
@@ -268,21 +225,13 @@ func (suite *TestSuite) TestDeleteIsDisallowed() {
 func (suite *TestSuite) TestUpdateEditableDisallowed() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	createMsg := GetDefaultCreateMsg()
-	createMsg.Permissions.CanUpdateIsEditable = []*types.IsEditablePermission{
+	createMsg.Permissions.CanEdit = []*types.IsEditablePermission{
 		{
-			PermanentlyPermittedTimes: []*types.UintRange{
-				
-			},
+			PermanentlyPermittedTimes: []*types.UintRange{},
 			PermanentlyForbiddenTimes: []*types.UintRange{{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(math.MaxUint64),
-			},},
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(1),
-					End:   sdkmath.NewUint(math.MaxUint64),
-				},
-			},
+			}},
 			KeyListId: "All",
 		},
 	}
@@ -290,21 +239,19 @@ func (suite *TestSuite) TestUpdateEditableDisallowed() {
 	err := CreateMap(suite, wctx, createMsg)
 	suite.Require().Nil(err, "Error creating map: %s")
 
-	updateMapMsg :=  &types.MsgUpdateMap{
-		Creator: bob,
-		MapId: "test",
-		UpdateIsEditableTimeline: true,
-		IsEditableTimeline: []*types.IsEditableTimeline{
-			{
-				IsEditable:    false,
-				KeyListId: "All",
-				TimelineTimes: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(math.MaxUint64),
-					},
-				},
+	updateMapMsg := &types.MsgUpdateMap{
+		Creator:           bob,
+		MapId:             "test",
+		UpdatePermissions: true,
+		Permissions:       createMsg.Permissions,
+	}
+	updateMapMsg.Permissions.CanEdit = []*types.IsEditablePermission{
+		{
+			PermanentlyPermittedTimes: []*types.UintRange{},
+			PermanentlyForbiddenTimes: []*types.UintRange{
+				//Nothing handled
 			},
+			KeyListId: "All",
 		},
 	}
 
@@ -317,35 +264,14 @@ func (suite *TestSuite) TestForceUpdateDisallowed() {
 	createMsg := GetDefaultCreateMsg()
 	createMsg.UpdateCriteria.ManagerOnly = false
 	createMsg.UpdateCriteria.CreatorOnly = true
-	createMsg.Permissions.CanUpdateIsForceEditable = []*types.IsEditablePermission{
+	createMsg.Permissions.CanForceEdit = []*types.IsEditablePermission{
 		{
-			PermanentlyPermittedTimes: []*types.UintRange{
-				
-			},
+			PermanentlyPermittedTimes: []*types.UintRange{},
 			PermanentlyForbiddenTimes: []*types.UintRange{{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(math.MaxUint64),
-			},},
+			}},
 			KeyListId: "All",
-			TimelineTimes: []*types.UintRange{ 
-				{
-					Start: sdkmath.NewUint(1),
-					End:   sdkmath.NewUint(math.MaxUint64),
-				},
-			},
-		},
-	}
-
-	createMsg.IsForceEditableTimeline = []*types.IsEditableTimeline{
-		{
-			IsEditable:    false,
-			KeyListId: "All",
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(1),
-					End:   sdkmath.NewUint(math.MaxUint64),
-				},
-			},
 		},
 	}
 
@@ -354,22 +280,22 @@ func (suite *TestSuite) TestForceUpdateDisallowed() {
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: bob,
-		MapId: "test",
-		Key: alice,
-		Value: "test",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Error(err, "Error setting value: %s")
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: bob,
-		MapId: "test",
-		Key: bob,
-		Value: "test",
+		MapId:   "test",
+		Key:     bob,
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Nil(err, "Error setting value: %s")
-	
+
 	valStore, err := GetMapValue(suite, wctx, "test", bob)
 	if err != nil {
 		suite.Require().Error(err, "Error getting value: %s")
@@ -384,32 +310,20 @@ func (suite *TestSuite) TestForceUpdateAllowed() {
 	createMsg := GetDefaultCreateMsg()
 	createMsg.UpdateCriteria.ManagerOnly = false
 	createMsg.UpdateCriteria.CreatorOnly = true
-	createMsg.Permissions.CanUpdateIsForceEditable = []*types.IsEditablePermission{}
-	createMsg.IsForceEditableTimeline = []*types.IsEditableTimeline{
-		{
-			IsEditable:    true,
-			KeyListId: "All",
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(1),
-					End:   sdkmath.NewUint(math.MaxUint64),
-				},
-			},
-		},
-	}
+	createMsg.Permissions.CanForceEdit = []*types.IsEditablePermission{}
 
 	err := CreateMap(suite, wctx, createMsg)
 	suite.Require().Nil(err, "Error creating map: %s")
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: bob,
-		MapId: "test",
-		Key: alice,
-		Value: "test",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Nil(err, "Error setting value: %s")
-	
+
 	valStore, err := GetMapValue(suite, wctx, "test", alice)
 	if err != nil {
 		suite.Require().Error(err, "Error getting value: %s")
@@ -424,21 +338,20 @@ func (suite *TestSuite) TestForceUpdateAllowedDefaultValues() {
 	createMsg := GetDefaultCreateMsg()
 	createMsg.UpdateCriteria.ManagerOnly = false
 	createMsg.UpdateCriteria.CreatorOnly = true
-	createMsg.Permissions.CanUpdateIsForceEditable = []*types.IsEditablePermission{}
-	createMsg.IsForceEditableTimeline = []*types.IsEditableTimeline{}
+	createMsg.Permissions.CanForceEdit = []*types.IsEditablePermission{}
 
 	err := CreateMap(suite, wctx, createMsg)
 	suite.Require().Nil(err, "Error creating map: %s")
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: bob,
-		MapId: "test",
-		Key: alice,
-		Value: "test",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Nil(err, "Error setting value: %s")
-	
+
 	valStore, err := GetMapValue(suite, wctx, "test", alice)
 	if err != nil {
 		suite.Require().Error(err, "Error getting value: %s")
@@ -455,21 +368,22 @@ func (suite *TestSuite) TestIsNotEditable() {
 	err := CreateMap(suite, wctx, createMsg)
 	suite.Require().Nil(err, "Error creating map: %s")
 
-	updateMapMsg :=  &types.MsgUpdateMap{
-		Creator: bob,
-		MapId: "test",
-		UpdateIsEditableTimeline: true,
-		IsEditableTimeline: []*types.IsEditableTimeline{
-			{
-				IsEditable:    false,
-				KeyListId: "All",
-				TimelineTimes: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(math.MaxUint64),
-					},
+	updateMapMsg := &types.MsgUpdateMap{
+		Creator:           bob,
+		MapId:             "test",
+		Permissions:       createMsg.Permissions,
+		UpdatePermissions: true,
+	}
+	updateMapMsg.Permissions.CanEdit = []*types.IsEditablePermission{
+		{
+			PermanentlyPermittedTimes: []*types.UintRange{},
+			PermanentlyForbiddenTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:   sdkmath.NewUint(math.MaxUint64),
 				},
 			},
+			KeyListId: "All",
 		},
 	}
 
@@ -478,14 +392,13 @@ func (suite *TestSuite) TestIsNotEditable() {
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
-		MapId: "test",
-		Key: alice,
-		Value: "test",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Error(err, "Error setting value: %s")
 }
-
 
 func (suite *TestSuite) TestManagerOnly() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -497,22 +410,22 @@ func (suite *TestSuite) TestManagerOnly() {
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
-		MapId: "test",
-		Key: alice,
-		Value: "test",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Error(err, "Error setting value: %s")
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: bob,
-		MapId: "test",
-		Key: alice,
-		Value: "test",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Nil(err, "Error setting value: %s")
-	
+
 	valStore, err := GetMapValue(suite, wctx, "test", alice)
 	if err != nil {
 		suite.Require().Error(err, "Error getting value: %s")
@@ -523,9 +436,9 @@ func (suite *TestSuite) TestManagerOnly() {
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
-		MapId: "test",
-		Key: alice,
-		Value: "",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Error(err, "Error setting value: %s")
@@ -541,22 +454,22 @@ func (suite *TestSuite) TestFirstComeFirstServe() {
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
-		MapId: "test",
-		Key: alice,
-		Value: "test",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Nil(err, "Error setting value: %s")
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: bob,
-		MapId: "test",
-		Key: alice,
-		Value: "test",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Error(err, "Error setting value: %s")
-	
+
 	valStore, err := GetMapValue(suite, wctx, "test", alice)
 	if err != nil {
 		suite.Require().Error(err, "Error getting value: %s")
@@ -568,9 +481,9 @@ func (suite *TestSuite) TestFirstComeFirstServe() {
 	//unset value
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
-		MapId: "test",
-		Key: alice,
-		Value: "",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Nil(err, "Error setting value: %s")
@@ -595,22 +508,22 @@ func (suite *TestSuite) TestNoDuplicates() {
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
-		MapId: "test",
-		Key: alice,
-		Value: "test",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Nil(err, "Error setting value: %s")
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: bob,
-		MapId: "test",
-		Key: bob,
-		Value: "test",
+		MapId:   "test",
+		Key:     bob,
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Error(err, "Error setting value: %s")
-	
+
 	valStore, err := GetMapValue(suite, wctx, "test", alice)
 	if err != nil {
 		suite.Require().Error(err, "Error getting value: %s")
@@ -622,9 +535,9 @@ func (suite *TestSuite) TestNoDuplicates() {
 	//unset value
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
-		MapId: "test",
-		Key: alice,
-		Value: "",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Nil(err, "Error setting value: %s")
@@ -638,9 +551,9 @@ func (suite *TestSuite) TestNoDuplicates() {
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: bob,
-		MapId: "test",
-		Key: bob,
-		Value: "test",
+		MapId:   "test",
+		Key:     bob,
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Nil(err, "Error setting value: %s")
@@ -658,18 +571,18 @@ func (suite *TestSuite) TestPermanentOnceSet() {
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
-		MapId: "test",
-		Key: alice,
-		Value: "test",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Nil(err, "Error setting value: %s")
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
-		MapId: "test",
-		Key: alice,
-		Value: "test",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Error(err, "Error setting value: %s")
@@ -677,9 +590,9 @@ func (suite *TestSuite) TestPermanentOnceSet() {
 	//Cant unset either
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
-		MapId: "test",
-		Key: alice,
-		Value: "",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Error(err, "Error setting value: %s")
@@ -697,9 +610,9 @@ func (suite *TestSuite) TestUseMostRecentCollectionId() {
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
-		MapId: "test",
-		Key: alice,
-		Value: "test",
+		MapId:   "test",
+		Key:     alice,
+		Value:   "test",
 		Options: &types.SetOptions{
 			UseMostRecentCollectionId: true,
 		},
@@ -713,7 +626,6 @@ func (suite *TestSuite) TestUseMostRecentCollectionId() {
 
 	suite.Require().Equal("0", valStore.Value, "Error getting value: %s")
 }
-
 
 func (suite *TestSuite) TestReservedAddressMaps() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -831,7 +743,7 @@ func (suite *TestSuite) TestCollectionIdCriteria() {
 		},
 		BalancesType: "Standard",
 	})
-	
+
 	err := CreateMap(suite, wctx, createMsg)
 	suite.Require().Nil(err, "Error creating map: %s")
 
@@ -857,11 +769,10 @@ func (suite *TestSuite) TestCollectionIdCriteria() {
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
-		MapId: "1",
-		Key: "1",
-		Value: "test",
-		Options: &types.SetOptions{
-		},
+		MapId:   "1",
+		Key:     "1",
+		Value:   "test",
+		Options: &types.SetOptions{},
 	})
 	suite.Require().Nil(err, "Error setting value: %s")
 
@@ -874,11 +785,10 @@ func (suite *TestSuite) TestCollectionIdCriteria() {
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
-		MapId: "1",
-		Key: "2",
-		Value: "test",
-		Options: &types.SetOptions{
-		},
+		MapId:   "1",
+		Key:     "2",
+		Value:   "test",
+		Options: &types.SetOptions{},
 	})
 	suite.Require().Error(err, "Error setting value: %s")
 }
@@ -891,18 +801,20 @@ func (suite *TestSuite) TestLockSpecificKey() {
 	createMsg.UpdateCriteria.FirstComeFirstServe = true
 	createMsg.MapId = "testing"
 	createMsg.Creator = alice
-	createMsg.IsEditableTimeline = []*types.IsEditableTimeline{
+	createMsg.Permissions.CanEdit = []*types.IsEditablePermission{
 		{
-			IsEditable:   false,
 			KeyListId: "test",
-			TimelineTimes: []*types.UintRange{
+
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(math.MaxUint64),
 				},
 			},
+			PermanentlyPermittedTimes: []*types.UintRange{},
 		},
 	}
+
 	createMsg.ManagerTimeline = []*types.ManagerTimeline{}
 
 	err := CreateMap(suite, wctx, createMsg)
@@ -910,18 +822,18 @@ func (suite *TestSuite) TestLockSpecificKey() {
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: bob,
-		MapId: "testing",
-		Key: "test",
-		Value: "test",
+		MapId:   "testing",
+		Key:     "test",
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Error(err, "Error setting value: %s")
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: bob,
-		MapId: "testing",
-		Key: "another test",
-		Value: "test",
+		MapId:   "testing",
+		Key:     "another test",
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Nil(err, "Error setting value: %s")
@@ -935,16 +847,16 @@ func (suite *TestSuite) TestLockAllButSpecificKey() {
 	createMsg.UpdateCriteria.FirstComeFirstServe = true
 	createMsg.MapId = "testing"
 	createMsg.Creator = alice
-	createMsg.IsEditableTimeline = []*types.IsEditableTimeline{
+	createMsg.Permissions.CanEdit = []*types.IsEditablePermission{
 		{
-			IsEditable:   false,
 			KeyListId: "!test",
-			TimelineTimes: []*types.UintRange{
+			PermanentlyForbiddenTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(math.MaxUint64),
 				},
 			},
+			PermanentlyPermittedTimes: []*types.UintRange{},
 		},
 	}
 	createMsg.ManagerTimeline = []*types.ManagerTimeline{}
@@ -954,18 +866,18 @@ func (suite *TestSuite) TestLockAllButSpecificKey() {
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: bob,
-		MapId: "testing",
-		Key: "test",
-		Value: "test",
+		MapId:   "testing",
+		Key:     "test",
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Nil(err, "Error setting value: %s")
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: bob,
-		MapId: "testing",
-		Key: "another test",
-		Value: "test",
+		MapId:   "testing",
+		Key:     "another test",
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Error(err, "Error setting value: %s")
@@ -980,7 +892,6 @@ func (suite *TestSuite) TestInheritManagerFromCollection() {
 	createMsg.MapId = "testing"
 	createMsg.Creator = alice
 	createMsg.ManagerTimeline = []*types.ManagerTimeline{}
-	createMsg.IsEditableTimeline = []*types.IsEditableTimeline{}
 	createMsg.InheritManagerTimelineFrom = sdkmath.NewUint(1)
 
 	err := CreateMap(suite, wctx, createMsg)
@@ -1004,18 +915,18 @@ func (suite *TestSuite) TestInheritManagerFromCollection() {
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
-		MapId: "testing",
-		Key: "test",
-		Value: "test",
+		MapId:   "testing",
+		Key:     "test",
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Nil(err, "Error setting value: %s")
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: bob,
-		MapId: "testing",
-		Key: "test",
-		Value: "test",
+		MapId:   "testing",
+		Key:     "test",
+		Value:   "test",
 		Options: &types.SetOptions{},
 	})
 	suite.Require().Error(err, "Error setting value: %s")

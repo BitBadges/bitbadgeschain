@@ -238,11 +238,11 @@ func (m *ValueOptions) GetExpectUri() bool {
 }
 
 type MapPermissions struct {
-	CanUpdateMetadata        []*TimedUpdatePermission `protobuf:"bytes,1,rep,name=canUpdateMetadata,proto3" json:"canUpdateMetadata,omitempty"`
-	CanUpdateManager         []*TimedUpdatePermission `protobuf:"bytes,2,rep,name=canUpdateManager,proto3" json:"canUpdateManager,omitempty"`
-	CanUpdateIsEditable      []*IsEditablePermission  `protobuf:"bytes,3,rep,name=canUpdateIsEditable,proto3" json:"canUpdateIsEditable,omitempty"`
-	CanDeleteMap             []*ActionPermission      `protobuf:"bytes,4,rep,name=canDeleteMap,proto3" json:"canDeleteMap,omitempty"`
-	CanUpdateIsForceEditable []*IsEditablePermission  `protobuf:"bytes,5,rep,name=canUpdateIsForceEditable,proto3" json:"canUpdateIsForceEditable,omitempty"`
+	CanUpdateMetadata []*TimedUpdatePermission `protobuf:"bytes,1,rep,name=canUpdateMetadata,proto3" json:"canUpdateMetadata,omitempty"`
+	CanUpdateManager  []*TimedUpdatePermission `protobuf:"bytes,2,rep,name=canUpdateManager,proto3" json:"canUpdateManager,omitempty"`
+	CanEdit           []*IsEditablePermission  `protobuf:"bytes,3,rep,name=canEdit,proto3" json:"canEdit,omitempty"`
+	CanDeleteMap      []*ActionPermission      `protobuf:"bytes,4,rep,name=canDeleteMap,proto3" json:"canDeleteMap,omitempty"`
+	CanForceEdit      []*IsEditablePermission  `protobuf:"bytes,5,rep,name=canForceEdit,proto3" json:"canForceEdit,omitempty"`
 }
 
 func (m *MapPermissions) Reset()         { *m = MapPermissions{} }
@@ -292,9 +292,9 @@ func (m *MapPermissions) GetCanUpdateManager() []*TimedUpdatePermission {
 	return nil
 }
 
-func (m *MapPermissions) GetCanUpdateIsEditable() []*IsEditablePermission {
+func (m *MapPermissions) GetCanEdit() []*IsEditablePermission {
 	if m != nil {
-		return m.CanUpdateIsEditable
+		return m.CanEdit
 	}
 	return nil
 }
@@ -306,75 +306,14 @@ func (m *MapPermissions) GetCanDeleteMap() []*ActionPermission {
 	return nil
 }
 
-func (m *MapPermissions) GetCanUpdateIsForceEditable() []*IsEditablePermission {
+func (m *MapPermissions) GetCanForceEdit() []*IsEditablePermission {
 	if m != nil {
-		return m.CanUpdateIsForceEditable
+		return m.CanForceEdit
 	}
 	return nil
-}
-
-type IsEditableTimeline struct {
-	TimelineTimes []*UintRange `protobuf:"bytes,1,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
-	KeyListId     string       `protobuf:"bytes,2,opt,name=keyListId,proto3" json:"keyListId,omitempty"`
-	IsEditable    bool         `protobuf:"varint,3,opt,name=isEditable,proto3" json:"isEditable,omitempty"`
-}
-
-func (m *IsEditableTimeline) Reset()         { *m = IsEditableTimeline{} }
-func (m *IsEditableTimeline) String() string { return proto.CompactTextString(m) }
-func (*IsEditableTimeline) ProtoMessage()    {}
-func (*IsEditableTimeline) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d4bd760995a662e3, []int{4}
-}
-func (m *IsEditableTimeline) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *IsEditableTimeline) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_IsEditableTimeline.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *IsEditableTimeline) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_IsEditableTimeline.Merge(m, src)
-}
-func (m *IsEditableTimeline) XXX_Size() int {
-	return m.Size()
-}
-func (m *IsEditableTimeline) XXX_DiscardUnknown() {
-	xxx_messageInfo_IsEditableTimeline.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_IsEditableTimeline proto.InternalMessageInfo
-
-func (m *IsEditableTimeline) GetTimelineTimes() []*UintRange {
-	if m != nil {
-		return m.TimelineTimes
-	}
-	return nil
-}
-
-func (m *IsEditableTimeline) GetKeyListId() string {
-	if m != nil {
-		return m.KeyListId
-	}
-	return ""
-}
-
-func (m *IsEditableTimeline) GetIsEditable() bool {
-	if m != nil {
-		return m.IsEditable
-	}
-	return false
 }
 
 type IsEditablePermission struct {
-	TimelineTimes             []*UintRange `protobuf:"bytes,1,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 	KeyListId                 string       `protobuf:"bytes,2,opt,name=keyListId,proto3" json:"keyListId,omitempty"`
 	PermanentlyPermittedTimes []*UintRange `protobuf:"bytes,3,rep,name=permanentlyPermittedTimes,proto3" json:"permanentlyPermittedTimes,omitempty"`
 	PermanentlyForbiddenTimes []*UintRange `protobuf:"bytes,4,rep,name=permanentlyForbiddenTimes,proto3" json:"permanentlyForbiddenTimes,omitempty"`
@@ -384,7 +323,7 @@ func (m *IsEditablePermission) Reset()         { *m = IsEditablePermission{} }
 func (m *IsEditablePermission) String() string { return proto.CompactTextString(m) }
 func (*IsEditablePermission) ProtoMessage()    {}
 func (*IsEditablePermission) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d4bd760995a662e3, []int{5}
+	return fileDescriptor_d4bd760995a662e3, []int{4}
 }
 func (m *IsEditablePermission) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -413,13 +352,6 @@ func (m *IsEditablePermission) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_IsEditablePermission proto.InternalMessageInfo
 
-func (m *IsEditablePermission) GetTimelineTimes() []*UintRange {
-	if m != nil {
-		return m.TimelineTimes
-	}
-	return nil
-}
-
 func (m *IsEditablePermission) GetKeyListId() string {
 	if m != nil {
 		return m.KeyListId
@@ -447,20 +379,18 @@ type Map struct {
 	InheritManagerTimelineFrom Uint               `protobuf:"bytes,3,opt,name=inheritManagerTimelineFrom,proto3,customtype=Uint" json:"inheritManagerTimelineFrom"`
 	ManagerTimeline            []*ManagerTimeline `protobuf:"bytes,4,rep,name=managerTimeline,proto3" json:"managerTimeline,omitempty"`
 	// config options that will not change at all
-	UpdateCriteria          *MapUpdateCriteria     `protobuf:"bytes,5,opt,name=updateCriteria,proto3" json:"updateCriteria,omitempty"`
-	ValueOptions            *ValueOptions          `protobuf:"bytes,6,opt,name=valueOptions,proto3" json:"valueOptions,omitempty"`
-	DefaultValue            string                 `protobuf:"bytes,7,opt,name=defaultValue,proto3" json:"defaultValue,omitempty"`
-	IsEditableTimeline      []*IsEditableTimeline  `protobuf:"bytes,8,rep,name=isEditableTimeline,proto3" json:"isEditableTimeline,omitempty"`
-	IsForceEditableTimeline []*IsEditableTimeline  `protobuf:"bytes,9,rep,name=isForceEditableTimeline,proto3" json:"isForceEditableTimeline,omitempty"`
-	MetadataTimeline        []*MapMetadataTimeline `protobuf:"bytes,10,rep,name=metadataTimeline,proto3" json:"metadataTimeline,omitempty"`
-	Permissions             *MapPermissions        `protobuf:"bytes,11,opt,name=permissions,proto3" json:"permissions,omitempty"`
+	UpdateCriteria   *MapUpdateCriteria     `protobuf:"bytes,5,opt,name=updateCriteria,proto3" json:"updateCriteria,omitempty"`
+	ValueOptions     *ValueOptions          `protobuf:"bytes,6,opt,name=valueOptions,proto3" json:"valueOptions,omitempty"`
+	DefaultValue     string                 `protobuf:"bytes,7,opt,name=defaultValue,proto3" json:"defaultValue,omitempty"`
+	MetadataTimeline []*MapMetadataTimeline `protobuf:"bytes,10,rep,name=metadataTimeline,proto3" json:"metadataTimeline,omitempty"`
+	Permissions      *MapPermissions        `protobuf:"bytes,11,opt,name=permissions,proto3" json:"permissions,omitempty"`
 }
 
 func (m *Map) Reset()         { *m = Map{} }
 func (m *Map) String() string { return proto.CompactTextString(m) }
 func (*Map) ProtoMessage()    {}
 func (*Map) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d4bd760995a662e3, []int{6}
+	return fileDescriptor_d4bd760995a662e3, []int{5}
 }
 func (m *Map) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -531,20 +461,6 @@ func (m *Map) GetDefaultValue() string {
 	return ""
 }
 
-func (m *Map) GetIsEditableTimeline() []*IsEditableTimeline {
-	if m != nil {
-		return m.IsEditableTimeline
-	}
-	return nil
-}
-
-func (m *Map) GetIsForceEditableTimeline() []*IsEditableTimeline {
-	if m != nil {
-		return m.IsForceEditableTimeline
-	}
-	return nil
-}
-
 func (m *Map) GetMetadataTimeline() []*MapMetadataTimeline {
 	if m != nil {
 		return m.MetadataTimeline
@@ -565,20 +481,18 @@ type MsgCreateMap struct {
 	InheritManagerTimelineFrom Uint               `protobuf:"bytes,3,opt,name=inheritManagerTimelineFrom,proto3,customtype=Uint" json:"inheritManagerTimelineFrom"`
 	ManagerTimeline            []*ManagerTimeline `protobuf:"bytes,4,rep,name=managerTimeline,proto3" json:"managerTimeline,omitempty"`
 	// config options that will not change at all
-	UpdateCriteria          *MapUpdateCriteria     `protobuf:"bytes,5,opt,name=updateCriteria,proto3" json:"updateCriteria,omitempty"`
-	ValueOptions            *ValueOptions          `protobuf:"bytes,6,opt,name=valueOptions,proto3" json:"valueOptions,omitempty"`
-	DefaultValue            string                 `protobuf:"bytes,7,opt,name=defaultValue,proto3" json:"defaultValue,omitempty"`
-	IsEditableTimeline      []*IsEditableTimeline  `protobuf:"bytes,8,rep,name=isEditableTimeline,proto3" json:"isEditableTimeline,omitempty"`
-	MetadataTimeline        []*MapMetadataTimeline `protobuf:"bytes,9,rep,name=metadataTimeline,proto3" json:"metadataTimeline,omitempty"`
-	Permissions             *MapPermissions        `protobuf:"bytes,10,opt,name=permissions,proto3" json:"permissions,omitempty"`
-	IsForceEditableTimeline []*IsEditableTimeline  `protobuf:"bytes,11,rep,name=isForceEditableTimeline,proto3" json:"isForceEditableTimeline,omitempty"`
+	UpdateCriteria   *MapUpdateCriteria     `protobuf:"bytes,5,opt,name=updateCriteria,proto3" json:"updateCriteria,omitempty"`
+	ValueOptions     *ValueOptions          `protobuf:"bytes,6,opt,name=valueOptions,proto3" json:"valueOptions,omitempty"`
+	DefaultValue     string                 `protobuf:"bytes,7,opt,name=defaultValue,proto3" json:"defaultValue,omitempty"`
+	MetadataTimeline []*MapMetadataTimeline `protobuf:"bytes,9,rep,name=metadataTimeline,proto3" json:"metadataTimeline,omitempty"`
+	Permissions      *MapPermissions        `protobuf:"bytes,10,opt,name=permissions,proto3" json:"permissions,omitempty"`
 }
 
 func (m *MsgCreateMap) Reset()         { *m = MsgCreateMap{} }
 func (m *MsgCreateMap) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateMap) ProtoMessage()    {}
 func (*MsgCreateMap) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d4bd760995a662e3, []int{7}
+	return fileDescriptor_d4bd760995a662e3, []int{6}
 }
 func (m *MsgCreateMap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -649,13 +563,6 @@ func (m *MsgCreateMap) GetDefaultValue() string {
 	return ""
 }
 
-func (m *MsgCreateMap) GetIsEditableTimeline() []*IsEditableTimeline {
-	if m != nil {
-		return m.IsEditableTimeline
-	}
-	return nil
-}
-
 func (m *MsgCreateMap) GetMetadataTimeline() []*MapMetadataTimeline {
 	if m != nil {
 		return m.MetadataTimeline
@@ -670,13 +577,6 @@ func (m *MsgCreateMap) GetPermissions() *MapPermissions {
 	return nil
 }
 
-func (m *MsgCreateMap) GetIsForceEditableTimeline() []*IsEditableTimeline {
-	if m != nil {
-		return m.IsForceEditableTimeline
-	}
-	return nil
-}
-
 type MsgCreateMapResponse struct {
 }
 
@@ -684,7 +584,7 @@ func (m *MsgCreateMapResponse) Reset()         { *m = MsgCreateMapResponse{} }
 func (m *MsgCreateMapResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateMapResponse) ProtoMessage()    {}
 func (*MsgCreateMapResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d4bd760995a662e3, []int{8}
+	return fileDescriptor_d4bd760995a662e3, []int{7}
 }
 func (m *MsgCreateMapResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -714,25 +614,21 @@ func (m *MsgCreateMapResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgCreateMapResponse proto.InternalMessageInfo
 
 type MsgUpdateMap struct {
-	Creator                       string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	MapId                         string                 `protobuf:"bytes,2,opt,name=mapId,proto3" json:"mapId,omitempty"`
-	UpdateManagerTimeline         bool                   `protobuf:"varint,3,opt,name=updateManagerTimeline,proto3" json:"updateManagerTimeline,omitempty"`
-	ManagerTimeline               []*ManagerTimeline     `protobuf:"bytes,4,rep,name=managerTimeline,proto3" json:"managerTimeline,omitempty"`
-	UpdateIsEditableTimeline      bool                   `protobuf:"varint,5,opt,name=updateIsEditableTimeline,proto3" json:"updateIsEditableTimeline,omitempty"`
-	IsEditableTimeline            []*IsEditableTimeline  `protobuf:"bytes,6,rep,name=isEditableTimeline,proto3" json:"isEditableTimeline,omitempty"`
-	UpdateMetadataTimeline        bool                   `protobuf:"varint,7,opt,name=updateMetadataTimeline,proto3" json:"updateMetadataTimeline,omitempty"`
-	MetadataTimeline              []*MapMetadataTimeline `protobuf:"bytes,8,rep,name=metadataTimeline,proto3" json:"metadataTimeline,omitempty"`
-	UpdatePermissions             bool                   `protobuf:"varint,9,opt,name=updatePermissions,proto3" json:"updatePermissions,omitempty"`
-	Permissions                   *MapPermissions        `protobuf:"bytes,10,opt,name=permissions,proto3" json:"permissions,omitempty"`
-	UpdateIsForceEditableTimeline bool                   `protobuf:"varint,11,opt,name=updateIsForceEditableTimeline,proto3" json:"updateIsForceEditableTimeline,omitempty"`
-	IsForceEditableTimeline       []*IsEditableTimeline  `protobuf:"bytes,12,rep,name=isForceEditableTimeline,proto3" json:"isForceEditableTimeline,omitempty"`
+	Creator                string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	MapId                  string                 `protobuf:"bytes,2,opt,name=mapId,proto3" json:"mapId,omitempty"`
+	UpdateManagerTimeline  bool                   `protobuf:"varint,3,opt,name=updateManagerTimeline,proto3" json:"updateManagerTimeline,omitempty"`
+	ManagerTimeline        []*ManagerTimeline     `protobuf:"bytes,4,rep,name=managerTimeline,proto3" json:"managerTimeline,omitempty"`
+	UpdateMetadataTimeline bool                   `protobuf:"varint,7,opt,name=updateMetadataTimeline,proto3" json:"updateMetadataTimeline,omitempty"`
+	MetadataTimeline       []*MapMetadataTimeline `protobuf:"bytes,8,rep,name=metadataTimeline,proto3" json:"metadataTimeline,omitempty"`
+	UpdatePermissions      bool                   `protobuf:"varint,9,opt,name=updatePermissions,proto3" json:"updatePermissions,omitempty"`
+	Permissions            *MapPermissions        `protobuf:"bytes,10,opt,name=permissions,proto3" json:"permissions,omitempty"`
 }
 
 func (m *MsgUpdateMap) Reset()         { *m = MsgUpdateMap{} }
 func (m *MsgUpdateMap) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateMap) ProtoMessage()    {}
 func (*MsgUpdateMap) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d4bd760995a662e3, []int{9}
+	return fileDescriptor_d4bd760995a662e3, []int{8}
 }
 func (m *MsgUpdateMap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -789,20 +685,6 @@ func (m *MsgUpdateMap) GetManagerTimeline() []*ManagerTimeline {
 	return nil
 }
 
-func (m *MsgUpdateMap) GetUpdateIsEditableTimeline() bool {
-	if m != nil {
-		return m.UpdateIsEditableTimeline
-	}
-	return false
-}
-
-func (m *MsgUpdateMap) GetIsEditableTimeline() []*IsEditableTimeline {
-	if m != nil {
-		return m.IsEditableTimeline
-	}
-	return nil
-}
-
 func (m *MsgUpdateMap) GetUpdateMetadataTimeline() bool {
 	if m != nil {
 		return m.UpdateMetadataTimeline
@@ -831,20 +713,6 @@ func (m *MsgUpdateMap) GetPermissions() *MapPermissions {
 	return nil
 }
 
-func (m *MsgUpdateMap) GetUpdateIsForceEditableTimeline() bool {
-	if m != nil {
-		return m.UpdateIsForceEditableTimeline
-	}
-	return false
-}
-
-func (m *MsgUpdateMap) GetIsForceEditableTimeline() []*IsEditableTimeline {
-	if m != nil {
-		return m.IsForceEditableTimeline
-	}
-	return nil
-}
-
 type MsgUpdateMapResponse struct {
 }
 
@@ -852,7 +720,7 @@ func (m *MsgUpdateMapResponse) Reset()         { *m = MsgUpdateMapResponse{} }
 func (m *MsgUpdateMapResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateMapResponse) ProtoMessage()    {}
 func (*MsgUpdateMapResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d4bd760995a662e3, []int{10}
+	return fileDescriptor_d4bd760995a662e3, []int{9}
 }
 func (m *MsgUpdateMapResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -890,7 +758,7 @@ func (m *MsgDeleteMap) Reset()         { *m = MsgDeleteMap{} }
 func (m *MsgDeleteMap) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteMap) ProtoMessage()    {}
 func (*MsgDeleteMap) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d4bd760995a662e3, []int{11}
+	return fileDescriptor_d4bd760995a662e3, []int{10}
 }
 func (m *MsgDeleteMap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -940,7 +808,7 @@ func (m *MsgDeleteMapResponse) Reset()         { *m = MsgDeleteMapResponse{} }
 func (m *MsgDeleteMapResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteMapResponse) ProtoMessage()    {}
 func (*MsgDeleteMapResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d4bd760995a662e3, []int{12}
+	return fileDescriptor_d4bd760995a662e3, []int{11}
 }
 func (m *MsgDeleteMapResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -977,7 +845,7 @@ func (m *SetOptions) Reset()         { *m = SetOptions{} }
 func (m *SetOptions) String() string { return proto.CompactTextString(m) }
 func (*SetOptions) ProtoMessage()    {}
 func (*SetOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d4bd760995a662e3, []int{13}
+	return fileDescriptor_d4bd760995a662e3, []int{12}
 }
 func (m *SetOptions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1025,7 +893,7 @@ func (m *MsgSetValue) Reset()         { *m = MsgSetValue{} }
 func (m *MsgSetValue) String() string { return proto.CompactTextString(m) }
 func (*MsgSetValue) ProtoMessage()    {}
 func (*MsgSetValue) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d4bd760995a662e3, []int{14}
+	return fileDescriptor_d4bd760995a662e3, []int{13}
 }
 func (m *MsgSetValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1096,7 +964,7 @@ func (m *MsgSetValueResponse) Reset()         { *m = MsgSetValueResponse{} }
 func (m *MsgSetValueResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgSetValueResponse) ProtoMessage()    {}
 func (*MsgSetValueResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d4bd760995a662e3, []int{15}
+	return fileDescriptor_d4bd760995a662e3, []int{14}
 }
 func (m *MsgSetValueResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1130,7 +998,6 @@ func init() {
 	proto.RegisterType((*MapUpdateCriteria)(nil), "maps.MapUpdateCriteria")
 	proto.RegisterType((*ValueOptions)(nil), "maps.ValueOptions")
 	proto.RegisterType((*MapPermissions)(nil), "maps.MapPermissions")
-	proto.RegisterType((*IsEditableTimeline)(nil), "maps.IsEditableTimeline")
 	proto.RegisterType((*IsEditablePermission)(nil), "maps.IsEditablePermission")
 	proto.RegisterType((*Map)(nil), "maps.Map")
 	proto.RegisterType((*MsgCreateMap)(nil), "maps.MsgCreateMap")
@@ -1147,80 +1014,72 @@ func init() {
 func init() { proto.RegisterFile("maps/tx.proto", fileDescriptor_d4bd760995a662e3) }
 
 var fileDescriptor_d4bd760995a662e3 = []byte{
-	// 1156 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x57, 0xcd, 0x4e, 0x1c, 0x47,
-	0x17, 0x65, 0x3c, 0x83, 0x61, 0xee, 0x0c, 0x36, 0x14, 0x03, 0x6e, 0xe6, 0xfb, 0x32, 0x46, 0xad,
-	0x2c, 0x2c, 0x2b, 0x02, 0x44, 0x12, 0x14, 0x39, 0x51, 0x2c, 0x03, 0x26, 0xc1, 0x62, 0x44, 0xd4,
-	0x63, 0x7b, 0x91, 0x5d, 0x4d, 0xf7, 0xf5, 0x50, 0x72, 0x4f, 0x77, 0xab, 0xab, 0x06, 0xc1, 0x0b,
-	0x24, 0xf2, 0x2e, 0x79, 0x9d, 0xe4, 0x05, 0xbc, 0xf4, 0x32, 0xca, 0xc2, 0x8a, 0x60, 0x93, 0x27,
-	0xc8, 0x32, 0x8a, 0xaa, 0xaa, 0x7f, 0xaa, 0xe7, 0x07, 0x02, 0x28, 0x8b, 0x48, 0xd9, 0x75, 0x9f,
-	0xba, 0xe7, 0xd4, 0xad, 0xba, 0xa7, 0x6e, 0x77, 0xc1, 0x5c, 0x9f, 0x46, 0x7c, 0x5d, 0x9c, 0xac,
-	0x45, 0x71, 0x28, 0x42, 0x52, 0x91, 0xaf, 0xcd, 0x46, 0x2f, 0xec, 0x85, 0x0a, 0x58, 0x97, 0x4f,
-	0x7a, 0xac, 0xb9, 0xac, 0x42, 0x23, 0x8c, 0xfb, 0x8c, 0x73, 0x16, 0x06, 0x3c, 0xc1, 0x1b, 0x5a,
-	0x82, 0xf5, 0xd1, 0x67, 0x01, 0xa6, 0xe8, 0xa2, 0x42, 0xbb, 0xd4, 0xa7, 0x81, 0x9b, 0x82, 0xb6,
-	0x03, 0xf0, 0x92, 0xfa, 0x03, 0xec, 0x88, 0x30, 0x46, 0x32, 0x0f, 0xe5, 0xd7, 0x78, 0x6a, 0x95,
-	0x56, 0x4b, 0x0f, 0xaa, 0x8e, 0x7c, 0x24, 0x0d, 0x98, 0x3e, 0x96, 0xe3, 0xd6, 0x2d, 0x85, 0xe9,
-	0x17, 0xf2, 0x7f, 0xa8, 0xfa, 0x94, 0x8b, 0x0e, 0x8a, 0xed, 0x53, 0xab, 0xac, 0x46, 0x72, 0xc0,
-	0xfe, 0xb9, 0x04, 0x0b, 0x6d, 0x1a, 0xbd, 0x88, 0x3c, 0x2a, 0x70, 0x27, 0x66, 0x02, 0x63, 0x46,
-	0xc9, 0x2a, 0xd4, 0xfa, 0x34, 0xa0, 0x3d, 0x8c, 0x0f, 0x03, 0x5f, 0xcf, 0x31, 0xeb, 0x98, 0x10,
-	0xd9, 0x80, 0xba, 0x1b, 0xfa, 0x3e, 0xba, 0x82, 0x85, 0xc1, 0xbe, 0xa7, 0xa7, 0xdc, 0xae, 0xbf,
-	0x7d, 0x7f, 0x7f, 0xea, 0xd7, 0xf7, 0xf7, 0x2b, 0x2f, 0x58, 0x20, 0x9c, 0x42, 0x84, 0xd4, 0x74,
-	0x63, 0xa4, 0x22, 0xd4, 0x9a, 0x65, 0xad, 0x69, 0x40, 0x64, 0x03, 0x16, 0x5f, 0xb1, 0x98, 0x8b,
-	0x9d, 0xb0, 0x8f, 0x7b, 0xf2, 0xa1, 0x83, 0xf1, 0x31, 0x5a, 0x15, 0x15, 0x39, 0x6e, 0xc8, 0xfe,
-	0xbd, 0x04, 0x75, 0xb5, 0x25, 0x87, 0x91, 0x9c, 0x85, 0x13, 0x1b, 0xea, 0x41, 0xb8, 0x3b, 0x88,
-	0x7c, 0xe6, 0x52, 0x81, 0x3c, 0xc9, 0xbc, 0x80, 0x91, 0x87, 0x30, 0x2f, 0xcb, 0x40, 0x03, 0x0c,
-	0xc4, 0x61, 0xe0, 0x62, 0x07, 0x85, 0x4a, 0x7f, 0xd6, 0x19, 0xc1, 0x49, 0x0b, 0x00, 0x4f, 0x22,
-	0x74, 0x85, 0x5c, 0x50, 0x92, 0xb3, 0x81, 0x90, 0x0f, 0x61, 0x4e, 0xbf, 0x6d, 0x87, 0xa1, 0x8f,
-	0x34, 0x48, 0x92, 0x2d, 0x82, 0x79, 0xd4, 0x13, 0xcf, 0x8b, 0x91, 0x73, 0x6b, 0xda, 0x8c, 0x4a,
-	0x40, 0x59, 0xa8, 0x44, 0x39, 0x66, 0xd6, 0x6d, 0x15, 0x91, 0x03, 0xf6, 0x77, 0x65, 0xb8, 0xd3,
-	0xa6, 0xd1, 0x37, 0xb9, 0x81, 0xc8, 0x3e, 0x2c, 0xb8, 0x34, 0xd0, 0xa5, 0x6b, 0xa3, 0xa0, 0x1e,
-	0x15, 0xd4, 0x2a, 0xad, 0x96, 0x1f, 0xd4, 0x36, 0xff, 0xb7, 0x26, 0x0d, 0xb4, 0xf6, 0x9c, 0xf5,
-	0xd1, 0xd3, 0x01, 0x39, 0xd1, 0x19, 0x65, 0x91, 0xaf, 0x60, 0x3e, 0x07, 0x75, 0x99, 0xad, 0x5b,
-	0x97, 0x2b, 0x8d, 0x90, 0xc8, 0x01, 0x2c, 0x66, 0xd8, 0x3e, 0x7f, 0xea, 0x31, 0x41, 0xbb, 0x3e,
-	0x5a, 0x65, 0xa5, 0xd5, 0xd4, 0x5a, 0x39, 0x6e, 0x48, 0x8d, 0xa3, 0x91, 0x47, 0x50, 0x77, 0x69,
-	0xb0, 0x8b, 0x3e, 0xca, 0x19, 0x22, 0xab, 0xa2, 0x64, 0x96, 0xb5, 0xcc, 0x13, 0xe5, 0x2c, 0x43,
-	0xa2, 0x10, 0x4b, 0x5e, 0x82, 0x65, 0x48, 0xee, 0x85, 0xb1, 0x8b, 0x59, 0x3a, 0xd3, 0x97, 0xa6,
-	0x33, 0x91, 0x6b, 0xbf, 0x29, 0x01, 0xc9, 0x29, 0xcf, 0x93, 0x83, 0x4b, 0x3e, 0x85, 0xb9, 0xf4,
-	0x10, 0x4b, 0x8c, 0x27, 0x85, 0xb8, 0xab, 0xe7, 0x50, 0xe7, 0x81, 0x06, 0x3d, 0x74, 0x8a, 0x51,
-	0xb2, 0xe8, 0xaf, 0xf1, 0xf4, 0x80, 0x71, 0x91, 0x1e, 0x22, 0x27, 0x07, 0xa4, 0xfd, 0x98, 0xb9,
-	0x89, 0xca, 0x7e, 0x39, 0x62, 0xbf, 0xb9, 0x05, 0x8d, 0x71, 0xe9, 0xff, 0x33, 0xd9, 0xb4, 0x61,
-	0x25, 0x3b, 0x20, 0xfe, 0xa9, 0x9a, 0x4d, 0x08, 0xf4, 0xf4, 0x04, 0xe5, 0xf1, 0x13, 0x4c, 0x66,
-	0x0c, 0xc9, 0xed, 0x85, 0x71, 0x97, 0x79, 0x1e, 0x06, 0x5a, 0xae, 0x72, 0xb9, 0x5c, 0x91, 0x61,
-	0xff, 0x59, 0x81, 0xb2, 0xac, 0xbb, 0x05, 0x33, 0x49, 0x53, 0x49, 0x7a, 0x63, 0xfa, 0x2a, 0xfb,
-	0x63, 0x9f, 0x46, 0xd9, 0xca, 0xf4, 0x0b, 0x39, 0x80, 0x26, 0x0b, 0x8e, 0x30, 0x66, 0x22, 0xf1,
-	0x70, 0x5a, 0xd2, 0xbd, 0x38, 0xec, 0xeb, 0x86, 0x39, 0xd4, 0xd7, 0x2e, 0x88, 0x27, 0x8f, 0xe1,
-	0x6e, 0xbf, 0x08, 0x27, 0x4b, 0x59, 0xd2, 0x4b, 0x19, 0xe2, 0x38, 0xc3, 0xd1, 0xe4, 0x31, 0xdc,
-	0x19, 0x14, 0x9a, 0xb1, 0x6a, 0x16, 0xb5, 0xcd, 0x7b, 0x29, 0x7f, 0xa8, 0x57, 0x3b, 0x43, 0xe1,
-	0x64, 0x0b, 0xea, 0xc7, 0x46, 0x4b, 0x54, 0x9d, 0xa4, 0xb6, 0x49, 0x34, 0xdd, 0x6c, 0x96, 0x4e,
-	0x21, 0x4e, 0xb6, 0x4e, 0x0f, 0x5f, 0xd1, 0x81, 0x2f, 0x54, 0x90, 0x35, 0xa3, 0x36, 0xa9, 0x80,
-	0x91, 0xaf, 0x81, 0xb0, 0x11, 0xeb, 0x5b, 0xb3, 0x6a, 0x81, 0xd6, 0xf0, 0x69, 0xca, 0xd6, 0x38,
-	0x86, 0x43, 0x1c, 0xb8, 0xc7, 0x8a, 0x07, 0x2b, 0x93, 0xab, 0x5e, 0x22, 0x37, 0x89, 0x48, 0x9e,
-	0xc2, 0x7c, 0x3f, 0x69, 0x68, 0x99, 0x18, 0x28, 0xb1, 0x95, 0x6c, 0xf3, 0xda, 0x43, 0x01, 0xce,
-	0x08, 0x85, 0x6c, 0x41, 0xcd, 0xf8, 0x4c, 0x5b, 0x35, 0xb5, 0x7f, 0x8d, 0x4c, 0xc1, 0xe8, 0xc0,
-	0x8e, 0x19, 0x68, 0x7f, 0x3f, 0x0d, 0xf5, 0x36, 0xef, 0xed, 0x48, 0xb7, 0xe1, 0x7f, 0x4e, 0xfc,
-	0xb7, 0x38, 0x71, 0x9c, 0x6b, 0xaa, 0x37, 0x76, 0x0d, 0xfc, 0x4d, 0xd7, 0x5c, 0x74, 0x10, 0x6a,
-	0xd7, 0x3c, 0x08, 0xf6, 0x32, 0x34, 0x4c, 0x23, 0x3a, 0xc8, 0xa3, 0x30, 0xe0, 0x68, 0xff, 0xa4,
-	0x1d, 0x9a, 0x7e, 0xb1, 0xaf, 0xee, 0xd0, 0x4f, 0x60, 0x69, 0x60, 0x7e, 0xee, 0xb3, 0x54, 0xf5,
-	0xa7, 0x69, 0xfc, 0xe0, 0xcd, 0x9d, 0xf8, 0x08, 0xac, 0xc1, 0xd0, 0xaf, 0x41, 0xa6, 0xa4, 0x7f,
-	0xa5, 0x26, 0x8e, 0x4f, 0x30, 0xca, 0xed, 0x6b, 0x18, 0x65, 0x0b, 0x96, 0x07, 0x85, 0xbf, 0xa6,
-	0x4c, 0x6d, 0x46, 0xe5, 0x30, 0x61, 0x74, 0xac, 0xc1, 0x66, 0xaf, 0x6e, 0xb0, 0x8f, 0x60, 0x61,
-	0x30, 0xf4, 0xff, 0xc5, 0xad, 0xaa, 0x9a, 0x79, 0x74, 0xe0, 0xda, 0x76, 0xdc, 0x85, 0x0f, 0x06,
-	0xe3, 0x7e, 0x7b, 0x0c, 0x53, 0xca, 0x19, 0x2f, 0x0e, 0xba, 0xc8, 0xd4, 0xf5, 0x9b, 0x99, 0x3a,
-	0xf3, 0x6e, 0x66, 0xea, 0x2f, 0x95, 0xa7, 0xf3, 0xff, 0xbe, 0x2b, 0x7a, 0x3a, 0xd1, 0xcd, 0xf8,
-	0x99, 0xee, 0x33, 0x80, 0x0e, 0x8a, 0xb4, 0x27, 0x7d, 0x01, 0x2b, 0x03, 0x8e, 0xed, 0x90, 0x0b,
-	0x07, 0x5d, 0x0c, 0xc4, 0x8e, 0x79, 0xf9, 0xd1, 0xb7, 0x8c, 0xc9, 0x01, 0xf6, 0x8f, 0x25, 0xa8,
-	0xb5, 0x79, 0xaf, 0x83, 0x49, 0xf7, 0xba, 0xea, 0xb9, 0x4b, 0xee, 0x7a, 0xe5, 0x31, 0x77, 0xbd,
-	0x8a, 0x79, 0xd7, 0x7b, 0x08, 0x33, 0x61, 0xd2, 0x6c, 0x75, 0xaf, 0x9e, 0xd7, 0xfb, 0x9c, 0x2f,
-	0xc4, 0x49, 0x03, 0xec, 0x25, 0x58, 0x34, 0x52, 0x4a, 0x97, 0xbd, 0xf9, 0x47, 0x09, 0xca, 0x6d,
-	0xde, 0x23, 0x9f, 0x43, 0x35, 0xff, 0x92, 0x25, 0x3d, 0xdb, 0x6c, 0x2a, 0xcd, 0xe6, 0x28, 0x96,
-	0x8a, 0x48, 0x72, 0xde, 0x64, 0x72, 0x72, 0x86, 0x19, 0xe4, 0x91, 0x82, 0x4a, 0x72, 0x5e, 0xcd,
-	0x9c, 0x9c, 0x61, 0x06, 0x79, 0xa4, 0x6a, 0xe4, 0x33, 0x98, 0xcd, 0x76, 0x79, 0x21, 0x8b, 0x4b,
-	0xa1, 0xe6, 0xca, 0x08, 0x94, 0x32, 0xb7, 0x9f, 0xbd, 0x3d, 0x6b, 0x95, 0xde, 0x9d, 0xb5, 0x4a,
-	0xbf, 0x9d, 0xb5, 0x4a, 0x3f, 0x9c, 0xb7, 0xa6, 0xde, 0x9d, 0xb7, 0xa6, 0x7e, 0x39, 0x6f, 0x4d,
-	0x7d, 0xbb, 0xd1, 0x63, 0xe2, 0x68, 0xd0, 0x5d, 0x73, 0xc3, 0xfe, 0x7a, 0x97, 0x89, 0x2e, 0xf5,
-	0x7a, 0xc8, 0xf3, 0x27, 0xf7, 0x88, 0xb2, 0x60, 0xfd, 0x64, 0x5d, 0x5f, 0xe4, 0x4f, 0x23, 0xe4,
-	0xdd, 0xdb, 0xea, 0xc2, 0xfe, 0xf1, 0x5f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x0e, 0x43, 0x24, 0x8e,
-	0x20, 0x10, 0x00, 0x00,
+	// 1033 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x57, 0xcd, 0x6e, 0xdb, 0x46,
+	0x10, 0x36, 0x2d, 0x39, 0xb6, 0x47, 0x4a, 0x62, 0xaf, 0x65, 0x97, 0x56, 0x0b, 0xc5, 0x20, 0x7a,
+	0x08, 0x82, 0xc2, 0x32, 0xdc, 0xc0, 0x28, 0xda, 0x22, 0x41, 0xec, 0xc4, 0x85, 0x83, 0x08, 0x2e,
+	0xa8, 0xa4, 0x87, 0xde, 0x56, 0xe4, 0x44, 0x26, 0x42, 0xee, 0x12, 0xdc, 0x95, 0x61, 0xbd, 0x45,
+	0x7b, 0xed, 0xab, 0xf4, 0x05, 0x72, 0x0c, 0x7a, 0x28, 0x8a, 0x1e, 0x82, 0xc0, 0xbe, 0xb4, 0x2f,
+	0xd0, 0x73, 0xb1, 0xbb, 0xfc, 0x95, 0xe4, 0xba, 0x86, 0x81, 0x9e, 0x7a, 0x23, 0xbf, 0xfd, 0xbe,
+	0xd9, 0x9f, 0x6f, 0x66, 0xb8, 0x84, 0xdb, 0x11, 0x8d, 0x45, 0x57, 0x9e, 0x6d, 0xc7, 0x09, 0x97,
+	0x9c, 0xd4, 0xd5, 0x6b, 0xbb, 0x35, 0xe4, 0x43, 0xae, 0x81, 0xae, 0x7a, 0x32, 0x63, 0xed, 0x0d,
+	0x4d, 0x8d, 0x31, 0x89, 0x02, 0x21, 0x02, 0xce, 0x44, 0x8a, 0xb7, 0x4c, 0x88, 0x20, 0xc2, 0x30,
+	0x60, 0x98, 0xa1, 0x6b, 0x1a, 0x1d, 0xd0, 0x90, 0x32, 0x2f, 0x03, 0x1d, 0x17, 0xe0, 0x3b, 0x1a,
+	0x8e, 0xb0, 0x2f, 0x79, 0x82, 0x64, 0x05, 0x6a, 0x6f, 0x70, 0x6c, 0x5b, 0x5b, 0xd6, 0xfd, 0x65,
+	0x57, 0x3d, 0x92, 0x16, 0x2c, 0x9c, 0xaa, 0x71, 0x7b, 0x5e, 0x63, 0xe6, 0x85, 0x7c, 0x02, 0xcb,
+	0x21, 0x15, 0xb2, 0x8f, 0x72, 0x7f, 0x6c, 0xd7, 0xf4, 0x48, 0x01, 0x38, 0x3f, 0x5b, 0xb0, 0xda,
+	0xa3, 0xf1, 0xab, 0xd8, 0xa7, 0x12, 0x0f, 0x92, 0x40, 0x62, 0x12, 0x50, 0xb2, 0x05, 0x8d, 0x88,
+	0x32, 0x3a, 0xc4, 0xe4, 0x98, 0x85, 0x66, 0x8e, 0x25, 0xb7, 0x0c, 0x91, 0x1d, 0x68, 0x7a, 0x3c,
+	0x0c, 0xd1, 0x93, 0x01, 0x67, 0x47, 0xbe, 0x99, 0x72, 0xbf, 0xf9, 0xf6, 0xfd, 0xbd, 0xb9, 0xdf,
+	0xdf, 0xdf, 0xab, 0xbf, 0x0a, 0x98, 0x74, 0x2b, 0x0c, 0x15, 0xd3, 0x4b, 0x90, 0x4a, 0x6e, 0x62,
+	0xd6, 0x4c, 0xcc, 0x12, 0x44, 0x76, 0x60, 0xed, 0x75, 0x90, 0x08, 0x79, 0xc0, 0x23, 0x3c, 0x54,
+	0x0f, 0x7d, 0x4c, 0x4e, 0xd1, 0xae, 0x6b, 0xe6, 0xac, 0x21, 0xe7, 0x0f, 0x0b, 0x9a, 0xfa, 0x48,
+	0x8e, 0x63, 0x35, 0x8b, 0x20, 0x0e, 0x34, 0x19, 0x7f, 0x3a, 0x8a, 0xc3, 0xc0, 0xa3, 0x12, 0x45,
+	0xba, 0xf2, 0x0a, 0x46, 0x1e, 0xc0, 0x8a, 0xb2, 0x81, 0x32, 0x64, 0xf2, 0x98, 0x79, 0xd8, 0x47,
+	0xa9, 0x97, 0xbf, 0xe4, 0x4e, 0xe1, 0xa4, 0x03, 0x80, 0x67, 0x31, 0x7a, 0x52, 0x6d, 0x28, 0x5d,
+	0x73, 0x09, 0x21, 0x9f, 0xc2, 0x6d, 0xf3, 0xb6, 0xcf, 0x79, 0x88, 0x94, 0xa5, 0x8b, 0xad, 0x82,
+	0x05, 0xeb, 0x89, 0xef, 0x27, 0x28, 0x84, 0xbd, 0x50, 0x66, 0xa5, 0xa0, 0x32, 0x2a, 0x8d, 0x9c,
+	0x04, 0xf6, 0x2d, 0xcd, 0x28, 0x00, 0xe7, 0xd7, 0x79, 0xb8, 0xd3, 0xa3, 0xf1, 0xb7, 0x45, 0x02,
+	0x91, 0x23, 0x58, 0xf5, 0x28, 0x33, 0xd6, 0xf5, 0x50, 0x52, 0x9f, 0x4a, 0x6a, 0x5b, 0x5b, 0xb5,
+	0xfb, 0x8d, 0xdd, 0x8f, 0xb7, 0x55, 0x02, 0x6d, 0xbf, 0x0c, 0x22, 0xf4, 0x0d, 0xa1, 0x10, 0xba,
+	0xd3, 0x2a, 0xf2, 0x0d, 0xac, 0x14, 0xa0, 0xb1, 0xd9, 0x9e, 0xbf, 0x3a, 0xd2, 0x94, 0x88, 0x3c,
+	0x84, 0x45, 0x8f, 0xb2, 0x67, 0x7e, 0xa0, 0x4e, 0x4b, 0xe9, 0xdb, 0x46, 0x7f, 0x24, 0x14, 0x46,
+	0x07, 0x61, 0x59, 0x9e, 0x51, 0xc9, 0x97, 0xd0, 0xf4, 0x28, 0x7b, 0x8a, 0x21, 0xaa, 0x48, 0xb1,
+	0x5d, 0xd7, 0xd2, 0x0d, 0x23, 0x7d, 0xa2, 0x33, 0xa8, 0x24, 0xab, 0x70, 0xc9, 0x23, 0xad, 0x3d,
+	0xe4, 0x89, 0x87, 0x7a, 0xda, 0x85, 0x2b, 0xa7, 0xad, 0xf0, 0x9d, 0x5f, 0x2c, 0x68, 0xcd, 0xa2,
+	0x29, 0x3f, 0xde, 0xe0, 0xf8, 0x45, 0x20, 0x64, 0x96, 0xdf, 0x6e, 0x01, 0x90, 0x1e, 0x6c, 0xe6,
+	0xd9, 0x12, 0x8e, 0xb5, 0x4c, 0x4a, 0xf4, 0xd5, 0x39, 0x89, 0x74, 0xeb, 0x77, 0xcd, 0x1a, 0x74,
+	0x2d, 0x50, 0x36, 0x44, 0xf7, 0x72, 0xc5, 0x44, 0xb8, 0x43, 0x9e, 0x0c, 0x02, 0xdf, 0x47, 0x66,
+	0xc2, 0xd5, 0xaf, 0x0e, 0x57, 0x55, 0x38, 0x1f, 0x6a, 0x50, 0x53, 0x87, 0x63, 0xc3, 0x62, 0x5a,
+	0x61, 0x69, 0xa3, 0xc8, 0x5e, 0x55, 0xb3, 0x88, 0x68, 0x9c, 0xef, 0xcc, 0xbc, 0x90, 0x17, 0xd0,
+	0x0e, 0xd8, 0x09, 0x26, 0x81, 0x4c, 0x0d, 0x7d, 0x99, 0x36, 0xa6, 0xc3, 0x84, 0x47, 0xa6, 0x7b,
+	0x4c, 0x14, 0xf9, 0x3f, 0xf0, 0xc9, 0x63, 0xb8, 0x1b, 0x55, 0xe1, 0x74, 0x2b, 0xeb, 0x66, 0x2b,
+	0x13, 0x1a, 0x77, 0x92, 0x4d, 0x1e, 0xc3, 0x9d, 0x51, 0xa5, 0x33, 0xe9, 0xca, 0x69, 0xec, 0x7e,
+	0x94, 0xe9, 0x27, 0x1a, 0x97, 0x3b, 0x41, 0x27, 0x7b, 0xd0, 0x3c, 0x2d, 0xf5, 0x07, 0x5d, 0x56,
+	0x8d, 0x5d, 0x62, 0xe4, 0xe5, 0xce, 0xe1, 0x56, 0x78, 0xaa, 0x8f, 0xf8, 0xf8, 0x9a, 0x8e, 0x42,
+	0xa9, 0x49, 0xf6, 0xa2, 0x3e, 0xa4, 0x0a, 0x46, 0x9e, 0xc1, 0x4a, 0x94, 0xd6, 0x4f, 0xbe, 0x3d,
+	0xd0, 0xdb, 0xdb, 0xcc, 0x97, 0xd7, 0x9b, 0x20, 0xb8, 0x53, 0x12, 0xb2, 0x07, 0x8d, 0xd2, 0x57,
+	0xc1, 0x6e, 0xe8, 0x15, 0xb6, 0xf2, 0x08, 0xa5, 0x82, 0x77, 0xcb, 0x44, 0xe7, 0xcf, 0x1a, 0x34,
+	0x7b, 0x62, 0x78, 0xa0, 0xfc, 0xc4, 0xff, 0xbd, 0xfe, 0xef, 0xbd, 0x5e, 0xbe, 0xb1, 0xd7, 0xf0,
+	0x6f, 0xbd, 0xde, 0x80, 0x56, 0xd9, 0x6a, 0x17, 0x45, 0xcc, 0x99, 0x40, 0xe7, 0x27, 0x93, 0x03,
+	0x59, 0x0b, 0xbe, 0x7e, 0x0e, 0x3c, 0x84, 0xf5, 0x51, 0xb9, 0x7f, 0xe7, 0x9b, 0x33, 0x9f, 0xba,
+	0xd9, 0x83, 0x37, 0xf7, 0x7a, 0x0f, 0x36, 0x46, 0x95, 0x0f, 0x50, 0x1e, 0x67, 0x51, 0xcf, 0x7b,
+	0xc9, 0xe8, 0x4c, 0x1b, 0x96, 0xae, 0x6f, 0xc3, 0x67, 0xb0, 0x3a, 0x9a, 0xf8, 0x94, 0x09, 0x7b,
+	0x59, 0xcf, 0x3c, 0x3d, 0x70, 0x43, 0xd3, 0x72, 0x6f, 0x72, 0xd3, 0x1e, 0x69, 0xcf, 0x8a, 0x0f,
+	0xd8, 0x35, 0x3d, 0x4b, 0xe3, 0xe6, 0xfa, 0x3c, 0xee, 0x73, 0x80, 0x3e, 0xca, 0x2c, 0xab, 0xbf,
+	0x86, 0xcd, 0x91, 0xc0, 0x1e, 0x17, 0xd2, 0x45, 0x0f, 0x99, 0x3c, 0x28, 0xdf, 0xd6, 0xcc, 0xb5,
+	0xe8, 0x72, 0x82, 0xf3, 0xa3, 0x05, 0x8d, 0x9e, 0x18, 0xf6, 0x31, 0xcd, 0xff, 0xeb, 0xe6, 0x55,
+	0x7a, 0x39, 0xad, 0xcd, 0xb8, 0x9c, 0xd6, 0xcb, 0x97, 0xd3, 0x07, 0xb0, 0xc8, 0xd3, 0x72, 0x35,
+	0xd5, 0xbe, 0x62, 0xce, 0xb5, 0xd8, 0x88, 0x9b, 0x11, 0x9c, 0x75, 0x58, 0x2b, 0x2d, 0x29, 0xdb,
+	0xf6, 0xee, 0x5f, 0x16, 0xd4, 0x7a, 0x62, 0x48, 0xbe, 0x82, 0xe5, 0xa2, 0x17, 0xa6, 0x55, 0x5f,
+	0x2e, 0x9a, 0x76, 0x7b, 0x1a, 0xcb, 0x82, 0x28, 0x71, 0x51, 0x44, 0x85, 0x38, 0xc7, 0x4a, 0xe2,
+	0x29, 0x43, 0x95, 0xb8, 0x70, 0xb3, 0x10, 0xe7, 0x58, 0x49, 0x3c, 0xe5, 0x1a, 0xf9, 0x02, 0x96,
+	0xf2, 0x53, 0x5e, 0xcd, 0x79, 0x19, 0xd4, 0xde, 0x9c, 0x82, 0x32, 0xe5, 0xfe, 0xf3, 0xb7, 0xe7,
+	0x1d, 0xeb, 0xdd, 0x79, 0xc7, 0xfa, 0x70, 0xde, 0xb1, 0x7e, 0xb8, 0xe8, 0xcc, 0xbd, 0xbb, 0xe8,
+	0xcc, 0xfd, 0x76, 0xd1, 0x99, 0xfb, 0x7e, 0x67, 0x18, 0xc8, 0x93, 0xd1, 0x60, 0xdb, 0xe3, 0x51,
+	0x77, 0x10, 0xc8, 0x01, 0xf5, 0x87, 0x28, 0x8a, 0x27, 0xef, 0x84, 0x06, 0xac, 0x7b, 0xd6, 0x35,
+	0x7f, 0x1e, 0xe3, 0x18, 0xc5, 0xe0, 0x96, 0xfe, 0xc3, 0xf8, 0xfc, 0xef, 0x00, 0x00, 0x00, 0xff,
+	0xff, 0x5c, 0xc5, 0xf4, 0xa1, 0xd1, 0x0c, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1621,10 +1480,10 @@ func (m *MapPermissions) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.CanUpdateIsForceEditable) > 0 {
-		for iNdEx := len(m.CanUpdateIsForceEditable) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.CanForceEdit) > 0 {
+		for iNdEx := len(m.CanForceEdit) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.CanUpdateIsForceEditable[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.CanForceEdit[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1649,10 +1508,10 @@ func (m *MapPermissions) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x22
 		}
 	}
-	if len(m.CanUpdateIsEditable) > 0 {
-		for iNdEx := len(m.CanUpdateIsEditable) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.CanEdit) > 0 {
+		for iNdEx := len(m.CanEdit) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.CanUpdateIsEditable[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.CanEdit[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1681,60 +1540,6 @@ func (m *MapPermissions) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		for iNdEx := len(m.CanUpdateMetadata) - 1; iNdEx >= 0; iNdEx-- {
 			{
 				size, err := m.CanUpdateMetadata[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *IsEditableTimeline) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *IsEditableTimeline) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *IsEditableTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.IsEditable {
-		i--
-		if m.IsEditable {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x18
-	}
-	if len(m.KeyListId) > 0 {
-		i -= len(m.KeyListId)
-		copy(dAtA[i:], m.KeyListId)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.KeyListId)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.TimelineTimes) > 0 {
-		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1803,20 +1608,6 @@ func (m *IsEditablePermission) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.TimelineTimes) > 0 {
-		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -1864,34 +1655,6 @@ func (m *Map) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			}
 			i--
 			dAtA[i] = 0x52
-		}
-	}
-	if len(m.IsForceEditableTimeline) > 0 {
-		for iNdEx := len(m.IsForceEditableTimeline) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.IsForceEditableTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x4a
-		}
-	}
-	if len(m.IsEditableTimeline) > 0 {
-		for iNdEx := len(m.IsEditableTimeline) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.IsEditableTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x42
 		}
 	}
 	if len(m.DefaultValue) > 0 {
@@ -1986,20 +1749,6 @@ func (m *MsgCreateMap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.IsForceEditableTimeline) > 0 {
-		for iNdEx := len(m.IsForceEditableTimeline) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.IsForceEditableTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x5a
-		}
-	}
 	if m.Permissions != nil {
 		{
 			size, err := m.Permissions.MarshalToSizedBuffer(dAtA[:i])
@@ -2024,20 +1773,6 @@ func (m *MsgCreateMap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			}
 			i--
 			dAtA[i] = 0x4a
-		}
-	}
-	if len(m.IsEditableTimeline) > 0 {
-		for iNdEx := len(m.IsEditableTimeline) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.IsEditableTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x42
 		}
 	}
 	if len(m.DefaultValue) > 0 {
@@ -2155,30 +1890,6 @@ func (m *MsgUpdateMap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.IsForceEditableTimeline) > 0 {
-		for iNdEx := len(m.IsForceEditableTimeline) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.IsForceEditableTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x62
-		}
-	}
-	if m.UpdateIsForceEditableTimeline {
-		i--
-		if m.UpdateIsForceEditableTimeline {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x58
-	}
 	if m.Permissions != nil {
 		{
 			size, err := m.Permissions.MarshalToSizedBuffer(dAtA[:i])
@@ -2224,30 +1935,6 @@ func (m *MsgUpdateMap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		}
 		i--
 		dAtA[i] = 0x38
-	}
-	if len(m.IsEditableTimeline) > 0 {
-		for iNdEx := len(m.IsEditableTimeline) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.IsEditableTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x32
-		}
-	}
-	if m.UpdateIsEditableTimeline {
-		i--
-		if m.UpdateIsEditableTimeline {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x28
 	}
 	if len(m.ManagerTimeline) > 0 {
 		for iNdEx := len(m.ManagerTimeline) - 1; iNdEx >= 0; iNdEx-- {
@@ -2589,8 +2276,8 @@ func (m *MapPermissions) Size() (n int) {
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if len(m.CanUpdateIsEditable) > 0 {
-		for _, e := range m.CanUpdateIsEditable {
+	if len(m.CanEdit) > 0 {
+		for _, e := range m.CanEdit {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -2601,33 +2288,11 @@ func (m *MapPermissions) Size() (n int) {
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if len(m.CanUpdateIsForceEditable) > 0 {
-		for _, e := range m.CanUpdateIsForceEditable {
+	if len(m.CanForceEdit) > 0 {
+		for _, e := range m.CanForceEdit {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
-	}
-	return n
-}
-
-func (m *IsEditableTimeline) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.TimelineTimes) > 0 {
-		for _, e := range m.TimelineTimes {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
-	l = len(m.KeyListId)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if m.IsEditable {
-		n += 2
 	}
 	return n
 }
@@ -2638,12 +2303,6 @@ func (m *IsEditablePermission) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if len(m.TimelineTimes) > 0 {
-		for _, e := range m.TimelineTimes {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
 	l = len(m.KeyListId)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
@@ -2697,18 +2356,6 @@ func (m *Map) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if len(m.IsEditableTimeline) > 0 {
-		for _, e := range m.IsEditableTimeline {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
-	if len(m.IsForceEditableTimeline) > 0 {
-		for _, e := range m.IsForceEditableTimeline {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
 	if len(m.MetadataTimeline) > 0 {
 		for _, e := range m.MetadataTimeline {
 			l = e.Size()
@@ -2756,12 +2403,6 @@ func (m *MsgCreateMap) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if len(m.IsEditableTimeline) > 0 {
-		for _, e := range m.IsEditableTimeline {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
 	if len(m.MetadataTimeline) > 0 {
 		for _, e := range m.MetadataTimeline {
 			l = e.Size()
@@ -2771,12 +2412,6 @@ func (m *MsgCreateMap) Size() (n int) {
 	if m.Permissions != nil {
 		l = m.Permissions.Size()
 		n += 1 + l + sovTx(uint64(l))
-	}
-	if len(m.IsForceEditableTimeline) > 0 {
-		for _, e := range m.IsForceEditableTimeline {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
 	}
 	return n
 }
@@ -2813,15 +2448,6 @@ func (m *MsgUpdateMap) Size() (n int) {
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if m.UpdateIsEditableTimeline {
-		n += 2
-	}
-	if len(m.IsEditableTimeline) > 0 {
-		for _, e := range m.IsEditableTimeline {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
 	if m.UpdateMetadataTimeline {
 		n += 2
 	}
@@ -2837,15 +2463,6 @@ func (m *MsgUpdateMap) Size() (n int) {
 	if m.Permissions != nil {
 		l = m.Permissions.Size()
 		n += 1 + l + sovTx(uint64(l))
-	}
-	if m.UpdateIsForceEditableTimeline {
-		n += 2
-	}
-	if len(m.IsForceEditableTimeline) > 0 {
-		for _, e := range m.IsForceEditableTimeline {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
 	}
 	return n
 }
@@ -3500,7 +3117,7 @@ func (m *MapPermissions) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateIsEditable", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CanEdit", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3527,8 +3144,8 @@ func (m *MapPermissions) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CanUpdateIsEditable = append(m.CanUpdateIsEditable, &IsEditablePermission{})
-			if err := m.CanUpdateIsEditable[len(m.CanUpdateIsEditable)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.CanEdit = append(m.CanEdit, &IsEditablePermission{})
+			if err := m.CanEdit[len(m.CanEdit)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3568,7 +3185,7 @@ func (m *MapPermissions) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateIsForceEditable", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CanForceEdit", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3595,147 +3212,11 @@ func (m *MapPermissions) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CanUpdateIsForceEditable = append(m.CanUpdateIsForceEditable, &IsEditablePermission{})
-			if err := m.CanUpdateIsForceEditable[len(m.CanUpdateIsForceEditable)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.CanForceEdit = append(m.CanForceEdit, &IsEditablePermission{})
+			if err := m.CanForceEdit[len(m.CanForceEdit)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *IsEditableTimeline) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: IsEditableTimeline: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: IsEditableTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
-			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field KeyListId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.KeyListId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IsEditable", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.IsEditable = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -3786,40 +3267,6 @@ func (m *IsEditablePermission) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: IsEditablePermission: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
-			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field KeyListId", wireType)
@@ -4206,74 +3653,6 @@ func (m *Map) Unmarshal(dAtA []byte) error {
 			}
 			m.DefaultValue = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IsEditableTimeline", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.IsEditableTimeline = append(m.IsEditableTimeline, &IsEditableTimeline{})
-			if err := m.IsEditableTimeline[len(m.IsEditableTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IsForceEditableTimeline", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.IsForceEditableTimeline = append(m.IsForceEditableTimeline, &IsEditableTimeline{})
-			if err := m.IsForceEditableTimeline[len(m.IsForceEditableTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MetadataTimeline", wireType)
@@ -4630,40 +4009,6 @@ func (m *MsgCreateMap) Unmarshal(dAtA []byte) error {
 			}
 			m.DefaultValue = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IsEditableTimeline", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.IsEditableTimeline = append(m.IsEditableTimeline, &IsEditableTimeline{})
-			if err := m.IsEditableTimeline[len(m.IsEditableTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		case 9:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MetadataTimeline", wireType)
@@ -4731,40 +4076,6 @@ func (m *MsgCreateMap) Unmarshal(dAtA []byte) error {
 				m.Permissions = &MapPermissions{}
 			}
 			if err := m.Permissions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IsForceEditableTimeline", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.IsForceEditableTimeline = append(m.IsForceEditableTimeline, &IsEditableTimeline{})
-			if err := m.IsForceEditableTimeline[len(m.IsForceEditableTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4986,60 +4297,6 @@ func (m *MsgUpdateMap) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdateIsEditableTimeline", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.UpdateIsEditableTimeline = bool(v != 0)
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IsEditableTimeline", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.IsEditableTimeline = append(m.IsEditableTimeline, &IsEditableTimeline{})
-			if err := m.IsEditableTimeline[len(m.IsEditableTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		case 7:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdateMetadataTimeline", wireType)
@@ -5147,60 +4404,6 @@ func (m *MsgUpdateMap) Unmarshal(dAtA []byte) error {
 				m.Permissions = &MapPermissions{}
 			}
 			if err := m.Permissions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 11:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdateIsForceEditableTimeline", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.UpdateIsForceEditableTimeline = bool(v != 0)
-		case 12:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IsForceEditableTimeline", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.IsForceEditableTimeline = append(m.IsForceEditableTimeline, &IsEditableTimeline{})
-			if err := m.IsForceEditableTimeline[len(m.IsForceEditableTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

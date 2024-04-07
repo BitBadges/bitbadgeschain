@@ -4,7 +4,6 @@ import (
 	"context"
 
 	sdkerrors "cosmossdk.io/errors"
-	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -19,10 +18,10 @@ func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*t
 	if !found {
 		return nil, sdkerrors.Wrap(ErrMapDoesNotExist, "Failed to get map from store")
 	}
-	
+
 	collection := &badgetypes.BadgeCollection{}
 	if !currMap.InheritManagerTimelineFrom.IsNil() && !currMap.InheritManagerTimelineFrom.IsZero() {
-		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{ CollectionId: currMap.InheritManagerTimelineFrom })
+		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerTimelineFrom})
 		if err != nil {
 			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Could not find collection in store")
 		}
@@ -41,26 +40,6 @@ func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*t
 		}
 		currMap.ManagerTimeline = msg.ManagerTimeline
 	}
-	
-	if msg.UpdateIsForceEditableTimeline {
-		if err := k.badgesKeeper.ValidateCollectionApprovalsUpdate(ctx, 
-			&badgetypes.BadgeCollection{ CollectionId: sdkmath.NewUintFromString("1"), BalancesType: "Standard" },
-			types.CastIsEditableTimelineArray(currMap.IsForceEditableTimeline), types.CastIsEditableTimelineArray(msg.IsForceEditableTimeline), types.CastIsEditablePermissions(currMap.Permissions.CanUpdateIsEditable)); err != nil {
-			return nil, err
-		}
-		currMap.IsForceEditableTimeline = msg.IsForceEditableTimeline
-	}
-
-	if msg.UpdateIsEditableTimeline {
-		if err := k.badgesKeeper.ValidateCollectionApprovalsUpdate(ctx, 
-			&badgetypes.BadgeCollection{ CollectionId: sdkmath.NewUintFromString("1"), BalancesType: "Standard" },
-			types.CastIsEditableTimelineArray(currMap.IsEditableTimeline), 
-			types.CastIsEditableTimelineArray(msg.IsEditableTimeline), 
-			types.CastIsEditablePermissions(currMap.Permissions.CanUpdateIsEditable)); err != nil {
-			return nil, err
-		}
-		currMap.IsEditableTimeline = msg.IsEditableTimeline
-	}
 
 	if msg.UpdateMetadataTimeline {
 		if err := k.badgesKeeper.ValidateCollectionMetadataUpdate(ctx, types.CastMetadataTimelineArray(currMap.MetadataTimeline), types.CastMetadataTimelineArray(msg.MetadataTimeline), types.CastTimedUpdatePermissions(currMap.Permissions.CanUpdateMetadata)); err != nil {
@@ -78,16 +57,15 @@ func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*t
 			return nil, err
 		}
 
-		
 		if err := k.badgesKeeper.ValidateActionPermissionUpdate(ctx, types.CastActionPermissions(currMap.Permissions.CanDeleteMap), types.CastActionPermissions(msg.Permissions.CanDeleteMap)); err != nil {
 			return nil, err
 		}
-	
-		if err := k.badgesKeeper.ValidateCollectionApprovalPermissionsUpdate(ctx, types.CastIsEditablePermissions(currMap.Permissions.CanUpdateIsEditable), types.CastIsEditablePermissions(msg.Permissions.CanUpdateIsEditable)); err != nil {
+
+		if err := k.badgesKeeper.ValidateCollectionApprovalPermissionsUpdate(ctx, types.CastIsEditablePermissions(currMap.Permissions.CanEdit), types.CastIsEditablePermissions(msg.Permissions.CanEdit)); err != nil {
 			return nil, err
 		}
 
-		if err := k.badgesKeeper.ValidateCollectionApprovalPermissionsUpdate(ctx, types.CastIsEditablePermissions(currMap.Permissions.CanUpdateIsEditable), types.CastIsEditablePermissions(msg.Permissions.CanUpdateIsEditable)); err != nil {
+		if err := k.badgesKeeper.ValidateCollectionApprovalPermissionsUpdate(ctx, types.CastIsEditablePermissions(currMap.Permissions.CanForceEdit), types.CastIsEditablePermissions(msg.Permissions.CanForceEdit)); err != nil {
 			return nil, err
 		}
 

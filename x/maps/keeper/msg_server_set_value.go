@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"math"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -10,8 +11,6 @@ import (
 
 	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
-
-
 
 func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*types.MsgSetValueResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -26,19 +25,15 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 		value = nextCollectionId.Sub(sdk.NewUint(1)).BigInt().String()
 	}
 
-	
-
-
 	currMap, found := k.GetMapFromStore(ctx, mapId)
 	if !found {
 		return nil, sdkerrors.Wrap(ErrMapDoesNotExist, "Failed to get map from store")
 	}
 
-
 	// bool expectUint = 3;
-  // bool expectBoolean = 4;
-  // bool expectAddress = 5;
-  // bool expectUri = 6;
+	// bool expectBoolean = 4;
+	// bool expectAddress = 5;
+	// bool expectUri = 6;
 
 	if currMap.ValueOptions.ExpectUint {
 		newUint := sdkmath.NewUintFromString(value)
@@ -74,14 +69,14 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 
 	collection := &badgetypes.BadgeCollection{}
 	if !currMap.InheritManagerTimelineFrom.IsNil() && !currMap.InheritManagerTimelineFrom.IsZero() {
-		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{ CollectionId: currMap.InheritManagerTimelineFrom })
+		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerTimelineFrom})
 		if err != nil {
 			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Could not find collection in store")
 		}
 
 		collection = collectionRes.Collection
 	}
-	
+
 	currManager := types.GetCurrentManagerForMap(ctx, currMap, collection)
 
 	forceUpdate := false
@@ -94,7 +89,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 		badgeId := sdkmath.NewUintFromString(key)
 		balancesRes, err := k.badgesKeeper.GetBalance(ctx, &badgetypes.QueryGetBalanceRequest{
 			CollectionId: currMap.UpdateCriteria.CollectionId,
-			Address: 		msg.Creator,
+			Address:      msg.Creator,
 		})
 		if err != nil {
 			return nil, sdkerrors.Wrap(err, "Failed to get balance")
@@ -102,9 +97,9 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 
 		currTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 		bals, err := badgetypes.GetBalancesForIds(ctx, []*badgetypes.UintRange{
-			{ Start: badgeId, End: badgeId },
+			{Start: badgeId, End: badgeId},
 		}, []*badgetypes.UintRange{
-			{ Start: currTime, End: currTime },
+			{Start: currTime, End: currTime},
 		}, balancesRes.Balance.Balances)
 		if err != nil {
 			return nil, sdkerrors.Wrap(err, "Failed to get balances for ids")
@@ -123,10 +118,10 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 	}
 
 	if currMap.UpdateCriteria.FirstComeFirstServe {
-		
+
 		if currVal.Value == "" {
 			canUpdate = true
-		} 
+		}
 
 		if currVal.Value != "" && currVal.LastSetBy == msg.Creator {
 			canUpdate = true
@@ -134,11 +129,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 	}
 
 	if currManager == msg.Creator {
-		canForceUpdate, err := k.CheckIfKeyIsEditable(ctx, currMap.IsForceEditableTimeline, key)
-		if err != nil {
-			return nil, sdkerrors.Wrap(err, "Failed to check if key is editable")
-		}
-
+		canForceUpdate := k.CheckIfKeyIsEditable(ctx, currMap.Permissions.CanForceEdit, key)
 		if canForceUpdate {
 			canUpdate = true
 			forceUpdate = true
@@ -155,7 +146,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 		if k.GetMapDuplicateValueFromStore(ctx, mapId, value) {
 			return nil, sdkerrors.Wrap(ErrDuplicateValue, "Duplicate values not allowed")
 		}
-		
+
 		if currVal.Value != "" {
 			k.DeleteMapDuplicateValueFromStore(ctx, mapId, currVal.Value)
 		}
@@ -167,11 +158,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 	}
 
 	if !forceUpdate {
-		canEdit, err := k.CheckIfKeyIsEditable(ctx, currMap.IsEditableTimeline, key)
-		if err != nil {
-			return nil, sdkerrors.Wrap(err, "Failed to check if key is editable")
-		}
-
+		canEdit := k.CheckIfKeyIsEditable(ctx, currMap.Permissions.CanEdit, key)
 		if !canEdit {
 			return nil, sdkerrors.Wrap(ErrMapNotEditable, "Map is not editable")
 		}
@@ -189,52 +176,44 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 	return &types.MsgSetValueResponse{}, nil
 }
 
-
-func (k Keeper)	CheckIfKeyIsEditable(ctx sdk.Context, timeline []*types.IsEditableTimeline, key string) (bool, error) {
-	currTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-
-	//By default, the manager can update if no timeline vals are set or its unhandled
-	canForceUpdate := true
-
-	// Check if the manager can force update
-	// Get first match
-	for _, timelineVal := range timeline {
-		validTime := false			
-
-		found, err := badgetypes.SearchUintRangesForUint(currTime, types.CastUintRanges(timelineVal.TimelineTimes))
-		if found && err == nil {
-			validTime = true
-		} else {
-			continue
-		}
-
-		keyList, err := k.badgesKeeper.GetTrackerListById(ctx, timelineVal.KeyListId)
-		if err != nil {
-			return false, sdkerrors.Wrap(err, "Failed to create list by id")
-		}
-		
-		foundInAddressList := false
-		for _, keyVal := range keyList.Addresses {
-			if key == keyVal {
-				foundInAddressList = true
-				break
-			}
-		}
-
-		if !keyList.Whitelist {
-			foundInAddressList = !foundInAddressList
-		}
-
-		if foundInAddressList && validTime {
-			if timelineVal.IsEditable {	
-				canForceUpdate = true
-			} else {
-				canForceUpdate = false
-			}
-			break
-		}
+func (k Keeper) CheckIfKeyIsEditable(ctx sdk.Context, permissions []*types.IsEditablePermission, key string) (bool) {
+	toCheck := []*badgetypes.UniversalPermissionDetails{
+		{
+			ApprovalIdList: &badgetypes.AddressList{
+				Whitelist: true,
+				Addresses: []string{key},
+			},
+			ToList: &badgetypes.AddressList{
+				Whitelist: false,
+				Addresses: []string{},
+			},
+			FromList: &badgetypes.AddressList{
+				Whitelist: false,
+				Addresses: []string{},
+			},
+			InitiatedByList: &badgetypes.AddressList{
+				Whitelist: false,
+				Addresses: []string{},
+			},
+			BadgeId: &badgetypes.UintRange{
+				Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64),
+			},
+			TimelineTime: &badgetypes.UintRange{
+				Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64),
+			},
+			TransferTime: &badgetypes.UintRange{
+				Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64),
+			},
+			OwnershipTime: &badgetypes.UintRange{
+				Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64),
+			},
+		},
 	}
 
+	err := k.badgesKeeper.CheckIfCollectionApprovalPermissionPermits(ctx, toCheck, types.CastIsEditablePermissions(permissions), "can edit")
+	if err != nil {
+		return false
+	}
 
-	return canForceUpdate, nil
+	return true
 }

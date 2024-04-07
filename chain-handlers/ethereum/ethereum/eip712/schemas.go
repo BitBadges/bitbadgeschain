@@ -15,6 +15,316 @@ func GetSchemas() []string {
 	schemas := make([]string, 0)
 
 	schemas = append(schemas, `{
+		"type": "maps/CreateMap",
+		"value": {
+			"creator": "",
+			"mapId": "",
+			"inheritManagerTimelineFrom": "",
+			"managerTimeline": [
+				{
+					"manager": "",
+					"timelineTimes": [
+						{
+							"start": "",
+							"end": ""
+						}
+					]
+				}
+			],
+			"updateCriteria": {
+				"managerOnly": false,
+				"collectionId": "",
+				"creatorOnly": false,
+				"firstComeFirstServe": false
+			},
+			"valueOptions": {
+				"noDuplicates": false,
+				"permanentOnceSet": false,
+				"expectUint": false,
+				"expectBoolean": false,
+				"expectAddress": false,
+				"expectUri": false
+			},
+			"defaultValue": "",
+			"metadataTimeline": [
+				{
+					"metadata": {
+						"uri": "",
+						"customData": ""
+					},
+					"timelineTimes": [
+						{
+							"start": "",
+							"end": ""
+						}
+					]
+				}
+			],
+			"permissions": {
+				"canUpdateMetadata": [
+					{
+						"timelineTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyPermittedTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyForbiddenTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						]
+					}
+				],
+				"canUpdateManager": [
+					{
+						"timelineTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyPermittedTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyForbiddenTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						]
+					}
+				],
+				"canEdit": [
+					{
+						"keyListId": "",
+						"permanentlyPermittedTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyForbiddenTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						]
+					}
+				],
+				"canDeleteMap": [
+					{
+						"timelineTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyPermittedTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyForbiddenTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						]
+					}
+				],
+				"canForceEdit": [
+					{
+						"keyListId": "",
+						"permanentlyPermittedTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyForbiddenTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						]
+					}
+				]
+			},
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "maps/UpdateMap",
+		"value": {
+			"creator": "",
+			"mapId": "",
+			"updateManagerTimeline": false,
+			"managerTimeline": [
+				{
+					"manager": "",
+					"timelineTimes": [
+						{
+							"start": "",
+							"end": ""
+						}
+					]
+				}
+			],
+			"updateMetadataTimeline": false,
+			"metadataTimeline": [
+				{
+					"metadata": {
+						"uri": "",
+						"customData": ""
+					},
+					"timelineTimes": [
+						{
+							"start": "",
+							"end": ""
+						}
+					]
+				}
+			],
+			"updatePermissions": false,
+			"permissions": {
+				"canUpdateMetadata": [
+					{
+						"timelineTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyPermittedTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyForbiddenTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						]
+					}
+				],
+				"canUpdateManager": [
+					{
+						"timelineTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyPermittedTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyForbiddenTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						]
+					}
+				],
+				"canEdit": [
+					{
+						"keyListId": "",
+						"permanentlyPermittedTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyForbiddenTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						]
+					}
+				],
+				"canDeleteMap": [
+					{
+						"timelineTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyPermittedTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyForbiddenTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						]
+					}
+				],
+				"canForceEdit": [
+					{
+						"keyListId": "",
+						"permanentlyPermittedTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyForbiddenTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						]
+					}
+				]
+			}
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "maps/DeleteMap",
+		"value": {
+			"creator": "",
+			"mapId": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "maps/SetValue",
+		"value": {
+			"creator": "",
+			"mapId": "",
+			"key": "",
+			"value": "",
+			"options": {
+				"useMostRecentCollectionId": false,
+			}
+		}
+	}`)
+
+	schemas = append(schemas, `{
 		"type": "protocols/CreateProtocol",
 		"value": {
 			"creator": "",
@@ -193,8 +503,6 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"amountTrackerId": "",
-						"challengeTrackerId": "",
 						"uri": "",
 						"customData": "",
 						"approvalId": "",
@@ -222,17 +530,19 @@ func GetSchemas() []string {
 									"mustSatisfyForAllAssets": false
 								}
 							],
-							"merkleChallenge": {
+							"merkleChallenges": [{
 								"root": "",
 								"expectedProofLength": "",
 								"useCreatorAddressAsLeaf": false,
 								"maxUsesPerLeaf": "",
+								"challengeTrackerId": "",
 								"uri": "",
 								"customData": ""
-							},
+							}],
 							"zkProofs": [
 								{
 									"verificationKey": "",
+									"zkpTrackerId": "",
 									"uri": "",
 									"customData": ""
 								}
@@ -285,6 +595,7 @@ func GetSchemas() []string {
 									"usePerToAddressNumTransfers": false,
 									"usePerFromAddressNumTransfers": false,
 									"usePerInitiatedByAddressNumTransfers": false,
+									"challengeTrackerId": "",
 									"useMerkleChallengeLeafIndex": false
 								}
 							},
@@ -292,12 +603,14 @@ func GetSchemas() []string {
 								"overallApprovalAmount": "",
 								"perToAddressApprovalAmount": "",
 								"perFromAddressApprovalAmount": "",
+								"amountTrackerId": "",
 								"perInitiatedByAddressApprovalAmount": ""
 							},
 							"maxNumTransfers": {
 								"overallMaxNumTransfers": "",
 								"perToAddressMaxNumTransfers": "",
 								"perFromAddressMaxNumTransfers": "",
+								"amountTrackerId": "",
 								"perInitiatedByAddressMaxNumTransfers": ""
 							},
 							"requireFromEqualsInitiatedBy": false,
@@ -327,8 +640,6 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"amountTrackerId": "",
-						"challengeTrackerId": "",
 						"uri": "",
 						"customData": "",
 						"approvalId": "",
@@ -356,17 +667,19 @@ func GetSchemas() []string {
 									"mustSatisfyForAllAssets": false
 								}
 							],
-							"merkleChallenge": {
+							"merkleChallenges": [{
 								"root": "",
 								"expectedProofLength": "",
 								"useCreatorAddressAsLeaf": false,
 								"maxUsesPerLeaf": "",
+								"challengeTrackerId": "",
 								"uri": "",
 								"customData": ""
-							},
+							}],
 							"zkProofs": [
 								{
 									"verificationKey": "",
+									"zkpTrackerId": "",
 									"uri": "",
 									"customData": ""
 								}
@@ -419,6 +732,7 @@ func GetSchemas() []string {
 									"usePerToAddressNumTransfers": false,
 									"usePerFromAddressNumTransfers": false,
 									"usePerInitiatedByAddressNumTransfers": false,
+									"challengeTrackerId": "",
 									"useMerkleChallengeLeafIndex": false
 								}
 							},
@@ -426,12 +740,14 @@ func GetSchemas() []string {
 								"overallApprovalAmount": "",
 								"perToAddressApprovalAmount": "",
 								"perFromAddressApprovalAmount": "",
+								"amountTrackerId": "",
 								"perInitiatedByAddressApprovalAmount": ""
 							},
 							"maxNumTransfers": {
 								"overallMaxNumTransfers": "",
 								"perToAddressMaxNumTransfers": "",
 								"perFromAddressMaxNumTransfers": "",
+								"amountTrackerId": "",
 								"perInitiatedByAddressMaxNumTransfers": ""
 							},
 							"requireToEqualsInitiatedBy": false,
@@ -463,8 +779,6 @@ func GetSchemas() []string {
 								}
 							],
 							"approvalId": "",
-							"amountTrackerId": "",
-							"challengeTrackerId": "",
 							"permanentlyPermittedTimes": [
 								{
 									"start": "",
@@ -502,8 +816,6 @@ func GetSchemas() []string {
 								}
 							],
 							"approvalId": "",
-							"amountTrackerId": "",
-							"challengeTrackerId": "",
 							"permanentlyPermittedTimes": [
 								{
 									"start": "",
@@ -801,8 +1113,6 @@ func GetSchemas() []string {
 							}
 						],
 						"approvalId": "",
-						"amountTrackerId": "",
-						"challengeTrackerId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
@@ -919,8 +1229,6 @@ func GetSchemas() []string {
 							"end": ""
 						}
 					],
-					"amountTrackerId": "",
-					"challengeTrackerId": "",
 					"uri": "",
 					"customData": "",
 					"approvalId": "",
@@ -948,17 +1256,19 @@ func GetSchemas() []string {
 								"mustSatisfyForAllAssets": false
 							}
 						],
-						"merkleChallenge": {
+						"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
 							"maxUsesPerLeaf": "",
+							"challengeTrackerId": "",
 							"uri": "",
 							"customData": ""
-						},
+						}],
 						"zkProofs": [
 							{
 								"verificationKey": "",
+								"zkpTrackerId": "",
 								"uri": "",
 								"customData": ""
 							}
@@ -1011,6 +1321,7 @@ func GetSchemas() []string {
 								"usePerToAddressNumTransfers": false,
 								"usePerFromAddressNumTransfers": false,
 								"usePerInitiatedByAddressNumTransfers": false,
+								"challengeTrackerId": "",
 								"useMerkleChallengeLeafIndex": false
 							}
 						},
@@ -1018,12 +1329,14 @@ func GetSchemas() []string {
 							"overallApprovalAmount": "",
 							"perToAddressApprovalAmount": "",
 							"perFromAddressApprovalAmount": "",
+							"amountTrackerId": "",
 							"perInitiatedByAddressApprovalAmount": ""
 						},
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
 							"perFromAddressMaxNumTransfers": "",
+							"amountTrackerId": "",
 							"perInitiatedByAddressMaxNumTransfers": ""
 						},
 						"requireToEqualsInitiatedBy": false,
@@ -1090,8 +1403,6 @@ func GetSchemas() []string {
 							"end": ""
 						}
 					],
-					"amountTrackerId": "",
-					"challengeTrackerId": "",
 					"uri": "",
 					"customData": "",
 					"approvalId": "",
@@ -1119,17 +1430,19 @@ func GetSchemas() []string {
 								"mustSatisfyForAllAssets": false
 							}
 						],
-						"merkleChallenge": {
+						"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
 							"maxUsesPerLeaf": "",
+							"challengeTrackerId": "",
 							"uri": "",
 							"customData": ""
-						},
+						}],
 						"zkProofs": [
 							{
 								"verificationKey": "",
+								"zkpTrackerId": "",
 								"uri": "",
 								"customData": ""
 							}
@@ -1182,6 +1495,7 @@ func GetSchemas() []string {
 								"usePerToAddressNumTransfers": false,
 								"usePerFromAddressNumTransfers": false,
 								"usePerInitiatedByAddressNumTransfers": false,
+								"challengeTrackerId": "",
 								"useMerkleChallengeLeafIndex": false
 							}
 						},
@@ -1189,12 +1503,14 @@ func GetSchemas() []string {
 							"overallApprovalAmount": "",
 							"perToAddressApprovalAmount": "",
 							"perFromAddressApprovalAmount": "",
+							"amountTrackerId": "",
 							"perInitiatedByAddressApprovalAmount": ""
 						},
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
 							"perFromAddressMaxNumTransfers": "",
+							"amountTrackerId": "",
 							"perInitiatedByAddressMaxNumTransfers": ""
 						},
 						"requireToEqualsInitiatedBy": false,
@@ -1225,8 +1541,6 @@ func GetSchemas() []string {
 							"end": ""
 						}
 					],
-					"amountTrackerId": "",
-					"challengeTrackerId": "",
 					"uri": "",
 					"customData": "",
 					"approvalId": "",
@@ -1254,17 +1568,19 @@ func GetSchemas() []string {
 								"mustSatisfyForAllAssets": false
 							}
 						],
-						"merkleChallenge": {
+						"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
 							"maxUsesPerLeaf": "",
+							"challengeTrackerId": "",
 							"uri": "",
 							"customData": ""
-						},
+						}],
 						"zkProofs": [
 							{
 								"verificationKey": "",
+								"zkpTrackerId": "",
 								"uri": "",
 								"customData": ""
 							}
@@ -1317,6 +1633,7 @@ func GetSchemas() []string {
 								"usePerToAddressNumTransfers": false,
 								"usePerFromAddressNumTransfers": false,
 								"usePerInitiatedByAddressNumTransfers": false,
+								"challengeTrackerId": "",
 								"useMerkleChallengeLeafIndex": false
 							}
 						},
@@ -1324,12 +1641,14 @@ func GetSchemas() []string {
 							"overallApprovalAmount": "",
 							"perToAddressApprovalAmount": "",
 							"perFromAddressApprovalAmount": "",
+							"amountTrackerId": "",
 							"perInitiatedByAddressApprovalAmount": ""
 						},
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
 							"perFromAddressMaxNumTransfers": "",
+							"amountTrackerId": "",
 							"perInitiatedByAddressMaxNumTransfers": ""
 						},
 						"requireFromEqualsInitiatedBy": false,
@@ -1366,8 +1685,6 @@ func GetSchemas() []string {
 							}
 						],
 						"approvalId": "",
-						"amountTrackerId": "",
-						"challengeTrackerId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
@@ -1405,8 +1722,6 @@ func GetSchemas() []string {
 							}
 						],
 						"approvalId": "",
-						"amountTrackerId": "",
-						"challengeTrackerId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
@@ -1500,8 +1815,6 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"amountTrackerId": "",
-						"challengeTrackerId": "",
 						"uri": "",
 						"customData": "",
 						"approvalId": "",
@@ -1529,17 +1842,19 @@ func GetSchemas() []string {
 									"mustSatisfyForAllAssets": false
 								}
 							],
-							"merkleChallenge": {
+							"merkleChallenges": [{
 								"root": "",
 								"expectedProofLength": "",
 								"useCreatorAddressAsLeaf": false,
 								"maxUsesPerLeaf": "",
+								"challengeTrackerId": "",
 								"uri": "",
 								"customData": ""
-							},
+							}],
 							"zkProofs": [
 								{
 									"verificationKey": "",
+									"zkpTrackerId": "",
 									"uri": "",
 									"customData": ""
 								}
@@ -1592,6 +1907,7 @@ func GetSchemas() []string {
 									"usePerToAddressNumTransfers": false,
 									"usePerFromAddressNumTransfers": false,
 									"usePerInitiatedByAddressNumTransfers": false,
+									"challengeTrackerId": "",
 									"useMerkleChallengeLeafIndex": false
 								}
 							},
@@ -1599,12 +1915,14 @@ func GetSchemas() []string {
 								"overallApprovalAmount": "",
 								"perToAddressApprovalAmount": "",
 								"perFromAddressApprovalAmount": "",
+								"amountTrackerId": "",
 								"perInitiatedByAddressApprovalAmount": ""
 							},
 							"maxNumTransfers": {
 								"overallMaxNumTransfers": "",
 								"perToAddressMaxNumTransfers": "",
 								"perFromAddressMaxNumTransfers": "",
+								"amountTrackerId": "",
 								"perInitiatedByAddressMaxNumTransfers": ""
 							},
 							"requireFromEqualsInitiatedBy": false,
@@ -1634,8 +1952,6 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"amountTrackerId": "",
-						"challengeTrackerId": "",
 						"uri": "",
 						"customData": "",
 						"approvalId": "",
@@ -1663,17 +1979,19 @@ func GetSchemas() []string {
 									"mustSatisfyForAllAssets": false
 								}
 							],
-							"merkleChallenge": {
+							"merkleChallenges": [{
 								"root": "",
 								"expectedProofLength": "",
 								"useCreatorAddressAsLeaf": false,
 								"maxUsesPerLeaf": "",
+								"challengeTrackerId": "",
 								"uri": "",
 								"customData": ""
-							},
+							}],
 							"zkProofs": [
 								{
 									"verificationKey": "",
+									"zkpTrackerId": "",
 									"uri": "",
 									"customData": ""
 								}
@@ -1726,6 +2044,7 @@ func GetSchemas() []string {
 									"usePerToAddressNumTransfers": false,
 									"usePerFromAddressNumTransfers": false,
 									"usePerInitiatedByAddressNumTransfers": false,
+									"challengeTrackerId": "",
 									"useMerkleChallengeLeafIndex": false
 								}
 							},
@@ -1733,12 +2052,14 @@ func GetSchemas() []string {
 								"overallApprovalAmount": "",
 								"perToAddressApprovalAmount": "",
 								"perFromAddressApprovalAmount": "",
+								"amountTrackerId": "",
 								"perInitiatedByAddressApprovalAmount": ""
 							},
 							"maxNumTransfers": {
 								"overallMaxNumTransfers": "",
 								"perToAddressMaxNumTransfers": "",
 								"perFromAddressMaxNumTransfers": "",
+								"amountTrackerId": "",
 								"perInitiatedByAddressMaxNumTransfers": ""
 							},
 							"requireToEqualsInitiatedBy": false,
@@ -1770,8 +2091,6 @@ func GetSchemas() []string {
 								}
 							],
 						  "approvalId": "",
-							"amountTrackerId": "",
-							"challengeTrackerId": "",
 							"permanentlyPermittedTimes": [
 								{
 									"start": "",
@@ -1809,8 +2128,6 @@ func GetSchemas() []string {
 								}
 							],
 							"approvalId": "",
-							"amountTrackerId": "",
-							"challengeTrackerId": "",
 							"permanentlyPermittedTimes": [
 								{
 									"start": "",
@@ -2107,8 +2424,6 @@ func GetSchemas() []string {
 							}
 						],
 						"approvalId": "",
-						"amountTrackerId": "",
-						"challengeTrackerId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
@@ -2219,8 +2534,6 @@ func GetSchemas() []string {
 							"end": ""
 						}
 					],
-					"amountTrackerId": "",
-					"challengeTrackerId": "",
 					"uri": "",
 					"customData": "",
 					"approvalId": "",
@@ -2248,17 +2561,19 @@ func GetSchemas() []string {
 								"mustSatisfyForAllAssets": false
 							}
 						],
-						"merkleChallenge": {
+						"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
 							"maxUsesPerLeaf": "",
+							"challengeTrackerId": "",
 							"uri": "",
 							"customData": ""
-						},
+						}],
 						"zkProofs": [
 							{
 								"verificationKey": "",
+								"zkpTrackerId": "",
 								"uri": "",
 								"customData": ""
 							}
@@ -2311,6 +2626,7 @@ func GetSchemas() []string {
 								"usePerToAddressNumTransfers": false,
 								"usePerFromAddressNumTransfers": false,
 								"usePerInitiatedByAddressNumTransfers": false,
+								"challengeTrackerId": "",
 								"useMerkleChallengeLeafIndex": false
 							}
 						},
@@ -2318,12 +2634,14 @@ func GetSchemas() []string {
 							"overallApprovalAmount": "",
 							"perToAddressApprovalAmount": "",
 							"perFromAddressApprovalAmount": "",
+							"amountTrackerId": "",
 							"perInitiatedByAddressApprovalAmount": ""
 						},
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
 							"perFromAddressMaxNumTransfers": "",
+							"amountTrackerId": "",
 							"perInitiatedByAddressMaxNumTransfers": ""
 						},
 						"requireToEqualsInitiatedBy": false,
@@ -2612,8 +2930,6 @@ func GetSchemas() []string {
 							}
 						],
 						"approvalId": "",
-						"amountTrackerId": "",
-						"challengeTrackerId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
@@ -2730,8 +3046,6 @@ func GetSchemas() []string {
 							"end": ""
 						}
 					],
-					"amountTrackerId": "",
-					"challengeTrackerId": "",
 					"uri": "",
 					"customData": "",
 					"approvalId": "",
@@ -2759,17 +3073,19 @@ func GetSchemas() []string {
 								"mustSatisfyForAllAssets": false
 							}
 						],
-						"merkleChallenge": {
+						"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
 							"maxUsesPerLeaf": "",
+							"challengeTrackerId": "",
 							"uri": "",
 							"customData": ""
-						},
+						}],
 						"zkProofs": [
 							{
 								"verificationKey": "",
+								"zkpTrackerId": "",
 								"uri": "",
 								"customData": ""
 							}
@@ -2822,6 +3138,7 @@ func GetSchemas() []string {
 								"usePerToAddressNumTransfers": false,
 								"usePerFromAddressNumTransfers": false,
 								"usePerInitiatedByAddressNumTransfers": false,
+								"challengeTrackerId": "",
 								"useMerkleChallengeLeafIndex": false
 							}
 						},
@@ -2829,12 +3146,14 @@ func GetSchemas() []string {
 							"overallApprovalAmount": "",
 							"perToAddressApprovalAmount": "",
 							"perFromAddressApprovalAmount": "",
+							"amountTrackerId": "",
 							"perInitiatedByAddressApprovalAmount": ""
 						},
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
 							"perFromAddressMaxNumTransfers": "",
+							"amountTrackerId": "",
 							"perInitiatedByAddressMaxNumTransfers": ""
 						},
 						"requireToEqualsInitiatedBy": false,

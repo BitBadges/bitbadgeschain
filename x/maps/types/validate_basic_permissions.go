@@ -14,7 +14,7 @@ func ValidatePermissions(permissions *MapPermissions, canChangeValues bool) erro
 		return err
 	}
 
-	if err := badgetypes.ValidateCollectionApprovalPermissions(CastIsEditablePermissions(permissions.CanUpdateIsEditable), canChangeValues); err != nil {
+	if err := badgetypes.ValidateCollectionApprovalPermissions(CastIsEditablePermissions(permissions.CanEdit), canChangeValues); err != nil {
 		return err
 	}
 
@@ -26,7 +26,7 @@ func ValidatePermissions(permissions *MapPermissions, canChangeValues bool) erro
 		return err
 	}
 
-	if err := badgetypes.ValidateCollectionApprovalPermissions(CastIsEditablePermissions(permissions.CanUpdateIsForceEditable), canChangeValues); err != nil {
+	if err := badgetypes.ValidateCollectionApprovalPermissions(CastIsEditablePermissions(permissions.CanForceEdit), canChangeValues); err != nil {
 		return err
 	}
 

@@ -11,19 +11,17 @@ const TypeMsgCreateMap = "create_map"
 
 var _ sdk.Msg = &MsgCreateMap{}
 
-func NewMsgCreateMap(creator string, mapId string, updateCriteria *MapUpdateCriteria, valueOptions *ValueOptions, defaultValue string, managerTimeline []*ManagerTimeline, isEditableTimeline []*IsEditableTimeline, metadataTimeline []*MapMetadataTimeline, permissions *MapPermissions, inheritManagerTimelineFrom sdkmath.Uint, isForceEditableTimeline []*IsEditableTimeline) *MsgCreateMap {
+func NewMsgCreateMap(creator string, mapId string, updateCriteria *MapUpdateCriteria, valueOptions *ValueOptions, defaultValue string, managerTimeline []*ManagerTimeline, metadataTimeline []*MapMetadataTimeline, permissions *MapPermissions, inheritManagerTimelineFrom sdkmath.Uint) *MsgCreateMap {
 	return &MsgCreateMap{
-		Creator:            creator,
-		MapId:              mapId,
-		UpdateCriteria:     updateCriteria,
-		ValueOptions:       valueOptions,
-		DefaultValue:       defaultValue,
-		ManagerTimeline:    managerTimeline,
-		IsEditableTimeline: isEditableTimeline,
-		MetadataTimeline:   metadataTimeline,
-		Permissions:        permissions,
+		Creator:                    creator,
+		MapId:                      mapId,
+		UpdateCriteria:             updateCriteria,
+		ValueOptions:               valueOptions,
+		DefaultValue:               defaultValue,
+		ManagerTimeline:            managerTimeline,
+		MetadataTimeline:           metadataTimeline,
+		Permissions:                permissions,
 		InheritManagerTimelineFrom: inheritManagerTimelineFrom,
-		IsForceEditableTimeline: isForceEditableTimeline,
 	}
 }
 
@@ -58,20 +56,9 @@ func (msg *MsgCreateMap) ValidateBasic() error {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "map ID cannot be empty")
 	}
 
-	err = badgestypes.ValidateManagerTimeline(CastManagerTimelineArray(msg.ManagerTimeline)) 
+	err = badgestypes.ValidateManagerTimeline(CastManagerTimelineArray(msg.ManagerTimeline))
 	if err != nil {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "manager timeline cannot be invalid")
-	}
-
-	blankCtx := sdk.Context{}
-	err = badgestypes.ValidateCollectionApprovals(blankCtx, CastIsEditableTimelineArray(msg.IsEditableTimeline), false)
-	if err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "is editable timeline cannot be invalid")
-	}
-
-	err = badgestypes.ValidateCollectionApprovals(blankCtx, CastIsEditableTimelineArray(msg.IsForceEditableTimeline), false)
-	if err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "is force editable timeline cannot be invalid")
 	}
 
 	err = badgestypes.ValidateCollectionMetadataTimeline(CastMetadataTimelineArray(msg.MetadataTimeline))

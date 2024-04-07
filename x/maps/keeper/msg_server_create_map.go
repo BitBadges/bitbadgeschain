@@ -54,11 +54,9 @@ func (k msgServer) CreateMap(goCtx context.Context, msg *types.MsgCreateMap) (*t
 		ValueOptions: msg.ValueOptions,
 		DefaultValue: msg.DefaultValue,
 		ManagerTimeline: msg.ManagerTimeline,
-		IsEditableTimeline: msg.IsEditableTimeline,
 		MetadataTimeline: msg.MetadataTimeline,
 		Permissions: msg.Permissions,
 		InheritManagerTimelineFrom: msg.InheritManagerTimelineFrom,
-		IsForceEditableTimeline: msg.IsForceEditableTimeline,
 	}
 	if msg.Permissions == nil {
 		mapToAdd.Permissions = &types.MapPermissions{}

@@ -46,19 +46,13 @@ message ValueOptions {
 message MapPermissions {
   repeated TimedUpdatePermission canUpdateMetadata = 1;
   repeated TimedUpdatePermission canUpdateManager = 2;
-  repeated IsEditablePermission canUpdateIsEditable = 3;
+  repeated IsEditablePermission canEdit = 3;
   repeated ActionPermission canDeleteMap = 4;
-  repeated IsEditablePermission canUpdateIsForceEditable = 5;
+  repeated IsEditablePermission canForceEdit = 5;
 }
 
-message IsEditableTimeline {
-  repeated UintRange timelineTimes = 1;
-  string keyListId = 2;
-  bool isEditable = 3;
-}
 
 message IsEditablePermission {
-  repeated UintRange timelineTimes = 1;
   string keyListId = 2;
 
   repeated UintRange permanentlyPermittedTimes = 3;
@@ -79,9 +73,6 @@ message Map {
   ValueOptions valueOptions = 6;
   string defaultValue = 7;
 
-  repeated IsEditableTimeline isEditableTimeline = 8;
-  repeated IsEditableTimeline isForceEditableTimeline = 9;
-
   repeated MapMetadataTimeline metadataTimeline = 10;
 
   MapPermissions permissions = 11;
@@ -99,12 +90,9 @@ message MsgCreateMap {
   ValueOptions valueOptions = 6;
   string defaultValue = 7;
 
-  repeated IsEditableTimeline isEditableTimeline = 8;
   repeated MapMetadataTimeline metadataTimeline = 9;
 
   MapPermissions permissions = 10;
-
-  repeated IsEditableTimeline isForceEditableTimeline = 11;
 }
 
 message MsgCreateMapResponse {}
@@ -116,17 +104,11 @@ message MsgUpdateMap {
   bool updateManagerTimeline = 3;
   repeated ManagerTimeline managerTimeline = 4;
 
-  bool updateIsEditableTimeline = 5;
-  repeated IsEditableTimeline isEditableTimeline = 6;
-
   bool updateMetadataTimeline = 7;
   repeated MapMetadataTimeline metadataTimeline = 8;
 
   bool updatePermissions = 9;
   MapPermissions permissions = 10;
-
-  bool updateIsForceEditableTimeline = 11;
-  repeated IsEditableTimeline isForceEditableTimeline = 12;
 }
 
 message MsgUpdateMapResponse {}
