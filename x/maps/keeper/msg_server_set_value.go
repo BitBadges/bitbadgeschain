@@ -30,35 +30,32 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 		return nil, sdkerrors.Wrap(ErrMapDoesNotExist, "Failed to get map from store")
 	}
 
-	// bool expectUint = 3;
-	// bool expectBoolean = 4;
-	// bool expectAddress = 5;
-	// bool expectUri = 6;
-
-	if currMap.ValueOptions.ExpectUint {
-		newUint := sdkmath.NewUintFromString(value)
-		if newUint.IsNil() {
-			return nil, sdkerrors.Wrap(ErrInvalidValue, "Value must be a valid uint")
+	if value != "" {
+		if currMap.ValueOptions.ExpectUint {
+			newUint := sdkmath.NewUintFromString(value)
+			if newUint.IsNil() {
+				return nil, sdkerrors.Wrap(ErrInvalidValue, "Value must be a valid uint")
+			}
 		}
-	}
 
-	if currMap.ValueOptions.ExpectBoolean {
-		if value != "true" && value != "false" {
-			return nil, sdkerrors.Wrap(ErrInvalidValue, "Value must be a valid boolean")
+		if currMap.ValueOptions.ExpectBoolean {
+			if value != "true" && value != "false" {
+				return nil, sdkerrors.Wrap(ErrInvalidValue, "Value must be a valid boolean")
+			}
 		}
-	}
 
-	if currMap.ValueOptions.ExpectAddress {
-		_, err := sdk.AccAddressFromBech32(value)
-		if err != nil {
-			return nil, sdkerrors.Wrap(ErrInvalidValue, "Value must be a valid address")
+		if currMap.ValueOptions.ExpectAddress {
+			_, err := sdk.AccAddressFromBech32(value)
+			if err != nil {
+				return nil, sdkerrors.Wrap(ErrInvalidValue, "Value must be a valid address")
+			}
 		}
-	}
 
-	if currMap.ValueOptions.ExpectUri {
-		err := badgetypes.ValidateURI(value)
-		if err != nil {
-			return nil, sdkerrors.Wrap(ErrInvalidValue, "Value must be a valid URI")
+		if currMap.ValueOptions.ExpectUri {
+			err := badgetypes.ValidateURI(value)
+			if err != nil {
+				return nil, sdkerrors.Wrap(ErrInvalidValue, "Value must be a valid URI")
+			}
 		}
 	}
 
@@ -176,7 +173,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 	return &types.MsgSetValueResponse{}, nil
 }
 
-func (k Keeper) CheckIfKeyIsEditable(ctx sdk.Context, permissions []*types.IsEditablePermission, key string) (bool) {
+func (k Keeper) CheckIfKeyIsEditable(ctx sdk.Context, permissions []*types.IsEditablePermission, key string) bool {
 	toCheck := []*badgetypes.UniversalPermissionDetails{
 		{
 			ApprovalIdList: &badgetypes.AddressList{

@@ -127,16 +127,13 @@ import (
 	wasmxkeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
 	wasmxtypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 
-	protocolsmodule "github.com/bitbadges/bitbadgeschain/x/protocols"
-	protocolsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/protocols/keeper"
-	protocolsmoduletypes "github.com/bitbadges/bitbadgeschain/x/protocols/types"
-
 	anchormodule "github.com/bitbadges/bitbadgeschain/x/anchor"
 	anchormodulekeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
 	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
 	mapsmodule "github.com/bitbadges/bitbadgeschain/x/maps"
 	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
 	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
@@ -201,7 +198,6 @@ var (
 		badgesmodule.AppModuleBasic{},
 		wasm.AppModuleBasic{},
 		wasmx.AppModuleBasic{},
-		protocolsmodule.AppModuleBasic{},
 		anchormodule.AppModuleBasic{},
 		mapsmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
@@ -291,7 +287,6 @@ type App struct {
 	ScopedWasmKeeper      capabilitykeeper.ScopedKeeper
 	WasmxKeeper           wasmxkeeper.Keeper
 	ScopedProtocolsKeeper capabilitykeeper.ScopedKeeper
-	ProtocolsKeeper       protocolsmodulekeeper.Keeper
 	ScopedAnchorKeeper    capabilitykeeper.ScopedKeeper
 	AnchorKeeper          anchormodulekeeper.Keeper
 	ScopedMapsKeeper      capabilitykeeper.ScopedKeeper
@@ -346,7 +341,6 @@ func New(
 		wasmtypes.StoreKey,
 		wasmxtypes.StoreKey,
 		ibcfeetypes.StoreKey,
-		protocolsmoduletypes.StoreKey,
 		anchormoduletypes.StoreKey,
 		mapsmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
@@ -601,7 +595,7 @@ func New(
 	}
 
 	customEncoderOptions := GetCustomMsgEncodersOptions()
-	customQueryOptions := GetCustomMsgQueryOptions(app.BadgesKeeper, app.ProtocolsKeeper)
+	customQueryOptions := GetCustomMsgQueryOptions(app.BadgesKeeper)
 	wasmOpts := append(customEncoderOptions, customQueryOptions...)
 	availableCapabilities := "iterator,staking,stargate,cosmwasm_1_1,cosmwasm_1_2,bitbadges"
 
@@ -640,21 +634,7 @@ func New(
 
 	wasmxModule := wasmx.NewAppModule(app.WasmxKeeper, app.AccountKeeper, app.BankKeeper)
 
-	scopedProtocolsKeeper := app.CapabilityKeeper.ScopeToModule(protocolsmoduletypes.ModuleName)
-	app.ScopedProtocolsKeeper = scopedProtocolsKeeper
-	app.ProtocolsKeeper = *protocolsmodulekeeper.NewKeeper(
-		appCodec,
-		keys[protocolsmoduletypes.StoreKey],
-		keys[protocolsmoduletypes.MemStoreKey],
-		app.GetSubspace(protocolsmoduletypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper,
-		&app.IBCKeeper.PortKeeper,
-		scopedProtocolsKeeper,
-		app.BadgesKeeper,
-	)
-	protocolsModule := protocolsmodule.NewAppModule(appCodec, app.ProtocolsKeeper, app.AccountKeeper, app.BankKeeper)
-
-	protocolsIBCModule := protocolsmodule.NewIBCModule(app.ProtocolsKeeper)
+	
 	scopedAnchorKeeper := app.CapabilityKeeper.ScopeToModule(anchormoduletypes.ModuleName)
 	app.ScopedAnchorKeeper = scopedAnchorKeeper
 	app.AnchorKeeper = *anchormodulekeeper.NewKeeper(
@@ -692,7 +672,6 @@ func New(
 	wasmStack = wasm.NewIBCHandler(app.WasmKeeper, app.IBCKeeper.ChannelKeeper, app.IBCFeeKeeper)
 	wasmStack = ibcfee.NewIBCMiddleware(wasmStack, app.IBCFeeKeeper)
 
-
 	// Sealing prevents other modules from creating scoped sub-keepers
 	app.CapabilityKeeper.Seal()
 
@@ -702,7 +681,6 @@ func New(
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
 	ibcRouter.AddRoute(badgesmoduletypes.ModuleName, badgesIBCModule)
 	ibcRouter.AddRoute(wasmtypes.ModuleName, wasmStack)
-	ibcRouter.AddRoute(protocolsmoduletypes.ModuleName, protocolsIBCModule)
 	ibcRouter.AddRoute(anchormoduletypes.ModuleName, anchorIBCModule)
 	ibcRouter.AddRoute(mapsmoduletypes.ModuleName, mapsIBCModule)
 
@@ -765,7 +743,6 @@ func New(
 		icaModule,
 		badgesModule,
 		wasmxModule,
-		protocolsModule,
 		anchorModule,
 		mapsModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
@@ -803,7 +780,6 @@ func New(
 		badgesmoduletypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxtypes.ModuleName,
-		protocolsmoduletypes.ModuleName,
 		anchormoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
@@ -834,7 +810,6 @@ func New(
 		badgesmoduletypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxtypes.ModuleName,
-		protocolsmoduletypes.ModuleName,
 		anchormoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
@@ -870,7 +845,6 @@ func New(
 		badgesmoduletypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxtypes.ModuleName,
-		protocolsmoduletypes.ModuleName,
 		anchormoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
@@ -1130,7 +1104,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(badgesmoduletypes.ModuleName)
 	paramsKeeper.Subspace(wasmtypes.ModuleName)
 	paramsKeeper.Subspace(wasmxtypes.ModuleName)
-	paramsKeeper.Subspace(protocolsmoduletypes.ModuleName)
 	paramsKeeper.Subspace(anchormoduletypes.ModuleName)
 	paramsKeeper.Subspace(mapsmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace

@@ -9,13 +9,10 @@ import (
 	badgeKeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	badgeTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 
-	protocolKeeper "github.com/bitbadges/bitbadgeschain/x/protocols/keeper"
-	protocolTypes "github.com/bitbadges/bitbadgeschain/x/protocols/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func PerformCustomBitBadgesModuleQuery(bk badgeKeeper.Keeper, pk protocolKeeper.Keeper) wasmKeeper.CustomQuerier {
+func PerformCustomBitBadgesModuleQuery(bk badgeKeeper.Keeper) wasmKeeper.CustomQuerier {
 	return func(ctx sdk.Context, request json.RawMessage) ([]byte, error) {
 		isBadgeModuleQuery := false
 		var custom badgeCustomQuery
@@ -57,27 +54,6 @@ func PerformCustomBitBadgesModuleQuery(bk badgeKeeper.Keeper, pk protocolKeeper.
 					return nil, err
 				}
 				return json.Marshal(badgeTypes.QueryGetChallengeTrackerResponse{NumUsed: res.NumUsed})
-			}
-		} else {
-			var custom protocolCustomQuery
-			err := json.Unmarshal(request, &custom)
-			if err != nil {
-				return nil, sdkerrors.Wrap(err, err.Error())
-			}
-
-			switch {
-			case custom.QueryGetProtocol != nil:
-				res, err := pk.GetProtocol(ctx, custom.QueryGetProtocol)
-				if err != nil {
-					return nil, err
-				}
-				return json.Marshal(protocolTypes.QueryGetProtocolResponse{Protocol: res.Protocol})
-			case custom.QueryGetCollectionIdForProtocol != nil:
-				res, err := pk.GetCollectionIdForProtocol(ctx, custom.QueryGetCollectionIdForProtocol)
-				if err != nil {
-					return nil, err
-				}
-				return json.Marshal(protocolTypes.QueryGetCollectionIdForProtocolResponse{CollectionId: res.CollectionId})
 			}
 		}
 
@@ -137,9 +113,4 @@ type badgeCustomQuery struct {
 	QueryAddressList         *badgeTypes.QueryGetAddressListRequest      `json:"queryAddressList,omitempty"`
 	QueryApprovalTracker     *badgeTypes.QueryGetApprovalTrackerRequest  `json:"queryApprovalTracker,omitempty"`
 	QueryGetChallengeTracker *badgeTypes.QueryGetChallengeTrackerRequest `json:"queryGetChallengeTracker,omitempty"`
-}
-
-type protocolCustomQuery struct {
-	QueryGetProtocol                *protocolTypes.QueryGetProtocolRequest                `json:"queryGetProtocol,omitempty"`
-	QueryGetCollectionIdForProtocol *protocolTypes.QueryGetCollectionIdForProtocolRequest `json:"queryGetCollectionIdForProtocol,omitempty"`
 }

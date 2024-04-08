@@ -5,7 +5,6 @@ import (
 	wasmKeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	badgeKeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 
-	protocolKeeper "github.com/bitbadges/bitbadgeschain/x/protocols/keeper"
 
 	customBindings "github.com/bitbadges/bitbadgeschain/custom-bindings"
 )
@@ -15,8 +14,8 @@ func GetCustomMsgEncodersOptions() []wasmKeeper.Option {
 	return []wasm.Option{badgeEncodingOptions}
 }
 
-func GetCustomMsgQueryOptions(keeper badgeKeeper.Keeper, keeper2 protocolKeeper.Keeper) []wasmKeeper.Option {
-	badgeQueryOptions := wasmKeeper.WithQueryPlugins(badgeQueryPlugins(keeper, keeper2))
+func GetCustomMsgQueryOptions(keeper badgeKeeper.Keeper) []wasmKeeper.Option {
+	badgeQueryOptions := wasmKeeper.WithQueryPlugins(badgeQueryPlugins(keeper))
 	return []wasm.Option{badgeQueryOptions}
 }
 
@@ -27,8 +26,8 @@ func badgeMsgEncoders() *wasmKeeper.MessageEncoders {
 }
 
 // badgeQueryPlugins needs to be registered in test setup to handle custom query callbacks
-func badgeQueryPlugins(bk badgeKeeper.Keeper, pk protocolKeeper.Keeper) *wasmKeeper.QueryPlugins {
+func badgeQueryPlugins(bk badgeKeeper.Keeper,) *wasmKeeper.QueryPlugins {
 	return &wasmKeeper.QueryPlugins{
-		Custom: customBindings.PerformCustomBitBadgesModuleQuery(bk, pk),
+		Custom: customBindings.PerformCustomBitBadgesModuleQuery(bk),
 	}
 }

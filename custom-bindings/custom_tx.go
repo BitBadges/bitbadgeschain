@@ -11,7 +11,6 @@ import (
 	"github.com/gogo/protobuf/jsonpb"
 
 	badgeTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	protocolTypes "github.com/bitbadges/bitbadgeschain/x/protocols/types"
 )
 
 func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
@@ -64,33 +63,8 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 			default:
 				return nil, sdkerrors.Wrapf(types.ErrInvalidMsg, "Unknown custom badge message variant %s", badgeCustomMsg)
 			}
-		} else {
-			reader = bytes.NewReader(jsonData)
-			var badgeCustomMsg protocolTypes.ProtocolCustomMsgType
-			err = jsonpb.Unmarshal(reader, &badgeCustomMsg)
-			if err != nil {
-				return nil, sdkerrors.Wrap(err, err.Error())
-			}
-			switch {
-			case badgeCustomMsg.CreateProtocolMsg != nil:
-				badgeCustomMsg.CreateProtocolMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.CreateProtocolMsg}, nil
-			case badgeCustomMsg.UpdateProtocolMsg != nil:
-				badgeCustomMsg.UpdateProtocolMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.UpdateProtocolMsg}, nil
-			case badgeCustomMsg.DeleteProtocolMsg != nil:
-				badgeCustomMsg.DeleteProtocolMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.DeleteProtocolMsg}, nil
-			case badgeCustomMsg.SetCollectionForProtocolMsg != nil:
-				badgeCustomMsg.SetCollectionForProtocolMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.SetCollectionForProtocolMsg}, nil
-			case badgeCustomMsg.UnsetCollectionForProtocolMsg != nil:
-				badgeCustomMsg.UnsetCollectionForProtocolMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.UnsetCollectionForProtocolMsg}, nil
-			default:
-				return nil, sdkerrors.Wrapf(types.ErrInvalidMsg, "Unknown custom badge message variant %s", badgeCustomMsg)
-			}
 		}
 
+		return nil, sdkerrors.Wrap(types.ErrInvalidMsg, "Unknown custom badge message variant")
 	}
 }
