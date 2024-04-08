@@ -112,6 +112,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			})
 		}
 	}
+
 	//Keep a running tally of all the badges we still have to handle
 	remainingBalances := []*types.Balance{
 		{
@@ -189,6 +190,25 @@ func (k Keeper) DeductAndGetUserApprovals(
 			if approvalCriteria.RequireToEqualsInitiatedBy && toAddress != initiatedBy {
 				continue
 				//return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrDisallowedTransfer, "transfer disallowed because to != initiatedBy: %s", transferStr)
+			}
+
+			//simulate the sdk.Coin transfers
+			coinTransfers := approvalCriteria.CoinTransfers
+			spendableCoins := k.bankKeeper.SpendableCoins(ctx, sdk.AccAddress(initiatedBy))
+			underflows := false
+			for _, coinTransfer := range coinTransfers {
+				toTransfer := coinTransfer.Coins
+				for _, coin := range toTransfer {
+					newCoins, underflow := spendableCoins.SafeSub(*coin)
+					if underflow {
+						underflows = true
+					}
+					spendableCoins = newCoins
+				}
+			}
+
+			if underflows {
+				continue
 			}
 
 			//Assert that initiatedBy owns the required badges
@@ -347,7 +367,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			//here, we assert the transfer is good for each level of approvals and increment if necessary
-			maxPossible, err := k.GetMaxPossible(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.OverallApprovalAmount, approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "overall", "", true, )
+			maxPossible, err := k.GetMaxPossible(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.OverallApprovalAmount, approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "overall", "", true)
 			if err != nil {
 				continue
 			}
@@ -356,7 +376,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
-			maxPossible, err = k.GetMaxPossible(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount, approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "to", toAddress, true, )
+			maxPossible, err = k.GetMaxPossible(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount, approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "to", toAddress, true)
 			if err != nil {
 				continue
 			}
@@ -365,7 +385,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
-			maxPossible, err = k.GetMaxPossible(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount, approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "from", fromAddress, true, )
+			maxPossible, err = k.GetMaxPossible(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount, approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "from", fromAddress, true)
 			if err != nil {
 				continue
 			}
@@ -374,7 +394,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
-			maxPossible, err = k.GetMaxPossible(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount, approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "initiatedBy", initiatedBy, true, )
+			maxPossible, err = k.GetMaxPossible(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount, approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "initiatedBy", initiatedBy, true)
 			if err != nil {
 				continue
 			}
@@ -389,25 +409,25 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			//here, we assert the transfer is good for each level of approvals and increment if necessary
-			err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.OverallApprovalAmount, approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "overall", "", true, )
+			err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.OverallApprovalAmount, approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "overall", "", true)
 			if err != nil {
 				continue
 				//return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "exceeded overall approvals: %s", transferStr)
 			}
 
-			err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount, approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "to", toAddress, true, )
+			err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount, approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "to", toAddress, true)
 			if err != nil {
 				continue
 				//return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "exceeded to approvals: %s", transferStr)
 			}
 
-			err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount, approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "from", fromAddress, true, )
+			err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount, approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "from", fromAddress, true)
 			if err != nil {
 				continue
 				//return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "exceeded from approvals: %s", transferStr)
 			}
 
-			err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount, approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "initiatedBy", initiatedBy, true, )
+			err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, transferVal, approvalCriteria, overallTransferBalances, collection, approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount, approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers, transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, "initiatedBy", initiatedBy, true)
 			if err != nil {
 				continue
 				//return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "exceeded initiatedBy approvals: %s", transferStr)
@@ -417,6 +437,20 @@ func (k Keeper) DeductAndGetUserApprovals(
 			remainingBalances, err = types.SubtractBalances(ctx, transferBalancesToCheck, remainingBalances)
 			if err != nil {
 				continue
+			}
+
+			//execute the sdk.Coin transfers
+			coinTransfers = approvalCriteria.CoinTransfers
+			for _, coinTransfer := range coinTransfers {
+				coinsToTransfer := coinTransfer.Coins
+				toAddressAcc := sdk.AccAddress(coinTransfer.To)
+				fromAddressAcc := sdk.AccAddress(initiatedBy)
+				for _, coin := range coinsToTransfer {
+					err := k.bankKeeper.SendCoins(ctx, fromAddressAcc, toAddressAcc, sdk.NewCoins(*coin))
+					if err != nil {
+						return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error sending coins after simulation: %s", transferStr)
+					}
+				}
 			}
 
 			//If the approval has challenges, we need to check that a valid solutions is provided for every challenge
@@ -758,7 +792,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerToAddressNumTransfers && trackerType == "to") ||
 		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers && trackerType == "from") ||
 		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers && trackerType == "initiatedBy") {
-		
+
 		maxNumTransfersTrackerDetails.NumTransfers = maxNumTransfersTrackerDetails.NumTransfers.Add(sdkmath.NewUint(1))
 		//only check exceeds if maxNumTransfers is not 0 (because 0 means no limit)
 		if maxNumTransfers.GT(sdkmath.NewUint(0)) {
@@ -766,7 +800,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 				return sdkerrors.Wrapf(ErrDisallowedTransfer, "exceeded max transfers allowed - %s", maxNumTransfers.String())
 			}
 		}
-		
+
 	}
 
 	if needToFetchApprovalTrackerDetails && !simulate {

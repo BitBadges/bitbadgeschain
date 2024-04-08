@@ -21,6 +21,8 @@ import (
 	channeltypes "github.com/cosmos/ibc-go/v7/modules/core/04-channel/types"
 	"github.com/stretchr/testify/require"
 
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+
 	accountkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 )
 
@@ -89,6 +91,7 @@ func BadgesKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 		badgesPortKeeper{},
 		capabilityKeeper.ScopeToModule("BadgesScopedKeeper"),
 		//accountKeeper,
+		bankkeeper.BaseSendKeeper{},
 		accountkeeper.AccountKeeper{},
 	)
 

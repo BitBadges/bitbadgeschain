@@ -15,6 +15,8 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	bitbadgesapp "github.com/bitbadges/bitbadgeschain/app"
+
+	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/testutil"
 )
 
 const (
@@ -76,11 +78,15 @@ func (suite *TestSuite) SetupTest() {
 	suite.app.AccountKeeper.SetAccount(suite.ctx, alice_acc)
 	suite.app.AccountKeeper.SetAccount(suite.ctx, charlie_acc)
 
+	//initialize bob with 1000 coins
+
 	suite.ctx = suite.ctx.WithBlockTime(time.Now())
 
 	// for i := uint64(0); i < 1000; i++ {
 	// 	suite.app.AccountKeeper.SetAccount(suite.ctx, suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.AccAddress([]byte{byte(i)})))
 	// }
+
+	banktestutil.FundAccount(suite.app.BankKeeper, suite.ctx, sdk.AccAddress(bob), sdk.NewCoins(sdk.NewInt64Coin("badge", 1000)))
 }
 
 func TestBadgesKeeperTestSuite(t *testing.T) {

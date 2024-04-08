@@ -5,6 +5,7 @@ import "gogoproto/gogo.proto";
 import "badges/permissions.proto";
 import "badges/address_lists.proto";
 import "badges/balances.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
@@ -304,6 +305,13 @@ message ZkProofSolution {
   string proof = 2;
 }
 
+message CoinTransfer {
+  // The address of the recipient of the transfer.
+  string to = 1;
+  // The sdk.Coins to be transferred.
+  repeated cosmos.base.v1beta1.Coin coins = 2;
+}
+
 // ApprovalCriteria defines the criteria for approving transfers.
 message ApprovalCriteria {
   // List of badges that the user must own for approval.
@@ -318,6 +326,8 @@ message ApprovalCriteria {
   MaxNumTransfers maxNumTransfers = 5;
   // The ZKPs that need to be solved for approval.
   repeated ZkProof zkProofs = 6;
+  // The sdk.Coins that need to be transferred for approval.
+  repeated CoinTransfer coinTransfers = 7;
 
   // Require the "to" address to be equal to the "initiated by" address for approval.
   bool requireToEqualsInitiatedBy = 9;
@@ -332,8 +342,6 @@ message ApprovalCriteria {
   bool overridesFromOutgoingApprovals = 13;
   // Overrides the user's incoming approvals for approval.
   bool overridesToIncomingApprovals = 14;
-
-  
 }
 
 // OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.
@@ -350,6 +358,8 @@ message OutgoingApprovalCriteria {
   MaxNumTransfers maxNumTransfers = 5;
   // The ZKPs that need to be solved for approval.
   repeated ZkProof zkProofs = 6;
+// The sdk.Coins that need to be transferred for approval.
+repeated CoinTransfer coinTransfers = 7;
 
   // Require the "to" address to be equal to the "initiated by" address for approval.
   bool requireToEqualsInitiatedBy = 9;
@@ -371,6 +381,8 @@ message IncomingApprovalCriteria {
   MaxNumTransfers maxNumTransfers = 5;
   // The ZKPs that need to be solved for approval.
   repeated ZkProof zkProofs = 6;
+// The sdk.Coins that need to be transferred for approval.
+repeated CoinTransfer coinTransfers = 7;
 
   // Require the "from" address to be equal to the "initiated by" address for approval.
   bool requireFromEqualsInitiatedBy = 10;

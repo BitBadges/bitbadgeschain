@@ -250,6 +250,38 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 
 		approvalCriteria := collectionApproval.ApprovalCriteria
 		if approvalCriteria != nil {
+			for _, coinTransfer := range approvalCriteria.CoinTransfers {
+				if coinTransfer == nil {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "coin transfer is nil")
+				}
+
+				if ValidateAddress(coinTransfer.To, false) != nil {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "invalid from address")
+				}
+
+				for _, coinToTransfer := range coinTransfer.Coins {
+					if coinToTransfer == nil {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "coin to transfer is nil")
+					}
+
+					if coinToTransfer.Amount.IsNil() {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "coin amount is uninitialized")
+					}
+
+					if coinToTransfer.Amount.IsZero() {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "coin amount is zero")
+					}
+
+					if coinToTransfer.Denom == "" {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "coin denom is uninitialized")
+					}
+
+					if coinToTransfer.Denom != "badge" {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "coin denom must be badge")
+					}
+				}
+			}
+
 			usingLeafIndexForTransferOrder := false
 			if approvalCriteria.PredeterminedBalances != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
 				usingLeafIndexForTransferOrder = true
@@ -417,7 +449,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 
 func ValidateMerkleChallenges(challenges []*MerkleChallenge, usingLeafIndexForTransferOrder bool) error {
 
-	for  i, challenge := range challenges {
+	for i, challenge := range challenges {
 		if challenge == nil || challenge.Root == "" {
 			challenge = &MerkleChallenge{}
 			return nil

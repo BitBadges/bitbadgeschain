@@ -611,3 +611,281 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 // 		sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, []*types.ZkProofSolution{})
 // 	suite.Require().Error(err, "Error deducting outgoing approvals")
 // }
+
+func (suite *TestSuite) TestCoinTransfersWithApprovals() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovals[0].FromListId = "Mint"
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.CoinTransfers = []*types.CoinTransfer{
+		{
+			To: alice,
+			Coins: []*sdk.Coin{
+				{
+					Amount: sdk.NewInt(100),
+					Denom:  "badge",
+				},
+			},
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating badges")
+
+	bobBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(bob), "badge")
+	aliceBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(alice), "badge")
+	suite.Require().Equal(sdk.NewInt(1000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdk.NewInt(0), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						OwnershipTimes: GetFullUintRanges(),
+						BadgeIds:       GetFullUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error deducting outgoing approvals")
+
+	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(bob), "badge")
+	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(alice), "badge")
+	suite.Require().Equal(sdk.NewInt(900), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdk.NewInt(100), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
+
+}
+
+func (suite *TestSuite) TestCoinTransfersWithApprovalsUnderflow() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovals[0].FromListId = "Mint"
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.CoinTransfers = []*types.CoinTransfer{
+		{
+			To: alice,
+			Coins: []*sdk.Coin{
+				{
+					Amount: sdk.NewInt(100000),
+					Denom:  "badge",
+				},
+			},
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating badges")
+
+	bobBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(bob), "badge")
+	aliceBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(alice), "badge")
+	suite.Require().Equal(sdk.NewInt(1000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdk.NewInt(0), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						OwnershipTimes: GetFullUintRanges(),
+						BadgeIds:       GetFullUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error deducting outgoing approvals")
+
+	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(bob), "badge")
+	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(alice), "badge")
+	suite.Require().Equal(sdk.NewInt(1000), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdk.NewInt(0), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
+}
+
+func (suite *TestSuite) TestCoinTransfersWithApprovalsMultiple() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovals[0].FromListId = "Mint"
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.CoinTransfers = []*types.CoinTransfer{
+		{
+			To: alice,
+			Coins: []*sdk.Coin{
+				{
+					Amount: sdk.NewInt(100),
+					Denom:  "badge",
+				},
+			},
+		},
+		{
+			To: charlie,
+			Coins: []*sdk.Coin{
+				{
+					Amount: sdk.NewInt(100),
+					Denom:  "badge",
+				},
+			},
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating badges")
+
+	bobBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(bob), "badge")
+	aliceBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(alice), "badge")
+	suite.Require().Equal(sdk.NewInt(1000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdk.NewInt(0), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{charlie},
+				Balances: []*types.Balance{
+					{
+						OwnershipTimes: GetFullUintRanges(),
+						BadgeIds:       GetFullUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error deducting outgoing approvals")
+
+	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(bob), "badge")
+	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(alice), "badge")
+	suite.Require().Equal(sdk.NewInt(800), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdk.NewInt(100), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdk.NewInt(100), suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(charlie), "badge").Amount, "Error deducting outgoing approvals")
+}
+
+func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovals[0].FromListId = "Mint"
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.CoinTransfers = []*types.CoinTransfer{
+		{
+			To: alice,
+			Coins: []*sdk.Coin{
+				{
+					Amount: sdk.NewInt(100),
+					Denom:  "badge",
+				},
+			},
+		},
+		{
+			To: charlie,
+			Coins: []*sdk.Coin{
+				{
+					Amount: sdk.NewInt(100),
+					Denom:  "badge",
+				},
+			},
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.MaxNumTransfers.OverallMaxNumTransfers = sdkmath.NewUint(1)
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		BadgeIds:          GetFullUintRanges(),
+		ApprovalId:        "test2",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	})
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.CoinTransfers = []*types.CoinTransfer{
+		{
+			To: alice,
+			Coins: []*sdk.Coin{
+				{
+					Amount: sdk.NewInt(100),
+					Denom:  "badge",
+				},
+			},
+		},
+	}
+
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating badges")
+
+	bobBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(bob), "badge")
+	aliceBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(alice), "badge")
+	suite.Require().Equal(sdk.NewInt(1000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdk.NewInt(0), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{charlie},
+				Balances: []*types.Balance{
+					{
+						OwnershipTimes: GetFullUintRanges(),
+						BadgeIds:       GetOneUintRange(),
+						Amount:         sdkmath.NewUint(1),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error deducting outgoing approvals")
+	
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{charlie},
+				Balances: []*types.Balance{
+					{
+						OwnershipTimes: GetFullUintRanges(),
+						BadgeIds:       GetTwoUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error deducting outgoing approvals")
+
+	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(bob), "badge")
+	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(alice), "badge")
+	suite.Require().Equal(sdk.NewInt(700), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdk.NewInt(200), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdk.NewInt(100), suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(charlie), "badge").Amount, "Error deducting outgoing approvals")
+}

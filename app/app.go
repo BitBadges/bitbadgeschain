@@ -582,6 +582,7 @@ func New(
 		app.IBCKeeper.ChannelKeeper,
 		&app.IBCKeeper.PortKeeper,
 		scopedBadgesKeeper,
+		app.BankKeeper,
 		app.AccountKeeper,
 	)
 	badgesModule := badgesmodule.NewAppModule(appCodec, app.BadgesKeeper, app.AccountKeeper, app.BankKeeper)
@@ -633,8 +634,6 @@ func New(
 	badgesIBCModule := badgesmodule.NewIBCModule(app.BadgesKeeper)
 
 	wasmxModule := wasmx.NewAppModule(app.WasmxKeeper, app.AccountKeeper, app.BankKeeper)
-
-	
 	scopedAnchorKeeper := app.CapabilityKeeper.ScopeToModule(anchormoduletypes.ModuleName)
 	app.ScopedAnchorKeeper = scopedAnchorKeeper
 	app.AnchorKeeper = *anchormodulekeeper.NewKeeper(

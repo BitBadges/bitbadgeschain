@@ -28,6 +28,8 @@ type (
 		portKeeper    types.PortKeeper
 		scopedKeeper  exported.ScopedKeeper
 
+		bankKeeper types.BankKeeper
+
 		accKeeper types.AccountKeeper
 	}
 )
@@ -40,7 +42,7 @@ func NewKeeper(
 	channelKeeper types.ChannelKeeper,
 	portKeeper types.PortKeeper,
 	scopedKeeper exported.ScopedKeeper,
-
+	bankKeeper types.BankKeeper,
 	accKeeper types.AccountKeeper,
 ) *Keeper {
 	// set KeyTable if it has not already been set
@@ -57,6 +59,7 @@ func NewKeeper(
 		channelKeeper: channelKeeper,
 		portKeeper:    portKeeper,
 		scopedKeeper:  scopedKeeper,
+		bankKeeper:    bankKeeper,
 
 		accKeeper: accKeeper,
 	}
