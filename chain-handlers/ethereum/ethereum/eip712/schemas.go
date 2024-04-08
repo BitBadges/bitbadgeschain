@@ -547,6 +547,17 @@ func GetSchemas() []string {
 									"customData": ""
 								}
 							],
+							"coinTransfers": [
+								{
+									"to": "",
+									"coins": [
+										{
+											"amount": "",
+											"denom": "",
+										}
+									]
+								}
+							],
 							"predeterminedBalances": {
 								"manualBalances": [
 									{
@@ -682,6 +693,17 @@ func GetSchemas() []string {
 									"zkpTrackerId": "",
 									"uri": "",
 									"customData": ""
+								}
+							],
+							"coinTransfers": [
+								{
+									"to": "",
+									"coins": [
+										{
+											"amount": "",
+											"denom": "",
+										}
+									]
 								}
 							],
 							"predeterminedBalances": {
@@ -1273,6 +1295,17 @@ func GetSchemas() []string {
 								"customData": ""
 							}
 						],
+						"coinTransfers": [
+								{
+									"to": "",
+									"coins": [
+										{
+											"amount": "",
+											"denom": "",
+										}
+									]
+								}
+							],
 						"predeterminedBalances": {
 							"manualBalances": [
 								{
@@ -1447,6 +1480,17 @@ func GetSchemas() []string {
 								"customData": ""
 							}
 						],
+						"coinTransfers": [
+								{
+									"to": "",
+									"coins": [
+										{
+											"amount": "",
+											"denom": "",
+										}
+									]
+								}
+							],
 						"predeterminedBalances": {
 							"manualBalances": [
 								{
@@ -1585,6 +1629,17 @@ func GetSchemas() []string {
 								"customData": ""
 							}
 						],
+						"coinTransfers": [
+								{
+									"to": "",
+									"coins": [
+										{
+											"amount": "",
+											"denom": "",
+										}
+									]
+								}
+							],
 						"predeterminedBalances": {
 							"manualBalances": [
 								{
@@ -1859,6 +1914,17 @@ func GetSchemas() []string {
 									"customData": ""
 								}
 							],
+							"coinTransfers": [
+								{
+									"to": "",
+									"coins": [
+										{
+											"amount": "",
+											"denom": "",
+										}
+									]
+								}
+							],
 							"predeterminedBalances": {
 								"manualBalances": [
 									{
@@ -1994,6 +2060,17 @@ func GetSchemas() []string {
 									"zkpTrackerId": "",
 									"uri": "",
 									"customData": ""
+								}
+							],
+							"coinTransfers": [
+								{
+									"to": "",
+									"coins": [
+										{
+											"amount": "",
+											"denom": "",
+										}
+									]
 								}
 							],
 							"predeterminedBalances": {
@@ -2578,6 +2655,17 @@ func GetSchemas() []string {
 								"customData": ""
 							}
 						],
+						"coinTransfers": [
+								{
+									"to": "",
+									"coins": [
+										{
+											"amount": "",
+											"denom": "",
+										}
+									]
+								}
+							],
 						"predeterminedBalances": {
 							"manualBalances": [
 								{
@@ -3090,6 +3178,17 @@ func GetSchemas() []string {
 								"customData": ""
 							}
 						],
+						"coinTransfers": [
+								{
+									"to": "",
+									"coins": [
+										{
+											"amount": "",
+											"denom": "",
+										}
+									]
+								}
+							],
 						"predeterminedBalances": {
 							"manualBalances": [
 								{
