@@ -14,7 +14,7 @@ service Msg {
   rpc CreateMap (MsgCreateMap) returns (MsgCreateMapResponse);
   rpc UpdateMap (MsgUpdateMap) returns (MsgUpdateMapResponse);
   rpc DeleteMap (MsgDeleteMap) returns (MsgDeleteMapResponse);
-  rpc SetValue (MsgSetValue) returns (MsgSetValueResponse);
+  rpc SetValues (MsgSetValues) returns (MsgSetValuesResponse);
 }
 
 message ValueStore {
@@ -23,42 +23,44 @@ message ValueStore {
   string lastSetBy = 3;
 }
 
-message MapUpdateCriteria {
-  //All ID slots are only updatable by manager
-  bool managerOnly = 1;
-  //ID slots are only updatable by badge ID owner of this collection (>1 balance at current time)
-  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  //Keys are address based and can only be updated by that respective address
-  bool creatorOnly = 3;
-  //Claim slots. Can unclaim by setting to blank. Uses lastSetBy.
-  bool firstComeFirstServe = 4;
-}
-
-message ValueOptions {
-  bool noDuplicates = 1;
-  bool permanentOnceSet = 2;
-  bool expectUint = 3;
-  bool expectBoolean = 4;
-  bool expectAddress = 5;
-  bool expectUri = 6;
-}
-
 message MapPermissions {
   repeated TimedUpdatePermission canUpdateMetadata = 1;
   repeated TimedUpdatePermission canUpdateManager = 2;
-  repeated IsEditablePermission canEdit = 3;
+  repeated EditApprovalPermission canUpdateEditApprovals = 3;
   repeated ActionPermission canDeleteMap = 4;
-  repeated IsEditablePermission canForceEdit = 5;
 }
 
+message EditApproval {
+  string approvalId = 13;
 
-message IsEditablePermission {
+  repeated UintRange editableTimes = 1;
+  string editorListId = 2;
+  string keyListId = 3;
+
+  bool isEditable = 4;
+  bool frozenIfSet = 5;
+
+  bool expectUint = 6;
+  bool expectBoolean = 7;
+  bool expectAddress = 8;
+  bool expectUri = 9;
+
+  bool keyMustBeCreator = 10;
+
+  //ID slots are only updatable by badge ID owner of this collection (>1 balance at current time)
+  string mustOwnBadgeFromCollection = 11 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  bool mustBeLastSetBy = 12;
+}
+
+message EditApprovalPermission {
+  repeated UintRange editableTimes = 1;
   string keyListId = 2;
+  string editorListId = 3;
+  string approvalId = 4;
 
-  repeated UintRange permanentlyPermittedTimes = 3;
-  repeated UintRange permanentlyForbiddenTimes = 4;
+  repeated UintRange permanentlyPermittedTimes = 5;
+  repeated UintRange permanentlyForbiddenTimes = 6;
 }
-
 
 message Map {
   string creator = 1;
@@ -68,14 +70,13 @@ message Map {
   repeated ManagerTimeline managerTimeline = 4;
 
   //config options that will not change at all
-  MapUpdateCriteria updateCriteria = 5;
-
-  ValueOptions valueOptions = 6;
+  bool noDuplicates = 6;
   string defaultValue = 7;
 
-  repeated MapMetadataTimeline metadataTimeline = 10;
+  repeated EditApproval editApprovals = 8;
+  repeated MapMetadataTimeline metadataTimeline = 9;
 
-  MapPermissions permissions = 11;
+  MapPermissions permissions = 10;
 }
 
 message MsgCreateMap {
@@ -86,10 +87,10 @@ message MsgCreateMap {
   repeated ManagerTimeline managerTimeline = 4;
 
   //config options that will not change at all
-  MapUpdateCriteria updateCriteria = 5;
-  ValueOptions valueOptions = 6;
+  bool noDuplicates = 6;
   string defaultValue = 7;
 
+  repeated EditApproval editApprovals = 8;
   repeated MapMetadataTimeline metadataTimeline = 9;
 
   MapPermissions permissions = 10;
@@ -103,6 +104,9 @@ message MsgUpdateMap {
 
   bool updateManagerTimeline = 3;
   repeated ManagerTimeline managerTimeline = 4;
+
+  bool updateeditApprovals = 5;
+  repeated EditApproval editApprovals = 6;
 
   bool updateMetadataTimeline = 7;
   repeated MapMetadataTimeline metadataTimeline = 8;
@@ -124,12 +128,52 @@ message SetOptions {
   bool useMostRecentCollectionId = 1;
 }
 
-message MsgSetValue {
-  string creator = 1;
-  string mapId = 2;
-  string key = 3;
-  string value = 4;
-  SetOptions options = 5;
+message ValueToSet {
+  string key = 1;
+  string value = 2;
+  SetOptions options = 3;
 }
 
-message MsgSetValueResponse {}
+message MsgSetValues {
+  string creator = 1;
+  string mapId = 2;
+  repeated ValueToSet valuesToSet = 3;
+}
+
+message MsgSetValuesResponse {}
+
+message StorePermissions {
+  repeated TimedUpdatePermission canUpdateManager = 1;
+  repeated KeyEditApprovalPermission canUpdateEditApprovals = 2;
+  repeated ActionPermission canDeleteStore = 3;
+  repeated TimedUpdatePermission canUpdatePermissions = 4;
+}
+
+message KeyEditApproval {
+  //TODO:
+}
+
+message TimelineStoreItem {
+  repeated UintRange timelineTimes = 1;
+  string value = 2;
+}
+
+message KeyStore {
+  string key = 1;
+  repeated TimelineStoreItem timelineStoreItems = 2;
+  string lastSetBy = 3;
+}
+
+message MsgCreateTimedUpdateKeyStore {
+  string creator = 1;
+  string mapId = 2; 
+
+  string inheritManagerTimelineFrom = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated ManagerTimeline managerTimeline = 4;
+
+  repeated KeyEditApproval editApprovals = 8;
+
+  StorePermissions permissions = 10;
+
+  repeated KeyStore value = 11;
+}
