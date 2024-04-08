@@ -1,8 +1,6 @@
 package types
 
 import (
-	"math"
-
 	sdkmath "cosmossdk.io/math"
 	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -67,34 +65,6 @@ func CastTimedUpdatePermissions(perms []*TimedUpdatePermission) []*badgetypes.Ti
 	casted := make([]*badgetypes.TimedUpdatePermission, len(perms))
 	for i, perm := range perms {
 		casted[i] = CastTimedUpdatePermission(perm)
-	}
-	return casted
-}
-
-func CastIsEditablePermission(perm *IsEditablePermission) *badgetypes.CollectionApprovalPermission {
-	return &badgetypes.CollectionApprovalPermission{
-		ApprovalId:        perm.KeyListId,
-		FromListId:        "All",
-		ToListId:          "All",
-		InitiatedByListId: "All",
-		TransferTimes: []*badgetypes.UintRange{
-			{Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64)},
-		},
-		BadgeIds: []*badgetypes.UintRange{
-			{Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64)},
-		},
-		OwnershipTimes: []*badgetypes.UintRange{
-			{Start: sdk.NewUint(math.MaxUint64), End: sdk.NewUint(math.MaxUint64)},
-		},
-		PermanentlyPermittedTimes: CastUintRanges(perm.PermanentlyPermittedTimes),
-		PermanentlyForbiddenTimes: CastUintRanges(perm.PermanentlyForbiddenTimes),
-	}
-}
-
-func CastIsEditablePermissions(perms []*IsEditablePermission) []*badgetypes.CollectionApprovalPermission {
-	casted := make([]*badgetypes.CollectionApprovalPermission, len(perms))
-	for i, perm := range perms {
-		casted[i] = CastIsEditablePermission(perm)
 	}
 	return casted
 }

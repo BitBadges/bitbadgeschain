@@ -61,14 +61,6 @@ func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*t
 			return nil, err
 		}
 
-		if err := k.badgesKeeper.ValidateCollectionApprovalPermissionsUpdate(ctx, types.CastIsEditablePermissions(currMap.Permissions.CanEdit), types.CastIsEditablePermissions(msg.Permissions.CanEdit)); err != nil {
-			return nil, err
-		}
-
-		if err := k.badgesKeeper.ValidateCollectionApprovalPermissionsUpdate(ctx, types.CastIsEditablePermissions(currMap.Permissions.CanForceEdit), types.CastIsEditablePermissions(msg.Permissions.CanForceEdit)); err != nil {
-			return nil, err
-		}
-
 		if err := k.badgesKeeper.ValidateTimedUpdatePermissionUpdate(ctx, types.CastTimedUpdatePermissions(currMap.Permissions.CanUpdateManager), types.CastTimedUpdatePermissions(msg.Permissions.CanUpdateManager)); err != nil {
 			return nil, err
 		}

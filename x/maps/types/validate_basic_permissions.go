@@ -14,19 +14,11 @@ func ValidatePermissions(permissions *MapPermissions, canChangeValues bool) erro
 		return err
 	}
 
-	if err := badgetypes.ValidateCollectionApprovalPermissions(CastIsEditablePermissions(permissions.CanEdit), canChangeValues); err != nil {
-		return err
-	}
-
 	if err := badgetypes.ValidateTimedUpdatePermission(CastTimedUpdatePermissions(permissions.CanUpdateMetadata), canChangeValues); err != nil {
 		return err
 	}
 
 	if err := badgetypes.ValidateActionPermission(CastActionPermissions(permissions.CanDeleteMap), canChangeValues); err != nil {
-		return err
-	}
-
-	if err := badgetypes.ValidateCollectionApprovalPermissions(CastIsEditablePermissions(permissions.CanForceEdit), canChangeValues); err != nil {
 		return err
 	}
 

@@ -105,23 +105,6 @@ func GetSchemas() []string {
 						]
 					}
 				],
-				"canEdit": [
-					{
-						"keyListId": "",
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
 				"canDeleteMap": [
 					{
 						"timelineTimes": [
@@ -130,23 +113,6 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canForceEdit": [
-					{
-						"keyListId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",
@@ -243,23 +209,6 @@ func GetSchemas() []string {
 						]
 					}
 				],
-				"canEdit": [
-					{
-						"keyListId": "",
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
 				"canDeleteMap": [
 					{
 						"timelineTimes": [
@@ -268,23 +217,6 @@ func GetSchemas() []string {
 								"end": ""
 							}
 						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canForceEdit": [
-					{
-						"keyListId": "",
 						"permanentlyPermittedTimes": [
 							{
 								"start": "",

@@ -46,17 +46,7 @@ message ValueOptions {
 message MapPermissions {
   repeated TimedUpdatePermission canUpdateMetadata = 1;
   repeated TimedUpdatePermission canUpdateManager = 2;
-  repeated IsEditablePermission canEdit = 3;
-  repeated ActionPermission canDeleteMap = 4;
-  repeated IsEditablePermission canForceEdit = 5;
-}
-
-
-message IsEditablePermission {
-  string keyListId = 2;
-
-  repeated UintRange permanentlyPermittedTimes = 3;
-  repeated UintRange permanentlyForbiddenTimes = 4;
+  repeated ActionPermission canDeleteMap = 3;
 }
 
 
@@ -69,7 +59,6 @@ message Map {
 
   //config options that will not change at all
   MapUpdateCriteria updateCriteria = 5;
-
   ValueOptions valueOptions = 6;
   string defaultValue = 7;
 

@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"math"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -76,7 +75,6 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 
 	currManager := types.GetCurrentManagerForMap(ctx, currMap, collection)
 
-	forceUpdate := false
 	canUpdate := false
 	if currMap.UpdateCriteria.ManagerOnly && currManager == msg.Creator {
 		canUpdate = true
@@ -125,14 +123,6 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 		}
 	}
 
-	if currManager == msg.Creator {
-		canForceUpdate := k.CheckIfKeyIsEditable(ctx, currMap.Permissions.CanForceEdit, key)
-		if canForceUpdate {
-			canUpdate = true
-			forceUpdate = true
-		}
-	}
-
 	if currMap.ValueOptions.PermanentOnceSet {
 		if currVal.Value != "" {
 			return nil, sdkerrors.Wrap(ErrValueAlreadySet, "Value already set and cannot be updated")
@@ -154,13 +144,6 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 		}
 	}
 
-	if !forceUpdate {
-		canEdit := k.CheckIfKeyIsEditable(ctx, currMap.Permissions.CanEdit, key)
-		if !canEdit {
-			return nil, sdkerrors.Wrap(ErrMapNotEditable, "Map is not editable")
-		}
-	}
-
 	if !canUpdate {
 		return nil, sdkerrors.Wrap(ErrCannotUpdateMapValue, "Cannot update map value")
 	}
@@ -171,46 +154,4 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 	}
 
 	return &types.MsgSetValueResponse{}, nil
-}
-
-func (k Keeper) CheckIfKeyIsEditable(ctx sdk.Context, permissions []*types.IsEditablePermission, key string) bool {
-	toCheck := []*badgetypes.UniversalPermissionDetails{
-		{
-			ApprovalIdList: &badgetypes.AddressList{
-				Whitelist: true,
-				Addresses: []string{key},
-			},
-			ToList: &badgetypes.AddressList{
-				Whitelist: false,
-				Addresses: []string{},
-			},
-			FromList: &badgetypes.AddressList{
-				Whitelist: false,
-				Addresses: []string{},
-			},
-			InitiatedByList: &badgetypes.AddressList{
-				Whitelist: false,
-				Addresses: []string{},
-			},
-			BadgeId: &badgetypes.UintRange{
-				Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64),
-			},
-			TimelineTime: &badgetypes.UintRange{
-				Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64),
-			},
-			TransferTime: &badgetypes.UintRange{
-				Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64),
-			},
-			OwnershipTime: &badgetypes.UintRange{
-				Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64),
-			},
-		},
-	}
-
-	err := k.badgesKeeper.CheckIfCollectionApprovalPermissionPermits(ctx, toCheck, types.CastIsEditablePermissions(permissions), "can edit")
-	if err != nil {
-		return false
-	}
-
-	return true
 }
