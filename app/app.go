@@ -216,6 +216,7 @@ var (
 		wasmtypes.ModuleName:           {authtypes.Burner},
 		wasmxtypes.ModuleName:          {authtypes.Burner},
 		ibcfeetypes.ModuleName:         nil,
+		badgesmoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -596,7 +597,7 @@ func New(
 	}
 
 	customEncoderOptions := GetCustomMsgEncodersOptions()
-	customQueryOptions := GetCustomMsgQueryOptions(app.BadgesKeeper)
+	customQueryOptions := GetCustomMsgQueryOptions(app.BadgesKeeper, app.AnchorKeeper, app.MapsKeeper)
 	wasmOpts := append(customEncoderOptions, customQueryOptions...)
 	availableCapabilities := "iterator,staking,stargate,cosmwasm_1_1,cosmwasm_1_2,bitbadges"
 

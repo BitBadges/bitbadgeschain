@@ -17,6 +17,15 @@ service Msg {
   rpc SetValue (MsgSetValue) returns (MsgSetValueResponse);
 }
 
+
+//Used for WASM bindings and JSON parsing
+message MapCustomMsgType {
+  MsgSetValue setValueMsg = 1;
+  MsgCreateMap createMapMsg = 2;
+  MsgUpdateMap updateMapMsg = 3;
+  MsgDeleteMap deleteMapMsg = 4;
+}
+
 message ValueStore {
   string key = 1;
   string value = 2;

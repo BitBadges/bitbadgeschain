@@ -194,13 +194,14 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			//simulate the sdk.Coin transfers
 			coinTransfers := approvalCriteria.CoinTransfers
-			spendableCoins := k.bankKeeper.SpendableCoins(ctx, sdk.AccAddress(initiatedBy))
+			spendableCoins := k.bankKeeper.SpendableCoins(ctx, sdk.MustAccAddressFromBech32(initiatedBy))
 			underflows := false
 			for _, coinTransfer := range coinTransfers {
 				toTransfer := coinTransfer.Coins
 				for _, coin := range toTransfer {
 					newCoins, underflow := spendableCoins.SafeSub(*coin)
 					if underflow {
+
 						underflows = true
 					}
 					spendableCoins = newCoins
@@ -443,8 +444,8 @@ func (k Keeper) DeductAndGetUserApprovals(
 			coinTransfers = approvalCriteria.CoinTransfers
 			for _, coinTransfer := range coinTransfers {
 				coinsToTransfer := coinTransfer.Coins
-				toAddressAcc := sdk.AccAddress(coinTransfer.To)
-				fromAddressAcc := sdk.AccAddress(initiatedBy)
+				toAddressAcc := sdk.MustAccAddressFromBech32(coinTransfer.To)
+				fromAddressAcc := sdk.MustAccAddressFromBech32(initiatedBy)
 				for _, coin := range coinsToTransfer {
 					err := k.bankKeeper.SendCoins(ctx, fromAddressAcc, toAddressAcc, sdk.NewCoins(*coin))
 					if err != nil {

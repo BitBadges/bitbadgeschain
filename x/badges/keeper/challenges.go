@@ -116,7 +116,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 							sdk.NewEvent("challenge"+fmt.Sprint(approval.ApprovalId)+fmt.Sprint(challengeId)+fmt.Sprint(leafIndex)+fmt.Sprint(approverAddress)+fmt.Sprint(challengeLevel)+fmt.Sprint(newNumUsed),
 								sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 								sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-								sdk.NewAttribute("challengeId", fmt.Sprint(challengeId)),
+								sdk.NewAttribute("challengeTrackerId", fmt.Sprint(challengeId)),
 								sdk.NewAttribute("approvalId", fmt.Sprint(approval.ApprovalId)),
 								sdk.NewAttribute("leafIndex", fmt.Sprint(leafIndex.Sub(leftmostLeafIndex))),
 								sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),

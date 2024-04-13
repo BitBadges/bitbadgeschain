@@ -291,6 +291,8 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 				return sdkerrors.Wrapf(err, "invalid challenges")
 			}
 
+			
+
 			if approvalCriteria.MustOwnBadges == nil {
 				approvalCriteria.MustOwnBadges = []*MustOwnBadges{}
 			}

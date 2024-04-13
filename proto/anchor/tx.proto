@@ -10,6 +10,11 @@ service Msg {
   rpc AddCustomData (MsgAddCustomData) returns (MsgAddCustomDataResponse);
 }
 
+//Used for WASM bindings and JSON parsing
+message AnchorCustomMsgType {
+  MsgAddCustomData addCustomDataMsg = 1;
+}
+
 message AnchorData {
   string creator = 1;
   string data    = 2;

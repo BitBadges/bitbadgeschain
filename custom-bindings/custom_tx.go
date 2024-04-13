@@ -10,7 +10,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/jsonpb"
 
+	anchortypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
 	badgeTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	mapstypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 )
 
 func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
@@ -28,6 +30,20 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 		err = jsonpb.Unmarshal(reader, &badgeCustomMsg)
 		if err == nil {
 			isBadgeModuleMsg = true
+		}
+
+		isAnchorModuleMsg := false
+		var anchorCustomMsg anchortypes.AnchorCustomMsgType
+		err = jsonpb.Unmarshal(reader, &anchorCustomMsg)
+		if err == nil {
+			isAnchorModuleMsg = true
+		}
+
+		isMapsModuleMsg := false
+		var mapsCustomMsg mapstypes.MapCustomMsgType
+		err = jsonpb.Unmarshal(reader, &mapsCustomMsg)
+		if err == nil {
+			isMapsModuleMsg = true
 		}
 
 		if isBadgeModuleMsg {
@@ -62,6 +78,41 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 				return []sdk.Msg{badgeCustomMsg.UpdateUserApprovalsMsg}, nil
 			default:
 				return nil, sdkerrors.Wrapf(types.ErrInvalidMsg, "Unknown custom badge message variant %s", badgeCustomMsg)
+			}
+		} else if isAnchorModuleMsg {
+			reader = bytes.NewReader(jsonData)
+			var anchorCustomMsg anchortypes.AnchorCustomMsgType
+			err = jsonpb.Unmarshal(reader, &anchorCustomMsg)
+			if err != nil {
+				return nil, sdkerrors.Wrap(err, err.Error())
+			}
+
+			switch {
+			case anchorCustomMsg.AddCustomDataMsg != nil:
+				anchorCustomMsg.AddCustomDataMsg.Creator = sender.String()
+				return []sdk.Msg{anchorCustomMsg.AddCustomDataMsg}, nil
+			}
+		} else if isMapsModuleMsg {
+			reader = bytes.NewReader(jsonData)
+			var mapsCustomMsg mapstypes.MapCustomMsgType
+			err = jsonpb.Unmarshal(reader, &mapsCustomMsg)
+			if err != nil {
+				return nil, sdkerrors.Wrap(err, err.Error())
+			}
+
+			switch {
+			case mapsCustomMsg.CreateMapMsg != nil:
+				mapsCustomMsg.CreateMapMsg.Creator = sender.String()
+				return []sdk.Msg{mapsCustomMsg.CreateMapMsg}, nil
+			case mapsCustomMsg.UpdateMapMsg != nil:
+				mapsCustomMsg.UpdateMapMsg.Creator = sender.String()
+				return []sdk.Msg{mapsCustomMsg.UpdateMapMsg}, nil
+			case mapsCustomMsg.DeleteMapMsg != nil:
+				mapsCustomMsg.DeleteMapMsg.Creator = sender.String()
+				return []sdk.Msg{mapsCustomMsg.DeleteMapMsg}, nil
+			case mapsCustomMsg.SetValueMsg != nil:
+				mapsCustomMsg.SetValueMsg.Creator = sender.String()
+				return []sdk.Msg{mapsCustomMsg.SetValueMsg}, nil
 			}
 		}
 

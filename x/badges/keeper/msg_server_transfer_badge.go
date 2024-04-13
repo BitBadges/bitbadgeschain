@@ -10,6 +10,7 @@ import (
 
 func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferBadges) (*types.MsgTransferBadgesResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
 	err := msg.CheckAndCleanMsg(ctx, true)
 	if err != nil {
 		return nil, err
