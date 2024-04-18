@@ -201,7 +201,6 @@ func (k Keeper) DeductAndGetUserApprovals(
 				for _, coin := range toTransfer {
 					newCoins, underflow := spendableCoins.SafeSub(*coin)
 					if underflow {
-
 						underflows = true
 					}
 					spendableCoins = newCoins
