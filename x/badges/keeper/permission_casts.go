@@ -136,6 +136,7 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 			UsesToList:                true,
 			UsesFromList:              true,
 			UsesInitiatedByList:       true,
+			
 			PermanentlyPermittedTimes: collectionUpdatePermission.PermanentlyPermittedTimes,
 			PermanentlyForbiddenTimes: collectionUpdatePermission.PermanentlyForbiddenTimes,
 		})
@@ -153,6 +154,7 @@ func (k Keeper) CastTimedUpdateWithBadgeIdsPermissionToUniversalPermission(timed
 			BadgeIds:                  timedUpdateWithBadgeIdsPermission.BadgeIds,
 			UsesTimelineTimes:         true,
 			UsesBadgeIds:              true,
+
 			PermanentlyPermittedTimes: timedUpdateWithBadgeIdsPermission.PermanentlyPermittedTimes,
 			PermanentlyForbiddenTimes: timedUpdateWithBadgeIdsPermission.PermanentlyForbiddenTimes,
 		})
@@ -168,6 +170,7 @@ func (k Keeper) CastTimedUpdatePermissionToUniversalPermission(timedUpdatePermis
 
 			TimelineTimes:             timedUpdatePermission.TimelineTimes,
 			UsesTimelineTimes:         true,
+
 			PermanentlyPermittedTimes: timedUpdatePermission.PermanentlyPermittedTimes,
 			PermanentlyForbiddenTimes: timedUpdatePermission.PermanentlyForbiddenTimes,
 		})
@@ -184,6 +187,7 @@ func (k Keeper) CastBalancesActionPermissionToUniversalPermission(BalancesAction
 			OwnershipTimes:            BalancesActionPermission.OwnershipTimes,
 			UsesBadgeIds:              true,
 			UsesOwnershipTimes:        true,
+
 			PermanentlyPermittedTimes: BalancesActionPermission.PermanentlyPermittedTimes,
 			PermanentlyForbiddenTimes: BalancesActionPermission.PermanentlyForbiddenTimes,
 		})

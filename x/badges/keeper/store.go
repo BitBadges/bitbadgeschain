@@ -87,6 +87,16 @@ func (k Keeper) GetGlobalArchiveFromStore(ctx sdk.Context) bool {
 
 // Sets a user balance in the store using UserBalanceKey ([]byte{0x02}) as the prefix. No check if store has key already.
 func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBalance *types.UserBalanceStore) error {
+	//HACK: We always store a non-nil permissions object to avoid the case where everything is nil -> marshaled len = 0 -> default balances get populated again
+	if UserBalance.UserPermissions == nil {
+		UserBalance.UserPermissions = &types.UserPermissions{
+			CanUpdateOutgoingApprovals:                         []*types.UserOutgoingApprovalPermission{},
+			CanUpdateIncomingApprovals:                         []*types.UserIncomingApprovalPermission{},
+			CanUpdateAutoApproveSelfInitiatedOutgoingTransfers: []*types.ActionPermission{},
+			CanUpdateAutoApproveSelfInitiatedIncomingTransfers: []*types.ActionPermission{},
+		}
+	}
+
 	marshaled_badge_balance_info, err := k.cdc.Marshal(UserBalance)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.UserBalanceStore failed")
@@ -201,22 +211,22 @@ func (k Keeper) IncrementNextAddressListCounter(ctx sdk.Context) {
 }
 
 /*********************************USED ZKPS*********************************/
-func (k Keeper) SetZKPAsUsedInStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForZKP string, challengeLevel string, approvalId, zkpId string, proofHash string) error {
+func (k Keeper) SetZKPAsUsedInStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForZKP string, approvalLevel string, approvalId, zkpId string, proofHash string) error {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(usedZKPTrackerStoreKey(ConstructZKPTreeTrackerKey(collectionId, addressForZKP, challengeLevel, approvalId, zkpId, proofHash)), []byte("1"))
+	store.Set(usedZKPTrackerStoreKey(ConstructZKPTreeTrackerKey(collectionId, addressForZKP, approvalLevel, approvalId, zkpId, proofHash)), []byte("1"))
 	return nil
 }
 
-func (k Keeper) GetZKPFromStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForZKP string, challengeLevel string, approvalId, zkpId string, proofHash string) (bool, error) {
+func (k Keeper) GetZKPFromStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForZKP string, approvalLevel string, approvalId, zkpId string, proofHash string) (bool, error) {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(usedZKPTrackerStoreKey(ConstructZKPTreeTrackerKey(collectionId, addressForZKP, challengeLevel, approvalId, zkpId, proofHash))), nil
+	return store.Has(usedZKPTrackerStoreKey(ConstructZKPTreeTrackerKey(collectionId, addressForZKP, approvalLevel, approvalId, zkpId, proofHash))), nil
 }
 
 /********************************************************************************/
 // Sets a usedClaimData in the store using UsedClaimDataKey ([]byte{0x07}) as the prefix. No check if store has key already.
-func (k Keeper) IncrementChallengeTrackerInStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForChallenge string, challengeLevel string, approvalId, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {
+func (k Keeper) IncrementChallengeTrackerInStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
-	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, challengeLevel, approvalId, challengeId, leafIndex)))
+	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)))
 	curr := sdkmath.NewUint(0)
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
@@ -227,13 +237,13 @@ func (k Keeper) IncrementChallengeTrackerInStore(ctx sdk.Context, collectionId s
 		curr = sdkmath.NewUint(currUint)
 	}
 	incrementedNum := curr.AddUint64(1)
-	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, challengeLevel, approvalId, challengeId, leafIndex)), []byte(curr.Incr().String()))
+	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)), []byte(curr.Incr().String()))
 	return incrementedNum, nil
 }
 
-func (k Keeper) GetChallengeTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForChallenge string, challengeLevel string, approvalId, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {
+func (k Keeper) GetChallengeTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {
 	store := ctx.KVStore(k.storeKey)
-	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, challengeLevel, approvalId, challengeId, leafIndex)))
+	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)))
 	curr := sdkmath.NewUint(0)
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)

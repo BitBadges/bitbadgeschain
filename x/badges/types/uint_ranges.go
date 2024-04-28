@@ -21,7 +21,7 @@ func DeepCopyRanges(ranges []*UintRange) []*UintRange {
 	return newRanges
 }
 
-// Search ID ranges for a specific ID. Return (true) if found. And (false) if not.
+// Search ID ranges for a specific ID. Returns [found, err].
 func SearchUintRangesForUint(id sdkmath.Uint, uintRanges []*UintRange) (bool, error) {
 	ranges := DeepCopyRanges(uintRanges)
 	ranges, err := SortUintRangesAndMerge(ranges, false)
@@ -34,7 +34,6 @@ func SearchUintRangesForUint(id sdkmath.Uint, uintRanges []*UintRange) (bool, er
 	high := len(ranges) - 1
 	for low <= high {
 		median := int(uint(low+high) >> 1)
-
 		currRange := ranges[median]
 
 		if currRange.Start.LTE(id) && currRange.End.GTE(id) {
@@ -122,7 +121,6 @@ func RemoveUintRangeFromUintRange(idxsToRemove *UintRange, rangeObject *UintRang
 
 	if idxsToRemove.End.LT(rangeObject.End) && idxsToRemove.Start.GT(rangeObject.Start) {
 		// idxsToRemove is in the middle of rangeObject
-
 		removedRanges = []*UintRange{idxsToRemove}
 	}
 
@@ -218,10 +216,7 @@ func SortUintRangesAndMerge(ids []*UintRange, mergeIntersecting bool) ([]*UintRa
 					//Example: prevRange = [1, 5], currRange = [2, 10] -> newRange = [1, 10]
 					newUintRanges[len(newUintRanges)-1].End = currRange.End
 				}
-			}
-			// else {
-			//Note: If currRange.End <= prevInsertedRange.End, it is already fully contained within the previous. We can just continue.
-			// }
+			} // else: If currRange.End <= prevInsertedRange.End, it is already fully contained within the previous. We can just continue.
 		}
 
 		return newUintRanges, nil

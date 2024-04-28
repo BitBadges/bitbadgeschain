@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"encoding/json"
+
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -15,10 +17,13 @@ import (
 func (k Keeper) CastBadgeMetadataToUniversalPermission(badgeMetadata []*types.BadgeMetadata) []*types.UniversalPermission {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, badgeMetadata := range badgeMetadata {
+		marshaledMetadata, _ := json.Marshal(badgeMetadata)
+		stringifiedMetadata := string(marshaledMetadata)
+
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 			BadgeIds:       badgeMetadata.BadgeIds,
 			UsesBadgeIds:   true,
-			ArbitraryValue: badgeMetadata.Uri + "<><><>" + badgeMetadata.CustomData,
+			ArbitraryValue: stringifiedMetadata,
 		})
 	}
 	return castedPermissions
@@ -46,117 +51,24 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 			Addresses: []string{approval.ApprovalId},
 			Whitelist: true,
 		}
-		
+
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			BadgeIds:               approval.BadgeIds,
-			TransferTimes:          approval.TransferTimes,
-			OwnershipTimes:         approval.OwnershipTimes,
-			FromList:               fromList,
-			ToList:                 toList,
-			InitiatedByList:        initiatedByList,
-			ApprovalIdList:         approvalTrackerList,
-			UsesBadgeIds:           true,
-			UsesTransferTimes:      true,
-			UsesToList:             true,
-			UsesFromList:           true,
-			UsesInitiatedByList:    true,
-			UsesOwnershipTimes:     true,
-			UsesApprovalId:         true,
-			ArbitraryValue:         approval,
+			BadgeIds:            approval.BadgeIds,
+			TransferTimes:       approval.TransferTimes,
+			OwnershipTimes:      approval.OwnershipTimes,
+			FromList:            fromList,
+			ToList:              toList,
+			InitiatedByList:     initiatedByList,
+			ApprovalIdList:      approvalTrackerList,
+			UsesBadgeIds:        true,
+			UsesTransferTimes:   true,
+			UsesToList:          true,
+			UsesFromList:        true,
+			UsesInitiatedByList: true,
+			UsesOwnershipTimes:  true,
+			UsesApprovalId:      true,
+			ArbitraryValue:      approval,
 		})
 	}
 	return castedPermissions, nil
 }
-
-//TODO: Unused currently .... keep?
-//TODO: Note tracker ids may be msising when i uncomment
-// func (k Keeper) CastUserOutgoingApprovalToUniversalPermission(ctx sdk.Context, approvals []*types.UserOutgoingApproval) ([]*types.UniversalPermission, error) {
-// 	castedPermissions := []*types.UniversalPermission{}
-// 	for _, approval := range approvals {
-// 		initiatedByList, err := k.GetAddressListById(ctx, approval.InitiatedByListId)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-
-// 		toList, err := k.GetAddressListById(ctx, approval.ToListId)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-
-// 		approvalTrackerList := &types.AddressList{}
-// 		if approval.ApprovalId == "All" {
-// 			approvalTrackerList = &types.AddressList{
-// 				Addresses:        []string{},
-// 				Whitelist: false,
-// 			}
-// 		} else {
-// 			approvalTrackerList = &types.AddressList{
-// 				Addresses:        []string{approval.ApprovalId},
-// 				Whitelist: true,
-// 			}
-// 		}
-
-// 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-// 			BadgeIds:                  approval.BadgeIds,
-// 			TransferTimes:             approval.TransferTimes,
-// 			OwnershipTimes:            approval.OwnershipTimes,
-// 			ToList:                 toList,
-// 			InitiatedByList:        initiatedByList,
-// 			ApprovalIdList: 			 approvalTrackerList,
-// 			UsesApprovalId: 					true,
-// 			UsesBadgeIds:              true,
-// 			UsesTransferTimes:         true,
-// 			UsesOwnershipTimes:        true,
-// 			UsesToList:             true,
-// 			UsesInitiatedByList:    true,
-// 			ArbitraryValue:            approval,
-// 		})
-// 	}
-// 	return castedPermissions, nil
-// }
-
-// func (k Keeper) CastUserIncomingApprovalToUniversalPermission(ctx sdk.Context, approvals []*types.UserIncomingApproval) ([]*types.UniversalPermission, error) {
-// 	castedPermissions := []*types.UniversalPermission{}
-// 	for _, approval := range approvals {
-
-// 		fromList, err := k.GetAddressListById(ctx, approval.FromListId)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-
-// 		initiatedByList, err := k.GetAddressListById(ctx, approval.InitiatedByListId)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-
-// 		approvalTrackerList := &types.AddressList{}
-// 		if approval.ApprovalId == "All" {
-// 			approvalTrackerList = &types.AddressList{
-// 				Addresses:        []string{},
-// 				Whitelist: false,
-// 			}
-// 		} else {
-// 			approvalTrackerList = &types.AddressList{
-// 				Addresses:        []string{approval.ApprovalId},
-// 				Whitelist: true,
-// 			}
-// 		}
-
-// 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-// 			BadgeIds:                  approval.BadgeIds,
-// 			TransferTimes:             approval.TransferTimes,
-// 			OwnershipTimes:            approval.OwnershipTimes,
-// 			FromList:               fromList,
-// 			InitiatedByList:        initiatedByList,
-// 			ApprovalIdList: 			 approvalTrackerList,
-// 			UsesApprovalId: 					true,
-// 			UsesBadgeIds:              true,
-// 			UsesTransferTimes:         true,
-// 			UsesOwnershipTimes:        true,
-// 			UsesFromList:           true,
-// 			UsesInitiatedByList:    true,
-// 			ArbitraryValue:            approval,
-// 		})
-// 	}
-// 	return castedPermissions, nil
-// }

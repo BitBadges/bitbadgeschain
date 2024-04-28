@@ -7,8 +7,6 @@ import (
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 
-	"math"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -23,15 +21,10 @@ func FilterZeroBalances(balances []*Balance) []*Balance {
 	return newBalances
 }
 
-func DoBalancesExceedThreshold(ctx sdk.Context, balances []*Balance, thresholdBalances []*Balance) bool {
-	//Check if we exceed the threshold; will underflow if we do exceed it
+func DoBalancesExceedThreshold(ctx sdk.Context, balances []*Balance, thresholdBalances []*Balance) error {
 	thresholdCopy := DeepCopyBalances(thresholdBalances)
-	_, err := SubtractBalances(ctx, balances, thresholdCopy)
-	if err != nil {
-		return true
-	}
-
-	return false
+	_, err := SubtractBalances(ctx, balances, thresholdCopy) // underflow if exceeds
+	return err
 }
 
 func AddBalancesAndAssertDoesntExceedThreshold(ctx sdk.Context, currTally []*Balance, toAdd []*Balance, threshold []*Balance) ([]*Balance, error) {
@@ -45,9 +38,9 @@ func AddBalancesAndAssertDoesntExceedThreshold(ctx sdk.Context, currTally []*Bal
 	}
 
 	//Check if we exceed the threshold; will underflow if we do exceed it
-	doExceed := DoBalancesExceedThreshold(ctx, currTally, threshold)
-	if doExceed {
-		return []*Balance{}, sdkerrors.Wrapf(ErrExceedsThreshold, "curr tally plus added amounts exceeds threshold")
+	err = DoBalancesExceedThreshold(ctx, currTally, threshold)
+	if err != nil {
+		return []*Balance{}, sdkerrors.Wrapf(err, "curr tally plus added amounts exceeds threshold")
 	}
 
 	return currTally, nil
@@ -124,8 +117,7 @@ func UpdateBalance(ctx sdk.Context, newBalance *Balance, balances []*Balance) ([
 		return balances, err
 	}
 
-	bals := []*Balance{}
-	bals = append(bals, newBalance)
+	bals := []*Balance{newBalance}
 	balances, err = SetBalances(bals, balances)
 	if err != nil {
 		return balances, err
@@ -143,15 +135,9 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 		for _, currRange := range balanceObj.BadgeIds {
 			for _, currTime := range balanceObj.OwnershipTimes {
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
-					BadgeId:                currRange,
-					OwnershipTime:          currTime,
-					TransferTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-					TimelineTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-					ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
-					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
-					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
-					ApprovalIdList:         &AddressList{Addresses: []string{}, Whitelist: false},
-					ArbitraryValue:         balanceObj.Amount,
+					BadgeId:        currRange,
+					OwnershipTime:  currTime,
+					ArbitraryValue: balanceObj.Amount,
 				})
 			}
 		}
@@ -161,14 +147,8 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 	for _, rangeToFetch := range idRanges {
 		for _, timeToFetch := range times {
 			toFetchPermissionDetails = append(toFetchPermissionDetails, &UniversalPermissionDetails{
-				BadgeId:                rangeToFetch,
-				OwnershipTime:          timeToFetch,
-				TransferTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-				TimelineTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-				ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
-				FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
-				InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
-				ApprovalIdList:         &AddressList{Addresses: []string{}, Whitelist: false},
+				BadgeId:       rangeToFetch,
+				OwnershipTime: timeToFetch,
 			},
 			)
 		}
@@ -332,14 +312,8 @@ func DeleteBalances(ctx sdk.Context, rangesToDelete []*UintRange, timesToDelete 
 		for _, currRange := range balanceObj.BadgeIds {
 			for _, currTime := range balanceObj.OwnershipTimes {
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
-					BadgeId:                currRange,
-					OwnershipTime:          currTime,
-					TransferTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-					TimelineTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-					ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
-					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
-					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
-					ApprovalIdList:         &AddressList{Addresses: []string{}, Whitelist: false},
+					BadgeId:       currRange,
+					OwnershipTime: currTime,
 				})
 			}
 		}
@@ -348,14 +322,8 @@ func DeleteBalances(ctx sdk.Context, rangesToDelete []*UintRange, timesToDelete 
 		for _, rangeToDelete := range rangesToDelete {
 			for _, timeToDelete := range timesToDelete {
 				toDeletePermissionDetails = append(toDeletePermissionDetails, &UniversalPermissionDetails{
-					BadgeId:                rangeToDelete,
-					OwnershipTime:          timeToDelete,
-					TransferTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-					TimelineTime:           &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}, //dummy range
-					ToList:                 &AddressList{Addresses: []string{}, Whitelist: false},
-					FromList:               &AddressList{Addresses: []string{}, Whitelist: false},
-					ApprovalIdList:         &AddressList{Addresses: []string{}, Whitelist: false},
-					InitiatedByList:        &AddressList{Addresses: []string{}, Whitelist: false},
+					BadgeId:       rangeToDelete,
+					OwnershipTime: timeToDelete,
 				})
 			}
 		}

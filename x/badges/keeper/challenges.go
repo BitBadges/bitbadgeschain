@@ -11,8 +11,19 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collectionId sdkmath.Uint, challenges []*types.MerkleChallenge, merkleProofs []*types.MerkleProof, creatorAddress string, simulation bool, approverAddress string, challengeLevel string, approval *types.CollectionApproval) (sdkmath.Uint, error) {
+func (k Keeper) HandleMerkleChallenges(
+	ctx sdk.Context,
+	collectionId sdkmath.Uint,
+	transfer *types.Transfer,
+	approval *types.CollectionApproval,
+	creatorAddress string,
+	approverAddress string,
+	approvalLevel string,
+	simulation bool,
+) (sdkmath.Uint, error) {
 	numIncrements := sdkmath.NewUint(0)
+	challenges := approval.ApprovalCriteria.MerkleChallenges
+	merkleProofs := transfer.MerkleProofs
 
 	if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.PredeterminedBalances != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId != "" && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
 		hasMatchingChallenge := false
@@ -29,13 +40,11 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 	}
 
 	for _, challenge := range challenges {
-		challengeId := challenge.ChallengeTrackerId
-
 		if challenge == nil || challenge.Root == "" {
-			//No challenge specified
-			continue
+			return numIncrements, sdkerrors.Wrapf(types.ErrChallengeTrackerIdIsNil, "challenge is nil or has empty root")
 		}
 
+		challengeId := challenge.ChallengeTrackerId
 		root := challenge.Root
 		hasValidSolution := false
 		errStr := ""
@@ -57,7 +66,7 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 				}
 
 				if challenge.UseCreatorAddressAsLeaf {
-					proof.Leaf = creatorAddress //overwrites it
+					proof.Leaf = creatorAddress //overwrites it with creator address
 				}
 
 				if proof.Leaf == "" {
@@ -65,14 +74,14 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 					continue
 				}
 
-				leafIndex := GetLeafIndex(proof.Aunts)
-
 				//Get leftmost leaf index for layer === challenge.ExpectedProofLength
+				leafIndex := GetLeafIndex(proof.Aunts)
 				leftmostLeafIndex := sdkmath.NewUint(1)
 				for i := sdkmath.NewUint(0); i.LT(challenge.ExpectedProofLength); i = i.Add(sdkmath.NewUint(1)) {
 					leftmostLeafIndex = leftmostLeafIndex.Mul(sdkmath.NewUint(2))
 				}
 
+				//Predefined balances challenge tracker = current challenge tracker
 				useLeafIndexForTransferOrder := false
 				if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.PredeterminedBalances != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
 					if approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId == challengeId {
@@ -90,9 +99,9 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 					continue
 				}
 
+				//If there is a max uses per leaf, we need to check it has not exceeded the treshold uses
 				if !challenge.MaxUsesPerLeaf.IsNil() && challenge.MaxUsesPerLeaf.GT(sdkmath.NewUint(0)) {
-
-					numUsed, err := k.GetChallengeTrackerFromStore(ctx, collectionId, approverAddress, challengeLevel, approval.ApprovalId, challengeId, leafIndex)
+					numUsed, err := k.GetChallengeTrackerFromStore(ctx, collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, leafIndex)
 					if err != nil {
 						additionalDetailsErrorStr = "error getting num processed"
 						continue
@@ -105,22 +114,23 @@ func (k Keeper) AssertValidSolutionForEveryChallenge(ctx sdk.Context, collection
 						continue
 					}
 
+					//Increment the number of uses in store if we are doing it for real
 					if !simulation {
-						newNumUsed, err := k.IncrementChallengeTrackerInStore(ctx, collectionId, approverAddress, challengeLevel, approval.ApprovalId, challengeId, leafIndex.Sub(leftmostLeafIndex))
+						newNumUsed, err := k.IncrementChallengeTrackerInStore(ctx, collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, leafIndex.Sub(leftmostLeafIndex))
 						if err != nil {
 							continue
 						}
 
 						//Currently added for indexer, but note that it is planned to be deprecated
 						ctx.EventManager().EmitEvent(
-							sdk.NewEvent("challenge"+fmt.Sprint(approval.ApprovalId)+fmt.Sprint(challengeId)+fmt.Sprint(leafIndex)+fmt.Sprint(approverAddress)+fmt.Sprint(challengeLevel)+fmt.Sprint(newNumUsed),
+							sdk.NewEvent("challenge"+fmt.Sprint(approval.ApprovalId)+fmt.Sprint(challengeId)+fmt.Sprint(leafIndex)+fmt.Sprint(approverAddress)+fmt.Sprint(approvalLevel)+fmt.Sprint(newNumUsed),
 								sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 								sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 								sdk.NewAttribute("challengeTrackerId", fmt.Sprint(challengeId)),
 								sdk.NewAttribute("approvalId", fmt.Sprint(approval.ApprovalId)),
 								sdk.NewAttribute("leafIndex", fmt.Sprint(leafIndex.Sub(leftmostLeafIndex))),
 								sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
-								sdk.NewAttribute("challengeLevel", fmt.Sprint(challengeLevel)),
+								sdk.NewAttribute("approvalLevel", fmt.Sprint(approvalLevel)),
 								sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),
 							),
 						)

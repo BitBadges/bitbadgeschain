@@ -69,11 +69,11 @@ func ConstructApprovalTrackerKey(collectionID sdkmath.Uint, addressForApproval, 
 	return strings.Join(keyParts, BalanceKeyDelimiter)
 }
 
-func ConstructZKPTreeTrackerKey(collectionId sdkmath.Uint, addressForApproval string, challengeLevel string, approvalId string, challengeId string, proofHash string) string {
+func ConstructZKPTreeTrackerKey(collectionId sdkmath.Uint, addressForApproval string, approvalLevel string, approvalId string, challengeId string, proofHash string) string {
 	keyParts := []string{
 		collectionId.String(),
 		addressForApproval,
-		challengeLevel,
+		approvalLevel,
 		approvalId,
 		challengeId,
 		proofHash,
@@ -88,13 +88,13 @@ func ConstructUsedClaimDataKey(collectionId sdkmath.Uint, claimId sdkmath.Uint) 
 	return collection_id_str + BalanceKeyDelimiter + claim_id_str
 }
 
-func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, addressForChallenge string, challengeLevel string, approvalId string, challengeId string, codeLeafIndex sdkmath.Uint) string {
+func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId string, challengeId string, codeLeafIndex sdkmath.Uint) string {
 	collection_id_str := collectionId.String()
 
 	code_leaf_index_str := codeLeafIndex.String()
 	challenge_id_str := challengeId
 	address_for_challenge_str := addressForChallenge
-	challenge_level_str := challengeLevel
+	challenge_level_str := approvalLevel
 	return collection_id_str + BalanceKeyDelimiter + address_for_challenge_str + BalanceKeyDelimiter + challenge_level_str + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + code_leaf_index_str
 }
 

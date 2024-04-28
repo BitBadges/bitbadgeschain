@@ -9,11 +9,6 @@ import (
 	"github.com/bitbadges/bitbadgeschain/testutil/sample"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/stretchr/testify/require"
-	// "github.com/bitbadges/bitbadgeschain/testutil/sample"
-	// sdk "github.com/cosmos/cosmos-sdk/types"
-	// sdkerrors "cosmossdk.io/errors"
-	// "github.com/stretchr/testify/require"
-	// "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {

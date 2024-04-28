@@ -28,7 +28,7 @@ type UniversalPermission struct {
 	FromList        *AddressList
 	InitiatedByList *AddressList
 
-	ApprovalIdList         *AddressList
+	ApprovalIdList *AddressList
 
 	PermanentlyPermittedTimes []*UintRange
 	PermanentlyForbiddenTimes []*UintRange
@@ -41,7 +41,7 @@ type UniversalPermission struct {
 	UsesInitiatedByList bool
 	UsesOwnershipTimes  bool
 
-	UsesApprovalId         bool
+	UsesApprovalId bool
 
 	ArbitraryValue interface{}
 }
@@ -55,7 +55,7 @@ type UniversalPermissionDetails struct {
 	FromList        *AddressList
 	InitiatedByList *AddressList
 
-	ApprovalIdList         *AddressList
+	ApprovalIdList *AddressList
 
 	//These fields are not actually used in the overlapping logic.
 	//They are just along for the ride and used later for lookups
@@ -101,11 +101,11 @@ func GetOverlapsAndNonOverlaps(ctx sdk.Context, firstDetails []*UniversalPermiss
 	return allOverlaps, inOldButNotNew, inNewButNotOld
 }
 
-func UniversalRemoveOverlapFromValues(ctx sdk.Context, handled *UniversalPermissionDetails, valuesToCheck []*UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
+func UniversalRemoveOverlapFromValues(ctx sdk.Context, overlap *UniversalPermissionDetails, valuesToCheck []*UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
 	newValuesToCheck := []*UniversalPermissionDetails{}
 	removed := []*UniversalPermissionDetails{}
 	for _, valueToCheck := range valuesToCheck {
-		remaining, overlaps := UniversalRemoveOverlaps(ctx, handled, valueToCheck)
+		remaining, overlaps := UniversalRemoveOverlaps(ctx, overlap, valueToCheck)
 		newValuesToCheck = append(newValuesToCheck, remaining...)
 		removed = append(removed, overlaps...)
 	}
@@ -117,11 +117,49 @@ func IsAddressListEmpty(list *AddressList) bool {
 	return len(list.Addresses) == 0 && list.Whitelist
 }
 
+func AddDefaultsIfNil(permission *UniversalPermissionDetails) *UniversalPermissionDetails {
+	if permission.BadgeId == nil {
+		permission.BadgeId = &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)} //dummy range
+	}
+
+	if permission.TimelineTime == nil {
+		permission.TimelineTime = &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)} //dummy range
+	}
+
+	if permission.TransferTime == nil {
+		permission.TransferTime = &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)} //dummy range
+	}
+
+	if permission.OwnershipTime == nil {
+		permission.OwnershipTime = &UintRange{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)} //dummy range
+	}
+
+	if permission.ToList == nil {
+		permission.ToList = &AddressList{Addresses: []string{}, Whitelist: false}
+	}
+
+	if permission.FromList == nil {
+		permission.FromList = &AddressList{Addresses: []string{}, Whitelist: false}
+	}
+
+	if permission.InitiatedByList == nil {
+		permission.InitiatedByList = &AddressList{Addresses: []string{}, Whitelist: false}
+	}
+
+	if permission.ApprovalIdList == nil {
+		permission.ApprovalIdList = &AddressList{Addresses: []string{}, Whitelist: false}
+	}
+
+	return permission
+}
+
 func UniversalRemoveOverlaps(ctx sdk.Context, handled *UniversalPermissionDetails, valueToCheck *UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
 	if !ctx.IsZero() {
 		ctx.GasMeter().ConsumeGas(500, "UniversalRemoveOverlaps")
 	}
 
+	handled = AddDefaultsIfNil(handled)
+	valueToCheck = AddDefaultsIfNil(valueToCheck)
 	remaining := []*UniversalPermissionDetails{}
 
 	timelineTimesAfterRemoval, removedTimelineTimes := RemoveUintRangeFromUintRange(handled.TimelineTime, valueToCheck.TimelineTime)
@@ -153,7 +191,7 @@ func UniversalRemoveOverlaps(ctx sdk.Context, handled *UniversalPermissionDetail
 	initiatedByListAfterRemoval, removedInitiatedByList := RemoveAddressListFromAddressList(handled.InitiatedByList, valueToCheck.InitiatedByList)
 
 	approvalIdListAfterRemoval, removedApprovalIdList := RemoveAddressListFromAddressList(handled.ApprovalIdList, valueToCheck.ApprovalIdList)
-	
+
 	toListRemoved := !IsAddressListEmpty(removedToList)
 	fromListRemoved := !IsAddressListEmpty(removedFromList)
 	initiatedByListRemoved := !IsAddressListEmpty(removedInitiatedByList)
@@ -187,112 +225,112 @@ func UniversalRemoveOverlaps(ctx sdk.Context, handled *UniversalPermissionDetail
 
 	for _, timelineTimeAfterRemoval := range timelineTimesAfterRemoval {
 		remaining = append(remaining, &UniversalPermissionDetails{
-			TimelineTime:           timelineTimeAfterRemoval,
-			BadgeId:                valueToCheck.BadgeId,
-			TransferTime:           valueToCheck.TransferTime,
-			OwnershipTime:          valueToCheck.OwnershipTime,
-			ToList:                 valueToCheck.ToList,
-			FromList:               valueToCheck.FromList,
-			InitiatedByList:        valueToCheck.InitiatedByList,
-			ApprovalIdList:         valueToCheck.ApprovalIdList,
-			ArbitraryValue:         valueToCheck.ArbitraryValue,
+			TimelineTime:    timelineTimeAfterRemoval,
+			BadgeId:         valueToCheck.BadgeId,
+			TransferTime:    valueToCheck.TransferTime,
+			OwnershipTime:   valueToCheck.OwnershipTime,
+			ToList:          valueToCheck.ToList,
+			FromList:        valueToCheck.FromList,
+			InitiatedByList: valueToCheck.InitiatedByList,
+			ApprovalIdList:  valueToCheck.ApprovalIdList,
+			ArbitraryValue:  valueToCheck.ArbitraryValue,
 		})
 	}
 
 	for _, badgeAfterRemoval := range badgesAfterRemoval {
 		remaining = append(remaining, &UniversalPermissionDetails{
-			TimelineTime:           removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			BadgeId:                badgeAfterRemoval,
-			TransferTime:           valueToCheck.TransferTime,
-			OwnershipTime:          valueToCheck.OwnershipTime,
-			ToList:                 valueToCheck.ToList,
-			FromList:               valueToCheck.FromList,
-			InitiatedByList:        valueToCheck.InitiatedByList,
-			ApprovalIdList:         valueToCheck.ApprovalIdList,
-			ArbitraryValue:         valueToCheck.ArbitraryValue,
+			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			BadgeId:         badgeAfterRemoval,
+			TransferTime:    valueToCheck.TransferTime,
+			OwnershipTime:   valueToCheck.OwnershipTime,
+			ToList:          valueToCheck.ToList,
+			FromList:        valueToCheck.FromList,
+			InitiatedByList: valueToCheck.InitiatedByList,
+			ApprovalIdList:  valueToCheck.ApprovalIdList,
+			ArbitraryValue:  valueToCheck.ArbitraryValue,
 		})
 	}
 
 	for _, transferTimeAfterRemoval := range transferTimesAfterRemoval {
 		remaining = append(remaining, &UniversalPermissionDetails{
-			TimelineTime:           removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			BadgeId:                removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
-			TransferTime:           transferTimeAfterRemoval,
-			OwnershipTime:          valueToCheck.OwnershipTime,
-			ToList:                 valueToCheck.ToList,
-			FromList:               valueToCheck.FromList,
-			InitiatedByList:        valueToCheck.InitiatedByList,
-			ApprovalIdList:         valueToCheck.ApprovalIdList,
-			ArbitraryValue:         valueToCheck.ArbitraryValue,
+			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			BadgeId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
+			TransferTime:    transferTimeAfterRemoval,
+			OwnershipTime:   valueToCheck.OwnershipTime,
+			ToList:          valueToCheck.ToList,
+			FromList:        valueToCheck.FromList,
+			InitiatedByList: valueToCheck.InitiatedByList,
+			ApprovalIdList:  valueToCheck.ApprovalIdList,
+			ArbitraryValue:  valueToCheck.ArbitraryValue,
 		})
 	}
 
 	for _, ownershipTimeAfterRemoval := range ownershipTimesAfterRemoval {
 		remaining = append(remaining, &UniversalPermissionDetails{
-			TimelineTime:           removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			BadgeId:                removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
-			TransferTime:           removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			OwnershipTime:          ownershipTimeAfterRemoval,
-			ToList:                 valueToCheck.ToList,
-			FromList:               valueToCheck.FromList,
-			InitiatedByList:        valueToCheck.InitiatedByList,
-			ApprovalIdList:         valueToCheck.ApprovalIdList,
-			ArbitraryValue:         valueToCheck.ArbitraryValue,
+			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			BadgeId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
+			TransferTime:    removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			OwnershipTime:   ownershipTimeAfterRemoval,
+			ToList:          valueToCheck.ToList,
+			FromList:        valueToCheck.FromList,
+			InitiatedByList: valueToCheck.InitiatedByList,
+			ApprovalIdList:  valueToCheck.ApprovalIdList,
+			ArbitraryValue:  valueToCheck.ArbitraryValue,
 		})
 	}
 
 	if !IsAddressListEmpty(toListAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
-			TimelineTime:           removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			BadgeId:                removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
-			TransferTime:           removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			OwnershipTime:          removedOwnershipTimes[0],
-			ToList:                 toListAfterRemoval,
-			FromList:               valueToCheck.FromList,
-			InitiatedByList:        valueToCheck.InitiatedByList,
-			ApprovalIdList:         valueToCheck.ApprovalIdList,
-			ArbitraryValue:         valueToCheck.ArbitraryValue,
+			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			BadgeId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
+			TransferTime:    removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			OwnershipTime:   removedOwnershipTimes[0],
+			ToList:          toListAfterRemoval,
+			FromList:        valueToCheck.FromList,
+			InitiatedByList: valueToCheck.InitiatedByList,
+			ApprovalIdList:  valueToCheck.ApprovalIdList,
+			ArbitraryValue:  valueToCheck.ArbitraryValue,
 		})
 	}
 
 	if !IsAddressListEmpty(fromListAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
-			TimelineTime:           removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			BadgeId:                removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
-			TransferTime:           removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			OwnershipTime:          removedOwnershipTimes[0],
-			ToList:                 removedToList,
-			FromList:               fromListAfterRemoval,
-			InitiatedByList:        valueToCheck.InitiatedByList,
-			ApprovalIdList:         valueToCheck.ApprovalIdList,
-			ArbitraryValue:         valueToCheck.ArbitraryValue,
+			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			BadgeId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
+			TransferTime:    removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			OwnershipTime:   removedOwnershipTimes[0],
+			ToList:          removedToList,
+			FromList:        fromListAfterRemoval,
+			InitiatedByList: valueToCheck.InitiatedByList,
+			ApprovalIdList:  valueToCheck.ApprovalIdList,
+			ArbitraryValue:  valueToCheck.ArbitraryValue,
 		})
 	}
 
 	if !IsAddressListEmpty(initiatedByListAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
-			TimelineTime:           removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			BadgeId:                removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
-			TransferTime:           removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			OwnershipTime:          removedOwnershipTimes[0],
-			ToList:                 removedToList,
-			FromList:               removedFromList,
-			InitiatedByList:        initiatedByListAfterRemoval,
-			ApprovalIdList:         valueToCheck.ApprovalIdList,
-			ArbitraryValue:         valueToCheck.ArbitraryValue,
+			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			BadgeId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
+			TransferTime:    removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			OwnershipTime:   removedOwnershipTimes[0],
+			ToList:          removedToList,
+			FromList:        removedFromList,
+			InitiatedByList: initiatedByListAfterRemoval,
+			ApprovalIdList:  valueToCheck.ApprovalIdList,
+			ArbitraryValue:  valueToCheck.ArbitraryValue,
 		})
 	}
 
 	if !IsAddressListEmpty(approvalIdListAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
-			TimelineTime:           removedTimelineTimes[0],
-			BadgeId:                removedBadges[0],
-			TransferTime:           removedTransferTimes[0],
-			OwnershipTime:          removedOwnershipTimes[0],
-			ToList:                 removedToList,
-			FromList:               removedFromList,
-			InitiatedByList:        removedInitiatedByList,
-			ApprovalIdList:         approvalIdListAfterRemoval,
+			TimelineTime:    removedTimelineTimes[0],
+			BadgeId:         removedBadges[0],
+			TransferTime:    removedTransferTimes[0],
+			OwnershipTime:   removedOwnershipTimes[0],
+			ToList:          removedToList,
+			FromList:        removedFromList,
+			InitiatedByList: removedInitiatedByList,
+			ApprovalIdList:  approvalIdListAfterRemoval,
 
 			ArbitraryValue: valueToCheck.ArbitraryValue,
 		})
@@ -304,15 +342,15 @@ func UniversalRemoveOverlaps(ctx sdk.Context, handled *UniversalPermissionDetail
 			for _, removedTransferTime := range removedTransferTimes {
 				for _, removedOwnershipTime := range removedOwnershipTimes {
 					removedDetails = append(removedDetails, &UniversalPermissionDetails{
-						TimelineTime:           removedTimelineTime,
-						BadgeId:                removedBadge,
-						TransferTime:           removedTransferTime,
-						OwnershipTime:          removedOwnershipTime,
-						ToList:                 removedToList,
-						FromList:               removedFromList,
-						InitiatedByList:        removedInitiatedByList,
-						ApprovalIdList:         removedApprovalIdList,
-	
+						TimelineTime:    removedTimelineTime,
+						BadgeId:         removedBadge,
+						TransferTime:    removedTransferTime,
+						OwnershipTime:   removedOwnershipTime,
+						ToList:          removedToList,
+						FromList:        removedFromList,
+						InitiatedByList: removedInitiatedByList,
+						ApprovalIdList:  removedApprovalIdList,
+
 						ArbitraryValue: valueToCheck.ArbitraryValue,
 					})
 				}
@@ -349,55 +387,6 @@ func GetListWithOptions(list *AddressList, uses bool) *AddressList {
 	return list
 }
 
-func ApplyManipulations(permissions []*UniversalPermission) []*UniversalPermissionDetails {
-	handled := []*UniversalPermissionDetails{}
-	for _, permission := range permissions {
-		badgeIds := GetUintRangesWithOptions(permission.BadgeIds, permission.UsesBadgeIds)
-		timelineTimes := GetUintRangesWithOptions(permission.TimelineTimes, permission.UsesTimelineTimes)
-		transferTimes := GetUintRangesWithOptions(permission.TransferTimes, permission.UsesTransferTimes)
-		ownershipTimes := GetUintRangesWithOptions(permission.OwnershipTimes, permission.UsesOwnershipTimes)
-		permanentlyPermittedTimes := GetUintRangesWithOptions(permission.PermanentlyPermittedTimes, true)
-		permanentlyForbiddenTimes := GetUintRangesWithOptions(permission.PermanentlyForbiddenTimes, true)
-		arbitraryValue := permission.ArbitraryValue
-
-		toList := GetListWithOptions(permission.ToList, permission.UsesToList)
-		fromList := GetListWithOptions(permission.FromList, permission.UsesFromList)
-		initiatedByList := GetListWithOptions(permission.InitiatedByList, permission.UsesInitiatedByList)
-		approvalIdList := GetListWithOptions(permission.ApprovalIdList, permission.UsesApprovalId)
-
-		for _, badgeId := range badgeIds {
-			for _, timelineTime := range timelineTimes {
-				for _, transferTime := range transferTimes {
-					for _, ownershipTime := range ownershipTimes {
-						brokenDown := []*UniversalPermissionDetails{
-							{
-								BadgeId:                badgeId,
-								TimelineTime:           timelineTime,
-								TransferTime:           transferTime,
-								OwnershipTime:          ownershipTime,
-								ToList:                 toList,
-								FromList:               fromList,
-								InitiatedByList:        initiatedByList,
-								ApprovalIdList:         approvalIdList,
-
-								//Appended for future lookups (not involved in overlap logic)
-								PermanentlyPermittedTimes: permanentlyPermittedTimes,
-								PermanentlyForbiddenTimes: permanentlyForbiddenTimes,
-								ArbitraryValue:            arbitraryValue,
-							},
-						}
-
-						handled = append(handled, brokenDown...)
-					}
-				}
-			}
-		}
-
-	}
-
-	return handled
-}
-
 func GetFirstMatchOnly(ctx sdk.Context, permissions []*UniversalPermission) []*UniversalPermissionDetails {
 	handled := []*UniversalPermissionDetails{}
 	for _, permission := range permissions {
@@ -422,28 +411,28 @@ func GetFirstMatchOnly(ctx sdk.Context, permissions []*UniversalPermission) []*U
 					for _, ownershipTime := range ownershipTimes {
 						brokenDown := []*UniversalPermissionDetails{
 							{
-								BadgeId:                badgeId,
-								TimelineTime:           timelineTime,
-								TransferTime:           transferTime,
-								OwnershipTime:          ownershipTime,
-								ToList:                 toList,
-								FromList:               fromList,
-								InitiatedByList:        initiatedByList,
-								ApprovalIdList:         approvalIdList,
+								BadgeId:         badgeId,
+								TimelineTime:    timelineTime,
+								TransferTime:    transferTime,
+								OwnershipTime:   ownershipTime,
+								ToList:          toList,
+								FromList:        fromList,
+								InitiatedByList: initiatedByList,
+								ApprovalIdList:  approvalIdList,
 							},
 						}
 
 						_, inBrokenDownButNotHandled, _ := GetOverlapsAndNonOverlaps(ctx, brokenDown, handled)
 						for _, remaining := range inBrokenDownButNotHandled {
 							handled = append(handled, &UniversalPermissionDetails{
-								TimelineTime:           remaining.TimelineTime,
-								BadgeId:                remaining.BadgeId,
-								TransferTime:           remaining.TransferTime,
-								OwnershipTime:          remaining.OwnershipTime,
-								ToList:                 remaining.ToList,
-								FromList:               remaining.FromList,
-								InitiatedByList:        remaining.InitiatedByList,
-								ApprovalIdList:         remaining.ApprovalIdList,
+								TimelineTime:    remaining.TimelineTime,
+								BadgeId:         remaining.BadgeId,
+								TransferTime:    remaining.TransferTime,
+								OwnershipTime:   remaining.OwnershipTime,
+								ToList:          remaining.ToList,
+								FromList:        remaining.FromList,
+								InitiatedByList: remaining.InitiatedByList,
+								ApprovalIdList:  remaining.ApprovalIdList,
 
 								//Appended for future lookups (not involved in overlap logic)
 								PermanentlyPermittedTimes: permanentlyPermittedTimes,

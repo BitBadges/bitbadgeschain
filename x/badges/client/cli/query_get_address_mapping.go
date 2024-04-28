@@ -24,7 +24,6 @@ func CmdGetAddressList() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
-
 			params := &types.QueryGetAddressListRequest{
 				ListId: args[0],
 			}

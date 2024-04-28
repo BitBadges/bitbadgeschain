@@ -1,8 +1,8 @@
 package types
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const TypeMsgSetValue = "set_value"
@@ -11,14 +11,13 @@ var _ sdk.Msg = &MsgSetValue{}
 
 func NewMsgSetValue(creator string, mapId string, key string, value string, options *SetOptions) *MsgSetValue {
 	return &MsgSetValue{
-		Creator:                  creator,
-		MapId:                    mapId,
-		Key:                      key,
-		Value:                    value,
-		Options:                  options,
+		Creator: creator,
+		MapId:   mapId,
+		Key:     key,
+		Value:   value,
+		Options: options,
 	}
 }
-
 
 func (msg *MsgSetValue) Route() string {
 	return RouterKey
@@ -44,15 +43,15 @@ func (msg *MsgSetValue) GetSignBytes() []byte {
 func (msg *MsgSetValue) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	if len(msg.MapId) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "map ID cannot be empty")
+		return sdkerrors.Wrap(ErrInvalidRequest, "map ID cannot be empty")
 	}
 
 	if len(msg.Key) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "key cannot be empty")
+		return sdkerrors.Wrap(ErrInvalidRequest, "key cannot be empty")
 	}
 
 	return nil

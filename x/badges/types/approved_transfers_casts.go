@@ -19,19 +19,18 @@ func CastIncomingTransfersToCollectionTransfers(transfers []*UserIncomingApprova
 }
 
 func CastOutgoingTransferToCollectionTransfer(transfer *UserOutgoingApproval, fromAddress string) *CollectionApproval {
-
 	approvalCriteria := CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(transfer.ApprovalCriteria)
 	return &CollectionApproval{
-		ToListId:           transfer.ToListId,
-		FromListId:         fromAddress,
-		InitiatedByListId:  transfer.InitiatedByListId,
-		TransferTimes:      transfer.TransferTimes,
-		BadgeIds:           transfer.BadgeIds,
-		OwnershipTimes:     transfer.OwnershipTimes,
-		ApprovalCriteria:   approvalCriteria,
-		ApprovalId:         transfer.ApprovalId,
-		Uri:                transfer.Uri,
-		CustomData:         transfer.CustomData,
+		ToListId:          transfer.ToListId,
+		FromListId:        fromAddress,
+		InitiatedByListId: transfer.InitiatedByListId,
+		TransferTimes:     transfer.TransferTimes,
+		BadgeIds:          transfer.BadgeIds,
+		OwnershipTimes:    transfer.OwnershipTimes,
+		ApprovalCriteria:  approvalCriteria,
+		ApprovalId:        transfer.ApprovalId,
+		Uri:               transfer.Uri,
+		CustomData:        transfer.CustomData,
 	}
 }
 
@@ -40,15 +39,15 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApproval) 
 	approvalCriteria := CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(transfer.ApprovalCriteria)
 
 	return &UserOutgoingApproval{
-		ToListId:           transfer.ToListId,
-		InitiatedByListId:  transfer.InitiatedByListId,
-		TransferTimes:      transfer.TransferTimes,
-		BadgeIds:           transfer.BadgeIds,
-		OwnershipTimes:     transfer.OwnershipTimes,
-		ApprovalCriteria:   approvalCriteria,
-		ApprovalId:         transfer.ApprovalId,
-		Uri:                transfer.Uri,
-		CustomData:         transfer.CustomData,
+		ToListId:          transfer.ToListId,
+		InitiatedByListId: transfer.InitiatedByListId,
+		TransferTimes:     transfer.TransferTimes,
+		BadgeIds:          transfer.BadgeIds,
+		OwnershipTimes:    transfer.OwnershipTimes,
+		ApprovalCriteria:  approvalCriteria,
+		ApprovalId:        transfer.ApprovalId,
+		Uri:               transfer.Uri,
+		CustomData:        transfer.CustomData,
 	}
 }
 
@@ -57,16 +56,16 @@ func CastIncomingTransferToCollectionTransfer(transfer *UserIncomingApproval, to
 	approvalCriteria := CastIncomingApprovalCriteriaToCollectionApprovalCriteria(transfer.ApprovalCriteria)
 
 	return &CollectionApproval{
-		ToListId:           toAddress,
-		FromListId:         transfer.FromListId,
-		InitiatedByListId:  transfer.InitiatedByListId,
-		TransferTimes:      transfer.TransferTimes,
-		BadgeIds:           transfer.BadgeIds,
-		OwnershipTimes:     transfer.OwnershipTimes,
-		ApprovalCriteria:   approvalCriteria,
-		ApprovalId:         transfer.ApprovalId,
-		Uri:                transfer.Uri,
-		CustomData:         transfer.CustomData,
+		ToListId:          toAddress,
+		FromListId:        transfer.FromListId,
+		InitiatedByListId: transfer.InitiatedByListId,
+		TransferTimes:     transfer.TransferTimes,
+		BadgeIds:          transfer.BadgeIds,
+		OwnershipTimes:    transfer.OwnershipTimes,
+		ApprovalCriteria:  approvalCriteria,
+		ApprovalId:        transfer.ApprovalId,
+		Uri:               transfer.Uri,
+		CustomData:        transfer.CustomData,
 	}
 }
 
@@ -75,15 +74,15 @@ func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApproval) 
 	approvalCriteria := CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(transfer.ApprovalCriteria)
 
 	return &UserIncomingApproval{
-		FromListId:         transfer.FromListId,
-		InitiatedByListId:  transfer.InitiatedByListId,
-		TransferTimes:      transfer.TransferTimes,
-		BadgeIds:           transfer.BadgeIds,
-		OwnershipTimes:     transfer.OwnershipTimes,
-		ApprovalCriteria:   approvalCriteria,
-		ApprovalId:         transfer.ApprovalId,
-		Uri:                transfer.Uri,
-		CustomData:         transfer.CustomData,
+		FromListId:        transfer.FromListId,
+		InitiatedByListId: transfer.InitiatedByListId,
+		TransferTimes:     transfer.TransferTimes,
+		BadgeIds:          transfer.BadgeIds,
+		OwnershipTimes:    transfer.OwnershipTimes,
+		ApprovalCriteria:  approvalCriteria,
+		ApprovalId:        transfer.ApprovalId,
+		Uri:               transfer.Uri,
+		CustomData:        transfer.CustomData,
 	}
 }
 
@@ -99,7 +98,7 @@ func CastIncomingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		RequireFromDoesNotEqualInitiatedBy: approvalCriteria.RequireFromDoesNotEqualInitiatedBy,
 		PredeterminedBalances:              approvalCriteria.PredeterminedBalances,
 		MustOwnBadges:                      approvalCriteria.MustOwnBadges,
-		MerkleChallenges:                    approvalCriteria.MerkleChallenges,
+		MerkleChallenges:                   approvalCriteria.MerkleChallenges,
 	}
 }
 
@@ -115,7 +114,7 @@ func CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		RequireToDoesNotEqualInitiatedBy: approvalCriteria.RequireToDoesNotEqualInitiatedBy,
 		PredeterminedBalances:            approvalCriteria.PredeterminedBalances,
 		MustOwnBadges:                    approvalCriteria.MustOwnBadges,
-		MerkleChallenges:                  approvalCriteria.MerkleChallenges,
+		MerkleChallenges:                 approvalCriteria.MerkleChallenges,
 	}
 }
 
@@ -127,7 +126,7 @@ func CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(approvalCriter
 		RequireFromDoesNotEqualInitiatedBy: approvalCriteria.RequireFromDoesNotEqualInitiatedBy,
 		PredeterminedBalances:              approvalCriteria.PredeterminedBalances,
 		MustOwnBadges:                      approvalCriteria.MustOwnBadges,
-		MerkleChallenges:                    approvalCriteria.MerkleChallenges,
+		MerkleChallenges:                   approvalCriteria.MerkleChallenges,
 	}
 }
 
@@ -139,6 +138,6 @@ func CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(approvalCriter
 		RequireToDoesNotEqualInitiatedBy: approvalCriteria.RequireToDoesNotEqualInitiatedBy,
 		PredeterminedBalances:            approvalCriteria.PredeterminedBalances,
 		MustOwnBadges:                    approvalCriteria.MustOwnBadges,
-		MerkleChallenges:                  approvalCriteria.MerkleChallenges,
+		MerkleChallenges:                 approvalCriteria.MerkleChallenges,
 	}
 }

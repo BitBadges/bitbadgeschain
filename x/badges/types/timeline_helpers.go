@@ -19,7 +19,6 @@ func GetCurrentManager(ctx sdk.Context, collection *BadgeCollection) string {
 }
 
 func GetIsArchived(ctx sdk.Context, collection *BadgeCollection) bool {
-
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	isArchivedTimeline := collection.IsArchivedTimeline
 	for _, isArchivedTimelineVal := range isArchivedTimeline {

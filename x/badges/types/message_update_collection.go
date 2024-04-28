@@ -36,7 +36,6 @@ func (msg *MsgUniversalUpdateCollection) GetSigners() []sdk.AccAddress {
 func (msg *MsgUniversalUpdateCollection) GetSignBytes() []byte {
 	bz := AminoCdc.MustMarshalJSON(msg)
 	sorted := sdk.MustSortJSON(bz)
-
 	return sorted
 }
 
@@ -206,7 +205,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		if msg.BalancesType == "Off-Chain - Non-Indexed" {
 			for _, offChainUriObj := range msg.OffChainBalancesMetadataTimeline {
 				//must contain "{address}" in uri
-				if strings.Contains(offChainUriObj.OffChainBalancesMetadata.Uri, "{address}") == false {
+				if !strings.Contains(offChainUriObj.OffChainBalancesMetadata.Uri, "{address}") {
 					return sdkerrors.Wrapf(ErrInvalidRequest, "balances type is non-indexed but uri does not contain {address} in uri")
 				}
 			}

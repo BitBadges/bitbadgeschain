@@ -345,3 +345,94 @@ func (suite *TestSuite) TestBadgeIdsWeirdJSThing() {
 	suite.Require().Equal(sdkmath.NewUint(10000), currBalances[0].BadgeIds[0].End)
 	suite.Require().Equal(1, len(currBalances[0].BadgeIds))
 }
+
+func (suite *TestSuite) TestDefaultsCannotBeDoubleUsedAfterSpent() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
+		{
+			Amount:         sdkmath.NewUint(1),
+			BadgeIds:       GetOneUintRange(),
+			OwnershipTimes: GetFullUintRanges(),
+		},
+	}
+
+	collectionsToCreate[0].Transfers = []*types.Transfer{}
+	collectionsToCreate[0].DefaultBalances = []*types.Balance{
+		{
+			Amount:         sdkmath.NewUint(1),
+			BadgeIds:       GetOneUintRange(),
+			OwnershipTimes: GetFullUintRanges(),
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovals[0].FromListId = "All"
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria = nil
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating badge: %s")
+
+	balance := &types.UserBalanceStore{}
+	totalSupplys, err := GetUserBalance(suite, wctx, sdk.NewUint(1), "Total")
+	suite.Require().Nil(err, "Error getting user balance: %s")
+	AssertBalancesEqual(suite, totalSupplys.Balances, []*types.Balance{
+		{
+			Amount:         sdkmath.NewUint(1),
+			BadgeIds:       GetOneUintRange(),
+			OwnershipTimes: GetFullUintRanges(),
+		},
+	})
+
+	balance, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "Error getting user balance: %s")
+	AssertUintsEqual(suite, balance.Balances[0].Amount, sdkmath.NewUint(1))
+	AssertUintRangesEqual(suite, balance.Balances[0].BadgeIds, []*types.UintRange{
+		{
+			Start: sdkmath.NewUint(1),
+			End:   sdkmath.NewUint(1),
+		},
+	})
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badge")
+
+	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "Error getting user balance: %s")
+	AssertBalancesEqual(suite, bobBalance.Balances, []*types.Balance{})
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error transferring badge")
+}

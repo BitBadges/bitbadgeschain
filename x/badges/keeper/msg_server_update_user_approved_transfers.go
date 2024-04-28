@@ -33,19 +33,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		return nil, ErrWrongBalancesType
 	}
 
-	balanceKey := ConstructBalanceKey(msg.Creator, collection.CollectionId)
-	userBalance, found := k.GetUserBalanceFromStore(ctx, balanceKey)
-	if !found {
-		userBalance = &types.UserBalanceStore{
-			Balances:          collection.DefaultBalances.Balances,
-			OutgoingApprovals: collection.DefaultBalances.OutgoingApprovals,
-			IncomingApprovals: collection.DefaultBalances.IncomingApprovals,
-			AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedOutgoingTransfers,
-			AutoApproveSelfInitiatedIncomingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedIncomingTransfers,
-			UserPermissions: collection.DefaultBalances.UserPermissions,
-		}
-	}
-
+	userBalance := k.GetBalanceOrApplyDefault(ctx, collection, msg.Creator)
 	if userBalance.UserPermissions == nil {
 		userBalance.UserPermissions = &types.UserPermissions{}
 	}
@@ -91,7 +79,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		userBalance.UserPermissions = msg.UserPermissions
 	}
 
-	err = k.SetUserBalanceInStore(ctx, balanceKey, userBalance)
+	err = k.SetBalanceForAddress(ctx, collection, msg.Creator, userBalance)
 	if err != nil {
 		return nil, err
 	}

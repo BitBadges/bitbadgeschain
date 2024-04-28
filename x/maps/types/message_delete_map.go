@@ -1,8 +1,8 @@
 package types
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const TypeMsgDeleteMap = "delete_map"
@@ -11,11 +11,10 @@ var _ sdk.Msg = &MsgDeleteMap{}
 
 func NewMsgDeleteMap(creator string, mapId string) *MsgDeleteMap {
 	return &MsgDeleteMap{
-		Creator:                  creator,
-		MapId:                    mapId,
+		Creator: creator,
+		MapId:   mapId,
 	}
 }
-
 
 func (msg *MsgDeleteMap) Route() string {
 	return RouterKey
@@ -41,12 +40,12 @@ func (msg *MsgDeleteMap) GetSignBytes() []byte {
 func (msg *MsgDeleteMap) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	if len(msg.MapId) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "map ID cannot be empty")
+		return sdkerrors.Wrap(ErrInvalidRequest, "map ID cannot be empty")
 	}
-	
+
 	return nil
 }

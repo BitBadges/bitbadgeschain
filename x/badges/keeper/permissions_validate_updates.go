@@ -7,8 +7,8 @@ import (
 
 //This file checks that we are able to update some permission from A to B according to the rules:
 //-First match only (subsequent matches are ignored)
-//-If we have previously defined a permitted time or forbidden time, we cannot remove or switch it. If it was previously undefined, we can set it
-//-Forbidden and permitted times cannot overlap
+//-If we have previously defined an explicit permitted time or forbidden time, we cannot remove or switch it. If it was previously unhandled, we can make it explciit and permanent
+//-Forbidden and permitted times cannot overlap (i.e. a time cannot be both permitted and forbidden)
 //-Other permission-specific validation checks
 //-Duplicate combinations are disallowed because they are redundant
 

@@ -21,7 +21,23 @@ func (suite *TestSuite) TestNoMerkleChallengeWorking() {
 	CreateCollections(suite, wctx, collectionsToCreate)
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, []*types.ZkProofSolution{})
+	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(
+		suite.ctx,
+		collection,
+		&types.Transfer{
+			From:        bob,
+			ToAddresses: []string{alice},
+			Balances: []*types.Balance{
+				{
+					Amount:         sdkmath.NewUint(1),
+					BadgeIds:       GetTopHalfUintRanges(),
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+		},
+		alice,
+		alice,
+	)
 	suite.Require().Nil(err, "Error getting user balance: %s")
 }
 
@@ -43,16 +59,50 @@ func (suite *TestSuite) TestMerkleChallengeInvalidSolutions() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, []*types.ZkProofSolution{})
+	_, err := suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(
+		suite.ctx,
+		collection,
+		&types.Transfer{
+			From:        bob,
+			ToAddresses: []string{alice},
+			Balances: []*types.Balance{
+				{
+					Amount:         sdkmath.NewUint(1),
+					BadgeIds:       GetTopHalfUintRanges(),
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+		},
+		alice,
+		alice,
+	)
+
 	suite.Require().Error(err, "Error getting user balance: %s")
 
-	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{
+	_, err = suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(
+		suite.ctx,
+		collection,
+		&types.Transfer{
+			From:        bob,
+			ToAddresses: []string{alice},
+			Balances: []*types.Balance{
+				{
+					Amount:         sdkmath.NewUint(1),
+					BadgeIds:       GetTopHalfUintRanges(),
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+			MerkleProofs: []*types.MerkleProof{
 
-		{
-			Aunts: []*types.MerklePathItem{},
-			Leaf:  "sample",
+				{
+					Aunts: []*types.MerklePathItem{},
+					Leaf:  "sample",
+				},
+			},
 		},
-	}, nil, false, []*types.ZkProofSolution{})
+		alice,
+		alice,
+	)
 	suite.Require().Error(err, "Error getting user balance: %s")
 }
 func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {

@@ -56,6 +56,9 @@ message MsgNewCollection {
   repeated UserIncomingApproval defaultIncomingApprovals = 16; //The user's approved incoming transfers for each badge ID.
 
   bool defaultDisapproveSelfInitiated = 17; 
+   //The default balances for the user
+   repeated Balance defaultBalances = 18;
+
 }
 
 message MsgNewCollectionResponse {

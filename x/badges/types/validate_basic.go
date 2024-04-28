@@ -283,15 +283,15 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			}
 
 			usingLeafIndexForTransferOrder := false
+			challengeTrackerIdForTransferOrder := ""
 			if approvalCriteria.PredeterminedBalances != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
 				usingLeafIndexForTransferOrder = true
+				challengeTrackerIdForTransferOrder = approvalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId
 			}
 
-			if err := ValidateMerkleChallenges(approvalCriteria.MerkleChallenges, usingLeafIndexForTransferOrder); err != nil {
+			if err := ValidateMerkleChallenges(approvalCriteria.MerkleChallenges, usingLeafIndexForTransferOrder, challengeTrackerIdForTransferOrder); err != nil {
 				return sdkerrors.Wrapf(err, "invalid challenges")
 			}
-
-			
 
 			if approvalCriteria.MustOwnBadges == nil {
 				approvalCriteria.MustOwnBadges = []*MustOwnBadges{}
@@ -449,7 +449,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 	return nil
 }
 
-func ValidateMerkleChallenges(challenges []*MerkleChallenge, usingLeafIndexForTransferOrder bool) error {
+func ValidateMerkleChallenges(challenges []*MerkleChallenge, usingLeafIndexForTransferOrder bool, challengeTrackerIdForTransferOrder string) error {
 
 	for i, challenge := range challenges {
 		if challenge == nil || challenge.Root == "" {
@@ -467,7 +467,7 @@ func ValidateMerkleChallenges(challenges []*MerkleChallenge, usingLeafIndexForTr
 
 		maxOneUsePerLeaf := challenge.MaxUsesPerLeaf.Equal(sdkmath.NewUint(1))
 
-		if !maxOneUsePerLeaf && usingLeafIndexForTransferOrder {
+		if !maxOneUsePerLeaf && usingLeafIndexForTransferOrder && challenge.ChallengeTrackerId == challengeTrackerIdForTransferOrder {
 			return ErrPrimaryChallengeMustBeOneUsePerLeaf
 		}
 

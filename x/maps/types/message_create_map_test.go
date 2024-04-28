@@ -3,7 +3,6 @@ package types
 import (
 	"testing"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,8 +17,8 @@ func TestMsgCreateMap_ValidateBasic(t *testing.T) {
 			msg: MsgCreateMap{
 				Creator: "invalid_address",
 			},
-			err: sdkerrors.ErrInvalidAddress,
-		}, 
+			err: ErrInvalidAddress,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

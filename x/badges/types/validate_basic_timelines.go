@@ -88,23 +88,6 @@ func ValidateCollectionMetadataTimeline(timeline []*CollectionMetadataTimeline) 
 	return nil
 }
 
-// func ValidateInheritedBalancesTimeline(timeline []*InheritedBalancesTimeline) error {
-// 	for _, timelineVal := range timeline {
-// 		err := ValidateInheritedBalances(timelineVal.InheritedBalances)
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
-
-// 	times, _ := GetInheritedBalancesTimesAndValues(timeline)
-// 	err := ValidateTimelineTimesDoNotOverlap(times)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
-
 func ValidateStandardsTimeline(timeline []*StandardsTimeline) error {
 	times, _ := GetStandardsTimesAndValues(timeline)
 	err := ValidateTimelineTimesDoNotOverlap(times)

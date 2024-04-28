@@ -1,8 +1,8 @@
 package types
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
@@ -48,25 +48,25 @@ func (msg *MsgUpdateMap) GetSignBytes() []byte {
 func (msg *MsgUpdateMap) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	if len(msg.MapId) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "map ID cannot be empty")
+		return sdkerrors.Wrap(ErrInvalidRequest, "map ID cannot be empty")
 	}
 
 	err = badgestypes.ValidateManagerTimeline(CastManagerTimelineArray(msg.ManagerTimeline))
 	if err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "manager timeline cannot be invalid")
+		return sdkerrors.Wrap(ErrInvalidRequest, "manager timeline cannot be invalid")
 	}
 
 	err = badgestypes.ValidateCollectionMetadataTimeline(CastMetadataTimelineArray(msg.MetadataTimeline))
 	if err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "metadata timeline cannot be invalid")
+		return sdkerrors.Wrap(ErrInvalidRequest, "metadata timeline cannot be invalid")
 	}
 
 	if ValidatePermissions(msg.Permissions, false) != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "permissions are invalid")
+		return sdkerrors.Wrap(ErrInvalidRequest, "permissions are invalid")
 	}
 
 	return nil

@@ -1,10 +1,10 @@
 package types
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const TypeMsgCreateMap = "create_map"
@@ -49,26 +49,26 @@ func (msg *MsgCreateMap) GetSignBytes() []byte {
 func (msg *MsgCreateMap) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	if len(msg.MapId) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "map ID cannot be empty")
+		return sdkerrors.Wrap(ErrInvalidRequest, "map ID cannot be empty")
 	}
 
 	err = badgestypes.ValidateManagerTimeline(CastManagerTimelineArray(msg.ManagerTimeline))
 	if err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "manager timeline cannot be invalid")
+		return sdkerrors.Wrap(ErrInvalidRequest, "manager timeline cannot be invalid")
 	}
 
 	err = badgestypes.ValidateCollectionMetadataTimeline(CastMetadataTimelineArray(msg.MetadataTimeline))
 	if err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "metadata timeline cannot be invalid")
+		return sdkerrors.Wrap(ErrInvalidRequest, "metadata timeline cannot be invalid")
 	}
 
 	//Validate update criteria
 	if msg.UpdateCriteria == nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "update criteria cannot be nil")
+		return sdkerrors.Wrap(ErrInvalidRequest, "update criteria cannot be nil")
 	}
 
 	numDefined := 0
@@ -86,11 +86,11 @@ func (msg *MsgCreateMap) ValidateBasic() error {
 	}
 
 	if numDefined != 1 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "update criteria must have exactly one field defined")
+		return sdkerrors.Wrap(ErrInvalidRequest, "update criteria must have exactly one field defined")
 	}
 
 	if ValidatePermissions(msg.Permissions, false) != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "permissions are invalid")
+		return sdkerrors.Wrap(ErrInvalidRequest, "permissions are invalid")
 	}
 
 	return nil

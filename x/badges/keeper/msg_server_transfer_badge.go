@@ -21,11 +21,11 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 		return nil, err
 	}
 
+	//Get next collection id - 1 from badges keeper
+	//Used for multi-msg transactions where you do not know the collection ID yet upon creation
 	collectionId := msg.CollectionId
 	if collectionId.Equal(sdk.NewUint(0)) {
-		//Get next collection id - 1 from badges keeper
 		nextCollectionId := k.GetNextCollectionId(ctx)
-
 		collectionId = nextCollectionId.Sub(sdk.NewUint(1))
 	}
 

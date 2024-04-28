@@ -35,9 +35,3 @@ var (
 	NewDecFromStr     = sdkmath.LegacyNewDecFromStr
 	MustNewDecFromStr = sdkmath.LegacyMustNewDecFromStr
 )
-
-// var _ CustomProtobufType = (*Dec)(nil)
-
-// func (dp DecProto) String() string {
-// 	return dp.Dec.String()
-// }

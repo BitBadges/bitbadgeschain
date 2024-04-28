@@ -157,12 +157,12 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			CollectionPermissions: collectionToCreate.Permissions,
 			CollectionApprovals:   collectionToCreate.CollectionApprovals,
 			DefaultBalances: &types.UserBalanceStore{
-				Balances:          []*types.Balance{},
+				Balances:          collectionToCreate.DefaultBalances,
 				OutgoingApprovals: collectionToCreate.DefaultOutgoingApprovals,
 				IncomingApprovals: collectionToCreate.DefaultIncomingApprovals,
 				AutoApproveSelfInitiatedOutgoingTransfers: !collectionToCreate.DefaultDisapproveSelfInitiated,
 				AutoApproveSelfInitiatedIncomingTransfers: !collectionToCreate.DefaultDisapproveSelfInitiated,
-				UserPermissions: &types.UserPermissions{},
+				UserPermissions: nil,
 			},
 
 			// ManagerTimeline: []*types.ManagerTimeline{

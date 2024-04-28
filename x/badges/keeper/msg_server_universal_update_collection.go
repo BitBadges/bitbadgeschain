@@ -65,11 +65,6 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				},
 			},
 		}
-
-		// if IsInheritedBalances(collection) && (collection.InheritedCollectionId.IsZero() || collection.InheritedCollectionId.IsZero() ) {
-		// 	return nil, sdkerrors.Wrapf(ErrWrongBalancesType, "inherited balances are being set but collection %s does not have inherited balances", collection.CollectionId)
-		// }
-
 	} else {
 		found := false
 		collection, found = k.GetCollectionFromStore(ctx, msg.CollectionId)
@@ -97,6 +92,10 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		return nil, err
 	}
 
+	//Other cases:
+	//previouslyArchived && not stillArchived - we have just unarchived the collection
+	//not previouslyArchived && stillArchived - we have just archived the collection (all TXs moving forward will fail, but we allow this one)
+	//not previouslyArchived && not stillArchived - unarchived before and now so we allow
 	previouslyArchived := types.GetIsArchived(ctx, collection)
 	if msg.UpdateIsArchivedTimeline {
 		if err := k.ValidateIsArchivedUpdate(ctx, collection.IsArchivedTimeline, msg.IsArchivedTimeline, collection.CollectionPermissions.CanArchiveCollection); err != nil {
@@ -109,10 +108,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	if previouslyArchived && stillArchived {
 		return nil, ErrCollectionIsArchived
 	}
-	//Other cases:
-	//previouslyArchived && not stillArchived - we have just unarchived the collection
-	//not previouslyArchived && stillArchived - we have just archived the collection (all TXs moving forward will fail, but we allow this one)
-	//not previouslyArchived && not stillArchived - unarchived before and now so we allow
+
 
 	if msg.UpdateCollectionApprovals {
 		if err := k.ValidateCollectionApprovalsUpdate(ctx, collection, collection.CollectionApprovals, msg.CollectionApprovals, collection.CollectionPermissions.CanUpdateCollectionApprovals); err != nil {
