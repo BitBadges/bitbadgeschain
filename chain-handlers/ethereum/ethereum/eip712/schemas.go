@@ -371,7 +371,9 @@ func GetSchemas() []string {
 							"approverAddress": ""
 						}
 					],
-					"onlyCheckPrioritizedApprovals": false,
+					"onlyCheckPrioritizedCollectionApprovals": false,
+					"onlyCheckPrioritizedIncomingApprovals": false,
+					"onlyCheckPrioritizedOutgoingApprovals": false,
 					"zkProofSolutions": [
 						{
 							"proof": "",
