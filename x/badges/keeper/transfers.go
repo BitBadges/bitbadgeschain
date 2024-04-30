@@ -58,20 +58,21 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 						return sdkerrors.Wrapf(ErrNotImplemented, "approver address %s must match to or from address for user level precalculations", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
 					}
 
-					if transfer.PrecalculateBalancesFromApproval.ApproverAddress == to {
-						if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "incoming" {
-							userApprovals := toUserBalance.IncomingApprovals
-							approvals = types.CastIncomingTransfersToCollectionTransfers(userApprovals, to)
-						} else {
-							return sdkerrors.Wrapf(ErrNotImplemented, "approver address %s matches recipient but approval level was not 'incoming'", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
-						}
-					} else {
-						if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "outgoing" {
-							userApprovals := fromUserBalance.OutgoingApprovals
-							approvals = types.CastOutgoingTransfersToCollectionTransfers(userApprovals, transfer.From)
-						} else {
-							return sdkerrors.Wrapf(ErrNotImplemented, "approver address %s matches sender but approval level was not 'outgoing'", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
-						}
+					handled := false
+					if transfer.PrecalculateBalancesFromApproval.ApproverAddress == to && transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "incoming" {
+						userApprovals := toUserBalance.IncomingApprovals
+						approvals = types.CastIncomingTransfersToCollectionTransfers(userApprovals, to)
+						handled = true
+					}
+
+					if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "outgoing" && !handled && transfer.PrecalculateBalancesFromApproval.ApproverAddress == transfer.From {
+						userApprovals := fromUserBalance.OutgoingApprovals
+						approvals = types.CastOutgoingTransfersToCollectionTransfers(userApprovals, transfer.From)
+						handled = true
+					}
+
+					if !handled {
+						return sdkerrors.Wrapf(ErrNotImplemented, "could not determine approval to precalculate from %s", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
 					}
 				}
 
