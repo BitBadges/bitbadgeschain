@@ -149,13 +149,15 @@ func (k Keeper) HandleTransfer(
 	if len(userApprovals) > 0 {
 		for _, userApproval := range userApprovals {
 			newTransfer := &types.Transfer{
-				From:                          from,
-				ToAddresses:                   []string{to},
-				Balances:                      userApproval.Balances,
-				MerkleProofs:                  transfer.MerkleProofs,
-				PrioritizedApprovals:          transfer.PrioritizedApprovals,
-				OnlyCheckPrioritizedApprovals: transfer.OnlyCheckPrioritizedApprovals,
-				ZkProofSolutions:              transfer.ZkProofSolutions,
+				From:                                    from,
+				ToAddresses:                             []string{to},
+				Balances:                                userApproval.Balances,
+				MerkleProofs:                            transfer.MerkleProofs,
+				PrioritizedApprovals:                    transfer.PrioritizedApprovals,
+				OnlyCheckPrioritizedCollectionApprovals: transfer.OnlyCheckPrioritizedCollectionApprovals,
+				OnlyCheckPrioritizedIncomingApprovals:   transfer.OnlyCheckPrioritizedIncomingApprovals,
+				OnlyCheckPrioritizedOutgoingApprovals:   transfer.OnlyCheckPrioritizedOutgoingApprovals,
+				ZkProofSolutions:                        transfer.ZkProofSolutions,
 			}
 
 			if userApproval.Outgoing {

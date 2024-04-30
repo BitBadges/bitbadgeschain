@@ -446,9 +446,17 @@ message Transfer {
   // Whether to only check prioritized approvals for the transfer. 
   // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
   // If false, we will check the prioritized approvals first and then scan through the rest of the approvals. 
-  bool onlyCheckPrioritizedApprovals = 8;
+  bool onlyCheckPrioritizedCollectionApprovals = 8;
+  // Whether to only check prioritized approvals for the transfer. 
+  // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
+  // If false, we will check the prioritized approvals first and then scan through the rest of the approvals. 
+  bool onlyCheckPrioritizedIncomingApprovals = 9;
+  // Whether to only check prioritized approvals for the transfer. 
+  // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
+  // If false, we will check the prioritized approvals first and then scan through the rest of the approvals. 
+  bool onlyCheckPrioritizedOutgoingApprovals = 10;
   // The ZKPs that need to be solved for approval.
-  repeated ZkProofSolution zkProofSolutions = 9;
+  repeated ZkProofSolution zkProofSolutions = 11;
 }
 
 // MerklePathItem represents an item in a Merkle path.

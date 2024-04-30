@@ -116,7 +116,15 @@ func (k Keeper) DeductAndGetUserApprovals(
 ) ([]*UserApprovalsToCheck, error) {
 	prioritizedApprovals := transfer.PrioritizedApprovals
 	fromAddress := transfer.From
-	onlyCheckPrioritized := transfer.OnlyCheckPrioritizedApprovals
+	onlyCheckPrioritized := false
+	if approvalLevel == "collection" && transfer.OnlyCheckPrioritizedCollectionApprovals {
+		onlyCheckPrioritized = true
+	} else if approvalLevel == "outgoing" && transfer.OnlyCheckPrioritizedOutgoingApprovals {
+		onlyCheckPrioritized = true
+	} else if approvalLevel == "incoming" && transfer.OnlyCheckPrioritizedIncomingApprovals {
+		onlyCheckPrioritized = true
+	}
+
 	zkProofSolutions := transfer.ZkProofSolutions
 	originalTransferBalances = types.DeepCopyBalances(originalTransferBalances)
 

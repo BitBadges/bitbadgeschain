@@ -3116,7 +3116,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 						ApproverAddress: "",
 					},
 				},
-				OnlyCheckPrioritizedApprovals: true,
+				OnlyCheckPrioritizedCollectionApprovals: true,
 			},
 		},
 	})
@@ -3142,7 +3142,6 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 						ApproverAddress: "",
 					},
 				},
-				OnlyCheckPrioritizedApprovals: false,
 			},
 		},
 	})
