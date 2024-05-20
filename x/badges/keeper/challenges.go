@@ -125,6 +125,7 @@ func (k Keeper) HandleMerkleChallenges(
 						ctx.EventManager().EmitEvent(
 							sdk.NewEvent("challenge"+fmt.Sprint(approval.ApprovalId)+fmt.Sprint(challengeId)+fmt.Sprint(leafIndex)+fmt.Sprint(approverAddress)+fmt.Sprint(approvalLevel)+fmt.Sprint(newNumUsed),
 								sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+								sdk.NewAttribute("creator", creatorAddress),
 								sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 								sdk.NewAttribute("challengeTrackerId", fmt.Sprint(challengeId)),
 								sdk.NewAttribute("approvalId", fmt.Sprint(approval.ApprovalId)),

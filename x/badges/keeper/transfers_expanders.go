@@ -31,6 +31,7 @@ func AppendSelfInitiatedIncomingApproval(currApprovals []*types.UserIncomingAppr
 					End:   sdkmath.NewUint(math.MaxUint64),
 				},
 			},
+			ApprovalId: "self-initiated-incoming",
 		}}, currApprovals...)
 
 	return currApprovals
@@ -61,6 +62,7 @@ func AppendSelfInitiatedOutgoingApproval(currApprovals []*types.UserOutgoingAppr
 					End:   sdkmath.NewUint(math.MaxUint64),
 				},
 			},
+			ApprovalId: "self-initiated-outgoing",
 		}}, currApprovals...)
 
 	return currApprovals

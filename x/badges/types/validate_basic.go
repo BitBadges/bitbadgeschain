@@ -206,6 +206,10 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be default-outgoing or default-incoming")
 		}
 
+		if collectionApprovals[i].ApprovalId == "self-initiated-outgoing" || collectionApprovals[i].ApprovalId == "self-initiated-incoming" {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be default-outgoing or default-incoming")
+		}
+
 		for j := i + 1; j < len(collectionApprovals); j++ {
 			if collectionApprovals[i].ApprovalId == collectionApprovals[j].ApprovalId {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate approval ids")
