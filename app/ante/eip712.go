@@ -313,6 +313,8 @@ func VerifySignature(
 		sha256JsonHash := sha256.Sum256(sortedBytes)
 		jsonHashHexStr := hex.EncodeToString(sha256JsonHash[:])
 
+		humanReadableStr := "This is a BitBadges transaction with the content hash: " + jsonHashHexStr
+
 		//If chain is Solana, we need to use the Solana way to verify the signature (alphabetically sorted JSON keys)
 		//Else, we use EIP712 typed signatures for Ethereum
 		if chain == "Solana" || chain == "Bitcoin" {
@@ -333,30 +335,47 @@ func VerifySignature(
 				//Verify signature w/ ed25519 or the SHA256 hash of the sorted JSON (as a workaround for the 1000 byte limit)
 				standardMsgSigValid := ed25519.Verify(pubKey.Bytes(), sortedBytes, feePayerSig)
 				hashedMsgSigValid := ed25519.Verify(pubKey.Bytes(), []byte(jsonHashHexStr), feePayerSig)
-				if !standardMsgSigValid && !hashedMsgSigValid {
+				humanReadableMsgSigValid := ed25519.Verify(pubKey.Bytes(), []byte(humanReadableStr), feePayerSig)
+				if !standardMsgSigValid && !hashedMsgSigValid && !humanReadableMsgSigValid {
 					return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature %s %s", recoveredFeePayerAcc, jsonStr, jsonHashHexStr)
 				}
 			} else if chain == "Bitcoin" {
 				//verify bitcoin bip322 signature
-
 				message := string(sortedBytes)
 				signature := hex.EncodeToString(feePayerSig)
 				address := feePayer.String()
 
 				scriptPath := verifyBtcSigPath + "/dist/verify.js"
+				standardSigIsValid := false
+				humanReadableSigIsValid := false
+
 				output, err := exec.Command("node", scriptPath, message, signature, address).Output()
-				if err != nil {
-					return sdkerrors.Wrapf(err, "unable to verify signer signature of Bitcoin signature")
+				if err == nil {
+					// Process the output as needed, for example, splitting it into lines
+					lines := strings.Split(string(output), "\n")
+					if len(lines) >= 1 {
+						verified := string(lines[0]) == "true"
+						if verified {
+							standardSigIsValid = true
+						}
+					}
 				}
 
-				// Process the output as needed, for example, splitting it into lines
-				lines := strings.Split(string(output), "\n")
-				if len(lines) < 1 {
-					return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify signer signature of Bitcoin signature")
+				output, err = exec.Command("node", scriptPath, humanReadableStr, signature, address).Output()
+				if err == nil {
+					// Process the output as needed, for example, splitting it into lines
+					lines := strings.Split(string(output), "\n")
+					if len(lines) >= 1 {
+						verified := string(lines[0]) == "true"
+						if verified {
+							humanReadableSigIsValid = true
+						}
+					}
+				} else {
+					return sdkerrors.Wrapf(err, "failed to verify bitcoin signature %s %s %s %s", message, signature, address, scriptPath)
 				}
 
-				verified := string(lines[0]) == "true"
-				if !verified {
+				if !standardSigIsValid && !humanReadableSigIsValid {
 					return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify signer signature of Bitcoin signature")
 				}
 			}
@@ -375,6 +394,15 @@ func VerifySignature(
 				"0x"+hex.EncodeToString(feePayerSig),
 			)
 			if isHashSigValid && hashSigErr == nil {
+				return nil
+			}
+
+			isHumanReadableStrSigValid, humanReadableStrSigErr := sigverify.VerifyEllipticCurveHexSignatureEx(
+				ethcommon.Address(pubKey.Address().Bytes()),
+				[]byte(humanReadableStr),
+				"0x"+hex.EncodeToString(feePayerSig),
+			)
+			if isHumanReadableStrSigValid && humanReadableStrSigErr == nil {
 				return nil
 			}
 
