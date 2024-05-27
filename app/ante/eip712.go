@@ -3,24 +3,31 @@ package ante
 import (
 	"crypto/ed25519"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"os/exec"
-	"strings"
 
 	sdkerrors "cosmossdk.io/errors"
+	"github.com/btcsuite/btcd/btcutil"
+	"github.com/btcsuite/btcd/btcutil/bech32"
+	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/btcsuite/btcd/txscript"
+	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	bech32cosmos "github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
+
 	"github.com/tidwall/gjson"
+	"github.com/unisat-wallet/libbrc20-indexer/utils/bip322"
 
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
@@ -342,37 +349,36 @@ func VerifySignature(
 			} else if chain == "Bitcoin" {
 				//verify bitcoin bip322 signature
 				message := string(sortedBytes)
-				signature := hex.EncodeToString(feePayerSig)
-				address := feePayer.String()
-
-				scriptPath := verifyBtcSigPath + "/dist/verify.js"
-				standardSigIsValid := false
-				humanReadableSigIsValid := false
-
-				output, err := exec.Command("node", scriptPath, message, signature, address).Output()
-				if err == nil {
-					// Process the output as needed, for example, splitting it into lines
-					lines := strings.Split(string(output), "\n")
-					if len(lines) >= 1 {
-						verified := string(lines[0]) == "true"
-						if verified {
-							standardSigIsValid = true
-						}
-					}
+				// signature := hex.EncodeToString(feePayerSig)
+				cosmosAddress := feePayer.String()
+				signature := base64.StdEncoding.EncodeToString(feePayerSig)
+				_, base256Bytes, err := bech32cosmos.DecodeAndConvert(cosmosAddress)
+				if err != nil {
+					return sdkerrors.Wrap(err, "failed to decode and convert signer address")
 				}
 
-				output, err = exec.Command("node", scriptPath, humanReadableStr, signature, address).Output()
-				if err == nil {
-					// Process the output as needed, for example, splitting it into lines
-					lines := strings.Split(string(output), "\n")
-					if len(lines) >= 1 {
-						verified := string(lines[0]) == "true"
-						if verified {
-							humanReadableSigIsValid = true
-						}
-					}
-				} else {
-					return sdkerrors.Wrapf(err, "failed to verify bitcoin signature %s %s %s %s", message, signature, address, scriptPath)
+				base32Bytes, err := bech32.ConvertBits(base256Bytes, 8, 5, true)
+				if err != nil {
+					return sdkerrors.Wrap(err, "failed to convert signer address to base32")
+				}
+
+				btcAddressBytes := []byte{} //witness version byte
+				btcAddressBytes = append(btcAddressBytes, 0)
+				btcAddressBytes = append(btcAddressBytes, base32Bytes...)
+
+				signerAddress, err := bech32.Encode("bc", btcAddressBytes)
+				if err != nil {
+					return sdkerrors.Wrap(err, "failed to convert and encode signer address")
+				}
+
+				standardSigIsValid, err := VerifyBIP322Signature(signerAddress, signature, message)
+				if err != nil {
+					return sdkerrors.Wrapf(err, "failed to verify bitcoin signature %s %s %s", message, signature, signerAddress)
+				}
+
+				humanReadableSigIsValid, err := VerifyBIP322Signature(signerAddress, signature, humanReadableStr)
+				if err != nil {
+					return sdkerrors.Wrapf(err, "failed to verify bitcoin signature %s %s %s", humanReadableStr, signature, signerAddress)
 				}
 
 				if !standardSigIsValid && !humanReadableSigIsValid {
@@ -437,6 +443,54 @@ func VerifySignature(
 	default:
 		return sdkerrors.Wrapf(types.ErrTooManySignatures, "unexpected SignatureData %T", sigData)
 	}
+}
+
+func VerifyBIP322Signature(signerAddress string, signature string, message string) (bool, error) {
+	//These will be in the following format:
+	//[0x02 or 0x03] [LENGTH_BYTE, ...(LENGTH bytes that go into witness[0])] [0x21, ...(33 byte (len = 0x21) public key that was used to sign the message)]
+	//- First byte is either a 0x02 or 0x03 (not sure exactly why but apparently it is - https://github.com/ACken2/bip322-js/blob/f0f9373b3a1da19e017c518b891522eaa4bcccdd/src/helpers/Address.ts#L85)
+	//- Next part is the details that go into witness[0] (length of this part is determined by the second byte) - again, not exactly sure what this is
+	//- Last part is the public key that was used to sign the message (33 bytes) - There is a length byte 0x21 before this part to denote the length of the public key (0x21 = 33)
+	encodedSigBytes, err := base64.StdEncoding.DecodeString(signature)
+	if err != nil {
+		return false, err
+	}
+
+	//Convert the address to a public key script (I believe this is the denotation for a pay-to-this-address script but not 100% sure)
+	pkScript := convertAddressToScriptPubkey(signerAddress)
+
+	//Decode the length of the witness[0] part
+	encodedSigLenByte := encodedSigBytes[1]
+	encodedSigLen := int(encodedSigLenByte)
+
+	//Extract witness[0] and witness[1] from the encoded signature
+	PUB_KEY_LEN := 33
+	encodedSig := encodedSigBytes[len(encodedSigBytes)-PUB_KEY_LEN-1-encodedSigLen : len(encodedSigBytes)-PUB_KEY_LEN-1]
+	pubKey := encodedSigBytes[len(encodedSigBytes)-33:]
+
+	//Recreate the witness to pass into the VerifySignature function
+	witness := wire.TxWitness{
+		encodedSig,
+		pubKey,
+	}
+
+	//This is the BIP322 verification function from the Unisat wallet
+	verified := bip322.VerifySignature(witness, pkScript, message)
+	return verified, nil
+}
+
+func convertAddressToScriptPubkey(address string) []byte {
+	btcAddress, err := btcutil.DecodeAddress(address, &chaincfg.MainNetParams)
+	if err != nil {
+		panic(err)
+	}
+
+	outputScript, err := txscript.PayToAddrScript(btcAddress)
+	if err != nil {
+		panic(err)
+	}
+
+	return outputScript
 }
 
 func CheckFeePayerPubKey(pubKey cryptotypes.PubKey, message []byte, feePayerSig []byte) error {
