@@ -1,8 +1,6 @@
 module github.com/bitbadges/bitbadgeschain
 
-go 1.21.0
-
-toolchain go1.22.3
+go 1.22.3
 
 //golang.org/x/exp has been a problem dependency for 0.47 (see https://github.com/cosmos/cosmos-sdk/issues/18415)
 
