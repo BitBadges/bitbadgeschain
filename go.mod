@@ -34,7 +34,7 @@ require (
 )
 
 require (
-	github.com/btcsuite/btcd v0.23.5-0.20231215221805-96c9fd8078fd
+	github.com/btcsuite/btcd v0.24.0
 	github.com/btcsuite/btcd/btcutil v1.1.5
 	github.com/gogo/protobuf v1.3.2
 	github.com/iden3/go-iden3-crypto v0.0.15
