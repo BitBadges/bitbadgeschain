@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -14,12 +15,12 @@ func (suite *TestSuite) TestArchiveCollection() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")
 
-	_, err = GetCollection(suite, wctx, sdk.NewUint(1))
+	_, err = GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting badge: %s")
 
 	err = ArchiveCollection(suite, wctx, &types.MsgArchiveCollection{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		IsArchivedTimeline: []*types.IsArchivedTimeline{
 			{
 				IsArchived:    true,
@@ -30,12 +31,12 @@ func (suite *TestSuite) TestArchiveCollection() {
 	suite.Require().Nil(err, "Error archiving collection: %s")
 
 	//Still should be able to get collection
-	_, err = GetCollection(suite, wctx, sdk.NewUint(1))
+	_, err = GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting badge: %s")
 
 	err = UpdateManager(suite, wctx, &types.MsgUpdateManager{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		ManagerTimeline: []*types.ManagerTimeline{
 			{
 				Manager:       alice,
@@ -47,7 +48,7 @@ func (suite *TestSuite) TestArchiveCollection() {
 
 	err = ArchiveCollection(suite, wctx, &types.MsgArchiveCollection{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		IsArchivedTimeline: []*types.IsArchivedTimeline{
 			{
 				IsArchived:    false,
@@ -59,7 +60,7 @@ func (suite *TestSuite) TestArchiveCollection() {
 
 	err = UpdateManager(suite, wctx, &types.MsgUpdateManager{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		ManagerTimeline: []*types.ManagerTimeline{
 			{
 				Manager:       alice,

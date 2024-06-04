@@ -23,7 +23,7 @@ package ante_test
 // 			"success - DeliverTx EIP712 signed Cosmos Tx with MsgSend",
 // 			func() sdk.Tx {
 // 				from := acc.GetAddress()
-// 				amount := sdk.NewCoins(sdk.NewCoin(evmtypes.DefaultEVMDenom, sdk.NewInt(0)))
+// 				amount := sdk.NewCoins(sdk.NewCoin(evmtypes.DefaultEVMDenom, sdkmath.NewInt(0)))
 // 				gas := uint64(200000)
 // 				txBuilder := suite.CreateTestEIP712TxBuilderMsgSend(from, privKey, "ethermint_9000-1", gas, amount)
 // 				return txBuilder.GetTx()
@@ -33,7 +33,7 @@ package ante_test
 // 			"success - DeliverTx EIP712 signed Cosmos Tx with DelegateMsg",
 // 			func() sdk.Tx {
 // 				from := acc.GetAddress()
-// 				coinAmount := sdk.NewCoin(evmtypes.DefaultEVMDenom, sdk.NewInt(0))
+// 				coinAmount := sdk.NewCoin(evmtypes.DefaultEVMDenom, sdkmath.NewInt(0))
 // 				amount := sdk.NewCoins(coinAmount)
 // 				gas := uint64(200000)
 // 				txBuilder := suite.CreateTestEIP712TxBuilderMsgDelegate(from, privKey, "ethermint_9000-1", gas, amount)
@@ -44,7 +44,7 @@ package ante_test
 // 			"fails - DeliverTx EIP712 signed Cosmos Tx with wrong Chain ID",
 // 			func() sdk.Tx {
 // 				from := acc.GetAddress()
-// 				amount := sdk.NewCoins(sdk.NewCoin(evmtypes.DefaultEVMDenom, sdk.NewInt(0)))
+// 				amount := sdk.NewCoins(sdk.NewCoin(evmtypes.DefaultEVMDenom, sdkmath.NewInt(0)))
 // 				gas := uint64(200000)
 // 				txBuilder := suite.CreateTestEIP712TxBuilderMsgSend(from, privKey, "ethermint_9002-1", gas, amount)
 // 				return txBuilder.GetTx()
@@ -54,11 +54,11 @@ package ante_test
 // 			"fails - DeliverTx EIP712 signed Cosmos Tx with different gas fees",
 // 			func() sdk.Tx {
 // 				from := acc.GetAddress()
-// 				amount := sdk.NewCoins(sdk.NewCoin(evmtypes.DefaultEVMDenom, sdk.NewInt(0)))
+// 				amount := sdk.NewCoins(sdk.NewCoin(evmtypes.DefaultEVMDenom, sdkmath.NewInt(0)))
 // 				gas := uint64(200000)
 // 				txBuilder := suite.CreateTestEIP712TxBuilderMsgSend(from, privKey, "ethermint_9001-1", gas, amount)
 // 				txBuilder.SetGasLimit(uint64(300000))
-// 				txBuilder.SetFeeAmount(sdk.NewCoins(sdk.NewCoin(evmtypes.DefaultEVMDenom, sdk.NewInt(30))))
+// 				txBuilder.SetFeeAmount(sdk.NewCoins(sdk.NewCoin(evmtypes.DefaultEVMDenom, sdkmath.NewInt(30))))
 // 				return txBuilder.GetTx()
 // 			}, false, false, false,
 // 		},
@@ -66,7 +66,7 @@ package ante_test
 // 			"fails - DeliverTx EIP712 signed Cosmos Tx with empty signature",
 // 			func() sdk.Tx {
 // 				from := acc.GetAddress()
-// 				amount := sdk.NewCoins(sdk.NewCoin(evmtypes.DefaultEVMDenom, sdk.NewInt(0)))
+// 				amount := sdk.NewCoins(sdk.NewCoin(evmtypes.DefaultEVMDenom, sdkmath.NewInt(0)))
 // 				gas := uint64(200000)
 // 				txBuilder := suite.CreateTestEIP712TxBuilderMsgSend(from, privKey, "ethermint_9001-1", gas, amount)
 // 				sigsV2 := signing.SignatureV2{}
@@ -78,7 +78,7 @@ package ante_test
 // 			"fails - DeliverTx EIP712 signed Cosmos Tx with invalid sequence",
 // 			func() sdk.Tx {
 // 				from := acc.GetAddress()
-// 				amount := sdk.NewCoins(sdk.NewCoin(evmtypes.DefaultEVMDenom, sdk.NewInt(0)))
+// 				amount := sdk.NewCoins(sdk.NewCoin(evmtypes.DefaultEVMDenom, sdkmath.NewInt(0)))
 // 				gas := uint64(200000)
 // 				txBuilder := suite.CreateTestEIP712TxBuilderMsgSend(from, privKey, "ethermint_9001-1", gas, amount)
 // 				nonce, err := suite.app.AccountKeeper.GetSequence(suite.ctx, acc.GetAddress())
@@ -98,7 +98,7 @@ package ante_test
 // 			"fails - DeliverTx EIP712 signed Cosmos Tx with invalid signMode",
 // 			func() sdk.Tx {
 // 				from := acc.GetAddress()
-// 				amount := sdk.NewCoins(sdk.NewCoin(evmtypes.DefaultEVMDenom, sdk.NewInt(0)))
+// 				amount := sdk.NewCoins(sdk.NewCoin(evmtypes.DefaultEVMDenom, sdkmath.NewInt(0)))
 // 				gas := uint64(200000)
 // 				txBuilder := suite.CreateTestEIP712TxBuilderMsgSend(from, privKey, "ethermint_9001-1", gas, amount)
 // 				nonce, err := suite.app.AccountKeeper.GetSequence(suite.ctx, acc.GetAddress())

@@ -44,7 +44,7 @@ func (suite *TestSuite) TestCreateBadges() {
 	suite.Require().Nil(err, "Error getting badge: %s")
 	balance := &types.UserBalanceStore{}
 
-	totalSupplys, err := GetUserBalance(suite, wctx, sdk.NewUint(1), "Total")
+	totalSupplys, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Total")
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	AssertBalancesEqual(suite, totalSupplys.Balances, []*types.Balance{
 		{
@@ -105,7 +105,7 @@ func (suite *TestSuite) TestCreateBadges() {
 	}, false)
 	suite.Require().Nil(err, "Error subtracting balances: %s")
 
-	totalSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Total")
+	totalSupplys, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Total")
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	_, err = types.SubtractBalance(suite.ctx, totalSupplys.Balances, &types.Balance{
 		BadgeIds: []*types.UintRange{
@@ -117,7 +117,7 @@ func (suite *TestSuite) TestCreateBadges() {
 	}, false)
 	suite.Require().Nil(err, "Error subtracting balances: %s")
 
-	unmintedSupplys, err := GetUserBalance(suite, wctx, sdk.NewUint(1), "Mint")
+	unmintedSupplys, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Mint")
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	AssertBalancesEqual(suite, unmintedSupplys.Balances, []*types.Balance{})
 
@@ -130,7 +130,7 @@ func (suite *TestSuite) TestCreateBadges() {
 	})
 	suite.Require().Nil(err, "Error creating badges: %s")
 
-	totalSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Total")
+	totalSupplys, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Total")
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	_, err = types.SubtractBalance(suite.ctx, totalSupplys.Balances, &types.Balance{
 		BadgeIds: []*types.UintRange{
@@ -141,7 +141,7 @@ func (suite *TestSuite) TestCreateBadges() {
 	}, false)
 	suite.Require().Nil(err, "Error subtracting balances: %s")
 
-	unmintedSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Mint")
+	unmintedSupplys, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Mint")
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	_, err = types.SubtractBalance(suite.ctx, unmintedSupplys.Balances, &types.Balance{
 		BadgeIds: []*types.UintRange{
@@ -152,7 +152,7 @@ func (suite *TestSuite) TestCreateBadges() {
 	}, false)
 	suite.Require().Error(err, "Error subtracting balances: %s")
 
-	unmintedSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Mint")
+	unmintedSupplys, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Mint")
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	_, err = types.SubtractBalance(suite.ctx, unmintedSupplys.Balances, &types.Balance{
 		BadgeIds: []*types.UintRange{
@@ -187,7 +187,7 @@ func (suite *TestSuite) TestCreateBadges() {
 	suite.Require().Nil(err, "Error creating badges: %s")
 	// AssertUintsEqual(suite, collection.NextBadgeId, sdkmath.NewUint(uint64(math.MaxUint64)).Add(sdkmath.NewUint(1)))
 
-	unmintedSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Mint")
+	unmintedSupplys, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Mint")
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	_, err = types.SubtractBalance(suite.ctx, unmintedSupplys.Balances, &types.Balance{
 		BadgeIds: []*types.UintRange{
@@ -374,7 +374,7 @@ func (suite *TestSuite) TestDefaultsCannotBeDoubleUsedAfterSpent() {
 	suite.Require().Nil(err, "Error creating badge: %s")
 
 	balance := &types.UserBalanceStore{}
-	totalSupplys, err := GetUserBalance(suite, wctx, sdk.NewUint(1), "Total")
+	totalSupplys, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Total")
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	AssertBalancesEqual(suite, totalSupplys.Balances, []*types.Balance{
 		{

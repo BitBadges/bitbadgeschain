@@ -31,7 +31,7 @@ func (k Keeper) SetAnchorLocation(ctx sdk.Context, idx sdkmath.Uint, value strin
 	anchor := types.AnchorData{
 		Creator:   creator,
 		Data:      value,
-		Timestamp: sdk.NewUint(uint64(blockTime)),
+		Timestamp: sdkmath.NewUint(uint64(blockTime)),
 	}
 
 	marshaled_info, err := k.cdc.Marshal(&anchor)

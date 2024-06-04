@@ -700,7 +700,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovals() {
 			To: alice,
 			Coins: []*sdk.Coin{
 				{
-					Amount: sdk.NewInt(100),
+					Amount: sdkmath.NewInt(100),
 					Denom:  "badge",
 				},
 			},
@@ -714,8 +714,8 @@ func (suite *TestSuite) TestCoinTransfersWithApprovals() {
 
 	bobBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "badge")
 	aliceBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "badge")
-	suite.Require().Equal(sdk.NewInt(1000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
-	suite.Require().Equal(sdk.NewInt(0), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(1000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(0), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -738,8 +738,8 @@ func (suite *TestSuite) TestCoinTransfersWithApprovals() {
 
 	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "badge")
 	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "badge")
-	suite.Require().Equal(sdk.NewInt(900), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
-	suite.Require().Equal(sdk.NewInt(100), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(900), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(100), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
 
 }
 
@@ -753,7 +753,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsUnderflow() {
 			To: alice,
 			Coins: []*sdk.Coin{
 				{
-					Amount: sdk.NewInt(100000),
+					Amount: sdkmath.NewInt(100000),
 					Denom:  "badge",
 				},
 			},
@@ -767,8 +767,8 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsUnderflow() {
 
 	bobBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "badge")
 	aliceBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "badge")
-	suite.Require().Equal(sdk.NewInt(1000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
-	suite.Require().Equal(sdk.NewInt(0), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(1000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(0), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -791,8 +791,8 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsUnderflow() {
 
 	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "badge")
 	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "badge")
-	suite.Require().Equal(sdk.NewInt(1000), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
-	suite.Require().Equal(sdk.NewInt(0), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(1000), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(0), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
 }
 
 func (suite *TestSuite) TestCoinTransfersWithApprovalsMultiple() {
@@ -805,7 +805,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsMultiple() {
 			To: alice,
 			Coins: []*sdk.Coin{
 				{
-					Amount: sdk.NewInt(100),
+					Amount: sdkmath.NewInt(100),
 					Denom:  "badge",
 				},
 			},
@@ -814,7 +814,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsMultiple() {
 			To: charlie,
 			Coins: []*sdk.Coin{
 				{
-					Amount: sdk.NewInt(100),
+					Amount: sdkmath.NewInt(100),
 					Denom:  "badge",
 				},
 			},
@@ -828,8 +828,8 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsMultiple() {
 
 	bobBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "badge")
 	aliceBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "badge")
-	suite.Require().Equal(sdk.NewInt(1000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
-	suite.Require().Equal(sdk.NewInt(0), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(1000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(0), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -852,9 +852,9 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsMultiple() {
 
 	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "badge")
 	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "badge")
-	suite.Require().Equal(sdk.NewInt(800), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
-	suite.Require().Equal(sdk.NewInt(100), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
-	suite.Require().Equal(sdk.NewInt(100), suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(charlie), "badge").Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(800), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(100), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(100), suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(charlie), "badge").Amount, "Error deducting outgoing approvals")
 }
 
 func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
@@ -865,7 +865,7 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 			To: alice,
 			Coins: []*sdk.Coin{
 				{
-					Amount: sdk.NewInt(100),
+					Amount: sdkmath.NewInt(100),
 					Denom:  "badge",
 				},
 			},
@@ -874,7 +874,7 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 			To: charlie,
 			Coins: []*sdk.Coin{
 				{
-					Amount: sdk.NewInt(100),
+					Amount: sdkmath.NewInt(100),
 					Denom:  "badge",
 				},
 			},
@@ -907,7 +907,7 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 			To: alice,
 			Coins: []*sdk.Coin{
 				{
-					Amount: sdk.NewInt(100),
+					Amount: sdkmath.NewInt(100),
 					Denom:  "badge",
 				},
 			},
@@ -920,8 +920,8 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 
 	bobBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "badge")
 	aliceBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "badge")
-	suite.Require().Equal(sdk.NewInt(1000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
-	suite.Require().Equal(sdk.NewInt(0), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(1000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(0), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -963,9 +963,9 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 
 	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "badge")
 	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "badge")
-	suite.Require().Equal(sdk.NewInt(700), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
-	suite.Require().Equal(sdk.NewInt(200), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
-	suite.Require().Equal(sdk.NewInt(100), suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(charlie), "badge").Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(700), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(200), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(100), suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(charlie), "badge").Amount, "Error deducting outgoing approvals")
 }
 
 func (suite *TestSuite) TestWeirdBootstrapThing() {
@@ -976,7 +976,7 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 			To: alice,
 			Coins: []*sdk.Coin{
 				{
-					Amount: sdk.NewInt(100),
+					Amount: sdkmath.NewInt(100),
 					Denom:  "badge",
 				},
 			},
@@ -985,7 +985,7 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 			To: charlie,
 			Coins: []*sdk.Coin{
 				{
-					Amount: sdk.NewInt(100),
+					Amount: sdkmath.NewInt(100),
 					Denom:  "badge",
 				},
 			},
@@ -1018,7 +1018,7 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 			To: alice,
 			Coins: []*sdk.Coin{
 				{
-					Amount: sdk.NewInt(100),
+					Amount: sdkmath.NewInt(100),
 					Denom:  "badge",
 				},
 			},
@@ -1031,8 +1031,8 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 
 	bobBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "badge")
 	aliceBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "badge")
-	suite.Require().Equal(sdk.NewInt(1000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
-	suite.Require().Equal(sdk.NewInt(0), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(1000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(0), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -1074,7 +1074,7 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 
 	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "badge")
 	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "badge")
-	suite.Require().Equal(sdk.NewInt(700), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
-	suite.Require().Equal(sdk.NewInt(200), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
-	suite.Require().Equal(sdk.NewInt(100), suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(charlie), "badge").Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(700), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(200), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(100), suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(charlie), "badge").Amount, "Error deducting outgoing approvals")
 }

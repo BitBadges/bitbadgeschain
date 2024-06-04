@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -14,6 +15,6 @@ func (k msgServer) AddCustomData(goCtx context.Context, msg *types.MsgAddCustomD
 	k.SetAnchorLocation(ctx, nextLocationId, msg.Data, msg.Creator)
 
 	return &types.MsgAddCustomDataResponse{
-		LocationId: sdk.NewUint(nextLocationId.Uint64()),
+		LocationId: sdkmath.NewUint(nextLocationId.Uint64()),
 	}, nil
 }

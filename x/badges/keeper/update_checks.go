@@ -2,6 +2,7 @@ package keeper
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -11,7 +12,7 @@ import (
 // This is a generic function that is used to get the "updated" field combinations
 // Ex: If we go from [badgeIDs 1 to 10 -> www.example.com] to [badgeIDs 1 to 2 -> www.example2.com, badgeIDs 3 to 10 -> www.example.com]
 //
-// This will return a UniversalPermissionDetails with badgeIDs 1 to 2 because they changed and are the ones we need to check
+// # This will return a UniversalPermissionDetails with badgeIDs 1 to 2 because they changed and are the ones we need to check
 //
 // Note that updates are field-specific, so the comparison logic is handled via a custom passed-in function - compareAndGetUpdateCombosToCheck
 func GetUpdateCombinationsToCheck(
@@ -170,7 +171,7 @@ func CheckNotForbiddenForAllOverlaps(ctx sdk.Context, castedPermissions []*types
 }
 
 func CheckNotForbidden(ctx sdk.Context, permission *types.UniversalPermissionDetails, permissionStr string) error {
-	blockTime := sdk.NewUint(uint64(ctx.BlockTime().UnixMilli()))
+	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 
 	found, err := types.SearchUintRangesForUint(blockTime, permission.PermanentlyForbiddenTimes)
 	if found || err != nil {

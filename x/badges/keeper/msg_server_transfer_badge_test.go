@@ -188,7 +188,7 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 	suite.Require().Equal(sdkmath.NewUint(1), fetchedBalance[0].Amount)
 	suite.Require().Nil(err)
 
-	unmintedSupplys, err := GetUserBalance(suite, wctx, sdk.NewUint(1), "Mint")
+	unmintedSupplys, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Mint")
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	AssertBalancesEqual(suite, []*types.Balance{}, unmintedSupplys.Balances)
 
@@ -229,7 +229,7 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 	})
 	suite.Require().Nil(err, "Error transferring badge")
 
-	unmintedSupplys, err = GetUserBalance(suite, wctx, sdk.NewUint(1), "Mint")
+	unmintedSupplys, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Mint")
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	AssertBalancesEqual(suite, []*types.Balance{}, unmintedSupplys.Balances)
 

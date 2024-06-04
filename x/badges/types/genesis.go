@@ -1,8 +1,8 @@
 package types
 
 import (
-	"github.com/cosmos/cosmos-sdk/types"
-	host "github.com/cosmos/ibc-go/v7/modules/core/24-host"
+	sdkmath "cosmossdk.io/math"
+	host "github.com/cosmos/ibc-go/v8/modules/core/24-host"
 	// this line is used by starport scaffolding # genesis/types/import
 )
 
@@ -15,7 +15,7 @@ func DefaultGenesis() *GenesisState {
 		PortId: PortID,
 		// this line is used by starport scaffolding # genesis/types/default
 		Params:           DefaultParams(),
-		NextCollectionId: types.NewUint(1),
+		NextCollectionId: sdkmath.NewUint(1),
 	}
 }
 

@@ -146,8 +146,8 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 				{
 
 					Root:                hex.EncodeToString(rootHash),
-					ExpectedProofLength: sdk.NewUint(2),
-					MaxUsesPerLeaf:      sdk.NewUint(1),
+					ExpectedProofLength: sdkmath.NewUint(2),
+					MaxUsesPerLeaf:      sdkmath.NewUint(1),
 				},
 			},
 
@@ -169,7 +169,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        "Mint",
@@ -204,7 +204,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        "Mint",
@@ -239,7 +239,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        "Mint",
@@ -312,8 +312,8 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 				{
 
 					Root:                    hex.EncodeToString(rootHash),
-					ExpectedProofLength:     sdk.NewUint(2),
-					MaxUsesPerLeaf:          sdk.NewUint(1),
+					ExpectedProofLength:     sdkmath.NewUint(2),
+					MaxUsesPerLeaf:          sdkmath.NewUint(1),
 					UseCreatorAddressAsLeaf: true,
 				},
 			},
@@ -338,7 +338,7 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        "Mint",
@@ -410,8 +410,8 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 			MerkleChallenges: []*types.MerkleChallenge{
 				{
 					Root:                hex.EncodeToString(rootHash),
-					ExpectedProofLength: sdk.NewUint(5),
-					MaxUsesPerLeaf:      sdk.NewUint(1),
+					ExpectedProofLength: sdkmath.NewUint(5),
+					MaxUsesPerLeaf:      sdkmath.NewUint(1),
 				},
 			},
 			OverridesFromOutgoingApprovals: true,
@@ -434,7 +434,7 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        "Mint",
@@ -534,8 +534,8 @@ func (suite *TestSuite) TestIncrements() {
 				{
 					ChallengeTrackerId:  "testchallenge",
 					Root:                hex.EncodeToString(rootHash),
-					ExpectedProofLength: sdk.NewUint(2),
-					MaxUsesPerLeaf:      sdk.NewUint(1),
+					ExpectedProofLength: sdkmath.NewUint(2),
+					MaxUsesPerLeaf:      sdkmath.NewUint(1),
 				},
 			},
 			OverridesFromOutgoingApprovals: true,
@@ -559,7 +559,7 @@ func (suite *TestSuite) TestIncrements() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        "Mint",
@@ -594,7 +594,7 @@ func (suite *TestSuite) TestIncrements() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        "Mint",
@@ -684,8 +684,8 @@ func (suite *TestSuite) TestIncrementsMismatchingTrackerId() {
 				{
 					ChallengeTrackerId:  "testchallenge",
 					Root:                hex.EncodeToString(rootHash),
-					ExpectedProofLength: sdk.NewUint(2),
-					MaxUsesPerLeaf:      sdk.NewUint(1),
+					ExpectedProofLength: sdkmath.NewUint(2),
+					MaxUsesPerLeaf:      sdkmath.NewUint(1),
 				},
 			},
 			OverridesFromOutgoingApprovals: true,
@@ -708,7 +708,7 @@ func (suite *TestSuite) TestIncrementsMismatchingTrackerId() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        "Mint",
@@ -742,7 +742,7 @@ func (suite *TestSuite) TestIncrementsMismatchingTrackerId() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        "Mint",
@@ -830,8 +830,8 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 				{
 
 					Root:                hex.EncodeToString(rootHash),
-					ExpectedProofLength: sdk.NewUint(2),
-					MaxUsesPerLeaf:      sdk.NewUint(1),
+					ExpectedProofLength: sdkmath.NewUint(2),
+					MaxUsesPerLeaf:      sdkmath.NewUint(1),
 				},
 			},
 			OverridesFromOutgoingApprovals: true,
@@ -854,7 +854,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
@@ -954,8 +954,8 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 				{
 
 					Root:                hex.EncodeToString(rootHash),
-					ExpectedProofLength: sdk.NewUint(2),
-					MaxUsesPerLeaf:      sdk.NewUint(1),
+					ExpectedProofLength: sdkmath.NewUint(2),
+					MaxUsesPerLeaf:      sdkmath.NewUint(1),
 				},
 			},
 			OverridesFromOutgoingApprovals: true,
@@ -978,7 +978,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
@@ -1026,7 +1026,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      alice,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
@@ -1125,8 +1125,8 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 				{
 
 					Root:                hex.EncodeToString(rootHash),
-					ExpectedProofLength: sdk.NewUint(2),
-					MaxUsesPerLeaf:      sdk.NewUint(1),
+					ExpectedProofLength: sdkmath.NewUint(2),
+					MaxUsesPerLeaf:      sdkmath.NewUint(1),
 				},
 			}, OverridesFromOutgoingApprovals: true,
 			OverridesToIncomingApprovals: true,
@@ -1148,7 +1148,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      alice,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
@@ -1248,8 +1248,8 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 				{
 
 					Root:                hex.EncodeToString(rootHash),
-					ExpectedProofLength: sdk.NewUint(2),
-					MaxUsesPerLeaf:      sdk.NewUint(1),
+					ExpectedProofLength: sdkmath.NewUint(2),
+					MaxUsesPerLeaf:      sdkmath.NewUint(1),
 				},
 			},
 			OverridesFromOutgoingApprovals: true,
@@ -1271,7 +1271,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
@@ -1319,7 +1319,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      alice,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
@@ -1410,8 +1410,8 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 			MerkleChallenges: []*types.MerkleChallenge{
 				{
 					Root:                hex.EncodeToString(rootHash),
-					ExpectedProofLength: sdk.NewUint(2),
-					MaxUsesPerLeaf:      sdk.NewUint(1),
+					ExpectedProofLength: sdkmath.NewUint(2),
+					MaxUsesPerLeaf:      sdkmath.NewUint(1),
 				},
 			},
 			OverridesFromOutgoingApprovals: true,
@@ -1433,7 +1433,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
@@ -1564,8 +1564,8 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 			MerkleChallenges: []*types.MerkleChallenge{
 				{
 					Root:                hex.EncodeToString(rootHash),
-					ExpectedProofLength: sdk.NewUint(2),
-					MaxUsesPerLeaf:      sdk.NewUint(1),
+					ExpectedProofLength: sdkmath.NewUint(2),
+					MaxUsesPerLeaf:      sdkmath.NewUint(1),
 				},
 			},
 			OverridesFromOutgoingApprovals: true,
@@ -1587,7 +1587,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
@@ -1715,8 +1715,8 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 				{
 
 					Root:                hex.EncodeToString(rootHash),
-					ExpectedProofLength: sdk.NewUint(2),
-					MaxUsesPerLeaf:      sdk.NewUint(1),
+					ExpectedProofLength: sdkmath.NewUint(2),
+					MaxUsesPerLeaf:      sdkmath.NewUint(1),
 				},
 			},
 
@@ -1739,7 +1739,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
@@ -1877,8 +1877,8 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 				{
 
 					Root:                hex.EncodeToString(rootHash),
-					ExpectedProofLength: sdk.NewUint(2),
-					MaxUsesPerLeaf:      sdk.NewUint(1),
+					ExpectedProofLength: sdkmath.NewUint(2),
+					MaxUsesPerLeaf:      sdkmath.NewUint(1),
 				},
 			},
 			OverridesFromOutgoingApprovals: true,
@@ -1900,7 +1900,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
@@ -2027,8 +2027,8 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 			MerkleChallenges: []*types.MerkleChallenge{
 				{
 					Root:                hex.EncodeToString(rootHash),
-					ExpectedProofLength: sdk.NewUint(2),
-					MaxUsesPerLeaf:      sdk.NewUint(1),
+					ExpectedProofLength: sdkmath.NewUint(2),
+					MaxUsesPerLeaf:      sdkmath.NewUint(1),
 				},
 			},
 
@@ -2051,7 +2051,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        "Mint",
@@ -2086,7 +2086,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        "Mint",
@@ -2121,7 +2121,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        "Mint",
@@ -2156,7 +2156,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        "Mint",
@@ -2197,7 +2197,7 @@ func (suite *TestSuite) TestMustOwnBadges() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
-			CollectionId: sdk.NewUint(1),
+			CollectionId: sdkmath.NewUint(1),
 			AmountRange: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(1),
@@ -2237,7 +2237,7 @@ func (suite *TestSuite) TestMustOwnBadges() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -2262,7 +2262,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustSatisfyForAllAssets() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
-			CollectionId: sdk.NewUint(1),
+			CollectionId: sdkmath.NewUint(1),
 			AmountRange: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(1),
@@ -2302,7 +2302,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustSatisfyForAllAssets() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -2327,7 +2327,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustSatisfyForAllAssets2() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
-			CollectionId: sdk.NewUint(1),
+			CollectionId: sdkmath.NewUint(1),
 			AmountRange: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(2),
@@ -2337,7 +2337,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustSatisfyForAllAssets2() {
 			MustSatisfyForAllAssets: true,
 		},
 		{
-			CollectionId: sdk.NewUint(2),
+			CollectionId: sdkmath.NewUint(2),
 			AmountRange: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(2),
@@ -2377,7 +2377,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustSatisfyForAllAssets2() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -2402,7 +2402,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
-			CollectionId: sdk.NewUint(1),
+			CollectionId: sdkmath.NewUint(1),
 			AmountRange: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(1),
@@ -2411,7 +2411,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne() {
 			OwnershipTimes: GetFullUintRanges(),
 		},
 		{
-			CollectionId: sdk.NewUint(2),
+			CollectionId: sdkmath.NewUint(2),
 			AmountRange: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(1),
@@ -2450,7 +2450,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -2475,7 +2475,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne2() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
-			CollectionId: sdk.NewUint(2),
+			CollectionId: sdkmath.NewUint(2),
 			AmountRange: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(2),
@@ -2514,7 +2514,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne2() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -2539,7 +2539,7 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
-			CollectionId: sdk.NewUint(1),
+			CollectionId: sdkmath.NewUint(1),
 			AmountRange: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(1),
@@ -2578,7 +2578,7 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      alice,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -2603,7 +2603,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
-			CollectionId: sdk.NewUint(1),
+			CollectionId: sdkmath.NewUint(1),
 			AmountRange: &types.UintRange{
 				Start: sdkmath.NewUint(0),
 				End:   sdkmath.NewUint(0),
@@ -2642,7 +2642,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -2661,7 +2661,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      alice,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -2686,7 +2686,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.MustOwnBadges = []*types.MustOwnBadges{
 		{
-			CollectionId: sdk.NewUint(1),
+			CollectionId: sdkmath.NewUint(1),
 			AmountRange: &types.UintRange{
 				Start: sdkmath.NewUint(2),
 				End:   sdkmath.NewUint(100),
@@ -2726,7 +2726,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -2745,7 +2745,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      alice,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -2846,7 +2846,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 	//Fails because we do not take overflows
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -2865,7 +2865,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -2884,7 +2884,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -2984,7 +2984,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 	//Fails because we do not take overflows
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -3098,7 +3098,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -3124,7 +3124,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -3244,7 +3244,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 	//Fails because we do not take overflows
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -3263,7 +3263,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -3282,7 +3282,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      alice,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        alice,
@@ -3301,7 +3301,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
@@ -3320,7 +3320,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
-		CollectionId: sdk.NewUint(1),
+		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,

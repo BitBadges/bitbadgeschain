@@ -21,7 +21,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 	//Check the overwrite options
 	if msg.Options.UseMostRecentCollectionId {
 		nextCollectionId := k.badgesKeeper.GetNextCollectionId(ctx)
-		value = nextCollectionId.Sub(sdk.NewUint(1)).BigInt().String()
+		value = nextCollectionId.Sub(sdkmath.NewUint(1)).BigInt().String()
 	}
 
 	currMap, found := k.GetMapFromStore(ctx, mapId)
