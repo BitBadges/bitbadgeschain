@@ -86,7 +86,7 @@ func (suite *TestSuite) SetupTest() {
 	// 	suite.app.AccountKeeper.SetAccount(suite.ctx, suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.AccAddress([]byte{byte(i)})))
 	// }
 
-	banktestutil.FundAccount(suite.app.BankKeeper, suite.ctx, sdk.MustAccAddressFromBech32(bob), sdk.NewCoins(sdk.NewInt64Coin("badge", 1000)))
+	banktestutil.FundAccount(suite.app.BankKeeper, suite.ctx, sdk.MustAccAddressFromBech32(bob), sdk.NewCoins(sdk.NewInt64Coin("ubadge", 1000)))
 }
 
 func TestBadgesKeeperTestSuite(t *testing.T) {

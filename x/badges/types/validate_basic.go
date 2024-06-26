@@ -280,7 +280,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						return sdkerrors.Wrapf(ErrInvalidRequest, "coin denom is uninitialized")
 					}
 
-					if coinToTransfer.Denom != "badge" {
+					if coinToTransfer.Denom != "ubadge" {
 						return sdkerrors.Wrapf(ErrInvalidRequest, "coin denom must be badge")
 					}
 				}

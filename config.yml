@@ -9,37 +9,37 @@ build:
 accounts:
     - name: zero
       coins:
-          - 1badge
+          - 1ubadge
     - name: burn
       coins:
-          - 1badge
+          - 1ubadge
       address: cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnrql8a
+    #TODO: Remove alice?
     - name: alice
       coins:
-          - 200000000badge
-          - 2000000000stake
+          - 1ubadge
+          - 1000000000000000ustake
     - name: bob
       coins:
-          - 10000000000badge
-          - 100000000000000stake
+          - 99999999999999996ubadge
+          - 99000000000000000ustake
       address: cosmos1kx9532ujful8vgg2dht6k544ax4k9qzszjcw04
     - name: charlie
       coins:
-          - 100000000badge
+          - 1ubadge
 client:
     typescript:
         path: ts-client
     openapi:
         path: docs/static/openapi.yml
 genesis:
-    chain_id: bitbadges_1-2
+    chain_id: bitbadges_1-1
     consensus_params:
-      block:
-          max_bytes: '22020096'
-          max_gas: '40000000'
-          time_iota_ms: '1000'
+        block:
+            max_bytes: '22020096'
+            max_gas: '40000000'
+            time_iota_ms: '2000'
     app_state:
-        
         gov:
             params:
                 voting_period: '604800s'
@@ -47,8 +47,19 @@ genesis:
                 # voting_period: '600s'
                 # max_deposit_period: '600s'
                 min_deposit:
-                    - amount: '100'
-                      denom: badge
+                    - amount: '10000000000'
+                      denom: ustake
+        staking:
+            params:
+                bond_denom: ustake
+        mint:
+            params:
+                mint_denom: ustake
+                blocks_per_year: '15811200' # 6311520 assuming 5s blocks
+        crisis:
+            constant_fee:
+                denom: ubadge
+                amount: '10000000000'
 validators:
     - name: alice
-      bonded: 100000000stake
+      bonded: 1000000000000000ustake
