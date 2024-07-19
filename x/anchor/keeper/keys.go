@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"bitbadgeschain/x/anchor/types"
 )
 
 var (
@@ -12,5 +12,4 @@ var (
 	BalanceKeyDelimiter = "-"
 )
 
-// StoreKey is the store key string for nft
 const StoreKey = types.ModuleName

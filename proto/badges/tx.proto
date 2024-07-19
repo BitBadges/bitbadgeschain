@@ -1,20 +1,30 @@
 syntax = "proto3";
 package badges;
 
-// this line is used by starport scaffolding # proto/tx/import
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "badges/params.proto";
+
 import "badges/transfers.proto";
 import "badges/balances.proto";
 import "badges/permissions.proto";
 import "badges/metadata.proto";
 import "badges/collections.proto";
-import "gogoproto/gogo.proto";
 import "badges/address_lists.proto";
 import "badges/timelines.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
+
+option go_package = "bitbadgeschain/x/badges/types";
 
 // Msg defines the Msg service.
 service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // UpdateParams defines a (governance) operation for updating the module
+  // parameters. The authority defaults to the x/gov module account.
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
   rpc UniversalUpdateCollection      (MsgUniversalUpdateCollection) returns (MsgUniversalUpdateCollectionResponse);
   rpc CreateAddressLists (MsgCreateAddressLists) returns (MsgCreateAddressListsResponse);
   rpc TransferBadges(MsgTransferBadges) returns (MsgTransferBadgesResponse);
@@ -23,8 +33,30 @@ service Msg {
   rpc UpdateCollection      (MsgUpdateCollection) returns (MsgUpdateCollectionResponse);
   rpc CreateCollection      (MsgCreateCollection) returns (MsgCreateCollectionResponse);
   rpc GlobalArchive(MsgGlobalArchive) returns (MsgGlobalArchiveResponse);
-  // this line is used by starport scaffolding # proto/tx/rpc
 }
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "badges/MsgUpdateParams";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the module parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+message MsgUpdateParamsResponse {}
+
+
 
 //Used for WASM bindings and JSON parsing
 message BadgeCustomMsgType {
@@ -42,6 +74,9 @@ message BadgeCustomMsgType {
 // It is a universal interface that can be used for both creating and updating collections.
 // We have it defined for legacy purposes, but it is recommended to use MsgCreateCollection and MsgUpdateCollection instead.
 message MsgUniversalUpdateCollection {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/UniversalUpdateCollection";
+
   // Address of the creator.
   string creator = 1;
   
@@ -120,6 +155,9 @@ message MsgUniversalUpdateCollectionResponse {
 
 // MsgUpdateCollection is used to update a collection.
 message MsgUpdateCollection {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/UpdateCollection";
+
   // Address of the creator.
   string creator = 1;
   
@@ -192,6 +230,9 @@ message MsgUpdateCollectionResponse {
 
 // MsgCreateCollection is used to create a new collection.
 message MsgCreateCollection {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/CreateCollection";
+
   // Address of the creator.
   string creator = 1;
   
@@ -240,6 +281,9 @@ message MsgCreateCollectionResponse {
 
 // MsgCreateAddressLists is used to create address lists.
 message MsgCreateAddressLists {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/CreateAddressLists";
+
   // Address of the creator.
   string creator = 1;
   
@@ -252,6 +296,9 @@ message MsgCreateAddressListsResponse {}
 
 // MsgTransferBadges is used to transfer badges.
 message MsgTransferBadges {
+  option (cosmos.msg.v1.signer) = "creator";
+    option (amino.name) = "badges/TransferBadges";
+
   // Address of the creator.
   string creator = 1;
   
@@ -267,6 +314,9 @@ message MsgTransferBadgesResponse {}
 
 // MsgDeleteCollection is used to delete a collection.
 message MsgDeleteCollection {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/DeleteCollection";
+
   // Address of the creator.
   string creator = 1;
   
@@ -278,6 +328,8 @@ message MsgDeleteCollection {
 message MsgDeleteCollectionResponse {}
 
 message MsgGlobalArchive {
+  option (cosmos.msg.v1.signer) = "creator";
+
   string creator = 1;
   bool archive = 2;
 }
@@ -286,6 +338,9 @@ message MsgGlobalArchiveResponse {}
 
 // MsgUpdateUserApprovals is used to update user approvals.
 message MsgUpdateUserApprovals {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/UpdateUserApprovals";
+
   // Address of the creator.
   string creator = 1;
   

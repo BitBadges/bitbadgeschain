@@ -7,7 +7,7 @@ import "maps/permissions.proto";
 import "maps/metadata.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/maps/types";
+option go_package = "bitbadgeschain/x/maps/types";
 
 // MapMetadataTimeline defines the metadata for a collection at different timeline times.
 message MapMetadataTimeline {

@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"bitbadgeschain/x/badges/types"
+
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -24,9 +26,9 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 	//Get next collection id - 1 from badges keeper
 	//Used for multi-msg transactions where you do not know the collection ID yet upon creation
 	collectionId := msg.CollectionId
-	if collectionId.Equal(sdk.NewUint(0)) {
+	if collectionId.Equal(sdkmath.NewUint(0)) {
 		nextCollectionId := k.GetNextCollectionId(ctx)
-		collectionId = nextCollectionId.Sub(sdk.NewUint(1))
+		collectionId = nextCollectionId.Sub(sdkmath.NewUint(1))
 	}
 
 	collection, found := k.GetCollectionFromStore(ctx, collectionId)

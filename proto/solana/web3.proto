@@ -2,13 +2,16 @@ syntax = "proto3";
 package solana;
 
 import "gogoproto/gogo.proto";
+import "amino/amino.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/types";
+option go_package = "bitbadgeschain/chain-handlers/solana/types";
 
 // ExtensionOptionsWeb3Tx is an extension option that specifies the typed chain id,
 // the fee payer as well as its signature data.
 message ExtensionOptionsWeb3TxSolana {
   option (gogoproto.goproto_getters) = false;
+  option (amino.name) = "solana/ExtensionOptionsWeb3TxSolana";
+
 
   // typed_data_chain_id is used only in EIP712 Domain and should match
   // Ethereum network ID in a Web3 provider (e.g. Metamask).

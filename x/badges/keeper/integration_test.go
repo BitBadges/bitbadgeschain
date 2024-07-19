@@ -6,15 +6,13 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	"bitbadgeschain/x/badges/keeper"
+	"bitbadgeschain/x/badges/types"
 
-	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	bitbadgesapp "github.com/bitbadges/bitbadgeschain/app"
+	bitbadgesapp "bitbadgeschain/app"
 
 	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/testutil"
 )
@@ -58,11 +56,11 @@ func (suite *TestSuite) SetupTest() {
 		false,
 	)
 
-	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+	ctx := app.BaseApp.NewContext(false)
 
-	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
+	// app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
 
-	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
+	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.AppCodec().InterfaceRegistry())
 	queryClient := types.NewQueryClient(queryHelper)
 
 	suite.app = app
@@ -86,7 +84,7 @@ func (suite *TestSuite) SetupTest() {
 	// 	suite.app.AccountKeeper.SetAccount(suite.ctx, suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.AccAddress([]byte{byte(i)})))
 	// }
 
-	banktestutil.FundAccount(suite.app.BankKeeper, suite.ctx, sdk.MustAccAddressFromBech32(bob), sdk.NewCoins(sdk.NewInt64Coin("ubadge", 1000)))
+	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(bob), sdk.NewCoins(sdk.NewInt64Coin("ubadge", 1000)))
 }
 
 func TestBadgesKeeperTestSuite(t *testing.T) {

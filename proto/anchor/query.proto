@@ -1,23 +1,24 @@
 syntax = "proto3";
 package anchor;
 
+import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "anchor/params.proto";
 import "anchor/tx.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/anchor/types";
+option go_package = "bitbadgeschain/x/anchor/types";
 
 // Query defines the gRPC querier service.
 service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/bitbadges/bitbadgeschain/anchor/params";
+    option (google.api.http).get = "/bitbadgeschain/anchor/params";
   }
 
   rpc GetValueAtLocation(QueryGetValueAtLocationRequest) returns (QueryGetValueAtLocationResponse) {
-    option (google.api.http).get = "/bitbadges/bitbadgeschain/anchor/locations/{locationId}";
+    option (google.api.http).get = "/bitbadgeschain/anchor/locations/{locationId}";
   }
 }
 
@@ -27,8 +28,12 @@ message QueryParamsRequest {}
 // QueryParamsResponse is response type for the Query/Params RPC method.
 message QueryParamsResponse {
   // params holds all the parameters of this module.
-  Params params = 1 [(gogoproto.nullable) = false];
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
 }
+
 
 message QueryGetValueAtLocationRequest {
   string locationId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];

@@ -1,7 +1,8 @@
 package keeper
 
 import (
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"bitbadgeschain/x/badges/types"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -26,12 +27,12 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			BadgeIds:               permission.BadgeIds,
-			TransferTimes:          permission.TransferTimes,
-			OwnershipTimes:         permission.OwnershipTimes,
-			FromList:               fromList,
-			InitiatedByList:        initiatedByList,
-			ApprovalIdList:         approvalTrackerList,
+			BadgeIds:        permission.BadgeIds,
+			TransferTimes:   permission.TransferTimes,
+			OwnershipTimes:  permission.OwnershipTimes,
+			FromList:        fromList,
+			InitiatedByList: initiatedByList,
+			ApprovalIdList:  approvalTrackerList,
 
 			UsesBadgeIds:              true,
 			UsesTransferTimes:         true,
@@ -122,21 +123,21 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 
-			TransferTimes:             collectionUpdatePermission.TransferTimes,
-			OwnershipTimes:            collectionUpdatePermission.OwnershipTimes,
-			ToList:                    toList,
-			FromList:                  fromList,
-			InitiatedByList:           initiatedByList,
-			BadgeIds:                  collectionUpdatePermission.BadgeIds,
-			ApprovalIdList:            approvalTrackerList,
-			UsesApprovalId:            true,
-			UsesBadgeIds:              true,
-			UsesTransferTimes:         true,
-			UsesOwnershipTimes:        true,
-			UsesToList:                true,
-			UsesFromList:              true,
-			UsesInitiatedByList:       true,
-			
+			TransferTimes:       collectionUpdatePermission.TransferTimes,
+			OwnershipTimes:      collectionUpdatePermission.OwnershipTimes,
+			ToList:              toList,
+			FromList:            fromList,
+			InitiatedByList:     initiatedByList,
+			BadgeIds:            collectionUpdatePermission.BadgeIds,
+			ApprovalIdList:      approvalTrackerList,
+			UsesApprovalId:      true,
+			UsesBadgeIds:        true,
+			UsesTransferTimes:   true,
+			UsesOwnershipTimes:  true,
+			UsesToList:          true,
+			UsesFromList:        true,
+			UsesInitiatedByList: true,
+
 			PermanentlyPermittedTimes: collectionUpdatePermission.PermanentlyPermittedTimes,
 			PermanentlyForbiddenTimes: collectionUpdatePermission.PermanentlyForbiddenTimes,
 		})
@@ -150,10 +151,10 @@ func (k Keeper) CastTimedUpdateWithBadgeIdsPermissionToUniversalPermission(timed
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 
-			TimelineTimes:             timedUpdateWithBadgeIdsPermission.TimelineTimes,
-			BadgeIds:                  timedUpdateWithBadgeIdsPermission.BadgeIds,
-			UsesTimelineTimes:         true,
-			UsesBadgeIds:              true,
+			TimelineTimes:     timedUpdateWithBadgeIdsPermission.TimelineTimes,
+			BadgeIds:          timedUpdateWithBadgeIdsPermission.BadgeIds,
+			UsesTimelineTimes: true,
+			UsesBadgeIds:      true,
 
 			PermanentlyPermittedTimes: timedUpdateWithBadgeIdsPermission.PermanentlyPermittedTimes,
 			PermanentlyForbiddenTimes: timedUpdateWithBadgeIdsPermission.PermanentlyForbiddenTimes,
@@ -168,8 +169,8 @@ func (k Keeper) CastTimedUpdatePermissionToUniversalPermission(timedUpdatePermis
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 
-			TimelineTimes:             timedUpdatePermission.TimelineTimes,
-			UsesTimelineTimes:         true,
+			TimelineTimes:     timedUpdatePermission.TimelineTimes,
+			UsesTimelineTimes: true,
 
 			PermanentlyPermittedTimes: timedUpdatePermission.PermanentlyPermittedTimes,
 			PermanentlyForbiddenTimes: timedUpdatePermission.PermanentlyForbiddenTimes,
@@ -183,10 +184,10 @@ func (k Keeper) CastBalancesActionPermissionToUniversalPermission(BalancesAction
 	for _, BalancesActionPermission := range BalancesActionPermission {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 
-			BadgeIds:                  BalancesActionPermission.BadgeIds,
-			OwnershipTimes:            BalancesActionPermission.OwnershipTimes,
-			UsesBadgeIds:              true,
-			UsesOwnershipTimes:        true,
+			BadgeIds:           BalancesActionPermission.BadgeIds,
+			OwnershipTimes:     BalancesActionPermission.OwnershipTimes,
+			UsesBadgeIds:       true,
+			UsesOwnershipTimes: true,
 
 			PermanentlyPermittedTimes: BalancesActionPermission.PermanentlyPermittedTimes,
 			PermanentlyForbiddenTimes: BalancesActionPermission.PermanentlyForbiddenTimes,

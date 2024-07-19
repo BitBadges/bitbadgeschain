@@ -4,20 +4,21 @@ import (
 	"context"
 	"testing"
 
-	keepertest "github.com/bitbadges/bitbadgeschain/testutil/keeper"
-	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
+
+	keepertest "bitbadgeschain/testutil/keeper"
+	"bitbadgeschain/x/badges/keeper"
+	"bitbadgeschain/x/badges/types"
 )
 
-func setupMsgServer(t testing.TB) (types.MsgServer, context.Context) {
+func setupMsgServer(t testing.TB) (keeper.Keeper, types.MsgServer, context.Context) {
 	k, ctx := keepertest.BadgesKeeper(t)
-	return keeper.NewMsgServerImpl(*k), sdk.WrapSDKContext(ctx)
+	return k, keeper.NewMsgServerImpl(k), ctx
 }
 
 func TestMsgServer(t *testing.T) {
-	ms, ctx := setupMsgServer(t)
+	k, ms, ctx := setupMsgServer(t)
 	require.NotNil(t, ms)
 	require.NotNil(t, ctx)
+	require.NotEmpty(t, k)
 }

@@ -3,11 +3,12 @@ package types_test
 import (
 	"testing"
 
+	"bitbadgeschain/testutil/sample"
+
 	sdkmath "cosmossdk.io/math"
-	"github.com/bitbadges/bitbadgeschain/testutil/sample"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"bitbadgeschain/x/badges/types"
 )
 
 func TestMsgUniversalUpdateCollectionPermissions_ValidateBasic(t *testing.T) {

@@ -3,16 +3,16 @@ package keeper_test
 import (
 	"testing"
 
-	testkeeper "github.com/bitbadges/bitbadgeschain/testutil/keeper"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/stretchr/testify/require"
+
+	keepertest "bitbadgeschain/testutil/keeper"
+	"bitbadgeschain/x/badges/types"
 )
 
 func TestGetParams(t *testing.T) {
-	k, ctx := testkeeper.BadgesKeeper(t)
+	k, ctx := keepertest.BadgesKeeper(t)
 	params := types.DefaultParams()
 
-	k.SetParams(ctx, params)
-
+	require.NoError(t, k.SetParams(ctx, params))
 	require.EqualValues(t, params, k.GetParams(ctx))
 }

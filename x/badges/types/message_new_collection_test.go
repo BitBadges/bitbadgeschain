@@ -5,9 +5,10 @@ import (
 	math "math"
 	"testing"
 
+	"bitbadgeschain/testutil/sample"
+	"bitbadgeschain/x/badges/types"
+
 	sdkmath "cosmossdk.io/math"
-	"github.com/bitbadges/bitbadgeschain/testutil/sample"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/stretchr/testify/require"
 )
 

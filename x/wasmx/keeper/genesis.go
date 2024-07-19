@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
+	"bitbadgeschain/x/wasmx/types"
 )
 
 func (k *Keeper) InitGenesis(ctx sdk.Context, data types.GenesisState) {

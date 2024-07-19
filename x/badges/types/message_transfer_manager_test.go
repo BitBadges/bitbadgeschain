@@ -4,11 +4,12 @@ import (
 	"math"
 	"testing"
 
+	"bitbadgeschain/testutil/sample"
+
 	sdkmath "cosmossdk.io/math"
-	"github.com/bitbadges/bitbadgeschain/testutil/sample"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"bitbadgeschain/x/badges/types"
 )
 
 func TestMsgUpdateManager_ValidateBasic(t *testing.T) {

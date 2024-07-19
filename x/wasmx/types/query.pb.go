@@ -6,6 +6,8 @@ package types
 import (
 	context "context"
 	fmt "fmt"
+	_ "github.com/cosmos/cosmos-sdk/types/query"
+	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	grpc1 "github.com/cosmos/gogoproto/grpc"
 	proto "github.com/cosmos/gogoproto/proto"
@@ -29,6 +31,89 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// QueryParamsRequest is request type for the Query/Params RPC method.
+type QueryParamsRequest struct {
+}
+
+func (m *QueryParamsRequest) Reset()         { *m = QueryParamsRequest{} }
+func (m *QueryParamsRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryParamsRequest) ProtoMessage()    {}
+func (*QueryParamsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4ba433635f5517a5, []int{0}
+}
+func (m *QueryParamsRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryParamsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryParamsRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryParamsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryParamsRequest.Merge(m, src)
+}
+func (m *QueryParamsRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryParamsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryParamsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryParamsRequest proto.InternalMessageInfo
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+type QueryParamsResponse struct {
+	// params holds all the parameters of this module.
+	Params Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
+}
+
+func (m *QueryParamsResponse) Reset()         { *m = QueryParamsResponse{} }
+func (m *QueryParamsResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryParamsResponse) ProtoMessage()    {}
+func (*QueryParamsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4ba433635f5517a5, []int{1}
+}
+func (m *QueryParamsResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryParamsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryParamsResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryParamsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryParamsResponse.Merge(m, src)
+}
+func (m *QueryParamsResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryParamsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryParamsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryParamsResponse proto.InternalMessageInfo
+
+func (m *QueryParamsResponse) GetParams() Params {
+	if m != nil {
+		return m.Params
+	}
+	return Params{}
+}
+
 // QueryWasmxParamsRequest is the request type for the Query/WasmxParams RPC method.
 type QueryWasmxParamsRequest struct {
 }
@@ -37,7 +122,7 @@ func (m *QueryWasmxParamsRequest) Reset()         { *m = QueryWasmxParamsRequest
 func (m *QueryWasmxParamsRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryWasmxParamsRequest) ProtoMessage()    {}
 func (*QueryWasmxParamsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_4ba433635f5517a5, []int{0}
+	return fileDescriptor_4ba433635f5517a5, []int{2}
 }
 func (m *QueryWasmxParamsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -75,7 +160,7 @@ func (m *QueryWasmxParamsResponse) Reset()         { *m = QueryWasmxParamsRespon
 func (m *QueryWasmxParamsResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryWasmxParamsResponse) ProtoMessage()    {}
 func (*QueryWasmxParamsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_4ba433635f5517a5, []int{1}
+	return fileDescriptor_4ba433635f5517a5, []int{3}
 }
 func (m *QueryWasmxParamsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -119,7 +204,7 @@ func (m *QueryModuleStateRequest) Reset()         { *m = QueryModuleStateRequest
 func (m *QueryModuleStateRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryModuleStateRequest) ProtoMessage()    {}
 func (*QueryModuleStateRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_4ba433635f5517a5, []int{2}
+	return fileDescriptor_4ba433635f5517a5, []int{4}
 }
 func (m *QueryModuleStateRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -157,7 +242,7 @@ func (m *QueryModuleStateResponse) Reset()         { *m = QueryModuleStateRespon
 func (m *QueryModuleStateResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryModuleStateResponse) ProtoMessage()    {}
 func (*QueryModuleStateResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_4ba433635f5517a5, []int{3}
+	return fileDescriptor_4ba433635f5517a5, []int{5}
 }
 func (m *QueryModuleStateResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -194,6 +279,8 @@ func (m *QueryModuleStateResponse) GetState() *GenesisState {
 }
 
 func init() {
+	proto.RegisterType((*QueryParamsRequest)(nil), "wasmx.QueryParamsRequest")
+	proto.RegisterType((*QueryParamsResponse)(nil), "wasmx.QueryParamsResponse")
 	proto.RegisterType((*QueryWasmxParamsRequest)(nil), "wasmx.QueryWasmxParamsRequest")
 	proto.RegisterType((*QueryWasmxParamsResponse)(nil), "wasmx.QueryWasmxParamsResponse")
 	proto.RegisterType((*QueryModuleStateRequest)(nil), "wasmx.QueryModuleStateRequest")
@@ -203,30 +290,35 @@ func init() {
 func init() { proto.RegisterFile("wasmx/query.proto", fileDescriptor_4ba433635f5517a5) }
 
 var fileDescriptor_4ba433635f5517a5 = []byte{
-	// 360 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x52, 0x31, 0x4b, 0x03, 0x31,
-	0x14, 0xbe, 0x14, 0xdb, 0x21, 0x45, 0xd0, 0x54, 0xb0, 0x16, 0x49, 0xe5, 0x26, 0x4b, 0xa1, 0xe1,
-	0xea, 0xe0, 0x5e, 0x90, 0x0e, 0x22, 0x68, 0x1d, 0x04, 0x17, 0xc9, 0xb5, 0x21, 0x3d, 0xe8, 0x5d,
-	0xae, 0x4d, 0x4e, 0xed, 0xa8, 0xb3, 0x83, 0xe0, 0xe6, 0x2f, 0xea, 0x58, 0x70, 0x71, 0x12, 0x69,
-	0xfd, 0x21, 0x72, 0x49, 0xaa, 0x2d, 0xf5, 0xc0, 0x25, 0x3c, 0xbe, 0xf7, 0xbd, 0xf7, 0x7d, 0xef,
-	0x23, 0x70, 0xfb, 0x8e, 0xca, 0xf0, 0x9e, 0x0c, 0x13, 0x36, 0x1a, 0x37, 0xe2, 0x91, 0x50, 0x02,
-	0xe5, 0x35, 0x54, 0xd9, 0xe7, 0x42, 0xf0, 0x01, 0x23, 0x34, 0x0e, 0x08, 0x8d, 0x22, 0xa1, 0xa8,
-	0x0a, 0x44, 0x24, 0x0d, 0xa9, 0x62, 0xe7, 0xf4, 0x6b, 0xa1, 0x92, 0x81, 0x38, 0x8b, 0x98, 0x0c,
-	0x16, 0xbc, 0x1d, 0x2e, 0xb8, 0xd0, 0x25, 0x49, 0x2b, 0x83, 0xba, 0x7b, 0x70, 0xf7, 0x22, 0x55,
-	0xbc, 0x4a, 0x27, 0xce, 0xe9, 0x88, 0x86, 0xb2, 0xc3, 0x86, 0x09, 0x93, 0xca, 0x6d, 0xc3, 0xf2,
-	0x7a, 0x4b, 0xc6, 0x22, 0x92, 0x0c, 0xd5, 0x61, 0x21, 0xd6, 0x48, 0x19, 0x1c, 0x80, 0xc3, 0x62,
-	0x73, 0xb3, 0x61, 0xf4, 0x0d, 0xad, 0xb5, 0x31, 0xf9, 0xa8, 0x3a, 0x1d, 0x4b, 0xf9, 0xd1, 0x38,
-	0x13, 0xbd, 0x64, 0xc0, 0x2e, 0x15, 0x55, 0x6c, 0xa1, 0x71, 0x62, 0x35, 0x56, 0x5a, 0x56, 0xa3,
-	0x06, 0xf3, 0x32, 0x05, 0xac, 0x44, 0xc9, 0x4a, 0xb4, 0xcd, 0x55, 0x86, 0x6b, 0x18, 0xcd, 0xd7,
-	0x1c, 0xcc, 0xeb, 0x3d, 0xe8, 0x01, 0xc0, 0xe2, 0x92, 0x61, 0x84, 0xed, 0x54, 0xc6, 0x91, 0x95,
-	0x6a, 0x66, 0xdf, 0xb8, 0x70, 0xbd, 0xc7, 0xb7, 0xaf, 0x97, 0x5c, 0x1d, 0xd5, 0x88, 0x1f, 0x28,
-	0x9f, 0xf6, 0x38, 0x93, 0xbf, 0x55, 0xb7, 0x4f, 0x83, 0xc8, 0x44, 0x4f, 0x6e, 0x3d, 0x62, 0xee,
-	0x45, 0x4f, 0x00, 0x6e, 0xe9, 0x55, 0x4b, 0x57, 0xad, 0x1a, 0x59, 0x4f, 0x62, 0xd5, 0xc8, 0x1f,
-	0x71, 0xb8, 0xc7, 0xda, 0x88, 0x87, 0xc8, 0x3f, 0x8c, 0x84, 0x7a, 0xfe, 0x46, 0x87, 0xd3, 0x3a,
-	0x9d, 0xcc, 0x30, 0x98, 0xce, 0x30, 0xf8, 0x9c, 0x61, 0xf0, 0x3c, 0xc7, 0xce, 0x74, 0x8e, 0x9d,
-	0xf7, 0x39, 0x76, 0xae, 0x3d, 0x1e, 0xa8, 0x7e, 0xe2, 0x37, 0xba, 0x22, 0xcc, 0x5e, 0x6a, 0xbf,
-	0x16, 0x51, 0xe3, 0x98, 0x49, 0xbf, 0xa0, 0xbf, 0xcd, 0xd1, 0x77, 0x00, 0x00, 0x00, 0xff, 0xff,
-	0x48, 0xd0, 0x4a, 0xe6, 0xae, 0x02, 0x00, 0x00,
+	// 435 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0x41, 0xcb, 0x12, 0x41,
+	0x1c, 0xc6, 0x77, 0x2a, 0x85, 0x46, 0x82, 0x1c, 0x85, 0x74, 0x91, 0x31, 0x96, 0x0e, 0xa9, 0xe0,
+	0xb4, 0x06, 0x75, 0x17, 0xc2, 0x53, 0x50, 0x76, 0x08, 0xba, 0xc4, 0xac, 0x0e, 0xdb, 0x82, 0x3b,
+	0xb3, 0x3a, 0xa3, 0xe9, 0xd1, 0xce, 0x1d, 0x82, 0xbe, 0x44, 0xc7, 0x3e, 0x86, 0x47, 0xa1, 0x4b,
+	0xa7, 0x08, 0x0d, 0xfa, 0x1a, 0xb1, 0x33, 0x23, 0xed, 0xba, 0xbe, 0x2f, 0xef, 0x65, 0x19, 0xfe,
+	0xff, 0x67, 0x9e, 0xdf, 0xc3, 0x33, 0x0b, 0xab, 0x1f, 0xa9, 0x8c, 0xd7, 0x64, 0xbe, 0x64, 0x8b,
+	0x4d, 0x3f, 0x59, 0x08, 0x25, 0x50, 0x49, 0x8f, 0xdc, 0x2a, 0x8d, 0x23, 0x2e, 0x88, 0xfe, 0x9a,
+	0x8d, 0x5b, 0x0f, 0x45, 0x28, 0xf4, 0x91, 0xa4, 0x27, 0x3b, 0x6d, 0x85, 0x42, 0x84, 0x33, 0x46,
+	0x68, 0x12, 0x11, 0xca, 0xb9, 0x50, 0x54, 0x45, 0x82, 0x4b, 0xbb, 0xed, 0x4e, 0x84, 0x8c, 0x85,
+	0x24, 0x01, 0x95, 0xcc, 0x60, 0xc8, 0xca, 0x0f, 0x98, 0xa2, 0x3e, 0x49, 0x68, 0x18, 0x71, 0x2d,
+	0xb6, 0x5a, 0x64, 0xc2, 0x24, 0x74, 0x41, 0xe3, 0xd3, 0xfd, 0x9a, 0x99, 0x85, 0x8c, 0x33, 0x19,
+	0xd9, 0xa1, 0x57, 0x87, 0xe8, 0x75, 0x6a, 0xf5, 0x4a, 0x2b, 0xc7, 0x6c, 0xbe, 0x64, 0x52, 0x79,
+	0x23, 0x58, 0xcb, 0x4d, 0x65, 0x22, 0xb8, 0x64, 0xe8, 0x09, 0x2c, 0x1b, 0xc7, 0x06, 0x78, 0x08,
+	0x1e, 0x57, 0x06, 0xf7, 0xfa, 0xda, 0xb2, 0x6f, 0x64, 0xc3, 0xbb, 0xbb, 0x5f, 0x6d, 0xe7, 0xdb,
+	0xdf, 0xef, 0x5d, 0x30, 0xb6, 0x3a, 0xaf, 0x09, 0x1f, 0x68, 0xa3, 0xb7, 0xa9, 0xee, 0x9c, 0xd1,
+	0x28, 0xae, 0x2c, 0xa8, 0x77, 0x3d, 0xe8, 0x4e, 0x0a, 0x2a, 0x30, 0x5e, 0x8a, 0xe9, 0x72, 0xc6,
+	0xde, 0x28, 0xaa, 0xd8, 0x89, 0xf1, 0xc2, 0x32, 0x72, 0x2b, 0xcb, 0xe8, 0xc0, 0x92, 0x4c, 0x07,
+	0x16, 0x51, 0xb3, 0x88, 0x91, 0xa9, 0xc7, 0x68, 0x8d, 0x62, 0xb0, 0xbd, 0x0d, 0x4b, 0xda, 0x07,
+	0x31, 0x58, 0x36, 0x19, 0x50, 0xd3, 0xea, 0x8b, 0xed, 0xb9, 0xee, 0xa5, 0x95, 0xa1, 0x7a, 0x8f,
+	0x3e, 0xfd, 0xf8, 0xf3, 0xf5, 0x16, 0x46, 0x2d, 0x12, 0x44, 0x2a, 0xa0, 0xd3, 0x90, 0xc9, 0xc9,
+	0x07, 0x1a, 0x71, 0x92, 0x7d, 0x30, 0xb4, 0x05, 0xb0, 0x92, 0xe9, 0x05, 0xe1, 0xac, 0x63, 0xb1,
+	0x4b, 0xb7, 0x7d, 0xe5, 0xde, 0x62, 0x7d, 0x8d, 0xed, 0xa1, 0xce, 0x7f, 0xec, 0xe5, 0x00, 0x2b,
+	0xff, 0x94, 0xe1, 0x33, 0x80, 0xf7, 0xb5, 0x55, 0xa6, 0xbc, 0x7c, 0x90, 0x62, 0xe1, 0xf9, 0x20,
+	0x17, 0x5a, 0xf7, 0x9e, 0xeb, 0x20, 0x3e, 0x22, 0x37, 0x08, 0x12, 0xeb, 0xfb, 0xef, 0xf5, 0x1b,
+	0x0c, 0x9f, 0xed, 0x0e, 0x18, 0xec, 0x0f, 0x18, 0xfc, 0x3e, 0x60, 0xf0, 0xe5, 0x88, 0x9d, 0xfd,
+	0x11, 0x3b, 0x3f, 0x8f, 0xd8, 0x79, 0xd7, 0x3a, 0xbb, 0xbf, 0xb6, 0x0e, 0x6a, 0x93, 0x30, 0x19,
+	0x94, 0xf5, 0x7f, 0xfe, 0xf4, 0x5f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x3a, 0xe3, 0x70, 0x5c, 0x9f,
+	0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -241,6 +333,8 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
+	// Parameters queries the parameters of the module.
+	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 	// Retrieves wasmx params
 	WasmxParams(ctx context.Context, in *QueryWasmxParamsRequest, opts ...grpc.CallOption) (*QueryWasmxParamsResponse, error)
 	// Retrieves the entire wasmx module's state
@@ -253,6 +347,15 @@ type queryClient struct {
 
 func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 	return &queryClient{cc}
+}
+
+func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error) {
+	out := new(QueryParamsResponse)
+	err := c.cc.Invoke(ctx, "/wasmx.Query/Params", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *queryClient) WasmxParams(ctx context.Context, in *QueryWasmxParamsRequest, opts ...grpc.CallOption) (*QueryWasmxParamsResponse, error) {
@@ -275,6 +378,8 @@ func (c *queryClient) WasmxModuleState(ctx context.Context, in *QueryModuleState
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
+	// Parameters queries the parameters of the module.
+	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 	// Retrieves wasmx params
 	WasmxParams(context.Context, *QueryWasmxParamsRequest) (*QueryWasmxParamsResponse, error)
 	// Retrieves the entire wasmx module's state
@@ -285,6 +390,9 @@ type QueryServer interface {
 type UnimplementedQueryServer struct {
 }
 
+func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsRequest) (*QueryParamsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
+}
 func (*UnimplementedQueryServer) WasmxParams(ctx context.Context, req *QueryWasmxParamsRequest) (*QueryWasmxParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method WasmxParams not implemented")
 }
@@ -294,6 +402,24 @@ func (*UnimplementedQueryServer) WasmxModuleState(ctx context.Context, req *Quer
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
 	s.RegisterService(&_Query_serviceDesc, srv)
+}
+
+func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryParamsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Params(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/wasmx.Query/Params",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Params(ctx, req.(*QueryParamsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_WasmxParams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -337,6 +463,10 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "Params",
+			Handler:    _Query_Params_Handler,
+		},
+		{
 			MethodName: "WasmxParams",
 			Handler:    _Query_WasmxParams_Handler,
 		},
@@ -347,6 +477,62 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "wasmx/query.proto",
+}
+
+func (m *QueryParamsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryParamsRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryParamsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryParamsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryParamsResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.Params.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintQuery(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *QueryWasmxParamsRequest) Marshal() (dAtA []byte, err error) {
@@ -474,6 +660,26 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *QueryParamsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *QueryParamsResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.Params.Size()
+	n += 1 + l + sovQuery(uint64(l))
+	return n
+}
+
 func (m *QueryWasmxParamsRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -521,6 +727,139 @@ func sovQuery(x uint64) (n int) {
 }
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *QueryParamsRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryParamsRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryParamsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryParamsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryParamsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Params", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Params.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *QueryWasmxParamsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

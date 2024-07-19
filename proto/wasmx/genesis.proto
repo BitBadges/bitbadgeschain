@@ -1,13 +1,18 @@
 syntax = "proto3";
+
 package wasmx;
 
-import "wasmx/wasmx.proto";
+import "amino/amino.proto";
 import "gogoproto/gogo.proto";
+import "wasmx/params.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/wasmx/types";
+option go_package = "bitbadgeschain/x/wasmx/types";
 
 // GenesisState defines the wasmx module's genesis state.
 message GenesisState {
-  // params defines all the parameters of related to wasmx.
-  Params params = 1 [(gogoproto.nullable) = false];
+  
+  // params defines all the parameters of the module.
+  Params params  = 1 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+  string port_id = 2;
 }
+

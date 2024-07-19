@@ -1,18 +1,53 @@
 syntax = "proto3";
 package wasmx;
 
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
+import "wasmx/params.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/wasmx/types";
+option go_package = "bitbadgeschain/x/wasmx/types";
 
-// Msg defines the wasmx Msg service.
+// Msg defines the Msg service.
 service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // UpdateParams defines a (governance) operation for updating the module
+  // parameters. The authority defaults to the x/gov module account.
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+
   rpc ExecuteContractCompat(MsgExecuteContractCompat) returns (MsgExecuteContractCompatResponse);
   rpc InstantiateContractCompat(MsgInstantiateContractCompat) returns (MsgInstantiateContractCompatResponse);
 }
 
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "wasmx/MsgUpdateParams";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the module parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+message MsgUpdateParamsResponse {}
+
+
 // MsgExecuteContractCompat submits the given message data to a smart contract, compatible with EIP712
 message MsgExecuteContractCompat {
+  option (amino.name) = "wasmx/MsgUpdateParams";
+  option (cosmos.msg.v1.signer) = "sender";
+
   // Sender is the that actor that signed the messages
   string sender = 1;
   // Contract is the address of the smart contract
@@ -30,6 +65,9 @@ message MsgExecuteContractCompatResponse {
 }
 
 message MsgInstantiateContractCompat {
+  option (amino.name) = "wasmx/MsgInstantiateContractCompat";
+  option (cosmos.msg.v1.signer) = "sender";
+
   // Sender is the that actor that signed the messages
   string sender = 1;
   // Code ID obtained from store wasm code

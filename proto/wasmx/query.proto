@@ -1,14 +1,21 @@
 syntax = "proto3";
 package wasmx;
 
-import "google/api/annotations.proto";
-import "wasmx/wasmx.proto";
-import "wasmx/genesis.proto";
+import "amino/amino.proto";
 import "gogoproto/gogo.proto";
-option go_package = "github.com/bitbadges/bitbadgeschain/x/wasmx/types";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "wasmx/params.proto";
+import "wasmx/genesis.proto";
+
+option go_package = "bitbadgeschain/x/wasmx/types";
 
 // Query defines the gRPC querier service.
 service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/bitbadgeschain/wasmx/params";
+  }
 
   // Retrieves wasmx params
   rpc WasmxParams(QueryWasmxParamsRequest) returns (QueryWasmxParamsResponse) {
@@ -19,8 +26,20 @@ service Query {
   rpc WasmxModuleState(QueryModuleStateRequest) returns (QueryModuleStateResponse) {
     option (google.api.http).get = "/bitbadges/bitbadgeschain/wasmx/v1/module_state";
   }
-
 }
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
 
 // QueryWasmxParamsRequest is the request type for the Query/WasmxParams RPC method.
 message QueryWasmxParamsRequest {}

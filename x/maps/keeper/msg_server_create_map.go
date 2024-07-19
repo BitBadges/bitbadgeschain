@@ -3,12 +3,13 @@ package keeper
 import (
 	"context"
 
+	"bitbadgeschain/x/maps/types"
+
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
-	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	badgetypes "bitbadgeschain/x/badges/types"
 )
 
 func (k msgServer) CreateMap(goCtx context.Context, msg *types.MsgCreateMap) (*types.MsgCreateMapResponse, error) {
@@ -48,14 +49,14 @@ func (k msgServer) CreateMap(goCtx context.Context, msg *types.MsgCreateMap) (*t
 	}
 
 	mapToAdd := types.Map{
-		Creator: msg.Creator,
-		MapId:   msg.MapId,
-		UpdateCriteria: msg.UpdateCriteria,
-		ValueOptions: msg.ValueOptions,
-		DefaultValue: msg.DefaultValue,
-		ManagerTimeline: msg.ManagerTimeline,
-		MetadataTimeline: msg.MetadataTimeline,
-		Permissions: msg.Permissions,
+		Creator:                    msg.Creator,
+		MapId:                      msg.MapId,
+		UpdateCriteria:             msg.UpdateCriteria,
+		ValueOptions:               msg.ValueOptions,
+		DefaultValue:               msg.DefaultValue,
+		ManagerTimeline:            msg.ManagerTimeline,
+		MetadataTimeline:           msg.MetadataTimeline,
+		Permissions:                msg.Permissions,
 		InheritManagerTimelineFrom: msg.InheritManagerTimelineFrom,
 	}
 	if msg.Permissions == nil {
@@ -67,7 +68,6 @@ func (k msgServer) CreateMap(goCtx context.Context, msg *types.MsgCreateMap) (*t
 	if msg.UpdateCriteria == nil {
 		mapToAdd.UpdateCriteria = &types.MapUpdateCriteria{}
 	}
-
 
 	//Check if protocol already exists
 	if k.StoreHasMapID(ctx, msg.MapId) {

@@ -3,7 +3,9 @@ package keeper
 import (
 	"context"
 
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"bitbadgeschain/x/badges/types"
+
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -12,7 +14,7 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 
 	newMsg := types.MsgUniversalUpdateCollection{
 		Creator:      msg.Creator,
-		CollectionId: sdk.NewUint(0), //We use 0 to indicate a new collection
+		CollectionId: sdkmath.NewUint(0), //We use 0 to indicate a new collection
 
 		//Exclusive to collection creations
 		BalancesType:    msg.BalancesType,

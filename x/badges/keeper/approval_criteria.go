@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"bitbadgeschain/third_party/go-rapidsnark"
+	"bitbadgeschain/x/badges/types"
+
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
-	"github.com/bitbadges/bitbadgeschain/third_party/go-rapidsnark"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	rapidsnarktypes "github.com/iden3/go-rapidsnark/types"

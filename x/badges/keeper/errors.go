@@ -1,8 +1,9 @@
 package keeper
 
 import (
+	"bitbadgeschain/x/badges/types"
+
 	sdkerrors "cosmossdk.io/errors"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 var (

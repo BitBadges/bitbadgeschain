@@ -3,8 +3,9 @@ package simulation
 import (
 	"math/rand"
 
-	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"bitbadgeschain/x/badges/keeper"
+	"bitbadgeschain/x/badges/types"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
@@ -31,6 +32,6 @@ func SimulateMsgCreateAddressLists(
 			},
 		}
 
-		return simtypes.NewOperationMsg(msg, true, "", types.ModuleCdc), nil, nil
+		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }

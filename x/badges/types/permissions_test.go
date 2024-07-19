@@ -4,9 +4,10 @@ import (
 	math "math"
 	"testing"
 
+	"bitbadgeschain/testutil/keeper"
+	"bitbadgeschain/x/badges/types"
+
 	sdkmath "cosmossdk.io/math"
-	"github.com/bitbadges/bitbadgeschain/testutil/keeper"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -2119,10 +2120,10 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToListId:           "AllWithoutMint",
-		FromListId:         "AllWithoutMint",
-		InitiatedByListId:  alice,
-		ApprovalId:         "All",
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: alice,
+		ApprovalId:        "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2159,10 +2160,10 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToListId:           "AllWithoutMint",
-		FromListId:         "AllWithoutMint",
-		InitiatedByListId:  alice,
-		ApprovalId:         "All",
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: alice,
+		ApprovalId:        "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2202,10 +2203,10 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToListId:           "AllWithoutMint",
-		FromListId:         "AllWithoutMint",
-		InitiatedByListId:  alice,
-		ApprovalId:         "All",
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: alice,
+		ApprovalId:        "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2242,10 +2243,10 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToListId:           "AllWithoutMint",
-			FromListId:         "AllWithoutMint",
-			InitiatedByListId:  alice,
-			ApprovalId:         "All",
+			ToListId:          "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: alice,
+			ApprovalId:        "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2289,10 +2290,10 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToListId:           "AllWithoutMint",
-			FromListId:         "AllWithoutMint",
-			InitiatedByListId:  alice,
-			ApprovalId:         "All",
+			ToListId:          "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: alice,
+			ApprovalId:        "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2334,10 +2335,10 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToListId:           "AllWithoutMint",
-			FromListId:         "AllWithoutMint",
-			InitiatedByListId:  alice,
-			ApprovalId:         "All",
+			ToListId:          "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: alice,
+			ApprovalId:        "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2383,10 +2384,10 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToListId:           "x",
-			FromListId:         "AllWithoutMint",
-			InitiatedByListId:  alice,
-			ApprovalId:         "All",
+			ToListId:          "x",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: alice,
+			ApprovalId:        "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2423,10 +2424,10 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToListId:           "x",
-			FromListId:         "AllWithoutMint",
-			InitiatedByListId:  alice,
-			ApprovalId:         "All",
+			ToListId:          "x",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: alice,
+			ApprovalId:        "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2470,10 +2471,10 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToListId:           "AllWithoutMint",
-		FromListId:         "AllWithoutMint",
-		InitiatedByListId:  alice,
-		ApprovalId:         "All",
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: alice,
+		ApprovalId:        "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2515,10 +2516,10 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToListId:           "AllWithoutMint",
-			FromListId:         "AllWithoutMint",
-			InitiatedByListId:  alice,
-			ApprovalId:         "All",
+			ToListId:          "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: alice,
+			ApprovalId:        "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2563,10 +2564,10 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToListId:           "AllWithoutMint",
-		FromListId:         "AllWithoutMint",
-		InitiatedByListId:  alice,
-		ApprovalId:         "All",
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: alice,
+		ApprovalId:        "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2604,10 +2605,10 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToListId:           "AllWithoutMint",
-			FromListId:         "AllWithoutMint",
-			InitiatedByListId:  alice,
-			ApprovalId:         "All",
+			ToListId:          "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: alice,
+			ApprovalId:        "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2647,10 +2648,10 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToListId:           "AllWithoutMint",
-		FromListId:         "AllWithoutMint",
-		InitiatedByListId:  alice,
-		ApprovalId:         "All",
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: alice,
+		ApprovalId:        "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2686,10 +2687,10 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToListId:           "AllWithoutMint",
-		FromListId:         "AllWithoutMint",
-		InitiatedByListId:  alice,
-		ApprovalId:         "All",
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: alice,
+		ApprovalId:        "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2757,10 +2758,10 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToListId:           "ABC",
-		FromListId:         "AllWithoutMint",
-		InitiatedByListId:  "AllWithoutMint",
-		ApprovalId:         "All",
+		ToListId:          "ABC",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalId:        "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2797,10 +2798,10 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToListId:           "ABC",
-		FromListId:         "AllWithoutMint",
-		InitiatedByListId:  "AllWithoutMint",
-		ApprovalId:         "All",
+		ToListId:          "ABC",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalId:        "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2840,10 +2841,10 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToListId:           "AllWithoutMint",
-		FromListId:         "AllWithoutMint",
-		InitiatedByListId:  "AllWithoutMint",
-		ApprovalId:         "All",
+		ToListId:          "AllWithoutMint",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalId:        "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2881,10 +2882,10 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToListId:           "AllWithoutMint",
-			FromListId:         "AllWithoutMint",
-			InitiatedByListId:  "AllWithoutMint",
-			ApprovalId:         "All",
+			ToListId:          "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalId:        "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -2951,10 +2952,10 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToListId:           "ABC",
-		FromListId:         "AllWithoutMint",
-		InitiatedByListId:  "AllWithoutMint",
-		ApprovalId:         "All",
+		ToListId:          "ABC",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalId:        "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -2991,10 +2992,10 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			ToListId:           "ABC",
-			FromListId:         "AllWithoutMint",
-			InitiatedByListId:  "AllWithoutMint",
-			ApprovalId:         "All",
+			ToListId:          "ABC",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalId:        "All",
 			PermanentlyPermittedTimes: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
@@ -3034,10 +3035,10 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToListId:           "BobCharlie",
-		FromListId:         "AllWithoutMint",
-		InitiatedByListId:  "AllWithoutMint",
-		ApprovalId:         "All",
+		ToListId:          "BobCharlie",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalId:        "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -3073,10 +3074,10 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 				End:   sdkmath.NewUint(50),
 			},
 		},
-		ToListId:           "BobCharlie",
-		FromListId:         "AllWithoutMint",
-		InitiatedByListId:  "AllWithoutMint",
-		ApprovalId:         "All",
+		ToListId:          "BobCharlie",
+		FromListId:        "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalId:        "All",
 		PermanentlyPermittedTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),

@@ -5,7 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
 
-	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
+	"bitbadgeschain/x/anchor/types"
 
 	sdkmath "cosmossdk.io/math"
 )

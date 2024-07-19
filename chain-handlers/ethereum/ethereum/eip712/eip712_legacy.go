@@ -363,11 +363,11 @@ func unpackAny(cdc codectypes.AnyUnpacker, field reflect.Value) (reflect.Type, r
 }
 
 var (
-	hashType      = reflect.TypeOf(common.Hash{})
-	addressType   = reflect.TypeOf(common.Address{})
-	bigIntType    = reflect.TypeOf(big.Int{})
-	cosmIntType   = reflect.TypeOf(sdkmath.Int{})
-	cosmDecType   = reflect.TypeOf(sdk.Dec{})
+	hashType    = reflect.TypeOf(common.Hash{})
+	addressType = reflect.TypeOf(common.Address{})
+	bigIntType  = reflect.TypeOf(big.Int{})
+	cosmIntType = reflect.TypeOf(sdkmath.Int{})
+	// cosmDecType   = reflect.TypeOf(sdk.Dec{})
 	timeType      = reflect.TypeOf(time.Time{})
 	cosmosAnyType = reflect.TypeOf(&codectypes.Any{})
 	edType        = reflect.TypeOf(ed25519.PubKey{})
@@ -417,7 +417,7 @@ func typToEth(typ reflect.Type) string {
 		if typ.Elem().ConvertibleTo(bigIntType) ||
 			typ.Elem().ConvertibleTo(timeType) ||
 			typ.Elem().ConvertibleTo(edType) ||
-			typ.Elem().ConvertibleTo(cosmDecType) ||
+			// typ.Elem().ConvertibleTo(cosmDecType) ||
 			typ.Elem().ConvertibleTo(cosmIntType) {
 			return str
 		}
@@ -427,7 +427,7 @@ func typToEth(typ reflect.Type) string {
 			typ.ConvertibleTo(bigIntType) ||
 			typ.ConvertibleTo(edType) ||
 			typ.ConvertibleTo(timeType) ||
-			typ.ConvertibleTo(cosmDecType) ||
+			// typ.ConvertibleTo(cosmDecType) ||
 			typ.ConvertibleTo(cosmIntType) {
 			return str
 		}

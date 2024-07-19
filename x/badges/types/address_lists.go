@@ -24,20 +24,20 @@ func getDuplicatesAndNonDuplicates(list1 []string, list2 []string) ([]string, []
 	return duplicates, inListOneButNotTwo
 }
 
-//Each address list has a list of addresses and a boolean whitelist.
-//Four cases (toRemove.Whitelist, addressList.Whitelist):
-// 1) (true, true) - Remove ABC from BCD
-//    Removed - duplicates from toRemove.Addresses and addressList.Addresses (BC)
-//    Remaining - non-duplicates from addressList.Addresses (D)
-// 2) (false, true) - Remove All but ABC from BCD
-//    Removed - non-duplicates from addressList.Addresses (D)
-//    Remaining - duplicates from toRemove.Addresses and addressList.Addresses (BC)
-// 3) (true, false) - Remove ABC from All but BCD
-//    Removed - non-duplicates from toRemove.Addresses (A)
-//		Remaining - everyone but combined list of toRemove.Addresses and addressList.Addresses (everyone but ABCD)
-// 4) (false, false) - Remove All but ABC from All but BCD
-//		Removed - everyone but combined list of toRemove.Addresses and addressList.Addresses (everyone but ABCD)
-//		Remaining - non-duplicates from toRemove.Addresses (A)
+// Each address list has a list of addresses and a boolean whitelist.
+// Four cases (toRemove.Whitelist, addressList.Whitelist):
+//  1. (true, true) - Remove ABC from BCD
+//     Removed - duplicates from toRemove.Addresses and addressList.Addresses (BC)
+//     Remaining - non-duplicates from addressList.Addresses (D)
+//  2. (false, true) - Remove All but ABC from BCD
+//     Removed - non-duplicates from addressList.Addresses (D)
+//     Remaining - duplicates from toRemove.Addresses and addressList.Addresses (BC)
+//  3. (true, false) - Remove ABC from All but BCD
+//     Removed - non-duplicates from toRemove.Addresses (A)
+//     Remaining - everyone but combined list of toRemove.Addresses and addressList.Addresses (everyone but ABCD)
+//  4. (false, false) - Remove All but ABC from All but BCD
+//     Removed - everyone but combined list of toRemove.Addresses and addressList.Addresses (everyone but ABCD)
+//     Remaining - non-duplicates from toRemove.Addresses (A)
 func RemoveAddressListFromAddressList(listToRemove *AddressList, addressList *AddressList) (*AddressList, *AddressList) {
 	duplicates, inToRemoveButNotList := getDuplicatesAndNonDuplicates(listToRemove.Addresses, addressList.Addresses)
 	_, inListButNotToRemove := getDuplicatesAndNonDuplicates(addressList.Addresses, listToRemove.Addresses)

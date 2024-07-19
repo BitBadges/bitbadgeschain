@@ -3,11 +3,12 @@ package keeper
 import (
 	"context"
 
+	"bitbadgeschain/x/maps/types"
+
 	sdkerrors "cosmossdk.io/errors"
-	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	badgetypes "bitbadgeschain/x/badges/types"
 )
 
 func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*types.MsgUpdateMapResponse, error) {

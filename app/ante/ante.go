@@ -4,16 +4,19 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	tmlog "github.com/cometbft/cometbft/libs/log"
+	"bitbadgeschain/x/anchor/types"
 
 	sdkerrors "cosmossdk.io/errors"
+	"cosmossdk.io/log"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/crypto/ethsecp256k1"
+	storetypes "cosmossdk.io/store/types"
+
+	"bitbadgeschain/chain-handlers/ethereum/crypto/ethsecp256k1"
+
 	ed25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 )
 
@@ -71,7 +74,7 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 	}
 }
 
-func Recover(logger tmlog.Logger, err *error) {
+func Recover(logger log.Logger, err *error) {
 	if r := recover(); r != nil {
 		*err = sdkerrors.Wrapf(sdkerrors.ErrPanic, "%v", r)
 
@@ -96,7 +99,7 @@ var _ authante.SignatureVerificationGasConsumer = DefaultSigVerificationGasConsu
 // for signature verification based upon the public key type. The cost is fetched from the given params and is matched
 // by the concrete type.
 func DefaultSigVerificationGasConsumer(
-	meter sdk.GasMeter, sig signing.SignatureV2, params authtypes.Params,
+	meter storetypes.GasMeter, sig signing.SignatureV2, params authtypes.Params,
 ) error {
 	// support for ethereum ECDSA secp256k1 keys
 	_, ok := sig.PubKey.(*ethsecp256k1.PubKey)

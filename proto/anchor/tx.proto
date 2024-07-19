@@ -2,26 +2,49 @@ syntax = "proto3";
 
 package anchor;
 
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
-option go_package = "github.com/bitbadges/bitbadgeschain/x/anchor/types";
+import "anchor/params.proto";
+
+option go_package = "bitbadgeschain/x/anchor/types";
 
 // Msg defines the Msg service.
 service Msg {
+  option (cosmos.msg.v1.service) = true;
+  
+  // UpdateParams defines a (governance) operation for updating the module
+  // parameters. The authority defaults to the x/gov module account.
+  rpc UpdateParams  (MsgUpdateParams ) returns (MsgUpdateParamsResponse );
   rpc AddCustomData (MsgAddCustomData) returns (MsgAddCustomDataResponse);
 }
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) =                               "authority";
+  option           (amino.name) = "bitbadgeschain/x/anchor/MsgUpdateParams";
+  
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the module parameters to update.
+  
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+message MsgUpdateParamsResponse {}
 
 //Used for WASM bindings and JSON parsing
 message AnchorCustomMsgType {
   MsgAddCustomData addCustomDataMsg = 1;
 }
 
-message AnchorData {
-  string creator = 1;
-  string data    = 2;
-  string timestamp = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-}
-
 message MsgAddCustomData {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "anchor/AddCustomData";
   string creator = 1;
   string data    = 2;
 }
@@ -29,4 +52,10 @@ message MsgAddCustomData {
 message MsgAddCustomDataResponse {
   // ID of the anchor location.
   string locationId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+message AnchorData {
+  string creator = 1;
+  string data    = 2;
+  string timestamp = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }

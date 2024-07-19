@@ -3,8 +3,9 @@ package types_test
 import (
 	"testing"
 
-	"github.com/bitbadges/bitbadgeschain/testutil/sample"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"bitbadgeschain/testutil/sample"
+	"bitbadgeschain/x/badges/types"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -32,14 +33,14 @@ func TestMsgUpdateUserApprovals_ValidateBasic(t *testing.T) {
 				Creator: sample.AccAddress(),
 				OutgoingApprovals: []*types.UserOutgoingApproval{
 					{
-						ToListId:           "All",
-						InitiatedByListId:  "All",
-						ApprovalId:         "approval_id",
+						ToListId:          "All",
+						InitiatedByListId: "All",
+						ApprovalId:        "approval_id",
 					},
 					{
-						ToListId:           "All",
-						InitiatedByListId:  "All",
-						ApprovalId:         "approval_id",
+						ToListId:          "All",
+						InitiatedByListId: "All",
+						ApprovalId:        "approval_id",
 					},
 				},
 			},

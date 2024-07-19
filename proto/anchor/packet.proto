@@ -1,7 +1,7 @@
 syntax = "proto3";
 package anchor;
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/anchor/types";
+option go_package = "bitbadgeschain/x/anchor/types";
 
 message AnchorPacketData {
     oneof packet {

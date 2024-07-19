@@ -1,11 +1,11 @@
 package keeper
 
 import (
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"bitbadgeschain/x/badges/types"
 )
 
 var (
-	MapKey     = []byte{0x01}
+	MapKey      = []byte{0x01}
 	MapValueKey = []byte{0x02}
 
 	MapValueDuplicatesKey = []byte{0x03}

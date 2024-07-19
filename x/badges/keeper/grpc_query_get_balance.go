@@ -3,8 +3,9 @@ package keeper
 import (
 	"context"
 
+	"bitbadgeschain/x/badges/types"
+
 	sdkerrors "cosmossdk.io/errors"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

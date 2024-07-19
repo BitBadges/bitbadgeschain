@@ -6,8 +6,9 @@ import (
 	"crypto/subtle"
 	"fmt"
 
+	"bitbadgeschain/chain-handlers/ethereum/ethereum/eip712"
+
 	errorsmod "cosmossdk.io/errors"
-	"github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/ethereum/eip712"
 
 	tmcrypto "github.com/cometbft/cometbft/crypto"
 	"github.com/cosmos/cosmos-sdk/codec"

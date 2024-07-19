@@ -3,7 +3,8 @@ package cli
 import (
 	"strconv"
 
-	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
+	"bitbadgeschain/x/anchor/types"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"

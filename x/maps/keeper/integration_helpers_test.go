@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"context"
 
-	"github.com/bitbadges/bitbadgeschain/x/maps/types"
+	"bitbadgeschain/x/maps/types"
 )
 
 /* Query helpers */
@@ -25,7 +25,6 @@ func GetMapValue(suite *TestSuite, ctx context.Context, id string, key string) (
 
 	return res.Value, nil
 }
-
 
 // /* Msg helpers */
 

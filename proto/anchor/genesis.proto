@@ -2,16 +2,20 @@ syntax = "proto3";
 
 package anchor;
 
+import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 import "anchor/params.proto";
 import "anchor/tx.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/anchor/types";
+option go_package = "bitbadgeschain/x/anchor/types";
 
 // GenesisState defines the anchor module's genesis state.
 message GenesisState {
-  Params params  = 1 [(gogoproto.nullable) = false];
+  
+  // params defines all the parameters of the module.
+  Params params  = 1 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
   string port_id = 2;
+
 
   string nextLocationId = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated AnchorData anchorData = 4 [(gogoproto.nullable) = false];

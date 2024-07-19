@@ -3,12 +3,13 @@ package keeper_test
 import (
 	"math"
 
+	"bitbadgeschain/x/maps/types"
+
 	sdkmath "cosmossdk.io/math"
-	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	badgeskeeper "bitbadgeschain/x/badges/keeper"
+	badgestypes "bitbadgeschain/x/badges/types"
 )
 
 func GetDefaultCreateMsg() *types.MsgCreateMap {
@@ -600,7 +601,6 @@ func (suite *TestSuite) TestCollectionIdCriteria() {
 	})
 	suite.Require().Error(err, "Error setting value: %s")
 }
-
 
 func (suite *TestSuite) TestInheritManagerFromCollection() {
 	wctx := sdk.WrapSDKContext(suite.ctx)

@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
+	"bitbadgeschain/x/anchor/types"
 )
 
 type msgServer struct {

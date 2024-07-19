@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"math"
 
+	"bitbadgeschain/x/badges/types"
+
 	sdkmath "cosmossdk.io/math"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"encoding/binary"
@@ -108,7 +109,6 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	if previouslyArchived && stillArchived {
 		return nil, ErrCollectionIsArchived
 	}
-
 
 	if msg.UpdateCollectionApprovals {
 		if err := k.ValidateCollectionApprovalsUpdate(ctx, collection, collection.CollectionApprovals, msg.CollectionApprovals, collection.CollectionPermissions.CanUpdateCollectionApprovals); err != nil {

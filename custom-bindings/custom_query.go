@@ -3,15 +3,16 @@ package custom_bindings
 import (
 	"encoding/json"
 
+	anchorKeeper "bitbadgeschain/x/anchor/keeper"
+	anchortypes "bitbadgeschain/x/anchor/types"
+	badgeKeeper "bitbadgeschain/x/badges/keeper"
+	badgeTypes "bitbadgeschain/x/badges/types"
+	mapsKeeper "bitbadgeschain/x/maps/keeper"
+	mapsTypes "bitbadgeschain/x/maps/types"
+
 	sdkerrors "cosmossdk.io/errors"
 	wasmKeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/CosmWasm/wasmd/x/wasm/types"
-	anchorKeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
-	anchortypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
-	badgeKeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	badgeTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	mapsKeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
-	mapsTypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

@@ -3,8 +3,9 @@ package keeper_test
 import (
 	"math"
 
+	"bitbadgeschain/x/badges/types"
+
 	sdkmath "cosmossdk.io/math"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

@@ -528,6 +528,7 @@ func request_Query_GetBalance_0(ctx context.Context, marshaler runtime.Marshaler
 
 	str, err := runtime.String(val)
 	protoReq.CollectionId = sdkmath.NewUintFromString(str)
+
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
 	}
@@ -896,17 +897,17 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"bitbadges", "bitbadgeschain", "badges", "params"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"bitbadges", "bitbadgeschain", "badges", "params"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_GetCollection_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"bitbadges", "bitbadgeschain", "badges", "get_collection", "collectionId"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetCollection_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"bitbadges", "bitbadgeschain", "badges", "get_collection", "collectionId"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_GetAddressList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"bitbadges", "bitbadgeschain", "badges", "get_address_list", "listId"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetAddressList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"bitbadges", "bitbadgeschain", "badges", "get_address_list", "listId"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_GetApprovalTracker_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"bitbadges", "bitbadgeschain", "badges", "get_approvals_tracker", "collectionId", "approvalLevel", "approverAddress", "amountTrackerId", "trackerType", "approvedAddress"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetApprovalTracker_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"bitbadges", "bitbadgeschain", "badges", "get_approvals_tracker", "collectionId", "approvalLevel", "approverAddress", "amountTrackerId", "trackerType", "approvedAddress"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_GetChallengeTracker_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"bitbadges", "bitbadgeschain", "badges", "get_challenge_tracker", "collectionId", "approvalLevel", "approverAddress", "challengeTrackerId", "leafIndex"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetChallengeTracker_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"bitbadges", "bitbadgeschain", "badges", "get_challenge_tracker", "collectionId", "approvalLevel", "approverAddress", "challengeTrackerId", "leafIndex"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_GetBalance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"bitbadges", "bitbadgeschain", "badges", "get_balance", "collectionId", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetBalance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"bitbadges", "bitbadgeschain", "badges", "get_balance", "collectionId", "address"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (

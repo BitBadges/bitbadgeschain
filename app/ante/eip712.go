@@ -8,6 +8,9 @@ import (
 	"encoding/json"
 	"fmt"
 
+	protov2 "google.golang.org/protobuf/proto"
+
+	signingv1beta1 "cosmossdk.io/api/cosmos/tx/signing/v1beta1"
 	sdkerrors "cosmossdk.io/errors"
 	"github.com/btcsuite/btcd/btcutil"
 	"github.com/btcsuite/btcd/btcutil/bech32"
@@ -23,8 +26,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
-	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	"github.com/tidwall/gjson"
 	"github.com/unisat-wallet/libbrc20-indexer/utils/bip322"
@@ -32,21 +36,26 @@ import (
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 
-	"github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/crypto/ethsecp256k1"
-	"github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/ethereum/eip712"
-	ethereumtypes "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/types"
-	ethereum "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/utils"
-	solanatypes "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/types"
+	"bitbadgeschain/chain-handlers/ethereum/crypto/ethsecp256k1"
+	"bitbadgeschain/chain-handlers/ethereum/ethereum/eip712"
+	ethereumtypes "bitbadgeschain/chain-handlers/ethereum/types"
+	ethereum "bitbadgeschain/chain-handlers/ethereum/utils"
+	solanatypes "bitbadgeschain/chain-handlers/solana/types"
 
-	bitcointypes "github.com/bitbadges/bitbadgeschain/chain-handlers/bitcoin/types"
+	bitcointypes "bitbadgeschain/chain-handlers/bitcoin/types"
 
-	solana "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/utils"
+	solana "bitbadgeschain/chain-handlers/solana/utils"
 
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	wasmxkeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
+	"bitbadgeschain/x/badges/types"
+
 	ethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 	"github.com/storyicon/sigverify"
+
+	bitcoin "bitbadgeschain/chain-handlers/bitcoin/utils"
+	ethereumcodec "bitbadgeschain/chain-handlers/ethereum/crypto/codec"
+
+	txsigning "cosmossdk.io/x/tx/signing"
 )
 
 var ethereumCodec codec.ProtoCodecMarshaler
@@ -54,6 +63,8 @@ var solanaCodec codec.ProtoCodecMarshaler
 
 func init() {
 	registry := codectypes.NewInterfaceRegistry()
+	ethereumcodec.RegisterInterfaces(registry)
+	bitcoin.RegisterInterfaces(registry)
 	ethereum.RegisterInterfaces(registry)
 	solana.RegisterInterfaces(registry)
 	ethereumCodec = codec.NewProtoCodec(registry)
@@ -66,23 +77,18 @@ func init() {
 // CONTRACT: Pubkeys are set in context for all signers before this decorator runs
 // CONTRACT: Tx must implement SigVerifiableTx interface
 type Eip712SigVerificationDecorator struct {
-	ak               ante.AccountKeeper
-	wasmxKeeper      wasmxkeeper.Keeper
-	signModeHandler  authsigning.SignModeHandler
-	chain            string
-	verifyBtcSigPath string
+	ak              ante.AccountKeeper
+	signModeHandler *txsigning.HandlerMap
+	chain           string
 }
 
 // NewEip712SigVerificationDecorator creates a new Eip712SigVerificationDecorator
 func NewEip712SigVerificationDecorator(ak ante.AccountKeeper,
-	wk wasmxkeeper.Keeper,
-	signModeHandler authsigning.SignModeHandler, chain string, verifyBtcSigPath string) Eip712SigVerificationDecorator {
+	signModeHandler *txsigning.HandlerMap, chain string) Eip712SigVerificationDecorator {
 	return Eip712SigVerificationDecorator{
-		ak:               ak,
-		wasmxKeeper:      wk,
-		signModeHandler:  signModeHandler,
-		chain:            chain,
-		verifyBtcSigPath: verifyBtcSigPath,
+		ak:              ak,
+		signModeHandler: signModeHandler,
+		chain:           chain,
 	}
 }
 
@@ -111,7 +117,10 @@ func (svd Eip712SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx,
 		return ctx, err
 	}
 
-	signerAddrs := sigTx.GetSigners()
+	signerAddrs, err := sigTx.GetSigners()
+	if err != nil {
+		return ctx, err
+	}
 
 	// EIP712 allows just one signature
 	if len(sigs) != 1 {
@@ -161,16 +170,47 @@ func (svd Eip712SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx,
 		Sequence:      acc.GetSequence(),
 	}
 
+	anyPk, err := codectypes.NewAnyWithValue(pubKey)
+	if err != nil {
+		return ctx, err
+	}
+
+	txSigningData := txsigning.SignerData{
+		ChainID:       chainID,
+		AccountNumber: accNum,
+		Sequence:      acc.GetSequence(),
+		Address:       sdk.AccAddress(acc.GetAddress()).String(),
+	}
+
+	if pubKey != nil {
+		txSigningData.PubKey = &anypb.Any{
+			TypeUrl: anyPk.TypeUrl,
+			Value:   anyPk.Value,
+		}
+	}
+
 	if simulate {
 		return next(ctx, tx, simulate)
 	}
 
-	if err := VerifySignature(pubKey, signerData, sig.Data, svd.signModeHandler, authSignTx, svd.chain, svd.wasmxKeeper, ctx, svd.verifyBtcSigPath); err != nil {
+	if err := VerifySignature(pubKey, signerData, sig.Data, svd.signModeHandler, authSignTx, svd.chain, ctx, txSigningData); err != nil {
 		errMsg := fmt.Errorf("signature verification failed; please verify account number (%d) and chain-id (%s): %w", accNum, chainID, err)
 		return ctx, sdkerrors.Wrap(types.ErrUnauthorized, errMsg.Error())
 	}
 
 	return next(ctx, tx, simulate)
+}
+
+func deepCopyAnySlice(input []*anypb.Any) ([]*anypb.Any, error) {
+	output := make([]*anypb.Any, len(input))
+	for i, v := range input {
+		if v != nil {
+			// Use proto.Clone to deep copy each element
+			cloned := proto.Clone(v).(*anypb.Any)
+			output[i] = cloned
+		}
+	}
+	return output, nil
 }
 
 // VerifySignature verifies a transaction signature contained in SignatureData abstracting over different signing modes
@@ -179,12 +219,11 @@ func VerifySignature(
 	pubKey cryptotypes.PubKey,
 	signerData authsigning.SignerData,
 	sigData signing.SignatureData,
-	_ authsigning.SignModeHandler,
+	signModeMap *txsigning.HandlerMap,
 	tx authsigning.Tx,
 	chain string,
-	wk wasmxkeeper.Keeper,
 	ctx sdk.Context,
-	verifyBtcSigPath string,
+	txSigningData txsigning.SignerData,
 ) error {
 	switch data := sigData.(type) {
 	case *signing.SingleSignatureData:
@@ -197,25 +236,10 @@ func VerifySignature(
 			return sdkerrors.Wrap(types.ErrTooManySignatures, "invalid signature value; EIP712 must have the cosmos transaction signature empty")
 		}
 
-		// @contract: this code is reached only when Msg has Web3Tx extension (so this custom Ante handler flow),
-		// and the signature is SIGN_MODE_LEGACY_AMINO_JSON which is supported for EIP712 for now
-
 		msgs := tx.GetMsgs()
 		if len(msgs) == 0 {
 			return sdkerrors.Wrap(types.ErrNoSignatures, "tx doesn't contain any msgs to verify signature")
 		}
-
-		txBytes := legacytx.StdSignBytes(
-			signerData.ChainID,
-			signerData.AccountNumber,
-			signerData.Sequence,
-			tx.GetTimeoutHeight(),
-			legacytx.StdFee{
-				Amount: tx.GetFee(),
-				Gas:    tx.GetGas(),
-			},
-			msgs, tx.GetMemo(), tx.GetTip(),
-		)
 
 		signerChainID, err := ethereum.ParseChainID(signerData.ChainID)
 		if err != nil {
@@ -282,6 +306,37 @@ func VerifySignature(
 		if !recoveredFeePayerAcc.Equals(feePayer) {
 			return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to match fee payer in extension to the expected signer %s", recoveredFeePayerAcc)
 		}
+
+		adaptableTx := tx.(authsigning.V2AdaptableTx)
+		txData := adaptableTx.GetSigningTxData()
+
+		deepCopiedExtOpts, err := deepCopyAnySlice(txData.Body.ExtensionOptions)
+		if err != nil {
+			return sdkerrors.Wrap(err, "failed to deep copy extension options")
+		}
+
+		deepCopiedNonCritExtOpts, err := deepCopyAnySlice(txData.Body.NonCriticalExtensionOptions)
+		if err != nil {
+			return sdkerrors.Wrap(err, "failed to deep copy non-critical extension options")
+		}
+
+		//HACK: Little hacky. We only use txBytes for generating tx JSON (extensions not included)
+		//			And, the GetSignBytes function throws for extensions with Amino. So, we remove and readd.
+		//			IDK if all of this is necessary
+		txData.Body.ExtensionOptions = nil
+		txData.Body.NonCriticalExtensionOptions = nil
+		bodyBz, err := protov2.Marshal(txData.Body)
+		if err != nil {
+			return sdkerrors.Wrap(err, "failed to marshal tx body")
+		}
+		txData.BodyBytes = bodyBz
+		txBytes, err := signModeMap.GetSignBytes(ctx, signingv1beta1.SignMode_SIGN_MODE_LEGACY_AMINO_JSON, txSigningData, txData)
+		if err != nil {
+			return sdkerrors.Wrap(err, "failed to get sign bytes")
+		}
+
+		txData.Body.ExtensionOptions = deepCopiedExtOpts
+		txData.Body.NonCriticalExtensionOptions = deepCopiedNonCritExtOpts
 
 		//This uses the new EIP712 wrapper, not legacy
 		//This also accounts for multiple msgs, not just one
@@ -388,16 +443,21 @@ func VerifySignature(
 
 			return nil
 		} else {
+
 			if len(feePayerSig) != ethcrypto.SignatureLength {
 				return sdkerrors.Wrap(types.ErrorInvalidSigner, "signature length doesn't match typical [R||S||V] signature 65 bytes")
 			}
 
+			byteStr := []byte(jsonStr)
+			hexSig := hex.EncodeToString(feePayerSig)
+			pubKeyBytes := pubKey.Address().Bytes()
+
 			//Standard JSON signature verification
 			isHashSigValid, hashSigErr := sigverify.VerifyEllipticCurveHexSignatureEx(
-				ethcommon.Address(pubKey.Address().Bytes()),
+				ethcommon.Address(pubKeyBytes),
 				// []byte(jsonHashHexStr),
-				[]byte(jsonStr),
-				"0x"+hex.EncodeToString(feePayerSig),
+				byteStr,
+				"0x"+hexSig,
 			)
 			if isHashSigValid && hashSigErr == nil {
 				return nil

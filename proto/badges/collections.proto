@@ -9,7 +9,7 @@ import "badges/metadata.proto";
 import "badges/timelines.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
+option go_package = "bitbadgeschain/x/badges/types";
 
 /* 
   A BadgeCollection is the top-level object for a collection of badges. 

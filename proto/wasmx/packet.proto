@@ -1,0 +1,13 @@
+syntax = "proto3";
+package wasmx;
+
+option go_package = "bitbadgeschain/x/wasmx/types";
+
+message WasmxPacketData {
+    oneof packet {
+        NoData noData = 1;
+    }
+}
+
+message NoData {
+}

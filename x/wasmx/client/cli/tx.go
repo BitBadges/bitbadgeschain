@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
+	"bitbadgeschain/x/wasmx/types"
 	cliflags "github.com/cosmos/cosmos-sdk/client/flags"
 )
 

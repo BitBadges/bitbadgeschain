@@ -14,7 +14,7 @@ RUN apt-get install -y make wget
 
 
 WORKDIR /home
-RUN curl https://get.ignite.com/cli@v0.27.2 | bash
+RUN curl https://get.ignite.com/cli@v28.5.0 | bash
 RUN mv ignite /usr/local/bin
 RUN ignite version
 

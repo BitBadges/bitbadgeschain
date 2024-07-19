@@ -21,6 +21,10 @@ const (
 )
 
 var (
+	ParamsKey = []byte("p_anchor")
+)
+
+var (
 	// PortKey defines the key to store the port ID in store
 	PortKey = KeyPrefix("anchor-port-")
 )

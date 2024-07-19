@@ -4,13 +4,15 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/bitbadges/bitbadgeschain/app/params"
+	"bitbadgeschain/app/params"
+
 	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	txTypes "github.com/cosmos/cosmos-sdk/types/tx"
 
-	types "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/utils"
+	types "bitbadgeschain/chain-handlers/ethereum/utils"
+
 	apitypes "github.com/ethereum/go-ethereum/signer/core/apitypes"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -176,8 +178,6 @@ func decodeProtobufSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 		Gas:    authInfo.Fee.GasLimit,
 	}
 
-	tip := authInfo.Tip
-
 	// WrapTxToTypedData expects the payload as an Amino Sign Doc
 	signBytes := legacytx.StdSignBytes(
 		signDoc.ChainId,
@@ -187,7 +187,6 @@ func decodeProtobufSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 		*stdFee,
 		msgs,
 		body.Memo,
-		tip,
 	)
 
 	typedData, err := WrapTxToTypedData(
@@ -222,16 +221,16 @@ func validatePayloadMessages(msgs []sdk.Msg) error {
 	var msgSigner sdk.AccAddress
 
 	for i, m := range msgs {
-		if len(m.GetSigners()) != 1 {
+		if len(m.(sdk.LegacyMsg).GetSigners()) != 1 {
 			return errors.New("unable to build EIP-712 payload: expect exactly 1 signer")
 		}
 
 		if i == 0 {
-			msgSigner = m.GetSigners()[0]
+			msgSigner = m.(sdk.LegacyMsg).GetSigners()[0]
 			continue
 		}
 
-		if !msgSigner.Equals(m.GetSigners()[0]) {
+		if !msgSigner.Equals(m.(sdk.LegacyMsg).GetSigners()[0]) {
 			return errors.New("unable to build EIP-712 payload: multiple signers detected")
 		}
 	}

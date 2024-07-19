@@ -4,6 +4,17 @@ release/
 .idea/
 .vscode/
 .DS_Store
+*.dot
+*.log
+*.ign
+
+
+vue/node_modules
+vue/dist
+release/
+.idea/
+.vscode/
+.DS_Store
 
 x/badges/keeper/coverage*
 

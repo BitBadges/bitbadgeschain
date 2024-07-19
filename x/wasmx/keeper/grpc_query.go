@@ -5,12 +5,12 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
+	"bitbadgeschain/x/wasmx/types"
 )
 
 var _ types.QueryServer = &Keeper{}
 
-func (k *Keeper) WasmxParams(c context.Context, _ *types.QueryWasmxParamsRequest) (*types.QueryWasmxParamsResponse, error) {
+func (k Keeper) WasmxParams(c context.Context, _ *types.QueryWasmxParamsRequest) (*types.QueryWasmxParamsResponse, error) {
 
 	ctx := sdk.UnwrapSDKContext(c)
 
@@ -22,7 +22,7 @@ func (k *Keeper) WasmxParams(c context.Context, _ *types.QueryWasmxParamsRequest
 	return res, nil
 }
 
-func (k *Keeper) WasmxModuleState(c context.Context, _ *types.QueryModuleStateRequest) (*types.QueryModuleStateResponse, error) {
+func (k Keeper) WasmxModuleState(c context.Context, _ *types.QueryModuleStateRequest) (*types.QueryModuleStateResponse, error) {
 
 	ctx := sdk.UnwrapSDKContext(c)
 

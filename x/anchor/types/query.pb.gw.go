@@ -23,7 +23,6 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-
 	sdkmath "cosmossdk.io/math"
 )
 
@@ -70,8 +69,7 @@ func request_Query_GetValueAtLocation_0(ctx context.Context, marshaler runtime.M
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "locationId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.LocationId = sdkmath.NewUintFromString(str)
+	protoReq.LocationId = sdkmath.NewUintFromString(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
 	}
@@ -101,12 +99,10 @@ func local_request_Query_GetValueAtLocation_0(ctx context.Context, marshaler run
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "locationId")
 	}
 
-	str, err := runtime.String(val)
-	protoReq.LocationId = sdkmath.NewUintFromString(str)
+	protoReq.LocationId = sdkmath.NewUintFromString(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
 	}
-
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "locationId", err)
@@ -254,9 +250,9 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"bitbadges", "bitbadgeschain", "anchor", "params"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"bitbadgeschain", "anchor", "params"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_GetValueAtLocation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"bitbadges", "bitbadgeschain", "anchor", "locations", "locationId"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetValueAtLocation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"bitbadgeschain", "anchor", "locations", "locationId"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (

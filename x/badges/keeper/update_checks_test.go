@@ -1,8 +1,9 @@
 package keeper_test
 
 import (
+	"bitbadgeschain/x/badges/types"
+
 	sdkmath "cosmossdk.io/math"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -796,14 +797,14 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 		CollectionApprovals: []*types.CollectionApproval{
 			collectionsToCreate[0].CollectionApprovals[0],
 			{
-				FromListId:         alice,
-				ToListId:           "AllWithoutMint",
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetFullUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "different id",
-				ApprovalCriteria: collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
+				FromListId:        alice,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetFullUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "different id",
+				ApprovalCriteria:  collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
 			},
 		},
 	})
@@ -859,12 +860,12 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 		UpdateIncomingApprovals: true,
 		OutgoingApprovals: []*types.UserOutgoingApproval{
 			{
-				ToListId:           alice,
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetFullUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "test",
+				ToListId:          alice,
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetFullUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "test",
 				ApprovalCriteria: &types.OutgoingApprovalCriteria{
 
 					RequireToEqualsInitiatedBy: true,
@@ -875,12 +876,12 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 		},
 		IncomingApprovals: []*types.UserIncomingApproval{
 			{
-				FromListId:         alice,
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetFullUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "test",
+				FromListId:        alice,
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetFullUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "test",
 			},
 		},
 	})
@@ -893,12 +894,12 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 		UpdateIncomingApprovals: true,
 		OutgoingApprovals: []*types.UserOutgoingApproval{
 			{
-				ToListId:           bob,
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetFullUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "test",
+				ToListId:          bob,
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetFullUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "test",
 				ApprovalCriteria: &types.OutgoingApprovalCriteria{
 
 					RequireToEqualsInitiatedBy: true,
@@ -909,12 +910,12 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 		},
 		IncomingApprovals: []*types.UserIncomingApproval{
 			{
-				FromListId:         bob,
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetFullUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "test",
+				FromListId:        bob,
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetFullUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "test",
 				ApprovalCriteria: &types.IncomingApprovalCriteria{
 
 					RequireFromEqualsInitiatedBy: true,
@@ -986,7 +987,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 	suite.Require().Nil(err, "Error creating collections")
 
 	newApprovalCriteria := collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria
-	newApprovalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdk.NewUint(1)
+	newApprovalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(1)
 
 	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
 		Creator:      bob,
@@ -994,24 +995,24 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 		CollectionApprovals: []*types.CollectionApproval{
 			collectionsToCreate[0].CollectionApprovals[0],
 			{
-				FromListId:         bob,
-				ToListId:           "AllWithoutMint",
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetFullUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "test",
-				ApprovalCriteria:   newApprovalCriteria,
+				FromListId:        bob,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetFullUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "test",
+				ApprovalCriteria:  newApprovalCriteria,
 			},
 			{
-				FromListId:         "!" + bob,
-				ToListId:           "AllWithoutMint",
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetFullUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "testgfag",
-				ApprovalCriteria:   newApprovalCriteria,
+				FromListId:        "!" + bob,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetFullUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "testgfag",
+				ApprovalCriteria:  newApprovalCriteria,
 			},
 		},
 	})
@@ -1065,7 +1066,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalances() 
 	suite.Require().Nil(err, "Error creating collections")
 
 	newApprovalCriteria := collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria
-	newApprovalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdk.NewUint(1)
+	newApprovalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(1)
 
 	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
 		Creator:      bob,
@@ -1073,24 +1074,24 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalances() 
 		CollectionApprovals: []*types.CollectionApproval{
 			collectionsToCreate[0].CollectionApprovals[0],
 			{
-				FromListId:         bob,
-				ToListId:           "AllWithoutMint",
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetFullUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "test",
-				ApprovalCriteria:   newApprovalCriteria,
+				FromListId:        bob,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetFullUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "test",
+				ApprovalCriteria:  newApprovalCriteria,
 			},
 			{
-				FromListId:         "!" + bob,
-				ToListId:           "AllWithoutMint",
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetFullUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "testagdf",
-				ApprovalCriteria:   newApprovalCriteria,
+				FromListId:        "!" + bob,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetFullUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "testagdf",
+				ApprovalCriteria:  newApprovalCriteria,
 			},
 		},
 	})
@@ -1130,7 +1131,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 	suite.Require().Nil(err, "Error creating collections")
 
 	newApprovalCriteria := collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria
-	newApprovalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdk.NewUint(1)
+	newApprovalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(1)
 
 	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
 		Creator:      bob,
@@ -1138,24 +1139,24 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 		CollectionApprovals: []*types.CollectionApproval{
 			collectionsToCreate[0].CollectionApprovals[0],
 			{
-				FromListId:         bob,
-				ToListId:           "AllWithoutMint",
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetFullUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "test",
-				ApprovalCriteria:   newApprovalCriteria,
+				FromListId:        bob,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetFullUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "test",
+				ApprovalCriteria:  newApprovalCriteria,
 			},
 			{
-				FromListId:         "!" + bob,
-				ToListId:           "AllWithoutMint",
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetFullUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "testadfgsd",
-				ApprovalCriteria:   newApprovalCriteria,
+				FromListId:        "!" + bob,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetFullUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "testadfgsd",
+				ApprovalCriteria:  newApprovalCriteria,
 			},
 		},
 	})
@@ -1209,7 +1210,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 	suite.Require().Nil(err, "Error creating collections")
 
 	newApprovalCriteria := collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria
-	newApprovalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdk.NewUint(1)
+	newApprovalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(1)
 	newApprovalCriteria.PredeterminedBalances = &types.PredeterminedBalances{
 		IncrementedBalances: &types.IncrementedBalances{
 			StartBalances: []*types.Balance{
@@ -1219,8 +1220,8 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
-			IncrementBadgeIdsBy:       sdk.NewUint(0),
-			IncrementOwnershipTimesBy: sdk.NewUint(0),
+			IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 		},
 		OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
 			UseOverallNumTransfers: true,
@@ -1233,24 +1234,24 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 		CollectionApprovals: []*types.CollectionApproval{
 			collectionsToCreate[0].CollectionApprovals[0],
 			{
-				FromListId:         bob,
-				ToListId:           "AllWithoutMint",
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetBottomHalfUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "test",
-				ApprovalCriteria:   newApprovalCriteria,
+				FromListId:        bob,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetBottomHalfUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "test",
+				ApprovalCriteria:  newApprovalCriteria,
 			},
 			{
-				FromListId:         bob,
-				ToListId:           "AllWithoutMint",
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetTopHalfUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "testsgdfs",
-				ApprovalCriteria:   newApprovalCriteria,
+				FromListId:        bob,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetTopHalfUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "testsgdfs",
+				ApprovalCriteria:  newApprovalCriteria,
 			},
 		},
 	})
@@ -1305,7 +1306,7 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 	suite.Require().Nil(err, "Error creating collections")
 
 	newApprovalCriteria := collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria
-	newApprovalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdk.NewUint(1)
+	newApprovalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(1)
 	newApprovalCriteria.PredeterminedBalances = &types.PredeterminedBalances{
 		IncrementedBalances: &types.IncrementedBalances{
 			StartBalances: []*types.Balance{
@@ -1315,8 +1316,8 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
-			IncrementBadgeIdsBy:       sdk.NewUint(0),
-			IncrementOwnershipTimesBy: sdk.NewUint(0),
+			IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 		},
 		OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
 			UseOverallNumTransfers: true,
@@ -1329,24 +1330,24 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 		CollectionApprovals: []*types.CollectionApproval{
 			collectionsToCreate[0].CollectionApprovals[0],
 			{
-				FromListId:         bob,
-				ToListId:           "AllWithoutMint",
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetBottomHalfUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "test",
-				ApprovalCriteria:   newApprovalCriteria,
+				FromListId:        bob,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetBottomHalfUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "test",
+				ApprovalCriteria:  newApprovalCriteria,
 			},
 			{
-				FromListId:         bob,
-				ToListId:           "AllWithoutMint",
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetTopHalfUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "testsdfgsdf",
-				ApprovalCriteria:   newApprovalCriteria,
+				FromListId:        bob,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetTopHalfUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "testsdfgsdf",
+				ApprovalCriteria:  newApprovalCriteria,
 			},
 		},
 	})
@@ -1384,12 +1385,12 @@ func (suite *TestSuite) TestGetMaxPossible() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].DefaultIncomingApprovals = []*types.UserIncomingApproval{
 		{
-			FromListId:         "AllWithoutMint",
-			InitiatedByListId:  "AllWithoutMint",
-			TransferTimes:      GetFullUintRanges(),
-			OwnershipTimes:     GetFullUintRanges(),
-			ApprovalId:         "test",
-			BadgeIds:           GetFullUintRanges(),
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			ApprovalId:        "test",
+			BadgeIds:          GetFullUintRanges(),
 		},
 	}
 	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
@@ -1410,33 +1411,33 @@ func (suite *TestSuite) TestGetMaxPossible() {
 		CollectionApprovals: []*types.CollectionApproval{
 			collectionsToCreate[0].CollectionApprovals[0],
 			{
-				FromListId:         bob,
-				ToListId:           "AllWithoutMint",
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetFullUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "test",
+				FromListId:        bob,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetFullUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "test",
 				ApprovalCriteria: &types.ApprovalCriteria{
 					ApprovalAmounts: &types.ApprovalAmounts{
-						OverallApprovalAmount: sdk.NewUint(10),
+						OverallApprovalAmount: sdkmath.NewUint(10),
 					},
 
 					MaxNumTransfers: &types.MaxNumTransfers{},
 				},
 			},
 			{
-				FromListId:         bob,
-				ToListId:           "AllWithoutMint",
-				InitiatedByListId:  "AllWithoutMint",
-				BadgeIds:           GetFullUintRanges(),
-				TransferTimes:      GetFullUintRanges(),
-				OwnershipTimes:     GetFullUintRanges(),
-				ApprovalId:         "tessdgfst",
+				FromListId:        bob,
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				BadgeIds:          GetFullUintRanges(),
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				ApprovalId:        "tessdgfst",
 				ApprovalCriteria: &types.ApprovalCriteria{
 
 					ApprovalAmounts: &types.ApprovalAmounts{
-						OverallApprovalAmount: sdk.NewUint(10),
+						OverallApprovalAmount: sdkmath.NewUint(10),
 					},
 					MaxNumTransfers: &types.MaxNumTransfers{},
 				},

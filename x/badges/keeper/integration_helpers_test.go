@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"math"
 
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
 )
@@ -83,13 +83,13 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 			BalancesType: sdkmath.NewUint(1),
 			CollectionApprovals: []*types.CollectionApproval{
 				{
-					ToListId:           "AllWithoutMint",
-					FromListId:         "AllWithoutMint",
-					InitiatedByListId:  "AllWithoutMint",
-					TransferTimes:      GetFullUintRanges(),
-					OwnershipTimes:     GetFullUintRanges(),
-					BadgeIds:           GetFullUintRanges(),
-					ApprovalId:         "test",
+					ToListId:          "AllWithoutMint",
+					FromListId:        "AllWithoutMint",
+					InitiatedByListId: "AllWithoutMint",
+					TransferTimes:     GetFullUintRanges(),
+					OwnershipTimes:    GetFullUintRanges(),
+					BadgeIds:          GetFullUintRanges(),
+					ApprovalId:        "test",
 					ApprovalCriteria: &types.ApprovalCriteria{
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
@@ -107,7 +107,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 					OwnershipTimes:    GetFullUintRanges(),
 					BadgeIds:          GetFullUintRanges(),
 
-					ApprovalId:         "test",
+					ApprovalId: "test",
 					ApprovalCriteria: &types.IncomingApprovalCriteria{
 
 						MaxNumTransfers: &types.MaxNumTransfers{
@@ -127,7 +127,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 					OwnershipTimes:    GetFullUintRanges(),
 					BadgeIds:          GetFullUintRanges(),
 
-					ApprovalId:         "test",
+					ApprovalId: "test",
 					ApprovalCriteria: &types.OutgoingApprovalCriteria{
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
@@ -177,10 +177,10 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*type
 		FromListId:        "Mint",
 		InitiatedByListId: "AllWithoutMint",
 
-		TransferTimes:      GetFullUintRanges(),
-		BadgeIds:           GetFullUintRanges(),
-		OwnershipTimes:     GetFullUintRanges(),
-		ApprovalId:         "mint-test",
+		TransferTimes:  GetFullUintRanges(),
+		BadgeIds:       GetFullUintRanges(),
+		OwnershipTimes: GetFullUintRanges(),
+		ApprovalId:     "mint-test",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(1000),

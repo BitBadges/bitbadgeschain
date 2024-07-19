@@ -3,12 +3,13 @@ package keeper
 import (
 	"context"
 
+	"bitbadgeschain/x/maps/types"
+
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
-	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	badgetypes "bitbadgeschain/x/badges/types"
 )
 
 func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*types.MsgSetValueResponse, error) {
@@ -21,7 +22,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 	//Check the overwrite options
 	if msg.Options.UseMostRecentCollectionId {
 		nextCollectionId := k.badgesKeeper.GetNextCollectionId(ctx)
-		value = nextCollectionId.Sub(sdk.NewUint(1)).BigInt().String()
+		value = nextCollectionId.Sub(sdkmath.NewUint(1)).BigInt().String()
 	}
 
 	currMap, found := k.GetMapFromStore(ctx, mapId)

@@ -7,7 +7,7 @@ import (
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
+	"bitbadgeschain/x/wasmx/types"
 )
 
 var _ types.MsgServer = msgServer{}

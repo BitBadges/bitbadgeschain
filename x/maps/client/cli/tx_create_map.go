@@ -8,7 +8,8 @@ import (
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/spf13/cobra"
 
-	"github.com/bitbadges/bitbadgeschain/x/maps/types"
+	"bitbadgeschain/x/maps/types"
+
 	"github.com/cosmos/cosmos-sdk/client"
 )
 
@@ -37,7 +38,7 @@ func CmdCreateMap() *cobra.Command {
 			}
 
 			txData.Creator = clientCtx.GetFromAddress().String()
-			
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &txData)
 		},
 	}
@@ -46,7 +47,6 @@ func CmdCreateMap() *cobra.Command {
 
 	return cmd
 }
-
 
 func CmdSetValue() *cobra.Command {
 	cmd := &cobra.Command{
@@ -107,7 +107,7 @@ func CmdUpdateMap() *cobra.Command {
 			}
 
 			txData.Creator = clientCtx.GetFromAddress().String()
-			
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &txData)
 		},
 	}
@@ -140,7 +140,7 @@ func CmdDeleteMap() *cobra.Command {
 			}
 
 			txData.Creator = clientCtx.GetFromAddress().String()
-			
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &txData)
 		},
 	}

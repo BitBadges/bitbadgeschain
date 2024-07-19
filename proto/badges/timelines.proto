@@ -8,7 +8,7 @@ import "badges/permissions.proto";
 import "badges/metadata.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
+option go_package = "bitbadgeschain/x/badges/types";
 
 // CollectionMetadataTimeline defines the metadata for a collection at different timeline times.
 message CollectionMetadataTimeline {

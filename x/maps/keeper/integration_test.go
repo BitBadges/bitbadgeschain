@@ -6,15 +6,13 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	"bitbadgeschain/x/maps/keeper"
+	"bitbadgeschain/x/maps/types"
 
-	"github.com/bitbadges/bitbadgeschain/x/maps/keeper"
-	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	bitbadgesapp "github.com/bitbadges/bitbadgeschain/app"
+	bitbadgesapp "bitbadgeschain/app"
 )
 
 const (
@@ -56,11 +54,9 @@ func (suite *TestSuite) SetupTest() {
 		false,
 	)
 
-	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+	ctx := app.BaseApp.NewContext(false)
 
-	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
-
-	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
+	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.AppCodec().InterfaceRegistry())
 	queryClient := types.NewQueryClient(queryHelper)
 
 	suite.app = app

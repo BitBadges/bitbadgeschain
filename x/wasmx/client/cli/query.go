@@ -7,7 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 
-	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
+	"bitbadgeschain/x/wasmx/types"
 	cliflags "github.com/cosmos/cosmos-sdk/client/flags"
 )
 

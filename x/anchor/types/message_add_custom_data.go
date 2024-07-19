@@ -5,9 +5,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const TypeMsgAddCustomData = "add_custom_data"
-
 var _ sdk.Msg = &MsgAddCustomData{}
+
+const TypeMsgAddCustomData = "add_custom_data"
 
 func NewMsgAddCustomData(creator string, data string) *MsgAddCustomData {
 	return &MsgAddCustomData{
@@ -16,20 +16,20 @@ func NewMsgAddCustomData(creator string, data string) *MsgAddCustomData {
 	}
 }
 
-func (msg *MsgAddCustomData) Route() string {
-	return RouterKey
-}
-
-func (msg *MsgAddCustomData) Type() string {
-	return TypeMsgAddCustomData
-}
-
 func (msg *MsgAddCustomData) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
 	}
 	return []sdk.AccAddress{creator}
+}
+
+func (msg *MsgAddCustomData) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgAddCustomData) Type() string {
+	return TypeMsgAddCustomData
 }
 
 func (msg *MsgAddCustomData) GetSignBytes() []byte {

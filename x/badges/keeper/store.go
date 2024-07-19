@@ -3,11 +3,16 @@ package keeper
 import (
 	"strconv"
 
+	"bitbadgeschain/x/badges/types"
+
 	sdkerrors "cosmossdk.io/errors"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	sdkmath "cosmossdk.io/math"
+
+	"cosmossdk.io/store/prefix"
+	storetypes "cosmossdk.io/store/types"
 )
 
 // The following methods are used for the badge store and everything associated with badges.
@@ -25,14 +30,16 @@ func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection *types.BadgeCol
 		return sdkerrors.Wrap(err, "Marshal types.BadgeCollection failed")
 	}
 
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Set(collectionStoreKey(collection.CollectionId), marshaled_badge)
 	return nil
 }
 
 // Gets a badge from the store according to the collectionId.
 func (k Keeper) GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*types.BadgeCollection, bool) {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	marshaled_collection := store.Get(collectionStoreKey(collectionId))
 
 	var collection types.BadgeCollection
@@ -45,8 +52,9 @@ func (k Keeper) GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uin
 
 // GetCollectionsFromStore defines a method for returning all badges information by key.
 func (k Keeper) GetCollectionsFromStore(ctx sdk.Context) (collections []*types.BadgeCollection) {
-	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, CollectionKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var collection types.BadgeCollection
@@ -58,24 +66,28 @@ func (k Keeper) GetCollectionsFromStore(ctx sdk.Context) (collections []*types.B
 
 // StoreHasCollectionID determines whether the specified collectionId exists
 func (k Keeper) StoreHasCollectionID(ctx sdk.Context, collectionId sdkmath.Uint) bool {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	return store.Has(collectionStoreKey(collectionId))
 }
 
 // DeleteCollectionFromStore deletes a badge from the store.
 func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Delete(collectionStoreKey(collectionId))
 }
 
 /** ****************************** GLOBAL ARCHIVE ****************************** **/
 func (k Keeper) SetGlobalArchiveInStore(ctx sdk.Context, archive bool) error {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Set(GlobalArchiveKey, []byte(strconv.FormatBool(archive)))
 	return nil
 }
 func (k Keeper) GetGlobalArchiveFromStore(ctx sdk.Context) bool {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	archive := store.Get(GlobalArchiveKey)
 	if archive == nil {
 		return false
@@ -109,14 +121,16 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 		}
 	}
 
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Set(userBalanceStoreKey(balanceKey), marshaled_badge_balance_info)
 	return nil
 }
 
 // Gets a user balance from the store according to the balanceID.
 func (k Keeper) GetUserBalanceFromStore(ctx sdk.Context, balanceKey string) (*types.UserBalanceStore, bool) {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	marshaled_badge_balance_info := store.Get(userBalanceStoreKey(balanceKey))
 
 	var UserBalance types.UserBalanceStore
@@ -129,8 +143,9 @@ func (k Keeper) GetUserBalanceFromStore(ctx sdk.Context, balanceKey string) (*ty
 
 // GetUserBalancesFromStore defines a method for returning all user balances information by key.
 func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.UserBalanceStore, addresses []string, ids []sdkmath.Uint) {
-	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, UserBalanceKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, UserBalanceKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var UserBalance types.UserBalanceStore
@@ -146,9 +161,10 @@ func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.Use
 
 // GetUserBalanceIdsFromStore defines a method for returning all keys of all user balances.
 func (k Keeper) GetUserBalanceIdsFromStore(ctx sdk.Context) (ids []string) {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 
-	iterator := sdk.KVStorePrefixIterator(store, UserBalanceKey)
+	iterator := storetypes.KVStorePrefixIterator(store, UserBalanceKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		ids = append(ids, string(iterator.Key()[1:]))
@@ -158,13 +174,15 @@ func (k Keeper) GetUserBalanceIdsFromStore(ctx sdk.Context) (ids []string) {
 
 // StoreHasUserBalanceID determines whether the specified user balanceID exists in the store
 func (k Keeper) StoreHasUserBalance(ctx sdk.Context, balanceKey string) bool {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	return store.Has(userBalanceStoreKey(balanceKey))
 }
 
 // DeleteUserBalanceFromStore deletes a user balance from the store.
 func (k Keeper) DeleteUserBalanceFromStore(ctx sdk.Context, balanceKey string) {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Delete(userBalanceStoreKey(balanceKey))
 }
 
@@ -172,14 +190,18 @@ func (k Keeper) DeleteUserBalanceFromStore(ctx sdk.Context, balanceKey string) {
 
 // Gets the next collection ID.
 func (k Keeper) GetNextCollectionId(ctx sdk.Context) sdkmath.Uint {
-	store := ctx.KVStore(k.storeKey)
-	nextID := types.NewUintFromString(string((store.Get(nextCollectionIdKey()))))
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	nextCollectionId := store.Get(nextCollectionIdKey())
+	nextCollectionIdStr := string((nextCollectionId))
+	nextID := types.NewUintFromString(nextCollectionIdStr)
 	return nextID
 }
 
 // Sets the next asset ID. Should only be used in InitGenesis. Everything else should call IncrementNextAssetID()
 func (k Keeper) SetNextCollectionId(ctx sdk.Context, nextID sdkmath.Uint) {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Set(nextCollectionIdKey(), []byte(nextID.String()))
 }
 
@@ -193,14 +215,16 @@ func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) {
 
 // Gets the next collection ID.
 func (k Keeper) GetNextAddressListCounter(ctx sdk.Context) sdkmath.Uint {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	nextID := types.NewUintFromString(string((store.Get(nextAddressListCounterKey()))))
 	return nextID
 }
 
 // Sets the next asset ID. Should only be used in InitGenesis. Everything else should call IncrementNextAssetID()
 func (k Keeper) SetNextAddressListCounter(ctx sdk.Context, nextID sdkmath.Uint) {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Set(nextAddressListCounterKey(), []byte(nextID.String()))
 }
 
@@ -212,20 +236,23 @@ func (k Keeper) IncrementNextAddressListCounter(ctx sdk.Context) {
 
 /*********************************USED ZKPS*********************************/
 func (k Keeper) SetZKPAsUsedInStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForZKP string, approvalLevel string, approvalId, zkpId string, proofHash string) error {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Set(usedZKPTrackerStoreKey(ConstructZKPTreeTrackerKey(collectionId, addressForZKP, approvalLevel, approvalId, zkpId, proofHash)), []byte("1"))
 	return nil
 }
 
 func (k Keeper) GetZKPFromStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForZKP string, approvalLevel string, approvalId, zkpId string, proofHash string) (bool, error) {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	return store.Has(usedZKPTrackerStoreKey(ConstructZKPTreeTrackerKey(collectionId, addressForZKP, approvalLevel, approvalId, zkpId, proofHash))), nil
 }
 
 /********************************************************************************/
 // Sets a usedClaimData in the store using UsedClaimDataKey ([]byte{0x07}) as the prefix. No check if store has key already.
 func (k Keeper) IncrementChallengeTrackerInStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)))
 	curr := sdkmath.NewUint(0)
 	if currBytes != nil {
@@ -242,7 +269,8 @@ func (k Keeper) IncrementChallengeTrackerInStore(ctx sdk.Context, collectionId s
 }
 
 func (k Keeper) GetChallengeTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)))
 	curr := sdkmath.NewUint(0)
 	if currBytes != nil {
@@ -257,8 +285,9 @@ func (k Keeper) GetChallengeTrackerFromStore(ctx sdk.Context, collectionId sdkma
 }
 
 func (k Keeper) GetChallengeTrackersFromStore(ctx sdk.Context) (numUsed []sdkmath.Uint, ids []string) {
-	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, UsedClaimChallengeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, UsedClaimChallengeKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		curr, err := strconv.ParseUint(string((iterator.Value())), 10, 64)
@@ -272,7 +301,8 @@ func (k Keeper) GetChallengeTrackersFromStore(ctx sdk.Context) (numUsed []sdkmat
 }
 
 func (k Keeper) SetChallengeTrackerInStore(ctx sdk.Context, key string, numUsed sdkmath.Uint) error {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Set(usedClaimChallengeStoreKey(key), []byte(numUsed.String()))
 	return nil
 }
@@ -285,13 +315,15 @@ func (k Keeper) SetAddressListInStore(ctx sdk.Context, addressList types.Address
 		return sdkerrors.Wrap(err, "Marshal types.AddressList failed")
 	}
 
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Set(addressListStoreKey(addressList.ListId), marshaled_address_list)
 	return nil
 }
 
 func (k Keeper) GetAddressListFromStore(ctx sdk.Context, addressListId string) (types.AddressList, bool) {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	marshaled_address_list := store.Get(addressListStoreKey(addressListId))
 
 	var addressList types.AddressList
@@ -303,8 +335,9 @@ func (k Keeper) GetAddressListFromStore(ctx sdk.Context, addressListId string) (
 }
 
 func (k Keeper) GetAddressListsFromStore(ctx sdk.Context) (addressLists []*types.AddressList) {
-	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, AddressListKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, AddressListKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var addressList types.AddressList
@@ -315,12 +348,14 @@ func (k Keeper) GetAddressListsFromStore(ctx sdk.Context) (addressLists []*types
 }
 
 func (k Keeper) StoreHasAddressList(ctx sdk.Context, addressListId string) bool {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	return store.Has(addressListStoreKey(addressListId))
 }
 
 func (k Keeper) DeleteAddressListFromStore(ctx sdk.Context, addressListId string) {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Delete(addressListStoreKey(addressListId))
 }
 
@@ -332,7 +367,8 @@ func (k Keeper) SetApprovalTrackerInStore(ctx sdk.Context, collectionId sdkmath.
 		return sdkerrors.Wrap(err, "Marshal types.ApprovalTracker failed")
 	}
 
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Set(approvalTrackerStoreKey(ConstructApprovalTrackerKey(collectionId, addressForApproval, approvalId, amountTrackerId, level, trackerType, address)), marshaled_transfer_tracker)
 	return nil
 }
@@ -343,13 +379,15 @@ func (k Keeper) SetApprovalTrackerInStoreViaKey(ctx sdk.Context, key string, app
 		return sdkerrors.Wrap(err, "Marshal types.ApprovalTracker failed")
 	}
 
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Set(approvalTrackerStoreKey(key), marshaled_transfer_tracker)
 	return nil
 }
 
 func (k Keeper) GetApprovalTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForApproval string, approvalId string, amountTrackerId string, level string, trackerType string, address string) (types.ApprovalTracker, bool) {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	marshaled_transfer_tracker := store.Get(approvalTrackerStoreKey(ConstructApprovalTrackerKey(collectionId, addressForApproval, approvalId, amountTrackerId, level, trackerType, address)))
 
 	var approvalTracker types.ApprovalTracker
@@ -361,8 +399,9 @@ func (k Keeper) GetApprovalTrackerFromStore(ctx sdk.Context, collectionId sdkmat
 }
 
 func (k Keeper) GetApprovalTrackersFromStore(ctx sdk.Context) (approvalTrackers []*types.ApprovalTracker, ids []string) {
-	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, ApprovalTrackerKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, ApprovalTrackerKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var approvalTracker types.ApprovalTracker
@@ -375,11 +414,13 @@ func (k Keeper) GetApprovalTrackersFromStore(ctx sdk.Context) (approvalTrackers 
 }
 
 func (k Keeper) StoreHasApprovalTracker(ctx sdk.Context, collectionId sdkmath.Uint, addressForApproval string, approvalId, amountTrackerId string, level string, trackerType string, address string) bool {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	return store.Has(approvalTrackerStoreKey(ConstructApprovalTrackerKey(collectionId, addressForApproval, approvalId, amountTrackerId, level, trackerType, address)))
 }
 
 func (k Keeper) DeleteApprovalTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForApproval string, approvalId, amountTrackerId string, level string, trackerType string, address string) {
-	store := ctx.KVStore(k.storeKey)
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Delete(approvalTrackerStoreKey(ConstructApprovalTrackerKey(collectionId, addressForApproval, approvalId, amountTrackerId, level, trackerType, address)))
 }

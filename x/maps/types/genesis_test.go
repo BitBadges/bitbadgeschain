@@ -3,7 +3,8 @@ package types_test
 import (
 	"testing"
 
-	"github.com/bitbadges/bitbadgeschain/x/maps/types"
+	"bitbadgeschain/x/maps/types"
+
 	"github.com/stretchr/testify/require"
 )
 

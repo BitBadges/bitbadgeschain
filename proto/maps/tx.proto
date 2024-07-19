@@ -2,20 +2,49 @@ syntax = "proto3";
 
 package maps;
 
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "maps/permissions.proto";
 import "maps/timelines.proto";
 import "maps/balances.proto";
+import "maps/params.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/maps/types";
+option go_package = "bitbadgeschain/x/maps/types";
 
 // Msg defines the Msg service.
 service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
   rpc CreateMap (MsgCreateMap) returns (MsgCreateMapResponse);
   rpc UpdateMap (MsgUpdateMap) returns (MsgUpdateMapResponse);
   rpc DeleteMap (MsgDeleteMap) returns (MsgDeleteMapResponse);
   rpc SetValue (MsgSetValue) returns (MsgSetValueResponse);
 }
+
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "maps/MsgUpdateParams";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the module parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+message MsgUpdateParamsResponse {}
 
 
 //Used for WASM bindings and JSON parsing
@@ -76,7 +105,10 @@ message Map {
   MapPermissions permissions = 11;
 }
 
-message MsgCreateMap {
+message MsgCreateMap {  
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "maps/CreateMap";
+  
   string creator = 1;
   string mapId = 2; 
 
@@ -96,6 +128,9 @@ message MsgCreateMap {
 message MsgCreateMapResponse {}
 
 message MsgUpdateMap {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "maps/UpdateMap";
+
   string creator = 1;
   string mapId = 2;
 
@@ -112,6 +147,9 @@ message MsgUpdateMap {
 message MsgUpdateMapResponse {}
 
 message MsgDeleteMap {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "maps/DeleteMap";
+
   string creator = 1;
   string mapId = 2;
 }
@@ -123,6 +161,9 @@ message SetOptions {
 }
 
 message MsgSetValue {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "maps/SetValue";
+
   string creator = 1;
   string mapId = 2;
   string key = 3;

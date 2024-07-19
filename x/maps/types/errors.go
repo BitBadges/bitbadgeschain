@@ -15,4 +15,5 @@ var (
 	ErrInvalidAddress       = sdkerrors.Register(ModuleName, 1503, "invalid address")
 	ErrInvalidRequest       = sdkerrors.Register(ModuleName, 1504, "invalid request")
 	ErrUnknownRequest       = sdkerrors.Register(ModuleName, 1505, "unknown request")
+	ErrInvalidSigner        = sdkerrors.Register(ModuleName, 1506, "invalid signer")
 )

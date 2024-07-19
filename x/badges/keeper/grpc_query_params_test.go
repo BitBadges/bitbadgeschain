@@ -3,8 +3,9 @@ package keeper_test
 import (
 	"testing"
 
-	testkeeper "github.com/bitbadges/bitbadgeschain/testutil/keeper"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	testkeeper "bitbadgeschain/testutil/keeper"
+	"bitbadgeschain/x/badges/types"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )

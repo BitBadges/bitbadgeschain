@@ -1,19 +1,34 @@
 package ante
 
 import (
+	"bitbadgeschain/x/badges/types"
+
 	sdkerrors "cosmossdk.io/errors"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
+
+	txsigning "cosmossdk.io/x/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	ibcante "github.com/cosmos/ibc-go/v7/modules/core/ante"
-	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
+	ibcante "github.com/cosmos/ibc-go/v8/modules/core/ante"
+	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
-	wasmxkeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
+	storetypes "cosmossdk.io/store/types"
+
+	circuitante "cosmossdk.io/x/circuit/ante"
+	circuitkeeper "cosmossdk.io/x/circuit/keeper"
+
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
+	corestoretypes "cosmossdk.io/core/store"
 )
+
+//TODO: We can play around with some more native ones
+// circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
+// ante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
+// ante.NewUnorderedTxDecorator(unorderedtx.DefaultMaxUnOrderedTTL, options.TxManager, options.Environment, ante.DefaultSha256Cost),
 
 // HandlerOptions extend the SDK's AnteHandler options by requiring the IBC
 // channel keeper, EVM Keeper and Fee Market Keeper.
@@ -22,12 +37,14 @@ type HandlerOptions struct {
 	BankKeeper      authtypes.BankKeeper
 	IBCKeeper       *ibckeeper.Keeper
 	FeegrantKeeper  ante.FeegrantKeeper
-	SignModeHandler authsigning.SignModeHandler
-	SigGasConsumer  func(meter sdk.GasMeter, sig signing.SignatureV2, params authtypes.Params) error
+	SignModeHandler *txsigning.HandlerMap
+	SigGasConsumer  func(meter storetypes.GasMeter, sig signing.SignatureV2, params authtypes.Params) error
 	TxFeeChecker    ante.TxFeeChecker
-	WasmXKeeper     wasmxkeeper.Keeper
 
-	VerifyBtcSigPath string
+	WasmConfig            *wasmTypes.WasmConfig
+	WasmKeeper            *wasmkeeper.Keeper
+	TXCounterStoreService corestoretypes.KVStoreService
+	CircuitKeeper         *circuitkeeper.Keeper
 }
 
 func (options HandlerOptions) Validate() error {
@@ -40,12 +57,27 @@ func (options HandlerOptions) Validate() error {
 	if options.SignModeHandler == nil {
 		return sdkerrors.Wrap(types.ErrLogic, "sign mode handler is required for ante builder")
 	}
+
+	if options.WasmConfig == nil {
+		return sdkerrors.Wrap(types.ErrLogic, "wasm config is required for ante builder")
+	}
+	if options.TXCounterStoreService == nil {
+		return sdkerrors.Wrap(types.ErrLogic, "wasm store service is required for ante builder")
+	}
+	if options.CircuitKeeper == nil {
+		return sdkerrors.Wrap(types.ErrLogic, "circuit keeper is required for ante builder")
+	}
 	return nil
 }
 
 func newCosmosAnteHandler(options HandlerOptions) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
 		ante.NewSetUpContextDecorator(),
+		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit), // after setup context to enforce limits early
+		wasmkeeper.NewCountTXDecorator(options.TXCounterStoreService),
+		wasmkeeper.NewGasRegisterDecorator(options.WasmKeeper.GetGasRegister()),
+		circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
+
 		// ante.NewRejectExtensionOptionsDecorator(),
 		// ante.NewMempoolFeeDecorator(),
 
@@ -68,8 +100,13 @@ func newCosmosAnteHandlerEip712(options HandlerOptions, chain string) sdk.AnteHa
 	if chain != "Ethereum" && chain != "Solana" && chain != "Bitcoin" {
 		panic("chain must be either Ethereum or Solana")
 	}
+
 	return sdk.ChainAnteDecorators(
 		ante.NewSetUpContextDecorator(),
+		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit), // after setup context to enforce limits early
+		wasmkeeper.NewCountTXDecorator(options.TXCounterStoreService),
+		wasmkeeper.NewGasRegisterDecorator(options.WasmKeeper.GetGasRegister()),
+		circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
 		// NOTE: extensions option decorator removed
 		// ante.NewRejectExtensionOptionsDecorator(),
 
@@ -86,7 +123,7 @@ func newCosmosAnteHandlerEip712(options HandlerOptions, chain string) sdk.AnteHa
 
 		// Note: signature verification uses EIP instead of the cosmos signature validator
 		//This also accounts for Solana signatures
-		NewEip712SigVerificationDecorator(options.AccountKeeper, options.WasmXKeeper, options.SignModeHandler, chain, options.VerifyBtcSigPath),
+		NewEip712SigVerificationDecorator(options.AccountKeeper, options.SignModeHandler, chain),
 
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
