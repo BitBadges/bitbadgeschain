@@ -195,7 +195,7 @@ func ValidateTimedUpdateWithBadgeIdsPermission(permissions []*TimedUpdateWithBad
 	return nil
 }
 
-func ValidateBalancesActionPermission(permissions []*BalancesActionPermission, canChangeValues bool) error {
+func ValidateBadgeIdsActionPermission(permissions []*BadgeIdsActionPermission, canChangeValues bool) error {
 	for _, permission := range permissions {
 		if permission == nil {
 			return ErrPermissionsValueIsNil
@@ -206,18 +206,12 @@ func ValidateBalancesActionPermission(permissions []*BalancesActionPermission, c
 			return err
 		}
 
-		err = ValidateRangesAreValid(permission.OwnershipTimes, false, false)
-		if err != nil {
-			return err
-		}
-
 		err = ValidatePermanentlyPermittedTimes(permission.PermanentlyPermittedTimes, permission.PermanentlyForbiddenTimes)
 		if err != nil {
 			return err
 		}
 
 		if canChangeValues {
-			permission.OwnershipTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.OwnershipTimes)
 			permission.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.BadgeIds)
 			permission.PermanentlyPermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermanentlyPermittedTimes)
 			permission.PermanentlyForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermanentlyForbiddenTimes)
@@ -318,7 +312,7 @@ func ValidatePermissions(permissions *CollectionPermissions, canChangeValues boo
 		return err
 	}
 
-	if err := ValidateBalancesActionPermission(permissions.CanCreateMoreBadges, canChangeValues); err != nil {
+	if err := ValidateBadgeIdsActionPermission(permissions.CanUpdateValidBadgeIds, canChangeValues); err != nil {
 		return err
 	}
 

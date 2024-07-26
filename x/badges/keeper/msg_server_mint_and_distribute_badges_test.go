@@ -135,11 +135,10 @@ func (suite *TestSuite) TestNewBadgesNotAllowed() {
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanCreateMoreBadges: []*types.BalancesActionPermission{
+			CanUpdateValidBadgeIds: []*types.BadgeIdsActionPermission{
 				{
 					PermanentlyForbiddenTimes: GetFullUintRanges(),
 					BadgeIds:                  GetFullUintRanges(),
-					OwnershipTimes:            GetFullUintRanges(),
 				},
 			},
 		},
@@ -185,16 +184,14 @@ func (suite *TestSuite) TestNewBadgesPermissionIsApproved() {
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanCreateMoreBadges: []*types.BalancesActionPermission{
+			CanUpdateValidBadgeIds: []*types.BadgeIdsActionPermission{
 				{
 					PermanentlyPermittedTimes: GetFullUintRanges(),
 					BadgeIds:                  GetOneUintRange(),
-					OwnershipTimes:            GetOneUintRange(),
 				},
 				{
 					PermanentlyForbiddenTimes: GetFullUintRanges(),
 					BadgeIds:                  GetFullUintRanges(),
-					OwnershipTimes:            GetFullUintRanges(),
 				},
 			},
 		},
@@ -208,6 +205,19 @@ func (suite *TestSuite) TestNewBadgesPermissionIsApproved() {
 			{
 				Amount:         sdkmath.NewUint(1),
 				BadgeIds:       GetOneUintRange(),
+				OwnershipTimes: GetFullUintRanges(),
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error creating badge: %s")
+
+	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		BadgesToCreate: []*types.Balance{
+			{
+				Amount:         sdkmath.NewUint(1),
+				BadgeIds:       GetTwoUintRanges(),
 				OwnershipTimes: GetFullUintRanges(),
 			},
 		},

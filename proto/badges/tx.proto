@@ -89,8 +89,8 @@ message MsgUniversalUpdateCollection {
   //The default balances for the user
   UserBalanceStore defaultBalances = 4;
 
-  // Balances to create for the collection. Will be sent to the "Mint" address.
-  repeated Balance badgesToCreate = 6; 
+  // New badge IDs to add to this collection
+  repeated UintRange badgeIdsToAdd = 6; 
 
   // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
   bool updateCollectionPermissions = 7;
@@ -164,8 +164,8 @@ message MsgUpdateCollection {
   // ID of the collection (0 for new collection).
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
-  // Balances to create for the collection. Will be sent to the "Mint" address.
-  repeated Balance badgesToCreate = 6;
+  // New badge IDs to add to this collection
+  repeated UintRange badgeIdsToAdd = 6;
   
   // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
   bool updateCollectionPermissions = 7;
@@ -241,9 +241,9 @@ message MsgCreateCollection {
   
   //The default balances for the user
   UserBalanceStore defaultBalances = 4;
-  
-  // Balances to create for the collection. Will be sent to the "Mint" address.
-  repeated Balance badgesToCreate = 5;
+
+  // New badge IDs to add to this collection
+  repeated UintRange badgeIdsToAdd = 5; 
   
   // Collection permissions.
   CollectionPermissions collectionPermissions = 6;

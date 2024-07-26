@@ -94,8 +94,22 @@ func TestActionPermissionUpdate(t *testing.T) {
 	require.Error(t, err)
 }
 
+func GetFullUintRanges() []*types.UintRange {
+	return []*types.UintRange{
+		{
+			Start: sdkmath.NewUint(1),
+			End:   sdkmath.NewUint(math.MaxUint64),
+		},
+	}
+}
+
 func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
-	oldActionPermission := &types.BalancesActionPermission{
+	oldActionPermission := &types.CollectionApprovalPermission{
+		ApprovalId:        "All",
+		FromListId:        "All",
+		ToListId:          "All",
+		InitiatedByListId: "All",
+		TransferTimes:     GetFullUintRanges(),
 
 		BadgeIds: []*types.UintRange{
 			{
@@ -118,7 +132,12 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		PermanentlyForbiddenTimes: []*types.UintRange{},
 	}
 
-	newActionPermission := &types.BalancesActionPermission{
+	newActionPermission := &types.CollectionApprovalPermission{
+		ApprovalId:        "All",
+		FromListId:        "All",
+		ToListId:          "All",
+		InitiatedByListId: "All",
+		TransferTimes:     GetFullUintRanges(),
 
 		BadgeIds: []*types.UintRange{
 			{
@@ -151,10 +170,15 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	}
 
 	keeper, _ := keeper.BadgesKeeper(t)
-	err := keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err := keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
 	require.NoError(t, err)
 
-	newActionPermission = &types.BalancesActionPermission{
+	newActionPermission = &types.CollectionApprovalPermission{
+		ApprovalId:        "All",
+		FromListId:        "All",
+		ToListId:          "All",
+		InitiatedByListId: "All",
+		TransferTimes:     GetFullUintRanges(),
 
 		BadgeIds: []*types.UintRange{
 			{
@@ -186,10 +210,15 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
 	require.NoError(t, err)
 
-	newActionPermission = &types.BalancesActionPermission{
+	newActionPermission = &types.CollectionApprovalPermission{
+		ApprovalId:        "All",
+		FromListId:        "All",
+		ToListId:          "All",
+		InitiatedByListId: "All",
+		TransferTimes:     GetFullUintRanges(),
 
 		BadgeIds: []*types.UintRange{
 			{
@@ -221,10 +250,15 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
 	require.Error(t, err)
 
-	newActionPermission = &types.BalancesActionPermission{
+	newActionPermission = &types.CollectionApprovalPermission{
+		ApprovalId:        "All",
+		FromListId:        "All",
+		ToListId:          "All",
+		InitiatedByListId: "All",
+		TransferTimes:     GetFullUintRanges(),
 
 		BadgeIds: types.InvertUintRanges([]*types.UintRange{
 			{
@@ -256,10 +290,15 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
 	require.Error(t, err)
 
-	newActionPermission = &types.BalancesActionPermission{
+	newActionPermission = &types.CollectionApprovalPermission{
+		ApprovalId:        "All",
+		FromListId:        "All",
+		ToListId:          "All",
+		InitiatedByListId: "All",
+		TransferTimes:     GetFullUintRanges(),
 		BadgeIds: types.InvertUintRanges([]*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
@@ -290,10 +329,15 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
 	require.Error(t, err)
 
-	newActionPermission = &types.BalancesActionPermission{
+	newActionPermission = &types.CollectionApprovalPermission{
+		ApprovalId:        "All",
+		FromListId:        "All",
+		ToListId:          "All",
+		InitiatedByListId: "All",
+		TransferTimes:     GetFullUintRanges(),
 
 		BadgeIds: []*types.UintRange{
 			{
@@ -333,10 +377,15 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
 	require.NoError(t, err)
 
-	newActionPermission = &types.BalancesActionPermission{
+	newActionPermission = &types.CollectionApprovalPermission{
+		ApprovalId:        "All",
+		FromListId:        "All",
+		ToListId:          "All",
+		InitiatedByListId: "All",
+		TransferTimes:     GetFullUintRanges(),
 
 		BadgeIds: []*types.UintRange{
 			{
@@ -368,10 +417,15 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
 	require.Error(t, err)
 
-	newActionPermission = &types.BalancesActionPermission{
+	newActionPermission = &types.CollectionApprovalPermission{
+		ApprovalId:        "All",
+		FromListId:        "All",
+		ToListId:          "All",
+		InitiatedByListId: "All",
+		TransferTimes:     GetFullUintRanges(),
 
 		BadgeIds: []*types.UintRange{
 			{
@@ -403,10 +457,15 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission})
+	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
 	require.Error(t, err)
 
-	newActionPermission = &types.BalancesActionPermission{
+	newActionPermission = &types.CollectionApprovalPermission{
+		ApprovalId:        "All",
+		FromListId:        "All",
+		ToListId:          "All",
+		InitiatedByListId: "All",
+		TransferTimes:     GetFullUintRanges(),
 
 		BadgeIds: []*types.UintRange{
 			{
@@ -439,12 +498,12 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	}
 
 	//copy newActionPermission to newActionPermission2
-	newActionPermission2 := &types.BalancesActionPermission{}
+	newActionPermission2 := &types.CollectionApprovalPermission{}
 	*newActionPermission2 = *newActionPermission
 	newActionPermission2.BadgeIds = types.InvertUintRanges(newActionPermission2.BadgeIds, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64))
 	//Everything else from newActionPermission
 
-	err = keeper.ValidateBalancesActionPermissionUpdate(sdk.Context{}, []*types.BalancesActionPermission{oldActionPermission}, []*types.BalancesActionPermission{newActionPermission, newActionPermission2})
+	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission, newActionPermission2})
 	require.NoError(t, err)
 }
 

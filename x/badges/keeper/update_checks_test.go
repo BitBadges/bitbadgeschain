@@ -1393,6 +1393,7 @@ func (suite *TestSuite) TestGetMaxPossible() {
 			BadgeIds:          GetFullUintRanges(),
 		},
 	}
+	
 	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
 		{
 			Amount:         sdkmath.NewUint(20),

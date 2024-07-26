@@ -102,7 +102,7 @@ func (k Keeper) HandleMerkleChallenges(
 
 				//If there is a max uses per leaf, we need to check it has not exceeded the treshold uses
 				if !challenge.MaxUsesPerLeaf.IsNil() && challenge.MaxUsesPerLeaf.GT(sdkmath.NewUint(0)) {
-					numUsed, err := k.GetChallengeTrackerFromStore(ctx, collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, leafIndex)
+					numUsed, err := k.GetChallengeTrackerFromStore(ctx, collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, leafIndex.Sub(leftmostLeafIndex))
 					if err != nil {
 						additionalDetailsErrorStr = "error getting num processed"
 						continue

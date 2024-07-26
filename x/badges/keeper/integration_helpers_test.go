@@ -156,7 +156,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 				CanUpdateCollectionMetadata:       []*types.TimedUpdatePermission{},
 				CanUpdateBadgeMetadata:            []*types.TimedUpdateWithBadgeIdsPermission{},
 				CanUpdateCollectionApprovals:      []*types.CollectionApprovalPermission{},
-				CanCreateMoreBadges: []*types.BalancesActionPermission{
+				CanUpdateValidBadgeIds: []*types.BadgeIdsActionPermission{
 					{
 						PermanentlyPermittedTimes: GetFullUintRanges(),
 					},

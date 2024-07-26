@@ -179,18 +179,16 @@ func (k Keeper) CastTimedUpdatePermissionToUniversalPermission(timedUpdatePermis
 	return castedPermissions, nil
 }
 
-func (k Keeper) CastBalancesActionPermissionToUniversalPermission(BalancesActionPermission []*types.BalancesActionPermission) ([]*types.UniversalPermission, error) {
+func (k Keeper) CastBadgeIdsActionPermissionToUniversalPermission(BadgeIdsActionPermission []*types.BadgeIdsActionPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
-	for _, BalancesActionPermission := range BalancesActionPermission {
+	for _, BadgeIdsActionPermission := range BadgeIdsActionPermission {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 
-			BadgeIds:           BalancesActionPermission.BadgeIds,
-			OwnershipTimes:     BalancesActionPermission.OwnershipTimes,
+			BadgeIds:           BadgeIdsActionPermission.BadgeIds,
 			UsesBadgeIds:       true,
-			UsesOwnershipTimes: true,
 
-			PermanentlyPermittedTimes: BalancesActionPermission.PermanentlyPermittedTimes,
-			PermanentlyForbiddenTimes: BalancesActionPermission.PermanentlyForbiddenTimes,
+			PermanentlyPermittedTimes: BadgeIdsActionPermission.PermanentlyPermittedTimes,
+			PermanentlyForbiddenTimes: BadgeIdsActionPermission.PermanentlyForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil

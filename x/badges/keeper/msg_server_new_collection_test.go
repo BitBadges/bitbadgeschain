@@ -96,3 +96,27 @@ func (suite *TestSuite) TestNewCollectionDuplicateBadgeIds() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Error(err, "Error creating badge: %s")
 }
+
+func (suite *TestSuite) TestNewCollectionNonSequentialBadgeIds() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	_, err := sdk.AccAddressFromBech32(alice)
+	suite.Require().Nil(err, "Address %s failed to parse")
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
+
+		{
+			Amount: sdkmath.NewUint(1),
+			BadgeIds: []*types.UintRange{
+				GetOneUintRange()[0],
+				GetOneUintRange()[0],
+				{Start: sdkmath.NewUint(3), End: sdkmath.NewUint(3)},
+			},
+			OwnershipTimes: GetFullUintRanges(),
+		},
+	}
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Error(err, "Error creating badge: %s")
+}

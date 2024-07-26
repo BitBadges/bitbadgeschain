@@ -370,7 +370,7 @@
         }
       ]
     },
-    "badgesToCreate": [
+    "badgeIdsToAdd": [
       {
         "amount": "",
         "ownershipTimes": [
@@ -537,7 +537,7 @@
           ]
         }
       ],
-      "canCreateMoreBadges": [
+      "canUpdateValidBadgeIds": [
         {
           "badgeIds": [
             {

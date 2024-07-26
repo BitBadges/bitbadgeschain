@@ -16,6 +16,7 @@ func (suite *TestSuite) TestZKPs() {
 	collectionsToCreate[0].CollectionApprovals = []*types.CollectionApproval{
 		collectionsToCreate[0].CollectionApprovals[0],
 	}
+	
 	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
 		{
 			Amount:         sdkmath.NewUint(100),

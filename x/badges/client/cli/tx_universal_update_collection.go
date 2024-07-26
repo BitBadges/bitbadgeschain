@@ -14,24 +14,6 @@ import (
 
 var _ = strconv.Itoa(0)
 
-/*
-your-cli-command update-collection '{
-  "creator": "your-creator-address",
-  "collectionId": "your-collection-id",
-  "badgesToCreate": [
-    {
-      "badgeId": "badge1",
-      "amount": "10"
-    },
-    {
-      "badgeId": "badge2",
-      "amount": "5"
-    }
-  ],
-  "collectionPermissions": {...}, // Populate with permissions
-  // Add other fields as needed
-}'
-*/
 
 func CmdUpdateCollection() *cobra.Command {
 	cmd := &cobra.Command{

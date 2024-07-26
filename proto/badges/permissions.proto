@@ -10,13 +10,13 @@ option go_package = "bitbadgeschain/x/badges/types";
 /* 
   CollectionPermissions defines the permissions for the collection (i.e., what the manager can and cannot do).
 
-  There are five types of permissions for a collection: ActionPermission, TimedUpdatePermission, TimedUpdateWithBadgeIdsPermission, BalancesActionPermission, and CollectionApprovalPermission.
+  There are five types of permissions for a collection: ActionPermission, TimedUpdatePermission, TimedUpdateWithBadgeIdsPermission, BadgeIdsActionPermission, and CollectionApprovalPermission.
 
   The permission type allows fine-grained access control for each action.
   - ActionPermission: defines when the manager can perform an action.
   - TimedUpdatePermission: defines when the manager can update a timeline-based field and what times of the timeline can be updated.
   - TimedUpdateWithBadgeIdsPermission: defines when the manager can update a timeline-based field for specific badges and what times of the timeline can be updated.
-  - BalancesActionPermission: defines when the manager can perform an action for specific badges and specific badge ownership times.
+  - BadgeIdsActionPermission: defines when the manager can perform an action for specific badges
   - CollectionApprovalPermission: defines when the manager can update the transferability of the collection and what transfers can be updated vs. locked.
 
   Note there are a few different times here which could get confusing:
@@ -55,7 +55,7 @@ message CollectionPermissions {
   repeated TimedUpdatePermission canUpdateCollectionMetadata = 7;
 
   // Permissions related to creating more badges for the collection.
-  repeated BalancesActionPermission canCreateMoreBadges = 8;
+  repeated BadgeIdsActionPermission canUpdateValidBadgeIds = 8;
 
   // Permissions related to updating badge metadata for specific badges.
   repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 9;
@@ -206,24 +206,21 @@ message UserIncomingApprovalPermission {
 }
 
 /* 
-  BalancesActionPermission defines the permissions for updating a timeline-based field for specific badges and specific badge ownership times.
+  BadgeIdsActionPermission defines the permissions for updating a timeline-based field for specific badges and specific badge ownership times.
   Currently, this is only used for creating new badges.
 
   Ex: If you want to lock the ability to create new badges for badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021, 
   you could set the combination (badgeIds: [1,2], ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
 */
-message BalancesActionPermission {
+message BadgeIdsActionPermission {
   // Specifies the badge IDs involved in the transfer.
   repeated UintRange badgeIds = 1;
 
-  // Specifies the ownership times for the badges in the transfer.
-  repeated UintRange ownershipTimes = 2;
-
   // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
-  repeated UintRange permanentlyPermittedTimes = 3;
+  repeated UintRange permanentlyPermittedTimes = 2;
 
   // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
-  repeated UintRange permanentlyForbiddenTimes = 4;
+  repeated UintRange permanentlyForbiddenTimes = 3;
 }
 
 /* 

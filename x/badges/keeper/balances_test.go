@@ -342,154 +342,192 @@ func (suite *TestSuite) TestDefaultBalances() {
 	})
 }
 
+func GetBobApproval() *types.CollectionApproval {
+	return &types.CollectionApproval{
+		FromListId:        "Mint",
+		ToListId:          "All",
+		InitiatedByListId: bob,
+		ApprovalId:        "bob-approved",
+		BadgeIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TransferTimes:     GetFullUintRanges(),
+		ApprovalCriteria: &types.ApprovalCriteria{
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}
+}
+
 func (suite *TestSuite) TestWeirdJSSDKThing() {
-	err := UpdateCollection(suite, suite.ctx, &types.MsgUniversalUpdateCollection{
-		CollectionId:    sdkmath.NewUint(0),
-		Creator:         alice,
-		ManagerTimeline: []*types.ManagerTimeline{},
-		BalancesType:    "Standard",
-		BadgesToCreate: []*types.Balance{
+	collectionRes, err := UpdateCollectionWithRes(suite, suite.ctx, &types.MsgUniversalUpdateCollection{
+		CollectionId:              sdkmath.NewUint(0),
+		Creator:                   alice,
+		ManagerTimeline:           []*types.ManagerTimeline{},
+		BalancesType:              "Standard",
+		UpdateCollectionApprovals: true,
+		CollectionApprovals: []*types.CollectionApproval{
+			GetBobApproval(),
+		},
+
+		DefaultBalances: &types.UserBalanceStore{},
+	})
+	suite.Require().Nil(err, "Error updating collection: %s")
+	suite.Require().NotNil(collectionRes, "Error updating collection: %s")
+
+	collection, err := GetCollection(suite, suite.ctx, sdkmath.NewUint(collectionRes.CollectionId.Uint64()))
+	suite.Require().Nil(err, "Error getting collection: %s")
+	suite.Require().Greater(len(collection.CollectionApprovals), 0, "Error getting collection: %s")
+
+	err = TransferBadges(suite, suite.ctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
 			{
-				Amount: sdkmath.NewUint(71),
-				BadgeIds: []*types.UintRange{
+				From:        "Mint",
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
 					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(72),
+						Amount: sdkmath.NewUint(71),
+						BadgeIds: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(1),
+								End:   sdkmath.NewUint(72),
+							},
+						},
+						OwnershipTimes: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(54),
+								End:   sdkmath.NewUint(150),
+							},
+						},
 					},
-				},
-				OwnershipTimes: []*types.UintRange{
 					{
-						Start: sdkmath.NewUint(54),
-						End:   sdkmath.NewUint(150),
+						Amount: sdkmath.NewUint(45),
+						BadgeIds: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(85),
+								End:   sdkmath.NewUint(99),
+							},
+						},
+						OwnershipTimes: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(1),
+								End:   sdkmath.NewUint(19),
+							},
+						},
 					},
-				},
-			},
-			{
-				Amount: sdkmath.NewUint(45),
-				BadgeIds: []*types.UintRange{
 					{
-						Start: sdkmath.NewUint(85),
-						End:   sdkmath.NewUint(99),
+						Amount: sdkmath.NewUint(80),
+						BadgeIds: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(37),
+								End:   sdkmath.NewUint(42),
+							},
+						},
+						OwnershipTimes: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(1),
+								End:   sdkmath.NewUint(35),
+							},
+						},
 					},
-				},
-				OwnershipTimes: []*types.UintRange{
 					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(19),
+						Amount: sdkmath.NewUint(99),
+						BadgeIds: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(1),
+								End:   sdkmath.NewUint(9),
+							},
+						},
+						OwnershipTimes: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(72),
+								End:   sdkmath.NewUint(76),
+							},
+						},
 					},
-				},
-			},
-			{
-				Amount: sdkmath.NewUint(80),
-				BadgeIds: []*types.UintRange{
 					{
-						Start: sdkmath.NewUint(37),
-						End:   sdkmath.NewUint(42),
+						Amount: sdkmath.NewUint(14),
+						BadgeIds: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(11),
+								End:   sdkmath.NewUint(25),
+							},
+						},
+						OwnershipTimes: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(15),
+								End:   sdkmath.NewUint(110),
+							},
+						},
 					},
-				},
-				OwnershipTimes: []*types.UintRange{
 					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(35),
+						Amount: sdkmath.NewUint(70),
+						BadgeIds: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(9),
+								End:   sdkmath.NewUint(88),
+							},
+						},
+						OwnershipTimes: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(74),
+								End:   sdkmath.NewUint(89),
+							},
+						},
 					},
-				},
-			},
-			{
-				Amount: sdkmath.NewUint(99),
-				BadgeIds: []*types.UintRange{
 					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(9),
+						Amount: sdkmath.NewUint(49),
+						BadgeIds: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(1),
+								End:   sdkmath.NewUint(24),
+							},
+						},
+						OwnershipTimes: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(12),
+								End:   sdkmath.NewUint(64),
+							},
+						},
 					},
-				},
-				OwnershipTimes: []*types.UintRange{
 					{
-						Start: sdkmath.NewUint(72),
-						End:   sdkmath.NewUint(76),
+						Amount: sdkmath.NewUint(70),
+						BadgeIds: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(1),
+								End:   sdkmath.NewUint(78),
+							},
+						},
+						OwnershipTimes: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(1),
+								End:   sdkmath.NewUint(56),
+							},
+						},
 					},
-				},
-			},
-			{
-				Amount: sdkmath.NewUint(14),
-				BadgeIds: []*types.UintRange{
 					{
-						Start: sdkmath.NewUint(11),
-						End:   sdkmath.NewUint(25),
-					},
-				},
-				OwnershipTimes: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(15),
-						End:   sdkmath.NewUint(110),
-					},
-				},
-			},
-			{
-				Amount: sdkmath.NewUint(70),
-				BadgeIds: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(9),
-						End:   sdkmath.NewUint(88),
-					},
-				},
-				OwnershipTimes: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(74),
-						End:   sdkmath.NewUint(89),
-					},
-				},
-			},
-			{
-				Amount: sdkmath.NewUint(49),
-				BadgeIds: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(24),
-					},
-				},
-				OwnershipTimes: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(12),
-						End:   sdkmath.NewUint(64),
-					},
-				},
-			},
-			{
-				Amount: sdkmath.NewUint(70),
-				BadgeIds: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(78),
-					},
-				},
-				OwnershipTimes: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(56),
-					},
-				},
-			},
-			{
-				Amount: sdkmath.NewUint(66),
-				BadgeIds: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(80),
-					},
-				},
-				OwnershipTimes: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(64),
-						End:   sdkmath.NewUint(127),
+						Amount: sdkmath.NewUint(66),
+						BadgeIds: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(1),
+								End:   sdkmath.NewUint(80),
+							},
+						},
+						OwnershipTimes: []*types.UintRange{
+							{
+								Start: sdkmath.NewUint(64),
+								End:   sdkmath.NewUint(127),
+							},
+						},
 					},
 				},
 			},
 		},
-		DefaultBalances: &types.UserBalanceStore{},
 	})
-	suite.Require().Nil(err, "Error updating collection: %s")
+	suite.Require().Nil(err, "Error transferring badges: %s")
 
-	bal, err := GetUserBalance(suite, suite.ctx, sdkmath.NewUint(1), "Mint")
+	bal, err := GetUserBalance(suite, suite.ctx, sdkmath.NewUint(1), alice)
 	suite.Require().Nil(err, "Error getting user balance: %s")
 
 	for _, balance := range bal.Balances {
@@ -555,14 +593,30 @@ func (suite *TestSuite) TestBruteForcedBalances() {
 	}
 
 	err := UpdateCollection(suite, suite.ctx, &types.MsgUniversalUpdateCollection{
-		CollectionId:    sdkmath.NewUint(0),
-		Creator:         alice,
-		ManagerTimeline: []*types.ManagerTimeline{},
-		BalancesType:    "Standard",
-		BadgesToCreate:  badgesToCreate,
+		CollectionId:              sdkmath.NewUint(0),
+		Creator:                   alice,
+		ManagerTimeline:           []*types.ManagerTimeline{},
+		BalancesType:              "Standard",
+		UpdateCollectionApprovals: true,
+		CollectionApprovals: []*types.CollectionApproval{
+			GetBobApproval(),
+		},
 		DefaultBalances: &types.UserBalanceStore{},
 	})
 	suite.Require().Nil(err, "Error updating collection: %s")
+
+	err = TransferBadges(suite, suite.ctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{alice},
+				Balances:    badgesToCreate,
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring badges: %s")
 }
 
 // Adjust these values to test more or less

@@ -182,7 +182,6 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 	suite.Require().Nil(err, "Error creating collections")
 
 	bobbalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
-
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
 	fetchedBalance, err := types.GetBalancesForIds(suite.ctx, GetOneUintRange(), GetOneUintRange(), bobbalance.Balances)
@@ -234,17 +233,18 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	AssertBalancesEqual(suite, []*types.Balance{}, unmintedSupplys.Balances)
 
+	// Mint has unlimited balances now
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From:        "Mint",
+				From:        bob,
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
-						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetOneUintRange(),
+						Amount:         sdkmath.NewUint(1000),
+						BadgeIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},

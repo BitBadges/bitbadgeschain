@@ -74,4 +74,7 @@ message BadgeCollection {
 
   //The generated address of the badge collection.
   string aliasAddress = 15;
+
+  // The valid badge IDs for this collection.
+  repeated UintRange validBadgeIds = 16;
 }

@@ -106,6 +106,7 @@ func (suite *TestSuite) TestMerkleChallengeInvalidSolutions() {
 	)
 	suite.Require().Error(err, "Error getting user balance: %s")
 }
+
 func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
@@ -131,7 +132,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	rootHash := rootHashI[:]
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{}, &types.CollectionApproval{
 
 		ApprovalId: "asadsdas",
 		ApprovalCriteria: &types.ApprovalCriteria{

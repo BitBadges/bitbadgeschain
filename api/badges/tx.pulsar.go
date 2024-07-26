@@ -1862,7 +1862,7 @@ func (x *fastReflection_BadgeCustomMsgType) ProtoMethods() *protoiface.Methods {
 var _ protoreflect.List = (*_MsgUniversalUpdateCollection_6_list)(nil)
 
 type _MsgUniversalUpdateCollection_6_list struct {
-	list *[]*Balance
+	list *[]*UintRange
 }
 
 func (x *_MsgUniversalUpdateCollection_6_list) Len() int {
@@ -1878,18 +1878,18 @@ func (x *_MsgUniversalUpdateCollection_6_list) Get(i int) protoreflect.Value {
 
 func (x *_MsgUniversalUpdateCollection_6_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*Balance)
+	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_MsgUniversalUpdateCollection_6_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*Balance)
+	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_MsgUniversalUpdateCollection_6_list) AppendMutable() protoreflect.Value {
-	v := new(Balance)
+	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -1902,7 +1902,7 @@ func (x *_MsgUniversalUpdateCollection_6_list) Truncate(n int) {
 }
 
 func (x *_MsgUniversalUpdateCollection_6_list) NewElement() protoreflect.Value {
-	v := new(Balance)
+	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -2324,7 +2324,7 @@ var (
 	fd_MsgUniversalUpdateCollection_collectionId                           protoreflect.FieldDescriptor
 	fd_MsgUniversalUpdateCollection_balancesType                           protoreflect.FieldDescriptor
 	fd_MsgUniversalUpdateCollection_defaultBalances                        protoreflect.FieldDescriptor
-	fd_MsgUniversalUpdateCollection_badgesToCreate                         protoreflect.FieldDescriptor
+	fd_MsgUniversalUpdateCollection_badgeIdsToAdd                          protoreflect.FieldDescriptor
 	fd_MsgUniversalUpdateCollection_updateCollectionPermissions            protoreflect.FieldDescriptor
 	fd_MsgUniversalUpdateCollection_collectionPermissions                  protoreflect.FieldDescriptor
 	fd_MsgUniversalUpdateCollection_updateManagerTimeline                  protoreflect.FieldDescriptor
@@ -2352,7 +2352,7 @@ func init() {
 	fd_MsgUniversalUpdateCollection_collectionId = md_MsgUniversalUpdateCollection.Fields().ByName("collectionId")
 	fd_MsgUniversalUpdateCollection_balancesType = md_MsgUniversalUpdateCollection.Fields().ByName("balancesType")
 	fd_MsgUniversalUpdateCollection_defaultBalances = md_MsgUniversalUpdateCollection.Fields().ByName("defaultBalances")
-	fd_MsgUniversalUpdateCollection_badgesToCreate = md_MsgUniversalUpdateCollection.Fields().ByName("badgesToCreate")
+	fd_MsgUniversalUpdateCollection_badgeIdsToAdd = md_MsgUniversalUpdateCollection.Fields().ByName("badgeIdsToAdd")
 	fd_MsgUniversalUpdateCollection_updateCollectionPermissions = md_MsgUniversalUpdateCollection.Fields().ByName("updateCollectionPermissions")
 	fd_MsgUniversalUpdateCollection_collectionPermissions = md_MsgUniversalUpdateCollection.Fields().ByName("collectionPermissions")
 	fd_MsgUniversalUpdateCollection_updateManagerTimeline = md_MsgUniversalUpdateCollection.Fields().ByName("updateManagerTimeline")
@@ -2462,9 +2462,9 @@ func (x *fastReflection_MsgUniversalUpdateCollection) Range(f func(protoreflect.
 			return
 		}
 	}
-	if len(x.BadgesToCreate) != 0 {
-		value := protoreflect.ValueOfList(&_MsgUniversalUpdateCollection_6_list{list: &x.BadgesToCreate})
-		if !f(fd_MsgUniversalUpdateCollection_badgesToCreate, value) {
+	if len(x.BadgeIdsToAdd) != 0 {
+		value := protoreflect.ValueOfList(&_MsgUniversalUpdateCollection_6_list{list: &x.BadgeIdsToAdd})
+		if !f(fd_MsgUniversalUpdateCollection_badgeIdsToAdd, value) {
 			return
 		}
 	}
@@ -2599,8 +2599,8 @@ func (x *fastReflection_MsgUniversalUpdateCollection) Has(fd protoreflect.FieldD
 		return x.BalancesType != ""
 	case "badges.MsgUniversalUpdateCollection.defaultBalances":
 		return x.DefaultBalances != nil
-	case "badges.MsgUniversalUpdateCollection.badgesToCreate":
-		return len(x.BadgesToCreate) != 0
+	case "badges.MsgUniversalUpdateCollection.badgeIdsToAdd":
+		return len(x.BadgeIdsToAdd) != 0
 	case "badges.MsgUniversalUpdateCollection.updateCollectionPermissions":
 		return x.UpdateCollectionPermissions != false
 	case "badges.MsgUniversalUpdateCollection.collectionPermissions":
@@ -2661,8 +2661,8 @@ func (x *fastReflection_MsgUniversalUpdateCollection) Clear(fd protoreflect.Fiel
 		x.BalancesType = ""
 	case "badges.MsgUniversalUpdateCollection.defaultBalances":
 		x.DefaultBalances = nil
-	case "badges.MsgUniversalUpdateCollection.badgesToCreate":
-		x.BadgesToCreate = nil
+	case "badges.MsgUniversalUpdateCollection.badgeIdsToAdd":
+		x.BadgeIdsToAdd = nil
 	case "badges.MsgUniversalUpdateCollection.updateCollectionPermissions":
 		x.UpdateCollectionPermissions = false
 	case "badges.MsgUniversalUpdateCollection.collectionPermissions":
@@ -2727,11 +2727,11 @@ func (x *fastReflection_MsgUniversalUpdateCollection) Get(descriptor protoreflec
 	case "badges.MsgUniversalUpdateCollection.defaultBalances":
 		value := x.DefaultBalances
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "badges.MsgUniversalUpdateCollection.badgesToCreate":
-		if len(x.BadgesToCreate) == 0 {
+	case "badges.MsgUniversalUpdateCollection.badgeIdsToAdd":
+		if len(x.BadgeIdsToAdd) == 0 {
 			return protoreflect.ValueOfList(&_MsgUniversalUpdateCollection_6_list{})
 		}
-		listValue := &_MsgUniversalUpdateCollection_6_list{list: &x.BadgesToCreate}
+		listValue := &_MsgUniversalUpdateCollection_6_list{list: &x.BadgeIdsToAdd}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.MsgUniversalUpdateCollection.updateCollectionPermissions":
 		value := x.UpdateCollectionPermissions
@@ -2839,10 +2839,10 @@ func (x *fastReflection_MsgUniversalUpdateCollection) Set(fd protoreflect.FieldD
 		x.BalancesType = value.Interface().(string)
 	case "badges.MsgUniversalUpdateCollection.defaultBalances":
 		x.DefaultBalances = value.Message().Interface().(*UserBalanceStore)
-	case "badges.MsgUniversalUpdateCollection.badgesToCreate":
+	case "badges.MsgUniversalUpdateCollection.badgeIdsToAdd":
 		lv := value.List()
 		clv := lv.(*_MsgUniversalUpdateCollection_6_list)
-		x.BadgesToCreate = *clv.list
+		x.BadgeIdsToAdd = *clv.list
 	case "badges.MsgUniversalUpdateCollection.updateCollectionPermissions":
 		x.UpdateCollectionPermissions = value.Bool()
 	case "badges.MsgUniversalUpdateCollection.collectionPermissions":
@@ -2920,11 +2920,11 @@ func (x *fastReflection_MsgUniversalUpdateCollection) Mutable(fd protoreflect.Fi
 			x.DefaultBalances = new(UserBalanceStore)
 		}
 		return protoreflect.ValueOfMessage(x.DefaultBalances.ProtoReflect())
-	case "badges.MsgUniversalUpdateCollection.badgesToCreate":
-		if x.BadgesToCreate == nil {
-			x.BadgesToCreate = []*Balance{}
+	case "badges.MsgUniversalUpdateCollection.badgeIdsToAdd":
+		if x.BadgeIdsToAdd == nil {
+			x.BadgeIdsToAdd = []*UintRange{}
 		}
-		value := &_MsgUniversalUpdateCollection_6_list{list: &x.BadgesToCreate}
+		value := &_MsgUniversalUpdateCollection_6_list{list: &x.BadgeIdsToAdd}
 		return protoreflect.ValueOfList(value)
 	case "badges.MsgUniversalUpdateCollection.collectionPermissions":
 		if x.CollectionPermissions == nil {
@@ -3025,8 +3025,8 @@ func (x *fastReflection_MsgUniversalUpdateCollection) NewField(fd protoreflect.F
 	case "badges.MsgUniversalUpdateCollection.defaultBalances":
 		m := new(UserBalanceStore)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "badges.MsgUniversalUpdateCollection.badgesToCreate":
-		list := []*Balance{}
+	case "badges.MsgUniversalUpdateCollection.badgeIdsToAdd":
+		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_MsgUniversalUpdateCollection_6_list{list: &list})
 	case "badges.MsgUniversalUpdateCollection.updateCollectionPermissions":
 		return protoreflect.ValueOfBool(false)
@@ -3158,8 +3158,8 @@ func (x *fastReflection_MsgUniversalUpdateCollection) ProtoMethods() *protoiface
 			l = options.Size(x.DefaultBalances)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if len(x.BadgesToCreate) > 0 {
-			for _, e := range x.BadgesToCreate {
+		if len(x.BadgeIdsToAdd) > 0 {
+			for _, e := range x.BadgeIdsToAdd {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -3522,9 +3522,9 @@ func (x *fastReflection_MsgUniversalUpdateCollection) ProtoMethods() *protoiface
 			i--
 			dAtA[i] = 0x38
 		}
-		if len(x.BadgesToCreate) > 0 {
-			for iNdEx := len(x.BadgesToCreate) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgesToCreate[iNdEx])
+		if len(x.BadgeIdsToAdd) > 0 {
+			for iNdEx := len(x.BadgeIdsToAdd) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.BadgeIdsToAdd[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3756,7 +3756,7 @@ func (x *fastReflection_MsgUniversalUpdateCollection) ProtoMethods() *protoiface
 				iNdEx = postIndex
 			case 6:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgesToCreate", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIdsToAdd", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -3783,8 +3783,8 @@ func (x *fastReflection_MsgUniversalUpdateCollection) ProtoMethods() *protoiface
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgesToCreate = append(x.BadgesToCreate, &Balance{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgesToCreate[len(x.BadgesToCreate)-1]); err != nil {
+				x.BadgeIdsToAdd = append(x.BadgeIdsToAdd, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIdsToAdd[len(x.BadgeIdsToAdd)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -4734,7 +4734,7 @@ func (x *fastReflection_MsgUniversalUpdateCollectionResponse) ProtoMethods() *pr
 var _ protoreflect.List = (*_MsgUpdateCollection_6_list)(nil)
 
 type _MsgUpdateCollection_6_list struct {
-	list *[]*Balance
+	list *[]*UintRange
 }
 
 func (x *_MsgUpdateCollection_6_list) Len() int {
@@ -4750,18 +4750,18 @@ func (x *_MsgUpdateCollection_6_list) Get(i int) protoreflect.Value {
 
 func (x *_MsgUpdateCollection_6_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*Balance)
+	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_MsgUpdateCollection_6_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*Balance)
+	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_MsgUpdateCollection_6_list) AppendMutable() protoreflect.Value {
-	v := new(Balance)
+	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -4774,7 +4774,7 @@ func (x *_MsgUpdateCollection_6_list) Truncate(n int) {
 }
 
 func (x *_MsgUpdateCollection_6_list) NewElement() protoreflect.Value {
-	v := new(Balance)
+	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -5194,7 +5194,7 @@ var (
 	md_MsgUpdateCollection                                        protoreflect.MessageDescriptor
 	fd_MsgUpdateCollection_creator                                protoreflect.FieldDescriptor
 	fd_MsgUpdateCollection_collectionId                           protoreflect.FieldDescriptor
-	fd_MsgUpdateCollection_badgesToCreate                         protoreflect.FieldDescriptor
+	fd_MsgUpdateCollection_badgeIdsToAdd                          protoreflect.FieldDescriptor
 	fd_MsgUpdateCollection_updateCollectionPermissions            protoreflect.FieldDescriptor
 	fd_MsgUpdateCollection_collectionPermissions                  protoreflect.FieldDescriptor
 	fd_MsgUpdateCollection_updateManagerTimeline                  protoreflect.FieldDescriptor
@@ -5220,7 +5220,7 @@ func init() {
 	md_MsgUpdateCollection = File_badges_tx_proto.Messages().ByName("MsgUpdateCollection")
 	fd_MsgUpdateCollection_creator = md_MsgUpdateCollection.Fields().ByName("creator")
 	fd_MsgUpdateCollection_collectionId = md_MsgUpdateCollection.Fields().ByName("collectionId")
-	fd_MsgUpdateCollection_badgesToCreate = md_MsgUpdateCollection.Fields().ByName("badgesToCreate")
+	fd_MsgUpdateCollection_badgeIdsToAdd = md_MsgUpdateCollection.Fields().ByName("badgeIdsToAdd")
 	fd_MsgUpdateCollection_updateCollectionPermissions = md_MsgUpdateCollection.Fields().ByName("updateCollectionPermissions")
 	fd_MsgUpdateCollection_collectionPermissions = md_MsgUpdateCollection.Fields().ByName("collectionPermissions")
 	fd_MsgUpdateCollection_updateManagerTimeline = md_MsgUpdateCollection.Fields().ByName("updateManagerTimeline")
@@ -5318,9 +5318,9 @@ func (x *fastReflection_MsgUpdateCollection) Range(f func(protoreflect.FieldDesc
 			return
 		}
 	}
-	if len(x.BadgesToCreate) != 0 {
-		value := protoreflect.ValueOfList(&_MsgUpdateCollection_6_list{list: &x.BadgesToCreate})
-		if !f(fd_MsgUpdateCollection_badgesToCreate, value) {
+	if len(x.BadgeIdsToAdd) != 0 {
+		value := protoreflect.ValueOfList(&_MsgUpdateCollection_6_list{list: &x.BadgeIdsToAdd})
+		if !f(fd_MsgUpdateCollection_badgeIdsToAdd, value) {
 			return
 		}
 	}
@@ -5451,8 +5451,8 @@ func (x *fastReflection_MsgUpdateCollection) Has(fd protoreflect.FieldDescriptor
 		return x.Creator != ""
 	case "badges.MsgUpdateCollection.collectionId":
 		return x.CollectionId != ""
-	case "badges.MsgUpdateCollection.badgesToCreate":
-		return len(x.BadgesToCreate) != 0
+	case "badges.MsgUpdateCollection.badgeIdsToAdd":
+		return len(x.BadgeIdsToAdd) != 0
 	case "badges.MsgUpdateCollection.updateCollectionPermissions":
 		return x.UpdateCollectionPermissions != false
 	case "badges.MsgUpdateCollection.collectionPermissions":
@@ -5509,8 +5509,8 @@ func (x *fastReflection_MsgUpdateCollection) Clear(fd protoreflect.FieldDescript
 		x.Creator = ""
 	case "badges.MsgUpdateCollection.collectionId":
 		x.CollectionId = ""
-	case "badges.MsgUpdateCollection.badgesToCreate":
-		x.BadgesToCreate = nil
+	case "badges.MsgUpdateCollection.badgeIdsToAdd":
+		x.BadgeIdsToAdd = nil
 	case "badges.MsgUpdateCollection.updateCollectionPermissions":
 		x.UpdateCollectionPermissions = false
 	case "badges.MsgUpdateCollection.collectionPermissions":
@@ -5569,11 +5569,11 @@ func (x *fastReflection_MsgUpdateCollection) Get(descriptor protoreflect.FieldDe
 	case "badges.MsgUpdateCollection.collectionId":
 		value := x.CollectionId
 		return protoreflect.ValueOfString(value)
-	case "badges.MsgUpdateCollection.badgesToCreate":
-		if len(x.BadgesToCreate) == 0 {
+	case "badges.MsgUpdateCollection.badgeIdsToAdd":
+		if len(x.BadgeIdsToAdd) == 0 {
 			return protoreflect.ValueOfList(&_MsgUpdateCollection_6_list{})
 		}
-		listValue := &_MsgUpdateCollection_6_list{list: &x.BadgesToCreate}
+		listValue := &_MsgUpdateCollection_6_list{list: &x.BadgeIdsToAdd}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.MsgUpdateCollection.updateCollectionPermissions":
 		value := x.UpdateCollectionPermissions
@@ -5677,10 +5677,10 @@ func (x *fastReflection_MsgUpdateCollection) Set(fd protoreflect.FieldDescriptor
 		x.Creator = value.Interface().(string)
 	case "badges.MsgUpdateCollection.collectionId":
 		x.CollectionId = value.Interface().(string)
-	case "badges.MsgUpdateCollection.badgesToCreate":
+	case "badges.MsgUpdateCollection.badgeIdsToAdd":
 		lv := value.List()
 		clv := lv.(*_MsgUpdateCollection_6_list)
-		x.BadgesToCreate = *clv.list
+		x.BadgeIdsToAdd = *clv.list
 	case "badges.MsgUpdateCollection.updateCollectionPermissions":
 		x.UpdateCollectionPermissions = value.Bool()
 	case "badges.MsgUpdateCollection.collectionPermissions":
@@ -5753,11 +5753,11 @@ func (x *fastReflection_MsgUpdateCollection) Set(fd protoreflect.FieldDescriptor
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgUpdateCollection) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.MsgUpdateCollection.badgesToCreate":
-		if x.BadgesToCreate == nil {
-			x.BadgesToCreate = []*Balance{}
+	case "badges.MsgUpdateCollection.badgeIdsToAdd":
+		if x.BadgeIdsToAdd == nil {
+			x.BadgeIdsToAdd = []*UintRange{}
 		}
-		value := &_MsgUpdateCollection_6_list{list: &x.BadgesToCreate}
+		value := &_MsgUpdateCollection_6_list{list: &x.BadgeIdsToAdd}
 		return protoreflect.ValueOfList(value)
 	case "badges.MsgUpdateCollection.collectionPermissions":
 		if x.CollectionPermissions == nil {
@@ -5851,8 +5851,8 @@ func (x *fastReflection_MsgUpdateCollection) NewField(fd protoreflect.FieldDescr
 		return protoreflect.ValueOfString("")
 	case "badges.MsgUpdateCollection.collectionId":
 		return protoreflect.ValueOfString("")
-	case "badges.MsgUpdateCollection.badgesToCreate":
-		list := []*Balance{}
+	case "badges.MsgUpdateCollection.badgeIdsToAdd":
+		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_MsgUpdateCollection_6_list{list: &list})
 	case "badges.MsgUpdateCollection.updateCollectionPermissions":
 		return protoreflect.ValueOfBool(false)
@@ -5976,8 +5976,8 @@ func (x *fastReflection_MsgUpdateCollection) ProtoMethods() *protoiface.Methods 
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if len(x.BadgesToCreate) > 0 {
-			for _, e := range x.BadgesToCreate {
+		if len(x.BadgeIdsToAdd) > 0 {
+			for _, e := range x.BadgeIdsToAdd {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -6340,9 +6340,9 @@ func (x *fastReflection_MsgUpdateCollection) ProtoMethods() *protoiface.Methods 
 			i--
 			dAtA[i] = 0x38
 		}
-		if len(x.BadgesToCreate) > 0 {
-			for iNdEx := len(x.BadgesToCreate) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgesToCreate[iNdEx])
+		if len(x.BadgeIdsToAdd) > 0 {
+			for iNdEx := len(x.BadgeIdsToAdd) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.BadgeIdsToAdd[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -6485,7 +6485,7 @@ func (x *fastReflection_MsgUpdateCollection) ProtoMethods() *protoiface.Methods 
 				iNdEx = postIndex
 			case 6:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgesToCreate", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIdsToAdd", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -6512,8 +6512,8 @@ func (x *fastReflection_MsgUpdateCollection) ProtoMethods() *protoiface.Methods 
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgesToCreate = append(x.BadgesToCreate, &Balance{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgesToCreate[len(x.BadgesToCreate)-1]); err != nil {
+				x.BadgeIdsToAdd = append(x.BadgeIdsToAdd, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIdsToAdd[len(x.BadgeIdsToAdd)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -7463,7 +7463,7 @@ func (x *fastReflection_MsgUpdateCollectionResponse) ProtoMethods() *protoiface.
 var _ protoreflect.List = (*_MsgCreateCollection_5_list)(nil)
 
 type _MsgCreateCollection_5_list struct {
-	list *[]*Balance
+	list *[]*UintRange
 }
 
 func (x *_MsgCreateCollection_5_list) Len() int {
@@ -7479,18 +7479,18 @@ func (x *_MsgCreateCollection_5_list) Get(i int) protoreflect.Value {
 
 func (x *_MsgCreateCollection_5_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*Balance)
+	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_MsgCreateCollection_5_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*Balance)
+	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_MsgCreateCollection_5_list) AppendMutable() protoreflect.Value {
-	v := new(Balance)
+	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -7503,7 +7503,7 @@ func (x *_MsgCreateCollection_5_list) Truncate(n int) {
 }
 
 func (x *_MsgCreateCollection_5_list) NewElement() protoreflect.Value {
-	v := new(Balance)
+	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -7924,7 +7924,7 @@ var (
 	fd_MsgCreateCollection_creator                          protoreflect.FieldDescriptor
 	fd_MsgCreateCollection_balancesType                     protoreflect.FieldDescriptor
 	fd_MsgCreateCollection_defaultBalances                  protoreflect.FieldDescriptor
-	fd_MsgCreateCollection_badgesToCreate                   protoreflect.FieldDescriptor
+	fd_MsgCreateCollection_badgeIdsToAdd                    protoreflect.FieldDescriptor
 	fd_MsgCreateCollection_collectionPermissions            protoreflect.FieldDescriptor
 	fd_MsgCreateCollection_managerTimeline                  protoreflect.FieldDescriptor
 	fd_MsgCreateCollection_collectionMetadataTimeline       protoreflect.FieldDescriptor
@@ -7942,7 +7942,7 @@ func init() {
 	fd_MsgCreateCollection_creator = md_MsgCreateCollection.Fields().ByName("creator")
 	fd_MsgCreateCollection_balancesType = md_MsgCreateCollection.Fields().ByName("balancesType")
 	fd_MsgCreateCollection_defaultBalances = md_MsgCreateCollection.Fields().ByName("defaultBalances")
-	fd_MsgCreateCollection_badgesToCreate = md_MsgCreateCollection.Fields().ByName("badgesToCreate")
+	fd_MsgCreateCollection_badgeIdsToAdd = md_MsgCreateCollection.Fields().ByName("badgeIdsToAdd")
 	fd_MsgCreateCollection_collectionPermissions = md_MsgCreateCollection.Fields().ByName("collectionPermissions")
 	fd_MsgCreateCollection_managerTimeline = md_MsgCreateCollection.Fields().ByName("managerTimeline")
 	fd_MsgCreateCollection_collectionMetadataTimeline = md_MsgCreateCollection.Fields().ByName("collectionMetadataTimeline")
@@ -8037,9 +8037,9 @@ func (x *fastReflection_MsgCreateCollection) Range(f func(protoreflect.FieldDesc
 			return
 		}
 	}
-	if len(x.BadgesToCreate) != 0 {
-		value := protoreflect.ValueOfList(&_MsgCreateCollection_5_list{list: &x.BadgesToCreate})
-		if !f(fd_MsgCreateCollection_badgesToCreate, value) {
+	if len(x.BadgeIdsToAdd) != 0 {
+		value := protoreflect.ValueOfList(&_MsgCreateCollection_5_list{list: &x.BadgeIdsToAdd})
+		if !f(fd_MsgCreateCollection_badgeIdsToAdd, value) {
 			return
 		}
 	}
@@ -8118,8 +8118,8 @@ func (x *fastReflection_MsgCreateCollection) Has(fd protoreflect.FieldDescriptor
 		return x.BalancesType != ""
 	case "badges.MsgCreateCollection.defaultBalances":
 		return x.DefaultBalances != nil
-	case "badges.MsgCreateCollection.badgesToCreate":
-		return len(x.BadgesToCreate) != 0
+	case "badges.MsgCreateCollection.badgeIdsToAdd":
+		return len(x.BadgeIdsToAdd) != 0
 	case "badges.MsgCreateCollection.collectionPermissions":
 		return x.CollectionPermissions != nil
 	case "badges.MsgCreateCollection.managerTimeline":
@@ -8160,8 +8160,8 @@ func (x *fastReflection_MsgCreateCollection) Clear(fd protoreflect.FieldDescript
 		x.BalancesType = ""
 	case "badges.MsgCreateCollection.defaultBalances":
 		x.DefaultBalances = nil
-	case "badges.MsgCreateCollection.badgesToCreate":
-		x.BadgesToCreate = nil
+	case "badges.MsgCreateCollection.badgeIdsToAdd":
+		x.BadgeIdsToAdd = nil
 	case "badges.MsgCreateCollection.collectionPermissions":
 		x.CollectionPermissions = nil
 	case "badges.MsgCreateCollection.managerTimeline":
@@ -8205,11 +8205,11 @@ func (x *fastReflection_MsgCreateCollection) Get(descriptor protoreflect.FieldDe
 	case "badges.MsgCreateCollection.defaultBalances":
 		value := x.DefaultBalances
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "badges.MsgCreateCollection.badgesToCreate":
-		if len(x.BadgesToCreate) == 0 {
+	case "badges.MsgCreateCollection.badgeIdsToAdd":
+		if len(x.BadgeIdsToAdd) == 0 {
 			return protoreflect.ValueOfList(&_MsgCreateCollection_5_list{})
 		}
-		listValue := &_MsgCreateCollection_5_list{list: &x.BadgesToCreate}
+		listValue := &_MsgCreateCollection_5_list{list: &x.BadgeIdsToAdd}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.MsgCreateCollection.collectionPermissions":
 		value := x.CollectionPermissions
@@ -8288,10 +8288,10 @@ func (x *fastReflection_MsgCreateCollection) Set(fd protoreflect.FieldDescriptor
 		x.BalancesType = value.Interface().(string)
 	case "badges.MsgCreateCollection.defaultBalances":
 		x.DefaultBalances = value.Message().Interface().(*UserBalanceStore)
-	case "badges.MsgCreateCollection.badgesToCreate":
+	case "badges.MsgCreateCollection.badgeIdsToAdd":
 		lv := value.List()
 		clv := lv.(*_MsgCreateCollection_5_list)
-		x.BadgesToCreate = *clv.list
+		x.BadgeIdsToAdd = *clv.list
 	case "badges.MsgCreateCollection.collectionPermissions":
 		x.CollectionPermissions = value.Message().Interface().(*CollectionPermissions)
 	case "badges.MsgCreateCollection.managerTimeline":
@@ -8351,11 +8351,11 @@ func (x *fastReflection_MsgCreateCollection) Mutable(fd protoreflect.FieldDescri
 			x.DefaultBalances = new(UserBalanceStore)
 		}
 		return protoreflect.ValueOfMessage(x.DefaultBalances.ProtoReflect())
-	case "badges.MsgCreateCollection.badgesToCreate":
-		if x.BadgesToCreate == nil {
-			x.BadgesToCreate = []*Balance{}
+	case "badges.MsgCreateCollection.badgeIdsToAdd":
+		if x.BadgeIdsToAdd == nil {
+			x.BadgeIdsToAdd = []*UintRange{}
 		}
-		value := &_MsgCreateCollection_5_list{list: &x.BadgesToCreate}
+		value := &_MsgCreateCollection_5_list{list: &x.BadgeIdsToAdd}
 		return protoreflect.ValueOfList(value)
 	case "badges.MsgCreateCollection.collectionPermissions":
 		if x.CollectionPermissions == nil {
@@ -8434,8 +8434,8 @@ func (x *fastReflection_MsgCreateCollection) NewField(fd protoreflect.FieldDescr
 	case "badges.MsgCreateCollection.defaultBalances":
 		m := new(UserBalanceStore)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "badges.MsgCreateCollection.badgesToCreate":
-		list := []*Balance{}
+	case "badges.MsgCreateCollection.badgeIdsToAdd":
+		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_MsgCreateCollection_5_list{list: &list})
 	case "badges.MsgCreateCollection.collectionPermissions":
 		m := new(CollectionPermissions)
@@ -8545,8 +8545,8 @@ func (x *fastReflection_MsgCreateCollection) ProtoMethods() *protoiface.Methods 
 			l = options.Size(x.DefaultBalances)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if len(x.BadgesToCreate) > 0 {
-			for _, e := range x.BadgesToCreate {
+		if len(x.BadgeIdsToAdd) > 0 {
+			for _, e := range x.BadgeIdsToAdd {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -8774,9 +8774,9 @@ func (x *fastReflection_MsgCreateCollection) ProtoMethods() *protoiface.Methods 
 			i--
 			dAtA[i] = 0x32
 		}
-		if len(x.BadgesToCreate) > 0 {
-			for iNdEx := len(x.BadgesToCreate) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgesToCreate[iNdEx])
+		if len(x.BadgeIdsToAdd) > 0 {
+			for iNdEx := len(x.BadgeIdsToAdd) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.BadgeIdsToAdd[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -8969,7 +8969,7 @@ func (x *fastReflection_MsgCreateCollection) ProtoMethods() *protoiface.Methods 
 				iNdEx = postIndex
 			case 5:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgesToCreate", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIdsToAdd", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -8996,8 +8996,8 @@ func (x *fastReflection_MsgCreateCollection) ProtoMethods() *protoiface.Methods 
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgesToCreate = append(x.BadgesToCreate, &Balance{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgesToCreate[len(x.BadgesToCreate)-1]); err != nil {
+				x.BadgeIdsToAdd = append(x.BadgeIdsToAdd, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIdsToAdd[len(x.BadgeIdsToAdd)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -15096,8 +15096,8 @@ type MsgUniversalUpdateCollection struct {
 	BalancesType string `protobuf:"bytes,3,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
 	// The default balances for the user
 	DefaultBalances *UserBalanceStore `protobuf:"bytes,4,opt,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
-	// Balances to create for the collection. Will be sent to the "Mint" address.
-	BadgesToCreate []*Balance `protobuf:"bytes,6,rep,name=badgesToCreate,proto3" json:"badgesToCreate,omitempty"`
+	// New badge IDs to add to this collection
+	BadgeIdsToAdd []*UintRange `protobuf:"bytes,6,rep,name=badgeIdsToAdd,proto3" json:"badgeIdsToAdd,omitempty"`
 	// Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
 	UpdateCollectionPermissions bool `protobuf:"varint,7,opt,name=updateCollectionPermissions,proto3" json:"updateCollectionPermissions,omitempty"`
 	// New collection permissions to set.
@@ -15184,9 +15184,9 @@ func (x *MsgUniversalUpdateCollection) GetDefaultBalances() *UserBalanceStore {
 	return nil
 }
 
-func (x *MsgUniversalUpdateCollection) GetBadgesToCreate() []*Balance {
+func (x *MsgUniversalUpdateCollection) GetBadgeIdsToAdd() []*UintRange {
 	if x != nil {
-		return x.BadgesToCreate
+		return x.BadgeIdsToAdd
 	}
 	return nil
 }
@@ -15364,8 +15364,8 @@ type MsgUpdateCollection struct {
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	// ID of the collection (0 for new collection).
 	CollectionId string `protobuf:"bytes,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
-	// Balances to create for the collection. Will be sent to the "Mint" address.
-	BadgesToCreate []*Balance `protobuf:"bytes,6,rep,name=badgesToCreate,proto3" json:"badgesToCreate,omitempty"`
+	// New badge IDs to add to this collection
+	BadgeIdsToAdd []*UintRange `protobuf:"bytes,6,rep,name=badgeIdsToAdd,proto3" json:"badgeIdsToAdd,omitempty"`
 	// Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
 	UpdateCollectionPermissions bool `protobuf:"varint,7,opt,name=updateCollectionPermissions,proto3" json:"updateCollectionPermissions,omitempty"`
 	// New collection permissions to set.
@@ -15438,9 +15438,9 @@ func (x *MsgUpdateCollection) GetCollectionId() string {
 	return ""
 }
 
-func (x *MsgUpdateCollection) GetBadgesToCreate() []*Balance {
+func (x *MsgUpdateCollection) GetBadgeIdsToAdd() []*UintRange {
 	if x != nil {
-		return x.BadgesToCreate
+		return x.BadgeIdsToAdd
 	}
 	return nil
 }
@@ -15620,8 +15620,8 @@ type MsgCreateCollection struct {
 	BalancesType string `protobuf:"bytes,2,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
 	// The default balances for the user
 	DefaultBalances *UserBalanceStore `protobuf:"bytes,4,opt,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
-	// Balances to create for the collection. Will be sent to the "Mint" address.
-	BadgesToCreate []*Balance `protobuf:"bytes,5,rep,name=badgesToCreate,proto3" json:"badgesToCreate,omitempty"`
+	// New badge IDs to add to this collection
+	BadgeIdsToAdd []*UintRange `protobuf:"bytes,5,rep,name=badgeIdsToAdd,proto3" json:"badgeIdsToAdd,omitempty"`
 	// Collection permissions.
 	CollectionPermissions *CollectionPermissions `protobuf:"bytes,6,opt,name=collectionPermissions,proto3" json:"collectionPermissions,omitempty"`
 	// Manager timeline entries.
@@ -15683,9 +15683,9 @@ func (x *MsgCreateCollection) GetDefaultBalances() *UserBalanceStore {
 	return nil
 }
 
-func (x *MsgCreateCollection) GetBadgesToCreate() []*Balance {
+func (x *MsgCreateCollection) GetBadgeIdsToAdd() []*UintRange {
 	if x != nil {
-		return x.BadgesToCreate
+		return x.BadgeIdsToAdd
 	}
 	return nil
 }
@@ -16341,10 +16341,10 @@ var file_badges_tx_proto_rawDesc = []byte{
 	0x28, 0x0b, 0x32, 0x18, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x73, 0x65, 0x72,
 	0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x52, 0x0f, 0x64, 0x65,
 	0x66, 0x61, 0x75, 0x6c, 0x74, 0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x12, 0x37, 0x0a,
-	0x0e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x54, 0x6f, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x18,
-	0x06, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x42,
-	0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x52, 0x0e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x54, 0x6f,
-	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x12, 0x40, 0x0a, 0x1b, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x0d, 0x62, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x54, 0x6f, 0x41, 0x64, 0x64, 0x18, 0x06,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69,
+	0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x62, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64,
+	0x73, 0x54, 0x6f, 0x41, 0x64, 0x64, 0x12, 0x40, 0x0a, 0x1b, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65,
 	0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73,
 	0x73, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x07, 0x20, 0x01, 0x28, 0x08, 0x52, 0x1b, 0x75, 0x70, 0x64,
 	0x61, 0x74, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x65, 0x72,
@@ -16443,11 +16443,11 @@ var file_badges_tx_proto_rawDesc = []byte{
 	0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x30, 0x0a, 0x0c, 0x63, 0x6f, 0x6c,
 	0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42,
 	0x0c, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x04, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x0c, 0x63,
-	0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x37, 0x0a, 0x0e, 0x62,
-	0x61, 0x64, 0x67, 0x65, 0x73, 0x54, 0x6f, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x18, 0x06, 0x20,
-	0x03, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x42, 0x61, 0x6c,
-	0x61, 0x6e, 0x63, 0x65, 0x52, 0x0e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x54, 0x6f, 0x43, 0x72,
-	0x65, 0x61, 0x74, 0x65, 0x12, 0x40, 0x0a, 0x1b, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6f,
+	0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x37, 0x0a, 0x0d, 0x62,
+	0x61, 0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x54, 0x6f, 0x41, 0x64, 0x64, 0x18, 0x06, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74,
+	0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x62, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x54,
+	0x6f, 0x41, 0x64, 0x64, 0x12, 0x40, 0x0a, 0x1b, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6f,
 	0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69,
 	0x6f, 0x6e, 0x73, 0x18, 0x07, 0x20, 0x01, 0x28, 0x08, 0x52, 0x1b, 0x75, 0x70, 0x64, 0x61, 0x74,
 	0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x65, 0x72, 0x6d, 0x69,
@@ -16549,10 +16549,10 @@ var file_badges_tx_proto_rawDesc = []byte{
 	0x28, 0x0b, 0x32, 0x18, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x73, 0x65, 0x72,
 	0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x52, 0x0f, 0x64, 0x65,
 	0x66, 0x61, 0x75, 0x6c, 0x74, 0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x12, 0x37, 0x0a,
-	0x0e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x54, 0x6f, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x18,
-	0x05, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x42,
-	0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x52, 0x0e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x54, 0x6f,
-	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x12, 0x53, 0x0a, 0x15, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63,
+	0x0d, 0x62, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x54, 0x6f, 0x41, 0x64, 0x64, 0x18, 0x05,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69,
+	0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x62, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64,
+	0x73, 0x54, 0x6f, 0x41, 0x64, 0x64, 0x12, 0x53, 0x0a, 0x15, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63,
 	0x74, 0x69, 0x6f, 0x6e, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x18,
 	0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x43,
 	0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73,
@@ -16806,7 +16806,7 @@ var file_badges_tx_proto_goTypes = []interface{}{
 	(*MsgUpdateUserApprovalsResponse)(nil),       // 18: badges.MsgUpdateUserApprovalsResponse
 	(*Params)(nil),                               // 19: badges.Params
 	(*UserBalanceStore)(nil),                     // 20: badges.UserBalanceStore
-	(*Balance)(nil),                              // 21: badges.Balance
+	(*UintRange)(nil),                            // 21: badges.UintRange
 	(*CollectionPermissions)(nil),                // 22: badges.CollectionPermissions
 	(*ManagerTimeline)(nil),                      // 23: badges.ManagerTimeline
 	(*CollectionMetadataTimeline)(nil),           // 24: badges.CollectionMetadataTimeline
@@ -16833,7 +16833,7 @@ var file_badges_tx_proto_depIdxs = []int32{
 	7,  // 7: badges.BadgeCustomMsgType.createCollectionMsg:type_name -> badges.MsgCreateCollection
 	15, // 8: badges.BadgeCustomMsgType.globalArchiveMsg:type_name -> badges.MsgGlobalArchive
 	20, // 9: badges.MsgUniversalUpdateCollection.defaultBalances:type_name -> badges.UserBalanceStore
-	21, // 10: badges.MsgUniversalUpdateCollection.badgesToCreate:type_name -> badges.Balance
+	21, // 10: badges.MsgUniversalUpdateCollection.badgeIdsToAdd:type_name -> badges.UintRange
 	22, // 11: badges.MsgUniversalUpdateCollection.collectionPermissions:type_name -> badges.CollectionPermissions
 	23, // 12: badges.MsgUniversalUpdateCollection.managerTimeline:type_name -> badges.ManagerTimeline
 	24, // 13: badges.MsgUniversalUpdateCollection.collectionMetadataTimeline:type_name -> badges.CollectionMetadataTimeline
@@ -16843,7 +16843,7 @@ var file_badges_tx_proto_depIdxs = []int32{
 	28, // 17: badges.MsgUniversalUpdateCollection.collectionApprovals:type_name -> badges.CollectionApproval
 	29, // 18: badges.MsgUniversalUpdateCollection.standardsTimeline:type_name -> badges.StandardsTimeline
 	30, // 19: badges.MsgUniversalUpdateCollection.isArchivedTimeline:type_name -> badges.IsArchivedTimeline
-	21, // 20: badges.MsgUpdateCollection.badgesToCreate:type_name -> badges.Balance
+	21, // 20: badges.MsgUpdateCollection.badgeIdsToAdd:type_name -> badges.UintRange
 	22, // 21: badges.MsgUpdateCollection.collectionPermissions:type_name -> badges.CollectionPermissions
 	23, // 22: badges.MsgUpdateCollection.managerTimeline:type_name -> badges.ManagerTimeline
 	24, // 23: badges.MsgUpdateCollection.collectionMetadataTimeline:type_name -> badges.CollectionMetadataTimeline
@@ -16854,7 +16854,7 @@ var file_badges_tx_proto_depIdxs = []int32{
 	29, // 28: badges.MsgUpdateCollection.standardsTimeline:type_name -> badges.StandardsTimeline
 	30, // 29: badges.MsgUpdateCollection.isArchivedTimeline:type_name -> badges.IsArchivedTimeline
 	20, // 30: badges.MsgCreateCollection.defaultBalances:type_name -> badges.UserBalanceStore
-	21, // 31: badges.MsgCreateCollection.badgesToCreate:type_name -> badges.Balance
+	21, // 31: badges.MsgCreateCollection.badgeIdsToAdd:type_name -> badges.UintRange
 	22, // 32: badges.MsgCreateCollection.collectionPermissions:type_name -> badges.CollectionPermissions
 	23, // 33: badges.MsgCreateCollection.managerTimeline:type_name -> badges.ManagerTimeline
 	24, // 34: badges.MsgCreateCollection.collectionMetadataTimeline:type_name -> badges.CollectionMetadataTimeline

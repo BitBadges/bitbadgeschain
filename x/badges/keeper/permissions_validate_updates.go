@@ -15,21 +15,21 @@ import (
 
 //HACK: For resuable code, we cast the permissions to their UniversalPermission equivalents, so we can reuse the UniversalPermission functions
 
-func (k Keeper) ValidateBalancesActionPermissionUpdate(ctx sdk.Context, oldPermissions []*types.BalancesActionPermission, newPermissions []*types.BalancesActionPermission) error {
-	if err := types.ValidateBalancesActionPermission(oldPermissions, true); err != nil {
+func (k Keeper) ValidateBadgeIdsActionPermissionUpdate(ctx sdk.Context, oldPermissions []*types.BadgeIdsActionPermission, newPermissions []*types.BadgeIdsActionPermission) error {
+	if err := types.ValidateBadgeIdsActionPermission(oldPermissions, true); err != nil {
 		return err
 	}
 
-	if err := types.ValidateBalancesActionPermission(newPermissions, true); err != nil {
+	if err := types.ValidateBadgeIdsActionPermission(newPermissions, true); err != nil {
 		return err
 	}
 
-	castedOldPermissions, err := k.CastBalancesActionPermissionToUniversalPermission(oldPermissions)
+	castedOldPermissions, err := k.CastBadgeIdsActionPermissionToUniversalPermission(oldPermissions)
 	if err != nil {
 		return err
 	}
 
-	castedNewPermissions, err := k.CastBalancesActionPermissionToUniversalPermission(newPermissions)
+	castedNewPermissions, err := k.CastBadgeIdsActionPermissionToUniversalPermission(newPermissions)
 	if err != nil {
 		return err
 	}
@@ -270,7 +270,7 @@ func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types
 		return err
 	}
 
-	if err := k.ValidateBalancesActionPermissionUpdate(ctx, oldPermissions.CanCreateMoreBadges, newPermissions.CanCreateMoreBadges); err != nil {
+	if err := k.ValidateBadgeIdsActionPermissionUpdate(ctx, oldPermissions.CanUpdateValidBadgeIds, newPermissions.CanUpdateValidBadgeIds); err != nil {
 		return err
 	}
 

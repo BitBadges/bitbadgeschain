@@ -23,10 +23,15 @@ func GetDefaultBalanceStoreForCollection(collection *types.BadgeCollection) *typ
 }
 
 func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.BadgeCollection, userAddress string) *types.UserBalanceStore {
+	
+	//Mint has unlimited balances
+	if userAddress == "Total" || userAddress == "Mint" {
+		return &types.UserBalanceStore{}
+	}
+
 	balanceKey := ConstructBalanceKey(userAddress, collection.CollectionId)
 	balance, found := k.GetUserBalanceFromStore(ctx, balanceKey)
-	//Defaults don't apply to Total or Mint
-	if !found && userAddress != "Total" && userAddress != "Mint" {
+	if !found {
 		balance = GetDefaultBalanceStoreForCollection(collection)
 	}
 
@@ -118,8 +123,10 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 			}
 		}
 
-		if err := k.SetBalanceForAddress(ctx, collection, transfer.From, fromUserBalance); err != nil {
-			return err
+		if transfer.From != "Mint" {
+			if err := k.SetBalanceForAddress(ctx, collection, transfer.From, fromUserBalance); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -177,9 +184,12 @@ func (k Keeper) HandleTransfer(
 	}
 
 	for _, balance := range transferBalances {
-		fromUserBalance.Balances, err = types.SubtractBalance(ctx, fromUserBalance.Balances, balance, false)
-		if err != nil {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "inadequate balances for transfer from %s", from)
+		//Mint has unlimited balances
+		if from != "Mint" {
+			fromUserBalance.Balances, err = types.SubtractBalance(ctx, fromUserBalance.Balances, balance, false)
+			if err != nil {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "inadequate balances for transfer from %s", from)
+			}
 		}
 
 		toUserBalance.Balances, err = types.AddBalance(ctx, toUserBalance.Balances, balance)

@@ -26,22 +26,10 @@ func TestMsgMintAndDistributeBadges_ValidateBasic(t *testing.T) {
 		}, {
 			name: "valid state",
 			msg: types.MsgUniversalUpdateCollection{
-				Creator:        sample.AccAddress(),
-				CollectionId:   sdkmath.NewUint(1),
-				BadgesToCreate: []*types.Balance{},
+				Creator:       sample.AccAddress(),
+				CollectionId:  sdkmath.NewUint(1),
+				BadgeIdsToAdd: []*types.UintRange{},
 			},
-		}, {
-			name: "invalid amount",
-			msg: types.MsgUniversalUpdateCollection{
-				Creator:      sample.AccAddress(),
-				CollectionId: sdkmath.NewUint(1),
-				BadgesToCreate: []*types.Balance{
-					{
-						Amount: sdkmath.NewUint(0),
-					},
-				},
-			},
-			err: types.ErrElementCantEqualThis,
 		},
 	}
 	for _, tt := range tests {

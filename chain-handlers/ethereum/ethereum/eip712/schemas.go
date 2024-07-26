@@ -822,7 +822,7 @@ func GetSchemas() []string {
 				"autoApproveSelfInitiatedIncomingTransfers": true,
 				"autoApproveSelfInitiatedOutgoingTransfers": true
 			},
-			"badgesToCreate": [
+			"badgeIdsToAdd": [
 				{
 					"amount": "",
 					"ownershipTimes": [
@@ -989,7 +989,7 @@ func GetSchemas() []string {
 						]
 					}
 				],
-				"canCreateMoreBadges": [
+				"canUpdateValidBadgeIds": [
 					{
 						"badgeIds": [
 							{
@@ -2189,7 +2189,7 @@ func GetSchemas() []string {
 				"autoApproveSelfInitiatedIncomingTransfers": true,
 				"autoApproveSelfInitiatedOutgoingTransfers": true
 			},
-			"badgesToCreate": [
+			"badgeIdsToAdd": [
 				{
 					"amount": "",
 					"ownershipTimes": [
@@ -2355,7 +2355,7 @@ func GetSchemas() []string {
 						]
 					}
 				],
-				"canCreateMoreBadges": [
+				"canUpdateValidBadgeIds": [
 					{
 						"badgeIds": [
 							{
@@ -2705,7 +2705,7 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"collectionId": "",
-			"badgesToCreate": [
+			"badgeIdsToAdd": [
 				{
 					"amount": "",
 					"ownershipTimes": [
@@ -2872,7 +2872,7 @@ func GetSchemas() []string {
 						]
 					}
 				],
-				"canCreateMoreBadges": [
+				"canUpdateValidBadgeIds": [
 					{
 						"badgeIds": [
 							{

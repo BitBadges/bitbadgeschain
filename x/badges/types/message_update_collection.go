@@ -53,8 +53,8 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
 	}
 
-	if msg.BadgesToCreate != nil {
-		msg.BadgesToCreate, err = ValidateBalances(ctx, msg.BadgesToCreate, canChangeValues)
+	if msg.BadgeIdsToAdd != nil {
+		err = ValidateRangesAreValid(msg.BadgeIdsToAdd, false, false)
 		if err != nil {
 			return err
 		}

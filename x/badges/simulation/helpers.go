@@ -130,12 +130,11 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				TimelineTimes:             GetTimelineTimes(r, 3),
 			},
 		},
-		CanCreateMoreBadges: []*types.BalancesActionPermission{
+		CanUpdateValidBadgeIds: []*types.BadgeIdsActionPermission{
 			{
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				OwnershipTimes:            GetTimelineTimes(r, 3),
 				BadgeIds:                  GetTimelineTimes(r, 3),
 			},
 		},

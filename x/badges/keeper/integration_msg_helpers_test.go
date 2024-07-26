@@ -151,12 +151,20 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			return sdkerrors.Wrapf(types.ErrInvalidCollectionID, "Balances type %s not supported", collectionToCreate.BalancesType)
 		}
 
+		allBadgeIds := []*types.UintRange{}
+		for _, badge := range collectionToCreate.BadgesToCreate {
+			allBadgeIds = append(allBadgeIds, badge.BadgeIds...)
+		}
+		allBadgeIds = types.SortUintRangesAndMergeAdjacentAndIntersecting(allBadgeIds)
+
+		//For legacy purposes, we will use badgesToCreate which mints them to the mint address
 		collectionRes, err := UpdateCollectionWithRes(suite, ctx, &types.MsgUniversalUpdateCollection{
 			CollectionId:          sdkmath.NewUint(0),
 			Creator:               bob,
 			BalancesType:          balancesType,
 			CollectionPermissions: collectionToCreate.Permissions,
 			CollectionApprovals:   collectionToCreate.CollectionApprovals,
+
 			DefaultBalances: &types.UserBalanceStore{
 				Balances:          collectionToCreate.DefaultBalances,
 				OutgoingApprovals: collectionToCreate.DefaultOutgoingApprovals,
@@ -166,19 +174,13 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 				UserPermissions: nil,
 			},
 
-			// ManagerTimeline: []*types.ManagerTimeline{
-			// 	{
-			// 		Manager: collectionToCreate.Creator,
-			// 		TimelineTimes: GetFullUintRanges(),
-			// 	},
-			// },
 			CollectionMetadataTimeline:       collectionToCreate.CollectionMetadataTimeline,
 			BadgeMetadataTimeline:            collectionToCreate.BadgeMetadataTimeline,
 			OffChainBalancesMetadataTimeline: collectionToCreate.OffChainBalancesMetadataTimeline,
 			// InheritedCollectionId: collectionToCreate.InheritedCollectionId,
 			CustomDataTimeline: collectionToCreate.CustomDataTimeline,
 			StandardsTimeline:  collectionToCreate.StandardsTimeline,
-			BadgesToCreate:     collectionToCreate.BadgesToCreate,
+			BadgeIdsToAdd:      allBadgeIds,
 			// IsArchivedTimeline: collectionToCreate.IsArchivedTimeline,
 
 			// ManagerTimeline: collectionToCreate.ManagerTimeline,
@@ -221,10 +223,16 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 }
 
 func MintAndDistributeBadges(suite *TestSuite, ctx context.Context, msg *types.MsgMintAndDistributeBadges) error {
+	allBadgeIds := []*types.UintRange{}
+	for _, badge := range msg.BadgesToCreate {
+		allBadgeIds = append(allBadgeIds, badge.BadgeIds...)
+	}
+	allBadgeIds = types.SortUintRangesAndMergeAdjacentAndIntersecting(allBadgeIds)
+
 	_, err := suite.msgServer.UniversalUpdateCollection(ctx, &types.MsgUniversalUpdateCollection{
 		Creator:                                bob,
 		CollectionId:                           msg.CollectionId,
-		BadgesToCreate:                         msg.BadgesToCreate,
+		BadgeIdsToAdd:                          allBadgeIds,
 		CollectionMetadataTimeline:             msg.CollectionMetadataTimeline,
 		UpdateCollectionMetadataTimeline:       true,
 		BadgeMetadataTimeline:                  msg.BadgeMetadataTimeline,

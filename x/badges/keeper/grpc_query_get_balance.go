@@ -26,7 +26,7 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 		return nil, sdkerrors.Wrapf(ErrCollectionNotExists, "collection %s not found", currCollectionId)
 	} else {
 		isStandardBalances := collection.BalancesType == "Standard"
-		if isStandardBalances || req.Address == "Mint" || req.Address == "Total" {
+		if isStandardBalances {
 			balances = k.GetBalanceOrApplyDefault(ctx, collection, req.Address)
 		} else {
 			return nil, sdkerrors.Wrapf(ErrWrongBalancesType, "unsupported balances type %s %s", collection.BalancesType, collection.CollectionId)

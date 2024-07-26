@@ -39,7 +39,7 @@ func SimulateMsgUniversalUpdateCollection(
 					TimelineTimes: GetTimelineTimes(r, 3),
 				},
 			},
-			BadgesToCreate: GetRandomBalances(r, 3),
+			BadgeIdsToAdd: GetTimelineTimes(r, 3),
 			CollectionApprovals: []*types.CollectionApproval{
 				{
 					FromListId:        GetRandomAddresses(r, 1, accs)[0],
