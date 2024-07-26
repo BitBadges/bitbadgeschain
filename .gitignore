@@ -27,3 +27,7 @@ build/
 
 # We use the SDK for TS which also supports unique functionality to our chain like EIP-712 and Solana 
 ts-client/
+
+k8s/
+
+output.txt 

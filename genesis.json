@@ -1,30 +1,19 @@
 {
-  "genesis_time": "2024-01-30T22:49:02.35649318Z",
-  "chain_id": "bitbadges_1-2",
-  "initial_height": "1",
-  "consensus_params": {
-    "block": {
-      "max_bytes": "22020096",
-      "max_gas": "-1"
-    },
-    "evidence": {
-      "max_age_num_blocks": "100000",
-      "max_age_duration": "172800000000000",
-      "max_bytes": "1048576"
-    },
-    "validator": {
-      "pub_key_types": [
-        "ed25519"
-      ]
-    },
-    "version": {
-      "app": "0"
-    }
-  },
-  "app_hash": "",
+  "app_name": "bitbadgeschaind",
+  "app_version": "1.0-betanet-621e6f55",
+  "genesis_time": "2024-07-21T13:05:56.341810129Z",
+  "chain_id": "bitbadges_1-1",
+  "initial_height": 1,
+  "app_hash": null,
   "app_state": {
     "06-solomachine": null,
     "07-tendermint": null,
+    "anchor": {
+      "anchorData": [],
+      "nextLocationId": "0",
+      "params": {},
+      "port_id": "anchor"
+    },
     "auth": {
       "params": {
         "max_memo_characters": "256",
@@ -36,7 +25,7 @@
       "accounts": [
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "cosmos1gtll279hytf307uw3n6d9366sc4ggq380xn63m",
+          "address": "cosmos1aqlxp4lzpwlfgu4antdgjrm7whkaahjhrmp4ah",
           "pub_key": null,
           "account_number": "0",
           "sequence": "0"
@@ -50,7 +39,7 @@
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "cosmos1g0q4m6gyt5s2fmvg9cu5w8rnrp3ng3jj8drprt",
+          "address": "cosmos16fv7jdefw53zdljr4ml4cej44a7rhwcyc258rq",
           "pub_key": null,
           "account_number": "2",
           "sequence": "0"
@@ -64,7 +53,7 @@
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "cosmos17zanup92jw9vq06u94nwjhenng9c2sfummgt3q",
+          "address": "cosmos1976uphu2evdkdlzcx6f0rfn2835j6v9njytsj5",
           "pub_key": null,
           "account_number": "4",
           "sequence": "0"
@@ -97,26 +86,17 @@
           "address": "cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnrql8a",
           "coins": [
             {
-              "denom": "badge",
+              "denom": "ubadge",
               "amount": "1"
             }
           ]
         },
         {
-          "address": "cosmos1gtll279hytf307uw3n6d9366sc4ggq380xn63m",
+          "address": "cosmos1976uphu2evdkdlzcx6f0rfn2835j6v9njytsj5",
           "coins": [
             {
-              "denom": "badge",
+              "denom": "ubadge",
               "amount": "1"
-            }
-          ]
-        },
-        {
-          "address": "cosmos1g0q4m6gyt5s2fmvg9cu5w8rnrp3ng3jj8drprt",
-          "coins": [
-            {
-              "denom": "badge",
-              "amount": "200000000"
             }
           ]
         },
@@ -124,22 +104,48 @@
           "address": "cosmos1kx9532ujful8vgg2dht6k544ax4k9qzszjcw04",
           "coins": [
             {
-              "denom": "badge",
-              "amount": "100000000"
+              "denom": "ubadge",
+              "amount": "99999999999999996"
+            },
+            {
+              "denom": "ustake",
+              "amount": "99000000000000000"
             }
           ]
         },
         {
-          "address": "cosmos17zanup92jw9vq06u94nwjhenng9c2sfummgt3q",
+          "address": "cosmos16fv7jdefw53zdljr4ml4cej44a7rhwcyc258rq",
           "coins": [
             {
-              "denom": "badge",
-              "amount": "100000000"
+              "denom": "ubadge",
+              "amount": "1"
+            },
+            {
+              "denom": "ustake",
+              "amount": "1000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "cosmos1aqlxp4lzpwlfgu4antdgjrm7whkaahjhrmp4ah",
+          "coins": [
+            {
+              "denom": "ubadge",
+              "amount": "1"
             }
           ]
         }
       ],
-      "supply": [],
+      "supply": [
+        {
+          "denom": "ubadge",
+          "amount": "100000000000000000"
+        },
+        {
+          "denom": "ustake",
+          "amount": "100000000000000000"
+        }
+      ],
       "denom_metadata": [],
       "send_enabled": []
     },
@@ -147,11 +153,15 @@
       "index": "1",
       "owners": []
     },
+    "circuit": {
+      "account_permissions": [],
+      "disabled_type_urls": []
+    },
     "consensus": null,
     "crisis": {
       "constant_fee": {
-        "amount": "1000",
-        "denom": "stake"
+        "amount": "10000000000",
+        "denom": "ubadge"
       }
     },
     "distribution": {
@@ -206,19 +216,19 @@
                   "max_change_rate": "0.010000000000000000"
                 },
                 "min_self_delegation": "1",
-                "delegator_address": "cosmos1g0q4m6gyt5s2fmvg9cu5w8rnrp3ng3jj8drprt",
-                "validator_address": "cosmosvaloper1g0q4m6gyt5s2fmvg9cu5w8rnrp3ng3jjzeh50c",
+                "delegator_address": "",
+                "validator_address": "cosmosvaloper16fv7jdefw53zdljr4ml4cej44a7rhwcya7qj0n",
                 "pubkey": {
                   "@type": "/cosmos.crypto.ed25519.PubKey",
-                  "key": "bmJVpVO9FVVxMdIjozIhF1JFBw6jHAJTjh8+EC4aOGM="
+                  "key": "x1YguEsT6vXcRc6sk8kHkXV00jkCvA/Zd6A+FC5dYK0="
                 },
                 "value": {
-                  "denom": "badge",
-                  "amount": "100000000"
+                  "denom": "ustake",
+                  "amount": "1000000000000000"
                 }
               }
             ],
-            "memo": "4bf7aaa8a6c97b5fc5926d83cc961ab622abf777@192.168.0.66:26656",
+            "memo": "f4086def065992cb4de16ab9f764c6550bbf84af@134.122.12.165:26656",
             "timeout_height": "0",
             "extension_options": [],
             "non_critical_extension_options": []
@@ -228,7 +238,7 @@
               {
                 "public_key": {
                   "@type": "/cosmos.crypto.secp256k1.PubKey",
-                  "key": "A4UHiZFxYRSzCu8gNAhBZjWAkBrADdwdH+zTvK0ywAPc"
+                  "key": "A61+pPrvXcn91USJ+35rF3lPmz+KhtBpMhOdHUhyW6ge"
                 },
                 "mode_info": {
                   "single": {
@@ -247,30 +257,42 @@
             "tip": null
           },
           "signatures": [
-            "AC6BMTT0m6d6F08eUQucnSSpqXr4AyL69VxKFZgcsfZ4zdNUQqN8Ma9jG1DTSBomgRyR1XTNFor/k1T8gasPeg=="
+            "oFeP+nUokkzCEK+1A++TjYlZlEP+/+Vxu1/QCReOzfYJ4EBV2bkAWmVhF4z3DOkjRSdPoDmECu9ZLuhKIRc2Ng=="
           ]
         }
       ]
     },
     "gov": {
+      "constitution": "",
       "deposit_params": null,
       "deposits": [],
       "params": {
         "burn_proposal_deposit_prevote": false,
         "burn_vote_quorum": false,
         "burn_vote_veto": true,
-        "max_deposit_period": "172800s",
-        "min_deposit": [
+        "expedited_min_deposit": [
           {
-            "amount": "10000000",
+            "amount": "50000000",
             "denom": "stake"
           }
         ],
+        "expedited_threshold": "0.667000000000000000",
+        "expedited_voting_period": "86400s",
+        "max_deposit_period": "604800s",
+        "min_deposit": [
+          {
+            "amount": "10000000000",
+            "denom": "ustake"
+          }
+        ],
+        "min_deposit_ratio": "0.010000000000000000",
         "min_initial_deposit_ratio": "0.000000000000000000",
+        "proposal_cancel_dest": "",
+        "proposal_cancel_ratio": "0.500000000000000000",
         "quorum": "0.334000000000000000",
         "threshold": "0.500000000000000000",
         "veto_threshold": "0.334000000000000000",
-        "voting_period": "172800s"
+        "voting_period": "604800s"
       },
       "proposals": [],
       "starting_proposal_id": "1",
@@ -295,6 +317,15 @@
         "channels": [],
         "commitments": [],
         "next_channel_sequence": "0",
+        "params": {
+          "upgrade_timeout": {
+            "height": {
+              "revision_height": "0",
+              "revision_number": "0"
+            },
+            "timestamp": "600000000000"
+          }
+        },
         "receipts": [],
         "recv_sequences": [],
         "send_sequences": []
@@ -307,9 +338,7 @@
         "next_client_sequence": "0",
         "params": {
           "allowed_clients": [
-            "06-solomachine",
-            "07-tendermint",
-            "09-localhost"
+            "*"
           ]
         }
       },
@@ -343,28 +372,34 @@
         "port": "icahost"
       }
     },
+    "maps": {
+      "duplicates_full_keys": [],
+      "full_keys": [],
+      "maps": [],
+      "params": {},
+      "port_id": "maps",
+      "values": []
+    },
     "mint": {
       "minter": {
         "annual_provisions": "0.000000000000000000",
         "inflation": "0.130000000000000000"
       },
       "params": {
-        "blocks_per_year": "6311520",
+        "blocks_per_year": "15811200",
         "goal_bonded": "0.670000000000000000",
         "inflation_max": "0.200000000000000000",
         "inflation_min": "0.070000000000000000",
         "inflation_rate_change": "0.130000000000000000",
-        "mint_denom": "stake"
+        "mint_denom": "ustake"
       }
     },
-    "params": null,
-    "protocols": {
-      "collection_ids_for_protocols": [],
-      "collection_ids_for_protocols_keys": [],
-      "params": {},
-      "port_id": "protocols",
-      "protocols": []
+    "nft": {
+      "classes": [],
+      "entries": []
     },
+    "params": null,
+    "runtime": null,
     "slashing": {
       "missed_blocks": [],
       "params": {
@@ -382,7 +417,7 @@
       "last_total_power": "0",
       "last_validator_powers": [],
       "params": {
-        "bond_denom": "badge",
+        "bond_denom": "ustake",
         "historical_entries": 10000,
         "max_entries": 7,
         "max_validators": 100,
@@ -416,12 +451,37 @@
       },
       "sequences": []
     },
-    "xwasm": {
+    "wasmx": {
       "params": {
         "is_execution_enabled": false,
-        "max_begin_block_total_gas": "42000000",
-        "max_contract_gas_limit": "3500000",
-        "min_gas_price": "1000000000"
+        "max_begin_block_total_gas": "0",
+        "max_contract_gas_limit": "0",
+        "min_gas_price": "0"
+      },
+      "port_id": "wasmx"
+    }
+  },
+  "consensus": {
+    "params": {
+      "block": {
+        "max_bytes": "22020096",
+        "max_gas": "-1"
+      },
+      "evidence": {
+        "max_age_num_blocks": "100000",
+        "max_age_duration": "172800000000000",
+        "max_bytes": "1048576"
+      },
+      "validator": {
+        "pub_key_types": [
+          "ed25519"
+        ]
+      },
+      "version": {
+        "app": "0"
+      },
+      "abci": {
+        "vote_extensions_enable_height": "0"
       }
     }
   }
