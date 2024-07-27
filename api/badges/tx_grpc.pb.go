@@ -27,7 +27,6 @@ const (
 	Msg_DeleteCollection_FullMethodName          = "/badges.Msg/DeleteCollection"
 	Msg_UpdateCollection_FullMethodName          = "/badges.Msg/UpdateCollection"
 	Msg_CreateCollection_FullMethodName          = "/badges.Msg/CreateCollection"
-	Msg_GlobalArchive_FullMethodName             = "/badges.Msg/GlobalArchive"
 )
 
 // MsgClient is the client API for Msg service.
@@ -44,7 +43,6 @@ type MsgClient interface {
 	DeleteCollection(ctx context.Context, in *MsgDeleteCollection, opts ...grpc.CallOption) (*MsgDeleteCollectionResponse, error)
 	UpdateCollection(ctx context.Context, in *MsgUpdateCollection, opts ...grpc.CallOption) (*MsgUpdateCollectionResponse, error)
 	CreateCollection(ctx context.Context, in *MsgCreateCollection, opts ...grpc.CallOption) (*MsgCreateCollectionResponse, error)
-	GlobalArchive(ctx context.Context, in *MsgGlobalArchive, opts ...grpc.CallOption) (*MsgGlobalArchiveResponse, error)
 }
 
 type msgClient struct {
@@ -127,15 +125,6 @@ func (c *msgClient) CreateCollection(ctx context.Context, in *MsgCreateCollectio
 	return out, nil
 }
 
-func (c *msgClient) GlobalArchive(ctx context.Context, in *MsgGlobalArchive, opts ...grpc.CallOption) (*MsgGlobalArchiveResponse, error) {
-	out := new(MsgGlobalArchiveResponse)
-	err := c.cc.Invoke(ctx, Msg_GlobalArchive_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
@@ -150,7 +139,6 @@ type MsgServer interface {
 	DeleteCollection(context.Context, *MsgDeleteCollection) (*MsgDeleteCollectionResponse, error)
 	UpdateCollection(context.Context, *MsgUpdateCollection) (*MsgUpdateCollectionResponse, error)
 	CreateCollection(context.Context, *MsgCreateCollection) (*MsgCreateCollectionResponse, error)
-	GlobalArchive(context.Context, *MsgGlobalArchive) (*MsgGlobalArchiveResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -181,9 +169,6 @@ func (UnimplementedMsgServer) UpdateCollection(context.Context, *MsgUpdateCollec
 }
 func (UnimplementedMsgServer) CreateCollection(context.Context, *MsgCreateCollection) (*MsgCreateCollectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateCollection not implemented")
-}
-func (UnimplementedMsgServer) GlobalArchive(context.Context, *MsgGlobalArchive) (*MsgGlobalArchiveResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GlobalArchive not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -342,24 +327,6 @@ func _Msg_CreateCollection_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_GlobalArchive_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgGlobalArchive)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).GlobalArchive(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Msg_GlobalArchive_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).GlobalArchive(ctx, req.(*MsgGlobalArchive))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -398,10 +365,6 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateCollection",
 			Handler:    _Msg_CreateCollection_Handler,
-		},
-		{
-			MethodName: "GlobalArchive",
-			Handler:    _Msg_GlobalArchive_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

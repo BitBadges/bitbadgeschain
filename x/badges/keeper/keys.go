@@ -24,8 +24,6 @@ var (
 
 	NextAddressListIdKey = []byte{0x0A}
 
-	GlobalArchiveKey = []byte{0x0B}
-
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}
 

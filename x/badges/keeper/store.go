@@ -78,23 +78,6 @@ func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId sdkmath.
 	store.Delete(collectionStoreKey(collectionId))
 }
 
-/** ****************************** GLOBAL ARCHIVE ****************************** **/
-func (k Keeper) SetGlobalArchiveInStore(ctx sdk.Context, archive bool) error {
-	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, []byte{})
-	store.Set(GlobalArchiveKey, []byte(strconv.FormatBool(archive)))
-	return nil
-}
-func (k Keeper) GetGlobalArchiveFromStore(ctx sdk.Context) bool {
-	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, []byte{})
-	archive := store.Get(GlobalArchiveKey)
-	if archive == nil {
-		return false
-	}
-	return archive[0] == 't'
-}
-
 /****************************************USER BALANCES****************************************/
 
 // Sets a user balance in the store using UserBalanceKey ([]byte{0x02}) as the prefix. No check if store has key already.

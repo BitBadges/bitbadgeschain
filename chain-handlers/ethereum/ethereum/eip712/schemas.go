@@ -386,14 +386,6 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/GlobalArchive",
-		"value": {
-			"creator": "",
-			"archive": true
-		}
-	}`)
-
-	schemas = append(schemas, `{
 		"type": "badges/UniversalUpdateCollection",
 		"value": {
 			"creator": "",
@@ -822,21 +814,11 @@ func GetSchemas() []string {
 				"autoApproveSelfInitiatedIncomingTransfers": true,
 				"autoApproveSelfInitiatedOutgoingTransfers": true
 			},
+			
 			"badgeIdsToAdd": [
 				{
-					"amount": "",
-					"ownershipTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"badgeIds": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"start": "",
+					"end": ""
 				}
 			],
 			"updateCollectionPermissions": false,
@@ -992,12 +974,6 @@ func GetSchemas() []string {
 				"canUpdateValidBadgeIds": [
 					{
 						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"ownershipTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -2191,19 +2167,8 @@ func GetSchemas() []string {
 			},
 			"badgeIdsToAdd": [
 				{
-					"amount": "",
-					"ownershipTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"badgeIds": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"start": "",
+					"end": ""
 				}
 			],
 			"collectionPermissions": {
@@ -2358,12 +2323,6 @@ func GetSchemas() []string {
 				"canUpdateValidBadgeIds": [
 					{
 						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"ownershipTimes": [
 							{
 								"start": "",
 								"end": ""
@@ -2707,19 +2666,8 @@ func GetSchemas() []string {
 			"collectionId": "",
 			"badgeIdsToAdd": [
 				{
-					"amount": "",
-					"ownershipTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"badgeIds": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"start": "",
+					"end": ""
 				}
 			],
 			"updateCollectionPermissions": false,
@@ -2875,12 +2823,6 @@ func GetSchemas() []string {
 				"canUpdateValidBadgeIds": [
 					{
 						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"ownershipTimes": [
 							{
 								"start": "",
 								"end": ""
