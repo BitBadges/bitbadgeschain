@@ -4,8 +4,6 @@ import (
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 )
 
-// WrapTxToTypedData wraps an Amino-encoded Cosmos Tx JSON SignDoc
-// bytestream into an EIP712-compatible TypedData request.
 func WrapTxToTypedData(
 	chainID uint64,
 	data []byte,

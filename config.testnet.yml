@@ -34,7 +34,7 @@ client:
     openapi:
         path: docs/static/openapi.yml
 genesis:
-    chain_id: bitbadges-1
+    chain_id: bitbadges-2
     consensus_params:
         block:
             max_bytes: '22020096'

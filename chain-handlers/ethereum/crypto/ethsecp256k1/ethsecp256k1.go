@@ -6,8 +6,6 @@ import (
 	"crypto/subtle"
 	"fmt"
 
-	"bitbadgeschain/chain-handlers/ethereum/ethereum/eip712"
-
 	errorsmod "cosmossdk.io/errors"
 
 	tmcrypto "github.com/cometbft/cometbft/crypto"
@@ -218,22 +216,7 @@ func (pubKey PubKey) VerifySignature(msg, sig []byte) bool {
 // to EIP-712 object bytes, then performing ECDSA verification on the hash. This is to support
 // signing a Cosmos payload using EIP-712.
 func (pubKey PubKey) verifySignatureAsEIP712(msg, sig []byte) bool {
-	eip712Bytes, err := eip712.GetEIP712BytesForMsg(msg)
-	if err != nil {
-		return false
-	}
-
-	if pubKey.verifySignatureECDSA(eip712Bytes, sig) {
-		return true
-	}
-
-	// Try verifying the signature using the legacy EIP-712 encoding
-	legacyEIP712Bytes, err := eip712.LegacyGetEIP712BytesForMsg(msg)
-	if err != nil {
-		return false
-	}
-
-	return pubKey.verifySignatureECDSA(legacyEIP712Bytes, sig)
+	panic("Not implemented")
 }
 
 // Perform standard ECDSA signature verification for the given raw bytes and signature.
