@@ -17,12 +17,4 @@ var (
 
 	// ErrInvalidChainID returns an error resulting from an invalid chain ID.
 	ErrInvalidChainID = errorsmod.Register(RootCodespace, 3, "invalid chain ID")
-
-	// ErrMarshalBigInt returns an error resulting from marshaling a big.Int to a string.
-	ErrMarshalBigInt = errorsmod.Register(RootCodespace, 5, "cannot marshal big.Int to string")
-
-	// ErrUnmarshalBigInt returns an error resulting from unmarshaling a big.Int from a string.
-	ErrUnmarshalBigInt = errorsmod.Register(RootCodespace, 6, "cannot unmarshal big.Int from string")
-
-	ErrInvalidEIP712Object = errorsmod.Register(RootCodespace, 7, "invalid EIP-712 object type. could not resolve type")
 )
