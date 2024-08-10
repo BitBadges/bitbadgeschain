@@ -1,12 +1,14 @@
 package keeper_test
 
 import (
+	"fmt"
 	"math"
 
 	"bitbadgeschain/x/badges/keeper"
 	"bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
+	types1 "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -85,6 +87,51 @@ func DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite *TestSuite, ctx s
 			OnlyCheckPrioritizedOutgoingApprovals:   onlyCheckPrioritizedOutgoingApprovals,
 			ZkProofSolutions:                        zkProofSolutions,
 		}, to, requester)
+}
+
+func (suite *TestSuite) TestMsgsToExecute() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// msg := &bankv1beta1.MsgSend{
+	// 	FromAddress: alice,
+	// 	ToAddress:   bob,
+	// 	Amount: []*basev1beta1.Coin{
+	// 		{
+	// 			Denom:  "ubadge",
+	// 			Amount: "1",
+	// 		},
+	// 	},
+	// }
+
+	msg := &types.MsgDeleteCollection{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+	}
+
+	protoMsg, err := types1.NewAnyWithValue(msg)
+	suite.Require().Nil(err, "error creating any")
+	suite.Require().NotNil(protoMsg, "error creating any")
+
+	// fmt.Println(protoMsg)
+	fmt.Println(protoMsg.GetCachedValue())
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.MsgsToExecute = []*types.GenericMsgToExecute{
+		{
+			UseApproverAddressAsCreator: true,
+			MsgsToExecute:               protoMsg,
+		},
+	}
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating badges")
+
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false, []*types.ZkProofSolution{})
+	suite.Require().Nil(err, "Error deducting outgoing approvals")
+	// suite.Require().Equal(2, len(x), "Error deducting outgoing approvals")
+	// suite.Require().True(x[0].Outgoing != x[1].Outgoing, "Error deducting outgoing approvals")
 }
 
 func (suite *TestSuite) TestDeductFromOutgoing() {

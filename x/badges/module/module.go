@@ -9,6 +9,7 @@ import (
 	"cosmossdk.io/core/store"
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -201,6 +202,8 @@ type ModuleInputs struct {
 
 	IBCKeeperFn        func() *ibckeeper.Keeper                   `optional:"true"`
 	CapabilityScopedFn func(string) capabilitykeeper.ScopedKeeper `optional:"true"`
+
+	MsgRouter *baseapp.MsgServiceRouter
 }
 
 type ModuleOutputs struct {
@@ -224,6 +227,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.IBCKeeperFn,
 		in.CapabilityScopedFn,
 		in.BankKeeper,
+		in.MsgRouter,
 	)
 	m := NewAppModule(
 		in.Cdc,

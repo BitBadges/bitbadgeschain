@@ -7,6 +7,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/log"
 	"cosmossdk.io/store/prefix"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -22,7 +23,7 @@ import (
 
 type (
 	Keeper struct {
-		cdc          codec.BinaryCodec
+		cdc          codec.Codec
 		storeService store.KVStoreService
 		logger       log.Logger
 
@@ -34,17 +35,20 @@ type (
 		capabilityScopedFn func(string) capabilitykeeper.ScopedKeeper
 
 		bankKeeper types.BankKeeper
+
+		msgRouter *baseapp.MsgServiceRouter
 	}
 )
 
 func NewKeeper(
-	cdc codec.BinaryCodec,
+	cdc codec.Codec,
 	storeService store.KVStoreService,
 	logger log.Logger,
 	authority string,
 	ibcKeeperFn func() *ibckeeper.Keeper,
 	capabilityScopedFn func(string) capabilitykeeper.ScopedKeeper,
 	bankKeeper types.BankKeeper,
+	msgRouter *baseapp.MsgServiceRouter,
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
 		panic(fmt.Sprintf("invalid authority address: %s", authority))
@@ -58,6 +62,7 @@ func NewKeeper(
 		ibcKeeperFn:        ibcKeeperFn,
 		capabilityScopedFn: capabilityScopedFn,
 		bankKeeper:         bankKeeper,
+		msgRouter:          msgRouter,
 	}
 }
 

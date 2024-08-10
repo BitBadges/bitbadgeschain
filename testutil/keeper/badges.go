@@ -59,6 +59,7 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 			return scopeModule
 		},
 		bankkeeper.BaseSendKeeper{},
+		nil,
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

@@ -341,6 +341,11 @@ func (k Keeper) DeductAndGetUserApprovals(
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error handling coin transfers")
 			}
 
+			err = k.ExecuteGenericMsgs(ctx, approvalCriteria.MsgsToExecute, approverAddress, approvalLevel)
+			if err != nil {
+				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error executing generic msgs")
+			}
+
 			//If the approval has challenges, we need to check that a valid solutions is provided for every challenge
 			//If the challenge specifies to use the leaf index for the number of increments, we use this value for the number of increments later
 			//    If so, useLeafIndexForNumIncrements will be true
