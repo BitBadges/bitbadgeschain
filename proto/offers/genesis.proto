@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package offers;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "offers/params.proto";
+import "offers/tx.proto";
+
+option go_package = "bitbadgeschain/x/offers/types";
+
+// GenesisState defines the offers module's genesis state.
+message GenesisState {
+  
+  // params defines all the parameters of the module.
+  Params params  = 1 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+  string port_id = 2;
+
+  repeated Proposal proposals = 3;
+  string nextProposalId = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+

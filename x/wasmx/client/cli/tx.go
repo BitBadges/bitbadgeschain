@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/pflag"
 
 	"bitbadgeschain/x/wasmx/types"
+
 	cliflags "github.com/cosmos/cosmos-sdk/client/flags"
 )
 

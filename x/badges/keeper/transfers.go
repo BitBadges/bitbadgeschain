@@ -23,7 +23,7 @@ func GetDefaultBalanceStoreForCollection(collection *types.BadgeCollection) *typ
 }
 
 func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.BadgeCollection, userAddress string) *types.UserBalanceStore {
-	
+
 	//Mint has unlimited balances
 	if userAddress == "Total" || userAddress == "Mint" {
 		return &types.UserBalanceStore{}

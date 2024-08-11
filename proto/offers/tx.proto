@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package offers;
+
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "offers/params.proto";
+import "offers/ranges.proto";
+import "google/protobuf/any.proto";
+
+
+option go_package = "bitbadgeschain/x/offers/types";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+  
+  // UpdateParams defines a (governance) operation for updating the module
+  // parameters. The authority defaults to the x/gov module account.
+  rpc UpdateParams            (MsgUpdateParams           ) returns (MsgUpdateParamsResponse           );
+  rpc CreateProposal          (MsgCreateProposal         ) returns (MsgCreateProposalResponse         );
+  rpc AcceptProposal          (MsgAcceptProposal         ) returns (MsgAcceptProposalResponse         );
+  rpc RejectAndDeleteProposal (MsgRejectAndDeleteProposal) returns (MsgRejectAndDeleteProposalResponse);
+  rpc ExecuteProposal         (MsgExecuteProposal        ) returns (MsgExecuteProposalResponse        );
+}
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) =                               "authority";
+  option           (amino.name) = "bitbadgeschain/x/offers/MsgUpdateParams";
+  
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the module parameters to update.
+  
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+message MsgUpdateParamsResponse {}
+message Parties {
+  string creator = 1;
+  repeated google.protobuf.Any msgsToExecute = 2 [(cosmos_proto.accepts_interface) = "cosmos.base.v1beta1.Msg"];
+  bool accepted = 3;
+}
+
+message Proposal {
+  string id = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated Parties parties = 2;
+  string createdBy = 3;
+  repeated UintRange validTimes = 4;
+}
+
+message MsgCreateProposal {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "bitbadgeschain/x/handshake/MsgCreateProposal";
+  string creator = 1;
+  repeated Parties parties = 2;
+  repeated UintRange validTimes = 3;
+}
+message MsgCreateProposalResponse {
+  string id = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+message MsgAcceptProposal {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "bitbadgeschain/x/handshake/MsgAcceptProposal";
+  string creator = 1;
+  string id = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+message MsgAcceptProposalResponse {}
+
+message MsgRejectAndDeleteProposal {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "bitbadgeschain/x/handshake/MsgRejectAndDeleteProposal";
+  string creator = 1;
+  string id = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+message MsgRejectAndDeleteProposalResponse {}
+
+message MsgExecuteProposal {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "bitbadgeschain/x/handshake/MsgExecuteProposal";
+  string creator = 1;
+  string id = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+message MsgExecuteProposalResponse {}

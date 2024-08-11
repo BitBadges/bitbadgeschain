@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 
 	"bitbadgeschain/x/wasmx/types"
+
 	cliflags "github.com/cosmos/cosmos-sdk/client/flags"
 )
 

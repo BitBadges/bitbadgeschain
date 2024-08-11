@@ -46,6 +46,8 @@ import (
 	badgesmoduletypes "bitbadgeschain/x/badges/types"
 	mapsmodule "bitbadgeschain/x/maps/module"
 	mapsmoduletypes "bitbadgeschain/x/maps/types"
+	offersmodule "bitbadgeschain/x/offers/module"
+	offersmoduletypes "bitbadgeschain/x/offers/types"
 	wasmxmodule "bitbadgeschain/x/wasmx/module"
 	wasmxmoduletypes "bitbadgeschain/x/wasmx/types"
 )
@@ -157,7 +159,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// Create IBC modules with ibcfee middleware
 	transferIBCModule := ibcfee.NewIBCMiddleware(ibctransfer.NewIBCModule(app.TransferKeeper), app.IBCFeeKeeper)
 
-
 	//TODO: There was some wasmd IBC code that we did not fully copy here (e.g. middlewares, etc)
 
 	// integration point for custom authentication modules
@@ -168,7 +169,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	)
 
 	icaHostIBCModule := ibcfee.NewIBCMiddleware(icahost.NewIBCModule(app.ICAHostKeeper), app.IBCFeeKeeper)
-
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter().
@@ -190,6 +190,8 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 
 	wasmxIBCModule := ibcfee.NewIBCMiddleware(wasmxmodule.NewIBCModule(app.WasmxKeeper), app.IBCFeeKeeper)
 	ibcRouter.AddRoute(wasmxmoduletypes.ModuleName, wasmxIBCModule)
+	offersIBCModule := ibcfee.NewIBCMiddleware(offersmodule.NewIBCModule(app.OffersKeeper), app.IBCFeeKeeper)
+	ibcRouter.AddRoute(offersmoduletypes.ModuleName, offersIBCModule)
 	// this line is used by starport scaffolding # ibc/app/module
 
 	app.IBCKeeper.SetRouter(ibcRouter)

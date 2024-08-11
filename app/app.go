@@ -91,7 +91,9 @@ import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
+	offersmodulekeeper "bitbadgeschain/x/offers/keeper"
 	wasmxmodulekeeper "bitbadgeschain/x/wasmx/keeper"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	"bitbadgeschain/docs"
@@ -162,6 +164,7 @@ type App struct {
 	MapsKeeper   mapsmodulekeeper.Keeper
 	WasmKeeper   wasmkeeper.Keeper
 	WasmxKeeper  wasmxmodulekeeper.Keeper
+	OffersKeeper offersmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -278,6 +281,7 @@ func New(
 		&app.BadgesKeeper,
 		&app.MapsKeeper,
 		&app.WasmxKeeper,
+		&app.OffersKeeper,
 		// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	); err != nil {
 		panic(err)

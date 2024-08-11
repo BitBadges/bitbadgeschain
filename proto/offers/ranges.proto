@@ -1,0 +1,14 @@
+syntax = "proto3";
+package offers;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "bitbadgeschain/x/offers/types";
+
+message UintRange {
+  // The starting value of the range (inclusive).
+  string start = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  // The ending value of the range (inclusive).
+  string end = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}

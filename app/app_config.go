@@ -75,6 +75,10 @@ import (
 
 	// _ "github.com/CosmWasm/wasmd/x/wasm" // import for side-effects
 
+	offersmodulev1 "bitbadgeschain/api/offers/module"
+	_ "bitbadgeschain/x/offers/module" // import for side-effects
+	offersmoduletypes "bitbadgeschain/x/offers/types"
+
 	"google.golang.org/protobuf/types/known/durationpb"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
@@ -118,6 +122,7 @@ var (
 		mapsmoduletypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxmoduletypes.ModuleName,
+		offersmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
@@ -147,6 +152,7 @@ var (
 		mapsmoduletypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxmoduletypes.ModuleName,
+		offersmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
@@ -170,6 +176,7 @@ var (
 		mapsmoduletypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxmoduletypes.ModuleName,
+		offersmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
@@ -342,6 +349,10 @@ var (
 			{
 				Name:   wasmxmoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&wasmxmodulev1.Module{}),
+			},
+			{
+				Name:   offersmoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&offersmodulev1.Module{}),
 			},
 			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},

@@ -3167,5 +3167,48 @@ func GetSchemas() []string {
 		}
 	}`)
 
+	schemas = append(schemas, `{
+    "type": "offers/CreateProposal",
+    "value": {
+        "creator": "",
+        "parties": [
+            {
+                "creator": "",
+                "msgsToExecute": [
+                    {
+                        "typeUrl": "",
+                        "value": ""
+                    }
+                ],
+                "accepted": false
+            }
+        ]
+    }
+}`)
+
+	schemas = append(schemas, `{
+    "type": "offers/AcceptProposal",
+    "value": {
+        "creator": "",
+        "id": ""
+    }
+}`)
+
+	schemas = append(schemas, `{
+    "type": "offers/RejectAndDeleteProposal",
+    "value": {
+        "creator": "",
+        "id": ""
+    }
+}`)
+
+	schemas = append(schemas, `{
+    "type": "offers/ExecuteProposal",
+    "value": {
+        "creator": "",
+        "id": ""
+    }
+}`)
+
 	return schemas
 }

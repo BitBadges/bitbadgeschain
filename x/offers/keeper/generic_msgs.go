@@ -1,12 +1,10 @@
 package keeper
 
 import (
-	"bitbadgeschain/x/badges/types"
 	"fmt"
 
-	"cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-proto/anyutil"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -14,13 +12,15 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 
 	msgv1 "cosmossdk.io/api/cosmos/msg/v1"
+	"cosmossdk.io/errors"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) ReplaceCreatorField(msg *codectypes.Any, creatorAddress string) (*codectypes.Any, error) {
+func ReplaceCreatorField(cdc codec.Codec, msg *codectypes.Any, creatorAddress string) (*codectypes.Any, error) {
 	msgV2, err := anyutil.Unpack(&anypb.Any{
 		TypeUrl: msg.TypeUrl,
 		Value:   msg.Value,
-	}, k.cdc.InterfaceRegistry().SigningContext().FileResolver(), nil)
+	}, cdc.InterfaceRegistry().SigningContext().FileResolver(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -53,22 +53,9 @@ func (k Keeper) ReplaceCreatorField(msg *codectypes.Any, creatorAddress string) 
 	return anyMsg, nil
 }
 
-func (k Keeper) ExecuteGenericMsgs(ctx sdk.Context, msgs []*types.GenericMsgToExecute, approverAddress, initiatedBy string) error {
-	for _, msgObject := range msgs {
-		msg := msgObject.MsgsToExecute
-
-		creatorAddress := ""
-		useApproverAddressAsCreator := msgObject.UseApproverAddressAsCreator
-		useApproveeAddressAsCreator := msgObject.UseApproveeAddressAsCreator
-		if useApproverAddressAsCreator {
-			creatorAddress = approverAddress
-		} else if useApproveeAddressAsCreator {
-			creatorAddress = initiatedBy
-		} else {
-			return fmt.Errorf("no creator address specified for generic msg execution")
-		}
-
-		msg, err := k.ReplaceCreatorField(msg, creatorAddress)
+func (k Keeper) ExecuteGenericMsgs(ctx sdk.Context, msgs []*codectypes.Any, creatorAddress string) error {
+	for _, msg := range msgs {
+		msg, err := ReplaceCreatorField(k.cdc, msg, creatorAddress)
 		if err != nil {
 			return err
 		}

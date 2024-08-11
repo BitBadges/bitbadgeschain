@@ -1,0 +1,13 @@
+syntax = "proto3";
+package offers;
+
+option go_package = "bitbadgeschain/x/offers/types";
+
+message OffersPacketData {
+    oneof packet {
+        NoData noData = 1;
+    }
+}
+
+message NoData {
+}
