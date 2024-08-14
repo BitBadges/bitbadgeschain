@@ -358,8 +358,8 @@ func VerifySignature(
 		//Then, we sort the message field by alphabetizing the JSON keys
 
 		//Creates the EIP712 message payload
-		eip712Message := typedData.Message //map[string]interface{}
 		// Marshal the map to JSON
+		eip712Message := typedData.Message //map[string]interface{}
 		jsonData, err := json.Marshal(eip712Message)
 		if err != nil {
 			return sdkerrors.Wrap(err, "failed to marshal json")
@@ -401,6 +401,8 @@ func VerifySignature(
 				if !standardMsgSigValid && !hashedMsgSigValid && !humanReadableMsgSigValid {
 					return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature %s %s", recoveredFeePayerAcc, jsonStr, jsonHashHexStr)
 				}
+
+
 			} else if chain == "Bitcoin" {
 				//verify bitcoin bip322 signature
 				message := string(sortedBytes)

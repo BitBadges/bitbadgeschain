@@ -1,6 +1,7 @@
 package eip712
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
@@ -9,7 +10,7 @@ import (
 
 // NormalizeEmptyTypes is a recursive function that adds empty values to fields that are omitted when serialized with Proto and Amino.
 // EIP712 doesn't support optional fields, so we add the omitted empty values back in here.
-// This includes empty strings, when a uint64 is 0, and when a bool is false.
+// This includes empty strings, when a uint64 is 0 (for cosmos.Uint we do empty string since it is a custom type ""), and when a bool is false.
 func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Type, mapObject map[string]interface{}) (map[string]interface{}, error) {
 	for _, typeObj := range typeObjArr {
 		typeStr := typeObj.Type
@@ -19,12 +20,26 @@ func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Typ
 			mapObject[typeObj.Name] = []interface{}{}
 		} else if strings.Contains(typeStr, "[]") && value != nil {
 			valueArr := value.([]interface{})
-			// Get typeStr without the brackets at the end
+			// Get typeStr without the [] brackets at the end
 			typeStr = typeStr[:len(typeStr)-2]
+
+			//For multi-type arrays, we add Any[] to the end of the typeStr
+			//And the individual element types are going to be the stripped typeStr + "0" or "1" etc
+			isMultiTypeArray := strings.Contains(typeStr, "Any[]")
+			if isMultiTypeArray {
+				typeStr = typeStr[:len(typeStr)-3]
+			}
+
 			for i, value := range valueArr {
+
+				elementTypeStr := typeStr
+				if isMultiTypeArray {
+					elementTypeStr += strconv.Itoa(i)
+				}
+
 				innerMap, ok := value.(map[string]interface{})
 				if ok {
-					newMap, err := NormalizeEmptyTypes(typedData, typedData.Types[typeStr], innerMap)
+					newMap, err := NormalizeEmptyTypes(typedData, typedData.Types[elementTypeStr], innerMap)
 					if err != nil {
 						return mapObject, err
 					}
@@ -35,7 +50,7 @@ func NormalizeEmptyTypes(typedData apitypes.TypedData, typeObjArr []apitypes.Typ
 		} else if typeStr == "string" && value == nil {
 			mapObject[typeObj.Name] = ""
 		} else if typeStr == "uint64" && value == nil {
-			mapObject[typeObj.Name] = "0" //TODO: Does this really work / resolve correctly? We don't use it in any x/badges txs but it should be tested
+			mapObject[typeObj.Name] = "0"
 		} else if typeStr == "bool" && value == nil {
 			mapObject[typeObj.Name] = false
 		} else {
