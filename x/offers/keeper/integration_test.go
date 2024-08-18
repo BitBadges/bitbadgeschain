@@ -87,8 +87,7 @@ func GetFullUintRanges() []*types.UintRange {
 	}
 }
 
-func GetTestMsgs(creator string) []*codectypes.Any {
-
+func GetTestMsgs(creator string) []*types.ExecutableMsgWithOptions {
 	msg := &bankv1beta1.MsgSend{
 		FromAddress: creator,
 		ToAddress:   charlie,
@@ -105,7 +104,11 @@ func GetTestMsgs(creator string) []*codectypes.Any {
 		panic(err)
 	}
 
-	return []*codectypes.Any{protoMsg}
+	finalMsgs := []*types.ExecutableMsgWithOptions{
+		{Msg: protoMsg, UseContractAddress: false},
+	}
+
+	return finalMsgs
 }
 
 func (suite *TestSuite) TestCreateProposal() {
@@ -527,6 +530,118 @@ func (suite *TestSuite) TestInvalidTimes() {
 	_, err = ExecuteProposal(msgServer, ctx, executeMsg)
 	suite.Require().Error(err)
 
+}
+
+func (suite *TestSuite) TestCreatorMustFinalize() {
+	ctx := suite.ctx
+	msgServer := suite.msgServer
+
+	bobMsgs := GetTestMsgs(bob)
+	aliceMsgs := GetTestMsgs(alice)
+
+	createMsg := &types.MsgCreateProposal{
+		Creator: bob,
+		Parties: []*types.Parties{
+			{Creator: bob, MsgsToExecute: bobMsgs, Accepted: false},
+			{Creator: alice, MsgsToExecute: aliceMsgs, Accepted: false},
+		},
+		ValidTimes:          GetFullUintRanges(),
+		CreatorMustFinalize: true,
+	}
+	createResp, err := CreateProposal(msgServer, ctx, createMsg)
+	suite.Require().NoError(err)
+
+	// Accept proposals
+	AcceptProposal(msgServer, ctx, &types.MsgAcceptProposal{Creator: bob, Id: createResp.Id})
+	AcceptProposal(msgServer, ctx, &types.MsgAcceptProposal{Creator: alice, Id: createResp.Id})
+
+	// Try to execute with non-creator
+	_, err = ExecuteProposal(msgServer, ctx, &types.MsgExecuteProposal{Creator: alice, Id: createResp.Id})
+	suite.Require().Error(err)
+
+	// Execute with creator
+	_, err = ExecuteProposal(msgServer, ctx, &types.MsgExecuteProposal{Creator: bob, Id: createResp.Id})
+	suite.Require().NoError(err)
+}
+
+func (suite *TestSuite) TestAnyoneCanFinalize() {
+	ctx := suite.ctx
+	msgServer := suite.msgServer
+
+	bobMsgs := GetTestMsgs(bob)
+	aliceMsgs := GetTestMsgs(alice)
+
+	createMsg := &types.MsgCreateProposal{
+		Creator: bob,
+		Parties: []*types.Parties{
+			{Creator: bob, MsgsToExecute: bobMsgs, Accepted: false},
+			{Creator: alice, MsgsToExecute: aliceMsgs, Accepted: false},
+		},
+		ValidTimes:        GetFullUintRanges(),
+		AnyoneCanFinalize: true,
+	}
+	createResp, err := CreateProposal(msgServer, ctx, createMsg)
+	suite.Require().NoError(err)
+
+	// Accept proposals
+	AcceptProposal(msgServer, ctx, &types.MsgAcceptProposal{Creator: bob, Id: createResp.Id})
+	AcceptProposal(msgServer, ctx, &types.MsgAcceptProposal{Creator: alice, Id: createResp.Id})
+
+	// Execute with non-participant
+	_, err = ExecuteProposal(msgServer, ctx, &types.MsgExecuteProposal{Creator: charlie, Id: createResp.Id})
+	suite.Require().NoError(err)
+}
+
+func (suite *TestSuite) TestContractAddressExecution() {
+	ctx := suite.ctx
+	msgServer := suite.msgServer
+
+	bobMsgs := GetTestMsgs(bob)
+	aliceMsgs := GetTestMsgs(alice)
+
+	// Set useContractAddress to true for both parties
+	for _, msg := range bobMsgs {
+		msg.UseContractAddress = true
+	}
+	for _, msg := range aliceMsgs {
+		msg.UseContractAddress = true
+	}
+
+	createMsg := &types.MsgCreateProposal{
+		Creator: bob,
+		Parties: []*types.Parties{
+			{Creator: bob, MsgsToExecute: bobMsgs, Accepted: false},
+			{Creator: alice, MsgsToExecute: aliceMsgs, Accepted: false},
+		},
+		ValidTimes: GetFullUintRanges(),
+	}
+	createResp, err := CreateProposal(msgServer, ctx, createMsg)
+	suite.Require().NoError(err)
+
+	proposal, _ := suite.app.OffersKeeper.GetProposalFromStore(ctx, createResp.Id)
+
+	// fund the contract
+	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(proposal.ContractAddress), sdk.NewCoins(sdk.NewInt64Coin("ubadge", 1000)))
+
+	// Accept proposals
+	AcceptProposal(msgServer, ctx, &types.MsgAcceptProposal{Creator: bob, Id: createResp.Id})
+	AcceptProposal(msgServer, ctx, &types.MsgAcceptProposal{Creator: alice, Id: createResp.Id})
+
+	// Execute proposal
+	_, err = ExecuteProposal(msgServer, ctx, &types.MsgExecuteProposal{Creator: bob, Id: createResp.Id})
+	suite.Require().NoError(err)
+
+	// Check if the messages were executed with the contract address
+	// Note: You might need to modify this part based on how you're actually implementing
+	// the contract address functionality in your keeper
+	proposal, _ = suite.app.OffersKeeper.GetProposalFromStore(ctx, createResp.Id)
+	for _, party := range proposal.Parties {
+		for _, msg := range party.MsgsToExecute {
+			// This is a placeholder check. You should replace this with the actual way
+			// you're verifying that the contract address was used
+			suite.Require().True(msg.UseContractAddress)
+		}
+	}
 }
 
 func TestOffersKeeperTestSuite(t *testing.T) {

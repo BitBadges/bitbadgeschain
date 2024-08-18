@@ -14,6 +14,8 @@ var (
 	Delimiter         = []byte{0xDD}
 	Placeholder       = []byte{0xFF}
 
+	GenerationPrefix = []byte{0x55}
+
 	IDLength = 8
 
 	BalanceKeyDelimiter = "-"

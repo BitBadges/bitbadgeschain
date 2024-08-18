@@ -42,9 +42,15 @@ message MsgUpdateParams {
 // MsgUpdateParamsResponse defines the response structure for executing a
 // MsgUpdateParams message.
 message MsgUpdateParamsResponse {}
+
+message ExecutableMsgWithOptions {
+  google.protobuf.Any msg = 1 [(cosmos_proto.accepts_interface) = "cosmos.base.v1beta1.Msg"];
+  bool useContractAddress = 2;
+}
+
 message Parties {
   string creator = 1;
-  repeated google.protobuf.Any msgsToExecute = 2 [(cosmos_proto.accepts_interface) = "cosmos.base.v1beta1.Msg"];
+  repeated ExecutableMsgWithOptions msgsToExecute = 2;
   bool accepted = 3;
 }
 
@@ -53,6 +59,9 @@ message Proposal {
   repeated Parties parties = 2;
   string createdBy = 3;
   repeated UintRange validTimes = 4;
+  bool creatorMustFinalize = 5;
+  bool anyoneCanFinalize = 6;
+  string contractAddress = 7;
 }
 
 message MsgCreateProposal {
@@ -61,10 +70,14 @@ message MsgCreateProposal {
   string creator = 1;
   repeated Parties parties = 2;
   repeated UintRange validTimes = 3;
+  bool creatorMustFinalize = 4;
+  bool anyoneCanFinalize = 5;
 }
+
 message MsgCreateProposalResponse {
   string id = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
+
 message MsgAcceptProposal {
   option (cosmos.msg.v1.signer) = "creator";
   option (amino.name) = "bitbadgeschain/x/handshake/MsgAcceptProposal";

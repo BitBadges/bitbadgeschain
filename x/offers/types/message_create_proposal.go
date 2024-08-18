@@ -10,11 +10,13 @@ import (
 
 var _ sdk.Msg = &MsgCreateProposal{}
 
-func NewMsgCreateProposal(creator string, parties []*Parties, validTimes []*UintRange) *MsgCreateProposal {
+func NewMsgCreateProposal(creator string, parties []*Parties, validTimes []*UintRange, creatorMustFinalize bool, anyoneCanFinalize bool) *MsgCreateProposal {
 	return &MsgCreateProposal{
-		Creator:    creator,
-		Parties:    parties,
-		ValidTimes: validTimes,
+		Creator:             creator,
+		Parties:             parties,
+		ValidTimes:          validTimes,
+		CreatorMustFinalize: creatorMustFinalize,
+		AnyoneCanFinalize:   anyoneCanFinalize,
 	}
 }
 

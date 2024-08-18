@@ -51,6 +51,9 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 						{
 							ProtoField: "validTimes",
 						},
+						{
+							ProtoField: "creatorMustFinalize",
+						},
 					},
 				},
 				{
