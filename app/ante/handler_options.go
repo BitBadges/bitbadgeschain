@@ -121,9 +121,7 @@ func newCosmosAnteHandlerEip712(options HandlerOptions, chain string) sdk.AnteHa
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
 
-		// Note: signature verification uses EIP instead of the cosmos signature validator
-		//This also accounts for Solana signatures
-		NewEip712SigVerificationDecorator(options.AccountKeeper, options.SignModeHandler, chain),
+		NewCustomSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler, chain),
 
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
