@@ -20,7 +20,7 @@ service Query {
   }
   rpc MapValue(QueryGetMapValueRequest) returns (QueryGetMapValueResponse) {
     option (google.api.http).get = "/bitbadges/bitbadgeschain/maps/{mapId}/{key}";
-  }
+  } 
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.

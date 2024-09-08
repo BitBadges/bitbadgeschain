@@ -3,7 +3,6 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"bitbadgeschain/x/badges/types"
 
@@ -184,7 +183,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			continue
 		}
 
-		transferStr := "(from: " + fromAddress + ", to: " + toAddress + ", initiatedBy: " + initiatedBy + ", badgeId: " + approval.BadgeIds[0].Start.String() + ", time: " + approval.TransferTimes[0].Start.String() + ", ownershipTime: " + approval.OwnershipTimes[0].Start.String() + ")"
+		transferStr := "attempting to transfer badge ID " + approval.BadgeIds[0].Start.String()
 
 		//If there are no restrictions or criteria, it is a full match and we can deduct all the overlapping (badgeIds, ownershipTimes) from the remaining balances
 		if approval.ApprovalCriteria == nil {
@@ -391,10 +390,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 	//If we didn't find a successful approval, we throw
 	if len(remainingBalances) > 0 {
-		//convert ownership time unix milliseconds number to string
-		timeToConvert := remainingBalances[0].OwnershipTimes[0].Start //unix milliseconds
-		dateStr := time.Unix(0, int64(timeToConvert.Uint64())).Format(time.UnixDate)
-		transferStr := "(from: " + fromAddress + ", to: " + toAddress + ", initiatedBy: " + initiatedBy + ", badgeId: " + remainingBalances[0].BadgeIds[0].Start.String() + ", ownership time: " + dateStr + ")"
+		transferStr := "attempting to transfer badge ID " + remainingBalances[0].BadgeIds[0].Start.String()
 		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval found for transfer: %s", transferStr)
 	}
 
