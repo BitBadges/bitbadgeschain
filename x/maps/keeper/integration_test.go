@@ -17,9 +17,9 @@ import (
 
 const (
 	//Note these are alphanumerically sorted (needed for approvals test)
-	alice   = "cosmos1e0w5t53nrq7p66fye6c8p0ynyhf6y24l4yuxd7"
-	bob     = "cosmos1jmjfq0tplp9tmx4v9uemw72y4d2wa5nr3xn9d3"
-	charlie = "cosmos1xyxs3skf3f4jfqeuv89yyaqvjc6lffavxqhc8g"
+	alice   = "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24l4yuxd7"
+	bob     = "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nr3xn9d3"
+	charlie = "bb1xyxs3skf3f4jfqeuv89yyaqvjc6lffavxqhc8g"
 )
 
 // var DefaultConsensusParams = &abci.ConsensusParams{
