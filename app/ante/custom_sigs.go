@@ -372,7 +372,7 @@ func VerifySignature(
 		if chain == "Solana" || chain == "Bitcoin" {
 
 			//Match address to pubkey to make sure it's equivalent and no random address is used
-			//This is used for indexing purposes (to be able to map Solana addresses to Cosmos addresses,
+			//This is used for indexing purposes (to be able to map Solana addresses to BitBadges addresses,
 			//you need to know the Solana address bc it takes a hash to convert, so you can't go the opposite way)
 			//
 			//Doesn't have any on-chain significance
@@ -396,9 +396,9 @@ func VerifySignature(
 				//verify bitcoin bip322 signature
 				message := string(sortedBytes)
 				// signature := hex.EncodeToString(feePayerSig)
-				cosmosAddress := feePayer.String()
+				bitbadgesAddress := feePayer.String()
 				signature := base64.StdEncoding.EncodeToString(feePayerSig)
-				_, base256Bytes, err := bech32cosmos.DecodeAndConvert(cosmosAddress)
+				_, base256Bytes, err := bech32cosmos.DecodeAndConvert(bitbadgesAddress)
 				if err != nil {
 					return sdkerrors.Wrap(err, "failed to decode and convert signer address")
 				}

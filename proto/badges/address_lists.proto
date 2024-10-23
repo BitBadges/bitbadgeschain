@@ -34,6 +34,6 @@ message AddressList {
   // The user or entity who created the address list.
   string createdBy = 6;
 
-  // The alias cosmos address for the list.
+  // The alias BitBadges address for the list.
   string aliasAddress = 7;
 }

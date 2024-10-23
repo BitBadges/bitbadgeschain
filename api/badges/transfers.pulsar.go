@@ -18446,7 +18446,7 @@ type MerkleChallenge struct {
 	Root string `protobuf:"bytes,1,opt,name=root,proto3" json:"root,omitempty"`
 	// The expected length of the Merkle path for verification. Used to prevent Merkle path truncation attacks.
 	ExpectedProofLength string `protobuf:"bytes,2,opt,name=expectedProofLength,proto3" json:"expectedProofLength,omitempty"`
-	// If true, we will override the user's leaf for their proof with their creator address. Used for whitelist trees where all leaves are valid Cosmos addresses.
+	// If true, we will override the user's leaf for their proof with their creator address. Used for whitelist trees where all leaves are valid BitBadges addresses.
 	UseCreatorAddressAsLeaf bool `protobuf:"varint,3,opt,name=useCreatorAddressAsLeaf,proto3" json:"useCreatorAddressAsLeaf,omitempty"`
 	// The maximum number of times each leaf can be used. Must be 1 if useCreatorAddressAsLeaf is false to prevent replay attacks.
 	MaxUsesPerLeaf string `protobuf:"bytes,4,opt,name=maxUsesPerLeaf,proto3" json:"maxUsesPerLeaf,omitempty"`

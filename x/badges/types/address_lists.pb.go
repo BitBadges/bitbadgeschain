@@ -41,7 +41,7 @@ type AddressList struct {
 	CustomData string `protobuf:"bytes,5,opt,name=customData,proto3" json:"customData,omitempty"`
 	// The user or entity who created the address list.
 	CreatedBy string `protobuf:"bytes,6,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
-	// The alias cosmos address for the list.
+	// The alias BitBadges address for the list.
 	AliasAddress string `protobuf:"bytes,7,opt,name=aliasAddress,proto3" json:"aliasAddress,omitempty"`
 }
 

@@ -2,7 +2,7 @@ package app
 
 import sdk "github.com/cosmos/cosmos-sdk/types"
 
-func init() {
+func InitSDKConfig() {
 	// Set prefixes
 	accountPubKeyPrefix := AccountAddressPrefix + "pub"
 	validatorAddressPrefix := AccountAddressPrefix + "valoper"
@@ -16,4 +16,8 @@ func init() {
 	config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
 	config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
 	config.Seal()
+}
+
+func init() {
+	InitSDKConfig()
 }

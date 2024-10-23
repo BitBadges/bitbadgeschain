@@ -26,12 +26,6 @@ import (
 	sdkmath "cosmossdk.io/math"
 )
 
-// func init() {
-// 	cfg := sdk.GetConfig()
-// 	config.SetBech32Prefixes(cfg)
-// 	config.SetBip44CoinType(cfg)
-// }
-
 var DefaultConsensusParams = &tmproto.ConsensusParams{
 	Block: &tmproto.BlockParams{
 		MaxBytes: 200000,
@@ -49,12 +43,14 @@ var DefaultConsensusParams = &tmproto.ConsensusParams{
 	},
 }
 
-func init() {
-	// feemarkettypes.DefaultMinGasPrice = sdk.ZeroDec()
-	// cfg := sdk.GetConfig()
-	// config.SetBech32Prefixes(cfg)
-	// config.SetBip44CoinType(cfg)
-}
+// func init() {
+// 	// feemarkettypes.DefaultMinGasPrice = sdk.ZeroDec()
+// 	cfg := sdk.GetConfig()
+// 	config.SetBech32Prefixes(cfg)
+// 	config.SetBip44CoinType(cfg)
+
+// 	InitSDKConfig()
+// }
 
 // Setup initializes a new app.
 func Setup(

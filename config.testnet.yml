@@ -14,7 +14,6 @@ accounts:
     - name: burn
       coins:
           - 1ubadge
-      address: cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnrql8a
     #TODO: Remove alice?
     - name: alice
       coins:
@@ -24,7 +23,7 @@ accounts:
       coins:
           - 99999999999999996ubadge
           - 99000000000000000ustake
-      address: cosmos1kx9532ujful8vgg2dht6k544ax4k9qzszjcw04
+      address: bb1kx9532ujful8vgg2dht6k544ax4k9qzsp0sany
     - name: charlie
       coins:
           - 1ubadge

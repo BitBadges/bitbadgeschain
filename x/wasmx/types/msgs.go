@@ -52,5 +52,6 @@ func (msg MsgExecuteContractCompat) GetSigners() []sdk.AccAddress {
 	if err != nil { // should never happen as valid basic rejects invalid addresses
 		panic(err.Error())
 	}
+	
 	return []sdk.AccAddress{senderAddr}
 }
