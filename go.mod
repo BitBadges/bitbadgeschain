@@ -1,6 +1,8 @@
 module bitbadgeschain
 
-go 1.21
+go 1.22
+
+toolchain go1.23.3
 
 replace (
 	// fix upstream GHSA-h395-qcrw-5vmq vulnerability.
@@ -60,6 +62,7 @@ require (
 	github.com/rodaine/table v1.2.0
 	github.com/spf13/cast v1.6.0
 	github.com/storyicon/sigverify v1.1.0
+	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d
 	github.com/tidwall/gjson v1.17.1
 	github.com/tidwall/sjson v1.2.5
 	github.com/unisat-wallet/libbrc20-indexer v1.1.0
@@ -116,6 +119,7 @@ require (
 	github.com/cockroachdb/redact v1.1.5 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20230807174530-cc333fc44b06 // indirect
 	github.com/cometbft/cometbft-db v0.11.0 // indirect
+	github.com/cometbft/cometbft/api v1.0.0-rc.1
 	github.com/consensys/bavard v0.1.13 // indirect
 	github.com/consensys/gnark-crypto v0.12.1 // indirect
 	github.com/containerd/continuity v0.4.3 // indirect
@@ -258,7 +262,6 @@ require (
 	github.com/stoewer/go-strcase v1.3.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/supranational/blst v0.3.12 // indirect
-	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
 	github.com/tidwall/btree v1.7.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
