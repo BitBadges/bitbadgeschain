@@ -217,20 +217,6 @@ func (k Keeper) IncrementNextAddressListCounter(ctx sdk.Context) {
 	k.SetNextAddressListCounter(ctx, nextID.AddUint64(1)) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
 }
 
-/*********************************USED ZKPS*********************************/
-func (k Keeper) SetZKPAsUsedInStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForZKP string, approvalLevel string, approvalId, zkpId string, proofHash string) error {
-	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, []byte{})
-	store.Set(usedZKPTrackerStoreKey(ConstructZKPTreeTrackerKey(collectionId, addressForZKP, approvalLevel, approvalId, zkpId, proofHash)), []byte("1"))
-	return nil
-}
-
-func (k Keeper) GetZKPFromStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForZKP string, approvalLevel string, approvalId, zkpId string, proofHash string) (bool, error) {
-	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, []byte{})
-	return store.Has(usedZKPTrackerStoreKey(ConstructZKPTreeTrackerKey(collectionId, addressForZKP, approvalLevel, approvalId, zkpId, proofHash))), nil
-}
-
 /********************************************************************************/
 // Sets a usedClaimData in the store using UsedClaimDataKey ([]byte{0x07}) as the prefix. No check if store has key already.
 func (k Keeper) IncrementChallengeTrackerInStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {

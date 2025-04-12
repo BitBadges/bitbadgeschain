@@ -924,6 +924,7 @@ func _Query_GetBalance_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+var Query_serviceDesc = _Query_serviceDesc
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "badges.Query",
 	HandlerType: (*QueryServer)(nil),

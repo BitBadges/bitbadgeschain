@@ -287,23 +287,6 @@ message ApprovalTracker {
   repeated Balance amounts = 2;
 }
 
-message ZkProof {
-  // The verification key for the proof.
-  string verificationKey = 1;
-  // The URI associated with this proof, optionally providing metadata about the proof.
-  string uri = 2;
-  // Arbitrary custom data associated with this proof.
-  string customData = 3;
-  // The ID of this proof
-  string zkpTrackerId = 4;
-}
-
-message ZkProofSolution {
-  // The public inputs
-  string publicInputs = 1;
-  // The proof
-  string proof = 2;
-}
 
 message CoinTransfer {
   // The address of the recipient of the transfer.
@@ -314,80 +297,68 @@ message CoinTransfer {
 
 // ApprovalCriteria defines the criteria for approving transfers.
 message ApprovalCriteria {
-  // List of badges that the user must own for approval.
-  repeated MustOwnBadges mustOwnBadges = 1;
   // Merkle challenge that must be satisfied for approval.
-  repeated MerkleChallenge merkleChallenges = 2;
+  repeated MerkleChallenge merkleChallenges = 1;
   // Predetermined balances for eeach approval.
-  PredeterminedBalances predeterminedBalances = 3;
+  PredeterminedBalances predeterminedBalances = 2;
   // Threshold limit of amounts that can be transferred using this approval.
-  ApprovalAmounts approvalAmounts = 4;
+  ApprovalAmounts approvalAmounts = 3;
   // Maximum number of transfers that can be processed using this approval.
-  MaxNumTransfers maxNumTransfers = 5;
-  // The ZKPs that need to be solved for approval.
-  repeated ZkProof zkProofs = 6;
+  MaxNumTransfers maxNumTransfers = 4;
   // The sdk.Coins that need to be transferred for approval.
-  repeated CoinTransfer coinTransfers = 7;
+  repeated CoinTransfer coinTransfers = 5;
 
   // Require the "to" address to be equal to the "initiated by" address for approval.
-  bool requireToEqualsInitiatedBy = 9;
+  bool requireToEqualsInitiatedBy = 6;
   // Require the "from" address to be equal to the "initiated by" address for approval.
-  bool requireFromEqualsInitiatedBy = 10;
+  bool requireFromEqualsInitiatedBy = 7;
   // Require the "to" address to not be equal to the "initiated by" address for approval.
-  bool requireToDoesNotEqualInitiatedBy = 11;
+  bool requireToDoesNotEqualInitiatedBy = 8;
   // Require the "from" address to not be equal to the "initiated by" address for approval.
-  bool requireFromDoesNotEqualInitiatedBy = 12;
+  bool requireFromDoesNotEqualInitiatedBy = 9;
 
   // Overrides the user's outgoing approvals for approval.
-  bool overridesFromOutgoingApprovals = 13;
+  bool overridesFromOutgoingApprovals = 10;
   // Overrides the user's incoming approvals for approval.
-  bool overridesToIncomingApprovals = 14;
+  bool overridesToIncomingApprovals = 11;
 }
 
 // OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.
 message OutgoingApprovalCriteria {
-  // List of badges that the user must own for approval.
-  repeated MustOwnBadges mustOwnBadges = 1;
   // Merkle challenge that must be satisfied for approval.
-  repeated MerkleChallenge merkleChallenges = 2;
+  repeated MerkleChallenge merkleChallenges = 1;
   // Predetermined balances for eeach approval.
-  PredeterminedBalances predeterminedBalances = 3;
+  PredeterminedBalances predeterminedBalances = 2;
   // Threshold limit of amounts that can be transferred using this approval.
-  ApprovalAmounts approvalAmounts = 4;
+  ApprovalAmounts approvalAmounts = 3;
   // Maximum number of transfers that can be processed using this approval.
-  MaxNumTransfers maxNumTransfers = 5;
-  // The ZKPs that need to be solved for approval.
-  repeated ZkProof zkProofs = 6;
-// The sdk.Coins that need to be transferred for approval.
-repeated CoinTransfer coinTransfers = 7;
+  MaxNumTransfers maxNumTransfers = 4;
+  // The sdk.Coins that need to be transferred for approval.
+  repeated CoinTransfer coinTransfers = 5;
 
   // Require the "to" address to be equal to the "initiated by" address for approval.
-  bool requireToEqualsInitiatedBy = 9;
+  bool requireToEqualsInitiatedBy = 6;
   // Require the "to" address to not be equal to the "initiated by" address for approval.
-  bool requireToDoesNotEqualInitiatedBy = 11;
+  bool requireToDoesNotEqualInitiatedBy = 7;
 }
 
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
 message IncomingApprovalCriteria {
-  // List of badges that the user must own for approval.
-  repeated MustOwnBadges mustOwnBadges = 1;
   // Merkle challenge that must be satisfied for approval.
-  repeated MerkleChallenge merkleChallenges= 2;
+  repeated MerkleChallenge merkleChallenges= 1;
   // Predetermined balances for eeach approval.
-  PredeterminedBalances predeterminedBalances = 3;
+  PredeterminedBalances predeterminedBalances = 2;
   // Threshold limit of amounts that can be transferred using this approval.
-  ApprovalAmounts approvalAmounts = 4;
+  ApprovalAmounts approvalAmounts = 3;
   // Maximum number of transfers that can be processed using this approval.
-  MaxNumTransfers maxNumTransfers = 5;
-  // The ZKPs that need to be solved for approval.
-  repeated ZkProof zkProofs = 6;
-// The sdk.Coins that need to be transferred for approval.
-repeated CoinTransfer coinTransfers = 7;
+  MaxNumTransfers maxNumTransfers = 4;
+  // The sdk.Coins that need to be transferred for approval.
+  repeated CoinTransfer coinTransfers = 5;
 
   // Require the "from" address to be equal to the "initiated by" address for approval.
-  bool requireFromEqualsInitiatedBy = 10;
+  bool requireFromEqualsInitiatedBy = 6;
   // Require the "from" address to not be equal to the "initiated by" address for approval.
-  bool requireFromDoesNotEqualInitiatedBy = 12;
+  bool requireFromDoesNotEqualInitiatedBy = 7;
 }
 
 
@@ -455,8 +426,6 @@ message Transfer {
   // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
   // If false, we will check the prioritized approvals first and then scan through the rest of the approvals. 
   bool onlyCheckPrioritizedOutgoingApprovals = 10;
-  // The ZKPs that need to be solved for approval.
-  repeated ZkProofSolution zkProofSolutions = 11;
 }
 
 // MerklePathItem represents an item in a Merkle path.

@@ -877,132 +877,6 @@ func (m *ApprovalTracker) GetAmounts() []*Balance {
 	return nil
 }
 
-type ZkProof struct {
-	// The verification key for the proof.
-	VerificationKey string `protobuf:"bytes,1,opt,name=verificationKey,proto3" json:"verificationKey,omitempty"`
-	// The URI associated with this proof, optionally providing metadata about the proof.
-	Uri string `protobuf:"bytes,2,opt,name=uri,proto3" json:"uri,omitempty"`
-	// Arbitrary custom data associated with this proof.
-	CustomData string `protobuf:"bytes,3,opt,name=customData,proto3" json:"customData,omitempty"`
-	// The ID of this proof
-	ZkpTrackerId string `protobuf:"bytes,4,opt,name=zkpTrackerId,proto3" json:"zkpTrackerId,omitempty"`
-}
-
-func (m *ZkProof) Reset()         { *m = ZkProof{} }
-func (m *ZkProof) String() string { return proto.CompactTextString(m) }
-func (*ZkProof) ProtoMessage()    {}
-func (*ZkProof) Descriptor() ([]byte, []int) {
-	return fileDescriptor_db7d8388ebf2a03f, []int{11}
-}
-func (m *ZkProof) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ZkProof) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ZkProof.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ZkProof) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ZkProof.Merge(m, src)
-}
-func (m *ZkProof) XXX_Size() int {
-	return m.Size()
-}
-func (m *ZkProof) XXX_DiscardUnknown() {
-	xxx_messageInfo_ZkProof.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ZkProof proto.InternalMessageInfo
-
-func (m *ZkProof) GetVerificationKey() string {
-	if m != nil {
-		return m.VerificationKey
-	}
-	return ""
-}
-
-func (m *ZkProof) GetUri() string {
-	if m != nil {
-		return m.Uri
-	}
-	return ""
-}
-
-func (m *ZkProof) GetCustomData() string {
-	if m != nil {
-		return m.CustomData
-	}
-	return ""
-}
-
-func (m *ZkProof) GetZkpTrackerId() string {
-	if m != nil {
-		return m.ZkpTrackerId
-	}
-	return ""
-}
-
-type ZkProofSolution struct {
-	// The public inputs
-	PublicInputs string `protobuf:"bytes,1,opt,name=publicInputs,proto3" json:"publicInputs,omitempty"`
-	// The proof
-	Proof string `protobuf:"bytes,2,opt,name=proof,proto3" json:"proof,omitempty"`
-}
-
-func (m *ZkProofSolution) Reset()         { *m = ZkProofSolution{} }
-func (m *ZkProofSolution) String() string { return proto.CompactTextString(m) }
-func (*ZkProofSolution) ProtoMessage()    {}
-func (*ZkProofSolution) Descriptor() ([]byte, []int) {
-	return fileDescriptor_db7d8388ebf2a03f, []int{12}
-}
-func (m *ZkProofSolution) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ZkProofSolution) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ZkProofSolution.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ZkProofSolution) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ZkProofSolution.Merge(m, src)
-}
-func (m *ZkProofSolution) XXX_Size() int {
-	return m.Size()
-}
-func (m *ZkProofSolution) XXX_DiscardUnknown() {
-	xxx_messageInfo_ZkProofSolution.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ZkProofSolution proto.InternalMessageInfo
-
-func (m *ZkProofSolution) GetPublicInputs() string {
-	if m != nil {
-		return m.PublicInputs
-	}
-	return ""
-}
-
-func (m *ZkProofSolution) GetProof() string {
-	if m != nil {
-		return m.Proof
-	}
-	return ""
-}
-
 type CoinTransfer struct {
 	// The address of the recipient of the transfer.
 	To string `protobuf:"bytes,1,opt,name=to,proto3" json:"to,omitempty"`
@@ -1014,7 +888,7 @@ func (m *CoinTransfer) Reset()         { *m = CoinTransfer{} }
 func (m *CoinTransfer) String() string { return proto.CompactTextString(m) }
 func (*CoinTransfer) ProtoMessage()    {}
 func (*CoinTransfer) Descriptor() ([]byte, []int) {
-	return fileDescriptor_db7d8388ebf2a03f, []int{13}
+	return fileDescriptor_db7d8388ebf2a03f, []int{11}
 }
 func (m *CoinTransfer) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1059,39 +933,35 @@ func (m *CoinTransfer) GetCoins() []*types.Coin {
 
 // ApprovalCriteria defines the criteria for approving transfers.
 type ApprovalCriteria struct {
-	// List of badges that the user must own for approval.
-	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,1,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
 	// Merkle challenge that must be satisfied for approval.
-	MerkleChallenges []*MerkleChallenge `protobuf:"bytes,2,rep,name=merkleChallenges,proto3" json:"merkleChallenges,omitempty"`
+	MerkleChallenges []*MerkleChallenge `protobuf:"bytes,1,rep,name=merkleChallenges,proto3" json:"merkleChallenges,omitempty"`
 	// Predetermined balances for eeach approval.
-	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,3,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
+	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,2,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
 	// Threshold limit of amounts that can be transferred using this approval.
-	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,4,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
+	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,3,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
 	// Maximum number of transfers that can be processed using this approval.
-	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,5,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
-	// The ZKPs that need to be solved for approval.
-	ZkProofs []*ZkProof `protobuf:"bytes,6,rep,name=zkProofs,proto3" json:"zkProofs,omitempty"`
+	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,4,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
 	// The sdk.Coins that need to be transferred for approval.
-	CoinTransfers []*CoinTransfer `protobuf:"bytes,7,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
+	CoinTransfers []*CoinTransfer `protobuf:"bytes,5,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
 	// Require the "to" address to be equal to the "initiated by" address for approval.
-	RequireToEqualsInitiatedBy bool `protobuf:"varint,9,opt,name=requireToEqualsInitiatedBy,proto3" json:"requireToEqualsInitiatedBy,omitempty"`
+	RequireToEqualsInitiatedBy bool `protobuf:"varint,6,opt,name=requireToEqualsInitiatedBy,proto3" json:"requireToEqualsInitiatedBy,omitempty"`
 	// Require the "from" address to be equal to the "initiated by" address for approval.
-	RequireFromEqualsInitiatedBy bool `protobuf:"varint,10,opt,name=requireFromEqualsInitiatedBy,proto3" json:"requireFromEqualsInitiatedBy,omitempty"`
+	RequireFromEqualsInitiatedBy bool `protobuf:"varint,7,opt,name=requireFromEqualsInitiatedBy,proto3" json:"requireFromEqualsInitiatedBy,omitempty"`
 	// Require the "to" address to not be equal to the "initiated by" address for approval.
-	RequireToDoesNotEqualInitiatedBy bool `protobuf:"varint,11,opt,name=requireToDoesNotEqualInitiatedBy,proto3" json:"requireToDoesNotEqualInitiatedBy,omitempty"`
+	RequireToDoesNotEqualInitiatedBy bool `protobuf:"varint,8,opt,name=requireToDoesNotEqualInitiatedBy,proto3" json:"requireToDoesNotEqualInitiatedBy,omitempty"`
 	// Require the "from" address to not be equal to the "initiated by" address for approval.
-	RequireFromDoesNotEqualInitiatedBy bool `protobuf:"varint,12,opt,name=requireFromDoesNotEqualInitiatedBy,proto3" json:"requireFromDoesNotEqualInitiatedBy,omitempty"`
+	RequireFromDoesNotEqualInitiatedBy bool `protobuf:"varint,9,opt,name=requireFromDoesNotEqualInitiatedBy,proto3" json:"requireFromDoesNotEqualInitiatedBy,omitempty"`
 	// Overrides the user's outgoing approvals for approval.
-	OverridesFromOutgoingApprovals bool `protobuf:"varint,13,opt,name=overridesFromOutgoingApprovals,proto3" json:"overridesFromOutgoingApprovals,omitempty"`
+	OverridesFromOutgoingApprovals bool `protobuf:"varint,10,opt,name=overridesFromOutgoingApprovals,proto3" json:"overridesFromOutgoingApprovals,omitempty"`
 	// Overrides the user's incoming approvals for approval.
-	OverridesToIncomingApprovals bool `protobuf:"varint,14,opt,name=overridesToIncomingApprovals,proto3" json:"overridesToIncomingApprovals,omitempty"`
+	OverridesToIncomingApprovals bool `protobuf:"varint,11,opt,name=overridesToIncomingApprovals,proto3" json:"overridesToIncomingApprovals,omitempty"`
 }
 
 func (m *ApprovalCriteria) Reset()         { *m = ApprovalCriteria{} }
 func (m *ApprovalCriteria) String() string { return proto.CompactTextString(m) }
 func (*ApprovalCriteria) ProtoMessage()    {}
 func (*ApprovalCriteria) Descriptor() ([]byte, []int) {
-	return fileDescriptor_db7d8388ebf2a03f, []int{14}
+	return fileDescriptor_db7d8388ebf2a03f, []int{12}
 }
 func (m *ApprovalCriteria) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1120,13 +990,6 @@ func (m *ApprovalCriteria) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ApprovalCriteria proto.InternalMessageInfo
 
-func (m *ApprovalCriteria) GetMustOwnBadges() []*MustOwnBadges {
-	if m != nil {
-		return m.MustOwnBadges
-	}
-	return nil
-}
-
 func (m *ApprovalCriteria) GetMerkleChallenges() []*MerkleChallenge {
 	if m != nil {
 		return m.MerkleChallenges
@@ -1151,13 +1014,6 @@ func (m *ApprovalCriteria) GetApprovalAmounts() *ApprovalAmounts {
 func (m *ApprovalCriteria) GetMaxNumTransfers() *MaxNumTransfers {
 	if m != nil {
 		return m.MaxNumTransfers
-	}
-	return nil
-}
-
-func (m *ApprovalCriteria) GetZkProofs() []*ZkProof {
-	if m != nil {
-		return m.ZkProofs
 	}
 	return nil
 }
@@ -1213,31 +1069,27 @@ func (m *ApprovalCriteria) GetOverridesToIncomingApprovals() bool {
 
 // OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.
 type OutgoingApprovalCriteria struct {
-	// List of badges that the user must own for approval.
-	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,1,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
 	// Merkle challenge that must be satisfied for approval.
-	MerkleChallenges []*MerkleChallenge `protobuf:"bytes,2,rep,name=merkleChallenges,proto3" json:"merkleChallenges,omitempty"`
+	MerkleChallenges []*MerkleChallenge `protobuf:"bytes,1,rep,name=merkleChallenges,proto3" json:"merkleChallenges,omitempty"`
 	// Predetermined balances for eeach approval.
-	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,3,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
+	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,2,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
 	// Threshold limit of amounts that can be transferred using this approval.
-	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,4,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
+	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,3,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
 	// Maximum number of transfers that can be processed using this approval.
-	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,5,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
-	// The ZKPs that need to be solved for approval.
-	ZkProofs []*ZkProof `protobuf:"bytes,6,rep,name=zkProofs,proto3" json:"zkProofs,omitempty"`
+	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,4,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
 	// The sdk.Coins that need to be transferred for approval.
-	CoinTransfers []*CoinTransfer `protobuf:"bytes,7,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
+	CoinTransfers []*CoinTransfer `protobuf:"bytes,5,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
 	// Require the "to" address to be equal to the "initiated by" address for approval.
-	RequireToEqualsInitiatedBy bool `protobuf:"varint,9,opt,name=requireToEqualsInitiatedBy,proto3" json:"requireToEqualsInitiatedBy,omitempty"`
+	RequireToEqualsInitiatedBy bool `protobuf:"varint,6,opt,name=requireToEqualsInitiatedBy,proto3" json:"requireToEqualsInitiatedBy,omitempty"`
 	// Require the "to" address to not be equal to the "initiated by" address for approval.
-	RequireToDoesNotEqualInitiatedBy bool `protobuf:"varint,11,opt,name=requireToDoesNotEqualInitiatedBy,proto3" json:"requireToDoesNotEqualInitiatedBy,omitempty"`
+	RequireToDoesNotEqualInitiatedBy bool `protobuf:"varint,7,opt,name=requireToDoesNotEqualInitiatedBy,proto3" json:"requireToDoesNotEqualInitiatedBy,omitempty"`
 }
 
 func (m *OutgoingApprovalCriteria) Reset()         { *m = OutgoingApprovalCriteria{} }
 func (m *OutgoingApprovalCriteria) String() string { return proto.CompactTextString(m) }
 func (*OutgoingApprovalCriteria) ProtoMessage()    {}
 func (*OutgoingApprovalCriteria) Descriptor() ([]byte, []int) {
-	return fileDescriptor_db7d8388ebf2a03f, []int{15}
+	return fileDescriptor_db7d8388ebf2a03f, []int{13}
 }
 func (m *OutgoingApprovalCriteria) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1265,13 +1117,6 @@ func (m *OutgoingApprovalCriteria) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_OutgoingApprovalCriteria proto.InternalMessageInfo
-
-func (m *OutgoingApprovalCriteria) GetMustOwnBadges() []*MustOwnBadges {
-	if m != nil {
-		return m.MustOwnBadges
-	}
-	return nil
-}
 
 func (m *OutgoingApprovalCriteria) GetMerkleChallenges() []*MerkleChallenge {
 	if m != nil {
@@ -1301,13 +1146,6 @@ func (m *OutgoingApprovalCriteria) GetMaxNumTransfers() *MaxNumTransfers {
 	return nil
 }
 
-func (m *OutgoingApprovalCriteria) GetZkProofs() []*ZkProof {
-	if m != nil {
-		return m.ZkProofs
-	}
-	return nil
-}
-
 func (m *OutgoingApprovalCriteria) GetCoinTransfers() []*CoinTransfer {
 	if m != nil {
 		return m.CoinTransfers
@@ -1331,31 +1169,27 @@ func (m *OutgoingApprovalCriteria) GetRequireToDoesNotEqualInitiatedBy() bool {
 
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
 type IncomingApprovalCriteria struct {
-	// List of badges that the user must own for approval.
-	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,1,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
 	// Merkle challenge that must be satisfied for approval.
-	MerkleChallenges []*MerkleChallenge `protobuf:"bytes,2,rep,name=merkleChallenges,proto3" json:"merkleChallenges,omitempty"`
+	MerkleChallenges []*MerkleChallenge `protobuf:"bytes,1,rep,name=merkleChallenges,proto3" json:"merkleChallenges,omitempty"`
 	// Predetermined balances for eeach approval.
-	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,3,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
+	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,2,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
 	// Threshold limit of amounts that can be transferred using this approval.
-	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,4,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
+	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,3,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
 	// Maximum number of transfers that can be processed using this approval.
-	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,5,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
-	// The ZKPs that need to be solved for approval.
-	ZkProofs []*ZkProof `protobuf:"bytes,6,rep,name=zkProofs,proto3" json:"zkProofs,omitempty"`
+	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,4,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
 	// The sdk.Coins that need to be transferred for approval.
-	CoinTransfers []*CoinTransfer `protobuf:"bytes,7,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
+	CoinTransfers []*CoinTransfer `protobuf:"bytes,5,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
 	// Require the "from" address to be equal to the "initiated by" address for approval.
-	RequireFromEqualsInitiatedBy bool `protobuf:"varint,10,opt,name=requireFromEqualsInitiatedBy,proto3" json:"requireFromEqualsInitiatedBy,omitempty"`
+	RequireFromEqualsInitiatedBy bool `protobuf:"varint,6,opt,name=requireFromEqualsInitiatedBy,proto3" json:"requireFromEqualsInitiatedBy,omitempty"`
 	// Require the "from" address to not be equal to the "initiated by" address for approval.
-	RequireFromDoesNotEqualInitiatedBy bool `protobuf:"varint,12,opt,name=requireFromDoesNotEqualInitiatedBy,proto3" json:"requireFromDoesNotEqualInitiatedBy,omitempty"`
+	RequireFromDoesNotEqualInitiatedBy bool `protobuf:"varint,7,opt,name=requireFromDoesNotEqualInitiatedBy,proto3" json:"requireFromDoesNotEqualInitiatedBy,omitempty"`
 }
 
 func (m *IncomingApprovalCriteria) Reset()         { *m = IncomingApprovalCriteria{} }
 func (m *IncomingApprovalCriteria) String() string { return proto.CompactTextString(m) }
 func (*IncomingApprovalCriteria) ProtoMessage()    {}
 func (*IncomingApprovalCriteria) Descriptor() ([]byte, []int) {
-	return fileDescriptor_db7d8388ebf2a03f, []int{16}
+	return fileDescriptor_db7d8388ebf2a03f, []int{14}
 }
 func (m *IncomingApprovalCriteria) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1384,13 +1218,6 @@ func (m *IncomingApprovalCriteria) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_IncomingApprovalCriteria proto.InternalMessageInfo
 
-func (m *IncomingApprovalCriteria) GetMustOwnBadges() []*MustOwnBadges {
-	if m != nil {
-		return m.MustOwnBadges
-	}
-	return nil
-}
-
 func (m *IncomingApprovalCriteria) GetMerkleChallenges() []*MerkleChallenge {
 	if m != nil {
 		return m.MerkleChallenges
@@ -1415,13 +1242,6 @@ func (m *IncomingApprovalCriteria) GetApprovalAmounts() *ApprovalAmounts {
 func (m *IncomingApprovalCriteria) GetMaxNumTransfers() *MaxNumTransfers {
 	if m != nil {
 		return m.MaxNumTransfers
-	}
-	return nil
-}
-
-func (m *IncomingApprovalCriteria) GetZkProofs() []*ZkProof {
-	if m != nil {
-		return m.ZkProofs
 	}
 	return nil
 }
@@ -1475,7 +1295,7 @@ func (m *CollectionApproval) Reset()         { *m = CollectionApproval{} }
 func (m *CollectionApproval) String() string { return proto.CompactTextString(m) }
 func (*CollectionApproval) ProtoMessage()    {}
 func (*CollectionApproval) Descriptor() ([]byte, []int) {
-	return fileDescriptor_db7d8388ebf2a03f, []int{17}
+	return fileDescriptor_db7d8388ebf2a03f, []int{15}
 }
 func (m *CollectionApproval) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1588,7 +1408,7 @@ func (m *ApprovalIdentifierDetails) Reset()         { *m = ApprovalIdentifierDet
 func (m *ApprovalIdentifierDetails) String() string { return proto.CompactTextString(m) }
 func (*ApprovalIdentifierDetails) ProtoMessage()    {}
 func (*ApprovalIdentifierDetails) Descriptor() ([]byte, []int) {
-	return fileDescriptor_db7d8388ebf2a03f, []int{18}
+	return fileDescriptor_db7d8388ebf2a03f, []int{16}
 }
 func (m *ApprovalIdentifierDetails) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1668,15 +1488,13 @@ type Transfer struct {
 	// If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
 	// If false, we will check the prioritized approvals first and then scan through the rest of the approvals.
 	OnlyCheckPrioritizedOutgoingApprovals bool `protobuf:"varint,10,opt,name=onlyCheckPrioritizedOutgoingApprovals,proto3" json:"onlyCheckPrioritizedOutgoingApprovals,omitempty"`
-	// The ZKPs that need to be solved for approval.
-	ZkProofSolutions []*ZkProofSolution `protobuf:"bytes,11,rep,name=zkProofSolutions,proto3" json:"zkProofSolutions,omitempty"`
 }
 
 func (m *Transfer) Reset()         { *m = Transfer{} }
 func (m *Transfer) String() string { return proto.CompactTextString(m) }
 func (*Transfer) ProtoMessage()    {}
 func (*Transfer) Descriptor() ([]byte, []int) {
-	return fileDescriptor_db7d8388ebf2a03f, []int{19}
+	return fileDescriptor_db7d8388ebf2a03f, []int{17}
 }
 func (m *Transfer) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1775,13 +1593,6 @@ func (m *Transfer) GetOnlyCheckPrioritizedOutgoingApprovals() bool {
 	return false
 }
 
-func (m *Transfer) GetZkProofSolutions() []*ZkProofSolution {
-	if m != nil {
-		return m.ZkProofSolutions
-	}
-	return nil
-}
-
 // MerklePathItem represents an item in a Merkle path.
 type MerklePathItem struct {
 	// The hash of the sibling node (aunt) in the Merkle path.
@@ -1794,7 +1605,7 @@ func (m *MerklePathItem) Reset()         { *m = MerklePathItem{} }
 func (m *MerklePathItem) String() string { return proto.CompactTextString(m) }
 func (*MerklePathItem) ProtoMessage()    {}
 func (*MerklePathItem) Descriptor() ([]byte, []int) {
-	return fileDescriptor_db7d8388ebf2a03f, []int{20}
+	return fileDescriptor_db7d8388ebf2a03f, []int{18}
 }
 func (m *MerklePathItem) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1849,7 +1660,7 @@ func (m *MerkleProof) Reset()         { *m = MerkleProof{} }
 func (m *MerkleProof) String() string { return proto.CompactTextString(m) }
 func (*MerkleProof) ProtoMessage()    {}
 func (*MerkleProof) Descriptor() ([]byte, []int) {
-	return fileDescriptor_db7d8388ebf2a03f, []int{21}
+	return fileDescriptor_db7d8388ebf2a03f, []int{19}
 }
 func (m *MerkleProof) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1904,8 +1715,6 @@ func init() {
 	proto.RegisterType((*ApprovalAmounts)(nil), "badges.ApprovalAmounts")
 	proto.RegisterType((*MaxNumTransfers)(nil), "badges.MaxNumTransfers")
 	proto.RegisterType((*ApprovalTracker)(nil), "badges.ApprovalTracker")
-	proto.RegisterType((*ZkProof)(nil), "badges.ZkProof")
-	proto.RegisterType((*ZkProofSolution)(nil), "badges.ZkProofSolution")
 	proto.RegisterType((*CoinTransfer)(nil), "badges.CoinTransfer")
 	proto.RegisterType((*ApprovalCriteria)(nil), "badges.ApprovalCriteria")
 	proto.RegisterType((*OutgoingApprovalCriteria)(nil), "badges.OutgoingApprovalCriteria")
@@ -1920,123 +1729,114 @@ func init() {
 func init() { proto.RegisterFile("badges/transfers.proto", fileDescriptor_db7d8388ebf2a03f) }
 
 var fileDescriptor_db7d8388ebf2a03f = []byte{
-	// 1844 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x59, 0xcb, 0x6f, 0xdc, 0xc6,
-	0x19, 0xf7, 0xee, 0xea, 0xf9, 0xad, 0x5e, 0x19, 0x4b, 0xca, 0x5a, 0xb6, 0x37, 0x2a, 0xe3, 0xa2,
-	0x0a, 0x92, 0x4a, 0x8d, 0xfb, 0x70, 0x1f, 0xa8, 0x51, 0xed, 0xaa, 0x01, 0xd6, 0x91, 0x2c, 0x61,
-	0x2c, 0x03, 0x45, 0x50, 0xb4, 0x1d, 0x71, 0x47, 0x2b, 0x42, 0x24, 0x87, 0x19, 0x0e, 0x55, 0xc9,
-	0xe7, 0x02, 0x45, 0x91, 0x4b, 0xff, 0x87, 0x1e, 0x7a, 0xe8, 0x1f, 0x50, 0xf4, 0x3f, 0x08, 0xd0,
-	0x4b, 0x4e, 0x45, 0xd0, 0x43, 0x50, 0xd8, 0xd7, 0x1e, 0x7b, 0x6f, 0x31, 0xc3, 0x99, 0x5d, 0x72,
-	0x48, 0xae, 0xd6, 0x81, 0x4f, 0x85, 0x6e, 0xdc, 0x99, 0xdf, 0xf7, 0xe3, 0xf0, 0x7b, 0xce, 0xf7,
-	0x2d, 0xac, 0x9f, 0x90, 0xfe, 0x80, 0xc6, 0x3b, 0x82, 0x93, 0x30, 0x3e, 0xa5, 0x3c, 0xde, 0x8e,
-	0x38, 0x13, 0x0c, 0xcd, 0xa4, 0xeb, 0x1b, 0xab, 0x03, 0x36, 0x60, 0x6a, 0x69, 0x47, 0x3e, 0xa5,
-	0xbb, 0x1b, 0x2d, 0x2d, 0x15, 0x51, 0x1e, 0x78, 0x71, 0xec, 0xb1, 0x50, 0xcb, 0x6d, 0x6c, 0xe8,
-	0x1d, 0xd2, 0xef, 0x73, 0x1a, 0xc7, 0xbf, 0xf6, 0xbd, 0x58, 0x98, 0xbd, 0x35, 0xbd, 0x77, 0x42,
-	0x7c, 0x12, 0xba, 0xd4, 0x2c, 0xb7, 0x5d, 0x16, 0x07, 0x4c, 0x2e, 0xc7, 0x74, 0xe7, 0xe2, 0xc3,
-	0x13, 0x2a, 0xc8, 0x87, 0x3b, 0x2e, 0xf3, 0xc2, 0x74, 0xdf, 0xf9, 0x47, 0x03, 0x56, 0x9e, 0xc7,
-	0x94, 0x77, 0x52, 0xb1, 0x67, 0x82, 0x71, 0x8a, 0xde, 0x87, 0x39, 0x43, 0xd3, 0xaa, 0x6d, 0x36,
-	0xb6, 0x9a, 0x0f, 0x97, 0xb7, 0x53, 0xfa, 0x6d, 0x8d, 0xc3, 0x43, 0x00, 0x7a, 0x02, 0x6f, 0xb1,
-	0x44, 0x0c, 0x98, 0x17, 0x0e, 0x76, 0xa3, 0x88, 0xb3, 0x0b, 0xe2, 0xc7, 0xad, 0xba, 0x92, 0xba,
-	0x67, 0xa4, 0xe4, 0x1b, 0x0e, 0x2d, 0x10, 0x2e, 0x8a, 0x49, 0x2e, 0x2f, 0x74, 0x59, 0x90, 0xe3,
-	0x6a, 0x14, 0xb9, 0x7a, 0x16, 0x08, 0x17, 0xc5, 0xd0, 0x2f, 0xe1, 0x3d, 0x92, 0x08, 0x96, 0x2e,
-	0xd0, 0x67, 0xd4, 0x3f, 0xed, 0x85, 0x9e, 0xf0, 0x88, 0xa0, 0x7d, 0x73, 0x94, 0x63, 0x63, 0x97,
-	0xd6, 0xd4, 0x66, 0x6d, 0x6b, 0x0e, 0x4f, 0x2e, 0x30, 0x8e, 0xdd, 0x1c, 0x6e, 0xc4, 0x3e, 0x3d,
-	0x9e, 0xbd, 0x20, 0x80, 0x76, 0x61, 0x39, 0x89, 0x29, 0x3f, 0x1a, 0x79, 0x40, 0x6b, 0x66, 0xb3,
-	0xb6, 0xd5, 0x7c, 0xf8, 0x76, 0x56, 0x0b, 0x99, 0x6d, 0x6c, 0xe3, 0x9d, 0xbf, 0xd6, 0x61, 0xf9,
-	0x80, 0xf2, 0x73, 0x9f, 0x76, 0xcf, 0x88, 0xef, 0xd3, 0x70, 0x40, 0x11, 0x82, 0x29, 0xce, 0x98,
-	0x68, 0xd5, 0x36, 0x6b, 0x5b, 0xf3, 0x58, 0x3d, 0xa3, 0xc7, 0x70, 0x9b, 0x5e, 0x46, 0xd4, 0x15,
-	0xb4, 0x7f, 0xc4, 0x19, 0x3b, 0xdd, 0xa7, 0xe1, 0x40, 0x9c, 0xb5, 0xea, 0x12, 0xd2, 0x59, 0xf8,
-	0xfc, 0xab, 0x77, 0x6e, 0xfd, 0xf3, 0xab, 0x77, 0xa6, 0x9e, 0x7b, 0xa1, 0xc0, 0x65, 0x40, 0xf4,
-	0x43, 0x78, 0x3b, 0x89, 0x69, 0x97, 0x53, 0x22, 0x18, 0xdf, 0x4d, 0x1d, 0x73, 0x37, 0xde, 0xa7,
-	0xe4, 0xb4, 0xd5, 0x50, 0x9f, 0x5d, 0xb5, 0x8d, 0xbe, 0x07, 0x4b, 0x01, 0xb9, 0x7c, 0x1e, 0xd3,
-	0xf8, 0x88, 0x72, 0x25, 0x30, 0x55, 0xf2, 0x52, 0x0b, 0x83, 0x56, 0xa0, 0x91, 0x70, 0x4f, 0xa9,
-	0x74, 0x1e, 0xcb, 0x47, 0xd4, 0x06, 0x70, 0x93, 0x58, 0xb0, 0x60, 0x8f, 0x08, 0xa2, 0xf4, 0x34,
-	0x8f, 0x33, 0x2b, 0x68, 0x1b, 0x90, 0x6b, 0x54, 0x70, 0xcc, 0x89, 0x7b, 0x4e, 0x79, 0xaf, 0xdf,
-	0x9a, 0x55, 0xb8, 0x92, 0x1d, 0xe7, 0x4f, 0x0d, 0x58, 0x2d, 0x73, 0x58, 0xb4, 0x01, 0x73, 0x82,
-	0xed, 0x7b, 0xb1, 0xe8, 0xf5, 0xb5, 0x0a, 0x87, 0xbf, 0xd1, 0x07, 0xd2, 0x73, 0xb5, 0x3d, 0x3b,
-	0x57, 0x1a, 0xa4, 0x94, 0x88, 0x8b, 0x1b, 0xe8, 0x11, 0x2c, 0x9a, 0x9c, 0x70, 0xec, 0x05, 0xd4,
-	0xf8, 0xf8, 0x5b, 0x43, 0xeb, 0xca, 0x2f, 0x27, 0xe1, 0x80, 0xe2, 0x3c, 0x0e, 0x7d, 0x5b, 0x46,
-	0x66, 0x7f, 0x40, 0x7b, 0x7d, 0xe9, 0xb3, 0x15, 0x32, 0x43, 0x08, 0xfa, 0x11, 0x2c, 0xb1, 0xdf,
-	0x86, 0x94, 0xc7, 0x67, 0x5e, 0x94, 0xbe, 0x68, 0xba, 0x4a, 0xc8, 0x02, 0x1a, 0x3d, 0xcf, 0x55,
-	0xe9, 0x79, 0xbe, 0xa0, 0xe7, 0x36, 0x00, 0xd1, 0xaa, 0xea, 0xf5, 0x5b, 0x90, 0xee, 0x8f, 0x56,
-	0xd0, 0x3e, 0xac, 0x98, 0x5f, 0x5d, 0xee, 0x09, 0xca, 0x3d, 0xd2, 0x6a, 0x2a, 0xaf, 0xde, 0x34,
-	0xc7, 0xb1, 0x55, 0x6e, 0x70, 0xb8, 0x20, 0xe9, 0xfc, 0x59, 0x5b, 0xc9, 0x4e, 0x05, 0xf2, 0x18,
-	0xa7, 0x9c, 0x05, 0x39, 0x3b, 0x65, 0x56, 0x6e, 0x2c, 0xf5, 0x46, 0x2c, 0x65, 0xab, 0x7d, 0x8c,
-	0xa5, 0x7e, 0x0a, 0x4b, 0x07, 0x24, 0x4c, 0x88, 0xdf, 0x31, 0x25, 0xe3, 0x75, 0xea, 0x8b, 0xf3,
-	0x65, 0x0d, 0x6e, 0xf7, 0x42, 0x97, 0xd3, 0x80, 0x86, 0xd2, 0x32, 0x86, 0xe4, 0xfb, 0xb0, 0x18,
-	0x0b, 0xc2, 0x45, 0xe7, 0x1a, 0xa6, 0x3c, 0x4a, 0xe6, 0x3b, 0xcf, 0xb0, 0x75, 0xb4, 0xf6, 0x3b,
-	0x57, 0xe5, 0xf9, 0xae, 0x04, 0x88, 0x9e, 0xc0, 0x9d, 0xe1, 0xf2, 0x61, 0xce, 0x10, 0x9d, 0x2b,
-	0x95, 0xf1, 0x6c, 0x96, 0x6a, 0xb8, 0xf3, 0x97, 0x06, 0xbc, 0x7b, 0xc4, 0x69, 0x9f, 0x0a, 0x99,
-	0xb8, 0x43, 0xda, 0x3f, 0xe4, 0x7d, 0xca, 0xbb, 0xc4, 0x77, 0x13, 0x9f, 0x08, 0x8f, 0x85, 0x07,
-	0x54, 0x9c, 0xb1, 0x3e, 0xfa, 0x01, 0xac, 0x27, 0x31, 0x3d, 0xbc, 0xa0, 0x9c, 0xf8, 0xfe, 0xd3,
-	0x24, 0x18, 0x55, 0x96, 0x9a, 0x4a, 0xb1, 0x15, 0xbb, 0xe8, 0x67, 0x70, 0x37, 0x89, 0xe9, 0x11,
-	0xe5, 0xc7, 0x4c, 0xa7, 0xde, 0x9c, 0x70, 0x5d, 0x09, 0x8f, 0x83, 0xa0, 0x3d, 0xb8, 0x9f, 0x6e,
-	0x7f, 0xc4, 0x59, 0x50, 0xc6, 0x91, 0xe6, 0xf8, 0xf1, 0x20, 0x84, 0xe1, 0x41, 0x0a, 0xe8, 0x8d,
-	0xe2, 0xab, 0x8c, 0x2c, 0xad, 0xc2, 0x13, 0x61, 0xf5, 0xb7, 0x59, 0x15, 0x4e, 0x56, 0x88, 0x5e,
-	0xd8, 0xa7, 0x97, 0xba, 0xe4, 0x8e, 0x83, 0x54, 0xd4, 0x85, 0x99, 0xca, 0xba, 0xf0, 0x59, 0x1d,
-	0xd6, 0x72, 0xd6, 0xca, 0xf8, 0xd4, 0x52, 0x90, 0xf3, 0x70, 0xed, 0x8b, 0xeb, 0xc6, 0x17, 0xf3,
-	0xfe, 0x8f, 0x2d, 0x34, 0x3a, 0xc8, 0xf8, 0xe4, 0x88, 0x56, 0xd9, 0xa7, 0xf9, 0xf0, 0x6e, 0x26,
-	0xe4, 0x6c, 0x08, 0x2e, 0x93, 0x43, 0x2e, 0xac, 0xb3, 0x52, 0x47, 0x52, 0xd6, 0x6a, 0x3e, 0x7c,
-	0xdf, 0x30, 0x4e, 0xe0, 0x7b, 0xb8, 0x82, 0xca, 0xf9, 0x6f, 0x1d, 0x96, 0x4d, 0xf0, 0xef, 0x06,
-	0x2c, 0x09, 0x45, 0x8c, 0x3a, 0xb0, 0xc6, 0x52, 0x37, 0xcc, 0xef, 0xa4, 0x59, 0xd8, 0x8a, 0x8b,
-	0x72, 0x28, 0xda, 0x87, 0x8d, 0x28, 0xe3, 0x8d, 0x16, 0x51, 0x59, 0x98, 0x8e, 0xc1, 0xa3, 0x23,
-	0xb8, 0x17, 0xe5, 0xfc, 0xd2, 0xe2, 0x2b, 0x0b, 0xd8, 0xb1, 0x12, 0xe8, 0x57, 0xf0, 0x6e, 0x54,
-	0xe6, 0x9c, 0x16, 0x71, 0xd9, 0x55, 0x66, 0x12, 0x41, 0xb4, 0x05, 0xcb, 0x44, 0x3d, 0xd9, 0x2e,
-	0x69, 0x2f, 0x3b, 0xbf, 0x6f, 0xc0, 0xf2, 0x01, 0xb9, 0xb4, 0xe2, 0x75, 0x5d, 0xab, 0xd5, 0xda,
-	0x29, 0x35, 0x41, 0x05, 0x16, 0x3d, 0x85, 0xbb, 0x59, 0x9d, 0xda, 0x54, 0x65, 0x46, 0x18, 0x27,
-	0x80, 0x30, 0xdc, 0xcf, 0xeb, 0xd4, 0x66, 0x2c, 0x33, 0xc3, 0x78, 0x11, 0xf4, 0x1b, 0x78, 0x50,
-	0xaa, 0x4e, 0x9b, 0xba, 0xcc, 0x10, 0x13, 0x49, 0xbe, 0x86, 0x25, 0xc2, 0x51, 0x28, 0xe8, 0x45,
-	0xf4, 0x1d, 0x58, 0x08, 0xaf, 0x53, 0x7f, 0x0e, 0x81, 0xde, 0x83, 0xd9, 0x94, 0xd7, 0x74, 0x4f,
-	0x85, 0x4a, 0x66, 0xf6, 0x9d, 0x3f, 0xd4, 0x60, 0xf6, 0x93, 0x73, 0x75, 0x0b, 0x97, 0xa7, 0xbc,
-	0xa0, 0xdc, 0x3b, 0xf5, 0x5c, 0x15, 0x9d, 0x1f, 0xd3, 0x2b, 0x7d, 0xe7, 0xb1, 0x97, 0xcd, 0x3d,
-	0xa1, 0x5e, 0x75, 0x4f, 0x68, 0x14, 0xee, 0x09, 0x0e, 0x2c, 0xbc, 0x38, 0x8f, 0x46, 0x9f, 0xaf,
-	0x74, 0x89, 0x73, 0x6b, 0xce, 0xc7, 0xb0, 0xac, 0x8f, 0xf2, 0x8c, 0xf9, 0x89, 0x7c, 0x97, 0x14,
-	0x8b, 0x92, 0x13, 0xdf, 0x73, 0x7b, 0x61, 0x94, 0x08, 0xfd, 0xed, 0x38, 0xb7, 0x86, 0x56, 0x61,
-	0x3a, 0x92, 0x42, 0xfa, 0x38, 0xe9, 0x0f, 0xe7, 0x10, 0x16, 0xba, 0xcc, 0x0b, 0x8d, 0x52, 0xd0,
-	0x12, 0xd4, 0x05, 0xd3, 0xf2, 0x75, 0xc1, 0xd0, 0x0e, 0x4c, 0xcb, 0xde, 0xd5, 0x68, 0xe8, 0xce,
-	0x76, 0xda, 0xdd, 0x6e, 0xcb, 0xee, 0x76, 0x5b, 0x77, 0xb7, 0xdb, 0x92, 0x01, 0xa7, 0x38, 0xe7,
-	0x77, 0xb3, 0xb0, 0x62, 0x5f, 0x51, 0xd0, 0x4f, 0x60, 0x31, 0x48, 0x62, 0x59, 0x8e, 0x55, 0x5d,
-	0x37, 0xd9, 0x7a, 0x6d, 0x98, 0xad, 0xb3, 0x9b, 0x38, 0x8f, 0x45, 0x5d, 0x58, 0x09, 0xf2, 0x15,
-	0xc5, 0x9c, 0x66, 0xd8, 0x9b, 0x59, 0x15, 0x07, 0x17, 0x04, 0xd0, 0x33, 0x58, 0x8b, 0xca, 0x2a,
-	0x89, 0x4e, 0xd0, 0xf7, 0x4b, 0x13, 0xf4, 0x30, 0xe9, 0x97, 0xcb, 0xca, 0xa6, 0x91, 0xe4, 0x13,
-	0xb2, 0x32, 0x58, 0xe6, 0x60, 0x56, 0xbe, 0xc6, 0x36, 0x5e, 0x52, 0x04, 0x56, 0xfc, 0x4c, 0xe7,
-	0x29, 0xac, 0x20, 0xc1, 0x36, 0x5e, 0xde, 0xed, 0x5e, 0xa4, 0xfe, 0x20, 0x7b, 0xd6, 0x9c, 0x1f,
-	0x6b, 0x3f, 0xc1, 0x43, 0x00, 0xfa, 0x31, 0x2c, 0xba, 0x19, 0x7b, 0xc7, 0xad, 0x59, 0x25, 0xb1,
-	0x6a, 0x24, 0xb2, 0xce, 0x80, 0xf3, 0x50, 0xf4, 0x18, 0x36, 0x38, 0xfd, 0x34, 0xf1, 0x38, 0x3d,
-	0x66, 0x3f, 0xff, 0x34, 0x21, 0x7e, 0x9c, 0x09, 0x69, 0x75, 0xe9, 0x9d, 0xc3, 0x63, 0x10, 0xa8,
-	0x03, 0xf7, 0xf4, 0xae, 0xcc, 0x32, 0x45, 0x06, 0x50, 0x0c, 0x63, 0x31, 0xe8, 0x09, 0x6c, 0x0e,
-	0xdf, 0xb0, 0xc7, 0x68, 0xfc, 0x94, 0x09, 0x05, 0xca, 0xf2, 0x34, 0x15, 0xcf, 0xb5, 0x38, 0xf4,
-	0x14, 0x9c, 0xcc, 0xbb, 0xaa, 0xd8, 0x16, 0x14, 0xdb, 0x04, 0x48, 0xf4, 0x11, 0xb4, 0x65, 0x7a,
-	0xe7, 0x5e, 0x9f, 0xc6, 0x12, 0x77, 0x58, 0x18, 0xd2, 0x2c, 0x2a, 0xae, 0x6b, 0x50, 0x52, 0x4f,
-	0x43, 0xc4, 0x31, 0xeb, 0x15, 0xc6, 0x33, 0x4b, 0xa9, 0x9e, 0xc6, 0x61, 0x9c, 0x7f, 0x4f, 0x41,
-	0xab, 0xaa, 0xb7, 0xbb, 0x09, 0xc7, 0x9b, 0x70, 0x7c, 0xb3, 0xa1, 0xe4, 0xfc, 0x67, 0x0a, 0x5a,
-	0x55, 0x0d, 0xea, 0x8d, 0xbb, 0xfd, 0x5f, 0xb8, 0xdb, 0x9b, 0xc8, 0xde, 0x6f, 0x38, 0xe3, 0x3a,
-	0x7f, 0x6b, 0x00, 0xea, 0x32, 0xdf, 0xa7, 0xae, 0xbc, 0x06, 0x4d, 0x3c, 0x90, 0xca, 0x8e, 0x15,
-	0xeb, 0x93, 0x8c, 0x15, 0x1b, 0x13, 0x0f, 0xab, 0xa6, 0xbe, 0xc6, 0xb0, 0x6a, 0xfa, 0xeb, 0x0c,
-	0xab, 0x66, 0x5e, 0x73, 0x58, 0x35, 0x5f, 0x75, 0x09, 0x85, 0x6b, 0x86, 0x55, 0xcd, 0xc2, 0xb0,
-	0x6a, 0xaf, 0x64, 0x58, 0xb5, 0xa0, 0xdc, 0xb6, 0x65, 0x7b, 0xfe, 0x98, 0x21, 0xd5, 0x67, 0x35,
-	0xb8, 0xb3, 0x3b, 0x24, 0xa5, 0xa1, 0xf0, 0x4e, 0x3d, 0xca, 0xf7, 0xa8, 0x20, 0x9e, 0x1f, 0x5b,
-	0x67, 0xa8, 0x15, 0xce, 0xf0, 0x00, 0x16, 0xcd, 0xaf, 0x7d, 0x7a, 0x41, 0x7d, 0x6d, 0xc7, 0xfc,
-	0xa2, 0x6a, 0x28, 0xd2, 0xf1, 0xbf, 0x99, 0x84, 0x6b, 0x53, 0xda, 0xcb, 0xce, 0xdf, 0xa7, 0x61,
-	0x6e, 0x78, 0x09, 0x46, 0x30, 0x25, 0xbd, 0xc5, 0x4c, 0xed, 0xe5, 0x33, 0xda, 0x84, 0xa6, 0x30,
-	0xdd, 0x96, 0x4e, 0x41, 0xf3, 0x38, 0xbb, 0x94, 0x9b, 0xb1, 0x35, 0xae, 0xfb, 0x0f, 0x27, 0x80,
-	0xcd, 0x88, 0x53, 0x57, 0x37, 0xf9, 0xd4, 0x24, 0x15, 0xd5, 0x7e, 0xe9, 0x4f, 0xd0, 0xd9, 0xe4,
-	0x1b, 0xb6, 0x4e, 0x0b, 0xca, 0xc2, 0xd7, 0x52, 0xa1, 0x47, 0xb0, 0x90, 0x26, 0x45, 0x9d, 0x29,
-	0x52, 0x97, 0xbb, 0x9d, 0xcf, 0xa0, 0x69, 0xb6, 0xc8, 0x01, 0xa5, 0x2a, 0x02, 0x1a, 0x30, 0xdd,
-	0x87, 0xa9, 0x67, 0xf4, 0x1c, 0x56, 0x23, 0xee, 0x31, 0xee, 0x09, 0xef, 0x05, 0xed, 0x8f, 0xee,
-	0x25, 0x69, 0x32, 0x99, 0xe0, 0xbc, 0xa5, 0xe2, 0xe8, 0x17, 0xf0, 0x2d, 0x16, 0xfa, 0x57, 0xdd,
-	0x33, 0xea, 0x9e, 0x1f, 0x8d, 0x00, 0xc5, 0xf8, 0x8e, 0xd5, 0xe4, 0x75, 0x0e, 0x4f, 0x0a, 0x47,
-	0xc7, 0xf0, 0xcd, 0x32, 0x68, 0xf1, 0x66, 0x95, 0x16, 0xcd, 0xc9, 0xc0, 0x55, 0xac, 0xc5, 0x5b,
-	0x1f, 0x54, 0xb3, 0x16, 0x2f, 0x7f, 0x5d, 0x58, 0x79, 0x91, 0xef, 0xee, 0xe2, 0x56, 0x33, 0x5f,
-	0xef, 0xac, 0xee, 0x0f, 0x17, 0x04, 0x9c, 0xc7, 0xb0, 0xa4, 0x4d, 0x4a, 0xc4, 0x59, 0x4f, 0xd0,
-	0x40, 0xda, 0x91, 0x0c, 0xe7, 0x42, 0x58, 0x3d, 0xa3, 0x16, 0xcc, 0xb2, 0x10, 0x7b, 0x83, 0x33,
-	0xa1, 0x07, 0x93, 0xe6, 0xa7, 0x73, 0x08, 0xcd, 0x8c, 0x4b, 0x48, 0x61, 0x9f, 0x92, 0x53, 0x23,
-	0x2c, 0x9f, 0xd1, 0x07, 0x30, 0x4d, 0x32, 0xad, 0xf3, 0xba, 0xe5, 0x4a, 0xfa, 0xbd, 0x38, 0x05,
-	0x75, 0x1e, 0x7d, 0xfe, 0xb2, 0x5d, 0xfb, 0xe2, 0x65, 0xbb, 0xf6, 0xaf, 0x97, 0xed, 0xda, 0x1f,
-	0x5f, 0xb5, 0x6f, 0x7d, 0xf1, 0xaa, 0x7d, 0xeb, 0xcb, 0x57, 0xed, 0x5b, 0x9f, 0xdc, 0x3f, 0xf1,
-	0x44, 0x2a, 0xea, 0x9e, 0x11, 0x2f, 0xdc, 0xb9, 0xdc, 0x31, 0x7f, 0xe1, 0x5e, 0x45, 0x34, 0x3e,
-	0x99, 0x51, 0x7f, 0x9a, 0x7e, 0xf7, 0x7f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x8b, 0xd3, 0x92, 0xf5,
-	0xd9, 0x1d, 0x00, 0x00,
+	// 1711 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x59, 0xcd, 0x6f, 0xdb, 0x46,
+	0x16, 0xb7, 0x3e, 0xfc, 0xf5, 0xe4, 0xaf, 0x4c, 0x6c, 0x47, 0x71, 0x62, 0x45, 0xcb, 0x64, 0xb1,
+	0x0e, 0x92, 0x95, 0x37, 0xde, 0x8f, 0xec, 0x2e, 0xb0, 0xc1, 0x5a, 0xf2, 0x06, 0x50, 0xe0, 0x2f,
+	0x30, 0x36, 0xb0, 0x58, 0x2c, 0x76, 0x3b, 0x26, 0xc7, 0x12, 0x11, 0x92, 0xa3, 0x0c, 0x47, 0xae,
+	0xdd, 0x63, 0x0f, 0x2d, 0xd0, 0x5c, 0x7a, 0xee, 0xb5, 0x87, 0x1e, 0xfa, 0x07, 0x14, 0xfd, 0x0f,
+	0x72, 0xcc, 0xa9, 0x08, 0x7a, 0x08, 0x8a, 0xe4, 0x0f, 0x69, 0x41, 0x72, 0x46, 0x22, 0x87, 0xa4,
+	0xc4, 0x04, 0x2d, 0xd0, 0x43, 0x6e, 0xd4, 0xbc, 0xdf, 0xfb, 0x71, 0xf8, 0xde, 0x6f, 0xde, 0xcc,
+	0x3c, 0xc1, 0xea, 0x09, 0x36, 0x3b, 0xc4, 0xdb, 0xe4, 0x0c, 0xbb, 0xde, 0x29, 0x61, 0x5e, 0xa3,
+	0xc7, 0x28, 0xa7, 0x68, 0x2a, 0x1c, 0x5f, 0x5b, 0xee, 0xd0, 0x0e, 0x0d, 0x86, 0x36, 0xfd, 0xa7,
+	0xd0, 0xba, 0x56, 0x15, 0x5e, 0x3d, 0xc2, 0x1c, 0xcb, 0xf3, 0x2c, 0xea, 0x0a, 0xbf, 0xb5, 0x35,
+	0x61, 0xc1, 0xa6, 0xc9, 0x88, 0xe7, 0xfd, 0xdf, 0xb6, 0x3c, 0x2e, 0x6d, 0x2b, 0xc2, 0x76, 0x82,
+	0x6d, 0xec, 0x1a, 0x44, 0x0e, 0xd7, 0x0c, 0xea, 0x39, 0xd4, 0x1f, 0xf6, 0xc8, 0xe6, 0xd9, 0xbd,
+	0x13, 0xc2, 0xf1, 0xbd, 0x4d, 0x83, 0x5a, 0x6e, 0x68, 0xd7, 0xbe, 0x2b, 0xc1, 0xd2, 0xb1, 0x47,
+	0x58, 0x33, 0x74, 0x7b, 0xcc, 0x29, 0x23, 0xe8, 0x0e, 0xcc, 0x48, 0x9a, 0x6a, 0xa1, 0x5e, 0xda,
+	0xa8, 0x6c, 0x2d, 0x36, 0x42, 0xfa, 0x86, 0xc0, 0xe9, 0x03, 0x00, 0x7a, 0x04, 0x97, 0x68, 0x9f,
+	0x77, 0xa8, 0xe5, 0x76, 0xb6, 0x7b, 0x3d, 0x46, 0xcf, 0xb0, 0xed, 0x55, 0x8b, 0x81, 0xd7, 0x75,
+	0xe9, 0xe5, 0xbf, 0xe1, 0x40, 0x01, 0xe9, 0x49, 0x37, 0x9f, 0xcb, 0x72, 0x0d, 0xea, 0xc4, 0xb8,
+	0x4a, 0x49, 0xae, 0xb6, 0x02, 0xd2, 0x93, 0x6e, 0xe8, 0xbf, 0x70, 0x1b, 0xf7, 0x39, 0x0d, 0x07,
+	0xc8, 0x63, 0x62, 0x9f, 0xb6, 0x5d, 0x8b, 0x5b, 0x98, 0x13, 0x53, 0x4e, 0xe5, 0x48, 0xe6, 0xa5,
+	0x5a, 0xae, 0x17, 0x36, 0x66, 0xf4, 0xfc, 0x0e, 0xa3, 0xd8, 0xe5, 0xe4, 0x86, 0xec, 0x93, 0xa3,
+	0xd9, 0x13, 0x0e, 0x68, 0x1b, 0x16, 0xfb, 0x1e, 0x61, 0x87, 0x43, 0x05, 0x54, 0xa7, 0xea, 0x85,
+	0x8d, 0xca, 0xd6, 0x95, 0x68, 0x14, 0x22, 0x66, 0x5d, 0xc5, 0x6b, 0xdf, 0x14, 0x61, 0x71, 0x8f,
+	0xb0, 0x27, 0x36, 0x69, 0x75, 0xb1, 0x6d, 0x13, 0xb7, 0x43, 0x10, 0x82, 0x32, 0xa3, 0x94, 0x57,
+	0x0b, 0xf5, 0xc2, 0xc6, 0xac, 0x1e, 0x3c, 0xa3, 0x07, 0x70, 0x99, 0x9c, 0xf7, 0x88, 0xc1, 0x89,
+	0x79, 0xc8, 0x28, 0x3d, 0xdd, 0x25, 0x6e, 0x87, 0x77, 0xab, 0x45, 0x1f, 0xd2, 0x9c, 0x7b, 0xfe,
+	0xea, 0xc6, 0xc4, 0xf7, 0xaf, 0x6e, 0x94, 0x8f, 0x2d, 0x97, 0xeb, 0x69, 0x40, 0xf4, 0x57, 0xb8,
+	0xd2, 0xf7, 0x48, 0x8b, 0x11, 0xcc, 0x29, 0xdb, 0x0e, 0x85, 0xb9, 0xed, 0xed, 0x12, 0x7c, 0x5a,
+	0x2d, 0x05, 0x9f, 0x9d, 0x65, 0x46, 0x7f, 0x82, 0x05, 0x07, 0x9f, 0x1f, 0x7b, 0xc4, 0x3b, 0x24,
+	0x2c, 0x70, 0x28, 0xa7, 0xbc, 0x54, 0xc1, 0xa0, 0x25, 0x28, 0xf5, 0x99, 0x15, 0x84, 0x74, 0x56,
+	0xf7, 0x1f, 0x51, 0x0d, 0xc0, 0xe8, 0x7b, 0x9c, 0x3a, 0x3b, 0x98, 0xe3, 0x20, 0x4e, 0xb3, 0x7a,
+	0x64, 0x04, 0x35, 0x00, 0x19, 0x32, 0x04, 0x47, 0x0c, 0x1b, 0x4f, 0x08, 0x6b, 0x9b, 0xd5, 0xe9,
+	0x00, 0x97, 0x62, 0xd1, 0xbe, 0x2c, 0xc1, 0x72, 0x9a, 0x60, 0xd1, 0x1a, 0xcc, 0x70, 0xba, 0x6b,
+	0x79, 0xbc, 0x6d, 0x8a, 0x10, 0x0e, 0x7e, 0xa3, 0xbb, 0xbe, 0x72, 0x45, 0x3e, 0x9b, 0x17, 0x02,
+	0x14, 0x04, 0x51, 0x4f, 0x1a, 0xd0, 0x7d, 0x98, 0x97, 0x35, 0xe1, 0xc8, 0x72, 0x88, 0xd4, 0xf8,
+	0xa5, 0x41, 0x76, 0xfd, 0x2f, 0xc7, 0x6e, 0x87, 0xe8, 0x71, 0x1c, 0xfa, 0xbd, 0xbf, 0x32, 0xcd,
+	0x0e, 0x69, 0x9b, 0xbe, 0x66, 0x33, 0x7c, 0x06, 0x10, 0xf4, 0x37, 0x58, 0xa0, 0x1f, 0xba, 0x84,
+	0x79, 0x5d, 0xab, 0x17, 0xbe, 0x68, 0x32, 0xcb, 0x49, 0x01, 0xca, 0x38, 0xcf, 0x64, 0xc5, 0x79,
+	0x36, 0x11, 0xe7, 0x1a, 0x00, 0x16, 0xa1, 0x6a, 0x9b, 0x55, 0x08, 0xed, 0xc3, 0x11, 0xb4, 0x0b,
+	0x4b, 0xf2, 0x57, 0x8b, 0x59, 0x9c, 0x30, 0x0b, 0x57, 0x2b, 0x81, 0xaa, 0xeb, 0x72, 0x3a, 0x6a,
+	0xc8, 0x25, 0x4e, 0x4f, 0x78, 0x6a, 0x5f, 0x89, 0x2c, 0xa9, 0xa5, 0xc0, 0x9f, 0xc6, 0x29, 0xa3,
+	0x4e, 0x2c, 0x4f, 0x91, 0x91, 0xf7, 0x99, 0xfa, 0x59, 0x32, 0xa5, 0x86, 0x7d, 0x44, 0xa6, 0xfe,
+	0x01, 0x0b, 0x7b, 0xd8, 0xed, 0x63, 0xbb, 0x29, 0xb7, 0x8c, 0xb7, 0xd9, 0x5f, 0xb4, 0x97, 0x05,
+	0xb8, 0xdc, 0x76, 0x0d, 0x46, 0x1c, 0xe2, 0xfa, 0x99, 0x91, 0x24, 0x7f, 0x86, 0x79, 0x8f, 0x63,
+	0xc6, 0x9b, 0x63, 0x98, 0xe2, 0x28, 0xbf, 0xde, 0x59, 0x92, 0xad, 0x29, 0xa2, 0xdf, 0xbc, 0x48,
+	0xaf, 0x77, 0x29, 0x40, 0xf4, 0x08, 0xae, 0x0e, 0x86, 0x0f, 0x62, 0x89, 0x68, 0x5e, 0x04, 0x15,
+	0x4f, 0x65, 0xc9, 0x86, 0x6b, 0x5f, 0x97, 0xe0, 0xe6, 0x21, 0x23, 0x26, 0xe1, 0x7e, 0xe1, 0x76,
+	0x89, 0x79, 0xc0, 0x4c, 0xc2, 0x5a, 0xd8, 0x36, 0xfa, 0x36, 0xe6, 0x16, 0x75, 0xf7, 0x08, 0xef,
+	0x52, 0x13, 0xfd, 0x05, 0x56, 0xfb, 0x1e, 0x39, 0x38, 0x23, 0x0c, 0xdb, 0xf6, 0x7e, 0xdf, 0x19,
+	0xee, 0x2c, 0x85, 0xa0, 0xc4, 0x66, 0x58, 0xd1, 0x3f, 0xe1, 0x5a, 0xdf, 0x23, 0x87, 0x84, 0x1d,
+	0x51, 0x51, 0x7a, 0x63, 0xce, 0xc5, 0xc0, 0x79, 0x14, 0x04, 0xed, 0xc0, 0x7a, 0x68, 0x7e, 0xc8,
+	0xa8, 0x93, 0xc6, 0x11, 0xd6, 0xf8, 0xd1, 0x20, 0xa4, 0xc3, 0xad, 0x10, 0xd0, 0x1e, 0xae, 0xaf,
+	0x34, 0xb2, 0x70, 0x17, 0xce, 0x85, 0x15, 0xdf, 0xa6, 0xec, 0x70, 0xfe, 0x0e, 0xd1, 0x76, 0x4d,
+	0x72, 0x2e, 0xb6, 0xdc, 0x51, 0x90, 0x8c, 0x7d, 0x61, 0x2a, 0x73, 0x5f, 0x78, 0x56, 0x84, 0x95,
+	0x58, 0xb6, 0x22, 0x9a, 0x5a, 0x70, 0x62, 0x0a, 0x17, 0x5a, 0x5c, 0x95, 0x5a, 0x8c, 0xeb, 0x5f,
+	0x57, 0xd0, 0x68, 0x2f, 0xa2, 0xc9, 0x21, 0x6d, 0x90, 0x9f, 0xca, 0xd6, 0xb5, 0xc8, 0x92, 0x53,
+	0x21, 0x7a, 0x9a, 0x1f, 0x32, 0x60, 0x95, 0xa6, 0x0a, 0x29, 0xc8, 0x56, 0x65, 0xeb, 0x8e, 0x64,
+	0xcc, 0xa1, 0x3d, 0x3d, 0x83, 0x4a, 0xfb, 0xb1, 0x08, 0x8b, 0x72, 0xf1, 0x6f, 0x3b, 0xb4, 0xef,
+	0x72, 0x0f, 0x35, 0x61, 0x85, 0x86, 0x32, 0x8c, 0x5b, 0xc2, 0x2a, 0xac, 0xac, 0x8b, 0x74, 0x28,
+	0xda, 0x85, 0xb5, 0x5e, 0x44, 0x8d, 0x0a, 0x51, 0xda, 0x32, 0x1d, 0x81, 0x47, 0x87, 0x70, 0xbd,
+	0x17, 0xd3, 0xa5, 0xc2, 0x97, 0xb6, 0x60, 0x47, 0x7a, 0xa0, 0xff, 0xc1, 0xcd, 0x5e, 0x9a, 0x38,
+	0x15, 0xe2, 0xb4, 0xa3, 0x4c, 0x1e, 0x47, 0xb4, 0x01, 0x8b, 0x38, 0x78, 0x52, 0x25, 0xa9, 0x0e,
+	0x6b, 0x9f, 0x96, 0x60, 0x71, 0x0f, 0x9f, 0x2b, 0xeb, 0x75, 0x55, 0x84, 0x55, 0xb1, 0xa4, 0xa6,
+	0x20, 0x03, 0x8b, 0xf6, 0xe1, 0x5a, 0x34, 0xa6, 0x2a, 0x55, 0x5a, 0x12, 0x46, 0x39, 0x20, 0x1d,
+	0xd6, 0xe3, 0x31, 0x55, 0x19, 0xd3, 0xd2, 0x30, 0xda, 0x05, 0x7d, 0x00, 0xb7, 0x52, 0xc3, 0xa9,
+	0x52, 0xa7, 0x25, 0x22, 0x97, 0xe7, 0x5b, 0x64, 0xc2, 0x1d, 0x2e, 0x05, 0x31, 0x88, 0xfe, 0x00,
+	0x73, 0xee, 0xb8, 0xf0, 0xc7, 0x10, 0xe8, 0x36, 0x4c, 0x87, 0xbc, 0xf2, 0xf6, 0x94, 0xd8, 0xc9,
+	0xa4, 0x5d, 0x3b, 0x80, 0xb9, 0x16, 0xb5, 0x5c, 0xe9, 0x8b, 0x16, 0xa0, 0xc8, 0xa9, 0x38, 0xea,
+	0x14, 0x39, 0x45, 0x9b, 0x30, 0xe9, 0x5f, 0xf1, 0x24, 0xd1, 0xd5, 0x46, 0x78, 0x09, 0x6c, 0xf8,
+	0x97, 0xc0, 0x86, 0xb8, 0x04, 0x36, 0x7c, 0x06, 0x3d, 0xc4, 0x69, 0x5f, 0x4c, 0xc1, 0x92, 0xba,
+	0x93, 0xa3, 0x16, 0x2c, 0x39, 0xf1, 0xda, 0x29, 0xeb, 0xda, 0xe0, 0x16, 0xa2, 0xd4, 0x56, 0x3d,
+	0xe1, 0x80, 0x1e, 0xc3, 0x4a, 0x2f, 0xad, 0x66, 0x8a, 0xe2, 0xb6, 0x9e, 0x5a, 0x8a, 0x06, 0xe5,
+	0x2d, 0xdd, 0xd7, 0xbf, 0x1e, 0xe1, 0x78, 0xe9, 0x11, 0x95, 0x6d, 0x30, 0x31, 0xa5, 0x32, 0xe9,
+	0x2a, 0xde, 0xa7, 0x70, 0x52, 0x94, 0x12, 0xfd, 0xb6, 0xb8, 0x59, 0x57, 0xf1, 0xe8, 0xef, 0x30,
+	0x6f, 0x44, 0xb2, 0x20, 0x4f, 0x6c, 0xcb, 0x92, 0x20, 0x9a, 0x22, 0x3d, 0x0e, 0x45, 0x0f, 0x60,
+	0x8d, 0x91, 0xa7, 0x7d, 0x8b, 0x91, 0x23, 0xfa, 0xaf, 0xa7, 0x7d, 0x6c, 0x7b, 0x11, 0x3d, 0x06,
+	0x32, 0x9b, 0xd1, 0x47, 0x20, 0x50, 0x13, 0xae, 0x0b, 0xab, 0xbf, 0x44, 0x92, 0x0c, 0xd3, 0x01,
+	0xc3, 0x48, 0x0c, 0x7a, 0x04, 0xf5, 0xc1, 0x1b, 0x76, 0x28, 0xf1, 0xf6, 0x29, 0x0f, 0x40, 0x51,
+	0x9e, 0x99, 0x80, 0x67, 0x2c, 0x0e, 0xed, 0x83, 0x16, 0x79, 0x57, 0x16, 0xdb, 0x6c, 0xc0, 0x96,
+	0x03, 0x89, 0x1e, 0x42, 0xcd, 0xaf, 0x4d, 0xcc, 0x32, 0x89, 0xe7, 0xe3, 0x0e, 0x12, 0x1d, 0x06,
+	0x08, 0xb8, 0xc6, 0xa0, 0xfc, 0x38, 0x0d, 0x10, 0x47, 0xb4, 0x9d, 0xe8, 0x2d, 0x54, 0xc2, 0x38,
+	0x8d, 0xc2, 0x68, 0x1f, 0x97, 0xa1, 0x9a, 0x75, 0x31, 0x79, 0xbf, 0x48, 0x7e, 0xc5, 0x8b, 0x24,
+	0x8f, 0xc0, 0xa7, 0xf3, 0x09, 0x5c, 0xfb, 0xac, 0x0c, 0xd5, 0xac, 0x3b, 0xcf, 0x7b, 0x11, 0xfc,
+	0x82, 0x22, 0x18, 0x57, 0xe9, 0xa6, 0x72, 0x54, 0xba, 0x7c, 0xd5, 0x69, 0x3a, 0x6f, 0x75, 0xd2,
+	0xbe, 0x2d, 0x01, 0x6a, 0x51, 0xdb, 0x26, 0x86, 0x7f, 0x20, 0xce, 0xdd, 0x79, 0x88, 0xf6, 0x8f,
+	0x8a, 0x79, 0xfa, 0x47, 0xa5, 0xdc, 0x5d, 0x89, 0xf2, 0x3b, 0x74, 0x25, 0x26, 0xdf, 0xa5, 0x2b,
+	0x31, 0xf5, 0x96, 0x5d, 0x89, 0xd9, 0xac, 0xae, 0x04, 0x8c, 0xe9, 0x4a, 0x54, 0x12, 0x5d, 0x89,
+	0x9d, 0x94, 0xae, 0xc4, 0x5c, 0xa0, 0xc4, 0xaa, 0x2a, 0xe6, 0x11, 0xdd, 0x88, 0x67, 0x05, 0xb8,
+	0xba, 0x3d, 0x20, 0x25, 0x2e, 0xb7, 0x4e, 0x2d, 0xc2, 0x76, 0x08, 0xc7, 0x96, 0xed, 0x29, 0x73,
+	0x28, 0x24, 0xe6, 0x70, 0x0b, 0xe6, 0xe5, 0xaf, 0x5d, 0x72, 0x46, 0x6c, 0x91, 0xc7, 0xf8, 0x60,
+	0x70, 0x72, 0x0c, 0xfb, 0xbc, 0xb2, 0xe5, 0x29, 0x52, 0xa9, 0x0e, 0x6b, 0x9f, 0x4c, 0xc2, 0xcc,
+	0xe0, 0x18, 0x87, 0xa0, 0xec, 0xab, 0x45, 0xb6, 0x67, 0xfd, 0x67, 0x54, 0x87, 0x0a, 0x97, 0xc7,
+	0x6a, 0x12, 0x1e, 0xe8, 0x66, 0xf5, 0xe8, 0x50, 0xac, 0x99, 0x52, 0x1a, 0xd7, 0xac, 0x77, 0xa0,
+	0xde, 0x63, 0xc4, 0x10, 0xb7, 0x39, 0x22, 0xeb, 0x44, 0x70, 0xce, 0x16, 0x9f, 0x20, 0x56, 0xf7,
+	0x6f, 0xd4, 0x98, 0x26, 0x82, 0xa5, 0x8f, 0xa5, 0x42, 0xf7, 0x61, 0x2e, 0xac, 0x73, 0x41, 0xc7,
+	0x58, 0x4a, 0xee, 0x72, 0xbc, 0x28, 0x06, 0x36, 0x3d, 0x06, 0xf4, 0x43, 0xe1, 0x10, 0x87, 0x8a,
+	0x03, 0x77, 0xf0, 0x8c, 0x8e, 0x61, 0xb9, 0xc7, 0x2c, 0xca, 0x2c, 0x6e, 0x7d, 0x44, 0xcc, 0xe1,
+	0x1e, 0x3e, 0x1d, 0x90, 0xe6, 0x98, 0x6f, 0xaa, 0x3b, 0xfa, 0x37, 0xfc, 0x8e, 0xba, 0xf6, 0x45,
+	0xab, 0x4b, 0x8c, 0x27, 0x87, 0x43, 0x40, 0x72, 0x7d, 0x7b, 0xe2, 0x34, 0x94, 0x17, 0x8e, 0x8e,
+	0xe0, 0xb7, 0x69, 0xd0, 0xe4, 0x29, 0x24, 0x3c, 0x17, 0xe5, 0x03, 0x67, 0xb1, 0x66, 0x9d, 0x90,
+	0xf2, 0x81, 0xb5, 0x07, 0xb0, 0x20, 0xb2, 0x81, 0x79, 0xb7, 0xcd, 0x89, 0xe3, 0xa7, 0x00, 0x0f,
+	0xee, 0xee, 0x7a, 0xf0, 0x8c, 0xaa, 0x30, 0x4d, 0x5d, 0xdd, 0xea, 0x74, 0xb9, 0x68, 0x1e, 0xc9,
+	0x9f, 0xda, 0x01, 0x54, 0x22, 0xd9, 0xf4, 0x9d, 0x6d, 0x82, 0x4f, 0xa5, 0xb3, 0xff, 0x8c, 0xee,
+	0xc2, 0x24, 0x8e, 0x5c, 0x6f, 0x56, 0x15, 0x15, 0x88, 0xf7, 0xea, 0x21, 0xa8, 0x79, 0xff, 0xf9,
+	0xeb, 0x5a, 0xe1, 0xc5, 0xeb, 0x5a, 0xe1, 0x87, 0xd7, 0xb5, 0xc2, 0xe7, 0x6f, 0x6a, 0x13, 0x2f,
+	0xde, 0xd4, 0x26, 0x5e, 0xbe, 0xa9, 0x4d, 0xfc, 0x67, 0xfd, 0xc4, 0xe2, 0xa1, 0xab, 0xd1, 0xc5,
+	0x96, 0xbb, 0x79, 0xbe, 0x29, 0xff, 0x66, 0xbb, 0xe8, 0x11, 0xef, 0x64, 0x2a, 0xf8, 0x63, 0xeb,
+	0x8f, 0x3f, 0x05, 0x00, 0x00, 0xff, 0xff, 0x33, 0xa1, 0xdd, 0xa0, 0x7d, 0x1b, 0x00, 0x00,
 }
 
 func (m *UserBalanceStore) Marshal() (dAtA []byte, err error) {
@@ -2863,94 +2663,6 @@ func (m *ApprovalTracker) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *ZkProof) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ZkProof) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ZkProof) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.ZkpTrackerId) > 0 {
-		i -= len(m.ZkpTrackerId)
-		copy(dAtA[i:], m.ZkpTrackerId)
-		i = encodeVarintTransfers(dAtA, i, uint64(len(m.ZkpTrackerId)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.CustomData) > 0 {
-		i -= len(m.CustomData)
-		copy(dAtA[i:], m.CustomData)
-		i = encodeVarintTransfers(dAtA, i, uint64(len(m.CustomData)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Uri) > 0 {
-		i -= len(m.Uri)
-		copy(dAtA[i:], m.Uri)
-		i = encodeVarintTransfers(dAtA, i, uint64(len(m.Uri)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.VerificationKey) > 0 {
-		i -= len(m.VerificationKey)
-		copy(dAtA[i:], m.VerificationKey)
-		i = encodeVarintTransfers(dAtA, i, uint64(len(m.VerificationKey)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *ZkProofSolution) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ZkProofSolution) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ZkProofSolution) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Proof) > 0 {
-		i -= len(m.Proof)
-		copy(dAtA[i:], m.Proof)
-		i = encodeVarintTransfers(dAtA, i, uint64(len(m.Proof)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.PublicInputs) > 0 {
-		i -= len(m.PublicInputs)
-		copy(dAtA[i:], m.PublicInputs)
-		i = encodeVarintTransfers(dAtA, i, uint64(len(m.PublicInputs)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
 func (m *CoinTransfer) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -3023,7 +2735,7 @@ func (m *ApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x70
+		dAtA[i] = 0x58
 	}
 	if m.OverridesFromOutgoingApprovals {
 		i--
@@ -3033,7 +2745,7 @@ func (m *ApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x68
+		dAtA[i] = 0x50
 	}
 	if m.RequireFromDoesNotEqualInitiatedBy {
 		i--
@@ -3043,7 +2755,7 @@ func (m *ApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x60
+		dAtA[i] = 0x48
 	}
 	if m.RequireToDoesNotEqualInitiatedBy {
 		i--
@@ -3053,7 +2765,7 @@ func (m *ApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x58
+		dAtA[i] = 0x40
 	}
 	if m.RequireFromEqualsInitiatedBy {
 		i--
@@ -3063,7 +2775,7 @@ func (m *ApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x50
+		dAtA[i] = 0x38
 	}
 	if m.RequireToEqualsInitiatedBy {
 		i--
@@ -3073,7 +2785,7 @@ func (m *ApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x48
+		dAtA[i] = 0x30
 	}
 	if len(m.CoinTransfers) > 0 {
 		for iNdEx := len(m.CoinTransfers) - 1; iNdEx >= 0; iNdEx-- {
@@ -3086,21 +2798,7 @@ func (m *ApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintTransfers(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x3a
-		}
-	}
-	if len(m.ZkProofs) > 0 {
-		for iNdEx := len(m.ZkProofs) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.ZkProofs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTransfers(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x32
+			dAtA[i] = 0x2a
 		}
 	}
 	if m.MaxNumTransfers != nil {
@@ -3113,7 +2811,7 @@ func (m *ApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintTransfers(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x22
 	}
 	if m.ApprovalAmounts != nil {
 		{
@@ -3125,7 +2823,7 @@ func (m *ApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintTransfers(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x1a
 	}
 	if m.PredeterminedBalances != nil {
 		{
@@ -3137,26 +2835,12 @@ func (m *ApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintTransfers(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x12
 	}
 	if len(m.MerkleChallenges) > 0 {
 		for iNdEx := len(m.MerkleChallenges) - 1; iNdEx >= 0; iNdEx-- {
 			{
 				size, err := m.MerkleChallenges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTransfers(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x12
-		}
-	}
-	if len(m.MustOwnBadges) > 0 {
-		for iNdEx := len(m.MustOwnBadges) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.MustOwnBadges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -3198,7 +2882,7 @@ func (m *OutgoingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x58
+		dAtA[i] = 0x38
 	}
 	if m.RequireToEqualsInitiatedBy {
 		i--
@@ -3208,7 +2892,7 @@ func (m *OutgoingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x48
+		dAtA[i] = 0x30
 	}
 	if len(m.CoinTransfers) > 0 {
 		for iNdEx := len(m.CoinTransfers) - 1; iNdEx >= 0; iNdEx-- {
@@ -3221,21 +2905,7 @@ func (m *OutgoingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 				i = encodeVarintTransfers(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x3a
-		}
-	}
-	if len(m.ZkProofs) > 0 {
-		for iNdEx := len(m.ZkProofs) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.ZkProofs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTransfers(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x32
+			dAtA[i] = 0x2a
 		}
 	}
 	if m.MaxNumTransfers != nil {
@@ -3248,7 +2918,7 @@ func (m *OutgoingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 			i = encodeVarintTransfers(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x22
 	}
 	if m.ApprovalAmounts != nil {
 		{
@@ -3260,7 +2930,7 @@ func (m *OutgoingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 			i = encodeVarintTransfers(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x1a
 	}
 	if m.PredeterminedBalances != nil {
 		{
@@ -3272,26 +2942,12 @@ func (m *OutgoingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 			i = encodeVarintTransfers(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x12
 	}
 	if len(m.MerkleChallenges) > 0 {
 		for iNdEx := len(m.MerkleChallenges) - 1; iNdEx >= 0; iNdEx-- {
 			{
 				size, err := m.MerkleChallenges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTransfers(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x12
-		}
-	}
-	if len(m.MustOwnBadges) > 0 {
-		for iNdEx := len(m.MustOwnBadges) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.MustOwnBadges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -3333,7 +2989,7 @@ func (m *IncomingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x60
+		dAtA[i] = 0x38
 	}
 	if m.RequireFromEqualsInitiatedBy {
 		i--
@@ -3343,7 +2999,7 @@ func (m *IncomingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x50
+		dAtA[i] = 0x30
 	}
 	if len(m.CoinTransfers) > 0 {
 		for iNdEx := len(m.CoinTransfers) - 1; iNdEx >= 0; iNdEx-- {
@@ -3356,21 +3012,7 @@ func (m *IncomingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 				i = encodeVarintTransfers(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x3a
-		}
-	}
-	if len(m.ZkProofs) > 0 {
-		for iNdEx := len(m.ZkProofs) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.ZkProofs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTransfers(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x32
+			dAtA[i] = 0x2a
 		}
 	}
 	if m.MaxNumTransfers != nil {
@@ -3383,7 +3025,7 @@ func (m *IncomingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 			i = encodeVarintTransfers(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x22
 	}
 	if m.ApprovalAmounts != nil {
 		{
@@ -3395,7 +3037,7 @@ func (m *IncomingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 			i = encodeVarintTransfers(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x1a
 	}
 	if m.PredeterminedBalances != nil {
 		{
@@ -3407,26 +3049,12 @@ func (m *IncomingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 			i = encodeVarintTransfers(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x12
 	}
 	if len(m.MerkleChallenges) > 0 {
 		for iNdEx := len(m.MerkleChallenges) - 1; iNdEx >= 0; iNdEx-- {
 			{
 				size, err := m.MerkleChallenges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTransfers(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x12
-		}
-	}
-	if len(m.MustOwnBadges) > 0 {
-		for iNdEx := len(m.MustOwnBadges) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.MustOwnBadges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -3623,20 +3251,6 @@ func (m *Transfer) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.ZkProofSolutions) > 0 {
-		for iNdEx := len(m.ZkProofSolutions) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.ZkProofSolutions[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTransfers(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x5a
-		}
-	}
 	if m.OnlyCheckPrioritizedOutgoingApprovals {
 		i--
 		if m.OnlyCheckPrioritizedOutgoingApprovals {
@@ -4157,48 +3771,6 @@ func (m *ApprovalTracker) Size() (n int) {
 	return n
 }
 
-func (m *ZkProof) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.VerificationKey)
-	if l > 0 {
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	l = len(m.Uri)
-	if l > 0 {
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	l = len(m.CustomData)
-	if l > 0 {
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	l = len(m.ZkpTrackerId)
-	if l > 0 {
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	return n
-}
-
-func (m *ZkProofSolution) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.PublicInputs)
-	if l > 0 {
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	l = len(m.Proof)
-	if l > 0 {
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	return n
-}
-
 func (m *CoinTransfer) Size() (n int) {
 	if m == nil {
 		return 0
@@ -4224,12 +3796,6 @@ func (m *ApprovalCriteria) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if len(m.MustOwnBadges) > 0 {
-		for _, e := range m.MustOwnBadges {
-			l = e.Size()
-			n += 1 + l + sovTransfers(uint64(l))
-		}
-	}
 	if len(m.MerkleChallenges) > 0 {
 		for _, e := range m.MerkleChallenges {
 			l = e.Size()
@@ -4247,12 +3813,6 @@ func (m *ApprovalCriteria) Size() (n int) {
 	if m.MaxNumTransfers != nil {
 		l = m.MaxNumTransfers.Size()
 		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if len(m.ZkProofs) > 0 {
-		for _, e := range m.ZkProofs {
-			l = e.Size()
-			n += 1 + l + sovTransfers(uint64(l))
-		}
 	}
 	if len(m.CoinTransfers) > 0 {
 		for _, e := range m.CoinTransfers {
@@ -4287,12 +3847,6 @@ func (m *OutgoingApprovalCriteria) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if len(m.MustOwnBadges) > 0 {
-		for _, e := range m.MustOwnBadges {
-			l = e.Size()
-			n += 1 + l + sovTransfers(uint64(l))
-		}
-	}
 	if len(m.MerkleChallenges) > 0 {
 		for _, e := range m.MerkleChallenges {
 			l = e.Size()
@@ -4310,12 +3864,6 @@ func (m *OutgoingApprovalCriteria) Size() (n int) {
 	if m.MaxNumTransfers != nil {
 		l = m.MaxNumTransfers.Size()
 		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if len(m.ZkProofs) > 0 {
-		for _, e := range m.ZkProofs {
-			l = e.Size()
-			n += 1 + l + sovTransfers(uint64(l))
-		}
 	}
 	if len(m.CoinTransfers) > 0 {
 		for _, e := range m.CoinTransfers {
@@ -4338,12 +3886,6 @@ func (m *IncomingApprovalCriteria) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if len(m.MustOwnBadges) > 0 {
-		for _, e := range m.MustOwnBadges {
-			l = e.Size()
-			n += 1 + l + sovTransfers(uint64(l))
-		}
-	}
 	if len(m.MerkleChallenges) > 0 {
 		for _, e := range m.MerkleChallenges {
 			l = e.Size()
@@ -4361,12 +3903,6 @@ func (m *IncomingApprovalCriteria) Size() (n int) {
 	if m.MaxNumTransfers != nil {
 		l = m.MaxNumTransfers.Size()
 		n += 1 + l + sovTransfers(uint64(l))
-	}
-	if len(m.ZkProofs) > 0 {
-		for _, e := range m.ZkProofs {
-			l = e.Size()
-			n += 1 + l + sovTransfers(uint64(l))
-		}
 	}
 	if len(m.CoinTransfers) > 0 {
 		for _, e := range m.CoinTransfers {
@@ -4509,12 +4045,6 @@ func (m *Transfer) Size() (n int) {
 	}
 	if m.OnlyCheckPrioritizedOutgoingApprovals {
 		n += 2
-	}
-	if len(m.ZkProofSolutions) > 0 {
-		for _, e := range m.ZkProofSolutions {
-			l = e.Size()
-			n += 1 + l + sovTransfers(uint64(l))
-		}
 	}
 	return n
 }
@@ -6878,298 +6408,6 @@ func (m *ApprovalTracker) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ZkProof) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTransfers
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ZkProof: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ZkProof: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VerificationKey", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.VerificationKey = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Uri = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CustomData", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.CustomData = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ZkpTrackerId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ZkpTrackerId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTransfers(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ZkProofSolution) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTransfers
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ZkProofSolution: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ZkProofSolution: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PublicInputs", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.PublicInputs = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Proof", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Proof = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTransfers(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *CoinTransfer) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -7317,40 +6555,6 @@ func (m *ApprovalCriteria) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MustOwnBadges", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.MustOwnBadges = append(m.MustOwnBadges, &MustOwnBadges{})
-			if err := m.MustOwnBadges[len(m.MustOwnBadges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MerkleChallenges", wireType)
 			}
 			var msglen int
@@ -7383,7 +6587,7 @@ func (m *ApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PredeterminedBalances", wireType)
 			}
@@ -7419,7 +6623,7 @@ func (m *ApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 4:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalAmounts", wireType)
 			}
@@ -7455,7 +6659,7 @@ func (m *ApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MaxNumTransfers", wireType)
 			}
@@ -7491,41 +6695,7 @@ func (m *ApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ZkProofs", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ZkProofs = append(m.ZkProofs, &ZkProof{})
-			if err := m.ZkProofs[len(m.ZkProofs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CoinTransfers", wireType)
 			}
@@ -7559,7 +6729,7 @@ func (m *ApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 9:
+		case 6:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RequireToEqualsInitiatedBy", wireType)
 			}
@@ -7579,7 +6749,7 @@ func (m *ApprovalCriteria) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.RequireToEqualsInitiatedBy = bool(v != 0)
-		case 10:
+		case 7:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RequireFromEqualsInitiatedBy", wireType)
 			}
@@ -7599,7 +6769,7 @@ func (m *ApprovalCriteria) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.RequireFromEqualsInitiatedBy = bool(v != 0)
-		case 11:
+		case 8:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RequireToDoesNotEqualInitiatedBy", wireType)
 			}
@@ -7619,7 +6789,7 @@ func (m *ApprovalCriteria) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.RequireToDoesNotEqualInitiatedBy = bool(v != 0)
-		case 12:
+		case 9:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RequireFromDoesNotEqualInitiatedBy", wireType)
 			}
@@ -7639,7 +6809,7 @@ func (m *ApprovalCriteria) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.RequireFromDoesNotEqualInitiatedBy = bool(v != 0)
-		case 13:
+		case 10:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field OverridesFromOutgoingApprovals", wireType)
 			}
@@ -7659,7 +6829,7 @@ func (m *ApprovalCriteria) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.OverridesFromOutgoingApprovals = bool(v != 0)
-		case 14:
+		case 11:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field OverridesToIncomingApprovals", wireType)
 			}
@@ -7731,40 +6901,6 @@ func (m *OutgoingApprovalCriteria) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MustOwnBadges", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.MustOwnBadges = append(m.MustOwnBadges, &MustOwnBadges{})
-			if err := m.MustOwnBadges[len(m.MustOwnBadges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MerkleChallenges", wireType)
 			}
 			var msglen int
@@ -7797,7 +6933,7 @@ func (m *OutgoingApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PredeterminedBalances", wireType)
 			}
@@ -7833,7 +6969,7 @@ func (m *OutgoingApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 4:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalAmounts", wireType)
 			}
@@ -7869,7 +7005,7 @@ func (m *OutgoingApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MaxNumTransfers", wireType)
 			}
@@ -7905,41 +7041,7 @@ func (m *OutgoingApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ZkProofs", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ZkProofs = append(m.ZkProofs, &ZkProof{})
-			if err := m.ZkProofs[len(m.ZkProofs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CoinTransfers", wireType)
 			}
@@ -7973,7 +7075,7 @@ func (m *OutgoingApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 9:
+		case 6:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RequireToEqualsInitiatedBy", wireType)
 			}
@@ -7993,7 +7095,7 @@ func (m *OutgoingApprovalCriteria) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.RequireToEqualsInitiatedBy = bool(v != 0)
-		case 11:
+		case 7:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RequireToDoesNotEqualInitiatedBy", wireType)
 			}
@@ -8065,40 +7167,6 @@ func (m *IncomingApprovalCriteria) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MustOwnBadges", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.MustOwnBadges = append(m.MustOwnBadges, &MustOwnBadges{})
-			if err := m.MustOwnBadges[len(m.MustOwnBadges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MerkleChallenges", wireType)
 			}
 			var msglen int
@@ -8131,7 +7199,7 @@ func (m *IncomingApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PredeterminedBalances", wireType)
 			}
@@ -8167,7 +7235,7 @@ func (m *IncomingApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 4:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalAmounts", wireType)
 			}
@@ -8203,7 +7271,7 @@ func (m *IncomingApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MaxNumTransfers", wireType)
 			}
@@ -8239,41 +7307,7 @@ func (m *IncomingApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ZkProofs", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ZkProofs = append(m.ZkProofs, &ZkProof{})
-			if err := m.ZkProofs[len(m.ZkProofs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CoinTransfers", wireType)
 			}
@@ -8307,7 +7341,7 @@ func (m *IncomingApprovalCriteria) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 10:
+		case 6:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RequireFromEqualsInitiatedBy", wireType)
 			}
@@ -8327,7 +7361,7 @@ func (m *IncomingApprovalCriteria) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.RequireFromEqualsInitiatedBy = bool(v != 0)
-		case 12:
+		case 7:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RequireFromDoesNotEqualInitiatedBy", wireType)
 			}
@@ -9217,40 +8251,6 @@ func (m *Transfer) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.OnlyCheckPrioritizedOutgoingApprovals = bool(v != 0)
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ZkProofSolutions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ZkProofSolutions = append(m.ZkProofSolutions, &ZkProofSolution{})
-			if err := m.ZkProofSolutions[len(m.ZkProofSolutions)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTransfers(dAtA[iNdEx:])

@@ -11,11 +11,6 @@ import (
 func (k msgServer) CreateAddressLists(goCtx context.Context, msg *types.MsgCreateAddressLists) (*types.MsgCreateAddressListsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := k.UniversalValidateNotHalted(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	for _, addressList := range msg.AddressLists {
 		addressList.CreatedBy = msg.Creator
 		if err := k.CreateAddressList(ctx, addressList); err != nil {

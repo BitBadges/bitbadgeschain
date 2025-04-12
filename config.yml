@@ -38,7 +38,7 @@ genesis:
         block:
             max_bytes: '22020096'
             max_gas: '40000000'
-            time_iota_ms: '2000'
+            time_iota_ms: '5000'
     app_state:
         gov:
             params:

@@ -97,7 +97,6 @@ func CastIncomingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		RequireFromEqualsInitiatedBy:       approvalCriteria.RequireFromEqualsInitiatedBy,
 		RequireFromDoesNotEqualInitiatedBy: approvalCriteria.RequireFromDoesNotEqualInitiatedBy,
 		PredeterminedBalances:              approvalCriteria.PredeterminedBalances,
-		MustOwnBadges:                      approvalCriteria.MustOwnBadges,
 		MerkleChallenges:                   approvalCriteria.MerkleChallenges,
 	}
 }
@@ -113,7 +112,6 @@ func CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		RequireToEqualsInitiatedBy:       approvalCriteria.RequireToEqualsInitiatedBy,
 		RequireToDoesNotEqualInitiatedBy: approvalCriteria.RequireToDoesNotEqualInitiatedBy,
 		PredeterminedBalances:            approvalCriteria.PredeterminedBalances,
-		MustOwnBadges:                    approvalCriteria.MustOwnBadges,
 		MerkleChallenges:                 approvalCriteria.MerkleChallenges,
 	}
 }
@@ -125,7 +123,6 @@ func CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(approvalCriter
 		RequireFromEqualsInitiatedBy:       approvalCriteria.RequireFromEqualsInitiatedBy,
 		RequireFromDoesNotEqualInitiatedBy: approvalCriteria.RequireFromDoesNotEqualInitiatedBy,
 		PredeterminedBalances:              approvalCriteria.PredeterminedBalances,
-		MustOwnBadges:                      approvalCriteria.MustOwnBadges,
 		MerkleChallenges:                   approvalCriteria.MerkleChallenges,
 	}
 }
@@ -137,7 +134,6 @@ func CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(approvalCriter
 		RequireToEqualsInitiatedBy:       approvalCriteria.RequireToEqualsInitiatedBy,
 		RequireToDoesNotEqualInitiatedBy: approvalCriteria.RequireToDoesNotEqualInitiatedBy,
 		PredeterminedBalances:            approvalCriteria.PredeterminedBalances,
-		MustOwnBadges:                    approvalCriteria.MustOwnBadges,
 		MerkleChallenges:                 approvalCriteria.MerkleChallenges,
 	}
 }

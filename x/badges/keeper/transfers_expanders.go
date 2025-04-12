@@ -8,7 +8,6 @@ import (
 	sdkmath "cosmossdk.io/math"
 )
 
-// By default, we approve all transfers if to === initiatedBy
 func AppendSelfInitiatedIncomingApproval(currApprovals []*types.UserIncomingApproval, userAddress string) []*types.UserIncomingApproval {
 	currApprovals = append([]*types.UserIncomingApproval{
 		{
