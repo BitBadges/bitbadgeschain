@@ -2,9 +2,9 @@ package types_test
 
 import (
 	math "math"
-	"testing"
 
-	"bitbadgeschain/testutil/keeper"
+	keepertest "bitbadgeschain/x/badges/testutil/keeper"
+
 	"bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
@@ -13,7 +13,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func TestActionPermissionUpdate(t *testing.T) {
+func (suite *TestSuite) TestActionPermissionUpdate() {
 	oldActionPermission := &types.ActionPermission{
 
 		PermanentlyPermittedTimes: []*types.UintRange{
@@ -44,9 +44,9 @@ func TestActionPermissionUpdate(t *testing.T) {
 			},
 		},
 	}
-	keeper, _ := keeper.BadgesKeeper(t)
+	keeper, _ := keepertest.BadgesKeeper(suite.T())
 	err := keeper.ValidateActionPermissionUpdate(sdk.Context{}, []*types.ActionPermission{oldActionPermission}, []*types.ActionPermission{newActionPermission})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	newActionPermission = &types.ActionPermission{
 
@@ -69,7 +69,7 @@ func TestActionPermissionUpdate(t *testing.T) {
 	}
 
 	err = keeper.ValidateActionPermissionUpdate(sdk.Context{}, []*types.ActionPermission{oldActionPermission}, []*types.ActionPermission{newActionPermission})
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 	newActionPermission = &types.ActionPermission{
 
 		PermanentlyPermittedTimes: []*types.UintRange{
@@ -91,7 +91,7 @@ func TestActionPermissionUpdate(t *testing.T) {
 	}
 
 	err = keeper.ValidateActionPermissionUpdate(sdk.Context{}, []*types.ActionPermission{oldActionPermission}, []*types.ActionPermission{newActionPermission})
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 }
 
 func GetFullUintRanges() []*types.UintRange {
@@ -103,7 +103,7 @@ func GetFullUintRanges() []*types.UintRange {
 	}
 }
 
-func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
+func (suite *TestSuite) TestActionPermissionUpdateWithBadgeIds() {
 	oldActionPermission := &types.CollectionApprovalPermission{
 		ApprovalId:        "All",
 		FromListId:        "All",
@@ -169,9 +169,9 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	keeper, _ := keeper.BadgesKeeper(t)
+	keeper, _ := keepertest.BadgesKeeper(suite.T())
 	err := keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	newActionPermission = &types.CollectionApprovalPermission{
 		ApprovalId:        "All",
@@ -211,7 +211,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	newActionPermission = &types.CollectionApprovalPermission{
 		ApprovalId:        "All",
@@ -251,7 +251,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermission = &types.CollectionApprovalPermission{
 		ApprovalId:        "All",
@@ -291,7 +291,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermission = &types.CollectionApprovalPermission{
 		ApprovalId:        "All",
@@ -330,7 +330,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermission = &types.CollectionApprovalPermission{
 		ApprovalId:        "All",
@@ -378,7 +378,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	newActionPermission = &types.CollectionApprovalPermission{
 		ApprovalId:        "All",
@@ -418,7 +418,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermission = &types.CollectionApprovalPermission{
 		ApprovalId:        "All",
@@ -458,7 +458,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermission = &types.CollectionApprovalPermission{
 		ApprovalId:        "All",
@@ -504,10 +504,10 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 	//Everything else from newActionPermission
 
 	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission, newActionPermission2})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 }
 
-func TestTimedUpdatePermission(t *testing.T) {
+func (suite *TestSuite) TestTimedUpdatePermission() {
 	oldActionPermission := &types.TimedUpdatePermission{
 
 		TimelineTimes: []*types.UintRange{
@@ -551,9 +551,9 @@ func TestTimedUpdatePermission(t *testing.T) {
 		},
 	}
 
-	keeper, _ := keeper.BadgesKeeper(t)
+	keeper, _ := keepertest.BadgesKeeper(suite.T())
 	err := keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	newActionPermission = &types.TimedUpdatePermission{
 
@@ -582,7 +582,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	newActionPermission = &types.TimedUpdatePermission{
 
@@ -611,7 +611,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermission = &types.TimedUpdatePermission{
 		TimelineTimes: types.InvertUintRanges([]*types.UintRange{
@@ -639,7 +639,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermission = &types.TimedUpdatePermission{
 		TimelineTimes: types.InvertUintRanges([]*types.UintRange{
@@ -667,7 +667,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermission = &types.TimedUpdatePermission{
 
@@ -700,7 +700,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	newActionPermission = &types.TimedUpdatePermission{
 
@@ -729,7 +729,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermission = &types.TimedUpdatePermission{
 
@@ -758,7 +758,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermission = &types.TimedUpdatePermission{
 		TimelineTimes: []*types.UintRange{
@@ -791,10 +791,10 @@ func TestTimedUpdatePermission(t *testing.T) {
 	newActionPermission2.TimelineTimes = types.InvertUintRanges(newActionPermission2.TimelineTimes, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64))
 
 	err = keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission, newActionPermission2})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 }
 
-func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
+func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 	oldActionPermissions := []*types.TimedUpdateWithBadgeIdsPermission{
 		{
 
@@ -854,9 +854,9 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	keeper, _ := keeper.BadgesKeeper(t)
+	keeper, _ := keepertest.BadgesKeeper(suite.T())
 	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
 		{
@@ -893,7 +893,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
 		{
@@ -930,7 +930,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
 		{
@@ -967,7 +967,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
 		{
@@ -1004,7 +1004,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
 		{
@@ -1049,7 +1049,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
 		{
@@ -1086,7 +1086,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
 		{
@@ -1123,7 +1123,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
 		{
@@ -1189,7 +1189,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	oldActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{{
 		TimelineTimes: []*types.UintRange{
@@ -1333,7 +1333,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
 		{
@@ -1417,7 +1417,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 	}
 
 	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
 		{
@@ -1549,7 +1549,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
 	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	oldActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{{
 		TimelineTimes: []*types.UintRange{
@@ -1744,11 +1744,11 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
 	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 
 }
 
-func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
+func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2() {
 	oldActionPermissions := []*types.TimedUpdateWithBadgeIdsPermission{
 		{
 
@@ -1946,13 +1946,13 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 	},
 	}
 
-	keeper, _ := keeper.BadgesKeeper(t)
+	keeper, _ := keepertest.BadgesKeeper(suite.T())
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
 	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 }
 
-func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
+func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3() {
 	oldActionPermissions := []*types.TimedUpdateWithBadgeIdsPermission{
 		{
 
@@ -2152,13 +2152,14 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 		},
 	}
 
-	keeper, _ := keeper.BadgesKeeper(t)
+	keeper, _ := keepertest.BadgesKeeper(suite.T())
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
 	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 }
 
-func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
+func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate() {
+
 	oldActionPermissions := []*types.CollectionApprovalPermission{{
 
 		BadgeIds: []*types.UintRange{
@@ -2417,10 +2418,10 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 		},
 	}
 
-	keeper, ctx := keeper.BadgesKeeper(t)
+	keeper, ctx := keepertest.BadgesKeeper(suite.T())
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
 	err := keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions)
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	newActionPermissions = []*types.CollectionApprovalPermission{
 		{
@@ -2599,10 +2600,10 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 	}
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
 	err = keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions)
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 }
 
-func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
+func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate2() {
 	oldActionPermissions := []*types.CollectionApprovalPermission{{
 
 		BadgeIds: []*types.UintRange{
@@ -2769,33 +2770,33 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 	},
 	}
 
-	keeper, ctx := keeper.BadgesKeeper(t)
+	keeper, ctx := keepertest.BadgesKeeper(suite.T())
 	err := keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions)
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 }
 
-func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
-	keeper, ctx := keeper.BadgesKeeper(t)
+func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate3() {
+	keeper, ctx := keepertest.BadgesKeeper(suite.T())
 	err := keeper.CreateAddressList(ctx, &types.AddressList{
 		ListId:    "ABC",
 		Addresses: []string{bob, alice, charlie},
 		Whitelist: true,
 	})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	err = keeper.CreateAddressList(ctx, &types.AddressList{
 		ListId:    "Alice",
 		Addresses: []string{alice},
 		Whitelist: true,
 	})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	err = keeper.CreateAddressList(ctx, &types.AddressList{
 		ListId:    "BobCharlie",
 		Addresses: []string{bob, charlie},
 		Whitelist: true,
 	})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	oldActionPermissions := []*types.CollectionApprovalPermission{{
 
@@ -2965,31 +2966,31 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 	}
 
 	err = keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions)
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 }
 
-func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
-	keeper, ctx := keeper.BadgesKeeper(t)
+func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate4Invalid() {
+	keeper, ctx := keepertest.BadgesKeeper(suite.T())
 	err := keeper.CreateAddressList(ctx, &types.AddressList{
 		ListId:    "ABC",
 		Addresses: []string{bob, alice, charlie},
 		Whitelist: true,
 	})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	err = keeper.CreateAddressList(ctx, &types.AddressList{
 		ListId:    "Alice",
 		Addresses: []string{alice},
 		Whitelist: true,
 	})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	err = keeper.CreateAddressList(ctx, &types.AddressList{
 		ListId:    "BobCharlie",
 		Addresses: []string{bob, charlie},
 		Whitelist: true,
 	})
-	require.NoError(t, err)
+	require.NoError(suite.T(), err)
 
 	oldActionPermissions := []*types.CollectionApprovalPermission{{
 
@@ -3157,5 +3158,5 @@ func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
 	}
 
 	err = keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions)
-	require.Error(t, err)
+	require.Error(suite.T(), err)
 }

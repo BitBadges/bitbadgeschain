@@ -35,7 +35,7 @@ func (k msgServer) CreateMap(goCtx context.Context, msg *types.MsgCreateMap) (*t
 	collId, err := sdkmath.ParseUint(msg.MapId)
 	if err == nil {
 		currCollectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{
-			CollectionId: collId,
+			CollectionId: collId.String(),
 		})
 		if err != nil {
 			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Map ID must be a valid collection ID. Could not find collection in store")

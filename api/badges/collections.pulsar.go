@@ -422,54 +422,54 @@ func (x *_BadgeCollection_12_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_BadgeCollection_16_list)(nil)
+var _ protoreflect.List = (*_BadgeCollection_15_list)(nil)
 
-type _BadgeCollection_16_list struct {
+type _BadgeCollection_15_list struct {
 	list *[]*UintRange
 }
 
-func (x *_BadgeCollection_16_list) Len() int {
+func (x *_BadgeCollection_15_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeCollection_16_list) Get(i int) protoreflect.Value {
+func (x *_BadgeCollection_15_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeCollection_16_list) Set(i int, value protoreflect.Value) {
+func (x *_BadgeCollection_15_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeCollection_16_list) Append(value protoreflect.Value) {
+func (x *_BadgeCollection_15_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeCollection_16_list) AppendMutable() protoreflect.Value {
+func (x *_BadgeCollection_15_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_16_list) Truncate(n int) {
+func (x *_BadgeCollection_15_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeCollection_16_list) NewElement() protoreflect.Value {
+func (x *_BadgeCollection_15_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_16_list) IsValid() bool {
+func (x *_BadgeCollection_15_list) IsValid() bool {
 	return x.list != nil
 }
 
@@ -488,7 +488,6 @@ var (
 	fd_BadgeCollection_isArchivedTimeline               protoreflect.FieldDescriptor
 	fd_BadgeCollection_defaultBalances                  protoreflect.FieldDescriptor
 	fd_BadgeCollection_createdBy                        protoreflect.FieldDescriptor
-	fd_BadgeCollection_aliasAddress                     protoreflect.FieldDescriptor
 	fd_BadgeCollection_validBadgeIds                    protoreflect.FieldDescriptor
 )
 
@@ -508,7 +507,6 @@ func init() {
 	fd_BadgeCollection_isArchivedTimeline = md_BadgeCollection.Fields().ByName("isArchivedTimeline")
 	fd_BadgeCollection_defaultBalances = md_BadgeCollection.Fields().ByName("defaultBalances")
 	fd_BadgeCollection_createdBy = md_BadgeCollection.Fields().ByName("createdBy")
-	fd_BadgeCollection_aliasAddress = md_BadgeCollection.Fields().ByName("aliasAddress")
 	fd_BadgeCollection_validBadgeIds = md_BadgeCollection.Fields().ByName("validBadgeIds")
 }
 
@@ -655,14 +653,8 @@ func (x *fastReflection_BadgeCollection) Range(f func(protoreflect.FieldDescript
 			return
 		}
 	}
-	if x.AliasAddress != "" {
-		value := protoreflect.ValueOfString(x.AliasAddress)
-		if !f(fd_BadgeCollection_aliasAddress, value) {
-			return
-		}
-	}
 	if len(x.ValidBadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeCollection_16_list{list: &x.ValidBadgeIds})
+		value := protoreflect.ValueOfList(&_BadgeCollection_15_list{list: &x.ValidBadgeIds})
 		if !f(fd_BadgeCollection_validBadgeIds, value) {
 			return
 		}
@@ -708,8 +700,6 @@ func (x *fastReflection_BadgeCollection) Has(fd protoreflect.FieldDescriptor) bo
 		return x.DefaultBalances != nil
 	case "badges.BadgeCollection.createdBy":
 		return x.CreatedBy != ""
-	case "badges.BadgeCollection.aliasAddress":
-		return x.AliasAddress != ""
 	case "badges.BadgeCollection.validBadgeIds":
 		return len(x.ValidBadgeIds) != 0
 	default:
@@ -754,8 +744,6 @@ func (x *fastReflection_BadgeCollection) Clear(fd protoreflect.FieldDescriptor) 
 		x.DefaultBalances = nil
 	case "badges.BadgeCollection.createdBy":
 		x.CreatedBy = ""
-	case "badges.BadgeCollection.aliasAddress":
-		x.AliasAddress = ""
 	case "badges.BadgeCollection.validBadgeIds":
 		x.ValidBadgeIds = nil
 	default:
@@ -837,14 +825,11 @@ func (x *fastReflection_BadgeCollection) Get(descriptor protoreflect.FieldDescri
 	case "badges.BadgeCollection.createdBy":
 		value := x.CreatedBy
 		return protoreflect.ValueOfString(value)
-	case "badges.BadgeCollection.aliasAddress":
-		value := x.AliasAddress
-		return protoreflect.ValueOfString(value)
 	case "badges.BadgeCollection.validBadgeIds":
 		if len(x.ValidBadgeIds) == 0 {
-			return protoreflect.ValueOfList(&_BadgeCollection_16_list{})
+			return protoreflect.ValueOfList(&_BadgeCollection_15_list{})
 		}
-		listValue := &_BadgeCollection_16_list{list: &x.ValidBadgeIds}
+		listValue := &_BadgeCollection_15_list{list: &x.ValidBadgeIds}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
@@ -908,11 +893,9 @@ func (x *fastReflection_BadgeCollection) Set(fd protoreflect.FieldDescriptor, va
 		x.DefaultBalances = value.Message().Interface().(*UserBalanceStore)
 	case "badges.BadgeCollection.createdBy":
 		x.CreatedBy = value.Interface().(string)
-	case "badges.BadgeCollection.aliasAddress":
-		x.AliasAddress = value.Interface().(string)
 	case "badges.BadgeCollection.validBadgeIds":
 		lv := value.List()
-		clv := lv.(*_BadgeCollection_16_list)
+		clv := lv.(*_BadgeCollection_15_list)
 		x.ValidBadgeIds = *clv.list
 	default:
 		if fd.IsExtension() {
@@ -996,7 +979,7 @@ func (x *fastReflection_BadgeCollection) Mutable(fd protoreflect.FieldDescriptor
 		if x.ValidBadgeIds == nil {
 			x.ValidBadgeIds = []*UintRange{}
 		}
-		value := &_BadgeCollection_16_list{list: &x.ValidBadgeIds}
+		value := &_BadgeCollection_15_list{list: &x.ValidBadgeIds}
 		return protoreflect.ValueOfList(value)
 	case "badges.BadgeCollection.collectionId":
 		panic(fmt.Errorf("field collectionId of message badges.BadgeCollection is not mutable"))
@@ -1004,8 +987,6 @@ func (x *fastReflection_BadgeCollection) Mutable(fd protoreflect.FieldDescriptor
 		panic(fmt.Errorf("field balancesType of message badges.BadgeCollection is not mutable"))
 	case "badges.BadgeCollection.createdBy":
 		panic(fmt.Errorf("field createdBy of message badges.BadgeCollection is not mutable"))
-	case "badges.BadgeCollection.aliasAddress":
-		panic(fmt.Errorf("field aliasAddress of message badges.BadgeCollection is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeCollection"))
@@ -1055,11 +1036,9 @@ func (x *fastReflection_BadgeCollection) NewField(fd protoreflect.FieldDescripto
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "badges.BadgeCollection.createdBy":
 		return protoreflect.ValueOfString("")
-	case "badges.BadgeCollection.aliasAddress":
-		return protoreflect.ValueOfString("")
 	case "badges.BadgeCollection.validBadgeIds":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_BadgeCollection_16_list{list: &list})
+		return protoreflect.ValueOfList(&_BadgeCollection_15_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeCollection"))
@@ -1197,14 +1176,10 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.AliasAddress)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
 		if len(x.ValidBadgeIds) > 0 {
 			for _, e := range x.ValidBadgeIds {
 				l = options.Size(e)
-				n += 2 + l + runtime.Sov(uint64(l))
+				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
 		if x.unknownFields != nil {
@@ -1249,17 +1224,8 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 				copy(dAtA[i:], encoded)
 				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 				i--
-				dAtA[i] = 0x1
-				i--
-				dAtA[i] = 0x82
+				dAtA[i] = 0x7a
 			}
-		}
-		if len(x.AliasAddress) > 0 {
-			i -= len(x.AliasAddress)
-			copy(dAtA[i:], x.AliasAddress)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.AliasAddress)))
-			i--
-			dAtA[i] = 0x7a
 		}
 		if len(x.CreatedBy) > 0 {
 			i -= len(x.CreatedBy)
@@ -1929,38 +1895,6 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 15:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AliasAddress", wireType)
-				}
-				var stringLen uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.AliasAddress = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
-			case 16:
-				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ValidBadgeIds", wireType)
 				}
 				var msglen int
@@ -2091,10 +2025,8 @@ type BadgeCollection struct {
 	DefaultBalances *UserBalanceStore `protobuf:"bytes,13,opt,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
 	// The user or entity who created the badge collection.
 	CreatedBy string `protobuf:"bytes,14,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
-	// The generated address of the badge collection.
-	AliasAddress string `protobuf:"bytes,15,opt,name=aliasAddress,proto3" json:"aliasAddress,omitempty"`
 	// The valid badge IDs for this collection.
-	ValidBadgeIds []*UintRange `protobuf:"bytes,16,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
+	ValidBadgeIds []*UintRange `protobuf:"bytes,15,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
 }
 
 func (x *BadgeCollection) Reset() {
@@ -2208,13 +2140,6 @@ func (x *BadgeCollection) GetCreatedBy() string {
 	return ""
 }
 
-func (x *BadgeCollection) GetAliasAddress() string {
-	if x != nil {
-		return x.AliasAddress
-	}
-	return ""
-}
-
 func (x *BadgeCollection) GetValidBadgeIds() []*UintRange {
 	if x != nil {
 		return x.ValidBadgeIds
@@ -2237,7 +2162,7 @@ var file_badges_collections_proto_rawDesc = []byte{
 	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x16, 0x62,
 	0x61, 0x64, 0x67, 0x65, 0x73, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x9c, 0x08, 0x0a, 0x0f,
+	0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xf8, 0x07, 0x0a, 0x0f,
 	0x42, 0x61, 0x64, 0x67, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12,
 	0x30, 0x0a, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0c, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x04, 0x55,
@@ -2297,21 +2222,19 @@ var file_badges_collections_proto_rawDesc = []byte{
 	0x65, 0x72, 0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x52, 0x0f,
 	0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x12,
 	0x1c, 0x0a, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x42, 0x79, 0x18, 0x0e, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x42, 0x79, 0x12, 0x22, 0x0a,
-	0x0c, 0x61, 0x6c, 0x69, 0x61, 0x73, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x0f, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x0c, 0x61, 0x6c, 0x69, 0x61, 0x73, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73,
-	0x73, 0x12, 0x37, 0x0a, 0x0d, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x42, 0x61, 0x64, 0x67, 0x65, 0x49,
-	0x64, 0x73, 0x18, 0x10, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65,
-	0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x76, 0x61, 0x6c,
-	0x69, 0x64, 0x42, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x42, 0x71, 0x0a, 0x0a, 0x63, 0x6f,
-	0x6d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x42, 0x10, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63,
-	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x19, 0x62, 0x69,
-	0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x61, 0x70, 0x69,
-	0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x06,
-	0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xca, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xe2,
-	0x02, 0x12, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61,
-	0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x28, 0x09, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x42, 0x79, 0x12, 0x37, 0x0a,
+	0x0d, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x42, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x18, 0x0f,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69,
+	0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x42, 0x61,
+	0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x42, 0x71, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61,
+	0x64, 0x67, 0x65, 0x73, 0x42, 0x10, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e,
+	0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x19, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64,
+	0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64,
+	0x67, 0x65, 0x73, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67,
+	0x65, 0x73, 0xca, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xe2, 0x02, 0x12, 0x42, 0x61,
+	0x64, 0x67, 0x65, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
+	0xea, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (

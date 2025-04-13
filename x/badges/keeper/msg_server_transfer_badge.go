@@ -18,13 +18,9 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 		return nil, err
 	}
 
-	err = k.UniversalValidateNotHalted(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	//Get next collection id - 1 from badges keeper
-	//Used for multi-msg transactions where you do not know the collection ID yet upon creation
+	/*
+		We support specifying collectionId === 0 for multi-msg transactions where you do not know the collection ID yet upon creation
+	*/
 	collectionId := msg.CollectionId
 	if collectionId.Equal(sdkmath.NewUint(0)) {
 		nextCollectionId := k.GetNextCollectionId(ctx)

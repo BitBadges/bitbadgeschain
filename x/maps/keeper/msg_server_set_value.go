@@ -66,7 +66,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 
 	collection := &badgetypes.BadgeCollection{}
 	if !currMap.InheritManagerTimelineFrom.IsNil() && !currMap.InheritManagerTimelineFrom.IsZero() {
-		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerTimelineFrom})
+		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerTimelineFrom.String()})
 		if err != nil {
 			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Could not find collection in store")
 		}
@@ -84,7 +84,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 	if !currMap.UpdateCriteria.CollectionId.IsNil() && currMap.UpdateCriteria.CollectionId.GT(sdkmath.NewUint(0)) {
 		badgeId := sdkmath.NewUintFromString(key)
 		balancesRes, err := k.badgesKeeper.GetBalance(ctx, &badgetypes.QueryGetBalanceRequest{
-			CollectionId: currMap.UpdateCriteria.CollectionId,
+			CollectionId: currMap.UpdateCriteria.CollectionId.String(),
 			Address:      msg.Creator,
 		})
 		if err != nil {

@@ -3,7 +3,7 @@ package types
 import (
 	"testing"
 
-	"bitbadgeschain/testutil/sample"
+	"bitbadgeschain/x/badges/testutil/sample"
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/stretchr/testify/require"

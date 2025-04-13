@@ -44,8 +44,6 @@ import (
 	// this line is used by starport scaffolding # ibc/app/import
 	anchormodule "bitbadgeschain/x/anchor/module"
 	anchormoduletypes "bitbadgeschain/x/anchor/types"
-	badgesmodule "bitbadgeschain/x/badges/module"
-	badgesmoduletypes "bitbadgeschain/x/badges/types"
 	mapsmodule "bitbadgeschain/x/maps/module"
 	mapsmoduletypes "bitbadgeschain/x/maps/types"
 	wasmxmodule "bitbadgeschain/x/wasmx/module"
@@ -178,8 +176,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 
 	anchorIBCModule := ibcfee.NewIBCMiddleware(anchormodule.NewIBCModule(app.AnchorKeeper), app.IBCFeeKeeper)
 	ibcRouter.AddRoute(anchormoduletypes.ModuleName, anchorIBCModule)
-	badgesIBCModule := ibcfee.NewIBCMiddleware(badgesmodule.NewIBCModule(app.BadgesKeeper), app.IBCFeeKeeper)
-	ibcRouter.AddRoute(badgesmoduletypes.ModuleName, badgesIBCModule)
 	mapsIBCModule := ibcfee.NewIBCMiddleware(mapsmodule.NewIBCModule(app.MapsKeeper), app.IBCFeeKeeper)
 	ibcRouter.AddRoute(mapsmoduletypes.ModuleName, mapsIBCModule)
 

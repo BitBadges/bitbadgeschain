@@ -10,8 +10,8 @@ import (
 
 // Create badges and update the unminted / total supplys for the collection
 func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, newBadgeIdsToAdd []*types.UintRange) (*types.BadgeCollection, error) {
+	//For readability, we do not allow transfers to happen on-chain, if not defined in the collection
 	if !IsStandardBalances(collection) {
-		//For readability, we do not allow transfers to happen on-chain, if not defined in the collection
 		if len(collection.CollectionApprovals) > 0 {
 			return &types.BadgeCollection{}, ErrWrongBalancesType
 		}
@@ -19,7 +19,6 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 
 	err := *new(error)
 	currBadgeIds := collection.ValidBadgeIds
-
 	allBadgeIds := []*types.UintRange{}
 	allBadgeIds = append(allBadgeIds, currBadgeIds...)
 	allBadgeIds = append(allBadgeIds, newBadgeIdsToAdd...)
@@ -37,7 +36,6 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 	}
 
 	//Check if we are allowed to create these badges
-
 	detailsToCheck := []*types.UniversalPermissionDetails{}
 	for _, badgeIdRange := range newBadgeIdsToAdd {
 		detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{

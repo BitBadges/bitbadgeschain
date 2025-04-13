@@ -81,7 +81,6 @@ import (
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
-	"bitbadgeschain/app/ante"
 	anchormodulekeeper "bitbadgeschain/x/anchor/keeper"
 
 	badgesmodulekeeper "bitbadgeschain/x/badges/keeper"
@@ -369,27 +368,6 @@ func New(
 	}
 	app.sm = module.NewSimulationManagerFromAppModules(app.ModuleManager.Modules, overrideModules)
 	app.sm.RegisterStoreDecoders()
-
-	// use custom AnteHandler
-	options := ante.HandlerOptions{
-		AccountKeeper:   app.AccountKeeper,
-		BankKeeper:      app.BankKeeper,
-		FeegrantKeeper:  app.FeeGrantKeeper,
-		IBCKeeper:       app.IBCKeeper,
-		SignModeHandler: app.txConfig.SignModeHandler(),
-		SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
-
-		WasmConfig:            &wasmConfig,
-		WasmKeeper:            &app.WasmKeeper,
-		TXCounterStoreService: storeService,
-		CircuitKeeper:         &app.CircuitBreakerKeeper,
-	}
-
-	if err := options.Validate(); err != nil {
-		panic(err)
-	}
-
-	app.SetAnteHandler(ante.NewAnteHandler(options))
 
 	// A custom InitChainer sets if extra pre-init-genesis logic is required.
 	// This is necessary for manually registered modules that do not support app wiring.

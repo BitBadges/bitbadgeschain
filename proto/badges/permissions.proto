@@ -7,6 +7,8 @@ import "badges/address_lists.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "bitbadgeschain/x/badges/types";
+
+
 /* 
   CollectionPermissions defines the permissions for the collection (i.e., what the manager can and cannot do).
 
@@ -256,7 +258,7 @@ message TimedUpdatePermission {
 
 /* 
   TimedUpdateWithBadgeIdsPermission defines the permissions for updating a timeline-based field for specific badges.
-   
+
   Ex: If you want to lock the ability to update the metadata for badgeIds [1,2] for timelineTimes 1/1/2020 - 1/1/2021,
   you could set the combination (badgeIds: [1,2], TimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
 */

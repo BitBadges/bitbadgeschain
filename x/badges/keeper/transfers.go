@@ -23,12 +23,13 @@ func GetDefaultBalanceStoreForCollection(collection *types.BadgeCollection) *typ
 }
 
 func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.BadgeCollection, userAddress string) *types.UserBalanceStore {
-	
+
 	//Mint has unlimited balances
 	if userAddress == "Total" || userAddress == "Mint" {
 		return &types.UserBalanceStore{}
 	}
 
+	//We get current balances or fallback to default balances
 	balanceKey := ConstructBalanceKey(userAddress, collection.CollectionId)
 	balance, found := k.GetUserBalanceFromStore(ctx, balanceKey)
 	if !found {
@@ -165,7 +166,6 @@ func (k Keeper) HandleTransfer(
 				OnlyCheckPrioritizedCollectionApprovals: transfer.OnlyCheckPrioritizedCollectionApprovals,
 				OnlyCheckPrioritizedIncomingApprovals:   transfer.OnlyCheckPrioritizedIncomingApprovals,
 				OnlyCheckPrioritizedOutgoingApprovals:   transfer.OnlyCheckPrioritizedOutgoingApprovals,
-				ZkProofSolutions:                        transfer.ZkProofSolutions,
 			}
 
 			if userApproval.Outgoing {
@@ -179,7 +179,6 @@ func (k Keeper) HandleTransfer(
 					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "incoming approvals for %s not satisfied", to)
 				}
 			}
-
 		}
 	}
 

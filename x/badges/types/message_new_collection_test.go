@@ -5,7 +5,7 @@ import (
 	math "math"
 	"testing"
 
-	"bitbadgeschain/testutil/sample"
+	"bitbadgeschain/x/badges/testutil/sample"
 	"bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
