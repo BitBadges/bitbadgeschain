@@ -8,7 +8,8 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"bitbadgeschain/testutil/sample"
+	"bitbadgeschain/x/badges/testutil/sample"
+
 	badgessimulation "bitbadgeschain/x/badges/simulation"
 	"bitbadgeschain/x/badges/types"
 )

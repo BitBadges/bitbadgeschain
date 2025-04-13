@@ -184,8 +184,8 @@ func (k Keeper) CastBadgeIdsActionPermissionToUniversalPermission(BadgeIdsAction
 	for _, BadgeIdsActionPermission := range BadgeIdsActionPermission {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 
-			BadgeIds:           BadgeIdsActionPermission.BadgeIds,
-			UsesBadgeIds:       true,
+			BadgeIds:     BadgeIdsActionPermission.BadgeIds,
+			UsesBadgeIds: true,
 
 			PermanentlyPermittedTimes: BadgeIdsActionPermission.PermanentlyPermittedTimes,
 			PermanentlyForbiddenTimes: BadgeIdsActionPermission.PermanentlyForbiddenTimes,

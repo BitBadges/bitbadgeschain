@@ -20,8 +20,6 @@ var (
 	AccountGenerationPrefix = []byte{0x08}
 	AddressGenerationPrefix = []byte{0x09}
 
-	ZKPTrackerKey = []byte{0x0C}
-
 	NextAddressListIdKey = []byte{0x0A}
 
 	Delimiter   = []byte{0xDD}
@@ -64,18 +62,6 @@ func ConstructApprovalTrackerKey(collectionID sdkmath.Uint, addressForApproval, 
 		level,
 		trackerType,
 		address,
-	}
-	return strings.Join(keyParts, BalanceKeyDelimiter)
-}
-
-func ConstructZKPTreeTrackerKey(collectionId sdkmath.Uint, addressForApproval string, approvalLevel string, approvalId string, challengeId string, proofHash string) string {
-	keyParts := []string{
-		collectionId.String(),
-		addressForApproval,
-		approvalLevel,
-		approvalId,
-		challengeId,
-		proofHash,
 	}
 	return strings.Join(keyParts, BalanceKeyDelimiter)
 }
@@ -133,13 +119,6 @@ func usedClaimChallengeStoreKey(usedClaimChallengeKey string) []byte {
 	key := make([]byte, len(UsedClaimChallengeKey)+len(usedClaimChallengeKey))
 	copy(key, UsedClaimChallengeKey)
 	copy(key[len(UsedClaimChallengeKey):], []byte(usedClaimChallengeKey))
-	return key
-}
-
-func usedZKPTrackerStoreKey(usedZKPTrackerKey string) []byte {
-	key := make([]byte, len(ZKPTrackerKey)+len(usedZKPTrackerKey))
-	copy(key, ZKPTrackerKey)
-	copy(key[len(ZKPTrackerKey):], []byte(usedZKPTrackerKey))
 	return key
 }
 

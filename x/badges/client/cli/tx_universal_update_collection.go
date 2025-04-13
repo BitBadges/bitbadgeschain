@@ -14,7 +14,6 @@ import (
 
 var _ = strconv.Itoa(0)
 
-
 func CmdUpdateCollection() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "universal-update-collection [tx-json]",

@@ -9,8 +9,8 @@ option go_package = "bitbadgeschain/x/badges/types";
 
 /* 
   The UintRange is a range of IDs from some start to some end (inclusive).
+  uintRanges are one of the core types used.
 
-  uintRanges are one of the core types used in the BitBadgesChain module.
   They are used for everything from badge IDs to time ranges to min/max balance amounts.
 
   See the BitBadges documentation for more information.
@@ -41,36 +41,4 @@ message Balance {
 
   // The badge IDs for which the user owns the badge.
   repeated UintRange badgeIds = 3;
-}
-
-
-/* 
-  MustOwnBadges represents a condition where a user must own specific badges
-  to be approved to transfer.
-
-  - collectionId: The ID of the badge collection for the badges that must be owned
-  - amountRange: The range of badge amounts the user must own (min to max)
-  - ownershipTimes: The time ranges during which the user must own the badges.
-  - badgeIds: The badge IDs the user must own.
-  - overrideWithCurrentTime: If true, auto override ownershipTimes with the current time.
-  - mustSatisfyForAllAssets: If true, the user must own all specified badges; otherwise, owning any one for >= 1 millisecond is sufficient.
-*/
-message MustOwnBadges {
-  // The ID of the badge collection.
-  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-
-  // The range of badge amounts the user must own (min to max).
-  UintRange amountRange = 2;
-
-  // The time ranges during which the user must own the badges.
-  repeated UintRange ownershipTimes = 3;
-
-  // The badge IDs the user must own.
-  repeated UintRange badgeIds = 4;
-
-  // If true, override ownershipTimes with the current time.
-  bool overrideWithCurrentTime = 5;
-
-  // If true, the user must meet ownership requirements for all specified badges; else, must meet requirements for any single badge.
-  bool mustSatisfyForAllAssets = 6;
 }

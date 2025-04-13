@@ -1,8 +1,9 @@
 package cli
 
 import (
-	"bitbadgeschain/x/badges/types"
 	"strconv"
+
+	"bitbadgeschain/x/badges/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -27,7 +28,7 @@ func CmdGetCollection() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryGetCollectionRequest{
-				CollectionId: reqId,
+				CollectionId: reqId.String(),
 			}
 
 			res, err := queryClient.GetCollection(cmd.Context(), params)

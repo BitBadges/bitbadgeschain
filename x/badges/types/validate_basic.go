@@ -297,32 +297,6 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 				return sdkerrors.Wrapf(err, "invalid challenges")
 			}
 
-			if approvalCriteria.MustOwnBadges == nil {
-				approvalCriteria.MustOwnBadges = []*MustOwnBadges{}
-			}
-
-			for _, mustOwnBadgeBalance := range approvalCriteria.MustOwnBadges {
-				if mustOwnBadgeBalance == nil {
-					return sdkerrors.Wrapf(ErrInvalidRequest, "mustOwnBadges balance is nil")
-				}
-
-				if err := ValidateRangesAreValid(mustOwnBadgeBalance.BadgeIds, false, false); err != nil {
-					return sdkerrors.Wrapf(err, "invalid badge IDs")
-				}
-
-				if err := ValidateRangesAreValid(mustOwnBadgeBalance.OwnershipTimes, false, false); err != nil {
-					return sdkerrors.Wrapf(err, "invalid owned times")
-				}
-
-				if err := ValidateRangesAreValid([]*UintRange{mustOwnBadgeBalance.AmountRange}, true, true); err != nil {
-					return sdkerrors.Wrapf(err, "invalid transfer times")
-				}
-
-				if mustOwnBadgeBalance.CollectionId.IsNil() || mustOwnBadgeBalance.CollectionId.IsZero() {
-					return sdkerrors.Wrapf(ErrUintUnititialized, "collection id is uninitialized")
-				}
-			}
-
 			if canChangeValues {
 				if approvalCriteria.ApprovalAmounts == nil {
 					approvalCriteria.ApprovalAmounts = &ApprovalAmounts{}

@@ -57,8 +57,7 @@ message MsgNewCollection {
 
   bool defaultDisapproveSelfInitiated = 17; 
    //The default balances for the user
-   repeated Balance defaultBalances = 18;
-
+  repeated Balance defaultBalances = 18;
 }
 
 message MsgNewCollectionResponse {

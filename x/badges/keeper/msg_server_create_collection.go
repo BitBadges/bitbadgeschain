@@ -41,6 +41,7 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		UpdateIsArchivedTimeline:               true,
 		IsArchivedTimeline:                     msg.IsArchivedTimeline,
 	}
+
 	res, err := k.UniversalUpdateCollection(ctx, &newMsg)
 	if err != nil {
 		return nil, err
