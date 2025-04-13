@@ -3,7 +3,7 @@ package keeper
 import (
 	"strconv"
 
-	"bitbadgeschain/x/anchor/types"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
 
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"

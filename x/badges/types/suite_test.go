@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	bitbadgesapp "bitbadgeschain/app"
+	bitbadgesapp "github.com/bitbadges/bitbadgeschain/app"
 
 	"github.com/stretchr/testify/suite"
 )

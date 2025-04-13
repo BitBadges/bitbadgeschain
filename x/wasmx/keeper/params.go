@@ -5,7 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/runtime"
 
-	"bitbadgeschain/x/wasmx/types"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 )
 
 // GetParams get all parameters as types.Params

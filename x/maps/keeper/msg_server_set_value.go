@@ -3,13 +3,13 @@ package keeper
 import (
 	"context"
 
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	badgetypes "bitbadgeschain/x/badges/types"
+	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*types.MsgSetValueResponse, error) {

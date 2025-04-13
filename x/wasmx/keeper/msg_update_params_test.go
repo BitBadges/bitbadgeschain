@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
-	"bitbadgeschain/x/wasmx/types"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 )
 
 func TestMsgUpdateParams(t *testing.T) {

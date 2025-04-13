@@ -8,7 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	// "github.com/cosmos/cosmos-sdk/client/flags"
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 )
 
 var (

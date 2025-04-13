@@ -3,7 +3,7 @@ package cli
 import (
 	"encoding/json"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 func GetUintRange(start types.Uint, end types.Uint) *types.UintRange {

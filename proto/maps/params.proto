@@ -4,11 +4,11 @@ package maps;;
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "bitbadgeschain/x/maps/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/maps/types";
 
 // Params defines the parameters for the module.
 message Params {
-  option (amino.name) = "bitbadgeschain/x/maps/Params";
+  option (amino.name) = "github.com/bitbadges/bitbadgeschain/x/maps/Params";
   option (gogoproto.equal) = true;
 
   

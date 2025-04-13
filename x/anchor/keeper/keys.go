@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"bitbadgeschain/x/anchor/types"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
 )
 
 var (

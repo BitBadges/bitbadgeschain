@@ -8,9 +8,10 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"bitbadgeschain/testutil/sample"
-	wasmxsimulation "bitbadgeschain/x/wasmx/simulation"
-	"bitbadgeschain/x/wasmx/types"
+	"github.com/bitbadges/bitbadgeschain/testutil/sample"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
+
+	wasmxsimulation "github.com/bitbadges/bitbadgeschain/x/wasmx/simulation"
 )
 
 // avoid unused import issue

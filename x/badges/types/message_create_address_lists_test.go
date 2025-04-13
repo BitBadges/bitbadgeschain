@@ -3,7 +3,7 @@ package types
 import (
 	"testing"
 
-	"bitbadgeschain/x/badges/testutil/sample"
+	"github.com/bitbadges/bitbadgeschain/x/badges/testutil/sample"
 
 	"github.com/stretchr/testify/require"
 )

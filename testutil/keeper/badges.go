@@ -18,8 +18,8 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/stretchr/testify/require"
 
-	"bitbadgeschain/x/badges/keeper"
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {

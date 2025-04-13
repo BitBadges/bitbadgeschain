@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 
 	sdkerrors "cosmossdk.io/errors"
 )

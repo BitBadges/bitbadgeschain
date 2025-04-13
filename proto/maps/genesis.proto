@@ -6,7 +6,7 @@ import "gogoproto/gogo.proto";
 import "maps/params.proto";
 import "maps/tx.proto";
 
-option go_package = "bitbadgeschain/x/maps/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/maps/types";
 
 // GenesisState defines the maps module's genesis state.
 message GenesisState {

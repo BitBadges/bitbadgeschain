@@ -1,13 +1,13 @@
 package app
 
 import (
-	anchorKeeper "bitbadgeschain/x/anchor/keeper"
-	badgeKeeper "bitbadgeschain/x/badges/keeper"
-	mapsKeeper "bitbadgeschain/x/maps/keeper"
+	anchorKeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
+	badgeKeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	mapsKeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
 
 	wasmKeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 
-	customBindings "bitbadgeschain/custom-bindings"
+	customBindings "github.com/bitbadges/bitbadgeschain/custom-bindings"
 )
 
 func GetCustomMsgEncodersOptions() []wasmKeeper.Option {

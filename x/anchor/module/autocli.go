@@ -3,7 +3,7 @@ package anchor
 // import (
 // 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 
-// 	modulev1 "bitbadgeschain/api/anchor"
+// 	modulev1 "github.com/bitbadges/bitbadgeschain/api/anchor"
 // )
 
 // // AutoCLIOptions implements the autocli.HasAutoCLIConfig interface.

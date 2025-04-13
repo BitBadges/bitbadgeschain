@@ -6,7 +6,7 @@ import "badges/balances.proto";
 import "badges/address_lists.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "bitbadgeschain/x/badges/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 
 /* 

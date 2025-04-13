@@ -3,12 +3,12 @@ package keeper
 import (
 	"context"
 
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	badgetypes "bitbadgeschain/x/badges/types"
+	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 func (k msgServer) DeleteMap(goCtx context.Context, msg *types.MsgDeleteMap) (*types.MsgDeleteMapResponse, error) {

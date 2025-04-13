@@ -1,4 +1,4 @@
-module bitbadgeschain
+module github.com/bitbadges/bitbadgeschain
 
 go 1.23
 

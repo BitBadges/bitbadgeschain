@@ -81,19 +81,19 @@ import (
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
-	anchormodulekeeper "bitbadgeschain/x/anchor/keeper"
+	anchormodulekeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
 
-	badgesmodulekeeper "bitbadgeschain/x/badges/keeper"
-	mapsmodulekeeper "bitbadgeschain/x/maps/keeper"
+	badgesmodulekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
 
 	wasm "github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
-	wasmxmodulekeeper "bitbadgeschain/x/wasmx/keeper"
+	wasmxmodulekeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
-	"bitbadgeschain/docs"
+	"github.com/bitbadges/bitbadgeschain/docs"
 )
 
 const (

@@ -4,9 +4,10 @@ import (
 	"context"
 	"testing"
 
-	keepertest "bitbadgeschain/testutil/keeper"
-	"bitbadgeschain/x/maps/keeper"
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/x/maps/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
+
+	keepertest "github.com/bitbadges/bitbadgeschain/testutil/keeper"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"

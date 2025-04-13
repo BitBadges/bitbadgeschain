@@ -42,12 +42,12 @@ import (
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 
 	// this line is used by starport scaffolding # ibc/app/import
-	anchormodule "bitbadgeschain/x/anchor/module"
-	anchormoduletypes "bitbadgeschain/x/anchor/types"
-	mapsmodule "bitbadgeschain/x/maps/module"
-	mapsmoduletypes "bitbadgeschain/x/maps/types"
-	wasmxmodule "bitbadgeschain/x/wasmx/module"
-	wasmxmoduletypes "bitbadgeschain/x/wasmx/types"
+	anchormodule "github.com/bitbadges/bitbadgeschain/x/anchor/module"
+	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
+	mapsmodule "github.com/bitbadges/bitbadgeschain/x/maps/module"
+	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
+	wasmxmodule "github.com/bitbadges/bitbadgeschain/x/wasmx/module"
+	wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 )
 
 // registerIBCModules register IBC keepers and non dependency inject modules.

@@ -3,7 +3,7 @@ package keeper
 import (
 	"fmt"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	"cosmossdk.io/core/store"
 	"cosmossdk.io/log"

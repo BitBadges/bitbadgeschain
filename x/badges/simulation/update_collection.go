@@ -3,8 +3,8 @@ package simulation
 import (
 	"math/rand"
 
-	"bitbadgeschain/x/badges/keeper"
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/baseapp"

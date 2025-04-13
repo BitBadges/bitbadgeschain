@@ -24,11 +24,12 @@ import (
 
 	// this line is used by starport scaffolding # 1
 
-	modulev1 "bitbadgeschain/api/maps/module"
-	badgeskeeper "bitbadgeschain/x/badges/keeper"
-	"bitbadgeschain/x/maps/client/cli"
-	"bitbadgeschain/x/maps/keeper"
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/x/maps/client/cli"
+	"github.com/bitbadges/bitbadgeschain/x/maps/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
+
+	modulev1 "github.com/bitbadges/bitbadgeschain/api/maps/module"
+	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 )
 
 var (

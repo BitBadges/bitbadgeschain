@@ -1,7 +1,7 @@
 package types
 
 import (
-	badgetypes "bitbadgeschain/x/badges/types"
+	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 // Validate permissions are validly formed. Disallows leading zeroes.

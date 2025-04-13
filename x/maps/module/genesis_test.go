@@ -3,10 +3,11 @@ package maps_test
 import (
 	"testing"
 
-	keepertest "bitbadgeschain/testutil/keeper"
-	"bitbadgeschain/testutil/nullify"
-	maps "bitbadgeschain/x/maps/module"
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/testutil/nullify"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
+
+	keepertest "github.com/bitbadges/bitbadgeschain/testutil/keeper"
+	maps "github.com/bitbadges/bitbadgeschain/x/maps/module"
 
 	"github.com/stretchr/testify/require"
 )

@@ -3,12 +3,12 @@ package keeper_test
 import (
 	"testing"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
-	keepertest "bitbadgeschain/x/badges/testutil/keeper"
+	keepertest "github.com/bitbadges/bitbadgeschain/x/badges/testutil/keeper"
 )
 
 func TestParamsQuery(t *testing.T) {

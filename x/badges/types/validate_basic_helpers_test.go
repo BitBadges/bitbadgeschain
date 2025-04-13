@@ -3,7 +3,7 @@ package types_test
 import (
 	math "math"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
 )

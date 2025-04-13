@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"bitbadgeschain/x/anchor/types"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"

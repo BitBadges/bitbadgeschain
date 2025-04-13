@@ -4,11 +4,11 @@ package wasmx;
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "bitbadgeschain/x/wasmx/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/wasmx/types";
 
 // Params defines the parameters for the module.
 message Params {
-  option (amino.name) = "bitbadgeschain/x/wasmx/Params";
+  option (amino.name) = "github.com/bitbadges/bitbadgeschain/x/wasmx/Params";
   option (gogoproto.equal) = true;
 
   // Set the status to active to indicate that contracts can be executed in begin blocker.

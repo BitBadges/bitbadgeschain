@@ -21,11 +21,11 @@ import (
 
 	// this line is used by starport scaffolding # 1
 
-	modulev1 "bitbadgeschain/api/badges/module"
+	modulev1 "github.com/bitbadges/bitbadgeschain/api/badges/module"
 
-	"bitbadgeschain/x/badges/client/cli"
-	"bitbadgeschain/x/badges/keeper"
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/client/cli"
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 var (

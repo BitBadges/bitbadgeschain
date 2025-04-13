@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"bitbadgeschain/x/wasmx/types"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 )
 
 var _ types.QueryServer = Keeper{}

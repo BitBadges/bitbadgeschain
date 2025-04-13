@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"bitbadgeschain/x/anchor/types"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"

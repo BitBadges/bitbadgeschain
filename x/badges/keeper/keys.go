@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
 )

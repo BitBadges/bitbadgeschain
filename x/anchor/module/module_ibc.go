@@ -3,8 +3,8 @@ package anchor
 import (
 	"fmt"
 
-	"bitbadgeschain/x/anchor/keeper"
-	"bitbadgeschain/x/anchor/types"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"

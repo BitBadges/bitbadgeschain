@@ -24,10 +24,11 @@ import (
 
 	// this line is used by starport scaffolding # 1
 
-	modulev1 "bitbadgeschain/api/wasmx/module"
-	"bitbadgeschain/x/wasmx/client/cli"
-	"bitbadgeschain/x/wasmx/keeper"
-	"bitbadgeschain/x/wasmx/types"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/client/cli"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
+
+	modulev1 "github.com/bitbadges/bitbadgeschain/api/wasmx/module"
 )
 
 var (

@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	"bitbadgeschain/x/wasmx/types"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 
 	"github.com/stretchr/testify/require"
 )
