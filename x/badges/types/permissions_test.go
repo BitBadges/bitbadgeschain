@@ -4,7 +4,8 @@ import (
 	math "math"
 	"testing"
 
-	"bitbadgeschain/testutil/keeper"
+	keepertest "bitbadgeschain/testutil/keeper"
+
 	"bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
@@ -44,7 +45,7 @@ func TestActionPermissionUpdate(t *testing.T) {
 			},
 		},
 	}
-	keeper, _ := keeper.BadgesKeeper(t)
+	keeper, _ := keepertest.BadgesKeeper(t)
 	err := keeper.ValidateActionPermissionUpdate(sdk.Context{}, []*types.ActionPermission{oldActionPermission}, []*types.ActionPermission{newActionPermission})
 	require.NoError(t, err)
 
@@ -169,7 +170,7 @@ func TestActionPermissionUpdateWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	keeper, _ := keeper.BadgesKeeper(t)
+	keeper, _ := keepertest.BadgesKeeper(t)
 	err := keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission})
 	require.NoError(t, err)
 
@@ -551,7 +552,7 @@ func TestTimedUpdatePermission(t *testing.T) {
 		},
 	}
 
-	keeper, _ := keeper.BadgesKeeper(t)
+	keeper, _ := keepertest.BadgesKeeper(t)
 	err := keeper.ValidateTimedUpdatePermissionUpdate(sdk.Context{}, []*types.TimedUpdatePermission{oldActionPermission}, []*types.TimedUpdatePermission{newActionPermission})
 	require.NoError(t, err)
 
@@ -854,7 +855,7 @@ func TestValidateTimedUpdatePermissionWithBadgeIds(t *testing.T) {
 		},
 	}
 
-	keeper, _ := keeper.BadgesKeeper(t)
+	keeper, _ := keepertest.BadgesKeeper(t)
 	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(t, err)
 
@@ -1946,7 +1947,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2(t *testing.T) {
 	},
 	}
 
-	keeper, _ := keeper.BadgesKeeper(t)
+	keeper, _ := keepertest.BadgesKeeper(t)
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
 	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(t, err)
@@ -2152,7 +2153,7 @@ func TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3(t *testing.T) {
 		},
 	}
 
-	keeper, _ := keeper.BadgesKeeper(t)
+	keeper, _ := keepertest.BadgesKeeper(t)
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
 	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(t, err)
@@ -2417,7 +2418,7 @@ func TestValidateCollectionApprovalPermissionsUpdate(t *testing.T) {
 		},
 	}
 
-	keeper, ctx := keeper.BadgesKeeper(t)
+	keeper, ctx := keepertest.BadgesKeeper(t)
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
 	err := keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions)
 	require.NoError(t, err)
@@ -2769,13 +2770,13 @@ func TestValidateCollectionApprovalPermissionsUpdate2(t *testing.T) {
 	},
 	}
 
-	keeper, ctx := keeper.BadgesKeeper(t)
+	keeper, ctx := keepertest.BadgesKeeper(t)
 	err := keeper.ValidateCollectionApprovalPermissionsUpdate(ctx, oldActionPermissions, newActionPermissions)
 	require.Error(t, err)
 }
 
 func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
-	keeper, ctx := keeper.BadgesKeeper(t)
+	keeper, ctx := keepertest.BadgesKeeper(t)
 	err := keeper.CreateAddressList(ctx, &types.AddressList{
 		ListId:    "ABC",
 		Addresses: []string{bob, alice, charlie},
@@ -2969,7 +2970,7 @@ func TestValidateCollectionApprovalPermissionsUpdate3(t *testing.T) {
 }
 
 func TestValidateCollectionApprovalPermissionsUpdate4Invalid(t *testing.T) {
-	keeper, ctx := keeper.BadgesKeeper(t)
+	keeper, ctx := keepertest.BadgesKeeper(t)
 	err := keeper.CreateAddressList(ctx, &types.AddressList{
 		ListId:    "ABC",
 		Addresses: []string{bob, alice, charlie},

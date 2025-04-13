@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	keepertest "bitbadgeschain/testutil/keeper"
+
 	"bitbadgeschain/x/badges/types"
 )
 

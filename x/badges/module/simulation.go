@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
 	"bitbadgeschain/testutil/sample"
+
 	badgessimulation "bitbadgeschain/x/badges/simulation"
 	"bitbadgeschain/x/badges/types"
 )

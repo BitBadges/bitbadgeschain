@@ -4,11 +4,10 @@ import (
 	"math"
 	"testing"
 
-	"bitbadgeschain/testutil/sample"
-
 	sdkmath "cosmossdk.io/math"
 	"github.com/stretchr/testify/require"
 
+	"bitbadgeschain/testutil/sample"
 	"bitbadgeschain/x/badges/types"
 )
 

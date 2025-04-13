@@ -29,7 +29,6 @@ func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.Badg
 		return &types.UserBalanceStore{}
 	}
 
-
 	//We get current balances or fallback to default balances
 	balanceKey := ConstructBalanceKey(userAddress, collection.CollectionId)
 	balance, found := k.GetUserBalanceFromStore(ctx, balanceKey)

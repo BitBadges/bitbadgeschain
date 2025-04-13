@@ -25,6 +25,7 @@ import (
 	// this line is used by starport scaffolding # 1
 
 	modulev1 "bitbadgeschain/api/badges/module"
+
 	"bitbadgeschain/x/badges/client/cli"
 	"bitbadgeschain/x/badges/keeper"
 	"bitbadgeschain/x/badges/types"

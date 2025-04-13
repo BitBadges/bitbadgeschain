@@ -1,8 +1,9 @@
 package cli
 
 import (
-	"bitbadgeschain/x/badges/types"
 	"strconv"
+
+	"bitbadgeschain/x/badges/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
