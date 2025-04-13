@@ -6,8 +6,8 @@ package keeper_test
 // sdkmath "cosmossdk.io/math"
 // 	"math"
 
-// 	"bitbadgeschain/x/badges/keeper"
-// 	"bitbadgeschain/x/badges/types"
+// 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+// 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 // )
 

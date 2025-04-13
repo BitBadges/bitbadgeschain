@@ -24,10 +24,11 @@ import (
 
 	// this line is used by starport scaffolding # 1
 
-	modulev1 "bitbadgeschain/api/anchor/module"
-	"bitbadgeschain/x/anchor/client/cli"
-	"bitbadgeschain/x/anchor/keeper"
-	"bitbadgeschain/x/anchor/types"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/client/cli"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
+
+	modulev1 "github.com/bitbadges/bitbadgeschain/api/anchor/module"
 )
 
 var (

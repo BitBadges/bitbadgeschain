@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"context"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -12,7 +12,7 @@ import (
 /* Query helpers */
 
 func GetCollection(suite *TestSuite, ctx context.Context, id sdkmath.Uint) (*types.BadgeCollection, error) {
-	res, err := suite.app.BadgesKeeper.GetCollection(ctx, &types.QueryGetCollectionRequest{CollectionId: sdkmath.Uint(id)})
+	res, err := suite.app.BadgesKeeper.GetCollection(ctx, &types.QueryGetCollectionRequest{CollectionId: sdkmath.Uint(id).String()})
 	if err != nil {
 		return &types.BadgeCollection{}, err
 	}
@@ -22,7 +22,7 @@ func GetCollection(suite *TestSuite, ctx context.Context, id sdkmath.Uint) (*typ
 
 func GetUserBalance(suite *TestSuite, ctx context.Context, collectionId sdkmath.Uint, address string) (*types.UserBalanceStore, error) {
 	res, err := suite.app.BadgesKeeper.GetBalance(ctx, &types.QueryGetBalanceRequest{
-		CollectionId: sdkmath.Uint(collectionId),
+		CollectionId: collectionId.String(),
 		Address:      address,
 	})
 	if err != nil {

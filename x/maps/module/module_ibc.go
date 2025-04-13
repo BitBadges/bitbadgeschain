@@ -3,8 +3,8 @@ package maps
 import (
 	"fmt"
 
-	"bitbadgeschain/x/maps/keeper"
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/x/maps/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"

@@ -3,7 +3,7 @@ package keeper
 import (
 	"strconv"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkerrors "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -215,20 +215,6 @@ func (k Keeper) SetNextAddressListCounter(ctx sdk.Context, nextID sdkmath.Uint) 
 func (k Keeper) IncrementNextAddressListCounter(ctx sdk.Context) {
 	nextID := k.GetNextAddressListCounter(ctx)
 	k.SetNextAddressListCounter(ctx, nextID.AddUint64(1)) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
-}
-
-/*********************************USED ZKPS*********************************/
-func (k Keeper) SetZKPAsUsedInStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForZKP string, approvalLevel string, approvalId, zkpId string, proofHash string) error {
-	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, []byte{})
-	store.Set(usedZKPTrackerStoreKey(ConstructZKPTreeTrackerKey(collectionId, addressForZKP, approvalLevel, approvalId, zkpId, proofHash)), []byte("1"))
-	return nil
-}
-
-func (k Keeper) GetZKPFromStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForZKP string, approvalLevel string, approvalId, zkpId string, proofHash string) (bool, error) {
-	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, []byte{})
-	return store.Has(usedZKPTrackerStoreKey(ConstructZKPTreeTrackerKey(collectionId, addressForZKP, approvalLevel, approvalId, zkpId, proofHash))), nil
 }
 
 /********************************************************************************/

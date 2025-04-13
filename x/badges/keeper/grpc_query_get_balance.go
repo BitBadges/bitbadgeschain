@@ -3,9 +3,10 @@ package keeper
 import (
 	"context"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -20,10 +21,10 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 
 	//Assert that initiatedBy owns the required badges
 	balances := &types.UserBalanceStore{}
-	currCollectionId := req.CollectionId
-	collection, found := k.GetCollectionFromStore(ctx, currCollectionId)
+	collectionId := sdkmath.NewUintFromString(req.CollectionId)
+	collection, found := k.GetCollectionFromStore(ctx, collectionId)
 	if !found {
-		return nil, sdkerrors.Wrapf(ErrCollectionNotExists, "collection %s not found", currCollectionId)
+		return nil, sdkerrors.Wrapf(ErrCollectionNotExists, "collection %s not found", req.CollectionId)
 	} else {
 		isStandardBalances := collection.BalancesType == "Standard"
 		if isStandardBalances {

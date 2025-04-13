@@ -1,7 +1,7 @@
 package types
 
 import (
-	badgetypes "bitbadgeschain/x/badges/types"
+	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"

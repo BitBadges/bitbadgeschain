@@ -10,9 +10,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/jsonpb"
 
-	anchortypes "bitbadgeschain/x/anchor/types"
-	badgeTypes "bitbadgeschain/x/badges/types"
-	mapstypes "bitbadgeschain/x/maps/types"
+	anchortypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
+	badgeTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	mapstypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 )
 
 func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {

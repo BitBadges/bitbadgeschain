@@ -31,7 +31,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
-	"bitbadgeschain/app"
+	"github.com/bitbadges/bitbadgeschain/app"
 )
 
 const (

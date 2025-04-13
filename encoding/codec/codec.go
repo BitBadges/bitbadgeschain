@@ -4,10 +4,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 
-	bitcoin "bitbadgeschain/chain-handlers/bitcoin/utils"
-	ethereumcodec "bitbadgeschain/chain-handlers/ethereum/crypto/codec"
-	ethereum "bitbadgeschain/chain-handlers/ethereum/utils"
-	solana "bitbadgeschain/chain-handlers/solana/utils"
+	bitcoin "github.com/bitbadges/bitbadgeschain/chain-handlers/bitcoin/utils"
+	ethereumcodec "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/crypto/codec"
+	ethereum "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/utils"
+	solana "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/utils"
 )
 
 // RegisterLegacyAminoCodec registers Interfaces from types, crypto, and SDK std.

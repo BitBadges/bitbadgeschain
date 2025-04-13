@@ -3,10 +3,11 @@ package wasmx_test
 import (
 	"testing"
 
-	keepertest "bitbadgeschain/testutil/keeper"
-	"bitbadgeschain/testutil/nullify"
-	wasmx "bitbadgeschain/x/wasmx/module"
-	"bitbadgeschain/x/wasmx/types"
+	"github.com/bitbadges/bitbadgeschain/testutil/nullify"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
+
+	keepertest "github.com/bitbadges/bitbadgeschain/testutil/keeper"
+	wasmx "github.com/bitbadges/bitbadgeschain/x/wasmx/module"
 
 	"github.com/stretchr/testify/require"
 )

@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -26,6 +26,7 @@ func (k Keeper) HandleMerkleChallenges(
 	challenges := approval.ApprovalCriteria.MerkleChallenges
 	merkleProofs := transfer.MerkleProofs
 
+	// Sanity check to make sure the challenge tracker id is valid
 	if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.PredeterminedBalances != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId != "" && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
 		hasMatchingChallenge := false
 		for _, challenge := range challenges {
@@ -48,6 +49,7 @@ func (k Keeper) HandleMerkleChallenges(
 		challengeId := challenge.ChallengeTrackerId
 		root := challenge.Root
 		hasValidSolution := false
+
 		errStr := ""
 		if challenge.UseCreatorAddressAsLeaf {
 			errStr = "does not satisfy whitelist"
@@ -55,8 +57,8 @@ func (k Keeper) HandleMerkleChallenges(
 			errStr = "invalid code / password"
 		}
 
+		// We check that 1 of N proofs is valid
 		additionalDetailsErrorStr := ""
-
 		for _, proof := range merkleProofs {
 			additionalDetailsErrorStr = ""
 			if root != "" {
@@ -192,5 +194,6 @@ func GetLeafIndex(aunts []*types.MerklePathItem) sdkmath.Uint {
 			leafIndex = leafIndex.Mul(sdkmath.NewUint(2)).Add(sdkmath.NewUint(1))
 		}
 	}
+
 	return leafIndex
 }

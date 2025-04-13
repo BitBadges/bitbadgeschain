@@ -3,8 +3,9 @@ package keeper
 import (
 	"context"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,7 +18,8 @@ func (k Keeper) GetCollection(goCtx context.Context, req *types.QueryGetCollecti
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	collection, found := k.GetCollectionFromStore(ctx, req.CollectionId)
+	collectionId := sdkmath.NewUintFromString(req.CollectionId)
+	collection, found := k.GetCollectionFromStore(ctx, collectionId)
 	if !found {
 		return nil, types.ErrInvalidCollectionID
 	}

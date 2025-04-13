@@ -3,13 +3,13 @@ package keeper_test
 import (
 	"math"
 
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	badgeskeeper "bitbadgeschain/x/badges/keeper"
-	badgestypes "bitbadgeschain/x/badges/types"
+	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 func GetDefaultCreateMsg() *types.MsgCreateMap {

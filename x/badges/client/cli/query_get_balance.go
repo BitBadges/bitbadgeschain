@@ -3,7 +3,7 @@ package cli
 import (
 	"strconv"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -19,7 +19,7 @@ func CmdGetBalance() *cobra.Command {
 		Short: "Query getBalance",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			reqBadgeId := types.NewUintFromString(args[0])
+			reqBadgeId := args[0]
 			if err != nil {
 				return err
 			}

@@ -3,9 +3,9 @@ package app
 import (
 	"time"
 
-	anchormodulev1 "bitbadgeschain/api/anchor/module"
-	_ "bitbadgeschain/x/anchor/module" // import for side-effects
-	anchormoduletypes "bitbadgeschain/x/anchor/types"
+	anchormodulev1 "github.com/bitbadges/bitbadgeschain/api/anchor/module"
+	_ "github.com/bitbadges/bitbadgeschain/x/anchor/module" // import for side-effects
+	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
 
 	runtimev1alpha1 "cosmossdk.io/api/cosmos/app/runtime/v1alpha1"
 	appv1alpha1 "cosmossdk.io/api/cosmos/app/v1alpha1"
@@ -57,21 +57,21 @@ import (
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 
-	badgesmodulev1 "bitbadgeschain/api/badges/module"
-	_ "bitbadgeschain/x/badges/module" // import for side-effects
-	badgesmoduletypes "bitbadgeschain/x/badges/types"
+	badgesmodulev1 "github.com/bitbadges/bitbadgeschain/api/badges/module"
+	_ "github.com/bitbadges/bitbadgeschain/x/badges/module" // import for side-effects
+	badgesmoduletypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 
-	mapsmodulev1 "bitbadgeschain/api/maps/module"
-	_ "bitbadgeschain/x/maps/module" // import for side-effects
-	mapsmoduletypes "bitbadgeschain/x/maps/types"
+	mapsmodulev1 "github.com/bitbadges/bitbadgeschain/api/maps/module"
+	_ "github.com/bitbadges/bitbadgeschain/x/maps/module" // import for side-effects
+	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
-	wasmxmodulev1 "bitbadgeschain/api/wasmx/module"
-	_ "bitbadgeschain/x/wasmx/module" // import for side-effects
-	wasmxmoduletypes "bitbadgeschain/x/wasmx/types"
+	wasmxmodulev1 "github.com/bitbadges/bitbadgeschain/api/wasmx/module"
+	_ "github.com/bitbadges/bitbadgeschain/x/wasmx/module" // import for side-effects
+	wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 
-	// wasmmodulev1 "bitbadgeschain/api/wasm/module"
+	// wasmmodulev1 "github.com/bitbadges/bitbadgeschain/api/wasm/module"
 
 	// _ "github.com/CosmWasm/wasmd/x/wasm" // import for side-effects
 

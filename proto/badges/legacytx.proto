@@ -11,7 +11,7 @@ import "gogoproto/gogo.proto";
 import "badges/address_lists.proto";
 import "badges/timelines.proto";
 
-option go_package = "bitbadgeschain/x/badges/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 //Before switching to the universal Msgs, we had a separate Msg for each action.
 //This is the old Msg service definition. It is still used in some parts of the codebase for compatibility.
@@ -57,8 +57,7 @@ message MsgNewCollection {
 
   bool defaultDisapproveSelfInitiated = 17; 
    //The default balances for the user
-   repeated Balance defaultBalances = 18;
-
+  repeated Balance defaultBalances = 18;
 }
 
 message MsgNewCollectionResponse {

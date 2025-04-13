@@ -5,16 +5,13 @@ import (
 	"fmt"
 	"math"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"encoding/binary"
-
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
+// Legacy function that is all-inclusive (creates and updates)
 func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.MsgUniversalUpdateCollection) (*types.MsgUniversalUpdateCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -25,27 +22,9 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 
 	collection := &types.BadgeCollection{}
 	if msg.CollectionId.Equal(sdkmath.NewUint(0)) {
+		//Creation case
 		nextCollectionId := k.GetNextCollectionId(ctx)
 		k.IncrementNextCollectionId(ctx)
-
-		// From cosmos SDK x/group module
-		// Generate account address of collection
-		var accountAddr sdk.AccAddress
-		// loop here in the rare case where a ADR-028-derived address creates a
-		// collision with an existing address.
-		for {
-			derivationKey := make([]byte, 8)
-			binary.BigEndian.PutUint64(derivationKey, nextCollectionId.Uint64())
-
-			ac, err := authtypes.NewModuleCredential(types.ModuleName, AccountGenerationPrefix, derivationKey)
-			if err != nil {
-				return nil, err
-			}
-			//generate the address from the credential
-			accountAddr = sdk.AccAddress(ac.Address())
-
-			break
-		}
 
 		collection = &types.BadgeCollection{
 			CollectionId:          nextCollectionId,
@@ -53,7 +32,6 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			BalancesType:          msg.BalancesType,
 			DefaultBalances:       msg.DefaultBalances,
 			CreatedBy:             msg.Creator,
-			AliasAddress:          accountAddr.String(),
 			ManagerTimeline: []*types.ManagerTimeline{
 				{
 					Manager: msg.Creator,
@@ -67,6 +45,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			},
 		}
 	} else {
+		//Update case
 		found := false
 		collection, found = k.GetCollectionFromStore(ctx, msg.CollectionId)
 		if !found {
@@ -74,21 +53,11 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 	}
 
-	err = k.UniversalValidateNotHalted(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	//Check must be manager
 	err = k.UniversalValidate(ctx, collection, UniversalValidationParams{
 		Creator:       msg.Creator,
 		MustBeManager: true,
 	})
-	if err != nil {
-		return nil, err
-	}
-
-	err = k.UniversalValidateNotHalted(ctx)
 	if err != nil {
 		return nil, err
 	}

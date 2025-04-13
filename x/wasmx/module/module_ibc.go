@@ -3,8 +3,8 @@ package wasmx
 import (
 	"fmt"
 
-	"bitbadgeschain/x/wasmx/keeper"
-	"bitbadgeschain/x/wasmx/types"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"

@@ -3,9 +3,9 @@ package types_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/suite"
+	bitbadgesapp "github.com/bitbadges/bitbadgeschain/app"
 
-	bitbadgesapp "bitbadgeschain/app"
+	"github.com/stretchr/testify/suite"
 )
 
 // Bunch of weird config stuff to setup the app. Inherited most from Cosmos SDK tutorials and existing Cosmos SDK modules.

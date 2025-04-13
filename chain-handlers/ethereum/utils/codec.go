@@ -1,7 +1,7 @@
 package types
 
 import (
-	"bitbadgeschain/chain-handlers/ethereum/types"
+	"github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/types"
 
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types/tx"

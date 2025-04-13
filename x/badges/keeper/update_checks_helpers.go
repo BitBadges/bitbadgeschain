@@ -7,7 +7,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	proto "github.com/gogo/protobuf/proto"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -55,7 +55,7 @@ func GetPotentialUpdatesForTimelineValues(ctx sdk.Context,
 	return types.GetFirstMatchOnly(ctx, castedPermissions)
 }
 
-// Make a struct witha  bool flag isApproved and an approval details arr
+// Make a struct with a bool flag isApproved and an approval details arr
 type ApprovalCriteriaWithIsApproved struct {
 	ApprovalCriteria *types.ApprovalCriteria
 }

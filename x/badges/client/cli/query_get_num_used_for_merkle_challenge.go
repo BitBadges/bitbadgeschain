@@ -3,7 +3,7 @@ package cli
 import (
 	"strconv"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -35,12 +35,12 @@ func CmdGetChallengeTracker() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryGetChallengeTrackerRequest{
-				CollectionId:       types.NewUintFromString(args[0]),
+				CollectionId:       args[0],
 				ApprovalLevel:      args[1],
 				ApproverAddress:    args[2],
 				ApprovalId:         args[3],
 				ChallengeTrackerId: args[4],
-				LeafIndex:          types.NewUintFromString(args[5]),
+				LeafIndex:          args[5],
 			}
 
 			res, err := queryClient.GetChallengeTracker(cmd.Context(), params)

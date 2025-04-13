@@ -23,7 +23,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"bitbadgeschain/app"
+	"github.com/bitbadges/bitbadgeschain/app"
 )
 
 func initRootCmd(

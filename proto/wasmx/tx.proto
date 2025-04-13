@@ -7,7 +7,7 @@ import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "wasmx/params.proto";
 
-option go_package = "bitbadgeschain/x/wasmx/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/wasmx/types";
 
 // Msg defines the Msg service.
 service Msg {

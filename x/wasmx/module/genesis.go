@@ -3,8 +3,8 @@ package wasmx
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"bitbadgeschain/x/wasmx/keeper"
-	"bitbadgeschain/x/wasmx/types"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.

@@ -6,9 +6,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	keepertest "bitbadgeschain/testutil/keeper"
-	"bitbadgeschain/x/wasmx/keeper"
-	"bitbadgeschain/x/wasmx/types"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
+
+	keepertest "github.com/bitbadges/bitbadgeschain/testutil/keeper"
 )
 
 func setupMsgServer(t testing.TB) (keeper.Keeper, types.MsgServer, context.Context) {

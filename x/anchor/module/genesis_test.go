@@ -3,10 +3,11 @@ package anchor_test
 import (
 	"testing"
 
-	keepertest "bitbadgeschain/testutil/keeper"
-	"bitbadgeschain/testutil/nullify"
-	anchor "bitbadgeschain/x/anchor/module"
-	"bitbadgeschain/x/anchor/types"
+	"github.com/bitbadges/bitbadgeschain/testutil/nullify"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
+
+	keepertest "github.com/bitbadges/bitbadgeschain/testutil/keeper"
+	anchor "github.com/bitbadges/bitbadgeschain/x/anchor/module"
 
 	"github.com/stretchr/testify/require"
 )

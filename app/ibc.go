@@ -42,14 +42,12 @@ import (
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 
 	// this line is used by starport scaffolding # ibc/app/import
-	anchormodule "bitbadgeschain/x/anchor/module"
-	anchormoduletypes "bitbadgeschain/x/anchor/types"
-	badgesmodule "bitbadgeschain/x/badges/module"
-	badgesmoduletypes "bitbadgeschain/x/badges/types"
-	mapsmodule "bitbadgeschain/x/maps/module"
-	mapsmoduletypes "bitbadgeschain/x/maps/types"
-	wasmxmodule "bitbadgeschain/x/wasmx/module"
-	wasmxmoduletypes "bitbadgeschain/x/wasmx/types"
+	anchormodule "github.com/bitbadges/bitbadgeschain/x/anchor/module"
+	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
+	mapsmodule "github.com/bitbadges/bitbadgeschain/x/maps/module"
+	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
+	wasmxmodule "github.com/bitbadges/bitbadgeschain/x/wasmx/module"
+	wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 )
 
 // registerIBCModules register IBC keepers and non dependency inject modules.
@@ -178,8 +176,8 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 
 	anchorIBCModule := ibcfee.NewIBCMiddleware(anchormodule.NewIBCModule(app.AnchorKeeper), app.IBCFeeKeeper)
 	ibcRouter.AddRoute(anchormoduletypes.ModuleName, anchorIBCModule)
-	badgesIBCModule := ibcfee.NewIBCMiddleware(badgesmodule.NewIBCModule(app.BadgesKeeper), app.IBCFeeKeeper)
-	ibcRouter.AddRoute(badgesmoduletypes.ModuleName, badgesIBCModule)
+	// badgesIBCModule := ibcfee.NewIBCMiddleware(badgesmodule.NewIBCModule(app.BadgesKeeper), app.IBCFeeKeeper)
+	// ibcRouter.AddRoute(badgesmoduletypes.ModuleName, badgesIBCModule)
 	mapsIBCModule := ibcfee.NewIBCMiddleware(mapsmodule.NewIBCModule(app.MapsKeeper), app.IBCFeeKeeper)
 	ibcRouter.AddRoute(mapsmoduletypes.ModuleName, mapsIBCModule)
 

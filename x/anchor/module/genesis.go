@@ -4,8 +4,8 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"bitbadgeschain/x/anchor/keeper"
-	"bitbadgeschain/x/anchor/types"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.

@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 )

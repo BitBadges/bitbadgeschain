@@ -3,8 +3,8 @@ package maps
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"bitbadgeschain/x/maps/keeper"
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/x/maps/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.

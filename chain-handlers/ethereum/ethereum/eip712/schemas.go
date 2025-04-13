@@ -306,8 +306,7 @@ func GetSchemas() []string {
 					"whitelist": false,
 					"uri": "",
 					"customData": "",
-					"createdBy": "",
-					"aliasAddress": ""
+					"createdBy": ""
 				}
 			]
 		}
@@ -373,12 +372,7 @@ func GetSchemas() []string {
 					],
 					"onlyCheckPrioritizedCollectionApprovals": false,
 					"onlyCheckPrioritizedIncomingApprovals": false,
-					"onlyCheckPrioritizedOutgoingApprovals": false,
-					"zkProofSolutions": [
-						{
-							"proof": "",
-							"publicInputs": ""
-						}
+					"onlyCheckPrioritizedOutgoingApprovals": false
 					]
 				}
 			]
@@ -433,29 +427,6 @@ func GetSchemas() []string {
 						"customData": "",
 						"approvalId": "",
 						"approvalCriteria": {
-							"mustOwnBadges": [
-								{
-									"collectionId": "",
-									"amountRange": {
-										"start": "",
-										"end": ""
-									},
-									"ownershipTimes": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"badgeIds": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"overrideWithCurrentTime": false,
-									"mustSatisfyForAllAssets": false
-								}
-							],
 							"merkleChallenges": [{
 								"root": "",
 								"expectedProofLength": "",
@@ -465,14 +436,6 @@ func GetSchemas() []string {
 								"uri": "",
 								"customData": ""
 							}],
-							"zkProofs": [
-								{
-									"verificationKey": "",
-									"zkpTrackerId": "",
-									"uri": "",
-									"customData": ""
-								}
-							],
 							"coinTransfers": [
 								{
 									"to": "",
@@ -581,29 +544,6 @@ func GetSchemas() []string {
 						"customData": "",
 						"approvalId": "",
 						"approvalCriteria": {
-							"mustOwnBadges": [
-								{
-									"collectionId": "",
-									"amountRange": {
-										"start": "",
-										"end": ""
-									},
-									"ownershipTimes": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"badgeIds": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"overrideWithCurrentTime": false,
-									"mustSatisfyForAllAssets": false
-								}
-							],
 							"merkleChallenges": [{
 								"root": "",
 								"expectedProofLength": "",
@@ -613,14 +553,6 @@ func GetSchemas() []string {
 								"uri": "",
 								"customData": ""
 							}],
-							"zkProofs": [
-								{
-									"verificationKey": "",
-									"zkpTrackerId": "",
-									"uri": "",
-									"customData": ""
-								}
-							],
 							"coinTransfers": [
 								{
 									"to": "",
@@ -1165,29 +1097,6 @@ func GetSchemas() []string {
 					"customData": "",
 					"approvalId": "",
 					"approvalCriteria": {
-						"mustOwnBadges": [
-							{
-								"collectionId": "",
-								"amountRange": {
-									"start": "",
-									"end": ""
-								},
-								"ownershipTimes": [
-									{
-										"start": "",
-										"end": ""
-									}
-								],
-								"badgeIds": [
-									{
-										"start": "",
-										"end": ""
-									}
-								],
-								"overrideWithCurrentTime": false,
-								"mustSatisfyForAllAssets": false
-							}
-						],
 						"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
@@ -1197,14 +1106,6 @@ func GetSchemas() []string {
 							"uri": "",
 							"customData": ""
 						}],
-						"zkProofs": [
-							{
-								"verificationKey": "",
-								"zkpTrackerId": "",
-								"uri": "",
-								"customData": ""
-							}
-						],
 						"coinTransfers": [
 								{
 									"to": "",
@@ -1350,29 +1251,6 @@ func GetSchemas() []string {
 					"customData": "",
 					"approvalId": "",
 					"approvalCriteria": {
-						"mustOwnBadges": [
-							{
-								"collectionId": "",
-								"amountRange": {
-									"start": "",
-									"end": ""
-								},
-								"ownershipTimes": [
-									{
-										"start": "",
-										"end": ""
-									}
-								],
-								"badgeIds": [
-									{
-										"start": "",
-										"end": ""
-									}
-								],
-								"overrideWithCurrentTime": false,
-								"mustSatisfyForAllAssets": false
-							}
-						],
 						"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
@@ -1382,14 +1260,6 @@ func GetSchemas() []string {
 							"uri": "",
 							"customData": ""
 						}],
-						"zkProofs": [
-							{
-								"verificationKey": "",
-								"zkpTrackerId": "",
-								"uri": "",
-								"customData": ""
-							}
-						],
 						"coinTransfers": [
 								{
 									"to": "",
@@ -1499,29 +1369,6 @@ func GetSchemas() []string {
 					"customData": "",
 					"approvalId": "",
 					"approvalCriteria": {
-						"mustOwnBadges": [
-							{
-								"collectionId": "",
-								"amountRange": {
-									"start": "",
-									"end": ""
-								},
-								"ownershipTimes": [
-									{
-										"start": "",
-										"end": ""
-									}
-								],
-								"badgeIds": [
-									{
-										"start": "",
-										"end": ""
-									}
-								],
-								"overrideWithCurrentTime": false,
-								"mustSatisfyForAllAssets": false
-							}
-						],
 						"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
@@ -1531,14 +1378,6 @@ func GetSchemas() []string {
 							"uri": "",
 							"customData": ""
 						}],
-						"zkProofs": [
-							{
-								"verificationKey": "",
-								"zkpTrackerId": "",
-								"uri": "",
-								"customData": ""
-							}
-						],
 						"coinTransfers": [
 								{
 									"to": "",
@@ -1784,29 +1623,6 @@ func GetSchemas() []string {
 						"customData": "",
 						"approvalId": "",
 						"approvalCriteria": {
-							"mustOwnBadges": [
-								{
-									"collectionId": "",
-									"amountRange": {
-										"start": "",
-										"end": ""
-									},
-									"ownershipTimes": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"badgeIds": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"overrideWithCurrentTime": false,
-									"mustSatisfyForAllAssets": false
-								}
-							],
 							"merkleChallenges": [{
 								"root": "",
 								"expectedProofLength": "",
@@ -1816,14 +1632,6 @@ func GetSchemas() []string {
 								"uri": "",
 								"customData": ""
 							}],
-							"zkProofs": [
-								{
-									"verificationKey": "",
-									"zkpTrackerId": "",
-									"uri": "",
-									"customData": ""
-								}
-							],
 							"coinTransfers": [
 								{
 									"to": "",
@@ -1932,29 +1740,6 @@ func GetSchemas() []string {
 						"customData": "",
 						"approvalId": "",
 						"approvalCriteria": {
-							"mustOwnBadges": [
-								{
-									"collectionId": "",
-									"amountRange": {
-										"start": "",
-										"end": ""
-									},
-									"ownershipTimes": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"badgeIds": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"overrideWithCurrentTime": false,
-									"mustSatisfyForAllAssets": false
-								}
-							],
 							"merkleChallenges": [{
 								"root": "",
 								"expectedProofLength": "",
@@ -1964,14 +1749,6 @@ func GetSchemas() []string {
 								"uri": "",
 								"customData": ""
 							}],
-							"zkProofs": [
-								{
-									"verificationKey": "",
-									"zkpTrackerId": "",
-									"uri": "",
-									"customData": ""
-								}
-							],
 							"coinTransfers": [
 								{
 									"to": "",
@@ -2508,29 +2285,6 @@ func GetSchemas() []string {
 					"customData": "",
 					"approvalId": "",
 					"approvalCriteria": {
-						"mustOwnBadges": [
-							{
-								"collectionId": "",
-								"amountRange": {
-									"start": "",
-									"end": ""
-								},
-								"ownershipTimes": [
-									{
-										"start": "",
-										"end": ""
-									}
-								],
-								"badgeIds": [
-									{
-										"start": "",
-										"end": ""
-									}
-								],
-								"overrideWithCurrentTime": false,
-								"mustSatisfyForAllAssets": false
-							}
-						],
 						"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
@@ -2540,14 +2294,6 @@ func GetSchemas() []string {
 							"uri": "",
 							"customData": ""
 						}],
-						"zkProofs": [
-							{
-								"verificationKey": "",
-								"zkpTrackerId": "",
-								"uri": "",
-								"customData": ""
-							}
-						],
 						"coinTransfers": [
 								{
 									"to": "",
@@ -3014,29 +2760,6 @@ func GetSchemas() []string {
 					"customData": "",
 					"approvalId": "",
 					"approvalCriteria": {
-						"mustOwnBadges": [
-							{
-								"collectionId": "",
-								"amountRange": {
-									"start": "",
-									"end": ""
-								},
-								"ownershipTimes": [
-									{
-										"start": "",
-										"end": ""
-									}
-								],
-								"badgeIds": [
-									{
-										"start": "",
-										"end": ""
-									}
-								],
-								"overrideWithCurrentTime": false,
-								"mustSatisfyForAllAssets": false
-							}
-						],
 						"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
@@ -3046,14 +2769,6 @@ func GetSchemas() []string {
 							"uri": "",
 							"customData": ""
 						}],
-						"zkProofs": [
-							{
-								"verificationKey": "",
-								"zkpTrackerId": "",
-								"uri": "",
-								"customData": ""
-							}
-						],
 						"coinTransfers": [
 								{
 									"to": "",

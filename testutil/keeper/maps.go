@@ -21,8 +21,8 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 	"github.com/stretchr/testify/require"
 
-	"bitbadgeschain/x/maps/keeper"
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/x/maps/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 )
 
 func MapsKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {

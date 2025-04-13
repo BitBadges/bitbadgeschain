@@ -4,7 +4,7 @@ import (
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	badgestypes "bitbadgeschain/x/badges/types"
+	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 const TypeMsgUpdateMap = "update_map"

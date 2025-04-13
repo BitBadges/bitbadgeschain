@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -11,11 +11,6 @@ import (
 func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpdateUserApprovals) (*types.MsgUpdateUserApprovalsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	err := msg.CheckAndCleanMsg(ctx, true)
-	if err != nil {
-		return nil, err
-	}
-
-	err = k.UniversalValidateNotHalted(ctx)
 	if err != nil {
 		return nil, err
 	}

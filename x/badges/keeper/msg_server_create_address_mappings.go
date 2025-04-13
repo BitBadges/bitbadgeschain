@@ -3,18 +3,13 @@ package keeper
 import (
 	"context"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (k msgServer) CreateAddressLists(goCtx context.Context, msg *types.MsgCreateAddressLists) (*types.MsgCreateAddressListsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	err := k.UniversalValidateNotHalted(ctx)
-	if err != nil {
-		return nil, err
-	}
 
 	for _, addressList := range msg.AddressLists {
 		addressList.CreatedBy = msg.Creator

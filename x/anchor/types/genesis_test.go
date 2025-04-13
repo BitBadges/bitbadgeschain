@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	"bitbadgeschain/x/anchor/types"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
 
 	"github.com/stretchr/testify/require"
 )

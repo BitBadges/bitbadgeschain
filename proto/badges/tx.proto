@@ -16,7 +16,7 @@ import "badges/address_lists.proto";
 import "badges/timelines.proto";
 
 
-option go_package = "bitbadgeschain/x/badges/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 // Msg defines the Msg service.
 service Msg {

@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -41,6 +41,7 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		UpdateIsArchivedTimeline:               true,
 		IsArchivedTimeline:                     msg.IsArchivedTimeline,
 	}
+
 	res, err := k.UniversalUpdateCollection(ctx, &newMsg)
 	if err != nil {
 		return nil, err

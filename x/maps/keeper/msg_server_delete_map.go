@@ -3,12 +3,12 @@ package keeper
 import (
 	"context"
 
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	badgetypes "bitbadgeschain/x/badges/types"
+	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 func (k msgServer) DeleteMap(goCtx context.Context, msg *types.MsgDeleteMap) (*types.MsgDeleteMapResponse, error) {
@@ -22,7 +22,7 @@ func (k msgServer) DeleteMap(goCtx context.Context, msg *types.MsgDeleteMap) (*t
 
 	collection := &badgetypes.BadgeCollection{}
 	if !currMap.InheritManagerTimelineFrom.IsNil() && !currMap.InheritManagerTimelineFrom.IsZero() {
-		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerTimelineFrom})
+		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerTimelineFrom.String()})
 		if err != nil {
 			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Could not find collection in store")
 		}

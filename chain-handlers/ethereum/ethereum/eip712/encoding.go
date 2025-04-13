@@ -4,14 +4,14 @@ import (
 	"errors"
 	"fmt"
 
-	"bitbadgeschain/app/params"
+	"github.com/bitbadges/bitbadgeschain/app/params"
 
 	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	txTypes "github.com/cosmos/cosmos-sdk/types/tx"
 
-	types "bitbadgeschain/chain-handlers/ethereum/utils"
+	types "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/utils"
 
 	apitypes "github.com/ethereum/go-ethereum/signer/core/apitypes"
 

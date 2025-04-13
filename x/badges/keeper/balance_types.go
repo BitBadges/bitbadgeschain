@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 func IsStandardBalances(collection *types.BadgeCollection) bool {

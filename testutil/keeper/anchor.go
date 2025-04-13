@@ -21,8 +21,8 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 	"github.com/stretchr/testify/require"
 
-	"bitbadgeschain/x/anchor/keeper"
-	"bitbadgeschain/x/anchor/types"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
 )
 
 func AnchorKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {

@@ -3,11 +3,13 @@ package keeper
 import (
 	"context"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	sdkmath "cosmossdk.io/math"
 )
 
 // Queries a balance for the given address and badgeId and returns its contents.
@@ -18,7 +20,8 @@ func (k Keeper) GetApprovalTracker(goCtx context.Context, req *types.QueryGetApp
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	address, found := k.GetApprovalTrackerFromStore(ctx, req.CollectionId, req.ApproverAddress, req.ApprovalId, req.AmountTrackerId, req.ApprovalLevel, req.TrackerType, req.ApprovedAddress)
+	collectionId := sdkmath.NewUintFromString(req.CollectionId)
+	address, found := k.GetApprovalTrackerFromStore(ctx, collectionId, req.ApproverAddress, req.ApprovalId, req.AmountTrackerId, req.ApprovalLevel, req.TrackerType, req.ApprovedAddress)
 	if !found {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}

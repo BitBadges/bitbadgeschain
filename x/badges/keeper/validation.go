@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -23,9 +23,5 @@ func (k Keeper) UniversalValidate(ctx sdk.Context, collection *types.BadgeCollec
 		}
 	}
 
-	return nil
-}
-
-func (k Keeper) UniversalValidateNotHalted(ctx sdk.Context) error {
 	return nil
 }

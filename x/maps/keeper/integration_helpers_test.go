@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"context"
 
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 )
 
 /* Query helpers */

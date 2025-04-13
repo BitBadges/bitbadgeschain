@@ -21,8 +21,8 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 	"github.com/stretchr/testify/require"
 
-	"bitbadgeschain/x/wasmx/keeper"
-	"bitbadgeschain/x/wasmx/types"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 )
 
 func WasmxKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {

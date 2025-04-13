@@ -8,7 +8,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "anchor/params.proto";
 import "anchor/tx.proto";
 
-option go_package = "bitbadgeschain/x/anchor/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/anchor/types";
 
 // Query defines the gRPC querier service.
 service Query {

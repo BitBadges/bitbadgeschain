@@ -3,7 +3,7 @@ package maps
 // import (
 // 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 
-// 	modulev1 "bitbadgeschain/api/maps"
+// 	modulev1 "github.com/bitbadges/bitbadgeschain/api/maps"
 // )
 
 // // AutoCLIOptions implements the autocli.HasAutoCLIConfig interface.

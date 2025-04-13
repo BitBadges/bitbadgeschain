@@ -5,8 +5,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	keepertest "bitbadgeschain/testutil/keeper"
-	"bitbadgeschain/x/anchor/types"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
+
+	keepertest "github.com/bitbadges/bitbadgeschain/testutil/keeper"
 )
 
 func TestGetParams(t *testing.T) {

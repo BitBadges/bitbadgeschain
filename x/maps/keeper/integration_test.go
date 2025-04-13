@@ -6,13 +6,13 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"bitbadgeschain/x/maps/keeper"
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/x/maps/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	bitbadgesapp "bitbadgeschain/app"
+	bitbadgesapp "github.com/bitbadges/bitbadgeschain/app"
 )
 
 const (

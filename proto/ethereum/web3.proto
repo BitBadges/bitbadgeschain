@@ -4,7 +4,7 @@ package ethereum;
 import "gogoproto/gogo.proto";
 import "amino/amino.proto";
 
-option go_package = "bitbadgeschain/chain-handlers/ethereum/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/types";
 
 // ExtensionOptionsWeb3Tx is an extension option that specifies the typed chain id,
 // the fee payer as well as its signature data.

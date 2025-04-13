@@ -11,7 +11,7 @@ import "badges/balances.proto";
 import "badges/transfers.proto";
 import "badges/address_lists.proto";
 
-option go_package = "bitbadgeschain/x/badges/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 
 // Query defines the gRPC querier service.

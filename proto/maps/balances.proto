@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "maps/params.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "bitbadgeschain/x/maps/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/maps/types";
 
 /* 
   The UintRange is a range of IDs from some start to some end (inclusive).

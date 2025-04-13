@@ -7,7 +7,7 @@ import "gogoproto/gogo.proto";
 import "anchor/params.proto";
 import "anchor/tx.proto";
 
-option go_package = "bitbadgeschain/x/anchor/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/anchor/types";
 
 // GenesisState defines the anchor module's genesis state.
 message GenesisState {

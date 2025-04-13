@@ -428,3 +428,21 @@ func jsonEqual(a, b interface{}) bool {
 
 	return string(aJSON) == string(bJSON)
 }
+
+func IncrementBalances(startBalances []*Balance, numIncrements sdkmath.Uint, incrementOwnershipTimesBy sdkmath.Uint, incrementBadgeIdsBy sdkmath.Uint) ([]*Balance, error) {
+	balances := DeepCopyBalances(startBalances)
+
+	for _, startBalance := range balances {
+		for _, time := range startBalance.OwnershipTimes {
+			time.Start = time.Start.Add(numIncrements.Mul(incrementOwnershipTimesBy))
+			time.End = time.End.Add(numIncrements.Mul(incrementOwnershipTimesBy))
+		}
+
+		for _, badgeId := range startBalance.BadgeIds {
+			badgeId.Start = badgeId.Start.Add(numIncrements.Mul(incrementBadgeIdsBy))
+			badgeId.End = badgeId.End.Add(numIncrements.Mul(incrementBadgeIdsBy))
+		}
+	}
+
+	return balances, nil
+}

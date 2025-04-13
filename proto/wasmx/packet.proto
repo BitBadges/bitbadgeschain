@@ -1,7 +1,7 @@
 syntax = "proto3";
 package wasmx;
 
-option go_package = "bitbadgeschain/x/wasmx/types";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/wasmx/types";
 
 message WasmxPacketData {
     oneof packet {

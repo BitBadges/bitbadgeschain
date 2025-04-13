@@ -20,7 +20,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"bitbadgeschain/app"
+	"github.com/bitbadges/bitbadgeschain/app"
 
 	wasm "github.com/CosmWasm/wasmd/x/wasm"
 )

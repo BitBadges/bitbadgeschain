@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"bitbadgeschain/x/anchor/types"
+	"github.com/bitbadges/bitbadgeschain/x/anchor/types"
 
 	sdkerrors "cosmossdk.io/errors"
 	"cosmossdk.io/log"
@@ -15,7 +15,7 @@ import (
 
 	storetypes "cosmossdk.io/store/types"
 
-	"bitbadgeschain/chain-handlers/ethereum/crypto/ethsecp256k1"
+	"github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/crypto/ethsecp256k1"
 
 	ed25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 )

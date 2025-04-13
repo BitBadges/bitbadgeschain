@@ -6,13 +6,13 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"bitbadgeschain/x/badges/keeper"
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	bitbadgesapp "bitbadgeschain/app"
+	bitbadgesapp "github.com/bitbadges/bitbadgeschain/app"
 
 	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/testutil"
 )

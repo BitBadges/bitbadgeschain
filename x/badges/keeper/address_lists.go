@@ -1,13 +1,11 @@
 package keeper
 
 import (
-	"encoding/binary"
 	"strings"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	sdkerrors "cosmossdk.io/errors"
 )
@@ -20,10 +18,10 @@ func (k Keeper) CreateAddressList(ctx sdk.Context, addressList *types.AddressLis
 		return sdkerrors.Wrapf(ErrInvalidAddressListId, "address list id cannot start with !")
 	}
 
-	//if any char is a :
+	//Check if all characters are alphanumeric
 	for _, char := range id {
-		if char == ':' || char == '_' {
-			return sdkerrors.Wrapf(ErrInvalidAddressListId, "address list id cannot contain : or _")
+		if !((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9')) {
+			return sdkerrors.Wrapf(ErrInvalidAddressListId, "address list id can only contain alphanumeric characters")
 		}
 	}
 
@@ -31,28 +29,6 @@ func (k Keeper) CreateAddressList(ctx sdk.Context, addressList *types.AddressLis
 	if err == nil {
 		return sdkerrors.Wrapf(ErrAddressListAlreadyExists, "address list with id %s already exists or is reserved", id)
 	}
-
-	// From cosmos SDK x/group module
-	// Generate account address for list
-	var accountAddr sdk.AccAddress
-	// loop here in the rare case where a ADR-028-derived address creates a
-	// collision with an existing address.
-	for {
-		derivationKey := make([]byte, 8)
-		nextId := k.GetNextAddressListCounter(ctx)
-		binary.BigEndian.PutUint64(derivationKey, nextId.Uint64())
-
-		ac, err := authtypes.NewModuleCredential(types.ModuleName, AddressGenerationPrefix, derivationKey)
-		if err != nil {
-			return err
-		}
-		//generate the address from the credential
-		accountAddr = sdk.AccAddress(ac.Address())
-
-		break
-	}
-
-	addressList.AliasAddress = accountAddr.String()
 
 	err = k.SetAddressListInStore(ctx, *addressList)
 	if err != nil {
@@ -65,111 +41,84 @@ func (k Keeper) CreateAddressList(ctx sdk.Context, addressList *types.AddressLis
 }
 
 func getReservedListById(addressListId string, allowAliases bool) (*types.AddressList, bool, error) {
-	handled := false
-	addressList := &types.AddressList{}
 
-	if addressListId == "Mint" {
-		addressList = &types.AddressList{
+	// Handle special reserved IDs
+	switch {
+	case addressListId == "Mint":
+		return &types.AddressList{
 			ListId:     "Mint",
 			Addresses:  []string{"Mint"},
 			Whitelist:  true,
 			Uri:        "",
 			CustomData: "",
+		}, true, nil
+
+	case strings.HasPrefix(addressListId, "AllWithout"):
+		addresses := strings.Split(addressListId[10:], ":")
+		for _, address := range addresses {
+			if err := types.ValidateAddress(address, true); err != nil {
+				return nil, false, sdkerrors.Wrapf(ErrInvalidAddressListId, "address list cannot contain invalid addresses")
+			}
 		}
-		handled = true
-	} else if len(addressListId) > 10 && addressListId[0:10] == "AllWithout" {
-		//If starts with AllWithout, we create a list with all addresses except the ones specified delimited by :
-		addresses := addressListId[10:]
-		addressList = &types.AddressList{
+		return &types.AddressList{
+			ListId:     addressListId,
+			Addresses:  addresses,
+			Whitelist:  false,
+			Uri:        "",
+			CustomData: "",
+		}, true, nil
+
+	case addressListId == "All", addressListId == "AllWithMint":
+		return &types.AddressList{
 			ListId:     addressListId,
 			Addresses:  []string{},
 			Whitelist:  false,
 			Uri:        "",
 			CustomData: "",
-		}
+		}, true, nil
 
-		//split by :
-		splitAdresses := strings.Split(addresses, ":")
-		for _, address := range splitAdresses {
-			addressList.Addresses = append(addressList.Addresses, address)
-
-			if err := types.ValidateAddress(address, true); err != nil {
-				return nil, false, sdkerrors.Wrapf(ErrInvalidAddressListId, "address list cannot contain invalid addresses")
-			}
-		}
-
-		handled = true
-	} else if addressListId == "All" {
-		addressList = &types.AddressList{
-			ListId:     "All",
-			Addresses:  []string{},
-			Whitelist:  false,
-			Uri:        "",
-			CustomData: "",
-		}
-		handled = true
-	} else if addressListId == "AllWithMint" {
-		addressList = &types.AddressList{
-			ListId:     "AllWithMint",
-			Addresses:  []string{},
-			Whitelist:  false,
-			Uri:        "",
-			CustomData: "",
-		}
-		handled = true
-	} else if addressListId == "None" {
-		addressList = &types.AddressList{
-			ListId:     "None",
+	case addressListId == "None":
+		return &types.AddressList{
+			ListId:     addressListId,
 			Addresses:  []string{},
 			Whitelist:  true,
 			Uri:        "",
 			CustomData: "",
-		}
-		handled = true
+		}, true, nil
 	}
 
-	//Split by :
-	if !handled {
-		addresses := strings.Split(addressListId, ":")
-		allAreValid := true
-		if !allowAliases {
-			for _, address := range addresses {
-				if err := types.ValidateAddress(address, true); err != nil {
-					allAreValid = false
-				}
+	// Handle colon-separated addresses
+	addresses := strings.Split(addressListId, ":")
+	if !allowAliases {
+		for _, address := range addresses {
+			if err := types.ValidateAddress(address, true); err != nil {
+				return nil, false, nil
 			}
-		}
-
-		if allAreValid {
-			addressList = &types.AddressList{
-				ListId:     addressListId,
-				Addresses:  addresses,
-				Whitelist:  true,
-				Uri:        "",
-				CustomData: "",
-			}
-			handled = true
 		}
 	}
 
-	return addressList, handled, nil
+	return &types.AddressList{
+		ListId:     addressListId,
+		Addresses:  addresses,
+		Whitelist:  true,
+		Uri:        "",
+		CustomData: "",
+	}, true, nil
 }
 
 func (k Keeper) GetTrackerListById(ctx sdk.Context, trackerListId string) (*types.AddressList, error) {
 	inverted := false
-	trackerListIdCopy := trackerListId
-	addressList := &types.AddressList{}
+	originalId := trackerListId
+
 	if trackerListId[0] == '!' {
 		inverted = true
 		trackerListId = trackerListId[1:]
 	}
 
-	//Tracker lists do not allow aliases and are only reserved IDs
 	addressList, handled, err := getReservedListById(trackerListId, true)
 	if err != nil {
 		return nil, err
 	}
-
 	if !handled {
 		return nil, sdkerrors.Wrapf(ErrAddressListNotFound, "tracker list with id %s not a reserved ID", trackerListId)
 	}
@@ -177,22 +126,19 @@ func (k Keeper) GetTrackerListById(ctx sdk.Context, trackerListId string) (*type
 	if inverted {
 		addressList.Whitelist = !addressList.Whitelist
 	}
-
-	if addressList.ListId != trackerListIdCopy {
-		addressList.ListId = trackerListIdCopy
-	}
-
+	addressList.ListId = originalId
 	return addressList, nil
 }
 
 func (k Keeper) GetAddressListById(ctx sdk.Context, addressListId string) (*types.AddressList, error) {
 	inverted := false
-	addressListIdCopy := addressListId
-	addressList := &types.AddressList{}
+	originalId := addressListId
+
+	// Handle inversion patterns
 	if addressListId[0] == '!' && len(addressListId) > 1 && addressListId[len(addressListId)-1] != ')' {
 		inverted = true
 		addressListId = addressListId[1:]
-	} else if len(addressListId) > 3 && addressListId[0:2] == "!(" && addressListId[len(addressListId)-1] == ')' {
+	} else if strings.HasPrefix(addressListId, "!(") && strings.HasSuffix(addressListId, ")") {
 		inverted = true
 		addressListId = addressListId[2 : len(addressListId)-1]
 	}
@@ -204,21 +150,16 @@ func (k Keeper) GetAddressListById(ctx sdk.Context, addressListId string) (*type
 
 	if !handled {
 		addressListFetched, found := k.GetAddressListFromStore(ctx, addressListId)
-		if found {
-			addressList = &addressListFetched
-		} else {
+		if !found {
 			return nil, sdkerrors.Wrapf(ErrAddressListNotFound, "address list with id %s not found", addressListId)
 		}
+		addressList = &addressListFetched
 	}
 
 	if inverted {
 		addressList.Whitelist = !addressList.Whitelist
 	}
-
-	if addressList.ListId != addressListIdCopy {
-		addressList.ListId = addressListIdCopy
-	}
-
+	addressList.ListId = originalId
 	return addressList, nil
 }
 
@@ -232,6 +173,7 @@ func (k Keeper) CheckAddresses(ctx sdk.Context, addressListId string, addressToC
 	for _, address := range addressList.Addresses {
 		if address == addressToCheck {
 			found = true
+			break
 		}
 	}
 
@@ -246,12 +188,7 @@ func (k Keeper) CheckAddresses(ctx sdk.Context, addressListId string, addressToC
 	return true, nil
 }
 
-// Checks if the addresses are in their respective list.
-// If whitelist is true, then we check if the address is in the Addresses field.
-// If whitelist is false, then we check if the address is NOT in the Addresses field.
-
-// Note addresses matching does not mean the transfer is allowed. It just means the addresses match.
-// All other criteria must also be met.
+// Checks if the addresses in the (to, from, initiatedBy) are approved
 func (k Keeper) CheckIfAddressesMatchCollectionListIds(ctx sdk.Context, collectionApproval *types.CollectionApproval, from string, to string, initiatedBy string) bool {
 	fromFound, err := k.CheckAddresses(ctx, collectionApproval.FromListId, from)
 	if err != nil {

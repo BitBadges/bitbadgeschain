@@ -3,9 +3,9 @@ package keeper
 import (
 	"fmt"
 
-	"bitbadgeschain/x/maps/types"
+	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 
-	badgekeeper "bitbadgeschain/x/badges/keeper"
+	badgekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 
 	"cosmossdk.io/core/store"
 	errorsmod "cosmossdk.io/errors"

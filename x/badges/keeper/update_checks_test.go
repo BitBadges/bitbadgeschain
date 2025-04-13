@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -1393,7 +1393,7 @@ func (suite *TestSuite) TestGetMaxPossible() {
 			BadgeIds:          GetFullUintRanges(),
 		},
 	}
-	
+
 	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
 		{
 			Amount:         sdkmath.NewUint(20),

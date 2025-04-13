@@ -36,24 +36,24 @@ import (
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 
-	"bitbadgeschain/chain-handlers/ethereum/crypto/ethsecp256k1"
-	"bitbadgeschain/chain-handlers/ethereum/ethereum/eip712"
-	ethereumtypes "bitbadgeschain/chain-handlers/ethereum/types"
-	ethereum "bitbadgeschain/chain-handlers/ethereum/utils"
-	solanatypes "bitbadgeschain/chain-handlers/solana/types"
+	"github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/crypto/ethsecp256k1"
+	"github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/ethereum/eip712"
+	ethereumtypes "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/types"
+	ethereum "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/utils"
+	solanatypes "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/types"
 
-	bitcointypes "bitbadgeschain/chain-handlers/bitcoin/types"
+	bitcointypes "github.com/bitbadges/bitbadgeschain/chain-handlers/bitcoin/types"
 
-	solana "bitbadgeschain/chain-handlers/solana/utils"
+	solana "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/utils"
 
-	"bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	ethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 	"github.com/storyicon/sigverify"
 
-	bitcoin "bitbadgeschain/chain-handlers/bitcoin/utils"
-	ethereumcodec "bitbadgeschain/chain-handlers/ethereum/crypto/codec"
+	bitcoin "github.com/bitbadges/bitbadgeschain/chain-handlers/bitcoin/utils"
+	ethereumcodec "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/crypto/codec"
 
 	txsigning "cosmossdk.io/x/tx/signing"
 )

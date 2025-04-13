@@ -6,7 +6,7 @@ import (
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 
-	"bitbadgeschain/chain-handlers/ethereum/crypto/ethsecp256k1"
+	"github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/crypto/ethsecp256k1"
 )
 
 func RegisterCrypto(cdc *codec.LegacyAmino) {
