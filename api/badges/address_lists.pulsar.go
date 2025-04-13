@@ -60,14 +60,13 @@ func (x *_AddressList_2_list) IsValid() bool {
 }
 
 var (
-	md_AddressList              protoreflect.MessageDescriptor
-	fd_AddressList_listId       protoreflect.FieldDescriptor
-	fd_AddressList_addresses    protoreflect.FieldDescriptor
-	fd_AddressList_whitelist    protoreflect.FieldDescriptor
-	fd_AddressList_uri          protoreflect.FieldDescriptor
-	fd_AddressList_customData   protoreflect.FieldDescriptor
-	fd_AddressList_createdBy    protoreflect.FieldDescriptor
-	fd_AddressList_aliasAddress protoreflect.FieldDescriptor
+	md_AddressList            protoreflect.MessageDescriptor
+	fd_AddressList_listId     protoreflect.FieldDescriptor
+	fd_AddressList_addresses  protoreflect.FieldDescriptor
+	fd_AddressList_whitelist  protoreflect.FieldDescriptor
+	fd_AddressList_uri        protoreflect.FieldDescriptor
+	fd_AddressList_customData protoreflect.FieldDescriptor
+	fd_AddressList_createdBy  protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -79,7 +78,6 @@ func init() {
 	fd_AddressList_uri = md_AddressList.Fields().ByName("uri")
 	fd_AddressList_customData = md_AddressList.Fields().ByName("customData")
 	fd_AddressList_createdBy = md_AddressList.Fields().ByName("createdBy")
-	fd_AddressList_aliasAddress = md_AddressList.Fields().ByName("aliasAddress")
 }
 
 var _ protoreflect.Message = (*fastReflection_AddressList)(nil)
@@ -183,12 +181,6 @@ func (x *fastReflection_AddressList) Range(f func(protoreflect.FieldDescriptor, 
 			return
 		}
 	}
-	if x.AliasAddress != "" {
-		value := protoreflect.ValueOfString(x.AliasAddress)
-		if !f(fd_AddressList_aliasAddress, value) {
-			return
-		}
-	}
 }
 
 // Has reports whether a field is populated.
@@ -216,8 +208,6 @@ func (x *fastReflection_AddressList) Has(fd protoreflect.FieldDescriptor) bool {
 		return x.CustomData != ""
 	case "badges.AddressList.createdBy":
 		return x.CreatedBy != ""
-	case "badges.AddressList.aliasAddress":
-		return x.AliasAddress != ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.AddressList"))
@@ -246,8 +236,6 @@ func (x *fastReflection_AddressList) Clear(fd protoreflect.FieldDescriptor) {
 		x.CustomData = ""
 	case "badges.AddressList.createdBy":
 		x.CreatedBy = ""
-	case "badges.AddressList.aliasAddress":
-		x.AliasAddress = ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.AddressList"))
@@ -285,9 +273,6 @@ func (x *fastReflection_AddressList) Get(descriptor protoreflect.FieldDescriptor
 	case "badges.AddressList.createdBy":
 		value := x.CreatedBy
 		return protoreflect.ValueOfString(value)
-	case "badges.AddressList.aliasAddress":
-		value := x.AliasAddress
-		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.AddressList"))
@@ -322,8 +307,6 @@ func (x *fastReflection_AddressList) Set(fd protoreflect.FieldDescriptor, value 
 		x.CustomData = value.Interface().(string)
 	case "badges.AddressList.createdBy":
 		x.CreatedBy = value.Interface().(string)
-	case "badges.AddressList.aliasAddress":
-		x.AliasAddress = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.AddressList"))
@@ -360,8 +343,6 @@ func (x *fastReflection_AddressList) Mutable(fd protoreflect.FieldDescriptor) pr
 		panic(fmt.Errorf("field customData of message badges.AddressList is not mutable"))
 	case "badges.AddressList.createdBy":
 		panic(fmt.Errorf("field createdBy of message badges.AddressList is not mutable"))
-	case "badges.AddressList.aliasAddress":
-		panic(fmt.Errorf("field aliasAddress of message badges.AddressList is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.AddressList"))
@@ -387,8 +368,6 @@ func (x *fastReflection_AddressList) NewField(fd protoreflect.FieldDescriptor) p
 	case "badges.AddressList.customData":
 		return protoreflect.ValueOfString("")
 	case "badges.AddressList.createdBy":
-		return protoreflect.ValueOfString("")
-	case "badges.AddressList.aliasAddress":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
@@ -484,10 +463,6 @@ func (x *fastReflection_AddressList) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.AliasAddress)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -516,13 +491,6 @@ func (x *fastReflection_AddressList) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
-		}
-		if len(x.AliasAddress) > 0 {
-			i -= len(x.AliasAddress)
-			copy(dAtA[i:], x.AliasAddress)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.AliasAddress)))
-			i--
-			dAtA[i] = 0x3a
 		}
 		if len(x.CreatedBy) > 0 {
 			i -= len(x.CreatedBy)
@@ -800,38 +768,6 @@ func (x *fastReflection_AddressList) ProtoMethods() *protoiface.Methods {
 				}
 				x.CreatedBy = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 7:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AliasAddress", wireType)
-				}
-				var stringLen uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.AliasAddress = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -881,10 +817,10 @@ const (
 )
 
 // An AddressList is a list of addresses that are referenced by an ID.
-// The list may include only the specified addresses, or it may include all addresses but
-// the specified addresses (depending on if whitelist is true (whitelist) or false (blacklist)).
 //
-// AddressLists are used for defining approvals, as well as being a simplified badge interface.
+// AddressLists are used for defining approvals.
+//
+// Note: We also support a reserved ID system by string ID; "Mint", "!Mint"
 type AddressList struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -902,8 +838,6 @@ type AddressList struct {
 	CustomData string `protobuf:"bytes,5,opt,name=customData,proto3" json:"customData,omitempty"`
 	// The user or entity who created the address list.
 	CreatedBy string `protobuf:"bytes,6,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
-	// The alias BitBadges address for the list.
-	AliasAddress string `protobuf:"bytes,7,opt,name=aliasAddress,proto3" json:"aliasAddress,omitempty"`
 }
 
 func (x *AddressList) Reset() {
@@ -968,13 +902,6 @@ func (x *AddressList) GetCreatedBy() string {
 	return ""
 }
 
-func (x *AddressList) GetAliasAddress() string {
-	if x != nil {
-		return x.AliasAddress
-	}
-	return ""
-}
-
 var File_badges_address_lists_proto protoreflect.FileDescriptor
 
 var file_badges_address_lists_proto_rawDesc = []byte{
@@ -983,7 +910,7 @@ var file_badges_address_lists_proto_rawDesc = []byte{
 	0x64, 0x67, 0x65, 0x73, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f,
 	0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x15, 0x62, 0x61, 0x64, 0x67,
 	0x65, 0x73, 0x2f, 0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x22, 0xd5, 0x01, 0x0a, 0x0b, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x4c, 0x69, 0x73,
+	0x6f, 0x22, 0xb1, 0x01, 0x0a, 0x0b, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x4c, 0x69, 0x73,
 	0x74, 0x12, 0x16, 0x0a, 0x06, 0x6c, 0x69, 0x73, 0x74, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x09, 0x52, 0x06, 0x6c, 0x69, 0x73, 0x74, 0x49, 0x64, 0x12, 0x1c, 0x0a, 0x09, 0x61, 0x64, 0x64,
 	0x72, 0x65, 0x73, 0x73, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x09, 0x61, 0x64,
@@ -994,17 +921,15 @@ var file_badges_address_lists_proto_rawDesc = []byte{
 	0x6d, 0x44, 0x61, 0x74, 0x61, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x63, 0x75, 0x73,
 	0x74, 0x6f, 0x6d, 0x44, 0x61, 0x74, 0x61, 0x12, 0x1c, 0x0a, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74,
 	0x65, 0x64, 0x42, 0x79, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61,
-	0x74, 0x65, 0x64, 0x42, 0x79, 0x12, 0x22, 0x0a, 0x0c, 0x61, 0x6c, 0x69, 0x61, 0x73, 0x41, 0x64,
-	0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x61, 0x6c, 0x69,
-	0x61, 0x73, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x42, 0x72, 0x0a, 0x0a, 0x63, 0x6f, 0x6d,
-	0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x42, 0x11, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
-	0x4c, 0x69, 0x73, 0x74, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x19, 0x62, 0x69,
-	0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x61, 0x70, 0x69,
-	0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x06,
-	0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xca, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xe2,
-	0x02, 0x12, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61,
-	0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x65, 0x64, 0x42, 0x79, 0x42, 0x72, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x64,
+	0x67, 0x65, 0x73, 0x42, 0x11, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x4c, 0x69, 0x73, 0x74,
+	0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x19, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64,
+	0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64,
+	0x67, 0x65, 0x73, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67,
+	0x65, 0x73, 0xca, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xe2, 0x02, 0x12, 0x42, 0x61,
+	0x64, 0x67, 0x65, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
+	0xea, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
