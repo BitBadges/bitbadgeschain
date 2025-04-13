@@ -1,4 +1,4 @@
-# BitBadges Blockchian
+# BitBadges Blockchain
 
 **bitbadgeschain** is a blockchain built using Cosmos SDK and Tendermint and created with [Ignite CLI](https://ignite.com/cli). BitBadges offers an open-source, community-driven suite of tools focused on cross-chain issuance of digital tokens (badges). This blockchain is the core of the BitBadges ecosystem.
 
