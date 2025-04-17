@@ -60,7 +60,7 @@ message QueryParamsResponse {
 }
 
 message QueryGetCollectionRequest {
-  string collectionId = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string collectionId = 1  ;
 }
 
 message QueryGetCollectionResponse {
@@ -68,7 +68,7 @@ message QueryGetCollectionResponse {
 }
 
 message QueryGetBalanceRequest {
-  string collectionId = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string collectionId = 1  ;
   string address = 2;
 }
 
@@ -85,7 +85,7 @@ message QueryGetAddressListResponse {
 }
 
 message QueryGetApprovalTrackerRequest {
-  string collectionId = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string collectionId = 5 ;
   string approvalLevel = 2; //"collection" or "incoming" or "outgoing"
   string approverAddress = 3; //if approvalLevel is "collection", leave blank
   string approvalId = 7;
@@ -99,15 +99,15 @@ message QueryGetApprovalTrackerResponse {
 }
 
 message QueryGetChallengeTrackerRequest {
-  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string collectionId = 1 ;
   string approvalLevel = 2; //"collection" or "incoming" or "outgoing"
   string approverAddress = 3; //if approvalLevel is "collection", leave blank
   string approvalId = 6;
   string challengeTrackerId = 4;
-  string leafIndex = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false]; 
+  string leafIndex = 5 ; 
 }
 
 message QueryGetChallengeTrackerResponse {
-  string numUsed = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string numUsed = 1 ;
 }
 // this line is used by starport scaffolding # 3

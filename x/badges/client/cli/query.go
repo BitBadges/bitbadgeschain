@@ -37,10 +37,10 @@ func GetQueryCmd() *cobra.Command {
 
 // // Queries an approvals tracker by ID.
 // rpc GetApprovalTracker(QueryGetApprovalTrackerRequest) returns (QueryGetApprovalTrackerResponse) {
-// 	option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_approvals_tracker/{collectionId}/{approvalLevel}/{approverAddress}/{amountTrackerId}/{trackerType}/{approvedAddress}";
+// 	option (google.api.http).get = "/bitbadges/github.com/bitbadges/bitbadgeschain/badges/get_approvals_tracker/{collectionId}/{approvalLevel}/{approverAddress}/{amountTrackerId}/{trackerType}/{approvedAddress}";
 // }
 
 // // Queries the number of times a given leaf has been used for a given merkle challenge.
 // rpc GetChallengeTracker(QueryGetChallengeTrackerRequest) returns (QueryGetChallengeTrackerResponse) {
-// 	option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{collectionId}/{approvalLevel}/{approverAddress}/{challengeTrackerId}/{leafIndex}";
+// 	option (google.api.http).get = "/bitbadges/github.com/bitbadges/bitbadgeschain/badges/get_num_used_for_challenge/{collectionId}/{approvalLevel}/{approverAddress}/{challengeTrackerId}/{leafIndex}";
 // }

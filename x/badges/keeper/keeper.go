@@ -22,6 +22,8 @@ type (
 		authority string
 
 		bankKeeper types.BankKeeper
+
+		ApprovedContractAddresses []string
 	}
 )
 
@@ -31,17 +33,19 @@ func NewKeeper(
 	logger log.Logger,
 	authority string,
 	bankKeeper types.BankKeeper,
+	ApprovedContractAddresses []string,
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
 		panic(fmt.Sprintf("invalid authority address: %s", authority))
 	}
 
 	return Keeper{
-		cdc:          cdc,
-		storeService: storeService,
-		authority:    authority,
-		logger:       logger,
-		bankKeeper:   bankKeeper,
+		cdc:                       cdc,
+		storeService:              storeService,
+		authority:                 authority,
+		logger:                    logger,
+		bankKeeper:                bankKeeper,
+		ApprovedContractAddresses: ApprovedContractAddresses,
 	}
 }
 

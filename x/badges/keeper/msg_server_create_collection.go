@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
@@ -11,6 +12,12 @@ import (
 
 func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateCollection) (*types.MsgCreateCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	creator, err := k.GetCreator(ctx, msg.Creator, msg.CreatorOverride)
+	if err != nil {
+		return nil, err
+	}
+	msg.Creator = creator
 
 	newMsg := types.MsgUniversalUpdateCollection{
 		Creator:      msg.Creator,
@@ -46,6 +53,20 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 	if err != nil {
 		return nil, err
 	}
+
+	msgBytes, err := json.Marshal(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute("msg_type", "create_collection"),
+			sdk.NewAttribute("msg", string(msgBytes)),
+		),
+	)
 
 	return &types.MsgCreateCollectionResponse{
 		CollectionId: res.CollectionId,

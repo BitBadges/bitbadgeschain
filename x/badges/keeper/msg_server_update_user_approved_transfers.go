@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
@@ -10,7 +11,14 @@ import (
 
 func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpdateUserApprovals) (*types.MsgUpdateUserApprovalsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	err := msg.CheckAndCleanMsg(ctx, true)
+
+	creator, err := k.GetCreator(ctx, msg.Creator, msg.CreatorOverride)
+	if err != nil {
+		return nil, err
+	}
+	msg.Creator = creator
+
+	err = msg.CheckAndCleanMsg(ctx, true)
 	if err != nil {
 		return nil, err
 	}
@@ -80,10 +88,17 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		return nil, err
 	}
 
+	msgBytes, err := json.Marshal(msg)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute("msg_type", "update_user_approved_transfers"),
+			sdk.NewAttribute("msg", string(msgBytes)),
 		),
 	)
 

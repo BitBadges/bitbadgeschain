@@ -176,8 +176,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 
 	anchorIBCModule := ibcfee.NewIBCMiddleware(anchormodule.NewIBCModule(app.AnchorKeeper), app.IBCFeeKeeper)
 	ibcRouter.AddRoute(anchormoduletypes.ModuleName, anchorIBCModule)
-	// badgesIBCModule := ibcfee.NewIBCMiddleware(badgesmodule.NewIBCModule(app.BadgesKeeper), app.IBCFeeKeeper)
-	// ibcRouter.AddRoute(badgesmoduletypes.ModuleName, badgesIBCModule)
 	mapsIBCModule := ibcfee.NewIBCMiddleware(mapsmodule.NewIBCModule(app.MapsKeeper), app.IBCFeeKeeper)
 	ibcRouter.AddRoute(mapsmoduletypes.ModuleName, mapsIBCModule)
 

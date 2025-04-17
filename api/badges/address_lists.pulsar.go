@@ -817,9 +817,7 @@ const (
 )
 
 // An AddressList is a list of addresses that are referenced by an ID.
-//
-// AddressLists are used for defining approvals.
-//
+// AddressLists are used in defining approvals ia a reusbale identifier.
 // Note: We also support a reserved ID system by string ID; "Mint", "!Mint"
 type AddressList struct {
 	state         protoimpl.MessageState

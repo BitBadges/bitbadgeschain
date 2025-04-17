@@ -143,6 +143,10 @@ message MsgUniversalUpdateCollection {
   
   // New isArchived timeline to set.
   repeated IsArchivedTimeline isArchivedTimeline = 26;
+
+  // Address of the original creator. Used for CosmWASM purposes. 
+  // IMPORTANT: We will override but we must trust the original creator address.
+  string creatorOverride = 27;
 }
 
 // MsgUniversalUpdateCollectionResponse is the response to MsgUniversalUpdateCollection.
@@ -218,6 +222,10 @@ message MsgUpdateCollection {
   
   // New isArchived timeline to set.
   repeated IsArchivedTimeline isArchivedTimeline = 28;
+
+  // Address of the original creator. Used for CosmWASM purposes. 
+  // IMPORTANT: We will override but we must trust the original creator address.
+  string creatorOverride = 29;
 }
 
 // MsgUpdateCollectionResponse is the response to MsgUpdateCollection.
@@ -269,6 +277,10 @@ message MsgCreateCollection {
   
   // isArchived timeline entries.
   repeated IsArchivedTimeline isArchivedTimeline = 14;
+
+  // Address of the original creator. Used for CosmWASM purposes. 
+  // IMPORTANT: We will override but we must trust the original creator address.
+  string creatorOverride = 15;
 }
 
 // MsgCreateCollectionResponse is the response to MsgCreateCollection.
@@ -287,6 +299,10 @@ message MsgCreateAddressLists {
   
   // Address lists to create.
   repeated AddressList addressLists = 2;
+
+  // Address of the original creator. Used for CosmWASM purposes. 
+  // IMPORTANT: We will override but we must trust the original creator address.
+  string creatorOverride = 3;
 }
 
 // MsgCreateAddressListsResponse is the response to MsgCreateAddressLists.
@@ -305,6 +321,10 @@ message MsgTransferBadges {
   
   // Transfers to execute.
   repeated Transfer transfers = 3;
+
+  // Address of the original creator. Used for CosmWASM purposes. 
+  // IMPORTANT: We will override but we must trust the original creator address.
+  string creatorOverride = 4;
 }
 
 // MsgTransferBadgesResponse is the response to MsgTransferBadges.
@@ -320,6 +340,10 @@ message MsgDeleteCollection {
   
   // ID of the collection.
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  // Address of the original creator. Used for CosmWASM purposes. 
+  // IMPORTANT: We will override but we must trust the original creator address.
+  string creatorOverride = 3;
 }
 
 // MsgDeleteCollectionResponse is the response to MsgDeleteCollection.
@@ -365,6 +389,10 @@ message MsgUpdateUserApprovals {
   
   // New user permissions to set.
   UserPermissions userPermissions = 12;
+
+  // Address of the original creator. Used for CosmWASM purposes. 
+  // IMPORTANT: We will override but we must trust the original creator address.
+  string creatorOverride = 13;
 }
 
 // MsgUpdateUserApprovalsResponse is the response to MsgUpdateUserApprovals.

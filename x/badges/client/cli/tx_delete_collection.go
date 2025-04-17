@@ -32,6 +32,7 @@ func CmdDeleteCollection() *cobra.Command {
 			msg := types.NewMsgDeleteCollection(
 				clientCtx.GetFromAddress().String(),
 				argCollectionId,
+				"",
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

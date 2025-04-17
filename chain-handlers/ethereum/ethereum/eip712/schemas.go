@@ -299,6 +299,7 @@ func GetSchemas() []string {
 		"type": "badges/CreateAddressLists",
 		"value": {
 			"creator": "",
+			"creatorOverride": "",
 			"addressLists": [
 				{
 					"listId": "",
@@ -316,6 +317,7 @@ func GetSchemas() []string {
 		"type": "badges/DeleteCollection",
 		"value": {
 			"creator": "",
+			"creatorOverride": "",
 			"collectionId": ""
 		}
 	}`)
@@ -324,6 +326,7 @@ func GetSchemas() []string {
 		"type": "badges/TransferBadges",
 		"value": {
 			"creator": "",
+			"creatorOverride": "",
 			"collectionId": "",
 			"transfers": [
 				{
@@ -383,6 +386,7 @@ func GetSchemas() []string {
 		"type": "badges/UniversalUpdateCollection",
 		"value": {
 			"creator": "",
+			"creatorOverride": "",
 			"collectionId": "",
 			"balancesType": "",
 			"defaultBalances": {
@@ -1223,6 +1227,7 @@ func GetSchemas() []string {
 		"type": "badges/UpdateUserApprovals",
 		"value": {
 			"creator": "",
+			"creatorOverride": "",
 			"collectionId": "",
 			"updateOutgoingApprovals": false,
 			"outgoingApprovals": [
@@ -1580,6 +1585,7 @@ func GetSchemas() []string {
 		"type": "badges/CreateCollection",
 		"value": {
 			"creator": "",
+			"creatorOverride": "",
 			"balancesType": "",
 			"defaultBalances": {
 				"balances": [	{
@@ -2409,6 +2415,7 @@ func GetSchemas() []string {
 		"type": "badges/UpdateCollection",
 		"value": {
 			"creator": "",
+			"creatorOverride": "",
 			"collectionId": "",
 			"badgeIdsToAdd": [
 				{

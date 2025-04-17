@@ -13,15 +13,63 @@ import (
 	sync "sync"
 )
 
+var _ protoreflect.List = (*_Module_2_list)(nil)
+
+type _Module_2_list struct {
+	list *[]string
+}
+
+func (x *_Module_2_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_Module_2_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfString((*x.list)[i])
+}
+
+func (x *_Module_2_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_Module_2_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_Module_2_list) AppendMutable() protoreflect.Value {
+	panic(fmt.Errorf("AppendMutable can not be called on message Module at list field ApprovedContractAddresses as it is not of Message kind"))
+}
+
+func (x *_Module_2_list) Truncate(n int) {
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_Module_2_list) NewElement() protoreflect.Value {
+	v := ""
+	return protoreflect.ValueOfString(v)
+}
+
+func (x *_Module_2_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
-	md_Module           protoreflect.MessageDescriptor
-	fd_Module_authority protoreflect.FieldDescriptor
+	md_Module                             protoreflect.MessageDescriptor
+	fd_Module_authority                   protoreflect.FieldDescriptor
+	fd_Module_approved_contract_addresses protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_badges_module_module_proto_init()
 	md_Module = File_badges_module_module_proto.Messages().ByName("Module")
 	fd_Module_authority = md_Module.Fields().ByName("authority")
+	fd_Module_approved_contract_addresses = md_Module.Fields().ByName("approved_contract_addresses")
 }
 
 var _ protoreflect.Message = (*fastReflection_Module)(nil)
@@ -95,6 +143,12 @@ func (x *fastReflection_Module) Range(f func(protoreflect.FieldDescriptor, proto
 			return
 		}
 	}
+	if len(x.ApprovedContractAddresses) != 0 {
+		value := protoreflect.ValueOfList(&_Module_2_list{list: &x.ApprovedContractAddresses})
+		if !f(fd_Module_approved_contract_addresses, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -112,6 +166,8 @@ func (x *fastReflection_Module) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	case "badges.module.Module.authority":
 		return x.Authority != ""
+	case "badges.module.Module.approved_contract_addresses":
+		return len(x.ApprovedContractAddresses) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.module.Module"))
@@ -130,6 +186,8 @@ func (x *fastReflection_Module) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	case "badges.module.Module.authority":
 		x.Authority = ""
+	case "badges.module.Module.approved_contract_addresses":
+		x.ApprovedContractAddresses = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.module.Module"))
@@ -149,6 +207,12 @@ func (x *fastReflection_Module) Get(descriptor protoreflect.FieldDescriptor) pro
 	case "badges.module.Module.authority":
 		value := x.Authority
 		return protoreflect.ValueOfString(value)
+	case "badges.module.Module.approved_contract_addresses":
+		if len(x.ApprovedContractAddresses) == 0 {
+			return protoreflect.ValueOfList(&_Module_2_list{})
+		}
+		listValue := &_Module_2_list{list: &x.ApprovedContractAddresses}
+		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.module.Module"))
@@ -171,6 +235,10 @@ func (x *fastReflection_Module) Set(fd protoreflect.FieldDescriptor, value proto
 	switch fd.FullName() {
 	case "badges.module.Module.authority":
 		x.Authority = value.Interface().(string)
+	case "badges.module.Module.approved_contract_addresses":
+		lv := value.List()
+		clv := lv.(*_Module_2_list)
+		x.ApprovedContractAddresses = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.module.Module"))
@@ -191,6 +259,12 @@ func (x *fastReflection_Module) Set(fd protoreflect.FieldDescriptor, value proto
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Module) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "badges.module.Module.approved_contract_addresses":
+		if x.ApprovedContractAddresses == nil {
+			x.ApprovedContractAddresses = []string{}
+		}
+		value := &_Module_2_list{list: &x.ApprovedContractAddresses}
+		return protoreflect.ValueOfList(value)
 	case "badges.module.Module.authority":
 		panic(fmt.Errorf("field authority of message badges.module.Module is not mutable"))
 	default:
@@ -208,6 +282,9 @@ func (x *fastReflection_Module) NewField(fd protoreflect.FieldDescriptor) protor
 	switch fd.FullName() {
 	case "badges.module.Module.authority":
 		return protoreflect.ValueOfString("")
+	case "badges.module.Module.approved_contract_addresses":
+		list := []string{}
+		return protoreflect.ValueOfList(&_Module_2_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.module.Module"))
@@ -281,6 +358,12 @@ func (x *fastReflection_Module) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
+		if len(x.ApprovedContractAddresses) > 0 {
+			for _, s := range x.ApprovedContractAddresses {
+				l = len(s)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -309,6 +392,15 @@ func (x *fastReflection_Module) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.ApprovedContractAddresses) > 0 {
+			for iNdEx := len(x.ApprovedContractAddresses) - 1; iNdEx >= 0; iNdEx-- {
+				i -= len(x.ApprovedContractAddresses[iNdEx])
+				copy(dAtA[i:], x.ApprovedContractAddresses[iNdEx])
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ApprovedContractAddresses[iNdEx])))
+				i--
+				dAtA[i] = 0x12
+			}
 		}
 		if len(x.Authority) > 0 {
 			i -= len(x.Authority)
@@ -398,6 +490,38 @@ func (x *fastReflection_Module) ProtoMethods() *protoiface.Methods {
 				}
 				x.Authority = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ApprovedContractAddresses", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ApprovedContractAddresses = append(x.ApprovedContractAddresses, string(dAtA[iNdEx:postIndex]))
+				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -454,6 +578,8 @@ type Module struct {
 
 	// authority defines the custom module authority. If not set, defaults to the governance module.
 	Authority string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
+	// approved_contract_addresses defines the list of contract addresses that are approved to override the creator.
+	ApprovedContractAddresses []string `protobuf:"bytes,2,rep,name=approved_contract_addresses,json=approvedContractAddresses,proto3" json:"approved_contract_addresses,omitempty"`
 }
 
 func (x *Module) Reset() {
@@ -483,6 +609,13 @@ func (x *Module) GetAuthority() string {
 	return ""
 }
 
+func (x *Module) GetApprovedContractAddresses() []string {
+	if x != nil {
+		return x.ApprovedContractAddresses
+	}
+	return nil
+}
+
 var File_badges_module_module_proto protoreflect.FileDescriptor
 
 var file_badges_module_module_proto_rawDesc = []byte{
@@ -490,22 +623,27 @@ var file_badges_module_module_proto_rawDesc = []byte{
 	0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0d, 0x62, 0x61,
 	0x64, 0x67, 0x65, 0x73, 0x2e, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x1a, 0x20, 0x63, 0x6f, 0x73,
 	0x6d, 0x6f, 0x73, 0x2f, 0x61, 0x70, 0x70, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31,
-	0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x47, 0x0a,
-	0x06, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f,
-	0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x61, 0x75, 0x74, 0x68,
-	0x6f, 0x72, 0x69, 0x74, 0x79, 0x3a, 0x1f, 0xba, 0xc0, 0x96, 0xda, 0x01, 0x19, 0x0a, 0x17, 0x62,
-	0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x78, 0x2f,
-	0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x42, 0x97, 0x01, 0x0a, 0x11, 0x63, 0x6f, 0x6d, 0x2e, 0x62,
-	0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x42, 0x0b, 0x4d, 0x6f,
-	0x64, 0x75, 0x6c, 0x65, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x20, 0x62, 0x69, 0x74,
-	0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f,
-	0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0xa2, 0x02, 0x03,
-	0x42, 0x4d, 0x58, 0xaa, 0x02, 0x0d, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x4d, 0x6f, 0x64,
-	0x75, 0x6c, 0x65, 0xca, 0x02, 0x0d, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x5c, 0x4d, 0x6f, 0x64,
-	0x75, 0x6c, 0x65, 0xe2, 0x02, 0x19, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x5c, 0x4d, 0x6f, 0x64,
-	0x75, 0x6c, 0x65, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea,
-	0x02, 0x0e, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x3a, 0x3a, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x9c, 0x01,
+	0x0a, 0x06, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x61, 0x75, 0x74, 0x68,
+	0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x61, 0x75, 0x74,
+	0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x12, 0x3e, 0x0a, 0x1b, 0x61, 0x70, 0x70, 0x72, 0x6f, 0x76,
+	0x65, 0x64, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74, 0x5f, 0x61, 0x64, 0x64, 0x72,
+	0x65, 0x73, 0x73, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x19, 0x61, 0x70, 0x70,
+	0x72, 0x6f, 0x76, 0x65, 0x64, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74, 0x41, 0x64, 0x64,
+	0x72, 0x65, 0x73, 0x73, 0x65, 0x73, 0x3a, 0x34, 0xba, 0xc0, 0x96, 0xda, 0x01, 0x2e, 0x0a, 0x2c,
+	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x62, 0x69, 0x74, 0x62, 0x61,
+	0x64, 0x67, 0x65, 0x73, 0x2f, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68,
+	0x61, 0x69, 0x6e, 0x2f, 0x78, 0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x42, 0x97, 0x01, 0x0a,
+	0x11, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x6d, 0x6f, 0x64, 0x75,
+	0x6c, 0x65, 0x42, 0x0b, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
+	0x01, 0x5a, 0x20, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69,
+	0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2f, 0x6d, 0x6f, 0x64,
+	0x75, 0x6c, 0x65, 0xa2, 0x02, 0x03, 0x42, 0x4d, 0x58, 0xaa, 0x02, 0x0d, 0x42, 0x61, 0x64, 0x67,
+	0x65, 0x73, 0x2e, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0xca, 0x02, 0x0d, 0x42, 0x61, 0x64, 0x67,
+	0x65, 0x73, 0x5c, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0xe2, 0x02, 0x19, 0x42, 0x61, 0x64, 0x67,
+	0x65, 0x73, 0x5c, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74,
+	0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0e, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x3a, 0x3a,
+	0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (

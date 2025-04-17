@@ -1,6 +1,7 @@
 package eip712
 
 import (
+	"encoding/json"
 	"strconv"
 	"strings"
 
@@ -87,6 +88,42 @@ func GetPopulatedSchemaForMsg(msg gjson.Result) (gjson.Result, error) {
 	//3. If no match is found, return the original msg
 
 	msgType := msg.Get("type").String()
+
+	// Check if this is a MsgExec authz message
+	if strings.Contains(msgType, "cosmos-sdk/MsgExec") && msg.Get("value.msgs").Exists() {
+		// Get the inner messages array
+		innerMsgs := msg.Get("value.msgs").Array()
+
+		// Create a new array to hold populated messages
+		populatedMsgs := make([]interface{}, len(innerMsgs))
+
+		// Process each inner message
+		for i, innerMsg := range innerMsgs {
+			populatedInnerMsg, err := GetPopulatedSchemaForMsg(innerMsg)
+			if err != nil {
+				return msg, err
+			}
+			// Store the populated message
+			populatedMsgs[i] = populatedInnerMsg.Value()
+		}
+
+		// Construct new message with populated msgs
+		newMsg := map[string]interface{}{
+			"type": msgType,
+			"value": map[string]interface{}{
+				"grantee": msg.Get("value.grantee").String(),
+				"msgs":    populatedMsgs,
+			},
+		}
+
+		jsonBytes, err := json.Marshal(newMsg)
+		if err != nil {
+			return msg, err
+		}
+
+		return gjson.ParseBytes(jsonBytes), nil
+	}
+
 	schemas := GetSchemas()
 
 	for _, schema := range schemas {
