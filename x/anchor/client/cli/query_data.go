@@ -26,7 +26,7 @@ func CmdQueryData() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			res, err := queryClient.GetValueAtLocation(cmd.Context(), &types.QueryGetValueAtLocationRequest{
-				LocationId: locationId,
+				LocationId: locationId.String(),
 			})
 			if err != nil {
 				return err

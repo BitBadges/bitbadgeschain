@@ -68,5 +68,14 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 		),
 	)
 
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent("indexer",
+			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute("msg_type", "transfer_badges"),
+			sdk.NewAttribute("msg", string(msgBytes)),
+			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
+		),
+	)
 	return &types.MsgTransferBadgesResponse{}, nil
 }

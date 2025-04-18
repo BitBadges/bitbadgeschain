@@ -24,6 +24,10 @@ type (
 		bankKeeper types.BankKeeper
 
 		ApprovedContractAddresses []string
+		PayoutAddress             string
+		EnableCoinTransfers       bool
+		AllowedDenoms             []string
+		FixedCostPerTransfer      string
 	}
 )
 
@@ -34,6 +38,10 @@ func NewKeeper(
 	authority string,
 	bankKeeper types.BankKeeper,
 	ApprovedContractAddresses []string,
+	PayoutAddress string,
+	EnableCoinTransfers bool,
+	AllowedDenoms []string,
+	FixedCostPerTransfer string,
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
 		panic(fmt.Sprintf("invalid authority address: %s", authority))
@@ -46,6 +54,10 @@ func NewKeeper(
 		logger:                    logger,
 		bankKeeper:                bankKeeper,
 		ApprovedContractAddresses: ApprovedContractAddresses,
+		PayoutAddress:             PayoutAddress,
+		EnableCoinTransfers:       EnableCoinTransfers,
+		AllowedDenoms:             AllowedDenoms,
+		FixedCostPerTransfer:      FixedCostPerTransfer,
 	}
 }
 

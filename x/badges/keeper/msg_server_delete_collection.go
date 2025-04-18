@@ -57,5 +57,13 @@ func (k msgServer) DeleteCollection(goCtx context.Context, msg *types.MsgDeleteC
 		),
 	)
 
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent("indexer",
+			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute("msg_type", "delete_collection"),
+			sdk.NewAttribute("msg", string(msgBytes)),
+		),
+	)
 	return &types.MsgDeleteCollectionResponse{}, nil
 }

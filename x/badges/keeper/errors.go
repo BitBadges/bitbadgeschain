@@ -29,4 +29,6 @@ var (
 	ErrAddressListAlreadyExists                 = sdkerrors.Register(types.ModuleName, 80, "address list already exists")
 	ErrGlobalArchive                            = sdkerrors.Register(types.ModuleName, 81, "global halt is active")
 	ErrNoMatchingChallengeForChallengeTrackerId = sdkerrors.Register(types.ModuleName, 82, "no matching challenge for challenge tracker id")
+	ErrCoinTransfersDisabled                    = sdkerrors.Register(types.ModuleName, 83, "coin transfers are disabled")
+	ErrInvalidDenom                             = sdkerrors.Register(types.ModuleName, 84, "invalid denom")
 )

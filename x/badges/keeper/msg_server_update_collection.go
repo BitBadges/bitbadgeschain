@@ -60,6 +60,15 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 		),
 	)
 
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent("indexer",
+			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute("msg_type", "update_collection"),
+			sdk.NewAttribute("msg", string(msgBytes)),
+		),
+	)
+
 	return &types.MsgUpdateCollectionResponse{
 		CollectionId: res.CollectionId,
 	}, nil

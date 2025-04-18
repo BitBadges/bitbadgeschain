@@ -68,6 +68,15 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		),
 	)
 
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent("indexer",
+			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute("msg_type", "create_collection"),
+			sdk.NewAttribute("msg", string(msgBytes)),
+		),
+	)
+
 	return &types.MsgCreateCollectionResponse{
 		CollectionId: res.CollectionId,
 	}, nil

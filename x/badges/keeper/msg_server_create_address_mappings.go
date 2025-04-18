@@ -39,5 +39,14 @@ func (k msgServer) CreateAddressLists(goCtx context.Context, msg *types.MsgCreat
 		),
 	)
 
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent("indexer",
+			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute("msg_type", "create_address_lists"),
+			sdk.NewAttribute("msg", string(msgBytes)),
+		),
+	)
+
 	return &types.MsgCreateAddressListsResponse{}, nil
 }

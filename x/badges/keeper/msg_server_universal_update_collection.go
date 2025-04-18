@@ -168,6 +168,16 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		),
 	)
 
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent("indexer",
+			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute("msg_type", "universal_update_collection"),
+			sdk.NewAttribute("msg", string(msgBytes)),
+			sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
+		),
+	)
+
 	return &types.MsgUniversalUpdateCollectionResponse{
 		CollectionId: collection.CollectionId,
 	}, nil

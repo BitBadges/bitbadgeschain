@@ -335,6 +335,10 @@ var (
 				Name: badgesmoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&badgesmodulev1.Module{
 					ApprovedContractAddresses: []string{},
+					PayoutAddress:             "bb18el5ug46umcws58m445ql5scgg2n3tzagfecvl",
+					EnableCoinTransfers:       true,
+					AllowedDenoms:             []string{"ubadge"},
+					FixedCostPerTransfer:      "0ubadge",
 				}),
 			},
 			{

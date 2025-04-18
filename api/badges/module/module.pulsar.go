@@ -59,10 +59,60 @@ func (x *_Module_2_list) IsValid() bool {
 	return x.list != nil
 }
 
+var _ protoreflect.List = (*_Module_5_list)(nil)
+
+type _Module_5_list struct {
+	list *[]string
+}
+
+func (x *_Module_5_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_Module_5_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfString((*x.list)[i])
+}
+
+func (x *_Module_5_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_Module_5_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_Module_5_list) AppendMutable() protoreflect.Value {
+	panic(fmt.Errorf("AppendMutable can not be called on message Module at list field AllowedDenoms as it is not of Message kind"))
+}
+
+func (x *_Module_5_list) Truncate(n int) {
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_Module_5_list) NewElement() protoreflect.Value {
+	v := ""
+	return protoreflect.ValueOfString(v)
+}
+
+func (x *_Module_5_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
 	md_Module                             protoreflect.MessageDescriptor
 	fd_Module_authority                   protoreflect.FieldDescriptor
 	fd_Module_approved_contract_addresses protoreflect.FieldDescriptor
+	fd_Module_payout_address              protoreflect.FieldDescriptor
+	fd_Module_enable_coin_transfers       protoreflect.FieldDescriptor
+	fd_Module_allowed_denoms              protoreflect.FieldDescriptor
+	fd_Module_fixed_cost_per_transfer     protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -70,6 +120,10 @@ func init() {
 	md_Module = File_badges_module_module_proto.Messages().ByName("Module")
 	fd_Module_authority = md_Module.Fields().ByName("authority")
 	fd_Module_approved_contract_addresses = md_Module.Fields().ByName("approved_contract_addresses")
+	fd_Module_payout_address = md_Module.Fields().ByName("payout_address")
+	fd_Module_enable_coin_transfers = md_Module.Fields().ByName("enable_coin_transfers")
+	fd_Module_allowed_denoms = md_Module.Fields().ByName("allowed_denoms")
+	fd_Module_fixed_cost_per_transfer = md_Module.Fields().ByName("fixed_cost_per_transfer")
 }
 
 var _ protoreflect.Message = (*fastReflection_Module)(nil)
@@ -149,6 +203,30 @@ func (x *fastReflection_Module) Range(f func(protoreflect.FieldDescriptor, proto
 			return
 		}
 	}
+	if x.PayoutAddress != "" {
+		value := protoreflect.ValueOfString(x.PayoutAddress)
+		if !f(fd_Module_payout_address, value) {
+			return
+		}
+	}
+	if x.EnableCoinTransfers != false {
+		value := protoreflect.ValueOfBool(x.EnableCoinTransfers)
+		if !f(fd_Module_enable_coin_transfers, value) {
+			return
+		}
+	}
+	if len(x.AllowedDenoms) != 0 {
+		value := protoreflect.ValueOfList(&_Module_5_list{list: &x.AllowedDenoms})
+		if !f(fd_Module_allowed_denoms, value) {
+			return
+		}
+	}
+	if x.FixedCostPerTransfer != "" {
+		value := protoreflect.ValueOfString(x.FixedCostPerTransfer)
+		if !f(fd_Module_fixed_cost_per_transfer, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -168,6 +246,14 @@ func (x *fastReflection_Module) Has(fd protoreflect.FieldDescriptor) bool {
 		return x.Authority != ""
 	case "badges.module.Module.approved_contract_addresses":
 		return len(x.ApprovedContractAddresses) != 0
+	case "badges.module.Module.payout_address":
+		return x.PayoutAddress != ""
+	case "badges.module.Module.enable_coin_transfers":
+		return x.EnableCoinTransfers != false
+	case "badges.module.Module.allowed_denoms":
+		return len(x.AllowedDenoms) != 0
+	case "badges.module.Module.fixed_cost_per_transfer":
+		return x.FixedCostPerTransfer != ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.module.Module"))
@@ -188,6 +274,14 @@ func (x *fastReflection_Module) Clear(fd protoreflect.FieldDescriptor) {
 		x.Authority = ""
 	case "badges.module.Module.approved_contract_addresses":
 		x.ApprovedContractAddresses = nil
+	case "badges.module.Module.payout_address":
+		x.PayoutAddress = ""
+	case "badges.module.Module.enable_coin_transfers":
+		x.EnableCoinTransfers = false
+	case "badges.module.Module.allowed_denoms":
+		x.AllowedDenoms = nil
+	case "badges.module.Module.fixed_cost_per_transfer":
+		x.FixedCostPerTransfer = ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.module.Module"))
@@ -213,6 +307,21 @@ func (x *fastReflection_Module) Get(descriptor protoreflect.FieldDescriptor) pro
 		}
 		listValue := &_Module_2_list{list: &x.ApprovedContractAddresses}
 		return protoreflect.ValueOfList(listValue)
+	case "badges.module.Module.payout_address":
+		value := x.PayoutAddress
+		return protoreflect.ValueOfString(value)
+	case "badges.module.Module.enable_coin_transfers":
+		value := x.EnableCoinTransfers
+		return protoreflect.ValueOfBool(value)
+	case "badges.module.Module.allowed_denoms":
+		if len(x.AllowedDenoms) == 0 {
+			return protoreflect.ValueOfList(&_Module_5_list{})
+		}
+		listValue := &_Module_5_list{list: &x.AllowedDenoms}
+		return protoreflect.ValueOfList(listValue)
+	case "badges.module.Module.fixed_cost_per_transfer":
+		value := x.FixedCostPerTransfer
+		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.module.Module"))
@@ -239,6 +348,16 @@ func (x *fastReflection_Module) Set(fd protoreflect.FieldDescriptor, value proto
 		lv := value.List()
 		clv := lv.(*_Module_2_list)
 		x.ApprovedContractAddresses = *clv.list
+	case "badges.module.Module.payout_address":
+		x.PayoutAddress = value.Interface().(string)
+	case "badges.module.Module.enable_coin_transfers":
+		x.EnableCoinTransfers = value.Bool()
+	case "badges.module.Module.allowed_denoms":
+		lv := value.List()
+		clv := lv.(*_Module_5_list)
+		x.AllowedDenoms = *clv.list
+	case "badges.module.Module.fixed_cost_per_transfer":
+		x.FixedCostPerTransfer = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.module.Module"))
@@ -265,8 +384,20 @@ func (x *fastReflection_Module) Mutable(fd protoreflect.FieldDescriptor) protore
 		}
 		value := &_Module_2_list{list: &x.ApprovedContractAddresses}
 		return protoreflect.ValueOfList(value)
+	case "badges.module.Module.allowed_denoms":
+		if x.AllowedDenoms == nil {
+			x.AllowedDenoms = []string{}
+		}
+		value := &_Module_5_list{list: &x.AllowedDenoms}
+		return protoreflect.ValueOfList(value)
 	case "badges.module.Module.authority":
 		panic(fmt.Errorf("field authority of message badges.module.Module is not mutable"))
+	case "badges.module.Module.payout_address":
+		panic(fmt.Errorf("field payout_address of message badges.module.Module is not mutable"))
+	case "badges.module.Module.enable_coin_transfers":
+		panic(fmt.Errorf("field enable_coin_transfers of message badges.module.Module is not mutable"))
+	case "badges.module.Module.fixed_cost_per_transfer":
+		panic(fmt.Errorf("field fixed_cost_per_transfer of message badges.module.Module is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.module.Module"))
@@ -285,6 +416,15 @@ func (x *fastReflection_Module) NewField(fd protoreflect.FieldDescriptor) protor
 	case "badges.module.Module.approved_contract_addresses":
 		list := []string{}
 		return protoreflect.ValueOfList(&_Module_2_list{list: &list})
+	case "badges.module.Module.payout_address":
+		return protoreflect.ValueOfString("")
+	case "badges.module.Module.enable_coin_transfers":
+		return protoreflect.ValueOfBool(false)
+	case "badges.module.Module.allowed_denoms":
+		list := []string{}
+		return protoreflect.ValueOfList(&_Module_5_list{list: &list})
+	case "badges.module.Module.fixed_cost_per_transfer":
+		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.module.Module"))
@@ -364,6 +504,23 @@ func (x *fastReflection_Module) ProtoMethods() *protoiface.Methods {
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
+		l = len(x.PayoutAddress)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.EnableCoinTransfers {
+			n += 2
+		}
+		if len(x.AllowedDenoms) > 0 {
+			for _, s := range x.AllowedDenoms {
+				l = len(s)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
+		}
+		l = len(x.FixedCostPerTransfer)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -392,6 +549,39 @@ func (x *fastReflection_Module) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.FixedCostPerTransfer) > 0 {
+			i -= len(x.FixedCostPerTransfer)
+			copy(dAtA[i:], x.FixedCostPerTransfer)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.FixedCostPerTransfer)))
+			i--
+			dAtA[i] = 0x32
+		}
+		if len(x.AllowedDenoms) > 0 {
+			for iNdEx := len(x.AllowedDenoms) - 1; iNdEx >= 0; iNdEx-- {
+				i -= len(x.AllowedDenoms[iNdEx])
+				copy(dAtA[i:], x.AllowedDenoms[iNdEx])
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(x.AllowedDenoms[iNdEx])))
+				i--
+				dAtA[i] = 0x2a
+			}
+		}
+		if x.EnableCoinTransfers {
+			i--
+			if x.EnableCoinTransfers {
+				dAtA[i] = 1
+			} else {
+				dAtA[i] = 0
+			}
+			i--
+			dAtA[i] = 0x20
+		}
+		if len(x.PayoutAddress) > 0 {
+			i -= len(x.PayoutAddress)
+			copy(dAtA[i:], x.PayoutAddress)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.PayoutAddress)))
+			i--
+			dAtA[i] = 0x1a
 		}
 		if len(x.ApprovedContractAddresses) > 0 {
 			for iNdEx := len(x.ApprovedContractAddresses) - 1; iNdEx >= 0; iNdEx-- {
@@ -522,6 +712,122 @@ func (x *fastReflection_Module) ProtoMethods() *protoiface.Methods {
 				}
 				x.ApprovedContractAddresses = append(x.ApprovedContractAddresses, string(dAtA[iNdEx:postIndex]))
 				iNdEx = postIndex
+			case 3:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PayoutAddress", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.PayoutAddress = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 4:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field EnableCoinTransfers", wireType)
+				}
+				var v int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				x.EnableCoinTransfers = bool(v != 0)
+			case 5:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AllowedDenoms", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.AllowedDenoms = append(x.AllowedDenoms, string(dAtA[iNdEx:postIndex]))
+				iNdEx = postIndex
+			case 6:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field FixedCostPerTransfer", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.FixedCostPerTransfer = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -580,6 +886,14 @@ type Module struct {
 	Authority string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
 	// approved_contract_addresses defines the list of contract addresses that are approved to override the creator.
 	ApprovedContractAddresses []string `protobuf:"bytes,2,rep,name=approved_contract_addresses,json=approvedContractAddresses,proto3" json:"approved_contract_addresses,omitempty"`
+	// payout_address defines where to send the revenue from the module
+	PayoutAddress string `protobuf:"bytes,3,opt,name=payout_address,json=payoutAddress,proto3" json:"payout_address,omitempty"`
+	// whether to allow coin_transfers in the approval interface
+	EnableCoinTransfers bool `protobuf:"varint,4,opt,name=enable_coin_transfers,json=enableCoinTransfers,proto3" json:"enable_coin_transfers,omitempty"`
+	// allowed_denoms defines the list of denoms that are allowed to be used in coin_transfers
+	AllowedDenoms []string `protobuf:"bytes,5,rep,name=allowed_denoms,json=allowedDenoms,proto3" json:"allowed_denoms,omitempty"`
+	// fixed_cost_per_transfer defines the fixed cost per transfer
+	FixedCostPerTransfer string `protobuf:"bytes,6,opt,name=fixed_cost_per_transfer,json=fixedCostPerTransfer,proto3" json:"fixed_cost_per_transfer,omitempty"`
 }
 
 func (x *Module) Reset() {
@@ -616,6 +930,34 @@ func (x *Module) GetApprovedContractAddresses() []string {
 	return nil
 }
 
+func (x *Module) GetPayoutAddress() string {
+	if x != nil {
+		return x.PayoutAddress
+	}
+	return ""
+}
+
+func (x *Module) GetEnableCoinTransfers() bool {
+	if x != nil {
+		return x.EnableCoinTransfers
+	}
+	return false
+}
+
+func (x *Module) GetAllowedDenoms() []string {
+	if x != nil {
+		return x.AllowedDenoms
+	}
+	return nil
+}
+
+func (x *Module) GetFixedCostPerTransfer() string {
+	if x != nil {
+		return x.FixedCostPerTransfer
+	}
+	return ""
+}
+
 var File_badges_module_module_proto protoreflect.FileDescriptor
 
 var file_badges_module_module_proto_rawDesc = []byte{
@@ -623,27 +965,39 @@ var file_badges_module_module_proto_rawDesc = []byte{
 	0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0d, 0x62, 0x61,
 	0x64, 0x67, 0x65, 0x73, 0x2e, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x1a, 0x20, 0x63, 0x6f, 0x73,
 	0x6d, 0x6f, 0x73, 0x2f, 0x61, 0x70, 0x70, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31,
-	0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x9c, 0x01,
+	0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xd5, 0x02,
 	0x0a, 0x06, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x61, 0x75, 0x74, 0x68,
 	0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x61, 0x75, 0x74,
 	0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x12, 0x3e, 0x0a, 0x1b, 0x61, 0x70, 0x70, 0x72, 0x6f, 0x76,
 	0x65, 0x64, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74, 0x5f, 0x61, 0x64, 0x64, 0x72,
 	0x65, 0x73, 0x73, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x19, 0x61, 0x70, 0x70,
 	0x72, 0x6f, 0x76, 0x65, 0x64, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74, 0x41, 0x64, 0x64,
-	0x72, 0x65, 0x73, 0x73, 0x65, 0x73, 0x3a, 0x34, 0xba, 0xc0, 0x96, 0xda, 0x01, 0x2e, 0x0a, 0x2c,
-	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x62, 0x69, 0x74, 0x62, 0x61,
-	0x64, 0x67, 0x65, 0x73, 0x2f, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68,
-	0x61, 0x69, 0x6e, 0x2f, 0x78, 0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x42, 0x97, 0x01, 0x0a,
-	0x11, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x6d, 0x6f, 0x64, 0x75,
-	0x6c, 0x65, 0x42, 0x0b, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
-	0x01, 0x5a, 0x20, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69,
-	0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2f, 0x6d, 0x6f, 0x64,
-	0x75, 0x6c, 0x65, 0xa2, 0x02, 0x03, 0x42, 0x4d, 0x58, 0xaa, 0x02, 0x0d, 0x42, 0x61, 0x64, 0x67,
-	0x65, 0x73, 0x2e, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0xca, 0x02, 0x0d, 0x42, 0x61, 0x64, 0x67,
-	0x65, 0x73, 0x5c, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0xe2, 0x02, 0x19, 0x42, 0x61, 0x64, 0x67,
-	0x65, 0x73, 0x5c, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74,
-	0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0e, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x3a, 0x3a,
-	0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x65, 0x73, 0x73, 0x65, 0x73, 0x12, 0x25, 0x0a, 0x0e, 0x70, 0x61, 0x79, 0x6f, 0x75, 0x74,
+	0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d,
+	0x70, 0x61, 0x79, 0x6f, 0x75, 0x74, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x32, 0x0a,
+	0x15, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x63, 0x6f, 0x69, 0x6e, 0x5f, 0x74, 0x72, 0x61,
+	0x6e, 0x73, 0x66, 0x65, 0x72, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x08, 0x52, 0x13, 0x65, 0x6e,
+	0x61, 0x62, 0x6c, 0x65, 0x43, 0x6f, 0x69, 0x6e, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72,
+	0x73, 0x12, 0x25, 0x0a, 0x0e, 0x61, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x64, 0x5f, 0x64, 0x65, 0x6e,
+	0x6f, 0x6d, 0x73, 0x18, 0x05, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0d, 0x61, 0x6c, 0x6c, 0x6f, 0x77,
+	0x65, 0x64, 0x44, 0x65, 0x6e, 0x6f, 0x6d, 0x73, 0x12, 0x35, 0x0a, 0x17, 0x66, 0x69, 0x78, 0x65,
+	0x64, 0x5f, 0x63, 0x6f, 0x73, 0x74, 0x5f, 0x70, 0x65, 0x72, 0x5f, 0x74, 0x72, 0x61, 0x6e, 0x73,
+	0x66, 0x65, 0x72, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x14, 0x66, 0x69, 0x78, 0x65, 0x64,
+	0x43, 0x6f, 0x73, 0x74, 0x50, 0x65, 0x72, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x3a,
+	0x34, 0xba, 0xc0, 0x96, 0xda, 0x01, 0x2e, 0x0a, 0x2c, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
+	0x63, 0x6f, 0x6d, 0x2f, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2f, 0x62, 0x69,
+	0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x78, 0x2f, 0x62,
+	0x61, 0x64, 0x67, 0x65, 0x73, 0x42, 0x97, 0x01, 0x0a, 0x11, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61,
+	0x64, 0x67, 0x65, 0x73, 0x2e, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x42, 0x0b, 0x4d, 0x6f, 0x64,
+	0x75, 0x6c, 0x65, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x20, 0x62, 0x69, 0x74, 0x62,
+	0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62,
+	0x61, 0x64, 0x67, 0x65, 0x73, 0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0xa2, 0x02, 0x03, 0x42,
+	0x4d, 0x58, 0xaa, 0x02, 0x0d, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x4d, 0x6f, 0x64, 0x75,
+	0x6c, 0x65, 0xca, 0x02, 0x0d, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x5c, 0x4d, 0x6f, 0x64, 0x75,
+	0x6c, 0x65, 0xe2, 0x02, 0x19, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x5c, 0x4d, 0x6f, 0x64, 0x75,
+	0x6c, 0x65, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02,
+	0x0e, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x3a, 0x3a, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (

@@ -218,6 +218,10 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		authority.String(),
 		in.BankKeeper,
 		in.Config.ApprovedContractAddresses,
+		in.Config.PayoutAddress,
+		in.Config.EnableCoinTransfers,
+		in.Config.AllowedDenoms,
+		in.Config.FixedCostPerTransfer,
 	)
 	m := NewAppModule(
 		in.Cdc,

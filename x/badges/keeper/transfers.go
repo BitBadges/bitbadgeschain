@@ -111,6 +111,15 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 						sdk.NewAttribute("transfer", amountsStr),
 					),
 				)
+
+				ctx.EventManager().EmitEvent(
+					sdk.NewEvent("indexer",
+						sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+						sdk.NewAttribute("creator", initiatedBy),
+						sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
+						sdk.NewAttribute("transfer", amountsStr),
+					),
+				)
 			}
 
 			fromUserBalance, toUserBalance, err = k.HandleTransfer(ctx, collection, transfer, fromUserBalance, toUserBalance, transfer.From, to, initiatedBy)
@@ -120,6 +129,28 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 
 			if err := k.SetBalanceForAddress(ctx, collection, to, toUserBalance); err != nil {
 				return err
+			}
+
+			if k.PayoutAddress != "" && k.FixedCostPerTransfer != "" {
+				cost, err := sdk.ParseCoinNormalized(k.FixedCostPerTransfer)
+				if err != nil {
+					return err
+				}
+
+				payoutAddressAcc, err := sdk.AccAddressFromBech32(k.PayoutAddress)
+				if err != nil {
+					return err
+				}
+
+				fromAddressAcc, err := sdk.AccAddressFromBech32(initiatedBy)
+				if err != nil {
+					return err
+				}
+
+				err = k.bankKeeper.SendCoins(ctx, fromAddressAcc, payoutAddressAcc, sdk.NewCoins(cost))
+				if err != nil {
+					return sdkerrors.Wrapf(err, "error completing required payout. each transfer costs %s", cost)
+				}
 			}
 		}
 

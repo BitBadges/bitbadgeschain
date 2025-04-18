@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"slices"
+
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkerrors "cosmossdk.io/errors"
@@ -8,6 +10,21 @@ import (
 )
 
 func (k Keeper) HandleCoinTransfers(ctx sdk.Context, coinTransfers []*types.CoinTransfer, initiatedBy string, simulate bool) error {
+	if len(coinTransfers) == 0 {
+		return nil
+	}
+
+	if !k.EnableCoinTransfers {
+		return sdkerrors.Wrap(ErrCoinTransfersDisabled, "coin transfers are disabled")
+	}
+
+	if len(k.AllowedDenoms) > 0 {
+		for _, coinTransfer := range coinTransfers {
+			if !slices.Contains(k.AllowedDenoms, coinTransfer.Coins[0].Denom) {
+				return sdkerrors.Wrapf(ErrInvalidDenom, "denom %s is not allowed", coinTransfer.Coins[0].Denom)
+			}
+		}
+	}
 
 	//simulate the sdk.Coin transfers
 	initiatedByAcc := sdk.MustAccAddressFromBech32(initiatedBy)

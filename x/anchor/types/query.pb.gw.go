@@ -22,8 +22,6 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-
-	sdkmath "cosmossdk.io/math"
 )
 
 // Suppress "imported and not used" errors
@@ -69,10 +67,7 @@ func request_Query_GetValueAtLocation_0(ctx context.Context, marshaler runtime.M
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "locationId")
 	}
 
-	protoReq.LocationId = sdkmath.NewUintFromString(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
-	}
+	protoReq.LocationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "locationId", err)
@@ -99,10 +94,7 @@ func local_request_Query_GetValueAtLocation_0(ctx context.Context, marshaler run
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "locationId")
 	}
 
-	protoReq.LocationId = sdkmath.NewUintFromString(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
-	}
+	protoReq.LocationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "locationId", err)

@@ -8,6 +8,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	sdkmath "cosmossdk.io/math"
 )
 
 func (k Keeper) GetValueAtLocation(goCtx context.Context, req *types.QueryGetValueAtLocationRequest) (*types.QueryGetValueAtLocationResponse, error) {
@@ -16,6 +18,7 @@ func (k Keeper) GetValueAtLocation(goCtx context.Context, req *types.QueryGetVal
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	val := k.GetAnchorLocation(ctx, req.LocationId)
+	locationId := sdkmath.NewUintFromString(req.LocationId)
+	val := k.GetAnchorLocation(ctx, locationId)
 	return &types.QueryGetValueAtLocationResponse{AnchorData: val}, nil
 }

@@ -36,7 +36,7 @@ message QueryParamsResponse {
 
 
 message QueryGetValueAtLocationRequest {
-  string locationId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string locationId = 1;
 }
 
 message QueryGetValueAtLocationResponse {

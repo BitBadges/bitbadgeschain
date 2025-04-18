@@ -97,7 +97,16 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		sdk.NewEvent(sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "update_user_approved_transfers"),
+			sdk.NewAttribute("msg_type", "update_user_approvals"),
+			sdk.NewAttribute("msg", string(msgBytes)),
+		),
+	)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent("indexer",
+			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute("msg_type", "update_user_approvals"),
 			sdk.NewAttribute("msg", string(msgBytes)),
 		),
 	)
