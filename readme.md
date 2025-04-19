@@ -93,6 +93,8 @@ Couple of development notes:
 ## Additional Information
 
 The code related to handling EIP-712 signatures is forked and adapted from the ethermint repository [here](https://github.com/evmos/ethermint)
-licensed under LGPL-3.0. This repository is also licensed under LGPL-3.0.
+licensed under LGPL-3.0. 
+
+This repo and the badge modules are registered under US Copyright, and this repository is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.
 
 
